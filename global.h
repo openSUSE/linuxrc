@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
-#define LXRC_VERSION  "1.1.7"
+#define LXRC_VERSION  "1.1.8"
 
 #ifdef LINUXRC_AXP
 #define MEM_LIMIT1_RAMDISK    50000000
@@ -70,6 +70,8 @@
 
 #define ACT_DEMO		(1 << 0)
 #define ACT_DEMO_LANG_SEL	(1 << 1)
+#define ACT_LOAD_NET		(1 << 2)
+#define ACT_LOAD_DISK		(1 << 3)
 
 enum langid_t
     {

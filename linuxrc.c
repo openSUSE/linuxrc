@@ -322,13 +322,13 @@ static void lxrc_init (void)
            if (strstr (s, ",demo,"))
                {
                demo_ig = TRUE;
-               action_ig |= ACT_DEMO | ACT_DEMO_LANG_SEL;
+               action_ig |= ACT_DEMO | ACT_DEMO_LANG_SEL | ACT_LOAD_DISK;
                }
 
            if (strstr (s, ",eval,"))
                {
                demo_ig = TRUE;
-               action_ig |= ACT_DEMO;
+               action_ig |= ACT_DEMO | ACT_LOAD_DISK;
                }
 
            if (strstr (s, ",reboot,"))
@@ -339,6 +339,11 @@ static void lxrc_init (void)
 
            if (strstr (s, ",yast2,"))
                yast_version_ig = 2;
+
+           if (strstr (s, ",loadnet,"))
+               {
+               action_ig |= ACT_LOAD_NET;
+               }
 
            free (s);
            }

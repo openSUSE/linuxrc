@@ -409,7 +409,13 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
       }
 
       /* some module was loaded...; in demo mode activate all disks */
-      if(!(demo_ig && base_class == bc_storage) && di) break;
+      if(
+        !(
+          ((action_ig & ACT_LOAD_DISK) && base_class == bc_storage) ||
+          ((action_ig & ACT_LOAD_NET) && base_class == bc_network)
+        ) &&
+        di
+      ) break;
     }
 
     di0 = hd_free_driver_info(di0);
