@@ -44,8 +44,7 @@ endif
 %.o:	%.c
 	$(CC) $(CFLAGS) $(WARN) -o $@ $<
 
-default:
-	libs linuxrc
+default: libs linuxrc
 
 linuxrc: $(OBJ) $(LIBS)
 	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd -o $@
