@@ -33,9 +33,6 @@
 #include "window.h"
 #include "module.h"
 #include "net.h"
-#if WITH_PCMCIA
-#include "pcmcia.h"
-#endif
 #include "install.h"
 #include "settings.h"
 #include "file.h"

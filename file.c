@@ -25,9 +25,6 @@
 #include "net.h"
 #include "settings.h"
 #include "auto2.h"
-#if WITH_PCMCIA
-#include "pcmcia.h"
-#endif
 #include "rootimage.h"
 #include "display.h"
 

@@ -26,9 +26,6 @@
 #include "display.h"
 #include "window.h"
 #include "modparms.h"
-#if WITH_PCMCIA
-#include "pcmcia.h"
-#endif
 #include "rootimage.h"
 #include "net.h"
 #include "info.h"

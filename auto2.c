@@ -33,7 +33,6 @@
 #include "auto2.h"
 #include "settings.h"
 #include "modparms.h"
-#include "pcmcia.h"
 
 
 #ifdef USE_LIBHD
@@ -686,7 +685,7 @@ int auto2_init()
       if(i)
         deb_msg("Oops: card manager didn't start.");
       else {
-        pcmcia_core_loaded_im = TRUE;
+//        pcmcia_core_loaded_im = TRUE;
         deb_msg("card manager ok.");
       }
       /* wait for cards to be activated... */
