@@ -61,6 +61,7 @@ static void put_short(int fd, unsigned short data);
 static void put_int(int fd, unsigned data);
 static unsigned mkdosfs(int fd, unsigned size);
 static void do_cp(char *src_dir, char *dst_dir, char *name);
+static void util_disable_splash(void);
 
 void util_redirect_kmsg (void)
     {
@@ -312,6 +313,8 @@ void util_print_banner (void)
     struct utsname utsinfo_ri;
 
     if(auto2_ig) return;
+
+    util_disable_splash();
 
     memset (&win_ri, 0, sizeof (window_t));
     win_ri.x_left = 1;
@@ -979,5 +982,34 @@ int util_cat_main(int argc, char **argv)
   }
 
   return 0;
+}
+
+/* disable kernel graphics screen */
+void util_disable_splash()
+{
+  FILE *f;
+  int fd;
+  struct winsize winsize;
+
+  if((f = fopen("/proc/splash", "w"))) {
+    fprintf(f, "0\n");
+    fclose(f);
+
+    fd = open(console_tg, O_RDWR);
+    if(fd >= 0) {
+      if(!ioctl(fd, TIOCGWINSZ, &winsize)) {
+        if(winsize.ws_col && winsize.ws_row) {
+          if(winsize.ws_col != max_x_ig || winsize.ws_row != max_y_ig) {
+            disp_end();
+            max_x_ig = winsize.ws_col;
+            max_y_ig = winsize.ws_row;
+            disp_init();
+            disp_set_display(color_ig ? 1 : 2);
+          }
+        }
+      }
+    }
+  }
+
 }
 
