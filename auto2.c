@@ -589,13 +589,13 @@ int activate_driver(hd_t *hd, slist_t **mod_list)
   if(hd->is.notready) return 1;
 
   for(di = hd->driver_info; di; di = di->next) {
-    if(di->module.type == di_module && !di->module.modprobe) {
+    if(di->module.type == di_module) {
       for(
         sl1 = di->module.names, sl2 = di->module.mod_args;
         sl1 && sl2;
         sl1 = sl1->next, sl2 = sl2->next
       ) {
-        mod_insmod(sl1->str, sl2->str);
+        di->module.modprobe ? mod_modprobe(sl1->str, sl2->str) : mod_insmod(sl1->str, sl2->str);
         if(mod_list) {
           slm = slist_add(mod_list, slist_new());
           str_copy(&slm->key, sl1->str);

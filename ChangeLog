@@ -1,3 +1,6 @@
+11/8/2003:	v1.5.7
+	- support modprobe libhd entries
+
 31/7/2003:	v1.5.6
 	- make 'boot installed system' work again
 	- shut down correct network interface (#27839, #28261)
