@@ -49,6 +49,7 @@ static int auto2_net_dev(hd_t **);
 static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
+static void auto2_chk_x11i(void);
 static int auto2_find_floppy(void);
 static void auto2_find_mouse(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
@@ -458,6 +459,7 @@ int auto2_init()
   unsigned last_idx;
   hd_t *hd_devs = NULL;
 
+  auto2_chk_x11i();
   auto2_chk_frame_buffer();
 
   deb_msg("Beginning hardware probing...");
@@ -637,6 +639,32 @@ void auto2_chk_frame_buffer()
   }
 
   if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
+}
+
+
+/*
+ * Read "x11i=" entry from the kernel command line.
+ */
+void auto2_chk_x11i()
+{
+  FILE *f;
+  char buf[256], *s, *t;
+  char x11i[64];
+
+  *x11i = 0;
+
+  if((f = fopen("/proc/cmdline", "r"))) {
+    if(fread(buf, 1, sizeof buf, f)) {
+      t = buf;
+      while((s = strsep(&t, " "))) {
+        if(sscanf(s, "x11i=%60s", x11i) == 1) {
+          x11i_tg = strdup(x11i);
+          break;
+        }
+      }
+    }
+    fclose(f);
+  }
 }
 
 
@@ -846,7 +874,7 @@ char *auto2_xserver(char **version, char **busid)
   static char display[16];
   static char xf86_ver[2];
   static char id[32];
-  char c, *x11i = getenv("x11i");
+  char c, *x11i = x11i_tg;
   static driver_info_t *di0 = NULL;
   driver_info_t *di;
   hd_t *hd;

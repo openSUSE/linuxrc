@@ -98,3 +98,4 @@ unsigned        action_ig = 0;
 int             reboot_wait_ig = FALSE;
 char            *braille_ig = NULL;
 char            *braille_dev_ig = NULL;
+char            *x11i_tg = NULL;

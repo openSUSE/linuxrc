@@ -277,7 +277,7 @@ void file_write_yast_info (char *file_name)
         fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
         if(*t) fprintf (file_pri, "%s %s\n", file_txt_xversion_tm, t);
         if(*v) fprintf (file_pri, "%s %s\n", file_txt_xbusid_tm, v);
-        if((v = getenv("X11i"))) fprintf (file_pri, "%s %s\n", file_txt_x11i_tm, v);
+        if(x11i_tg) fprintf (file_pri, "%s %s\n", file_txt_x11i_tm, x11i_tg);
         auto2_print_x11_opts(file_pri);
       }
     }

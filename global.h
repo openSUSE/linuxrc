@@ -236,3 +236,4 @@ extern unsigned        action_ig;
 extern int             reboot_wait_ig;
 extern char            *braille_ig;
 extern char            *braille_dev_ig;
+extern char            *x11i_tg;
