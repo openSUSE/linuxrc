@@ -42,8 +42,9 @@ static char *auto2_loaded_module = NULL;
 static char *auto2_loaded_module_args = NULL;
 
 static char *auto2_device_name(hd_t *hd);
-static int auto2_cdrom_dev(void);
-static int auto2_net_dev(void);
+static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
+static int auto2_cdrom_dev(hd_t **);
+static int auto2_net_dev(hd_t **);
 static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
@@ -237,6 +238,18 @@ void auto2_scan_hardware(char *log_file)
 }
 
 
+hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd)
+{
+  while(*hd) hd = &(*hd)->next;
+
+  *hd = calloc(sizeof **hd, 1);
+  **hd = *new_hd;
+  (*hd)->next = NULL;
+
+  return *hd;
+}
+
+
 /*
  * Look for a SuSE CD and mount it.
  *
@@ -246,13 +259,14 @@ void auto2_scan_hardware(char *log_file)
  *   2: CD found, but mount failed
  *
  */
-int auto2_cdrom_dev()
+int auto2_cdrom_dev(hd_t **hd0)
 {
   int i = 1;
   hd_t *hd;
   cdrom_info_t *ci;
 
-  for(hd = hd_cd_list(hd_data, 2); hd; hd = hd->next) {
+  for(hd = hd_list(hd_data, hw_cdrom, 1, *hd0); hd; hd = hd->next) {
+    add_hd_entry(hd0, hd);
     if(
       hd->unix_dev_name &&
       hd->detail &&
@@ -291,11 +305,12 @@ int auto2_cdrom_dev()
  *   0: OK
  *   1: oops
  */
-int auto2_net_dev()
+int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
 
-  for(hd = hd_net_list(hd_data, 2); hd; hd = hd->next) {
+  for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
+    add_hd_entry(hd0, hd);
     if(hd->unix_dev_name && strcmp(hd->unix_dev_name, "lo")) {
 
       /* net_stop() - just in case */
@@ -439,6 +454,7 @@ int auto2_init()
 {
   int i;
   unsigned last_idx;
+  hd_t *hd_devs = NULL;
 
   auto2_chk_frame_buffer();
 
@@ -491,7 +507,7 @@ int auto2_init()
 
   if(bootmode_ig == BOOTMODE_CD) {
     deb_msg("Looking for a SuSE CD...");
-    if(!(i = auto2_cdrom_dev())) {
+    if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
       if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
       return TRUE;
@@ -512,7 +528,7 @@ int auto2_init()
       }
 
       fprintf(stderr, "Looking for a SuSE CD again...\n");
-      if(!(i = auto2_cdrom_dev())) {
+      if(!(i = auto2_cdrom_dev(&hd_devs))) {
         if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
         if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
         return TRUE;
@@ -541,7 +557,7 @@ int auto2_init()
   if((valid_net_config_ig & 0x10))
     fprintf(stderr, "name srv:  %s\n", inet_ntoa(nameserver_rg));
 
-  if(!auto2_net_dev()) {
+  if(!auto2_net_dev(&hd_devs)) {
     if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
     return TRUE;
   }
@@ -555,7 +571,7 @@ int auto2_init()
     }
 
     fprintf(stderr, "Looking for a NFS/FTP server again...\n");
-    if(!auto2_net_dev()) {
+    if(!auto2_net_dev(&hd_devs)) {
       if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
       return TRUE;
     }
@@ -769,15 +785,18 @@ char *auto2_usb_module()
 /*
  * Assumes xf86_ver to be either "3" or "4" (or empty).
  */
-char *auto2_xserver(char **version)
+char *auto2_xserver(char **version, char **busid)
 {
   static char display[16];
   static char xf86_ver[2];
+  static char id[32];
   char c, *x11i = getenv("x11i");
   driver_info_t *di, *di0;
+  hd_t *hd;
 
-  *display = *xf86_ver = c = 0;
+  *display = *xf86_ver = *id = c = 0;
   *version = xf86_ver;
+  *busid = id;
 
   if(x11i) {
     if(*x11i == '3' || *x11i == '4') {
@@ -799,11 +818,14 @@ char *auto2_xserver(char **version)
 
   if(c) { xf86_ver[0] = c; xf86_ver[1] = 0; }
 
-  if(*display) return display;
-
   if(!hd_data) return NULL;
 
-  di0 = hd_driver_info(hd_data, hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data)));
+  hd = hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data));
+  if(hd) sprintf(id, "%d:%d:%d", hd->slot >> 8, hd->slot & 0xff, hd->func);
+
+  if(*display) return display;
+
+  di0 = hd_driver_info(hd_data, hd);
   for(di = di0; di; di = di->next) {
     if(di->any.type == di_x11 && di->x11.server && di->x11.xf86_ver && !di->x11.x3d) {
       if(c == 0 || c == di->x11.xf86_ver[0]) {
@@ -852,7 +874,7 @@ char *auto2_disk_list(int *boot_disk)
     }
   }
 
-  for(hd = hd_disk_list(hd_data, 1); hd; hd = hd->next) {
+  for(hd = hd_list(hd_data, hw_disk, 1, NULL); hd; hd = hd->next) {
     if(hd->unix_dev_name && strcmp(bdev, hd->unix_dev_name)) {
       if(*buf) strcat(buf, " ");
       strcat(buf, hd->unix_dev_name);

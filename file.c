@@ -83,6 +83,8 @@ static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
 static const char  *file_txt_usb_tm            = "USB:";
 static const char  *file_txt_xserver_tm        = "XServer:";
 static const char  *file_txt_xversion_tm       = "XVersion:";
+static const char  *file_txt_xbusid_tm         = "XBusID:";
+static const char  *file_txt_x11i_tm           = "X11i:";
 static const char  *file_probe_tm              = "probe:";
 static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
@@ -262,11 +264,13 @@ void file_write_yast_info (char *file_name)
 
     fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
     {
-      char *s, *t;
-      s = auto2_xserver(&t);
-      if(s && t) {
+      char *s, *t, *v;
+      s = auto2_xserver(&t, &v);
+      if(s && *s) {
         fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
-        fprintf (file_pri, "%s %s\n", file_txt_xversion_tm, t);
+        if(*t) fprintf (file_pri, "%s %s\n", file_txt_xversion_tm, t);
+        if(*v) fprintf (file_pri, "%s %s\n", file_txt_xbusid_tm, v);
+        if((v = getenv("X11i"))) fprintf (file_pri, "%s %s\n", file_txt_x11i_tm, v);
       }
     }
     if(*xkbrules_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbrules_tm, xkbrules_tg);

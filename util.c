@@ -593,9 +593,7 @@ int util_eject_cdrom(char *dev)
 
 #ifdef USE_LIBHD
   hd_data = calloc(1, sizeof *hd_data);
-  hd_set_probe_feature(hd_data, pr_cdrom);
-  hd_scan(hd_data);
-  for(hd = hd_cd_list(hd_data, 0); hd; hd = hd->next) {
+  for(hd = hd_list(hd_data, hw_cdrom, 1, NULL); hd; hd = hd->next) {
     _util_eject_cdrom(hd->unix_dev_name);
   }
   hd_free_hd_list(hd);
