@@ -24,7 +24,7 @@
 #if 1	/* I think the line below would catch all anyway... */
 // #if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__sparc__) || defined(__alpha__)
 
-#define LANG_DEFAULT	1
+#define LANG_DEFAULT	2
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_br

@@ -1,3 +1,8 @@
+5/9/2003:	v1.5.9
+	- back to en as default (#29594)
+	- load cardbus drivers (#29543)
+	- remove more items from cmdline (#30164)
+
 25/8/2003:	v1.5.8
 	- reduce number of warnings: include stdlib.h for exit
 	- rename "int log" to "int err_log" in insmod stuff

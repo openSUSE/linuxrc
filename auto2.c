@@ -677,6 +677,7 @@ int auto2_init()
 #endif
   hd_t *hd;
   char buf[256];
+  hd_hw_item_t hw_items[] = { hw_cdrom, hw_network, 0 };
 
   auto2_chk_frame_buffer();
 
@@ -793,9 +794,7 @@ int auto2_init()
       /* wait for cards to be activated... */
       sleep(is_vaio ? 10 : 2);
       /* check for cdrom & net devs */
-      // What's this???????
-      hd_list(hd_data, hw_cdrom, 0, NULL);
-      hd_list(hd_data, hw_network, 0, NULL);
+      hd_list2(hd_data, hw_items, 1);
     }
     else {
       fprintf(stderr, "Error loading PCMCIA modules.\n");

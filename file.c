@@ -1330,7 +1330,7 @@ void file_write_install_inf(char *dir)
   }
 #endif
 
-  ft0 = file_read_cmdline(kf_cmd + kf_boot);
+  ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
   for(i = 0, ft = ft0; ft; ft = ft->next) {
     if(ft->key == key_none) {
