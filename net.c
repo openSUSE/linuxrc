@@ -678,7 +678,10 @@ static int net_input_data (void)
         if (!ftp_server_rg.s_addr)
             ftp_server_rg = ipaddr_rg;
 
-        inet_aton ("255.255.255.0", &netmask_rg);
+        if(!netmask_rg.s_addr) {
+          char *s = inet_ntoa(ipaddr_rg);
+          inet_aton (strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0", &netmask_rg);
+        }
         if (net_get_address (txt_get (TXT_INPUT_NETMASK), &netmask_rg))
             return (-1);
 

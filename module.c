@@ -383,7 +383,6 @@ void mod_init (void)
     static int   core_loaded_is = FALSE;
            char *core_modules_ati [] = {
                                        "nvram",
-                                       "serial",
                                        "8390"
                                        };
            int   i_ii;

@@ -658,9 +658,20 @@ int auto2_pcmcia()
 
 int auto2_full_libhd()
 {
-  if(!hd_data) return 0;
+  hd_data_t *hd_data_tmp;
+  int i;
 
-  return hd_bus_name(hd_data, bus_none) ? 1 : 0;
+  if(hd_data) {
+    return hd_bus_name(hd_data, bus_none) ? 1 : 0;
+  }
+
+  hd_data_tmp = calloc(1, sizeof *hd_data_tmp);
+  /* init data structures  */
+  hd_scan(hd_data_tmp);
+  i = hd_bus_name(hd_data_tmp, bus_none) ? 1 : 0;
+  hd_free_hd_data(hd_data_tmp);
+
+  return i;
 }
 
 char *auto2_usb_module()

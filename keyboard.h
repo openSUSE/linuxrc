@@ -11,8 +11,8 @@
 
 #define KEY_ESC         27
 #define KEY_ENTER       10
-#define KEY_TAB          8
-#define KEY_BTAB         9
+#define KEY_TAB          9
+#define KEY_BTAB         8
 #define KEY_BACKSPACE  127
 
 #define KEY_CTRL_A       1
