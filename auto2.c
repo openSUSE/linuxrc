@@ -119,6 +119,10 @@ void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
   hd_t *hd;
+  int i;
+  int no_feature[] = {
+    pr_modem, pr_serial, pr_mouse, pr_isa, pr_isdn, pr_parallel
+  };
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -128,16 +132,18 @@ void auto2_scan_hardware(char *log_file)
   hd_set_probe_feature(hd_data, pr_default);
   if(!log_file) {
     hd_data->progress = auto2_progress;
-    hd_clear_probe_feature(hd_data, pr_modem);
-    hd_clear_probe_feature(hd_data, pr_parallel);
+    for(i = 0; i < sizeof no_feature / sizeof *no_feature; i++) {
+      hd_clear_probe_feature(hd_data, no_feature[i]);
+    }
   }
 
   if(auto2_get_probe_env(hd_data)) {
     /* reset flags on error */
     hd_set_probe_feature(hd_data, pr_default);
     if(!log_file) {
-      hd_clear_probe_feature(hd_data, pr_modem);
-      hd_clear_probe_feature(hd_data, pr_parallel);
+      for(i = 0; i < sizeof no_feature / sizeof *no_feature; i++) {
+        hd_clear_probe_feature(hd_data, no_feature[i]);
+      }
     }
   }
 
@@ -588,6 +594,18 @@ int auto2_get_probe_env(hd_data_t *hd_data)
 int auto2_pcmcia()
 {
   return hd_has_pcmcia(hd_data);
+}
+
+int auto2_full_libhd()
+{
+  return hd_bus_name(hd_data, bus_none) ? 1 : 0;
+}
+
+char *auto2_usb_module()
+{
+  if(hd_data) usb_ig = hd_usb_support(hd_data);
+
+  return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
 }
 
 

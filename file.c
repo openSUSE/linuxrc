@@ -77,6 +77,7 @@ static const char  *file_txt_yast2_serial_tm   = "YaST2serial:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
 static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
+static const char  *file_txt_usb_tm            = "USB:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
@@ -243,6 +244,8 @@ void file_write_yast_info (void)
 
     if (frame_buffer_mode_ig)
         fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);
+
+    fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
 #endif
 
     fclose (file_pri);

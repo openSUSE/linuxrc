@@ -16,8 +16,9 @@
 #define MEM_LIMIT1_RAMDISK    50000000
 #define MEM_LIMIT2_RAMDISK    50000000
 #else
-#define MEM_LIMIT1_RAMDISK    46000000
-#define MEM_LIMIT2_RAMDISK    46000000
+// was: 46000000; 64MB will currently not do...
+#define MEM_LIMIT1_RAMDISK    70000000
+#define MEM_LIMIT2_RAMDISK    70000000
 #endif
 #define MEM_LIMIT_SWAP_MSG     6500000
 #define MEM_LIMIT_CACHE_LIBS  15000000
@@ -217,3 +218,4 @@ extern char            *mouse_dev_ig;
 extern int             yast_version_ig;
 extern int             valid_net_config_ig;
 extern int             reboot_ig;
+extern int             usb_ig;

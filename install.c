@@ -673,6 +673,7 @@ static int inst_prepare (void)
                           "/etc/ld.so.conf",
                           "/etc/ld.so.cache",
                           "/etc/host.conf",
+                          "/etc/modules.conf",
                           "/bin",
                           "/boot",
                           "/root",
@@ -779,6 +780,8 @@ static int inst_execute_yast (void)
         disp_clear_screen ();
     fflush (stdout);
 
+    lxrc_set_modprobe ("/sbin/modprobe");
+
     if (yast_version_ig == 2)
         sprintf (command_ti, "%s %s", YAST2_COMMAND,
                  auto_ig ? "--autofloppy" : "");
@@ -794,6 +797,8 @@ static int inst_execute_yast (void)
 #ifdef LXRC_DEBUG
     if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }
 #endif
+
+    lxrc_set_modprobe ("/etc/nothing");
 
     sync ();
     if (!auto2_ig)

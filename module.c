@@ -31,6 +31,7 @@
 #include "net.h"
 #include "info.h"
 #include "keyboard.h"
+#include "auto2.h"
 
 static module_t mod_scsi_mod_arm [] = 
 {

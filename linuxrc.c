@@ -50,7 +50,6 @@ static void lxrc_do_shell      (int argc, char **argv, char **env);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (int what_iv);
 static void lxrc_memcheck      (void);
-static void lxrc_set_modprobe  (char *program_tv);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int is_rpc_prog         (pid_t pid);
@@ -372,7 +371,6 @@ static void lxrc_init (void)
     // #### drop this later!!!
     // if (yast_version_ig == 2) strcpy(rootimage_tg, "/suse/images/yast2");
     // deb_str(rootimage_tg);
-
     mod_init ();
 
 #ifdef USE_LIBHD
@@ -387,6 +385,19 @@ static void lxrc_init (void)
         disp_cursor_off();
         disp_set_display(1);
         dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
+      }
+    }
+
+    {
+      char *usb_mod = auto2_usb_module();
+
+      if(usb_mod) {
+        mod_load_module("usbcore", NULL);
+        mod_load_module(usb_mod, NULL);
+        mod_load_module("input", NULL);
+        mod_load_module("hid", NULL);
+        mod_load_module("keybdev", NULL);
+        mod_load_module("mousedev", NULL);
       }
     }
 #endif
@@ -585,7 +596,7 @@ static void lxrc_memcheck (void)
     }
 
 
-static void lxrc_set_modprobe (char *program_tv)
+void lxrc_set_modprobe (char *program_tv)
     {
     FILE  *proc_file_pri;
 

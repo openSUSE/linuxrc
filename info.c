@@ -53,21 +53,20 @@ void info_menu (void)
     {
 #ifdef USE_LIBHD
     item_t  items_ari [12];
+    int     full_libhd = auto2_full_libhd ();
 #else
     item_t  items_ari [11];
+#define     full_libhd  0
 #endif
     int     i_ii;
     int     width_ii = 26;
     int     nr_items_ii = 0;
 
-#ifdef USE_LIBHD
-    util_create_items (items_ari, 12, width_ii);
-#else
-    util_create_items (items_ari, 11, width_ii);
-#endif
+    util_create_items (items_ari, 11 + full_libhd, width_ii);
 
 #ifdef USE_LIBHD
-    strncpy (items_ari [nr_items_ii++].text, "Hardware Info", width_ii);
+    if (full_libhd)
+        strncpy (items_ari [nr_items_ii++].text, "Hardware Info", width_ii);
 #endif
     strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_INFO_KERNEL), width_ii);
     strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_DRIVES), width_ii);
@@ -86,11 +85,7 @@ void info_menu (void)
     (void) dia_menu (txt_get (TXT_MENU_INFO), items_ari,
                      nr_items_ii, 1);
 
-#ifdef USE_LIBHD
-    util_free_items (items_ari, 12);
-#else
-    util_free_items (items_ari, 11);
-#endif
+    util_free_items (items_ari, 11 + full_libhd);
     }
 
 
@@ -411,9 +406,10 @@ static int info_show_cb (int what_iv)
     char  tmp_ti [30];
     int   rc_ii;
 
-
 #ifndef USE_LIBHD
     what_iv++;
+#else
+    if(!auto2_full_libhd ()) what_iv++;
 #endif
 
     if (what_iv == 1)
