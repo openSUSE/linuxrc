@@ -40,22 +40,18 @@ LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a \
 	  portmap/portmap.a dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
-    USE_MINI_GLIBC	= no
     CFLAGS		+= -DLX_ARCH=\"i386\"
 endif
 
 ifeq ($(ARCH),x86_64)
-    USE_MINI_GLIBC	= no
     CFLAGS		+= -DLX_ARCH=\"x86_64\"
 endif
 
 ifeq ($(ARCH),alpha)
-    USE_MINI_GLIBC	= no
     CFLAGS		+= -DLINUXRC_AXP -DLX_ARCH=\"axp\"
 endif
 
 ifneq ($(findstring $(ARCH),ppc ppc64),)
-    USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
@@ -63,7 +59,6 @@ ifneq ($(findstring $(ARCH),ppc ppc64),)
 endif
 
 ifeq ($(ARCH),sparc)
-    USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
@@ -71,7 +66,6 @@ ifeq ($(ARCH),sparc)
 endif
 
 ifeq ($(ARCH),sparc64)
-    USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
@@ -79,12 +73,10 @@ ifeq ($(ARCH),sparc64)
 endif
 
 ifeq ($(ARCH),ia64)
-    USE_MINI_GLIBC	= no
     CFLAGS		+= -DLX_ARCH=\"ia64\"
 endif
 
 ifeq ($(ARCH),mips)
-    USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
@@ -92,7 +84,6 @@ ifeq ($(ARCH),mips)
 endif
 
 ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
-    USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
@@ -106,13 +97,6 @@ ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
     LIBS		:= $(filter-out portmap/portmap.a, $(LIBS))
     OBJ			:= $(filter-out portmap.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"s390\"
-endif
-
-ifneq ($(USE_MINI_GLIBC),no)
-    CFLAGS	+= -I$(TOPDIR)/libc/include
-    LDFLAGS	+= -u__force_mini_libc_symbols
-    SUBDIRS	+= libc
-    LIBS	+= libc/mini-libc.a
 endif
 
 .EXPORT_ALL_VARIABLES:
