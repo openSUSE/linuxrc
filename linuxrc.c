@@ -384,12 +384,27 @@ static void lxrc_do_shell (int argc, char **argv, char **env)
     int   k_ii = 0;
     char *arguments_apci [10];
 
+    freopen ("/dev/tty3", "a", stdout);
+    freopen ("/dev/tty3", "a", stderr);
+    printf ("Executing: »%s«\n", argv [2]);
+
     while (argv [2][i_ii] == ' ')
         i_ii++;
 
     do
         {
-        command_ati [j_ii][k_ii++] = argv [2][i_ii++];
+        if (argv [2][i_ii] == '\"')
+            {
+            i_ii++;
+            while (argv [2][i_ii] && argv [2][i_ii] != '\"')
+                command_ati [j_ii][k_ii++] = argv [2][i_ii++];
+
+            if (argv [2][i_ii])
+                i_ii++;
+            }
+        else
+            command_ati [j_ii][k_ii++] = argv [2][i_ii++];
+
         if (argv [2][i_ii] == ' ' || argv [2][i_ii] == 0)
             {
             command_ati [j_ii][k_ii] = 0;
@@ -404,9 +419,6 @@ static void lxrc_do_shell (int argc, char **argv, char **env)
     while (argv [2][i_ii]);
 
     arguments_apci [j_ii] = 0;
-    freopen ("/dev/tty3", "a", stdout);
-    freopen ("/dev/tty3", "a", stderr);
-    printf ("Executing: \"%s\"\n", argv [2]);
 
     sprintf (progname_ti, "/bin/%s", arguments_apci [0]);
     execve (progname_ti, arguments_apci, env);
