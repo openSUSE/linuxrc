@@ -167,6 +167,10 @@ enum modid_t
     ID_I2O_CORE,
     ID_I2O_CONFIG,
     ID_I2O_BLOCK,
-    ID_I2O_SCSI
+    ID_I2O_SCSI,
+
+    ID_MACE,
+    ID_BMAC,
+    ID_GMAC
 
     };

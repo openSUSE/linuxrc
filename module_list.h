@@ -93,6 +93,9 @@ static module_t mod_cdrom_mod_arm [] =
 
 static module_t mod_net_mod_arm [] =
 {
+{ ID_MACE,       "Apple mace (old PowerMacs)",         "mace",       0, __LINE__ },
+{ ID_BMAC,       "Apple bmac (PowerMacs with Mach64)", "bmac",       0, __LINE__ },
+{ ID_GMAC,       "Apple gmac (PowerMacs with Rage128)","gmac",       0, __LINE__ },
 { ID_DE_45,      "DE425, DE434, DE435, DE450, DE500",  "de4x5",      0, __LINE__ },
 { ID_TULIP,      "DEC Tulip (DC21x4x) PCI",            "tulip",      "options=0", __LINE__ },
 { ID_TULIP_OLD,  "DEC Tulip (DC21x4x) (old driver)",   "old_tulip",  "options=0", __LINE__ },

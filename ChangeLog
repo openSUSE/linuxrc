@@ -1,3 +1,6 @@
+2/2/2001:	v1.1.18.010
+	- olh: add Apple network drivers (mace,bmac,gmac)
+
 17/1/2001:	v1.1.18.009
 	- make it report libhd version
 
