@@ -1,5 +1,6 @@
 	- make 'info' file parser more flexible
 	- rewrote color scheme, language and keytable handling
+	- lots of menus rewritten
 
 26/11/2001:	v1.3.2
 	- work around broken terminals that send CR + LF

@@ -48,7 +48,7 @@
 
 static void lxrc_main_menu     (void);
 static void lxrc_init          (void);
-static int  lxrc_main_cb       (int what_iv);
+static int  lxrc_main_cb       (dia_item_t di);
 static void lxrc_memcheck      (void);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
@@ -125,6 +125,8 @@ static struct {
   { "nopcmcia",   lx_nopcmcia   },
   { "debug",      lx_debug      }
 };
+
+static dia_item_t di_lxrc_main_menu_last = di_main_start;
 
 
 int main(int argc, char **argv, char **env)
@@ -749,86 +751,85 @@ void lxrc_init()
 #endif
 }
 
+void lxrc_main_menu()
+{
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_main_settings,
+    di_main_info,
+    di_main_modules,
+    di_main_start, 
+    di_main_reboot,
+    di_main_halt,
+    di_none
+  };
 
-static int lxrc_main_cb (int what_iv)
-    {
-    int    rc_ii = 1;
+  util_manual_mode();
 
+  for(;;) {
+    di = dia_menu2(txt_get(TXT_HDR_MAIN), 40, lxrc_main_cb, items, di_lxrc_main_menu_last);
 
-    switch (what_iv)
-        {
-        case 1:
-            rc_ii = set_settings ();
-            if (rc_ii == 1 || rc_ii == 2)
-                rc_ii = 0;
-            else if (rc_ii == 0)
-                rc_ii = 1;
-            break;
-        case 2:
-            info_menu ();
-            break;
-        case 3:
-            mod_menu ();
-            break;
-        case 4:
-            rc_ii = inst_menu ();
-            break;
-        case 5:
-            lxrc_reboot ();
-            break;
-        case 6:
-            lxrc_halt ();
-            break;
-        default:
-            break;
-        }
-
-    return (rc_ii);
+    if(di == di_none) {
+      if(dia_message(txt_get(TXT_NO_LXRC_END), MSGTYPE_INFO) == -42) break;
+      continue;
     }
 
-
-static void lxrc_main_menu (void)
-    {
-    int    width_ii = 40;
-    item_t items_ari [6];
-    int    i_ii;
-    int    choice_ii;
-    int    nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
-
-    util_manual_mode();
-
-    util_create_items (items_ari, nr_items_ii, width_ii);
-
-    do
-        {
-        strcpy (items_ari [0].text, txt_get (TXT_SETTINGS));
-        strcpy (items_ari [1].text, txt_get (TXT_MENU_INFO));
-        strcpy (items_ari [2].text, txt_get (TXT_MENU_MODULES));
-        strcpy (items_ari [3].text, txt_get (TXT_MENU_START));
-        strcpy (items_ari [4].text, txt_get (TXT_END_REBOOT));
-        strcpy (items_ari [5].text, "Power off");
-        for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-            {
-            util_center_text (items_ari [i_ii].text, width_ii);
-            items_ari [i_ii].func = lxrc_main_cb;
-            }
-
-        choice_ii = dia_menu (txt_get (TXT_HDR_MAIN), items_ari,
-                              nr_items_ii, 4);
-        if (!choice_ii)
-            if (dia_message (txt_get (TXT_NO_LXRC_END), MSGTYPE_INFO) == -42)
-                choice_ii = 42;
-
-        if (choice_ii == 1)
-            {
-            util_print_banner ();
-            choice_ii = 0;
-            }
-        }
-    while (!choice_ii);
-
-    util_free_items (items_ari, nr_items_ii);
+    if(di == di_main_settings) {
+      util_print_banner();
+      continue;
     }
+
+    break;
+  }
+}
+
+
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int lxrc_main_cb(dia_item_t di)
+{
+  int rc = 1;
+
+  di_lxrc_main_menu_last = di;
+
+  switch(di) {
+    case di_main_settings:
+      rc = set_settings();
+      if(rc == di_set_lang || rc == di_set_display)
+        rc = 0;
+      else if(rc == di_none)
+        rc = 1;
+      break;
+
+    case di_main_info:
+      info_menu();
+      break;
+
+    case di_main_modules:
+      mod_menu();
+      break;
+
+    case di_main_start:
+      rc = inst_menu();
+      break;
+
+    case di_main_reboot:
+      lxrc_reboot();
+      break;
+
+    case di_main_halt:
+      lxrc_halt();
+      break;
+
+    default:
+  }
+
+  return rc;
+}
 
 
 static void lxrc_memcheck (void)

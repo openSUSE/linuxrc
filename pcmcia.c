@@ -125,25 +125,35 @@ int pcmcia_load_core (void)
     }
 
 
-static int pcmcia_find_chipset (void)
-    {
-    int      type_ii;
-    item_t   items_ari [2];
-    int      width_ii = 10;
+int pcmcia_find_chipset()
+{
+  static dia_item_t di = di_none;
+  dia_item_t items[] = {
+    di_pcmcia_1,
+    di_pcmcia_2,
+    di_none
+  };
+  int type;
 
+  type = system("probe");
+  type >>= 8;
 
-    type_ii = system ("probe");
-    type_ii >>= 8;
-    if (type_ii != 1 && type_ii != 2)
-        {
-        util_create_items (items_ari, 2, width_ii);
-        strcpy (items_ari [0].text, "tcic");
-        strcpy (items_ari [1].text, "i82365");
-        util_center_text (items_ari [0].text, width_ii);
-        util_center_text (items_ari [1].text, width_ii);
-        type_ii = dia_menu (txt_get (TXT_NO_PCMCIA), items_ari, 2, 1);
-        util_free_items (items_ari, 2);
-        }
+  if(type != 1 && type != 2) {
+    di = dia_menu2(txt_get(TXT_NO_PCMCIA), 10, NULL, items, di);
 
-    return (type_ii);
+    switch(di) {
+      case di_pcmcia_1:
+        type = 1;
+        break;
+
+      case di_pcmcia_2:
+        type = 2;
+        break;
+
+      default:
+        type = 0;
     }
+  }
+
+  return type;
+}

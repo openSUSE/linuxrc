@@ -36,7 +36,7 @@
 #define MTAB_FILE		"/etc/mtab"
 #define CMDLINE_FILE		"/proc/cmdline"
 
-#define DEBUG_FILE
+// #define DEBUG_FILE
 
 static char *file_key2str(file_key_t key);
 static file_key_t file_str2key(char *value);
@@ -117,7 +117,8 @@ static struct {
   { key_screenmap,      "Screenmap"        },
   { key_fontmagic,      "Fontmagic"        },
   { key_autoyast,       "autoyast"         },
-  { key_linuxrc,        "linuxrc"          }
+  { key_linuxrc,        "linuxrc"          },
+  { key_forceinsmod,    "ForceInsmod"      }
 };
 
 static struct {
@@ -282,16 +283,16 @@ int file_read_info()
   window_t win_ri;
   char *file = NULL;
 
-  if(auto2_ig) {
+  if(config.win) {
+    dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
+  }
+  else {
     printf("%s...", txt_get(TXT_SEARCH_INFOFILE));
     fflush(stdout);
   }
-  else if(auto_ig) {
-    dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
-  }
 
   if(!config.infofile || !strcmp(config.infofile, "default")) {
-    if(config.infofile || auto2_ig) {
+    if(config.infofile || auto2_ig || auto_ig) {
       file = file_read_info_file("floppy:/suse/setup/descr/info", "floppy:/info");
     }
     if(!file) file = file_read_info_file("file:/info", NULL);
@@ -301,11 +302,11 @@ int file_read_info()
     file = file_read_info_file(config.infofile, NULL);
   }
 
-  if(auto2_ig) {
-    printf("\n");
-  }
-  else if(auto_ig) {
+  if(config.win) {
     win_close(&win_ri);
+  }
+  else {
+    printf("\n");
   }
 
   if(file) {
@@ -486,6 +487,10 @@ char *file_read_info_file(char *file, char *file2)
 
       case key_workdomain:
         config.smb.workgroup = strdup(f->value);
+        break;
+
+      case key_forceinsmod:
+        config.forceinsmod = f->nvalue;
         break;
 
       default:
@@ -881,8 +886,8 @@ file_t *file_get_cmdline(file_key_t key)
 
 void file_module_load(char *insmod_arg)
 {
-  char module[64], params[256], text[256];
-  window_t win;
+  char module[64], params[256] /*, text[256] */;
+//  window_t win;
   int i;
 
   i = sscanf(insmod_arg, "%63s %255[^\n]", module, params);
@@ -891,8 +896,10 @@ void file_module_load(char *insmod_arg)
 
   if(i == 1) *params = 0;
 
+#if 0
   sprintf(text, txt_get(TXT_TRY_TO_LOAD), module);
   dia_info(&win, text);
+#endif
 
   if(!mod_load_module(module, params)) {
     mpar_save_modparams(module, params);
@@ -906,7 +913,9 @@ void file_module_load(char *insmod_arg)
     }
   }
 
+#if 0
   win_close(&win);
+#endif
 }
 
 

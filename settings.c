@@ -248,6 +248,9 @@ static keymap_t set_keymaps_arm_mac [] =
 #define NR_KEYMAPS_MAC (sizeof set_keymaps_arm_mac / sizeof *set_keymaps_arm_mac)
 #endif
 
+static dia_item_t di_set_settings_last = di_none;
+static dia_item_t di_set_expert_last = di_none;
+
 
 /*
  *
@@ -255,9 +258,9 @@ static keymap_t set_keymaps_arm_mac [] =
  *
  */
 
-static int  set_settings_cb          (int what_iv);
+static int  set_settings_cb          (dia_item_t di);
 static void set_expert               (void);
-static int  set_expert_cb            (int what_iv);
+static int  set_expert_cb            (dia_item_t di);
 static int  set_get_current_language (void);
 #if 0
 static void set_activate_font        (int usermap_iv);
@@ -301,54 +304,84 @@ enum langid_t set_langidbyname(char *name)
   return lang_undef;
 }
 
+int set_settings()
+{
+  dia_item_t items[] = {
+    di_set_lang,
+    di_set_display,
+    di_set_keymap,
+    di_set_expert,
+    di_none
+  };
 
-int set_settings (void)
-    {
-    item_t items_ari [4];
-    int    nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
-    int    i_ii;
-    int    width_ii = 30;
-    int    choice_ii;
-
-
-    util_create_items (items_ari, nr_items_ii, width_ii);
-
-    strncpy (items_ari [0].text, txt_get (TXT_MENU_LANG), width_ii);
-    strncpy (items_ari [1].text, txt_get (TXT_MENU_DISPLAY), width_ii);
-    strncpy (items_ari [2].text, txt_get (TXT_MENU_KEYMAP), width_ii);
-    strncpy (items_ari [3].text, txt_get (TXT_MENU_EXPERT), width_ii);
-    for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-        {
-        util_center_text (items_ari [i_ii].text, width_ii);
-        items_ari [i_ii].func = set_settings_cb;
-        }
-
-    choice_ii = dia_menu (txt_get (TXT_SETTINGS), items_ari, nr_items_ii, 1);
-
-    util_free_items (items_ari, nr_items_ii);
-
-    return (choice_ii);
-    }
+  return dia_menu2(txt_get(TXT_SETTINGS), 30, set_settings_cb, items, di_set_settings_last);
+}
 
 
-void set_choose_display (void)
-    {
-    item_t   items_ari [2];
-    int      choice_ii;
-    int      width_ii = 30;
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int set_settings_cb (dia_item_t di)
+{
+  int rc = 0;
 
-    util_create_items (items_ari, 2, width_ii);
-    strcpy (items_ari [0].text, txt_get (TXT_COLOR_DISPLAY));
-    strcpy (items_ari [1].text, txt_get (TXT_MONO_DISPLAY));
-    util_center_text (items_ari [0].text, width_ii);
-    util_center_text (items_ari [1].text, width_ii);
+  di_set_settings_last = di;
 
-    choice_ii = dia_menu (txt_get (TXT_CHOOSE_DISPLAY), items_ari, 2, 1);
-    config.color = choice_ii ? choice_ii == 1 ? 2 : 1 : 3;
-    disp_set_display ();
+  switch(di) {
+    case di_set_lang:
+      set_choose_language();
+      break;
 
-    util_free_items (items_ari, 2);
-    }
+    case di_set_display:
+      set_choose_display();
+      util_print_banner();
+      break;
+
+    case di_set_keymap:
+      set_choose_keytable(1);
+      rc = 1;
+      break;
+
+    case di_set_expert:
+      set_expert ();
+      rc = 1;
+      break;
+
+    default:
+  }
+
+  return rc;
+}
+
+void set_choose_display()
+{
+  static dia_item_t di = di_none;
+  dia_item_t items[] = {
+    di_display_color,
+    di_display_mono,
+    di_none
+  };
+
+  di = dia_menu2(txt_get(TXT_CHOOSE_DISPLAY), 30, NULL, items, di);
+
+  switch(di) {
+    case di_display_color:
+      config.color = 2;
+      break;
+
+    case di_display_mono:
+      config.color = 1;
+      break;
+
+    default:
+      config.color = 3;
+  }
+
+  disp_set_display();
+}
 
 
 void set_choose_keytable (int always_show)
@@ -473,131 +506,93 @@ void set_choose_language()
   util_free_items(items, NR_LANGUAGES);
 }
 
+void set_expert()
+{
+  char tmp[MAX_X];
+  time_t t;
+  struct tm *gm;
 
-static int set_settings_cb (int what_iv)
-    {
-    int  rc_ii = 0;
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_expert_animate,
+    di_expert_forceroot,
+    di_expert_rootimage,
+    di_expert_instsys,
+    di_expert_nfsport,
+    di_expert_bootptimeout,
+    di_none
+  };
 
-    switch (what_iv)
-        {
-        case 1:
-            set_choose_language ();
-            break;
-        case 2:
-            set_choose_display ();
-            util_print_banner ();
-            break;
-        case 3:
-            set_choose_keytable (1);
-            rc_ii = 1;
-            break;
-        case 4:
-            set_expert ();
-            rc_ii = 1;
-            break;
-        default:
-            break;
-        }
+  t = time(NULL);
+  gm = gmtime(&t);
+  sprintf(tmp, "%s -- Time: %02d:%02d", txt_get(TXT_MENU_EXPERT), gm->tm_hour, gm->tm_min);
 
-    return (rc_ii);
-    }
+  di = dia_menu2(tmp, 32, set_expert_cb, items, di_set_expert_last);
+}
 
 
-static void set_expert (void)
-    {
-    item_t     items_ari [6];
-    int        nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
-    int        i_ii;
-    int        width_ii = 32;
-    char       tmp_ti [MAX_X];
-    time_t     time_ri;
-    struct tm *broken_time_ri;
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int set_expert_cb(dia_item_t di)
+{
+  char tmp[MAX_FILENAME];
+  int rc;
 
+  di_set_expert_last = di;
 
-    util_create_items (items_ari, nr_items_ii, width_ii);
+  switch(di) {
+    case di_expert_animate:
+      rc = dia_yesno(txt_get(TXT_ASK_EXPLODE), explode_win_ig == TRUE ? YES : NO);
+      if(rc == YES)
+        explode_win_ig = TRUE;
+      else if(rc == NO)
+        explode_win_ig = FALSE;
+      break;
 
-    strncpy (items_ari [0].text, txt_get (TXT_ASK_ANIMATE), width_ii);
-    strncpy (items_ari [1].text, txt_get (TXT_FORCE_ROOTIMAGE), width_ii);
-    strncpy (items_ari [2].text, txt_get (TXT_NEW_ROOTIMAGE), width_ii);
-    strncpy (items_ari [3].text, txt_get (TXT_NEW_INST_SYS), width_ii);
-    strncpy (items_ari [4].text, txt_get (TXT_NFSPORT), width_ii);
-    strncpy (items_ari [5].text, txt_get (TXT_BOOTP_TIMEOUT), width_ii);
-    for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-        {
-        util_center_text (items_ari [i_ii].text, width_ii);
-        items_ari [i_ii].func = set_expert_cb;
-        }
+    case di_expert_forceroot:
+      rc = dia_yesno(txt_get(TXT_ASK_RI_FORCE), force_ri_ig == TRUE ? YES : NO);
+      if(rc == YES)
+        force_ri_ig = TRUE;
+      else if(rc == NO)
+        force_ri_ig = FALSE;
+      break;
 
-    time_ri = time (0);
-    broken_time_ri = gmtime (&time_ri);
-    sprintf (tmp_ti, "%s -- Time: %02d:%02d", txt_get (TXT_MENU_EXPERT),
-             broken_time_ri->tm_hour, broken_time_ri->tm_min);
-    (void) dia_menu (tmp_ti, items_ari, nr_items_ii, 1);
+    case di_expert_rootimage:
+      strcpy(tmp, rootimage_tg);
+      rc = dia_input(txt_get(TXT_ENTER_ROOTIMAGE), tmp, sizeof tmp - 1, 30);
+      if(!rc) strcpy(rootimage_tg, tmp);
+      break;
 
-    util_free_items (items_ari, nr_items_ii);
-    }
+    case di_expert_instsys:
+      strcpy(tmp, installdir_tg);
+      rc = dia_input(txt_get(TXT_ENTER_INST_SYS), tmp, sizeof tmp - 1, 30);
+      if(!rc) strcpy (installdir_tg, tmp);
+      break;
 
+    case di_expert_nfsport:
+      if(nfsport_ig)
+        sprintf(tmp, "%d", nfsport_ig);
+      else
+        *tmp = 0;
+      rc = dia_input(txt_get(TXT_ENTER_NFSPORT), tmp, 6, 6);
+      if(!rc) nfsport_ig = atoi(tmp);
+      break;
 
-static int set_expert_cb (int what_iv)
-    {
-    char  tmp_ti [MAX_FILENAME];
-    int   rc_ii;
+    case di_expert_bootptimeout:
+      sprintf(tmp, "%d", bootp_timeout_ig);
+      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4);
+      if(!rc) bootp_timeout_ig = atoi(tmp);
+      break;
 
+    default:
+  }
 
-    switch (what_iv)
-        {
-        case 1:
-            rc_ii = dia_yesno (txt_get (TXT_ASK_EXPLODE),
-                               explode_win_ig == TRUE ? YES : NO);
-            if (rc_ii == YES)
-                explode_win_ig = TRUE;
-            else if (rc_ii == NO)
-                explode_win_ig = FALSE;
-            break;
-        case 2:
-            rc_ii = dia_yesno (txt_get (TXT_ASK_RI_FORCE),
-                               force_ri_ig == TRUE ? YES : NO);
-            if (rc_ii == YES)
-                force_ri_ig = TRUE;
-            else if (rc_ii == NO)
-                force_ri_ig = FALSE;
-            break;
-        case 3:
-            strcpy (tmp_ti, rootimage_tg);
-            rc_ii = dia_input (txt_get (TXT_ENTER_ROOTIMAGE), tmp_ti,
-                               MAX_FILENAME - 1, 30);
-            if (!rc_ii)
-                strcpy (rootimage_tg, tmp_ti);
-            break;
-        case 4:
-            strcpy (tmp_ti, installdir_tg);
-            rc_ii = dia_input (txt_get (TXT_ENTER_INST_SYS), tmp_ti,
-                               MAX_FILENAME - 1, 30);
-            if (!rc_ii)
-                strcpy (installdir_tg, tmp_ti);
-            break;
-        case 5:
-            if (nfsport_ig)
-                sprintf (tmp_ti, "%d", nfsport_ig);
-            else
-                tmp_ti [0] = 0;
-            rc_ii = dia_input (txt_get (TXT_ENTER_NFSPORT), tmp_ti, 6, 6);
-            if (!rc_ii)
-                nfsport_ig = atoi (tmp_ti);
-            break;
-        case 6:
-            sprintf (tmp_ti, "%d", bootp_timeout_ig);
-            rc_ii = dia_input (txt_get (TXT_ENTER_BOOTP_TIMEOUT), tmp_ti, 4, 4);
-            if (!rc_ii)
-                bootp_timeout_ig = atoi (tmp_ti);
-            break;
-        default:
-            dia_message (txt_get (TXT_NOT_IMPLEMENTED), MSGTYPE_ERROR);
-            break;
-        }
-
-    return (what_iv);
-    }
+  return 1;
+}
 
 
 void set_write_info(FILE *f)

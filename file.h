@@ -19,7 +19,7 @@ typedef enum {
   key_yast2serial, key_textmode, key_yast2autoinst, key_usb, key_yast2color,
   key_bootdisk, key_disks, key_username, key_password, key_workdomain,
   key_alias, key_options, key_initrdmodules, key_locale, key_font,
-  key_screenmap, key_fontmagic, key_autoyast, key_linuxrc
+  key_screenmap, key_fontmagic, key_autoyast, key_linuxrc, key_forceinsmod
 } file_key_t;
 
 typedef struct file_s {

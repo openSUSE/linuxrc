@@ -26,6 +26,55 @@
 #define MIN_WIN_SIZE    40
 #define MAX_LINES     1000
 
+struct {
+  dia_item_t item;
+  int text_id;
+  char *text;
+} dia_texts[] = {
+  { di_main_settings, TXT_SETTINGS,      },
+  { di_main_info,     TXT_MENU_INFO,     },
+  { di_main_modules,  TXT_MENU_MODULES,  },
+  { di_main_start,    TXT_MENU_START,    },
+  { di_main_reboot,   TXT_END_REBOOT,    },
+  { di_main_halt,     0, "Power off"     },
+
+  { di_set_lang,    TXT_MENU_LANG,    },
+  { di_set_display, TXT_MENU_DISPLAY, },
+  { di_set_keymap,  TXT_MENU_KEYMAP,  },
+  { di_set_expert,  TXT_MENU_EXPERT,  },
+
+  { di_display_color, TXT_COLOR_DISPLAY, },
+  { di_display_mono,  TXT_MONO_DISPLAY,  },
+
+  { di_expert_animate,      TXT_ASK_ANIMATE,     },
+  { di_expert_forceroot,    TXT_FORCE_ROOTIMAGE, },
+  { di_expert_rootimage,    TXT_NEW_ROOTIMAGE,   },
+  { di_expert_instsys,      TXT_NEW_INST_SYS,    },
+  { di_expert_nfsport,      TXT_NFSPORT,         },
+  { di_expert_bootptimeout, TXT_BOOTP_TIMEOUT,   },
+
+  { di_inst_install, TXT_START_INSTALL,    },
+  { di_inst_demo,    TXT_START_DEMO,       },
+  { di_inst_system,  TXT_BOOT_SYSTEM,      },
+  { di_inst_rescue,  TXT_START_RESCUE,     },
+  { di_inst_eject,   TXT_EJECT_CD,         },
+  { di_inst_update,  0, "Driver Update CD" },
+
+  { di_yast_1, TXT_YAST1, },
+  { di_yast_2, TXT_YAST2, },
+
+  { di_source_cdrom,  TXT_CDROM,    },
+  { di_source_nfs,    TXT_NFS,      },
+  { di_source_ftp,    TXT_FTP,      },
+  { di_source_smb,    TXT_SMB,      },
+  { di_source_hd,     TXT_HARDDISK, },
+  { di_source_floppy, TXT_FLOPPY,   },
+
+  { di_pcmcia_1, 0, "tcic"   },
+  { di_pcmcia_2, 0, "i82365" }
+};
+
+
 /*
  *
  * local function prototypes
@@ -33,7 +82,7 @@
  */
 
 static int  dia_win_open (window_t *win_prr, char *txt_tv);
-
+static char *dia_get_text(dia_item_t di);
 
 /*
  *
@@ -416,8 +465,8 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
                     {
                     if (items_arv [offset_ii + current_ii].func)
                         {
-                        rc_ii = items_arv [offset_ii + current_ii].func
-                                            (offset_ii + current_ii + 1);
+                        i_ii = items_arv[offset_ii + current_ii].di ?: offset_ii + current_ii + 1;
+                        rc_ii = items_arv[offset_ii + current_ii].func(i_ii);
                         if (rc_ii == -1)
                             key_ii = KEY_ESC;
                         else if (rc_ii)
@@ -1019,3 +1068,69 @@ void dia_handle_ctrlc (void)
 
     is_in_ctrlc_is = FALSE;
     }
+
+
+char *dia_get_text(dia_item_t di)
+{
+  int i;
+  char *s = "";
+
+  for(i = 0; i < sizeof dia_texts / sizeof *dia_texts; i++) {
+    if(dia_texts[i].item == di) {
+      s = dia_texts[i].text ?: txt_get(dia_texts[i].text_id);
+      break;
+    }
+  }
+
+  return s;
+}
+
+
+/*
+ * returns selected menu item, or di_none (ESC pressed)
+ */
+dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t *items, dia_item_t default_item)
+{
+  int item_cnt, default_idx, i;
+  dia_item_t *it, di;
+  item_t *item_list;
+
+  for(item_cnt = 0, it = items; *it != di_none; it++) {
+    if(*it != di_skip) item_cnt++;
+  }
+
+  if(!item_cnt) return di_none;
+
+  item_list = calloc(item_cnt, sizeof *item_list);
+
+  /* not sure about the '+ 1'... */
+  util_create_items(item_list, item_cnt, width + 1);
+
+  default_idx = 1;
+  for(i = 0, it = items; *it != di_none; it++) {
+    if(*it != di_skip) {
+      if(*it == default_item) default_idx = i + 1;
+      strncpy(item_list[i].text, dia_get_text(*it), width);
+      item_list[i].text[width] = 0;
+      item_list[i].di = *it;
+      item_list[i].func = (int (*)(int)) func;
+      util_center_text(item_list[i].text, width);
+      i++;
+    }
+  }
+
+  i = dia_menu(title, item_list, item_cnt, default_idx);
+
+  if(i > 0 && i <= item_cnt) {
+    di = item_list[i - 1].di;
+  }
+  else {
+    di = di_none;
+  }
+
+  util_free_items(item_list, item_cnt);
+
+  return di;
+}
+
+

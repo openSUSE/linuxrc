@@ -135,13 +135,21 @@ int mod_load_module (char *module_tv, char *params_tv)
       { "hptraid",   "ataraid"  },
       { "pdcraid",   "ataraid"  }
     };
+    char *force = config.forceinsmod ? "-f " : "";
 
-    sprintf (command_ti, "insmod %s ", module_tv);
+#if 0
+    if(!config.win) {
+      printf("loading module %s...", module_tv);
+      fflush(stdout);
+    }
+#endif
+
+    sprintf (command_ti, "insmod %s%s ", force, module_tv);
 
     *command1_ti = 0;
     for(i = 0; i < sizeof deps / sizeof *deps; i++ ) {
       if(!strcmp(module_tv, deps[i].mod)) {
-        sprintf(command1_ti, "insmod %s ", deps[i].dep);
+        sprintf(command1_ti, "insmod %s%s ", force, deps[i].dep);
         break;
       }
     }
@@ -159,6 +167,13 @@ int mod_load_module (char *module_tv, char *params_tv)
         kbd_switch_tty (1);
 
     util_update_kernellog ();
+
+#if 0
+    if(!config.win) {
+      printf(" %s\n", rc_ii ? "failed" : "ok");
+    }
+#endif
+
     return (rc_ii);
     }
 

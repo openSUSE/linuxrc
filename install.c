@@ -70,8 +70,8 @@ static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_source       (void);
-static int   inst_choose_source_cb    (int what_iv);
-static int   inst_menu_cb             (int what_iv);
+static int   inst_choose_source_cb    (dia_item_t di);
+static int   inst_menu_cb             (dia_item_t di);
 static int   inst_init_cache          (void);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
@@ -87,6 +87,9 @@ static void  inst_swapoff             (void);
 /* 'Live' entry in yast.inf */
 static int yast_live_cd = 0;
 #endif
+
+static dia_item_t di_inst_menu_last = di_none;
+static dia_item_t di_inst_choose_source_last = di_none;
 
 int inst_auto_install (void)
     {
@@ -232,193 +235,168 @@ int inst_start_demo (void)
     }
 
 
-int inst_menu (void)
-    {
-    int     width_ii = 40;
-    item_t  items_ari [5];
-    int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
-    int     choice_ii;
-    int     i_ii;
+int inst_menu()
+{
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_inst_install,
+    di_inst_demo,
+    di_inst_system,
+    di_inst_rescue,
+    di_inst_eject,
+    di_inst_update,
+    di_none
+  };
 
-    util_create_items (items_ari, nr_items_ii, width_ii);
+  items[(action_ig & ACT_DEMO) ? 0 : 1] = di_skip;
+  if(!yast2_update_ig) items[5] = di_skip;
 
-    strcpy (items_ari [0].text, txt_get ((action_ig & ACT_DEMO) ? TXT_START_DEMO : TXT_START_INSTALL));
-    strcpy (items_ari [1].text, txt_get (TXT_BOOT_SYSTEM));
-    strcpy (items_ari [2].text, txt_get (TXT_START_RESCUE));
-#if 0
-    strcpy (items_ari [3].text, txt_get (TXT_START_DEMO));
-#endif
-    strcpy (items_ari [3].text, txt_get (TXT_EJECT_CD));
-    strcpy (items_ari [4].text, "Driver Update CD");
-    for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-        {
-        util_center_text (items_ari [i_ii].text, width_ii);
-        items_ari [i_ii].func = inst_menu_cb;
-        }
+  di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
 
-    choice_ii = dia_menu (txt_get (TXT_MENU_START), items_ari,
-                          yast2_update_ig ? nr_items_ii : nr_items_ii - 1, 1);
-
-    util_free_items (items_ari, nr_items_ii);
-
-    if (choice_ii)
-        return (0);
-    else
-        return (1);
-    }
+  return di == di_none ? 1 : 0;
+}
 
 
-static int inst_menu_cb (int what_iv)
-    {
-    int  error_ii = FALSE;
-    char s[64];
-    int rc;
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int inst_menu_cb(dia_item_t di)
+{
+  int error = 0;
+  char s[64];
+  int rc = 1;
 
-    switch (what_iv)
-        {
-        case 1:
-            error_ii = (action_ig & ACT_DEMO) ? inst_start_demo () : inst_start_install ();
-            break;
-        case 2:
-            error_ii = root_boot_system ();
-            break;
-        case 3:
-            error_ii = inst_start_rescue ();
-            break;
-#if 0
-        case 4:
-            error_ii = inst_start_demo ();
-            break;
-#endif
-        case 4:
-            sprintf(s, "/dev/%s", cdrom_tg);
-            util_eject_cdrom(*cdrom_tg ? s : NULL);
-            error_ii = -1;
-            break;
-        case 5:
-            inst_update_cd ();
-            error_ii = -1;
-            break;
-        default:
-            dia_message (txt_get (TXT_NOT_IMPLEMENTED), MSGTYPE_ERROR);
-            error_ii = -1;
-            break;
-        }
+  di_inst_menu_last = di;
 
-    /*
-     * Fall through to the main menu if we return from a failed installation
-     * attempt.
-     */
-    rc = error_ii ? what_iv == 1 && config.redraw_menu ? -1 : what_iv : 0;
-    config.redraw_menu = 0;
+  switch(di) {
+    case di_inst_install:
+      error = inst_start_install();
+     /*
+      * Fall through to the main menu if we return from a failed installation
+      * attempt.
+      */
+      if(config.redraw_menu) rc = -1;
+      break;
 
-    return rc;
-    }
+    case di_inst_demo:
+      error = inst_start_demo();
+      if(config.redraw_menu) rc = -1;
+      break;
 
+    case di_inst_system:
+      error = root_boot_system();
+      break;
 
-static int inst_choose_source_cb (int what_iv)
-    {
-           int  error_ii = FALSE;
-    static int  told_is = FALSE;
-           char tmp_ti [200];
+    case di_inst_rescue:
+      error = inst_start_rescue();
+      break;
 
-    // skip SMB menu entry
-    if (!config.smb.available && what_iv >= 4) what_iv++;
+    case di_inst_eject:
+      sprintf(s, "/dev/%s", cdrom_tg);
+      util_eject_cdrom(*cdrom_tg ? s : NULL);
+      error = 1;
+      break;
 
-    switch (what_iv)
-        {
-        case 1:
-            error_ii = inst_mount_cdrom (0);
-//            if (!told_is && !util_cd1_boot ())
-            if (error_ii)
-                {
-                sprintf (tmp_ti, txt_get (TXT_INSERT_CD), 1);
-                (void) dia_message (tmp_ti, MSGTYPE_INFO);
-                told_is = TRUE;
-                error_ii = inst_mount_cdrom (1);
-                }
-            break;
-        case 2:
-            error_ii = inst_mount_nfs ();
-            break;
-        case 3:
-            error_ii = inst_ftp ();
-            break;
-        case 4:
-            error_ii = inst_mount_smb ();
-            break;
-        case 5:
-            error_ii = inst_mount_harddisk ();
-            break;
-        case 6:
-            error_ii = inst_check_floppy ();
-            break;
-        default:
-            break;
-        }
+    case di_inst_update:
+      inst_update_cd();
+      error = 1;
+      break;
 
-    if (!error_ii && what_iv != 1)
-        {
-        error_ii = inst_check_instsys ();
-        if (error_ii)
-            dia_message (txt_get (TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-        }
+    default:
+  }
 
-    if (error_ii)
-        {
-        inst_umount ();
-        return (what_iv);
-        }
-    else
-        return (0);
-    }
+  config.redraw_menu = 0;
+
+  if(!error) rc = 0;
+
+  return rc;
+}
 
 
-static int inst_choose_source (void)
-    {
-    int     width_ii = 33;
-    item_t  items_ari [6];
-    int     choice_ii;
-    int     i_ii;
-    int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
-    int smb_dif;
+int inst_choose_source()
+{
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_source_cdrom,
+    di_source_nfs,
+    di_source_ftp,
+    di_source_smb,
+    di_source_hd,
+    di_source_floppy,
+    di_none
+  };
 
-    inst_umount ();
+  inst_umount();
 
-    config.smb.available = util_check_exist ("/bin/smbmount");
+  config.smb.available = util_check_exist("/bin/smbmount");
 
-    smb_dif = config.smb.available;
+  if(!config.smb.available) items[3] = di_skip;
+  if(!inst_rescue_im) items[5] = di_skip;
 
-    if(!inst_rescue_im) nr_items_ii--;
-    if(!config.smb.available) nr_items_ii--;
+  di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
 
-    util_create_items (items_ari, nr_items_ii, width_ii);
-    strncpy (items_ari [0].text, txt_get (TXT_CDROM), width_ii);
-    strncpy (items_ari [1].text, txt_get (TXT_NFS), width_ii);
-    strncpy (items_ari [2].text, txt_get (TXT_FTP), width_ii);
-    if (config.smb.available)
-        strncpy (items_ari [3].text, txt_get (TXT_SMB), width_ii);
-    strncpy (items_ari [3 + smb_dif].text, txt_get (TXT_HARDDISK), width_ii);
-    // this one has to stay last, since it won't be displayed if
-    // 'inst_rescue_im' = 0
-    if(inst_rescue_im)
-        strncpy (items_ari [4 + smb_dif].text, txt_get (TXT_FLOPPY), width_ii);
+  return di == di_none ? -1 : 0;
+}
 
-    for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-        {
-        util_center_text (items_ari [i_ii].text, width_ii);
-        items_ari [i_ii].func = inst_choose_source_cb;
-        }
 
-    choice_ii = dia_menu (txt_get (TXT_CHOOSE_SOURCE), items_ari, nr_items_ii, 1);
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int inst_choose_source_cb(dia_item_t di)
+{
+  int error = FALSE;
+  char tmp[200];
 
-    util_free_items (items_ari, nr_items_ii);
+  di_inst_choose_source_last = di;
 
-    if (choice_ii)
-        return (0);
-    else
-        return (-1);
-    }
+  switch(di) {
+    case di_source_cdrom:
+      error = inst_mount_cdrom(0);
+      if(error) {
+        sprintf(tmp, txt_get(TXT_INSERT_CD), 1);
+        dia_message(tmp, MSGTYPE_INFO);
+        error = inst_mount_cdrom(1);
+      }
+      break;
+
+    case di_source_nfs:
+      error = inst_mount_nfs();
+      break;
+
+    case di_source_ftp:
+      error = inst_ftp();
+      break;
+
+    case di_source_smb:
+      error = inst_mount_smb();
+      break;
+
+    case di_source_hd:
+      error = inst_mount_harddisk();
+      break;
+
+    case di_source_floppy:
+      error = inst_check_floppy();
+      break;
+
+    default:
+  }
+
+  if(!error && di != di_source_cdrom) {
+    error = inst_check_instsys();
+    if(error) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+  }
+
+  if(error) inst_umount();
+
+  return error ? 1 : 0;
+}
 
 
 static int inst_try_cdrom (char *device_tv)
@@ -1536,66 +1514,66 @@ static int inst_mount_smb (void)
 
 
 
-static int inst_choose_yast_version (void)
-    {
-    item_t   items_ari [2];
-    int      width_ii = 30;
-    int      yast1_ii, yast2_ii;
-    char yast1_file[MAX_FILENAME], yast2_file[MAX_FILENAME];
+int inst_choose_yast_version()
+{
+  int yast1, yast2;
+  char yast1_file[MAX_FILENAME], yast2_file[MAX_FILENAME];
 
-    *yast1_file = *yast2_file = 0;
-    if (config.instsys)
-        {
-        strcpy (yast1_file, config.instsys);
-        strcpy (yast2_file, config.instsys);
-        }
-    strcat (yast1_file, YAST1_COMMAND);
-    strcat (yast2_file, YAST2_COMMAND);
+  static dia_item_t di = di_yast_2;
+  dia_item_t items[] = {
+    di_yast_1,
+    di_yast_2,
+    di_none
+  };
 
-    yast1_ii = util_check_exist (yast1_file);
-    yast2_ii = util_check_exist (yast2_file);
+  *yast1_file = *yast2_file = 0;
+  if(config.instsys) {
+    strcpy(yast1_file, config.instsys);
+    strcpy(yast2_file, config.instsys);
+  }
+  strcat(yast1_file, YAST1_COMMAND);
+  strcat(yast2_file, YAST2_COMMAND);
 
-    if (!yast_version_ig && auto_ig)
-        yast_version_ig = 1;
+  yast1 = util_check_exist(yast1_file);
+  yast2 = util_check_exist(yast2_file);
 
-    if (yast_version_ig == 1 && yast1_ii)
-        return (0);
+  if(!yast_version_ig && auto_ig) yast_version_ig = 1;
 
-    if (yast_version_ig == 2 && yast2_ii)
-        return (0);
+  if(yast_version_ig == 1 && yast1) return 0;
 
-    if (yast1_ii && !yast2_ii)
-        {
-        yast_version_ig = 1;
-        return (0);
-        }
+  if(yast_version_ig == 2 && yast2) return 0;
 
-    if (!yast1_ii && yast2_ii)
-        {
-        yast_version_ig = 2;
-        return (0);
-        }
+  if(yast1 && !yast2) {
+    yast_version_ig = 1;
+    return 0;
+  }
 
-    if (auto2_ig)
-        {
-        util_manual_mode();
-        util_disp_init();
-        }
+  if(!yast1 && yast2) {
+    yast_version_ig = 2;
+    return 0;
+  }
 
-    util_create_items (items_ari, 2, width_ii);
-    strcpy (items_ari [0].text, txt_get (TXT_YAST1));
-    strcpy (items_ari [1].text, txt_get (TXT_YAST2));
-    util_center_text (items_ari [0].text, width_ii);
-    util_center_text (items_ari [1].text, width_ii);
-    yast_version_ig = dia_menu (txt_get (TXT_CHOOSE_YAST),
-                                items_ari, 2, 2);
-    util_free_items (items_ari, 2);
+  if(auto2_ig) {
+    util_manual_mode();
+    util_disp_init();
+  }
 
-    if (!yast_version_ig)
-        return (-1);
-    else
-        return (0);
-    }
+  di = dia_menu2(txt_get(TXT_CHOOSE_YAST), 30, NULL, items, di);
+
+  switch(di) {
+    case di_yast_1:
+      yast_version_ig = 1;
+      break;
+    case di_yast_2:
+      yast_version_ig = 2;
+      break;
+    default:
+      yast_version_ig = 0;
+  }
+
+  return yast_version_ig ? 0 : -1;
+}
+
 
 #ifdef USE_LIBHD
 

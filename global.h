@@ -148,6 +148,7 @@ typedef struct {
 typedef struct {
                char  *text;
                int  (*func) (int);
+               int di;
                }
         item_t;
 
@@ -167,6 +168,7 @@ typedef struct {
   unsigned suppress_warnings:1;	/* show less warning dialogs */
   unsigned is_iseries:1;	/* set if we run on an iSeries machine */
   unsigned win:1;		/* set if we are drawing windows */
+  unsigned forceinsmod:1;	/* use 'insmod -f' if set */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
