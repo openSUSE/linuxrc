@@ -66,6 +66,7 @@
 #include "fstype.h"
 #include "mkdevs.h"
 #include "scsi_rename.h"
+#include "utf8.h"
 
 #define LED_TIME     50000
 
@@ -103,6 +104,9 @@ static void create_update_name(unsigned idx);
 static char *read_symlink(char *name);
 static void scsi_rename_single(char *old_name, char *new_name);
 
+static int skip_spaces(unsigned char **str);
+static int word_size(unsigned char *str, int *width, int *enc_len);
+
 void util_redirect_kmsg()
 {
   static char newvt[2] = { 11, 4 /* console 4 */ };
@@ -122,99 +126,186 @@ void util_redirect_kmsg()
 }
 
 
-void util_center_text (char *txt_tr, int size_iv)
-    {
-    int  length_ii;
-    char tmp_txt_ti [MAX_X];
+/*
+ * Center text.
+ */
+void util_center_text(unsigned char *txt, int max_width)
+{
+  int width, pre, post, len;
 
-    strcpy (tmp_txt_ti, txt_tr);
-    length_ii = strlen (tmp_txt_ti);
-    memset (txt_tr, 32, size_iv);
-    if (length_ii < size_iv)
-        memcpy (&txt_tr [(size_iv - length_ii - 1) / 2],
-                tmp_txt_ti, length_ii);
-    else
-        memcpy (txt_tr, tmp_txt_ti, size_iv);
+  width = utf8_strwidth(txt);
+  len = strlen(txt);
 
-    txt_tr [size_iv - 1] = 0;
-    }
+  /* functions seem to expect max_width to include the final '\0'. */
+  max_width--;
+
+  if(width >= max_width) return;
+
+  pre = (max_width - width) / 2;
+  post = max_width - width - pre;
+
+  if(len) memmove(txt + pre, txt, len);
+  if(pre) memset(txt, ' ', pre);
+  if(post) memset(txt + pre + len, ' ', post);
+  txt[pre + len + post] = 0;
+
+#if 0
+  fprintf(stderr, "[center %d->%d: <%s>]\n", width, max_width, txt);
+#endif
+}
+
+
+/*
+ * Left-align text.
+ */
+void util_fill_string(unsigned char *str, int max_width)
+{
+  int width, len;
+
+  /* functions seem to expect max_width to include the final '\0'. */
+  max_width--;
+
+  width = utf8_strwidth(str);
+  len = strlen(str);
+
+  while(width++ < max_width) {
+    str[len++] = ' ';
+    str[len] = 0;
+  }
+}
 
 
 void util_generate_button(button_t *button, char *txt, int size)
 {
-  size = size > 8 ? BUTTON_SIZE_LARGE : BUTTON_SIZE_NORMAL;
+  size = size > BUTTON_SIZE_NORMAL ? BUTTON_SIZE_LARGE : BUTTON_SIZE_NORMAL;
 
   memset(button, 0, sizeof *button);
-  strncpy(button->text, txt, size - 1);
-  util_center_text(button->text, size);
+  utf8_strwcpy(button->text, txt, size);
+
+  util_center_text(button->text, size + 1);
 }
 
 
-int util_format_txt (char *txt_tv, char *lines_atr [], int width_iv)
-    {
-    int  current_line_ii;
-    int  i_ii;
-    int  pos_ii;
+int skip_spaces(unsigned char **str)
+{
+  int spaces = 0;
+
+  while(**str && (**str == ' ' || **str == '\t')) {
+    (*str)++;
+    spaces++;
+  }
+
+  return spaces;
+}
 
 
-    current_line_ii = 0;
-    i_ii = 0;
-    pos_ii = 0;
-    lines_atr [current_line_ii] = malloc (width_iv);
-    lines_atr [current_line_ii][0] = 0;
+int word_size(unsigned char *str, int *width, int *enc_len)
+{
+  unsigned char *s;
+  int c;
 
-    while (txt_tv [i_ii] && current_line_ii < MAX_Y)
-        {
-        while (txt_tv [i_ii] && txt_tv [i_ii] != '\n' && pos_ii < width_iv)
-            lines_atr [current_line_ii][pos_ii++] = txt_tv [i_ii++];
+  *width = *enc_len = 0;
 
-        if (pos_ii == width_iv || txt_tv [i_ii] == '\n')
-            {
-            if (pos_ii == width_iv)
-                {
-                do
-                    {
-                    --pos_ii;
-                    --i_ii;
-                    }
-                while (lines_atr [current_line_ii][pos_ii] != ' ' && pos_ii);
+  if(!*str) return 0;
 
-                if (pos_ii == 0)
-                    {
-                    pos_ii = width_iv;
-                    i_ii += width_iv - 1;
-                    }
-                }
+  s = str;
 
-            lines_atr [current_line_ii][pos_ii] = 0;
-            pos_ii = 0;
-            ++i_ii;
-            if (txt_tv [i_ii])
-                lines_atr [++current_line_ii] = malloc (width_iv);
-            }
-        else
-            lines_atr [current_line_ii][pos_ii] = 0;
+  if(skip_spaces(&s)) {
+    *width = (!*s || *s == '\n') ? 0 : 1;
+    *enc_len = s - str;
+
+    return 1;
+  }
+
+  while(*s && *s != ' ' && *s != '\t' && *s != '\n') {
+    if(!(c = utf8_decode(s))) break;
+    s += utf8_enc_len(*s);
+    *width += utf32_char_width(c);
+    if(c >= 0x3000) break;
+  }
+
+  *enc_len = s - str;
+
+  return 0;
+}
+
+
+/*
+ * Add linebreaks to txt.
+ * Returns number of lines put into the lines array.
+ */
+int util_format_txt(unsigned char *txt, unsigned char **lines, int max_width)
+{
+  int line, pos, width, w_width, w_enc_len, w_space;
+
+#if 0
+  fprintf(stderr, "[format: %d <%s> = ", max_width, txt);
+#endif
+
+  line = 0;
+  *(lines[line] = malloc(UTF8_SIZE(max_width))) = 0;
+
+  width = pos = 0;
+  skip_spaces(&txt);
+
+  while(*txt) {
+    if(*txt == '\n') {
+      w_width = w_enc_len = 0;
+      w_space = 1;
+      txt++;
+      skip_spaces(&txt);
+    }
+    else {
+      w_space = word_size(txt, &w_width, &w_enc_len);
+
+#if 0
+      fprintf(stderr, "{<%s> %d %d %d}", txt, w_width, w_enc_len, w_space);
+#endif
+
+      if(w_width + width <= max_width || width == 0) {
+        if(w_width && w_enc_len) {
+          if(w_space) {
+            lines[line][pos++] = ' ';
+            lines[line][pos] = 0;
+          }
+          else {
+            memcpy(lines[line] + pos, txt, w_enc_len);
+            lines[line][pos += w_enc_len] = 0;
+          }
         }
-
-    for (i_ii = 0; i_ii <= current_line_ii; i_ii++)
-        util_center_text (lines_atr [i_ii], width_iv);
-
-    return (current_line_ii + 1);
+        width += w_width;
+        txt += w_enc_len;
+        continue;
+      }
     }
 
-
-void util_fill_string (char *txt_tr, int size_iv)
-    {
-    int i_ii = 0;
-
-    while (txt_tr [i_ii] && i_ii < size_iv - 1)
-        ++i_ii;
-
-    while (i_ii < size_iv - 1)
-        txt_tr [i_ii++] = ' ';
-
-    txt_tr [i_ii] = 0;
+    if(line >= MAX_Y - 1) break;
+    *(lines[++line] = malloc(UTF8_SIZE(max_width))) = 0;
+    width = pos = 0;
+    if(!w_space && w_enc_len) {
+      memcpy(lines[line] + pos, txt, w_enc_len);
+      lines[line][pos += w_enc_len] = 0;
+      width += w_width;
     }
+
+    txt += w_enc_len;
+  }
+
+  line++;
+
+  for(pos = 0; pos < line; pos++) {
+    width = strlen(lines[pos]);
+    while(width > 0 && lines[pos][width - 1] == ' ') lines[pos][--width] = 0;
+    util_center_text(lines[pos], max_width);
+  }
+
+#if 0
+  for(pos = 0; pos < line; pos++) fprintf(stderr, " <%s>", lines[pos]);
+  fprintf(stderr, "]\n");
+#endif
+
+  return line;
+}
 
 
 void util_create_items (item_t items_arr [], int nr_iv, int size_iv)
@@ -223,7 +314,7 @@ void util_create_items (item_t items_arr [], int nr_iv, int size_iv)
 
     for (i_ii = 0; i_ii < nr_iv; i_ii++)
         {
-        items_arr [i_ii].text = malloc (size_iv + 1);
+        items_arr [i_ii].text = malloc (UTF8_SIZE(size_iv));
         items_arr [i_ii].func = 0;
         items_arr [i_ii].di = 0;
         }
@@ -349,7 +440,7 @@ void util_update_kernellog (void)
 void util_print_banner (void)
     {
     window_t       win_ri;
-    char           text_ti [MAX_X];
+    char           text_ti [UTF8_SIZE(MAX_X)];
     struct utsname utsinfo_ri;
 
     if(!config.win) return;
@@ -1305,8 +1396,8 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "dud = %d, updates = %d, yast2serial = %d",
-    config.update.ask, config.update.count, yast2_serial_ig
+    "dud = %d, updates = %d, dir = \"%s\"",
+    config.update.ask, config.update.count, config.update.dir
   );
   slist_append_str(&sl0, buf);
 
@@ -1425,7 +1516,7 @@ void util_status_info()
     }
   }
 
-  dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION "/" LX_ARCH "-" LX_REL " (" __DATE__ ", " __TIME__ ")", sl0, 76);
+  dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION "/" LX_ARCH " (" __DATE__ ", " __TIME__ ")", sl0, 76);
 
   slist_free(sl0);
 

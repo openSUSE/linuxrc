@@ -24,6 +24,7 @@
 #include "dialog.h"
 #include "linuxrc.h"
 #include "file.h"
+#include "utf8.h"
 
 
 #define MIN_WIN_SIZE    40
@@ -104,7 +105,6 @@ struct {
 
 static int dia_binary(char *txt, char *button0, char *button1, int def);
 static int dia_win_open (window_t *win_prr, char *txt_tv);
-static int strwidth(char *str);
 
 /*
  *
@@ -261,15 +261,15 @@ int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
   win.fg_color = colors_prg->choice_fg;
   width = dia_win_open(&win, txt);
 
-  len0 = strlen(button0_txt);
-  len1 = strlen(button1_txt);
+  len0 = utf8_strwidth(button0_txt);
+  len1 = utf8_strwidth(button1_txt);
   len_max = len0 > len1 ? len0 : len1;
 
   util_generate_button(buttons[0], button0_txt, len_max);
   util_generate_button(buttons[1], button1_txt, len_max);
 
-  len0 = strlen(button0.text);
-  len1 = strlen(button1.text);
+  len0 = utf8_strwidth(button0.text);
+  len1 = utf8_strwidth(button1.text);
 
   win_add_button(&win, buttons[0], width / 3 - len0 / 2 - 3, len0);
   win_add_button(&win, buttons[1], width - width / 3 - len1 / 2 + 2, len1);
@@ -320,10 +320,10 @@ int dia_message (char *txt_tv, int msgtype_iv)
         }
     width_ii = dia_win_open (&win_ri, txt_tv);
     s = txt_get(msgtype_iv == MSGTYPE_REBOOT ? TXT_REBOOT : TXT_OK);
-    util_generate_button (&button_ri, s, strlen(s));
+    util_generate_button (&button_ri, s, utf8_strwidth(s));
     win_add_button (&win_ri, &button_ri,
-                    width_ii / 2 - strlen (button_ri.text) / 2 - 1,
-                    strlen (button_ri.text));
+                    width_ii / 2 - utf8_strwidth (button_ri.text) / 2 - 1,
+                    utf8_strwidth (button_ri.text));
 /*    win_button_select (&button_ri); */
 
     disp_flush_area (&win_ri);
@@ -377,7 +377,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     button_t  no_button_ri;
     button_t *curr_button_pri;
     int       nr_lines_ii;
-    char     *lines_ati [MAX_Y];
+    unsigned char *lines_ati [MAX_Y];
     int       i_ii;
     int       phys_items_ii;
     int       offset_ii;
@@ -428,9 +428,9 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
       }
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
-    width_ii = strwidth (head_tv) + 6;
-    if (width_ii < (ssize_t) strlen (items_arv [0].text) + 6)
-        width_ii = strlen (items_arv [0].text) + 6;
+    width_ii = utf8_strwidth (head_tv) + 6;
+    if (width_ii < utf8_strwidth(items_arv [0].text) + 6)
+        width_ii = utf8_strwidth(items_arv [0].text) + 6;
 
     if (width_ii < MIN_WIN_SIZE)
         width_ii = MIN_WIN_SIZE;
@@ -484,24 +484,24 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     s0 = txt_get (TXT_OK);
     s1 = txt_get (TXT_CANCEL);
 
-    len0 = strlen(s0);
-    len1 = strlen(s1);
+    len0 = utf8_strwidth(s0);
+    len1 = utf8_strwidth(s1);
     len_max = len0 > len1 ? len0 : len1;
 
     util_generate_button (&yes_button_ri, s0, len_max);
     util_generate_button (&no_button_ri, s1, len_max);
 
     win_add_button (&menu_win_ri, &yes_button_ri,
-                    width_ii / 3 - strlen (yes_button_ri.text) / 2 - 3,
-                    strlen (yes_button_ri.text));
+                    width_ii / 3 - utf8_strwidth (yes_button_ri.text) / 2 - 3,
+                    utf8_strwidth (yes_button_ri.text));
     win_add_button (&menu_win_ri, &no_button_ri,
-                    width_ii - width_ii / 3 - strlen (yes_button_ri.text) / 2 + 1,
-                    strlen (no_button_ri.text));
+                    width_ii - width_ii / 3 - utf8_strwidth (yes_button_ri.text) / 2 + 1,
+                    utf8_strwidth (no_button_ri.text));
     curr_button_pri = &yes_button_ri;
     win_button_select (curr_button_pri);
 
-    if (width_ii > (ssize_t) strlen (items_arv [0].text) + 4)
-        width_ii = strlen (items_arv [0].text) + 4;
+    if (width_ii > utf8_strwidth (items_arv [0].text) + 4)
+        width_ii = utf8_strwidth (items_arv [0].text) + 4;
     memset (&tmp_win_ri, 0, sizeof (window_t));
     tmp_win_ri.x_left = max_x_ig / 2 - width_ii / 2;
     tmp_win_ri.y_left = menu_win_ri.y_left + menu_win_ri.head + 2;
@@ -735,7 +735,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 void dia_status_on (window_t *win_prr, char *txt_tv)
     {
     window_t  tmp_win_ri;
-    char      tmp_txt_ti [STATUS_SIZE + 1];
+    char      tmp_txt_ti [STATUS_SIZE * 6 + 1];
 
     if(!config.win || config.linemode) {
       printf("%s", txt_tv);
@@ -932,7 +932,7 @@ int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
     int       i_ii;
     int       textlines_ii;
     int       need_redraw_ii;
-    char     *lines_ati [MAX_Y];
+    unsigned char *lines_ati [MAX_Y];
     int       line_length_ii;
     int       h_offset_ii;
     char      tmp_ti [MAX_X];
@@ -1003,11 +1003,11 @@ int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
         }
     
     s = txt_get (TXT_OK);
-    util_generate_button (&button_ri, s, strlen(s));
+    util_generate_button (&button_ri, s, utf8_strwidth(s));
 
     win_add_button (&file_win_ri, &button_ri,
-                    width_iv / 2 - strlen (button_ri.text) / 2 - 1,
-                    strlen (button_ri.text));
+                    width_iv / 2 - utf8_strwidth (button_ri.text) / 2 - 1,
+                    utf8_strwidth (button_ri.text));
 
     memset (&tmp_win_ri, 0, sizeof (window_t));
     tmp_win_ri.x_left = file_win_ri.x_left + 1;
@@ -1185,8 +1185,8 @@ int dia_show_file (char *head_tv, char *file_tv, int eof_iv)
                 buffer_ti [i_ii] = ' ';
         strncpy (lines_ati [nr_lines_ii], buffer_ti, MAX_X - 1);
         lines_ati [nr_lines_ii][MAX_X - 1] = 0;
-        if ((ssize_t) strlen (lines_ati [nr_lines_ii]) + 6 > width_ii)
-            width_ii = strlen (lines_ati [nr_lines_ii]) + 6;
+        if ((ssize_t) utf8_strwidth (lines_ati [nr_lines_ii]) + 6 > width_ii)
+            width_ii = utf8_strwidth (lines_ati [nr_lines_ii]) + 6;
         util_fill_string (lines_ati [nr_lines_ii], MAX_X);
         nr_lines_ii++;
         }
@@ -1205,7 +1205,7 @@ void dia_info (window_t *win_prr, char *txt_tv)
     {
     int        width_ii;
     window_t   tmp_win_ri;
-    char      *lines_ati [MAX_Y];
+    unsigned char *lines_ati [MAX_Y];
     int        nr_lines_ii;
     int        i_ii;
 
@@ -1218,7 +1218,7 @@ void dia_info (window_t *win_prr, char *txt_tv)
       }
 
     disp_toggle_output (DISP_OFF);
-    width_ii = strlen (txt_tv) + 6;
+    width_ii = utf8_strwidth (txt_tv) + 6;
     if (width_ii < MIN_WIN_SIZE)
         width_ii = MIN_WIN_SIZE;
 
@@ -1270,12 +1270,12 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
     {
     int        width_ii;
     window_t   tmp_win_ri;
-    char      *lines_ati [MAX_Y];
+    unsigned char *lines_ati [MAX_Y];
     int        nr_lines_ii;
     int        i_ii;
 
 
-    width_ii = strwidth (txt_tv) + 6;
+    width_ii = utf8_strwidth (txt_tv) + 6;
     if (width_ii < MIN_WIN_SIZE)
         width_ii = MIN_WIN_SIZE;
 
@@ -1432,8 +1432,7 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
   for(i = 0, it = items; *it != di_none; it++) {
     if(*it != di_skip) {
       if(*it == default_item) default_idx = i + 1;
-      strncpy(item_list[i].text, dia_get_text(*it), width);
-      item_list[i].text[width] = 0;
+      utf8_strwcpy(item_list[i].text, dia_get_text(*it), width);
       item_list[i].di = *it;
       item_list[i].func = (int (*)(int)) func;
       util_center_text(item_list[i].text, width);
@@ -1476,8 +1475,7 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
   if(default_item < 1 || default_item > item_cnt) default_item = 1;
 
   for(i = 0, it = items; *it; it++, i++) {
-    strncpy(item_list[i].text, *it, width);
-    item_list[i].text[width] = 0;
+    utf8_strwcpy(item_list[i].text, *it, width);
     item_list[i].func = func;
     if(align == align_center) {
       util_center_text(item_list[i].text, width);
@@ -1544,22 +1542,4 @@ int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
   return i;
 }
 
-/*
- * return string width, taking line breaks into account
- */
-int strwidth(char *str)
-{
-  int i, width = 0;
-
-  for(i = 0; *str; str++) {
-    if(*str == '\n') {
-      i = 0;
-    }
-    else {
-      if(++i > width) width = i;
-    }
-  }
-
-  return width;
-}
 

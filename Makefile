@@ -1,6 +1,3 @@
-# SuSE release number
-LX_REL	?= -DLX_REL=\"9.1\"
-
 # include pcmcia/config.mk
 
 TOPDIR	:= $(CURDIR)
@@ -22,7 +19,7 @@ CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
 # _No_ -fomit-frame-pointer! It makes linuxrc larger (after compression).
-CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
+CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS)
 
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 ifeq ($(CC),$(CC_DIET))

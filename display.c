@@ -561,7 +561,7 @@ void disp_clear_screen()
  */
 void disp_write_utf32string(int *str)
 {
-  int i, len, buf_len;
+  int i, len, buf_len, width;
   unsigned char *buf;
 
   if(
@@ -580,13 +580,27 @@ void disp_write_utf32string(int *str)
     }
 
     for(i = 0; i < len; i++) {
-      if(i + disp_x_im <= max_x_ig) {
-        disp_screen_aprm[disp_y_im - 1][i + disp_x_im - 1].attr = disp_attr_cm;
-        disp_screen_aprm[disp_y_im - 1][i + disp_x_im - 1].c = str[i];
-      }
-    }
 
-    disp_x_im += len;
+      width = 1;
+
+#if 0
+      width = utf32_char_width(str[i]);
+      if(!width) width = 1;
+#endif
+
+      if(disp_x_im <= max_x_ig) {
+        disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].attr = disp_attr_cm;
+        disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].c = str[i];
+#if 0
+        if(width > 1) {
+          disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].attr = disp_attr_cm;
+          disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].c = ' ';
+        }
+#endif
+      }
+
+      disp_x_im += width;
+    }
 
     if(disp_x_im > max_x_ig) disp_gotoxy(1, 1);
   }
@@ -600,11 +614,16 @@ void disp_write_string(char *str)
 {
   int len, *buf;
 
+//  fprintf(stderr, "[* <%s>", str); fflush(stderr);
+//  getchar();
+
   len = strlen(str) + 1;
 
   buf = malloc(len * sizeof *buf);
   utf8_to_utf32(buf, len, str);
   disp_write_utf32string(buf);
+
+//  fprintf(stderr, "#]\n"); fflush(stderr);
 
   free(buf);
 }
@@ -615,6 +634,8 @@ void disp_write_string(char *str)
  */
 void disp_write_char(int c)
 {
+  int width;
+
   if(
     disp_x_im > 0 &&
     disp_x_im <= max_x_ig &&
@@ -623,12 +644,24 @@ void disp_write_char(int c)
   ) {
     if(disp_state_im == DISP_ON) printf("%s", utf8_encode(c));
 
-//    fprintf(stderr, "[u+%02x <%s>]", c, utf8_encode(c));
+    width = 1;
+
+#if 0
+    width = utf32_char_width(c);
+    if(!width) width = 1;
+#endif
 
     disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].attr = disp_attr_cm;
     disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].c = c;
 
-    disp_x_im++;
+#if 0
+    if(width > 1) {
+      disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].attr = disp_attr_cm;
+      disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].c = 0;
+    }
+#endif
+
+    disp_x_im += width;
   }
 }
 

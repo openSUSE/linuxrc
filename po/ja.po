@@ -48,7 +48,7 @@ msgid "Language"
 msgstr ""
 
 #. TXT_MENU_MODULES
-msgid "Kernel Modules (Hardware Drivers)"
+msgid "パスワード (Hardware Drivers)"
 msgstr ""
 
 #. TXT_MENU_START
@@ -57,15 +57,15 @@ msgstr ""
 
 #. TXT_MENU_INFO
 msgid "System Information"
-msgstr ""
+msgstr "ハードディスクから起動"
 
 #. TXT_HDR_MAIN
 msgid "Main Menu"
-msgstr ""
+msgstr "レスキューシステム"
 
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr ""
+msgstr "起動オプション"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
@@ -290,6 +290,8 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
+"グラフィックブートメニューから\n"
+"テキストモードに切替えます。"
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."

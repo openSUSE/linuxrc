@@ -636,7 +636,7 @@ void lxrc_init()
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
-  config.update.dir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
+  config.update.dir = strdup("/linux/suse/" LX_ARCH);
   config.update.dst = strdup("/update");
 
   config.update.map = calloc(1, MAX_UPDATES);

@@ -15,11 +15,10 @@
 #endif
 
 extern void util_redirect_kmsg     (void);
-extern void util_center_text       (char *txt_tr, int size_iv);
+extern void util_center_text       (unsigned char *txt, int size);
 extern void util_generate_button   (button_t *button, char *txt, int size);
-extern int  util_format_txt        (char *txt_tv, char *lines_atr [],
-                                    int width_iv);
-extern void util_fill_string       (char *txt_tr, int size_iv);
+extern int  util_format_txt        (unsigned char *txt, unsigned char **lines, int max_width);
+extern void util_fill_string       (unsigned char *str, int max_width);
 extern void util_create_items      (item_t items_arr [], int nr_iv, int size_iv);
 extern void util_free_items        (item_t items_arr [], int nr_iv);
 extern int  util_fileinfo          (char *file_name, int *size, int *compressed);

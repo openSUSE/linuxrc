@@ -127,3 +127,87 @@ int utf32_len(int *str)
 }
 
 
+/*
+ * Return char width (0, 1, or 2).
+ */
+int utf32_char_width(int c)
+{
+  if(c == 0) return 0;
+
+  if(
+    c >= 0x1100 &&
+    (
+      c <= 0x115f ||                    /* Hangul Jamo init. consonants */
+      (
+        c >= 0x2e80 && c <= 0xa4cf && (c & ~0x0011) != 0x300a && c != 0x303f
+      ) ||                  /* CJK ... Yi */
+      (c >=  0xac00 && c <=  0xd7a3) || /* Hangul Syllables */
+      (c >=  0xdf00 && c <=  0xdfff) || /* dw combining sequence */
+      (c >=  0xf900 && c <=  0xfaff) || /* CJK Compatibility Ideographs */
+      (c >=  0xfe30 && c <=  0xfe6f) || /* CJK Compatibility Forms */
+      (c >=  0xff00 && c <=  0xff5f) || /* Fullwidth Forms */
+      (c >=  0xffe0 && c <=  0xffe6) ||
+      (c >= 0x20000 && c <= 0x2ffff)
+    )
+  ) return 2;
+
+  return 1;
+}
+
+
+/*
+ * Return string width, taking line breaks into account.
+ */
+int utf8_strwidth(unsigned char *str)
+{
+  int i, width = 0;
+  int *buf, *p, buf_len;
+
+  buf_len = strlen(str) + 1;
+  buf = malloc(buf_len * sizeof *buf);
+
+  utf8_to_utf32(buf, buf_len, str);
+
+  for(p = buf, i = 0; *p; p++) {
+    if(*p == '\n') {
+      i = 0;
+    }
+    else {
+      i += utf32_char_width(*p);
+      if(i > width) width = i;
+    }
+  }
+
+  free(buf);
+
+#if 0
+  fprintf(stderr, "[%d: <%s>]\n", width, str);
+#endif
+
+  return width;
+}
+
+
+/*
+ * Copy as long as dst doesn't exceed width. '\0' is always added.
+ */
+void utf8_strwcpy(unsigned char *dst, unsigned char *src, int width)
+{
+  int w = 0, c, l = 0;
+
+//  fprintf(stderr, "[wcpy %d: <%s>", width, src);
+
+  while(
+    (c = utf8_decode(src + l)) &&
+    (w += utf32_char_width(c)) <= width
+  ) {
+    l += utf8_enc_len(src[l]);
+  }
+
+  memcpy(dst, src, l);
+  dst[l] = 0;
+
+//  fprintf(stderr, " <%s>]\n", dst);
+}
+
+

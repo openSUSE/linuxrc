@@ -96,7 +96,6 @@ static struct {
   { key_floppydisk,     "Floppydisk",     kf_none                        },	/* ??? */
   { key_keyboard,       "Keyboard",       kf_none                        },
   { key_yast2update,    "YaST2update",    kf_none                        },
-  { key_yast2serial,    "YaST2serial",    kf_none                        },
   { key_textmode,       "Textmode",       kf_cfg + kf_cmd                },
   { key_yast2color,     "YaST2color",     kf_none                        },
   { key_bootdisk,       "BootDisk",       kf_none                        },	/* obsolete */
@@ -750,7 +749,6 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) {
           if((f->nvalue & 1)) config.textmode = 1;
           if((f->nvalue & 2)) config.update.ask = 1;
-          if((f->nvalue & 4)) yast2_serial_ig = 1;
         }
         break;
 
@@ -1425,7 +1423,6 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
 
-  file_write_num(f, key_yast2serial, yast2_serial_ig);
   file_write_num(f, key_textmode, config.textmode);
 
   file_write_str(f, key_autoyast, config.autoyast);

@@ -1,5 +1,6 @@
+6/8/2004:	v1.7.1
 	- deal with multi gateway dhcp response (#25413)
-	- some utf8 support
+	- utf8 support
 
 5/7/2004:	v1.7.0
 	- removed obsolete files

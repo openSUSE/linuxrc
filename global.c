@@ -30,7 +30,6 @@ int             pcmcia_chip_ig = 0;
 int             cpu_ig = 0;
 int             force_ri_ig = FALSE;
 char            ppcd_tg [10];
-int             yast2_serial_ig = FALSE;
 int             has_floppy_ig = TRUE;
 int             has_kbd_ig = TRUE;
 unsigned        frame_buffer_mode_ig = 0;

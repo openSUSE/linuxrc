@@ -42,11 +42,14 @@
 #define NO			0
 #define ESCAPE			-1
 
+/* max bytes needed for utf8 string of length a */
+#define UTF8_SIZE(a)		((a) * 6 + 1)
+
 #define MAX_X			250
 #define MAX_Y			150
 
-#define BUTTON_SIZE_NORMAL	9
-#define BUTTON_SIZE_LARGE	11
+#define BUTTON_SIZE_NORMAL	8
+#define BUTTON_SIZE_LARGE	10
 #define STATUS_SIZE		50
 
 #define  LXRC_DEBUG
@@ -93,7 +96,7 @@ typedef struct {
 
 typedef struct {
                window_t  win;
-               char      text [BUTTON_SIZE_LARGE];
+               char      text [UTF8_SIZE(BUTTON_SIZE_LARGE)];
                }
         button_t;
 
@@ -447,7 +450,6 @@ extern int             pcmcia_chip_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
 extern char            ppcd_tg [10];
-extern int             yast2_serial_ig;
 extern int             has_floppy_ig;
 extern int             has_kbd_ig;
 extern unsigned        frame_buffer_mode_ig;
