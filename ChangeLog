@@ -1,3 +1,6 @@
+6/3/2001:	v1.1.18.017
+	- don't try to do too much networking without a proper net config
+
 1/3/2001:	v1.1.18.016
 	- mantel: changed german text "Lade PCMCIA Module" to "PCMCIA-Module laden"
 

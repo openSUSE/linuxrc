@@ -386,6 +386,8 @@ int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
 
+  if(!(valid_net_config_ig || bootmode_ig == BOOTMODE_NET)) return 1;
+
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
     if(hd->unix_dev_name && strcmp(hd->unix_dev_name, "lo")) {
@@ -734,15 +736,17 @@ int auto2_find_install_medium()
 
   deb_msg("Well, maybe there is a NFS/FTP server...");
 
-  broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+  if(valid_net_config_ig || bootmode_ig == BOOTMODE_NET) {
+    broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
 
-  fprintf(stderr, "host ip:   %s\n", inet_ntoa(ipaddr_rg));
-  fprintf(stderr, "netmask:   %s\n", inet_ntoa(netmask_rg));
-  fprintf(stderr, "broadcast: %s\n", inet_ntoa(broadcast_rg));
-  fprintf(stderr, "gateway:   %s\n", inet_ntoa(gateway_rg));
-  fprintf(stderr, "server ip: %s\n", inet_ntoa(nfs_server_rg));
-  if((valid_net_config_ig & 0x10))
-    fprintf(stderr, "name srv:  %s\n", inet_ntoa(nameserver_rg));
+    fprintf(stderr, "host ip:   %s\n", inet_ntoa(ipaddr_rg));
+    fprintf(stderr, "netmask:   %s\n", inet_ntoa(netmask_rg));
+    fprintf(stderr, "broadcast: %s\n", inet_ntoa(broadcast_rg));
+    fprintf(stderr, "gateway:   %s\n", inet_ntoa(gateway_rg));
+    fprintf(stderr, "server ip: %s\n", inet_ntoa(nfs_server_rg));
+    if((valid_net_config_ig & 0x10))
+      fprintf(stderr, "name srv:  %s\n", inet_ntoa(nameserver_rg));
+  }
 
   if(!auto2_net_dev(&hd_devs)) {
     if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
