@@ -760,7 +760,7 @@ static int inst_prepare (void)
 
 #ifdef USE_LIBHD   
 #ifdef __i386__
-    auto2_find_braille();
+//    auto2_find_braille();
 #endif
 #endif
 

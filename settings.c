@@ -28,7 +28,7 @@ typedef struct
       char          *font;
       char          *mapscreen;
       char          *unimap;
-      int            usermap;
+      int            usermap;	// redundant, will drop it later -- snwint
       int            write_info;
       char          *locale;
       char          *yastcode;
@@ -225,7 +225,10 @@ static int  set_settings_cb          (int what_iv);
 static void set_expert               (void);
 static int  set_expert_cb            (int what_iv);
 static int  set_get_current_language (void);
+#if 0
 static void set_activate_font        (int usermap_iv);
+#endif
+static void set_font(char *font, char *map, char *unimap);
 
 /*
  *
@@ -391,6 +394,7 @@ void set_choose_language (void)
         language_ig = set_languages_arm [rc_ii - 1].id;
         if (!serial_ig && set_languages_arm [rc_ii - 1].font)
             {
+#if 0
             sprintf (command_ti, "setfont %s -m %s",
                      set_languages_arm [rc_ii - 1].font,
                      set_languages_arm [rc_ii - 1].mapscreen /*,
@@ -398,6 +402,12 @@ void set_choose_language (void)
 
             system (command_ti);
             set_activate_font (set_languages_arm [rc_ii - 1].usermap);
+#endif
+            set_font(
+              set_languages_arm[rc_ii - 1].font,
+              set_languages_arm[rc_ii - 1].mapscreen,
+              NULL /* set_languages_arm[rc_ii - 1].unimap */	/* loading an uni map should be redundant for .psfu fonts? */
+            );
             }
         /* Maybe we should always load the keymap??? */
         if (demo_ig && !serial_ig)
@@ -589,6 +599,7 @@ static int set_get_current_language (void)
     }
 
 
+#if 0
 static void set_activate_font (int usermap_iv)
     {
     char  text_ti [20];
@@ -614,3 +625,58 @@ static void set_activate_font (int usermap_iv)
             }
         }
     }
+#endif
+
+/*
+ * New setfont code.
+ * setfont apparently works with /dev/tty. This breaks things on frame buffer
+ * consoles for some reason. Moreover, fb consoles can have different settings
+ * for every console.
+ * Hence the workaround.
+ */
+static void set_font(char *font, char *map, char *unimap)
+{
+  char cmd[100], cmd_map[32], cmd_unimap[32];
+  char dev[32];
+  char usermap;
+  int i, err = 0, max_cons;
+  int has_fb;
+  FILE *f;
+
+  *cmd_map = *cmd_unimap = 0;
+  usermap = !map || strcmp(map, "none") ? 'K' : 'B';
+  sprintf(cmd, "setfont %s", font);
+  if(map) sprintf(cmd_map, " -m %s", map);
+  if(unimap) sprintf(cmd_map, " -u %s", unimap);
+  strcat(strcat(cmd, cmd_map), cmd_unimap);
+
+  has_fb = 0;
+  if((f = fopen("/dev/fb", "r"))) {
+    has_fb = 1;
+    fclose(f);
+  }
+
+  deb_int(has_fb);
+
+  max_cons = has_fb ? 6 : 1;
+
+  err |= rename("/dev/tty", "/dev/tty.bak");
+  for(i = 0; i < max_cons; i++) {
+    sprintf(dev, "/dev/tty%d", i);
+    err |= rename(dev, "/dev/tty");
+    system(cmd);
+    f = fopen("/dev/tty", "w");
+    if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
+    err |= rename("/dev/tty", dev);
+  }
+  err |= rename("/dev/tty.bak", "/dev/tty");
+
+#if 0
+  system(cmd);
+  f = fopen("/dev/tty", "w");
+  if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
+#endif
+
+  deb_int(err);
+}
+

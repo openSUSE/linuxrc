@@ -1,3 +1,7 @@
+24/11/2000:	v1.1.16.002
+	- removed braille detection (done later by hwinfo)
+	- made font settings work on fb consoles
+
 24/11/2000:	v1.1.16.001
 	- started this log
 	- moved linuxrc version number to VERSION
