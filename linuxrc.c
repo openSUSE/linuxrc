@@ -52,6 +52,7 @@
 #include "mkdevs.h"
 #include "scsi_rename.h"
 #include "hotplug.h"
+#include "checkmd5.h"
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -909,8 +910,9 @@ void lxrc_main_menu()
     di_main_info,
     di_main_modules,
     di_main_start,
+    di_main_verify,
     di_main_eject,
-    di_main_hwcheck,
+//    di_main_hwcheck,
     di_main_reboot,
     di_main_halt,
     di_none
@@ -918,14 +920,18 @@ void lxrc_main_menu()
 
   config.manual |= 1;
 
+  di_lxrc_main_menu_last = di_main_start;
+
+#if 0
   di_lxrc_main_menu_last = config.hwcheck ? di_main_hwcheck : di_main_start;
 
   if(config.hwcheck) {
-    items[0] = items[1] = items[2] = items[3] = items[4] = di_skip;
+    items[0] = items[1] = items[2] = items[3] = items[4] = items[5] = di_skip;
   }
   else {
-    items[5] = di_skip;
+    items[6] = di_skip;
   }
+#endif
 
   for(;;) {
     di = dia_menu2(txt_get(TXT_HDR_MAIN), 40, lxrc_main_cb, items, di_lxrc_main_menu_last);
@@ -976,6 +982,11 @@ int lxrc_main_cb(dia_item_t di)
 
     case di_main_start:
       rc = inst_menu();
+      break;
+
+    case di_main_verify:
+      md5_verify();
+      rc = 1;
       break;
 
     case di_main_eject:
@@ -1157,4 +1168,5 @@ void find_shell()
     symlink("/lbin/sh", "/bin/sh");
   }
 }
+
 

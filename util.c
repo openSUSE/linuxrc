@@ -4017,7 +4017,7 @@ char *long_dev(char *dev)
 {
   static char *buf = NULL;
 
-  if(dev && strncmp(dev, "/dev/", sizeof "/dev/" - 1)) {
+  if(dev && *dev != '/') {
     strprintf(&buf, "/dev/%s", dev);
     dev = buf;
   }

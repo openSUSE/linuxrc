@@ -1,5 +1,6 @@
 	- added installation display selection (X11/VNC/SSH)
 	- initial support for S/390 network device setup (IUCV, CTC, QDIO)
+	- added md5sum check option
 
 16/8/2004:	v1.7.3
 	- some font adjustments
