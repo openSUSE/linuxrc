@@ -827,7 +827,7 @@ static int mod_menu_cb (int what_iv)
                 if (rc_ii && !scsi_tg [0])
                     {
                     strcpy (scsi_tg, mod_current_arm [rc_ii - 1].module_name);
-                    strcpy (cdrom_tg, "scd0");
+                    strcpy (cdrom_tg, "sr0");
                     }
                 mod_show_kernel_im = FALSE;
                 }

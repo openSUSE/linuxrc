@@ -386,10 +386,10 @@ static int inst_mount_cdrom (int show_err)
     {
     static char  *device_tab_ats [] =
                           {
-                          "hdb",   "hdc",    "hdd",     "scd0",   "scd1",
-                          "scd2",  "scd3",   "scd4",    "scd5",   "scd6",
-                          "scd7",  "scd8",   "scd9",    "scd10",  "scd11",
-                          "scd12", "scd13",  "scd14",   "scd15",
+                          "hdb",   "hdc",    "hdd",     "sr0",    "sr1",
+                          "sr2",   "sr3",    "sr4",     "sr5",    "sr6",
+                          "sr7",   "sr8",    "sr9",     "sr10",   "sr11",
+                          "sr12",  "sr13",   "sr14",    "sr15",
                           "hda",   "hde",    "hdf",     "hdg",    "hdh",
                           "aztcd", "cdu535", "cm206cd", "gscd",   "sjcd",
                           "mcd",   "mcdx0",  "mcdx1",   "optcd",  "sonycd",
