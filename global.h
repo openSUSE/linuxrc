@@ -256,7 +256,7 @@ typedef struct {
   char *rescueimage;		/* "/suse/images/rescue" */
   char *demoimage;		/* "/suse/images/cd-demo" */
   char *term;			/* TERM var */
-  char *susecd;			/* set if we found a SuSE cd */
+  char *cdid;			/* set if we found a install CD */
   int usbwait;			/* sleep this much after loading usb modules */
   char *setupcmd;		/* command used to start the install program */
   char **argv;			/* store argv here */
@@ -264,6 +264,8 @@ typedef struct {
   char *console;		/* console device */
   char *serial;			/* serial console parameters, e.g. ttyS0,38400 or ttyS1,9600n8 */
   char *product;		/* product name */
+  char *product_dir;		/* product specific dir component (e.g. 'suse') */
+  int kbdtimeout;		/* keyboard timeout (in s) */
 
   struct {
     char *buf;

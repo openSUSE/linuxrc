@@ -89,7 +89,7 @@ void s_addr2inet(inet_t *inet, unsigned long s_addr);
 char *inet2print(inet_t *inet);
 url_t *parse_url(char *str);
 void str_copy(char **dst, char *src);
-
+void strprintf(char **buf, char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void set_instmode(instmode_t instmode);
 char *get_instmode_name(instmode_t instmode);
 char *get_instmode_name_up(instmode_t instmode);
@@ -116,3 +116,4 @@ void util_debugwait(char *msg);
 void util_hwcheck(void);
 void util_set_serial_console(char *str);
 void util_set_stderr(char *name);
+void util_set_product_dir(char *prod);

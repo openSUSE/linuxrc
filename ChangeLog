@@ -1,3 +1,8 @@
+21/8/2002:	v1.4.15
+	- accept AutoYaST XML files for config data
+	- delayed splash message a bit (until we got the product name)
+	- more config things
+
 20/8/2002:	v1.4.14
 	- turn off (most) automatic hardware detection via 'hwdetect=0'
 	- no longer require CD label to start with 'SU'

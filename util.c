@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -715,8 +716,8 @@ int util_chk_driver_update(char *dir)
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
-  sprintf(drv_src, "%s/linux/suse/" LX_ARCH "-" LX_REL, dir);
-  sprintf(mods_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/modules", dir);
+  sprintf(drv_src, "%s/linux/%s/" LX_ARCH "-" LX_REL, dir, config.product_dir);
+  sprintf(mods_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/modules", dir, config.product_dir);
 
   if(stat(drv_src, &st) == -1) return 0;
   if(!S_ISDIR(st.st_mode)) return 0;
@@ -731,7 +732,7 @@ int util_chk_driver_update(char *dir)
   if(mount("shmfs", driver_update_dir, "shm", 0, 0)) return 0;
 
   for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
-    sprintf(inst_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/%s", dir, copy_dir[i]);
+    sprintf(inst_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/%s", dir, config.product_dir, copy_dir[i]);
     sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
 
     if(
@@ -932,8 +933,8 @@ void util_status_info()
   strcat(buf, " )");
   slist_append_str(&sl0, buf);
 
-  if(config.susecd) {
-    sprintf(buf, "cdrom id = %s", config.susecd);
+  if(config.cdid) {
+    sprintf(buf, "cdrom id = %s", config.cdid);
     slist_append_str(&sl0, buf);
   }
 
@@ -1070,6 +1071,9 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "evalimage = \"%s\"", config.demoimage);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "installdir = \"%s\"", config.installdir);
@@ -2557,6 +2561,24 @@ void str_copy(char **dst, char *src)
 }
 
 
+void strprintf(char **buf, char *format, ...)
+{
+  char sbuf[1024];
+  
+  va_list args;
+
+  va_start(args, format);
+  vsnprintf(sbuf, sizeof sbuf - 1, format, args);
+  va_end(args);
+
+  sbuf[sizeof sbuf - 1] = 0;
+
+  if(*buf) free(*buf);
+
+  *buf = strcpy(malloc(strlen(sbuf) + 1), sbuf);
+}
+
+
 void set_instmode(instmode_t instmode)
 {
   config.instmode_extra = config.instmode = instmode;
@@ -3321,4 +3343,16 @@ void util_set_stderr(char *name)
 #endif
 }
 
+
+void util_set_product_dir(char *prod)
+{
+  if(!prod | !*prod) return;
+
+  str_copy(&config.product_dir, prod);
+
+  strprintf(&config.installdir, "/%s/inst-sys", prod);
+  strprintf(&config.rootimage, "/%s/images/root", prod);
+  strprintf(&config.rescueimage, "/%s/images/rescue", prod);
+  strprintf(&config.demoimage, "/%s/images/cd-demo", prod);
+}
 

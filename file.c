@@ -186,7 +186,10 @@ static struct {
   { key_cdromdevice,    "CDROMDevice"      },
   { key_consoledevice,  "ConsoleDevice"    },
   { key_product,        "Product"          },
-  { key_linuxrcstderr,  "LinuxrcSTDERR"    }
+  { key_productdir,     "ProductDir"       },
+  { key_linuxrcstderr,  "LinuxrcSTDERR"    },
+  { key_comment,        "#"                },
+  { key_kbdtimeout,     "KBDTimeout"       }
 };
 
 static struct {
@@ -392,6 +395,7 @@ int file_read_info()
 {
   window_t win_ri;
   char *file = NULL, *s;
+  char *info_file_old = NULL;
 
   if(config.win) {
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
@@ -403,7 +407,10 @@ int file_read_info()
 
   if(!config.info.file || !strcmp(config.info.file, "default")) {
     if(config.info.file || auto2_ig || auto_ig) {
-      file = file_read_info_file("floppy:/suse/setup/descr/info", "floppy:/info");
+      strprintf(&info_file_old, "floppy:/%s/setup/descr/info", config.product_dir);
+      file = file_read_info_file(info_file_old, "floppy:/info");
+      free(info_file_old);
+      info_file_old = NULL;
     }
     if(!file) file = file_read_info_file("file:/info", NULL);
   }
@@ -497,14 +504,31 @@ void file_do_info(file_t *f0)
 {
   file_t *f;
   url_t *url;
-  int i;
+  int i, is_xml = 0;
   char buf[256], *s, *t;
   slist_t *sl;
 
   config.info.mod_autoload = 0;
   config.info.start_pcmcia = 0;
 
+  /* maybe it's an AutoYaST XML file */
   for(f = f0; f; f = f->next) {
+    if(f->key == key_comment && !strcmp(f->value, "start_linuxrc_conf")) {
+      is_xml = 1;
+      f0 = f->next;
+      break;
+    }
+  }
+
+  for(f = f0; f; f = f->next) {
+    if(
+      is_xml &&
+      f->key == key_comment &&
+      !strcmp(f->value, "end_linuxrc_conf")
+    ) {
+      break;
+    }
+
     switch(f->key) {
       case key_insmod:
         file_module_load(f->value);
@@ -939,8 +963,16 @@ void file_do_info(file_t *f0)
         if(*f->value) str_copy(&config.product, f->value);
         break;
 
+      case key_productdir:
+        if(*f->value) util_set_product_dir(f->value);
+        break;
+
       case key_linuxrcstderr:
         if(*f->value) util_set_stderr(f->value);
+        break;
+
+      case key_kbdtimeout:
+        if(f->is.numeric) config.kbdtimeout = f->nvalue;
         break;
 
       default:

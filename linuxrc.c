@@ -620,16 +620,8 @@ void lxrc_init()
   char *s, *t0, *t, buf[256];
   url_t *url;
 
-  if(!config.had_segv) {
-    printf(
-      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n",
-      config.product
-    );
-    fflush(stdout);
-  }
-
   if(txt_init()) {
-    printf("Corrupted texts!\n");
+    printf("Linuxrc error: Corrupted texts!\n");
     exit(-1);
   }
 
@@ -661,22 +653,16 @@ void lxrc_init()
   config.mountpoint.instsys = strdup("/mounts/instsys");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.installdir = strdup("/suse/inst-sys");
-  config.rootimage = strdup("/suse/images/root");
-  config.rescueimage = strdup("/suse/images/rescue");
-  config.demoimage = strdup("/suse/images/cd-demo");
-
   config.setupcmd = strdup("/sbin/inst_setup yast2");
 
-  /* just a default for manual mode */
-  config.floppies = 1;
-  config.floppy_dev[0] = strdup("/dev/fd0");
+  util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;
   config.net.dhcp_timeout = 60;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
 
+  config.explode_win = 1;
   config.color = 2;
   config.net.use_dhcp = 1;
   config.addswap = 1;
@@ -706,6 +692,22 @@ void lxrc_init()
   config.module.ramdisk = -1;
 
   file_read_info_file("file:/linuxrc.config", NULL);
+
+  if(!config.had_segv) {
+    printf(
+      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n",
+      config.product
+    );
+    fflush(stdout);
+  }
+
+  /* just a default for manual mode */
+  config.floppies = 1;
+  config.floppy_dev[0] = strdup("/dev/fd0");
+  if(config.floppydev) {
+    sprintf(buf, "/dev/%s", config.floppydev);
+    str_copy(&config.floppy_dev[0], buf);
+  }
 
   if((s = getenv("lang"))) {
     i = set_langidbyname(s);

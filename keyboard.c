@@ -148,19 +148,28 @@ int kbd_getch_raw (int wait_iv)
     char  keypress_ci;
     char  tmp_ci;
     int   i_ii;
-
+    int   time_to_wait;
 
     keypress_ci = 0;
+
+    time_to_wait = config.kbdtimeout * 1000000;
+
     do
         {
         kbd_set_timeout (KBD_TIMEOUT);
         read (kbd_tty_im, &keypress_ci, 1);
         kbd_del_timeout ();
+        if(wait_iv && config.kbdtimeout && (time_to_wait -= KBD_TIMEOUT) <= 0)
+            {
+            return KEY_ENTER;
+            }
         }
     while (!keypress_ci && wait_iv);
 
     if (!keypress_ci)
         return (0);
+
+    config.kbdtimeout = 0;
 
     if (keypress_ci != KEY_ESC)
         return ((int) keypress_ci);

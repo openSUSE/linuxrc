@@ -66,7 +66,7 @@ int auto2_mount_cdrom(char *device)
 
   set_instmode(inst_cdrom);
 
-  if(config.susecd && strstr(config.susecd, "-DVD-")) set_instmode(inst_dvd);
+  if(config.cdid && strstr(config.cdid, "-DVD-")) set_instmode(inst_dvd);
 
   rc = mount(device, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
   if(!rc) {
@@ -337,10 +337,10 @@ int auto2_cdrom_dev(hd_t **hd0)
         i = 0;
       }
       else {
-        if(ci->iso9660.ok && ci->iso9660.volume /* && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume */) {
+        if(ci->iso9660.ok && ci->iso9660.volume) {
           fprintf(stderr, "Found CD in %s\n", hd->unix_dev_name);
-          str_copy(&config.susecd, ci->iso9660.volume);
-          if(ci->iso9660.application) str_copy(&config.susecd, ci->iso9660.application);
+          str_copy(&config.cdid, ci->iso9660.volume);
+          if(ci->iso9660.application) str_copy(&config.cdid, ci->iso9660.application);
           /* CD found -> try to mount it */
           i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
         }

@@ -936,7 +936,7 @@ int inst_prepare()
         while((de = readdir(d))) {
           if(
             strstr(de->d_name, ".S.u.S.E") == de->d_name ||
-            !strcmp(de->d_name, "suse")
+            !strcmp(de->d_name, config.product_dir)
           ) {
             sprintf(buf, "%s/%s", config.mountpoint.instdata, de->d_name);
             unlink(buf);
