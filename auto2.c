@@ -129,11 +129,13 @@ void auto2_scan_hardware(char *log_file)
   }
   hd_data = calloc(1, sizeof *hd_data);
   hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
+  hd_clear_probe_feature(hd_data, pr_parallel);
   if(!log_file) hd_data->progress = auto2_progress;
 
   if(auto2_get_probe_env(hd_data)) {
     /* reset flags on error */
     hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
+    hd_clear_probe_feature(hd_data, pr_parallel);
   }
 
   if((guru_ig & 4)) hd_data->debug=-1 & ~HD_DEB_DRIVER_INFO;
