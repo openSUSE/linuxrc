@@ -164,6 +164,9 @@ void auto2_scan_hardware(char *log_file)
   }
 
   if((usb_mod = auto2_usb_module())) {
+    printf("Activating usb devices...");
+    hd_data->progress = NULL;
+    fflush(stdout);
     i = 0;
     if(*usb_mod) {
       if(
@@ -174,8 +177,8 @@ void auto2_scan_hardware(char *log_file)
       );
       mod_insmod("keybdev", NULL);
     }
-    k = mount ("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
-    if(!i) sleep(4);
+    k = mount("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
+    if(!i && config.usbwait > 0) sleep(config.usbwait);
     if(with_usb) {
       hd_clear_probe_feature(hd_data, pr_all);
       hd_set_probe_feature(hd_data, pr_usb);
@@ -184,6 +187,7 @@ void auto2_scan_hardware(char *log_file)
       hd_scan(hd_data);
       if(auto2_load_usb_storage()) {
         mod_insmod("usb-storage", NULL);
+        if(config.usbwait > 0) sleep(1);
         hd_clear_probe_feature(hd_data, pr_all);
         hd_set_probe_feature(hd_data, pr_usb);
         hd_set_probe_feature(hd_data, pr_scsi);
@@ -191,6 +195,8 @@ void auto2_scan_hardware(char *log_file)
         hd_scan(hd_data);
       }
     }
+    printf(" done\n"); fflush(stdout);
+    if(!log_file) hd_data->progress = auto2_progress;
   }
 
   /* look for keyboards & mice */
@@ -614,7 +620,9 @@ int auto2_init()
     hd_has_pcmcia(hd_data) &&
     !mod_pcmcia_ok()
   ) {
-    fprintf(stderr, "Going to load PCMCIA support...");
+    fprintf(stderr, "Going to load PCMCIA support...\n");
+    printf("Activating PCMCIA devices...");
+    fflush(stdout);
 
     if(!util_check_exist("/modules/pcmcia_core.o")) {
       char buf[256], *t;
@@ -647,13 +655,13 @@ int auto2_init()
     );
 
     if(!i) {
-      fprintf(stderr, "PCMCIA modules loaded - starting card manager.");
+      fprintf(stderr, "PCMCIA modules loaded - starting card manager.\n");
       pcmcia_chip_ig = 2;	/* i82365 */
       i = system("cardmgr -v -m /modules >&2");
       if(i)
-        fprintf(stderr, "Oops: card manager didn't start.");
+        fprintf(stderr, "Oops: card manager didn't start.\n");
       else {
-        fprintf(stderr, "card manager ok.");
+        fprintf(stderr, "card manager ok.\n");
       }
       /* wait for cards to be activated... */
       sleep(is_vaio ? 10 : 2);
@@ -662,8 +670,11 @@ int auto2_init()
       hd_list(hd_data, hw_network, 0, NULL);
     }
     else {
-      deb_msg("Error loading PCMCIA modules.");
+      fprintf(stderr, "Error loading PCMCIA modules.\n");
+      i = -1;
     }
+    printf("\r%s%s", "Activating PCMCIA devices...", i ? " failed\n" : " done\n");
+    fflush(stdout);
   }
 #endif
 
@@ -783,7 +794,7 @@ int auto2_find_install_medium()
     }
 
     for(need_modules = 0, last_idx = 0;;) {
-      deb_msg("Ok, that didn't work; see if we can activate another network device...");
+      fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
 
       if(!(last_idx = auto2_activate_devices(bc_network, last_idx))) {
         fprintf(stderr, "No further network cards found; giving up.\n");

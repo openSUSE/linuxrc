@@ -910,3 +910,21 @@ msgstr "Bitte wählen Sie die Swap-Partition."
 msgid "There is not enough memory to load all data."
 msgstr "Der Hauptspeicher reicht nicht aus, um alle Daten zu laden."
 
+#. TXT_LOW_MEMORY2
+msgid "Your computer doesn't have enough memory to run YaST."
+msgstr "Ihr Rechner hat nicht genügend Hauptspeicher, um YaST zu starten."
+
+#. TXT_ADD_SWAP
+msgid "To continue, activate some swap space."
+msgstr "Aktivieren Sie Swap-Speicher, um fortzufahren."
+
+#. TXT_ERROR_SWAP
+msgid "Error activating swap space."
+msgstr "Fehler beim Aktivieren des Swap-Speichers."
+
+#. TXT_ENTER_SWAP
+msgid "Please enter the swap partition (eg. /dev/sda2)"
+msgstr ""
+"Bitte geben Sie die Swap-Partition an\n"
+"(z.B. /dev/sda2)"
+

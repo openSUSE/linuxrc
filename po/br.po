@@ -861,3 +861,19 @@ msgstr ""
 msgid "There is not enough memory to load all data."
 msgstr ""
 
+#. TXT_LOW_MEMORY2
+msgid "Your computer doesn't have enough memory to run YaST."
+msgstr ""
+
+#. TXT_ADD_SWAP
+msgid "To continue, activate some swap space."
+msgstr ""
+
+#. TXT_ERROR_SWAP
+msgid "Error activating swap space."
+msgstr ""
+
+#. TXT_ENTER_SWAP
+msgid "Please enter the swap partition (eg. /dev/sda2)"
+msgstr ""
+

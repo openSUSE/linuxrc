@@ -1,3 +1,10 @@
+24/3/2002:	v1.3.26
+	- fixed driver update disk handling
+	- finalized VNC support
+	- added missing swap dialog translations
+	- added 'usbwait' option to get slow usb devs working
+	- added 'nfs.[rw]size' options
+
 21/3/2002:	v1.3.25
 	- fixed module handling when we're not using tmpfs (#13985)
 	- show popup if we didn't add modules from mod disk (#14185)

@@ -242,6 +242,7 @@ int inst_menu()
 {
   dia_item_t di;
   dia_item_t items[] = {
+    di_inst_vnc,
     di_inst_install,
     di_inst_demo,
     di_inst_system,
@@ -251,8 +252,9 @@ int inst_menu()
     di_none
   };
 
-  items[config.demo ? 0 : 1] = di_skip;
-  if(!yast2_update_ig) items[5] = di_skip;
+  if(!config.vnc) items[0] = di_skip;
+  items[config.demo ? 1 : 2] = di_skip;
+  if(!yast2_update_ig) items[6] = di_skip;
 
   di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
 
@@ -274,6 +276,12 @@ int inst_menu_cb(dia_item_t di)
   di_inst_menu_last = di;
 
   switch(di) {
+    case di_inst_vnc:
+      dia_input2("Please enter your VNC password", &config.net.vncpassword, 20, 1);
+      if(config.insttype != inst_net) net_config();
+      error = 1;
+      break;
+
     case di_inst_install:
       config.rescue = 0;
       error = inst_start_install();
@@ -990,7 +998,7 @@ int inst_execute_yast()
   if(config.addswap) {
     i = ask_for_swap(
       (config.memory.min_yast_text - config.memory.min_free) << 10,
-      "Not enough memory for YaST."
+      txt_get(TXT_LOW_MEMORY2)
     );
   }
 
@@ -1497,7 +1505,7 @@ int inst_update_cd()
   mkdir(mp, 0755);
 
   dia_message("Please insert the Driver Update CD-ROM", MSGTYPE_INFO);
-  dia_info(&win, "Trying to mount the CD-ROM...");	// TXT_TRY_CD_MOUNT
+  dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
 
   hd_data = calloc(1, sizeof *hd_data);
   hd0 = hd_list(hd_data, hw_cdrom, 1, NULL);
@@ -1508,12 +1516,12 @@ int inst_update_cd()
       i = util_mount_ro(hd->unix_dev_name, mp);
       if(!i) {
         cdroms++;
-        deb_msg("Update CD mounted");
+        fprintf(stderr, "Update CD mounted\n");
         util_chk_driver_update(mp);
         umount(mp);
       }
       else {
-        deb_msg("Update CD mount failed");
+        fprintf(stderr, "Update CD mount failed\n");
       }
     }
     if(*driver_update_dir) break;
@@ -1526,7 +1534,7 @@ int inst_update_cd()
   win_close(&win);
 
   if(!*driver_update_dir) {
-    dia_message(cdroms ? "Driver Update failed" : "Could not mount the CD-ROM", MSGTYPE_ERROR);
+    dia_message(cdroms ? "Driver Update failed" : txt_get(TXT_ERROR_CD_MOUNT), MSGTYPE_ERROR);
   }
   else {
     dia_message("Driver Update ok", MSGTYPE_INFO);

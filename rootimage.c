@@ -297,11 +297,6 @@ int ask_for_swap(int size, char *msg)
 {
   int i, did_init = 0;
   char tmp[256];
-  char *txt2 = "To continue, activate some swap space.";
-  char *txt3 = "Please enter a partition to use for swap.\n\n"
-               "All existing data on this partition will be lost!"
-               "\n\n-- does not work yet --";
-  char *txt4 = "Error activating swap space.";
   char *partition = NULL;
   char *argv[] = { NULL, tmp };
 
@@ -313,7 +308,7 @@ int ask_for_swap(int size, char *msg)
     util_disp_init();
     did_init = 1;
   }
-  sprintf(tmp, "%s\n\n%s", msg, txt2);
+  sprintf(tmp, "%s\n\n%s", msg, txt_get(TXT_ADD_SWAP));
   i = dia_contabort(tmp, YES);
   util_free_mem();
   if(i != YES) {
@@ -327,7 +322,7 @@ int ask_for_swap(int size, char *msg)
   }
 
   do {
-    if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt3)) {
+    if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt_get(TXT_ENTER_SWAP))) {
       i = -1;
       break;
     }
@@ -336,7 +331,7 @@ int ask_for_swap(int size, char *msg)
       sprintf(tmp, "/dev/%s", partition);
       i = util_swapon_main(2, argv);
       if(i) {
-        dia_message(txt4, MSGTYPE_ERROR);
+        dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
       }
     }
     util_free_mem();

@@ -69,12 +69,6 @@ static inline _syscall3 (int,syslog,int,type,char *,b,int,len);
 
 static char  *util_loopdev_tm = "/dev/loop0";
 
-#ifdef USE_VFAT
-static void put_byte(int fd, unsigned char data);
-static void put_short(int fd, unsigned short data);
-static void put_int(int fd, unsigned data);
-static unsigned mkdosfs(int fd, unsigned size);
-#endif
 static void do_file_cp(char *src_dir, char *dst_dir, char *name);
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
@@ -688,71 +682,6 @@ void util_manual_mode()
   auto2_ig = 0;
 }
 
-#ifdef USE_VFAT
-void put_byte(int fd, unsigned char data)
-{
-  write(fd, &data, 1);
-}
-
-void put_short(int fd, unsigned short data)
-{
-  write(fd, &data, 2);
-}
-
-void put_int(int fd, unsigned data)
-{
-  write(fd, &data, 4);
-}
-
-/*
- * Create a FAT file system on fd; size in kbyte.
- * Return the actual free space in kbyte.
- *
- * size must be less than 32MB.
- */
-unsigned mkdosfs(int fd, unsigned size)
-{
-  unsigned char sect[0x200];
-
-  static unsigned char part1[] = {
-    0xeb, 0xfe, 0x90, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 0, 2, 2, 1, 0,
-    1, 0x20, 0
-  };
-  static unsigned char part2[] = {
-    16, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0, 0x29, 1, 2, 3, 4,
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ',
-    'F', 'A', 'T', '1', '6', ' ', ' ', ' '
-  };
-  int i;
-  unsigned clusters;
-  unsigned fat_sectors;
-
-  fat_sectors = ((16 * (size + 2) + 7) / 8 + 0x200 - 1) / 0x200;
-  clusters = (size * 2 - fat_sectors - 2) / 2;
-
-  /* clear fs meta data */
-  memset(sect, 0, sizeof sect);
-  i = fat_sectors + 1 + 16;
-  if(i > 2 * size) i = 2 * size;
-  lseek(fd, 0, SEEK_SET);
-  while(i--) write(fd, sect, sizeof sect);
-  lseek(fd, 0, SEEK_SET);
-
-  for(i = 0; i < sizeof part1; i++) put_byte(fd, part1[i]);
-  put_short(fd, size * 2);
-  put_byte(fd, 0xf8);
-  put_short(fd, fat_sectors);
-  for(i = 0; i < sizeof part2; i++) put_byte(fd, part2[i]);
-
-  lseek(fd, 0x1fe, SEEK_SET);
-  put_short(fd, 0xaa55);
-  put_int(fd, 0xfffffff8);
-  for(i = 1; i < ((fat_sectors + 1) * 0x200) / 4; i++) put_int(fd, 0);
-
-  return clusters;
-}
-#endif
-
 void do_file_cp(char *src_dir, char *dst_dir, char *name)
 {
   char buf[256];
@@ -776,13 +705,9 @@ void do_file_cp(char *src_dir, char *dst_dir, char *name)
 int util_chk_driver_update(char *dir)
 {
   char drv_src[100], mods_src[100], inst_src[100];
-  char inst_dst[100], imod[200], rmod[100], *s;
+  char inst_dst[100], buf[256], rmod[100], *s;
   struct stat st;
   int i;
-#ifdef USE_VFAT
-  int fd;
-  unsigned fssize;
-#endif
   struct dirent *de;
   DIR *d;
 
@@ -799,34 +724,13 @@ int util_chk_driver_update(char *dir)
   /* Driver update disk, even if the update dir is empty! */
   strcpy(driver_update_dir, "/update");
 
-  deb_msg("driver update disk");
-//  deb_str(dir);
-
-#ifdef USE_VFAT
-  fd = open("/dev/ram3", O_RDWR);
-  if(fd < 0) return 0;
-  fssize = mkdosfs(fd, 8000);
-  close(fd);
-#endif
-
-//  deb_int(fssize);
+  fprintf(stderr, "found driver update disk\n");
 
   mkdir(driver_update_dir, 0755);
 
-#ifdef USE_VFAT
-  i = mount("/dev/ram3", driver_update_dir, "vfat", 0, 0);
-#else
   i = mount("shmfs", driver_update_dir, "shm", 0, 0);
-#endif
-
-// Why does this not work???
-// i = util_mount_ro("/dev/ram3", driver_update_dir);
-
-//  deb_int(i);
 
   if(i) return 0;
-
-//  deb_msg("mounted");
 
   sprintf(inst_dst, "%s/install", driver_update_dir);
 
@@ -835,7 +739,7 @@ int util_chk_driver_update(char *dir)
     S_ISDIR(st.st_mode) &&
     !mkdir(inst_dst, 0755)
   ) {
-    deb_msg("install");
+    fprintf(stderr, "copying install dir\n");
     d = opendir(inst_src);
     if(d) {
       while((de = readdir(d))) {
@@ -851,22 +755,33 @@ int util_chk_driver_update(char *dir)
     !stat(mods_src, &st) &&
     S_ISDIR(st.st_mode)
   ) {
-    deb_msg("modules");
-    d = opendir(mods_src);
-    if(d) {
-      while((de = readdir(d))) {
-        if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
-          if((s = strstr(de->d_name, ".o")) && !s[2]) {
-            sprintf(imod, "%s/%s", mods_src, de->d_name);
-            strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
-            mod_unload_module(rmod);
-            mod_insmod(imod, NULL);
+    sprintf(buf, "%s/module.config", mods_src);
+    if(config.tmpfs && util_check_exist(buf)) {
+      fprintf(stderr, "copying modules\n");
+      mod_copy_modules(mods_src, 1);
+      mod_init();
+    }
+    else {
+      fprintf(stderr, "loading modules\n");
+      d = opendir(mods_src);
+      if(d) {
+        while((de = readdir(d))) {
+          if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
+            if((s = strstr(de->d_name, ".o")) && !s[2]) {
+              sprintf(buf, "%s/%s", mods_src, de->d_name);
+              strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
+              mod_unload_module(rmod);
+              mod_insmod(buf, NULL);
+            }
           }
         }
+        closedir(d);
       }
-      closedir(d);
     }
   }
+
+  sprintf(buf, "file:/%s/linuxrc.config", inst_src);
+  file_read_info_file(buf, NULL);
 
   return 0;
 }
@@ -877,8 +792,6 @@ void util_umount_driver_update()
 
   util_umount(driver_update_dir);
   *driver_update_dir = 0;
-
-  util_free_ramdisk("/dev/ram3");
 }
 
 

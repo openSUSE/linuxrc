@@ -168,7 +168,11 @@ static struct {
   { key_term,           "TERM"             },
   { key_addswap,        "AddSwap"          },
   { key_fullnetsetup,   "FullNetSetup"     },
-  { key_aborted,        "Aborted"          }
+  { key_aborted,        "Aborted"          },
+  { key_exec,           "Exec"             },
+  { key_usbwait,        "USBWait"          },
+  { key_nfsrsize,       "NFS.RSize"        },
+  { key_nfswsize,       "NFS.WSize"        }
 };
 
 static struct {
@@ -745,7 +749,14 @@ void file_do_info(file_t *f0)
 
       case key_rescue:
       case key_install:
-        config.rescue = f->key == key_rescue ? 1 : 0;
+        if(f->key == key_rescue) {
+          config.rescue = 1;
+          config.activate_storage = 1;
+          config.activate_network = 1;
+        }
+        else {
+          config.rescue = 0;
+        }
         url = parse_url(f->value);
         if(url && url->scheme) {
           set_instmode(url->scheme);
@@ -772,11 +783,13 @@ void file_do_info(file_t *f0)
 
       case key_vnc:
         if(f->is.numeric) config.vnc = f->nvalue;
+        if(f->nvalue) config.activate_network = 1;
         break;
 
       case key_vncpassword:
         str_copy(&config.net.vncpassword, *f->value ? f->value : NULL);
         config.vnc = 1;
+        config.activate_network = 1;
         break;
 
       case key_usepivotroot:
@@ -831,6 +844,22 @@ void file_do_info(file_t *f0)
             util_swapon_main(2, argv);
           }
         }
+        break;
+
+      case key_exec:
+        if(*f->value) system(f->value);
+        break;
+
+      case key_usbwait:
+        if(f->is.numeric) config.usbwait = f->nvalue;
+        break;
+
+      case key_nfsrsize:
+        if(f->is.numeric) config.net.nfs_rsize = f->nvalue;
+        break;
+
+      case key_nfswsize:
+        if(f->is.numeric) config.net.nfs_wsize = f->nvalue;
         break;
 
       default:
@@ -1000,7 +1029,8 @@ void file_write_install_inf(char *dir)
 
   if(
     config.insttype == inst_net ||
-    config.instmode_extra == inst_cdwithnet
+    config.instmode_extra == inst_cdwithnet ||
+    config.vnc
   ) {
     file_write_str(f, key_netdevice, netdevice_tg);
     file_write_inet(f, key_ip, &config.net.hostname);

@@ -649,8 +649,8 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
 
     memset (&mount_data_ri, 0, sizeof (struct nfs_mount_data));
 //    mount_data_ri.flags = NFS_MOUNT_NONLM;
-    mount_data_ri.rsize = 0;
-    mount_data_ri.wsize = 0;
+    mount_data_ri.rsize = config.net.nfs_rsize;
+    mount_data_ri.wsize = config.net.nfs_wsize;
     mount_data_ri.timeo = 70;
     mount_data_ri.retrans = 3;
     mount_data_ri.acregmin = 3;

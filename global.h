@@ -242,6 +242,7 @@ typedef struct {
   char *demoimage;		/* "/suse/images/cd-demo" */
   char *term;			/* TERM var */
   char *susecd;			/* set if we found a SuSE cd */
+  int usbwait;			/* sleep this much after loading usb modules */
 
   struct {
     char *buf;
@@ -313,6 +314,8 @@ typedef struct {
     int dhcp_timeout;
     int tftp_timeout;
     int bootp_wait;		/* wait this time (in s) after network setup before starting bootp */
+    int nfs_rsize;		/* nfs rsize mount option */
+    int nfs_wsize;		/* nfs wsize mount option */
     inet_t netmask;
     inet_t network;
     inet_t broadcast;

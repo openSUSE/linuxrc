@@ -612,6 +612,7 @@ void lxrc_init()
   config.net.use_dhcp = 1;
   config.addswap = 1;
   config.netstop = 1;
+  config.usbwait = 4;		/* 4 seconds */
   yast_version_ig = 2;
 
   /* make auto mode default */
@@ -842,7 +843,7 @@ void lxrc_init()
       auto2_ig = 1;
       config.manual = 0;
     } else {
-      deb_msg("Automatic setup not possible.");
+      fprintf(stderr, "Automatic setup not possible.\n");
 
       util_disp_init();
 
@@ -920,11 +921,14 @@ void lxrc_init()
 
   net_setup_localhost();
 
-  if(config.vnc) {
+  if(config.vnc && !config.manual) {
     int win_old;
   
     if(!(win_old = config.win)) util_disp_init();
-    net_config();
+    if(!config.net.vncpassword) {
+      dia_input2("Please enter your VNC password", &config.net.vncpassword, 20, 1);
+    }
+    if(config.insttype != inst_net) net_config();
     if(!win_old) util_disp_done();
   }
 

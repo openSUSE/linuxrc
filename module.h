@@ -20,3 +20,4 @@ int        mod_modprobe(char *module, char *param);
 void       mod_show_modules(void);
 int        mod_pcmcia_ok(void);
 void       mod_disk_text(char *buf, int type);
+int        mod_copy_modules(char *src_dir, int doit);

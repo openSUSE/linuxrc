@@ -44,7 +44,6 @@ static int mod_menu_last = 0;
 static char *mod_param_text = NULL;
 static int mod_show_kernel_messages = 0;
 
-static int mod_copy_modules(char *src_dir, int doit);
 static void mod_update_list(void);
 static int mod_show_type(int type);
 static int mod_build_list(int type, char ***list, module_t ***mod_list);
@@ -747,18 +746,13 @@ int mod_insmod(char *module, char *param)
   char *force = config.forceinsmod ? "-f " : "";
   slist_t *sl;
 
-#if 0
-  if(!config.win) {
-    printf("loading module %s...", module);
-    fflush(stdout);
-  }
-#endif
-
   if(mod_is_loaded(module)) return 0;
 
   if(!config.forceinsmod) {
-    sprintf(buf, "%s/%s.o", config.module.dir, module);
-    if(!util_check_exist(buf)) return -1;
+    if(!util_check_exist(module)) {
+      sprintf(buf, "%s/%s.o", config.module.dir, module);
+      if(!util_check_exist(buf)) return -1;
+    }
   }
 
   sprintf(buf, "insmod %s%s ", force, module);
@@ -789,12 +783,6 @@ int mod_insmod(char *module, char *param)
   if(mod_show_kernel_messages) kbd_switch_tty(1);
 
   util_update_kernellog();
-
-#if 0
-  if(!config.win) {
-    printf(" %s\n", rc_ii ? "failed" : "ok");
-  }
-#endif
 
   if(!err) {
     util_update_netdevice_list(module, 1);
