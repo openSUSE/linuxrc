@@ -707,7 +707,7 @@ static int mod_try_auto (module_t *module_prv, window_t *status_prv)
     fflush (stdout);
 
     if (mod_auto_allowed (module_prv->id) ||
-        (demo_ig && mod_current_arm == mod_cdrom_mod_arm))
+        (/* demo_ig && */ mod_current_arm == mod_cdrom_mod_arm))
         rc_ii = mod_load_module (module_prv->module_name, module_prv->example);
 
     if (rc_ii == 0)

@@ -229,7 +229,7 @@ int inst_menu (void)
 
     util_create_items (items_ari, nr_items_ii, width_ii);
 
-    strcpy (items_ari [0].text, txt_get (TXT_START_INSTALL));
+    strcpy (items_ari [0].text, txt_get ((action_ig & ACT_DEMO) ? TXT_START_DEMO : TXT_START_INSTALL));
     strcpy (items_ari [1].text, txt_get (TXT_BOOT_SYSTEM));
     strcpy (items_ari [2].text, txt_get (TXT_START_RESCUE));
 #if 0
@@ -263,7 +263,7 @@ static int inst_menu_cb (int what_iv)
     switch (what_iv)
         {
         case 1:
-            error_ii = inst_start_install ();
+            error_ii = (action_ig & ACT_DEMO) ? inst_start_demo () : inst_start_install ();
             break;
         case 2:
             error_ii = root_boot_system ();

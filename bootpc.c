@@ -7,8 +7,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.3 $
-  $Date: 2000/09/13 09:23:43 $
+  $Revision: 1.4 $
+  $Date: 2001/02/21 11:19:49 $
 */
 
 /* Standard headers */
@@ -125,23 +125,27 @@ int performBootp(char *device,
     ifr.ifr_hwaddr = their_ifr->ifr_hwaddr ;
   } else {
 /* Get the hardware address, and family information */
+
     memcpy(ifr.ifr_name, device, strlen(device)+1);
-    if (ioctl(sockfd, SIOCGIFHWADDR, &ifr) < 0) {
-      perror("bootpc: ioctl failed");
-      return BootpFatal();
-    }
+
     /* Set the interface flags. */
     ifr.ifr_flags = IFF_UP | IFF_BROADCAST | IFF_NOTRAILERS | IFF_RUNNING;
     if (ioctl(sockfd, SIOCSIFFLAGS, &ifr)) {
       perror("bootpc: ioctl SIOCSIFFLAGS");
       return BootpFatal();
     }
+
     /* Set a non-zero internet address. */
     memset((struct sockaddr_in *)&ifr.ifr_addr, 0, sizeof(struct sockaddr_in));
     ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr = htonl(1);
     ((struct sockaddr_in *)&ifr.ifr_addr)->sin_family = AF_INET;
     if (ioctl(sockfd, SIOCSIFADDR, &ifr)) {
       perror("bootpc: ioctl SIOCSIFADDR");
+      return BootpFatal();
+    }
+
+    if (ioctl(sockfd, SIOCGIFHWADDR, &ifr) < 0) {
+      perror("bootpc: ioctl failed");
       return BootpFatal();
     }
   }

@@ -66,7 +66,6 @@ const char *lxrc_new_root;
 static char **saved_environment;
 extern char **environ;
 
-
 int main (int argc, char **argv, char **env)
     {
     int   rc_ii = 0;
@@ -509,7 +508,7 @@ static void lxrc_init (void)
         util_print_banner();
         i = 0;
         j = 1;
-        if(cdrom_drives) {
+        if(cdrom_drives && !(action_ig & ACT_DEMO)) {
           sprintf(s, txt_get(TXT_INSERT_CD), 1);
           j = dia_okcancel(s, YES) == YES ? 1 : 0;
           if(j) {
@@ -526,7 +525,15 @@ static void lxrc_init (void)
           yast_version_ig = 0;
           disp_cursor_off();
           util_print_banner();
-          if(j) dia_message("Could not find the SuSE Linux Installation CD.\n\nActivating manual setup program.\n", MSGTYPE_ERROR);
+          if(j) {
+            char s[200];
+
+            sprintf(s,
+              "Could not find the SuSE Linux %s CD.\n\nActivating manual setup program.\n",
+              (action_ig & ACT_DEMO) ? "LiveEval" : "Installation"
+            );
+            dia_message(s, MSGTYPE_ERROR);
+          }
         }
 #endif
 

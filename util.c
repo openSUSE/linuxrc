@@ -813,10 +813,11 @@ void util_umount_driver_update()
 
 void util_status_info()
 {
-  char *l[14];		/* WATCH this!!! */
+  char *l[16];		/* WATCH this!!! */
   int i, lc;
   char *s, t[100];
   hd_data_t *hd_data;
+  char *lxrc;
 
   hd_data = calloc(1, sizeof *hd_data);
   hd_data->debug = 1;
@@ -841,6 +842,9 @@ void util_status_info()
     "memory = %" PRIu64 ", bootmode = %d, net_config = 0x%x",
     memory_ig, bootmode_ig, valid_net_config_ig
   );
+  lxrc = getenv("linuxrc");
+  sprintf(l[lc++], "linuxrc = \"%s\"", lxrc ? lxrc : "");
+  sprintf(l[lc++], "yast = %d, auto = %d, action = 0x%x", yast_version_ig, auto2_ig ? 2 : auto_ig ? 1 : 0, action_ig);
   sprintf(l[lc++], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
   sprintf(l[lc++], "driver_update_dir = \"%s\"", driver_update_dir);
 
@@ -876,6 +880,10 @@ void util_status_info()
     auto2_pcmcia(),
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
+
+  for(i = 0; i < lc; i++) {
+    util_fill_string(l[i], 76-4);
+  }
 
   dia_show_lines("Linuxrc v" LXRC_FULL_VERSION "/" LX_REL "-" LX_ARCH " (" __DATE__ ", " __TIME__ ")", l, lc, 76, FALSE);
 

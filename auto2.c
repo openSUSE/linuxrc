@@ -701,7 +701,19 @@ int auto2_find_install_medium()
     }
   }
 
-  if((valid_net_config_ig & 0x2b) != 0x2b) return FALSE;
+  net_setup_localhost();
+  if((valid_net_config_ig & 0x2b) != 0x2b) {
+    printf("Sending bootp request...");
+    fflush(stdout);
+    net_bootp();
+    if(!server_dir_tg || !*server_dir_tg || !ipaddr_rg.s_addr || !netmask_rg.s_addr || !broadcast_rg.s_addr || !gateway_rg.s_addr || !nfs_server_rg.s_addr) {
+      printf("no/incomplete answer.\n");
+      return FALSE;
+    }
+    printf("done.\n");
+  }
+
+  /* if((valid_net_config_ig & 0x2b) != 0x2b) return FALSE; */
 
   if(auto2_loaded_module) {
     free(auto2_loaded_module); auto2_loaded_module = NULL;

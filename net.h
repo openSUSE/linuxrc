@@ -7,6 +7,7 @@
  */
 
 extern int  net_config          (void);
+extern int  net_bootp           (void);
 extern int  net_mount_nfs       (char *server_addr_tv, char *hostdir_tv);
 extern void net_stop            (void);
 extern int  net_check_address   (char *input_tv, struct in_addr *address_prr);

@@ -58,7 +58,6 @@ static int  net_choose_device    (void);
 static void net_show_error       (enum nfs_stat status_rv);
 static void net_setup_nameserver (void);
 static int  net_input_data       (void);
-static int  net_bootp            (void);
 static int  net_get_address      (char *text_tv, struct in_addr *address_prr);
 
 int net_config (void)
@@ -712,7 +711,7 @@ static int net_input_data (void)
     }
 
 
-static int net_bootp (void)
+int net_bootp (void)
     {
     window_t  win_ri;
     int       rc_ii;
@@ -736,7 +735,8 @@ static int net_bootp (void)
         return (-1);
         }
 
-    dia_info (&win_ri, txt_get (TXT_SEND_BOOTP));
+    if (!auto2_ig)
+	dia_info (&win_ri, txt_get (TXT_SEND_BOOTP));
 
     if (bootp_wait_ig)
         sleep (bootp_wait_ig);
@@ -747,7 +747,8 @@ static int net_bootp (void)
 
     if (rc_ii || !getenv ("BOOTP_IPADDR"))
         {
-        (void) dia_message (txt_get (TXT_ERROR_BOOTP), MSGTYPE_ERROR);
+	if (!auto2_ig)
+	    (void) dia_message (txt_get (TXT_ERROR_BOOTP), MSGTYPE_ERROR);
         return (-1);
         }
 
