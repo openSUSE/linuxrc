@@ -133,13 +133,13 @@ libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done
 
 clean: libs
-	rm -f $(OBJ) *~ linuxrc linuxrc.map linuxrc-debug .depend
+	rm -f $(OBJ) *~ linuxrc linuxrc.map linuxrc-debug .depend version.h
 
 TAGS: *.c *.h */*.c */*.h
 	etags *.c *.h */*.c */*.h
 
 ifneq ($(MAKECMDGOALS),clean)
-.depend: $(SRC) $(INC)
+.depend: version.h $(SRC) $(INC)
 	@$(MAKE) -C po
 	@$(CC) -MM $(CFLAGS) $(SRC) >$@
 -include .depend

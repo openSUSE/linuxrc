@@ -3,3 +3,4 @@ linuxrc
 linuxrc-debug
 linuxrc.map
 todo
+version.h

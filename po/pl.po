@@ -874,3 +874,28 @@ msgstr ""
 msgid "Please enter the swap partition (eg. /dev/sda2)"
 msgstr ""
 
+#. TXT_ENTER_USER
+#, c-format
+msgid "Please enter the user name under which you want to access the %s server"
+msgstr ""
+
+#. TXT_ENTER_PASSWORD
+#, c-format
+msgid "Please enter the password for the %s server"
+msgstr ""
+
+#. TXT_WANT_PROXY
+#, c-format
+msgid "Do you want to use a %s proxy?"
+msgstr ""
+
+#. TXT_ENTER_PROXY
+#, c-format
+msgid "Please enter the address of the %s proxy"
+msgstr ""
+
+#. TXT_ENTER_PROXYPORT
+#, c-format
+msgid "Please enter the port of the %s proxy"
+msgstr ""
+

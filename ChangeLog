@@ -1,3 +1,13 @@
+20/6/2002:	v1.4.3
+	- merge (mainly ftp) changes from 8.0 branch:
+	  - raised min free memory limit to 12MB
+	  - fixed proxy code
+	  - added 'ProxyProto' entry to install.inf
+	  - ask for http proxy
+	  - ftp proxy is proxy via http per default
+	  - link .S.u.S.E* file to /var/adm/mount for ftp/http/tftp install
+	  - let 'NetDevice' option cooperate with auto install
+
 27/5/2002:	v1.4.2
 	- fixed Makefile for sparc
 

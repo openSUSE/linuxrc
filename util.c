@@ -2543,9 +2543,18 @@ void set_instmode(instmode_t instmode)
       config.insttype = inst_net;
   }
 
-  if(instmode == inst_ftp || instmode == inst_tftp || instmode == inst_http) {
+  if(
+    (instmode == inst_ftp || instmode == inst_http) &&
+    !config.net.proxyproto
+  ) {
+    config.net.proxyproto = inst_http;
+  }
+
+#if 0
+  if(instmode == inst_tftp) {
     config.fullnetsetup = 1;
   }
+#endif
 }
 
 
@@ -2616,7 +2625,10 @@ int net_open(char *filename)
     return -1;
   }
 
-  if(config.instmode == inst_ftp) {
+  if(
+    config.instmode == inst_ftp &&
+    !(config.net.proxyport && config.net.proxyproto == inst_http)
+  ) {
 
     if(config.net.proxyport && config.net.proxy.ok) {
       config.net.ftp_sock = ftpOpen(inet_ntoa(config.net.server.ip), user, password, inet_ntoa(config.net.proxy.ip), config.net.proxyport);
@@ -2647,12 +2659,19 @@ int net_open(char *filename)
 
   }
 
-  if(config.instmode == inst_http) {
+  if(
+    config.instmode == inst_http ||
+    (config.net.proxyport && config.net.proxyproto == inst_http)
+  ) {
     if(config.net.proxyport && config.net.proxy.ok) {
-      fd = http_connect(&config.net.server, filename, &config.net.proxy, config.net.proxyport, &len);
+      fd = http_connect(
+        &config.net.server, filename, get_instmode_name(config.instmode),
+        &config.net.proxy, config.net.port, config.net.proxyport,
+        &len
+      );
     }
     else {
-      fd = http_connect(&config.net.server, filename, NULL, config.net.port, &len);
+      fd = http_connect(&config.net.server, filename, NULL, NULL, config.net.port, 0, &len);
     }
 
     if(fd < 0) {
@@ -2736,6 +2755,7 @@ int util_wget_main(int argc, char **argv)
   url_t *url;
   int i, j, fd = -1;
   unsigned char buf[0x1000];
+  char *s;
 
   argv++; argc--;
 
@@ -2755,6 +2775,18 @@ int util_wget_main(int argc, char **argv)
   str_copy(&config.net.password, url->password);
   if(config.insttype == inst_net) {
     name2inet(&config.net.server, url->server);
+
+    if((s = getenv("proxy"))) {
+      url = parse_url(s);
+      if(url) {
+        config.net.proxyproto = inst_http;
+        if(url->server) name2inet(&config.net.proxy, url->server);
+        if(url->scheme) config.net.proxyproto = url->scheme;
+        if(url->port) config.net.proxyport = url->port;
+        // fprintf(stderr, "using proxy %s://%s:%d\n", get_instmode_name(config.net.proxyproto), config.net.proxy.name, config.net.proxyport);
+      }
+    }
+
     fd = net_open(config.serverdir);
   }
 

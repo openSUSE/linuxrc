@@ -1061,9 +1061,20 @@ void file_write_install_inf(char *dir)
   }
 #endif
 
-  file_write_inet(f, key_proxy, &config.net.proxy);
-  if(config.net.proxyport) {
+  if(
+    config.net.proxyport &&
+    (
+      config.instmode == inst_ftp ||
+      config.instmode == inst_http ||
+      config.instmode == inst_tftp
+    )
+  ) {
+    file_write_inet(f, key_proxy, &config.net.proxy);
     file_write_num(f, key_proxyport, config.net.proxyport);
+    file_write_str(f,
+      key_proxyproto,
+      get_instmode_name(config.net.proxyproto ?: config.instmode)
+    );
   }
 
   file_write_str(f, key_username, config.net.user);
