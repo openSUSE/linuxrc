@@ -683,12 +683,15 @@ void auto2_find_braille()
 
   braille_ig = braille_dev_ig = NULL;
 
-  hd_data->progress = auto2_progress;
-
-  printf("Looking for a braille display...\n");
+  if(auto2_ig) {
+    hd_data->progress = auto2_progress;
+    printf("Looking for a braille display...\n");
+  }
   hd = hd_list(hd_data, hw_braille, 1, NULL);
-  printf("\r%64s\r", "");
-  fflush(stdout);  
+  if(hd_data->progress) {
+    printf("\r%64s\r", "");
+    fflush(stdout);
+  }
 
   hd_data->progress = NULL;
 
