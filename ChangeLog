@@ -2,6 +2,7 @@
 	- SMB support
 	- support more than one floppy drive
 	- read info file even if there's no floppy
+	- new cs & es translations
 
 4/9/2001:	1.2.20
 	- look for yast directly in instsys
