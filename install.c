@@ -513,17 +513,20 @@ static int inst_mount_nfs (void)
 
 static int inst_mount_harddisk (void)
     {
-            int   rc_ii;
-            int   i_ii;
-            char *mountpoint_pci;
+    int   rc_ii = 0;
+    int   i_ii;
+    char *mountpoint_pci;
 
 
     bootmode_ig = BOOTMODE_HARDDISK;
     do
         {
-        rc_ii = dia_input (txt_get (TXT_ENTER_PARTITION), harddisk_tg, 17, 17);
-        if (rc_ii)
-            return (rc_ii);
+        if (!auto_ig)
+            {
+            rc_ii = dia_input (txt_get (TXT_ENTER_PARTITION), harddisk_tg, 17, 17);
+            if (rc_ii)
+                return (rc_ii);
+            }
 
         if (!inst_rescue_im && !force_ri_ig)
             {
@@ -548,15 +551,18 @@ static int inst_mount_harddisk (void)
         else
             {
             fstype_tg = fs_types_atg [i_ii - 1];
-            rc_ii = dia_input (txt_get (TXT_ENTER_HD_DIR), server_dir_tg,
-                               sizeof (server_dir_tg) - 1, 30);
-            if (rc_ii)
+            if (!auto_ig)
                 {
-                inst_umount ();
-                return (rc_ii);
-                }
+                rc_ii = dia_input (txt_get (TXT_ENTER_HD_DIR), server_dir_tg,
+                                   sizeof (server_dir_tg) - 1, 30);
+                if (rc_ii)
+                    {
+                    inst_umount ();
+                    return (rc_ii);
+                    }
 
-            util_truncate_dir (server_dir_tg);
+                util_truncate_dir (server_dir_tg);
+                }
             }
         }
     while (rc_ii);
