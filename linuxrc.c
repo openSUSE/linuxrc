@@ -51,6 +51,7 @@
 #include "multiple_info.h"
 #include "mkdevs.h"
 #include "scsi_rename.h"
+#include "hotplug.h"
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -139,6 +140,7 @@ static struct {
   { "modprobe",    util_modprobe_main    },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
+  { "hotplug",     hotplug_main		 },
   { "nothing",     util_nothing_main     }
 };
 #endif

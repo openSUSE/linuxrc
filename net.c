@@ -53,23 +53,23 @@
 #include "bootpc.h"
 #include "file.h"
 #include "module.h"
+#include "hotplug.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
 
 #define MAX_NETDEVICE      64
 
-static int  net_is_plip_im = FALSE;
+static int  net_is_ptp_im = FALSE;
 
 #if !defined(NETWORK_CONFIG)
-#  if defined (__s390__) || defined (__s390x__)
-#    define NETWORK_CONFIG 0
-#  else
-#    define NETWORK_CONFIG 1
-#  endif
+#  define NETWORK_CONFIG 1
 #endif
 
 static int net_activate(void);
+#if defined(__s390__) || defined(__s390x__)
+static int net_activate_s390_devs(void);
+#endif
 static void net_setup_nameserver(void);
 
 #if NETWORK_CONFIG
@@ -144,6 +144,11 @@ int net_config()
   ) {
     return 0;
   }
+
+#if defined(__s390__) || defined(__s390x__)
+  /* bring up network devices, write hwcfg */
+  if(net_activate_s390_devs()) return -1;
+#endif
 
   if(net_choose_device()) return -1;
 
@@ -384,9 +389,9 @@ int net_activate()
     if (ioctl (socket_ii, SIOCSIFADDR, &interface_ri) < 0)
         error_ii = TRUE;
 
-    if (net_is_plip_im)
+    if (net_is_ptp_im)
         {
-        sockaddr_ri.sin_addr = config.net.pliphost.ip;
+        sockaddr_ri.sin_addr = config.net.ptphost.ip;
         memcpy (&interface_ri.ifr_dstaddr, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFDSTADDR, &interface_ri) < 0)
             error_ii = TRUE;
@@ -410,7 +415,7 @@ int net_activate()
         error_ii = TRUE;
 
     interface_ri.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (net_is_plip_im)
+    if (net_is_ptp_im)
         interface_ri.ifr_flags |= IFF_POINTOPOINT | IFF_NOARP;
     else
         interface_ri.ifr_flags |= IFF_BROADCAST;
@@ -420,9 +425,9 @@ int net_activate()
     memset (&route_ri, 0, sizeof (struct rtentry));
     route_ri.rt_dev = netdevice_tg;
 
-    if (net_is_plip_im)
+    if (net_is_ptp_im)
         {
-        sockaddr_ri.sin_addr = config.net.pliphost.ip;
+        sockaddr_ri.sin_addr = config.net.ptphost.ip;
         memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
         route_ri.rt_flags = RTF_UP | RTF_HOST;
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
@@ -985,7 +990,7 @@ int net_choose_device()
     { "ctc",   TXT_NET_CTC   },
     { "escon", TXT_NET_ESCON },
     { "ci",    TXT_NET_CLAW  },
-    { "iucv",  TXT_NET_CLAW  }
+    { "iucv",  TXT_NET_IUCV  }
   };
     
   if(config.net.device_given) return 0;
@@ -1028,7 +1033,10 @@ int net_choose_device()
     s = strchr(items[choice - 1], ' ');
     if(s) *s = 0;
     strcpy(netdevice_tg, items[choice - 1]);
-    net_is_plip_im = strstr(netdevice_tg, "plip") == netdevice_tg ? TRUE : FALSE;
+    net_is_ptp_im=FALSE;
+    if(strstr(netdevice_tg, "plip") == netdevice_tg) net_is_ptp_im=TRUE;
+    if(strstr(netdevice_tg, "iucv") == netdevice_tg) net_is_ptp_im=TRUE;
+    if(strstr(netdevice_tg, "ctc") == netdevice_tg) net_is_ptp_im=TRUE;
   }
 
   for(i = 0; i < item_cnt; i++) free(items[i]);
@@ -1176,7 +1184,7 @@ void net_setup_nameserver()
  * Global vars changed:
  *  config.net.hostname
  *  config.net.netmask
- *  config.net.pliphost
+ *  config.net.ptphost
  *  config.net.gateway
  *  config.net.server
  *  config.net.broadcast
@@ -1194,23 +1202,23 @@ int net_input_data()
     s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
   }
 
-  if(net_is_plip_im) {
-    if(!config.net.pliphost.name) {
-      name2inet(&config.net.pliphost, config.net.hostname.name);
+  if(net_is_ptp_im) {
+    if(!config.net.ptphost.name) {
+      name2inet(&config.net.ptphost, config.net.hostname.name);
     }
 
-    if(net_get_address(txt_get(TXT_INPUT_PLIP_IP), &config.net.pliphost, 1)) return -1;
+    if(net_get_address(txt_get(TXT_INPUT_PLIP_IP), &config.net.ptphost, 1)) return -1;
 
     if(!config.net.gateway.name) {
-      name2inet(&config.net.gateway, config.net.pliphost.name);
+      name2inet(&config.net.gateway, config.net.ptphost.name);
     }
 
     if(!config.net.server.name) {
-      name2inet(&config.net.server, config.net.pliphost.name);
+      name2inet(&config.net.server, config.net.ptphost.name);
     }
   }
   else {
-    name2inet(&config.net.pliphost, "");
+    name2inet(&config.net.ptphost, "");
 
     if(!config.net.gateway.name) {
       name2inet(&config.net.gateway, config.net.hostname.name);
@@ -1264,7 +1272,7 @@ int net_input_data()
  *  config.net.netmask
  *  config.net.network
  *  config.net.broadcast
- *  config.net.pliphost
+ *  config.net.ptphost
  *  config.net.gateway
  *  config.net.nameserver
  *  config.net.domain
@@ -1288,7 +1296,7 @@ int net_bootp()
   name2inet(&config.net.netmask, "");
   name2inet(&config.net.network, "");
   s_addr2inet(&config.net.broadcast, 0xffffffff);
-  name2inet(&config.net.pliphost, "");
+  name2inet(&config.net.ptphost, "");
   name2inet(&config.net.hostname, "");
   netconf_error	= 0;
 
@@ -1626,3 +1634,151 @@ void if_down(char *dev)
   close(sock);
 }
 
+#if defined(__s390__) || defined(__s390x__)
+/* hwcfg file parameters */
+struct {
+  char* userid;
+  char* startmode;
+  char* module;
+  char* module_options;
+  char* module_unload;
+  char* scriptup;
+  char* scriptup_ccw;
+  char* scriptup_ccwgroup;
+  char* scriptdown;
+  char* readchan;
+  char* writechan;
+  char* datachan;
+  char* ccw_chan_ids;
+  int ccw_chan_num;
+  int protocol;
+} hwp;
+
+void net_list_s390_devs(char* driver)
+{
+  printf("%s not implemented yet\n", __FUNCTION__);
+}
+
+int net_check_ccw_address(char* addr)
+{
+  printf("%s not implemented yet\n", __FUNCTION__);
+  return 0;
+}
+
+int net_activate_s390_devs(void)
+{
+  int rc;
+  char buf[100];
+  char hwcfg_name[40];
+  char* ifname;
+
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_390net_osatr,
+    di_390net_osaeth,
+    di_390net_osaexeth,
+    di_390net_ctc,
+    di_390net_escon,
+    di_390net_iucv,
+    di_390net_hsi,
+    di_390net_osaextr,
+    di_none
+  };
+  
+  di = dia_menu2(txt_get(TXT_CHOOSE_390NET), 33, 0, items, di_390net_iucv);
+  
+  /* hwcfg parms common to all devices */
+  hwp.startmode="auto";
+  hwp.module_options="";
+  hwp.module_unload="yes";
+  hwp.protocol=-1;
+  
+  switch(di)
+  {
+  case di_390net_iucv:
+    if((rc=dia_input2(txt_get(TXT_IUCV_PEER), &hwp.userid,20,0))) return rc;
+
+    // does not work mod_modprobe("netiucv",NULL);	// FIXME: error handling
+    system("/sbin/modprobe netiucv");
+    util_set_sysfs_attr("/sys/bus/iucv/drivers/netiucv/connection",hwp.userid);	// FIXME: error handling
+
+    sprintf(hwcfg_name,"iucv-id-%s",hwp.userid);
+    hwp.module="netiucv";
+    hwp.scriptup="hwup-iucv";
+    break;
+
+  case di_390net_ctc:
+    system("/sbin/modprobe ctc");
+
+    net_list_s390_devs("cu3088");
+
+    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &hwp.readchan, 8, 0))) return rc;
+    if((rc=net_check_ccw_address(hwp.readchan))) return rc;
+    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &hwp.writechan, 8, 0))) return rc;
+    if((rc=net_check_ccw_address(hwp.writechan))) return rc;
+    
+    dia_item_t protocols[] = {
+      di_ctc_compat,
+      di_ctc_ext,
+      di_ctc_zos390,
+      di_none
+    };
+    rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 33, 0, protocols, di_ctc_compat);
+    switch(rc)
+    {
+    case di_ctc_compat: hwp.protocol=0; break;
+    case di_ctc_ext: hwp.protocol=1; break;
+    case di_ctc_zos390: hwp.protocol=3; break;
+    default: return -1;
+    }
+    
+    sprintf(buf,"%s,%s\n",hwp.readchan,hwp.writechan);
+    util_set_sysfs_attr("/sys/bus/ccwgroup/drivers/ctc/group",buf);	// FIXME: error handling
+    sprintf(buf,"/sys/devices/cu3088/%s/protocol",hwp.readchan);
+    sprintf(hwcfg_name,"%d",hwp.protocol);
+    util_set_sysfs_attr(buf,hwcfg_name);	// FIXME: error handling
+
+    hotplug_event_handled();	/* remove stale events */
+    sprintf(buf,"/sys/devices/cu3088/%s/online",hwp.readchan);
+    util_set_sysfs_attr(buf,"1");	// FIXME: error handling
+    if((rc=hotplug_wait_for_event("net"))) return rc;
+    ifname=hotplug_get_info("INTERFACE");	// FIXME: error handling
+    hotplug_event_handled();
+    
+    sprintf(hwcfg_name, "ctc-bus-ccw-%s",hwp.readchan);
+    hwp.module="ctc";
+    hwp.scriptup="hwup-ccw";
+    hwp.scriptup_ccw="hwup-ccw";
+    hwp.scriptup_ccwgroup="hwup-ccw";
+    hwp.scriptdown="hwdown-ccw";
+    strprintf(&hwp.ccw_chan_ids,"%s %s",hwp.readchan,hwp.writechan);
+    hwp.ccw_chan_num=2;
+    
+    break;
+    
+  default:
+    return -1;
+  }
+  
+  /* write hwcfg file */
+
+  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
+  FILE* fp=fopen(buf,"w");	// FIXME: error handling
+
+  if(hwp.startmode) fprintf(fp,"STARTMODE=\"%s\"\n",hwp.startmode);
+  if(hwp.module) fprintf(fp,"MODULE=\"%s\"\n",hwp.module);
+  if(hwp.module_options) fprintf(fp,"MODULE_OPTIONS=\"%s\"\n",hwp.module_options);
+  if(hwp.module_unload) fprintf(fp,"MODULE_UNLOAD=\"%s\"\n",hwp.module_unload);
+  if(hwp.scriptup) fprintf(fp,"SCRIPTUP=\"%s\"\n",hwp.scriptup);
+  if(hwp.scriptup_ccw) fprintf(fp,"SCRIPTUP_ccw=\"%s\"\n",hwp.scriptup_ccw);
+  if(hwp.scriptup_ccwgroup) fprintf(fp,"SCRIPTUP_ccwgroup=\"%s\"\n",hwp.scriptup_ccwgroup);
+  if(hwp.scriptdown) fprintf(fp,"SCRIPTDOWN=\"%s\"\n",hwp.scriptdown);
+  if(hwp.ccw_chan_ids) fprintf(fp,"CCW_CHAN_IDS=\"%s\"\n",hwp.ccw_chan_ids);
+  if(hwp.ccw_chan_num) fprintf(fp,"CCW_CHAN_NUM=\"%d\"\n",hwp.ccw_chan_num);
+  if(hwp.protocol > -1) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",hwp.protocol);
+  
+  fclose(fp);
+
+  return 0;
+}
+#endif

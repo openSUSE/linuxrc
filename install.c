@@ -67,6 +67,8 @@ static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_netsource    (void);
 static int   inst_choose_netsource_cb (dia_item_t di);
+static int   inst_choose_display      (void);
+static int   inst_choose_display_cb   (dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
@@ -88,6 +90,7 @@ static void live_show_state(void);
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
+static dia_item_t di_inst_choose_display_last = di_none;
 
 #if 0
 int inst_auto_install()
@@ -361,6 +364,56 @@ int inst_choose_netsource_cb(dia_item_t di)
   if(error) inst_umount();
 
   return error ? 1 : 0;
+}
+
+int inst_choose_display()
+{
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_display_x11,
+    di_display_vnc,
+    di_display_ssh,
+    di_none
+  };
+
+  di = dia_menu2(txt_get(TXT_CHOOSE_DISPLAY), 33, inst_choose_display_cb, items, di_inst_choose_display_last);
+
+  return di == di_none ? -1 : 0;
+}
+
+
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int inst_choose_display_cb(dia_item_t di)
+{
+  int rc;
+  di_inst_choose_display_last = di;
+
+  switch(di) {
+    case di_display_x11:
+      if((rc = net_get_address(txt_get(TXT_XSERVER_IP), &config.net.displayip, 1)))
+        return rc;
+      break;
+
+    case di_display_vnc:
+      config.vnc=1;
+      net_ask_password();
+      break;
+
+    case di_display_ssh:
+      config.usessh=1;
+      net_ask_password();
+      break;
+
+    default:
+      break;
+  }
+
+  return 0;
 }
 
 
@@ -789,6 +842,9 @@ int inst_start_install()
 
   if(config.manual) {
     if((rc = inst_choose_source())) return rc;
+#if defined(__s390__) || defined(__s390x__)
+    if((rc = inst_choose_display())) return rc;
+#endif
   }
   else {
     fprintf(stderr, "going for automatic install\n");

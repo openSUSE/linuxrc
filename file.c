@@ -88,7 +88,7 @@ static struct {
   { key_pcmcia,         "PCMCIA",         kf_none                        },
   { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
   { key_console,        "Console",        kf_none                        },
-  { key_pliphost,       "PLIPHost",       kf_none                        },	/* drop it? */
+  { key_ptphost,        "Pointopoint",    kf_none                        },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_demo,           "Demo",           kf_none                        },	/* obsolete */
@@ -154,6 +154,7 @@ static struct {
   { key_vnc,            "VNC",            kf_cfg + kf_cmd                },
   { key_usessh,         "UseSSH",         kf_cfg + kf_cmd                },
   { key_vncpassword,    "VNCPassword",    kf_cfg + kf_cmd                },
+  { key_displayip,	"Display_IP",     kf_cfg + kf_cmd		 },
   { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },
   { key_usepivotroot,   "UsePivotRoot",   kf_cfg + kf_cmd                },
   { key_term,           "TERM",           kf_cfg + kf_cmd                },
@@ -836,6 +837,11 @@ void file_do_info(file_t *f0)
 	/* do not enable vnc nor network ... this is done with vnc=1 */
         break;
 
+      case key_displayip:
+        name2inet(&config.net.displayip, f->value);
+        net_check_address2(&config.net.displayip, 0);
+        break;
+                                      
       case key_sshpassword:
         str_copy(&config.net.sshpassword, *f->value ? f->value : NULL);
 	/* do not enable ssh nor network ... this is done with usessh=1 */
@@ -1369,8 +1375,8 @@ void file_write_install_inf(char *dir)
     }
     file_write_inet(f, key_broadcast, &config.net.broadcast);
     file_write_inet(f, key_network, &config.net.network);
-    if(config.net.pliphost.ok) {
-      file_write_inet(f, key_pliphost, &config.net.pliphost);
+    if(config.net.ptphost.ok) {
+      file_write_inet(f, key_ptphost, &config.net.ptphost);
     }
     else {
       file_write_inet(f, key_netmask, &config.net.netmask);
@@ -1434,6 +1440,8 @@ void file_write_install_inf(char *dir)
 
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
+  file_write_inet(f, key_displayip, &config.net.displayip);
+  file_write_inet(f, key_ptphost, &config.net.ptphost);
   file_write_num(f, key_usessh, config.usessh);
   if(
     config.rootpassword &&

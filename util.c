@@ -37,6 +37,8 @@
 #include <net/if.h>
 #include <linux/major.h>
 #include <linux/raid/md_u.h>
+#include <sysfs/dlist.h>
+#include <sysfs/libsysfs.h>
 
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
 
@@ -1331,7 +1333,7 @@ void util_status_info()
   sprintf(buf, "server = %s", inet2print(&config.net.server));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "plip host = %s", inet2print(&config.net.pliphost));
+  sprintf(buf, "ptp host = %s", inet2print(&config.net.ptphost));
   slist_append_str(&sl0, buf);
 
   if(config.serverdir) {
@@ -4345,4 +4347,16 @@ void util_load_usb()
   hd_free_hd_data(hd_data);
 }
 
+int util_set_sysfs_attr(char* attr, char* value)
+{
+  int rc;
+  struct sysfs_attribute* sa;
 
+  sa=sysfs_open_attribute(attr);
+  if(!sa) return -1;
+    
+  rc=sysfs_write_attribute(sa,value,strlen(value));
+
+  sysfs_close_attribute(sa);
+  return rc;
+}

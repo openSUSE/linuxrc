@@ -72,7 +72,24 @@ typedef enum {
   di_extras_info,
   di_extras_change,
   di_extras_command,
-  di_extras_quit
+  di_extras_quit,
+  
+  di_display_x11,
+  di_display_vnc,
+  di_display_ssh,
+
+  di_390net_osatr,
+  di_390net_osaeth,
+  di_390net_osaexeth,
+  di_390net_ctc,
+  di_390net_escon,
+  di_390net_iucv,
+  di_390net_hsi,
+  di_390net_osaextr,
+  
+  di_ctc_compat,
+  di_ctc_ext,
+  di_ctc_zos390
 
 } dia_item_t;
 

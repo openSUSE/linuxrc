@@ -1238,3 +1238,75 @@ msgstr ""
 msgid "Password is too short (must have at least 5 characters)."
 msgstr ""
 
+#. TXT_XSERVER_IP
+msgid "Enter the IP address of the host running the X11 server."
+msgstr ""
+
+#. TXT_CHOOSE_390NET
+msgid "Please select the type of your network device."
+msgstr ""
+
+#. TXT_IUCV_PEER
+msgid "Please enter the name (user ID) of the target VM guest."
+msgstr ""
+
+#. TXT_390NET_OSATR
+msgid "OSA Token Ring (LCS)"
+msgstr ""
+
+#. TXT_390NET_OSAETH
+msgid "OSA Ethernet"
+msgstr ""
+
+#. TXT_390NET_OSAEXETH
+msgid "OSA Gigabit Ethernet or OSA Express Fast Ethernet"
+msgstr ""
+
+#. TXT_390NET_CTC
+msgid "Channel To Channel (CTC)"
+msgstr ""
+
+#. TXT_390NET_ESCON
+msgid "ESCON"
+msgstr ""
+
+#. TXT_390NET_IUCV
+msgid "Inter-User Communication Vehicle (IUCV)"
+msgstr ""
+
+#. TXT_390NET_HSI
+msgid "Hipersockets"
+msgstr ""
+
+#. TXT_390NET_OSAEXTR
+msgid "OSA High Speed Token Ring"
+msgstr ""
+
+#. TXT_CTC_CHANNEL_READ
+msgid "Device address for read channel"
+msgstr ""
+
+#. TXT_CTC_CHANNEL_WRITE
+msgid "Device address for write channel"
+msgstr ""
+
+#. TXT_CTC_CHANNEL_DATA
+msgid "Device address for data channel"
+msgstr ""
+
+#. TXT_CHOOSE_CTC_PROTOCOL
+msgid "Select protocol for this CTC device."
+msgstr ""
+
+#. TXT_CTC_PROT_COMPAT
+msgid "Compatibility mode (default)"
+msgstr ""
+
+#. TXT_CTC_PROT_EXT
+msgid "Extended mode"
+msgstr ""
+
+#. TXT_CTC_PROT_ZOS390
+msgid "Compatibility mode for OS/390 and z/OS peers"
+msgstr ""
+

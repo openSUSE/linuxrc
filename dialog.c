@@ -92,7 +92,24 @@ struct {
   { di_extras_info,     0, "Show config"    },
   { di_extras_change,   0, "Change config"  },
   { di_extras_command,  0, "Run command"    },
-  { di_extras_quit,     0, "Quit linuxrc"   }
+  { di_extras_quit,     0, "Quit linuxrc"   },
+  
+  { di_display_vnc,	0, "VNC"	    },
+  { di_display_x11,	0, "X11"	    },
+  { di_display_ssh,     0, "SSH"	    },
+  
+  { di_390net_osatr,	TXT_390NET_OSATR    },
+  { di_390net_osaeth,	TXT_390NET_OSAETH   },
+  { di_390net_osaexeth, TXT_390NET_OSAEXETH },
+  { di_390net_ctc,	TXT_390NET_CTC	    },
+  { di_390net_escon,	TXT_390NET_ESCON    },
+  { di_390net_iucv,	TXT_390NET_IUCV     },
+  { di_390net_hsi,	TXT_390NET_HSI	    },
+  { di_390net_osaextr,	TXT_390NET_OSAEXTR  },
+  
+  { di_ctc_compat,	TXT_CTC_PROT_COMPAT },
+  { di_ctc_ext,		TXT_CTC_PROT_EXT    },
+  { di_ctc_zos390,	TXT_CTC_PROT_ZOS390 }
 
 };
 

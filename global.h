@@ -424,12 +424,13 @@ typedef struct {
     inet_t proxy;
     inet_t hostname;
     inet_t server;
-    inet_t pliphost;
+    inet_t ptphost;
     char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *password;
     char *vncpassword;
+    inet_t displayip;		/* IP of remote X server */
     char *sshpassword;
     net_config_t configured;	/* how we configured the network device */
     char *unique_id;		/* unique id of network card */
