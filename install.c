@@ -106,7 +106,9 @@ int inst_auto_install (void)
         case BOOTMODE_CDWITHNET:
             rc_ii = inst_mount_cdrom (1);
             break;
-	    // TODO: SMB
+        case BOOTMODE_SMB:
+            rc_ii = inst_mount_smb ();
+            break;
         case BOOTMODE_NET:
             rc_ii = inst_mount_nfs ();
             break;
@@ -1545,7 +1547,7 @@ static int inst_mount_smb (void)
         if (rc_ii)
             return (rc_ii);
 
-	sprintf(msg, txt_get(TEXT_SMB_TRYING_MOUNT),
+	sprintf(msg, txt_get(TXT_SMB_TRYING_MOUNT),
 		inet_ntoa(config.smb.server),
 		config.smb.share);
 
@@ -1559,8 +1561,6 @@ static int inst_mount_smb (void)
         }
     while (rc_ii);
 
-    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
-    return (-1);
     bootmode_ig = BOOTMODE_SMB;
     return (0);
     }

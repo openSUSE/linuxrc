@@ -385,6 +385,12 @@ int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
 
+  // TODO: +=SMB
+  if (bootmode_ig == BOOTMODE_SMB) {
+    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
+    return (1);
+  }
+      
   if(!(valid_net_config_ig || bootmode_ig == BOOTMODE_NET)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
@@ -765,6 +771,12 @@ int auto2_find_install_medium()
   }
   if(auto2_loaded_module_args) {
     free(auto2_loaded_module_args); auto2_loaded_module_args = NULL;
+  }
+
+  // TODO: +=SMB
+  if (bootmode_ig == BOOTMODE_SMB) {
+    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
+    return FALSE;
   }
 
   deb_msg("Well, maybe there is a NFS/FTP server...");

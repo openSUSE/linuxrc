@@ -43,6 +43,7 @@ static const char  *file_txt_bootmode_tm       = "Bootmode:";
 static const char  *file_txt_bootfloppy_tm     = "Floppy";
 static const char  *file_txt_bootcd_tm         = "CD";
 static const char  *file_txt_bootnet_tm        = "Net";
+static const char  *file_txt_bootsmb_tm        = "SMB";
 static const char  *file_txt_bootharddisk_tm   = "Harddisk";
 static const char  *file_txt_bootcdwithnet_tm  = "CDwithNET";
 static const char  *file_txt_bootftp_tm        = "FTP";
@@ -295,7 +296,9 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
         case BOOTMODE_CDWITHNET:
             strcat (line_ti, file_txt_bootcd_tm);
             break;
-	    // TODO: +=SMB
+        case BOOTMODE_SMB:
+            strcat (line_ti, file_txt_bootsmb_tm);
+            break;
         case BOOTMODE_NET:
             strcat (line_ti, file_txt_bootnet_tm);
             break;
@@ -320,6 +323,7 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
         }
 
     if ( bootmode_ig == BOOTMODE_NET || 
+	 bootmode_ig == BOOTMODE_SMB || 
 	 bootmode_ig == BOOTMODE_FTP || 
 	 bootmode_ig == BOOTMODE_CDWITHNET )
         {
@@ -346,10 +350,25 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
         if (nameserver_rg.s_addr)
             fprintf (file_pri, "%s %s\n", file_txt_dnsserver_tm,
                                           inet_ntoa (nameserver_rg));
-	//TODO: +=SMB
-        fprintf (file_pri, "%s %s\n", file_txt_server_tm,
-                 inet_ntoa (bootmode_ig == BOOTMODE_NET ? nfs_server_rg : ftp_server_rg));
-        fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir_tg);
+	{
+	    struct in_addr *server_address = 0;
+	    char           *server_dir = server_dir_tg;
+	    switch (bootmode_ig) {
+	    case BOOTMODE_SMB:
+		server_address = &config.smb.server;
+		server_dir     = config.smb.share;
+		break;
+	    case BOOTMODE_NET:
+		server_address = &nfs_server_rg;
+		break;
+	    case BOOTMODE_FTP:
+		server_address = &ftp_server_rg;
+		break;
+	    }
+	    fprintf (file_pri, "%s %s\n", file_txt_server_tm,
+		     inet_ntoa (*server_address));
+	    fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir);
+	}
 
         if (machine_name_tg [0])
             fprintf (file_pri, "%s %s\n", file_txt_machine_name_tm,
@@ -441,6 +460,17 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
                                   inet_ntoa (nfs_server_rg),
                                   server_dir_tg, mountpoint_tg);
                 break;
+            case BOOTMODE_SMB: {
+		char smb_mount_options[200];
+		net_smb_get_mount_options(smb_mount_options);
+                sprintf (line_ti, 
+			 "//%s/%s %s smbfs ro,%s 0 0\n",
+			 inet_ntoa (config.smb.server),
+			 config.smb.share,
+			 mountpoint_tg,
+			 smb_mount_options);
+	        }
+	        break;
             default:
                 line_ti [0] = 0;
                 break;
@@ -568,7 +598,9 @@ int file_read_info (void)
             else if (!strncasecmp (value_ti, file_txt_bootnet_tm,
                                    strlen (file_txt_bootnet_tm)))
                 bootmode_ig = BOOTMODE_NET;
-	    // TODO: += SMB
+            else if (!strncasecmp (value_ti, file_txt_bootsmb_tm,
+                                   strlen (file_txt_bootsmb_tm)))
+                bootmode_ig = BOOTMODE_SMB;
             }
 
         if (!strncasecmp (file_txt_ip_tm, buffer_ti,

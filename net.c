@@ -372,6 +372,23 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
     return (0);
     }
 
+void net_smb_get_mount_options (char* options)
+{
+    
+    sprintf(options,"ip=%s", inet_ntoa(config.smb.server));
+    if (config.smb.user) {
+	strcat(options, ",username=");
+	strcat(options, config.smb.user);
+	strcat(options, ",password=");
+	strcat(options, config.smb.password);
+	if (config.smb.workgroup) {
+	    strcat(options,",workgroup=");
+	    strcat(options,config.smb.workgroup);
+	}
+    } else {
+	strcat(options,",guest");
+    }
+}
 int net_mount_smb ()
 {
     /*******************************************************************
@@ -393,26 +410,17 @@ int net_mount_smb ()
 
     *******************************************************************/
     char mount_command[1000];
-    char server_ascii[100];
-    strcpy(server_ascii, inet_ntoa(config.smb.server));
-    sprintf(mount_command, "sudo mount -t smbfs //%s/%s %s -o ip=%s",
-	    server_ascii,
+    char mount_options[200];
+    net_smb_get_mount_options(mount_options);
+#if !defined(SUDO)
+#  define SUDO
+#endif
+    sprintf(mount_command, SUDO "mount -t smbfs //%s/%s %s -o %s",
+	    inet_ntoa(config.smb.server),
 	    config.smb.share,
 	    mountpoint_tg,
-	    server_ascii
+	    mount_options
 	);
-    if (config.smb.user) {
-	strcat(mount_command, ",username=");
-	strcat(mount_command, config.smb.user);
-	strcat(mount_command, ",password=");
-	strcat(mount_command, config.smb.password);
-	if (config.smb.workgroup) {
-	    strcat(mount_command,",workgroup=");
-	    strcat(mount_command,config.smb.workgroup);
-	}
-    } else {
-	strcat(mount_command,",guest");
-    }
     deb_str(mount_command);
     if (system(mount_command))
 	return(-1);
