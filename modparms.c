@@ -112,7 +112,7 @@ void mpar_write_modparms (FILE *file_prv)
 
     if (mpar_modnames_atm [0] || usb_mods_ig)
         {
-        fprintf (file_prv, "INITRD_MODULES=\"%s", usb_mods_ig ? usb_mods_ig : "");
+        fprintf (file_prv, "InitrdModules: %s", usb_mods_ig ? usb_mods_ig : "");
 
         for (i_ii = 0; i_ii < NR_MODPARAMS; i_ii++) {
           if(
@@ -147,12 +147,12 @@ void mpar_write_modparms (FILE *file_prv)
           }
         }
 
-        fprintf (file_prv, "\"\n");
+        fprintf (file_prv, "\n");
         }
 
     for (i_ii = 0; i_ii < NR_MODPARAMS; i_ii++)
         if (mpar_modparams_atm [i_ii])
-            fprintf (file_prv, "options %s\n", mpar_modparams_atm [i_ii]);
+            fprintf (file_prv, "Options: %s\n", mpar_modparams_atm [i_ii]);
     }
 
 

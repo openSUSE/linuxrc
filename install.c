@@ -47,7 +47,6 @@
 #include "auto2.h"
 
 
-#define YAST_INFO_FILE  "/etc/yast.inf"
 #define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
 #define YAST1_COMMAND   "/sbin/YaST"
 #define SETUP_COMMAND   "/sbin/inst_setup"
@@ -69,7 +68,6 @@ static int   inst_start_rescue        (void);
 static int   inst_prepare             (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
-static int   inst_read_yast_file      (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (int what_iv);
@@ -213,8 +211,7 @@ int inst_start_demo (void)
     if (util_try_mount (RAMDISK_2, mountpoint_tg, 0, 0))
         return (-1);
 
-    sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/install.inf");
-    file_write_yast_info (filename_ti);
+    file_write_install_inf (mountpoint_tg);
 
     sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
     file_pri = fopen (filename_ti, "a");
@@ -828,7 +825,8 @@ int inst_prepare()
 
   setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
-  file_write_yast_info(NULL);
+  file_write_install_inf("");
+  file_write_mtab();
 
   if(!ramdisk_ig) rc = inst_init_cache();
 
@@ -944,7 +942,7 @@ int inst_execute_yast()
   sync();
   fprintf(stderr, " ok\n");
 
-  i = inst_read_yast_file();
+  i = file_read_yast_inf();
   if(!rc_ii) rc_ii = i;
 
   // if(!auto2_ig) disp_restore_screen();
@@ -1040,60 +1038,6 @@ int inst_check_floppy()
     close(fd);
 
   return fd < 0 ? fd : 0;
-}
-
-
-int inst_read_yast_file()
-{
-  int root = 0;
-  char cmd[MAX_FILENAME];
-  file_t *f0, *f;
-
-  f0 = file_read_file(YAST_INFO_FILE);
-
-  for(f = f0; f; f = f->next) {
-    switch(f->key) {
-#if OBSOLETE_SWAPOFF
-      case key_swap:
-        swapoff(f->value);
-        break;
-#endif
-
-#if OBSOLETE_YAST_LIVECD
-      case key_live:		/* really obsolete */
-        yast_live_cd = f->nvalue;
-        break;
-#endif
-
-      case key_root:
-        root = 1;
-        if(!f->is.numeric) root_set_root(f->value);
-        reboot_ig = f->nvalue;
-        break;
-
-      case key_keytable:
-        strcpy(keymap_tg, f->value);
-        sprintf(cmd, "loadkeys %s.map", keymap_tg);
-        system(cmd);
-        do_disp_init_ig = TRUE;
-        break;
-
-      case key_language:
-        set_activate_language(set_langidbyname(f->value));
-        do_disp_init_ig = TRUE;
-        break;
-
-      case key_rebootmsg:
-        config.rebootmsg = f->nvalue;
-        break;
-
-      default:
-    }
-  }
-
-  file_free_file(f0);
-
-  return root ? 0 : -1;
 }
 
 

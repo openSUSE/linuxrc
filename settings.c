@@ -19,7 +19,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "dialog.h"
-
+#include "file.h"
 
 typedef struct
       {
@@ -248,14 +248,6 @@ static keymap_t set_keymaps_arm_mac [] =
 #define NR_KEYMAPS_MAC (sizeof set_keymaps_arm_mac / sizeof *set_keymaps_arm_mac)
 #endif
 
-static const char  *set_txt_language_tm       = "Language:";
-static const char  *set_txt_font_tm           = "Font:";
-static const char  *set_txt_screenmap_tm      = "Screenmap:";
-#if 0
-static const char  *set_txt_unicode_tm        = "Unicodemap:";
-#endif
-static const char  *set_txt_fontmagic_tm      = "Fontmagic:";
-static const char  *set_txt_locale_tm         = "Locale:";
 
 /*
  *
@@ -591,42 +583,24 @@ static int set_expert_cb (int what_iv)
     }
 
 
-void set_write_info (FILE *file_prv)
-    {
-    char   line_ti [200];
-    int    lang_idx_ii;
+void set_write_info(FILE *f)
+{
+  language_t *lang;
+  char magic[3] = "( ";
 
-    lang_idx_ii = set_get_current_language () - 1;
+  lang = set_languages_arm + set_get_current_language() - 1;
 
-    sprintf (line_ti, "%s %s\n", set_txt_language_tm,
-                      set_languages_arm [lang_idx_ii].yastcode);
-    fprintf (file_prv, line_ti);
+  file_write_str(f, key_language, lang->yastcode);
 
-    if (set_languages_arm [lang_idx_ii].write_info)
-        {
-        sprintf (line_ti, "%s %s\n", set_txt_font_tm,
-                          set_languages_arm [lang_idx_ii].font);
-        fprintf (file_prv, line_ti);
+  if(lang->write_info) {
+    file_write_str(f, key_font, lang->font);
+    file_write_str(f, key_screenmap, lang->mapscreen);
+    magic[1] = lang->usermap ? 'K' : 'B';
+    file_write_str(f, key_fontmagic, magic);
+  }
 
-#if 0
-        sprintf (line_ti, "%s %s\n", set_txt_unicode_tm,
-                          set_languages_arm [lang_idx_ii].unimap);
-#endif
-        fprintf (file_prv, line_ti);
-
-        sprintf (line_ti, "%s %s\n", set_txt_screenmap_tm,
-                          set_languages_arm [lang_idx_ii].mapscreen);
-        fprintf (file_prv, line_ti);
-
-        sprintf (line_ti, "%s (%c\n", set_txt_fontmagic_tm,
-                          set_languages_arm [lang_idx_ii].usermap ? 'K' : 'B');
-        fprintf (file_prv, line_ti);
-        }
-
-    sprintf (line_ti, "%s %s\n", set_txt_locale_tm,
-                      set_languages_arm [lang_idx_ii].locale);
-    fprintf (file_prv, line_ti);
-    }
+  file_write_str(f, key_locale, lang->locale);
+}
 
 
 /* Note: this *must* return a value in the range [1, NR_LANGUAGES]! */
@@ -722,3 +696,4 @@ static void set_font(char *font, char *map, char *unimap)
 
   deb_int(err);
 }
+

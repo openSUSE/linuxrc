@@ -1,4 +1,5 @@
 	- reimplemented info file read function
+	- file write function ("install.inf") rewritten
 
 9/11/2001:	v1.3.0
 	- nashif: added autoinstall patches

@@ -28,62 +28,16 @@
 #if WITH_PCMCIA
 #include "pcmcia.h"
 #endif
+#include "rootimage.h"
 
-static const char  *file_infofile_tm           = "/etc/install.inf";
+#define YAST_INF_FILE		"/etc/yast.inf"
+#define INFO_FILE		"/info"
+#define INSTALL_INF_FILE	"/etc/install.inf"
+#define MTAB_FILE		"/etc/mtab"
 
-static const char  *file_txt_keymap_tm         = "Keytable:";
-static const char  *file_txt_sourcemount_tm    = "Sourcemounted:";
-static const char  *file_txt_display_tm        = "Display:";
-static const char  *file_txt_cdrom_tm          = "Cdrom:";
-#if WITH_PCMCIA
-static const char  *file_txt_pcmcia_tm         = "PCMCIA:";
-#endif
-static const char  *file_txt_bootmode_tm       = "Bootmode:";
-static const char  *file_txt_bootfloppy_tm     = "Floppy";
-static const char  *file_txt_bootcd_tm         = "CD";
-static const char  *file_txt_bootnet_tm        = "Net";
-static const char  *file_txt_bootsmb_tm        = "SMB";
-static const char  *file_txt_bootharddisk_tm   = "Harddisk";
-static const char  *file_txt_bootftp_tm        = "FTP";
-static const char  *file_txt_partition_tm      = "Partition:";
-static const char  *file_txt_fstyp_tm          = "Fstyp:";
-static const char  *file_txt_serverdir_tm      = "Serverdir:";
-static const char  *file_txt_ip_tm             = "IP:";
-static const char  *file_txt_pliphost_tm       = "PLIP-Host:";
-static const char  *file_txt_netmask_tm        = "Netmask:";
-static const char  *file_txt_gateway_tm        = "Gateway:";
-static const char  *file_txt_server_tm         = "Server:";
-static const char  *file_txt_dnsserver_tm      = "Nameserver:";
-static const char  *file_txt_netdevice_tm      = "Netdevice:";
-static const char  *file_txt_machine_name_tm   = "Machinename:";
-static const char  *file_txt_broadcast_tm      = "Broadcast:";
-static const char  *file_txt_network_tm        = "Network:";
-static const char  *file_txt_domain_name_tm    = "Domain:";
-static const char  *file_txt_ftp_user_tm       = "FTP-User:";
-static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
-static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
-static const char  *file_txt_manual_tm         = "Manual:";
-static const char  *file_txt_demo_tm           = "Demo:";
-static const char  *file_txt_reboot            = "Reboot:";
-static const char  *file_txt_console_tm        = "Console:";
-#ifdef USE_LIBHD
-static const char  *file_txt_mouse_dev_tm      = "Mousedevice:";
-static const char  *file_txt_mouse_xf86_tm     = "MouseXF86:";
-static const char  *file_txt_mouse_gpm_tm      = "MouseGPM:";
-static const char  *file_txt_has_floppy_tm     = "Floppydisk:";
-static const char  *file_txt_has_kbd_tm        = "Keyboard:";
-static const char  *file_txt_yast2_update_tm   = "YaST2update:";
-static const char  *file_txt_yast2_serial_tm   = "YaST2serial:";
-static const char  *file_txt_yast2_autoinst_tm = "YaST2AutoInstall:";
-static const char  *file_txt_text_mode_tm      = "Textmode:";
-static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
-static const char  *file_txt_usb_tm            = "USB:";
-static const char  *file_txt_yast2_color_tm    = "YaST2color:";
-static const char  *file_txt_boot_disk_tm      = "BootDisk:";
-static const char  *file_txt_disks_tm          = "Disks:";
-#endif
-
+static char *file_key2str(file_key_t key);
 static file_key_t file_str2key(char *value);
+static int sym2index(char *sym);
 
 static void file_module_load (char *insmod_arg);
 
@@ -91,31 +45,68 @@ static struct {
   file_key_t key;
   char *value;
 } keywords[] = {
-  { key_none,           ""               },
-  { key_swap,           "Swap"           },
-  { key_root,           "Root"           },
-  { key_live,           "Live"           },
-  { key_keytable,       "Keytable"       },
-  { key_language,       "Language"       },
-  { key_rebootmsg,      "RebootMsg"      },
-  { key_insmod,         "insmod"         },
-  { key_autoprobe,      "autoprobe"      },
-  { key_start_pcmcia,   "start_pcmcia"   },
-  { key_color,          "Color"          },
-  { key_bootmode,       "Bootmode"       },
-  { key_ip,             "IP"             },
-  { key_netmask,        "Netmask"        },
-  { key_gateway,        "Gateway"        },
-  { key_server,         "Server"         },
-  { key_dnsserver,      "Nameserver"     },
-  { key_partition,      "Partition"      },
-  { key_serverdir,      "Serverdir"      },
-  { key_netdevice,      "Netdevice"      },
-  { key_livesrc,        "LiveSRC"        },
-  { key_bootpwait,      "Bootpwait"      },
-  { key_bootptimeout,   "BOOTP_TIMEOUT"  },
-  { key_forcerootimage, "ForceRootimage" },
-  { key_rebootwait,     "WaitReboot"     }
+  { key_none,           ""                 },
+  { key_swap,           "Swap"             },
+  { key_root,           "Root"             },
+  { key_live,           "Live"             },
+  { key_keytable,       "Keytable"         },
+  { key_language,       "Language"         },
+  { key_rebootmsg,      "RebootMsg"        },
+  { key_insmod,         "Insmod"           },
+  { key_autoprobe,      "Autoprobe"        },
+  { key_start_pcmcia,   "start_pcmcia"     },
+  { key_display,        "Display"          },
+  { key_bootmode,       "Bootmode"         },
+  { key_ip,             "IP"               },
+  { key_netmask,        "Netmask"          },
+  { key_gateway,        "Gateway"          },
+  { key_server,         "Server"           },
+  { key_dnsserver,      "Nameserver"       },
+  { key_broadcast,      "Broadcast"        },
+  { key_network,        "Network"          },
+  { key_partition,      "Partition"        },
+  { key_serverdir,      "Serverdir"        },
+  { key_fstype,         "Fstyp"            },
+  { key_netdevice,      "Netdevice"        },
+  { key_livesrc,        "LiveSRC"          },
+  { key_bootpwait,      "Bootpwait"        },
+  { key_bootptimeout,   "BOOTP_TIMEOUT"    },
+  { key_forcerootimage, "ForceRootimage"   },
+  { key_rebootwait,     "WaitReboot"       },
+  { key_sourcemounted,  "Sourcemounted"    },
+  { key_cdrom,          "Cdrom"            },
+  { key_pcmcia,         "PCMCIA"           },
+  { key_haspcmcia,      "HasPCMCIA"        },
+  { key_console,        "Console"          },
+  { key_pliphost,       "PLIP-Host"        },
+  { key_machine,        "Machinename"      },
+  { key_domain,         "Domain"           },
+  { key_ftpuser,        "FTP-User"         },
+  { key_ftpproxy,       "FTP-Proxy"        },
+  { key_ftpproxyport,   "FTP-Proxyport"    },
+  { key_manual,         "Manual"           },
+  { key_demo,           "Demo"             },
+  { key_reboot,         "Reboot"           },
+  { key_floppydisk,     "Floppydisk"       },
+  { key_keyboard,       "Keyboard"         },
+  { key_yast2update,    "YaST2update"      },
+  { key_yast2serial,    "YaST2serial"      },
+  { key_textmode,       "Textmode"         },
+  { key_yast2autoinst,  "YaST2AutoInstall" },
+  { key_usb,            "USB"              },
+  { key_yast2color,     "YaST2color"       },
+  { key_bootdisk,       "BootDisk"         },
+  { key_disks,          "Disks"            },
+  { key_username,       "Username"         },
+  { key_password,       "Password"         },
+  { key_workdomain,     "WorkDomain"       },
+  { key_alias,          "Alias"            },
+  { key_options,        "Options"          },
+  { key_initrdmodules,  "InitrdModules"    },
+  { key_locale,         "Locale"           },
+  { key_font,           "Font"             },
+  { key_screenmap,      "Screenmap"        },
+  { key_fontmagic,      "Fontmagic"        }
 };
 
 static struct {
@@ -169,6 +160,18 @@ file_key_t file_str2key(char *str)
 }
 
 
+int sym2index(char *sym)
+{
+  int i;
+
+  for(i = 0; i < sizeof sym_constants / sizeof *sym_constants; i++) {
+    if(!strcasecmp(sym_constants[i].name, sym)) return i;
+  }
+
+  return -1;
+}
+
+
 file_t *file_read_file(char *name)
 {
   FILE *f;
@@ -206,12 +209,9 @@ file_t *file_read_file(char *name)
           (*ft)->is.numeric = 1;
         }
         else {
-          for(l = 0; l < sizeof sym_constants / sizeof *sym_constants; l++) {
-            if(!strcasecmp(sym_constants[l].name, s)) {
-              (*ft)->nvalue = sym_constants[l].value;
-              (*ft)->is.numeric = 1;
-              break;
-            }
+          if((l = sym2index(s)) >= 0) {
+            (*ft)->nvalue = sym_constants[l].value;
+            (*ft)->is.numeric = 1;
           }
         }
         if(!(*ft)->is.numeric) {
@@ -244,278 +244,9 @@ void file_free_file(file_t *file)
 }
 
 
-void file_write_yast_info (char *file_name)
-     /*
-Bootmode: SMB
-Server: <samba server>
-Serverdir: <samba share>
-Username: <samba user>  // falls nicht gesetzt, Anmeldung als 'guest'
-Password: <samba password>
-AsWorkgroup: <1 == workgroup, 0 == domain>
-WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
-     */
-    {
-    FILE  *file_pri;
-    char   line_ti [200];
-
-
-    file_pri = fopen (file_name ? file_name : file_infofile_tm, "w");
-    if (!file_pri)
-        {
-        fprintf (stderr, "Cannot open yast info file\n");
-        return;
-        }
-
-    if (language_ig != LANG_UNDEF)
-        set_write_info (file_pri);
-
-    strcpy (line_ti, file_txt_sourcemount_tm);
-    if (!ramdisk_ig)
-        strcat (line_ti, " 1\n");
-    else
-        strcat (line_ti, " 0\n");
-    fprintf (file_pri, line_ti);
-
-    strcpy (line_ti, file_txt_display_tm);
-    if (colors_prg->has_colors)
-        strcat (line_ti, " Color\n");
-    else
-        strcat (line_ti, " Mono\n");
-    fprintf (file_pri, line_ti);
-
-    if (keymap_tg [0] && (!auto2_ig || yast_version_ig == 1))
-        fprintf (file_pri, "%s %s\n", file_txt_keymap_tm, keymap_tg);
-    if (cdrom_tg [0])
-        fprintf (file_pri, "%s %s\n", file_txt_cdrom_tm, cdrom_tg);
-    if (net_tg [0])
-        fprintf (file_pri, "alias %s %s\n", netdevice_tg, net_tg);
-    if (ppcd_tg [0])
-        {
-        fprintf (file_pri, "post-install paride insmod %s\n", ppcd_tg);
-        fprintf (file_pri, "pre-remove paride rmmod %s\n", ppcd_tg);
-        }
-
-#if WITH_PCMCIA
-    if (pcmcia_chip_ig == 1 || pcmcia_chip_ig == 2)
-        {
-        strcpy (line_ti, file_txt_pcmcia_tm);
-        if (pcmcia_chip_ig == 1)
-            strcat (line_ti, " tcic\n");
-        else
-            strcat (line_ti, " i82365\n");
-        fprintf (file_pri, line_ti);
-        }
-#endif
-#ifdef USE_LIBHD
-    fprintf (file_pri, "%s %d\n", file_txt_has_pcmcia_tm, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
-#endif
-
-    if (serial_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_console_tm, console_parms_tg);
-
-    strcpy (line_ti, file_txt_bootmode_tm);
-    strcat (line_ti, " ");
-    switch (bootmode_ig)
-        {
-        case BOOTMODE_FLOPPY:
-            strcat (line_ti, file_txt_bootfloppy_tm);
-            break;
-        case BOOTMODE_CD:
-        case BOOTMODE_CDWITHNET:
-            strcat (line_ti, file_txt_bootcd_tm);
-            break;
-        case BOOTMODE_SMB:
-            strcat (line_ti, file_txt_bootsmb_tm);
-            break;
-        case BOOTMODE_NET:
-            strcat (line_ti, file_txt_bootnet_tm);
-            break;
-        case BOOTMODE_HARDDISK:
-            strcat (line_ti, file_txt_bootharddisk_tm);
-            break;
-        case BOOTMODE_FTP:
-            strcat (line_ti, file_txt_bootftp_tm);
-            break;
-        default:
-            strcat (line_ti, "unknown");
-            break;
-        }
-    strcat (line_ti, "\n");
-    fprintf (file_pri, line_ti);
-
-    if (bootmode_ig == BOOTMODE_HARDDISK)
-        {
-        fprintf (file_pri, "%s %s\n", file_txt_partition_tm, harddisk_tg);
-        fprintf (file_pri, "%s %s\n", file_txt_fstyp_tm, fstype_tg);
-        fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir_tg);
-        }
-
-    if ( bootmode_ig == BOOTMODE_NET || 
-	 bootmode_ig == BOOTMODE_SMB || 
-	 bootmode_ig == BOOTMODE_FTP || 
-	 bootmode_ig == BOOTMODE_CDWITHNET )
-        {
-        fprintf (file_pri, "%s %s\n", file_txt_netdevice_tm, netdevice_tg);
-        fprintf (file_pri, "%s %s\n", file_txt_ip_tm, inet_ntoa (ipaddr_rg));
-
-	if ( bootmode_ig == BOOTMODE_CDWITHNET ) {
-            broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
-            network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
-            fprintf (file_pri, "%s %s\n", file_txt_broadcast_tm, inet_ntoa ( broadcast_rg ) );
-            fprintf (file_pri, "%s %s\n", file_txt_network_tm,   inet_ntoa ( network_rg ) );
-  	}
-
-        if (plip_host_rg.s_addr)
-            fprintf (file_pri, "%s %s\n", file_txt_pliphost_tm,
-                                          inet_ntoa (plip_host_rg));
-        else
-            fprintf (file_pri, "%s %s\n", file_txt_netmask_tm,
-                                          inet_ntoa (netmask_rg));
-            
-        if (gateway_rg.s_addr)
-            fprintf (file_pri, "%s %s\n", file_txt_gateway_tm,
-                                          inet_ntoa (gateway_rg));
-        if (nameserver_rg.s_addr)
-            fprintf (file_pri, "%s %s\n", file_txt_dnsserver_tm,
-                                          inet_ntoa (nameserver_rg));
-	{
-	    struct in_addr *server_address = 0;
-	    char           *server_dir = server_dir_tg;
-	    switch (bootmode_ig) {
-	    case BOOTMODE_SMB:
-		server_address = &config.smb.server;
-		server_dir     = config.smb.share;
-		break;
-	    case BOOTMODE_NET:
-		server_address = &nfs_server_rg;
-		break;
-	    case BOOTMODE_FTP:
-		server_address = &ftp_server_rg;
-		break;
-	    }
-	    fprintf (file_pri, "%s %s\n", file_txt_server_tm,
-		     inet_ntoa (*server_address));
-	    fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir);
-	}
-
-        if (machine_name_tg [0])
-            fprintf (file_pri, "%s %s\n", file_txt_machine_name_tm,
-                                          machine_name_tg);
-        if (domain_name_tg [0])
-            fprintf (file_pri, "%s %s\n", file_txt_domain_name_tm,
-                                          domain_name_tg);
-        }
-
-    if (bootmode_ig == BOOTMODE_FTP)
-        {
-        if (ftp_user_tg [0])
-            fprintf (file_pri, "%s %s\n", file_txt_ftp_user_tm,
-                                          ftp_user_tg);
-        if (ftp_proxy_tg [0])
-            fprintf (file_pri, "%s %s\n", file_txt_ftp_proxy_tm,
-                                          ftp_proxy_tg);
-        if (ftp_proxyport_ig != -1)
-            fprintf (file_pri, "%s %d\n", file_txt_ftp_proxy_port_tm,
-                                          ftp_proxyport_ig);
-        }
-
-    mpar_write_modparms (file_pri);
-
-    fprintf (file_pri, "%s %d\n", file_txt_manual_tm, auto_ig || auto2_ig ? 0 : 1);
-    fprintf (file_pri, "%s %d\n", file_txt_demo_tm, demo_ig);
-    if(reboot_ig)
-        fprintf (file_pri, "%s 1\n", file_txt_reboot);
-
-#ifdef USE_LIBHD
-    if (mouse_dev_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_mouse_dev_tm, mouse_dev_ig);
-    if (mouse_type_xf86_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_mouse_xf86_tm, mouse_type_xf86_ig);
-    if (mouse_type_gpm_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
-
-    if(config.floppies)
-        fprintf(file_pri, "%s %s\n", file_txt_has_floppy_tm, config.floppy_dev[config.floppy]);
-    fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
-    fprintf(file_pri, "%s %d\n",
-      file_txt_yast2_update_tm,
-      (yast2_update_ig || *driver_update_dir) ? 1 : 0
-    );
-    fprintf (file_pri, "%s %d\n", file_txt_yast2_serial_tm, yast2_serial_ig);
-    fprintf (file_pri, "%s %d\n", file_txt_text_mode_tm, text_mode_ig);
-    if ((action_ig & ACT_YAST2_AUTO_INSTALL))
-        fprintf (file_pri, "%s %d\n", file_txt_yast2_autoinst_tm, 1);
-
-    fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
-
-    if(yast2_color_ig) {
-      fprintf (file_pri, "%s %06x\n", file_txt_yast2_color_tm, yast2_color_ig);
-    }
-
-    {
-      char *s;
-      int boot_disk;
-
-      s = auto2_disk_list(&boot_disk);
-      if(*s) {
-        fprintf (file_pri, "%s %d\n", file_txt_boot_disk_tm, boot_disk ? 1 : 0);
-        fprintf (file_pri, "%s %s\n", file_txt_disks_tm, s);
-      }
-    }
-
-#endif
-
-    fclose (file_pri);
-
-    file_pri = fopen ("/etc/mtab", "w");
-    if (!file_pri)
-        return;
-
-    fprintf (file_pri, "/dev/initrd / minix rw 0 0\n");
-    fprintf (file_pri, "none /proc proc rw 0 0\n");
-
-    if (!ramdisk_ig)
-        {
-        switch (bootmode_ig)
-            {
-            case BOOTMODE_CD:
-            case BOOTMODE_CDWITHNET:
-                sprintf (line_ti, "/dev/%s %s iso9660 ro 0 0\n", cdrom_tg, mountpoint_tg);
-                break;
-		// TODO: +=SMB
-            case BOOTMODE_NET:
-                sprintf (line_ti, "%s:%s %s nfs ro 0 0\n",
-                                  inet_ntoa (nfs_server_rg),
-                                  server_dir_tg, mountpoint_tg);
-                break;
-            case BOOTMODE_SMB: {
-		char smb_mount_options[200];
-		net_smb_get_mount_options(smb_mount_options);
-                sprintf (line_ti, 
-			 "//%s/%s %s smbfs ro,%s 0 0\n",
-			 inet_ntoa (config.smb.server),
-			 config.smb.share,
-			 mountpoint_tg,
-			 smb_mount_options);
-	        }
-	        break;
-            default:
-                line_ti [0] = 0;
-                break;
-            }
-        }
-    else
-        sprintf (line_ti, "/dev/ram2 %s ext2 ro 0 0\n", inst_mountpoint_tg);
-
-    fprintf (file_pri, line_ti);
-
-    fclose (file_pri);
-    }
-
-
 int file_read_info()
 {
-  char filename_ti[MAX_FILENAME] = "/info";
+  char filename_ti[MAX_FILENAME] = INFO_FILE;
   window_t win_ri;
   int do_autoprobe = FALSE;
 #if WITH_PCMCIA
@@ -545,10 +276,10 @@ int file_read_info()
 
       util_chk_driver_update(mountpoint_tg);
 
-      sprintf(filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
+      sprintf(filename_ti, "%s/suse/setup/descr" INFO_FILE, mountpoint_tg);
       f0 = file_read_file(filename_ti);
       if(!f0) {
-        sprintf(filename_ti, "%s/info", mountpoint_tg);
+        sprintf(filename_ti, "%s" INFO_FILE, mountpoint_tg);
         f0 = file_read_file(filename_ti);
       }
     }
@@ -583,7 +314,7 @@ int file_read_info()
         if(i != LANG_UNDEF) language_ig = i;
         break;
 
-      case key_color:
+      case key_display:
         color_ig = f->nvalue;
         break;
 
@@ -669,6 +400,18 @@ int file_read_info()
         reboot_wait_ig = f->nvalue;
         break;
 
+      case key_username:
+        config.smb.user = strdup(f->value);
+        break;
+
+      case key_password:
+        config.smb.password = strdup(f->value);
+        break;
+
+      case key_workdomain:
+        config.smb.workgroup = strdup(f->value);
+        break;
+
       default:
     }
   }
@@ -691,6 +434,315 @@ int file_read_info()
 #endif
 
   return 0;
+}
+
+
+int file_read_yast_inf()
+{
+  int root = 0;
+  char cmd[MAX_FILENAME];
+  file_t *f0, *f;
+
+  f0 = file_read_file(YAST_INF_FILE);
+
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+#if OBSOLETE_SWAPOFF
+      case key_swap:
+        swapoff(f->value);
+        break;
+#endif
+
+#if OBSOLETE_YAST_LIVECD
+      case key_live:		/* really obsolete */
+        yast_live_cd = f->nvalue;
+        break;
+#endif
+
+      case key_root:
+        root = 1;
+        if(!f->is.numeric) root_set_root(f->value);
+        reboot_ig = f->nvalue;
+        break;
+
+      case key_keytable:
+        strcpy(keymap_tg, f->value);
+        sprintf(cmd, "loadkeys %s.map", keymap_tg);
+        system(cmd);
+        do_disp_init_ig = TRUE;
+        break;
+
+      case key_language:
+        set_activate_language(set_langidbyname(f->value));
+        do_disp_init_ig = TRUE;
+        break;
+
+      case key_rebootmsg:
+        config.rebootmsg = f->nvalue;
+        break;
+
+      default:
+    }
+  }
+
+  file_free_file(f0);
+
+  return root ? 0 : -1;
+}
+
+
+void file_write_str(FILE *f, file_key_t key, char *str)
+{
+  fprintf(f, "%s: %s\n", file_key2str(key), str);
+}
+
+
+void file_write_num(FILE *f, file_key_t key, int num)
+{
+  fprintf(f, "%s: %d\n", file_key2str(key), num);
+}
+
+
+void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num)
+{
+  int i;
+
+  i = sym2index(base_sym);
+
+  if(i < 0 || num < 0 || i + num >= sizeof sym_constants / sizeof *sym_constants) {
+    file_write_num(f, key, num);
+  }
+
+  fprintf(f, "%s: %s\n", file_key2str(key), sym_constants[i + num].name);
+}
+
+
+void file_write_inet(FILE *f, file_key_t key, struct in_addr *inet)
+{
+  fprintf(f, "%s: %s\n", file_key2str(key), inet_ntoa(*inet));
+}
+
+
+void file_write_install_inf(char *dir)
+{
+  FILE *f;
+  char file_name[256];
+  int i;
+
+  strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
+
+  if(!(f = fopen(file_name, "w"))) {
+    fprintf(stderr, "Cannot open yast info file\n");
+    return;
+  }
+
+  if(language_ig != LANG_UNDEF) set_write_info(f);
+
+  // is that really true???
+  file_write_num(f, key_sourcemounted, ramdisk_ig ? 0 : 1);
+
+  file_write_sym(f, key_display, "Mono", colors_prg->has_colors ? 1 : 0);
+
+  if(*keymap_tg && (!auto2_ig || yast_version_ig == 1)) {
+    file_write_str(f, key_keytable, keymap_tg);
+  }
+
+  if(*cdrom_tg) file_write_str(f, key_cdrom, cdrom_tg);
+  if(*net_tg) {
+    fprintf(f, "%s: %s %s\n", file_key2str(key_alias), netdevice_tg, net_tg);
+  }
+
+  if(*ppcd_tg) {
+    fprintf(f, "post-install paride insmod %s\n", ppcd_tg);
+    fprintf(f, "pre-remove paride rmmod %s\n", ppcd_tg);
+  }
+
+#if WITH_PCMCIA
+  if(pcmcia_chip_ig == 1 || pcmcia_chip_ig == 2) {
+    file_write_str(f, key_pcmcia, pcmcia_chip_ig == 1 ? "tcic" : "i82365");
+  }
+#endif
+
+#ifdef USE_LIBHD
+  file_write_num(f, key_haspcmcia, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
+#endif
+
+  if(serial_ig) file_write_str(f, key_console, console_parms_tg);
+
+  i = bootmode_ig != BOOTMODE_CDWITHNET ?: BOOTMODE_CD;
+  file_write_sym(f, key_bootmode, "Floppy", i);
+
+  if(bootmode_ig == BOOTMODE_HARDDISK) {
+    file_write_str(f, key_partition, harddisk_tg);
+    file_write_str(f, key_fstype, fstype_tg);
+    file_write_str(f, key_serverdir, server_dir_tg);
+  }
+
+  if(
+    bootmode_ig == BOOTMODE_NET ||
+    bootmode_ig == BOOTMODE_SMB ||
+    bootmode_ig == BOOTMODE_FTP ||
+    bootmode_ig == BOOTMODE_CDWITHNET
+  ) {
+    file_write_str(f, key_netdevice, netdevice_tg);
+    file_write_inet(f, key_ip, &ipaddr_rg);
+
+    if(bootmode_ig == BOOTMODE_CDWITHNET) {
+      broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+      network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+      file_write_inet(f, key_broadcast, &broadcast_rg);
+      file_write_inet(f, key_network, &network_rg);
+    }
+
+    if(plip_host_rg.s_addr) {
+      file_write_inet(f, key_pliphost, &plip_host_rg);
+    }
+    else {
+      file_write_inet(f, key_netmask, &netmask_rg);
+    }
+            
+    if(gateway_rg.s_addr) {
+      file_write_inet(f, key_gateway, &gateway_rg);
+    }
+
+    if(nameserver_rg.s_addr) {
+      file_write_inet(f, key_dnsserver, &nameserver_rg);
+    }
+
+    {
+      struct in_addr *server_address = &nfs_server_rg;
+      char *server_dir = server_dir_tg;
+
+      if(bootmode_ig == BOOTMODE_FTP) {
+        server_address = &ftp_server_rg;
+      }
+      else if(bootmode_ig == BOOTMODE_SMB) {
+        server_address = &config.smb.server;
+        server_dir     = config.smb.share;
+      }
+
+      file_write_inet(f, key_server, server_address);
+      file_write_str(f, key_serverdir, server_dir);
+    }
+
+    if(*machine_name_tg) {
+      file_write_str(f, key_machine, machine_name_tg);
+    }
+
+    if(*domain_name_tg) {
+      file_write_str(f, key_domain, domain_name_tg);
+    }
+  }
+
+  if(bootmode_ig == BOOTMODE_FTP) {
+    if(*ftp_user_tg) {
+      file_write_str(f, key_ftpuser, ftp_user_tg);
+    }
+    if(*ftp_proxy_tg) {
+      file_write_str(f, key_ftpproxy, ftp_proxy_tg);
+    }
+    if(ftp_proxyport_ig != -1) {
+      file_write_num(f, key_ftpproxyport, ftp_proxyport_ig);
+    }
+  }
+
+  if(bootmode_ig == BOOTMODE_SMB) {
+    if(config.smb.user) {
+      file_write_str(f, key_username, config.smb.user);
+    }
+    if(config.smb.password) {
+      file_write_str(f, key_password, config.smb.password);
+    }
+    if(config.smb.workgroup) {
+      file_write_str(f, key_workdomain, config.smb.workgroup);
+    }
+  }
+
+  mpar_write_modparms(f);
+
+  file_write_num(f, key_manual, auto_ig || auto2_ig ? 0 : 1);
+  file_write_num(f, key_demo, demo_ig);
+
+  if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
+
+#ifdef USE_LIBHD
+  if(config.floppies) {
+    file_write_str(f, key_floppydisk, config.floppy_dev[config.floppy]);
+  }
+
+  file_write_num(f, key_keyboard, has_kbd_ig);
+  file_write_num(f, key_yast2update, yast2_update_ig || *driver_update_dir ? 1 : 0);
+
+  file_write_num(f, key_yast2serial, yast2_serial_ig);
+  file_write_num(f, key_textmode, text_mode_ig);
+
+  if((action_ig & ACT_YAST2_AUTO_INSTALL)) {
+    file_write_num(f, key_yast2autoinst, 1);
+  }
+
+  file_write_num(f, key_usb, usb_ig);
+
+  if(yast2_color_ig) {
+    fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
+  }
+
+  {
+    char *s;
+    int boot_disk;
+
+    s = auto2_disk_list(&boot_disk);
+    if(*s) {
+      file_write_num(f, key_bootdisk, boot_disk ? 1 : 0);
+      file_write_str(f, key_disks, s);
+    }
+  }
+#endif
+
+  fclose(f);
+}
+
+
+void file_write_mtab()
+{
+  char smb_mount_options[200];
+  FILE *f;
+
+  if(!(f = fopen(MTAB_FILE, "w"))) return;
+
+  fprintf(f,
+    "/dev/initrd / minix rw 0 0\n"
+    "none /proc proc rw 0 0\n"
+  );
+
+  if(!ramdisk_ig) {
+    switch(bootmode_ig) {
+      case BOOTMODE_CD:
+      case BOOTMODE_CDWITHNET:
+        fprintf(f, "/dev/%s %s iso9660 ro 0 0\n", cdrom_tg, mountpoint_tg);
+        break;
+
+      case BOOTMODE_NET:
+        fprintf(f,
+          "%s:%s %s nfs ro 0 0\n",
+          inet_ntoa(nfs_server_rg), server_dir_tg, mountpoint_tg
+        );
+        break;
+
+      case BOOTMODE_SMB:
+        net_smb_get_mount_options(smb_mount_options);
+        fprintf(f,
+          "//%s/%s %s smbfs ro,%s 0 0\n",
+          inet_ntoa(config.smb.server), config.smb.share,
+          mountpoint_tg, smb_mount_options
+        );
+        break;
+    }
+  }
+  else {
+    fprintf(f, "/dev/ram2 %s ext2 ro 0 0\n", inst_mountpoint_tg);
+  }
+
+  fclose(f);
 }
 
 
@@ -724,55 +776,3 @@ void file_module_load(char *insmod_arg)
   win_close(&win);
 }
 
-#if 0
-static void file_module_load (char *command_tv)
-    {
-    char      module_ti [30];
-    char      params_ti [MAX_PARAM_LEN];
-    char     *tmp_pci;
-    int       i_ii = 0;
-    char      text_ti [200];
-    window_t  win_ri;
-
-
-    tmp_pci = command_tv;
-#if 0
-    tmp_pci = strchr (command_tv, ' ');
-    if (!tmp_pci)
-        return;
-
-    while (*tmp_pci && (*tmp_pci == ' ' || *tmp_pci == 0x09))
-        tmp_pci++;
-#endif
-
-    while (*tmp_pci && *tmp_pci != ' ' && *tmp_pci != 0x09)
-        module_ti [i_ii++] = *tmp_pci++;
-
-    module_ti [i_ii] = 0;
-
-    while (*tmp_pci && (*tmp_pci == ' ' || *tmp_pci == 0x09))
-        tmp_pci++;
-
-    strcpy (params_ti, tmp_pci);
-
-    sprintf (text_ti, txt_get (TXT_TRY_TO_LOAD), module_ti);
-    dia_info (&win_ri, text_ti);
-    if (!mod_load_module (module_ti, params_ti))
-        {
-        mpar_save_modparams (module_ti, params_ti);
-        switch (mod_get_mod_type (module_ti))
-            {
-            case MOD_TYPE_SCSI:
-                strcpy (scsi_tg, module_ti);
-                break;
-            case MOD_TYPE_NET:
-                strcpy (net_tg, module_ti);
-                break;
-            default:
-                break;
-            }
-        }
-
-    win_close (&win_ri);
-    }
-#endif

@@ -52,7 +52,7 @@ static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
 static int auto2_load_usb_storage(void);
-static void auto2_find_mouse(void);
+// static void auto2_find_mouse(void);
 static int auto2_has_i2o(void);
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, int mod_type);
@@ -704,7 +704,7 @@ int auto2_init()
   }
 #endif
 
-  auto2_find_mouse();
+//  auto2_find_mouse();
 
   deb_int(valid_net_config_ig);
 
@@ -927,6 +927,7 @@ void auto2_chk_x11i()
 #endif
 
 
+#if 0
 /*
  * Scans the hardware list for a mouse.
  */
@@ -957,7 +958,7 @@ void auto2_find_mouse()
     if(mouse_dev_ig) break;
   }
 }
-
+#endif
 
 /*
  * Scans the hardware list for a floppy and puts the result into
