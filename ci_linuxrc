@@ -23,11 +23,11 @@ find . -depth -name .cvsignore -exec rm -r {} \;
 rm -f ci_linuxrc Makefile.new
 cd /tmp
 
-tar -zcf $linuxrc.tar.gz linuxrc-$ver
+tar -Icf $linuxrc.tar.bz2 linuxrc-$ver
 
 if mkdir /work/src/done/STABLE/linuxrc ; then
   cd /work/src/done/STABLE/linuxrc
-  cp $linuxrc.tar.gz /work/SRC/all/linuxrc/linuxrc.{changes,spec} .
+  cp $linuxrc.tar.bz2 /work/SRC/all/linuxrc/linuxrc.{changes,spec} .
   perl -pi -e 's/^(Version:\s+)\S+/${1}'$ver'/' /work/src/done/STABLE/linuxrc/linuxrc.spec
   perl -pi -e 's/^(Source.+?-)\S+?(\.tar\.gz)/${1}'$ver'${2}/' /work/src/done/STABLE/linuxrc/linuxrc.spec
   . /work/src/bin/.profile
