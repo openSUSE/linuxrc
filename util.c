@@ -59,7 +59,9 @@ static char  *util_loopdev_tm = "/dev/loop0";
 static void put_byte(int fd, unsigned char data);
 static void put_short(int fd, unsigned short data);
 static void put_int(int fd, unsigned data);
+#ifdef USE_VFAT
 static unsigned mkdosfs(int fd, unsigned size);
+#endif
 static void do_cp(char *src_dir, char *dst_dir, char *name);
 
 void util_redirect_kmsg (void)
@@ -643,6 +645,7 @@ void put_int(int fd, unsigned data)
   write(fd, &data, 4);
 }
 
+#ifdef USE_VFAT
 /*
  * Create a FAT file system on fd; size in kbyte.
  * Return the actual free space in kbyte.
@@ -651,6 +654,8 @@ void put_int(int fd, unsigned data)
  */
 unsigned mkdosfs(int fd, unsigned size)
 {
+  unsigned char sect[0x200];
+
   static unsigned char part1[] = {
     0xeb, 0xfe, 0x90, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 0, 2, 2, 1, 0,
     1, 0x20, 0
@@ -667,6 +672,14 @@ unsigned mkdosfs(int fd, unsigned size)
   fat_sectors = ((16 * (size + 2) + 7) / 8 + 0x200 - 1) / 0x200;
   clusters = (size * 2 - fat_sectors - 2) / 2;
 
+  /* clear fs meta data */
+  memset(sect, 0, sizeof sect);
+  i = fat_sectors + 1 + 16;
+  if(i > 2 * size) i = 2 * size;
+  lseek(fd, 0, SEEK_SET);
+  while(i--) write(fd, sect, sizeof sect);
+  lseek(fd, 0, SEEK_SET);
+
   for(i = 0; i < sizeof part1; i++) put_byte(fd, part1[i]);
   put_short(fd, size * 2);
   put_byte(fd, 0xf8);
@@ -680,6 +693,7 @@ unsigned mkdosfs(int fd, unsigned size)
 
   return clusters;
 }
+#endif
 
 void do_cp(char *src_dir, char *dst_dir, char *name)
 {
@@ -702,6 +716,8 @@ void do_cp(char *src_dir, char *dst_dir, char *name)
 
   fclose(g);
   fclose(f);
+
+  chmod(dst, 0755);
 }
 
 /*
@@ -718,8 +734,11 @@ int util_chk_driver_update(char *dir)
   char drv_src[100], mods_src[100], inst_src[100];
   char inst_dst[100], imod[200], rmod[100], *s;
   struct stat st;
-  int fd, i;
+  int i;
+#ifdef USE_VFAT
+  int fd;
   unsigned fssize;
+#endif
   struct dirent *de;
   DIR *d;
 
@@ -739,16 +758,22 @@ int util_chk_driver_update(char *dir)
   deb_msg("driver update disk");
 //  deb_str(dir);
 
+#ifdef USE_VFAT
   fd = open("/dev/ram3", O_RDWR);
   if(fd < 0) return 0;
   fssize = mkdosfs(fd, 8000);
   close(fd);
+#endif
 
 //  deb_int(fssize);
 
   mkdir(driver_update_dir, 0755);
 
+#ifdef USE_VFAT
   i = mount("/dev/ram3", driver_update_dir, "vfat", 0, 0);
+#else
+  i = mount("shmfs", driver_update_dir, "shm", 0, 0);
+#endif
 
 // Why does this not work???
 // i = util_try_mount("/dev/ram3", driver_update_dir, MS_MGC_VAL | MS_RDONLY, 0);
@@ -792,7 +817,7 @@ int util_chk_driver_update(char *dir)
             strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
             mod_unload_module(rmod);
             if(!mod_load_module(imod, NULL)) {
-              mpar_save_modparams(imod, NULL);
+              mpar_save_modparams(rmod, NULL);
             }
           }
         }
