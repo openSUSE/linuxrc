@@ -1211,7 +1211,7 @@ int auto2_ask_for_modules(int prompt, int mod_type)
   util_print_banner();
 
   if(prompt) {
-    prompt = dia_okcancel(txt_get(TXT_ENTER_MODDISK), YES) == YES ? 1 : 0;
+    prompt = dia_okcancel(txt_get(mod_type == MOD_TYPE_NET ? TXT_ENTER_MODDISK2 : TXT_ENTER_MODDISK), YES) == YES ? 1 : 0;
   }
   else {
     prompt = 1;

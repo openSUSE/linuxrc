@@ -788,3 +788,9 @@ msgstr ""
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
 
+#. TXT_ENTER_MODDISK2
+msgid ""
+"Please insert the second modules disk.\n"
+"You'll find instructions on how to create it in disks/README on CD1 or DVD."
+msgstr ""
+

@@ -151,6 +151,7 @@ typedef struct {
         item_t;
 
 typedef struct {
+  unsigned       available:1;	/* set if SMB functionality is available */
   struct in_addr server;	/* SMB server to install from */
   char           *share;
   char           *workgroup;
@@ -162,6 +163,7 @@ typedef struct {
   unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
   unsigned initrd_has_ldso:1;	/* instsys contains a dynamic linker */
+  unsigned suppress_warnings:1;	/* show less warning dialogs */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

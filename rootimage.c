@@ -223,7 +223,8 @@ int root_load_rootimage (char *infile_tv)
         rc_ii = util_fileinfo (infile_tv, &filesize_li, &compressed_ii);
         if (rc_ii)
             {
-            dia_message (txt_get (TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+            if (!config.suppress_warnings)
+                dia_message (txt_get (TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
             return (rc_ii);
             }
 

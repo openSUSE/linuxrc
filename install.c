@@ -325,6 +325,8 @@ static int inst_choose_source_cb (int what_iv)
     static int  told_is = FALSE;
            char tmp_ti [200];
 
+    // skip SMB menu entry
+    if (!config.smb.available && what_iv >= 4) what_iv++;
 
     switch (what_iv)
         {
@@ -377,32 +379,41 @@ static int inst_choose_source_cb (int what_iv)
 
 static int inst_choose_source (void)
     {
-    int     width_ii = 32;
+    int     width_ii = 33;
     item_t  items_ari [6];
     int     choice_ii;
     int     i_ii;
     int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
-
+    int smb_dif;
 
     inst_umount ();
+
+    config.smb.available = util_check_exist ("/bin/smbmount");
+
+    smb_dif = config.smb.available;
+
+    if(!inst_rescue_im) nr_items_ii--;
+    if(!config.smb.available) nr_items_ii--;
 
     util_create_items (items_ari, nr_items_ii, width_ii);
     strncpy (items_ari [0].text, txt_get (TXT_CDROM), width_ii);
     strncpy (items_ari [1].text, txt_get (TXT_NFS), width_ii);
     strncpy (items_ari [2].text, txt_get (TXT_FTP), width_ii);
-    strncpy (items_ari [3].text, txt_get (TXT_SMB), width_ii);
-    strncpy (items_ari [4].text, txt_get (TXT_HARDDISK), width_ii);
+    if (config.smb.available)
+        strncpy (items_ari [3].text, txt_get (TXT_SMB), width_ii);
+    strncpy (items_ari [3 + smb_dif].text, txt_get (TXT_HARDDISK), width_ii);
     // this one has to stay last, since it won't be displayed if
     // 'inst_rescue_im' = 0
-    strncpy (items_ari [5].text, txt_get (TXT_FLOPPY), width_ii);
+    if(inst_rescue_im)
+        strncpy (items_ari [4 + smb_dif].text, txt_get (TXT_FLOPPY), width_ii);
+
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, width_ii);
         items_ari [i_ii].func = inst_choose_source_cb;
         }
 
-    choice_ii = dia_menu (txt_get (TXT_CHOOSE_SOURCE), items_ari,
-                          inst_rescue_im ? nr_items_ii : nr_items_ii - 1, 1);
+    choice_ii = dia_menu (txt_get (TXT_CHOOSE_SOURCE), items_ari, nr_items_ii, 1);
 
     util_free_items (items_ari, nr_items_ii);
 

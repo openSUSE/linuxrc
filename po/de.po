@@ -865,3 +865,12 @@ msgstr ""
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
 
+#. TXT_ENTER_MODDISK2
+msgid ""
+"Please insert the second modules disk.\n"
+"You'll find instructions on how to create it in disks/README on CD1 or DVD."
+msgstr ""
+"Bitte legen Sie die zweite Modul-Diskette ein.\n"
+"Sie finden eine Anleitung zum Erstellen dieser Diskette in disks/LIESMICH "
+"auf der CD1 oder DVD."
+
