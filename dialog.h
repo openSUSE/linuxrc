@@ -9,6 +9,7 @@
 #define MSGTYPE_INFO      0
 #define MSGTYPE_ERROR     1
 #define MSGTYPE_INFOENTER 2
+#define MSGTYPE_REBOOT    3
 
 typedef enum {
   di_none,	/* must be 0 */

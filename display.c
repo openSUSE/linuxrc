@@ -598,3 +598,4 @@ void disp_clear_screen (void)
     {
     printf ("\033[H\033[J");
     }
+
