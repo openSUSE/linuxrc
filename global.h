@@ -14,7 +14,11 @@
 
 // should be architecture dependent!
 #define MEM_LIMIT_RAMDISK_YAST1	 93*1024*1024
+#ifdef __alpha__
+#define MEM_LIMIT_RAMDISK_YAST2	500*1024*1024
+#else
 #define MEM_LIMIT_RAMDISK_YAST2	252*1024*1024	// the Y2 partitioner needs that much...
+#endif
 #define MEM_LIMIT_RAMDISK_FTP	 30*1024*1024
 #define MEM_LIMIT_YAST2		 30*1024*1024
 
