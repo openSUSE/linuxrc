@@ -331,10 +331,10 @@ static int inst_choose_source_cb (int what_iv)
             error_ii = inst_ftp ();
             break;
         case 4:
-            error_ii = inst_mount_harddisk ();
+            error_ii = inst_mount_smb ();
             break;
         case 5:
-            error_ii = inst_mount_smb ();
+            error_ii = inst_mount_harddisk ();
             break;
         case 6:
             error_ii = inst_check_floppy ();
@@ -362,7 +362,7 @@ static int inst_choose_source_cb (int what_iv)
 
 static int inst_choose_source (void)
     {
-    int     width_ii = 30;
+    int     width_ii = 32;
     item_t  items_ari [6];
     int     choice_ii;
     int     i_ii;
@@ -375,8 +375,8 @@ static int inst_choose_source (void)
     strncpy (items_ari [0].text, txt_get (TXT_CDROM), width_ii);
     strncpy (items_ari [1].text, txt_get (TXT_NFS), width_ii);
     strncpy (items_ari [2].text, txt_get (TXT_FTP), width_ii);
-    strncpy (items_ari [3].text, txt_get (TXT_HARDDISK), width_ii);
-    strncpy (items_ari [4].text, txt_get (TXT_SMB), width_ii);
+    strncpy (items_ari [3].text, txt_get (TXT_SMB), width_ii);
+    strncpy (items_ari [4].text, txt_get (TXT_HARDDISK), width_ii);
     // this one has to stay last, since it won't be displayed if
     // 'inst_rescue_im' = 0
     strncpy (items_ari [5].text, txt_get (TXT_FLOPPY), width_ii);
