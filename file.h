@@ -38,7 +38,9 @@ typedef enum {
   key_updateask, key_initrd, key_vga, key_bootimage, key_ramdisksize,
   key_suse, key_showopts, key_nosshkey, key_startshell, key_y2debug, key_ro,
   key_rw, key_netid, key_nethwaddr, key_loglevel, key_netsetup,
-  key_rootpassword, key_loghost, key_escdelay, key_minmem, key_updateprio
+  key_rootpassword, key_loghost, key_escdelay, key_minmem, key_updateprio,
+  key_instnetdev, key_iucvpeer, key_portname, key_readchan, key_writechan,
+  key_datachan, key_ctcprotocol
 } file_key_t;
 
 typedef enum {

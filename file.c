@@ -215,7 +215,16 @@ static struct {
   { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },
   { key_loghost,        "Loghost",        kf_cfg + kf_cmd                },
   { key_escdelay,       "ESCDelay",       kf_cfg + kf_cmd                },
-  { key_minmem,         "MinMemory",      kf_cfg + kf_cmd + kf_cmd_early }
+  { key_minmem,         "MinMemory",      kf_cfg + kf_cmd + kf_cmd_early },
+#if defined(__s390__) || defined(__s390x__)
+  { key_instnetdev,	"InstNetDev",	  kf_cfg + kf_cmd		 },
+  { key_iucvpeer,	"IUCVPeer",	  kf_cfg + kf_cmd		 },
+  { key_portname,	"Portname",	  kf_cfg + kf_cmd		 },
+  { key_readchan,	"ReadChannel",	  kf_cfg + kf_cmd		 },
+  { key_writechan,	"WriteChannel",   kf_cfg + kf_cmd		 },
+  { key_datachan,	"DataChannel",	  kf_cfg + kf_cmd		 },
+  { key_ctcprotocol,	"CTCProtocol",	  kf_cfg + kf_cmd		 },
+#endif
 };
 
 static struct {
@@ -250,7 +259,17 @@ static struct {
   { "slp",       inst_slp           },
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
-  { "cdrom",     inst_cdrom         }
+  { "cdrom",     inst_cdrom         },
+#if defined(__s390__) || defined(__s390x__)
+  { "osatr",	 di_390net_osatr    },
+  { "osaeth",	 di_390net_osaeth   },
+  { "osaexeth",	 di_390net_osaexeth },
+  { "ctc",	 di_390net_ctc	    },
+  { "escon",	 di_390net_escon    },
+  { "iucv",	 di_390net_iucv     },
+  { "hsi",	 di_390net_hsi	    },
+  { "osaextr",	 di_390net_osaextr  },
+#endif
 };
 
 
@@ -1163,6 +1182,30 @@ void file_do_info(file_t *f0)
       case key_minmem:
         if(f->is.numeric) config.memory.ram_min = f->nvalue;
         break;
+
+#if defined(__s390__) || defined(__s390x__)
+      case key_instnetdev:
+        if(*f->value) config.hwp.type=file_sym2num(f->value);
+        break;
+      case key_iucvpeer:
+        if(*f->value) str_copy(&config.hwp.userid, f->value);
+        break;
+      case key_portname:
+        if(*f->value) str_copy(&config.hwp.portname, f->value);
+        break;
+      case key_readchan:
+        if(*f->value) str_copy(&config.hwp.readchan, f->value);
+        break;
+      case key_writechan:
+        if(*f->value) str_copy(&config.hwp.writechan, f->value);
+        break;
+      case key_datachan:
+        if(*f->value) str_copy(&config.hwp.datachan, f->value);
+        break;
+      case key_ctcprotocol:
+        if(f->is.numeric) config.hwp.protocol = f->nvalue + 1;
+        break;        
+#endif      
 
       default:
         break;

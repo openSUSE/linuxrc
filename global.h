@@ -437,6 +437,30 @@ typedef struct {
     char *hwaddr;		/* hardware addr of network card */
   } net;
 
+#if defined(__s390__) || defined(__s390x__)
+  /* hwcfg file parameters */
+  struct {
+    char* userid;
+    char* startmode;
+    char* module;
+    char* module_options;
+    char* module_unload;
+    char* scriptup;
+    char* scriptup_ccw;
+    char* scriptup_ccwgroup;
+    char* scriptdown;
+    char* readchan;
+    char* writechan;
+    char* datachan;
+    char* ccw_chan_ids;
+    int ccw_chan_num;
+    int protocol;
+    char* portname;
+    int type;
+  } hwp;
+  
+#endif
+
 } config_t;
 
 config_t config;
