@@ -128,8 +128,7 @@ static struct {
 
 typedef enum {
   lx_auto, lx_auto2, lx_noauto2, lx_y2autoinst, lx_demo, lx_eval, lx_reboot,
-  lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, lx_rescue, lx_nopcmcia,
-  lx_nocmdline
+  lx_loadnet, lx_loaddisk, lx_rescue, lx_nopcmcia, lx_nocmdline
 } lx_param_t;
 
 static struct {
@@ -143,8 +142,6 @@ static struct {
   { "demo",       lx_demo       },
   { "eval",       lx_eval       },
   { "reboot",     lx_reboot     },
-  { "yast1",      lx_yast1      },
-  { "yast2",      lx_yast2      },
   { "loadnet",    lx_loadnet    },
   { "loaddisk",   lx_loaddisk   },
   { "rescue",     lx_rescue     },
@@ -617,6 +614,8 @@ void lxrc_init()
   config.rescueimage = strdup("/suse/images/rescue");
   config.demoimage = strdup("/suse/images/cd-demo");
 
+  config.setupcmd = strdup("/sbin/inst_setup yast2");
+
   /* just a default for manual mode */
   config.floppies = 1;
   config.floppy_dev[0] = strdup("/dev/fd0");
@@ -624,13 +623,13 @@ void lxrc_init()
   config.net.bootp_timeout = 10;
   config.net.dhcp_timeout = 60;
   config.net.tftp_timeout = 10;
+  config.net.ifconfig = 1;
 
   config.color = 2;
   config.net.use_dhcp = 1;
   config.addswap = 1;
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */
-  yast_version_ig = 2;
 
   /* make auto mode default */
   if(config.test) {
@@ -680,7 +679,6 @@ void lxrc_init()
     auto_ig = 0;
     auto2_ig = 1;
     config.manual = 0;
-    yast_version_ig = 2;
     url = parse_url(config.autoyast);
     if(url && url->scheme) set_instmode(url->scheme);
   }
@@ -714,7 +712,6 @@ void lxrc_init()
               auto_ig = 0;
               auto2_ig = 1;
               config.manual = 0;
-              yast_version_ig = 2;
               break;
 
             case lx_demo:
@@ -731,14 +728,6 @@ void lxrc_init()
 
             case lx_reboot:
               reboot_ig = TRUE;
-              break;
-
-            case lx_yast1:
-              yast_version_ig = 1;
-              break;
-
-            case lx_yast2:
-              yast_version_ig = 2;
               break;
 
             case lx_loadnet:
@@ -879,7 +868,6 @@ void lxrc_init()
       if(!i) {
         config.rescue = 0;
         util_manual_mode();
-        yast_version_ig = 0;
         util_disp_init();
         if(j) {
           strcpy(buf, "Could not find the SuSE Linux ");

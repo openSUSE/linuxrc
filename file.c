@@ -173,7 +173,9 @@ static struct {
   { key_usbwait,        "USBWait"          },
   { key_nfsrsize,       "NFS.RSize"        },
   { key_nfswsize,       "NFS.WSize"        },
-  { key_hwcheck,        "HWCheck"          }
+  { key_hwcheck,        "HWCheck"          },
+  { key_setupcmd,       "SetupCmd"         },
+  { key_setupnetif,     "SetupNetIF"       }
 };
 
 static struct {
@@ -776,7 +778,6 @@ void file_do_info(file_t *f0)
       case key_autoyast:
         str_copy(&config.autoyast, f->value);
         auto2_ig = TRUE;
-        yast_version_ig = 2;
         if(!config.instmode) {
           url = parse_url(config.autoyast);
           if(url && url->scheme) set_instmode(url->scheme);
@@ -862,6 +863,14 @@ void file_do_info(file_t *f0)
 
       case key_nfswsize:
         if(f->is.numeric) config.net.nfs_wsize = f->nvalue;
+        break;
+
+      case key_setupcmd:
+        str_copy(&config.setupcmd, *f->value ? f->value : NULL);
+        break;
+
+      case key_setupnetif:
+        if(f->is.numeric) config.net.ifconfig = f->nvalue;
         break;
 
       default:
@@ -991,7 +1000,7 @@ void file_write_install_inf(char *dir)
 
   file_write_sym(f, key_display, "Undef", config.color);
 
-  if(config.keymap && (!auto2_ig || yast_version_ig == 1)) {
+  if(config.keymap && !auto2_ig) {
     file_write_str(f, key_keytable, config.keymap);
   }
 

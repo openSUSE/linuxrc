@@ -51,10 +51,6 @@
 #include "fstype.h"
 
 
-#define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
-#define YAST1_COMMAND   "/sbin/YaST"
-#define SETUP_COMMAND   "/sbin/inst_setup"
-
 static char  inst_rootimage_tm [MAX_FILENAME];
 
 static int   inst_mount_harddisk      (void);
@@ -78,7 +74,6 @@ static int   inst_do_ftp              (void);
 static int   inst_do_http             (void);
 static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
-static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
 
@@ -871,14 +866,14 @@ int inst_start_rescue()
 
 /*
  * Do some basic preparations before we can run programs from the
- * installation system. More is done later in SETUP_COMMAND.
+ * installation system. More must be done later in config.setupcmd.
  *
  * Note: the instsys must already be mounted at this point.
  *
  */
 int inst_prepare()
 {
-  char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
+  char *links[] = { "/bin", "/lib", "/lib64", "/sbin", "/usr" };
   char link_source[MAX_FILENAME], buf[256];
   int i = 0, rc = 0;
   struct dirent *de;
@@ -997,11 +992,6 @@ int inst_execute_yast()
   rc = inst_prepare();
   if(rc) return rc;
 
-  if(inst_choose_yast_version()) {
-    inst_yast_done();
-    return -1;
-  }
-
   if(!config.test) {
     lxrc_set_modprobe("/sbin/modprobe");
     if(util_check_exist("/sbin/update")) system("/sbin/update");
@@ -1050,17 +1040,8 @@ int inst_execute_yast()
     rc = system("/bin/bash 2>&1");
   }
   else {
-    sprintf(cmd, "%s%s", config.instsys, SETUP_COMMAND);
-
-    if(util_check_exist(cmd)) {
-      sprintf(cmd + strlen(cmd), " yast%d", yast_version_ig == 2 ? 2 : 1);
-      fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
-    }
-    else {
-      sprintf(cmd, "%s", yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND);
-      fprintf(stderr, "starting \"%s\"\n", cmd);
-    }
-
+    sprintf(cmd, "%s%s", config.instsys, config.setupcmd);
+    fprintf(stderr, "starting %s\n", cmd);
     rc = system(cmd);
   }
 
@@ -1075,7 +1056,7 @@ int inst_execute_yast()
 
   if(config.splash && config.textmode) system("echo 1 >/proc/splash");
 
-  fprintf(stderr, "yast exit code is %d\n", rc);
+  fprintf(stderr, "install program exit code is %d\n", rc);
 
   /* Redraw erverything and go back to the main menu. */
   config.redraw_menu = 1;
@@ -1091,8 +1072,6 @@ int inst_execute_yast()
 
   disp_cursor_off();
   kbd_reset();
-
-  yast_version_ig = 0;
 
   if(rc || config.aborted) {
     config.rescue = 0;
@@ -1472,56 +1451,6 @@ int inst_do_tftp()
   util_truncate_dir(config.serverdir);
 
   return 0;
-}
-
-
-int inst_choose_yast_version()
-{
-  int yast1, yast2;
-  char yast1_file[MAX_FILENAME], yast2_file[MAX_FILENAME];
-  static int last_item = 0;
-  char *items[] = {
-    txt_get(TXT_YAST1),
-    txt_get(TXT_YAST2),
-    NULL
-  };
-
-  *yast1_file = *yast2_file = 0;
-  if(config.instsys) {
-    strcpy(yast1_file, config.instsys);
-    strcpy(yast2_file, config.instsys);
-  }
-  strcat(yast1_file, YAST1_COMMAND);
-  strcat(yast2_file, YAST2_COMMAND);
-
-  yast1 = util_check_exist(yast1_file);
-  yast2 = util_check_exist(yast2_file);
-
-  if(!yast_version_ig && auto_ig) yast_version_ig = 1;
-
-  if(yast_version_ig == 1 && yast1) return 0;
-
-  if(yast_version_ig == 2 && yast2) return 0;
-
-  if(yast1 && !yast2) {
-    yast_version_ig = 1;
-    return 0;
-  }
-
-  if(!yast1 && yast2) {
-    yast_version_ig = 2;
-    return 0;
-  }
-
-  if(auto2_ig) {
-    util_manual_mode();
-    util_disp_init();
-  }
-
-  yast_version_ig = dia_list(txt_get(TXT_CHOOSE_YAST), 30, NULL, items, last_item, align_center);
-  if(yast_version_ig) last_item = 0;
-
-  return yast_version_ig ? 0 : -1;
 }
 
 

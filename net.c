@@ -253,7 +253,7 @@ int net_activate (void)
     struct sockaddr_in  sockaddr_ri;
     int                 error_ii = FALSE;
 
-    if(config.test || config.net.dhcp_active) return 0;
+    if(config.test || !config.net.ifconfig || config.net.dhcp_active) return 0;
 
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)

@@ -1,3 +1,11 @@
+18/7/2002:	v1.4.7
+	- you can use an arbitrary install program now
+	- added 'setupnetif' parameter (specifies if linuxrc should setup
+	  network interfaces itself)
+
+16/7/2002:	v1.4.6
+	- work properly on systems that have /lib64
+
 15/7/2002:	v1.4.5
 	- fixed cramfs detection (byte order issue)
 

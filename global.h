@@ -244,6 +244,7 @@ typedef struct {
   char *term;			/* TERM var */
   char *susecd;			/* set if we found a SuSE cd */
   int usbwait;			/* sleep this much after loading usb modules */
+  char *setupcmd;		/* command used to start the install program */
 
   struct {
     char *buf;
@@ -300,6 +301,7 @@ typedef struct {
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned smb_available:1;	/* set if SMB functionality is available */
     unsigned device_given:1;	/* netdevice explicity set in info file */
+    unsigned ifconfig:1;	/* setup network interface */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
     int ftp_sock;		/* used internally by ftp code */
@@ -362,7 +364,6 @@ extern int             yast2_serial_ig;
 extern int             has_floppy_ig;
 extern int             has_kbd_ig;
 extern unsigned        frame_buffer_mode_ig;
-extern int             yast_version_ig;
 extern int             reboot_ig;
 extern int             usb_ig;
 extern char            *usb_mods_ig;

@@ -899,7 +899,7 @@ void util_status_info()
   if(*t) sprintf(buf + strlen(buf), ", %s", t);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "yast = %d, auto = %d", yast_version_ig, auto2_ig ? 2 : auto_ig ? 1 : 0);
+  sprintf(buf, "auto = %d", auto2_ig ? 2 : auto_ig ? 1 : 0);
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "floppies = (");
@@ -1055,6 +1055,9 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "installdir = \"%s\"", config.installdir);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "setup command = \"%s\"", config.setupcmd);
   slist_append_str(&sl0, buf);
 
   if(config.cdroms) {

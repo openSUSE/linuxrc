@@ -43,7 +43,6 @@ int             yast2_serial_ig = FALSE;
 int             has_floppy_ig = TRUE;
 int             has_kbd_ig = TRUE;
 unsigned        frame_buffer_mode_ig = 0;
-int             yast_version_ig = 0;
 int             reboot_ig;
 int             usb_ig = 0;
 char            *usb_mods_ig = NULL;
