@@ -618,9 +618,7 @@ void lxrc_catch_signal(int signum)
 void lxrc_init()
 {
   int i;
-#ifdef __i386__
   int j;
-#endif
   file_t *ft;
   char *s, *t0, *t, buf[256];
   url_t *url;
@@ -665,7 +663,7 @@ void lxrc_init()
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;
-  config.net.dhcp_timeout = 60;
+  config.net.dhcp_timeout = 90;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
 
@@ -943,7 +941,6 @@ void lxrc_init()
 
       util_disp_init();
 
-#ifdef __i386__
       i = 0;
       j = 1;
       if(config.insttype == inst_cdrom && cdrom_drives && !config.demo) {
@@ -973,8 +970,6 @@ void lxrc_init()
           dia_message(buf, MSGTYPE_ERROR);
         }
       }
-#endif
-
     }
   }
 #endif
