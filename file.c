@@ -2,7 +2,7 @@
  *
  * file.c        File access
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -58,14 +58,6 @@ static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
-#ifdef USE_LIBHD
-static const char  *file_txt_mouse_dev_tm      = "Mouse-Device:";
-static const char  *file_txt_mouse_type_tm     = "Mouse-Type:";
-static const char  *file_txt_has_floppy_tm     = "Floppy-Disk:";
-static const char  *file_txt_yast2_update_tm   = "YaST2-Update:";
-static const char  *file_txt_text_mode_tm      = "Textmode:";
-static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
-#endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
 static void file_trim_buffer (char *buffer_tr);
@@ -84,7 +76,7 @@ void file_write_yast_info (void)
         return;
         }
 
-    if(!auto2_ig) set_write_info (file_pri);
+    set_write_info (file_pri);
 
     strcpy (line_ti, file_txt_sourcemount_tm);
     if (!ramdisk_ig)
@@ -100,7 +92,7 @@ void file_write_yast_info (void)
         strcat (line_ti, " Mono\n");
     fprintf (file_pri, line_ti);
 
-    if (keymap_tg [0] && !auto2_ig)
+    if (keymap_tg [0])
         fprintf (file_pri, "%s %s\n", file_txt_keymap_tm, keymap_tg);
     if (cdrom_tg [0])
         fprintf (file_pri, "%s %s\n", file_txt_cdrom_tm, cdrom_tg);
@@ -206,21 +198,6 @@ void file_write_yast_info (void)
     else
         fprintf (file_pri, "SMP: 0\n");
 
-#ifdef USE_LIBHD
-    if (mouse_dev_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_mouse_dev_tm, mouse_dev_ig);
-
-    if (mouse_type_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_mouse_type_tm, mouse_type_ig);
-
-    fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
-    fprintf (file_pri, "%s %d\n", file_txt_yast2_update_tm, yast2_update_ig);
-    fprintf (file_pri, "%s %d\n", file_txt_text_mode_tm, text_mode_ig);
-
-    if (frame_buffer_mode_ig)
-        fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);
-#endif
-
     fclose (file_pri);
 
     file_pri = fopen ("/etc/mtab", "w");
@@ -258,51 +235,47 @@ void file_write_yast_info (void)
 
 int file_read_info (void)
     {
-    char      filename_ti [MAX_FILENAME];
+    char      filename_ti [MAX_FILENAME] = "/info";
     FILE     *fd_pri;
     char      buffer_ti [MAX_X];
     window_t  win_ri;
     char      value_ti [MAX_X];
     int       do_autoprobe_ii = FALSE;
     int       start_pcmcia_ii = FALSE;
+    int       need_mount_ii = FALSE;
 
 
-    if(auto2_ig)
-        {
-        printf("%s...", txt_get (TXT_SEARCH_INFOFILE));
-        fflush(stdout);
-        }
-    else
-        {
-        dia_info (&win_ri, txt_get (TXT_SEARCH_INFOFILE));
-        }
-
-    if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-        if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-            {
-            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-            return (-1);
-            }
-
-    sprintf (filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
+    dia_info (&win_ri, txt_get (TXT_SEARCH_INFOFILE));
     fd_pri = fopen (filename_ti, "r");
     if (!fd_pri)
         {
-        sprintf (filename_ti, "%s/info", mountpoint_tg);
+        if (util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+            if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+                {
+                win_close (&win_ri);
+                return (-1);
+                }
+
+        sprintf (filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
         fd_pri = fopen (filename_ti, "r");
         if (!fd_pri)
             {
-            umount (mountpoint_tg);
-            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-            return (-1);
+            sprintf (filename_ti, "%s/info", mountpoint_tg);
+            fd_pri = fopen (filename_ti, "r");
+            if (!fd_pri)
+                {
+                umount (mountpoint_tg);
+                win_close (&win_ri);
+                return (-1);
+                }
             }
-        }
 
-    valid_net_config_ig = 0;
+        need_mount_ii = TRUE;
+        }
 
     while (fgets (buffer_ti, sizeof (buffer_ti) - 1, fd_pri))
         {
-        fprintf (stderr, "%s", buffer_ti);
+        fprintf (stderr, buffer_ti);
         file_trim_buffer (buffer_ti);
 
         if (!strncasecmp (buffer_ti, "insmod", 6))
@@ -360,30 +333,27 @@ int file_read_info (void)
 
         if (!strncasecmp (file_txt_ip_tm, buffer_ti,
                           strlen (file_txt_ip_tm)))
-            if (!net_check_address (value_ti, &ipaddr_rg)) valid_net_config_ig |= 1;
+            (void) net_check_address (value_ti, &ipaddr_rg);
 
         if (!strncasecmp (file_txt_netmask_tm, buffer_ti,
                           strlen (file_txt_netmask_tm)))
-            if (!net_check_address (value_ti, &netmask_rg)) valid_net_config_ig |= 2;
+            (void) net_check_address (value_ti, &netmask_rg);
 
         if (!strncasecmp (file_txt_gateway_tm, buffer_ti,
                           strlen (file_txt_gateway_tm)))
-            if (!net_check_address (value_ti, &gateway_rg)) valid_net_config_ig |= 4;
+            (void) net_check_address (value_ti, &gateway_rg);
 
         if (!strncasecmp (file_txt_server_tm, buffer_ti,
                           strlen (file_txt_server_tm)))
-            if (!net_check_address (value_ti, &nfs_server_rg)) valid_net_config_ig |= 8;
+            (void) net_check_address (value_ti, &nfs_server_rg);
 
         if (!strncasecmp (file_txt_dnsserver_tm, buffer_ti,
                           strlen (file_txt_dnsserver_tm)))
-            if (!net_check_address (value_ti, &nameserver_rg)) valid_net_config_ig |= 0x10;
+            (void) net_check_address (value_ti, &nameserver_rg);
 
         if (!strncasecmp (file_txt_serverdir_tm, buffer_ti,
                           strlen (file_txt_serverdir_tm)))
-            {
             strncpy (server_dir_tg, value_ti, sizeof (server_dir_tg));
-            valid_net_config_ig |= 0x20;
-            }
 
         if (!strncasecmp (file_txt_netdevice_tm, buffer_ti,
                           strlen (file_txt_netdevice_tm)))
@@ -395,8 +365,11 @@ int file_read_info (void)
         }
 
     fclose (fd_pri);
-    umount (mountpoint_tg);
-    if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+
+    if (need_mount_ii)
+        umount (mountpoint_tg);
+
+    win_close (&win_ri);
 
     if (do_autoprobe_ii)
         mod_autoload ();
