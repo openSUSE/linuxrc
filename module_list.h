@@ -47,6 +47,11 @@ static module_t mod_scsi_mod_arm [] =
 { ID_SYM53C416,  "Symbios 53C416",                     "sym53c416",  0, __LINE__ },
 { ID_SIM710,     "Simple 53c710 (Compaq, NCR)",        "sim710",     0, __LINE__ },
 { ID_QLOGICPTI,  "PTI Qlogic ISP Driver",              "qlogicpti",  0, __LINE__ },
+{ ID_I2O_PCI,    "Intelligent I/O PCI",                "i2o_pci",    0, __LINE__ },
+{ ID_I2O_CORE,   "Intelligent I/O Core",               "i2o_core",   0, __LINE__ },
+{ ID_I2O_CONFIG, "Intelligent I/O Config",             "i2o_config", 0, __LINE__ },
+{ ID_I2O_BLOCK,  "Intelligent I/O Block",              "i2o_block",  0, __LINE__ },
+{ ID_I2O_SCSI,   "Intelligent I/O SCSI",               "i2o_scsi",   0, __LINE__ },
 };
 
 static module_t mod_cdrom_mod_arm [] =
@@ -186,7 +191,12 @@ static enum modid_t mod_noauto_arm [] =
   ID_EEPRO,
   ID_EATA_DMA,
   ID_EATA_PIO,
-  ID_ADVANSYS
+  ID_ADVANSYS,
+  ID_I2O_PCI,
+  ID_I2O_CORE,
+  ID_I2O_CONFIG,
+  ID_I2O_BLOCK,
+  ID_I2O_SCSI
 };
 
 static enum modid_t mod_is_ppcd_arm [] =

@@ -152,5 +152,12 @@ enum modid_t
     ID_SUNQUADE,
 
     /* SPARC - SCSI */
-    ID_QLOGICPTI
+    ID_QLOGICPTI,
+
+    ID_I2O_PCI,
+    ID_I2O_CORE,
+    ID_I2O_CONFIG,
+    ID_I2O_BLOCK,
+    ID_I2O_SCSI
+
     };
