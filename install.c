@@ -174,7 +174,7 @@ int inst_start_demo()
     }
   }
 
-  sprintf(buf, "%s/%s", mountpoint_tg, config.live.image);
+  sprintf(buf, "%s/%s", config.mountpoint.instdata, config.live.image);
 
   if(!util_check_exist(buf)) {
     util_disp_init();
@@ -642,6 +642,7 @@ int inst_mount_harddisk()
       util_fstype(buf, &module);
       if(module) mod_modprobe(module, NULL);
       rc = util_mount_ro(buf, config.mountpoint.extra);
+      if(!rc) config.extramount = 1;
     }
     else {
       rc = -1;
@@ -662,8 +663,6 @@ int inst_mount_harddisk()
       }
     }
   } while(rc);
-
-  config.extramount = 1;
 
   return 0;
 }
@@ -692,7 +691,7 @@ int inst_mount_nfs()
 
   system("portmap");
 
-  rc = net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir);
+  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
 
   win_close(&win);
 
@@ -704,16 +703,17 @@ int inst_mount_smb()
 {
   int rc;
   window_t win;
-  char msg[256];
+  char buf[256];
 
   set_instmode(inst_smb);
 
   if((rc = net_config())) return rc;
 
   if(config.win) {	/* ###### check really needed? */
-    sprintf(msg, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(msg, &config.net.server, 1))) return rc;
-    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.serverdir, 30, 0))) return rc;
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
+    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.net.share, 30, 0))) return rc;
+    if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
   }
   util_truncate_dir(config.serverdir);
 
@@ -735,18 +735,29 @@ int inst_mount_smb()
     }
   }
 
-  sprintf(msg, txt_get(TXT_SMB_TRYING_MOUNT), config.net.server.name, config.serverdir);
+  sprintf(buf, txt_get(TXT_SMB_TRYING_MOUNT), config.net.server.name, config.net.share);
 
-  dia_info(&win, msg);
+  dia_info(&win, buf);
 
-  rc = net_mount_smb(mountpoint_tg,
-    &config.net.server, config.serverdir,
+  mkdir(config.mountpoint.extra, 0755);
+
+  rc = net_mount_smb(config.mountpoint.extra,
+    &config.net.server, config.net.share,
     config.net.user, config.net.password, config.net.workgroup
   );
 
+  if(!rc) config.extramount = 1;
+
+  sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
+  if(!rc) rc = util_mount_ro(buf, config.mountpoint.instdata);
+
   win_close(&win);
 
-  if(rc) return -1;
+  if(rc) {
+    fprintf(stderr, "doing umount\n");
+    inst_umount();
+    return -1;
+  }
 
   return 0;
 }
@@ -955,100 +966,6 @@ int inst_start_rescue()
 
   return config.inst_ramdisk < 0 ? -1 : 0;
 }
-
-
-#if 0
-/*
- * Do some basic preparations before we can run programs from the
- * installation system. More must be done later in config.setupcmd.
- *
- * Note: the instsys must already be mounted at this point.
- *
- */
-int inst_prepare()
-{
-  char *links[] = { "/bin", "/lib", "/lib64", "/sbin", "/usr" };
-  char link_source[MAX_FILENAME], buf[256];
-  int i = 0, rc = 0;
-  struct dirent *de;
-  DIR *d;
-
-  mod_free_modules();
-  if(!config.initrd_has_ldso && !config.test) {
-    rename("/bin", "/.bin");
-  }
-
-  setenv("INSTSYS", config.instsys, TRUE);
-
-  if(config.term) setenv("TERM", config.term, TRUE);
-
-  util_free_mem();
-  if(config.memory.current - config.memory.free_swap < config.memory.min_modules) {
-    putenv("REMOVE_MODULES=1");
-  }
-  else {
-    unsetenv("REMOVE_MODULES");
-  }
-
-  if(!config.initrd_has_ldso && !config.test)
-    for(i = 0; (unsigned) i < sizeof links / sizeof *links; i++) {
-      if(!util_check_exist(links[i])) {
-	unlink(links[i]);
-	sprintf(link_source, "%s%s", config.instsys, links[i]);
-	symlink(link_source, links[i]);
-      }
-    }
-
-  setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
-
-  if(config.serial) {
-    setenv("TERM", "vt100", TRUE);
-    setenv("ESCDELAY", "1100", TRUE);
-  }
-  else {
-    setenv("TERM", "linux", TRUE);
-    setenv("ESCDELAY", "10", TRUE);
-  }
-
-  setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
-
-  file_write_install_inf("");
-  if(!config.test) {
-    // file_write_mtab();
-    system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
-
-    /*
-     * In these cases, part of the "/suse" tree is in the installation
-     * system. We add some symlinks needed by YaST2 to make it available
-     * below config.mountpoint.instdata.
-     */
-    if(
-      config.instmode == inst_ftp ||
-      config.instmode == inst_tftp ||
-      config.instmode == inst_http
-    ) {
-      if((d = opendir(config.mountpoint.instsys))) {
-        while((de = readdir(d))) {
-          if(
-            strstr(de->d_name, ".S.u.S.E") == de->d_name ||
-            !strcmp(de->d_name, config.product_dir)
-          ) {
-            sprintf(buf, "%s/%s", config.mountpoint.instdata, de->d_name);
-            unlink(buf);
-            if(!util_check_exist(buf)) {
-              sprintf(link_source, "%s/%s", config.mountpoint.instsys, de->d_name);
-              symlink(link_source, buf);
-            }
-          }
-        }
-        closedir(d);
-      }
-    }
-  }
-
-  return rc;
-}
-#endif
 
 
 int add_instsys()

@@ -233,7 +233,8 @@ static struct {
   { key_moduledisks,    "ModuleDisks",    kf_cfg + kf_cmd                },
   { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
   { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early },
-  { key_port,           "Port",           kf_none                        }
+  { key_port,           "Port",           kf_none                        },
+  { key_smbshare,       "Share",          kf_none                        }
 };
 
 static struct {
@@ -527,19 +528,19 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
   }
   else if(!strncmp(file, "floppy:", 7)) {
     for(i = 0; i < config.floppies; i++) {
-      if(!util_mount_ro(config.floppy_dev[i], mountpoint_tg)) break;
+      if(!util_mount_ro(config.floppy_dev[i], config.mountpoint.instdata)) break;
     }
     if(i < config.floppies) {
       config.floppy = i;	// remember currently used floppy
       mounted = 1;
-      util_chk_driver_update(mountpoint_tg, "floppy");
+      util_chk_driver_update(config.mountpoint.instdata, "floppy");
       dud = 1;
-      sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
+      sprintf(filename, "%s/%s", config.mountpoint.instdata, file + 7);
       f0 = file_read_file(filename, flags);
     }
   }
 
-  if(mounted) umount(mountpoint_tg);
+  if(mounted) umount(config.mountpoint.instdata);
 
   if(dud) util_do_driver_updates();
 
@@ -818,6 +819,7 @@ void file_do_info(file_t *f0)
           str_copy(&config.serverdir, url->dir);
           str_copy(&config.net.user, url->user);
           str_copy(&config.net.password, url->password);
+          str_copy(&config.net.share, url->share);
 
           if(config.insttype == inst_net) {
             name2inet(&config.net.server, url->server);
@@ -1463,6 +1465,7 @@ void file_write_install_inf(char *dir)
     file_write_inet_both(f, key_server, &config.net.server);
     file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
+    file_write_str(f, key_smbshare, config.net.share);
   }
 
   if(config.net.port) {

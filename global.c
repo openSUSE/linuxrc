@@ -21,7 +21,6 @@ int             max_y_ig = Y_DEFAULT;
 config_t config;
 
 colorset_t     *colors_prg;
-char           *mountpoint_tg = "/var/adm/mount";
 char           *kernellog_tg = "/etc/kernellog";
 char           *lastlog_tg = "/etc/lastlog";
 char           *bootmsg_tg = "/var/log/boot.msg";

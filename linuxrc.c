@@ -385,32 +385,32 @@ void lxrc_end()
 {
   FILE *f;
 
-    if(config.netstop) {
-      util_debugwait("shut down network");
-      net_stop();
-    }
+  if(config.netstop) {
+    util_debugwait("shut down network");
+    net_stop();
+  }
 
-    util_debugwait("kill remaining procs");
+  util_debugwait("kill remaining procs");
 
-    lxrc_killall(1);
+  lxrc_killall(1);
 
-    while(waitpid(-1, NULL, WNOHANG) == 0);
+  while(waitpid(-1, NULL, WNOHANG) == 0);
 
-    if (!config.linemode)
-      printf ("\033[9;15]");		/* screen saver on */
+  /* screen saver on */
+  if(!config.linemode) printf("\033[9;15]");
 
 /*    reboot (RB_ENABLE_CAD); */
-    mod_free_modules();
+  mod_free_modules();
 
-//    util_umount_driver_update();
-    util_umount(mountpoint_tg);
+  util_umount(config.mountpoint.extra);
+  util_umount(config.mountpoint.instdata);
 
-    lxrc_set_modprobe("/sbin/modprobe");
-    lxrc_set_bdflush(40);
+  lxrc_set_modprobe("/sbin/modprobe");
+  lxrc_set_bdflush(40);
 
-    deb_str(config.new_root);
+  deb_str(config.new_root);
 
-    util_debugwait("leaving now");
+  util_debugwait("leaving now");
 
   if(!config.test) {
     if(config.new_root && config.pivotroot) {

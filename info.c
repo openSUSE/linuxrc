@@ -208,11 +208,12 @@ void info_init (void)
 void info_show_hardware()
 {
   slist_t *sl0 = NULL;
-  char buf[256];
+  char buf[256], *s;
   hd_data_t *hd_data;
   hd_t *hd, *hd0;
   hd_hw_item_t hw_items[] = { hw_cdrom, hw_disk, 0 };
   hd_res_t *res;
+  static char *geo_type_str[] = { "Physical", "Logical", "BIOS EDD", "BIOS Legacy" };
 
   hd_data = calloc(1, sizeof *hd_data);
 
@@ -264,10 +265,11 @@ void info_show_hardware()
           break;
 
         case res_disk_geo:
+          s = res->disk_geo.geotype < sizeof geo_type_str / sizeof *geo_type_str ?
+            geo_type_str[res->disk_geo.geotype] : "";
           sprintf(buf,
             "  Geometry (%s): CHS %u/%u/%u",
-            res->disk_geo.logical ? "Logical" : "Physical",
-            res->disk_geo.cyls, res->disk_geo.heads, res->disk_geo.sectors
+            s, res->disk_geo.cyls, res->disk_geo.heads, res->disk_geo.sectors
           );
           slist_append_str(&sl0, buf);
           break;

@@ -435,12 +435,12 @@ int root_check_root(char *root_string_tv)
 
   sprintf(buf, "/dev/%s", root_string_tv);
 
-  if(util_mount_ro(buf, mountpoint_tg)) return -1;
+  if(util_mount_ro(buf, config.mountpoint.instdata)) return -1;
 
-  sprintf(buf, "%s/etc/passwd", mountpoint_tg);
+  sprintf(buf, "%s/etc/passwd", config.mountpoint.instdata);
   rc = util_check_exist(buf);
 
-  umount(mountpoint_tg);
+  umount(config.mountpoint.instdata);
 
   return rc == 'r' ? 0 : -1;
 }

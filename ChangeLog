@@ -1,3 +1,6 @@
+17/2/2005:	v1.7.23
+	- smb mount accepts share + directory (#26059)
+
 14/2/2005:	v1.7.22
 	- really always write Locale (#37679)
 	- fix url handling (#35907, #50618)

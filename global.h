@@ -153,6 +153,7 @@ typedef struct {
 typedef struct {
   instmode_t scheme;
   char *server;
+  char *share;
   char *dir;
   char *user;
   char *password;
@@ -449,6 +450,7 @@ typedef struct {
     inet_t ptphost;
     char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */
+    char *share;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *password;
     char *vncpassword;
@@ -490,7 +492,6 @@ config_t config;
 extern int             max_x_ig;
 extern int             max_y_ig;
 extern colorset_t     *colors_prg;
-extern char           *mountpoint_tg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;

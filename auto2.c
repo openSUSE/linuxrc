@@ -55,7 +55,7 @@ static int auto2_ask_for_modules(int prompt, char *type);
 static void get_zen_config(void);
 
 /*
- * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
+ * mount a detected suse-cdrom at config.mountpoint.instdata and run inst_check_instsys()
  *
  * return 0 on success
  */
@@ -67,11 +67,11 @@ int auto2_mount_cdrom(char *device)
 
   if(config.cdid && strstr(config.cdid, "-DVD-")) set_instmode(inst_dvd);
 
-  rc = mount(device, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
+  rc = mount(device, config.mountpoint.instdata, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
   if(!rc) {
     if((rc = inst_check_instsys())) {
       fprintf(stderr, "%s is not a %s Installation CD.\n", device, config.product);
-      umount(mountpoint_tg);
+      umount(config.mountpoint.instdata);
     } else {
       /* skip "/dev/" !!! */
       str_copy(&config.cdrom, device + sizeof "/dev/" - 1);
@@ -476,6 +476,7 @@ int auto2_net_dev(hd_t **hd0)
 int auto2_net_dev1(char *device)
 {
   int i;
+  char buf[256];
 
   if(!device) return 1;
 
@@ -547,12 +548,21 @@ int auto2_net_dev1(char *device)
 
   switch(config.instmode) {
     case inst_smb:
-      fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.serverdir);
+      fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.net.share);
 
-      i = net_mount_smb(mountpoint_tg,
-        &config.net.server, config.serverdir,
+      mkdir(config.mountpoint.extra, 0755);
+
+      i = net_mount_smb(config.mountpoint.extra,
+        &config.net.server, config.net.share,
         config.net.user, config.net.password, config.net.workgroup
       );
+
+      if(!i) {
+        config.extramount = 1;
+        util_truncate_dir(config.serverdir);
+        sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
+        i = util_check_exist(buf) ? util_mount_ro(buf, config.mountpoint.instdata) : -1;
+      }
       
       if(i) {
         fprintf(stderr, "SMB mount failed\n");
@@ -568,7 +578,7 @@ int auto2_net_dev1(char *device)
 
       fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
 
-      if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
+      if(net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir)) {
         fprintf(stderr, "NFS mount failed\n");
         return 1;
       }

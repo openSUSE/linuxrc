@@ -715,16 +715,17 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
  *
  * mountpoint: mount point
  * server: SMB server
- * hostdir: share
+ * share: share
  * user: user (NULL: guest)
  * password: password (NULL: no password)
  * workgroup: workgroup (NULL: no workgroup)
  *
  */
+
 /*
- * abhängig von Guest login 
+ * depending on guest login
  *   options += "guest"
- * bzw.
+ * resp.
  *   options += "username=" + USERNAME + ",password=" + PASSWORD
  *
  *   device = "//" + SERVER + "/" + SHARE
@@ -732,21 +733,21 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
  *   options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
  * "  mount -t smbfs" + device + " " + mountpoint + " " + options
  */
-int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup)
+int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, char *password, char *workgroup)
 {
   char tmp[1024];
   char mount_options[256];
 
   if(net_check_address2(server, 1)) return -1;
 
-  if(!hostdir) hostdir = "/";
+  if(!share) share = "";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
 
   net_smb_get_mount_options(mount_options, server, user, password, workgroup);
 
   sprintf(tmp,
     "smbmount //%s/%s %s -o ro,%s >&2",
-    server->name, hostdir, mountpoint, mount_options
+    server->name, share, mountpoint, mount_options
   );
 
   mod_modprobe("smbfs", NULL);

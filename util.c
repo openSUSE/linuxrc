@@ -3105,19 +3105,32 @@ url_t *parse_url(char *str)
 
   if(!url.dir) str_copy(&url.dir, "");
 
+  if(url.scheme == inst_smb) {
+    url.share = url.dir;
+    url.dir = NULL;
+    s = strchr(url.share, '/');
+    if(s) {
+      *s = 0;
+      str_copy(&url.dir, s + 1);
+    }
+    else {
+      str_copy(&url.dir, "");
+    }
+  }
+
   if(
     url.scheme == inst_http ||
     (url.scheme == inst_slp && !*url.dir) ||
-    (url.scheme == inst_nfs && *url.dir != '/')
+    ((url.scheme == inst_nfs || url.scheme == inst_smb) && *url.dir != '/')
   ) {
     strprintf(&url.dir, "/%s", url.dir);
   }
 
   if(config.debug >= 2) {
     fprintf(stderr,
-      "  scheme = %s, server = \"%s\", dir = \"%s\"\n"
+      "  scheme = %s, server = \"%s\", dir = \"%s\", share = \"%s\"\n"
       "  user = \"%s\", password = \"%s\", port = %u\n",
-      get_instmode_name(url.scheme), url.server, url.dir,
+      get_instmode_name(url.scheme), url.server, url.dir, url.share,
       url.user, url.password, url.port
     );
   }
