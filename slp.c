@@ -279,9 +279,9 @@ slp_get_install()
 	    {
 	      bp = sendbuf + 18;
 	      memmove(bp + l3 + comma, bp, l - 18);
-	      if (comma)
-		*bp++ = ',';
 	      memmove(bp, iaddr, l3);
+	      if (comma)
+		bp[l3] = ',';
 	      l2 = slpgetw(sendbuf + 16) + l3 + comma;
 	      sendbuf[16] = l2 >> 8;
 	      sendbuf[17] = l2 & 255;
