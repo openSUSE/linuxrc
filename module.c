@@ -124,9 +124,9 @@ int mod_copy_modules(char *src_dir, int doit)
   while((de = readdir(d))) {
     i = strlen(de->d_name);
     if(
-      i >= 3 &&
+      i >= sizeof MODULE_SUFFIX &&
       (
-        (de->d_name[i - 2] == '.' && de->d_name[i - 1] == 'o') ||
+        !strcmp(de->d_name + i + 1 - sizeof MODULE_SUFFIX, MODULE_SUFFIX) ||
         !strcmp(de->d_name, MODULE_CONFIG)
       )
     ) {
@@ -235,13 +235,12 @@ void mod_update_list()
   while((de = readdir(d))) {
     i = strlen(de->d_name);
     if(
-      i >= 3 &&
+      i >= sizeof MODULE_SUFFIX &&
       i < (int) sizeof buf &&
-      de->d_name[i - 2] == '.' &&
-      de->d_name[i - 1] == 'o'
+      !strcmp(de->d_name + i + 1 - sizeof MODULE_SUFFIX, MODULE_SUFFIX)
     ) {
       strcpy(buf, de->d_name);
-      buf[i - 2] = 0;
+      buf[i + 1 - sizeof MODULE_SUFFIX] = 0;
 
       for(found = 0, ml = config.module.list; ml; ml = ml->next) {
         /* Don't stop if it is an 'autoload' entry! */
@@ -752,7 +751,7 @@ int mod_insmod(char *module, char *param)
 
   if(!config.forceinsmod) {
     if(!util_check_exist(module)) {
-      sprintf(buf, "%s/%s." MODULE_SUFFIX, config.module.dir, module);
+      sprintf(buf, "%s/%s" MODULE_SUFFIX, config.module.dir, module);
       if(!util_check_exist(buf)) return -1;
     }
   }
@@ -762,7 +761,7 @@ int mod_insmod(char *module, char *param)
     return -1;
   }
 
-  sprintf(buf, "insmod %s%s/%s." MODULE_SUFFIX, force, config.module.dir, module);
+  sprintf(buf, "insmod %s%s/%s" MODULE_SUFFIX, force, config.module.dir, module);
 
   if(param && *param) strcat(buf, param);
 

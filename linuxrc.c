@@ -84,7 +84,7 @@ int loadkeys_main(int argc, char **argv);
 int dhcpcd_main(int argc, char **argv);
 int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
-// int rmmod_main(int argc, char **argv);
+int rmmod_main(int argc, char **argv);
 int setfont_main(int argc, char **argv);
 int smbmnt_main(int argc, char **argv);
 
@@ -96,7 +96,7 @@ static struct {
   { "lsh",         lsh_main              },
   { "mkdevs",      mkdevs_main           },
 //  { "insmod",      insmod_main           },
-//  { "rmmod",       rmmod_main            },
+  { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
   { "loadkeys",    loadkeys_main         },
   { "dhcpcd",      dhcpcd_main           },

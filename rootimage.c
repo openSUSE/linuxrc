@@ -490,7 +490,7 @@ int root_boot_system()
 
     if((type = util_fstype(root, &module))) {
       if(module && config.module.dir) {
-        sprintf(buf, "%s/%s." MODULE_SUFFIX, config.module.dir, module);
+        sprintf(buf, "%s/%s" MODULE_SUFFIX, config.module.dir, module);
         if(!util_check_exist(buf)) {
           mtype = mod_get_type("file system");
 
