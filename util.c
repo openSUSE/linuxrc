@@ -724,9 +724,9 @@ int util_chk_driver_update(char *dir)
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
-  sprintf(drv_src, "%s/suse.drv", dir);
-  sprintf(mods_src, "%s/suse.drv/modules", dir);
-  sprintf(inst_src, "%s/suse.drv/install", dir);
+  sprintf(drv_src, "%s/linux/suse/" LX_ARCH "-" LX_REL, dir);
+  sprintf(mods_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/modules", dir);
+  sprintf(inst_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/install", dir);
 
   if(stat(drv_src, &st) == -1) return 0;
   if(!S_ISDIR(st.st_mode)) return 0;
@@ -861,7 +861,7 @@ void util_status_info()
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
 
-  dia_show_lines("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", l, sizeof l / sizeof *l, 76, FALSE);
+  dia_show_lines("Linuxrc v" LXRC_FULL_VERSION "/" LX_REL "-" LX_ARCH " (" __DATE__ ", " __TIME__ ")", l, sizeof l / sizeof *l, 76, FALSE);
 
   for(i = 0; i < sizeof l / sizeof *l; i++) free(l[i]);
 }

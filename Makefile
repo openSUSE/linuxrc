@@ -1,12 +1,24 @@
+# SuSE release number, needed for driver update feature
+LX_REL	?= -DLX_REL=\"7.1\"
+
 include pcmcia/config.mk
 
 TOPDIR	:= $(CURDIR)
 ARCH	:= $(shell uname -m)
+ifeq "$(ARCH)" "i486"
+ARCH	:= i386
+endif
+ifeq "$(ARCH)" "i586"
+ARCH	:= i386
+endif
+ifeq "$(ARCH)" "i686"
+ARCH	:= i386
+endif
 
 CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
-CFLAGS	= -O1 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
+CFLAGS	= -O1 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 WARN	= -Wstrict-prototypes -Wall
 LIBHDFL	= -DUSE_LIBHD
@@ -18,9 +30,13 @@ OBJ	= $(SRC:.c=.o)
 SUBDIRS	= insmod loadkeys pcmcia portmap
 LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a
 
+ifeq ($(ARCH),i386)
+    CFLAGS		+= -DLX_ARCH=\"i386\"
+endif
+
 ifeq ($(ARCH),alpha)
     USE_MINI_GLIBC	= no
-    CFLAGS		+= -DLINUXRC_AXP
+    CFLAGS		+= -DLINUXRC_AXP -DLX_ARCH=\"axp\"
 endif
 
 ifeq ($(ARCH),ppc)
@@ -28,6 +44,7 @@ ifeq ($(ARCH),ppc)
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
+    CFLAGS		+= -DLX_ARCH=\"ppc\"
 endif
 
 ifeq ($(ARCH),sparc)
@@ -35,6 +52,7 @@ ifeq ($(ARCH),sparc)
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
+    CFLAGS		+= -DLX_ARCH=\"sparc\"
 endif
 
 ifeq ($(ARCH),sparc64)
@@ -42,10 +60,16 @@ ifeq ($(ARCH),sparc64)
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
+    CFLAGS		+= -DLX_ARCH=\"sparc64\"
 endif
 
 ifeq ($(ARCH),ia64)
     USE_MINI_GLIBC	= no
+    CFLAGS		+= -DLX_ARCH=\"ia64\"
+endif
+
+ifeq ($(ARCH),s390)
+    CFLAGS		+= -DLX_ARCH=\"s390\"
 endif
 
 ifneq ($(USE_MINI_GLIBC),no)
