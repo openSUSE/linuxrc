@@ -428,7 +428,7 @@ static void lxrc_init (void)
         }
 #if defined(__i386__)
         else {
-          dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
+          dia_message("Could not find the SuSE Linux installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
         }
 #endif
       }
