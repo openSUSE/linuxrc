@@ -766,6 +766,7 @@ int auto2_find_install_medium()
     if(!config.partition) return FALSE;
 
     if (config.vnc || config.usessh) {
+      auto2_activate_devices(bc_network, 0);
       if (net_config())
 	config.vnc = config.usessh = 0;
     }
@@ -784,6 +785,7 @@ int auto2_find_install_medium()
     need_modules = 0;
   
     if (config.vnc || config.usessh) {
+      auto2_activate_devices(bc_network, 0);
       if(net_config())
 	config.vnc = config.usessh = 0;
     }

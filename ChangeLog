@@ -1,3 +1,6 @@
+03/9/2002:	v1.4.19
+	- autoload network modules on auto cd/hd install with vnc/ssh.
+
 29/8/2002:	v1.4.18
 	- kukuk: fix for serial console on SPARC & PPC
 	- symlink /etc/pam.d from instsys so we can run chpasswd for ssh mode.
