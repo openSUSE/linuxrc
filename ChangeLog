@@ -1,5 +1,6 @@
 17/2/2003:	v1.4.42
 	- copy content file from the first CD linuxrc sees to /tmp/content
+	- always enable update CD menu entry
 
 15/1/2003:	v1.4.41
 	- fixed 'usbwait' option handling (had no effect when given
