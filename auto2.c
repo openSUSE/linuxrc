@@ -261,7 +261,9 @@ void auto2_scan_hardware(char *log_file)
     }
   }
 
-  hd_sys = hd_list(hd_data, hw_sys, 0, NULL);
+  hd_sys = hd_list(hd_data, hw_sys, 1, NULL);
+
+  activate_driver(hd_data, hd_sys, NULL);
 
   if(
     hd_sys &&

@@ -1,3 +1,6 @@
+15/3/2005:	v1.8.4
+	- load acpi modules if necessary (#72146)
+
 11/3/2005:	v1.8.3
 	- s390: fix segfault in net_list_s390_devs()
 	- extra root image was sometimes not used
