@@ -308,7 +308,7 @@ char **args;
 int optd = 0;
 int optm = 0;
 int opts = 0;
-int verbose = 0;
+int lk_verbose = 0;
 int quiet = 0;
 int nocompose = 0;
 
@@ -353,7 +353,7 @@ loadkeys_main(unsigned int argc, char *argv[]) {
 				quiet = 1;
 				break;
 			case 'v':
-				verbose++;
+				lk_verbose++;
 				break;
 			case 'V':
 				print_version_and_exit();
@@ -548,7 +548,7 @@ void
 open_include(char *s) {
 	char *t, *te;
 
-	if (verbose)
+	if (lk_verbose)
 		/* start reading include file */
 		fprintf(stderr, _("switching to %s\n"), s);
 
@@ -796,7 +796,7 @@ defkeys(int fd) {
 			    perror("KDSKBENT");
 			} else
 			  ct++;
-			if(verbose)
+			if(lk_verbose)
 			  printf("keycode %d, table %d = %d%s\n", j, i,
 				 (key_map[i])[j], fail ? _("    FAILED") : "");
 			else if (fail)
@@ -811,7 +811,7 @@ defkeys(int fd) {
 		ke.kb_table = i;
 		ke.kb_value = K_NOSUCHMAP;
 
-		if (verbose > 1)
+		if (lk_verbose > 1)
 		  printf(_("deallocate keymap %d\n"), i);
 
 		if(ioctl(fd, KDSKBENT, (unsigned long)&ke)) {
@@ -992,7 +992,7 @@ loadkeys (void) {
 	funcct = deffuncs(fd);
 	if (accent_table_size > 0 || nocompose)
 		diacct = defdiacs(fd);
-	if (verbose) {
+	if (lk_verbose) {
 	        printf(_("\nChanged %d %s and %d %s.\n"),
 		       keyct, (keyct == 1) ? _("key") : _("keys"),
 		       funcct, (funcct == 1) ? _("string") : _("strings"));

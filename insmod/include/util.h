@@ -1,3 +1,6 @@
+#ifndef MODUTILS_UTIL_H
+#define MODUTILS_UTIL_H 1
+
 /* Miscelaneous utility functions.
    Copyright 1996, 1997 Linux International.
 
@@ -19,13 +22,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-
-#ifndef MODUTILS_UTIL_H
-#define MODUTILS_UTIL_H 1
-
-#ident "$Id: util.h,v 1.2 2000/11/22 15:45:22 snwint Exp $"
-
-#define verbose modutils_verbose
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -78,6 +74,7 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 #define ME_ALL			(ME_GLOB|ME_SHELL_COMMAND|ME_BUILTIN_COMMAND)
 
 extern void snap_shot(const char *module_name, int number);
+extern void snap_shot_log(const char *fmt,...);
 
 #ifdef CONFIG_USE_ZLIB
 int gzf_open(const char *name, int mode);
@@ -96,6 +93,7 @@ void gzf_close(int fd);
 
 #endif /* CONFIG_USE_ZLIB */
 
-static const char symprefix[] = "__insmod_";
+#define SYMPREFIX "__insmod_";
+extern const char symprefix[10];	/* Must be sizeof(SYMPREFIX), including nul */
 
 #endif /* util.h */

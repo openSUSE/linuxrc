@@ -21,8 +21,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_load.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
-
 #include <alloca.h>
 #include <string.h>
 #include <stdlib.h>
@@ -52,7 +50,7 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
   gzf_lseek(fp, 0, SEEK_SET);
   if (gzf_read(fp, &f->header, sizeof(f->header)) != sizeof(f->header))
     {
-      error("error reading ELF header %s: %m", filename);
+      error("cannot read ELF header from %s", filename);
       return NULL;
     }
 
@@ -94,7 +92,7 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
   if (f->header.e_shentsize != sizeof(ElfW(Shdr)))
     {
       error("section header size mismatch %s: %lu != %lu",
-	    filename, 
+	    filename,
 	    (unsigned long)f->header.e_shentsize,
 	    (unsigned long)sizeof(ElfW(Shdr)));
       return NULL;
@@ -152,14 +150,18 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
 
 #if SHT_RELM == SHT_REL
 	case SHT_RELA:
-	  if (sec->header.sh_size)
+	  if (sec->header.sh_size) {
 	    error("RELA relocations not supported on this architecture %s", filename);
-	  return NULL;
+	    return NULL;
+	  }
+	  break;
 #else
 	case SHT_REL:
-	  if (sec->header.sh_size)
+	  if (sec->header.sh_size) {
 	    error("REL relocations not supported on this architecture %s", filename);
-	  return NULL;
+	    return NULL;
+	  }
+	  break;
 #endif
 
 	default:
@@ -190,11 +192,13 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
     {
       struct obj_section *sec = f->sections[i];
 
-      /* .modinfo should be contents only but gcc has no attribute for that.
-       * The kernel may have marked .modinfo as ALLOC, ignore this bit.
+      /* .modinfo and .modstring should be contents only but gcc has no
+       *  attribute for that.  The kernel may have marked these sections as
+       *  ALLOC, ignore the allocate bit.
        */
-      if (strcmp(sec->name, ".modinfo") == 0)
-        sec->header.sh_flags &= ~SHF_ALLOC;
+      if (strcmp(sec->name, ".modinfo") == 0 ||
+	  strcmp(sec->name, ".modstring") == 0)
+	sec->header.sh_flags &= ~SHF_ALLOC;
 
       if (sec->header.sh_flags & SHF_ALLOC)
 	obj_insert_section_load_order(f, sec);
@@ -210,7 +214,7 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
 	    if (sec->header.sh_entsize != sizeof(ElfW(Sym)))
 	      {
 		error("symbol size mismatch %s: %lu != %lu",
-		      filename, 
+		      filename,
 		      (unsigned long)sec->header.sh_entsize,
 		      (unsigned long)sizeof(ElfW(Sym)));
 		return NULL;
@@ -251,14 +255,14 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
 	{
 	case SHT_RELM:
 	  {
-	    unsigned long nrel, j;
+	    unsigned long nrel, j, nsyms;
 	    ElfW(RelM) *rel;
 	    struct obj_section *symtab;
 	    char *strtab;
 	    if (sec->header.sh_entsize != sizeof(ElfW(RelM)))
 	      {
 		error("relocation entry size mismatch %s: %lu != %lu",
-		      filename, 
+		      filename,
 		      (unsigned long)sec->header.sh_entsize,
 		      (unsigned long)sizeof(ElfW(RelM)));
 		return NULL;
@@ -267,34 +271,25 @@ obj_load (int fp, Elf32_Half e_type, const char *filename)
 	    nrel = sec->header.sh_size / sizeof(ElfW(RelM));
 	    rel = (ElfW(RelM) *) sec->contents;
 	    symtab = f->sections[sec->header.sh_link];
+	    nsyms = symtab->header.sh_size / symtab->header.sh_entsize;
 	    strtab = f->sections[symtab->header.sh_link]->contents;
 
 	    /* Save the relocate type in each symbol entry.  */
 	    for (j = 0; j < nrel; ++j, ++rel)
 	      {
-		ElfW(Sym) *extsym;
 		struct obj_symbol *intsym;
 		unsigned long symndx;
 		symndx = ELFW(R_SYM)(rel->r_info);
 		if (symndx)
 		  {
-		    extsym = ((ElfW(Sym) *) symtab->contents) + symndx;
-		    if (ELFW(ST_BIND)(extsym->st_info) == STB_LOCAL)
+		    if (symndx >= nsyms)
 		      {
-			/* Local symbols we look up in the local table to be sure
-			   we get the one that is really intended.  */
-			intsym = f->local_symtab[symndx];
+			error("%s: Bad symbol index: %08lx >= %08lx",
+			      filename, symndx, nsyms);
+			continue;
 		      }
-		    else
-		      {
-			/* Others we look up in the hash table.  */
-			const char *name;
-			if (extsym->st_name)
-			  name = strtab + extsym->st_name;
-			else
-			  name = f->sections[extsym->st_shndx]->name;
-			intsym = obj_find_symbol(f, name);
-		      }
+
+		    obj_find_relsym(intsym, f, f, rel, (ElfW(Sym) *)(symtab->contents), strtab);
 		    intsym->r_type = ELFW(R_TYPE)(rel->r_info);
 		  }
 	      }
@@ -340,6 +335,9 @@ void obj_free(struct obj_file *f)
 
 	if (f->filename)
 		free((char *)(f->filename));
+
+	if (f->persist)
+		free((char *)(f->persist));
 
 	free(f);
 }

@@ -1,6 +1,7 @@
 24/5/2002:	v1.4.1
 	- removed mini-glibc code
 	- xf86_64 fixes
+	- new modutils
 
 23/5/2002:	v1.4.0
 	- let 'NetDevice' option cooperate with auto install

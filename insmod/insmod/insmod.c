@@ -52,9 +52,11 @@
        Keith Owens <kaos@ocs.com.au> October 2000.
      Add insmod -S.
        Keith Owens <kaos@ocs.com.au> November 2000.
+     Add persistent data support.
+       Keith Owens <kaos@ocs.com.au> November 2000.
+     Add tainted module support.
+       Keith Owens <kaos@ocs.com.au> September 2001.
    */
-
-#ident "$Id: insmod.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 #include <sys/types.h>
 #include <stdlib.h>
@@ -90,6 +92,8 @@ static int flag_ksymoops = 1;
 
 static int n_ext_modules_used;
 static int m_has_modinfo;
+static int gplonly_seen;
+static int warnings;
 
 extern int insmod_main(int argc, char **argv);
 extern int insmod_main_32(int argc, char **argv);
@@ -229,7 +233,7 @@ static unsigned long ncv_symbol_hash(const char *str)
  * to the new module.
  */
 static int add_symbols_from(struct obj_file *f, int idx,
-			    struct module_symbol *syms, size_t nsyms)
+			    struct module_symbol *syms, size_t nsyms, int gpl)
 {
 	struct module_symbol *s;
 	size_t i;
@@ -244,8 +248,57 @@ static int add_symbols_from(struct obj_file *f, int idx,
 		 */
 		struct obj_symbol *sym;
 
+		/* GPL licensed modules can use symbols exported with
+		 * EXPORT_SYMBOL_GPL, so ignore any GPLONLY_ prefix on the
+		 * exported names.  Non-GPL modules never see any GPLONLY_
+		 * symbols so they cannot fudge it by adding the prefix on
+		 * their references.
+		 */
+		if (strncmp((char *)s->name, "GPLONLY_", 8) == 0) {
+			gplonly_seen = 1;
+			if (gpl)
+				((char *)s->name) += 8;
+			else
+				continue;
+		}
+
 		sym = obj_find_symbol(f, (char *) s->name);
-		if (sym && !ELFW(ST_BIND) (sym->info) == STB_LOCAL) {
+#ifdef	ARCH_ppc64
+		if (!sym)
+		  {
+		    static size_t buflen = 0;
+		    static char *buf = 0;
+		    int len;
+
+		    /* ppc64 is one of those architectures with
+		       function descriptors.  A function is exported
+		       and accessed across object boundaries via its
+		       function descriptor.  The function code symbol
+		       happens to be the function name, prefixed with
+		       '.', and a function call is a branch to the
+		       code symbol.  The linker recognises when a call
+		       crosses object boundaries, and inserts a stub
+		       to call via the function descriptor.
+		       obj_ppc64.c of course does the same thing, so
+		       here we recognise that an undefined code symbol
+		       can be satisfied by the corresponding function
+		       descriptor symbol.  */
+
+		    len = strlen ((char *) s->name) + 2;
+		    if (buflen < len)
+		      {
+			buflen = len + (len >> 1);
+			if (buf)
+			  free (buf);
+			buf = malloc (buflen);
+		      }
+		    buf[0] = '.';
+		    strcpy (buf + 1, (char *) s->name);
+		    sym = obj_find_symbol(f, buf);
+		  }
+#endif	/* ARCH_ppc64 */
+
+		if (sym && ELFW(ST_BIND) (sym->info) != STB_LOCAL) {
 			sym = obj_add_symbol(f, (char *) s->name, -1,
 				  ELFW(ST_INFO) (STB_GLOBAL, STT_NOTYPE),
 					     idx, s->value, 0);
@@ -261,7 +314,7 @@ static int add_symbols_from(struct obj_file *f, int idx,
 	return used;
 }
 
-static void add_kernel_symbols(struct obj_file *f)
+static void add_kernel_symbols(struct obj_file *f, int gpl)
 {
 	struct module_stat *m;
 	size_t i, nused = 0;
@@ -269,13 +322,13 @@ static void add_kernel_symbols(struct obj_file *f)
 	/* Add module symbols first.  */
 	for (i = 0, m = module_stat; i < n_module_stat; ++i, ++m)
 		if (m->nsyms &&
-		    add_symbols_from(f, SHN_HIRESERVE + 2 + i, m->syms, m->nsyms))
+		    add_symbols_from(f, SHN_HIRESERVE + 2 + i, m->syms, m->nsyms, gpl))
 			m->status = 1 /* used */, ++nused;
 	n_ext_modules_used = nused;
 
 	/* And finally the symbols from the kernel proper.  */
 	if (nksyms)
-		add_symbols_from(f, SHN_HIRESERVE + 1, ksyms, nksyms);
+		add_symbols_from(f, SHN_HIRESERVE + 1, ksyms, nksyms, gpl);
 }
 
 static void hide_special_symbols(struct obj_file *f)
@@ -323,7 +376,7 @@ static void print_load_map(struct obj_file *f)
 		if (a == -1)
 			a = 0;
 
-		lprintf("%-16s%08lx  %0*lx  2**%d",
+		lprintf("%-15s %08lx  %0*lx  2**%d",
 			sec->name,
 			(long)sec->header.sh_size,
 			(int) (2 * sizeof(void *)),
@@ -462,9 +515,10 @@ static int old_create_mod_use_count(struct obj_file *f)
 	 */
 	got = obj_find_symbol(f, "_GLOBAL_OFFSET_TABLE_");
 	if (got)
-{
+	{
 		sec = obj_create_alloced_section(f, ".got",
-						 sizeof(long), sizeof(long));
+						 sizeof(long), sizeof(long),
+						 SHF_WRITE);
 		got->secidx = sec->idx; /* mark the symbol as defined */
 	}
 	return 1;
@@ -488,7 +542,8 @@ static void add_ksymtab(struct obj_file *f, struct obj_symbol *sym)
 		sec = NULL;
 	}
 	if (!sec)
-		sec = obj_create_alloced_section(f, "__ksymtab", tgt_sizeof_void_p, 0);
+		sec = obj_create_alloced_section(f, "__ksymtab",
+						 tgt_sizeof_void_p, 0, 0);
 	if (!sec)
 		return;
 	sec->header.sh_flags |= SHF_ALLOC;
@@ -510,9 +565,9 @@ static int create_module_ksymtab(struct obj_file *f)
 		struct module_ref *dep;
 		struct obj_symbol *tm;
 
-		sec = obj_create_alloced_section(f, ".kmodtab", tgt_sizeof_void_p,
-					   (sizeof(struct module_ref)
-					    * n_ext_modules_used));
+		sec = obj_create_alloced_section(f, ".kmodtab",
+			tgt_sizeof_void_p,
+			sizeof(struct module_ref) * n_ext_modules_used, 0);
 		if (!sec)
 			return 0;
 
@@ -521,6 +576,9 @@ static int create_module_ksymtab(struct obj_file *f)
 		for (i = 0; i < n_module_stat; ++i)
 			if (module_stat[i].status /* used */) {
 				dep->dep = module_stat[i].addr;
+#ifdef ARCH_ppc64
+				dep->dep |= ppc64_module_base (f);
+#endif
 				obj_symbol_patch(f, sec->idx, (char *) &dep->ref - sec->contents, tm);
 				dep->next_ref = 0;
 				++dep;
@@ -677,7 +735,7 @@ static void add_ksymoops_symbols(struct obj_file *f, const char *filename,
 		version = get_module_version(f, str);	/* -1 if not found */
 		snprintf(name, l, "%s%s_O%s_M%0*lX_V%d",
 			 symprefix, m_name, absolute_filename,
-			 2*sizeof(statbuf.st_mtime), statbuf.st_mtime,
+			 (int)(2*sizeof(statbuf.st_mtime)), statbuf.st_mtime,
 			 version);
 		sym = obj_add_symbol(f, name, -1,
 				     ELFW(ST_INFO) (STB_GLOBAL, STT_NOTYPE),
@@ -686,6 +744,23 @@ static void add_ksymoops_symbols(struct obj_file *f, const char *filename,
 			add_ksymtab(f, sym);
 	}
 	free(absolute_filename);
+
+	/* record where the persistent data is going, same address as previous symbol */
+
+	if (f->persist) {
+		l = sizeof(symprefix)+		/* "__insmod_" */
+			lm_name+		/* module name */
+			2+			/* "_P" */
+			strlen(f->persist)+	/* data store */
+			1;			/* nul */
+		name = xmalloc(l);
+		snprintf(name, l, "%s%s_P%s",
+			 symprefix, m_name, f->persist);
+		sym = obj_add_symbol(f, name, -1, ELFW(ST_INFO) (STB_GLOBAL, STT_NOTYPE),
+				     sec->idx, sec->header.sh_addr, 0);
+		if (use_ksymtab)
+			add_ksymtab(f, sym);
+	}
 
 	/* tag the desired sections if size is non-zero */
 
@@ -711,7 +786,7 @@ static void add_ksymoops_symbols(struct obj_file *f, const char *filename,
 	}
 }
 
-static int process_module_arguments(struct obj_file *f, int argc, char **argv)
+static int process_module_arguments(struct obj_file *f, int argc, char **argv, int required)
 {
 	for (; argc > 0; ++argv, --argc) {
 		struct obj_symbol *sym;
@@ -737,8 +812,15 @@ static int process_module_arguments(struct obj_file *f, int argc, char **argv)
 			memcpy(key + 5, *argv, n);
 			key[n + 5] = '\0';
 			if ((fmt = get_modinfo_value(f, key)) == NULL) {
-				error("invalid parameter %s", key);
-				return 0;
+				if (required) {
+					error("invalid parameter %s", key);
+					return 0;
+				}
+				else {
+					if (flag_verbose)
+						lprintf("ignoring %s", *argv);
+					continue;	/* silently ignore optional parameters */
+				}
 			}
 			key += 5;
 
@@ -988,7 +1070,7 @@ static int add_kallsyms(struct obj_file *f,
 		}
 	    }
 	if (!*module_kallsyms)
-		*module_kallsyms = obj_create_alloced_section(f, KALLSYMS_SEC_NAME, 0, 0);
+		*module_kallsyms = obj_create_alloced_section(f, KALLSYMS_SEC_NAME, 0, 0, 0);
 
 	/* Size and populate kallsyms */
 	if (obj_kallsyms(f, &f_kallsyms))
@@ -1020,7 +1102,7 @@ static int add_archdata(struct obj_file *f,
 		}
 	    }
 	if (!*sec)
-		*sec = obj_create_alloced_section(f, ARCHDATA_SEC_NAME, 16, 0);
+		*sec = obj_create_alloced_section(f, ARCHDATA_SEC_NAME, 16, 0, 0);
 
 	/* Size and populate archdata */
 	if (arch_archdata(f, *sec))
@@ -1121,7 +1203,8 @@ static int init_module(const char *m_name, struct obj_file *f,
 		if (ret) {
 			error("init_module: %m");
 			lprintf("Hint: insmod errors can be caused by incorrect module parameters, "
-				"including invalid IO or IRQ parameters");
+				"including invalid IO or IRQ parameters.\n"
+			        "      You may find more information in syslog or the output from dmesg");
 		}
 	}
 
@@ -1237,6 +1320,191 @@ static int old_init_module(const char *m_name, struct obj_file *f,
 /* end compat */
 /************************************************************************/
 
+/* Check that a module parameter has a reasonable definition */
+static int check_module_parameter(struct obj_file *f, char *key, char *value, int *persist_flag)
+{
+	struct obj_symbol *sym;
+	int min, max;
+	char *p = value;
+
+	sym = obj_find_symbol(f, key);
+	if (sym == NULL) {
+		/* FIXME: For 2.2 kernel compatibility, only issue warnings for
+		 *        most error conditions.  Make these all errors in 2.5.
+		 */
+		lprintf("Warning: %s symbol for parameter %s not found", error_file, key);
+		++warnings;
+		return(1);
+	}
+
+	if (isdigit(*p)) {
+		min = strtoul(p, &p, 10);
+		if (*p == '-')
+			max = strtoul(p + 1, &p, 10);
+		else
+			max = min;
+	} else
+		min = max = 1;
+
+	if (max < min) {
+		lprintf("Warning: %s parameter %s has max < min!", error_file, key);
+		++warnings;
+		return(1);
+	}
+
+	switch (*p) {
+	case 'c':
+		if (!isdigit(p[1])) {
+			lprintf("%s parameter %s has no size after 'c'!", error_file, key);
+			++warnings;
+			return(1);
+		}
+		while (isdigit(p[1]))
+			++p;	/* swallow c array size */
+		break;
+	case 'b':	/* drop through */
+	case 'h':	/* drop through */
+	case 'i':	/* drop through */
+	case 'l':	/* drop through */
+	case 's':
+		break;
+	case '\0':
+		lprintf("%s parameter %s has no format character!", error_file, key);
+		++warnings;
+		return(1);
+	default:
+		lprintf("%s parameter %s has unknown format character '%c'", error_file, key, *p);
+		++warnings;
+		return(1);
+	}
+	switch (*++p) {
+	case 'p':
+		if (*(p-1) == 's') {
+			error("parameter %s is invalid persistent string", key);
+			return(1);
+		}
+		*persist_flag = 1;
+		break;
+	case '\0':
+		break;
+	default:
+		lprintf("%s parameter %s has unknown format modifier '%c'", error_file, key, *p);
+		++warnings;
+		return(1);
+	}
+	return(0);
+}
+
+/* Check that all module parameters have reasonable definitions */
+static void check_module_parameters(struct obj_file *f, int *persist_flag)
+{
+	struct obj_section *sec;
+	char *ptr, *value, *n, *endptr;
+	int namelen, err = 0;
+
+	sec = obj_find_section(f, ".modinfo");
+	if (sec == NULL) {
+		/* module does not support typed parameters */
+		return;
+	}
+
+	ptr = sec->contents;
+	endptr = ptr + sec->header.sh_size;
+	while (ptr < endptr && !err) {
+		value = strchr(ptr, '=');
+		n = strchr(ptr, '\0');
+		if (value) {
+			namelen = value - ptr;
+			if (namelen >= 5 && strncmp(ptr, "parm_", 5) == 0
+			    && !(namelen > 10 && strncmp(ptr, "parm_desc_", 10) == 0)) {
+				char *pname = xmalloc(namelen + 1);
+				strncpy(pname, ptr + 5, namelen - 5);
+				pname[namelen - 5] = '\0';
+				err = check_module_parameter(f, pname, value+1, persist_flag);
+				free(pname);
+			}
+		} else {
+			if (n - ptr >= 5 && strncmp(ptr, "parm_", 5) == 0) {
+				error("parameter %s found with no value", ptr);
+				err = 1;
+			}
+		}
+		ptr = n + 1;
+	}
+
+	if (err)
+		*persist_flag = 0;
+	return;
+}
+
+static void set_tainted(struct obj_file *f, int fd, int kernel_has_tainted,
+			int noload, int taint,
+			const char *text1, const char *text2)
+{
+	char buf[80];
+	int oldval;
+	static int first = 1;
+	if (fd < 0 && !kernel_has_tainted)
+		return;		/* New modutils on old kernel */
+	lprintf("Warning: loading %s will taint the kernel: %s%s",
+			f->filename, text1, text2);
+	++warnings;
+	if (first) {
+		lprintf("  See %s for information about tainted modules", TAINT_URL);
+		first = 0;
+	}
+	if (fd >= 0 && !noload) {
+		read(fd, buf, sizeof(buf)-1);
+		buf[sizeof(buf)-1] = '\0';
+		oldval = strtoul(buf, NULL, 10);
+		sprintf(buf, "%d\n", oldval | taint);
+		write(fd, buf, strlen(buf));
+	}
+}
+
+/* Check if loading this module will taint the kernel. */
+static void check_tainted_module(struct obj_file *f, int noload)
+{
+	static const char tainted_file[] = TAINT_FILENAME;
+	int fd, kernel_has_tainted;
+	const char *ptr;
+
+	if ((fd = open(tainted_file, O_RDWR)) < 0) {
+		if (errno == ENOENT)
+			kernel_has_tainted = 0;
+		else if (errno == EACCES)
+			kernel_has_tainted = 1;
+		else {
+			perror(tainted_file);
+			kernel_has_tainted = 0;
+		}
+	}
+	else
+		kernel_has_tainted = 1;
+
+	switch (obj_gpl_license(f, &ptr)) {
+	case 0:
+		break;
+	case 1:
+		set_tainted(f, fd, kernel_has_tainted, noload, TAINT_PROPRIETORY_MODULE, "no license", "");
+		break;
+	case 2:
+		/* The module has a non-GPL license so we pretend that the
+		 * kernel always has a taint flag to get a warning even on
+		 * kernels without the proc flag.
+		 */
+		set_tainted(f, fd, 1, noload, TAINT_PROPRIETORY_MODULE, "non-GPL license - ", ptr);
+		break;
+	default:
+		set_tainted(f, fd, 1, noload, TAINT_PROPRIETORY_MODULE, "Unexpected return from obj_gpl_license", "");
+		break;
+	}
+
+	if (flag_force_load)
+		set_tainted(f, fd, 1, noload, TAINT_FORCED_MODULE, "forced load", "");
+	if (fd >= 0)
+		close(fd);
+}
 
 /* For common 3264 code, only compile the usage message once, in the 64 bit version */
 #if defined(COMMON_3264) && defined(ONLY_32)
@@ -1245,7 +1513,7 @@ extern void insmod_usage(void);		/* Use the copy in the 64 bit version */
 void insmod_usage(void)
 {
 	fputs("Usage:\n"
-	      "insmod [-fhkLmnpqrsSvVxXyY] [-o module_name] [-O blob_name] [-P prefix] module [ symbol=value ... ]\n"
+	      "insmod [-fhkLmnpqrsSvVxXyY] [-e persist_name] [-o module_name] [-O blob_name] [-P prefix] module [ symbol=value ... ]\n"
 	      "\n"
 	      "  module                Name of a loadable kernel module ('.o' can be omitted)\n"
 	      "  -f, --force           Force loading under wrong kernel version\n"
@@ -1265,6 +1533,8 @@ void insmod_usage(void)
 	      "  -X, --export          Do export externs (default)\n"
 	      "  -y, --noksymoops      Do not add ksymoops symbols\n"
 	      "  -Y, --ksymoops        Do add ksymoops symbols (default)\n"
+	      "  -e persist_name\n"
+	      "      --persist=persist_name Filename to hold any persistent data from the module\n"
 	      "  -o NAME, --name=NAME  Set internal module name to NAME\n"
 	      "  -O NAME, --blob=NAME  Save the object as a binary blob in NAME\n"
 	      "  -P PREFIX\n"
@@ -1306,6 +1576,7 @@ int INSMOD_MAIN(int argc, char **argv)
 		{"export", 0, 0, 'X'},
 		{"noksymoops", 0, 0, 'y'},
 		{"ksymoops", 0, 0, 'Y'},
+		{"persist", 1, 0, 'e'},
 		{"name", 1, 0, 'o'},
 		{"blob", 1, 0, 'O'},
 		{"prefix", 1, 0, 'P'},
@@ -1319,6 +1590,7 @@ int INSMOD_MAIN(int argc, char **argv)
 	int m_crcs;
 	char m_strversion[STRVERSIONLEN];
 	char *filename;
+	char *persist_name = NULL;	/* filename to hold any persistent data */
 	int fp;
 	struct obj_file *f;
 	struct obj_section *kallsyms = NULL, *archdata = NULL;
@@ -1328,7 +1600,9 @@ int INSMOD_MAIN(int argc, char **argv)
 	int quiet = 0;
 	int exit_status = 1;
 	int force_kallsyms = 0;
+	int persist_parms = 0;	/* does module have persistent parms? */
 	int i;
+	int gpl;
 
 	error_file = "insmod";
 
@@ -1336,7 +1610,7 @@ int INSMOD_MAIN(int argc, char **argv)
 	errors = optind = 0;
 
 	/* Process the command line.  */
-	while ((o = getopt_long(argc, argv, "fhkLmnpqrsSvVxXyYo:O:P:",
+	while ((o = getopt_long(argc, argv, "fhkLmnpqrsSvVxXyYe:o:O:P:R:",
 				&long_opts[0], NULL)) != EOF)
 		switch (o) {
 		case 'f':	/* force loading */
@@ -1391,6 +1665,10 @@ int INSMOD_MAIN(int argc, char **argv)
 			flag_ksymoops = 1;
 			break;
 
+		case 'e':	/* persistent data filename */
+			free(persist_name);
+			persist_name = xstrdup(optarg);
+			break;
 		case 'o':	/* name the output module */
 			m_name = optarg;
 			break;
@@ -1413,6 +1691,16 @@ int INSMOD_MAIN(int argc, char **argv)
 
 	if (config_read(0, NULL, "", NULL) < 0) {
 		error("Failed handle configuration");
+	}
+
+	if (persist_name && !*persist_name &&
+	    (!persistdir || !*persistdir)) {
+		free(persist_name);
+		persist_name = NULL;
+		if (flag_verbose) {
+			lprintf("insmod: -e \"\" ignored, no persistdir");
+			++warnings;
+		}
 	}
 
 	if (m_name == NULL) {
@@ -1453,7 +1741,6 @@ int INSMOD_MAIN(int argc, char **argv)
 
 	/* And open it.  */
 	if ((fp = gzf_open(filename, O_RDONLY)) == -1) {
-		error_file = filename;
 		error("%s: %m", filename);
 		return 1;
 	}
@@ -1470,7 +1757,7 @@ int INSMOD_MAIN(int argc, char **argv)
 	 */
 	set_ncv_prefix(NULL);
 
-	for (i = 0; i < n_module_stat; ++i) {
+	for (i = 0; !noload && i < n_module_stat; ++i) {
 		if (strcmp(module_stat[i].name, m_name) == 0) {
 			error("a module named %s already exists", m_name);
 			goto out;
@@ -1498,6 +1785,7 @@ int INSMOD_MAIN(int argc, char **argv)
 			      "\t%s was compiled for kernel version %s\n"
 				"\twhile this kernel is version %s",
 				filename, m_strversion, k_strversion);
+			++warnings;
 		} else {
 			if (!quiet)
 				error("kernel-module version mismatch\n"
@@ -1511,7 +1799,13 @@ int INSMOD_MAIN(int argc, char **argv)
 		obj_set_symbol_compare(f, ncv_strcmp, ncv_symbol_hash);
 
 	/* Let the module know about the kernel symbols.  */
-	add_kernel_symbols(f);
+	gpl = obj_gpl_license(f, NULL) == 0;
+	add_kernel_symbols(f, gpl);
+
+#ifdef	ARCH_ppc64
+	if (!ppc64_process_syms (f))
+		goto out;
+#endif
 
 	/* Allocate common symbols, symbol tables, and string tables.
 	 *
@@ -1530,16 +1824,148 @@ int INSMOD_MAIN(int argc, char **argv)
 		goto out;
 #endif
 
-	if (!obj_check_undefineds(f, quiet))	/* DEPMOD, obj_clear_undefineds */
+	arch_create_got(f);     /* DEPMOD */
+	if (!obj_check_undefineds(f, quiet)) {	/* DEPMOD, obj_clear_undefineds */
+		if (!gpl && !quiet) {
+			if (gplonly_seen)
+				error("\n"
+				      "Hint: You are trying to load a module without a GPL compatible license\n"
+				      "      and it has unresolved symbols.  The module may be trying to access\n"
+				      "      GPLONLY symbols but the problem is more likely to be a coding or\n"
+				      "      user error.  Contact the module supplier for assistance, only they\n"
+				      "      can help you.\n");
+			else
+				error("\n"
+				      "Hint: You are trying to load a module without a GPL compatible license\n"
+				      "      and it has unresolved symbols.  Contact the module supplier for\n"
+				      "      assistance, only they can help you.\n");
+		}
 		goto out;
+	}
 	obj_allocate_commons(f);	/* DEPMOD */
 
+	check_module_parameters(f, &persist_parms);
+	check_tainted_module(f, noload);
+
 	if (optind < argc) {
-		if (!process_module_arguments(f, argc - optind, argv + optind))
+		if (!process_module_arguments(f, argc - optind, argv + optind, 1))
 			goto out;
 	}
-	arch_create_got(f);	/* DEPMOD */
 	hide_special_symbols(f);
+
+	if (persist_parms && persist_name && *persist_name) {
+		f->persist = persist_name;
+		persist_name = NULL;
+	}
+
+	if (persist_parms &&
+	    persist_name && !*persist_name) {
+		/* -e "".  This is ugly.  Take the filename, compare it against
+		 * each of the module paths until we find a match on the start
+		 * of the filename, assume the rest is the relative path.  Have
+		 * to do it this way because modprobe uses absolute filenames
+		 * for module names in modules.dep and the format of modules.dep
+		 * does not allow for any backwards compatible changes, so there
+		 * is nowhere to store the relative filename.  The only way this
+		 * should fail to calculate a relative path is "insmod ./xxx", for
+		 * that case the user has to specify -e filename.
+		 */
+		int j, l = strlen(filename);
+		char *relative = NULL;
+		char *p;
+		for (i = 0; i < nmodpath; ++i) {
+			p = modpath[i].path;
+			j = strlen(p);
+			while (j && p[j] == '/')
+				--j;
+			if (j < l && strncmp(filename, p, j) == 0 && filename[j] == '/') {
+				while (filename[j] == '/')
+					++j;
+				relative = xstrdup(filename+j);
+				break;
+			}
+		}
+		if (relative) {
+			i = strlen(relative);
+			if (i > 3 && strcmp(relative+i-3, ".gz") == 0)
+				relative[i -= 3] = '\0';
+			if (i > 2 && strcmp(relative+i-2, ".o") == 0)
+				relative[i -= 2] = '\0';
+			else if (i > 4 && strcmp(relative+i-4, ".mod") == 0)
+				relative[i -= 4] = '\0';
+			f->persist = xmalloc(strlen(persistdir) + 1 + i + 1);
+			strcpy(f->persist, persistdir);	/* safe, xmalloc */
+			strcat(f->persist, "/");	/* safe, xmalloc */
+			strcat(f->persist, relative);	/* safe, xmalloc */
+			free(relative);
+		}
+		else
+			error("Cannot calculate persistent filename");
+	}
+
+	if (f->persist && *(f->persist) != '/') {
+		error("Persistent filenames must be absolute, ignoring '%s'",
+			f->persist);
+		free(f->persist);
+		f->persist = NULL;
+	}
+
+	if (f->persist && !flag_ksymoops) {
+		error("has persistent data but ksymoops symbols are not available");
+		free(f->persist);
+		f->persist = NULL;
+	}
+
+	if (f->persist && !k_new_syscalls) {
+		error("has persistent data but the kernel is too old to support it");
+		free(f->persist);
+		f->persist = NULL;
+	}
+
+	if (persist_parms && flag_verbose) {
+		if (f->persist)
+			lprintf("Persist filename '%s'", f->persist);
+		else
+			lprintf("No persistent filename available");
+	}
+
+	if (f->persist) {
+		FILE *fp = fopen(f->persist, "r");
+		if (!fp) {
+			if (flag_verbose)
+				lprintf("Cannot open persist file '%s' %m", f->persist);
+		}
+		else {
+			int pargc = 0;
+			char *pargv[1000];	/* hard coded but big enough */
+			char line[3000];	/* hard coded but big enough */
+			char *p;
+			while (fgets(line, sizeof(line), fp)) {
+				p = strchr(line, '\n');
+				if (!p) {
+					error("Persistent data line is too long\n%s", line);
+					break;
+				}
+				*p = '\0';
+				p = line;
+				while (isspace(*p))
+					++p;
+				if (!*p || *p == '#')
+					continue;
+				if (pargc == sizeof(pargv)/sizeof(pargv[0])) {
+					error("More than %d persistent parameters", pargc);
+					break;
+				}
+				pargv[pargc++] = xstrdup(p);
+			}
+			fclose(fp);
+			if (!process_module_arguments(f, pargc, pargv, 0))
+				goto out;
+			while (pargc--)
+				free(pargv[pargc]);
+		}
+	}
+
 	if (flag_ksymoops)
 		add_ksymoops_symbols(f, filename, m_name);
 
@@ -1572,6 +1998,9 @@ int INSMOD_MAIN(int argc, char **argv)
 	} else {
 		errno = 0;
 		m_addr = create_module(m_name, m_size);
+#ifdef	ARCH_ppc64
+		m_addr |= ppc64_module_base (f);
+#endif
 		switch (errno) {
 		case 0:
 			break;
@@ -1594,6 +2023,29 @@ int INSMOD_MAIN(int argc, char **argv)
 		default:
 			error("create_module: %m");
 			goto out;
+		}
+	}
+
+	/* module is already built, complete with ksymoops symbols for the
+	 * persistent filename.  If the kernel does not support persistent data
+	 * then give an error but continue.  It is too difficult to clean up at
+	 * this stage and this error will only occur on backported modules.
+	 * rmmod will also get an error so warn the user now.
+	 */
+	if (f->persist && !noload) {
+		struct {
+			struct module m;
+			int data;
+		} test_read;
+		memset(&test_read, 0, sizeof(test_read));
+		test_read.m.size_of_struct = -sizeof(test_read.m);      /* -ve size => read, not write */
+		test_read.m.read_start = m_addr + sizeof(struct module);
+		test_read.m.read_end = test_read.m.read_start + sizeof(test_read.data);
+		if (sys_init_module(m_name, (struct module *) &test_read)) {
+			int old_errors = errors;
+			error("has persistent data but the kernel is too old to support it."
+				"  Expect errors during rmmod as well");
+			errors = old_errors;
 		}
 	}
 
@@ -1624,6 +2076,8 @@ int INSMOD_MAIN(int argc, char **argv)
 			delete_module(m_name);
 		goto out;
 	}
+	if (warnings && !noload)
+		lprintf("Module %s loaded, with warnings", m_name);
 	exit_status = 0;
 
       out:
@@ -1649,7 +2103,7 @@ int insmod_main(int argc, char **argv)
 
 
 /* For common 3264 code, only compile main in the 64 bit version. */
-#if 1 || (defined(COMMON_3264) && defined(ONLY_32))
+#if 1 || defined(COMMON_3264) && defined(ONLY_32)
 /* Use the main in the 64 bit version */
 #else
 /* This mainline looks at the name it was invoked under, checks that the name

@@ -1,3 +1,6 @@
+#ifndef MODUTILS_MODULE_H
+#define MODUTILS_MODULE_H 1
+
 /* Definitions for the Linux module syscall interface.
    Copyright 1996, 1997 Linux International.
 
@@ -19,11 +22,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-
-#ifndef MODUTILS_MODULE_H
-#define MODUTILS_MODULE_H 1
-
-#ident "$Id: module.h,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 /* This file contains the structures used by the 2.0 and 2.1 kernels.
    We do not use the kernel headers directly because we do not wish
@@ -117,7 +115,7 @@ int old_sys_init_module(const char *name, char *code, unsigned codesize,
 #endif
 
 /*======================================================================*/
-/* The structures used in Linux 2.1.  */
+/* The structures used in Linux 2.1 onwards.  */
 
 /* Note: module_symbol does not use tgt_long intentionally */
 struct module_symbol
@@ -125,8 +123,6 @@ struct module_symbol
   unsigned long value;
   unsigned long name;
 };
-
-struct module_persist;
 
 struct module_ref
 {
@@ -159,8 +155,8 @@ struct module
   unsigned tgt_long gp;
 #endif
   /* Everything after here is extension.  */
-  unsigned tgt_long persist_start;
-  unsigned tgt_long persist_end;
+  unsigned tgt_long read_start;		/* Read data from existing module */
+  unsigned tgt_long read_end;
   unsigned tgt_long can_unload;
   unsigned tgt_long runsize;
   unsigned tgt_long kallsyms_start;
@@ -207,6 +203,15 @@ int delete_module(const char *);
 /* In safe mode the last parameter is forced to be a module name and meta
  * expansion is not allowed on that name.
  */
-extern unsigned long safemode;
+extern unsigned int safemode;
+
+/*======================================================================*/
+/* Tainted kernel information.  This must match include/linux/kernel.h  */
+/* and kernel/panic.c.                                                  */
+
+#define TAINT_FILENAME			"/proc/sys/kernel/tainted"
+#define TAINT_PROPRIETORY_MODULE	(1<<0)
+#define TAINT_FORCED_MODULE		(1<<1)
+#define TAINT_UNSAFE_SMP		(1<<2)
 
 #endif /* module.h */

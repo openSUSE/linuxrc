@@ -29,7 +29,7 @@ static char *mapsuffixes[] = { "", 0 };
 #include "getfd.h"
 #include "version.h"
 
-int verbose = 0;
+int lk_verbose = 0;
 int debug = 0;
 
 int
@@ -107,7 +107,7 @@ loadnewmap(int fd, char *mfil) {
 	    exit(1);
 	}
 
-	if (verbose)
+	if (lk_verbose)
 	  printf(_("Loaded screen map from `%s'\n"), mfil);
 }
 
@@ -182,6 +182,6 @@ saveoldmap(int fd, char *omfil) {
     }
     fclose(fp);
 
-    if (verbose)
+    if (lk_verbose)
       printf(_("Saved screen map in `%s'\n"), omfil);
 }

@@ -1,7 +1,7 @@
-/* i386 specific support for Elf loading and relocation.
-   Copyright 1996, 1997 Linux International.
+/* SH specific support for Elf loading and relocation.
+   Copyright 1999 Linux International.
 
-   Contributed by Richard Henderson <rth@tamu.edu>
+   Contributed by Kazumoto Kojima <kkojima@rr.iij4u.or.jp>
 
    This file is part of the Linux modutils.
 
@@ -29,23 +29,23 @@
 
 /*======================================================================*/
 
-struct i386_got_entry
+struct sh_got_entry
 {
   int offset;
   unsigned offset_done : 1;
   unsigned reloc_done : 1;
 };
 
-struct i386_file
+struct sh_file
 {
   struct obj_file root;
   struct obj_section *got;
 };
 
-struct i386_symbol
+struct sh_symbol
 {
   struct obj_symbol root;
-  struct i386_got_entry gotent;
+  struct sh_got_entry gotent;
 };
 
 
@@ -54,7 +54,7 @@ struct i386_symbol
 struct obj_file *
 arch_new_file (void)
 {
-  struct i386_file *f;
+  struct sh_file *f;
   f = xmalloc(sizeof(*f));
   f->got = NULL;
   return &f->root;
@@ -69,20 +69,10 @@ arch_new_section (void)
 struct obj_symbol *
 arch_new_symbol (void)
 {
-  struct i386_symbol *sym;
+  struct sh_symbol *sym;
   sym = xmalloc(sizeof(*sym));
   memset(&sym->gotent, 0, sizeof(sym->gotent));
   return &sym->root;
-}
-
-int
-arch_load_proc_section(struct obj_section *sec, int fp)
-{
-    /* Assume it's just a debugging section that we can safely
-       ignore ...  */
-    sec->contents = NULL;
-
-    return 0;
 }
 
 enum obj_reloc
@@ -90,11 +80,11 @@ arch_apply_relocation (struct obj_file *f,
 		       struct obj_section *targsec,
 		       struct obj_section *symsec,
 		       struct obj_symbol *sym,
-		       Elf32_Rel *rel,
+		       Elf32_Rela *rel,
 		       Elf32_Addr v)
 {
-  struct i386_file *ifile = (struct i386_file *)f;
-  struct i386_symbol *isym  = (struct i386_symbol *)sym;
+  struct sh_file *ifile = (struct sh_file *)f;
+  struct sh_symbol *isym  = (struct sh_symbol *)sym;
 
   Elf32_Addr *loc = (Elf32_Addr *)(targsec->contents + rel->r_offset);
   Elf32_Addr dot = targsec->header.sh_addr + rel->r_offset;
@@ -104,45 +94,48 @@ arch_apply_relocation (struct obj_file *f,
 
   switch (ELF32_R_TYPE(rel->r_info))
     {
-    case R_386_NONE:
+    case R_SH_NONE:
       break;
 
-    case R_386_32:
+    case R_SH_DIR32:
       *loc += v;
       break;
 
-    case R_386_PLT32:
-    case R_386_PC32:
+    case R_SH_REL32:
       *loc += v - dot;
       break;
 
-    case R_386_GLOB_DAT:
-    case R_386_JMP_SLOT:
+    case R_SH_PLT32:
+      *loc = v - dot;
+      break;
+
+    case R_SH_GLOB_DAT:
+    case R_SH_JMP_SLOT:
       *loc = v;
       break;
 
-    case R_386_RELATIVE:
-      *loc += f->baseaddr;
+    case R_SH_RELATIVE:
+      *loc = f->baseaddr + rel->r_addend;
       break;
 
-    case R_386_GOTPC:
+    case R_SH_GOTPC:
       assert(got != 0);
-      *loc += got - dot;
+      *loc = got - dot + rel->r_addend;
       break;
 
-    case R_386_GOT32:
+    case R_SH_GOT32:
       assert(isym != NULL);
       if (!isym->gotent.reloc_done)
 	{
 	  isym->gotent.reloc_done = 1;
 	  *(Elf32_Addr *)(ifile->got->contents + isym->gotent.offset) = v;
 	}
-      *loc += isym->gotent.offset;
+      *loc = isym->gotent.offset + rel->r_addend;
       break;
 
-    case R_386_GOTOFF:
+    case R_SH_GOTOFF:
       assert(got != 0);
-      *loc += v - got;
+      *loc = v - got;
       break;
 
     default:
@@ -156,14 +149,14 @@ arch_apply_relocation (struct obj_file *f,
 int
 arch_create_got (struct obj_file *f)
 {
-  struct i386_file *ifile = (struct i386_file *)f;
+  struct sh_file *ifile = (struct sh_file *)f;
   int i, n, offset = 0, gotneeded = 0;
 
   n = ifile->root.header.e_shnum;
   for (i = 0; i < n; ++i)
     {
       struct obj_section *relsec, *symsec, *strsec;
-      Elf32_Rel *rel, *relend;
+      Elf32_Rela *rel, *relend;
       Elf32_Sym *symtab;
       const char *strtab;
 
@@ -174,24 +167,24 @@ arch_create_got (struct obj_file *f)
       symsec = ifile->root.sections[relsec->header.sh_link];
       strsec = ifile->root.sections[symsec->header.sh_link];
 
-      rel = (Elf32_Rel *)relsec->contents;
-      relend = rel + (relsec->header.sh_size / sizeof(Elf32_Rel));
+      rel = (Elf32_Rela *)relsec->contents;
+      relend = rel + (relsec->header.sh_size / sizeof(Elf32_Rela));
       symtab = (Elf32_Sym *)symsec->contents;
       strtab = (const char *)strsec->contents;
 
       for (; rel < relend; ++rel)
 	{
-	  struct i386_symbol *intsym;
+	  struct sh_symbol *intsym;
 
 	  switch (ELF32_R_TYPE(rel->r_info))
 	    {
-	    case R_386_GOTPC:
-	    case R_386_GOTOFF:
+	    case R_SH_GOTPC:
+	    case R_SH_GOTOFF:
 	      gotneeded = 1;
 	    default:
 	      continue;
 
-	    case R_386_GOT32:
+	    case R_SH_GOT32:
 	      break;
 	    }
 
@@ -207,8 +200,7 @@ arch_create_got (struct obj_file *f)
     }
 
   if (offset > 0 || gotneeded)
-    ifile->got = obj_create_alloced_section(&ifile->root, ".got", 4, offset,
-					    SHF_WRITE);
+    ifile->got = obj_create_alloced_section(&ifile->root, ".got", 4, offset, SHF_WRITE);
 
   return 1;
 }
@@ -228,6 +220,16 @@ arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
   for (i = 0; i < n; ++i)
     f->sections[i]->header.sh_addr += base;
   return 1;
+}
+
+int
+arch_load_proc_section(struct obj_section *sec, int fp)
+{
+    /* Assume it's just a debugging section that we can safely
+       ignore ...  */
+    sec->contents = NULL;
+
+    return 0;
 }
 
 int

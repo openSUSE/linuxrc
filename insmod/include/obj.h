@@ -1,3 +1,6 @@
+#ifndef MODUTILS_OBJ_H
+#define MODUTILS_OBJ_H 1
+
 /* Elf object file loading and relocation routines.
    Copyright 1996, 1997 Linux International.
 
@@ -21,14 +24,10 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 
-#ifndef MODUTILS_OBJ_H
-#define MODUTILS_OBJ_H 1
-
-#ident "$Id: obj.h,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
 /* The relocatable object is manipulated using elfin types.  */
 
 #include <stdio.h>
+#include <sys/types.h>
 #include <elf.h>
 #include ELF_MACHINE_H
 
@@ -106,6 +105,7 @@ struct obj_file
   struct obj_symbol **local_symtab;
   struct obj_symbol *symtab[HASH_BUCKETS];
   const char *filename;
+  char *persist;
 };
 
 enum obj_reloc
@@ -158,6 +158,10 @@ struct obj_symbol_patch_struct
 #define obj_load			ObjW(load)
 #define obj_free			ObjW(free)
 #define obj_create_image		ObjW(create_image)
+#define obj_addr_to_native_ptr		ObjW(addr_to_native_ptr)
+#define obj_native_ptr_to_addr		ObjW(native_ptr_to_addr)
+#define obj_kallsyms			ObjW(kallsyms)
+#define obj_gpl_license			ObjW(gpl_license)
 #define arch_new_file			ObjW(arch_new_file)
 #define arch_new_section		ObjW(arch_new_section)
 #define arch_new_symbol			ObjW(arch_new_symbol)
@@ -195,7 +199,8 @@ void obj_insert_section_load_order (struct obj_file *f,
 struct obj_section *obj_create_alloced_section (struct obj_file *f,
 						const char *name,
 						unsigned long align,
-						unsigned long size);
+						unsigned long size,
+						unsigned long flags);
 
 struct obj_section *obj_create_alloced_section_first (struct obj_file *f,
 						      const char *name,
@@ -254,5 +259,39 @@ int arch_finalize_section_address (struct obj_file *f, ElfW(Addr) base);
 int arch_archdata (struct obj_file *fin, struct obj_section *sec);
 
 #define ARCHDATA_SEC_NAME "__archdata"
+
+/* Pointers in objects can be 32 or 64 bit */
+union obj_ptr_4 {
+	Elf32_Word addr;
+	void *ptr;
+};
+union obj_ptr_8 {
+	u_int64_t addr;	/* Should be Elf64_Xword but not all users have this yet */
+	void *ptr;
+};
+
+void *obj_addr_to_native_ptr(ElfW(Addr));
+
+ElfW(Addr) obj_native_ptr_to_addr(void *);
+
+/* Standard method of finding relocation symbols, sets isym */
+#define obj_find_relsym(isym, f, find, rel, symtab, strtab) \
+	{ \
+		unsigned long symndx = ELFW(R_SYM)((rel)->r_info); \
+		ElfW(Sym) *extsym = (symtab)+symndx; \
+		if (ELFW(ST_BIND)(extsym->st_info) == STB_LOCAL) { \
+			isym = (typeof(isym)) (f)->local_symtab[symndx]; \
+		} \
+		else { \
+			const char *name; \
+			if (extsym->st_name) \
+				name = (strtab) + extsym->st_name; \
+			else \
+				name = (f)->sections[extsym->st_shndx]->name; \
+			isym = (typeof(isym)) obj_find_symbol((find), name); \
+		} \
+	}
+
+int obj_gpl_license(struct obj_file *, const char **);
 
 #endif /* obj.h */

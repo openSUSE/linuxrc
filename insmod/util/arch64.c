@@ -18,8 +18,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: arch64.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
-
 #include <stdlib.h>
 #include <string.h>
 #include <sys/utsname.h>
@@ -30,6 +28,16 @@
 /* Indicate if the current machine uses 64 bit architecture */
 int arch64(void)
 {
-	struct utsname u;
-	return(!uname(&u) && strstr(u.machine, "64"));
+	struct utsname uts;
+	char *uname_m;
+	if (uname(&uts))
+		return(0);
+	if ((uname_m = getenv("UNAME_MACHINE"))) {
+		int l = strlen(uname_m);
+		if (l >= sizeof(uts.machine))
+			l = sizeof(uts.machine)-1;
+		memcpy(uts.machine, uname_m, l);
+		uts.machine[l] = '\0';
+	}
+	return(strstr(uts.machine, "64") != NULL);
 }

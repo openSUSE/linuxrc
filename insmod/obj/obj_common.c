@@ -19,14 +19,14 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_common.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <alloca.h>
 
 #include <obj.h>
 #include <util.h>
+#include <module.h>
 
 /*======================================================================*/
 
@@ -228,6 +228,14 @@ obj_find_section (struct obj_file *f, const char *name)
   return NULL;
 }
 
+#if defined (ARCH_alpha)
+#define ARCH_SHF_SHORT	SHF_ALPHA_GPREL
+#elif defined (ARCH_ia64)
+#define ARCH_SHF_SHORT	SHF_IA_64_SHORT
+#else
+#define ARCH_SHF_SHORT	0
+#endif
+
 static int
 obj_load_order_prio(struct obj_section *a)
 {
@@ -236,15 +244,24 @@ obj_load_order_prio(struct obj_section *a)
   af = a->header.sh_flags;
 
   ac = 0;
-  if (a->name[0] != '.' || strlen(a->name) != 10 ||
-      strcmp(a->name + 5, ".init")) ac |= 32;
-  if (af & SHF_ALLOC) ac |= 16;
+  if (a->name[0] != '.'
+      || strlen(a->name) != 10
+      || strcmp(a->name + 5, ".init"))
+    ac |= 64;
+  if (af & SHF_ALLOC) ac |= 32;
+  if (af & SHF_EXECINSTR) ac |= 16;
   if (!(af & SHF_WRITE)) ac |= 8;
-  if (af & SHF_EXECINSTR) ac |= 4;
-  if (a->header.sh_type != SHT_NOBITS) ac |= 2;
-#if defined(ARCH_ia64)
-  if (af & SHF_IA_64_SHORT) ac -= 1;
-#endif
+  if (a->header.sh_type != SHT_NOBITS) ac |= 4;
+  /* Desired order is
+		P S  AC & 7
+	.data	1 0  4
+	.got	1 1  3
+	.sdata  1 1  1
+	.sbss   0 1  1
+	.bss    0 0  0  */
+  if (strcmp (a->name, ".got") == 0) ac |= 2;
+  if (af & ARCH_SHF_SHORT)
+    ac = (ac & ~4) | 1;
 
   return ac;
 }
@@ -263,7 +280,8 @@ obj_insert_section_load_order (struct obj_file *f, struct obj_section *sec)
 
 struct obj_section *
 obj_create_alloced_section (struct obj_file *f, const char *name,
-			    unsigned long align, unsigned long size)
+			    unsigned long align, unsigned long size,
+			    unsigned long flags)
 {
   int newidx = f->header.e_shnum++;
   struct obj_section *sec;
@@ -273,7 +291,7 @@ obj_create_alloced_section (struct obj_file *f, const char *name,
 
   memset(sec, 0, sizeof(*sec));
   sec->header.sh_type = SHT_PROGBITS;
-  sec->header.sh_flags = SHF_WRITE|SHF_ALLOC;
+  sec->header.sh_flags = flags | SHF_ALLOC;
   sec->header.sh_size = size;
   sec->header.sh_addralign = align;
   sec->name = name;
@@ -320,4 +338,79 @@ obj_extend_section (struct obj_section *sec, unsigned long more)
   unsigned long oldsize = sec->header.sh_size;
   sec->contents = xrealloc(sec->contents, sec->header.sh_size += more);
   return sec->contents + oldsize;
+}
+
+/* Convert an object pointer (address) to a native pointer and vice versa.
+ * It gets interesting when the object has 64 bit pointers but modutils
+ * is running 32 bit.  This is nasty code but it stops the compiler giving
+ * spurious warning messages.  "I know what I am doing" ...
+ */
+
+void *
+obj_addr_to_native_ptr (ElfW(Addr) addr)
+{
+	unsigned int convert = (sizeof(void *) << 8) + sizeof(addr);	/* to, from */
+	union obj_ptr_4 p4;
+	union obj_ptr_8 p8;
+	switch (convert) {
+	case 0x0404:
+		p4.addr = addr;
+		return(p4.ptr);
+		break;
+	case 0x0408:
+		p4.addr = addr;
+		if (p4.addr != addr) {
+			error("obj_addr_to_native_ptr truncation %" tgt_long_fmt "x",
+				(tgt_long) addr);
+			exit(1);
+		}
+		return(p4.ptr);
+		break;
+	case 0x0804:
+		p8.addr = addr;
+		return(p8.ptr);
+		break;
+	case 0x0808:
+		p8.addr = addr;
+		return(p8.ptr);
+		break;
+	default:
+		error("obj_addr_to_native_ptr unknown conversion 0x%04x", convert);
+		exit(1);
+	}
+}
+
+ElfW(Addr)
+obj_native_ptr_to_addr (void *ptr)
+{
+	unsigned int convert = (sizeof(ElfW(Addr)) << 8) + sizeof(ptr);	/* to, from */
+	union obj_ptr_4 p4;
+	union obj_ptr_8 p8;
+	switch (convert) {
+	case 0x0404:
+		p4.ptr = ptr;
+		return(p4.addr);
+		break;
+	case 0x0408:
+		p8.ptr = ptr;
+		p4.addr = p8.addr;
+		if (p4.addr != p8.addr) {
+			error("obj_native_ptr_to_addr truncation %" tgt_long_fmt "x",
+				(tgt_long) p8.addr);
+			exit(1);
+		}
+		return(p4.addr);
+		break;
+	case 0x0804:
+		p4.ptr = ptr;
+		return(p4.addr);	/* compiler expands to 8 */
+		break;
+	case 0x0808:
+		p8.ptr = ptr;
+		return(p8.addr);
+		break;
+	default:
+		error("obj_native_ptr_to_addr unknown conversion 0x%04x", convert);
+		exit(1);
+	}
 }

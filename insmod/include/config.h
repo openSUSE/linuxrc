@@ -87,11 +87,17 @@ extern struct gen_files gen_file[];
 extern const int gen_file_count;
 /* The enum order must match the gen_file initialization order in config.c */
 enum gen_file_enum {
+	GEN_GENERIC_STRINGFILE,
 	GEN_PCIMAPFILE,
 	GEN_ISAPNPMAPFILE,
 	GEN_USBMAPFILE,
+	GEN_PARPORTMAPFILE,
+	GEN_IEEE1394MAPFILE,
+	GEN_PNPBIOSMAPFILE,
 	GEN_DEPFILE,
 };
+
+extern char *persistdir;
 
 char *fgets_strip(char *buf, int sizebuf, FILE * fin, int *lineno);
 int config_read(int all, char *force_ver, char *base_dir, char *conf_file);

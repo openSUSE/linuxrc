@@ -231,7 +231,7 @@ static int xftw_readdir(const char *directory, int depth)
 	    strcmp(ent->d_name, "..") == 0)
 	    continue;
 	name = xftw_dir_name(directory, ent->d_name);
-	xftw_add_dirent(depth); 
+	xftw_add_dirent(depth);
 	f = tree[depth].contents+tree[depth].used-1;
 	f->name = xstrdup(ent->d_name);
 	f->fullname = name;     /* do not free name, it is in use */
@@ -304,13 +304,15 @@ cleanup:
 int xftw(const char *directory, xftw_func_t funcptr)
 {
     struct stat statbuf;
-    int ret, i, j, type;
+    int ret, i, j, type, flag_verbose_orig=flag_verbose;
     xftw_tree_t *t;
     struct xftw_dirent *c;
 
+    flag_verbose=0;
     verbose("xftw starting at %s ", directory);
     if (lstat(directory, &statbuf)) {
 	verbose("lstat on %s failed\n", directory);
+	flag_verbose=flag_verbose_orig;
 	return(0);
     }
     if (S_ISLNK(statbuf.st_mode)) {
@@ -319,20 +321,24 @@ int xftw(const char *directory, xftw_func_t funcptr)
 	if (!(directory = realpath(directory, real))) {
 	    if (errno == ENOENT) {
 		verbose("%s: does not exist, dangling symlink ignored\n", real);
+                flag_verbose=flag_verbose_orig;
 		return(0);
 	    }
 	    perror("... failed");
+            flag_verbose=flag_verbose_orig;
 	    return(-1);
 	}
 	verbose("%s ", directory);
 	if (lstat(directory, &statbuf)) {
 	    error("lstat on %s failed ", directory);
 	    perror("");
+            flag_verbose=flag_verbose_orig;
 	    return(-1);
 	}
     }
     if (!S_ISDIR(statbuf.st_mode)) {
 	error("%s is not a directory\n", directory);
+        flag_verbose=flag_verbose_orig;
 	return(-1);
     }
     verbose("\n");
@@ -418,5 +424,6 @@ int xftw(const char *directory, xftw_func_t funcptr)
 cleanup:
     for (i = 0; i < XFTW_MAXDEPTH; ++i)
 	xftw_free_tree(i);
+    flag_verbose=flag_verbose_orig;
     return(ret);
 }

@@ -19,8 +19,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_reloc.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
 #include <string.h>
 #include <assert.h>
 #include <alloca.h>
@@ -48,7 +46,7 @@ obj_string_patch(struct obj_file *f, int secidx, ElfW(Addr) offset,
   strsec = obj_find_section(f, ".kstrtab");
   if (strsec == NULL)
     {
-      strsec = obj_create_alloced_section(f, ".kstrtab", 1, len);
+      strsec = obj_create_alloced_section(f, ".kstrtab", 1, len, 0);
       p->string_offset = 0;
       loc = strsec->contents;
     }
@@ -284,6 +282,7 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
       ElfW(RelM) *rel, *relend;
       ElfW(Sym) *symtab;
       const char *strtab;
+      unsigned long nsyms;
 
       relsec = f->sections[i];
       if (relsec->header.sh_type != SHT_RELM)
@@ -293,9 +292,13 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
       targsec = f->sections[relsec->header.sh_info];
       strsec = f->sections[symsec->header.sh_link];
 
+      if (!(targsec->header.sh_flags & SHF_ALLOC))
+	continue;
+
       rel = (ElfW(RelM) *)relsec->contents;
       relend = rel + (relsec->header.sh_size / sizeof(ElfW(RelM)));
       symtab = (ElfW(Sym) *)symsec->contents;
+      nsyms = symsec->header.sh_size / symsec->header.sh_entsize;
       strtab = (const char *)strsec->contents;
 
       for (; rel < relend; ++rel)
@@ -303,7 +306,6 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
 	  ElfW(Addr) value = 0;
 	  struct obj_symbol *intsym = NULL;
 	  unsigned long symndx;
-	  ElfW(Sym) *extsym = 0;
 	  const char *errmsg;
 
 	  /* Attempt to find a value to use for this relocation.  */
@@ -313,33 +315,18 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
 	    {
 	      /* Note we've already checked for undefined symbols.  */
 
-	      extsym = &symtab[symndx];
-	      if (ELFW(ST_BIND)(extsym->st_info) == STB_LOCAL)
+	      if (symndx >= nsyms)
 		{
-		  /* Local symbols we look up in the local table to be sure
-		     we get the one that is really intended.  */
-		  intsym = f->local_symtab[symndx];
-		}
-	      else
-		{
-		  /* Others we look up in the hash table.  */
-		  const char *name;
-		  if (extsym->st_name)
-		    name = strtab + extsym->st_name;
-		  else
-		    name = f->sections[extsym->st_shndx]->name;
-		  intsym = obj_find_symbol(f, name);
+		  error("Bad symbol index: %08lx >= %08lx",
+			symndx, nsyms);
+		  continue;
 		}
 
+	      obj_find_relsym(intsym, f, f, rel, symtab, strtab);
 	      value = obj_symbol_final_value(f, intsym);
 	    }
 
 #if SHT_RELM == SHT_RELA
-#if defined(__alpha__) && defined(AXP_BROKEN_GAS)
-	  /* Work around a nasty GAS bug, that is fixed as of 2.7.0.9.  */
-	  if (!extsym || !extsym->st_name ||
-	      ELFW(ST_BIND)(extsym->st_info) != STB_LOCAL)
-#endif
 	  value += rel->r_addend;
 #endif
 
@@ -362,17 +349,8 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
 	      errmsg = "Modules compiled with -mconstant-gp cannot be loaded";
 	      goto bad_reloc;
 	    bad_reloc:
-	      if (extsym)
-		{
-		  error("%s of type %ld for %s", errmsg,
-			(long)ELFW(R_TYPE)(rel->r_info),
-			strtab + extsym->st_name);
-		}
-	      else
-		{
-		  error("%s of type %ld", errmsg,
-			(long)ELFW(R_TYPE)(rel->r_info));
-		}
+	      error("%s of type %ld for %s", errmsg,
+		    (long)ELFW(R_TYPE)(rel->r_info), intsym->name);
 	      ret = 0;
 	      break;
 	    }

@@ -115,6 +115,7 @@ int info_show_cb(dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   if(s) {

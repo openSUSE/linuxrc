@@ -19,14 +19,18 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_alpha.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
 #include <string.h>
 #include <assert.h>
 
 #include <module.h>
 #include <obj.h>
 #include <util.h>
+
+
+/* This relocation got renamed, and the change hasn't propagated yet.  */
+#ifndef R_ALPHA_GPREL16
+#define R_ALPHA_GPREL16  R_ALPHA_IMMED_GP_16
+#endif
 
 /*======================================================================*/
 
@@ -100,6 +104,7 @@ arch_apply_relocation (struct obj_file *f,
 
   unsigned long *lloc = (unsigned long *)(targsec->contents + rel->r_offset);
   unsigned int *iloc = (unsigned int *)lloc;
+  unsigned short *sloc = (unsigned short *)lloc;
   Elf64_Addr dot = targsec->header.sh_addr + rel->r_offset;
   Elf64_Addr gp = af->got->header.sh_addr + 0x8000;
 
@@ -113,6 +118,30 @@ arch_apply_relocation (struct obj_file *f,
 
     case R_ALPHA_REFQUAD:
       *lloc += v;
+      break;
+
+    case R_ALPHA_GPREL16:
+      v -= gp;
+      if ((Elf64_Sxword)v > 0x7fff
+	  || (Elf64_Sxword)v < -(Elf64_Sxword)0x8000)
+	ret = obj_reloc_overflow;
+      *sloc = v;
+      break;
+
+    case R_ALPHA_GPRELLOW:
+      /* GPRELLOW does not overflow.  Errors are seen in the
+	 corresponding GPRELHIGH.  */
+      v -= gp;
+      *sloc = v;
+      break;
+
+    case R_ALPHA_GPRELHIGH:
+      v -= gp;
+      v = ((Elf64_Sxword)v >> 16) + ((v >> 15) & 1);
+      if ((Elf64_Sxword)v > 0x7fff
+	  || (Elf64_Sxword)v < -(Elf64_Sxword)0x8000)
+	ret = obj_reloc_overflow;
+      *sloc = v;
       break;
 
     case R_ALPHA_GPREL32:
@@ -138,7 +167,7 @@ arch_apply_relocation (struct obj_file *f,
 	    gotent->reloc_done = 1;
 	  }
 
-	*iloc = (*iloc & ~0xffff) | ((gotent->offset - 0x8000) & 0xffff);
+	*sloc = gotent->offset - 0x8000;
       }
     break;
 
@@ -233,19 +262,12 @@ arch_create_got (struct obj_file *f)
       for (; rel < relend; ++rel)
 	{
 	  struct alpha_got_entry *ent;
-	  Elf64_Sym *extsym;
 	  struct alpha_symbol *intsym;
-	  const char *name;
 
 	  if (ELF64_R_TYPE(rel->r_info) != R_ALPHA_LITERAL)
 	    continue;
 
-	  extsym = &symtab[ELF64_R_SYM(rel->r_info)];
-	  if (extsym->st_name)
-	    name = strtab + extsym->st_name;
-	  else
-	    name = f->sections[extsym->st_shndx]->name;
-	  intsym = (struct alpha_symbol *)obj_find_symbol(&af->root, name);
+	  obj_find_relsym(intsym, f, &af->root, rel, symtab, strtab);
 
 	  for (ent = intsym->got_entries; ent ; ent = ent->next)
 	    if (ent->addend == rel->r_addend)
@@ -270,9 +292,10 @@ arch_create_got (struct obj_file *f)
     }
 
   /* We always want a .got section so that we always have a GP for
-     use with GPDISP and GPREL32 relocs.  Besides, if the section
+     use with GPDISP and GPREL relocs.  Besides, if the section
      is empty we don't use up space anyway.  */
-  af->got = obj_create_alloced_section(&af->root, ".got", 8, offset);
+  af->got = obj_create_alloced_section(&af->root, ".got", 8, offset,
+				       SHF_WRITE | SHF_ALPHA_GPREL);
 
   return 1;
 }

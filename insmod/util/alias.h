@@ -42,6 +42,7 @@ char *tbtype[] =
  */
 char *aliaslist[] =
 {
+	"binfmt-0000 off",
 	"binfmt-204 binfmt_aout",
 	"binfmt-263 binfmt_aout",
 	"binfmt-264 binfmt_aout",
@@ -52,7 +53,7 @@ char *aliaslist[] =
 
 	"block-major-1 rd",
 	"block-major-2 floppy",
-	"block-major-3 ide-probe",
+	"block-major-3 ide-probe-mod",
 	"block-major-7 loop",
 	"block-major-8 sd_mod",
 	"block-major-9 md", /* For modular RAID */
@@ -63,7 +64,7 @@ char *aliaslist[] =
 	"block-major-17 optcd",
 	"block-major-18 sjcd",
 	"block-major-20 mcdx",
-	"block-major-22 ide-probe",
+	"block-major-22 ide-probe-mod",
 	"block-major-23 mcd",
 	"block-major-24 sonycd535",
 	"block-major-25 sbpcd",
@@ -71,13 +72,27 @@ char *aliaslist[] =
 	"block-major-27 sbpcd",
 	"block-major-29 aztcd",
 	"block-major-32 cm206",
-	"block-major-33 ide-probe",
-	"block-major-34 ide-probe",
+	"block-major-33 ide-probe-mod",
+	"block-major-34 ide-probe-mod",
 	"block-major-37 ide-tape",
 	"block-major-44 ftl",		/* from David Woodhouse <dwmw2@infradead.org> */
+	"block-major-46 pcd",
+	"block-major-47 pf",
+	"block-major-56 ide-probe-mod",
+	"block-major-57 ide-probe-mod",
+	"block-major-58 lvm-mod",
+	"block-major-88 ide-probe-mod",
+	"block-major-89 ide-probe-mod",
+	"block-major-90 ide-probe-mod",
+	"block-major-91 ide-probe-mod",
 	"block-major-93 nftl",		/* from David Woodhouse <dwmw2@infradead.org> */
+	"block-major-97 pg",
 
+#if !defined(__s390__) && !defined(__s390x__)
 	"char-major-4 serial",
+#else
+ 	"char-major-4 off",
+#endif
 	"char-major-5 serial",
 	"char-major-6 lp",
 	"char-major-9 st",
@@ -96,11 +111,12 @@ char *aliaslist[] =
 	"char-major-10-131 wdt",	/* /dev/temperature Machine internal temperature */
 					/* /dev/hwtrap Hardware fault trap */
 					/* /dev/exttrp External device trap */
-	"char-major-10-135 off",	/* rtc cannot be compiled as a module */
+	"char-major-10-135 rtc",	/* /dev/rtc Real time clock */
 	"char-major-10-139 openprom",	/* /dev/openprom Linux/Sparc interface */
 	"char-major-10-144 nvram",	/* from Tigran Aivazian <tigran@sco.COM> */
 	"char-major-10-157 applicom",	/* from David Woodhouse <dwmw2@infradead.org> */
 	"char-major-10-175 agpgart",    /* /dev/agpgart GART AGP mapping access */
+	"char-major-10-184 microcode",	/* Tigran Aivazian <tigran@veritas.com> */
 
 	"char-major-14 soundcore",
 	"char-major-19 cyclades",
@@ -119,8 +135,14 @@ char *aliaslist[] =
 	"char-major-58 esp",
 	"char-major-63 kdebug",
 	"char-major-90 mtdchar",	/* from David Woodhouse <dwmw2@infradead.org> */
+	"char-major-96 pt",
 	"char-major-99 ppdev",
 	"char-major-107 3dfx", /* from Tigran Aivazian <tigran@sco.COM> */
+	"char-major-108 ppp_generic",
+	"char-major-109 lvm-mod",
+	"char-major-161 ircomm-tty",
+	"char-major-200 vxspec",
+	"char-major-206 osst",	/* OnStream SCSI tape */
 
 	"dos msdos",
 	"dummy0 dummy",
@@ -135,13 +157,13 @@ char *aliaslist[] =
 	"net-pf-1 unix",	/* PF_UNIX	1  Unix domain sockets */
 	"net-pf-2 ipv4",	/* PF_INET	2  Internet IP Protocol */
 	"net-pf-3 off",		/* PF_AX25	3  Amateur Radio AX.25 */
-	"net-pf-4 off",		/* PF_IPX	4  Novell IPX */
-	"net-pf-5 off",		/* PF_APPLETALK	5  Appletalk DDP */
+	"net-pf-4 ipx",		/* PF_IPX	4  Novell IPX */
+	"net-pf-5 appletalk",	/* PF_APPLETALK	5  Appletalk DDP */
 	"net-pf-6 off",		/* PF_NETROM	6  Amateur radio NetROM */
 				/* PF_BRIDGE	7  Multiprotocol bridge */
 				/* PF_AAL5	8  Reserved for Werner's ATM */
 				/* PF_X25	9  Reserved for X.25 project */
-				/* PF_INET6	10 IP version 6 */
+	"net-pf-10 off",	/* PF_INET6	10 IP version 6 */
 
 	/* next two from <dairiki@matthews.dairiki.org>  Thanks! */
 	"net-pf-17 af_packet",
@@ -150,13 +172,28 @@ char *aliaslist[] =
 	"netalias-2 ip_alias",
 	"plip0 plip",
 	"plip1 plip",
+	"tunl0 ipip",
+	"cipcb0 cipcb",
+	"cipcb1 cipcb",
+	"cipcb2 cipcb",
+	"cipcb3 cipcb",
+#if	defined(__s390__) || defined(__s390x__)
+	"ctc0 ctc",
+	"ctc1 ctc",
+	"ctc2 ctc",
+	"iucv0 netiucv",
+	"iucv1 netiucv",
+#endif
 	"ppp0 ppp",
 	"ppp1 ppp",
 	"scsi_hostadapter off",	/* if not in config file */
 	"slip0 slip",
 	"slip1 slip",
 	"tty-ldisc-1 slip",
-	"tty-ldisc-3 ppp",
+	"tty-ldisc-3 ppp_async",
+	"tty-ldisc-11 irtty",
+	"tty-ldisc-14 ppp_synctty",
+	"ppp-compress-18 ppp_mppe",
 	"ppp-compress-21 bsd_comp",
 	"ppp-compress-24 ppp_deflate",
 	"ppp-compress-26 ppp_deflate",
@@ -166,6 +203,8 @@ char *aliaslist[] =
 #else
         "parport_lowlevel parport_ax",
 #endif
+
+	"usbdevfs usbcore",
 
 	NULL			/* marks the end of the list! */
 };
@@ -210,9 +249,13 @@ char *below[] =
 char *prune[] =
 {
 	"modules.dep",
+	"modules.generic_string",
 	"modules.pcimap",
 	"modules.isapnpmap",
 	"modules.usbmap",
+	"modules.parportmap",
+	"modules.ieee1394map",
+	"modules.pnpbiosmap",
 	"System.map",
 	".config",
 	"build",		/* symlink to source tree */

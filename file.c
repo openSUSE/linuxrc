@@ -865,6 +865,7 @@ void file_do_info(file_t *f0)
         break;
 
       default:
+        break;
     }
   }
 
@@ -925,6 +926,7 @@ int file_read_yast_inf()
         break;
 
       default:
+        break;
     }
   }
 

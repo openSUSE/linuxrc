@@ -1,7 +1,7 @@
-/* i386 specific support for Elf loading and relocation.
-   Copyright 1996, 1997 Linux International.
+/* x86-64 specific support for Elf loading and relocation.
+   Copyright 2002 SuSE Linux AG.
 
-   Contributed by Richard Henderson <rth@tamu.edu>
+   Contributed by Andreas Jaeger <aj@suse.de>.
 
    This file is part of the Linux modutils.
 
@@ -19,6 +19,8 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
+#ident "$Id: obj_x86_64.c,v 1.1 2002/05/25 10:45:17 snwint Exp $"
+
 #include <string.h>
 #include <assert.h>
 
@@ -26,26 +28,25 @@
 #include <obj.h>
 #include <util.h>
 
-
 /*======================================================================*/
 
-struct i386_got_entry
+struct x86_64_got_entry
 {
-  int offset;
+  long int offset;
   unsigned offset_done : 1;
   unsigned reloc_done : 1;
 };
 
-struct i386_file
+struct x86_64_file
 {
   struct obj_file root;
   struct obj_section *got;
 };
 
-struct i386_symbol
+struct x86_64_symbol
 {
   struct obj_symbol root;
-  struct i386_got_entry gotent;
+  struct x86_64_got_entry gotent;
 };
 
 
@@ -54,7 +55,7 @@ struct i386_symbol
 struct obj_file *
 arch_new_file (void)
 {
-  struct i386_file *f;
+  struct x86_64_file *f;
   f = xmalloc(sizeof(*f));
   f->got = NULL;
   return &f->root;
@@ -69,7 +70,7 @@ arch_new_section (void)
 struct obj_symbol *
 arch_new_symbol (void)
 {
-  struct i386_symbol *sym;
+  struct x86_64_symbol *sym;
   sym = xmalloc(sizeof(*sym));
   memset(&sym->gotent, 0, sizeof(sym->gotent));
   return &sym->root;
@@ -90,59 +91,77 @@ arch_apply_relocation (struct obj_file *f,
 		       struct obj_section *targsec,
 		       struct obj_section *symsec,
 		       struct obj_symbol *sym,
-		       Elf32_Rel *rel,
-		       Elf32_Addr v)
+		       Elf64_Rela *rel,
+		       Elf64_Addr v)
 {
-  struct i386_file *ifile = (struct i386_file *)f;
-  struct i386_symbol *isym  = (struct i386_symbol *)sym;
+  struct x86_64_file *ifile = (struct x86_64_file *)f;
+  struct x86_64_symbol *isym  = (struct x86_64_symbol *)sym;
 
-  Elf32_Addr *loc = (Elf32_Addr *)(targsec->contents + rel->r_offset);
-  Elf32_Addr dot = targsec->header.sh_addr + rel->r_offset;
-  Elf32_Addr got = ifile->got ? ifile->got->header.sh_addr : 0;
+  Elf64_Addr *loc = (Elf64_Addr *)(targsec->contents + rel->r_offset);
+  Elf64_Addr dot = targsec->header.sh_addr + rel->r_offset;
+  Elf64_Addr got = ifile->got ? ifile->got->header.sh_addr : 0;
 
   enum obj_reloc ret = obj_reloc_ok;
 
-  switch (ELF32_R_TYPE(rel->r_info))
+  switch (ELF64_R_TYPE(rel->r_info))
     {
-    case R_386_NONE:
+    case R_X86_64_NONE:
       break;
 
-    case R_386_32:
+    case R_X86_64_64:
       *loc += v;
       break;
 
-    case R_386_PLT32:
-    case R_386_PC32:
-      *loc += v - dot;
+    case R_X86_64_32:
+      *(unsigned int *) loc += v;
       break;
 
-    case R_386_GLOB_DAT:
-    case R_386_JMP_SLOT:
+    case R_X86_64_32S:
+      *(signed int *) loc += v;
+      break;
+
+    case R_X86_64_16:
+      *(unsigned short *) loc += v;
+      break;
+
+    case R_X86_64_8:
+      *(unsigned char *) loc += v;
+      break;
+
+    case R_X86_64_PC32:
+      *(unsigned int *) loc += v - dot;
+      break;
+
+    case R_X86_64_PC16:
+      *(unsigned short *) loc += v - dot;
+      break;
+
+    case R_X86_64_PC8:
+      *(unsigned char *) loc += v - dot;
+      break;
+
+    case R_X86_64_GLOB_DAT:
+    case R_X86_64_JUMP_SLOT:
       *loc = v;
       break;
 
-    case R_386_RELATIVE:
+    case R_X86_64_RELATIVE:
       *loc += f->baseaddr;
       break;
 
-    case R_386_GOTPC:
-      assert(got != 0);
-      *loc += got - dot;
-      break;
-
-    case R_386_GOT32:
+    case R_X86_64_GOT32:
+    case R_X86_64_GOTPCREL:
       assert(isym != NULL);
       if (!isym->gotent.reloc_done)
 	{
 	  isym->gotent.reloc_done = 1;
-	  *(Elf32_Addr *)(ifile->got->contents + isym->gotent.offset) = v;
+	  *(Elf64_Addr *)(ifile->got->contents + isym->gotent.offset) = v;
 	}
-      *loc += isym->gotent.offset;
-      break;
-
-    case R_386_GOTOFF:
-      assert(got != 0);
-      *loc += v - got;
+      /* XXX are these really correct?  */
+      if (ELF64_R_TYPE(rel->r_info) == R_X86_64_GOTPCREL)
+        *(unsigned int *) loc += v + isym->gotent.offset;
+      else
+	*loc += isym->gotent.offset;
       break;
 
     default:
@@ -156,15 +175,15 @@ arch_apply_relocation (struct obj_file *f,
 int
 arch_create_got (struct obj_file *f)
 {
-  struct i386_file *ifile = (struct i386_file *)f;
+  struct x86_64_file *ifile = (struct x86_64_file *)f;
   int i, n, offset = 0, gotneeded = 0;
 
   n = ifile->root.header.e_shnum;
   for (i = 0; i < n; ++i)
     {
       struct obj_section *relsec, *symsec, *strsec;
-      Elf32_Rel *rel, *relend;
-      Elf32_Sym *symtab;
+      Elf64_Rela *rel, *relend;
+      Elf64_Sym *symtab;
       const char *strtab;
 
       relsec = ifile->root.sections[i];
@@ -174,25 +193,22 @@ arch_create_got (struct obj_file *f)
       symsec = ifile->root.sections[relsec->header.sh_link];
       strsec = ifile->root.sections[symsec->header.sh_link];
 
-      rel = (Elf32_Rel *)relsec->contents;
-      relend = rel + (relsec->header.sh_size / sizeof(Elf32_Rel));
-      symtab = (Elf32_Sym *)symsec->contents;
+      rel = (Elf64_Rela *)relsec->contents;
+      relend = rel + (relsec->header.sh_size / sizeof(Elf64_Rela));
+      symtab = (Elf64_Sym *)symsec->contents;
       strtab = (const char *)strsec->contents;
 
       for (; rel < relend; ++rel)
 	{
-	  struct i386_symbol *intsym;
+	  struct x86_64_symbol *intsym;
 
-	  switch (ELF32_R_TYPE(rel->r_info))
+	  switch (ELF64_R_TYPE(rel->r_info))
 	    {
-	    case R_386_GOTPC:
-	    case R_386_GOTOFF:
+	    case R_X86_64_GOTPCREL:
+	    case R_X86_64_GOT32:
 	      gotneeded = 1;
 	    default:
 	      continue;
-
-	    case R_386_GOT32:
-	      break;
 	    }
 
 	  obj_find_relsym(intsym, f, &ifile->root, rel, symtab, strtab);
@@ -207,7 +223,7 @@ arch_create_got (struct obj_file *f)
     }
 
   if (offset > 0 || gotneeded)
-    ifile->got = obj_create_alloced_section(&ifile->root, ".got", 4, offset,
+    ifile->got = obj_create_alloced_section(&ifile->root, ".got", 8, offset,
 					    SHF_WRITE);
 
   return 1;
@@ -220,7 +236,7 @@ arch_init_module (struct obj_file *f, struct module *mod)
 }
 
 int
-arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
+arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
 {
   int  i, n = f->header.e_shnum;
 

@@ -20,8 +20,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_ppc.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
 #include <stddef.h>
 #include <module.h>
 #include <obj.h>
@@ -180,8 +178,8 @@ arch_create_got (struct obj_file *f)
   int i, offset;
   struct obj_section *sec, *syms, *strs;
   ElfW(Rela) *rel, *relend;
-  ElfW(Sym) *symtab, *extsym;
-  const char *strtab, *name;
+  ElfW(Sym) *symtab;
+  const char *strtab;
   struct ppc_symbol *intsym;
   struct ppc_plt_entry *pe;
 
@@ -203,12 +201,7 @@ arch_create_got (struct obj_file *f)
 	{
 	  if (ELF32_R_TYPE(rel->r_info) != R_PPC_REL24)
 	    continue;
-	  extsym = &symtab[ELF32_R_SYM(rel->r_info)];
-	  if (extsym->st_name)
-	    name = strtab + extsym->st_name;
-	  else
-	    name = f->sections[extsym->st_shndx]->name;
-	  intsym = (struct ppc_symbol *) obj_find_symbol(f, name);
+	  obj_find_relsym(intsym, f, f, rel, symtab, strtab);
 
 	  for (pe = intsym->plt_entries; pe != NULL; pe = pe->next)
 	    if (pe->addend == rel->r_addend)
@@ -226,7 +219,7 @@ arch_create_got (struct obj_file *f)
 	}
     }
 
-  pf->plt = obj_create_alloced_section(f, ".plt", 16, offset);
+  pf->plt = obj_create_alloced_section(f, ".plt", 16, offset, SHF_WRITE);
 
   return 1;
 }
@@ -249,7 +242,25 @@ arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
 }
 
 int
-arch_archdata (struct obj_file *fin, struct obj_section *sec)
+arch_archdata (struct obj_file *f, struct obj_section *archdata_sec)
 {
+  struct archdata {
+    unsigned tgt_long __start___ftr_fixup;
+    unsigned tgt_long __stop___ftr_fixup;
+  } *ad;
+  struct obj_section *sec;
+
+  if (archdata_sec->contents)
+    free(archdata_sec->contents);
+  archdata_sec->header.sh_size = 0;
+  sec = obj_find_section(f, "__ftr_fixup");
+  if (sec) {
+    ad = (struct archdata *) (archdata_sec->contents) = xmalloc(sizeof(*ad));
+    memset(ad, 0, sizeof(*ad));
+    archdata_sec->header.sh_size = sizeof(*ad);
+    ad->__start___ftr_fixup = sec->header.sh_addr;
+    ad->__stop___ftr_fixup = sec->header.sh_addr + sec->header.sh_size;
+  }
+
   return 0;
 }

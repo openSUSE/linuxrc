@@ -295,6 +295,7 @@ int inst_menu_cb(dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   config.redraw_menu = 0;
@@ -376,6 +377,7 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   if(!error) {
@@ -446,6 +448,7 @@ int inst_choose_source_cb(dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   if(!error && di != di_source_cdrom) {

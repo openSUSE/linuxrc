@@ -20,8 +20,7 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
   */
 
-#ident "$Id: logger.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
-
+#include <limits.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -77,7 +76,7 @@ void error(const char *fmt,...)
 	if (silent)
 		;
 	else if (log) {
-		char buf[1024];
+		char buf[2*PATH_MAX];
 		int n;
 
 		if (error_file)
@@ -110,7 +109,7 @@ void lprintf(const char *fmt,...)
 
 	if (silent);
 	else if (log) {
-		char buf[1024];
+		char buf[2*PATH_MAX];
 		va_start(args, fmt);
 		vsnprintf(buf, sizeof(buf), fmt, args);
 		va_end(args);

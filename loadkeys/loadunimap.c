@@ -30,7 +30,7 @@ static char *unisuffixes[] = { "", ".uni", 0 };
 
 #ifdef MAIN
 #include "version.h"
-int verbose = 0;
+int lk_verbose = 0;
 int force = 0;
 int debug = 0;
 
@@ -146,7 +146,7 @@ loadunicodemap(int fd, char *tblname) {
 	exit(EX_NOINPUT);
     }
 
-    if (verbose)
+    if (lk_verbose)
       printf(_("Loading unicode map from file %s\n"), pathname);
 
     while ( fgets(buffer, sizeof(buffer), mapf) != NULL ) {
@@ -318,7 +318,7 @@ saveunicodemap(int fd, char *oufil) {
       fprintf(fpo, "0x%02x\tU+%04x\n", list[i].fontpos, list[i].unicode);
   fclose(fpo);
 
-  if (verbose)
+  if (lk_verbose)
     printf(_("Saved unicode map on `%s'\n"), oufil);
 }
 
@@ -354,6 +354,6 @@ appendunicodemap(int fd, FILE *fp, int fontsize, int utf8) {
 
 
 	if (debug) printf ("\n");
-	if (verbose)
+	if (lk_verbose)
 		printf(_("Appended Unicode map\n"));
 }

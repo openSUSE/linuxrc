@@ -19,8 +19,6 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ident "$Id: obj_ia64.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
-
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -255,14 +253,15 @@ obj_ia64_ins_imm64(Elf64_Xword v, Elf64_Addr *bundle, Elf64_Xword slot)
 {
     Elf64_Xword ins;
 
-    assert(slot == 1);
+    assert(slot == 2);
+
     ins = obj_ia64_ins_extract_from_bundle(bundle, slot);
-    ins &= 0xffffffee000101ff;
-    ins |= ((v & 0x8000000000000000) >> 28) | ((v & 0x0000000000200000)) |
+    ins &= 0xffffffe000101fff;
+    ins |= ((v & 0x8000000000000000) >> 27) | ((v & 0x0000000000200000)) |
 	   ((v & 0x00000000001f0000) <<  6) | ((v & 0x000000000000ff80) << 20) |
 	   ((v & 0x000000000000007f) << 13);
     obj_ia64_ins_insert_in_bundle(bundle, slot, ins);
-    obj_ia64_ins_insert_in_bundle(bundle, ++slot, ((v & 0x7fffffffffc00000) >> 22));
+    obj_ia64_ins_insert_in_bundle(bundle, --slot, ((v & 0x7fffffffffc00000) >> 22));
     return obj_reloc_ok;
 }
 
@@ -295,30 +294,6 @@ obj_ia64_generate_plt(Elf64_Addr v,
 	(Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset), 0);
 }
 
-struct obj_section *
-obj_ia64_create_alloced_section (struct obj_file *f, const char *name,
-    unsigned long align, unsigned long size, unsigned long sh_flags)
-{
-    int newidx = f->header.e_shnum++;
-    struct obj_section *sec;
-
-    f->sections = xrealloc(f->sections, (newidx+1) * sizeof(sec));
-    f->sections[newidx] = sec = arch_new_section();
-
-    memset(sec, 0, sizeof(*sec));
-    sec->header.sh_type = SHT_PROGBITS;
-    sec->header.sh_flags = sh_flags;
-    sec->header.sh_size = size;
-    sec->header.sh_addralign = align;
-    sec->name = name;
-    sec->idx = newidx;
-    if (size)
-	sec->contents = xmalloc(size);
-
-    obj_insert_section_load_order(f, sec);
-
-    return sec;
-}
 
 /*======================================================================*/
 
@@ -457,26 +432,10 @@ arch_create_got(struct obj_file *f)
 
 	    if (need_got || need_opd || need_plt)
 	    {
-		Elf64_Sym     *extsym;
 		ia64_symbol_t *isym;
-		const char    *name;
 		int            local;
-		unsigned long  symndx;
 
-		symndx = ELF64_R_SYM(rel->r_info);
-		extsym = &symtab[symndx];
-		if (ELF64_ST_BIND(extsym->st_info) == STB_LOCAL)
-		{
-		    isym = (ia64_symbol_t *) f->local_symtab[symndx];
-		}
-		else
-		{
-		    if (extsym->st_name)
-			name = strtab + extsym->st_name;
-		    else
-			name = f->sections[extsym->st_shndx]->name;
-		    isym = (ia64_symbol_t *)obj_find_symbol(f, name);
-		}
+		obj_find_relsym(isym, f, f, rel, symtab, strtab);
 		local = isym->root.secidx <= SHN_HIRESERVE;
 
 		if (need_plt)
@@ -545,20 +504,22 @@ arch_create_got(struct obj_file *f)
 	}
     }
 
-    ifile->got = obj_ia64_create_alloced_section(f, ".got", 8, got_offset,
-	(SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
+    ifile->got = obj_create_alloced_section(f, ".got", 8, got_offset,
+					    SHF_WRITE | SHF_IA_64_SHORT);
     assert(ifile->got != NULL);
 
-    ifile->opd = obj_ia64_create_alloced_section(f, ".opd", 16, opd_offset,
-	(SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
+    ifile->opd = obj_create_alloced_section(f, ".opd", 16, opd_offset,
+					    SHF_WRITE | SHF_IA_64_SHORT);
     assert(ifile->opd != NULL);
 
     if (plt_text_offset > 0)
     {
-	ifile->pltt = obj_ia64_create_alloced_section(f, ".plt", 16,
-	    plt_text_offset, (SHF_ALLOC | SHF_EXECINSTR | SHF_IA_64_SHORT));
-	ifile->pltd = obj_ia64_create_alloced_section(f, ".IA_64.pltoff",
-	    16, plt_data_offset, (SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
+	ifile->pltt = obj_create_alloced_section(f, ".plt", 16,
+						 plt_text_offset,
+						 SHF_WRITE | SHF_IA_64_SHORT);
+	ifile->pltd = obj_create_alloced_section(f, ".IA_64.pltoff", 16,
+						 plt_data_offset,
+						 SHF_WRITE | SHF_IA_64_SHORT);
 	assert(ifile->pltt != NULL);
 	assert(ifile->pltd != NULL);
     }
@@ -1010,14 +971,15 @@ arch_init_module (struct obj_file *f, struct module *mod)
     ia64_file_t *ifile = (ia64_file_t *)f;
     Elf64_Addr *opd = (Elf64_Addr *)(ifile->opd->contents);
 
-    if ((*opd++ = mod->init) == 0)
-	return 0;
-    *opd++ = ifile->gp;
-    mod->init = ifile->opd->header.sh_addr;
-
-    if ((*opd++ = mod->cleanup) != 0)
+    if ((opd[0] = mod->init) != 0)
     {
-	*opd = ifile->gp;
+	opd[1] = ifile->gp;
+	mod->init = ifile->opd->header.sh_addr;
+    }
+
+    if ((opd[2] = mod->cleanup) != 0)
+    {
+	opd[3] = ifile->gp;
 	mod->cleanup = ifile->opd->header.sh_addr + 16;
     }
 

@@ -48,7 +48,7 @@ extern void loadnewmap(int fd, char *mfil);
 extern void activatemap(void);
 extern void disactivatemap(void);
 
-extern int verbose;
+extern int lk_verbose;
 int force = 0;
 int debug = 0;
 
@@ -122,7 +122,7 @@ setfont_main(int argc, char *argv[])
 	    if (!strcmp(argv[i], "-V")) {
 		print_version_and_exit();
 	    } else if (!strcmp(argv[i], "-v")) {
-	        verbose = 1;
+	        lk_verbose = 1;
 	    } else if (!strcmp(argv[i], "-d")) {
 		debug = 1;
 	    } else if (!strcmp(argv[i], "-R")) {
@@ -298,7 +298,7 @@ do_loadfont(int fd, char *inbuf, int width, int unit, int hwunit, int fontsize,
 		}
 	}
 
-	if (verbose) {
+	if (lk_verbose) {
 		if (pathname)
 			printf(_("Loading %d-char %dx%d (%d) font from file %s\n"),
 			       fontsize, width, unit, hwunit, pathname);
@@ -364,7 +364,7 @@ do_loadtable(int fd, struct unicode_list *uclistheads, int fontsize) {
 
 	/* Note: after PIO_UNIMAPCLR and before PIO_UNIMAP
 	   this printf did not work on many kernels */
-	if (verbose)
+	if (lk_verbose)
 	  printf(_("Loading Unicode mapping table...\n"));
 
 	advice.advised_hashsize = 0;
@@ -440,7 +440,7 @@ loadnewfonts(int fd, char **ifiles, int ifilct,
 		}
 		bpl = (width + 7) / 8;
 		unit = fontbuflth / (bpl * fontsize);
-		if (verbose)
+		if (lk_verbose)
 			printf(_("Read %d-char %dx%d font from file %s\n"),
 			       fontsize, width, unit, pathname);
 		if (bigunit == 0)
@@ -662,7 +662,7 @@ do_saveoldfont(int fd, char *ofil, FILE *fpo, int unimap_follows, int *count, in
 		    *utf8 = writepsffont(fpo, buf, width, height*bpl, ct, 0, (struct unicode_list*)-1, fd);
 	    else
 		    writepsffont(fpo, buf, width, height*bpl, ct, 0, 0, fd);
-	    if (verbose)
+	    if (lk_verbose)
 		    printf(_("Saved %d-char %dx%d font file on %s\n"), ct, width, unit, ofil);
 	    if (count)
 		    *count = ct;
@@ -694,7 +694,7 @@ do_saveoldfont(int fd, char *ofil, FILE *fpo, int unimap_follows, int *count, in
 	   fprintf(stderr, _("Cannot write font file"));
 	   exit(EX_IOERR);
 	}
-      if (verbose)
+      if (lk_verbose)
 	printf(_("Saved %d-char 8x%d font file on %s\n"), ct, unit, ofil);
     }
 

@@ -98,6 +98,10 @@ static int n_probeall_list;
 OPT_LIST *aliases;
 static int n_aliases;
 
+char *persistdir = "/var/lib/modules/persist";
+
+const char symprefix[] = SYMPREFIX;
+
 char *insmod_opt = NULL;
 char *config_file = NULL;	/* Which file was actually used */
 time_t config_mtime;
@@ -107,9 +111,13 @@ int quick = 0;			/* Option -A */
 
 /* The initialization order must match the gen_file_enum order in config.h */
 struct gen_files gen_file[] = {
+	{"generic_string", NULL, 0},
 	{"pcimap", NULL, 0},
 	{"isapnpmap", NULL, 0},
 	{"usbmap", NULL, 0},
+	{"parportmap", NULL, 0},
+	{"ieee1394map", NULL, 0},
+	{"pnpbiosmap", NULL, 0},
 	{"dep", NULL, 0},
 };
 
@@ -125,7 +133,7 @@ void verbose(const char *ctl,...)
 		va_list list;
 		va_start(list, ctl);
 		vprintf(ctl, list);
-		va_end(list); 
+		va_end(list);
 		fflush(stdout);
 	}
 }
@@ -402,16 +410,16 @@ static int build_list(char **in, OPT_LIST **out, char *version, int opts)
 /* Environment variables can override defaults, testing only */
 static void gen_file_env(struct gen_files *gf)
 {
-        char *e = xmalloc(strlen(gf->base)+5), *p1 = gf->base, *p2 = e;
-	if (safemode)
-		return;
-	while ((*p2++ = toupper(*p1++))) ;
-	strcpy(p2-1, "PATH");	/* safe, xmalloc */
-	if ((p2 = getenv(e)) != NULL) {
-		free(gf->name);
-		gf->name = xstrdup(p2);
+	if (!safemode) {
+		char *e = xmalloc(strlen(gf->base)+5), *p1 = gf->base, *p2 = e;
+		while ((*p2++ = toupper(*p1++))) ;
+		strcpy(p2-1, "PATH");	/* safe, xmalloc */
+		if ((p2 = getenv(e)) != NULL) {
+			free(gf->name);
+			gf->name = xstrdup(p2);
+		}
+		free(e);
 	}
-	free(e);
 }
 
 /* Read a config option for a generated filename */
@@ -486,7 +494,7 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 	int state[MAX_LEVEL + 1]; /* nested "if" */
 	int level = 0;
 	char buf[3000];
-	char tmpline[100];
+	char tmpline[PATH_MAX];
 	char **pathp;
 	char *envpath;
 	char *version;
@@ -584,6 +592,9 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 	 *
 	 * include FILE_TO_INCLUDE
 	 *	This does what you expect. Include level is limited to 20.
+	 *
+	 * persistdir=persist_directory
+	 *	Name the directory to save persistent data from modules.
 	 *
 	 * In the following WORD is a sequence if non-white characters.
 	 * If ' " or ` is found in the string, all characters up to the
@@ -746,7 +757,7 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 				char **type;
 
 				for (type = tbtype; *type; ++type) {
-					char path[100];
+					char path[PATH_MAX];
 
 					snprintf(path, sizeof(path), "%s%s/%s", base_dir, *pathp, *type);
 					if (meta_expand(path, &g, NULL, version, ME_ALL))
@@ -1065,7 +1076,7 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 			arg2 = next_word(arg);
 			meta_expand(arg2, &g, NULL, version, ME_ALL);
 			snprintf(env, sizeof(env), "%s=%s", arg, (g.pathc ? g.pathv[0] : ""));
-			putenv(env);
+			putenv(xstrdup(env));
 			one_err = 0;
 		}
 
@@ -1104,7 +1115,7 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 		/*
 		 * prune
 		 */
-		else if (all && !assgn && strcmp(parm, "prune") == 0) {
+		else if (!assgn && strcmp(parm, "prune") == 0) {
 			decode_list(&n_prunelist, &prunelist, arg, adding, version, 0);
 			one_err = 0;
 		}
@@ -1309,6 +1320,15 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 			one_err = 0;
 		}
 
+		/*
+		 * persistdir
+		 */
+		else if (assgn && strcmp(parm, "persistdir") == 0) {
+			meta_expand(arg, &g, NULL, version, ME_ALL);
+			persistdir = xstrdup(g.pathc ? g.pathv[0] : arg);
+			one_err = 0;
+		}
+
 		/* Names for generated files in config file */
 		for (i = 0; one_err && i < gen_file_count; ++i)
 			one_err = gen_file_conf(gen_file+i, assgn, parm, arg);
@@ -1336,9 +1356,11 @@ static int do_read(int all, char *force_ver, char *base_dir, char *conf_file, in
 		return ret;
 	/* else */
 
-	/* Check we have names for generated files */
-	for (i = 0; !ret && i < gen_file_count; ++i)
-		ret = gen_file_check(gen_file+i, &g, base_dir, version);
+	if (depth == 0) {
+		/* Check we have names for generated files */
+		for (i = 0; !ret && i < gen_file_count; ++i)
+			ret = gen_file_check(gen_file+i, &g, base_dir, version);
+	}
 
 	return ret;
 }
@@ -1504,7 +1526,7 @@ GLOB_LIST *config_lstmod(const char *match, const char *type, int first_only)
 	 * not be trusted.  Even in unsafe mode, only apply globbing to the
 	 * module name, not command expansion.  We trust config file input so
 	 * applying command expansion is safe, we do not trust command line input.
-	 * This assumes that the only time the user can specify -C config file 
+	 * This assumes that the only time the user can specify -C config file
 	 * is when they run under their own authority.  In particular all
 	 * mechanisms that call modprobe as root on behalf of the user must
 	 * run in safe mode, without letting the user supply a config filename.

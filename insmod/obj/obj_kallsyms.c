@@ -17,8 +17,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_kallsyms.c,v 1.1 2000/11/22 15:46:44 snwint Exp $"
-
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>

@@ -161,6 +161,7 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 	char *line = NULL;
 	char *p, *p1;
 	char tmpline[PATH_MAX + 1];
+	char wrk[sizeof(tmpline)];
 	char tmpcmd[2*sizeof(tmpline)+20];	/* room for /bin/echo "text" */
 
 	g->pathc = 0;
@@ -172,7 +173,6 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 	 */
 	if ((p = strchr(pt, '`')) != NULL && (type & ME_BUILTIN_COMMAND)) {
 		do {
-			char wrk[sizeof(tmpline)];
 			char *s;
 
 			for (s = p + 1; isspace(*s); ++s)
@@ -226,7 +226,8 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 		 * No meta-chars.
 		 * Split into words, delimited by whitespace.
 		 */
-		snprintf(tmpline, sizeof(tmpline), "%s%s", (base_dir ? base_dir : ""), pt);
+		snprintf(wrk, sizeof(wrk), "%s%s", (base_dir ? base_dir : ""), pt);
+		strcpy(tmpline, wrk);	/* safe, same size */
 		if ((p = strtok(tmpline, " \t\n")) != NULL) {
 			while (p) {
 				g->pathv = (char **)xrealloc(g->pathv,
@@ -293,7 +294,8 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 	 */
 	if (!(type & ME_SHELL_COMMAND))
 		return 0;
-	snprintf(tmpline, sizeof(tmpline), "%s%s", (base_dir ? base_dir : ""), pt);
+	snprintf(wrk, sizeof(wrk), "%s%s", (base_dir ? base_dir : ""), pt);
+	strcpy(tmpline, wrk);	/* safe, same size */
 	snprintf(tmpcmd, sizeof(tmpcmd), "/bin/echo \"");
 	for (p = tmpline, p1 = tmpcmd + strlen(tmpcmd); *p; ++p, ++p1) {
 		if (*p == '"' || *p == '\\')
@@ -326,10 +328,10 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 	pclose(fin);
 
 	if (line) {
-		/* Ignore result if no expansion occurred */
-		xstrcat(tmpline, "\n", sizeof(tmpline));
-		if (strcmp(tmpline, line))
-			split_line(g, line, 0);
+		/* shell used to strip one set of quotes.  Paranoia code in
+		 * 2.3.20 stops that strip so we do it ourselves.
+		 */
+		split_line(g, line, 1);
 		free(line);
 	}
 

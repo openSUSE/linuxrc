@@ -1,3 +1,6 @@
+#ifndef MODUTILS_KALLSYMS_H
+#define MODUTILS_KALLSYMS_H 1
+
 /* kallsyms headers
    Copyright 2000 Keith Owens <kaos@ocs.com.au>
 
@@ -23,11 +26,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
-#ident "$Id: kallsyms.h,v 1.1 2000/11/22 15:46:44 snwint Exp $"
-
-#ifndef MODUTILS_KALLSYMS_H
-#define MODUTILS_KALLSYMS_H 1
 
 /* Have to (re)define these ElfW entries here because external kallsyms
  * code does not have access to modutils/include/obj.h.  This code is
@@ -64,7 +62,7 @@
  * Do not use sizeof() on these structures, modutils may be using extra
  * fields.  Instead use the size fields in the header to access the
  * other bits of data.
- */  
+ */
 
 struct kallsyms_header {
 	int		size;		/* Size of this header */

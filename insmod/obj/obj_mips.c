@@ -18,8 +18,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_mips.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -232,7 +230,25 @@ arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
 }
 
 int
-arch_archdata (struct obj_file *fin, struct obj_section *sec)
+arch_archdata (struct obj_file *f, struct obj_section *archdata_sec)
 {
+  struct archdata {
+    unsigned tgt_long __start___dbe_table;
+    unsigned tgt_long __stop___dbe_table;
+  } *ad;
+  struct obj_section *sec;
+
+  if (archdata_sec->contents)
+    free(archdata_sec->contents);
+  archdata_sec->header.sh_size = 0;
+  sec = obj_find_section(f, "__dbe_table");
+  if (sec) {
+    ad = (struct archdata *) (archdata_sec->contents) = xmalloc(sizeof(*ad));
+    memset(ad, 0, sizeof(*ad));
+    archdata_sec->header.sh_size = sizeof(*ad);
+    ad->__start___dbe_table = sec->header.sh_addr;
+    ad->__stop___dbe_table = sec->header.sh_addr + sec->header.sh_size;
+  }
+
   return 0;
 }

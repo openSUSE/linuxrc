@@ -27,5 +27,5 @@ extern FILE *findfile(char *fnam, char **dirpath, char **suffixes);
 extern char pathname[];
 extern void fpclose(FILE *fp);
 
-extern int verbose;
+extern int lk_verbose;
 extern int debug;

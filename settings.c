@@ -285,6 +285,7 @@ int set_settings_cb (dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   return rc;
@@ -509,6 +510,7 @@ int set_expert_cb(dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   return 1;

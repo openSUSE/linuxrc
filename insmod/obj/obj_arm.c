@@ -21,8 +21,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_arm.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
-
 #include <string.h>
 #include <assert.h>
 
@@ -201,7 +199,7 @@ arch_create_got (struct obj_file *f)
   struct obj_section *sec, *syms, *strs;
   ElfW(Rel) *rel, *relend;
   ElfW(Sym) *symtab, *extsym;
-  const char *strtab, *name;
+  const char *strtab;
   struct arm_symbol *intsym;
   struct arm_plt_entry *pe;
   struct arm_got_entry *ge;
@@ -227,11 +225,7 @@ arch_create_got (struct obj_file *f)
 	  switch(ELF32_R_TYPE(rel->r_info)) {
 	  case R_ARM_PC24:
 	  case R_ARM_PLT32:
-	    if (extsym->st_name)
-	      name = strtab + extsym->st_name;
-	    else
-	      name = f->sections[extsym->st_shndx]->name;
-	    intsym = (struct arm_symbol *) obj_find_symbol(f, name);
+	    obj_find_relsym(intsym, f, f, rel, symtab, strtab);
 
 	    pe = &intsym->pltent;
 
@@ -252,11 +246,7 @@ arch_create_got (struct obj_file *f)
 	    break;
 
 	  case R_ARM_GOT32:
-	    if (extsym->st_name)
-	      name = strtab + extsym->st_name;
-	    else
-	      name = f->sections[extsym->st_shndx]->name;
-	    intsym = (struct arm_symbol *) obj_find_symbol(f, name);
+	    obj_find_relsym(intsym, f, f, rel, symtab, strtab);
 
 	    ge = (struct arm_got_entry *) &intsym->gotent;
 	    if (! ge->allocated)
@@ -282,14 +272,16 @@ arch_create_got (struct obj_file *f)
 	obj_extend_section(sec, got_offset);
       else
 	{
-	  sec = obj_create_alloced_section(f, ".got", 8, got_offset);
+	  sec = obj_create_alloced_section(f, ".got", 8, got_offset,
+					   SHF_WRITE);
 	  assert(sec);
 	}
       afile->got = sec;
   }
 
   if (plt_offset)
-    afile->plt = obj_create_alloced_section(f, ".plt", 8, plt_offset);
+    afile->plt = obj_create_alloced_section(f, ".plt", 8, plt_offset,
+					    SHF_WRITE);
 
   return 1;
 }

@@ -20,10 +20,9 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
   */
 
-#ident "$Id: snap_shot.c,v 1.2 2000/11/22 15:45:23 snwint Exp $"
-
 #include <errno.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
@@ -33,13 +32,14 @@
 #include "modstat.h"
 #include "util.h"
 
+static char snap_dir[] = "/var/log/ksymoops";
+
 /* If snap_dir exists, take a snap shot of ksyms and modules to snap_dir.
  * Prefix the files with the equivalent of
  * date +%Y%m%d%T%M%S | sed -e 's/://g'
  */
 void snap_shot(const char *module_names, int n_module_names)
 {
-	static char snap_dir[] = "/var/log/ksymoops";
 	char file[] = "ccyymmddhhmmss.modules", buffer[4096];
 	static char *infile[] = { "/proc/ksyms", "/proc/modules" };
 	static char *suffix[] = {       "ksyms",       "modules" };
@@ -106,6 +106,51 @@ void snap_shot(const char *module_names, int n_module_names)
 		if (ferror(in))
 			error("unable to read from %s %m", infile[i]);
 		fclose(in);
+		fflush(out);
+		fdatasync(fileno(out));
 		fclose(out);
 	}
+}
+
+/* If snap_dir exists, log a message to snap_dir.  The log file is called the
+ * equivalent of date +%Y%m%d | sed -e 's/://g'.  Each line is prefixed with
+ * timestamp down to seconds and followed by a newline.
+ */
+void snap_shot_log(const char *fmt,...)
+{
+	char date[] = "ccyymmdd", file[] = "ccyymmdd.log", stamp[] = "ccyymmdd hhmmss";
+	struct tm *local;
+	time_t t;
+	FILE *log;
+	va_list args;
+	int save_errno = errno;
+
+	if (chdir(snap_dir))
+		return;
+	t = time(NULL);
+	local = localtime(&t);
+	snprintf(date, sizeof(date), "%04d%02d%02d",
+			local->tm_year+1900,
+			local->tm_mon + 1,
+			local->tm_mday);
+	snprintf(file, sizeof(file), "%s.log", date);
+	log = fopen(file, "a");
+	if (!log) {
+		error("cannot create %s/%s %m", snap_dir, file);
+		return;
+	}
+	snprintf(stamp, sizeof(stamp), "%s %02d%02d%02d",
+		date,
+		local->tm_hour,
+		local->tm_min,
+		local->tm_sec);
+	fprintf(log, "%s ", stamp);
+	va_start(args, fmt);
+	errno = save_errno;	/* fmt may use %m */
+	vfprintf(log, fmt, args);
+	va_end(args);
+	fprintf(log, "\n");
+	fflush(log);
+	fdatasync(fileno(log));
+	fclose(log);
 }
