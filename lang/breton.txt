@@ -195,5 +195,9 @@ static text_t txt_breton_atm [] =
 { TXT_INIT_PARPORT,   "Deraouekaat ar porzh a-stur..."                        },
 { TXT_ENTER_NFSPORT,  "Enankit niverenn ar porzh arveriet gant ar "
                       "servijer NFS"                                          },
+{ TXT_YAST1,          "YaST1 - text based"                                    },
+{ TXT_YAST2,          "YaST2 - grafical"                                      },
+{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
+                      "installation."                                         },
 { TXT_INSERT_CD,      "Diogelit emañ  en ho lenner ar CD niverenn %d!"        }
 };

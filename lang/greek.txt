@@ -187,6 +187,10 @@ static text_t txt_greek_atm [] =
 { TXT_INIT_PARPORT,   "Ενεργοποίηση παράλληλης θύρας..."                      },
 { TXT_ENTER_NFSPORT,  "Παρακαλώ δώστε τον αριθμό της θύρας στην οποία τρέχει"
                       "ο διακομιστή nfs"                                      },
+{ TXT_YAST1,          "YaST1 - text based"                                    },
+{ TXT_YAST2,          "YaST2 - grafical"                                      },
+{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
+                      "installation."                                         },
 { TXT_INSERT_CD,      "Παρακαλώ βεβαιωθείτε ότι έχετε βάλει στο drive το CD "
                       "με αριθμό %d!"                                         }
 };

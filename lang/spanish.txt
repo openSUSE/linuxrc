@@ -181,5 +181,9 @@ static text_t txt_spanish_atm [] =
 { TXT_INIT_PARPORT,   "Iniciando el puerto paralelo..."                       },
 { TXT_ENTER_NFSPORT,  "Introduzca el número de puerto donde se ejecuta el "
                       "servidor NFS"                                          },
+{ TXT_YAST1,          "YaST1 - text based"                                    },
+{ TXT_YAST2,          "YaST2 - grafical"                                      },
+{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
+                      "installation."                                         },
 { TXT_INSERT_CD,      "¡Asegúrese de que el CD número %d está en su unidad!"  }
 };

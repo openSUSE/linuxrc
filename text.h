@@ -2,7 +2,7 @@
  *
  * text.h        Header file for text.c
  *
- * Copyright (c) 1996-1998  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -153,6 +153,9 @@ enum textid_t
     TXT_MORE_MODULES,
     TXT_INIT_PARPORT,
     TXT_ENTER_NFSPORT,
+    TXT_YAST1,
+    TXT_YAST2,
+    TXT_CHOOSE_YAST,
     TXT_INSERT_CD
     };
 

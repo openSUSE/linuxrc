@@ -543,3 +543,9 @@ void disp_restore_screen (void)
 
     fflush (stdout);
     }
+
+
+void disp_clear_screen (void)
+    {
+    printf ("[H[J");
+    }

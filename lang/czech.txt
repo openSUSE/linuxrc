@@ -180,5 +180,9 @@ static text_t txt_czech_atm [] =
 { TXT_MORE_MODULES,   "-- Dal¹í moduly --"                                    },
 { TXT_INIT_PARPORT,   "Inicializuji paralelní port..."                        },
 { TXT_ENTER_NFSPORT,  "Zadejte prosím èíslo portu na kterém be¾í nfs server"  },
+{ TXT_YAST1,          "YaST1 - text based"                                    },
+{ TXT_YAST2,          "YaST2 - grafical"                                      },
+{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
+                      "installation."                                         },
 { TXT_INSERT_CD,      "Ujistìte se prosím, ¾e v mechanice máte CD èíslo %d!"  }
 };

@@ -197,6 +197,11 @@ static text_t txt_german_atm [] =
 { TXT_INIT_PARPORT,   "Initialisiere den Parallel-Port..."                    },
 { TXT_ENTER_NFSPORT,  "Bitte geben Sie die Nummer des Ports ein, auf dem der "
                       "NFS-Server läuft"                                      },
+{ TXT_YAST1,          "YaST1 - textbasiert"                                   },
+{ TXT_YAST2,          "YaST2 - grafisch"                                      },
+{ TXT_CHOOSE_YAST,    "Sie können die Installation wahlweise mit dem bekannten "
+                      "textbasierten YaST1 oder dem neuen grafischen YaST2 "
+                      "ausführen. Bitte wählen Sie die YaST-Version."         },
 { TXT_INSERT_CD,      "Bitte stellen Sie sicher, dass sich die CD Nummer %d "
                       "in Ihrem Laufwerk befindet!"                           }
 };

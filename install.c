@@ -43,6 +43,8 @@
 #include "install.h"
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
+#define YAST2_COMMAND   "/lib/YaST2/bin/YaST2.start"
+#define YAST1_COMMAND   "/sbin/YaST"
 
 static char  inst_rootimage_tm [MAX_FILENAME];
 static int   inst_rescue_im = FALSE;
@@ -51,26 +53,27 @@ static char *inst_tmpmount_tm = "/tmp/loopmount";
 static char  inst_rescuefile_tm [MAX_FILENAME];
 static char *inst_demo_sys_tm = "/suse/images/cd-demo";
 
-static int   inst_mount_harddisk   (void);
-static int   inst_try_cdrom        (char *device_tv);
-static int   inst_mount_cdrom      (void);
-static int   inst_mount_nfs        (void);
-static int   inst_start_install    (void);
-static int   inst_start_rescue     (void);
-static void  inst_start_shell      (char *tty_tv);
-static int   inst_prepare          (void);
-static int   inst_execute_yast     (void);
-static int   inst_check_floppy     (void);
-static int   inst_commit_install   (void);
-static int   inst_choose_source    (void);
-static int   inst_choose_source_cb (int what_iv);
-static int   inst_menu_cb          (int what_iv);
-static int   inst_init_cache       (void);
-static void  inst_umount           (void);
-static int   inst_get_nfsserver    (void);
-static int   inst_get_ftpserver    (void);
-static int   inst_ftp              (void);
-static int   inst_get_ftpsetup     (void);
+static int   inst_mount_harddisk      (void);
+static int   inst_try_cdrom           (char *device_tv);
+static int   inst_mount_cdrom         (void);
+static int   inst_mount_nfs           (void);
+static int   inst_start_install       (void);
+static int   inst_start_rescue        (void);
+static void  inst_start_shell         (char *tty_tv);
+static int   inst_prepare             (void);
+static int   inst_execute_yast        (void);
+static int   inst_check_floppy        (void);
+static int   inst_commit_install      (void);
+static int   inst_choose_source       (void);
+static int   inst_choose_source_cb    (int what_iv);
+static int   inst_menu_cb             (int what_iv);
+static int   inst_init_cache          (void);
+static void  inst_umount              (void);
+static int   inst_get_nfsserver       (void);
+static int   inst_get_ftpserver       (void);
+static int   inst_ftp                 (void);
+static int   inst_get_ftpsetup        (void);
+static void  inst_choose_yast_version (void);
 
 
 int inst_auto_install (void)
@@ -730,19 +733,24 @@ static int inst_execute_yast (void)
     if (rc_ii)
         return (rc_ii);
 
-    if(!auto2_ig) dia_status_on (&status_ri, txt_get (TXT_START_YAST));
+    inst_choose_yast_version ();
+
+    if (!auto2_ig)
+        dia_status_on (&status_ri, txt_get (TXT_START_YAST));
     system ("update");
 
-    if(!auto2_ig) while (i_ii < 50)
-        {
-        dia_status (&status_ri, i_ii++);
-        usleep (10000);
-        }
+    if (!auto2_ig)
+        while (i_ii < 50)
+            {
+            dia_status (&status_ri, i_ii++);
+            usleep (10000);
+            }
 
     inst_start_shell ("/dev/tty2");
     if (memory_ig < MEM_LIMIT_SWAP_MSG)
         {
-        if(!auto2_ig) dia_message (txt_get (TXT_LITTLE_MEM), MSGTYPE_ERROR);
+        if (!auto2_ig)
+            dia_message (txt_get (TXT_LITTLE_MEM), MSGTYPE_ERROR);
         }
     else
         {
@@ -750,31 +758,39 @@ static int inst_execute_yast (void)
         inst_start_shell ("/dev/tty6");
         }
 
-    if(!auto2_ig) while (i_ii <= 100)
-        {
-        dia_status (&status_ri, i_ii++);
-        usleep (10000);
-        }
+    if (!auto2_ig)
+        while (i_ii <= 100)
+            {
+            dia_status (&status_ri, i_ii++);
+            usleep (10000);
+            }
 
-    if(!auto2_ig) win_close (&status_ri);
+    if (!auto2_ig)
+        win_close (&status_ri);
     disp_set_color (COL_WHITE, COL_BLACK);
-    if(auto2_ig) printf("\033[H\033[J");	/* clear screen */
+    if (auto2_ig)
+        disp_clear_screen ();
     fflush (stdout);
 
-    if(yast_version_ig == 2)
-        sprintf (command_ti, "/lib/YaST2/bin/YaST2.start %s", auto_ig ? "--autofloppy" : "");
+    if (yast_version_ig == 2)
+        sprintf (command_ti, "%s %s", YAST2_COMMAND,
+                 auto_ig ? "--autofloppy" : "");
     else
-        sprintf (command_ti, "/sbin/YaST%s", auto_ig ? " --autofloppy" : "");
+        sprintf (command_ti, "%s%s", YAST1_COMMAND,
+                 auto_ig ? " --autofloppy" : "");
+
     fprintf (stderr, "starting \"%s\"\n", command_ti);
     rc_ii = system (command_ti);
-    fprintf (stderr, "%s return code is %d (errno = %d)\n", command_ti, rc_ii, rc_ii ? errno : 0);
+    fprintf (stderr, "%s return code is %d (errno = %d)\n",
+             command_ti, rc_ii, rc_ii ? errno : 0);
 
 #ifdef LXRC_DEBUG
     if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }
 #endif
 
     sync ();
-    if(!auto2_ig) disp_restore_screen ();
+    if (!auto2_ig)
+        disp_restore_screen ();
     disp_cursor_off ();
     kbd_reset ();
 
@@ -1080,7 +1096,7 @@ static int inst_ftp (void)
     while (rc_ii);
 
     if (inst_rescue_im)
-        strcpy (server_dir_tg, "/pub/SuSE-Linux/6.1");
+        strcpy (server_dir_tg, "/pub/SuSE-Linux/current");
 
     if (dia_input (txt_get (TXT_INPUT_DIR), server_dir_tg,
                             sizeof (server_dir_tg) - 1, 30))
@@ -1188,6 +1204,30 @@ static int inst_get_ftpsetup (void)
     }
 
 
+static void inst_choose_yast_version (void)
+    {
+    item_t   items_ari [2];
+    int      width_ii = 30;
+
+
+    if (auto_ig)
+        yast_version_ig = 1;
+    else if (auto2_ig)
+        yast_version_ig = 2;
+    else if (util_check_exist (YAST2_COMMAND))
+        {
+        util_create_items (items_ari, 2, width_ii);
+        strcpy (items_ari [0].text, txt_get (TXT_YAST1));
+        strcpy (items_ari [1].text, txt_get (TXT_YAST2));
+        util_center_text (items_ari [0].text, width_ii);
+        util_center_text (items_ari [1].text, width_ii);
+        yast_version_ig = dia_menu (txt_get (TXT_CHOOSE_YAST),
+                                    items_ari, 2, 2);
+        util_free_items (items_ari, 2);
+        }
+    else
+        yast_version_ig = 1;
+    }
 
 #ifdef USE_LIBHD
 
