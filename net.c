@@ -124,8 +124,8 @@ void net_ask_password()
  */
 int net_config()
 {
+  int rc = 0;
 #if NETWORK_CONFIG
-  int rc;
   char buf[256];
 
   net_ask_password();
