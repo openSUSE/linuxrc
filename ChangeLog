@@ -1,3 +1,6 @@
+31/7/2003:	v1.4.53
+	- make 'boot installed system' work again
+
 28/7/2003:	v1.4.52
 	- shut down correct network interface (#27839, #28261)
 
