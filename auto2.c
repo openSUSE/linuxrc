@@ -764,6 +764,12 @@ int auto2_find_install_medium()
 
   if(config.instmode == inst_hd) {
     if(!config.partition) return FALSE;
+
+    if (config.vnc || config.usessh) {
+      if (net_config())
+	config.vnc = config.usessh = 0;
+    }
+
     sprintf(buf, "/dev/%s", config.partition);
     if(!(i = auto2_mount_harddisk(buf))) return TRUE;
   }
@@ -776,6 +782,11 @@ int auto2_find_install_medium()
     util_debugwait("CD?");
 
     need_modules = 0;
+  
+    if (config.vnc || config.usessh) {
+      if(net_config())
+	config.vnc = config.usessh = 0;
+    }
 
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {

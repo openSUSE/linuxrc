@@ -1,6 +1,7 @@
 	- symlink /etc/pam.d from instsys so we can run chpasswd for ssh mode.
 	- ask for passwords not only on auto install with DHCP/BOOTP, but
 	  also with static config.
+	- VNC/SSH: ask for network config on CD/HD auto install mode too.
 
 29/8/2002:	v1.4.18
 	- kukuk: fix for serial console on SPARC & PPC
