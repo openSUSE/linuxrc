@@ -14,9 +14,9 @@
 
 // should be architecture dependent!
 #define MEM_LIMIT_RAMDISK_YAST1	 93*1024*1024
-#define MEM_LIMIT_RAMDISK_YAST2	124*1024*1024
+#define MEM_LIMIT_RAMDISK_YAST2	252*1024*1024	// the Y2 partitioner needs that much...
 #define MEM_LIMIT_RAMDISK_FTP	 30*1024*1024
-#define MEM_LIMIT_YAST2		 34*1024*1024
+#define MEM_LIMIT_YAST2		 30*1024*1024
 
 #define MEM_LIMIT_SWAP_MSG	6500000
 #define MEM_LIMIT_CACHE_LIBS	15000000
@@ -238,3 +238,4 @@ extern char            *x11i_tg;
 extern char            livesrc_tg[16];
 extern char            driver_update_dir[16];
 extern int             cdrom_drives;
+extern int             ask_for_moddisk;

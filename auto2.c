@@ -53,8 +53,8 @@ static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
 static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
-#if 0
 static void auto2_chk_frame_buffer(void);
+#if 0
 static void auto2_chk_x11i(void);
 #endif
 static int auto2_find_floppy(void);
@@ -533,8 +533,9 @@ int auto2_init()
 
 #if 0
   auto2_chk_x11i();
-  auto2_chk_frame_buffer();
 #endif
+
+  auto2_chk_frame_buffer();
 
   deb_msg("Beginning hardware probing...");
   printf("Starting hardware detection...\n");
@@ -575,6 +576,8 @@ int auto2_init()
         mod_free_modules();
         mod_get_ram_modules(MOD_TYPE_OTHER);
       }
+
+      ask_for_moddisk = FALSE;
 
       printf("\033c"); fflush(stdout);
       disp_clear_screen();
@@ -773,7 +776,6 @@ void auto2_chk_expert()
 }
 
 
-#if 0
 /*
  * Read "vga=" entry from the kernel command line.
  */
@@ -796,7 +798,6 @@ void auto2_chk_frame_buffer()
 
   if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
 }
-#endif
 
 
 #if 0
@@ -1210,7 +1211,10 @@ int auto2_ask_for_modules(int prompt, int mod_type)
 {
   int do_something = 0;
 
-  if(!util_check_exist("/etc/need_modules_disk")) return do_something;
+  if(
+    !ask_for_moddisk ||
+    !util_check_exist("/etc/need_modules_disk")
+  ) return do_something;
 
   util_manual_mode();
   disp_cursor_off();

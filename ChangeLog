@@ -1,3 +1,13 @@
+15/1/2001:	v1.1.18.004
+	- ask for mod disk only once
+	- make scsi/net module menu working
+	- load parport mods for imm/ppa
+
+15/1/2001:	v1.1.18.003
+	- adapted memory limits:
+          - no YaST2 unless mem >= 32M
+	  - load root image into ramdisk if mem >= 256M
+
 15/1/2001:	v1.1.18.002
 	- symlink /etc/init.d instead of /etc/rc.d
 

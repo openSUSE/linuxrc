@@ -65,6 +65,7 @@ static void      mod_sort_list        (module_t modlist_parr [], int nr_modules_
 static int       mod_is_ppcd          (char *name_tv);
 static int       mod_load_ppcd_core   (void);
 static int       mod_load_i2o_core    (void);
+static int       mod_load_parport_core(void);
 static int       mod_load_plip_core   (void);
 static void      mod_unload_plip_core (void);
 static int       mod_getmoddisk       (void);
@@ -211,12 +212,17 @@ int mod_load_by_user (int mod_type_iv)
     int     more_ii;
     int     ready_ii = FALSE;
 
+    rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
 
     switch (mod_type_iv)
         {
         case MOD_TYPE_SCSI:
         default:
             header_ti = txt_get (TXT_LOAD_SCSI);
+            if (rc_ii || !nr_modules_ii)
+            {
+                  if (mod_getmoddisk ()) return 0;
+            }
             break;
         case MOD_TYPE_OTHER:
             if (mod_getmoddisk ())
@@ -225,6 +231,10 @@ int mod_load_by_user (int mod_type_iv)
             break;
         case MOD_TYPE_NET:
             header_ti = txt_get (TXT_LOAD_NET);
+            if (rc_ii || !nr_modules_ii)
+            {
+                  if (mod_getmoddisk ()) return 0;
+            }
             break;
         }
 
@@ -233,6 +243,7 @@ int mod_load_by_user (int mod_type_iv)
     do
         {
         rc_ii = mod_get_ram_modules (mod_type_iv);
+
         if (rc_ii)
             return (0);
 
@@ -585,6 +596,16 @@ static int mod_choose_cb (int what_iv)
        )
         {
         rc_ii = mod_load_i2o_core ();
+        if (rc_ii)
+            return (rc_ii);
+        }
+
+    if (
+        !strcmp (mod_current_arm [what_iv - 1].module_name, "imm") ||
+        !strcmp (mod_current_arm [what_iv - 1].module_name, "ppa")
+       )
+        {
+        rc_ii = mod_load_parport_core ();
         if (rc_ii)
             return (rc_ii);
         }
@@ -1040,6 +1061,27 @@ static int mod_load_i2o_core()
     i2o_core_loaded = TRUE;
     for(i = 0; i < sizeof i2o_modules / sizeof *i2o_modules; i++) {
       mpar_save_modparams(i2o_modules[i], 0);
+    }
+  }
+
+  return 0;
+}
+
+
+static int mod_load_parport_core()
+{
+  static int parport_core_loaded = FALSE;
+  char *parport_modules[] = { "parport", "parport_pc", "parport_probe" };
+  int i, err;
+
+  if(!parport_core_loaded) {
+    for(i = 0; i < sizeof parport_modules / sizeof *parport_modules; i++) {
+      err = mod_load_module(parport_modules[i], 0);
+      if(err) return -1;
+    }
+    parport_core_loaded = TRUE;
+    for(i = 0; i < sizeof parport_modules / sizeof *parport_modules; i++) {
+      mpar_save_modparams(parport_modules[i], 0);
     }
   }
 
