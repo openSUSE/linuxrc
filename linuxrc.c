@@ -111,6 +111,8 @@ int main (int argc, char **argv, char **env)
         rc_ii = util_umount_main (argc, argv);
     else if (!strcmp (progname_pci, "cat"))
         rc_ii = util_cat_main (argc, argv);
+    else if (!strcmp (progname_pci, "echo"))
+        rc_ii = util_echo_main (argc, argv);
     else if (!strcmp (progname_pci, "ps"))
         rc_ii = util_ps_main (argc, argv);
     else if (!strcmp (progname_pci, "nothing"))

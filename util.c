@@ -1030,6 +1030,7 @@ int util_cat_main(int argc, char **argv)
 
   if(!argc) {
     while((c = fgetc(stdin)) != EOF) fputc(c, stdout);
+    fflush(stdout);
     return 0;
   }
 
@@ -1043,6 +1044,23 @@ int util_cat_main(int argc, char **argv)
       return 1;
     }
   }
+
+  fflush(stdout);
+
+  return 0;
+}
+
+int util_echo_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  for(i = 0; i < argc; i++) {
+    printf("%s%s", i ? " " : "", argv[i]);
+  }
+
+  printf("\n");
 
   return 0;
 }

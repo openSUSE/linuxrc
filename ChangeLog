@@ -1,5 +1,7 @@
 	- reimplemented info file read function
 	- file write function ("install.inf") rewritten
+	- 'info'-like entries are looked for in /proc/cmdline, too if no
+	  info file was found
 
 9/11/2001:	v1.3.0
 	- nashif: added autoinstall patches

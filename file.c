@@ -34,12 +34,19 @@
 #define INFO_FILE		"/info"
 #define INSTALL_INF_FILE	"/etc/install.inf"
 #define MTAB_FILE		"/etc/mtab"
+#define CMDLINE_FILE		"/proc/cmdline"
+
+// #define DEBUG_FILE
 
 static char *file_key2str(file_key_t key);
 static file_key_t file_str2key(char *value);
 static int sym2index(char *sym);
+static void parse_value(file_t *ft);
 
 static void file_module_load (char *insmod_arg);
+#ifdef DEBUG_FILE
+static void file_dump_flist(file_t *ft);
+#endif
 
 static struct {
   file_key_t key;
@@ -172,13 +179,40 @@ int sym2index(char *sym)
 }
 
 
+void parse_value(file_t *ft)
+{
+  char *s;
+  int i;
+  struct in_addr in;
+
+  if(*ft->value) {
+    i = strtol(ft->value, &s, 0);
+    if(!*s) {
+      ft->nvalue = i;
+      ft->is.numeric = 1;
+    }
+    else {
+      if((i = sym2index(ft->value)) >= 0) {
+        ft->nvalue = sym_constants[i].value;
+        ft->is.numeric = 1;
+      }
+    }
+    if(!ft->is.numeric) {
+      if(!net_check_address(ft->value, &in)) {
+        ft->ivalue = in;
+        ft->is.inet = 1;
+      }
+    }
+  }
+}
+
+
 file_t *file_read_file(char *name)
 {
   FILE *f;
-  char buf1[256], buf2[256], *s, *t;
+  char buf1[256], buf2[256], *s;
   int i, l;
   file_t *ft0 = NULL, **ft = &ft0;
-  struct in_addr in;
 
   if(!(f = fopen(name, "r"))) return NULL;
 
@@ -202,25 +236,7 @@ file_t *file_read_file(char *name)
       (*ft)->key = file_str2key(buf1);
       (*ft)->value = s = strdup(buf2);
 
-      if(*s) {
-        l = strtol(s, &t, 0);
-        if(!*t) {
-          (*ft)->nvalue = l;
-          (*ft)->is.numeric = 1;
-        }
-        else {
-          if((l = sym2index(s)) >= 0) {
-            (*ft)->nvalue = sym_constants[l].value;
-            (*ft)->is.numeric = 1;
-          }
-        }
-        if(!(*ft)->is.numeric) {
-          if(!net_check_address(s, &in)) {
-            (*ft)->ivalue = in;
-            (*ft)->is.inet = 1;
-          }
-        }
-      }
+      parse_value(*ft);
 
       ft = &(*ft)->next;
     }
@@ -288,8 +304,17 @@ int file_read_info()
   if(!f0) {
     if(mounted) umount(mountpoint_tg);
     if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-    return -1;
+    f0 = file_read_cmdline();
+#ifdef DEBUG_FILE
+    strcpy(filename_ti, CMDLINE_FILE);
+#endif
+    if(!f0) return -1;
   }
+
+#ifdef DEBUG_FILE
+  fprintf(stderr, "info file read from \"%s\":\n", filename_ti);
+  file_dump_flist(f0);
+#endif
 
   valid_net_config_ig = 0;
 
@@ -776,3 +801,63 @@ void file_module_load(char *insmod_arg)
   win_close(&win);
 }
 
+
+file_t *file_read_cmdline()
+{
+  FILE *f;
+  file_t *ft0 = NULL, **ft = &ft0;
+  char cmdline[1024], *current, *s, *s1, *t;
+  int quote;
+
+  if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
+  if(!fgets(cmdline, sizeof cmdline, f)) *cmdline = 0;
+  fclose(f);
+
+  current = cmdline;
+
+  do {
+    while(isspace(*current)) current++;
+    for(quote = 0, s = current; *s && (quote || !isspace(*s)); s++) {
+      if(*s == '"') quote ^= 1;
+    }
+    if(s > current) {
+      t = malloc(s - current + 1);
+
+      for(s1 = t; s > current; current++) {
+        if(*current != '"') *s1++ = *current;
+      }
+      *s1 = 0;
+
+      if((s1 = strchr(t, '='))) *s1++ = 0;
+
+      *ft = calloc(1, sizeof **ft);
+
+      (*ft)->key_str = strdup(t);
+      (*ft)->key = file_str2key(t);
+      (*ft)->value = strdup(s1 ?: "");
+
+      parse_value(*ft);
+
+      free(t);
+
+      ft = &(*ft)->next;
+    }
+  }
+  while(*current);
+
+  return ft0;
+}
+
+
+#ifdef DEBUG_FILE
+
+void file_dump_flist(file_t *ft)
+{
+  for(; ft; ft = ft->next) {
+    fprintf(stderr, "%d: \"%s\" = \"%s\"\n", ft->key, ft->key_str, ft->value);
+    if(ft->is.numeric) fprintf(stderr, "  num = %d\n", ft->nvalue);
+    if(ft->is.inet) fprintf(stderr, "  inet = %s\n", inet_ntoa(ft->ivalue));
+  }
+}
+
+#endif

@@ -47,3 +47,5 @@ void file_write_install_inf(char *dir);
 void file_write_mtab(void);
 int file_read_info(void);
 int file_read_yast_inf(void);
+file_t *file_read_cmdline(void);
+
