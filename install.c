@@ -50,6 +50,7 @@
 #define YAST_INFO_FILE  "/etc/yast.inf"
 #define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
 #define YAST1_COMMAND   "/sbin/YaST"
+#define SETUP_COMMAND   "/sbin/inst_setup"
 
 static char  inst_rootimage_tm [MAX_FILENAME];
 static int   inst_rescue_im = FALSE;
@@ -809,7 +810,7 @@ static int inst_execute_yast (void)
     int       rc_ii;
     int       i_ii = 0;
     window_t  status_ri;
-    char      command_ti [50];
+    char      command_ti [80];
 
     lxrc_set_modprobe ("/sbin/modprobe");
     rc_ii = inst_prepare ();
@@ -869,17 +870,30 @@ static int inst_execute_yast (void)
         disp_clear_screen ();
     fflush (stdout);
 
-    if (yast_version_ig == 2)
-        sprintf (command_ti, "%s %s", YAST2_COMMAND,
-                 auto_ig ? "--autofloppy" : "");
-    else
-        sprintf (command_ti, "%s%s", YAST1_COMMAND,
-                 auto_ig ? " --autofloppy" : "");
+    if(util_check_exist(SETUP_COMMAND)) {
+      sprintf(command_ti, "%s yast%d%s",
+        SETUP_COMMAND,
+        yast_version_ig == 2 ? 2 : 1,
+        auto_ig ? " --autofloppy" : ""
+      );
+      fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
+    }
+    else {
+      sprintf(command_ti, "%s%s",
+        yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND,
+        auto_ig ? " --autofloppy" : ""
+      );
+      fprintf(stderr, "starting \"%s\"\n", command_ti);
+    }
 
-    fprintf (stderr, "starting \"%s\"\n", command_ti);
-    rc_ii = system (command_ti);
-    fprintf (stderr, "%s return code is %d (errno = %d)\n",
-             command_ti, rc_ii, rc_ii ? errno : 0);
+    rc_ii = system(command_ti);
+
+    fprintf(stderr,
+      "yast%s return code is %d (errno = %d)\n",
+      yast_version_ig == 2 ? 2 : 1,
+      rc_ii,
+      rc_ii ? errno : 0
+    );
 
 #ifdef LXRC_DEBUG
     if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }

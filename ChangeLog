@@ -1,3 +1,8 @@
+8/8/2001:	v1.2.10
+	- fixed 'Console' entry in install.inf for ia32 (#9647)
+	- allow yast2 serial installation on ppc
+	- start /sbin/inst_setup instead of yast if it exists
+
 6/8/2001:	v1.2.9
 	- fixed for alpha
 

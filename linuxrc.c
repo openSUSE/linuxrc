@@ -808,14 +808,14 @@ static void lxrc_check_console (void)
 #if !defined(__sparc__) && !defined(__PPC__)
     FILE  *fd_pri;
     char   buffer_ti [300];
-    char  *tmp_pci = (char *) 0;
-    char  *found_pci = (char *) 0;
+    char  *tmp_pci = NULL;
+    char  *found_pci = NULL;
 
     fd_pri = fopen ("/proc/cmdline", "r");
     if (!fd_pri)
         return;
 
-    if (fgets (buffer_ti, sizeof (buffer_ti) - 1, fd_pri))
+    if (fgets (buffer_ti, sizeof buffer_ti - 1, fd_pri))
         {
         tmp_pci = strstr (buffer_ti, "console");
         while (tmp_pci)
@@ -834,21 +834,17 @@ static void lxrc_check_console (void)
 
 	/* Find the whole console= entry for the install.inf file */
         tmp_pci = found_pci;
-        while (*tmp_pci && *tmp_pci != '\t' && *tmp_pci != ' ' &&
-	                   *tmp_pci != '\n')
-            tmp_pci++;
-
+        while (*tmp_pci && !isspace(*tmp_pci)) tmp_pci++;
         *tmp_pci = 0;
-	strncpy (console_parms_tg, tmp_pci, sizeof (console_parms_tg));
-	console_parms_tg[sizeof(console_parms_tg) - 1] = '\0';
+
+	strncpy (console_parms_tg, found_pci, sizeof console_parms_tg);
+	console_parms_tg[sizeof console_parms_tg - 1] = '\0';
 
 	/* Now search only for the device name */
 	tmp_pci = found_pci;
-        while (*tmp_pci && *tmp_pci != ',' && *tmp_pci != '\t' &&
-                           *tmp_pci != ' ' && *tmp_pci != '\n')
-            tmp_pci++;
-
+        while (*tmp_pci && *tmp_pci != ',') tmp_pci++;
         *tmp_pci = 0;
+
         sprintf (console_tg, "/dev/%s", found_pci);
         if (!strncmp (found_pci, "ttyS", 4)) {
             serial_ig = TRUE;
@@ -868,10 +864,6 @@ static void lxrc_check_console (void)
       {
 	serial_ig = TRUE;
         text_mode_ig = TRUE;
-
-#ifdef __PPC__
-        yast_version_ig = 1;
-#endif
 
 	strcpy (console_tg, cp);
 
