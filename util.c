@@ -504,6 +504,7 @@ int util_open_ftp (char *server_tv)
 
 int util_cd1_boot (void)
     {
+#ifdef __i386__
     struct statfs fs_status_ri;
 
     (void) statfs ("/", &fs_status_ri);
@@ -514,6 +515,9 @@ int util_cd1_boot (void)
         return (TRUE);
     else
         return (FALSE);
+#else
+    return (TRUE);
+#endif
     }
 
 
