@@ -50,7 +50,7 @@
 #define	LXRC_DEBUG
 
 #ifdef LXRC_DEBUG
-# define deb_wait if((guru_ig & 4)) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
+# define deb_wait if((guru_ig & 2)) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
 # define deb_msg(a) fprintf(stderr, __FUNCTION__ ":%u %s\n", __LINE__, a)
 # define deb_str(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = \"%s\"\n", __LINE__, a)
 # define deb_int(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = %d\n", __LINE__, a)
@@ -197,7 +197,9 @@ extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];
 extern int             smp_ig;
+#ifdef LXRC_DEBUG
 extern int             guru_ig;
+#endif
 extern int             text_mode_ig;
 extern int             yast2_update_ig;
 extern int             has_floppy_ig;

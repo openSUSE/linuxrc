@@ -124,10 +124,14 @@ void auto2_scan_hardware(char *log_file)
   hd_data = calloc(1, sizeof *hd_data);
   if(!log_file) hd_data->progress = auto2_progress;
   hd_set_probe_feature(hd_data, pr_default);
+  hd_clear_probe_feature(hd_data, pr_modem);
+  hd_clear_probe_feature(hd_data, pr_parallel);
 
   if(auto2_get_probe_env(hd_data)) {
     /* reset flags on error */
     hd_set_probe_feature(hd_data, pr_default);
+    hd_clear_probe_feature(hd_data, pr_modem);
+    hd_clear_probe_feature(hd_data, pr_parallel);
   }
 
   hd_scan(hd_data);
@@ -201,8 +205,10 @@ int auto2_net_dev()
 
       strcpy(netdevice_tg, hd->unix_dev_name);
 
-      if(net_activate())
-        return deb_msg("net_activate() failed"), 1;
+      if(net_activate()) {
+        deb_msg("net_activate() failed");
+        return 1;
+      }
       else
         fprintf(stderr, "%s activated\n", hd->unix_dev_name);
 
@@ -213,8 +219,10 @@ int auto2_net_dev()
 
       fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(nfs_server_rg), server_dir_tg);
 
-      if(net_mount_nfs(inet_ntoa(nfs_server_rg), server_dir_tg))
-        return deb_msg("NFS mount failed."), 1;
+      if(net_mount_nfs(inet_ntoa(nfs_server_rg), server_dir_tg)) {
+        deb_msg("NFS mount failed.");
+        return 1;
+      }
 
       deb_msg("NFS mount ok.");
 
@@ -392,6 +400,8 @@ int auto2_init()
 
 /*
  * Read *all* "expert=" entries from the kernel command line.
+ *
+ * Note: can't use getenv() as there might be multiple "expert=" entries.
  */
 void auto2_chk_expert()
 {
@@ -413,7 +423,9 @@ void auto2_chk_expert()
   if((i & 0x02)) yast2_update_ig = 1;
   if((i & 0x04)) auto2_ig = 1;
   if((i & 0x08)) yast_version_ig = 2;	/* default is 1! */
+#ifdef LXRC_DEBUG
   guru_ig = i >> 4;
+#endif
 }
 
 
@@ -422,21 +434,12 @@ void auto2_chk_expert()
  */
 void auto2_chk_frame_buffer()
 {
-  FILE *f;
-  char buf[256], *s, *t;
-  int i = 0, j;
+  char *env = getenv("vga");
+  int i;
 
-  if((f = fopen("/proc/cmdline", "r"))) {
-    if(fread(buf, 1, sizeof buf, f)) {
-      t = buf;
-      while((s = strsep(&t, " "))) {
-        if(sscanf(s, "vga=%i", &j) == 1) i = j;
-      }
-    }
-    fclose(f);
-  }
+  if(!env) return;
 
-  if(i) frame_buffer_mode_ig = i;
+  if(sscanf(env, "%i", &i) == 1) frame_buffer_mode_ig = i;
 }
 
 
@@ -482,9 +485,11 @@ int auto2_find_floppy()
       hd->base_class == bc_storage_device &&	/* is a storage device... */
       hd->sub_class == sc_sdev_floppy &&	/* a floppy actually... */
       hd->unix_dev_name &&			/* and has a device name */
-      !strcmp(hd->unix_dev_name, "/dev/fd0")	/* it's the 1st floppy */
+      !strcmp(hd->unix_dev_name, "/dev/fd0") &&	/* it's the 1st floppy */
+      hd->detail &&
+      hd->detail->type == hd_detail_floppy	/* floppy can be read */
     ) {
-      return has_floppy_ig = TRUE;
+      return has_floppy_ig = hd->detail->floppy.data ? TRUE : FALSE;
     }
   }
 

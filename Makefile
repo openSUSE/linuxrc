@@ -7,7 +7,7 @@ CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
 CFLAGS	= -O2 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
-LDFLAGS	= -static -Wl,-Map=linuxrc.map -lhd
+LDFLAGS	= -static -Wl,-Map=linuxrc.map -lhd_tiny
 WARN	= -Wstrict-prototypes -Wall
 
 # use this to get a linuxrc that uses the libhd *

@@ -770,7 +770,7 @@ static int inst_execute_yast (void)
     fprintf (stderr, "%s return code is %d (errno = %d)\n", command_ti, rc_ii, rc_ii ? errno : 0);
 
 #ifdef LXRC_DEBUG
-    if((guru_ig & 2)) { printf("a shell for you...\n"); system("/bin/sh"); }
+    if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }
 #endif
 
     sync ();

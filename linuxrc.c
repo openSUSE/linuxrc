@@ -357,10 +357,8 @@ static void lxrc_init (void)
         auto2_ig = FALSE;
         printf("\033[9;0]");
         disp_cursor_off();
-        if(1 /*(guru_ig & 1) || testing_ig */) {
-          disp_set_display(1);
-          dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
-        }
+        disp_set_display(1);
+        dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
       }
 #endif
 
