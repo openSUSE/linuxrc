@@ -23,6 +23,7 @@
 #include "display.h"
 #include "dialog.h"
 #include "linuxrc.h"
+#include "file.h"
 
 
 #define MIN_WIN_SIZE    40
@@ -215,7 +216,14 @@ int dia_message (char *txt_tv, int msgtype_iv)
         if (key_ii == KEY_ENTER)
             win_button_pressed (&button_ri, FALSE);
         }
-    while (key_ii != KEY_ENTER && key_ii != KEY_ESC && key_ii != 'q' && key_ii != 'r' && key_ii != 'i');
+    while (
+      key_ii != KEY_ENTER &&
+      key_ii != KEY_ESC &&
+      key_ii != 'q' &&
+      key_ii != 'r' &&
+      key_ii != 'i' &&
+      key_ii != 'c'
+    );
 
     win_close (&win_ri);
 
@@ -227,6 +235,8 @@ int dia_message (char *txt_tv, int msgtype_iv)
         return (-69);
     else if (key_ii == 'i')
         return (-71);
+    else if (key_ii == 'c')
+        return (-73);
     else
         return (-42);
     }
@@ -1051,8 +1061,9 @@ void dia_handle_ctrlc (void)
     {
     int i, j;
     static int is_in_ctrlc_is = FALSE;
-    static char s[100] = { };
+    static char s[64] = { };
     char *t;
+    file_t *f;
 
     if (is_in_ctrlc_is)
         return;
@@ -1080,9 +1091,16 @@ void dia_handle_ctrlc (void)
         if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
       }
     }
-
     else if(i == -71) {
       util_status_info();
+    }
+    else if(i == -73) {
+      i = dia_input("Change Config", s, sizeof s - 1, 35);
+      if(!i) {
+        f = file_parse_buffer(s);
+        file_do_info(f);
+        file_free_file(f);
+      }
     }
 
     is_in_ctrlc_is = FALSE;

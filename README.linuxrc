@@ -232,9 +232,8 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # should YaST2 run in text mode?
   Textmode: 0|1
 
-  # YaST2 should do autoinstall
-  # (entry is missing, if not)
-  YaST2AutoInstall: 1
+  # YaST2 should do autoinstall, reading its config from 'autoconfig.xml'
+  AutoYaST: ftp://server.xyz.de/autoconfig.xml
 
   # 24bit hex number: the cmputer's color (available on some Macs only)
   YaST2color: 202030

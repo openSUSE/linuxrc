@@ -538,30 +538,45 @@ void lxrc_init()
   config.floppies = 1;
   config.floppy_dev[0] = strdup("/dev/fd0");
 
+  config.net.bootp_timeout = 10;
+  config.net.dhcp_timeout = 60;
+  config.net.tftp_timeout = 10;
+
+  config.color = 2;
+  config.net.use_dhcp = 1;
+
+#if defined(__s390__) || defined(__s390x__)
+  config.initrd_has_ldso = 1;
+#endif
+
   if((s = getenv("lang"))) {
     i = set_langidbyname(s);
     if(i) config.language = i;
   }
 
-  ft = file_get_cmdline(key_autoyast);
-  config.info.file = ft ? ft->value : getenv("autoyast");
-  if(config.info.file) {
-    config.info.file = strdup(*config.info.file ? config.info.file : "default");
-  }
+  ft = file_get_cmdline(key_info);
+  s = ft ? ft->value : getenv("info");
+  if(s && !*s) s = "default";
+  str_copy(&config.info.file, s);
 
-  if(config.info.file) {
+  ft = file_get_cmdline(key_autoyast);
+  s = ft ? ft->value : getenv("autoyast");
+  if(s && !*s) s = "default";
+  str_copy(&config.autoyast, s);
+
+  if(config.autoyast) {
     auto2_ig = TRUE;
     yast_version_ig = 2;
     action_ig |= ACT_YAST2_AUTO_INSTALL;
-    url = parse_url(config.info.file);
+    url = parse_url(config.autoyast);
     if(url && url->scheme) set_instmode(url->scheme);
   }
 
   ft = file_get_cmdline(key_linuxrc);
-  s = ft ? ft->value : getenv("linuxrc");
+  str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));
 
-  if(s) {
-    s = strdup(s);
+  if(config.linuxrc) {
+    s = strdup(config.linuxrc);
 
     for(t0 = s; (t = strsep(&t0, ",")); ) {
       for(i = 0; i < sizeof lxrc_params / sizeof *lxrc_params; i++) {

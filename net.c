@@ -404,6 +404,7 @@ int net_check_address2(inet_t *inet, int do_dns)
   struct hostent *he = NULL;
   struct in_addr iaddr;
   char *s;
+  slist_t *sl;
 #ifdef DIET
   file_t *f0, *f;
   char *has_dots;
@@ -419,16 +420,19 @@ int net_check_address2(inet_t *inet, int do_dns)
     inet->ok = 1;
     inet->ip = iaddr;
 
-    s = inet_ntoa(inet->ip);
-
-//    fprintf(stderr, "%s is %s\n", inet->name, s);
-
-    if(s) {
-      free(inet->name);
-      inet->name = strdup(s);
-    }
+    str_copy(&inet->name, inet_ntoa(inet->ip));
 
     return 0;
+  }
+
+  for(sl = config.net.dns_cache; sl; sl = sl->next) {
+    if(sl->key && sl->value && !strcasecmp(sl->key, inet->name)) {
+      if(!net_check_address(sl->value, &iaddr)) {
+        inet->ok = 1;
+        inet->ip = iaddr;
+        return 0;
+      }
+    }
   }
 
   /* ####### should be something like nameserver_active */
@@ -483,6 +487,10 @@ int net_check_address2(inet_t *inet, int do_dns)
 
   inet->ok = 1;
   inet->ip = *((struct in_addr *) *he->h_addr_list);
+
+  sl = slist_add(&config.net.dns_cache, slist_new());
+  str_copy(&sl->key, inet->name);
+  str_copy(&sl->value, inet_ntoa(inet->ip));
 
   if(config.run_as_linuxrc) {
     fprintf(stderr, "dns: %s is %s\n", inet->name, inet_ntoa(inet->ip));
@@ -726,10 +734,10 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
         return (-1);
         }
 
-    if (nfsport_ig)
+    if (config.net.nfs_port)
         {
-        fprintf (stderr, "Using specified port %d\n", nfsport_ig);
-        port_ii = nfsport_ig;
+        fprintf (stderr, "Using specified port %d\n", config.net.nfs_port);
+        port_ii = config.net.nfs_port;
         }
     else
         {
@@ -1019,11 +1027,11 @@ int net_bootp()
     dia_info(&win, tmp);
   }
 
-  if(bootp_wait_ig) sleep(bootp_wait_ig);
+  if(config.net.bootp_wait) sleep(config.net.bootp_wait);
 
   rc = performBootp(
     netdevice_tg, "255.255.255.255", "",
-    bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV, 1
+    config.net.bootp_timeout, 0, NULL, 0, 1, BP_PUT_ENV, 1
   );
 
   win_close(&win);
@@ -1168,12 +1176,14 @@ int net_dhcp()
     dia_info(&win, cmd);
   }
 
+  strcpy(cmd, "dhcpcd -B");
+  if(config.net.dhcp_timeout != 60) {
+    sprintf(cmd + strlen(cmd), "-t %d", config.net.dhcp_timeout);
+  }
   if(*machine_name_tg) {
-    sprintf(cmd, "dhcpcd -B -h %s %s", machine_name_tg, netdevice_tg);
+    sprintf(cmd + strlen(cmd), " %s", machine_name_tg);
   }
-  else {
-    sprintf(cmd, "dhcpcd -B %s", netdevice_tg);
-  }
+  sprintf(cmd + strlen(cmd), " %s", netdevice_tg);
 
   sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", netdevice_tg);
 

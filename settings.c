@@ -21,26 +21,6 @@
 #include "dialog.h"
 #include "file.h"
 
-typedef struct
-      {
-      enum langid_t  id;
-      char          *descr;
-      char          *keymap;
-      char          *font;
-      char          *mapscreen;
-      char          *unimap;
-      int            usermap;	// redundant, will drop it later -- snwint
-      int            write_info;
-      char          *locale;
-      char          *yastcode;
-      } language_t;
-
-typedef struct
-      {
-      char *descr;
-      char *mapname;
-      } keymap_t;
-
 #if 1	/* I think the line below would catch all anyway... */
 // #if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__sparc__) || defined(__alpha__)
 
@@ -552,18 +532,18 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_expert_nfsport:
-      if(nfsport_ig)
-        sprintf(tmp, "%d", nfsport_ig);
+      if(config.net.nfs_port)
+        sprintf(tmp, "%d", config.net.nfs_port);
       else
         *tmp = 0;
       rc = dia_input(txt_get(TXT_ENTER_NFSPORT), tmp, 6, 6);
-      if(!rc) nfsport_ig = atoi(tmp);
+      if(!rc) config.net.nfs_port = atoi(tmp);
       break;
 
     case di_expert_bootptimeout:
-      sprintf(tmp, "%d", bootp_timeout_ig);
+      sprintf(tmp, "%d", config.net.bootp_timeout);
       rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4);
-      if(!rc) bootp_timeout_ig = atoi(tmp);
+      if(!rc) config.net.bootp_timeout = atoi(tmp);
       break;
 
     case di_expert_dhcp:
@@ -692,5 +672,11 @@ static void set_font(char *font, char *map, char *unimap)
 #endif
 
   if(err) deb_int(err);
+}
+
+
+language_t *current_language()
+{
+  return set_languages_arm + set_get_current_language() - 1;
 }
 

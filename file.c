@@ -63,7 +63,7 @@ static struct {
   { key_rebootmsg,      "RebootMsg"        },
   { key_insmod,         "Insmod"           },
   { key_autoprobe,      "Autoprobe"        },
-  { key_start_pcmcia,   "start_pcmcia"     },
+  { key_start_pcmcia,   "StartPCMCIA"      },
   { key_display,        "Display"          },
   { key_bootmode,       "Bootmode"         },
   { key_ip,             "IP"               },
@@ -79,7 +79,7 @@ static struct {
   { key_netdevice,      "Netdevice"        },
   { key_livesrc,        "LiveSRC"          },
   { key_bootpwait,      "Bootpwait"        },
-  { key_bootptimeout,   "BOOTP_TIMEOUT"    },
+  { key_bootptimeout,   "BOOTPTimeout"     },
   { key_forcerootimage, "ForceRootimage"   },
   { key_rebootwait,     "WaitReboot"       },
   { key_sourcemounted,  "Sourcemounted"    },
@@ -87,11 +87,11 @@ static struct {
   { key_pcmcia,         "PCMCIA"           },
   { key_haspcmcia,      "HasPCMCIA"        },
   { key_console,        "Console"          },
-  { key_pliphost,       "PLIP-Host"        },
+  { key_pliphost,       "PLIPHost"         },
   { key_domain,         "Domain"           },
-  { key_ftpuser,        "FTP-User"         },
-  { key_ftpproxy,       "FTP-Proxy"        },
-  { key_ftpproxyport,   "FTP-Proxyport"    },
+  { key_ftpuser,        "FTPUser"          },
+  { key_ftpproxy,       "FTPProxy"         },
+  { key_ftpproxyport,   "FTPProxyport"     },
   { key_manual,         "Manual"           },
   { key_demo,           "Demo"             },
   { key_reboot,         "Reboot"           },
@@ -115,7 +115,7 @@ static struct {
   { key_font,           "Font"             },
   { key_screenmap,      "Screenmap"        },
   { key_fontmagic,      "Fontmagic"        },
-  { key_autoyast,       "autoyast"         },
+  { key_autoyast,       "AutoYaST"         },
   { key_linuxrc,        "linuxrc"          },
   { key_forceinsmod,    "ForceInsmod"      },
   { key_dhcp,           "DHCP"             },
@@ -138,7 +138,15 @@ static struct {
   { key_memtotal,       "MemTotal"         },
   { key_memfree,        "MemFree"          },
   { key_buffers,        "Buffers"          },
-  { key_cached,         "Cached"           }
+  { key_cached,         "Cached"           },
+  { key_info,           "Info"             },
+  { key_proxy,          "Proxy"            },
+  { key_proxyport,      "ProxyPort"        },
+  { key_proxyproto,     "ProxyProto"       },
+  { key_usedhcp,        "UseDHCP"          },
+  { key_nfsport,        "NFSPort"          },
+  { key_dhcptimeout,    "DHCPTimeout"      },
+  { key_tftptimeout,    "TFTPTimeout"      }
 };
 
 static struct {
@@ -187,11 +195,23 @@ char *file_key2str(file_key_t key)
 }
 
 
+/* !!! str is overwritten !!! */
 file_key_t file_str2key(char *str)
 {
   int i;
+  char *s;
 
   if(!str || !*str) return key_none;
+
+  /* remove all '-' and '_' */
+  for(i = 0, s = str; str[i]; i++) {
+    if(str[i] != '_' && str[i] != '-') {
+      *s++ = str[i];
+    }
+  }
+  *s = 0;
+
+  if(!*str) return key_none;
 
   for(i = 0; i < sizeof keywords / sizeof *keywords; i++) {
     if(!strcasecmp(keywords[i].value, str)) {
@@ -296,7 +316,7 @@ file_t *file_read_file(char *name)
       *ft = calloc(1, sizeof **ft);
 
       (*ft)->key_str = strdup(s);
-      (*ft)->key = file_str2key(s);
+      (*ft)->key = file_str2key(s);	/* destroys s!!! */
       (*ft)->value = strdup(t);
 
       parse_value(*ft);
@@ -374,13 +394,8 @@ int file_read_info()
 char *file_read_info_file(char *file, char *file2)
 {
   char filename[MAX_FILENAME];
-  int do_autoprobe = 0;
-#if WITH_PCMCIA
-  int start_pcmcia = 0;
-#endif
   int i, mounted = 0;
-  file_t *f0 = NULL, *f;
-  url_t *url;
+  file_t *f0 = NULL;
 
 #ifdef DEBUG_FILE
   fprintf(stderr, "looking for info file: %s\n", file);
@@ -420,6 +435,31 @@ char *file_read_info_file(char *file, char *file2)
   file_dump_flist(f0);
 #endif
 
+  file_do_info(f0);
+
+  file_free_file(f0);
+
+  if(mounted) umount(mountpoint_tg);
+
+  if(config.info.mod_autoload) mod_autoload();
+
+#if WITH_PCMCIA
+//  if(config.info.start_pcmcia) pcmcia_load_core();
+#endif
+
+  return file;
+}
+
+
+void file_do_info(file_t *f0)
+{
+  file_t *f;
+  url_t *url;
+  int i;
+
+  config.info.mod_autoload = 0;
+  config.info.start_pcmcia = 0;
+
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_insmod:
@@ -427,14 +467,12 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_autoprobe:
-        do_autoprobe = 1;
+        config.info.mod_autoload = 1;
         break;
 
-#if WITH_PCMCIA
       case key_start_pcmcia:
-        start_pcmcia = 1;
+        config.info.start_pcmcia = 1;
         break;
-#endif
 
       case key_language:
         i = set_langidbyname(f->value);
@@ -481,16 +519,28 @@ char *file_read_info_file(char *file, char *file2)
         net_check_address2(&config.net.nameserver, 0);
         break;
 
+      case key_proxy:
+      case key_ftpproxy:
+        name2inet(&config.net.proxy, f->value);
+        net_check_address2(&config.net.proxy, 0);
+        break;
+
+      case key_proxyport:
+      case key_ftpproxyport:
+        if(f->is.numeric) config.net.proxyport = f->nvalue;
+        break;
+
+      case key_proxyproto:
+        if(f->is.numeric) config.net.proxyproto = f->nvalue;
+        break;
+
       case key_partition:
         strncpy(harddisk_tg, f->value, sizeof harddisk_tg);
         harddisk_tg[sizeof harddisk_tg - 1] = 0;
         break;
 
       case key_serverdir:
-        if(*f->value) {
-          if(config.serverdir) free(config.serverdir);
-          config.serverdir = strdup(f->value);
-        }
+        if(*f->value) str_copy(&config.serverdir, f->value);
         break;
 
       case key_netdevice:
@@ -505,11 +555,19 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_bootpwait:
-        bootp_wait_ig = f->nvalue;
+        if(f->is.numeric) config.net.bootp_wait = f->nvalue;
         break;
 
       case key_bootptimeout:
-        bootp_timeout_ig = f->nvalue;
+        if(f->is.numeric) config.net.bootp_timeout = f->nvalue;
+        break;
+
+      case key_dhcptimeout:
+        if(f->is.numeric) config.net.dhcp_timeout = f->nvalue;
+        break;
+
+      case key_tftptimeout:
+        if(f->is.numeric) config.net.tftp_timeout = f->nvalue;
         break;
 
       case key_forcerootimage:
@@ -525,18 +583,16 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_username:
-        if(config.net.user) free(config.net.user);
-        config.net.user = strdup(f->value);
+      case key_ftpuser:
+        str_copy(&config.net.user, f->value);
         break;
 
       case key_password:
-        if(config.net.password) free(config.net.password);
-        config.net.password = strdup(f->value);
+        str_copy(&config.net.password, f->value);
         break;
 
       case key_workdomain:
-        if(config.net.workgroup) free(config.net.workgroup);
-        config.net.workgroup = strdup(f->value);
+        str_copy(&config.net.workgroup, f->value);
         break;
 
       case key_forceinsmod:
@@ -548,6 +604,19 @@ char *file_read_info_file(char *file, char *file2)
         if(config.net.use_dhcp) net_config();
         break;
 
+      case key_usedhcp:
+        if(f->is.numeric) {
+          config.net.use_dhcp = f->nvalue;
+        }
+        else {
+          if(!*f->value) config.net.use_dhcp = 1;
+        }
+        break;
+
+      case key_nfsport:
+        if(f->is.numeric) config.net.nfs_port = f->nvalue;
+        break;
+
       case key_domain:
         if(config.net.domain) free(config.net.domain);
         config.net.domain = strdup(f->value);
@@ -555,9 +624,8 @@ char *file_read_info_file(char *file, char *file2)
 
       case key_install:
         url = parse_url(f->value);
-        if(url) {
+        if(url && url->scheme) {
           set_instmode(url->scheme);
-
           if(url->port) config.net.port = url->port;
           str_copy(&config.serverdir, url->dir);
           str_copy(&config.net.user, url->user);
@@ -567,6 +635,15 @@ char *file_read_info_file(char *file, char *file2)
             name2inet(&config.net.server, url->server);
           }
         }
+        break;
+
+      case key_autoyast:
+        str_copy(&config.autoyast, f->value);
+        auto2_ig = TRUE;
+        yast_version_ig = 2;
+        action_ig |= ACT_YAST2_AUTO_INSTALL;
+        url = parse_url(config.autoyast);   
+        if(url && url->scheme) set_instmode(url->scheme);
         break;
 
       default:
@@ -583,18 +660,6 @@ char *file_read_info_file(char *file, char *file2)
       config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
     );
   }
-
-  file_free_file(f0);
-
-  if(mounted) umount(mountpoint_tg);
-
-  if(do_autoprobe) mod_autoload();
-
-#if WITH_PCMCIA
-//  if(start_pcmcia) pcmcia_load_core();
-#endif
-
-  return file;
 }
 
 
@@ -763,9 +828,16 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_domain, config.net.domain);
   }
 
+#if 0
   file_write_inet(f, key_ftpproxy, &config.net.proxy);
   if(config.net.proxyport) {
     file_write_num(f, key_ftpproxyport, config.net.proxyport);
+  }
+#endif
+
+  file_write_inet(f, key_proxy, &config.net.proxy);
+  if(config.net.proxyport) {
+    file_write_num(f, key_proxyport, config.net.proxyport);
   }
 
   file_write_str(f, key_username, config.net.user);
@@ -793,6 +865,8 @@ void file_write_install_inf(char *dir)
   if((action_ig & ACT_YAST2_AUTO_INSTALL)) {
     file_write_num(f, key_yast2autoinst, 1);
   }
+
+  file_write_str(f, key_autoyast, config.autoyast);
 
   file_write_num(f, key_usb, usb_ig);
 
@@ -947,15 +1021,23 @@ void file_write_modparms(FILE *f)
 file_t *file_read_cmdline()
 {
   FILE *f;
-  file_t *ft0 = NULL, **ft = &ft0;
-  char cmdline[1024], *current, *s, *s1, *t;
-  int i, quote;
+  char cmdline[1024];
 
   if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
   if(!fgets(cmdline, sizeof cmdline, f)) *cmdline = 0;
   fclose(f);
 
-  current = cmdline;
+  return file_parse_buffer(cmdline);
+}
+
+
+file_t *file_parse_buffer(char *buf)
+{
+  file_t *ft0 = NULL, **ft = &ft0;
+  char *current, *s, *s1, *t;
+  int i, quote;
+
+  current = buf;
 
   do {
     while(isspace(*current)) current++;
@@ -978,7 +1060,7 @@ file_t *file_read_cmdline()
       if(i && t[i - 1] == ':') t[i - 1] = 0;
 
       (*ft)->key_str = strdup(t);
-      (*ft)->key = file_str2key(t);
+      (*ft)->key = file_str2key(t);	/* destroys t!!! */
       (*ft)->value = strdup(s1 ?: "");
 
       parse_value(*ft);

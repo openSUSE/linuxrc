@@ -1,3 +1,6 @@
+#ifndef _TEXT_H
+#define _TEXT_H
+
 /*
  *
  * text.h        Header file for text.c
@@ -52,3 +55,5 @@ extern int   txt_init (void);
 #endif	/* LXRC_TINY */
 
 #endif	/* __alpha__ */
+
+#endif  /* _TEXT_H */

@@ -14,17 +14,8 @@
 int             max_x_ig = X_DEFAULT;
 int             max_y_ig = Y_DEFAULT;
 
-config_t config = {
-#if defined(__s390__) || defined(__s390x__)
-  initrd_has_ldso: 1,
-#else
-  initrd_has_ldso: 0,
-#endif
-  color:2,			/* default: 'color'; cf. disp_init(), too! */
-  net: {
-    use_dhcp: 1
-  }
-};
+/* for default config, look at linuxrc.c::lxrc_init() */
+config_t config;
 
 colorset_t     *colors_prg;
 char            rootimage_tg [MAX_FILENAME] = "/suse/images/root";
@@ -51,11 +42,8 @@ int             auto2_ig = TRUE;
 int             auto2_ig = FALSE;
 #endif
 int             demo_ig = FALSE;
-int             nfsport_ig = 0;
 char            machine_name_tg [100];
 int             old_kernel_ig = TRUE;
-int             bootp_wait_ig = 0;
-int             bootp_timeout_ig = 10;
 int             passwd_mode_ig = FALSE;
 char            ftp_user_tg [20];
 char            ftp_password_tg [20];

@@ -877,11 +877,11 @@ void util_umount_driver_update()
 void util_status_info()
 {
   int i, j;
-  char *s;
+  char *s, *t;
   hd_data_t *hd_data;
-  char *lxrc;
   slist_t *sl, *sl0 = NULL;
   char buf[256];
+  language_t *lang;
 
   hd_data = calloc(1, sizeof *hd_data);
   hd_data->debug = 1;
@@ -908,8 +908,21 @@ void util_status_info()
   );
   slist_append_str(&sl0, buf);
 
-  lxrc = getenv("linuxrc");
-  sprintf(buf, "linuxrc = \"%s\"", lxrc ? lxrc : "");
+  sprintf(buf, "linuxrc = %s", config.linuxrc ?: "");
+  slist_append_str(&sl0, buf);
+
+  if(config.autoyast) {
+    sprintf(buf, "autoyast = %s", config.autoyast);
+    slist_append_str(&sl0, buf);
+  }
+
+  s = config.info.loaded;
+  if(!s) s = "";
+  t = config.info.add_cmdline ? "cmdline" : "";
+  if(!*s || !strcmp(s, t)) { s = t; t = ""; }
+  sprintf(buf, "info = ");
+  if(*s) sprintf(buf + strlen(buf), "%s", s);
+  if(*t) sprintf(buf + strlen(buf), ", %s", t);
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
@@ -946,7 +959,7 @@ void util_status_info()
   sprintf(buf, "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "driver_update_dir = \"%s\"", driver_update_dir);
+  sprintf(buf, "driver_update = \"%s\"", driver_update_dir);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "hostname = %s", inet2print(&config.net.hostname));
@@ -970,6 +983,15 @@ void util_status_info()
   sprintf(buf, "nameserver = %s", inet2print(&config.net.nameserver));
   slist_append_str(&sl0, buf);
 
+  sprintf(buf, "proxy = %s", inet2print(&config.net.proxy));
+  if(config.net.proxyport) {
+    sprintf(buf + strlen(buf), ", proxyport = %d", config.net.proxyport);
+  }
+  if(config.net.proxyproto) {
+    sprintf(buf + strlen(buf), ", proxyproto = %s", get_instmode_name(config.net.proxyproto));
+  }
+  slist_append_str(&sl0, buf);
+
   sprintf(buf, "server = %s", inet2print(&config.net.server));
   slist_append_str(&sl0, buf);
 
@@ -979,7 +1001,34 @@ void util_status_info()
   sprintf(buf, "server dir = \"%s\"", config.serverdir ?: "");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "language = %d, keymap = \"%s\"", config.language, config.keymap ?: "");
+  if(config.net.use_dhcp) {
+    s = "", t = "*";
+  }
+  else {
+    s = "*", t = "";
+  }
+  sprintf(buf,
+    "timeouts: bootp%s = %ds, dhcp%s = %ds, tftp = %ds",
+    s, config.net.bootp_timeout, t, config.net.dhcp_timeout, config.net.tftp_timeout
+  );
+  slist_append_str(&sl0, buf);
+
+  if(config.net.nfs_port || config.net.bootp_wait) {
+    *buf = 0;
+    if(config.net.nfs_port) sprintf(buf, "nfs port = %d", config.net.nfs_port);
+    if(config.net.bootp_wait) {
+      sprintf(buf + strlen(buf),
+        "%sbootp wait = %d",
+        config.net.nfs_port ? ", " : "",
+        config.net.bootp_wait
+      );
+    }
+    slist_append_str(&sl0, buf);
+  }
+
+  lang = current_language();
+
+  sprintf(buf, "language = %s (%s), keymap = %s", lang->yastcode, lang->locale, config.keymap ?: "");
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
@@ -2024,7 +2073,10 @@ int util_bootpc_main(int argc, char **argv)
     dev = *argv;
   }
 
-  i = performBootp(dev, "255.255.255.255", "", bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV | BP_PRINT_OUT, 1);
+  i = performBootp(dev,
+    "255.255.255.255", "", config.net.bootp_timeout,
+    0, NULL, 0, 1, BP_PUT_ENV | BP_PRINT_OUT, 1
+  );
 
   return i;
 }
@@ -2201,7 +2253,7 @@ url_t *parse_url(char *str)
   static url_t url = {};
   char *s, *s0, *s1;
   unsigned u;
-  int scheme = -1;
+  int scheme = -1, i;
 
   if(!str) return NULL;
   str = strdup(str);
@@ -2256,6 +2308,12 @@ url_t *parse_url(char *str)
       url.dir = strdup(*s0 ? s0 : "/");
     }
   }
+  else {
+    i = file_sym2num(str);
+    if(i > 0) {
+      scheme  = i;
+    }
+  }
 
   free(str);
   if(scheme >= 0) url.scheme = scheme;
@@ -2269,7 +2327,7 @@ url_t *parse_url(char *str)
   );
 #endif
 
-  if(url.scheme && url.dir) return &url;
+  if(url.scheme || url.dir || url.server) return &url;
 
   return NULL;
 }
@@ -2426,7 +2484,7 @@ int net_open(char *filename)
 
     sa.sin_addr = config.net.server.ip;
     sa.sin_family = AF_INET;
-    fd = tftp_open(&config.net.tftp, &sa, filename ?: "", 10);
+    fd = tftp_open(&config.net.tftp, &sa, filename ?: "", config.net.tftp_timeout);
 
     if(fd < 0) {
       str_copy(&config.net.error, config.net.tftp.buf);
@@ -2495,7 +2553,7 @@ int util_wget_main(int argc, char **argv)
 
   url = parse_url(*argv);
 
-  if(!url) return fprintf(stderr, "invalid url\n"), 2;
+  if(!url || !url->scheme) return fprintf(stderr, "invalid url\n"), 2;
 
   set_instmode(url->scheme);
   

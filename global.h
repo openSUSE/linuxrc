@@ -12,6 +12,9 @@
 #include <inttypes.h>
 
 #include "tftp.h"
+#include "po/text_langids.h"
+#include "text.h"
+#include "settings.h"
 
 #include "version.h"
 
@@ -86,8 +89,6 @@
 #define ACT_RESCUE		(1 << 5)
 #define ACT_NO_PCMCIA		(1 << 6)
 #define ACT_DEBUG		(1 << 7)
-
-#include "po/text_langids.h"
 
 #define RAMDISK_2  "/dev/ram2"
 
@@ -218,7 +219,11 @@ typedef struct {
     char *file;			/* 'info' file name */
     char *loaded;		/* actual 'info' file that was loaded */
     unsigned add_cmdline:1;	/* parse cmdline, too */
+    unsigned mod_autoload:1;	/* used internally */
+    unsigned start_pcmcia:1;	/* dto  */
   } info;
+  char *autoyast;		/* yast autoinstall parameter */
+  char *linuxrc;		/* 'linuxrc' parameter */
   char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
@@ -254,6 +259,7 @@ typedef struct {
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned smb_available:1;	/* set if SMB functionality is available */
     slist_t *devices;		/* list of active network devs */
+    slist_t *dns_cache;		/* cache dns lookups here */
     int ftp_sock;		/* used internally by ftp code */
     struct tftp tftp;		/* used by tftp code */
     int file_length;		/* length of currently retrieved file */
@@ -262,6 +268,12 @@ typedef struct {
     char *nisdomain;		/* NIS domain name */
     unsigned proxyport;		/* proxy port */
     unsigned port;		/* port */
+    instmode_t proxyproto;	/* http or ftp */
+    int nfs_port;		/* nfs port */
+    int bootp_timeout;		/* various timeout values (in s) */
+    int dhcp_timeout;
+    int tftp_timeout;
+    int bootp_wait;		/* wait this time (in s) after network setup before starting bootp */
     inet_t netmask;
     inet_t network;
     inet_t broadcast;
@@ -303,11 +315,8 @@ extern int             explode_win_ig;
 extern int             auto_ig;
 extern int             demo_ig;
 extern int             auto2_ig;
-extern int             nfsport_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
-extern int             bootp_wait_ig;
-extern int             bootp_timeout_ig;
 extern int             passwd_mode_ig;
 extern char            ftp_user_tg [20];
 extern char            ftp_password_tg [20];
