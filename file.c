@@ -1141,6 +1141,7 @@ void file_do_info(file_t *f0)
 
           slist_free(sl);
         }
+        if(!config.net.setup) config.net.do_setup = 0;
         break;
 
       case key_rootpassword:

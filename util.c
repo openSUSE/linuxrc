@@ -3047,6 +3047,7 @@ void set_instmode(instmode_t instmode)
       break;
 
     case inst_hd:
+    case inst_file:
       config.insttype = inst_hd;
       break;
 
