@@ -505,6 +505,14 @@ int auto2_net_dev(hd_t **hd0)
         fprintf(stderr, "%s activated\n", hd->unix_dev_name);
       }
 
+      while (config.instmode == inst_slp) {
+	extern int slp_get_install(void);
+	if (slp_get_install()) {
+            fprintf(stderr, "SLP failed\n");
+            return 1;
+        }
+      }
+
       net_ask_password(); /* in case we have ssh or vnc in auto mode */
 
       switch(config.instmode) {

@@ -240,7 +240,8 @@ static struct {
   { "cdwithnet", inst_cdwithnet     },
   { "net",       inst_net           },
   { "harddisk",  inst_hd            },
-  { "cdrom",     inst_cdrom         }
+  { "cdrom",     inst_cdrom         },
+  { "slp",       inst_slp           }
 };
 
 

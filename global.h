@@ -120,7 +120,7 @@ typedef struct {
 typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
-  inst_dvd, inst_cdwithnet, inst_net
+  inst_dvd, inst_cdwithnet, inst_net, inst_slp
 } instmode_t;
 
 
