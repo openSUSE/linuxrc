@@ -6,5 +6,5 @@
  *
  */
 
-extern void file_write_yast_info (void);
+extern void file_write_yast_info (char *);
 extern int  file_read_info       (void);

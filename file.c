@@ -85,19 +85,21 @@ static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
 static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
 static const char  *file_txt_yast2_color_tm    = "YaST2color:";
+static const char  *file_txt_boot_disk_tm      = "BootDisk:";
+static const char  *file_txt_disks_tm          = "Disks:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
 static void file_trim_buffer (char *buffer_tr);
 static void file_module_load (char *command_tv);
 
-void file_write_yast_info (void)
+void file_write_yast_info (char *file_name)
     {
     FILE  *file_pri;
     char   line_ti [200];
 
 
-    file_pri = fopen (file_infofile_tm, "w");
+    file_pri = fopen (file_name ? file_name : file_infofile_tm, "w");
     if (!file_pri)
         {
         fprintf (stderr, "Cannot open yast info file\n");
@@ -269,6 +271,18 @@ void file_write_yast_info (void)
       char *s = getenv("probe");
       if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);
     }
+
+    {
+      char *s;
+      int boot_disk;
+
+      s = auto2_disk_list(&boot_disk);
+      if(*s) {
+        fprintf (file_pri, "%s %d\n", file_txt_boot_disk_tm, boot_disk ? 1 : 0);
+        fprintf (file_pri, "%s %s\n", file_txt_disks_tm, s);
+      }
+    }
+
 #endif
 
     fclose (file_pri);

@@ -45,7 +45,7 @@ static char *auto2_device_name(hd_t *hd);
 static int auto2_cdrom_dev(void);
 static int auto2_net_dev(void);
 static int auto2_driver_is_active(driver_info_t *di);
-static int auto2_activate_devices(unsigned base_class, int last_idx);
+static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
@@ -348,7 +348,7 @@ int auto2_driver_is_active(driver_info_t *di)
  * Activate storage/network devices.
  * Returns 0 or the index of the last controller we activated.
  */
-int auto2_activate_devices(unsigned base_class, int last_idx)
+int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 {
   char mod_cmd[100];
   driver_info_t *di, *di0;
@@ -401,8 +401,8 @@ int auto2_activate_devices(unsigned base_class, int last_idx)
         }
       }
 
-      /* some module was loaded... */
-      if(di) break;
+      /* some module was loaded...; in demo mode activate all disks */
+      if(!(demo_ig && base_class == bc_storage) && di) break;
     }
 
     di0 = hd_free_driver_info(di0);
@@ -478,7 +478,12 @@ int auto2_init()
 
   if(bootmode_ig == BOOTMODE_CD) {
     deb_msg("Looking for a SuSE CD...");
-    if(!(i = auto2_cdrom_dev())) return TRUE;
+    if(!(i = auto2_cdrom_dev())) {
+      if(demo_ig) {
+        auto2_activate_devices(bc_storage, 0);
+      }
+      return TRUE;
+    }
 
     for(last_idx = 0;;) {
       if(i == 2) {		/* CD found, but mount failed */
@@ -755,6 +760,38 @@ char *auto2_xserver()
   hd_free_driver_info(di);
 
   return display;
+}
+
+char *auto2_disk_list(int *boot_disk)
+{
+  static char buf[256];
+  hd_t *hd;
+  int matches;
+  unsigned boot_idx;
+
+  boot_disk = 0;
+  *buf = 0;
+  if(!hd_data) return buf;
+
+  boot_idx = hd_boot_disk(hd_data, &matches);
+  if(boot_idx && matches == 1) {
+    hd = hd_get_device_by_idx(hd_data, boot_idx);
+    if(hd && hd->unix_dev_name) {
+      boot_disk = boot_idx;
+      strcpy(buf, hd->unix_dev_name);
+    }
+  }
+  
+  for(hd = hd_disk_list(hd_data, 0); hd; hd = hd->next) {
+    if(hd->idx != boot_idx && hd->unix_dev_name) {
+      if(*buf) strcat(buf, " ");
+      strcat(buf, hd->unix_dev_name);
+    }
+  }
+
+  hd = hd_free_hd_list(hd);
+
+  return buf;
 }
 
 

@@ -182,6 +182,9 @@ int inst_start_demo (void)
     if (util_try_mount (RAMDISK_2, mountpoint_tg, 0, 0))
         return (-1);
 
+    sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/install.inf");
+    file_write_yast_info (filename_ti);
+
     sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
     file_pri = fopen (filename_ti, "a");
 
@@ -691,7 +694,7 @@ static int inst_prepare (void)
     int    rc_ii = 0;
 
     mod_free_modules ();
-    file_write_yast_info ();
+    file_write_yast_info (NULL);
     rename ("/bin", "/.bin");
 
     for (i_ii = 0; i_ii < sizeof (links_ati) / sizeof (links_ati [0]); i_ii++)
