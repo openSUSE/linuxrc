@@ -18,7 +18,7 @@
 #else
 // was: 46000000; 64MB will currently not do...
 #define MEM_LIMIT1_RAMDISK    70*1024*1024
-#define MEM_LIMIT2_RAMDISK    98*1024*1024
+#define MEM_LIMIT2_RAMDISK    124*1024*1024
 #endif
 #define MEM_LIMIT_SWAP_MSG     6500000
 #define MEM_LIMIT_CACHE_LIBS  15000000

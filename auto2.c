@@ -42,6 +42,7 @@ static char *auto2_loaded_module = NULL;
 static char *auto2_loaded_module_args = NULL;
 static driver_info_t *x11_driver = NULL;
 static char *pcmcia_params = NULL;
+static int is_vaio = 0;
 
 static char *auto2_device_name(hd_t *hd);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
@@ -206,6 +207,7 @@ void auto2_scan_hardware(char *log_file)
   ) {
     if((st->model && strstr(st->model, "PCG-") == st->model)) {
       /* is a Sony Vaio */
+      is_vaio = 1;
       pcmcia_params = "irq_list=9,10,11,15";
       if(usb_mod && *usb_mod) {
         sprintf(usb_mods, "usbcore %s", usb_mod);
@@ -510,7 +512,8 @@ int auto2_init()
         pcmcia_core_loaded_im = TRUE;
         deb_msg("card manager ok.");
       }
-      sleep(2);		/* wait for cards to be activated... */
+      /* wait for cards to be activated... */
+      sleep(is_vaio ? 10 : 2);
       /* check for cdrom & net devs */
       hd_list(hd_data, hw_cdrom, 0, NULL);
       hd_list(hd_data, hw_network, 0, NULL);
