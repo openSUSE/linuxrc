@@ -19,6 +19,7 @@ enum modid_t
     ID_PAS16,
     ID_QLOGIC_FAS,
     ID_QLOGIC_ISP,
+    ID_QLOGIC_2X,
     ID_QLA1280,
     ID_SEAGATE,
     ID_TRANTOR,

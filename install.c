@@ -505,7 +505,7 @@ static int inst_mount_nfs (void)
 static int inst_mount_harddisk (void)
     {
             int   rc_ii;
-    static  char *fs_types_ati [] = { "msdos", "reiserfs", "hpfs", "ext2", 0 };
+    static  char *fs_types_ati [] = { "vfat", "msdos", "reiserfs", "hpfs", "ext2", 0 };
             int   i_ii;
             char *mountpoint_pci;
 

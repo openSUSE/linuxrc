@@ -66,6 +66,7 @@ static int       mod_is_ppcd          (char *name_tv);
 static int       mod_load_ppcd_core   (void);
 static int       mod_load_i2o_core    (void);
 static int       mod_load_parport_core(void);
+static int       mod_load_pcinet_core (void);
 static int       mod_load_plip_core   (void);
 static void      mod_unload_plip_core (void);
 static int       mod_getmoddisk       (void);
@@ -610,6 +611,15 @@ static int mod_choose_cb (int what_iv)
             return (rc_ii);
         }
 
+    if (
+        !strcmp (mod_current_arm [what_iv - 1].module_name, "starfire")
+       )
+        {
+        rc_ii = mod_load_pcinet_core ();
+        if (rc_ii)
+            return (rc_ii);
+        }
+
     if (mod_current_arm [what_iv - 1].example)
         strcpy (params_ti, mod_current_arm [what_iv - 1].example);
     else
@@ -1082,6 +1092,27 @@ static int mod_load_parport_core()
     parport_core_loaded = TRUE;
     for(i = 0; i < sizeof parport_modules / sizeof *parport_modules; i++) {
       mpar_save_modparams(parport_modules[i], 0);
+    }
+  }
+
+  return 0;
+}
+
+
+static int mod_load_pcinet_core()
+{
+  static int pcinet_core_loaded = FALSE;
+  char *pcinet_modules[] = { "pci-scan" };
+  int i, err;
+
+  if(!pcinet_core_loaded) {
+    for(i = 0; i < sizeof pcinet_modules / sizeof *pcinet_modules; i++) {
+      err = mod_load_module(pcinet_modules[i], 0);
+      if(err) return -1;
+    }
+    pcinet_core_loaded = TRUE;
+    for(i = 0; i < sizeof pcinet_modules / sizeof *pcinet_modules; i++) {
+      mpar_save_modparams(pcinet_modules[i], 0);
     }
   }
 

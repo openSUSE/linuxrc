@@ -41,6 +41,7 @@ static module_t mod_scsi_mod_arm [] =
 { ID_53C78XX,    "NCR 53c7,8xx (old driver)",          "53c7,8xx",   0, __LINE__ },
 { ID_QLOGIC_ISP, "QLogic ISP 1020",                    "qlogicisp",  0, __LINE__ },
 { ID_QLOGIC_FC,  "QLogic ISP 2100 SCSI-FCP",           "qlogicfc",   0, __LINE__ },
+{ ID_QLOGIC_2X,  "QLogic ISP 2x00",                    "qla2x00",    0, __LINE__ },
 { ID_QLOGIC_FAS, "QLogic FAS",                         "qlogicfas",  0, __LINE__ },
 { ID_QLA1280,    "QLogic QLA1280/QLA12160",            "qla1280",    0, __LINE__ },
 { ID_ULTRASTOR,  "UltraStor (alternate driver)",       "ultrastor",  0, __LINE__ },
