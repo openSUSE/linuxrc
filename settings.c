@@ -40,6 +40,8 @@ typedef struct
       char *mapname;
       } keymap_t;
 
+
+#define LANG_DEFAULT	1
 static language_t set_languages_arm [] =
 {
 { LANG_GERMAN,       "Deutsch",              "de-lat1-nd",   "lat1u-16.psf",
@@ -78,7 +80,8 @@ static language_t set_languages_arm [] =
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
 };
 
-#if defined(__i386__) || defined(__alpha__)
+#if defined(__i386__) || defined(__alpha__) || defined(__PPC__)
+#define KEYMAP_DEFAULT	1
 static keymap_t set_keymaps_arm [] =
 {
 { "Deutsch",              "de-lat1-nd"   },
@@ -103,6 +106,7 @@ static keymap_t set_keymaps_arm [] =
 #endif
 
 #if defined(__sparc__)
+#define KEYMAP_DEFAULT	0
 static keymap_t set_keymaps_arm [] =
 {
 { "sunkeymap",       "sunkeymap"       },
@@ -117,18 +121,21 @@ static keymap_t set_keymaps_arm [] =
 };
 #endif
 
+#define NR_LANGUAGES (sizeof(set_languages_arm)/sizeof(set_languages_arm[0]))
+#define NR_KEYMAPS (sizeof(set_keymaps_arm)/sizeof(set_keymaps_arm[0]))
+
 #if defined(__PPC__)
-static keymap_t set_keymaps_arm [] =
+#define KEYMAP_DEFAULT	1
+static keymap_t set_keymaps_arm_mac [] =
 {
 { "Deutsch",              "mac-de-latin1-nodeadkeys" },
 { "English (US)",         "mac-us"                   },
 { "English (UK)",         "mac-us"                   },
 { "Français",             "mac-fr2-ext"              }
 };
+/* !!! ***MUST NOT*** be bigger than NR_KEYMAPS !!! */
+#define NR_KEYMAPS_MAC (sizeof set_keymaps_arm_mac / sizeof *set_keymaps_arm_mac)
 #endif
-
-#define NR_LANGUAGES (sizeof(set_languages_arm)/sizeof(set_languages_arm[0]))
-#define NR_KEYMAPS (sizeof(set_keymaps_arm)/sizeof(set_keymaps_arm[0]))
 
 static const char  *set_txt_language_tm       = "Language:";
 static const char  *set_txt_font_tm           = "Font:";
@@ -229,34 +236,42 @@ void set_choose_keytable (void)
     int     i_ii;
     int     width_ii = 24;
     char    command_ti [MAX_FILENAME];
+    int     keymaps = NR_KEYMAPS;
+    keymap_t *keymap = set_keymaps_arm;
 
+#ifdef __PPC__
+    if(!strcmp(xkbmodel_tg, "macintosh")) {
+      keymaps = NR_KEYMAPS_MAC;
+      keymap = set_keymaps_arm_mac;
+    }
+#endif
 
     if (auto_ig || auto2_ig)
         {
-        if (!keymap_tg [0])
-            strcpy (keymap_tg, set_keymaps_arm [0].mapname);
+        if (!*keymap_tg)
+            strcpy (keymap_tg, keymap [KEYMAP_DEFAULT].mapname);
 
         sprintf (command_ti, "loadkeys %s.map", keymap_tg);
         system (command_ti);
         return;
         }
 
-    util_create_items (items_ari, NR_KEYMAPS, width_ii);
-    for (i_ii = 0; i_ii < NR_KEYMAPS; i_ii++)
+    util_create_items (items_ari, keymaps, width_ii);
+    for (i_ii = 0; i_ii < keymaps; i_ii++)
         {
-        strcpy (items_ari [i_ii].text, set_keymaps_arm [i_ii].descr);
+        strcpy (items_ari [i_ii].text, keymap [i_ii].descr);
         util_fill_string (items_ari [i_ii].text, width_ii);
         }
 
-    i_ii = dia_menu (txt_get (TXT_CHOOSE_KEYMAP), items_ari, NR_KEYMAPS, 1);
-    util_free_items (items_ari, NR_KEYMAPS);
+    i_ii = dia_menu (txt_get (TXT_CHOOSE_KEYMAP), items_ari, keymaps, 1 + KEYMAP_DEFAULT);
+    util_free_items (items_ari, keymaps);
 
     if (i_ii)
         {
         sprintf (command_ti, "loadkeys %s.map",
-                 set_keymaps_arm [i_ii - 1].mapname);
+                 keymap [i_ii - 1].mapname);
         system (command_ti);
-        strcpy (keymap_tg, set_keymaps_arm [i_ii - 1].mapname);
+        strcpy (keymap_tg, keymap [i_ii - 1].mapname);
         }
     }
 
@@ -473,7 +488,7 @@ static int set_get_current_language (void)
             current_ii++;
 
     if (!found_ii)
-        current_ii = 1;
+        current_ii = LANG_DEFAULT + 1;
     else
         current_ii++;
 
