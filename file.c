@@ -66,6 +66,7 @@ static const char  *file_txt_manual_tm         = "Manual:";
 static const char  *file_txt_demo_tm           = "Demo:";
 static const char  *file_txt_reboot_wait       = "WaitReboot:";
 static const char  *file_txt_bootp_timeout_tm  = "BOOTP_TIMEOUT:";
+static const char  *file_txt_force_ri_tm       = "ForceRootimage:";
 #if WITH_PCMCIA
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #endif
@@ -530,6 +531,15 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_bootp_timeout_tm, buffer_ti,
                           strlen (file_txt_bootp_timeout_tm)))
             bootp_timeout_ig = atoi (value_ti);
+
+        if (!strncasecmp (file_txt_force_ri_tm, buffer_ti,
+                          strlen (file_txt_force_ri_tm)))
+            {
+            if (atoi (value_ti))
+                force_ri_ig = TRUE;
+            else
+                force_ri_ig = FALSE;
+            }
 
         if (!strncasecmp (file_txt_reboot_wait, buffer_ti,
                           strlen (file_txt_reboot_wait)))
