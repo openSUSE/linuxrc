@@ -53,6 +53,7 @@ static module_t mod_scsi_mod_arm [] =
 { ID_SYM53C416,  "Symbios 53C416",                     "sym53c416",  0, __LINE__ },
 { ID_SIM710,     "Simple 53c710 (Compaq, NCR)",        "sim710",     0, __LINE__ },
 { ID_QLOGICPTI,  "PTI Qlogic ISP Driver",              "qlogicpti",  0, __LINE__ },
+{ ID_3WARE,      "3ware ATA RAID (pseudo SCSI)",       "3w-xxxx",    0, __LINE__ },
 #if 0
 /* loaded implicitly */
 { ID_I2O_PCI,    "Intelligent I/O PCI",                "i2o_pci",    0, __LINE__ },

@@ -21,6 +21,7 @@ enum modid_t
     ID_QLOGIC_FAS,
     ID_QLOGIC_ISP,
     ID_QLOGIC_2X,
+    ID_3WARE,
     ID_QLA1280,
     ID_SEAGATE,
     ID_TRANTOR,
