@@ -7,11 +7,9 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.7 $
-  $Date: 2001/10/31 09:45:23 $
+  $Revision: 1.8 $
+  $Date: 2001/12/13 18:27:16 $
 */
-
-#include "global.h"
 
 /* Standard headers */
 #include <stdio.h>
@@ -35,6 +33,7 @@
 #include <sys/uio.h>
 
 /* local headers */
+#include "global.h"
 #include "bootpc.h"
 
 #define logMessage my_logmessage

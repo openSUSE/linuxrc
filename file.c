@@ -512,7 +512,7 @@ char *file_read_info_file(char *file, char *file2)
   if(do_autoprobe) mod_autoload();
 
 #if WITH_PCMCIA
-  if(start_pcmcia) pcmcia_load_core();
+//  if(start_pcmcia) pcmcia_load_core();
 #endif
 
   return file;

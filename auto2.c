@@ -35,6 +35,7 @@
 #include "modparms.h"
 #include "pcmcia.h"
 
+
 #ifdef USE_LIBHD
 
 static hd_data_t *hd_data = NULL;

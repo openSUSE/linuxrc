@@ -60,6 +60,7 @@ extern int  util_cp_main           (int argc, char **argv);
 extern int  util_do_cp             (char *src, char *dst);
 extern int  util_ls_main           (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
+extern char *util_process_name     (pid_t pid);
 
 slist_t *slist_new(void);
 slist_t *slist_append(slist_t **sl0, slist_t *sl);

@@ -19,6 +19,7 @@
 #include "util.h"
 #include "dialog.h"
 
+
 #define MAX_FIELD        40
 
 void win_open (window_t *win_prr)

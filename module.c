@@ -38,16 +38,16 @@
 
 #include "module_list.h"
 
+/* defined in pcmcia/cardmgr.c */
+extern char *pidfile;
+
 #define NR_SCSI_MODULES     (sizeof(mod_scsi_mod_arm)/sizeof(mod_scsi_mod_arm[0]))
 #define NR_CDROM_MODULES    (sizeof(mod_cdrom_mod_arm)/sizeof(mod_cdrom_mod_arm[0]))
 #define NR_NET_MODULES      (sizeof(mod_net_mod_arm)/sizeof(mod_net_mod_arm[0]))
 #define NR_MODULES          (NR_SCSI_MODULES+NR_CDROM_MODULES+NR_NET_MODULES+50)
 #define NR_NO_AUTOPROBE     (sizeof(mod_noauto_arm)/sizeof(mod_noauto_arm[0]))
-// #define NR_PPCD             (sizeof(mod_is_ppcd_arm)/sizeof(mod_is_ppcd_arm[0]))
 #define MENU_WIDTH          55
 
-
-// static int       mod_ram_modules_im = FALSE;
 static module_t  mod_current_arm [NR_MODULES];
 static int       mod_show_kernel_im = FALSE;
 int       mod_force_moddisk_im = FALSE;
@@ -56,14 +56,11 @@ int       mod_force_moddisk_im = FALSE;
 static int       mod_try_auto         (module_t *module_prv,
                                        window_t *status_prv);
 static int       mod_auto_allowed     (enum modid_t id_iv);
-// static module_t *mod_get_description  (char *name_tv);
 static void      mod_delete_module    (void);
 static int       mod_menu_cb          (int what_iv);
-// static int       mod_choose_cb        (int what_iv);
 static int       mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
                                        int *more_pir);
 static void      mod_sort_list        (module_t modlist_parr [], int nr_modules_iv);
-// static int       mod_is_ppcd          (char *name_tv);
 static int       mod_getmoddisk       (int mod_type);
 
 
@@ -74,6 +71,7 @@ static int       mod_getmoddisk       (int mod_type);
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};
 static int mod_menu_last = 0;
+static char *mod_param_text = NULL;
 
 static int mod_copy_modules(char *src_dir, int doit);
 static module2_t *mod_get_entry(char *name);
@@ -89,6 +87,9 @@ static int mod_unload_modules(char *modules);
 static int mod_load_modules(char *modules, int show);
 static char *mod_get_params(module2_t *mod);
 static void mod_load_module_manual(char *module, int show);
+static int mod_pcmcia_ok(void);
+static int mod_load_pcmcia(void);
+static int mod_pcmcia_chipset(void);
 
 
 int mod_copy_modules(char *src_dir, int doit)
@@ -421,30 +422,36 @@ int mod_load_manually(int type)
   if(i == 1 && !*mod_items) {
     /* list has just a 'more modules' line */
     mod_add_disk(type);
+    if(type == config.module.pcmcia_type) mod_load_pcmcia();
     added = 1;
   }
   else if(i) {
-    s = mod_get_title(type);
-    i = dia_list(s, MENU_WIDTH, NULL, items, 1, align_left);
-
-    if(i--) {
-      if(mod_items[i]) {
-        ok = 1;
-        if(mod_items[i]->pre_inst) {
-          ok = mod_load_modules(mod_items[i]->pre_inst, 1);
-        }
-        if(ok) ok = mod_load_modules(mod_items[i]->name, 2);
-        if(ok && mod_items[i]->post_inst) {
-          ok = mod_load_modules(mod_items[i]->post_inst, 1);
-        }
-      }
-      else {
-        mod_add_disk(type);
-        added = 1;
-      }
+    if(type == config.module.pcmcia_type) {
+      mod_load_pcmcia();
     }
+    else {
+      s = mod_get_title(type);
+      i = dia_list(s, MENU_WIDTH, NULL, items, 1, align_left);
 
-    free(s);
+      if(i--) {
+        if(mod_items[i]) {
+          ok = 1;
+          if(mod_items[i]->pre_inst) {
+            ok = mod_load_modules(mod_items[i]->pre_inst, 1);
+          }
+          if(ok) ok = mod_load_modules(mod_items[i]->name, 2);
+          if(ok && mod_items[i]->post_inst) {
+            ok = mod_load_modules(mod_items[i]->post_inst, 1);
+          }
+        }
+        else {
+          mod_add_disk(type);
+          added = 1;
+        }
+      }
+
+      free(s);
+    }
   }
 
   return added;
@@ -599,7 +606,7 @@ int mod_load_modules(char *modules, int show)
   for(i = 0; i < len; i++) if(isspace(modules[i])) modules[i] = 0;
 
   for(s = modules; s < modules + len && ok; s++) {
-    if(*s &&(s == modules || !s[-1])) {
+    if(*s && (s == modules || !s[-1])) {
       if(mod_is_loaded(s)) {
         if(show == 2) {
           sprintf(buf, "Module \"%s\" has already been loaded.", s);
@@ -625,7 +632,12 @@ char *mod_get_params(module2_t *mod)
   char buf2[MAX_PARAM_LEN];
   slist_t *sl;
 
-  sprintf(buf, txt_get(TXT_ENTER_PARAMS), mod->name);
+  if(mod_param_text) {
+    strcpy(buf, mod_param_text);
+  }
+  else {
+    sprintf(buf, txt_get(TXT_ENTER_PARAMS), mod->name);
+  }
 
   *buf2 = 0;
 
@@ -690,7 +702,6 @@ void mod_load_module_manual(char *module, int show)
   }
   else {
     mod_load_module(ml->name, s);
-    win_close(&win);
     i = mod_is_loaded(ml->name);
     if(!i) {
       util_beep(FALSE);
@@ -1400,3 +1411,110 @@ static int mod_getmoddisk (int mod_type)
 
     return (0);
     }
+
+
+
+int mod_pcmcia_ok()
+{
+  file_t *f;
+  int i, ok = 0;
+
+  if(util_check_exist(pidfile)) {
+    f = file_read_file(pidfile);
+
+    if(f && (i = atoi(f->key_str))) {
+      if(!strcmp(util_process_name(i), "cardmgr")) ok = 1;
+    }
+
+    file_free_file(f);
+  }
+
+  return ok;
+}
+
+
+int mod_load_pcmcia()
+{
+  int i, type, ok;
+  char buf[256];
+  window_t status, win;
+
+  if(mod_pcmcia_ok()) {
+    dia_message(txt_get(TXT_PCMCIA_ALREADY), MSGTYPE_INFO);
+    return 0;
+  }
+
+  type = mod_pcmcia_chipset();
+
+  if(type != 1 && type != 2) return -1;
+
+  mod_param_text = buf;
+
+  sprintf(buf, txt_get(TXT_FOUND_PCMCIA), type == 1 ? "tcic" : "i82365");
+  ok = mod_load_modules("pcmcia_core", 1);
+
+  if(ok) {
+    sprintf(buf, txt_get(TXT_PCMCIA_PARAMS), type == 1 ? "tcic" : "i82365");
+    ok = mod_load_modules(type == 1 ? "tcic" : "i82365", 1);
+  }
+
+  mod_param_text = NULL;
+
+  if(ok) ok = mod_load_modules("ds", 0);
+
+  if(ok) {
+    dia_status_on(&status, txt_get(TXT_START_CARDMGR));
+    system("cardmgr -v -m /modules");
+    for(i = 0; i <= 100; i++) {
+      dia_status(&status, i++);
+      usleep(100000);
+    }
+    win_close(&status);
+  }
+
+  ok = mod_pcmcia_ok();
+
+  if(ok) {
+    pcmcia_chip_ig = type;
+
+    if(!auto_ig) {
+      dia_message(txt_get(TXT_PCMCIA_SUCCESS), MSGTYPE_INFO);
+    }
+    else {
+      dia_info(&win, txt_get(TXT_PCMCIA_SUCCESS));
+      sleep(2);
+      win_close (&win);
+    }
+  }
+  else {
+    dia_message(txt_get(TXT_PCMCIA_FAIL), MSGTYPE_ERROR);
+  }
+
+  util_update_kernellog();
+
+  if(!auto_ig) dia_show_file(txt_get(TXT_INFO_KERNEL), lastlog_tg, TRUE);
+
+  return ok ? 0 : -1;
+}
+
+
+int mod_pcmcia_chipset()
+{
+  char *items[] = {
+    "tcic",
+    "i82365",
+    NULL
+  };
+  static int last_item = 0;
+  int type;
+
+  type = system("probe");
+  type >>= 8;
+
+  if(type != 1 && type != 2) {
+    type = dia_list(txt_get(TXT_NO_PCMCIA), 10, NULL, items, last_item, align_center);
+    if(type) last_item = type;
+  }
+
+  return type;
+}

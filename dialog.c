@@ -24,6 +24,7 @@
 #include "dialog.h"
 #include "linuxrc.h"
 
+
 #define MIN_WIN_SIZE    40
 #define MAX_LINES     1000
 

@@ -1350,13 +1350,13 @@ int util_mount_main(int argc, char **argv)
   if(strcmp(type, "nfs")) {
     if(!mount(dev, dir, type, 0, 0)) return 0;
     perror("mount");
-    return 3;
+    return errno;
   }
 
   srv_dir = index(dev, ':');
   if(!srv_dir) {
     fprintf(stderr, "invalid mount src \"%s\"\n", dev);
-    return 7;
+    return 77;
   }
 
   *srv_dir++ = 0;
@@ -1381,7 +1381,7 @@ int util_umount_main(int argc, char **argv)
 
   perror(*argv);
 
-  return 1;
+  return errno;
 }
 
 
@@ -1645,6 +1645,23 @@ int util_sh_main(int argc, char **argv)
   dup2(2, 1);
 
   return lsh_main(argc, argv);
+}
+
+
+char *util_process_name(pid_t pid)
+{
+  FILE *f;
+  char proc_status[64];
+  static char buf[64];
+
+  *buf = 0;
+  sprintf(proc_status, "/proc/%u/status", (unsigned) pid);
+  if((f = fopen(proc_status, "r"))) {
+    if(fscanf(f, "Name: %30s", buf) != 1) *buf = 0;
+    fclose(f);
+  }
+
+  return buf;
 }
 
 

@@ -14,7 +14,6 @@
 #include "global.h"
 #include "display.h"
 
-
 /*
  *
  * data on module level
@@ -363,6 +362,7 @@ void disp_save_area (window_t *win_prr)
                 &disp_screen_aprm [win_prr->y_left+i_ii-1][win_prr->x_left-1],
                 sizeof (character_t) * save_x_ii);
         }
+
     }
 
 
@@ -509,8 +509,7 @@ void disp_restore_area (window_t *win_prr, int mode_iv)
         }
 
 
-    for (y_ii = 0; y_ii < save_y_ii; y_ii++)
-        free (win_prr->save_area [y_ii]);
+    for (y_ii = 0; y_ii < save_y_ii; y_ii++) free (win_prr->save_area [y_ii]);
     free (win_prr->save_area);
     disp_set_attr (save_attr_ci);
     }

@@ -52,7 +52,7 @@ static int  lxrc_main_cb       (dia_item_t di);
 static void lxrc_memcheck      (void);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
-static int is_rpc_prog         (pid_t pid);
+static int do_not_kill         (pid_t pid);
 static void save_environment   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
@@ -321,35 +321,19 @@ void lxrc_end (void)
     }
 
 
-char *lxrc_prog_name(pid_t pid)
-{
-  FILE *f;
-  char proc_status[64];
-  static char buf[64];
-
-  *buf = 0;
-  sprintf(proc_status, "/proc/%u/status", (unsigned) pid);
-  if((f = fopen(proc_status, "r"))) {
-    if(fscanf(f, "Name: %30s", buf) != 1) *buf = 0;
-    fclose(f);
-  }
-
-  return buf;
-}
-
 /*
  * Check if pid is either portmap or rpciod.
  *
  */
-int is_rpc_prog(pid_t pid)
+int do_not_kill(pid_t pid)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lsh"
+    "portmap", "rpciod", "lockd", "lsh"
   };
   int i;
 
   for(i = 0; i < sizeof progs / sizeof *progs; i++) {
-    if(!strcmp(lxrc_prog_name(pid), progs[i])) return 1;
+    if(!strcmp(util_process_name(pid), progs[i])) return 1;
   }
 
   return 0;
@@ -382,9 +366,9 @@ void lxrc_killall (int really_all_iv)
         {
         pid_ri = (pid_t) atoi (process_pri->d_name);
         if (pid_ri > mypid_ri && pid_ri != lxrc_mempid_rm &&
-            (really_all_iv || !is_rpc_prog (pid_ri)))
+            (really_all_iv || !do_not_kill (pid_ri)))
             {
-            fprintf (stderr, "Killing %s (%d)\n", lxrc_prog_name (pid_ri),
+            fprintf (stderr, "Killing %s (%d)\n", util_process_name (pid_ri),
                                                   pid_ri);
             kill (pid_ri, 15);
             usleep (10000);
