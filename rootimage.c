@@ -524,7 +524,7 @@ void root_update_status(int block)
   static int old_percent_is;
   int percent;
 
-  percent = (block * 100) / root_nr_blocks_im;
+  percent = (block * 100) / (root_nr_blocks_im ?: 1);
   if(percent != old_percent_is) {
     dia_status(&root_status_win_rm, old_percent_is = percent);
   }
