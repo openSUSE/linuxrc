@@ -763,7 +763,7 @@ void lxrc_init()
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
-  if(!(config.test /* || config.serial */ || config.shell_started || config.noshell)) {
+  if(!(config.test || config.serial || config.shell_started || config.noshell)) {
     util_start_shell("/dev/tty9", "/lbin/lsh", 0);
     config.shell_started = 1;
   }
