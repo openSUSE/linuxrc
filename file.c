@@ -2,7 +2,7 @@
  *
  * file.c        File access
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -258,13 +258,14 @@ void file_write_yast_info (void)
 
 int file_read_info (void)
     {
-    char      filename_ti [MAX_FILENAME];
+    char      filename_ti [MAX_FILENAME] = "/info";
     FILE     *fd_pri;
     char      buffer_ti [MAX_X];
     window_t  win_ri;
     char      value_ti [MAX_X];
     int       do_autoprobe_ii = FALSE;
     int       start_pcmcia_ii = FALSE;
+    int       need_mount_ii = FALSE;
 
 
     if(auto2_ig)
@@ -277,25 +278,31 @@ int file_read_info (void)
         dia_info (&win_ri, txt_get (TXT_SEARCH_INFOFILE));
         }
 
-    if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-        if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-            {
-            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-            return (-1);
-            }
-
-    sprintf (filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
     fd_pri = fopen (filename_ti, "r");
     if (!fd_pri)
         {
-        sprintf (filename_ti, "%s/info", mountpoint_tg);
+        if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+            if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+                {
+                if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+                return (-1);
+                }
+
+        sprintf (filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
         fd_pri = fopen (filename_ti, "r");
         if (!fd_pri)
             {
-            umount (mountpoint_tg);
-            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-            return (-1);
+            sprintf (filename_ti, "%s/info", mountpoint_tg);
+            fd_pri = fopen (filename_ti, "r");
+            if (!fd_pri)
+                {
+                umount (mountpoint_tg);
+                if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+                return (-1);
+                }
             }
+
+        need_mount_ii = TRUE;
         }
 
     valid_net_config_ig = 0;
@@ -395,8 +402,14 @@ int file_read_info (void)
         }
 
     fclose (fd_pri);
-    umount (mountpoint_tg);
-    if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+
+    if (need_mount_ii)
+        umount (mountpoint_tg);
+
+    if (auto2_ig)
+        printf ("\n");
+    else
+        win_close (&win_ri);
 
     if (do_autoprobe_ii)
         mod_autoload ();
