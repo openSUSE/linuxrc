@@ -50,6 +50,7 @@ typedef struct file_s {
   } is; 
 } file_t;
 
+file_t *file_getentry(file_t *f, char *key);
 file_t *file_read_file(char *name);
 void file_free_file(file_t *file);
 
