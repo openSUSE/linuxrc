@@ -952,11 +952,13 @@ static int inst_commit_install (void)
             !strncasecmp (root_ti, "reboot", 6) ||
             reboot_ig)
             {
+#ifndef __PPC__
             if(!auto_ig) {
               disp_clear_screen();
               util_disp_init();
               dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
             }
+#endif
             reboot (RB_AUTOBOOT);
             rc_ii = -1;
             }
@@ -980,8 +982,10 @@ static int inst_commit_install (void)
                 else
                     if(!auto2_ig)
                         {
+#ifndef __PPC__
                         util_disp_init();
                         dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
+#endif
                         }
                 }
             }

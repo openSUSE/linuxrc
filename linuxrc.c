@@ -104,8 +104,11 @@ int main (int argc, char **argv, char **env)
             deb_int (rc_ii);
         }
 #endif
+        else
+             rc_ii = 99;
 
-        if (!(auto_ig || demo_ig || auto2_ig) || rc_ii)
+        if (rc_ii)
+// was:       if (!(auto_ig || demo_ig || auto2_ig) || rc_ii)
             {
             util_disp_init();
             lxrc_main_menu ();
