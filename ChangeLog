@@ -1,3 +1,6 @@
+9/5/2003:	v1.4.48
+	- copy 'part.info' file from install medium
+
 24/4/2003:	v1.4.47
 	- live eval changes
 	- added 'idescsi' parameter: use ide-scsi module for cdr/cdrw drives
