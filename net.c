@@ -133,11 +133,11 @@ int net_config()
 
   /* If we use VNC or ssh install, ask for the login password */
   if (config.vnc && config.win && !config.net.vncpassword) {
-    rc = dia_input2(TXT_VNC_PASSWORD, &config.net.vncpassword, 20, 1);
+    rc = dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1);
     /* if(rc == ESCAPE) return -1; */
   }
   if (config.usessh && config.win && !config.net.sshpassword) {
-    rc = dia_input2(TXT_SSH_PASSWORD, &config.net.sshpassword, 20, 1);
+    rc = dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
   }
 
 
