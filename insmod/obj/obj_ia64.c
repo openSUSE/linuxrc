@@ -915,6 +915,8 @@ arch_apply_relocation(struct obj_file *f,
 	    v = ifile->bss - v;
 	else if (targsec->header.sh_flags & SHF_EXECINSTR)
 	    v = ifile->text - v;
+	else if (targsec->header.sh_type == SHT_IA_64_UNWIND)
+	    v = v - ifile->text;
 	else
 	    v = ifile->data - v;
 	if (r_info == R_IA64_SEGREL32LSB)
