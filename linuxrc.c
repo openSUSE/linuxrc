@@ -38,6 +38,8 @@
 #include "linuxrc.h"
 #include "auto2.h"
 
+#include "multiple_info.h"
+
 extern int  insmod_main        (int argc, char **argv);
 extern int  rmmod_main         (int argc, char **argv);
 extern void cardmgr_main       (int argc, char **argv);
@@ -453,10 +455,14 @@ static void lxrc_init (void)
 
     util_print_banner ();
 
-    /* note: for auto2, file_read_info() is called inside auto2_init() */
-    if (auto_ig)
-        file_read_info ();
 
+    /* note: for auto2, file_read_info() is called inside auto2_init() */
+    if (auto_ig) 
+        {
+	rename_info_file ();
+        file_read_info ();
+        }
+	
     if (!auto2_ig && language_ig == LANG_UNDEF)
         set_choose_language ();
 
