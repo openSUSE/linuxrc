@@ -175,6 +175,15 @@ void auto2_scan_hardware(char *log_file)
       has_kbd_ig = TRUE;
       j++;
       if(hd->bus == bus_usb) ju++;
+      switch(hd_cpu_arch(hd_data)) {
+        case arch_intel:
+        case arch_alpha:
+          strcpy(xkbmodel_tg, "pc104");
+          break;
+        case arch_ppc:
+          strcpy(xkbmodel_tg, hd->bus == bus_ps2 ? "pc104" : "macintosh");
+          break;
+      }
     }
   }
 

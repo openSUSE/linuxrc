@@ -223,3 +223,4 @@ extern char            *usb_mods_ig;
 extern int             reboot_ig;
 extern int             found_suse_cd_ig;
 extern int             do_disp_init_ig;
+extern char            xkbmodel_tg [20];

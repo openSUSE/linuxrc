@@ -81,6 +81,7 @@ static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
 static const char  *file_txt_usb_tm            = "USB:";
 static const char  *file_txt_xserver_tm        = "XServer:";
 static const char  *file_probe_tm              = "probe:";
+static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
@@ -255,6 +256,7 @@ void file_write_yast_info (void)
       char *s = auto2_xserver();
       if(s) fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
     }
+    if(*xkbmodel_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbmodel_tm, xkbmodel_tg);
     {
       char *s = getenv("probe");
       if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);
