@@ -1353,7 +1353,7 @@ void file_write_install_inf(char *dir)
     }
     file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, netdevice_tg);
-    if(config.manual < 2 && !config.net.unique_id) get_net_unique_id();
+    if(config.manual < 2) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
     file_write_inet(f, key_ip, &config.net.hostname);
