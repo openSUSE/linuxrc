@@ -59,6 +59,7 @@ static void mod_delete_module(void);
 static int mod_load_pcmcia(void);
 static int mod_pcmcia_chipset(void);
 
+static int mod_cmp(char *str1, char *str2);
 
 /*
  * return:
@@ -213,7 +214,7 @@ module_t *mod_get_entry(char *name)
   if(!name) return NULL;
 
   for(ml = config.module.list; ml; ml = ml->next) {
-    if(!strcmp(ml->name, name)) break;
+    if(!mod_cmp(ml->name, name)) break;
   }
 
   return ml;
@@ -601,7 +602,7 @@ int mod_is_loaded(char *module)
   f0 = file_read_file("/proc/modules", kf_none);
 
   for(f = f0; f; f = f->next) {
-    if(!strcmp(f->key_str, module)) break;
+    if(!mod_cmp(f->key_str, module)) break;
   }
 
   file_free_file(f0);
@@ -1056,6 +1057,29 @@ void mod_disk_text(char *buf, int type)
   }
 
   strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
+}
+
+
+/*
+ * Compare module names.
+ */
+int mod_cmp(char *str1, char *str2)
+{
+  char *s;
+  int i;
+
+  str1 = strdup(str1);
+  str2 = strdup(str2);
+
+  for(s = str1; *s; s++) if(*s == '-') *s = '_';
+  for(s = str2; *s; s++) if(*s == '-') *s = '_';
+
+  i = strcmp(str1, str2);  
+
+  free(str1);
+  free(str2);
+
+  return i;
 }
 
 
