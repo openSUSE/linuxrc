@@ -55,6 +55,7 @@ static void auto2_progress(char *pos, char *msg);
 #ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
 #endif
+static void load_storage_mods();
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -138,6 +139,7 @@ void auto2_scan_hardware(char *log_file)
   int j, ju, k, with_usb;
   sys_info_t *st;
   slist_t *usb_modules = NULL;
+  int storage_loaded = 0;
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -162,6 +164,9 @@ void auto2_scan_hardware(char *log_file)
   hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL);
 
   if(hd_usb) {
+    load_storage_mods();
+    storage_loaded = 1;
+
     printf("Activating usb devices...");
     hd_data->progress = NULL;
 
@@ -196,6 +201,8 @@ void auto2_scan_hardware(char *log_file)
   hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL);
 
   if(hd_fw) {
+    if(!storage_loaded) load_storage_mods();
+
     printf("Activating ieee1394 devices...");
     fflush(stdout);
 
@@ -1160,5 +1167,13 @@ int auto2_ask_for_modules(int prompt, char *type)
 }
 #endif
 
+
+void load_storage_mods()
+{
+  if(!config.scsi_before_usb) return;
+
+  config.activate_storage = 1;
+  auto2_activate_devices(bc_storage, 0);
+}
 
 #endif	/* USE_LIBHD */

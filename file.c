@@ -191,7 +191,8 @@ static struct {
   { key_comment,        "#"                },
   { key_kbdtimeout,     "KBDTimeout"       },
   { key_brokenmodules,  "BrokenModules"    },
-  { key_testpivotroot,  "_TestPivotRoot"   }
+  { key_testpivotroot,  "_TestPivotRoot"   },
+  { key_scsibeforeusb,  "SCSIBeforeUSB"    }
 };
 
 static struct {
@@ -989,6 +990,10 @@ void file_do_info(file_t *f0)
         config.module.initrd = slist_split(',', f->value);
         break;
 
+      case key_scsibeforeusb:
+        if(f->is.numeric) config.scsi_before_usb = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1122,7 +1127,7 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_cdrom, config.cdrom);
   if(
-    config.insttype == inst_net &&
+    (config.insttype == inst_net || (config.vnc || config.usessh)) &&
     *netdevice_tg &&
     (s = net_if2module(netdevice_tg))
   ) {

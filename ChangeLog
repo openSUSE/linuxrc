@@ -1,3 +1,8 @@
+7/9/2002:	v1.4.23
+	- added option to force loading scsi modules before usb mods
+	  (in case of scsi device naming problems)
+	- write 'alias' entry for vnc
+
 6/9/2002:	v1.4.22
 	- better usb cdrom handling (#18583, #19004)
 	- no pcmcia version mismatch message
