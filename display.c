@@ -491,7 +491,7 @@ void disp_restore_area (window_t *win_prr, int mode_iv)
                 fflush (stdout);
 
                 if (x_start_ii % 2)
-                    usleep (1000);
+                    usleep (10000);
                 }
             while (!ready_ii);
             break;
