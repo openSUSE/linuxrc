@@ -82,6 +82,6 @@ extern void disp_save_area      (window_t *win_prr);
 extern void disp_restore_area   (window_t *win_prr, int mode_iv);
 extern void disp_flush_area     (window_t *win_prr);
 extern void disp_refresh_char   (int x_iv, int y_iv);
-extern void disp_set_display    (int type_iv);
+extern void disp_set_display    (void);
 extern void disp_restore_screen (void);
 extern void disp_clear_screen   (void);

@@ -933,7 +933,6 @@ int inst_execute_yast()
 #endif
 
   lxrc_set_modprobe("/etc/nothing");
-  do_disp_init_ig = TRUE;
 
   /* Redraw erverything and go back to the main menu. */
   config.redraw_menu = 1;

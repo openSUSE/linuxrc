@@ -166,6 +166,7 @@ typedef struct {
   unsigned initrd_has_ldso:1;	/* instsys contains a dynamic linker */
   unsigned suppress_warnings:1;	/* show less warning dialogs */
   unsigned is_iseries:1;	/* set if we run on an iSeries machine */
+  unsigned win:1;		/* set if we are drawing windows */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -174,13 +175,15 @@ typedef struct {
   char *infofile;		/* 'info' file name */
   char *infoloaded;		/* actual 'info' file that was loaded */
   char *stderr_name;		/* stderr device name */
+  int color;			/* color scheme: 0-3: undef, mono, color, alternate */
+  enum langid_t language;	/* currently selected language */
+  char *keymap;			/* current keymap */
 } config_t;
 
 config_t config;
 
 extern int             max_x_ig;
 extern int             max_y_ig;
-extern enum langid_t   language_ig;
 extern colorset_t     *colors_prg;
 extern struct in_addr  ipaddr_rg;
 extern struct in_addr  netmask_rg;
@@ -205,7 +208,6 @@ extern char            scsi_tg [20];
 extern char            net_tg [20];
 extern char            netdevice_tg [20];
 extern char            cdrom_tg [20];
-extern char            keymap_tg [30];
 extern int             bootmode_ig;
 extern int             pcmcia_chip_ig;
 extern uint64_t        memory_ig;
@@ -216,7 +218,6 @@ extern int             explode_win_ig;
 extern int             auto_ig;
 extern int             demo_ig;
 extern int             auto2_ig;
-extern int             color_ig;
 extern int             nfsport_ig;
 extern char            machine_name_tg [100];
 extern char            domain_name_tg [100];
@@ -248,7 +249,6 @@ extern int             usb_ig;
 extern char            *usb_mods_ig;
 extern int             reboot_ig;
 extern int             found_suse_cd_ig;
-extern int             do_disp_init_ig;
 extern char            xkbrules_tg [20];
 extern char            xkbmodel_tg [20];
 extern char            xkblayout_tg [20];

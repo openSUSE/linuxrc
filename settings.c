@@ -48,71 +48,71 @@ typedef struct
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_de
-{ LANG_de, "Deutsch", "de-lat1-nd", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "de_DE", "german" },
+{ lang_de, "Deutsch", "de-lat1-nd", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "de_DE", "german" },
 #endif
 
 #ifdef TRANS_en
-{ LANG_en, "English", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "en_US", "english" },
+{ lang_en, "English", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "en_US", "english" },
 #endif
 
 #ifdef TRANS_es
-{ LANG_es, "Español", "es", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
+{ lang_es, "Español", "es", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
 #endif
 
 #ifdef TRANS_fr
-{ LANG_fr, "Français", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
+{ lang_fr, "Français", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
 #endif
 
 #ifdef TRANS_br
-{ LANG_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
+{ lang_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
 #endif
 
 #ifdef TRANS_el
-{ LANG_el, "Hellenic", "gr", "lat7-16.psfu", "trivial", "lat7u.uni", 1, 1, "el_EL", "greek" },
+{ lang_el, "Hellenic", "gr", "lat7-16.psfu", "trivial", "lat7u.uni", 1, 1, "el_EL", "greek" },
 #endif
 
 #ifdef TRANS_id
-{ LANG_id, "Indonesia", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "de_DE", "indonesian" },
+{ lang_id, "Indonesia", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "de_DE", "indonesian" },
 #endif
 
 #ifdef TRANS_it
-{ LANG_it, "Italiano", "it", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
+{ lang_it, "Italiano", "it", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
 #endif
 
 #ifdef TRANS_hu
-{ LANG_hu, "Magyar", "hu", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
+{ lang_hu, "Magyar", "hu", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
 #endif
 
 #ifdef TRANS_nl
-{ LANG_nl, "Nederlands", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "nl_NL", "dutch" },
+{ lang_nl, "Nederlands", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "nl_NL", "dutch" },
 #endif
 
 #ifdef TRANS_pl
-{ LANG_pl, "Polski", "Pl02", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "pl_PL", "polish" },
+{ lang_pl, "Polski", "Pl02", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "pl_PL", "polish" },
 #endif
 
 #ifdef TRANS_pt
-{ LANG_pt, "Português", "pt-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
+{ lang_pt, "Português", "pt-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
 #endif
 
 #ifdef TRANS_pt_BR
-{ LANG_pt_BR, "Português Brasileiro", "br-abnt2", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
+{ lang_pt_BR, "Português Brasileiro", "br-abnt2", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
 #endif
 
 #ifdef TRANS_ro
-{ LANG_ro, "Romania", "us", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "en_US", "romanian" },
+{ lang_ro, "Romania", "us", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "en_US", "romanian" },
 #endif
 
 #ifdef TRANS_ru
-{ LANG_ru, "Russian", "ru1", "Cyr_a8x16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU.KOI8-R", "russian" },
+{ lang_ru, "Russian", "ru1", "Cyr_a8x16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU.KOI8-R", "russian" },
 #endif
 
 #ifdef TRANS_cs
-{ LANG_cs, "Cestina", "cz-us-qwertz", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
+{ lang_cs, "Cestina", "cz-us-qwertz", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
 #endif
 
 #ifdef TRANS_sk
-{ LANG_sk, "Slovencina", "sk-qwerty", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
+{ lang_sk, "Slovencina", "sk-qwerty", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
 #endif
 };
 #endif
@@ -272,19 +272,33 @@ static void set_font(char *font, char *map, char *unimap);
 
 enum langid_t set_langidbyname(char *name)
 {
-  int i;
+  int i, l;
 
   for(i = 0; i < NR_LANGUAGES; i++) {
-    if(!strcasecmp(set_languages_arm[i].yastcode, name))
+    if(!strcasecmp(set_languages_arm[i].yastcode, name)) {
       return set_languages_arm[i].id;
+    }
   }
 
   for(i = 0; i < NR_LANGUAGES; i++) {
-    if(!strcasecmp(set_languages_arm[i].locale, name))
+    if(!strcasecmp(set_languages_arm[i].locale, name)) {
       return set_languages_arm[i].id;
+    }
   }
 
-  return LANG_UNDEF;
+  l = strlen(name);
+  if(l) {
+    for(i = 0; i < NR_LANGUAGES; i++) {
+      if(
+        !strncasecmp(set_languages_arm[i].locale, name, l) &&
+        set_languages_arm[i].locale[l] == '_'
+      ) {
+        return set_languages_arm[i].id;
+      }
+    }
+  }
+
+  return lang_undef;
 }
 
 
@@ -323,13 +337,6 @@ void set_choose_display (void)
     int      choice_ii;
     int      width_ii = 30;
 
-
-    if (auto_ig || auto2_ig)
-        {
-        disp_set_display (color_ig ? 1 : 2);
-        return;
-        }
-
     util_create_items (items_ari, 2, width_ii);
     strcpy (items_ari [0].text, txt_get (TXT_COLOR_DISPLAY));
     strcpy (items_ari [1].text, txt_get (TXT_MONO_DISPLAY));
@@ -337,7 +344,8 @@ void set_choose_display (void)
     util_center_text (items_ari [1].text, width_ii);
 
     choice_ii = dia_menu (txt_get (TXT_CHOOSE_DISPLAY), items_ari, 2, 1);
-    disp_set_display (choice_ii);
+    config.color = choice_ii ? choice_ii == 1 ? 2 : 1 : 3;
+    disp_set_display ();
 
     util_free_items (items_ari, 2);
     }
@@ -348,7 +356,6 @@ void set_choose_keytable (int always_show)
     item_t  items_ari [NR_KEYMAPS];
     int     i_ii;
     int     width_ii = 24;
-    char    command_ti [MAX_FILENAME];
     int     keymaps = NR_KEYMAPS;
     keymap_t *keymap = set_keymaps_arm;
     int i, cur_lang, def_keymap_idx;
@@ -363,7 +370,7 @@ void set_choose_keytable (int always_show)
 
     /* note that this works only for iaxx, axp and non-mac ppc */
     cur_lang = set_get_current_language();
-    def_keymap = *keymap_tg ? keymap_tg : set_languages_arm[cur_lang - 1].keymap;
+    def_keymap = config.keymap ?: set_languages_arm[cur_lang - 1].keymap;
 
     def_keymap_idx = KEYMAP_DEFAULT;
     for(i = 0; i < keymaps; i++) {
@@ -373,15 +380,13 @@ void set_choose_keytable (int always_show)
       }
     }
 
-    if (*keymap_tg && !always_show)
+    if (config.keymap && !always_show)
         {
-        sprintf (command_ti, "loadkeys %s.map", keymap_tg);
-        system (command_ti);
+        set_activate_keymap(config.keymap);
         return;
         }
 
-    if ((auto2_ig || auto_ig) && !always_show)
-        return;
+    if (!config.win && !always_show) return;
 
     util_create_items (items_ari, keymaps, width_ii);
     for (i_ii = 0; i_ii < keymaps; i_ii++)
@@ -393,26 +398,20 @@ void set_choose_keytable (int always_show)
     i_ii = dia_menu (txt_get (TXT_CHOOSE_KEYMAP), items_ari, keymaps, 1 + def_keymap_idx);
     util_free_items (items_ari, keymaps);
 
-    if (i_ii)
-        {
-        sprintf (command_ti, "loadkeys %s.map",
-                 keymap [i_ii - 1].mapname);
-        system (command_ti);
-        strcpy (keymap_tg, keymap [i_ii - 1].mapname);
-        }
+    if (i_ii) set_activate_keymap(keymap[i_ii - 1].mapname);
     }
 
 
 /*
- * Set font and load keymap.
+ * Set language and activate font.
  */
 void set_activate_language(enum langid_t lang_id)
 {
   int i;
   language_t *lang;
-  char cmd[MAX_FILENAME];
+//  char cmd[MAX_FILENAME];
 
-  language_ig = lang_id;
+  config.language = lang_id;
   i = set_get_current_language();
 
   if(i > 0) {
@@ -422,11 +421,31 @@ void set_activate_language(enum langid_t lang_id)
       set_font(lang->font, lang->mapscreen, NULL);
     }
 
+#if 0
     /* Maybe we should always load the keymap??? */
     if(demo_ig && !serial_ig) {
-      sprintf(cmd, "loadkeys %s.map", strcpy(keymap_tg, lang->keymap));
-      system(cmd);
+      set_activate_keymap(lang->keymap);
     }
+#endif
+  }
+}
+
+
+/*
+ * Load keymap.
+ */
+void set_activate_keymap(char *keymap)
+{
+  char cmd[MAX_FILENAME];
+
+  /* keymap might be config.keymap, so be careful... */
+  keymap = keymap ? strdup(keymap) : NULL;
+
+  if(config.keymap) free(config.keymap);
+
+  if((config.keymap = keymap)) {
+    sprintf(cmd, "loadkeys %s.map", keymap);
+    system (cmd);
   }
 }
 
@@ -447,9 +466,7 @@ void set_choose_language()
      util_fill_string(items[i].text, width);
   }
 
-  if(!auto_ig && !auto2_ig) {
-    current = dia_menu(txt_get(TXT_CHOOSE_LANGUAGE), items, NR_LANGUAGES, current);
-  }
+  current = dia_menu(txt_get(TXT_CHOOSE_LANGUAGE), items, NR_LANGUAGES, current);
 
   if(current > 0) set_activate_language(set_languages_arm[current - 1].id);
 
@@ -609,7 +626,7 @@ int set_get_current_language()
   int i;
 
   for(i = 0; i < NR_LANGUAGES; i++) {
-    if(set_languages_arm[i].id == language_ig) return i + 1;
+    if(set_languages_arm[i].id == config.language) return i + 1;
   }
 
   return LANG_DEFAULT + 1;
@@ -667,13 +684,15 @@ static void set_font(char *font, char *map, char *unimap)
   if(unimap) sprintf(cmd_map, " -u %s", unimap);
   strcat(strcat(cmd, cmd_map), cmd_unimap);
 
+  fprintf(stderr, "setfont %s (map %s)\n", font, map);
+
   has_fb = 0;
   if((f = fopen("/dev/fb", "r"))) {
     has_fb = 1;
     fclose(f);
   }
 
-  deb_int(has_fb);
+//  deb_int(has_fb);
 
   max_cons = has_fb ? 6 : 1;
 
@@ -694,6 +713,6 @@ static void set_font(char *font, char *map, char *unimap)
   if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
 #endif
 
-  deb_int(err);
+  if(err) deb_int(err);
 }
 

@@ -57,13 +57,6 @@ static int auto2_has_i2o(void);
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, int mod_type);
 
-int auto2_init_settings()
-{
-  disp_set_display(1);
-
-  return 0;
-}
-
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -224,7 +217,10 @@ void auto2_scan_hardware(char *log_file)
         if(di->kbd.XkbModel) strcpy(xkbmodel_tg, di->kbd.XkbModel);
         if(di->kbd.XkbLayout) strcpy(xkblayout_tg, di->kbd.XkbLayout);
 	/* UNTESTED !!! */
-        if(di->kbd.keymap) strcpy(keymap_tg, di->kbd.keymap);
+        if(di->kbd.keymap) {
+          if(config.keymap) free(config.keymap);
+          config.keymap = strdup(di->kbd.keymap);
+        }
       }
       di = hd_free_driver_info(di);
     }
@@ -643,7 +639,7 @@ int auto2_init()
 
       util_manual_mode();
       disp_cursor_off();
-      disp_set_display(1);
+      disp_set_display();
       util_print_banner();
 
       sprintf(s, txt_get(TXT_FOUND_PCMCIA), "i82365");
@@ -1258,7 +1254,7 @@ int auto2_ask_for_modules(int prompt, int mod_type)
 
   util_manual_mode();
   disp_cursor_off();
-  disp_set_display(1);
+  disp_set_display();
   util_print_banner();
 
   if(prompt) {

@@ -326,7 +326,7 @@ void util_print_banner (void)
     char           text_ti [MAX_X];
     struct utsname utsinfo_ri;
 
-    if(auto2_ig) return;
+    if(!config.win) return;
 
     memset (&win_ri, 0, sizeof (window_t));
     win_ri.x_left = 1;
@@ -574,11 +574,21 @@ void util_disp_init()
 {
   int i_ii;
 
+  config.win = 1;
+
   for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
   disp_cursor_off();
   util_print_banner();
+}
 
-  do_disp_init_ig = FALSE;
+
+void util_disp_done()
+{
+  disp_clear_screen();
+  printf("\033c");
+  fflush(stdout);
+
+  config.win = 0;
 }
 
 
@@ -934,7 +944,7 @@ void util_status_info()
   s = inet_ntoa(plip_host_rg);
   sprintf(l[lc++], "plip host = %s", s);
 
-  sprintf(l[lc++], "language = %d, keymap = \"%s\"", language_ig, keymap_tg);
+  sprintf(l[lc++], "language = %d, keymap = \"%s\"", config.language, config.keymap ?: "");
 
   sprintf(l[lc++], "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
 

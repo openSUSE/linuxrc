@@ -155,10 +155,7 @@ void disp_init (void)
         graphics_sg.block    = 177;
         }
 
-    if (auto_ig)
-        colors_prg = &disp_vgacolors_rm;
-    else
-        colors_prg = &disp_mono_rm;
+    colors_prg = &disp_vgacolors_rm;
 
     disp_screen_aprm = malloc (sizeof (character_t *) * max_y_ig);
     for (i_ii = 0; i_ii < max_y_ig; i_ii++)
@@ -544,20 +541,21 @@ void disp_refresh_char (int x_iv, int y_iv)
     }
 
 
-void disp_set_display (int type_iv)
-    {
-    if (type_iv == 1)
-        colors_prg = &disp_vgacolors_rm;
-    else if (type_iv == 2)
-        colors_prg = &disp_mono_rm;
-    else
-        colors_prg = &disp_alternate_rm;
-
-    if (type_iv == 2)
-        color_ig = FALSE;
-    else
-        color_ig = TRUE;
-    }
+void disp_set_display()
+{
+  switch(config.color) {
+    case 1:
+      colors_prg = &disp_mono_rm;
+      break;
+    case 3:
+      colors_prg = &disp_alternate_rm;
+      break;
+    default:
+      colors_prg = &disp_vgacolors_rm;
+      config.color = 2;
+      break;
+  }
+}
 
 
 void disp_restore_screen (void)

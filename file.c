@@ -29,6 +29,7 @@
 #include "pcmcia.h"
 #endif
 #include "rootimage.h"
+#include "display.h"
 
 #define YAST_INF_FILE		"/etc/yast.inf"
 #define INSTALL_INF_FILE	"/etc/install.inf"
@@ -129,8 +130,10 @@ static struct {
   { "yes",       1                  },
   { "j",         1                  },	// keep for compatibility?
   { "default",   1                  },
-  { "Mono",      0                  },
-  { "Color",     1                  },
+  { "Undef",     0                  },
+  { "Mono",      1                  },
+  { "Color",     2                  },
+  { "Alt"  ,     3                  },
   { "Reboot",    1                  },
   { "Floppy",    BOOTMODE_FLOPPY    },
   { "CD",        BOOTMODE_CD        },
@@ -306,7 +309,7 @@ int file_read_info()
   }
 
   if(file) {
-    fprintf(stderr, "got info from: %s\n", file);
+    fprintf(stderr, "got info from %s\n", file);
   }
 
   config.infoloaded = strdup(file ?: "");
@@ -325,7 +328,9 @@ char *file_read_info_file(char *file, char *file2)
   int i, mounted = 0;
   file_t *f0 = NULL, *f;
 
+#ifdef DEBUG_FILE
   fprintf(stderr, "looking for info file: %s\n", file);
+#endif
 
   if(!strcmp(file, "cmdline")) {
     f0 = file_read_cmdline();
@@ -381,16 +386,17 @@ char *file_read_info_file(char *file, char *file2)
 
       case key_language:
         i = set_langidbyname(f->value);
-        if(i != LANG_UNDEF) language_ig = i;
+        if(i) config.language = i;
         break;
 
       case key_display:
-        color_ig = f->nvalue;
+        config.color = f->nvalue;
+        if(config.color) disp_set_display();
         break;
 
       case key_keytable:
-        strncpy(keymap_tg, f->value, sizeof keymap_tg);
-        keymap_tg[sizeof keymap_tg - 1] = 0;
+        if(config.keymap) free(config.keymap);
+        config.keymap = *f->value ? strdup(f->value) : NULL;
         break;
 
       case key_bootmode:
@@ -508,7 +514,6 @@ char *file_read_info_file(char *file, char *file2)
 int file_read_yast_inf()
 {
   int root = 0;
-  char cmd[MAX_FILENAME];
   file_t *f0, *f;
 
   f0 = file_read_file(YAST_INF_FILE);
@@ -534,15 +539,11 @@ int file_read_yast_inf()
         break;
 
       case key_keytable:
-        strcpy(keymap_tg, f->value);
-        sprintf(cmd, "loadkeys %s.map", keymap_tg);
-        system(cmd);
-        do_disp_init_ig = TRUE;
+        set_activate_keymap(*f->value ? f->value : NULL);
         break;
 
       case key_language:
         set_activate_language(set_langidbyname(f->value));
-        do_disp_init_ig = TRUE;
         break;
 
       case key_rebootmsg:
@@ -604,15 +605,15 @@ void file_write_install_inf(char *dir)
     return;
   }
 
-  if(language_ig != LANG_UNDEF) set_write_info(f);
+  if(config.language) set_write_info(f);
 
   // is that really true???
   file_write_num(f, key_sourcemounted, ramdisk_ig ? 0 : 1);
 
-  file_write_sym(f, key_display, "Mono", colors_prg->has_colors ? 1 : 0);
+  file_write_sym(f, key_display, "Undef", config.color);
 
-  if(*keymap_tg && (!auto2_ig || yast_version_ig == 1)) {
-    file_write_str(f, key_keytable, keymap_tg);
+  if(config.keymap && (!auto2_ig || yast_version_ig == 1)) {
+    file_write_str(f, key_keytable, config.keymap);
   }
 
   if(*cdrom_tg) file_write_str(f, key_cdrom, cdrom_tg);

@@ -100,7 +100,7 @@ static struct {
 
 typedef enum {
   lx_auto, lx_auto2, lx_noauto2, lx_y2autoinst, lx_demo, lx_eval, lx_reboot,
-  lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, lx_french, lx_color,
+  lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, /* lx_french, */ /* lx_color, */
   lx_rescue, lx_nopcmcia, lx_debug
 } lx_param_t;
 
@@ -119,8 +119,8 @@ static struct {
   { "yast2",      lx_yast2      },
   { "loadnet",    lx_loadnet    },
   { "loaddisk",   lx_loaddisk   },
-  { "french",     lx_french     },
-  { "color",      lx_color      },
+//  { "french",     lx_french     },
+//  { "color",      lx_color      },
   { "rescue",     lx_rescue     },
   { "nopcmcia",   lx_nopcmcia   },
   { "debug",      lx_debug      }
@@ -169,7 +169,6 @@ int main(int argc, char **argv, char **env)
     if((action_ig & ACT_RESCUE)) {
       util_manual_mode();
       util_disp_init();
-      util_print_banner();
       set_choose_keytable(1);
     }
     err = inst_auto2_install();
@@ -498,7 +497,7 @@ void lxrc_init()
 
   if((s = getenv("lang"))) {
     i = set_langidbyname(s);
-    if(i != LANG_UNDEF) language_ig = i;
+    if(i) config.language = i;
   }
 
   ft = file_get_cmdline(key_autoyast);
@@ -579,13 +578,17 @@ void lxrc_init()
               action_ig |= ACT_LOAD_DISK;
               break;
 
+#if 0	/* obsolete */
             case lx_french:
-              language_ig = LANG_fr;
+              config.language = lang_fr;
               break;
+#endif
 
+#if 0	/* obsolete */
             case lx_color:
-              color_ig = TRUE;
+              config.color = 2;
               break;
+#endif
 
             case lx_rescue:
               action_ig |= ACT_RESCUE;
@@ -636,23 +639,14 @@ void lxrc_init()
 
   kbd_init();
   util_redirect_kmsg();
-  disp_init ();
-  if(splash_active) color_ig = TRUE;
-  if(color_ig) disp_set_display(color_ig);
+  disp_init();
 
   auto2_chk_expert();
 
-#ifdef USE_LIBHD
   printf("\033[9;0]");		/* screen saver off */
   fflush(stdout);
-#endif
 
-  if(!auto2_ig) {
-    for(i = 1; i < max_y_ig; i++) printf("\n");
-    disp_cursor_off();
-  }
-
-  info_init ();
+  info_init();
 
   // ???
   if(memory_ig < MEM_LIMIT_YAST2) yast_version_ig = 1;
@@ -660,8 +654,6 @@ void lxrc_init()
   if(memory_ig > (yast_version_ig == 1 ? MEM_LIMIT_RAMDISK_YAST1 : MEM_LIMIT_RAMDISK_YAST2)) {
     force_ri_ig = TRUE;
   }
-
-  if((guru_ig & 8)) force_ri_ig = FALSE;
 
   lxrc_memcheck();
 
@@ -675,35 +667,30 @@ void lxrc_init()
   if(auto2_ig) {
     if(auto2_init()) {
       auto2_ig = TRUE;
-      auto2_init_settings();
     } else {
       deb_msg("Automatic setup not possible.");
 
       util_manual_mode();
-      disp_cursor_off();
-      disp_set_display(1);
+      disp_set_display();
+      util_disp_init();
 
 #ifdef __i386__
-      util_print_banner();
       i = 0;
       j = 1;
       if(cdrom_drives && !(action_ig & ACT_DEMO)) {
         sprintf(buf, txt_get(TXT_INSERT_CD), 1);
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
-          printf("\033c"); fflush(stdout);
-          disp_clear_screen();
+          util_disp_done();
           i = auto2_find_install_medium();
         }
       }
       if(i) {
         auto2_ig = TRUE;
-        auto2_init_settings();
       }
       else {
         yast_version_ig = 0;
-        disp_cursor_off();
-        util_print_banner();
+        util_disp_init();
         if(j) {
           sprintf(buf,
             "Could not find the SuSE Linux %s CD.\n\nActivating manual setup program.\n",
@@ -718,30 +705,37 @@ void lxrc_init()
   }
 #endif
 
-  util_print_banner();
-
-  /* note: for auto2, file_read_info() is called inside auto2_init() */
+  /* note: for auto2, file_read_info() is called in auto2_init() */
   if(auto_ig) {
     rename_info_file();
     file_read_info();
   }
 
-  /* For 'manual'. Is that useful anyway? */
+  /* for 'manual' */
   if(!config.infoloaded) file_read_info();
 	
-  if((!auto2_ig && language_ig == LANG_UNDEF) || (auto2_ig && demo_ig)) {
-    set_choose_language ();
+  if(!auto2_ig) {
+    util_disp_init();
+  }
+
+  if(!config.language && config.win) {
+    set_choose_language();
+  } else {
+    set_activate_language(config.language);
   }
 
   util_print_banner();
 
-  if(!color_ig)	{	/* if it hasn't already been set */
+  if(!config.color) {
+    int old_win = config.win;
+
+    if(!old_win) util_disp_init();
     set_choose_display();
-    util_print_banner();
+    if(old_win) util_print_banner(); else util_disp_done();
   }
 
   if(!(serial_ig || config.is_iseries)) {
-    set_choose_keytable (0);
+    set_choose_keytable(0);
   }
 
   util_update_kernellog();

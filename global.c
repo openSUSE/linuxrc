@@ -14,14 +14,13 @@
 int             max_x_ig = X_DEFAULT;
 int             max_y_ig = Y_DEFAULT;
 
-enum langid_t   language_ig = LANG_UNDEF;
-
 config_t config = {
 #if defined(__s390__) || defined(__s390x__)
-  initrd_has_ldso: 1
+  initrd_has_ldso: 1,
 #else
-  initrd_has_ldso: 0
+  initrd_has_ldso: 0,
 #endif
+  color:2			/* default: 'color'; cf. disp_init(), too! */
 };
 
 colorset_t     *colors_prg;
@@ -48,7 +47,6 @@ char            scsi_tg [20];
 char            net_tg [20];
 char            netdevice_tg [20] = "eth0";
 char            cdrom_tg [20];
-char            keymap_tg [30];
 int             bootmode_ig = BOOTMODE_CD;
 int             pcmcia_chip_ig = 0;
 uint64_t        memory_ig = 8192000;
@@ -63,7 +61,6 @@ int             auto2_ig = TRUE;
 int             auto2_ig = FALSE;
 #endif
 int             demo_ig = FALSE;
-int             color_ig = FALSE;
 int             nfsport_ig = 0;
 char            machine_name_tg [100];
 char            domain_name_tg [100];
@@ -94,7 +91,6 @@ int             reboot_ig;
 int             usb_ig = 0;
 char            *usb_mods_ig = NULL;
 int             found_suse_cd_ig = FALSE;
-int             do_disp_init_ig = TRUE;
 char            xkbrules_tg [20] = "";
 char            xkbmodel_tg [20] = "";
 char            xkblayout_tg [20] = "";

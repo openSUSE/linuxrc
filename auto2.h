@@ -2,7 +2,6 @@ int auto2_mount_cdrom(char *device);
 int auto2_mount_harddisk(char *device);
 void auto2_scan_hardware(char *log_file);
 int auto2_init(void);
-int auto2_init_settings(void);
 void auto2_chk_expert(void);
 int auto2_pcmcia(void);
 int auto2_full_libhd(void);

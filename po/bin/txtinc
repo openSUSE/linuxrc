@@ -18,7 +18,7 @@ print W "static alltexts_t alltexts_arm [] = {\n";
 
 for ($i = 0 ; $i < @list; $i++) {
   print W "#ifdef TRANS_$list[$i]\n";
-  print W "  { LANG_$list[$i], LANG_ENTRY(txt_$list[$i]_atm) },\n";
+  print W "  { lang_$list[$i], LANG_ENTRY(txt_$list[$i]_atm) },\n";
   print W "#endif\n"
 }
 print W "};\n";
@@ -26,11 +26,12 @@ close W;
 
 open W, ">text_langids.h";
 print W "/*\n * This file is generated automatically. Editing it is pointless.\n */\n\n";
+print W "/* lang_undef _must_ be 0 */\n\n";
 print W "enum langid_t {\n";
 
-@list = ( "UNDEF", @ARGV );
+@list = ( "undef", @ARGV );
 for ($i = 0 ; $i < @list; $i++) {
-  print W "  LANG_$list[$i]";
+  print W "  lang_$list[$i]";
   print W $i + 1 == @list ? "\n" : ",\n";
 }
 print W "};\n";

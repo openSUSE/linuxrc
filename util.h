@@ -40,6 +40,7 @@ extern int  util_open_ftp          (char *server_tv);
 extern int  util_cd1_boot          (void);
 
 extern void util_disp_init         (void);
+extern void util_disp_done         (void);
 extern int  util_umount            (char *mountpoint);
 extern int  util_eject_cdrom       (char *dev);
 extern void util_manual_mode       (void);

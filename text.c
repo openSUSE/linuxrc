@@ -44,7 +44,7 @@ char *txt_get (enum textid_t id_iv)
 
 
     while (i_ii < NR_LANGUAGES && !found_ii)
-        if (alltexts_arm [i_ii].language == language_ig)
+        if (alltexts_arm [i_ii].language == config.language)
             found_ii = TRUE;
         else
             i_ii++;
