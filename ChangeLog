@@ -1,3 +1,9 @@
+11/1/2001:	v1.1.17.004
+	- driver update almost ready
+
+10/1/2001:	v1.1.17.003
+	- no reboot for PCMCIA
+
 9/1/2001:	v1.1.17.002
 	- fixed 5 min NFS timeout bug
 	- fixed rootimage loading

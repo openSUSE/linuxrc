@@ -46,6 +46,7 @@ static driver_info_t *x11_driver = NULL;
 static char *pcmcia_params = NULL;
 static int is_vaio = 0;
 
+static void auto2_check_cdrom_update(char *dev);
 static char *auto2_device_name(hd_t *hd);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_cdrom_dev(hd_t **);
@@ -109,7 +110,7 @@ int auto2_mount_cdrom(char *device)
   rc = mount(device, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
   if(!rc) {
     if((rc = inst_check_instsys())) {
-      fprintf(stderr, "Defective SuSE CD in %s\n", device);
+      fprintf(stderr, "%s is not a SuSE Installation CD.\n", device);
       umount(mountpoint_tg);
     } else {
       /*
@@ -118,10 +119,24 @@ int auto2_mount_cdrom(char *device)
       strcpy(cdrom_tg, device + sizeof "/dev/" - 1);
     }
   }
+  else {
+    fprintf(stderr, "%s does'nt have an ISO9660 file syetem.\n", device);
+  }
 
   return rc;
 }
 
+
+void auto2_check_cdrom_update(char *dev)
+{
+  int i;
+
+  i = mount(dev, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
+  if(!i) {
+    util_chk_driver_update(mountpoint_tg);
+    umount(mountpoint_tg);
+  }
+}
 
 /*
  * probe for installed hardware
@@ -310,9 +325,9 @@ hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd)
  * Look for a SuSE CD and mount it.
  *
  * Returns:
- *   0: OK, CD was mounted
- *   1: no CD found
- *   2: CD found, but mount failed
+ *    0: OK, CD was mounted
+ *    1: no CD found
+ *   >1: CD found, but contiune the search
  *
  */
 int auto2_cdrom_dev(hd_t **hd0)
@@ -329,13 +344,26 @@ int auto2_cdrom_dev(hd_t **hd0)
       hd->detail->type == hd_detail_cdrom
     ) {
       ci = hd->detail->cdrom.data;
-      if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
-        fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
-        found_suse_cd_ig = TRUE;
-        /* CD found -> try to mount it */
-        i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
-        if(i == 0) break;
+
+      if(*cdrom_tg) {
+        i = 0;
       }
+      else {
+        if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
+          fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
+          found_suse_cd_ig = TRUE;
+          /* CD found -> try to mount it */
+          i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
+        }
+      }
+
+      if(i && !*driver_update_dir && ci->iso9660.ok) {
+        auto2_check_cdrom_update(hd->unix_dev_name);
+      }
+
+      if(yast2_update_ig && !*driver_update_dir && i == 0) i = 3;
+
+      if(i == 0) break;
     }
   }
 
@@ -561,20 +589,21 @@ int auto2_init()
   deb_int(valid_net_config_ig);
 
   if(bootmode_ig == BOOTMODE_CD) {
+    *cdrom_tg = 0;
+
     deb_msg("Looking for a SuSE CD...");
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
       if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+      if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }
 
     for(last_idx = 0;;) {
-      if(i == 2) {		/* CD found, but mount failed */
-        deb_msg("So you don't have an intact SuSE CD.");
-      }
-
       /* i == 1 -> try to activate another storage device */
-      deb_msg("Ok, that didn't work; see if we can activate another storage device...");
+      if(i == 1) {
+        deb_msg("Ok, that didn't work; see if we can activate another storage device...");
+      }
 
       if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
         fprintf(stderr, "No further storage devices found; giving up.\n");
@@ -585,8 +614,14 @@ int auto2_init()
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
         if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
         if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+        if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
         return TRUE;
       }
+    }
+
+    if(*cdrom_tg) {
+      if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
+      return TRUE;
     }
   }
 
@@ -613,6 +648,7 @@ int auto2_init()
 
   if(!auto2_net_dev(&hd_devs)) {
     if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+    if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
     return TRUE;
   }
 
@@ -627,6 +663,7 @@ int auto2_init()
     fprintf(stderr, "Looking for a NFS/FTP server again...\n");
     if(!auto2_net_dev(&hd_devs)) {
       if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+      if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }
   }
