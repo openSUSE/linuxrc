@@ -192,7 +192,8 @@ static struct {
   { key_kbdtimeout,     "KBDTimeout"       },
   { key_brokenmodules,  "BrokenModules"    },
   { key_testpivotroot,  "_TestPivotRoot"   },
-  { key_scsibeforeusb,  "SCSIBeforeUSB"    }
+  { key_scsibeforeusb,  "SCSIBeforeUSB"    },
+  { key_hostip,         "HostIP"           }
 };
 
 static struct {
@@ -565,6 +566,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_ip:
+      case key_hostip:
         name2inet(&config.net.hostname, f->value);
         net_check_address2(&config.net.hostname, 0);
         break;
