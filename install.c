@@ -1434,7 +1434,6 @@ int inst_get_proxysetup()
   else {
     name2inet(&config.net.proxy, "");
     config.net.proxyport = 0;
-    config.net.proxyproto = 0;
   }
 
   return 0;

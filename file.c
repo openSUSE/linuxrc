@@ -235,6 +235,19 @@ static struct {
   { "cdrom",     inst_cdrom         }
 };
 
+
+file_t *file_getentry(file_t *f, char *key)
+{
+  if(key) {
+    for(; f; f = f->next) {
+      if(f->key_str && !strcmp(key, f->key_str)) return f;
+    }
+  }
+
+  return NULL;
+}
+
+
 char *file_key2str(file_key_t key)
 {
   int i;

@@ -1,3 +1,7 @@
+11/3/2003:	v1.4.45
+	- module unloading used to clear internal network/disk lists (#24606)
+	- keep proxy scheme (#23611)
+
 7/3/2003:	v1.4.44
 	- don't log to console (#24753)
 
