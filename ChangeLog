@@ -1,6 +1,7 @@
 19/7/2001:	v1.2.3
 	- added linuxrc_tiny: smaller linuxrc with some things dropped
 	  (to be used for bootdisks)
+	- mantel: don't clobber hwaddress when doing bootp
 
 11/7/2001:	v1.2.2
 	- LiveEval: set language even in auto2 mode
