@@ -813,57 +813,76 @@ void util_umount_driver_update()
 
 void util_status_info()
 {
-  char *l[13];
-  int i;
+  char *l[14];		/* WATCH this!!! */
+  int i, lc;
   char *s, t[100];
+  hd_data_t *hd_data;
+
+  hd_data = calloc(1, sizeof *hd_data);
+  hd_data->debug = 1;
+  hd_scan(hd_data);
 
   for(i = 0; i < sizeof l / sizeof *l; i++) {
     l[i] = calloc(256, 1);
   }
 
-  sprintf(l[0],
+  lc = 0;
+
+  if(hd_data->log) {
+    s = index(hd_data->log, '\n');
+    if(s) {
+      i = s - hd_data->log;
+      if(i > 255) i = 255;
+      strncpy(l[lc++], hd_data->log, i);
+    }
+  }
+
+  sprintf(l[lc++],
     "memory = %" PRIu64 ", bootmode = %d, net_config = 0x%x",
     memory_ig, bootmode_ig, valid_net_config_ig
   );
-  sprintf(l[1], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
-  sprintf(l[2], "driver_update_dir = \"%s\"", driver_update_dir);
+  sprintf(l[lc++], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
+  sprintf(l[lc++], "driver_update_dir = \"%s\"", driver_update_dir);
 
   strcpy(t, inet_ntoa(ipaddr_rg));
   s = inet_ntoa(network_rg);
-  sprintf(l[3], "ip = %s, network = %s", t, s);
+  sprintf(l[lc++], "ip = %s, network = %s", t, s);
 
   strcpy(t, inet_ntoa(broadcast_rg));
   s = inet_ntoa(netmask_rg);
-  sprintf(l[4], "broadcast = %s, netmask = %s", t, s);
+  sprintf(l[lc++], "broadcast = %s, netmask = %s", t, s);
 
   strcpy(t, inet_ntoa(gateway_rg));
   s = inet_ntoa(nameserver_rg);
-  sprintf(l[5], "gateway = %s, nameserver = %s", t, s);
+  sprintf(l[lc++], "gateway = %s, nameserver = %s", t, s);
 
   strcpy(t, inet_ntoa(nfs_server_rg));
   s = inet_ntoa(ftp_server_rg);
-  sprintf(l[6], "nfs server = %s, ftp server = %s", t, s);
+  sprintf(l[lc++], "nfs server = %s, ftp server = %s", t, s);
 
   s = inet_ntoa(plip_host_rg);
-  sprintf(l[7], "plip host = %s", s);
+  sprintf(l[lc++], "plip host = %s", s);
 
-  sprintf(l[8], "language = %d, keymap = \"%s\"", language_ig, keymap_tg);
+  sprintf(l[lc++], "language = %d, keymap = \"%s\"", language_ig, keymap_tg);
 
-  sprintf(l[9], "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
+  sprintf(l[lc++], "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
 
-  sprintf(l[10], "vga = 0x%04x", frame_buffer_mode_ig);
+  sprintf(l[lc++], "vga = 0x%04x", frame_buffer_mode_ig);
 
-  sprintf(l[11], "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
+  sprintf(l[lc++], "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
 
-  sprintf(l[12],
+  sprintf(l[lc++],
     "pcmcia = %d, pcmcia_chip = %s",
     auto2_pcmcia(),
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
 
-  dia_show_lines("Linuxrc v" LXRC_FULL_VERSION "/" LX_REL "-" LX_ARCH " (" __DATE__ ", " __TIME__ ")", l, sizeof l / sizeof *l, 76, FALSE);
+  dia_show_lines("Linuxrc v" LXRC_FULL_VERSION "/" LX_REL "-" LX_ARCH " (" __DATE__ ", " __TIME__ ")", l, lc, 76, FALSE);
 
   for(i = 0; i < sizeof l / sizeof *l; i++) free(l[i]);
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
 }
 
 int util_mount_main(int argc, char **argv)

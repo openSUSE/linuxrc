@@ -26,6 +26,8 @@
 #include <sys/reboot.h>
 #include <arpa/inet.h>
 
+#include <hd.h>
+
 #include "global.h"
 #include "linuxrc.h"
 #include "text.h"
@@ -43,7 +45,7 @@
 #include "install.h"
 #include "settings.h"
 #include "auto2.h"
-#include "hd.h"
+
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
 #define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
