@@ -40,7 +40,6 @@ void info_menu()
     di_info_kernel,
     di_info_drives,
     di_info_modules,
-    di_info_pci,
     di_info_cpu,
     di_info_mem,
     di_info_ioports,
@@ -80,10 +79,6 @@ int info_show_cb(dia_item_t di)
 
     case di_info_modules:
       s = "modules";
-      break;
-
-    case di_info_pci:
-      s = "pci";
       break;
 
     case di_info_cpu:

@@ -193,7 +193,7 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay -= 1;
 
-    k = mount("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
+    k = mount("usbfs", "/proc/bus/usb", "usbfs", 0, 0);
     if(config.usbwait > 0) sleep(config.usbwait);
 
     if(with_usb) {
@@ -800,7 +800,7 @@ int auto2_init()
     if(!i) {
       fprintf(stderr, "PCMCIA modules loaded - starting card manager.\n");
       pcmcia_chip_ig = 2;
-      i = system("cardmgr -v -m /modules -n \"\" >&2");
+      i = system("cardmgr -d -v -m /modules -n \"\" >&2");
       if(i)
         fprintf(stderr, "Oops: card manager didn't start.\n");
       else {

@@ -632,7 +632,7 @@ void lxrc_init()
   config.mountpoint.update = strdup("/mounts/update");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.setupcmd = strdup("/sbin/inst_setup yast");
+  config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
   config.update.dir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
   config.update.dst = strdup("/update");
 
@@ -1040,7 +1040,7 @@ void lxrc_movetotmpfs()
     return;
   }
 
-  i = mount("tmpfs", newroot, "tmpfs", 0, "nr_inodes=20480");
+  i = mount("tmpfs", newroot, "tmpfs", 0, "nr_inodes=30720");
   if(i) {
     perror(newroot);
     return;

@@ -647,7 +647,7 @@ static int execute(char *msg, char *cmd)
     char line[256];
 
     syslog(LOG_INFO, "executing: '%s'", cmd);
-    strcat(cmd, " >&2");
+//    strcat(cmd, " >&2");
     f = popen(cmd, "r");
     while (fgets(line, 255, f)) {
 	line[strlen(line)-1] = '\0';

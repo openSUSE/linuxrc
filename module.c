@@ -989,7 +989,7 @@ int mod_load_pcmcia()
 
   if(ok) {
     dia_status_on(&status, txt_get(TXT_START_CARDMGR));
-    system("cardmgr -v -m /modules -n \"\" >&2");
+    system("cardmgr -d -v -m /modules -n \"\" >&2");
     for(i = 0; i <= 100; i++) {
       dia_status(&status, i++);
       usleep(100000);

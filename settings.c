@@ -114,6 +114,7 @@ static keymap_t set_keymaps_arm [] =
 { "Français",             "fr-latin1"    },
 { "Hellenic",             "gr"           },
 { "Italiano",             "it"           },
+{ "Japanese",             "jp106"        },
 { "Magyar",               "hu"           },
 { "Nederlands",           "nl"           },
 { "Norsk",                "no-latin1"    },

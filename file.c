@@ -62,6 +62,7 @@ static struct {
   { key_live,           "live",           kf_cfg + kf_cmd                },
   { key_keytable,       "Keytable",       kf_cfg + kf_cmd + kf_yast      },
   { key_language,       "Language",       kf_cfg + kf_cmd + kf_yast      },
+  { key_language,       "lang",           kf_cfg + kf_cmd                },
   { key_rebootmsg,      "RebootMsg",      kf_yast                        },
   { key_insmod,         "Insmod",         kf_cfg + kf_cmd                },
   { key_display,        "Display",        kf_cfg + kf_cmd                },
@@ -770,7 +771,7 @@ void file_do_info(file_t *f0)
       case key_rescue:
       case key_install:
         i = f->is.numeric ? f->nvalue : 1;
-        config.rescue = f->key == key_rescue ? i : 0;
+        if(f->key == key_rescue) config.rescue = i;
         config.hwcheck = f->key == key_hwcheck ? i : 0;
         if(config.rescue || config.hwcheck) {
           config.activate_storage = 1;

@@ -1,3 +1,9 @@
+29/3/2004:	v1.6.12
+	- no pci info (#37245)
+	- japanese keyboard (#31417)
+	- cardmgr: run modprobe without '>&2' (#36661)
+	- run setctsid before inst_setup
+
 23/3/2004:	v1.6.11
 	- don't try to rmmod usb-storage & sbp2 (#35582)
 
