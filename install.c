@@ -1812,6 +1812,24 @@ int eval_configure()
   slist_t *sl;
   char **items, *s, buf[256];
 
+  if(config.live.autopart && !config.partition) {
+    if(config.live.partitions) {
+      str_copy(&config.partition, config.live.partitions->key);
+    }
+    else {
+      config.live.nodisk = 1;
+    }
+  }
+
+  if(config.live.autoswap && !config.live.nodisk && !config.live.useswap) {
+    if(config.live.swaps) {
+      slist_append_str(&config.live.useswap, config.live.swaps->key);
+    }
+    else {
+      config.live.swapfile = 1;
+    }
+  }
+
   live_show_state();
 
   for(cnt = 0, pwidth = 4, sl = config.live.partitions; sl; sl = sl->next) {
@@ -1932,8 +1950,9 @@ void live_show_state()
   printf("\n");
 
   printf(
-    "newconfig = %u, nodisk = %u, swapfile = %u\n",
-    config.live.newconfig, config.live.nodisk, config.live.swapfile
+    "newconfig = %u, nodisk = %u, swapfile = %u, autopart = %u, autoswap = %u\n",
+    config.live.newconfig, config.live.nodisk, config.live.swapfile,
+    config.live.autopart, config.live.autoswap
   );
 
   if(config.partition) {

@@ -293,14 +293,15 @@ typedef struct {
   struct {
     char *image;		/* "/boot/liveeval" */
     char *cfg;			/* live config file */
-    char *arg;			/* 'live' cmdline arg */
-    slist_t *args;		/* 'live' cmdline arg, splitted */
+    slist_t *args;		/* 'live' cmdline args, splitted */
     slist_t *useswap;		/* swap partitions to use */
     slist_t *swaps;		/* swap partitions found */
     slist_t *partitions;	/* live eval partitions */
     unsigned newconfig:1;	/* ignore existing config */
     unsigned nodisk:1;		/* don't save to disk */
     unsigned swapfile:1;	/* use swap file */
+    unsigned autopart:1;	/* use first suitable partition, if any */
+    unsigned autoswap:1;	/* use first suitable swap, if any */
   } live;
 
   struct {

@@ -1015,8 +1015,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_live:
-        str_copy(&config.live.arg, f->value);
-        config.live.args = slist_split(',', config.live.arg);
+        slist_append(&config.live.args, sl = slist_split(',', f->value));
         if(
           slist_getentry(config.live.args, "new") ||
           slist_getentry(config.live.args, "clean")
@@ -1027,6 +1026,10 @@ void file_do_info(file_t *f0)
           config.live.newconfig = 1;
           config.live.nodisk = 1;
         }
+        if(slist_getentry(sl, "autopart")) config.live.autopart = 1;
+        if(slist_getentry(sl, "-autopart")) config.live.autopart = 0;
+        if(slist_getentry(sl, "autoswap")) config.live.autoswap = 1;
+        if(slist_getentry(sl, "-autoswap")) config.live.autoswap = 0;
         break;
 
       case key_liveconfig:
@@ -1576,7 +1579,8 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
  */
 file_t *file_get_cmdline(file_key_t key)
 {
-  static file_t *cmdline = NULL, *ft, *ft_ok = NULL;
+  static file_t *cmdline = NULL;
+  file_t *ft, *ft_ok = NULL;
 
   if(!cmdline) cmdline = file_read_cmdline(kf_cmd + kf_cmd_early);
 
@@ -1810,6 +1814,7 @@ void file_write_live_config(char *dir)
 {
   FILE *f;
   char file_name[256];
+  slist_t *sl;
 
   strcat(strcpy(file_name, dir), LIVE_CONF_FILE);
 
@@ -1818,8 +1823,11 @@ void file_write_live_config(char *dir)
     return;
   }
 
-  if(config.live.arg) {
-    fprintf(f, "%s=%s\n", file_key2str(key_live), config.live.arg);
+  if(config.live.args) {
+    fprintf(f, "%s=", file_key2str(key_live));
+    for(sl = config.live.args; sl; sl = sl->next) {
+      fprintf(f, "%s%c", sl->key, sl->next ? ',' : '\n');
+    }
   }
   fprintf(f, "liveconfig=%s\n", config.live.cfg);
   fprintf(f, "l_new=%s\n", config.live.newconfig ? "1" : "");
