@@ -174,7 +174,7 @@ static text_t txt_english_atm [] =
 { TXT_ENTER_FTPPORT,  "Please enter the port of the FTP proxy"                },
 { TXT_WANT_FTPPROXY,  "Do you want to use a FTP proxy?"                       },
 { TXT_NOMEM_FTP,      "Your computer does not have enough RAM to do an "
-                      "installation via FTP! (32 MB RAM required)"            },
+                      "installation via FTP! (%d MB RAM required)"            },
 { TXT_ANONYM_FTP,     "Normally a FTP installation is performed via "
                       "anonymous FTP. But there is the possibility to specify "
                       "a user name and password on the FTP server.\n"

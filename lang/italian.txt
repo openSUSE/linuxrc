@@ -184,7 +184,7 @@ static text_t txt_italian_atm [] =
 { TXT_ENTER_FTPPORT,  "Indicate il port dell' FTP Proxy"                      },
 { TXT_WANT_FTPPROXY,  "Desiderate usare un FTP Proxy?"                        },
 { TXT_NOMEM_FTP,      "Il Vostro computer non ha abbastanza RAM per fare "
-                      "un'installazione via FTP! (sono necessari 32 MB RAM)"  },
+                      "un'installazione via FTP! (sono necessari %d MB RAM)"  },
 { TXT_ANONYM_FTP,     "Normalement, une installation FTP est réalisée via "
                       "FTP anonyme. Mais il est possible de spécifier un nom "
                       "d'utilisateur et un mot de passe sur le serveur FTP.\n"

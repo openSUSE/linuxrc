@@ -171,7 +171,7 @@ static text_t txt_czech_atm [] =
 { TXT_ENTER_FTPPORT,  "Zadejte prosím port FTP proxy"                         },
 { TXT_WANT_FTPPROXY,  "Chcete pou¾ít FTP proxy?"                              },
 { TXT_NOMEM_FTP,      "Vá¹ poèítaè nemá dostatek RAM pamìti pro instalaci "
-                      "pøes FTP! (min. 32 MB RAM je vy¾adováno)"              },
+                      "pøes FTP! (min. %d MB RAM je vy¾adováno)"              },
 { TXT_ANONYM_FTP,     "Normalnì je FTP instalace provádìna pøes "
                       "anonymní FTP. Ale je zde mo¾nost specifikovat "
                       "u¾ivatelské jmého a heslo na FTP serveru.\n" 

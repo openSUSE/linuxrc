@@ -187,7 +187,7 @@ static text_t txt_german_atm [] =
 { TXT_ENTER_FTPPORT,  "Bitte geben Sie den Port des FTP Proxy ein"            },
 { TXT_WANT_FTPPROXY,  "Möchten Sie einen FTP Proxy verwenden?"                },
 { TXT_NOMEM_FTP,      "Für eine Installation via FTP hat Ihr Rechner nicht "
-                      "genügend Hauptspeicher! (mind. 32 MB erforderlich)"    },
+                      "genügend Hauptspeicher! (mind. %d MB erforderlich)"    },
 { TXT_ANONYM_FTP,     "Normalerweise erfolgt eine FTP-Installation via "
                       "anonymem FTP. Sie haben jedoch auch die Möglichkeit, "
                       "einen Benutzernamen und ein Passwort anzugeben.\n"

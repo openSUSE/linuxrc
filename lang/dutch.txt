@@ -184,7 +184,7 @@ static text_t txt_dutch_atm [] =
 { TXT_ENTER_FTPPORT,  "Vul hier de Port van de FTP Proxy in"                  },
 { TXT_WANT_FTPPROXY,  "Wilt U een FTP Proxy gebruiken?"                       },
 { TXT_NOMEM_FTP,      "Voor een installatie via FTP heeft uw computer niet "
-                      "genoeg geheugen! (min. 32 MB nodig)"                   },
+                      "genoeg geheugen! (min. %d MB nodig)"                   },
 { TXT_ANONYM_FTP,     "Normaal word de FTP-Installatie via een anoniem FTP"
                       "geinstalleerd. U heeft de Mogelijkheid, om "
                       "een gebruikersnaam en een paswoord in te vullen.\n"

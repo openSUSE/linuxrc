@@ -253,7 +253,7 @@ void file_write_yast_info (void)
     fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
     {
       char *s = auto2_xserver();
-      if(s) printf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
+      if(s) fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
     }
     {
       char *s = getenv("probe");

@@ -169,7 +169,7 @@ static text_t txt_slovak_atm [] =
 { TXT_ENTER_FTPPORT,  "Zadajte èíslo portu na FTP proxy serveri"              },
 { TXT_WANT_FTPPROXY,  "Chcete pou¾i» FTP proxy?"                              },
 { TXT_NOMEM_FTP,      "Vá¹ poèítaè nemá dos» pamäte RAM aby ste mohli "  
-                      "in¹talova» cez FTP ! (je potrebných 32 MB RAM)"        },
+                      "in¹talova» cez FTP ! (je potrebných %d MB RAM)"        },
 { TXT_ANONYM_FTP,     "Normálne sa in¹talácia cez FTP vykonáva pomocu "
                       "anonymous FTP. Je tu v¹ak mo¾nos» ¹pecifikova» u¾vateµa "
                       "a jeho heslo na FTP serveri.\n"

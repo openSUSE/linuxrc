@@ -185,7 +185,7 @@ static text_t txt_breton_atm [] =
 { TXT_ENTER_FTPPORT,  "Erspizit porzh ar proksi FTP"                          },
 { TXT_WANT_FTPPROXY,  "Fellout a ra deoc'h ober gant ur proksi FTP?"          },
 { TXT_NOMEM_FTP,      "Re nebeut a vemor greiz a zo gant hoc'h urzhiataer"
-                      "evit ur staliadur dre FTP! (32 MB da vihanañ)"         },
+                      "evit ur staliadur dre FTP! (%d MB da vihanañ)"         },
 { TXT_ANONYM_FTP,     "Sevenet e vez peurvuiañ ur staliadur FTP dre "
                       "FTP dizanv. Bez' e c'hellit ivez, ma karit, "
                       "enankañ un anv arveriad hag ur ger-tremen.\n"

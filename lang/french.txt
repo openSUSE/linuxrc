@@ -189,7 +189,7 @@ static text_t txt_french_atm [] =
 { TXT_ENTER_FTPPORT,  "Spécifiez le port du proxy FTP"                        },
 { TXT_WANT_FTPPROXY,  "Voulez-vous utiliser un proxy FTP?"                    },
 { TXT_NOMEM_FTP,      "Votre machine n'a pas assez de mémoire centrale pour"
-                      "une installation via FTP! (minimum requis: 32 Mo)"     },
+                      "une installation via FTP! (minimum requis: %d Mo)"     },
 { TXT_ANONYM_FTP,     "Normalement, une installation FTP se déroule via "
                       "FTP anonyme. Mais vous avez aussi la possibilité de "
                       "spécifier un nom d'utilisateur et un mot de passe.\n"

@@ -170,7 +170,7 @@ static text_t txt_hungarian_atm [] =
 { TXT_ENTER_FTPPORT,  "Kérem adja meg az FTP proxy portját"                   },
 { TXT_WANT_FTPPROXY,  "Kívánja használni az FTP proxy-t?"                     },
 { TXT_NOMEM_FTP,      "A számítógépében nincs elegendõ RAM, hogy a telepítést"
-                      "FTP-n keresztül végezze (32 MB RAM minimum)."          },
+                      "FTP-n keresztül végezze (%d MB RAM minimum)."          },
 { TXT_ANONYM_FTP,     "Normális esetben az FTP-s telepítés egy anonim FTP-n "
                       "keresztül történik. De itt a lehetõség, hogy megadjon "
                       "egy felhasználói nevet és jelszót az FTP-hez.\n"                      

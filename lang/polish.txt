@@ -179,7 +179,7 @@ static text_t txt_polish_atm [] =
 { TXT_ENTER_FTPPORT,  "Podaj port FTP-Proxy"                                  },
 { TXT_WANT_FTPPROXY,  "Czy chcesz korzystaæ z FTP-Proxy?"                     },
 { TXT_NOMEM_FTP,      "Zbyt ma³o pamiêci operacyjnej do przeprowadzenia "
-                      "instalacji poprzez FTP! (potrzeba min. 32 MB)"         },
+                      "instalacji poprzez FTP! (potrzeba min. %d MB)"         },
 { TXT_ANONYM_FTP,     "Przewa¿nie instalacjê poprzez FTP przeprowadza siê na "
                       "tzw. anonimowym FTP. Jednakowo¿ jest mo¿liwo¶æ "
                       "podania nazwy konta i has³a.\n"

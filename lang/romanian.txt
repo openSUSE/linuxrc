@@ -171,7 +171,7 @@ static text_t txt_romanian_atm [] =
 { TXT_ENTER_FTPPORT,  "Introduceti portul  proxyului FTP"                     },
 { TXT_WANT_FTPPROXY,  "Doriti sa folositi un proxy FTP?"                      },
 { TXT_NOMEM_FTP,      "Calculatorul dumneavoastra nu are destula memorie "
-                      "pentru instalarea via FTP! (minimum 32 MB RAM)"        },
+                      "pentru instalarea via FTP! (minimum %d MB RAM)"        },
 { TXT_ANONYM_FTP,     "In mod normal o instalare prin FTP se face via "
                       "anonymous FTP. Exista si posibilitatea specificarii "
                       "unui utilizator si a parolei acestuia.\n"

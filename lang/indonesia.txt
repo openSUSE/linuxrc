@@ -173,7 +173,7 @@ static text_t txt_indonesia_atm [] =
 { TXT_ENTER_FTPPORT,  "Harap tentukan port untuk FTP proxy"                   },
 { TXT_WANT_FTPPROXY,  "Apakah anda memakai FTP proxy ?"                       },
 { TXT_NOMEM_FTP,      "Komputer anda tidak memiliki RAM yang cukup untuk "
-                      "melakukan instalasi melalui FTP (minimal 32 MB RAM)"   },
+                      "melakukan instalasi melalui FTP (minimal %d MB RAM)"   },
 { TXT_ANONYM_FTP,     "Biasanya instalasi dengan FTP dilakukan melalui " 
                       "FTP anonymous.  Tetapi ada juga kemungkinan untuk "
                       "memberikan nama dan password user untuk FTP server.\n"

@@ -1069,11 +1069,13 @@ static int inst_ftp (void)
     {
     int       rc_ii;
     window_t  win_ri;
+    char msg[256];
 
     
     if (!inst_rescue_im && memory_ig <= (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
         {
-        (void) dia_message (txt_get (TXT_NOMEM_FTP), MSGTYPE_ERROR);
+        sprintf(msg, txt_get (TXT_NOMEM_FTP), (MEM_LIMIT1_RAMDISK >> 20) + 2);
+        (void) dia_message (msg, MSGTYPE_ERROR);
         return (-1);
         }
 
