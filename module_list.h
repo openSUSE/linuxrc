@@ -55,6 +55,8 @@ static module_t mod_scsi_mod_arm [] =
 { ID_SIM710,     "Simple 53c710 (Compaq, NCR)",        "sim710",     0, __LINE__ },
 { ID_QLOGICPTI,  "PTI Qlogic ISP Driver",              "qlogicpti",  0, __LINE__ },
 { ID_3WARE,      "3ware ATA RAID (pseudo SCSI)",       "3w-xxxx",    0, __LINE__ },
+{ ID_PDCRAID,    "Promise Fasttrak software RAID",     "pdcraid",    0, __LINE__ },
+{ ID_HPTRAID,    "Highpoint 370 software RAID",        "hptraid",    0, __LINE__ },
 { ID_DMX3191D,   "Domex DMX3191D SCSI",                "dmx3191d",   0, __LINE__ },
 #if 0
 /* loaded implicitly */
