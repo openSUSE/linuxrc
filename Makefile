@@ -28,6 +28,16 @@ endif
 
 ifeq ($(ARCH),sparc)
     USE_MINI_GLIBC	= no
+    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
+    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
+    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
+endif
+
+ifeq ($(ARCH),sparc64)
+    USE_MINI_GLIBC	= no
+    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
+    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
+    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
 endif
 
 ifneq ($(USE_MINI_GLIBC),no)
@@ -70,7 +80,7 @@ libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done
 
 clean: libs
-	rm -f $(OBJ) *~ linuxrc linuxrc.map .depend
+	rm -f $(OBJ) *~ linuxrc linuxrc_mini linuxrc_tiny linuxrc.map .depend
 
 ifneq ($(MAKECMDGOALS),clean)
 .depend: $(SRC) $(INC)

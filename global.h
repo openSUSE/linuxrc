@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
+#define LXRC_VERSION  "1.0.4"
+
 #ifdef LINUXRC_AXP
 #define MEM_LIMIT1_RAMDISK    50000000
 #define MEM_LIMIT2_RAMDISK    50000000
@@ -21,7 +23,11 @@
 #define MEM_LIMIT_CACHE_LIBS  15000000
 #define MEM_LIMIT_YAST2       12000000
 
-#define LXRC_VERSION  "1.0.4"
+#if defined(__sparc__)
+#define WITH_PCMCIA	0
+#else
+#define WITH_PCMCIA	1
+#endif
 
 #ifndef TRUE
 #define TRUE               1

@@ -24,7 +24,9 @@
 #include "display.h"
 #include "window.h"
 #include "modparms.h"
+#if WITH_PCMCIA
 #include "pcmcia.h"
+#endif
 #include "rootimage.h"
 #include "net.h"
 #include "info.h"
@@ -268,7 +270,11 @@ static int       mod_getmoddisk       (void);
 
 void mod_menu (void)
     {
+#if WITH_PCMCIA
     item_t  items_ari [7];
+#else
+    item_t  items_ari [6];
+#endif
     int     nr_items = sizeof (items_ari) / sizeof (items_ari [0]);
     int     i_ii;
 
@@ -278,10 +284,16 @@ void mod_menu (void)
     strcpy (items_ari [0].text, txt_get (TXT_LOAD_SCSI));
     strcpy (items_ari [1].text, txt_get (TXT_LOAD_CDROM));
     strcpy (items_ari [2].text, txt_get (TXT_LOAD_NET));
+#if WITH_PCMCIA
     strcpy (items_ari [3].text, txt_get (TXT_LOAD_PCMCIA));
     strcpy (items_ari [4].text, txt_get (TXT_SHOW_MODULES));
     strcpy (items_ari [5].text, txt_get (TXT_DEL_MODULES));
     strcpy (items_ari [6].text, txt_get (TXT_AUTO_LOAD));
+#else
+    strcpy (items_ari [3].text, txt_get (TXT_SHOW_MODULES));
+    strcpy (items_ari [4].text, txt_get (TXT_DEL_MODULES));
+    strcpy (items_ari [5].text, txt_get (TXT_AUTO_LOAD));
+#endif
     for (i_ii = 0; i_ii < nr_items; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, 40);
@@ -1040,6 +1052,7 @@ static int mod_menu_cb (int what_iv)
             if (rc_ii && !net_tg [0])
                 strcpy (net_tg, mod_current_arm [rc_ii - 1].module_name);
             break;
+#if WITH_PCMCIA
         case 4:
             if (!mod_getmoddisk ())
                 (void) pcmcia_load_core ();
@@ -1053,6 +1066,17 @@ static int mod_menu_cb (int what_iv)
         case 7:
             mod_autoload ();
             break;
+#else
+        case 4:
+            mod_show_modules ();
+            break;
+        case 5:
+            mod_delete_module ();
+            break;
+        case 6:
+            mod_autoload ();
+            break;
+#endif
         default:
             break;
         }

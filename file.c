@@ -24,7 +24,9 @@
 #include "net.h"
 #include "settings.h"
 #include "smp.h"
+#if WITH_PCMCIA
 #include "pcmcia.h"
+#endif
 
 static const char  *file_infofile_tm           = "/etc/install.inf";
 
@@ -33,7 +35,9 @@ static const char  *file_txt_keymap_tm         = "Keytable:";
 static const char  *file_txt_sourcemount_tm    = "Sourcemounted:";
 static const char  *file_txt_display_tm        = "Display:";
 static const char  *file_txt_cdrom_tm          = "Cdrom:";
+#if WITH_PCMCIA
 static const char  *file_txt_pcmcia_tm         = "PCMCIA:";
+#endif
 static const char  *file_txt_bootmode_tm       = "Bootmode:";
 static const char  *file_txt_bootfloppy_tm     = "Floppy";
 static const char  *file_txt_bootcd_tm         = "CD";
@@ -57,7 +61,9 @@ static const char  *file_txt_ftp_user_tm       = "FTP-User:";
 static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
+#if WITH_PCMCIA
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
+#endif
 static const char  *file_txt_console_tm        = "Console:";
 #ifdef USE_LIBHD
 static const char  *file_txt_mouse_dev_tm      = "Mouse-Device:";
@@ -114,6 +120,7 @@ void file_write_yast_info (void)
         fprintf (file_pri, "pre-remove paride rmmod %s\n", ppcd_tg);
         }
 
+#if WITH_PCMCIA
     if (pcmcia_chip_ig == 1 || pcmcia_chip_ig == 2)
         {
         strcpy (line_ti, file_txt_pcmcia_tm);
@@ -123,6 +130,7 @@ void file_write_yast_info (void)
             strcat (line_ti, " i82365\n");
         fprintf (file_pri, line_ti);
         }
+#endif
 
     if (serial_ig)
         fprintf (file_pri, "%s %s\n", file_txt_console_tm, console_tg);
@@ -269,7 +277,9 @@ int file_read_info (void)
     window_t  win_ri;
     char      value_ti [MAX_X];
     int       do_autoprobe_ii = FALSE;
+#if WITH_PCMCIA
     int       start_pcmcia_ii = FALSE;
+#endif
     int       need_mount_ii = FALSE;
 
 
@@ -324,9 +334,11 @@ int file_read_info (void)
                       strlen (file_txt_autoprobe_tm)))
             do_autoprobe_ii = TRUE;
 
+#if WITH_PCMCIA
         if (!strncasecmp (buffer_ti, file_txt_start_pcmcia_tm,
                       strlen (file_txt_start_pcmcia_tm)))
             start_pcmcia_ii = TRUE;
+#endif
 
         file_get_value (buffer_ti, value_ti);
 
@@ -419,8 +431,10 @@ int file_read_info (void)
     if (do_autoprobe_ii)
         mod_autoload ();
 
+#if WITH_PCMCIA
     if (start_pcmcia_ii)
         pcmcia_load_core ();
+#endif
 
     return (0);
     }

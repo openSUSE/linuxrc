@@ -28,7 +28,9 @@
 #include "window.h"
 #include "module.h"
 #include "net.h"
+#if WITH_PCMCIA
 #include "pcmcia.h"
+#endif
 #include "install.h"
 #include "settings.h"
 #include "file.h"
@@ -77,10 +79,12 @@ int main (int argc, char **argv, char **env)
         rc_ii = rmmod_main (argc, argv);
     else if (!strcmp (progname_pci, "loadkeys"))
         rc_ii = loadkeys_main ((unsigned int) argc, argv);
+#if WITH_PCMCIA
     else if (!strcmp (progname_pci, "cardmgr"))
         cardmgr_main (argc, argv);
     else if (!strcmp (progname_pci, "probe"))
         rc_ii = probe_main (argc, argv);
+#endif
     else if (!strcmp (progname_pci, "setfont"))
         rc_ii = setfont_main (argc, argv);
     else if (!strcmp (progname_pci, "portmap"))
