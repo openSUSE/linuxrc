@@ -2,7 +2,7 @@
  *
  * global.h      Global defines for linuxrc
  *
- * Copyright (c) 1996-2001  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 

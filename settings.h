@@ -2,7 +2,7 @@
  *
  * settings.h    Header file for settings.c
  *
- * Copyright (c) 1996-2001  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
