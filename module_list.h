@@ -209,6 +209,7 @@ static enum modid_t mod_noauto_arm [] =
   ID_EATA_PIO,
   ID_ADVANSYS,
   ID_AHA_2940,
+  ID_DM9102,
   ID_I2O_PCI,
   ID_I2O_CORE,
   ID_I2O_CONFIG,
