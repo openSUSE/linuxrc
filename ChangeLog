@@ -1,3 +1,6 @@
+10/7/2003:	v1.4.51
+	- updated FAT fs detection (#27814)
+
 7/7/2003:	v1.4.50
 	- rewrote driver update handling (#27792)
 
