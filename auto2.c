@@ -43,6 +43,7 @@ static int need_modules = 0;
 
 static void auto2_check_cdrom_update(char *dev);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
+static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
 static int driver_is_active(hd_t *hd);
@@ -81,7 +82,7 @@ int auto2_mount_cdrom(char *device)
     }
   }
   else {
-    fprintf(stderr, "%s does'nt have an ISO9660 file syetem.\n", device);
+    fprintf(stderr, "%s does'nt have an ISO9660 file system.\n", device);
   }
 
   if(rc) set_instmode(inst_cdrom);
@@ -89,31 +90,51 @@ int auto2_mount_cdrom(char *device)
   return rc;
 }
 
-/* 
- * mmj@suse.de - mount a harddisk partition at mountpoint_tg and run 
- * inst_check_instsys(), by trying all known partition types.
- * 
- * return 0 on success
- */
 
-int auto2_mount_harddisk(char *device)
+int auto2_mount_harddisk(char *dev)
 {
-  int rc;
+  int rc = 0;
+  char buf[256];
+  char *module, *type;
 
   set_instmode(inst_hd);
 
-  if(!(rc = util_mount_ro(device, mountpoint_tg))) {
-    if((rc = inst_check_instsys())) {
-      fprintf(stderr, "%s is not a %s installation media.\n", device, config.product);
-      umount(mountpoint_tg);
-    }
+  /* load fs module if necessary */
+
+  type = util_fstype(dev, &module);
+  if(module) mod_modprobe(module, NULL);
+
+  if(!type || !strcmp(type, "swap")) rc = -1;
+
+  if(!rc) {
+    rc = util_mount_ro(dev, config.mountpoint.extra);
   }
-  else {
-    fprintf(stderr, "%s does not have a mountable file system.\n", device);
+
+  if(!rc) {
+    config.extramount = 1;
+    util_truncate_dir(config.serverdir);
+    sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
+    rc = util_check_exist(buf) ? util_mount_ro(buf, config.mountpoint.instdata) : -1;
+  }
+
+  if(!rc) {
+    if((rc = inst_check_instsys())) {
+      fprintf(stderr, "%s::%s is not an installation source\n", dev, config.serverdir);
+    }
+    else {
+      fprintf(stderr, "using %s::%s\n", dev, config.serverdir);
+    }
+    util_chk_driver_update(config.mountpoint.instdata);
+  }
+
+  if(rc) {
+    fprintf(stderr, "nothing found on %s\n", dev);
+    inst_umount();
   }
 
   return rc;
 }
+
 
 void auto2_check_cdrom_update(char *dev)
 {
@@ -318,6 +339,50 @@ hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd)
 
 
 /*
+ * Look for a SuSE HD and mount it.
+ *
+ * Returns:
+ *    0: OK, HD was mounted
+ *    1: no HD found
+ *   >1: HD found, but contiune the search
+ *
+ */
+int auto2_harddisk_dev(hd_t **hd0)
+{
+  int i = 1;
+  hd_t *hd;
+
+  for(hd = hd_list(hd_data, hw_partition, 1, *hd0); hd; hd = hd->next) {
+    add_hd_entry(hd0, hd);
+
+    if(
+      !hd->unix_dev_name ||
+      strncmp(hd->unix_dev_name, "/dev/", sizeof "/dev/" - 1)
+    ) continue;
+
+    if(
+      config.partition &&
+      strcmp(config.partition, hd->unix_dev_name + sizeof "/dev/" - 1)
+    ) continue;
+
+    fprintf(stderr, "Checking partition: %s\n", hd->unix_dev_name);
+
+    i = auto2_mount_harddisk(hd->unix_dev_name) ? config.partition ? 1 : 2 : 0;
+
+    if(i == 0) {
+      str_copy(&config.partition, hd->unix_dev_name + sizeof "/dev/" - 1);
+    }
+
+    if(i == 0) break;
+  }
+
+  hd = hd_free_hd_list(hd);
+
+  return i;
+}
+
+
+/*
  * Look for a SuSE CD and mount it.
  *
  * Returns:
@@ -502,7 +567,7 @@ int auto2_net_dev(hd_t **hd0)
           break;
 
         default:
-          fprintf(stderr, "insupported inst mode: %s\n", get_instmode_name(config.instmode));
+          fprintf(stderr, "unsupported inst mode: %s\n", get_instmode_name(config.instmode));
           return 1;
       }
 
@@ -629,7 +694,8 @@ int auto2_init()
 #ifdef __i386__
   int net_cfg;
 #endif
-//  hd_t *hd;
+  hd_t *hd;
+  char buf[256];
 
   auto2_chk_frame_buffer();
 
@@ -642,6 +708,29 @@ int auto2_init()
 
   printf("\r%64s\r", "");
   fflush(stdout);
+
+  if(config.idescsi) {
+    strcpy(buf, "ignore=");
+    for(i = 0, hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+      if(
+        hd->bus.id == bus_ide &&
+        (config.idescsi > 1 || hd->is.cdr || hd->is.cdrw || hd->is.dvdr) &&
+        hd->unix_dev_name &&
+        !strncmp(hd->unix_dev_name, "/dev/hd", sizeof "/dev/hd" - 1)
+      ) {
+        sprintf(buf + strlen(buf), "%s%s", i ? "," : "", hd->unix_dev_name + 5);
+        i = 1;
+      }
+    }
+
+    if(i) {
+      mod_unload_module("ide-cd");
+      mod_insmod("ide-cd", buf);
+      mod_insmod("ide-scsi", NULL);
+      hd_list(hd_data, hw_cdrom, 1, NULL);
+    }
+  }
+
   fprintf(stderr, "Hardware probing finished.\n");
   fflush(stderr);
 
@@ -656,13 +745,6 @@ int auto2_init()
   if(!config.test) {
     if(mod_is_loaded("usb-storage")) {
       config.module.keep_usb_storage = 1;
-#if 0
-      for(hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
-        if(hd->hotplug == hp_usb) {
-          config.module.keep_usb_storage = 1;
-        }
-      }
-#endif
     }
     if(!config.module.keep_usb_storage) {
       mod_unload_module("usb-storage");
@@ -788,18 +870,7 @@ int auto2_find_install_medium()
   int i;
   unsigned last_idx;
   hd_t *hd_devs = NULL;
-  char buf[256];
 
-  if(config.instmode == inst_hd) {
-    if(!config.partition) return FALSE;
-
-    sprintf(buf, "/dev/%s", config.partition);
-    if(!(i = auto2_mount_harddisk(buf))) {
-	auto2_ask_net_if_vnc();
-    	return TRUE;
-    }
-  }
-    
   if(config.instmode == inst_cdrom || !config.instmode) {
     set_instmode(inst_cdrom);
 
@@ -843,6 +914,41 @@ int auto2_find_install_medium()
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       auto2_ask_net_if_vnc();
       return TRUE;
+    }
+  }
+
+  if(config.instmode == inst_hd) {
+
+    util_debugwait("HD?");
+
+    need_modules = 0;
+  
+    fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
+    if(!(i = auto2_harddisk_dev(&hd_devs))) {
+      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+      if(config.activate_network) auto2_activate_devices(bc_network, 0);
+      auto2_ask_net_if_vnc();
+      return TRUE;
+    }
+
+    for(need_modules = 0, last_idx = 0;;) {
+      /* i == 1 -> try to activate another storage device */
+      if(i == 1) {
+        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+      }
+
+      if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
+        fprintf(stderr, "No further storage devices found; giving up.\n");
+        break;
+      }
+
+      fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
+      if(!(i = auto2_harddisk_dev(&hd_devs))) {
+        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+        if(config.activate_network) auto2_activate_devices(bc_network, 0);
+        auto2_ask_net_if_vnc();
+        return TRUE;
+      }
     }
   }
 

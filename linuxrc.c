@@ -618,9 +618,7 @@ void lxrc_catch_signal(int signum)
 void lxrc_init()
 {
   int i;
-#ifdef __i386__
   int j;
-#endif
   file_t *ft;
   char *s, *t0, *t, buf[256];
   url_t *url;
@@ -656,6 +654,7 @@ void lxrc_init()
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
   config.mountpoint.instsys = strdup("/mounts/instsys");
+  config.mountpoint.live = strdup("/mounts/live");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("/sbin/inst_setup yast");
@@ -664,7 +663,7 @@ void lxrc_init()
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;
-  config.net.dhcp_timeout = 60;
+  config.net.dhcp_timeout = 90;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
 
@@ -772,6 +771,9 @@ void lxrc_init()
 
   ft = file_get_cmdline(key_useusbscsi);
   if(ft && ft->is.numeric) config.use_usbscsi = ft->nvalue;
+
+  ft = file_get_cmdline(key_useidescsi);
+  if(ft && ft->is.numeric) config.idescsi = ft->nvalue;
 
   ft = file_get_cmdline(key_lxrcdebug);
   if(ft && ft->is.numeric) config.debug = ft->nvalue;
@@ -939,7 +941,6 @@ void lxrc_init()
 
       util_disp_init();
 
-#ifdef __i386__
       i = 0;
       j = 1;
       if(config.insttype == inst_cdrom && cdrom_drives && !config.demo) {
@@ -969,8 +970,6 @@ void lxrc_init()
           dia_message(buf, MSGTYPE_ERROR);
         }
       }
-#endif
-
     }
   }
 #endif
