@@ -1,0 +1,20 @@
+linuxrc translations
+--------------------
+
+linuxrc does not use gettext but still gets its translations from *.po
+files. They are converted into header files for linuxrc by some perl
+scripts.
+
+o How do I add a new text?
+
+  - Use the linuxrc/po/bin/add_text script; example:
+
+      bin/add_text REISERFS 'Reiserfs file system found.'
+
+o How do I add a new language?
+
+  - Copy linuxrc.pot to <lang>.po. Remenber to get <lang>.po translated.
+  - Add TRANS_<lang> to linuxrc/texts.h.
+  - Create a new entry in set_languages_arm[] in linuxrc/settings.c.
+  - Optionally add a new entry to set_keymaps_arm[] in linuxrc/settings.c.
+

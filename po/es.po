@@ -1,3 +1,16 @@
+# Spanish translations for linuxrc.
+# Copyright (C) 2001 SuSE GmbH.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2001-08-03 12:00+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish <i18n@suse.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 #. TXT_OK
 msgid "Ok"
 msgstr "Aceptar"
@@ -12,7 +25,7 @@ msgstr "Sí"
 
 #. TXT_NO
 msgid "No"
-msgstr "No"
+msgstr ""
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Please choose the language"
@@ -87,6 +100,7 @@ msgid "Unload modules"
 msgstr "Descarga de drivers"
 
 #. TXT_TRY_TO_LOAD
+#, c-format
 msgid ""
 "Trying to load module \"%s\"...\n\n"
 "During loading you may want to watch the kernel "
@@ -98,16 +112,18 @@ msgstr ""
 "del kernel en la consola virtual 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
+#, c-format
 msgid "Module \"%s\" has been successfully loaded!"
 msgstr "¡El driver \"%s\" ha sido instalado correctamente!"
 
 #. TXT_LOAD_FAILED
+#, c-format
 msgid "Failed to load module \"%s\"!"
 msgstr "¡Fallo al cargar el driver \"%s\"!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr "CD-ROM"
+msgstr ""
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -142,6 +158,7 @@ msgid "Boot installed system"
 msgstr "Iniciar el sistema instalado"
 
 #. TXT_SEARCH_FOR_RI
+#, c-format
 msgid "Searching for image \"%s\"..."
 msgstr "Buscando imagen \"%s\"..."
 
@@ -175,7 +192,7 @@ msgstr "Tarjetas de red"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr "DMA"
+msgstr ""
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
@@ -195,7 +212,7 @@ msgstr "Drivers"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr "PCI"
+msgstr ""
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
@@ -248,6 +265,7 @@ msgstr ""
 "simplemente presione ESC."
 
 #. TXT_FOUND_HOST
+#, c-format
 msgid ""
 "The following data have been retrieved:\n\n"
 "IP address: %s\n"
@@ -282,14 +300,17 @@ msgid "Please enter the directory on the server."
 msgstr "Especifique el directorio en el servidor."
 
 #. TXT_ENTER_PARAMS
+#, c-format
 msgid "Please enter parameters for \"%s\"."
 msgstr "Introduzca los parámetros para \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
+#, c-format
 msgid "Trying to mount the directory\n\n\"%s:%s\"..."
 msgstr "Intentando montar el directorio\n\n\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
+#, c-format
 msgid ""
 "An error occurred while trying to mount the nfs "
 "directory.\n\nReason given by server: %s"
@@ -314,6 +335,7 @@ msgid "Currently there are no modules loaded!"
 msgstr "¡Actualmente no hay drivers cargados!"
 
 #. TXT_AUTO_RUNNING
+#, c-format
 msgid "Autoprobing (%s)...      "
 msgstr "Autodetectando (%s)...   "
 
@@ -376,6 +398,7 @@ msgstr ""
 "Por favor, hágalo manualmente."
 
 #. TXT_FOUND_PCMCIA
+#, c-format
 msgid ""
 "Found PCMCIA chipset \"%s\"!\n\nPlease enter "
 "parameters for PCMCIA core modules"
@@ -384,6 +407,7 @@ msgstr ""
 "los parámetros para el driver de PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
+#, c-format
 msgid "Please enter specific parameters for chipset \"%s\""
 msgstr "Escriba los parámetros específicos del chipset \"%s\""
 
@@ -594,6 +618,7 @@ msgid "Asking nameserver..."
 msgstr "Contactando con el DNS..."
 
 #. TXT_HOST_NOT_FOUND
+#, c-format
 msgid "Machine %s is unknown!"
 msgstr "¡La máquina %s no es conocida!"
 
@@ -618,6 +643,7 @@ msgstr ""
 "un driver."
 
 #. TXT_ALREADY_FOUND
+#, c-format
 msgid "A %s was already found in your system!\n"
 msgstr "¡Un %s ya se había detectado en su sistema!\n"
 
@@ -630,6 +656,7 @@ msgid "Do you want to load an additional module?"
 msgstr "¿Desea cargar algún driver adicional?"
 
 #. TXT_ERROR_FTP
+#, c-format
 msgid "Error while accessing the FTP server:\n\n%s"
 msgstr "Error accediendo al servidor FTP:\n\n%s"
 
@@ -662,6 +689,7 @@ msgid "Do you want to use a FTP proxy?"
 msgstr "¿Desea utilizar un proxy de FTP?"
 
 #. TXT_NOMEM_FTP
+#, c-format
 msgid ""
 "Your computer does not have enough RAM to do an "
 "installation via FTP! (%d MB RAM required)"
@@ -718,6 +746,7 @@ msgstr ""
 "utilizar para la instalación."
 
 #. TXT_INSERT_CD
+#, c-format
 msgid "Please make sure that CD number %d is in your drive!"
 msgstr "¡Asegúrese de que el CD número %d está en su unidad!"
 
@@ -727,7 +756,7 @@ msgstr "Expulsar CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp timeout"
-msgstr "Bootp timeout"
+msgstr ""
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Please enter the timeout value for bootp."

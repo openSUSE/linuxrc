@@ -1,6 +1,19 @@
+# Hellenic translations for linuxrc.
+# Copyright (C) 2001 SuSE GmbH.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2001-08-03 12:00+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Hellenic <i18n@suse.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-7\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 #. TXT_OK
 msgid "Ok"
-msgstr "Ok"
+msgstr ""
 
 #. TXT_CANCEL
 msgid "Back"
@@ -87,6 +100,7 @@ msgid "Unload modules"
 msgstr "Απεγκατάσταση οδηγών"
 
 #. TXT_TRY_TO_LOAD
+#, c-format
 msgid ""
 "Trying to load module \"%s\"...\n\n"
 "During loading you may want to watch the kernel "
@@ -99,20 +113,22 @@ msgstr ""
 "στήν εικονική κονσόλα 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
+#, c-format
 msgid "Module \"%s\" has been successfully loaded!"
 msgstr "Ο οδηγός \"%s\" εγκαταστάθηκε με επιτυχία"
 
 #. TXT_LOAD_FAILED
+#, c-format
 msgid "Failed to load module \"%s\"!"
 msgstr "Ανεπιτυχής προσπάθεια φόρτωσης του οδηγού \"%s\"!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr "CD-ROM"
+msgstr ""
 
 #. TXT_FLOPPY
 msgid "Floppy"
-msgstr "Floppy"
+msgstr ""
 
 #. TXT_NFS
 msgid "Network (NFS)"
@@ -124,7 +140,7 @@ msgstr "Δίκτυο (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
-msgstr "Harddisk"
+msgstr ""
 
 #. TXT_START_INSTALL
 msgid "Start installation/update"
@@ -143,6 +159,7 @@ msgid "Boot installed system"
 msgstr "Εκκίνηση εγκατεστημένου συστήματος"
 
 #. TXT_SEARCH_FOR_RI
+#, c-format
 msgid "Searching for image \"%s\"..."
 msgstr "Αναζήτηση βασικών αρχείων εγκατάστασης \"%s\"..."
 
@@ -176,7 +193,7 @@ msgstr "Κάρτες δικτύου"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr "DMA"
+msgstr ""
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
@@ -192,11 +209,11 @@ msgstr "Μνήμη"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
-msgstr "Modules"
+msgstr ""
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr "PCI"
+msgstr ""
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
@@ -253,6 +270,7 @@ msgstr ""
 "ονομάτων, αν δεν χρησιμοποιείτε πατήστε ESC."
 
 #. TXT_FOUND_HOST
+#, c-format
 msgid ""
 "The following data have been retrieved:\n\n"
 "IP address: %s\n"
@@ -287,14 +305,17 @@ msgid "Please enter the directory on the server."
 msgstr "Παρακαλώ πληκτρολογήστε τον κατάλογο του διακομιστή."
 
 #. TXT_ENTER_PARAMS
+#, c-format
 msgid "Please enter parameters for \"%s\"."
 msgstr "Παρακαλώ εισάγετε τις παραμέτρους για  \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
+#, c-format
 msgid "Trying to mount the directory\n\n\"%s:%s\"..."
 msgstr "Προσπάθεια αντιστοίχισης δίσκου\n\n\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
+#, c-format
 msgid ""
 "An error occurred while trying to mount the nfs "
 "directory.\n\nReason given by server: %s"
@@ -319,6 +340,7 @@ msgid "Currently there are no modules loaded!"
 msgstr "Επι του παρόντος δεν υπάρχουν φορτωμένοι οδηγοί!"
 
 #. TXT_AUTO_RUNNING
+#, c-format
 msgid "Autoprobing (%s)...      "
 msgstr "Αυτόματη ανίχνευση (%s).."
 
@@ -383,6 +405,7 @@ msgstr ""
 "chipset. Παρακαλώ ορίστε το."
 
 #. TXT_FOUND_PCMCIA
+#, c-format
 msgid ""
 "Found PCMCIA chipset \"%s\"!\n\nPlease enter "
 "parameters for PCMCIA core modules"
@@ -391,6 +414,7 @@ msgstr ""
 "δώστε τις παραμέτρους για το  PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
+#, c-format
 msgid "Please enter specific parameters for chipset \"%s\""
 msgstr "Δώστε λεπτομερείς παραμέτρους για το chipset \"%s\""
 
@@ -482,7 +506,7 @@ msgstr "Προκλήθηκε σφάλμα κατα την διάρκεια της εγκατάστασης!"
 
 #. TXT_DRIVES
 msgid "Harddisks / CD-ROMs"
-msgstr "Harddisks / CD-ROMs"
+msgstr ""
 
 #. TXT_LITTLE_MEM
 msgid ""
@@ -498,7 +522,7 @@ msgstr ""
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Animation"
+msgstr ""
 
 #. TXT_ASK_EXPLODE
 msgid "Do you like \"exploding\" windows?\n\nOf course ;-)"
@@ -514,15 +538,15 @@ msgstr ""
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Debug (expert)"
+msgstr ""
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Force rootimage"
-msgstr "Force rootimage"
+msgstr ""
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
-msgstr "Enter rootimage"
+msgstr ""
 
 #. TXT_ASK_RI_FORCE
 msgid ""
@@ -568,7 +592,7 @@ msgstr "Προετοιμασία εγκατάστασης..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Start Live CD"
+msgstr ""
 
 #. TXT_INSERT_LIVECD
 msgid "Please insert the Live CD."
@@ -603,6 +627,7 @@ msgid "Asking nameserver..."
 msgstr "Ερώτηση του διακομιστή ονομάτων..."
 
 #. TXT_HOST_NOT_FOUND
+#, c-format
 msgid "Machine %s is unknown!"
 msgstr "Ο Υπολογιστής %s είναι άγνωστος!"
 
@@ -627,18 +652,20 @@ msgstr ""
 "δικτύου."
 
 #. TXT_ALREADY_FOUND
+#, c-format
 msgid "A %s was already found in your system!\n"
 msgstr "Το %s βρέθηκε ήδη στο σύστημά σας!\n"
 
 #. TXT_SCSI_ADAPTER
 msgid "SCSI-Adapter"
-msgstr "SCSI-Adapter"
+msgstr ""
 
 #. TXT_ANOTHER_MOD
 msgid "Do you want to load an additional module?"
 msgstr "Θέλετε να φορτώσετε επιπλέον οδηγό?"
 
 #. TXT_ERROR_FTP
+#, c-format
 msgid "Error while accessing the FTP server:\n\n%s"
 msgstr "Σφάλμα πρόσβασης στο διακομιστή  FTP:\n\n%s"
 
@@ -671,6 +698,7 @@ msgid "Do you want to use a FTP proxy?"
 msgstr "Θέλετε να χρησιμοποιήσετε το FTP proxy?"
 
 #. TXT_NOMEM_FTP
+#, c-format
 msgid ""
 "Your computer does not have enough RAM to do an "
 "installation via FTP! (%d MB RAM required)"
@@ -727,6 +755,7 @@ msgstr ""
 "χρησιμοποιηθεί για την εγκατάσταση."
 
 #. TXT_INSERT_CD
+#, c-format
 msgid "Please make sure that CD number %d is in your drive!"
 msgstr ""
 "Παρακαλώ βεβαιωθείτε ότι έχετε βάλει στο drive το CD "
@@ -734,15 +763,15 @@ msgstr ""
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr "Eject CD"
+msgstr ""
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp timeout"
-msgstr "Bootp timeout"
+msgstr ""
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Please enter the timeout value for bootp."
-msgstr "Please enter the timeout value for bootp."
+msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -753,14 +782,8 @@ msgid ""
 "Do not remove the floppy disk if the Linux Loader (LILO) "
 "has been installed on it."
 msgstr ""
-"The base system has been successfully installed.  This "
-"new installed system will now be started in order to "
-"commit the installation. "
-"Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the Linux Loader (LILO) "
-"has been installed on it."
 
 #. TXT_REISERFS
 msgid "Reiserfs file system found."
-msgstr "Reiserfs file system found."
+msgstr ""
 

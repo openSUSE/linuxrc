@@ -1,6 +1,19 @@
+# Romanian translations for linuxrc.
+# Copyright (C) 2001 SuSE GmbH.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2001-08-03 12:00+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Romanian <i18n@suse.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 #. TXT_OK
 msgid "Ok"
-msgstr "Ok"
+msgstr ""
 
 #. TXT_CANCEL
 msgid "Back"
@@ -87,6 +100,7 @@ msgid "Unload modules"
 msgstr "Dezinstalarea modulelor"
 
 #. TXT_TRY_TO_LOAD
+#, c-format
 msgid ""
 "Trying to load module \"%s\"...\n\n"
 "During loading you may want to watch the kernel "
@@ -98,16 +112,18 @@ msgstr ""
 "kernelului pe a 4-a consola virtuala (ALT-F4)"
 
 #. TXT_LOAD_SUCCESSFUL
+#, c-format
 msgid "Module \"%s\" has been successfully loaded!"
 msgstr "Modulul \"%s\" a fost incarcat cu succes!"
 
 #. TXT_LOAD_FAILED
+#, c-format
 msgid "Failed to load module \"%s\"!"
 msgstr "Esec la incarcarea moduluilui \"%s\"!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr "CD-ROM"
+msgstr ""
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -123,7 +139,7 @@ msgstr "Retea (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
-msgstr "Harddisk"
+msgstr ""
 
 #. TXT_START_INSTALL
 msgid "Start installation/update"
@@ -142,6 +158,7 @@ msgid "Boot installed system"
 msgstr "Bootarea unui sistem instalat"
 
 #. TXT_SEARCH_FOR_RI
+#, c-format
 msgid "Searching for image \"%s\"..."
 msgstr "Cautand imaginea kernelului \"%s\"..."
 
@@ -167,7 +184,7 @@ msgstr "Procesor"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "Devices"
+msgstr ""
 
 #. TXT_INFO_NETDEV
 msgid "Network cards"
@@ -175,7 +192,7 @@ msgstr "Placi de retea"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr "DMA"
+msgstr ""
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
@@ -195,7 +212,7 @@ msgstr "Module"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr "PCI"
+msgstr ""
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
@@ -248,6 +265,7 @@ msgstr ""
 "Daca nu aveti unul, tastati ESC."
 
 #. TXT_FOUND_HOST
+#, c-format
 msgid ""
 "The following data have been retrieved:\n\n"
 "IP address: %s\n"
@@ -281,14 +299,17 @@ msgid "Please enter the directory on the server."
 msgstr "Introduceti numele directorului de pe server."
 
 #. TXT_ENTER_PARAMS
+#, c-format
 msgid "Please enter parameters for \"%s\"."
 msgstr "Introduceti parametrii pentru \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
+#, c-format
 msgid "Trying to mount the directory\n\n\"%s:%s\"..."
 msgstr "Incercand sa monteze directorul\n\n\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
+#, c-format
 msgid ""
 "An error occurred while trying to mount the nfs "
 "directory.\n\nReason given by server: %s"
@@ -313,6 +334,7 @@ msgid "Currently there are no modules loaded!"
 msgstr "In momentul de fata nu e nici un modul incarcat!"
 
 #. TXT_AUTO_RUNNING
+#, c-format
 msgid "Autoprobing (%s)...      "
 msgstr "Autoverificare (%s)...   "
 
@@ -375,6 +397,7 @@ msgstr ""
 "Va rog sa-l specificati manual."
 
 #. TXT_FOUND_PCMCIA
+#, c-format
 msgid ""
 "Found PCMCIA chipset \"%s\"!\n\nPlease enter "
 "parameters for PCMCIA core modules"
@@ -383,6 +406,7 @@ msgstr ""
 "parametrii pentru modulele PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
+#, c-format
 msgid "Please enter specific parameters for chipset \"%s\""
 msgstr "Introduceti parametrii specifici pentru chipset \"%s\""
 
@@ -595,6 +619,7 @@ msgid "Asking nameserver..."
 msgstr "Intreband nameserver-ul..."
 
 #. TXT_HOST_NOT_FOUND
+#, c-format
 msgid "Machine %s is unknown!"
 msgstr "Masina %s e necunoscuta!"
 
@@ -619,6 +644,7 @@ msgstr ""
 "Incarcati mai intai modulul de retea."
 
 #. TXT_ALREADY_FOUND
+#, c-format
 msgid "A %s was already found in your system!\n"
 msgstr "Un %s a fost deja gasit in sistemul dumneavoastra!\n"
 
@@ -631,6 +657,7 @@ msgid "Do you want to load an additional module?"
 msgstr "Doriti sa incarcati alte module?"
 
 #. TXT_ERROR_FTP
+#, c-format
 msgid "Error while accessing the FTP server:\n\n%s"
 msgstr "Eroare la accesarea serverului FTP:\n\n%s"
 
@@ -663,6 +690,7 @@ msgid "Do you want to use a FTP proxy?"
 msgstr "Doriti sa folositi un proxy FTP?"
 
 #. TXT_NOMEM_FTP
+#, c-format
 msgid ""
 "Your computer does not have enough RAM to do an "
 "installation via FTP! (%d MB RAM required)"
@@ -715,6 +743,7 @@ msgid ""
 msgstr "Selectati versiunea YaST pentru instalare."
 
 #. TXT_INSERT_CD
+#, c-format
 msgid "Please make sure that CD number %d is in your drive!"
 msgstr "Verificaþi dacã CD-ul cu numãrul %d e în CD-ROM!"
 
@@ -751,5 +780,5 @@ msgstr ""
 
 #. TXT_REISERFS
 msgid "Reiserfs file system found."
-msgstr "Reiserfs file system found."
+msgstr ""
 

@@ -5,8 +5,10 @@
 # Note: en.po ist treated specially!
 
 sub read_texts;
+sub join_msg;
 
 for $lang (@ARGV) {
+  $lang = 'en' if $lang eq 'linuxrc.pot';
   $lang =~ s/\.po$//;
   read_texts $lang;
 }
@@ -20,11 +22,12 @@ sub read_texts
 
   $lang = shift;
 
-  $file = $lang;
-  if($file =~ s/(^|\/)en$/$1de/) {
+  $file = "$lang.po";
+  $file = 'linuxrc.pot' if $lang eq 'en';
+
+  if($lang eq 'en') {
     $ids = 1;
   }
-  $file .= ".po";
 
   open F, $file;
   @f = (<F>);
@@ -38,7 +41,7 @@ sub read_texts
   for (@f) {
     if(/^\s*#\.\s*(TXT_\S+)/) {
       if($txt) {
-        @msgstr = @msgid if $ids;
+        @msgstr = @msgid if $ids || join_msg(\@msgstr) eq "";
         printf "{ %-25s", "$txt,";
         $p = pop @msgstr;
         for $t (@msgstr) {
@@ -86,7 +89,7 @@ sub read_texts
 
   if($txt) {
     printf "{ %-25s", "$txt,";
-    @msgstr = @msgid if $ids;
+    @msgstr = @msgid if $ids || join_msg(\@msgstr) eq "";
     $p = pop @msgstr;
     for $t (@msgstr) {
       printf "%s\n%-27s", $t, "";
@@ -109,3 +112,18 @@ sub read_texts
 }
 
 
+sub join_msg
+{
+  local $_;
+  my ($s, $msg, $m);
+
+  $msg = shift;
+
+  for $s (@{$msg}) {
+    $_ = $s;
+    s/^\"(.*)\"$/$1/;
+    $m .= $_;
+  }
+
+  return $m;
+}
