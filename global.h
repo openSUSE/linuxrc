@@ -57,6 +57,7 @@
 #define MAX_Y            150
 
 #define BUTTON_SIZE        9
+/* MAX_PARAM_LEN should not be less than 256 */
 #define MAX_PARAM_LEN    256
 #define STATUS_SIZE       50
 

@@ -1061,19 +1061,14 @@ int inst_read_yast_file()
 
 #if OBSOLETE_YAST_LIVECD
       case key_live:		/* really obsolete */
-        yast_live_cd = atoi(f->value);
+        yast_live_cd = f->nvalue;
         break;
 #endif
 
       case key_root:
         root = 1;
-        if(!strcasecmp(f->value, "reboot")) {
-          reboot_ig = TRUE;
-        }
-        else {
-          root_set_root(f->value);
-          reboot_ig = FALSE;
-        }
+        if(!f->is.numeric) root_set_root(f->value);
+        reboot_ig = f->nvalue;
         break;
 
       case key_keytable:
@@ -1089,7 +1084,7 @@ int inst_read_yast_file()
         break;
 
       case key_rebootmsg:
-        config.rebootmsg = atoi(f->value);
+        config.rebootmsg = f->nvalue;
         break;
 
       default:

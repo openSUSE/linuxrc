@@ -31,7 +31,6 @@
 
 static const char  *file_infofile_tm           = "/etc/install.inf";
 
-static const char  *file_txt_language_tm       = "Language:";
 static const char  *file_txt_keymap_tm         = "Keytable:";
 static const char  *file_txt_sourcemount_tm    = "Sourcemounted:";
 static const char  *file_txt_display_tm        = "Display:";
@@ -45,7 +44,6 @@ static const char  *file_txt_bootcd_tm         = "CD";
 static const char  *file_txt_bootnet_tm        = "Net";
 static const char  *file_txt_bootsmb_tm        = "SMB";
 static const char  *file_txt_bootharddisk_tm   = "Harddisk";
-static const char  *file_txt_bootcdwithnet_tm  = "CDwithNET";
 static const char  *file_txt_bootftp_tm        = "FTP";
 static const char  *file_txt_partition_tm      = "Partition:";
 static const char  *file_txt_fstyp_tm          = "Fstyp:";
@@ -61,20 +59,12 @@ static const char  *file_txt_machine_name_tm   = "Machinename:";
 static const char  *file_txt_broadcast_tm      = "Broadcast:";
 static const char  *file_txt_network_tm        = "Network:";
 static const char  *file_txt_domain_name_tm    = "Domain:";
-static const char  *file_txt_bootp_wait_tm     = "Bootpwait:";
 static const char  *file_txt_ftp_user_tm       = "FTP-User:";
 static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
-static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_manual_tm         = "Manual:";
 static const char  *file_txt_demo_tm           = "Demo:";
 static const char  *file_txt_reboot            = "Reboot:";
-static const char  *file_txt_reboot_wait       = "WaitReboot:";
-static const char  *file_txt_bootp_timeout_tm  = "BOOTP_TIMEOUT:";
-static const char  *file_txt_force_ri_tm       = "ForceRootimage:";
-#if WITH_PCMCIA
-static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
-#endif
 static const char  *file_txt_console_tm        = "Console:";
 #ifdef USE_LIBHD
 static const char  *file_txt_mouse_dev_tm      = "Mousedevice:";
@@ -86,54 +76,68 @@ static const char  *file_txt_yast2_update_tm   = "YaST2update:";
 static const char  *file_txt_yast2_serial_tm   = "YaST2serial:";
 static const char  *file_txt_yast2_autoinst_tm = "YaST2AutoInstall:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
-#if 0
-static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
-#endif
 static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
 static const char  *file_txt_usb_tm            = "USB:";
-#if 0
-static const char  *file_txt_xserver_tm        = "XServer:";
-static const char  *file_txt_xversion_tm       = "XVersion:";
-static const char  *file_txt_xbusid_tm         = "XBusID:";
-static const char  *file_txt_x11i_tm           = "X11i:";
-#endif
-#if 0
-static const char  *file_probe_tm              = "probe:";
-#endif
-#if 0
-static const char  *file_txt_xkbrules_tm       = "XkbRules:";
-static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
-static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
-#endif
 static const char  *file_txt_yast2_color_tm    = "YaST2color:";
 static const char  *file_txt_boot_disk_tm      = "BootDisk:";
 static const char  *file_txt_disks_tm          = "Disks:";
-#if 0
-static const char  *file_txt_braille_tm        = "Braille:";
-static const char  *file_txt_braille_dev_tm    = "Brailledevice:";
 #endif
-#endif
-static const char  *file_txt_livesrc_tm        = "LiveSRC:";
 
 static file_key_t file_str2key(char *value);
 
-static void file_get_value   (char *input_tv, char *value_tr);
-static void file_trim_buffer (char *buffer_tr);
-static void file_module_load (char *command_tv);
+static void file_module_load (char *insmod_arg);
 
 static struct {
   file_key_t key;
   char *value;
 } keywords[] = {
-  { key_none,      ""          },
-  { key_swap,      "Swap"      },
-  { key_root,      "Root"      },
-  { key_live,      "Live"      },
-  { key_keytable,  "Keytable"  },
-  { key_language,  "Language"  },
-  { key_rebootmsg, "RebootMsg" }
+  { key_none,           ""               },
+  { key_swap,           "Swap"           },
+  { key_root,           "Root"           },
+  { key_live,           "Live"           },
+  { key_keytable,       "Keytable"       },
+  { key_language,       "Language"       },
+  { key_rebootmsg,      "RebootMsg"      },
+  { key_insmod,         "insmod"         },
+  { key_autoprobe,      "autoprobe"      },
+  { key_start_pcmcia,   "start_pcmcia"   },
+  { key_color,          "Color"          },
+  { key_bootmode,       "Bootmode"       },
+  { key_ip,             "IP"             },
+  { key_netmask,        "Netmask"        },
+  { key_gateway,        "Gateway"        },
+  { key_server,         "Server"         },
+  { key_dnsserver,      "Nameserver"     },
+  { key_partition,      "Partition"      },
+  { key_serverdir,      "Serverdir"      },
+  { key_netdevice,      "Netdevice"      },
+  { key_livesrc,        "LiveSRC"        },
+  { key_bootpwait,      "Bootpwait"      },
+  { key_bootptimeout,   "BOOTP_TIMEOUT"  },
+  { key_forcerootimage, "ForceRootimage" },
+  { key_rebootwait,     "WaitReboot"     }
 };
 
+static struct {
+  char *name;
+  int value;
+} sym_constants[] = {
+  { "n",         0                  },
+  { "no",        0                  },
+  { "y",         1                  },
+  { "yes",       1                  },
+  { "j",         1                  },	// keep for compatibility?
+  { "Mono",      0                  },
+  { "Color",     1                  },
+  { "Reboot",    1                  },
+  { "Floppy",    BOOTMODE_FLOPPY    },
+  { "CD",        BOOTMODE_CD        },
+  { "Net",       BOOTMODE_NET       },
+  { "Harddisk",  BOOTMODE_HARDDISK  },
+  { "FTP",       BOOTMODE_FTP       },
+  { "CDwithNET", BOOTMODE_CDWITHNET },
+  { "SMB",       BOOTMODE_SMB       }
+};
 
 char *file_key2str(file_key_t key)
 {
@@ -168,9 +172,10 @@ file_key_t file_str2key(char *str)
 file_t *file_read_file(char *name)
 {
   FILE *f;
-  char buf1[256], buf2[256];
+  char buf1[256], buf2[256], *s, *t;
   int i, l;
   file_t *ft0 = NULL, **ft = &ft0;
+  struct in_addr in;
 
   if(!(f = fopen(name, "r"))) return NULL;
 
@@ -192,7 +197,30 @@ file_t *file_read_file(char *name)
       }
 
       (*ft)->key = file_str2key(buf1);
-      (*ft)->value = strdup(buf2);
+      (*ft)->value = s = strdup(buf2);
+
+      if(*s) {
+        l = strtol(s, &t, 0);
+        if(!*t) {
+          (*ft)->nvalue = l;
+          (*ft)->is.numeric = 1;
+        }
+        else {
+          for(l = 0; l < sizeof sym_constants / sizeof *sym_constants; l++) {
+            if(!strcasecmp(sym_constants[l].name, s)) {
+              (*ft)->nvalue = sym_constants[l].value;
+              (*ft)->is.numeric = 1;
+              break;
+            }
+          }
+        }
+        if(!(*ft)->is.numeric) {
+          if(!net_check_address(s, &in)) {
+            (*ft)->ivalue = in;
+            (*ft)->is.inet = 1;
+          }
+        }
+      }
 
       ft = &(*ft)->next;
     }
@@ -488,14 +516,13 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
 int file_read_info()
 {
   char filename_ti[MAX_FILENAME] = "/info";
-  FILE *fd;
   window_t win_ri;
-  char value_ti[MAX_X], buffer_ti[MAX_X];
   int do_autoprobe = FALSE;
 #if WITH_PCMCIA
   int start_pcmcia = FALSE;
 #endif
   int i, mounted = FALSE;
+  file_t *f0, *f;
 
   if(auto2_ig) {
     printf("%s...", txt_get(TXT_SEARCH_INFOFILE));
@@ -505,9 +532,9 @@ int file_read_info()
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
   }
 
-  fd = fopen(filename_ti, "r");
+  f0 = file_read_file(filename_ti);
 
-  if(!fd) {
+  if(!f0) {
     for(i = 0; i < config.floppies; i++) {
       if(!util_try_mount(config.floppy_dev[i], mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0)) break;
     }
@@ -519,15 +546,15 @@ int file_read_info()
       util_chk_driver_update(mountpoint_tg);
 
       sprintf(filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
-      fd = fopen(filename_ti, "r");
-      if(!fd) {
+      f0 = file_read_file(filename_ti);
+      if(!f0) {
         sprintf(filename_ti, "%s/info", mountpoint_tg);
-        fd = fopen(filename_ti, "r");
+        f0 = file_read_file(filename_ti);
       }
     }
   }
 
-  if(!fd) {
+  if(!f0) {
     if(mounted) umount(mountpoint_tg);
     if(auto2_ig) printf ("\n"); else win_close (&win_ri);
     return -1;
@@ -535,143 +562,123 @@ int file_read_info()
 
   valid_net_config_ig = 0;
 
-    while (fgets (buffer_ti, sizeof (buffer_ti) - 1, fd))
-        {
-        fprintf (stderr, "%s", buffer_ti);
-        file_trim_buffer (buffer_ti);
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+      case key_insmod:
+        file_module_load(f->value);
+        break;
 
-        if (!strncasecmp (buffer_ti, "insmod", 6))
-            file_module_load (buffer_ti);
-
-        if (!strncasecmp (buffer_ti, file_txt_autoprobe_tm,
-                      strlen (file_txt_autoprobe_tm)))
-            do_autoprobe = TRUE;
+      case key_autoprobe:
+        do_autoprobe = TRUE;
+        break;
 
 #if WITH_PCMCIA
-        if (!strncasecmp (buffer_ti, file_txt_start_pcmcia_tm,
-                      strlen (file_txt_start_pcmcia_tm)))
-            start_pcmcia = TRUE;
+      case key_start_pcmcia:
+        start_pcmcia = TRUE;
+        break;
 #endif
 
-        file_get_value (buffer_ti, value_ti);
+      case key_language:
+        i = set_langidbyname(f->value);
+        if(i != LANG_UNDEF) language_ig = i;
+        break;
 
-        if (!strncasecmp (file_txt_language_tm, buffer_ti,
-                          strlen (file_txt_language_tm)))
-            {
-              int i = set_langidbyname (value_ti);
+      case key_color:
+        color_ig = f->nvalue;
+        break;
 
-              if(i != LANG_UNDEF) language_ig = i;
-            }
+      case key_keytable:
+        strncpy(keymap_tg, f->value, sizeof keymap_tg);
+        keymap_tg[sizeof keymap_tg - 1] = 0;
+        break;
 
-        if (!strncasecmp (file_txt_display_tm, buffer_ti,
-                          strlen (file_txt_display_tm)))
-            {
-            if (!strncasecmp (value_ti, "Color", 5))
-                color_ig = TRUE;
-            else if (!strncasecmp (value_ti, "Mono", 4))
-                color_ig = FALSE;
-            }
+      case key_bootmode:
+        if(f->is.numeric) bootmode_ig = f->nvalue;
+        break;
 
-        if (!strncasecmp (file_txt_keymap_tm, buffer_ti,
-                          strlen (file_txt_keymap_tm)))
-            strncpy (keymap_tg, value_ti, sizeof (keymap_tg));
-
-        if (!strncasecmp (file_txt_bootmode_tm, buffer_ti,
-                          strlen (file_txt_bootmode_tm)))
-            {
-            if (!strncasecmp (value_ti, file_txt_bootcdwithnet_tm,
-                              strlen (file_txt_bootcdwithnet_tm)))
-                bootmode_ig = BOOTMODE_CDWITHNET;
-            else if (!strncasecmp (value_ti, file_txt_bootcd_tm,
-                              strlen (file_txt_bootcd_tm)))
-                bootmode_ig = BOOTMODE_CD;
-            else if (!strncasecmp (value_ti, file_txt_bootharddisk_tm,
-                                   strlen (file_txt_bootharddisk_tm)))
-                bootmode_ig = BOOTMODE_HARDDISK;
-            else if (!strncasecmp (value_ti, file_txt_bootnet_tm,
-                                   strlen (file_txt_bootnet_tm)))
-                bootmode_ig = BOOTMODE_NET;
-            else if (!strncasecmp (value_ti, file_txt_bootsmb_tm,
-                                   strlen (file_txt_bootsmb_tm)))
-                bootmode_ig = BOOTMODE_SMB;
-            }
-
-        if (!strncasecmp (file_txt_ip_tm, buffer_ti,
-                          strlen (file_txt_ip_tm)))
-            if (!net_check_address (value_ti, &ipaddr_rg)) valid_net_config_ig |= 1;
-
-        if (!strncasecmp (file_txt_netmask_tm, buffer_ti,
-                          strlen (file_txt_netmask_tm)))
-            if (!net_check_address (value_ti, &netmask_rg)) valid_net_config_ig |= 2;
-
-        if (!strncasecmp (file_txt_gateway_tm, buffer_ti,
-                          strlen (file_txt_gateway_tm)))
-            if (!net_check_address (value_ti, &gateway_rg)) valid_net_config_ig |= 4;
-
-        if (!strncasecmp (file_txt_server_tm, buffer_ti,
-                          strlen (file_txt_server_tm)))
-            if (!net_check_address (value_ti, &nfs_server_rg)) valid_net_config_ig |= 8;
-
-        if (!strncasecmp (file_txt_dnsserver_tm, buffer_ti,
-                          strlen (file_txt_dnsserver_tm)))
-            if (!net_check_address (value_ti, &nameserver_rg)) valid_net_config_ig |= 0x10;
-
-        if (!strncasecmp (file_txt_partition_tm, buffer_ti, strlen (file_txt_partition_tm)))
-            strncpy (harddisk_tg, value_ti, sizeof (harddisk_tg));
-        
-        if (!strncasecmp (file_txt_serverdir_tm, buffer_ti,
-                          strlen (file_txt_serverdir_tm)))
-            {
-            strncpy (server_dir_tg, value_ti, sizeof (server_dir_tg));
-            valid_net_config_ig |= 0x20;
-            }
-
-        if (!strncasecmp (file_txt_netdevice_tm, buffer_ti,
-                          strlen (file_txt_netdevice_tm)))
-            strncpy (netdevice_tg, value_ti, sizeof (netdevice_tg));
-
-        if((valid_net_config_ig & 3) == 3) {
-          broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
-          network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+      case key_ip:
+        if(f->is.inet) {
+          ipaddr_rg = f->ivalue;
+          valid_net_config_ig |= 1;
         }
+        break;
 
-        if (!strncasecmp (file_txt_livesrc_tm, buffer_ti, strlen (file_txt_livesrc_tm)))
-            {
-            strncpy (livesrc_tg, value_ti, sizeof (livesrc_tg));
-	    // TODO: SMB
-            if((valid_net_config_ig & 0x20)) bootmode_ig = BOOTMODE_NET;
-            }
-
-        if (!strncasecmp (file_txt_bootp_wait_tm, buffer_ti,
-                          strlen (file_txt_bootp_wait_tm)))
-            bootp_wait_ig = atoi (value_ti);
-
-        if (!strncasecmp (file_txt_bootp_timeout_tm, buffer_ti,
-                          strlen (file_txt_bootp_timeout_tm)))
-            bootp_timeout_ig = atoi (value_ti);
-
-        if (!strncasecmp (file_txt_force_ri_tm, buffer_ti,
-                          strlen (file_txt_force_ri_tm)))
-            {
-            if (atoi (value_ti))
-                force_ri_ig = TRUE;
-            else
-                force_ri_ig = FALSE;
-            }
-
-        if (!strncasecmp (file_txt_reboot_wait, buffer_ti,
-                          strlen (file_txt_reboot_wait)))
-            {
-            if (value_ti [0] == '1' ||
-                value_ti [0] == 'y' || value_ti [0] == 'Y' ||
-                value_ti [0] == 'j' || value_ti [0] == 'J')
-                reboot_wait_ig = TRUE;
-            else
-                reboot_wait_ig = FALSE;
-            }
+      case key_netmask:
+        if(f->is.inet) {
+          netmask_rg = f->ivalue;
+          valid_net_config_ig |= 2;
         }
+        break;
 
-  fclose(fd);
+      case key_gateway:
+        if(f->is.inet) {
+          gateway_rg = f->ivalue;
+          valid_net_config_ig |= 4;
+        }
+        break;
+
+      case key_server:
+        if(f->is.inet) {
+          nfs_server_rg = f->ivalue;
+          valid_net_config_ig |= 8;
+        }
+        break;
+
+      case key_dnsserver:
+        if(f->is.inet) {
+          nameserver_rg = f->ivalue;
+          valid_net_config_ig |= 0x10;
+        }
+        break;
+
+      case key_partition:
+        strncpy(harddisk_tg, f->value, sizeof harddisk_tg);
+        harddisk_tg[sizeof harddisk_tg - 1] = 0;
+        break;
+
+      case key_serverdir:
+        strncpy(server_dir_tg, f->value, sizeof server_dir_tg);
+        server_dir_tg[sizeof server_dir_tg - 1] = 0;
+        valid_net_config_ig |= 0x20;
+        break;
+
+      case key_netdevice:
+        strncpy(netdevice_tg, f->value, sizeof netdevice_tg);
+        netdevice_tg[sizeof netdevice_tg - 1] = 0;
+        break;
+
+      case key_livesrc:
+        strncpy(livesrc_tg, f->value, sizeof livesrc_tg);
+        livesrc_tg[sizeof livesrc_tg - 1] = 0;
+        if((valid_net_config_ig & 0x20)) bootmode_ig = BOOTMODE_NET;
+        break;
+
+      case key_bootpwait:
+        bootp_wait_ig = f->nvalue;
+        break;
+
+      case key_bootptimeout:
+        bootp_timeout_ig = f->nvalue;
+        break;
+
+      case key_forcerootimage:
+        force_ri_ig = f->nvalue;
+        break;
+
+      case key_rebootwait:
+        reboot_wait_ig = f->nvalue;
+        break;
+
+      default:
+    }
+  }
+
+  if((valid_net_config_ig & 3) == 3) {
+    broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+    network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+  }
+
+  file_free_file(f0);
 
   if(mounted) umount(mountpoint_tg);
 
@@ -687,43 +694,37 @@ int file_read_info()
 }
 
 
-static void file_get_value (char *input_tv, char *value_tr)
-    {
-    char  *tmp_pci;
+void file_module_load(char *insmod_arg)
+{
+  char module[64], params[256], text[256];
+  window_t win;
+  int i;
 
-    tmp_pci = input_tv;
-    while (*tmp_pci && *tmp_pci != ' ' && *tmp_pci != ':')
-        tmp_pci++;
+  i = sscanf(insmod_arg, "%63s %255[^\n]", module, params);
 
-    if (*tmp_pci == ':')
-        tmp_pci++;
+  if(i < 1) return;
 
-    while (*tmp_pci && isspace (*tmp_pci))
-        tmp_pci++;
+  if(i == 1) *params = 0;
 
-    if (*tmp_pci)
-        strcpy (value_tr, tmp_pci);
-    else
-        value_tr [0] = 0;
+  sprintf(text, txt_get(TXT_TRY_TO_LOAD), module);
+  dia_info(&win, text);
+
+  if(!mod_load_module(module, params)) {
+    mpar_save_modparams(module, params);
+    switch(mod_get_mod_type(module)) {
+      case MOD_TYPE_SCSI:
+        strcpy(scsi_tg, module);
+        break;
+      case MOD_TYPE_NET:
+        strcpy(net_tg, module);
+        break;
     }
+  }
 
+  win_close(&win);
+}
 
-static void file_trim_buffer (char *buffer_tr)
-    {
-    char  *tmp_pci;
-
-    tmp_pci = strchr (buffer_tr, '#');
-    if (tmp_pci)
-        *tmp_pci = 0;
-
-    tmp_pci = buffer_tr + strlen (buffer_tr) - 1;
-
-    while (tmp_pci > buffer_tr &&
-           (isspace (*tmp_pci) || *tmp_pci == '\r' || *tmp_pci == '\n'))
-        *(tmp_pci--) = 0;
-    }
-
-
+#if 0
 static void file_module_load (char *command_tv)
     {
     char      module_ti [30];
@@ -734,12 +735,15 @@ static void file_module_load (char *command_tv)
     window_t  win_ri;
 
 
+    tmp_pci = command_tv;
+#if 0
     tmp_pci = strchr (command_tv, ' ');
     if (!tmp_pci)
         return;
 
     while (*tmp_pci && (*tmp_pci == ' ' || *tmp_pci == 0x09))
         tmp_pci++;
+#endif
 
     while (*tmp_pci && *tmp_pci != ' ' && *tmp_pci != 0x09)
         module_ti [i_ii++] = *tmp_pci++;
@@ -771,3 +775,4 @@ static void file_module_load (char *command_tv)
 
     win_close (&win_ri);
     }
+#endif
