@@ -1311,7 +1311,10 @@ static int inst_choose_yast_version (void)
     yast2_ii = util_check_exist (YAST2_COMMAND);
 
     if (!yast_version_ig && auto_ig)
+        {
         yast_version_ig = 1;
+        return (0);
+        }
 
     if (yast_version_ig == 1 && yast1_ii)
         return (0);

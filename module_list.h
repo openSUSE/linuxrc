@@ -184,6 +184,7 @@ static enum modid_t mod_noauto_arm [] =
   ID_ATP,
   ID_EEPRO,
   ID_EATA_DMA,
+  ID_EATA_PIO,
   ID_ADVANSYS
 };
 
