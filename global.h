@@ -206,6 +206,7 @@ typedef struct {
   unsigned nopcmcia:1;		/* don't start pcmcia automatically */
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
+  unsigned usessh:1;		/* ssh mode */
   unsigned pivotroot:1;		/* use pivotroot system call */
   unsigned addswap:1;		/* offer to add swap if yast needs it */
   unsigned fullnetsetup:1;	/* offer all network protocols */
@@ -337,6 +338,7 @@ typedef struct {
     char *user;			/* if this is NULL, perform guest login */
     char *password;
     char *vncpassword;
+    char *sshpassword;
     net_config_t configured;	/* how we configured the network device */
   } net;
 

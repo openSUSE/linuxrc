@@ -163,7 +163,9 @@ static struct {
   { key_installdir,     "InstallDir"       },
   { key_nopcmcia,       "NoPCMCIA"         },
   { key_vnc,            "VNC"              },
+  { key_usessh,         "UseSSH"           },
   { key_vncpassword,    "VNCPassword"      },
+  { key_sshpassword,    "SSHPassword"      },
   { key_usepivotroot,   "UsePivotRoot"     },
   { key_term,           "TERM"             },
   { key_addswap,        "AddSwap"          },
@@ -790,9 +792,20 @@ void file_do_info(file_t *f0)
         if(f->nvalue) config.activate_network = 1;
         break;
 
+      case key_usessh:
+        if(f->is.numeric) config.usessh = f->nvalue;
+        if(f->nvalue) config.activate_network = 1;
+        break;
+
       case key_vncpassword:
         str_copy(&config.net.vncpassword, *f->value ? f->value : NULL);
         config.vnc = 1;
+        config.activate_network = 1;
+        break;
+
+      case key_sshpassword:
+        str_copy(&config.net.sshpassword, *f->value ? f->value : NULL);
+        config.usessh = 1;
         config.activate_network = 1;
         break;
 
@@ -1044,7 +1057,7 @@ void file_write_install_inf(char *dir)
   if(
     config.insttype == inst_net ||
     config.instmode_extra == inst_cdwithnet ||
-    config.vnc
+    (config.vnc || config.usessh)
   ) {
     s = NULL;
     switch(config.net.configured) {
@@ -1131,6 +1144,7 @@ void file_write_install_inf(char *dir)
 
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
+  file_write_num(f, key_usessh, config.usessh);
 
   if(yast2_color_ig) {
     fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);

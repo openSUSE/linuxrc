@@ -216,7 +216,6 @@ int inst_menu()
 {
   dia_item_t di;
   dia_item_t items[] = {
-    di_inst_vnc,
     di_inst_install,
     di_inst_demo,
     di_inst_system,
@@ -226,9 +225,8 @@ int inst_menu()
     di_none
   };
 
-  if(!config.vnc) items[0] = di_skip;
-  items[config.demo ? 1 : 2] = di_skip;
-  if(!yast2_update_ig) items[6] = di_skip;
+  items[config.demo ? 0 : 1] = di_skip;
+  if(!yast2_update_ig) items[5] = di_skip;
 
   di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
 
@@ -250,16 +248,6 @@ int inst_menu_cb(dia_item_t di)
   di_inst_menu_last = di;
 
   switch(di) {
-    case di_inst_vnc:
-      dia_input2("Please enter your VNC password", &config.net.vncpassword, 20, 1);
-      error = inst_start_install();
-      if(config.redraw_menu)  { /* install source not found */
-          rc = -1;
-	  break;
-      }
-      // if(config.insttype != inst_net) net_config();
-      break;
-
     case di_inst_install:
       config.rescue = 0;
       error = inst_start_install();
@@ -495,7 +483,7 @@ int inst_mount_cdrom(int show_err)
   else {
     set_instmode(inst_cdrom);
 
-    if(config.vnc && (rc = net_config())) return rc;
+    if((config.vnc || config.usessh) && (rc = net_config())) return rc;
   }
 
   dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
@@ -604,7 +592,7 @@ int inst_mount_harddisk()
 
   set_instmode(inst_hd);
 
-  if(config.vnc && (rc = net_config())) return rc;
+  if((config.vnc || config.usessh) && (rc = net_config())) return rc;
 
   do {
     if(!auto_ig) {
@@ -1028,6 +1016,19 @@ int inst_execute_yast()
   if(i) {
     inst_yast_done();
     return -1;
+  }
+
+  if (!config.test && config.usessh && config.net.sshpassword) {
+    FILE *passwd;
+
+    /* symlink most likely to ro medium */
+    rename("/etc/shadow","/etc/shadow.old");
+    system("cp /etc/shadow.old /etc/shadow");
+    passwd = popen("/usr/sbin/chpasswd","w");
+    if (passwd) {
+      fprintf(passwd,"root:%s\n",config.net.sshpassword);
+      pclose(passwd);
+    }
   }
 
   /* start shells only _after_ the swap dialog */

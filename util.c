@@ -869,6 +869,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.demo, "demo");
   add_flag(&sl0, buf, config.vnc, "vnc");
+  add_flag(&sl0, buf, config.usessh, "usessh");
   add_flag(&sl0, buf, config.hwcheck, "hwcheck");
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
@@ -991,6 +992,12 @@ void util_status_info()
     sprintf(buf, "vncpassword = %s", config.net.vncpassword);
     slist_append_str(&sl0, buf);
   }
+
+  if(config.net.sshpassword) {
+    sprintf(buf, "sshpassword = %s", config.net.sshpassword);
+    slist_append_str(&sl0, buf);
+  }
+
 
   if(config.net.use_dhcp) {
     s = "", t = "*";

@@ -131,6 +131,16 @@ int net_config()
   net_check_address2(&config.net.server, 1);
   // net_check_address2(&..., 1);
 
+  /* If we use VNC or ssh install, ask for the login password */
+  if (config.vnc && config.win && !config.net.vncpassword) {
+    rc = dia_input2(TXT_VNC_PASSWORD, &config.net.vncpassword, 20, 1);
+    /* if(rc == ESCAPE) return -1; */
+  }
+  if (config.usessh && config.win && !config.net.sshpassword) {
+    rc = dia_input2(TXT_SSH_PASSWORD, &config.net.sshpassword, 20, 1);
+  }
+
+
 #endif
 
   return 0;

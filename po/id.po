@@ -902,3 +902,19 @@ msgstr ""
 msgid "Use VNC for install?"
 msgstr ""
 
+#. TXT_SSH_SWITCH
+msgid "Enable/Disable SSH Mode"
+msgstr ""
+
+#. TXT_SSH_YES_NO
+msgid "Start SSH for Text Install?"
+msgstr ""
+
+#. TXT_VNC_PASSWORD
+msgid "Please enter your VNC password"
+msgstr ""
+
+#. TXT_SSH_PASSWORD
+msgid "Please enter your temporary SSH password"
+msgstr ""
+

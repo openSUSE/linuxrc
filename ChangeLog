@@ -1,3 +1,4 @@
+	- add an SSH mode. relayout SSH and VNC mode to be similar.
 	- make it possible to enable/disable VNC in expert mode
 	- adapted to libhd interface changes
 

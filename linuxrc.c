@@ -926,17 +926,6 @@ void lxrc_init()
 
   net_setup_localhost();
 
-  if(config.vnc && !config.manual) {
-    int win_old;
-  
-    if(!(win_old = config.win)) util_disp_init();
-    if(!config.net.vncpassword) {
-      dia_input2("Please enter your VNC password", &config.net.vncpassword, 20, 1);
-    }
-    if(config.insttype != inst_net) net_config();
-    if(!win_old) util_disp_done();
-  }
-
 #if !(defined(__PPC__) || defined(__sparc__))
   if(!auto_ig || reboot_wait_ig) {
     config.rebootmsg = 1;

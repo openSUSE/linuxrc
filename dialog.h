@@ -34,8 +34,8 @@ typedef enum {
   di_expert_bootptimeout,
   di_expert_dhcp,
   di_expert_vnc,
+  di_expert_usessh,
 
-  di_inst_vnc,
   di_inst_install,
   di_inst_demo,
   di_inst_system,
