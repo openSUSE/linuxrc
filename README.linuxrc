@@ -150,6 +150,9 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # FS type (bootmode Harddisk)  * Deprecated since we try and mount all
   # Fstyp:                       * possible filesystems
 
+  # how linuxrc configured the network device
+  NetConfig: static|bootp|dhcp
+
   # network device (bootmode Net)
   Netdevice: eth0
 
