@@ -157,6 +157,7 @@ typedef struct {
   char *dir;
   char *user;
   char *password;
+  char *domain;
   unsigned port;
 } url_t;
 

@@ -1346,6 +1346,11 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
+  if(config.net.share) {
+    sprintf(buf, "share = %s", config.net.share);
+    slist_append_str(&sl0, buf);
+  }
+
   if(config.net.workgroup) {
     sprintf(buf, "workgroup = %s", config.net.workgroup);
     slist_append_str(&sl0, buf);
@@ -3001,6 +3006,8 @@ url_t *parse_url(char *str)
   if(url.dir) free(url.dir);
   if(url.user) free(url.user);
   if(url.password) free(url.password);
+  if(url.domain) free(url.domain);
+  if(url.share) free(url.share);
 
   memset(&url, 0, sizeof url);
 
@@ -3117,6 +3124,19 @@ url_t *parse_url(char *str)
     else {
       str_copy(&url.dir, "");
     }
+
+    if(url.user && (s = strchr(url.user, ';'))) {
+      url.domain = url.user;
+      url.user = NULL;
+      *s = 0;
+      str_copy(&url.user, s + 1);
+    }
+    else if(url.server && (s = strchr(url.server, ';'))) {
+      url.domain = url.server;
+      url.server = NULL;
+      *s = 0;
+      str_copy(&url.server, s + 1);
+    }
   }
 
   if(
@@ -3130,9 +3150,9 @@ url_t *parse_url(char *str)
   if(config.debug >= 2) {
     fprintf(stderr,
       "  scheme = %s, server = \"%s\", dir = \"%s\", share = \"%s\"\n"
-      "  user = \"%s\", password = \"%s\", port = %u\n",
+      "  domain = \"%s\", user = \"%s\", password = \"%s\", port = %u\n",
       get_instmode_name(url.scheme), url.server, url.dir, url.share,
-      url.user, url.password, url.port
+      url.domain, url.user, url.password, url.port
     );
   }
 

@@ -821,6 +821,7 @@ void file_do_info(file_t *f0)
           str_copy(&config.net.user, url->user);
           str_copy(&config.net.password, url->password);
           str_copy(&config.net.share, url->share);
+          str_copy(&config.net.workgroup, url->domain);
 
           if(config.insttype == inst_net) {
             name2inet(&config.net.server, url->server);
