@@ -1,3 +1,5 @@
+	- s390: several minor netdev setup fixes
+
 13/9/2004:	v1.7.11
 	- fixed font creation
 

@@ -1248,3 +1248,7 @@ msgstr ""
 msgid "This is not a valid CCW address."
 msgstr ""
 
+#. TXT_NET_HSI
+msgid "Hipersocket"
+msgstr ""
+

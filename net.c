@@ -1015,7 +1015,8 @@ int net_choose_device()
     { "ctc",   TXT_NET_CTC   },
     { "escon", TXT_NET_ESCON },
     { "ci",    TXT_NET_CLAW  },
-    { "iucv",  TXT_NET_IUCV  }
+    { "iucv",  TXT_NET_IUCV  },
+    { "hsi",   TXT_NET_HSI   }
   };
     
   if(config.net.device_given) return 0;
@@ -1050,7 +1051,7 @@ int net_choose_device()
     choice = 1;
   }
   else {
-    choice = dia_list(txt_get(TXT_CHOOSE_NET), 32, NULL, items, last_item, align_left);
+    choice = dia_list(txt_get(TXT_CHOOSE_NET), 50, NULL, items, last_item, align_left);
     if(choice) last_item = choice;
   }
 
@@ -1680,14 +1681,16 @@ void net_list_s390_devs(char* driver, int model)
   struct sysfs_attribute* attr;
   char* bp=&buf[0];
 
+  strcpy(buf,"no devices found\n");
+
   if(!config.manual) return;
   
-  driv=sysfs_open_driver("ccw",driver);
-  devs=sysfs_get_driver_devices(driv);
+  driv=sysfs_open_driver("ccw",driver);	 // FIXME: error handling
+  devs=sysfs_get_driver_devices(driv);	 // FIXME: error handling
   dlist_for_each_data(devs,dev,struct sysfs_device)
   {
     attr=sysfs_get_device_attr(dev,"cutype");
-    if(model && strtol(attr->value,NULL,16)!=model) continue;
+    if(model && strtol(attr->value+5,NULL,16)!=model) continue;
     bp+=sprintf(bp,"%s ",dev->bus_id);
     bp+=sprintf(bp,"%s",attr->value);	/* attr->value contains a LF */
   }
@@ -1856,7 +1859,7 @@ int net_activate_s390_devs(void)
       default: return -1;
       }
     }
-    
+
     if((rc=net_s390_group_chans(2,"ctc"))) return rc;
 
     /* set protocol */
@@ -1864,7 +1867,7 @@ int net_activate_s390_devs(void)
     sprintf(buf,"/sys/%s/protocol",devpath);
     sprintf(hwcfg_name,"%d",config.hwp.protocol-1);
     if((rc=util_set_sysfs_attr(buf,hwcfg_name))) return rc;
-
+    
     if((rc=net_s390_put_online(devpath))) return rc;
     
     net_s390_set_config_ccwdev();
