@@ -23,6 +23,7 @@
 #include <syscall.h>
 #include <errno.h>
 
+#include <linux/cdrom.h>
 #include <linux/loop.h>
 
 #include "global.h"
@@ -550,5 +551,19 @@ int util_umount(char *mp)
 #else
   return umount(mp);
 #endif
+}
+
+int util_eject_cdrom(char *dev)
+{
+  int fd;
+
+  if(!*dev) return 0;
+
+  if((fd = open(dev, O_RDONLY | O_NONBLOCK)) < 0) return 1;
+  umount(dev);
+  if(ioctl(fd, CDROMEJECT, NULL) < 0) { close(fd); return 2; }
+  close(fd);
+
+  return 0;
 }
 

@@ -41,3 +41,4 @@ extern int  util_cd1_boot         (void);
 
 extern void util_disp_init        (void);
 extern int  util_umount           (char *mountpoint);
+extern int  util_eject_cdrom      (char *dev);

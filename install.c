@@ -204,11 +204,10 @@ int inst_start_demo (void)
 int inst_menu (void)
     {
     int     width_ii = 40;
-    item_t  items_ari [4];
+    item_t  items_ari [5];
     int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
     int     choice_ii;
     int     i_ii;
-
 
     util_create_items (items_ari, nr_items_ii, width_ii);
 
@@ -216,6 +215,7 @@ int inst_menu (void)
     strcpy (items_ari [1].text, txt_get (TXT_BOOT_SYSTEM));
     strcpy (items_ari [2].text, txt_get (TXT_START_RESCUE));
     strcpy (items_ari [3].text, txt_get (TXT_START_DEMO));
+    strcpy (items_ari [4].text, "Eject CD");
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, width_ii);
@@ -237,6 +237,7 @@ int inst_menu (void)
 static int inst_menu_cb (int what_iv)
     {
     int  error_ii = FALSE;
+    char s[64];
 
     switch (what_iv)
         {
@@ -251,6 +252,11 @@ static int inst_menu_cb (int what_iv)
             break;
         case 4:
             error_ii = inst_start_demo ();
+            break;
+        case 5:
+            sprintf(s, "/dev/%s", cdrom_tg);
+            util_eject_cdrom(s);
+            error_ii = -1;
             break;
         default:
             dia_message (txt_get (TXT_NOT_IMPLEMENTED), MSGTYPE_ERROR);

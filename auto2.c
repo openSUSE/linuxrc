@@ -210,6 +210,10 @@ void auto2_scan_hardware(char *log_file)
       disp_vgacolors_rm.bg = COL_YELLOW;
       yast2_color_ig = 0xff7f50;
       break;
+    case 0x07:
+      disp_vgacolors_rm.bg = COL_BLACK;
+      yast2_color_ig = 0x000000;
+      break;
     case 0xff:
       disp_vgacolors_rm.bg = COL_WHITE;
       yast2_color_ig = 0x7f7f7f;

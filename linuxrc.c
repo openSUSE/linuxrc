@@ -474,8 +474,7 @@ static void lxrc_main_menu (void)
     item_t items_ari [5];
     int    i_ii;
     int    choice_ii;
-    int    nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);;
-
+    int    nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
 
     auto_ig = FALSE;
 
