@@ -1,5 +1,6 @@
 30/10/2001:	v1.2.31
 	- fixed bootp again (#11817) [revert v1.2.3, part 2 changes]
+	- added 8139cp.o (RealTek RTL-8139 C+)
 
 25/9/2001:	v1.2.30
 	- added modules pdcraid and hptraid
