@@ -13,7 +13,7 @@ msgstr ""
 
 #. TXT_OK
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -197,7 +197,7 @@ msgstr "Sí»ové karty"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr ""
+msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
@@ -217,7 +217,7 @@ msgstr "Moduly"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr ""
+msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
@@ -539,7 +539,7 @@ msgstr "Nebyly detekovány ¾ádné disky ani CD mechaniky."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr ""
+msgstr "Ladící verze pro experty"
 
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
@@ -762,23 +762,23 @@ msgstr "Byl nalezen Reiserfs."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr ""
+msgstr "Spojení kanál kanál"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr ""
+msgstr "ESCON spojení"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr ""
+msgstr "IUCV spojení"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr ""
+msgstr "Kanálem pøipojený cisco smìrovaè"
 
 #. TXT_SMB
 msgid "Network (Windows Share aka SMB)"
-msgstr ""
+msgstr "Sí» (sdílené Windows jako SMB)"
 
 #. TXT_SMB_ENTER_SERVER
 msgid "Please enter the IP-address of the SMB server"
@@ -814,4 +814,5 @@ msgstr ""
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
+
 
