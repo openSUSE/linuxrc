@@ -305,7 +305,7 @@ static int do_hwcheck()
 {
   hd_t *hd, *hd0;
   hd_res_t *res;
-  driver_info_t *di, *di0;
+  driver_info_t *di;
   FILE *f;
   int i, wheels, buttons, missing = 0;
   unsigned u;
@@ -404,10 +404,9 @@ static int do_hwcheck()
       case hw_display:
         fprintf(f, "GFX Card\n");
         for(hd = hd0; hd; hd = hd->next) {
-          di0 = hd_driver_info(hd_data, hd);
           u = 0;
           s1 = NULL;
-          for(di = di0; di; di = di->next) {
+          for(di = hd->driver_info; di; di = di->next) {
             if(di->any.type == di_x11) {
               if(!s1) s1 = di->x11.server;
               if(di->x11.x3d && !u) {
@@ -424,7 +423,6 @@ static int do_hwcheck()
           if(u) fprintf(f, ", 3D support");
           fprintf(f, ")");
           fprintf(f, "\n");
-          di0 = hd_free_driver_info(di0);
         }
         fprintf(f, "\n");
         break;
@@ -432,10 +430,9 @@ static int do_hwcheck()
       case hw_mouse:
         fprintf(f, "Mouse\n");
         for(hd = hd0; hd; hd = hd->next) {
-          di0 = hd_driver_info(hd_data, hd);
           buttons = wheels = -1;	// make gcc happy
           s = NULL;
-          for(di = di0; di; di = di->next) {
+          for(di = hd->driver_info; di; di = di->next) {
             if(di->any.type == di_mouse) {
               buttons = di->mouse.buttons;
               wheels = di->mouse.wheels;
@@ -452,7 +449,6 @@ static int do_hwcheck()
           if(wheels >= 0) fprintf(f, ", %d wheels", wheels);
           fprintf(f, ")");
           fprintf(f, "\n");
-          di0 = hd_free_driver_info(di0);
         }
         fprintf(f, "\n");
         break;
@@ -460,9 +456,8 @@ static int do_hwcheck()
       case hw_tv:
         fprintf(f, "TV Card\n");
         for(hd = hd0; hd; hd = hd->next) {
-          di0 = hd_driver_info(hd_data, hd);
           s = NULL;
-          for(di = di0; di; di = di->next) {
+          for(di = hd->driver_info; di; di = di->next) {
             if(
               (di->any.type == di_any || di->any.type == di_module) &&
               di->any.hddb0 &&
@@ -476,7 +471,6 @@ static int do_hwcheck()
             s = "not supported";
           }
           fprintf(f, "  %s (%s)\n", hd->model, s);
-          di0 = hd_free_driver_info(di0);
         }
         fprintf(f, "\n");
         break;
@@ -484,9 +478,8 @@ static int do_hwcheck()
       case hw_sound:
         fprintf(f, "Sound Card\n");
         for(hd = hd0; hd; hd = hd->next) {
-          di0 = hd_driver_info(hd_data, hd);
           s = NULL;
-          for(di = di0; di; di = di->next) {
+          for(di = hd->driver_info; di; di = di->next) {
             if(
               (di->any.type == di_any || di->any.type == di_module) &&
               di->any.hddb0 &&
@@ -500,7 +493,6 @@ static int do_hwcheck()
             s = "not supported";
           }
           fprintf(f, "  %s (%s)\n", hd->model, s);
-          di0 = hd_free_driver_info(di0);
         }
         fprintf(f, "\n");
         break;
@@ -532,9 +524,7 @@ static int do_hwcheck()
       case hw_isdn:
         fprintf(f, "ISDN\n");
         for(hd = hd0; hd; hd = hd->next) {
-          di0 = hd_driver_info(hd_data, hd);
-          fprintf(f, "  %s (%ssupported)\n", hd->model, di0 ? "" : "not ");
-          di0 = hd_free_driver_info(di0);
+          fprintf(f, "  %s (%ssupported)\n", hd->model, hd->driver_info ? "" : "not ");
         }
         fprintf(f, "\n");
         break;
@@ -558,9 +548,8 @@ static int do_hwcheck()
           fprintf(f, "Network Controller\n");
         }
         for(hd = hd0; hd; hd = hd->next) {
-          di0 = hd_driver_info(hd_data, hd);
           s = NULL;
-          for(di = di0; di; di = di->next) {
+          for(di = hd->driver_info; di; di = di->next) {
             if(di->any.type == di_module && di->module.names) {
               s = di->module.names->str;
               break;
@@ -576,7 +565,6 @@ static int do_hwcheck()
             }
           }
           fprintf(f, "  %s (%s)\n", hd->model, s);
-          di0 = hd_free_driver_info(di0);
         }
         fprintf(f, "\n");
         break;
@@ -659,10 +647,9 @@ static int do_hwcheck()
         else {
           for(hd = hd0; hd; hd = hd->next) {
             fprintf(f, "Graphics : ");
-            di0 = hd_driver_info(hd_data, hd);
             u = 0;
             s1 = NULL;
-            for(di = di0; di; di = di->next) {
+            for(di = hd->driver_info; di; di = di->next) {
               if(di->any.type == di_x11) {
                 if(!s1) s1 = di->x11.server;
                 if(di->x11.x3d && !u) {
@@ -681,7 +668,6 @@ static int do_hwcheck()
               if(u) fprintf(f, " (3D supported)");
             }
             fprintf(f, "\n");
-            di0 = hd_free_driver_info(di0);
           }
         }
         break;
@@ -694,10 +680,9 @@ static int do_hwcheck()
         else {
           for(hd = hd0; hd; hd = hd->next) {
             fprintf(f, "Mouse    : ");
-            di0 = hd_driver_info(hd_data, hd);
             buttons = wheels = -1;	// make gcc happy
             s = NULL;
-            for(di = di0; di; di = di->next) {
+            for(di = hd->driver_info; di; di = di->next) {
               if(di->any.type == di_mouse) {
                 buttons = di->mouse.buttons;
                 wheels = di->mouse.wheels;
@@ -718,7 +703,6 @@ static int do_hwcheck()
               fprintf(f, ")");
             }
             fprintf(f, "\n");
-            di0 = hd_free_driver_info(di0);
           }
         }
         break;
@@ -735,9 +719,8 @@ static int do_hwcheck()
         else {
           for(hd = hd0; hd; hd = hd->next) {
             fprintf(f, item == hw_sound ? "Sound    : " : "TV Card  : ");
-            di0 = hd_driver_info(hd_data, hd);
             s = NULL;
-            for(di = di0; di; di = di->next) {
+            for(di = hd->driver_info; di; di = di->next) {
               if(
                 (di->any.type == di_any || di->any.type == di_module) &&
                 di->any.hddb0 &&
@@ -754,7 +737,6 @@ static int do_hwcheck()
             else {
               fprintf(f, "ok    %s (%s)\n", hd->model, s);
             }
-            di0 = hd_free_driver_info(di0);
           }
         }
         break;
@@ -772,14 +754,12 @@ static int do_hwcheck()
         if(hd0 && sep) { fprintf(f, sep); sep = NULL; }
         for(hd = hd0; hd; hd = hd->next) {
           fprintf(f, "ISDN     : ");
-          di0 = hd_driver_info(hd_data, hd);
-          if(!di0) {
+          if(!hd->driver_info) {
             fprintf(f, "not supported\n");
           }
           else {
             fprintf(f, "ok    %s\n", hd->model);
           }
-          di0 = hd_free_driver_info(di0);
         }
         break;
 
@@ -824,9 +804,8 @@ static int do_hwcheck()
         if(hd0 && sep) { fprintf(f, sep); sep = NULL; }
         for(hd = hd0; hd; hd = hd->next) {
           fprintf(f, "Network  : ");
-          di0 = hd_driver_info(hd_data, hd);
           s = NULL;
-          for(di = di0; di; di = di->next) {
+          for(di = hd->driver_info; di; di = di->next) {
             if(di->any.type == di_module && di->module.names) {
               s = di->module.names->str;
               break;
@@ -838,7 +817,6 @@ static int do_hwcheck()
           else {
             fprintf(f, "ok    %s (%s)\n", hd->model, s);
           }
-          di0 = hd_free_driver_info(di0);
         }
         break;
 

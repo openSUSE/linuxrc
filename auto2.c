@@ -209,7 +209,7 @@ void auto2_scan_hardware(char *log_file)
     if(hd->base_class == bc_keyboard) {
       has_kbd_ig = TRUE;
       if(hd->bus == bus_usb) ju++;
-      di = hd_driver_info(hd_data, hd);
+      di = hd->driver_info;
       if(di && di->any.type == di_kbd) {
 //        if(di->kbd.XkbRules) strcpy(xkbrules_tg, di->kbd.XkbRules);
         if(di->kbd.XkbModel) strcpy(xkbmodel_tg, di->kbd.XkbModel);
@@ -219,7 +219,6 @@ void auto2_scan_hardware(char *log_file)
           str_copy(&config.keymap, di->kbd.keymap);
         }
       }
-      di = hd_free_driver_info(di);
     }
   }
 
@@ -520,7 +519,7 @@ int auto2_driver_is_active(driver_info_t *di)
  */
 int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 {
-  driver_info_t *di, *di0;
+  driver_info_t *di;
   str_list_t *sl1, *sl2;
   hd_t *hd;
   int i;
@@ -533,13 +532,13 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 
   if(!hd) return 0;	/* no further entries */
 
-  for(di0 = NULL; hd; hd = hd->next) {
+  for(; hd; hd = hd->next) {
     if(
       hd->base_class == base_class &&
-      (di0 = hd_driver_info(hd_data, hd)) &&
-      !auto2_driver_is_active(di0)
+      hd->driver_info &&
+      !auto2_driver_is_active(hd->driver_info)
     ) {
-      for(di = di0; di; di = di->next) {
+      for(di = hd->driver_info; di; di = di->next) {
         if(di->module.type == di_module && !di->module.modprobe) {
           // fprintf(stderr, "Found a \"%s\"\n", auto2_device_name(hd));
           for(
@@ -576,11 +575,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
         di
       ) break;
     }
-
-    di0 = hd_free_driver_info(di0);
   }
-
-  di0 = hd_free_driver_info(di0);
 
   return last_idx;
 }
@@ -964,7 +959,7 @@ int auto2_has_i2o()
   if(hd_data) {
     for(hd = hd_data->hd; hd; hd = hd->next) {
       if(hd->base_class == bc_i2o) {
-        di = hd_driver_info(hd_data, hd);
+        di = hd->driver_info;
 
         /* don't use i2o if we have an alternative driver */
         if(di && di->any.type == di_module) {
@@ -972,8 +967,6 @@ int auto2_has_i2o()
         } else {
           if(i2o_needed == -1) i2o_needed = 1;
         }
-
-        di = hd_free_driver_info(di);
       }
     }
   }
