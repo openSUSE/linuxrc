@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <string.h>
 #include <linux/vt.h>
+#include <errno.h>
 
 #include "global.h"
 #include "keyboard.h"
@@ -48,17 +49,19 @@ static void kbd_timeout     (int signal_iv);
 
 static int kbd_getch_raw    (int wait_iv);
 
+static void get_screen_size(int fd);
+
+
 /*
  *
  * exported functions
  *
  */
 
-void kbd_init (void)
+void kbd_init (int first)
     {
     struct winsize  winsize_ri;
     char           *start_msg_pci = "Startup...\n";
-
 
     if(!config.test) {
       kbd_tty_im = open ("/dev/tty4", O_RDWR);
@@ -74,15 +77,18 @@ void kbd_init (void)
         {
 	kbd_tio_rm.c_lflag &= ~ISIG;
 	tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
-	max_x_ig = 80;
-	max_y_ig = 24;
+	if (first)
+	    {
+	    max_x_ig = 80;
+	    max_y_ig = 24;
+	    }
 	return;
 	}
     kbd_tio_rm.c_cc [VMIN] = 1;
     kbd_tio_rm.c_cc [VTIME] = 0;
     kbd_tio_rm.c_lflag &= ~(ECHO | ICANON | ISIG);
     kbd_tio_rm.c_iflag &= ~(INLCR | IGNCR | ICRNL);
-    if (!ioctl (kbd_tty_im, TIOCGWINSZ, &winsize_ri))
+    if (first && !ioctl (kbd_tty_im, TIOCGWINSZ, &winsize_ri))
         {
         if (winsize_ri.ws_col && winsize_ri.ws_row)
             {
@@ -90,10 +96,29 @@ void kbd_init (void)
             max_y_ig = winsize_ri.ws_row;
             }
 
-        if(!config.had_segv) fprintf (stderr, "Winsize (%d, %d)!\n", max_y_ig, max_x_ig);
         }
 
     tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
+
+    write(kbd_tty_im, "\033[?1l", sizeof "\033[?1l" - 1);
+    fsync(kbd_tty_im);
+
+    if(first) {
+      get_screen_size(kbd_tty_im);
+
+      if(max_x_ig > MAX_X) max_x_ig = MAX_X;
+      if(max_y_ig > MAX_Y) max_y_ig = MAX_Y;
+
+      if(!config.had_segv) fprintf(stderr, "Window size: %d x %d\n", max_x_ig, max_y_ig);
+
+      memset(&winsize_ri, 0, sizeof winsize_ri);
+
+      winsize_ri.ws_col = max_x_ig;
+      winsize_ri.ws_row = max_y_ig;
+
+      ioctl(kbd_tty_im, TIOCSWINSZ, &winsize_ri);
+    }
+
     }
 
 
@@ -157,6 +182,9 @@ int kbd_getch_raw (int wait_iv)
     char  tmp_ci;
     int   i_ii;
     int   time_to_wait;
+    int   esc_delay = KBD_ESC_DELAY;
+
+    if(config.escdelay) esc_delay = config.escdelay * 1000;
 
     keypress_ci = 0;
 
@@ -182,7 +210,7 @@ int kbd_getch_raw (int wait_iv)
     if (keypress_ci != KEY_ESC)
         return ((int) keypress_ci);
 
-    kbd_set_timeout (KBD_ESC_DELAY);
+    kbd_set_timeout (esc_delay);
 
     read (kbd_tty_im, &keypress_ci, 1);
     if (kbd_timeout_im)
@@ -201,7 +229,7 @@ int kbd_getch_raw (int wait_iv)
         return (((int) keypress_ci) | KEY_SPECIAL);
     
     i_ii = 0;
-    kbd_set_timeout (KBD_ESC_DELAY);
+    kbd_set_timeout (esc_delay);
 
     do
         {
@@ -263,3 +291,40 @@ static void kbd_timeout (int signal_iv)
     {
     kbd_timeout_im = TRUE;
     }
+
+
+void get_screen_size(int fd)
+{
+  static const char *term_init = "\0337\033[r\033[999;999H\033[6n\0338";
+  char buf[64];
+  int i, buf_len;
+  struct timeval to;
+  fd_set set;
+  unsigned u1, u2;
+
+  write(fd, term_init, strlen(term_init));
+  fsync(fd);
+
+  buf[buf_len = 0];
+
+  FD_ZERO(&set);
+  FD_SET(fd, &set);
+  to.tv_sec = 0; to.tv_usec = 500000;
+
+  while(select(fd + 1, &set, NULL, NULL, &to) > 0) {
+    if((i = read(fd, buf + buf_len, sizeof buf - 1 - buf_len)) < 0) break;
+    buf_len += i;
+    buf[buf_len] = 0;
+    to.tv_sec = 0; to.tv_usec = 500000;
+    if(strchr(buf, 'R')) break;
+  }
+
+  if(sscanf(buf, "\033[%u;%uR", &u1, &u2) == 2) {
+    max_x_ig = u2;
+    max_y_ig = u1;
+  }
+  else if(*buf) {
+    fprintf(stderr, "Unexpected response: >>%s<<\n", buf + 1);
+  }
+}
+
