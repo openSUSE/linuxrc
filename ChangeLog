@@ -1,5 +1,7 @@
 	- fixed stupid reiserfs typo
 	- in2000 no longer auto loaded
+	- dmfe no longer auto loaded
+	- new translations
 
 14/5/2001:	v1.1.19.012
 	- display reboot message (revert part 2 of changes for 1.1.19.006) (bug #7994)
