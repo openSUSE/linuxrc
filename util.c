@@ -1350,6 +1350,9 @@ void util_status_info()
   sprintf(buf, "console = \"%s\"", config.console);
   if(config.serial) sprintf(buf + strlen(buf), ", serial line params = \"%s\"", config.serial);
   slist_append_str(&sl0, buf);
+  sprintf(buf, "esc delay: %dms", config.escdelay);
+  slist_append_str(&sl0, buf);
+
 
   sprintf(buf, "stderr = \"%s\"", config.stderr_name);
   slist_append_str(&sl0, buf);
@@ -3777,7 +3780,6 @@ void util_hwcheck()
 void util_set_serial_console(char *str)
 {
   slist_t *sl;
-  char *s;
 
   if(!str || !*str) return;
 
@@ -3792,12 +3794,15 @@ void util_set_serial_console(char *str)
   sl = slist_split(',', config.serial);
 
   if(sl) {
+    str_copy(&config.console, long_dev(sl->key));
+#if 0
     s = long_dev(sl->key);
     if(!config.console || strcmp(s, config.console)) {
       str_copy(&config.console, s);
       freopen(config.console, "r", stdin);
       freopen(config.console, "a", stdout);
     }
+#endif
     config.textmode = 1;
   }
      

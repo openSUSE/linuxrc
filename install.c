@@ -1168,6 +1168,11 @@ int inst_execute_yast()
 
   fprintf(stderr, "install program exit code is %d\n", rc);
 
+  freopen(config.console, "r", stdin);
+  freopen(config.console, "a", stdout);
+  freopen(config.stderr_name, "a", stderr);
+  kbd_init(0);
+
   /* Redraw erverything and go back to the main menu. */
   config.redraw_menu = 1;
 

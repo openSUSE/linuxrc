@@ -54,7 +54,7 @@ static int kbd_getch_raw    (int wait_iv);
  *
  */
 
-void kbd_init (void)
+void kbd_init (int first)
     {
     struct winsize  winsize_ri;
     char           *start_msg_pci = "Startup...\n";
@@ -74,15 +74,18 @@ void kbd_init (void)
         {
 	kbd_tio_rm.c_lflag &= ~ISIG;
 	tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
-	max_x_ig = 80;
-	max_y_ig = 24;
+	if (first)
+	    {
+	    max_x_ig = 80;
+	    max_y_ig = 24;
+	    }
 	return;
 	}
     kbd_tio_rm.c_cc [VMIN] = 1;
     kbd_tio_rm.c_cc [VTIME] = 0;
     kbd_tio_rm.c_lflag &= ~(ECHO | ICANON | ISIG);
     kbd_tio_rm.c_iflag &= ~(INLCR | IGNCR | ICRNL);
-    if (!ioctl (kbd_tty_im, TIOCGWINSZ, &winsize_ri))
+    if (first && !ioctl (kbd_tty_im, TIOCGWINSZ, &winsize_ri))
         {
         if (winsize_ri.ws_col && winsize_ri.ws_row)
             {
@@ -90,7 +93,7 @@ void kbd_init (void)
             max_y_ig = winsize_ri.ws_row;
             }
 
-        if(!config.had_segv) fprintf (stderr, "Winsize (%d, %d)!\n", max_y_ig, max_x_ig);
+        if(!config.had_segv) fprintf (stderr, "Window size: %d x %d\n", max_x_ig, max_y_ig);
         }
 
     tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
@@ -157,6 +160,9 @@ int kbd_getch_raw (int wait_iv)
     char  tmp_ci;
     int   i_ii;
     int   time_to_wait;
+    int   esc_delay = KBD_ESC_DELAY;
+
+    if(config.escdelay) esc_delay = config.escdelay * 1000;
 
     keypress_ci = 0;
 
@@ -182,7 +188,7 @@ int kbd_getch_raw (int wait_iv)
     if (keypress_ci != KEY_ESC)
         return ((int) keypress_ci);
 
-    kbd_set_timeout (KBD_ESC_DELAY);
+    kbd_set_timeout (esc_delay);
 
     read (kbd_tty_im, &keypress_ci, 1);
     if (kbd_timeout_im)
@@ -201,7 +207,7 @@ int kbd_getch_raw (int wait_iv)
         return (((int) keypress_ci) | KEY_SPECIAL);
     
     i_ii = 0;
-    kbd_set_timeout (KBD_ESC_DELAY);
+    kbd_set_timeout (esc_delay);
 
     do
         {

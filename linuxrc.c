@@ -652,6 +652,7 @@ void lxrc_init()
   config.addswap = 1;
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */
+  config.escdelay = 25;		/* 25 ms */
 
   config.hwdetect = 1;
 
@@ -747,7 +748,7 @@ void lxrc_init()
     config.linemode = 1;
   }
 
-  kbd_init();
+  kbd_init(1);
   util_redirect_kmsg();
   disp_init();
 
@@ -763,7 +764,7 @@ void lxrc_init()
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
-  if(!(config.test || config.serial || config.shell_started || config.noshell)) {
+  if(!(config.test /* || config.serial */ || config.shell_started || config.noshell)) {
     util_start_shell("/dev/tty9", "/lbin/lsh", 0);
     config.shell_started = 1;
   }
@@ -988,7 +989,11 @@ void lxrc_set_modprobe(char *prog)
    commandline. On SPARC, we use the result from hardwareprobing. */
 void lxrc_check_console()
 {
-#if !defined(__sparc__) && !defined(__PPC__)
+#ifdef USE_LIBHD
+
+  util_set_serial_console(auto2_serial_console());
+
+#else
 
   file_t *ft;
 
@@ -996,12 +1001,6 @@ void lxrc_check_console()
 
   util_set_serial_console(ft->value);
 
-#else
-#ifdef USE_LIBHD
-
-  util_set_serial_console(auto2_serial_console());
-
-#endif
 #endif
 
   if(config.serial) {

@@ -85,7 +85,7 @@ static struct {
   { key_cdrom,          "Cdrom",          kf_none                        },
   { key_pcmcia,         "PCMCIA",         kf_none                        },
   { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
-  { key_console,        "Console",        kf_cmd                         },	/* tricky */
+  { key_console,        "Console",        kf_none                        },
   { key_pliphost,       "PLIPHost",       kf_none                        },	/* drop it? */
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
@@ -210,7 +210,8 @@ static struct {
   { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
   { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },
-  { key_loghost,        "Loghost",        kf_cfg + kf_cmd                }
+  { key_loghost,        "Loghost",        kf_cfg + kf_cmd                },
+  { key_escdelay,       "ESCDelay",       kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -962,12 +963,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-#if 0
-      case key_console:
-        if(*f->value) util_set_serial_console(f->value);
-        break;
-#endif
-
       case key_product:
         if(*f->value) str_copy(&config.product, f->value);
         break;
@@ -1149,6 +1144,10 @@ void file_do_info(file_t *f0)
 
       case key_loghost:
         str_copy(&config.loghost, f->value);
+        break;
+
+      case key_escdelay:
+        if(f->is.numeric) config.escdelay = f->nvalue;
         break;
 
       default:
@@ -1411,7 +1410,8 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_floppydisk, config.floppy_dev[config.floppy]);
   }
 
-  file_write_num(f, key_keyboard, has_kbd_ig);
+  /*we always have one */
+  file_write_num(f, key_keyboard, 1 /* has_kbd_ig */);
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
 
@@ -1453,10 +1453,7 @@ void file_write_install_inf(char *dir)
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
   for(i = 0, ft = ft0; ft; ft = ft->next) {
-    if(
-      ft->key == key_none ||
-      ft->key == key_console	/* keep serial console setting */
-    ) {
+    if(ft->key == key_none) {
       fprintf(f, "%s%s", i ? " " : "Cmdline: ", ft->unparsed);
       i = 1;
     }
