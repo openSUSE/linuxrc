@@ -169,7 +169,7 @@ void win_open (window_t *win_prr)
 
 void win_close (window_t *win_prr)
     {
-    if (win_prr->save_bg)
+    if (config.win && win_prr->save_bg)
         disp_restore_area (win_prr, DISP_RESTORE_IMPLODE);
     }
 

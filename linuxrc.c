@@ -748,6 +748,9 @@ void lxrc_init()
     if(url && url->scheme) set_instmode(url->scheme);
   }
 
+  ft = file_get_cmdline(key_linemode);
+  if(ft && ft->is.numeric) config.linemode = ft->nvalue;
+
   ft = file_get_cmdline(key_linuxrc);
   str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));
 

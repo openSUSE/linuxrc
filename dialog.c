@@ -1200,6 +1200,7 @@ void dia_info (window_t *win_prr, char *txt_tv)
     if (config.linemode)
       {
 	dia_printformatted(txt_tv, 0, max_x_ig - 1, 1);
+	memset(win_prr, 0, sizeof *win_prr);
 	return;
       }
 
