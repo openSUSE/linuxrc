@@ -610,7 +610,6 @@ void disp_write_utf32string(int *str)
     if(disp_state_im == DISP_ON) {
       buf = malloc(buf_len = len * 6 + 1);
       utf32_to_utf8(buf, buf_len, str);
-      fprintf(stderr, "[<%s>]\n", buf);
       printf("%s", buf);
       free(buf);
     }
