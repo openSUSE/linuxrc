@@ -1,3 +1,6 @@
+	- do write server info for VNC/ssh install again
+	  needed for network installion (#18882)
+
 10/9/2002:	v1.4.27
 	- mls: added line oriented display mode
 	- don't set serial console twice
