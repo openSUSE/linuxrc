@@ -1021,9 +1021,12 @@ int inst_execute_yast()
   if (!config.test && config.usessh && config.net.sshpassword) {
     FILE *passwd;
 
-    /* symlink most likely to ro medium */
-    rename("/etc/shadow","/etc/shadow.old");
-    system("cp /etc/shadow.old /etc/shadow");
+    /* symlink to ro medium, but we need to overwrite them. */  
+    unlink("/etc/passwd");
+    unlink("/etc/shadow");
+    sprintf(cmd, "cp %s/etc/shadow /etc", config.instsys);system(cmd);
+    sprintf(cmd, "cp %s/etc/passwd /etc", config.instsys);system(cmd);
+ 
     passwd = popen("/usr/sbin/chpasswd","w");
     if (passwd) {
       fprintf(passwd,"root:%s\n",config.net.sshpassword);

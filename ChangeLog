@@ -1,3 +1,6 @@
+19/8/2002:	v1.4.13
+	- copy shadow and passwd from inst-sys before calling chpasswd
+
 16/8/2002:	v1.4.12
 	- fixed for ppc & sparc
 
