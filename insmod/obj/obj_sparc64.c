@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_sparc64.c,v 1.1 2000/03/23 17:09:56 snwint Exp $"
+#ident "$Id: obj_sparc64.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
 
 #include <stddef.h>
 #include <module.h>
@@ -296,5 +296,16 @@ arch_create_got (struct obj_file *ef)
 int
 arch_init_module (struct obj_file *f, struct module *mod)
 {
+  return 1;
+}
+
+int
+arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
+{
+  int  i, n = f->header.e_shnum;
+
+  f->baseaddr = base;
+  for (i = 0; i < n; ++i)
+    f->sections[i]->header.sh_addr += base;
   return 1;
 }

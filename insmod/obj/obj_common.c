@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_common.c,v 1.1 2000/03/23 17:09:56 snwint Exp $"
+#ident "$Id: obj_common.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
 
 #include <string.h>
 #include <assert.h>
@@ -236,6 +236,9 @@ obj_load_order_prio(struct obj_section *a)
   if (!(af & SHF_WRITE)) ac |= 8;
   if (af & SHF_EXECINSTR) ac |= 4;
   if (a->header.sh_type != SHT_NOBITS) ac |= 2;
+#if defined(ARCH_ia64)
+  if (af & SHF_IA_64_SHORT) ac -= 1;
+#endif
 
   return ac;
 }

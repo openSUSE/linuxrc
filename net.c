@@ -27,7 +27,7 @@
 #include <net/if.h>
 #include <net/route.h>
 #include <nfs/nfs.h>
-#include <linux/nfs_mount.h>
+#include "nfs_mount4.h"
 
 #include "global.h"
 #include "text.h"
@@ -365,7 +365,6 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     struct timeval         timeout_ri;
     int                    rc_ii;
     struct fhstatus        status_ri;
-    fhandle                root_fhandle_ri;
     char                   tmp_ti [1024];
     char                  *opts_pci;
 
@@ -378,12 +377,13 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     memset (&mount_data_ri, 0, sizeof (struct nfs_mount_data));
     mount_data_ri.rsize = 0;
     mount_data_ri.wsize = 0;
-    mount_data_ri.timeo = 7;
+    mount_data_ri.timeo = 70;
     mount_data_ri.retrans = 3;
     mount_data_ri.acregmin = 3;
     mount_data_ri.acregmax = 60;
     mount_data_ri.acdirmin = 30;
     mount_data_ri.acdirmax = 60;
+    mount_data_ri.namlen = NAME_MAX;
     mount_data_ri.version = NFS_MOUNT_VERSION;
 
     mount_server_ri.sin_port = htons (0);
@@ -392,6 +392,7 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
                                        &socket_ii, 0, 0);
     if (!mount_client_pri)
         {
+	mount_data_ri.timeo = 7;
         mount_server_ri.sin_port = htons (0);
         socket_ii = RPC_ANYSOCK;
         timeout_ri.tv_sec = 3;
@@ -425,9 +426,13 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
         return (-1);
         }
 
-    memcpy ((char *) &root_fhandle_ri,
+    memcpy ((char *) &mount_data_ri.root.data,
             (char *) status_ri.fhstatus_u.fhs_fhandle,
-            sizeof (root_fhandle_ri));
+            NFS_FHSIZE);
+    mount_data_ri.root.size = NFS_FHSIZE;
+    memcpy(&mount_data_ri.old_root.data,
+	   (char *) status_ri.fhstatus_u.fhs_fhandle,
+	   NFS_FHSIZE);
 
     fsock_ii = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (fsock_ii < 0)
@@ -458,8 +463,6 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     server_ri.sin_port = htons (port_ii);
 
     mount_data_ri.fd = fsock_ii;
-    memcpy ((char *) &mount_data_ri.root, (char *) &root_fhandle_ri,
-            sizeof (root_fhandle_ri));
     memcpy ((char *) &mount_data_ri.addr, (char *) &server_ri,
             sizeof (mount_data_ri.addr));
     strncpy (mount_data_ri.hostname, server_addr_tv,

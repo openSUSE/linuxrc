@@ -324,6 +324,27 @@ static int intelDetectSMP(void)
 }
 #endif /* __i386__ */
 
+#ifdef __ia64__
+int ia64DetectSMP(void)
+{
+    int n_cpu = 0;
+    FILE *f;
+
+    f = fopen("/proc/cpuinfo", "r");
+    if (f) {     
+	char buff[1024];
+
+	while (fgets (buff, 1024, f) != NULL)
+	    if (!strncmp (buff, "CPU# ", 5))
+		n_cpu++;
+	fclose(f);
+    } else
+	return -1;
+
+    return n_cpu > 1;
+}
+#endif /* __ia64__ */
+
 int detectSMP(void)
 {
     static int isSMP = -1;
@@ -337,6 +358,8 @@ int detectSMP(void)
     return isSMP = sparcDetectSMP();
 #elif __alpha__
     return isSMP = alphaDetectSMP();
+#elif __ia64__
+    return isSMP = ia64DetectSMP();
 #else
     return isSMP;
 #endif

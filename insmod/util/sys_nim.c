@@ -18,7 +18,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: sys_nim.c,v 1.1 2000/03/23 17:09:56 snwint Exp $"
+#ident "$Id: sys_nim.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
 
 #include <stdlib.h>
 #include <errno.h>
@@ -34,6 +34,20 @@
 
 /*======================================================================*/
 
+#if defined(ARCH_ia64)
+
+extern int init_module(const char *name, const struct module *info);
+
+int 
+sys_init_module(const char *name, const struct module *info)
+{
+  return init_module(name, info);
+}
+
+#else
+
 #define __NR_sys_init_module  __NR_init_module
 _syscall2(int, sys_init_module, const char *, name,
 	  const struct module *, info)
+
+#endif

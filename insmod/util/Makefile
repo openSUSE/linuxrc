@@ -20,9 +20,11 @@ DEFS += -DELF_MACHINE_H='"elf_$(ARCH).h"' -DARCH_$(ARCH) $(EXTRA_DEFS)
 
 all: .depend libutil.a
 
-OBJS = sys_cm.o sys_dm.o sys_gks.o sys_nim.o sys_oim.o sys_qm.o \
-	xmalloc.o xrealloc.o xstrdup.o logger.o \
-	modstat.o meta_expand.o config.o snap_shot.o arch64.o
+OBJS = xmalloc.o xrealloc.o xstrdup.o logger.o modstat.o \
+	meta_expand.o config.o snap_shot.o arch64.o sys_nim.o
+ifneq ($(ARCH),ia64)
+OBJS += sys_cm.o sys_dm.o sys_gks.o sys_nim.o sys_oim.o sys_qm.o
+endif
 
 meta_expand.o: meta_expand.c
 	$(CC) $(CFLAGS) $(DEFS) -DHAVE_WORDEXP=1 -DHAVE_GLOB=1 -c $<

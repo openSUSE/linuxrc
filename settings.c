@@ -80,7 +80,7 @@ static language_t set_languages_arm [] =
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
 };
 
-#if defined(__i386__) || defined(__alpha__) || defined(__PPC__)
+#if defined(__i386__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__)
 #define KEYMAP_DEFAULT	1
 static keymap_t set_keymaps_arm [] =
 {

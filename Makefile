@@ -43,6 +43,10 @@ ifeq ($(ARCH),sparc64)
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
 endif
 
+ifeq ($(ARCH),ia64)
+    USE_MINI_GLIBC	= no
+endif
+
 ifneq ($(USE_MINI_GLIBC),no)
 #    CC		+= -V2.7.2.3			# doesn't work with newer gcc/egcs
     CFLAGS	+= -I$(TOPDIR)/libc/include

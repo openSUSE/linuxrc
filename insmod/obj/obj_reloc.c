@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_reloc.c,v 1.1 2000/03/23 17:09:56 snwint Exp $"
+#ident "$Id: obj_reloc.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
 
 #include <string.h>
 #include <assert.h>
@@ -258,9 +258,7 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
 
   /* Finalize the addresses of the sections.  */
 
-  f->baseaddr = base;
-  for (i = 0; i < n; ++i)
-    f->sections[i]->header.sh_addr += base;
+  arch_finalize_section_address(f, base);
 
   /* And iterate over all of the relocations.  */
 

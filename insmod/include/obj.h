@@ -24,7 +24,7 @@
 #ifndef MODUTILS_OBJ_H
 #define MODUTILS_OBJ_H 1
 
-#ident "$Id: obj.h,v 1.1 2000/03/23 17:09:55 snwint Exp $"
+#ident "$Id: obj.h,v 1.2 2000/05/18 10:51:17 schwab Exp $"
 
 /* The relocatable object is manipulated using elfin types.  */
 
@@ -162,6 +162,7 @@ struct obj_symbol_patch_struct
 #define arch_create_got			ObjW(arch_create_got)
 #define arch_init_module		ObjW(arch_init_module)
 #define arch_load_proc_section		ObjW(arch_load_proc_section)
+#define arch_finalize_section_address	ObjW(arch_finalize_section_address)
 
 unsigned long obj_elf_hash(const char *);
 
@@ -239,5 +240,7 @@ struct module;
 int arch_init_module (struct obj_file *f, struct module *);
 
 int arch_load_proc_section(struct obj_section *sec, FILE *fp);
+ 
+int arch_finalize_section_address (struct obj_file *f, ElfW(Addr) base);
 
 #endif /* obj.h */
