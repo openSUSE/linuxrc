@@ -494,7 +494,7 @@ void lxrc_killall(int really_all_iv)
  */
 
 
-#if defined(__i386__) || defined(__PPC__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__PPC__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
 static void lxrc_catch_signal_11(int signum, struct sigcontext scp)
 #endif
 #if defined(__alpha__) || defined(__ia64__)
@@ -506,6 +506,10 @@ static void lxrc_catch_signal_11(int signum, int x, struct sigcontext *scp)
 
 #ifdef __i386__
   ip = scp.eip;
+#endif
+
+#ifdef __x86_64__
+  ip = scp.rip;
 #endif
 
 #ifdef __PPC__
@@ -565,7 +569,10 @@ static void lxrc_catch_signal (int sig_iv)
 
 void lxrc_init()
 {
-  int i, j;
+  int i;
+#ifdef __i386__
+  int j;
+#endif
   file_t *ft;
   char *s, *t0, *t, buf[256];
   url_t *url;
@@ -1039,6 +1046,7 @@ int lxrc_main_cb(dia_item_t di)
       break;
 
     default:
+      break;
   }
 
   return rc;

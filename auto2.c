@@ -51,8 +51,9 @@ static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
 static int auto2_load_usb_storage(void);
 static void auto2_progress(char *pos, char *msg);
+#ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
-
+#endif
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -588,10 +589,9 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
  */
 int auto2_init()
 {
-  int i, j, net_cfg;
-
-#if 0
-  auto2_chk_x11i();
+  int i, j;
+#ifdef __i386__
+  int net_cfg;
 #endif
 
   auto2_chk_frame_buffer();
@@ -1138,6 +1138,7 @@ void auto2_print_x11_opts(FILE *f)
 #endif
 
 
+#ifdef __i386__
 int auto2_ask_for_modules(int prompt, char *type)
 {
   int do_something = 0;
@@ -1159,6 +1160,7 @@ int auto2_ask_for_modules(int prompt, char *type)
 
   return do_something;
 }
+#endif
 
 
 #endif	/* USE_LIBHD */

@@ -2136,6 +2136,7 @@ void util_free_mem()
         break;
 
       default:
+        break;
     }
   }
 

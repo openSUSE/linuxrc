@@ -44,6 +44,11 @@ ifeq ($(ARCH),i386)
     CFLAGS		+= -DLX_ARCH=\"i386\"
 endif
 
+ifeq ($(ARCH),x86_64)
+    USE_MINI_GLIBC	= no
+    CFLAGS		+= -DLX_ARCH=\"x86_64\"
+endif
+
 ifeq ($(ARCH),alpha)
     USE_MINI_GLIBC	= no
     CFLAGS		+= -DLINUXRC_AXP -DLX_ARCH=\"axp\"
