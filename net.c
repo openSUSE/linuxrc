@@ -914,7 +914,11 @@ int net_bootp (void)
     if (data_pci)
         strncpy (domain_name_tg, data_pci, sizeof (domain_name_tg) - 1);
 
-    data_pci = getenv ("BOOTP_BOOTFILE");
+    data_pci = getenv ("BOOTP_ROOT_PATH");
+    if (data_pci)
+	fprintf (stderr, "root-path is defined. Will be used intead of bootfile");	
+    else
+	data_pci = getenv ("BOOTP_BOOTFILE");
 
     if (data_pci && strlen (data_pci))
         {

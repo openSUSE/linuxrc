@@ -906,7 +906,7 @@ int inst_execute_yast()
       config.instsys,
       SETUP_COMMAND,
       yast_version_ig == 2 ? 2 : 1,
-      auto_ig ? " --autofloppy" : ""
+      (action_ig & ACT_YAST2_AUTO_INSTALL) ? " --autofloppy" : ""
     );
     fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
   }

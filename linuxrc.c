@@ -433,6 +433,7 @@ static void lxrc_init (void)
     {
     int    i_ii;
     char  *language_pci;
+    char  *autoyast_pci;
     char  *linuxrc_pci;
     char  *stderr_where_to;
 #define LINUXRC_DEFAULT_STDERR "/dev/tty3"
@@ -477,6 +478,20 @@ static void lxrc_init (void)
       if(i != LANG_UNDEF) language_ig = i;
     }
 
+#ifdef USE_LIBHD
+    autoyast_pci = getenv ("autoyast");
+    if (autoyast_pci)
+        {
+          auto2_ig = TRUE;
+          yast_version_ig = 2;
+	  action_ig |= ACT_YAST2_AUTO_INSTALL;
+          if (!strncasecmp(autoyast_pci, "nfs:", 4)) {
+            bootmode_ig = BOOTMODE_NET;
+          } else if (!strncasecmp(autoyast_pci, "tftp:", 5)) {
+            bootmode_ig = BOOTMODE_NET;
+          } 
+	}
+#endif
     linuxrc_pci = getenv ("linuxrc");
     if (linuxrc_pci)
         {
