@@ -673,14 +673,6 @@ msgstr "Lhùta pro bootp"
 msgid "Please enter the timeout value for bootp."
 msgstr "Zadejte prosím lhùtu pro bootp."
 
-#. TXT_DO_REBOOT
-msgid ""
-"The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
-msgstr ""
-"Základní systém byl úspì¹nì nainstalován. Poèítaè bude nyní restartován. Prosím odstraòte instalaèní média (CD, disketu).\n"
-"Pokud je na disketì zavadìè LILO, tak ji nechte v mechanice."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "Spojení kanál kanál"
@@ -901,5 +893,14 @@ msgstr ""
 
 #. TXT_SSH_PASSWORD
 msgid "Please enter your temporary SSH password"
+msgstr ""
+
+#. TXT_DO_REBOOT
+msgid ""
+"The base system was successfully installed. Your "
+"machine must now be rebooted. "
+"Please remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager "
+"was installed on it."
 msgstr ""
 

@@ -675,14 +675,6 @@ msgstr "Bootp timeout"
 msgid "Please enter the timeout value for bootp."
 msgstr "Itt határozhatja meg, hogy hány másodpercig várjak bootp-re"
 
-#. TXT_DO_REBOOT
-msgid ""
-"The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
-msgstr ""
-"Az alaprendszer telepítése sikerült. A rendszer most újraindul. Kérem, vegye ki a telepítéshez használt médiumokat (CD-ROM, hajlékonylemez) a meghajtóból.\n"
-"A hajlékonylemezt azonban bent kell hagyni a meghajtóban, ha a Linux Loader (LILO) erre a lemezre lett telepítve."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "A \"channel connection\"-hez használandó csatorna"
@@ -902,5 +894,14 @@ msgstr ""
 
 #. TXT_SSH_PASSWORD
 msgid "Please enter your temporary SSH password"
+msgstr ""
+
+#. TXT_DO_REBOOT
+msgid ""
+"The base system was successfully installed. Your "
+"machine must now be rebooted. "
+"Please remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager "
+"was installed on it."
 msgstr ""
 

@@ -7,6 +7,7 @@
 	- improved driver update handling
 	- fixed bug in module disk section naming
 	- prepared for uclibc
+	- don't mention LILO in reboot message (#18261)
 
 27/8/2002:	v1.4.17
 	- do not imply vnc=1 if vncpassword is given, dito for ssh

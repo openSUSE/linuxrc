@@ -697,15 +697,6 @@ msgstr "Bootp a expirat"
 msgid "Please enter the timeout value for bootp."
 msgstr "Va rugam sa introduceti perioada de expirare a bootp."
 
-#. TXT_DO_REBOOT
-#, fuzzy
-msgid ""
-"The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
-msgstr ""
-"Structura de baza a sistemului a fost instalata cu succes. Sistemul nou va fi repornit pentru a finaliza instalarea. Va rugam sa scoateti din computer suportul media de pe care s-a facut instalarea (CD-ROM, Floppy).\n"
-" Nu scoateti discheta din computer in cazul in care ati optat pentru bootare de pe discheta cu ajutorul sistemului LILO (LInux LOader)."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""
@@ -919,5 +910,14 @@ msgstr ""
 
 #. TXT_SSH_PASSWORD
 msgid "Please enter your temporary SSH password"
+msgstr ""
+
+#. TXT_DO_REBOOT
+msgid ""
+"The base system was successfully installed. Your "
+"machine must now be rebooted. "
+"Please remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager "
+"was installed on it."
 msgstr ""
 
