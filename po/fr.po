@@ -600,11 +600,6 @@ msgstr "Tentative de monter le CD-ROM..."
 msgid "Unable to mount the CD-ROM."
 msgstr "Impossible de monter le CD-ROM!"
 
-# TLABEL linuxrc_2002_03_29_0036__89
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Démarrage de YaST..."
-
 # TLABEL linuxrc_2002_03_29_0036__90
 #. TXT_ASK_REBOOT
 #, fuzzy
@@ -891,25 +886,6 @@ msgstr "Initialisation du port parallèle..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Entrez le numéro du port sur lequel tourne le serveur nfs"
-
-# TLABEL linuxrc_2002_03_29_0036__133
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - mode texte"
-
-# TLABEL linuxrc_2002_03_29_0036__134
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - mode graphique"
-
-# TLABEL linuxrc_2002_03_29_0036__135
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr ""
-"Choisissez la version de YaST que vous voulez utiliser pour l'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__136
 #. TXT_INSERT_CD

@@ -506,10 +506,6 @@ msgstr "Mencoba mengaitkan (mount) CD-ROM..."
 msgid "Unable to mount the CD-ROM."
 msgstr "Tak dapat mengaitkan (mount) CD-ROM!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Mulai menjalankan YaST..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -753,21 +749,6 @@ msgstr "Menginisialisasi port parallel ... "
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Berikan nomor port server NFS yangdigunakan"
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - mode teks"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - mode grafis"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr "Pilihlah versi YaST yang digunakan untuk instalasi."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format

@@ -514,10 +514,6 @@ msgstr "O klask marc'hañ ar CD-ROM..."
 msgid "Unable to mount the CD-ROM."
 msgstr "N'eus ket bet tu da varc'hañ ar CD-ROM!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Loc'hañ YaST..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -765,22 +761,6 @@ msgstr "Deraouekaat ar porzh a-stur..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Enankit niverenn ar porzh arveriet gant ar servijer NFS"
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - testennoù"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - kevregañ"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr ""
-"Diuzit an doare eus YaST ma fell deoc'h ober gantañ evit staliañ ho reizhiad."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format

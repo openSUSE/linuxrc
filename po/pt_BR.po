@@ -514,10 +514,6 @@ msgstr "Tentativa de montar o CD-ROM..."
 msgid "Unable to mount the CD-ROM."
 msgstr "Não foi possivel montar o CD-ROM!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Iniciando YaST..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -762,21 +758,6 @@ msgstr "Inicializando a porta paralela..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Favor indicar a porta na qual o servidor NFS está executando"
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - Modo Texto"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - Modo Gráfico"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr "Por favor escolha a versão do YaST que pretende usar na Instalação."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format

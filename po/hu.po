@@ -509,10 +509,6 @@ msgstr "A CD-ROM csatolása..."
 msgid "Unable to mount the CD-ROM."
 msgstr "A CD-ROM csatolása nem sikerült!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "A YaST indítása..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -757,21 +753,6 @@ msgstr "a párhuzamos port inicializálása..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Kérem adja meg a NFS szerver által használt port számát"
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - szöveges módban"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - grafikus módban"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr "Kérem válasszon YaST változatot a telepitéshez."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format

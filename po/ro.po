@@ -503,10 +503,6 @@ msgstr "Incercand sa monteze CD-ROM-ul..."
 msgid "Unable to mount the CD-ROM."
 msgstr "Nu se poate monta CD-ROM-ul!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Pornind YaST-ul..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -751,21 +747,6 @@ msgstr "Initializand portul paralel..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Introduceti portul la care ruleaza serverul NFS "
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - in mod text"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - grafic"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr "Selectati versiunea YaST pentru instalare."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format

@@ -418,10 +418,6 @@ msgstr ""
 msgid "Unable to mount the CD-ROM."
 msgstr ""
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr ""
-
 #. TXT_ASK_REBOOT
 msgid "Reboot the system now?"
 msgstr ""
@@ -614,18 +610,6 @@ msgstr ""
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
-msgstr ""
-
-#. TXT_YAST1
-msgid "YaST1 -- Text-Based"
-msgstr ""
-
-#. TXT_YAST2
-msgid "YaST2 -- Graphical"
-msgstr ""
-
-#. TXT_CHOOSE_YAST
-msgid "Choose the version of YaST to use for the installation."
 msgstr ""
 
 #. TXT_INSERT_CD

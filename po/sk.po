@@ -507,10 +507,6 @@ msgstr "Pokú¹am sa pripoji» CD-ROM..."
 msgid "Unable to mount the CD-ROM."
 msgstr "Nemohol som pripoji» CD-ROM!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "©tartujem YaST..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -754,21 +750,6 @@ msgstr "Inicializujem paralelný port..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Zadajte èíslo portu, na ktorom be¾í NFS server"
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - Textová"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - Grafická"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr "Vyberte si verziu YaST, ktorú chcete pou¾i» na in¹taláciu."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format

@@ -506,10 +506,6 @@ msgstr "Γίνεται προσπάθεια πρόσβασης στο CD-ROM..."
 msgid "Unable to mount the CD-ROM."
 msgstr "Ανεπιτυχής πρόσβαση στο CD-ROM!"
 
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Ξεκινώντας το YaST..."
-
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
@@ -752,23 +748,6 @@ msgstr "Ενεργοποίηση παράλληλης θύρας..."
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
 msgstr "Παρακαλώ δώστε τον αριθμό της θύρας στην οποία τρέχειο διακομιστή nfs"
-
-#. TXT_YAST1
-#, fuzzy
-msgid "YaST1 -- Text-Based"
-msgstr "YaST1 - Βασισμένο σε Κείμενο"
-
-#. TXT_YAST2
-#, fuzzy
-msgid "YaST2 -- Graphical"
-msgstr "YaST2 - Γραφικό Περιβάλλον"
-
-#. TXT_CHOOSE_YAST
-#, fuzzy
-msgid "Choose the version of YaST to use for the installation."
-msgstr ""
-"Παρακαλούμε επιλέξτε την έκδοση του YaST που θα χρησιμοποιηθεί για την "
-"εγκατάσταση."
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format
