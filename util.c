@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <utime.h>
 
 // #include <linux/cdrom.h>
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
@@ -62,7 +63,18 @@ static void put_short(int fd, unsigned short data);
 static void put_int(int fd, unsigned data);
 static unsigned mkdosfs(int fd, unsigned size);
 #endif
-static void do_cp(char *src_dir, char *dst_dir, char *name);
+static void do_file_cp(char *src_dir, char *dst_dir, char *name);
+
+static struct hlink_s {
+  struct hlink_s *next;
+  dev_t dev;
+  ino_t ino;
+  char *dst;
+} *hlink_list = NULL;
+
+static int do_cp(char *src, char *dst);
+static char *walk_hlink_list(ino_t ino, dev_t dev, char *dst);
+static void free_hlink_list(void);
 
 void util_redirect_kmsg (void)
     {
@@ -702,7 +714,7 @@ unsigned mkdosfs(int fd, unsigned size)
 }
 #endif
 
-void do_cp(char *src_dir, char *dst_dir, char *name)
+void do_file_cp(char *src_dir, char *dst_dir, char *name)
 {
   FILE *f, *g;
   int c;
@@ -803,7 +815,7 @@ int util_chk_driver_update(char *dir)
     if(d) {
       while((de = readdir(d))) {
         if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
-          do_cp(inst_src, inst_dst, de->d_name);
+          do_file_cp(inst_src, inst_dst, de->d_name);
         }
       }
       closedir(d);
@@ -1149,3 +1161,210 @@ int util_ps_main(int argc, char **argv)
 
   return 0;
 }
+
+
+int util_do_cp(char *src, char *dst)
+{
+  int i;
+
+  i = do_cp(src, dst);
+  free_hlink_list();
+
+  return i;
+}
+
+
+/*
+ * Copy recursively src to dst. Both must be existing directories.
+ */
+int do_cp(char *src, char *dst)
+{
+  DIR *dir;
+  struct dirent *de;
+  struct stat sbuf;
+  char src2[0x100];
+  char dst2[0x100];
+  char *s;
+  int i, j;
+  int err = 0;
+  unsigned char buf[0x1000];
+  int fd1, fd2;
+  struct utimbuf ubuf;
+
+  if((dir = opendir(src))) {
+    while((de = readdir(dir))) {
+      if(!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
+      sprintf(src2, "%s/%s", src, de->d_name);
+      sprintf(dst2, "%s/%s", dst, de->d_name);
+      i = lstat(src2, &sbuf);
+      if(i == -1) {
+        perror(src2);
+        err = 2;
+        break;
+      }
+
+      if(S_ISDIR(sbuf.st_mode)) {
+        i = mkdir(dst2, 0755);
+        if(i) {
+          err = 4;
+          perror(dst2);
+          break;
+        }
+        // avoid infinite recursion
+//        if(!(*src2 == '/' && !strcmp(src2 + 1, dst))) {
+        if(strcmp(src2, "//newroot")) {
+          err = do_cp(src2, dst2);
+        }
+        if(err) break;
+      }
+
+      else if(S_ISREG(sbuf.st_mode)) {
+        s = NULL;
+        if(sbuf.st_nlink > 1) {
+          s = walk_hlink_list(sbuf.st_ino, sbuf.st_dev, dst2);
+        }
+
+        if(s) {
+          // just make a link
+
+          i = link(s, dst2);
+          if(i) {
+            err = 12;
+            perror(dst2);
+            break;
+          }
+        }
+        else {
+          // actually copy it
+
+          fd1 = open(src2, O_RDONLY);
+          if(fd1 < 0) {
+            err = 5;
+            perror(src2);
+            break;
+          }
+          fd2 = open(dst2, O_WRONLY | O_CREAT | O_TRUNC);
+          if(fd2 < 0) {
+            err = 6;
+            perror(dst2);
+            close(fd1);
+            break;
+          }
+          do {
+            i = read(fd1, buf, sizeof buf);
+            j = 0;
+            if(i > 0) {
+              j = write(fd2, buf, i);
+            }
+          }
+          while(i > 0 && j > 0);
+          if(i < 0) {
+            perror(src2);
+            err = 7;
+          }
+          if(j < 0) {
+            perror(dst2);
+            err = 8;
+          }
+          close(fd1);
+          close(fd2);
+          if(err) break;
+        }
+      }
+
+      else if(S_ISLNK(sbuf.st_mode)) {
+        i = readlink(src2, buf, sizeof buf - 1);
+        if(i < 0) {
+          err = 9;
+          perror(src2);
+          break;
+        }
+        else {
+          buf[i] = 0;
+        }
+        i = symlink(buf, dst2);
+        if(i) {
+          err = 10;
+          perror(dst2);
+          break;
+        }
+      }
+
+      else if(
+        S_ISCHR(sbuf.st_mode) ||
+        S_ISBLK(sbuf.st_mode) ||
+        S_ISFIFO(sbuf.st_mode) ||
+        S_ISSOCK(sbuf.st_mode)
+      ) {
+        i = mknod(dst2, sbuf.st_mode, sbuf.st_rdev);
+        if(i) {
+          err = 11;
+          perror(dst2);
+          break;
+        }
+      }
+
+      else {
+        fprintf(stderr, "%s: type not supported\n", src2);
+        err = 3;
+        break;
+      }
+
+      // fix owner/time/permissions
+
+      lchown(dst2, sbuf.st_uid, sbuf.st_gid);
+      if(!S_ISLNK(sbuf.st_mode)) {
+        chmod(dst2, sbuf.st_mode);
+        ubuf.actime = sbuf.st_atime;
+        ubuf.modtime = sbuf.st_mtime;
+        utime(dst2, &ubuf);
+      }
+
+    }
+  } else {
+    perror(src);
+    return 1;
+  }
+
+  closedir(dir);
+
+  return err;
+}
+
+
+/*
+ * Return either the file name belonging to dev/inode or, if
+ * that's not found, return NULL and append dev/inode/dst to
+ * the current list.
+ */
+char *walk_hlink_list(ino_t ino, dev_t dev, char *dst)
+{
+  struct hlink_s **hl;
+
+  for(hl = &hlink_list; *hl; hl = &(*hl)->next) {
+    if((*hl)->dev == dev && (*hl)->ino == ino) {
+      return (*hl)->dst;
+    }
+  }
+
+  *hl = calloc(1, sizeof **hl);
+
+  (*hl)->dev = dev;
+  (*hl)->ino = ino;
+  (*hl)->dst = strdup(dst);
+
+  return NULL;
+}
+
+
+void free_hlink_list()
+{
+  struct hlink_s *hl, *next;
+
+  for(hl = hlink_list; hl; hl = next) {
+    next = hl->next;
+    if(hl->dst) free(hl->dst);
+    free(hl);
+  }
+}
+

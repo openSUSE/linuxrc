@@ -68,6 +68,7 @@ static char **lxrc_argv;
 const char *lxrc_new_root;
 static char **saved_environment;
 extern char **environ;
+static void   lxrc_movetotmpfs(void);
 
 int main (int argc, char **argv, char **env)
     {
@@ -113,6 +114,18 @@ int main (int argc, char **argv, char **env)
 #endif
         {
 	lxrc_argv = argv;
+
+        if(!getuid()) {
+          if(!util_check_exist("/oldroot")) {
+            lxrc_movetotmpfs();	// does (normally) not return
+          }
+          else {
+            // umount and release /oldroot
+            umount("/oldroot");
+            util_free_ramdisk("/dev/ram0");
+          }
+        }
+        
 	save_environment ();
         lxrc_init ();
         if (auto_ig)
@@ -958,3 +971,67 @@ static void lxrc_set_bdflush (int percent_iv)
     fprintf (fd_pri, "%d", percent_iv);
     fclose (fd_pri);
     }
+
+
+/*
+ * Copy root tree into a tmpfs tree, pivot_root() there and
+ * exec() the new linuxrc.
+ */
+void lxrc_movetotmpfs()
+{
+  int i;
+  char *newroot = "/newroot";
+
+  fprintf(stderr, "Moving into tmpfs...");
+  i = mkdir(newroot, 0755);
+  if(i) {
+    perror(newroot);
+    return;
+  }
+
+  i = mount("shmfs", newroot, "shm", 0, 0);
+  if(i) {
+    perror(newroot);
+    return;
+  }
+
+  i = util_do_cp("/", newroot);
+  if(i) {
+    fprintf(stderr, "copy failed: %d\n", i);
+    return;
+  }
+
+  fprintf(stderr, " done.\n");
+
+  i = chdir(newroot);
+  if(i) {
+    perror(newroot);
+    return;
+  }
+
+  i = mkdir("oldroot", 0755);
+  if(i) {
+    perror("oldroot");
+    return;
+  }
+
+  if(
+#if 1
+    !syscall(SYS_pivot_root, ".", "oldroot")
+#else
+    !pivot_root(".", "oldroot")
+#endif
+  ) {
+    for(i = 0; i < 20; i++) close(i);
+    chroot(".");
+    open("/dev/console", O_RDWR);
+    dup(0);
+    dup(0);
+    execve("/linuxrc", lxrc_argv, environ);
+    perror("/linuxrc");
+  }
+  else {
+    fprintf(stderr, "Oops, pivot_root failed\n");
+  }
+}
+

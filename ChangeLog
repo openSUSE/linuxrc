@@ -1,3 +1,8 @@
+18/9/2001:	v1.2.23
+	- linuxrc copies the intrd into an tmpfs at startup and uses this
+	  as the new root device
+	- it & nl translations
+
 12/9/2001:	v1.2.22
 	- fixed info file reading
 	- fr & hu translations
