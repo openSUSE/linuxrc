@@ -218,6 +218,7 @@ void util_update_kernellog (void)
     {
     FILE  *outfile_pri;
     FILE  *lastfile_pri;
+    FILE  *bootmsg_pri;
     char   buffer_ti [16384];
     char   line_ti [MAX_X - 30];
     int    i_ii = 1;
@@ -236,7 +237,15 @@ void util_update_kernellog (void)
         return;
         }
 
+    bootmsg_pri = fopen (bootmsg_tg, "a");
+
     size_ii = syslog (3, buffer_ti, sizeof (buffer_ti));
+
+    if (size_ii > 0 && bootmsg_pri)
+        fwrite (buffer_ti, 1, size_ii, bootmsg_pri);
+
+    if (bootmsg_pri) fclose (bootmsg_pri);
+
     for (pos_ii = 0; pos_ii < size_ii; pos_ii++)
         {
         line_ti [i_ii] = buffer_ti [pos_ii];

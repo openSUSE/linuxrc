@@ -161,6 +161,7 @@ extern char           *mountpoint_tg;
 extern char           *inst_mountpoint_tg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
+extern char           *bootmsg_tg;
 extern char            installdir_tg [MAX_FILENAME];
 extern char            harddisk_tg [12];
 extern char           *fstype_tg;

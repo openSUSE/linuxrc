@@ -32,6 +32,7 @@ char           *inst_mountpoint_tg = "/inst-img";
 char            server_dir_tg [MAX_FILENAME] = "/cdrom";
 char           *kernellog_tg = "/tmp/kernellog";
 char           *lastlog_tg = "/tmp/lastlog";
+char           *bootmsg_tg = "/var/log/boot.msg";
 char            installdir_tg [MAX_FILENAME] = "/suse/inst-sys";
 char            harddisk_tg [12] = "/dev/hda1";
 char           *fstype_tg;
