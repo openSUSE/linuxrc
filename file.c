@@ -19,7 +19,6 @@
 #include "text.h"
 #include "util.h"
 #include "module.h"
-#include "modparms.h"
 #include "window.h"
 #include "dialog.h"
 #include "net.h"
@@ -41,6 +40,7 @@ static int sym2index(char *sym);
 static void parse_value(file_t *ft);
 
 static char *file_read_info_file(char *file, char *file2);
+void file_write_modparms(FILE *f);
 static file_t *file_read_cmdline(void);
 static void file_module_load (char *insmod_arg);
 #ifdef DEBUG_FILE
@@ -272,6 +272,7 @@ void file_free_file(file_t *file)
 
   for(; file; file = next) {
     next = file->next;
+    if(file->key_str) free(file->key_str);
     if(file->value) free(file->value);
     free(file);
   }
@@ -732,7 +733,7 @@ void file_write_install_inf(char *dir)
     }
   }
 
-  mpar_write_modparms(f);
+  file_write_modparms(f);
 
   file_write_num(f, key_manual, auto_ig || auto2_ig ? 0 : 1);
   file_write_num(f, key_demo, demo_ig);
@@ -817,6 +818,84 @@ void file_write_mtab()
   }
 
   fclose(f);
+}
+
+
+void file_write_modparms(FILE *f)
+{
+  file_t *ft0, *ft;
+  module2_t *ml;
+  slist_t *sl0 = NULL, *sl1, *sl, *pl0, *pl;
+  slist_t *initrd0 = NULL, *initrd;
+  slist_t *modules0 = NULL;
+
+  ft0 = file_read_file("/proc/modules");
+
+  /* build list of modules & initrd modules, reverse /proc/modules order! */
+  for(ft = ft0; ft; ft = ft->next) {
+    ml = mod_get_entry(ft->key_str);
+    if(ml) {
+      sl = slist_add(&modules0, slist_new());
+      sl->key = strdup(ft->key_str);
+      if(ml->initrd) {
+        sl = slist_add(&sl0, slist_new());
+        sl->key = strdup(ft->key_str);
+      }
+    }
+  }
+
+  file_free_file(ft0);
+
+  /* resolve module deps for initrd module list */
+  for(sl = sl0; sl; sl = sl->next) {
+    ml = mod_get_entry(sl->key);
+    if(ml) {	/* just to be sure... */
+      pl0 = slist_split(ml->pre_inst);
+      for(pl = pl0; pl; pl = pl->next) {
+        if(!slist_getentry(initrd0, pl->key) && slist_getentry(modules0, pl->key)) {
+          initrd = slist_append(&initrd0, slist_new());
+          initrd->key = strdup(pl->key);
+        }
+      }
+      slist_free(pl0);
+      if(!slist_getentry(initrd0, sl->key)) {
+        initrd = slist_append(&initrd0, slist_new());
+        initrd->key = strdup(sl->key);
+      }
+      pl0 = slist_split(ml->post_inst);
+      for(pl = pl0; pl; pl = pl->next) {
+        if(!slist_getentry(initrd0, pl->key) && slist_getentry(modules0, pl->key)) {
+          initrd = slist_append(&initrd0, slist_new());
+          initrd->key = strdup(pl->key);
+        }
+      }
+      slist_free(pl0);
+    }
+  }
+
+  slist_free(sl0);
+
+  /* write 'InitrdModules:' line */
+  if(initrd0) {
+    fprintf(f, "%s:", file_key2str(key_initrdmodules));
+    for(initrd = initrd0; initrd; initrd = initrd->next) fprintf(f, " %s", initrd->key);
+    fprintf(f, "\n");
+  }
+
+  slist_free(initrd0);
+
+  /*
+   * For every currently loaded module, check if we used parameters and write
+   * appropriate 'Options:' lines.
+   */
+  for(sl = modules0; sl; sl = sl->next) {
+    sl1 = slist_getentry(config.module.used_params, sl->key);
+    if(sl1) {
+      fprintf(f, "%s: %s %s\n", file_key2str(key_options), sl1->key, sl1->value);
+    }
+  }
+
+  slist_free(modules0);
 }
 
 
@@ -940,11 +1019,15 @@ module2_t *file_read_modinfo(char *name)
   module2_t *ml0 = NULL, **ml = &ml0, *ml1;
   int i, j, quote, fields, esc;
   char *field[8];
-  int current_type = 0;
+  int current_type = MAX_MODULE_TYPES - 1;	/* default to 'other' */
 
   if(!config.module.type_name[0]) {
-    config.module.type_name[0] = strdup("");
-    config.module.type_name[1] = strdup("autoload");
+    /*
+     * cf. mod_init() & mod_menu()
+     * note2: scsi_type etc. are implicitly assumed to be nonzero in module.c
+     */
+    config.module.type_name[0] = strdup("autoload");
+    /* make it always appear as last menu entry */
     config.module.type_name[MAX_MODULE_TYPES - 1] = strdup("other");
   }
 
@@ -1054,7 +1137,7 @@ module2_t *file_read_modinfo(char *name)
       if(fields > 3 && *field[3]) ml1->pre_inst = strdup(field[3]);
       if(fields > 4 && *field[4]) ml1->post_inst = strdup(field[4]);
       if(fields > 5 && *field[5]) ml1->initrd = atoi(field[5]);
-      ml1->autoload = fields > 6 && *field[6] ? atoi(field[6]) : current_type ? 1 : 0;
+      ml1->autoload = fields > 6 && *field[6] ? atoi(field[6]) : 1;
 
       ml = &(*ml)->next;
     }

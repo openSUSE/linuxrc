@@ -32,7 +32,6 @@
 #include "install.h"
 #include "auto2.h"
 #include "settings.h"
-#include "modparms.h"
 
 
 #ifdef USE_LIBHD
@@ -55,7 +54,7 @@ static int auto2_load_usb_storage(void);
 // static void auto2_find_mouse(void);
 static int auto2_has_i2o(void);
 static void auto2_progress(char *pos, char *msg);
-static int auto2_ask_for_modules(int prompt, int mod_type);
+static int auto2_ask_for_modules(int prompt, char *type);
 
 
 /*
@@ -235,11 +234,6 @@ void auto2_scan_hardware(char *log_file)
       (i = mod_load_module("i2o_block", NULL))
     );
     if(!i) {
-      mpar_save_modparams("i2o_pci", NULL);
-      mpar_save_modparams("i2o_core", NULL);
-      mpar_save_modparams("i2o_config", NULL);
-      mpar_save_modparams("i2o_block", NULL);
-
       hd_clear_probe_feature(hd_data, pr_all);
       hd_set_probe_feature(hd_data, pr_i2o);
       hd_scan(hd_data);
@@ -563,7 +557,6 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
                 sl1 = sl1->next, sl2 = sl2->next
               ) {
                 fprintf(stderr, " %s", sl1->str);
-                mpar_save_modparams(sl1->str, sl2->str);
               }
               fprintf(stderr, " to initrd\n");
             }
@@ -634,13 +627,10 @@ int auto2_init()
   if(!(action_ig & ACT_NO_PCMCIA) && hd_has_pcmcia(hd_data)) {
     deb_msg("Going to load PCMCIA support...");
 
-    if(!util_check_exist("modules/pcmcia_core.o")) {
+    if(!mod_check_modules("pcmcia")) {
       char s[200], *t;
 
-      util_manual_mode();
-      disp_cursor_off();
-      disp_set_display();
-      util_print_banner();
+      util_disp_init();
 
       sprintf(s, txt_get(TXT_FOUND_PCMCIA), "i82365");
       t = strchr(s, '\n');
@@ -655,18 +645,9 @@ int auto2_init()
 
       j = dia_okcancel(s, YES) == YES ? 1 : 0;
 
-      if(j) {
-        mod_force_moddisk_im = TRUE;
-        mod_free_modules();
-        mod_get_ram_modules(MOD_TYPE_OTHER);
-      }
+      if(j) mod_add_disk(0, mod_get_type("pcmcia"));
 
-      ask_for_moddisk = FALSE;
-
-      printf("\033c"); fflush(stdout);
-      disp_clear_screen();
-
-      auto2_ig = TRUE;
+      util_disp_done();
     }
 
     if(
@@ -677,15 +658,11 @@ int auto2_init()
 
     if(!i) {
       deb_msg("PCMCIA modules loaded - starting card manager.");
-      if(pcmcia_params) {
-        mpar_save_modparams("i82365", pcmcia_params);
-      }
       pcmcia_chip_ig = 2;	/* i82365 */
       i = system("cardmgr -v -m /modules");
       if(i)
         deb_msg("Oops: card manager didn't start.");
       else {
-//        pcmcia_core_loaded_im = TRUE;
         deb_msg("card manager ok.");
       }
       /* wait for cards to be activated... */
@@ -717,13 +694,13 @@ int auto2_init()
     /* no CD, but CD drive and no network config */
     if(cdrom_drives && !net_cfg) return i;
 
-    if(auto2_ask_for_modules(1, net_cfg ? MOD_TYPE_NET : MOD_TYPE_SCSI) == 0) return FALSE;
+    if(auto2_ask_for_modules(1, net_cfg ? "network" : "scsi") == 0) return FALSE;
 
     i = auto2_find_install_medium();
 
     if(i || !net_cfg) return i;
 
-    if(auto2_ask_for_modules(0, net_cfg ? MOD_TYPE_SCSI : MOD_TYPE_NET) == 0) return FALSE;
+    if(auto2_ask_for_modules(0, net_cfg ? "scsi" : "network") == 0) return FALSE;
 
     i = auto2_find_install_medium();
   }
@@ -1243,38 +1220,19 @@ void auto2_print_x11_opts(FILE *f)
 #endif
 
 
-int auto2_ask_for_modules(int prompt, int mod_type)
+int auto2_ask_for_modules(int prompt, char *type)
 {
   int do_something = 0;
 
-  if(
-    !ask_for_moddisk ||
-    !util_check_exist("/etc/need_modules_disk")
-  ) return do_something;
+  if(mod_check_modules(type)) return do_something;
 
-  util_manual_mode();
-  disp_cursor_off();
-  disp_set_display();
-  util_print_banner();
+  util_disp_init();
 
-  if(prompt) {
-    prompt = dia_okcancel(txt_get(mod_type == MOD_TYPE_NET ? TXT_ENTER_MODDISK2 : TXT_ENTER_MODDISK), YES) == YES ? 1 : 0;
-  }
-  else {
-    prompt = 1;
-  }
+  do_something = prompt ? dia_okcancel(txt_get(TXT_ENTER_MODDISK), YES) == YES ? 1 : 0 : 1;
 
-  if(prompt) {
-    mod_force_moddisk_im = TRUE;
-    mod_free_modules();
-    mod_get_ram_modules(mod_type);
-    do_something = 1;
-  }
+  if(do_something) mod_add_disk(0, mod_get_type(type));
 
-  printf("\033c"); fflush(stdout);
-  disp_clear_screen();
-
-  auto2_ig = TRUE;
+  util_disp_done();
 
   return do_something;
 }

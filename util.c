@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
@@ -45,7 +46,6 @@
 #include "util.h"
 #include "window.h"
 #include "module.h"
-#include "modparms.h"
 #include "keyboard.h"
 #include "text.h"
 #include "dialog.h"
@@ -581,7 +581,7 @@ void util_disp_init()
   int i_ii;
 
   config.win = 1;
-
+  disp_set_display();
   for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
   disp_cursor_off();
   util_print_banner();
@@ -838,9 +838,7 @@ int util_chk_driver_update(char *dir)
             sprintf(imod, "%s/%s", mods_src, de->d_name);
             strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
             mod_unload_module(rmod);
-            if(!mod_load_module(imod, NULL)) {
-              mpar_save_modparams(rmod, NULL);
-            }
+            mod_load_module(imod, NULL);
           }
         }
       }
@@ -1669,38 +1667,6 @@ char *util_process_name(pid_t pid)
 }
 
 
-slist_t *slist_new()
-{
-  return calloc(1, sizeof (slist_t));
-}
-
-
-slist_t *slist_append(slist_t **sl0, slist_t *sl)
-{
-  for(; *sl0; sl0 = &(*sl0)->next);
-  return *sl0 = sl;
-}
-
-
-slist_t *slist_add(slist_t **sl0, slist_t *sl)
-{
-  sl->next = *sl0;
-  return *sl0 = sl;
-}
-
-
-slist_t *slist_getentry(slist_t *sl, char *key)
-{
-  if(key) {
-    for(; sl; sl = sl->next) {
-      if(sl->key && !strcmp(key, sl->key)) return sl;
-    }
-  }
-
-  return NULL;
-}
-
-
 int util_rm_main(int argc, char **argv)
 {
   int i;
@@ -1775,4 +1741,89 @@ int util_swapoff_main(int argc, char **argv)
   return i;
 }
 
+
+slist_t *slist_new()
+{
+  return calloc(1, sizeof (slist_t));
+}
+
+
+slist_t *slist_free(slist_t *sl)
+{
+  slist_t *next;
+
+  for(; sl; sl = next) {
+    next = sl->next;
+    if(sl->key) free(sl->key);
+    if(sl->value) free(sl->value);
+    free(sl);
+  }
+
+  return NULL;
+}
+
+
+slist_t *slist_append(slist_t **sl0, slist_t *sl)
+{
+  for(; *sl0; sl0 = &(*sl0)->next);
+  return *sl0 = sl;
+}
+
+
+slist_t *slist_add(slist_t **sl0, slist_t *sl)
+{
+  sl->next = *sl0;
+  return *sl0 = sl;
+}
+
+
+slist_t *slist_getentry(slist_t *sl, char *key)
+{
+  if(key) {
+    for(; sl; sl = sl->next) {
+      if(sl->key && !strcmp(key, sl->key)) return sl;
+    }
+  }
+
+  return NULL;
+}
+
+
+slist_t *slist_reverse(slist_t *sl0)
+{
+  slist_t *sl1 = NULL, *sl, *next;
+
+  for(sl = sl0; sl; sl = next) {
+    next = sl->next;
+    slist_add(&sl1, sl);
+  }
+
+  return sl1;
+}
+
+
+slist_t *slist_split(char *text)
+{
+  slist_t *sl0 = NULL, *sl;
+  int i, len;
+  char *s;
+
+  if(!text) return NULL;
+
+  text = strdup(text);
+  len = strlen(text);
+
+  for(i = 0; i < len; i++) if(isspace(text[i])) text[i] = 0;
+
+  for(s = text; s < text + len; s++) {
+    if(*s && (s == text || !s[-1])) {
+      sl = slist_append(&sl0, slist_new());
+      sl->key = strdup(s);
+    }
+  }
+
+  free(text);
+
+  return sl0;
+}
 

@@ -67,7 +67,10 @@ extern void util_start_shell       (char *tty, char *shell, int new_env);
 extern char *util_process_name     (pid_t pid);
 
 slist_t *slist_new(void);
+slist_t *slist_free(slist_t *sl);
 slist_t *slist_append(slist_t **sl0, slist_t *sl);
 slist_t *slist_add(slist_t **sl0, slist_t *sl);
 slist_t *slist_getentry(slist_t *sl, char *key);
+slist_t *slist_reverse(slist_t *sl0);
+slist_t *slist_split(char *text);
 

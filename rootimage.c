@@ -416,13 +416,7 @@ int root_boot_system (void)
 
             rc_ii = dia_okcancel(s, YES) == YES ? 1 : 0;
 
-            if(rc_ii) {
-              mod_force_moddisk_im = TRUE;
-              mod_free_modules();
-              mod_get_ram_modules(MOD_TYPE_OTHER);
-            }
-
-            ask_for_moddisk = FALSE;
+            if(rc_ii) mod_add_disk(0, mod_get_type("file system"));
           }
 
           mod_load_module("reiserfs", NULL);

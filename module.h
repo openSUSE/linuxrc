@@ -21,6 +21,10 @@ typedef struct
     int            order;
     } module_t;
 
+int mod_get_type(char *type_name);
+int mod_check_modules(char *type_name);
+module2_t *mod_get_entry(char *name);
+int mod_add_disk(int prompt, int type);
 extern void  mod_menu            (void);
 extern int   mod_load_module     (char *module_tv, char *params_tv);
 extern void  mod_unload_module   (char *module_tv);
