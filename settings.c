@@ -232,7 +232,7 @@ void set_choose_display (void)
     }
 
 
-void set_choose_keytable (void)
+void set_choose_keytable (int always_show)
     {
     item_t  items_ari [NR_KEYMAPS];
     int     i_ii;
@@ -248,7 +248,7 @@ void set_choose_keytable (void)
     }
 #endif
 
-    if (auto_ig || auto2_ig || keymap_tg[0] != 0)
+    if ((auto_ig || auto2_ig || *keymap_tg) && !always_show)
         {
         if (!*keymap_tg)
             strcpy (keymap_tg, keymap [KEYMAP_DEFAULT].mapname);
@@ -343,7 +343,7 @@ static int set_settings_cb (int what_iv)
             util_print_banner ();
             break;
         case 3:
-            set_choose_keytable ();
+            set_choose_keytable (1);
             rc_ii = 1;
             break;
         case 4:

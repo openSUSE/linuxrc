@@ -416,7 +416,7 @@ static void lxrc_init (void)
         auto2_init_settings();
       } else {
         deb_msg("Automatic setup not possible.");
-        auto2_ig = FALSE;
+        util_manual_mode();
         yast_version_ig = 0;
         printf("\033[9;0]");
         disp_cursor_off();
@@ -455,7 +455,7 @@ static void lxrc_init (void)
         }
 
     if (!serial_ig)
-        set_choose_keytable ();
+        set_choose_keytable (0);
 
     util_update_kernellog ();
 
@@ -504,7 +504,7 @@ static void lxrc_main_menu (void)
     int    choice_ii;
     int    nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
 
-    auto_ig = FALSE;
+    util_manual_mode();
 
     util_create_items (items_ari, nr_items_ii, width_ii);
 

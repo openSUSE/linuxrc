@@ -603,3 +603,10 @@ int util_eject_cdrom(char *dev)
 
   return 0;
 }
+
+void util_manual_mode()
+{
+  auto_ig = 0;
+  auto2_ig = 0;
+}
+

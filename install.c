@@ -167,11 +167,11 @@ int inst_start_demo (void)
         {
         if ((action_ig & ACT_DEMO_LANG_SEL))
             {
-            auto2_ig = FALSE;
+            util_manual_mode();
             util_disp_init ();
             set_choose_language ();
             util_print_banner ();
-            set_choose_keytable ();
+            set_choose_keytable (1);
             }
         }
 
@@ -841,7 +841,7 @@ static int inst_execute_yast (void)
         {
         if (auto2_ig)
             {
-            auto2_ig = 0;
+            util_manual_mode();
             util_disp_init();
             }
 
@@ -868,7 +868,7 @@ static int inst_execute_yast (void)
     unlink ("/bin");
     rename ("/.bin", "/bin");
 
-    if(rc_ii) auto2_ig = FALSE;
+    if(rc_ii) util_manual_mode();
 
     return (rc_ii);
     }
@@ -1325,7 +1325,7 @@ static int inst_choose_yast_version (void)
 
     if (auto2_ig)
         {
-        auto2_ig = 0;
+        util_manual_mode();
         util_disp_init();
         }
 
