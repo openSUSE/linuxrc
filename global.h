@@ -197,9 +197,7 @@ extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];
 extern int             smp_ig;
-#ifdef LXRC_DEBUG
 extern int             guru_ig;
-#endif
 extern int             text_mode_ig;
 extern int             yast2_update_ig;
 extern int             has_floppy_ig;

@@ -68,9 +68,7 @@ char            ppcd_tg [10];
 int             serial_ig = FALSE;
 char            console_tg [30] = "/dev/console";
 int             smp_ig = FALSE;
-#ifdef LXRC_DEBUG
 int             guru_ig = FALSE;
-#endif
 int             text_mode_ig = FALSE;
 int             yast2_update_ig = FALSE;
 int             has_floppy_ig = TRUE;

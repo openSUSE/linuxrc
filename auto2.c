@@ -124,21 +124,35 @@ void auto2_scan_hardware(char *log_file)
     free(hd_data);
   }
   hd_data = calloc(1, sizeof *hd_data);
-  if(!log_file) hd_data->progress = auto2_progress;
   hd_set_probe_feature(hd_data, pr_default);
-  hd_clear_probe_feature(hd_data, pr_modem);
-  hd_clear_probe_feature(hd_data, pr_parallel);
-
-  if(auto2_get_probe_env(hd_data)) {
-    /* reset flags on error */
-    hd_set_probe_feature(hd_data, pr_default);
+  if(!log_file) {
+    hd_data->progress = auto2_progress;
     hd_clear_probe_feature(hd_data, pr_modem);
     hd_clear_probe_feature(hd_data, pr_parallel);
   }
 
+  if(auto2_get_probe_env(hd_data)) {
+    /* reset flags on error */
+    hd_set_probe_feature(hd_data, pr_default);
+    if(!log_file) {
+      hd_clear_probe_feature(hd_data, pr_modem);
+      hd_clear_probe_feature(hd_data, pr_parallel);
+    }
+  }
+
+  if((guru_ig & 4)) hd_data->debug=-1 & ~HD_DEB_DRIVER_INFO;
+
   hd_scan(hd_data);
 
   if(log_file && (f = fopen(log_file, "w+"))) {
+
+    if((hd_data->debug & HD_DEB_SHOW_LOG) && hd_data->log) {
+      fprintf(f,
+        "============ start debug info ============\n%s=========== end debug info ============\n",
+        hd_data->log
+      );
+    }
+
     for(hd = hd_data->hd; hd; hd = hd->next) hd_dump_entry(hd_data, hd, f);
     fclose(f);
   }
@@ -440,9 +454,7 @@ void auto2_chk_expert()
   if((i & 0x02)) yast2_update_ig = 1;
   if((i & 0x04)) auto2_ig = 1;
   if((i & 0x08)) yast_version_ig = 2;	/* default is 1! */
-#ifdef LXRC_DEBUG
   guru_ig = i >> 4;
-#endif
 }
 
 
