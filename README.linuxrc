@@ -94,7 +94,7 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   Locale: de_DE
 
   # lxrc's loaded keytable
-  Keytable: de-kat1-nd
+  Keytable: de-lat1-nd
 
   # the next 4 entries are set on some languages only
 

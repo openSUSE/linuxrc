@@ -524,7 +524,7 @@ int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv)
         fflush (stdout);
 
         key_ii = kbd_getch (TRUE);
-        if (key_ii == KEY_BTAB) key_ii = ' ';
+        if (key_ii == KEY_TAB) key_ii = ' ';
         }
     while (key_ii != KEY_ENTER && key_ii != KEY_ESC);
 
