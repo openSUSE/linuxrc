@@ -673,6 +673,8 @@ void lxrc_init()
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */
 
+  config.hwdetect = 1;
+
   /* make auto mode default */
   if(config.test || config.had_segv) {
     config.manual = 1;

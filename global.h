@@ -216,6 +216,7 @@ typedef struct {
   unsigned noshell:1;		/* don't start any shells */
   volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
   unsigned run_memcheck:1;	/* run memcheck thread */
+  unsigned hwdetect:1;		/* do automatic hardware detection */
   unsigned had_segv;		/* last linuxrc run ended with segv */
   pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
@@ -227,6 +228,8 @@ typedef struct {
   slist_t *cdroms;		/* list of cdroms, without '/dev/' */
   char *cdrom;			/* currently used cdrom, without '/dev/' */
   slist_t *swaps;		/* swap partitions, without '/dev/' */
+  char *floppydev;		/* floppy device specified via config file (no '/dev/') */
+  char *cdromdev;		/* cdrom device specified via config file (no '/dev/') */
   char *instsys;		/* installation system mount point */
   struct {
     char *file;			/* 'info' file name */

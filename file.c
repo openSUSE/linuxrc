@@ -180,7 +180,10 @@ static struct {
   { key_setupnetif,     "SetupNetIF"       },
   { key_netconfig,      "NetConfig"        },
   { key_noshell,        "NoShell"          },
-  { key_memcheck,       "_MemCheck"        }
+  { key_memcheck,       "_MemCheck"        },
+  { key_hwdetect,       "HWDetect"         },
+  { key_floppydevice,   "FloppyDevice"     },
+  { key_cdromdevice,    "CDROMDevice"      }
 };
 
 static struct {
@@ -895,6 +898,24 @@ void file_do_info(file_t *f0)
 
       case key_memcheck:
         if(f->is.numeric) config.run_memcheck = f->nvalue;
+        break;
+
+      case key_hwdetect:
+        if(f->is.numeric) config.hwdetect = f->nvalue;
+        break;
+
+      case key_floppydevice:
+        str_copy(
+          &config.floppydev,
+          strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
+        );
+        break;
+
+      case key_cdromdevice:
+        str_copy(
+          &config.cdromdev,
+          strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
+        );
         break;
 
       default:

@@ -144,17 +144,12 @@ void auto2_scan_hardware(char *log_file)
     free(hd_data);
   }
   hd_data = calloc(1, sizeof *hd_data);
+
+  if(!config.hwdetect) return;
+
   hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
   hd_clear_probe_feature(hd_data, pr_parallel);
   if(!log_file) hd_data->progress = auto2_progress;
-
-#if 0
-  if(auto2_get_probe_env(hd_data)) {
-    /* reset flags on error */
-    hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
-    hd_clear_probe_feature(hd_data, pr_parallel);
-  }
-#endif
 
   with_usb = hd_probe_feature(hd_data, pr_usb);
   hd_clear_probe_feature(hd_data, pr_usb);
@@ -221,23 +216,6 @@ void auto2_scan_hardware(char *log_file)
       }
     }
   }
-
-#if 0
-  if(auto2_has_i2o()) {
-    i = 0;
-    if(
-      (i = mod_load_module("i2o_pci", NULL))    ||
-      (i = mod_load_module("i2o_core", NULL))   ||
-      (i = mod_load_module("i2o_config", NULL)) ||
-      (i = mod_load_module("i2o_block", NULL))
-    );
-    if(!i) {
-      hd_clear_probe_feature(hd_data, pr_all);
-      hd_set_probe_feature(hd_data, pr_i2o);
-      hd_scan(hd_data);
-    }
-  }
-#endif
 
   hd_sys = hd_list(hd_data, hw_sys, 0, NULL);
 
@@ -349,8 +327,8 @@ int auto2_cdrom_dev(hd_t **hd0)
         i = 0;
       }
       else {
-        if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
-          fprintf(stderr, "Found SuSE CD in %s\n", hd->unix_dev_name);
+        if(ci->iso9660.ok && ci->iso9660.volume /* && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume */) {
+          fprintf(stderr, "Found CD in %s\n", hd->unix_dev_name);
           str_copy(&config.susecd, ci->iso9660.volume);
           if(ci->iso9660.application) str_copy(&config.susecd, ci->iso9660.application);
           /* CD found -> try to mount it */
