@@ -1,3 +1,6 @@
+17/1/2001:	v1.1.18.007
+	- write keymap info for yast1 even during auto2 mode
+
 16/1/2001:	v1.1.18.006
 	- save PCMCIA module params
 	- ask for mod disk before "Autoload of modules"

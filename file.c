@@ -142,7 +142,7 @@ void file_write_yast_info (char *file_name)
         strcat (line_ti, " Mono\n");
     fprintf (file_pri, line_ti);
 
-    if (keymap_tg [0] && !auto2_ig)
+    if (keymap_tg [0] && (!auto2_ig || yast_version_ig == 1))
         fprintf (file_pri, "%s %s\n", file_txt_keymap_tm, keymap_tg);
     if (cdrom_tg [0])
         fprintf (file_pri, "%s %s\n", file_txt_cdrom_tm, cdrom_tg);
