@@ -2,7 +2,7 @@
  *
  * global.h      Global defines for linuxrc
  *
- * Copyright (c) 1996-1998  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -11,17 +11,17 @@
 #include <inttypes.h>
 
 #ifdef LINUXRC_AXP
-#define MEM_LIMIT1_RAMDISK	50000000
-#define MEM_LIMIT2_RAMDISK	50000000
+#define MEM_LIMIT1_RAMDISK    50000000
+#define MEM_LIMIT2_RAMDISK    50000000
 #else
-#define MEM_LIMIT1_RAMDISK	30000000
-#define MEM_LIMIT2_RAMDISK	47000000
+#define MEM_LIMIT1_RAMDISK    46000000
+#define MEM_LIMIT2_RAMDISK    46000000
 #endif
-#define MEM_LIMIT_SWAP_MSG	 6500000
-#define MEM_LIMIT_CACHE_LIBS	15000000
-#define MEM_LIMIT_YAST2		12000000
+#define MEM_LIMIT_SWAP_MSG     6500000
+#define MEM_LIMIT_CACHE_LIBS  15000000
+#define MEM_LIMIT_YAST2       12000000
 
-#define LXRC_VERSION	"1.0.1b"
+#define LXRC_VERSION  "1.0.1b"
 
 #ifndef TRUE
 #define TRUE               1
@@ -47,7 +47,7 @@
 #define BOOTMODE_HARDDISK  3
 #define BOOTMODE_FTP       4
 
-#define	LXRC_DEBUG
+#define  LXRC_DEBUG
 
 #ifdef LXRC_DEBUG
 # define deb_wait if((guru_ig & 2)) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
