@@ -236,7 +236,8 @@ static struct {
   { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
   { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_port,           "Port",           kf_none                        },
-  { key_smbshare,       "Share",          kf_none                        }
+  { key_smbshare,       "Share",          kf_none                        },
+  { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1240,6 +1241,10 @@ void file_do_info(file_t *f0)
 
       case key_zenconfig:
         if(*f->value) str_copy(&config.zenconfig, f->value);
+        break;
+
+      case key_rootimage2:
+        if(*f->value) str_copy(&config.rootimage2, f->value);
         break;
 
       default:

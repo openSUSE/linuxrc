@@ -284,6 +284,7 @@ typedef struct {
   char *floppydev;		/* floppy device specified via config file (no '/dev/') */
   char *cdromdev;		/* cdrom device specified via config file (no '/dev/') */
   char *instsys;		/* installation system mount point */
+  char *instsys2;		/* extra installation system mount point */
   struct {
     char *file;			/* 'info' file name */
     char *loaded;		/* actual 'info' file that was loaded */
@@ -300,10 +301,12 @@ typedef struct {
   instmode_t instmode;		/* ftp, nfs, smb, etc. */
   instmode_t instmode_extra;	/* for the stranger things... */
   int inst_ramdisk;		/* ramdisk with instsys */
+  int inst2_ramdisk;		/* ramdisk with extra instsys */
   char *new_root;		/* root device to boot */
   char *installdir;		/* "/boot/inst-sys" */
   char *rootimage;		/* "/boot/root" */
   char *rescueimage;		/* "/boot/rescue" */
+  char *rootimage2;		/* additional root image */
   char *term;			/* TERM var */
   char *cdid;			/* set if we found a install CD */
   int usbwait;			/* sleep this much after loading usb modules */
@@ -408,6 +411,7 @@ typedef struct {
     char *extra;
     char *instdata;
     char *instsys;
+    char *instsys2;
     char *live;
     char *update;
   } mountpoint;

@@ -18,6 +18,7 @@ typedef struct {
   int usermap;	// redundant, will drop it later -- snwint
   int write_info;
   char *locale;
+  int xfonts;	/* needs extra xfonts */
 } language_t;
 
 typedef struct {

@@ -1458,6 +1458,11 @@ void util_status_info()
   sprintf(buf, "rootimage = \"%s\"", config.rootimage);
   slist_append_str(&sl0, buf);
 
+  if(config.rootimage2) {
+    sprintf(buf, "rootimage2 = \"%s\"", config.rootimage2);
+    slist_append_str(&sl0, buf);
+  }
+
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
   slist_append_str(&sl0, buf);
 
@@ -4233,7 +4238,7 @@ int make_links(char *src, char *dst)
   struct dirent *de;
   struct stat sbuf;
   struct utimbuf ubuf;
-  char src2[0x400], dst2[0x400], tmp_dir[0x400], tmp_link[0x400];
+  char src2[0x400], dst2[0x400], tmp_dir[0x400], tmp_link[0x400], *tmp_s = NULL;
   char *s;
   int err = 0;
 
@@ -4260,7 +4265,8 @@ int make_links(char *src, char *dst)
               err = 2;
               continue;
             }
-            s = read_symlink(dst2);
+            str_copy(&tmp_s, read_symlink(dst2));
+            s = tmp_s;
             if(!*s) {
               err = 3;
               continue;
@@ -4300,8 +4306,10 @@ int make_links(char *src, char *dst)
       }
       else if(!is_there(dst2) || is_link(dst2)) {
         unlink(dst2);
-        if(symlink(src2, dst2)) {
-          perror(src2);
+        s = src2;
+        if(is_link(src2)) s = read_symlink(src2);
+        if(symlink(s, dst2)) {
+          perror(s);
           err = 6;
           continue;
         }
@@ -4309,6 +4317,8 @@ int make_links(char *src, char *dst)
     }
 
     closedir(dir);
+
+    free(tmp_s);
   }
   else {
     perror(src);

@@ -49,6 +49,7 @@ extern int   txt_init (void);
 // #define TRANS_id
 #define TRANS_it
 #define TRANS_ja
+#define TRANS_ko
 #define TRANS_nl
 #define TRANS_nb
 #define TRANS_pl

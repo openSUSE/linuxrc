@@ -1,6 +1,10 @@
+4/3/2005:	v1.8.2
 	- allow ssh=1 as an alias for usessh=1 (#66793)
 	- pass unknown languages to yast
 	- copy into new tmpfs even if we use initramfs
+	- support additional inst-sys (via rootimage2 option)
+	- load extra root image depending on language
+	- fixed bug in inst-sys linking code
 
 22/2/2005:	v1.8.1
 	- accept "domain;" in smb url

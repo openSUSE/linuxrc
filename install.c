@@ -848,6 +848,13 @@ int inst_start_install()
   int i, rc, update_rd;
   char *buf = NULL;
 
+  if(
+    !config.rootimage2 &&
+    current_language()->xfonts
+  ) {
+    str_copy(&config.rootimage2, ".fonts");
+  }
+
   if(config.manual) {
     if((rc = inst_choose_source())) return rc;
 #if defined(__s390__) || defined(__s390x__)
@@ -859,6 +866,7 @@ int inst_start_install()
   }
 
   str_copy(&config.instsys, NULL);
+  str_copy(&config.instsys2, NULL);
 
   if(config.use_ramdisk) {
     config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode);
@@ -874,11 +882,28 @@ int inst_start_install()
     rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.instsys);
     if(rc) return rc;
     str_copy(&config.instsys, config.mountpoint.instsys);
+
+    if(config.rootimage2) {
+      strprintf(&buf, "%s%s", inst_rootimage_tm, config.rootimage2);
+      config.inst2_ramdisk = load_image(buf, config.instmode);
+      if(config.inst2_ramdisk >= 0) {
+        if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
+          str_copy(&config.instsys2, config.mountpoint.instsys2);
+        }
+      }
+    }
   }
   else if(!util_is_dir(inst_rootimage_tm)) {
     rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
     if(rc) return rc;
     str_copy(&config.instsys, config.mountpoint.instsys);
+
+    if(config.rootimage2) {
+      strprintf(&buf, "%s%s", inst_rootimage_tm, config.rootimage2);
+      if(!util_mount_ro(buf, config.mountpoint.instsys2)) {
+        str_copy(&config.instsys2, config.mountpoint.instsys2);
+      }
+    }
   }
   else {
     strprintf(&buf, "%s%s", config.mountpoint.instdata, config.installdir);
@@ -1030,6 +1055,12 @@ int add_instsys()
   argv[2] = "/";
   util_lndir_main(3, argv);
 
+  if(config.instsys2) {
+    argv[1] = config.instsys2;
+    argv[2] = "/";
+    util_lndir_main(3, argv);
+  }
+
   return rc;
 }
 
@@ -1049,6 +1080,9 @@ void inst_yast_done()
   for(count = 5; inst_umount() == EBUSY && count--;) sleep(1);
 
   util_debugwait("inst-sys umount done");
+
+  ramdisk_free(config.inst2_ramdisk);
+  config.inst2_ramdisk = -1;
 
   ramdisk_free(config.inst_ramdisk);
   config.inst_ramdisk = -1;

@@ -449,7 +449,7 @@ void lxrc_movetotmpfs2()
     return;
   }
 
-  i = mount("tmpfs", newroot, "tmpfs", 0, "nr_inodes=30720");
+  i = mount("tmpfs", newroot, "tmpfs", 0, "size=0,nr_inodes=0");
   if(i) {
     perror(newroot);
     return;
@@ -745,6 +745,7 @@ void lxrc_init()
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
   config.mountpoint.instsys = strdup("/mounts/instsys");
+  config.mountpoint.instsys2 = strdup("/mounts/instsys2");
   config.mountpoint.live = strdup("/mounts/live");
   config.mountpoint.update = strdup("/mounts/update");
   config.mountpoint.instdata = strdup("/var/adm/mount");
@@ -823,7 +824,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2005 SUSE LINUX Products GmbH <<<\n",
+      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2005 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
