@@ -1,3 +1,8 @@
+24/4/2003:	v1.4.47
+	- live eval changes
+	- added 'idescsi' parameter: use ide-scsi module for cdr/cdrw drives
+	  (needed for live eval)
+
 4/4/2003:	v1.4.46
 	- copy content file from the first CD linuxrc sees to /tmp/content
 
