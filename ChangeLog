@@ -1,5 +1,9 @@
+18/9/2002:	v1.4.29
+	- serial console fix (superfluous '/dev', #19635)
+
+11/9/2002:	v1.4.28
 	- do write server info for VNC/ssh install again
-	  needed for network installion (#18882)
+	  needed for network installation (#18882)
 
 10/9/2002:	v1.4.27
 	- mls: added line oriented display mode
