@@ -272,6 +272,7 @@ typedef struct {
     int min_free;		/* don't let it drop below this */
     int min_modules;		/* remove modules before starting yast, if it drops below this */
     int min_yast;		/* minimum for yast */
+    int min_yast_text;		/* minimum for yast in text mode */
     int load_image;		/* _load_ rootimage, if we have at least that much */
   } memory;
 

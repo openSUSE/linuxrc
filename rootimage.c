@@ -327,7 +327,10 @@ int ask_for_swap(int size, char *msg)
   }
 
   do {
-    if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt3)) break;
+    if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt3)) {
+      i = -1;
+      break;
+    }
 
     if(partition) {
       sprintf(tmp, "/dev/%s", partition);

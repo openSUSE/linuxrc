@@ -985,31 +985,24 @@ int inst_execute_yast()
     if(util_check_exist("/sbin/update")) system("/sbin/update");
   }
 
-  util_free_mem();
-  if(config.addswap) ask_for_swap(
-    (config.memory.min_yast - config.memory.min_free) << 10,
-    "Not enough memory for YaST."
-  );
-
   i = 0;
+  util_free_mem();
+  if(config.addswap) {
+    i = ask_for_swap(
+      (config.memory.min_yast_text - config.memory.min_free) << 10,
+      "Not enough memory for YaST."
+    );
+  }
+
+  if(i == -1) {
+    inst_yast_done();
+    return -1;
+  }
 
   util_free_mem();
   if(config.addswap && config.memory.current < config.memory.min_yast) {
-    if(!config.textmode) {
-      int win_old;
-      if(!(win_old = config.win)) util_disp_init();
-      if(dia_okcancel(
-        "You don't have enough free memory for a graphical installation.\n\n"
-        "The text mode frontend of YaST2 will be used instead.",
-        YES
-      ) != YES) i = 1;
-      if(!win_old) util_disp_done();
-
-      if(!i) {
-        config.textmode = 1;
-        file_write_install_inf("");
-      }
-    }
+    config.textmode = 1;
+    file_write_install_inf("");
   }
 
   if(i) {

@@ -150,7 +150,10 @@ int mod_copy_modules(char *src_dir, int doit)
           sprintf(buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
           // fprintf(stderr, "%s\n", buf);
           system(buf);
-          if(doit == 2) dia_status(&win, (cnt++ * 100) / files);
+          if(doit == 2) {
+            dia_status(&win, (cnt * 100) / files);
+            if(strcmp(de->d_name, MODULE_CONFIG)) cnt++;
+          }
         }
         else {
           files++;
@@ -551,8 +554,12 @@ int mod_add_disk(int prompt, int type)
   if(config.tmpfs) {
     mod_copy_modules(config.mountpoint.floppy, 0);
     added += mod_copy_modules(config.mountpoint.floppy, 2);
-    mod_init();
   }
+  else {
+    sprintf(buf, "%s/" MODULE_CONFIG, config.mountpoint.floppy);
+    file_read_modinfo(buf);
+  }
+  mod_init();
 
   umount(config.mountpoint.floppy);
 

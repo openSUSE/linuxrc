@@ -930,8 +930,8 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory limits: min %d, yast %d, modules %d, image %d",
-    config.memory.min_free, config.memory.min_yast,
+    "memory limits: min %d, yast %d/%d, modules %d, image %d",
+    config.memory.min_free, config.memory.min_yast, config.memory.min_yast_text,
     config.memory.min_modules, config.memory.load_image
   );
   slist_append_str(&sl0, buf);

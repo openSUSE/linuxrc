@@ -1,3 +1,10 @@
+21/3/2002:	v1.3.25
+	- fixed module handling when we're not using tmpfs (#13985)
+	- show popup if we didn't add modules from mod disk (#14185)
+	- don't request module disk unless it would be really useful
+	- don't ask for swap unless we won't be able to run yast in text mode
+	- made search for installation system do less unexpected things
+
 17/3/2002:	v1.3.24
 	- don't use tmpfs on systems < 32 MB
 	- explicitly set nr_inodes for tmpfs (we need quite a few)

@@ -140,6 +140,7 @@ static struct {
   { key_swapfree,       "SwapFree"         },
   { key_memlimit,       "MemLimit"         },
   { key_memyast,        "MemYaST"          },
+  { key_memyasttext,    "MemYaSTText"      },
   { key_memmodules,     "MemModules"       },
   { key_memloadimage,   "MemLoadImage"     },
   { key_info,           "Info"             },
@@ -645,6 +646,10 @@ void file_do_info(file_t *f0)
 
       case key_memyast:
         if(f->is.numeric) config.memory.min_yast = f->nvalue;
+        break;
+
+      case key_memyasttext:
+        if(f->is.numeric) config.memory.min_yast_text = f->nvalue;
         break;
 
       case key_memmodules:

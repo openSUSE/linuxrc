@@ -783,10 +783,11 @@ void lxrc_init()
   util_free_mem();
 
   // default memory limits for i386 version
-  config.memory.min_free =      8 * 1024;
-  config.memory.min_yast =     44 * 1024;
-  config.memory.min_modules =  64 * 1024;
-  config.memory.load_image =  256 * 1024;
+  config.memory.min_free =        8 * 1024;
+  config.memory.min_yast_text =  32 * 1024;
+  config.memory.min_yast =       44 * 1024;
+  config.memory.min_modules =    64 * 1024;
+  config.memory.load_image =    256 * 1024;
 
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;
@@ -842,7 +843,7 @@ void lxrc_init()
 #ifdef __i386__
       i = 0;
       j = 1;
-      if(cdrom_drives && !config.demo) {
+      if(config.insttype == inst_cdrom && cdrom_drives && !config.demo) {
         sprintf(buf, txt_get(TXT_INSERT_CD), 1);
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
@@ -857,10 +858,16 @@ void lxrc_init()
         yast_version_ig = 0;
         util_disp_init();
         if(j) {
-          sprintf(buf,
-            "Could not find the SuSE Linux %s CD.\n\nActivating manual setup program.\n",
-            config.demo ? "LiveEval" : "Installation"
-          );
+          strcpy(buf, "Could not find the SuSE Linux ");
+          if(config.insttype == inst_cdrom) {
+            sprintf(buf + strlen(buf),
+              "%s CD.", config.demo ? "LiveEval" : "Installation"
+            );
+          }
+          else {
+            strcat(buf, "Installation Source.");
+          }
+          strcat(buf, "\n\nActivating manual setup program.\n");
           dia_message(buf, MSGTYPE_ERROR);
         }
       }

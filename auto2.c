@@ -37,10 +37,9 @@
 #ifdef USE_LIBHD
 
 static hd_data_t *hd_data = NULL;
-static char *auto2_loaded_module = NULL;
-static char *auto2_loaded_module_args = NULL;
 static char *pcmcia_params = NULL;
 static int is_vaio = 0;
+static int need_modules = 0;
 
 static void auto2_check_cdrom_update(char *dev);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
@@ -51,8 +50,6 @@ static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
 static int auto2_load_usb_storage(void);
-// static void auto2_find_mouse(void);
-// static int auto2_has_i2o(void);
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, char *type);
 
@@ -383,8 +380,6 @@ int auto2_net_dev(hd_t **hd0)
   hd_t *hd;
   int i;
 
-  // TODO: +=SMB
-      
   if(!(net_config_mask() || config.insttype == inst_net)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
@@ -509,7 +504,6 @@ int auto2_driver_is_active(driver_info_t *di)
  */
 int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 {
-//  char mod_cmd[256];
   driver_info_t *di, *di0;
   str_list_t *sl1, *sl2;
   hd_t *hd;
@@ -537,14 +531,6 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
             sl1 && sl2;
             sl1 = sl1->next, sl2 = sl2->next
           ) {
-#if 0
-            sprintf(
-              mod_cmd, "insmod %s%s%s",
-              sl1->str, sl2->str ? " " : "", sl2->str ? sl2->str : ""
-            );
-            // fprintf(stderr, "Going to load module \"%s\"...\n", sl1->str);
-            system(mod_cmd);
-#endif
             mod_insmod(sl1->str, sl2->str);
           }
 
@@ -554,35 +540,12 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
           }
 
           if(i) {
-            str_copy(&auto2_loaded_module, NULL);
-            str_copy(&auto2_loaded_module_args, NULL);
-
-            // use the last module
-            for(
-              sl1 = di->module.names, sl2 = di->module.mod_args;
-              sl1->next && sl2->next;
-              sl1 = sl1->next, sl2 = sl2->next
-            );
-            str_copy(&auto2_loaded_module, sl1->str);
-            if(sl2->str) str_copy(&auto2_loaded_module_args, sl2->str);
-
-            if(base_class == bc_storage) {
-              fprintf(stderr, "added");
-              for(
-                sl1 = di->module.names, sl2 = di->module.mod_args;
-                sl1 && sl2;
-                sl1 = sl1->next, sl2 = sl2->next
-              ) {
-                fprintf(stderr, " %s", sl1->str);
-              }
-              fprintf(stderr, " to initrd\n");
-            }
-
             last_idx = hd->idx;
             fprintf(stderr, "Ok, that seems to have worked. :-)\n");
             break;
           }
           else {
+            need_modules = 1;
             fprintf(stderr, "Oops, that didn't work.\n");
           }
         }
@@ -617,7 +580,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
  */
 int auto2_init()
 {
-  int i, j;
+  int i, j, net_cfg;
 
 #if 0
   auto2_chk_x11i();
@@ -704,35 +667,29 @@ int auto2_init()
   }
 #endif
 
-//  auto2_find_mouse();
-
-//  deb_int(net_config_mask());
-
   util_debugwait("starting search for inst-sys");
 
   i = auto2_find_install_medium();
 
 #ifdef __i386__
-  {
-    /* int net_cfg = (net_config_mask() & 0x2b) == 0x2b; */
-    int net_cfg = net_config_mask() || config.insttype == inst_net;
+  /* ok, found something */
+  if(i) return i;
 
-    /* ok, found something */
-    if(i) return i;
+  net_cfg = net_config_mask() || config.insttype == inst_net;
 
-    /* no CD, but CD drive and no network config */
-    if(cdrom_drives && !net_cfg) return i;
+  /* no CD, but CD drive and no network install */
+  if(cdrom_drives && config.insttype != inst_net) return i;
 
-    if(auto2_ask_for_modules(1, net_cfg ? "network" : "scsi") == 0) return FALSE;
-
-    i = auto2_find_install_medium();
-
-    if(i || !net_cfg) return i;
-
-    if(auto2_ask_for_modules(0, net_cfg ? "scsi" : "network") == 0) return FALSE;
-
-    i = auto2_find_install_medium();
+  if(need_modules) {
+    if(config.insttype == inst_net) {
+      if(auto2_ask_for_modules(1, "network") == 0) return FALSE;
+    }
+    else {
+      if(auto2_ask_for_modules(1, "scsi") == 0) return FALSE;
+    }
   }
+
+  i = auto2_find_install_medium();
 #endif
 
   return i;
@@ -757,9 +714,13 @@ int auto2_find_install_medium()
   }
     
   if(config.instmode == inst_cdrom || !config.instmode) {
+    set_instmode(inst_cdrom);
+
     str_copy(&config.cdrom, NULL);
 
     util_debugwait("CD?");
+
+    need_modules = 0;
 
     fprintf(stderr, "Looking for a SuSE CD...\n");
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
@@ -769,7 +730,7 @@ int auto2_find_install_medium()
       return TRUE;
     }
 
-    for(last_idx = 0;;) {
+    for(need_modules = 0, last_idx = 0;;) {
       /* i == 1 -> try to activate another storage device */
       if(i == 1) {
         fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
@@ -795,19 +756,12 @@ int auto2_find_install_medium()
     }
   }
 
-  str_copy(&auto2_loaded_module, NULL);
-  str_copy(&auto2_loaded_module_args, NULL);
-
-#if 0
-  // TODO: +=SMB
-#endif
-
-  deb_msg("Well, maybe there is a network server...");
-
-  util_debugwait("Net?");
-
   if(net_config_mask() || config.insttype == inst_net) {
-    // ???
+
+    util_debugwait("Net?");
+
+    need_modules = 0;
+
     s_addr2inet(
       &config.net.broadcast,
       config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
@@ -819,33 +773,34 @@ int auto2_find_install_medium()
     fprintf(stderr, "gateway:    %s\n", inet2print(&config.net.gateway));
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver));
-  }
 
-  if(!auto2_net_dev(&hd_devs)) {
-    if(config.activate_network) auto2_activate_devices(bc_network, 0);
-    if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
-    return TRUE;
-  }
-
-  for(last_idx = 0;;) {
-    deb_msg("Ok, that didn't work; see if we can activate another network device...");
-
-    if(!(last_idx = auto2_activate_devices(bc_network, last_idx))) {
-      fprintf(stderr, "No further network cards found; giving up.\n");
-      break;
-    }
-
-    fprintf(stderr, "Looking for a network server again...\n");
+    fprintf(stderr, "Looking for a network server...\n");
     if(!auto2_net_dev(&hd_devs)) {
+      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }
+
+    for(need_modules = 0, last_idx = 0;;) {
+      deb_msg("Ok, that didn't work; see if we can activate another network device...");
+
+      if(!(last_idx = auto2_activate_devices(bc_network, last_idx))) {
+        fprintf(stderr, "No further network cards found; giving up.\n");
+        break;
+      }
+
+      fprintf(stderr, "Looking for a network server again...\n");
+      if(!auto2_net_dev(&hd_devs)) {
+        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+        if(config.activate_network) auto2_activate_devices(bc_network, 0);
+        if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
+        return TRUE;
+      }
+    }
   }
 
   util_debugwait("Nothing found");
-
-  set_instmode(inst_cdrom);
 
   return FALSE;
 }
