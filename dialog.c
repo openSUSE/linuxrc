@@ -235,6 +235,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
       key_ii != KEY_ESC &&
       key_ii != 'q' &&
       key_ii != 'r' &&
+      key_ii != 's' &&
       key_ii != 'i' &&
       key_ii != 'c'
     );
@@ -247,6 +248,8 @@ int dia_message (char *txt_tv, int msgtype_iv)
         return (-1);
     else if (key_ii == 'r')
         return (-69);
+    else if (key_ii == 's')
+        return (-70);
     else if (key_ii == 'i')
         return (-71);
     else if (key_ii == 'c')
@@ -1114,6 +1117,10 @@ void dia_handle_ctrlc (void)
         }
         if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
       }
+    }
+    else if(i == -70) {
+      /* force segfault */
+      *((unsigned char *) NULL) = 7;
     }
     else if(i == -71) {
       util_status_info();

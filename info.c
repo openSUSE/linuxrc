@@ -185,7 +185,7 @@ void info_init (void)
     if (*(utsinfo_ri.release + 2) > '0')
         old_kernel_ig = FALSE;
 
-    fprintf (stderr, "CPU: %d, Memory: %"PRId64", %skernel\n",
+    if(!config.had_segv) fprintf (stderr, "CPU: %d, Memory: %"PRId64", %skernel\n",
              cpu_ig, memory_ig, old_kernel_ig ? "Old " : "New ");
 
     /* Check for LS-120 */

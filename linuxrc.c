@@ -17,6 +17,7 @@
 #include <sys/reboot.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>
+#include <sys/select.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
@@ -49,7 +50,15 @@
 
 #define LINUXRC_DEFAULT_STDERR "/dev/tty3"
 
+#if defined(__alpha__) || defined(__ia64__)
+#define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
+#else	// __i386__ __x86_64__ __PPC__ __sparc__ __s390__ __s390x__ __MIPSEB__
+#define SIGNAL_ARGS	int signum, struct sigcontext scp
+#endif
+
 static void lxrc_main_menu     (void);
+static void lxrc_catch_signal_11(SIGNAL_ARGS);
+static void lxrc_catch_signal  (int signum);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (dia_item_t di);
 static void lxrc_memcheck      (void);
@@ -61,8 +70,6 @@ static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
 static pid_t lxrc_mempid_rm;
-static int lxrc_sig11_im = FALSE;
-static char **lxrc_argv;
 static char **saved_environment;
 extern char **environ;
 static void lxrc_movetotmpfs(void);
@@ -155,10 +162,7 @@ static dia_item_t di_lxrc_main_menu_last;
 int main(int argc, char **argv, char **env)
 {
   char *prog;
-  int err;
-#if SWISS_ARMY_KNIFE
-  int i;
-#endif
+  int err, i, j;
   file_t *ft;
   int tmpfs_opt = 0;
 
@@ -172,10 +176,30 @@ int main(int argc, char **argv, char **env)
   }
 #endif
 
-  lxrc_argv = argv;
+  config.argv = argv;
 
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
+
+  /* maybe we had a segfault recently... */
+  if(argc == 4 && !strcmp(argv[1], "segv")) {
+    for(i = 0; i < 16 && argv[2][i]; i++) {
+      config.segv_addr <<= 4;
+      j = argv[2][i] - '0';
+      if(j > 9) j -= 'a' - '9' - 1;
+      config.segv_addr += j & 0xf;
+    }
+    config.had_segv = 1;
+
+    if(argv[3][0] == '0') {	/* was not in window mode */
+      fprintf(stderr, "\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
+      printf("\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
+      fflush(stdout);
+      getchar();
+    }
+  }
+
+  if(!config.had_segv) config.restart_on_segv = 1;
 
   if(util_check_exist("/opt") || getuid()) {
     printf("Seems we are on a running system; activating testmode...\n");
@@ -183,7 +207,7 @@ int main(int argc, char **argv, char **env)
     strcpy(console_tg, "/dev/tty");
   }
 
-  if(!config.test) {
+  if(!config.test && !config.had_segv) {
     if(!util_check_exist("/oldroot")) {
 #if SWISS_ARMY_KNIFE 
       lxrc_makelinks(*argv);
@@ -348,14 +372,14 @@ void lxrc_change_root (void)
 #if 0
       close (0); close (1); close (2);
       chroot (".");
-      execve ("/sbin/init", lxrc_argv, saved_environment ? : environ);
+      execve ("/sbin/init", config.argv, saved_environment ? : environ);
 #endif
       int i;
 
       for(i = 0; i < 20 ; i++) close(i);
       chroot(".");
       if(config.demo) {
-        execve("/sbin/init", lxrc_argv, saved_environment ? : environ);
+        execve("/sbin/init", config.argv, saved_environment ? : environ);
       }
       else {
         execl("/bin/umount", "umount", "/mnt", NULL);
@@ -491,15 +515,12 @@ void lxrc_killall(int really_all_iv)
  */
 
 
-#if defined(__i386__) || defined(__x86_64__) || defined(__PPC__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
-static void lxrc_catch_signal_11(int signum, struct sigcontext scp)
-#endif
-#if defined(__alpha__) || defined(__ia64__)
-static void lxrc_catch_signal_11(int signum, int x, struct sigcontext *scp)
-#endif
+void lxrc_catch_signal_11(SIGNAL_ARGS)
 {
-  volatile static unsigned cnt = 0;
   uint64_t ip;
+  char addr[17];
+  char state[2];
+  int i, j;
 
 #ifdef __i386__
   ip = scp.eip;
@@ -537,31 +558,41 @@ static void lxrc_catch_signal_11(int signum, int x, struct sigcontext *scp)
   ip = scp.sc_fpc_eir;
 #endif
 
-  if(!cnt++) fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
-  sleep(10);
+  fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
+  if(config.restart_on_segv) {
+    config.restart_on_segv = 0;
+    for(i = 15; i >= 0; i--, ip >>= 4) {
+      j = ip & 0xf;
+      if(j > 9) j += 'a' - '9' - 1;
+      addr[i] = j + '0';
+    }
+    addr[16] = 0;
+    state[0] = config.win ? '1' : '0';
+    state[1] = 0;
+    kill(lxrc_mempid_rm, 9);
+    kbd_end();		/* restore terminal settings */
+    execl(*config.argv, "linuxrc", "segv", addr, state, NULL);
+  }
 
-  lxrc_sig11_im = TRUE;
+  /* stop here */
+  for(;;) select(0, NULL, NULL, NULL, NULL);
 }
 
 
-static void lxrc_catch_signal (int sig_iv)
-    {
-    if (sig_iv)
-        {
-        fprintf (stderr, "Caught signal %d!\n", sig_iv);
-        sleep (10);
-        }
+void lxrc_catch_signal(int signum)
+{
+ if(signum) {
+   fprintf(stderr, "Caught signal %d!\n", signum);
+   sleep(10);
+ }
 
-    if (sig_iv == SIGBUS || sig_iv == SIGSEGV)
-        lxrc_sig11_im = TRUE;
-
-    signal (SIGHUP,  lxrc_catch_signal);
-    signal (SIGBUS,  lxrc_catch_signal);
-    signal (SIGINT,  lxrc_catch_signal);
-    signal (SIGTERM, lxrc_catch_signal);
-    signal (SIGSEGV, (void (*)(int)) lxrc_catch_signal_11);
-    signal (SIGPIPE, lxrc_catch_signal);
-    }
+ signal(SIGHUP,  lxrc_catch_signal);
+ signal(SIGBUS,  lxrc_catch_signal);
+ signal(SIGINT,  lxrc_catch_signal);
+ signal(SIGTERM, lxrc_catch_signal);
+ signal(SIGSEGV, (void (*)(int)) lxrc_catch_signal_11);
+ signal(SIGPIPE, lxrc_catch_signal);
+}
 
 
 void lxrc_init()
@@ -574,8 +605,10 @@ void lxrc_init()
   char *s, *t0, *t, buf[256];
   url_t *url;
 
-  printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n");
-  fflush(stdout);
+  if(!config.had_segv) {
+    printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n");
+    fflush(stdout);
+  }
 
   if(txt_init()) {
     printf("Corrupted texts!\n");
@@ -595,6 +628,7 @@ void lxrc_init()
   umask(022);
 
   if(!config.test) {
+    if(config.had_segv) umount("/proc");
     mount("proc", "/proc", "proc", 0, 0);
   }
 
@@ -632,7 +666,7 @@ void lxrc_init()
   config.usbwait = 4;		/* 4 seconds */
 
   /* make auto mode default */
-  if(config.test) {
+  if(config.test || config.had_segv) {
     config.manual = 1;
   }
   else {
@@ -658,11 +692,13 @@ void lxrc_init()
     if(i) config.language = i;
   }
 
-  ft = file_get_cmdline(key_manual);
-  if(ft && ft->is.numeric) {
-    config.manual = ft->nvalue;
-    auto_ig = 0;
-    auto2_ig = config.manual ^ 1;
+  if(!config.had_segv) {
+    ft = file_get_cmdline(key_manual);
+    if(ft && ft->is.numeric) {
+      config.manual = ft->nvalue;
+      auto_ig = 0;
+      auto2_ig = config.manual ^ 1;
+    }
   }
 
   ft = file_get_cmdline(key_info);
@@ -781,7 +817,7 @@ void lxrc_init()
   }
 #endif
 
-  if(!config.test) {
+  if(!config.test && !config.had_segv) {
     fprintf(stderr, "Remount of / ");
     i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
     fprintf(stderr, i ? "failed\n" : "ok\n");
@@ -842,6 +878,8 @@ void lxrc_init()
     config.shell_started = 1;
   }
 
+  if(config.had_segv) util_manual_mode();
+
 #ifdef USE_LIBHD
   if(auto2_ig) {
     if(auto2_init()) {
@@ -896,11 +934,25 @@ void lxrc_init()
   }
 
   /* for 'manual' */
-  if(!config.info.loaded && !config.hwcheck) file_read_info();
-	
-  if(!auto2_ig) {
+  if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
+
+  if(config.had_segv) {
+    char buf[256];
+
+    util_disp_init();
+    sprintf(buf,
+      "Sorry, linuxrc crashed at address 0x%08"PRIx64".\n\n"
+      "Linuxrc has been restarted in manual mode.",
+      config.segv_addr
+    );
+    dia_message(buf, MSGTYPE_ERROR);
+  }
+  else if(!auto2_ig) {
     util_disp_init();
   }
+
+  /* after we've told the user about the last segv, turn it on... */
+  config.restart_on_segv = 1;
 
   if(!config.language && config.win) {
     set_choose_language();
@@ -1030,46 +1082,29 @@ int lxrc_main_cb(dia_item_t di)
 }
 
 
-static void lxrc_memcheck (void)
-    {
-    int   nr_pages_ii;
-    int   max_pages_ii;
-    char *data_pci;
-    int   i_ii;
+void lxrc_memcheck()
+{
+  int nr_pages, max_pages, i;
+  char *buf;
 
+  if((lxrc_mempid_rm = fork())) return;
 
-    lxrc_mempid_rm = fork ();
-    if (lxrc_mempid_rm)
-        return;
+  lxrc_catch_signal(0);
 
-    lxrc_catch_signal (0);
+  max_pages = config.memory.free < 8000 ? 40 : 100;
 
-    if (config.memory.free < 8000)
-        max_pages_ii = 40;
-    else
-        max_pages_ii = 100;
-
-    while (1)
-        {
-#if 0
-  /* dietlibc's (v0.12) rand() gives values above RAND_MAX */
-        nr_pages_ii = 1 + (int) ((double) max_pages_ii * rand () / (RAND_MAX + 1.0));
-#endif
-        nr_pages_ii = ((rand() & 0xfff) % max_pages_ii) + 3;
-        data_pci = malloc (nr_pages_ii * 4096);
-        if (data_pci)
-            {
-            for (i_ii = 0; i_ii < nr_pages_ii && !lxrc_sig11_im; i_ii++)
-                {
-                data_pci [i_ii * 4096] = 42;
-                usleep (10000);
-                }
-            lxrc_sig11_im = FALSE;
-            free (data_pci);
-            }
-        sleep (1);
-        }
+  while(1) {
+    nr_pages = ((rand() & 0xfff) % max_pages) + 3;
+    if((buf = malloc(nr_pages * 4096))) {
+      for(i = 0; i < nr_pages; i++) {
+        buf[i * 4096] = 42;
+        usleep(10000);
+      }
+      free(buf);
     }
+    sleep(1);
+  }
+}
 
 
 void lxrc_set_modprobe (char *program_tv)
@@ -1231,7 +1266,7 @@ void lxrc_movetotmpfs()
     open("/dev/console", O_RDWR);
     dup(0);
     dup(0);
-    execve("/linuxrc", lxrc_argv, environ);
+    execve("/linuxrc", config.argv, environ);
     perror("/linuxrc");
   }
   else {

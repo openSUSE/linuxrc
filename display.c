@@ -123,7 +123,7 @@ void disp_init (void)
 
     if (config.test || serial_ig)
         {
-        fprintf (stderr, "ACS activated\n");
+        if(!config.had_segv) fprintf (stderr, "ACS activated\n");
 
         graphics_sg.lrcorner = 106;
         graphics_sg.urcorner = 107;

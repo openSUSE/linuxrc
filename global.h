@@ -214,6 +214,8 @@ typedef struct {
   unsigned splash:1;		/* splash active */
   unsigned netstop:1;		/* shut down network iface at end */
   unsigned noshell:1;		/* don't start any shells */
+  volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
+  unsigned had_segv;		/* last linuxrc run ended with segv */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -251,6 +253,8 @@ typedef struct {
   char *susecd;			/* set if we found a SuSE cd */
   int usbwait;			/* sleep this much after loading usb modules */
   char *setupcmd;		/* command used to start the install program */
+  char **argv;			/* store argv here */
+  uint64_t segv_addr;		/* segfault addr if last linuxrc run */
 
   struct {
     char *buf;

@@ -82,7 +82,7 @@ void kbd_init (void)
             max_y_ig = winsize_ri.ws_row;
             }
 
-        fprintf (stderr, "Winsize (%d, %d)!\n", max_y_ig, max_x_ig);
+        if(!config.had_segv) fprintf (stderr, "Winsize (%d, %d)!\n", max_y_ig, max_x_ig);
         }
 
     tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);

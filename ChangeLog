@@ -1,4 +1,6 @@
+14/8/2002:	v1.4.11
 	- use get_txt(id) in the 2 password messageboxes, not just id.
+	- restart linuxrc automatically after a segfault
 
 8/8/2002:	v1.4.10
 	- add an SSH mode. relayout SSH and VNC mode to be similar.
