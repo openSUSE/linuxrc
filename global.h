@@ -24,7 +24,7 @@
 #define MEM_LIMIT_CACHE_LIBS  15000000
 #define MEM_LIMIT_YAST2       12000000
 
-#if defined(__sparc__)
+#if defined(__sparc__) || defined(__PPC__)
 #define WITH_PCMCIA	0
 #else
 #define WITH_PCMCIA	1
