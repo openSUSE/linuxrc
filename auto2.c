@@ -55,7 +55,9 @@ static void auto2_chk_x11i(void);
 static int auto2_find_floppy(void);
 static void auto2_find_mouse(void);
 static int auto2_has_i2o(void);
+#if 0
 static int auto2_get_probe_env(hd_data_t *hd_data);
+#endif
 static void auto2_progress(char *pos, char *msg);
 
 char *auto2_device_name(hd_t *hd)
@@ -141,11 +143,13 @@ void auto2_scan_hardware(char *log_file)
   hd_clear_probe_feature(hd_data, pr_parallel);
   if(!log_file) hd_data->progress = auto2_progress;
 
+#if 0
   if(auto2_get_probe_env(hd_data)) {
     /* reset flags on error */
     hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
     hd_clear_probe_feature(hd_data, pr_parallel);
   }
+#endif
 
   if((guru_ig & 4)) hd_data->debug=-1 & ~HD_DEB_DRIVER_INFO;
 
@@ -745,49 +749,6 @@ void auto2_find_mouse()
 }
 
 
-#if 0
-/*
- * Scans the hardware list for a braille display.
- */
-void auto2_find_braille()
-{
-  hd_t *hd;
-  char *s;
-
-  if(!hd_data) return;
-
-  if(braille_ig || braille_dev_ig) return;
-
-  braille_ig = braille_dev_ig = NULL;
-
-  if(auto2_ig) {
-    hd_data->progress = auto2_progress;
-    printf("Looking for a braille display...\n");
-  }
-  hd = hd_list(hd_data, hw_braille, 1, NULL);
-  if(hd_data->progress) {
-    printf("\r%64s\r", "");
-    fflush(stdout);
-  }
-
-  hd_data->progress = NULL;
-
-  for(; hd; hd = hd->next) {
-    if(
-      hd->base_class == bc_braille &&		/* is a braille display */
-      hd->unix_dev_name	&&			/* and has a device name */
-      (s = hd_device_name(hd_data, hd->vend, hd->dev))
-    ) {
-      braille_ig = strdup(s);
-      braille_dev_ig = strdup(hd->unix_dev_name);
-
-      break;
-    }
-  }
-}
-#endif
-
-
 /*
  * Scans the hardware list for a floppy and puts the result in
  * has_floppy_ig.
@@ -848,6 +809,7 @@ int auto2_has_i2o()
   return FALSE;
 }
 
+#if 0
 int auto2_get_probe_env(hd_data_t *hd_data)
 {
   char *s, *t, *env = getenv("probe");
@@ -888,6 +850,7 @@ int auto2_get_probe_env(hd_data_t *hd_data)
 
   return 0;
 }
+#endif
 
 int auto2_pcmcia()
 {

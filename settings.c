@@ -196,6 +196,7 @@ static keymap_t set_keymaps_arm_mac [] =
 { "English (UK)",         "mac-uk"                   },
 { "Français",             "mac-fr-latin1"            },
 { "Deutsch (CH)",         "mac-de_CH"                },
+{ "Français (CH)",        "mac-fr_CH"                },
 { "Dansk",                "mac-dk-latin1"            },
 { "Suomi/Svensk",         "mac-fi"                   },
 { "Italiano",             "mac-it"                   },

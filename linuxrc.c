@@ -177,6 +177,10 @@ void lxrc_change_root (void)
       chroot (".");
       execv ("/sbin/init", lxrc_argv);
     }
+    else {
+      chdir ("/");
+      umount ("/mnt");
+    }
 #endif
 }
 

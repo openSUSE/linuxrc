@@ -86,7 +86,9 @@ static const char  *file_txt_xserver_tm        = "XServer:";
 static const char  *file_txt_xversion_tm       = "XVersion:";
 static const char  *file_txt_xbusid_tm         = "XBusID:";
 static const char  *file_txt_x11i_tm           = "X11i:";
+#if 0
 static const char  *file_probe_tm              = "probe:";
+#endif
 static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
 static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
@@ -295,10 +297,12 @@ void file_write_yast_info (char *file_name)
     if(yast2_color_ig) {
       fprintf (file_pri, "%s %06x\n", file_txt_yast2_color_tm, yast2_color_ig);
     }
+#if 0
     {
       char *s = getenv("probe");
       if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);
     }
+#endif
 
     {
       char *s;
