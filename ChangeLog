@@ -1,5 +1,5 @@
 7/7/2003:	v1.4.50
-	- rewrote driver update handling
+	- rewrote driver update handling (#27792)
 
 20/6/2003:	v1.4.49
 	- make dhcptimeout option work (#26974)
