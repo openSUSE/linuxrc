@@ -3,6 +3,7 @@
 	- tty and tty%d are known not to be serial lines (#18592)
 	- 'loglevel' parameter can be used to change kernel log level (#18592)
 	- make line drawing chars work on serial console
+	- 'insmod -f' for driver updates
 
 8/9/2003:	v1.4.54
 	- allow more net devices in selection list (#28659)
