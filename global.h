@@ -21,7 +21,7 @@
 #define MEM_LIMIT_CACHE_LIBS  15000000
 #define MEM_LIMIT_YAST2       12000000
 
-#define LXRC_VERSION  "1.0.1b"
+#define LXRC_VERSION  "1.0.2"
 
 #ifndef TRUE
 #define TRUE               1
