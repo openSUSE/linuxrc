@@ -1,3 +1,5 @@
+	- s390: fix segfault in net_list_s390_devs()
+
 4/3/2005:	v1.8.2
 	- allow ssh=1 as an alias for usessh=1 (#66793)
 	- pass unknown languages to yast

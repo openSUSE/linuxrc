@@ -1699,7 +1699,7 @@ void net_list_s390_devs(char* driver, int model)
     bp+=sprintf(bp,"%s",attr->value);	/* attr->value contains a LF */
   }
   sysfs_close_list(devs);
-  sysfs_close_driver(driv);
+  /* calling sysfs_close_driver() here causes double free()s */
   dia_message(buf,MSGTYPE_INFO);
 }
 
