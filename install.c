@@ -342,17 +342,9 @@ int inst_choose_netsource_cb(dia_item_t di)
       error = inst_mount_nfs();
       break;
 
-#if 0
     case di_netsource_smb:
-      config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
-      if(!config.net.smb_available) {
-        sprintf(buf, "%s\n\n%s", txt_get(TXT_SMBDISK), txt_get(TXT_MODDISK2));
-        dia_okcancel(buf, YES);
-      }
-      config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
-      error = config.net.smb_available ? inst_mount_smb() : 1;
+      error = inst_mount_smb();
       break;
-#endif
 
     case di_netsource_ftp:
       error = inst_do_ftp();
