@@ -158,7 +158,7 @@ void lxrc_end (void)
     deb_msg("lxrc_end()");
     kill (lxrc_mempid_rm, 9);
     lxrc_killall (1);
-    if(!auto2_ig) printf ("\033[9;15]");
+    printf ("\033[9;15]");	/* screen saver on */
 /*    reboot (RB_ENABLE_CAD); */
     mod_free_modules ();
     (void) util_umount (mountpoint_tg);
@@ -400,11 +400,12 @@ static void lxrc_init (void)
     deb_int(yast_version_ig);
     deb_int(guru_ig);
 
+    printf ("\033[9;0]");	/* screen saver off */
+
     if (!auto2_ig)
 #endif
         {
         for (i_ii = 1; i_ii < max_y_ig; i_ii++) printf ("\n");
-        printf ("\033[9;0]");
         disp_cursor_off ();
         }
 
@@ -434,7 +435,6 @@ static void lxrc_init (void)
         deb_msg("Automatic setup not possible.");
         util_manual_mode();
         yast_version_ig = 0;
-        printf("\033[9;0]");
         disp_cursor_off();
         disp_set_display(1);
         if(found_suse_cd_ig) {
