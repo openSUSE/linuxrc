@@ -1,3 +1,6 @@
+16/8/2002:	v1.4.12
+	- fixed for ppc & sparc
+
 16/8/2002:	v1.4.11
 	- use get_txt(id) in the 2 password messageboxes, not just id.
 	- restart linuxrc automatically after a segfault

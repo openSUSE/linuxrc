@@ -1067,8 +1067,8 @@ char *auto2_serial_console (void)
   console[0] = 0;
 
   for(hd = hd_data2->hd; hd; hd = hd->next)
-    if(hd->base_class == bc_keyboard && hd->bus == bus_serial &&
-       hd->sub_class == sc_keyboard_console &&
+    if(hd->base_class.id == bc_keyboard && hd->bus.id == bus_serial &&
+       hd->sub_class.id == sc_keyboard_console &&
        hd->res->baud.type && hd->res->baud.type == res_baud)
       {
 	strcpy (console, hd->unix_dev_name);
