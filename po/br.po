@@ -95,8 +95,9 @@ msgid "Show loaded modules"
 msgstr "Diskouez ar molladoù karget"
 
 #. TXT_AUTO_LOAD
+#, fuzzy
 msgid "Load modules automatically"
-msgstr ""
+msgstr "Kargadur emgefreek ar molladoù"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -551,7 +552,7 @@ msgstr "Digammañ (mailhed hepken!)"
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Kargañ ar roadennoù"
+msgstr "Forsiñ an adskeudenn root"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
@@ -624,9 +625,9 @@ msgid "Asking nameserver..."
 msgstr "Atersiñ ar servijer envel..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr ""
+msgstr "Dianav eo an urzhiataer %s!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -764,14 +765,6 @@ msgstr ""
 msgid "Reiserfs file system found."
 msgstr ""
 
-#~ msgid "Autoload of modules"
-#~ msgstr "Kargadur emgefreek ar molladoù"
-
-#~ msgid "Force rootimage"
-#~ msgstr "Forsiñ an adskeudenn root"
-
-#~ msgid "Machine %s is unknown!"
-#~ msgstr "Dianav eo an urzhiataer %s!"
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""

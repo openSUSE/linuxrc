@@ -95,8 +95,9 @@ msgid "Show loaded modules"
 msgstr "Zobrazit nahrané moduly"
 
 #. TXT_AUTO_LOAD
+#, fuzzy
 msgid "Load modules automatically"
-msgstr ""
+msgstr "Automatické zavedení modulù"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -543,7 +544,7 @@ msgstr ""
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Nahrávám data do ramdisku"
+msgstr "Vynutit root image"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
@@ -616,9 +617,9 @@ msgid "Asking nameserver..."
 msgstr "Kontaktuji nameserver..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr ""
+msgstr "Poèítaè %s je neznámý!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -759,14 +760,6 @@ msgstr ""
 msgid "Reiserfs file system found."
 msgstr "Byl nalezen Reiserfs."
 
-#~ msgid "Autoload of modules"
-#~ msgstr "Automatické zavedení modulù"
-
-#~ msgid "Force rootimage"
-#~ msgstr "Vynutit root image"
-
-#~ msgid "Machine %s is unknown!"
-#~ msgstr "Poèítaè %s je neznámý!"
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""

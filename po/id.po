@@ -95,8 +95,9 @@ msgid "Show loaded modules"
 msgstr "Tampilkan modul yang sudah dimuatkan"
 
 #. TXT_AUTO_LOAD
+#, fuzzy
 msgid "Load modules automatically"
-msgstr ""
+msgstr "Pemuatan modul otomatis (autoload)"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -543,7 +544,7 @@ msgstr ""
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Memuatkan data ke ramdisk"
+msgstr "Paksakan (force) rootimage"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
@@ -616,9 +617,9 @@ msgid "Asking nameserver..."
 msgstr "Mengirim request kepada nameserver..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr ""
+msgstr "Mesin %s tidak dikenal!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -756,14 +757,6 @@ msgstr ""
 msgid "Reiserfs file system found."
 msgstr ""
 
-#~ msgid "Autoload of modules"
-#~ msgstr "Pemuatan modul otomatis (autoload)"
-
-#~ msgid "Force rootimage"
-#~ msgstr "Paksakan (force) rootimage"
-
-#~ msgid "Machine %s is unknown!"
-#~ msgstr "Mesin %s tidak dikenal!"
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""

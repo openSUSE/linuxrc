@@ -543,7 +543,7 @@ msgstr "Debug (avançado)"
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Lendo dados na ramdisk"
+msgstr "Forçar imagem de root"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
@@ -616,9 +616,9 @@ msgid "Asking nameserver..."
 msgstr "Perguntando ao Servidor de nomes..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr ""
+msgstr "Maquina %s não é conhecida!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -756,11 +756,6 @@ msgstr ""
 msgid "Reiserfs file system found."
 msgstr ""
 
-#~ msgid "Force rootimage"
-#~ msgstr "Forçar imagem de root"
-
-#~ msgid "Machine %s is unknown!"
-#~ msgstr "Maquina %s não é conhecida!"
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""

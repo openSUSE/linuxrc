@@ -96,7 +96,7 @@ msgstr "Εμφάνιση ήδη εγκατεστημένων οδηγών"
 
 #. TXT_AUTO_LOAD
 msgid "Load modules automatically"
-msgstr ""
+msgstr "Αυτόματη εγκατάσταση οδηγών"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -616,9 +616,9 @@ msgid "Asking nameserver..."
 msgstr "Ερώτηση του διακομιστή ονομάτων..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr ""
+msgstr "Ο Υπολογιστής %s είναι άγνωστος!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -756,11 +756,6 @@ msgstr ""
 msgid "Reiserfs file system found."
 msgstr ""
 
-#~ msgid "Autoload of modules"
-#~ msgstr "Αυτόματη εγκατάσταση οδηγών"
-
-#~ msgid "Machine %s is unknown!"
-#~ msgstr "Ο Υπολογιστής %s είναι άγνωστος!"
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""

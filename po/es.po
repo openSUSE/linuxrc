@@ -95,8 +95,9 @@ msgid "Show loaded modules"
 msgstr "Mostrar los drivers cargados"
 
 #. TXT_AUTO_LOAD
+#, fuzzy
 msgid "Load modules automatically"
-msgstr ""
+msgstr "Auto detección de hardware"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -543,7 +544,7 @@ msgstr "Debug (experto)"
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Cargando datos en el Disco RAM"
+msgstr "Forzar imagen raíz (rootimage)"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
@@ -616,9 +617,9 @@ msgid "Asking nameserver..."
 msgstr "Contactando con el DNS..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr ""
+msgstr "¡La máquina %s no es conocida!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -759,14 +760,6 @@ msgstr ""
 msgid "Reiserfs file system found."
 msgstr "Encontrado sistema de archivos ReiserFS"
 
-#~ msgid "Autoload of modules"
-#~ msgstr "Auto detección de hardware"
-
-#~ msgid "Force rootimage"
-#~ msgstr "Forzar imagen raíz (rootimage)"
-
-#~ msgid "Machine %s is unknown!"
-#~ msgstr "¡La máquina %s no es conocida!"
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""
