@@ -1186,4 +1186,55 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
   return i;
 }
 
+int dia_show_lines2(char *head, slist_t *sl0, int width)
+{
+  int cnt = 0, i, j;
+  slist_t *sl;
+  char **lines, *s;
+
+  for(sl = sl0; sl; sl = sl->next) cnt++;
+
+  if(!cnt) return 0;
+
+  lines = malloc(cnt * sizeof *lines);
+
+  for(i = 0, sl = sl0; sl; sl = sl->next, i++) {
+    s = malloc(width + 1);
+    strncpy(s, sl->key, width);
+    s[width] = 0;
+    util_fill_string(s, width - 4);
+    lines[i] = s;
+  }
+
+  j = dia_show_lines(head, lines, cnt, width, FALSE);
+
+  for(i = 0; i < cnt; i++) free(lines[i]);
+  free(lines);
+
+  return j;
+}
+
+int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
+{
+  char buf[256];
+  int i;
+
+  if(!input) return 0;
+
+  *buf = 0;
+  if(*input) strncpy(buf, *input, sizeof buf - 1);
+  buf[sizeof buf - 1] = 0;
+
+  passwd_mode_ig = pw_mode;
+  i = dia_input(txt, buf, sizeof buf - 1, fieldlen);
+  passwd_mode_ig = 0;
+
+  if(*input) {
+    free(*input);
+    *input = NULL;
+  }
+  if(*buf) *input = strdup(buf);
+
+  return i;
+}
 

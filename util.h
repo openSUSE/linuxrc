@@ -66,6 +66,7 @@ extern int  util_swapoff_main      (int argc, char **argv);
 extern int  util_lsmod_main        (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
+extern int  util_bootpc_main       (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
 extern char *util_process_name     (pid_t pid);
 extern char *util_process_cmdline  (pid_t pid);
@@ -73,8 +74,14 @@ extern char *util_process_cmdline  (pid_t pid);
 slist_t *slist_new(void);
 slist_t *slist_free(slist_t *sl);
 slist_t *slist_append(slist_t **sl0, slist_t *sl);
+slist_t *slist_append_str(slist_t **sl0, char *str);
 slist_t *slist_add(slist_t **sl0, slist_t *sl);
 slist_t *slist_getentry(slist_t *sl, char *key);
 slist_t *slist_reverse(slist_t *sl0);
 slist_t *slist_split(char *text);
+
+void name2inet(inet_t *inet, char *name);
+void s_addr2inet(inet_t *inet, unsigned long s_addr);
+char *inet2print(inet_t *inet);
+url_t *parse_url(char *str);
 

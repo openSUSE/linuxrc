@@ -111,6 +111,7 @@ static struct {
   { "mv",       util_mv_main      },
   { "mkdir",    util_mkdir_main   },
   { "kill",     util_kill_main    },
+  { "bootpc",   util_bootpc_main  },
   { "swapon",   util_swapon_main  },
   { "swapoff",  util_swapoff_main },
   { "wget",     wget_main         },
@@ -121,7 +122,7 @@ static struct {
 typedef enum {
   lx_auto, lx_auto2, lx_noauto2, lx_y2autoinst, lx_demo, lx_eval, lx_reboot,
   lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, /* lx_french, */ /* lx_color, */
-  lx_rescue, lx_nopcmcia, lx_debug
+  lx_rescue, lx_nopcmcia, lx_debug, lx_nocmdline
 } lx_param_t;
 
 static struct {
@@ -143,7 +144,8 @@ static struct {
 //  { "color",      lx_color      },
   { "rescue",     lx_rescue     },
   { "nopcmcia",   lx_nopcmcia   },
-  { "debug",      lx_debug      }
+  { "debug",      lx_debug      },
+  { "nocmdline",  lx_nocmdline  }
 };
 
 static dia_item_t di_lxrc_main_menu_last = di_main_start;
@@ -401,7 +403,7 @@ void lxrc_killall(int really_all_iv)
         pid != lxrc_mempid_rm &&
         (really_all_iv || !do_not_kill(sl->value))
       ) {
-        fprintf(stderr, "sending signal %d to %s (%d)\n", sig, sl->value, pid);
+        if(sig == 15) fprintf(stderr, "killing %s (%d)\n", sl->value, pid);
         kill(pid, sig);
         usleep(20000);
       }
@@ -518,6 +520,9 @@ void lxrc_init()
 
   umask(022);
 
+  /* add cmdline to info file */
+  config.info.add_cmdline = 1;
+
   /* make it configurable? */
   config.module.dir = strdup("/modules");
   config.mountpoint.floppy = strdup("/mounts/floppy");
@@ -533,20 +538,20 @@ void lxrc_init()
   }
 
   ft = file_get_cmdline(key_autoyast);
-  config.infofile = ft ? ft->value : getenv("autoyast");
-  if(config.infofile) {
-    config.infofile = strdup(*config.infofile ? config.infofile : "default");
+  config.info.file = ft ? ft->value : getenv("autoyast");
+  if(config.info.file) {
+    config.info.file = strdup(*config.info.file ? config.info.file : "default");
   }
 
-  if(config.infofile) {
+  if(config.info.file) {
     auto2_ig = TRUE;
     yast_version_ig = 2;
     action_ig |= ACT_YAST2_AUTO_INSTALL;
     // ???
     if(
-      !strncasecmp(config.infofile, "nfs:", 4) ||
-      !strncasecmp(config.infofile, "tftp:", 5) ||
-      !strncasecmp(config.infofile, "dhcp", 4)
+      !strncasecmp(config.info.file, "nfs:", 4) ||
+      !strncasecmp(config.info.file, "tftp:", 5) ||
+      !strncasecmp(config.info.file, "dhcp", 4)
     ) {
       bootmode_ig = BOOTMODE_NET;
     }
@@ -632,6 +637,10 @@ void lxrc_init()
 
             case lx_debug:
               action_ig |= ACT_DEBUG;
+              break;
+
+            case lx_nocmdline:
+              config.info.add_cmdline = 0;
               break;
           }
           break;
@@ -752,7 +761,7 @@ void lxrc_init()
   }
 
   /* for 'manual' */
-  if(!config.infoloaded) file_read_info();
+  if(!config.info.loaded) file_read_info();
 	
   if(!auto2_ig) {
     util_disp_init();

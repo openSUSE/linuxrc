@@ -1,4 +1,8 @@
-21/2/2002:	v1.3.7:
+24/1/2002:	v1.3.8
+	- internal changes to networking code
+	- fixed bootpc to work with dietlibc
+
+21/1/2002:	v1.3.7:
 	- dhcp now mostly works
 	- smb works
 

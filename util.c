@@ -31,6 +31,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <utime.h>
+#include <net/if.h>
 
 // #include <linux/cdrom.h>
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
@@ -55,6 +56,7 @@
 #include "auto2.h"
 #include "file.h"
 #include "lsh.h"
+#include "bootpc.h"
 
 #define LED_TIME     50000
 
@@ -367,7 +369,7 @@ void util_print_banner (void)
     win_open (&win_ri);
 
     uname (&utsinfo_ri);
-    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2001 SuSE GmbH <<<",
+    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2002 SuSE GmbH <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
@@ -459,22 +461,21 @@ void util_umount_loop (char *mountpoint_tv)
     }
 
 
-void util_truncate_dir (char *dir_tr)
-    {
-    if (dir_tr [0] == 0)
-        return;
+/*
+ * Do we really need this?
+ *
+ * Never lengthen the string!
+ */
+void util_truncate_dir(char *dir)
+{
+  int l;
 
-    if (dir_tr [strlen (dir_tr) - 1] == '/')
-        dir_tr [strlen (dir_tr) - 1] = 0;
+  if(!dir) return;
 
-#if 0
-    if (strlen (dir_tr) > 4 && !strcmp (&dir_tr [strlen (dir_tr) - 5], "/suse"))
-        dir_tr [strlen (dir_tr) - 5] = 0;
-#endif
+  l = strlen(dir);
 
-    if (dir_tr [0] == 0)
-        strcpy (dir_tr, "/");
-    }
+  if(l && dir[l - 1] == '/') dir[l - 1] = 0;
+}
 
 
 int util_check_exist (char *filename_tv)
@@ -866,99 +867,113 @@ void util_umount_driver_update()
 
 void util_status_info()
 {
-  char *l[17];		/* WATCH this!!! */
-  int i, lc;
-  char *s, t[100], t2[100];
+  int i;
+  char *s;
   hd_data_t *hd_data;
   char *lxrc;
+  slist_t *sl0 = NULL;
+  char buf[256];
 
   hd_data = calloc(1, sizeof *hd_data);
   hd_data->debug = 1;
   hd_scan(hd_data);
 
-  for(i = 0; i < sizeof l / sizeof *l; i++) {
-    l[i] = calloc(256, 1);
-  }
-
-  lc = 0;
-
   if(hd_data->log) {
     s = strchr(hd_data->log, '\n');
     if(s) {
-      i = s - hd_data->log;
-      if(i > 255) i = 255;
-      strncpy(l[lc++], hd_data->log, i);
+      *s = 0;
+      slist_append_str(&sl0, hd_data->log);
     }
   }
 
-  sprintf(l[lc++],
-    "memory = %" PRIu64 ", bootmode = %d, net_config = 0x%x",
-    memory_ig, bootmode_ig, valid_net_config_ig
-  );
+  sprintf(buf, "memory = %" PRIu64, memory_ig);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "bootmode = %d, net_config_mask = 0x%x", bootmode_ig, net_config_mask());
+  slist_append_str(&sl0, buf);
+
   lxrc = getenv("linuxrc");
-  sprintf(l[lc++], "linuxrc = \"%s\"", lxrc ? lxrc : "");
-  sprintf(l[lc++],
+  sprintf(buf, "linuxrc = \"%s\"", lxrc ? lxrc : "");
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf,
     "yast = %d, auto = %d, action = 0x%x, splash = %s",
     yast_version_ig,
     auto2_ig ? 2 : auto_ig ? 1 : 0,
     action_ig,
     splash_active ? "on" : "off"
   );
-  s = l[lc++];
-  strcpy(s, "floppies = (");
+  slist_append_str(&sl0, buf);
+
+  strcpy(buf, "floppies = (");
   for(i = 0; i < config.floppies; i++) {
-    sprintf(t2, "%s\"%s\"%s",
+    sprintf(buf + strlen(buf), "%s\"%s\"%s",
       i ? ", " : " ",
       config.floppy_dev[i],
       i == config.floppy && config.floppies != 1 ? "*" : ""
     );
-    strcat(s, t2);
   }
-  strcat(s, " )");
+  strcat(buf, " )");
+  slist_append_str(&sl0, buf);
 
-  sprintf(l[lc++], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
-  sprintf(l[lc++], "driver_update_dir = \"%s\"", driver_update_dir);
+  sprintf(buf, "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
+  slist_append_str(&sl0, buf);
 
-  strcpy(t, inet_ntoa(ipaddr_rg));
-  s = inet_ntoa(network_rg);
-  sprintf(l[lc++], "ip = %s, network = %s", t, s);
+  sprintf(buf, "driver_update_dir = \"%s\"", driver_update_dir);
+  slist_append_str(&sl0, buf);
 
-  strcpy(t, inet_ntoa(broadcast_rg));
-  s = inet_ntoa(netmask_rg);
-  sprintf(l[lc++], "broadcast = %s, netmask = %s", t, s);
+  sprintf(buf, "hostname = %s", inet2print(&config.net.hostname));
+  slist_append_str(&sl0, buf);
 
-  strcpy(t, inet_ntoa(gateway_rg));
-  s = inet_ntoa(nameserver_rg);
-  sprintf(l[lc++], "gateway = %s, nameserver = %s", t, s);
+  sprintf(buf, "domain = %s", config.net.domain ?: "");
+  slist_append_str(&sl0, buf);
 
-  strcpy(t, inet_ntoa(nfs_server_rg));
-  s = inet_ntoa(ftp_server_rg);
-  sprintf(l[lc++], "nfs server = %s, ftp server = %s", t, s);
+  sprintf(buf, "network = %s", inet2print(&config.net.network));
+  slist_append_str(&sl0, buf);
 
-  s = inet_ntoa(plip_host_rg);
-  sprintf(l[lc++], "plip host = %s", s);
+  sprintf(buf, "netmask = %s", inet2print(&config.net.netmask));
+  slist_append_str(&sl0, buf);
 
-  sprintf(l[lc++], "language = %d, keymap = \"%s\"", config.language, config.keymap ?: "");
+  sprintf(buf, "broadcast = %s", inet2print(&config.net.broadcast));
+  slist_append_str(&sl0, buf);
 
-  sprintf(l[lc++], "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
+  sprintf(buf, "gateway = %s", inet2print(&config.net.gateway));
+  slist_append_str(&sl0, buf);
 
-  sprintf(l[lc++], "vga = 0x%04x", frame_buffer_mode_ig);
+  sprintf(buf, "nameserver = %s", inet2print(&config.net.nameserver));
+  slist_append_str(&sl0, buf);
 
-  sprintf(l[lc++], "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
+  sprintf(buf, "server = %s", inet2print(&config.net.server));
+  slist_append_str(&sl0, buf);
 
-  sprintf(l[lc++],
+  sprintf(buf, "plip host = %s", inet2print(&config.net.pliphost));
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "server dir = \"%s\"", config.serverdir ?: "");
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "language = %d, keymap = \"%s\"", config.language, config.keymap ?: "");
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "vga = 0x%04x", frame_buffer_mode_ig);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf,
     "pcmcia = %d, pcmcia_chip = %s",
     auto2_pcmcia(),
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
+  slist_append_str(&sl0, buf);
 
-  for(i = 0; i < lc; i++) {
-    util_fill_string(l[i], 76-4);
-  }
+  dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION "/" LX_ARCH "-" LX_REL " (" __DATE__ ", " __TIME__ ")", sl0, 76);
 
-  dia_show_lines("Linuxrc v" LXRC_FULL_VERSION "/" LX_REL "-" LX_ARCH " (" __DATE__ ", " __TIME__ ")", l, lc, 76, FALSE);
-
-  for(i = 0; i < sizeof l / sizeof *l; i++) free(l[i]);
+  slist_free(sl0);
 
   hd_free_hd_data(hd_data);
   free(hd_data);
@@ -1904,6 +1919,26 @@ int util_kill_main(int argc, char **argv)
 }
 
 
+int util_bootpc_main(int argc, char **argv)
+{
+  int i;
+  char *dev = "eth0";
+
+  argv++; argc--;
+
+  if(argc && !strcmp(*argv, "-t")) {
+    bootp_testing = 1;
+    argc--; argv++;
+  }
+
+  if(argc) {
+    dev = *argv;
+  }
+
+  i = performBootp(dev, "255.255.255.255", "", bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV | BP_PRINT_OUT, 1);
+
+  return i;
+}
 
 
 slist_t *slist_new()
@@ -1931,6 +1966,17 @@ slist_t *slist_append(slist_t **sl0, slist_t *sl)
 {
   for(; *sl0; sl0 = &(*sl0)->next);
   return *sl0 = sl;
+}
+
+
+slist_t *slist_append_str(slist_t **sl0, char *str)  
+{
+  slist_t *sl;
+
+  sl = slist_append(sl0, slist_new());
+  sl->key = strdup(str);
+
+  return sl;
 }
 
 
@@ -1989,5 +2035,83 @@ slist_t *slist_split(char *text)
   free(text);
 
   return sl0;
+}
+
+
+/*
+ * Clear 'inet' und add 'name' to it.
+ *
+ * 'inet' is unchanged if 'name' is NULL.
+ * If 'name' is "", 'inet' is just cleared.
+ */
+void name2inet(inet_t *inet, char *name)
+{
+  inet_t inet_new = {};
+
+  if(!inet || !name) return;
+
+  if(*name) inet_new.name = strdup(name);
+
+  if(inet->name) free(inet->name);
+
+  *inet = inet_new;
+}
+
+
+void s_addr2inet(inet_t *inet, unsigned long s_addr)
+{
+  inet_t inet_new = {};
+
+  if(!inet) return;
+
+  if(inet->name) free(inet->name);
+
+  inet_new.ip.s_addr = s_addr;
+  inet_new.name = inet_ntoa(inet_new.ip);
+
+  if(inet_new.name) inet_new.ok = 1;
+
+  *inet = inet_new;
+}
+
+
+char *inet2print(inet_t *inet)
+{
+  static char buf[256];
+  char *s;
+
+  *buf = 0;
+
+  if(!inet || (!inet->name && !inet->ok)) return buf;
+
+  s = inet_ntoa(inet->ip);
+
+  if(inet->name && s && !strcmp(s, inet->name)) s = NULL;
+  if(!inet->ok) s = "no ip";
+
+  sprintf(buf, "%s%s%s%s",
+    inet->name ? inet->name : "",
+    s ? " (" : "",
+    s ? s : "",
+    s ? ")" : ""
+  );
+
+  return buf;
+}
+
+
+url_t *parse_url(char *str)
+{
+  static url_t url = {};
+
+  if(!str) return NULL;
+
+  if(url.proto) { free(url.proto); url.proto = NULL; }
+  if(url.server) { free(url.server); url.server = NULL; }
+  if(url.dir) { free(url.dir); url.dir = NULL; }
+
+  if(url.proto && url.server && url.dir) return &url;
+
+  return NULL;
 }
 

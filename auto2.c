@@ -391,7 +391,7 @@ int auto2_net_dev(hd_t **hd0)
   }
 #endif
       
-  if(!(valid_net_config_ig || bootmode_ig == BOOTMODE_NET || bootmode_ig == BOOTMODE_SMB)) return 1;
+  if(!(net_config_mask() || bootmode_ig == BOOTMODE_NET || bootmode_ig == BOOTMODE_SMB)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
@@ -410,16 +410,19 @@ int auto2_net_dev(hd_t **hd0)
        * but some data are still missing
        */
       if(
-        (valid_net_config_ig || bootmode_ig == BOOTMODE_NET) &&
-        (valid_net_config_ig & 0x2b) != 0x2b
+        (net_config_mask() || bootmode_ig == BOOTMODE_NET) &&
+        (net_config_mask() & 0x2b) != 0x2b
       ) {
         printf("Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
         fflush(stdout);
         config.net.use_dhcp ? net_dhcp() : net_bootp();
         if(
-          !server_dir_tg || !*server_dir_tg || !ipaddr_rg.s_addr ||
-          !netmask_rg.s_addr || !broadcast_rg.s_addr ||
-          !gateway_rg.s_addr || !nfs_server_rg.s_addr
+          !config.serverdir || !*config.serverdir ||
+          !config.net.hostname.ok ||
+          !config.net.netmask.ok ||
+          !config.net.broadcast.ok ||
+          !config.net.gateway.ok ||
+          !config.net.server.ok
         ) {
           printf("no/incomplete answer.\n");
           return 1;
@@ -439,8 +442,8 @@ int auto2_net_dev(hd_t **hd0)
       if(bootmode_ig == BOOTMODE_SMB) {
         fprintf(stderr,
           "OK, going to mount //%s/%s ...\n",
-          config.net.smb.server.name,
-          config.net.smb.share
+          config.net.server.name,
+          config.serverdir
         );
         
         if(net_mount_smb()) {
@@ -454,9 +457,12 @@ int auto2_net_dev(hd_t **hd0)
         fprintf(stderr, "Starting portmap.\n");
         system("portmap");
 
-        fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(nfs_server_rg), server_dir_tg);
+        fprintf(stderr, "OK, going to mount %s:%s ...\n",
+          inet_ntoa(config.net.server.ip),
+          config.serverdir ?: ""
+        );
 
-        if(net_mount_nfs(inet_ntoa(nfs_server_rg), server_dir_tg)) {
+        if(net_mount_nfs(inet_ntoa(config.net.server.ip), config.serverdir ?: "")) {
           deb_msg("NFS mount failed.");
           return 1;
         }
@@ -683,14 +689,14 @@ int auto2_init()
 
 //  auto2_find_mouse();
 
-  deb_int(valid_net_config_ig);
+  deb_int(net_config_mask());
 
   i = auto2_find_install_medium();
 
 #ifdef __i386__
   {
-    /* int net_cfg = (valid_net_config_ig & 0x2b) == 0x2b; */
-    int net_cfg = valid_net_config_ig || bootmode_ig == BOOTMODE_NET;
+    /* int net_cfg = (net_config_mask() & 0x2b) == 0x2b; */
+    int net_cfg = net_config_mask() || bootmode_ig == BOOTMODE_NET;
 
     /* ok, found something */
     if(i) return i;
@@ -782,16 +788,19 @@ int auto2_find_install_medium()
 
   deb_msg("Well, maybe there is a NFS/FTP/SMB server...");
 
-  if(valid_net_config_ig || bootmode_ig == BOOTMODE_NET) {
-    broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+  if(net_config_mask() || bootmode_ig == BOOTMODE_NET) {
+    // ???
+    s_addr2inet(
+      &config.net.broadcast,
+      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+    );
 
-    fprintf(stderr, "host ip:   %s\n", inet_ntoa(ipaddr_rg));
-    fprintf(stderr, "netmask:   %s\n", inet_ntoa(netmask_rg));
-    fprintf(stderr, "broadcast: %s\n", inet_ntoa(broadcast_rg));
-    fprintf(stderr, "gateway:   %s\n", inet_ntoa(gateway_rg));
-    fprintf(stderr, "server ip: %s\n", inet_ntoa(nfs_server_rg));
-    if((valid_net_config_ig & 0x10))
-      fprintf(stderr, "name srv:  %s\n", inet_ntoa(nameserver_rg));
+    fprintf(stderr, "hostname:   %s\n", inet2print(&config.net.hostname));
+    fprintf(stderr, "netmask:    %s\n", inet2print(&config.net.netmask));
+    fprintf(stderr, "broadcast:  %s\n", inet2print(&config.net.broadcast));
+    fprintf(stderr, "gateway:    %s\n", inet2print(&config.net.gateway));
+    fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
+    fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver));
   }
 
   if(!auto2_net_dev(&hd_devs)) {

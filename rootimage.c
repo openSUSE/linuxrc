@@ -244,7 +244,7 @@ int root_load_rootimage (char *infile_tv)
 
     if (bootmode_ig == BOOTMODE_FTP)
         {
-        socket_ii = util_open_ftp (inet_ntoa (ftp_server_rg));
+        socket_ii = util_open_ftp (inet_ntoa (config.net.server.ip));
         if (socket_ii < 0)
             {
             util_print_ftp_error (socket_ii);

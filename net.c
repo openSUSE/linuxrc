@@ -77,7 +77,6 @@ static int  net_input_data       (void);
 #ifdef WITH_NFS
 static void net_show_error       (enum nfs_stat status_rv);
 #endif
-static int  net_get_address      (char *text_tv, struct in_addr *address_prr);
 
 int net_config()
 {
@@ -123,6 +122,10 @@ int net_config()
   net_setup_nameserver();
 
   net_is_configured_im = TRUE;
+
+  net_check_address2(&config.net.server, 1);
+  // net_check_address2(&..., 1);
+
 #endif
 
   return 0;
@@ -199,7 +202,7 @@ int net_setup_localhost (void)
     sockaddr_ri.sin_addr = ipaddr_ri;
     memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
     if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
-        if (old_kernel_ig || netmask_rg.s_addr)
+        if (old_kernel_ig || config.net.netmask.ip.s_addr)
             {
             HERE
             error_ii = TRUE;
@@ -211,7 +214,7 @@ int net_setup_localhost (void)
     sockaddr_ri.sin_addr = ipaddr_ri;
     memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
     if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
-        if (old_kernel_ig || broadcast_rg.s_addr != 0xffffffff)
+        if (old_kernel_ig || config.net.broadcast.ip.s_addr != 0xffffffff)
             {
             HERE
             error_ii = TRUE;
@@ -256,30 +259,30 @@ int net_activate (void)
 
     sockaddr_ri.sin_family = AF_INET;
     sockaddr_ri.sin_port = 0;
-    sockaddr_ri.sin_addr = ipaddr_rg;
+    sockaddr_ri.sin_addr = config.net.hostname.ip;
     memcpy (&interface_ri.ifr_addr, &sockaddr_ri, sizeof (sockaddr_ri));
     if (ioctl (socket_ii, SIOCSIFADDR, &interface_ri) < 0)
         error_ii = TRUE;
 
     if (net_is_plip_im)
         {
-        sockaddr_ri.sin_addr = plip_host_rg;
+        sockaddr_ri.sin_addr = config.net.pliphost.ip;
         memcpy (&interface_ri.ifr_dstaddr, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFDSTADDR, &interface_ri) < 0)
             error_ii = TRUE;
         }
     else
         {
-        sockaddr_ri.sin_addr = netmask_rg;
+        sockaddr_ri.sin_addr = config.net.netmask.ip;
         memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
-            if (old_kernel_ig || netmask_rg.s_addr)
+            if (old_kernel_ig || config.net.netmask.ip.s_addr)
                 error_ii = TRUE;
 
-        sockaddr_ri.sin_addr = broadcast_rg;
+        sockaddr_ri.sin_addr = config.net.broadcast.ip;
         memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
-            if (old_kernel_ig || broadcast_rg.s_addr != 0xffffffff)
+            if (old_kernel_ig || config.net.broadcast.ip.s_addr != 0xffffffff)
                 error_ii = TRUE;
         }
 
@@ -299,7 +302,7 @@ int net_activate (void)
 
     if (net_is_plip_im)
         {
-        sockaddr_ri.sin_addr = plip_host_rg;
+        sockaddr_ri.sin_addr = config.net.pliphost.ip;
         memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
         route_ri.rt_flags = RTF_UP | RTF_HOST;
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
@@ -314,16 +317,19 @@ int net_activate (void)
         }
     else
         {
-        sockaddr_ri.sin_addr = network_rg;
+        sockaddr_ri.sin_addr = config.net.network.ip;
         memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
         route_ri.rt_flags = RTF_UP;
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
             if (old_kernel_ig)
                 error_ii = TRUE;
 
-        if (gateway_rg.s_addr && gateway_rg.s_addr != ipaddr_rg.s_addr)
+        if (
+          config.net.gateway.ip.s_addr &&
+          config.net.gateway.ip.s_addr != config.net.hostname.ip.s_addr
+        )
             {
-            sockaddr_ri.sin_addr = gateway_rg;
+            sockaddr_ri.sin_addr = config.net.gateway.ip;
             memset (&route_ri.rt_dst, 0, sizeof (route_ri.rt_dst));
             route_ri.rt_dst.sa_family = AF_INET;
             memcpy (&route_ri.rt_gateway, &sockaddr_ri, sizeof (sockaddr_ri));
@@ -393,13 +399,13 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
     }
 
 
-int net_check_address2(inet_t *inet)
+int net_check_address2(inet_t *inet, int do_dns)
 {
   struct hostent *he = NULL;
   struct in_addr iaddr;
+  char *s;
 #ifdef DIET
   file_t *f0, *f;
-  char *s;
   char *has_dots;
 #endif
 
@@ -413,13 +419,23 @@ int net_check_address2(inet_t *inet)
     inet->ok = 1;
     inet->ip = iaddr;
 
-//    fprintf(stderr, "%s is %s\n", inet->name, inet_ntoa(inet->ip));
+    s = inet_ntoa(inet->ip);
+
+//    fprintf(stderr, "%s is %s\n", inet->name, s);
+
+    if(s) {
+      free(inet->name);
+      inet->name = strdup(s);
+    }
 
     return 0;
   }
 
   /* ####### should be something like nameserver_active */
-  if(!config.net.dhcp_active && !config.test && config.run_as_linuxrc) {
+  if(
+    !do_dns ||
+    (!config.net.dhcp_active && !config.test && config.run_as_linuxrc)
+  ) {
     return -1;
   }
 
@@ -452,16 +468,10 @@ int net_check_address2(inet_t *inet)
     file_free_file(f0);
   }
 
-#if 0
-  if(!he && !has_dots) {
-//    fprintf(stderr, "trying >%s<\n", inet->name);
-    he = gethostbyname(inet->name);
-//    fprintf(stderr, "%p\n", he);  
-  }
-#endif
-
 #else
+
   he = gethostbyname(inet->name);
+
 #endif
 
   if(!he) {
@@ -482,21 +492,22 @@ int net_check_address2(inet_t *inet)
 }
 
 
-void net_smb_get_mount_options (char* options)
+void net_smb_get_mount_options(char *options)
 {
-    sprintf(options,"ip=%s", inet_ntoa(config.net.smb.server.ip));
-    if (config.net.smb.user) {
-	strcat(options, ",username=");
-	strcat(options, config.net.smb.user);
-	strcat(options, ",password=");
-	strcat(options, config.net.smb.password);
-	if (config.net.smb.workgroup) {
-	    strcat(options,",workgroup=");
-	    strcat(options,config.net.smb.workgroup);
-	}
-    } else {
-	strcat(options,",guest");
+  sprintf(options,"ip=%s", inet_ntoa(config.net.server.ip));
+
+  if(config.net.user && config.net.password) {
+    strcat(options, ",username=");
+    strcat(options, config.net.user);
+    strcat(options, ",password=");
+    strcat(options, config.net.password);
+    if(config.net.workgroup) {
+      strcat(options,",workgroup=");
+      strcat(options,config.net.workgroup);
     }
+  } else {
+    strcat(options,",guest");
+  }
 }
 
 
@@ -531,8 +542,8 @@ int net_mount_smb()
 
   sprintf(tmp,
     SUDO "smbmount //%s/%s %s -o %s >&2",
-    config.net.smb.server.name,
-    config.net.smb.share,
+    config.net.server.name,
+    config.serverdir,
     mountpoint_tg,
     mount_options
   );
@@ -574,7 +585,7 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     inet_t inet = {};
 
     inet.name = strdup(server_addr_tv);
-    if(net_check_address2(&inet)) {
+    if(net_check_address2(&inet, 1)) {
       free(inet.name);
       return -1;
     }
@@ -880,252 +891,256 @@ static void net_show_error(enum nfs_stat status_rv)
 #endif
 
 #if NETWORK_CONFIG
-static void net_setup_nameserver (void)
-    {
-    if(config.net.dhcp_active) return;
+void net_setup_nameserver()
+{
+  char *s;
+  FILE *f;
 
-    if (!nameserver_rg.s_addr)
-        nameserver_rg = ipaddr_rg;
+  if(config.net.dhcp_active || !config.win || config.test) return;
 
-    if (!auto_ig && net_get_address (txt_get (TXT_INPUT_NAMED), &nameserver_rg))
-        return;
+  if(!config.net.nameserver.name && config.net.hostname.ok) {
+    s = inet_ntoa(config.net.hostname.ip);
+    config.net.nameserver.name = strdup(s ?: "");
+  }
+  net_get_address(txt_get(TXT_INPUT_NAMED), &config.net.nameserver, 0);
+
+  if(config.net.nameserver.ok) {
+    if((f = fopen("/etc/resolv.conf", "w"))) {
+      fprintf(f, "nameserver %s\n", config.net.nameserver.name);
+      if(config.net.domain) {
+        fprintf(f, "search %s\n", config.net.domain);
+      }
+      fclose(f);
+    }
+  }
+}
+
+
+int net_input_data()
+{
+  if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 1)) return -1;
+
+  if(net_is_plip_im) {
+    if(!config.net.pliphost.name) {
+      name2inet(&config.net.pliphost, config.net.hostname.name);
     }
 
-static int net_input_data (void)
-    {
-    if (net_get_address (txt_get (TXT_INPUT_IPADDR), &ipaddr_rg))
-        return (-1);
+    if(net_get_address(txt_get(TXT_INPUT_PLIP_IP), &config.net.pliphost, 1)) return -1;
 
-    if (net_is_plip_im)
-        {
-        if (!plip_host_rg.s_addr)
-            plip_host_rg = ipaddr_rg;
-
-        if (net_get_address (txt_get (TXT_INPUT_PLIP_IP), &plip_host_rg))
-            return (-1);
-
-        if (!gateway_rg.s_addr)
-            gateway_rg = plip_host_rg;
-
-        if (!nfs_server_rg.s_addr)
-            nfs_server_rg = plip_host_rg;
-        }
-    else
-        {
-        plip_host_rg.s_addr = 0;
-
-        if (!gateway_rg.s_addr)
-            gateway_rg = ipaddr_rg;
-
-        if (!nfs_server_rg.s_addr)
-            nfs_server_rg = ipaddr_rg;
-
-        if (!ftp_server_rg.s_addr)
-            ftp_server_rg = ipaddr_rg;
-
-        if(!netmask_rg.s_addr) {
-          char *s = inet_ntoa(ipaddr_rg);
-          inet_aton (strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0", &netmask_rg);
-        }
-        if (net_get_address (txt_get (TXT_INPUT_NETMASK), &netmask_rg))
-            return (-1);
-
-        broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
-        network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
-
-        if (net_get_address (txt_get (TXT_INPUT_GATEWAY), &gateway_rg))
-            gateway_rg.s_addr = 0;
-        }
-
-    return (0);
+    if(!config.net.gateway.name) {
+      name2inet(&config.net.gateway, config.net.pliphost.name);
     }
+
+    if(!config.net.server.name) {
+      name2inet(&config.net.server, config.net.pliphost.name);
+    }
+  }
+  else {
+    name2inet(&config.net.pliphost, "");
+
+    if(!config.net.gateway.name) {
+      name2inet(&config.net.gateway, config.net.hostname.name);
+    }
+
+    if(!config.net.server.name) {
+      name2inet(&config.net.server, config.net.hostname.name);
+    }
+
+    if(!config.net.netmask.ok) {
+      char *s = inet_ntoa(config.net.hostname.ip);
+
+      name2inet(
+        &config.net.netmask,
+        strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0"
+      );
+    }
+    if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) return -1;
+
+    s_addr2inet(
+      &config.net.broadcast,
+      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+    );
+
+    s_addr2inet(
+      &config.net.network,
+      config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
+    );
+
+    net_get_address(txt_get(TXT_INPUT_GATEWAY), &config.net.gateway, 1);
+  }
+
+  return 0;
+}
 #endif
 
 
-int net_bootp (void)
-    {
-    window_t  win_ri;
-    int       rc_ii;
-    char     *data_pci;
-    char      tmp_ti [256];
-    int       i_ii;
-    int	      netconf_error;
+int net_bootp()
+{
+  window_t  win;
+  int rc, netconf_error;
+  char *s, *t;
+  char tmp[256];
 
-    if (auto_ig && ipaddr_rg.s_addr)
-        return (0);
+  if(auto_ig && config.net.hostname.ok) return 0;
 
-    plip_host_rg.s_addr = 0;
-    ipaddr_rg.s_addr = 0;
-    netmask_rg.s_addr = 0;
-    network_rg.s_addr = 0;
-    broadcast_rg.s_addr = 0xffffffff;
-    netconf_error	= 0;
+  name2inet(&config.net.netmask, "");
+  name2inet(&config.net.network, "");
+  s_addr2inet(&config.net.broadcast, 0xffffffff);
+  name2inet(&config.net.pliphost, "");
+  name2inet(&config.net.hostname, "");
+  netconf_error	= 0;
 
-    if (net_activate ())
-        {
-        if (!auto2_ig)
-            dia_message (txt_get (TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
-        else
-            fprintf(stderr, "network setup failed\n");
+  if(net_activate ()) {
+    if(config.win) {
+      dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
+    }
+    else {
+      fprintf(stderr, "network setup failed\n");
+    }
             
-        return (-1);
-        }
+    return -1;
+  }
 
-    if (!auto2_ig)
-        {
-        sprintf (tmp_ti, txt_get (TXT_SEND_DHCP), "BOOTP");
-	dia_info (&win_ri, tmp_ti);
-	}
+  if(config.win) {
+    sprintf(tmp, txt_get(TXT_SEND_DHCP), "BOOTP");
+    dia_info(&win, tmp);
+  }
 
-    if (bootp_wait_ig)
-        sleep (bootp_wait_ig);
+  if(bootp_wait_ig) sleep(bootp_wait_ig);
 
-    rc_ii = performBootp (netdevice_tg, "255.255.255.255", "",
-                          bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV, 1);
-    win_close (&win_ri);
+  rc = performBootp(
+    netdevice_tg, "255.255.255.255", "",
+    bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV, 1
+  );
 
-    if ( rc_ii || !getenv ("BOOTP_IPADDR") ) {
-        if ( bootmode_ig == BOOTMODE_CDWITHNET ) {
-	    dia_input ("HOSTNAME", machine_name_tg, 32, 16);
-	    if( net_get_address (txt_get (TXT_INPUT_IPADDR), &ipaddr_rg) ) {
-	        netconf_error++;
-            }
-	    if( net_get_address (txt_get (TXT_INPUT_NETMASK), &netmask_rg) ) {
-	        netconf_error++;
-	    }
-            broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
-            network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
-	    if( net_get_address (txt_get (TXT_INPUT_GATEWAY), &gateway_rg) ) {
-   	        netconf_error++;
-            }
-	    if( netconf_error ) {
-	        dia_message( "Configuration not valid: press any key to reboot, ... ", 
-                             MSGTYPE_ERROR);
-	        reboot (RB_AUTOBOOT);
-            }
-	    net_stop ();
-	    return(0);
-        } else {
-            if (!auto2_ig)
-                {
-                sprintf (tmp_ti, txt_get (TXT_ERROR_DHCP), "BOOTP");
-                dia_message (tmp_ti, MSGTYPE_ERROR);
-                }
-            return (-1);
-        }
+  win_close(&win);
+
+  if(rc || !getenv("BOOTP_IPADDR")) {
+    if(bootmode_ig == BOOTMODE_CDWITHNET) {
+      dia_input("HOSTNAME", machine_name_tg, sizeof machine_name_tg - 1, 16);
+
+      if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 0)) netconf_error++;
+
+      if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) netconf_error++;
+
+      s_addr2inet(
+        &config.net.broadcast,
+        config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+      );
+
+      s_addr2inet(
+        &config.net.network,
+        config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
+      );
+
+      if(net_get_address(txt_get(TXT_INPUT_GATEWAY), &config.net.gateway, 0)) netconf_error++;
+
+      if(netconf_error) {
+        dia_message("Configuration not valid: press any key to reboot, ... ", MSGTYPE_ERROR);
+        reboot(RB_AUTOBOOT);
+      }
+
+      net_stop();
+
+      return 0;
+    }
+    else {
+      if(config.win) {
+        sprintf(tmp, txt_get (TXT_ERROR_DHCP), "BOOTP");
+        dia_message(tmp, MSGTYPE_ERROR);
+      }
+      return -1;
+    }
+  }
+
+  name2inet(&config.net.hostname, getenv("BOOTP_IPADDR"));
+  net_check_address2(&config.net.hostname, 0);
+
+  name2inet(&config.net.netmask, getenv("BOOTP_NETMASK"));
+  net_check_address2(&config.net.netmask, 0);
+
+  name2inet(&config.net.broadcast, getenv("BOOTP_BROADCAST"));
+  net_check_address2(&config.net.broadcast, 0);
+
+  name2inet(&config.net.network, getenv("BOOTP_NETWORK"));
+  net_check_address2(&config.net.network, 0);
+
+  name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS"));
+  name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS_1"));
+  net_check_address2(&config.net.gateway, 0);
+
+  name2inet(&config.net.nameserver, getenv("BOOTP_DNSSRVS"));
+  name2inet(&config.net.nameserver, getenv("BOOTP_DNSSRVS_1"));
+  net_check_address2(&config.net.nameserver, 0);
+
+  s = getenv("BOOTP_HOSTNAME");
+  if(s && !config.net.hostname.name) config.net.hostname.name = strdup(s);
+
+  if((s = getenv("BOOTP_DOMAIN"))) {
+    if(config.net.domain) free(config.net.domain);
+    config.net.domain = strdup(s);
+  }
+
+  s = getenv("BOOTP_ROOT_PATH");
+  if(!s) s = getenv("BOOTP_BOOTFILE");
+
+  if(s && *s) {
+    s = strdup(s);
+
+    fprintf(stderr, "bootp root: \"%s\"\n", s);
+
+    if((t = strchr(s, ':'))) {
+      *t++ = 0;
+    }
+    else {
+      t = s;
     }
 
-    data_pci = getenv ("BOOTP_IPADDR");
-    if (data_pci)
-        inet_aton (data_pci, &ipaddr_rg);
+    if(*t && !config.serverdir) config.serverdir = strdup(t);
 
-    data_pci = getenv ("BOOTP_NETMASK");
-    if (data_pci)
-        inet_aton (data_pci, &netmask_rg);
+    if(t != s) {
+      name2inet(&config.net.server, s);
+      net_check_address2(&config.net.server, 0);
+    }
 
-    data_pci = getenv ("BOOTP_BROADCAST");
-    if (data_pci)
-        inet_aton (data_pci, &broadcast_rg);
+    free(s);
+  }
 
-    data_pci = getenv ("BOOTP_NETWORK");
-    if (data_pci)
-        inet_aton (data_pci, &network_rg);
-
-    data_pci = getenv("BOOTP_GATEWAYS_1");
-    if (data_pci)
-        inet_aton (data_pci, &gateway_rg);
-
-    data_pci = getenv("BOOTP_GATEWAYS");
-    if (data_pci)
-        inet_aton (data_pci, &gateway_rg);
-
-    data_pci = getenv ("BOOTP_DNSSRVS_1");
-    if (data_pci)
-        inet_aton (data_pci, &nameserver_rg);
-
-    data_pci = getenv ("BOOTP_DNSSRVS");
-    if (data_pci)
-        inet_aton (data_pci, &nameserver_rg);
-
-    data_pci = getenv("BOOTP_HOSTNAME");
-    if (data_pci)
-        strncpy (machine_name_tg, data_pci, sizeof (machine_name_tg) - 1);
-
-    data_pci = getenv ("BOOTP_DOMAIN");
-    if (data_pci)
-        strncpy (domain_name_tg, data_pci, sizeof (domain_name_tg) - 1);
-
-    data_pci = getenv ("BOOTP_ROOT_PATH");
-    if (data_pci)
-	fprintf (stderr, "root-path is defined. Will be used intead of bootfile");	
-    else
-	data_pci = getenv ("BOOTP_BOOTFILE");
-
-    if (data_pci && strlen (data_pci))
-        {
-        fprintf (stderr, "\"%s\"\n", data_pci);
-
-        i_ii = 0;
-        memset (tmp_ti, 0, sizeof (tmp_ti));
-        while (i_ii < sizeof (tmp_ti) - 1 &&
-               i_ii < strlen (data_pci) &&
-               data_pci [i_ii] != ':')
-            tmp_ti [i_ii] = data_pci [i_ii++];
-
-
-        if (tmp_ti [0] && data_pci [i_ii] == ':')
-            {
-            if ((valid_net_config_ig & 0x20) != 0x20)
-                strncpy (server_dir_tg, data_pci + i_ii + 1,
-                         sizeof (server_dir_tg));
-
-            inet_aton (tmp_ti, &nfs_server_rg);
-            }
-        else
-            {
-            if ((valid_net_config_ig & 0x20) != 0x20)
-                strncpy (server_dir_tg, data_pci, sizeof (server_dir_tg));
-            }
-        }
-
-    data_pci = getenv ("BOOTP_SERVER");
-    if (data_pci && !nfs_server_rg.s_addr)
-        inet_aton (data_pci, &nfs_server_rg);
+  if(!config.net.server.name) {
+    name2inet(&config.net.server, getenv("BOOTP_SERVER"));
+    net_check_address2(&config.net.server, 0);
+  }
 
 #ifdef CDWITHNET_DEBUG
-    if( bootmode_ig == BOOTMODE_CDWITHNET ) {
-       dia_message(machine_name_tg, MSGTYPE_ERROR);
-    }
+  if(bootmode_ig == BOOTMODE_CDWITHNET) {
+    dia_message(machine_name_tg, MSGTYPE_ERROR);
+  }
 #endif
 
-    net_stop ();
-    return (0);
-    }
+  net_stop();
+
+  return 0;
+}
 
 
-static int net_get_address (char *text_tv, struct in_addr *address_prr)
-    {
-    int  rc_ii;
-    char input_ti [20];
+int net_get_address(char *text, inet_t *inet, int do_dns)
+{
+  int rc;
+  char input[256];
 
+  *input = 0;
+  if(inet->name) strcpy(input, inet->name);
 
-    if (address_prr->s_addr)
-        strcpy (input_ti, inet_ntoa (*address_prr));
-    else
-        input_ti [0] = 0;
-    do
-        {
-        rc_ii = dia_input (text_tv, input_ti, 16, 16);
-        if (rc_ii)
-            return (rc_ii);
-        rc_ii = net_check_address (input_ti, address_prr);
-        if (rc_ii)
-            (void) dia_message (txt_get (TXT_INVALID_INPUT), MSGTYPE_ERROR);
-        }
-    while (rc_ii);
+  do {
+    if((rc = dia_input(text, input, sizeof input - 1, 16))) return rc;
+    name2inet(inet, input);
+    rc = net_check_address2(inet, do_dns);
+    if(rc) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+  } while(rc);
 
-    return (0);
-    }
+  return 0;
+}
+
 
 int net_dhcp()
 {
@@ -1158,35 +1173,40 @@ int net_dhcp()
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_ipaddr:
-        if(f->is.inet) ipaddr_rg = f->ivalue;
+        name2inet(&config.net.hostname, f->value);
+        net_check_address2(&config.net.hostname, 0);
         break;
 
       case key_netmask:
-        if(f->is.inet) netmask_rg = f->ivalue;
+        name2inet(&config.net.netmask, f->value);
+        net_check_address2(&config.net.netmask, 0);
         break;
 
       case key_network:
-        if(f->is.inet) network_rg = f->ivalue;
+        name2inet(&config.net.network, f->value);
+        net_check_address2(&config.net.network, 0);
         break;
 
       case key_broadcast:
-        if(f->is.inet) broadcast_rg = f->ivalue;
+        name2inet(&config.net.broadcast, f->value);
+        net_check_address2(&config.net.broadcast, 0);
         break;
 
       case key_gateway:
-        if(f->is.inet) gateway_rg = f->ivalue;
+        name2inet(&config.net.gateway, f->value);
+        net_check_address2(&config.net.gateway, 0);
         break;
 
       case key_domain:
         if(*f->value) {
           if(config.net.domain) free(config.net.domain);
           config.net.domain = strdup(f->value);
-          strcpy(domain_name_tg, config.net.domain);
         }
         break;
 
       case key_dhcpsiaddr:
-        if(f->is.inet) nfs_server_rg = f->ivalue;
+        name2inet(&config.net.server, f->value);
+        net_check_address2(&config.net.server, 0);
         break;
 
       case key_rootpath:
@@ -1194,7 +1214,6 @@ int net_dhcp()
         if(*f->value) {
           if(config.serverdir) free(config.serverdir);
           config.serverdir = strdup(f->value);
-          strcpy(server_dir_tg, config.serverdir);
         }
         break;
 
@@ -1227,6 +1246,21 @@ void net_dhcp_stop()
   system("dhcpcd -k");
 
   config.net.dhcp_active = 0;
+}
+
+
+unsigned net_config_mask()
+{
+  unsigned u = 0;
+
+  if(config.net.hostname.name) u |= 1;
+  if(config.net.netmask.ok) u |= 2;
+  if(config.net.gateway.ok) u |= 4;
+  if(config.net.server.name) u |= 8;
+  if(config.net.nameserver.ok) u |= 0x10;
+  if(config.serverdir) u |= 0x20;
+
+  return u;
 }
 
 

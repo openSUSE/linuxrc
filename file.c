@@ -48,6 +48,8 @@ static void file_dump_flist(file_t *ft);
 static void file_dump_mlist(module2_t *ml);
 #endif
 
+static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
+
 static struct {
   file_key_t key;
   char *value;
@@ -68,7 +70,7 @@ static struct {
   { key_netmask,        "Netmask"          },
   { key_gateway,        "Gateway"          },
   { key_server,         "Server"           },
-  { key_dnsserver,      "Nameserver"       },
+  { key_nameserver,     "Nameserver"       },
   { key_broadcast,      "Broadcast"        },
   { key_network,        "Network"          },
   { key_partition,      "Partition"        },
@@ -86,7 +88,6 @@ static struct {
   { key_haspcmcia,      "HasPCMCIA"        },
   { key_console,        "Console"          },
   { key_pliphost,       "PLIP-Host"        },
-  { key_machine,        "Machinename"      },
   { key_domain,         "Domain"           },
   { key_ftpuser,        "FTP-User"         },
   { key_ftpproxy,       "FTP-Proxy"        },
@@ -131,7 +132,8 @@ static struct {
   { key_dhcpshaddr,     "DHCPSHAddr"       },
   { key_dhcpsname,      "DHCPSName"        },
   { key_rootpath,       "RootPath"         },
-  { key_bootfile,       "BootFile"         }
+  { key_bootfile,       "BootFile"         },
+  { key_install,        "Install"          }
 };
 
 static struct {
@@ -204,7 +206,6 @@ void parse_value(file_t *ft)
 {
   char *s;
   int i;
-  struct in_addr in;
 
   if(*ft->value) {
     i = strtol(ft->value, &s, 0);
@@ -216,12 +217,6 @@ void parse_value(file_t *ft)
       if((i = sym2index(ft->value)) >= 0) {
         ft->nvalue = sym_constants[i].value;
         ft->is.numeric = 1;
-      }
-    }
-    if(!ft->is.numeric) {
-      if(!net_check_address(ft->value, &in)) {
-        ft->ivalue = in;
-        ft->is.inet = 1;
       }
     }
   }
@@ -297,7 +292,7 @@ void file_free_file(file_t *file)
 int file_read_info()
 {
   window_t win_ri;
-  char *file = NULL;
+  char *file = NULL, *s;
 
   if(config.win) {
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
@@ -307,15 +302,19 @@ int file_read_info()
     fflush(stdout);
   }
 
-  if(!config.infofile || !strcmp(config.infofile, "default")) {
-    if(config.infofile || auto2_ig || auto_ig) {
+  if(!config.info.file || !strcmp(config.info.file, "default")) {
+    if(config.info.file || auto2_ig || auto_ig) {
       file = file_read_info_file("floppy:/suse/setup/descr/info", "floppy:/info");
     }
     if(!file) file = file_read_info_file("file:/info", NULL);
-    if(!file) file = file_read_info_file("cmdline", NULL);
   }
   else {
-    file = file_read_info_file(config.infofile, NULL);
+    file = file_read_info_file(config.info.file, NULL);
+  }
+
+  if(config.info.add_cmdline) {
+    s = file_read_info_file("cmdline", NULL);
+    if(!file) file = s;
   }
 
   if(config.win) {
@@ -329,7 +328,7 @@ int file_read_info()
     fprintf(stderr, "got info from %s\n", file);
   }
 
-  config.infoloaded = strdup(file ?: "");
+  config.info.loaded = strdup(file ?: "");
 
   return file ? 0 : 1;
 }
@@ -344,6 +343,7 @@ char *file_read_info_file(char *file, char *file2)
 #endif
   int i, mounted = 0;
   file_t *f0 = NULL, *f;
+  url_t *url;
 
 #ifdef DEBUG_FILE
   fprintf(stderr, "looking for info file: %s\n", file);
@@ -383,8 +383,6 @@ char *file_read_info_file(char *file, char *file2)
   file_dump_flist(f0);
 #endif
 
-  valid_net_config_ig = 0;
-
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_insmod:
@@ -421,38 +419,28 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_ip:
-        if(f->is.inet) {
-          ipaddr_rg = f->ivalue;
-          valid_net_config_ig |= 1;
-        }
+        name2inet(&config.net.hostname, f->value);
+        net_check_address2(&config.net.hostname, 0);
         break;
 
       case key_netmask:
-        if(f->is.inet) {
-          netmask_rg = f->ivalue;
-          valid_net_config_ig |= 2;
-        }
+        name2inet(&config.net.netmask, f->value);
+        net_check_address2(&config.net.netmask, 0);
         break;
 
       case key_gateway:
-        if(f->is.inet) {
-          gateway_rg = f->ivalue;
-          valid_net_config_ig |= 4;
-        }
+        name2inet(&config.net.gateway, f->value);
+        net_check_address2(&config.net.gateway, 0);
         break;
 
       case key_server:
-        if(f->is.inet) {
-          nfs_server_rg = f->ivalue;
-          valid_net_config_ig |= 8;
-        }
+        name2inet(&config.net.server, f->value);
+        net_check_address2(&config.net.server, 0);
         break;
 
-      case key_dnsserver:
-        if(f->is.inet) {
-          nameserver_rg = f->ivalue;
-          valid_net_config_ig |= 0x10;
-        }
+      case key_nameserver:
+        name2inet(&config.net.nameserver, f->value);
+        net_check_address2(&config.net.nameserver, 0);
         break;
 
       case key_partition:
@@ -461,9 +449,10 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_serverdir:
-        strncpy(server_dir_tg, f->value, sizeof server_dir_tg);
-        server_dir_tg[sizeof server_dir_tg - 1] = 0;
-        valid_net_config_ig |= 0x20;
+        if(*f->value) {
+          if(config.serverdir) free(config.serverdir);
+          config.serverdir = strdup(f->value);
+        }
         break;
 
       case key_netdevice:
@@ -474,7 +463,7 @@ char *file_read_info_file(char *file, char *file2)
       case key_livesrc:
         strncpy(livesrc_tg, f->value, sizeof livesrc_tg);
         livesrc_tg[sizeof livesrc_tg - 1] = 0;
-        if((valid_net_config_ig & 0x20)) bootmode_ig = BOOTMODE_NET;
+        if(config.serverdir) bootmode_ig = BOOTMODE_NET;
         break;
 
       case key_bootpwait:
@@ -494,15 +483,18 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_username:
-        config.net.smb.user = strdup(f->value);
+        if(config.net.user) free(config.net.user);
+        config.net.user = strdup(f->value);
         break;
 
       case key_password:
-        config.net.smb.password = strdup(f->value);
+        if(config.net.password) free(config.net.password);
+        config.net.password = strdup(f->value);
         break;
 
       case key_workdomain:
-        config.net.smb.workgroup = strdup(f->value);
+        if(config.net.workgroup) free(config.net.workgroup);
+        config.net.workgroup = strdup(f->value);
         break;
 
       case key_forceinsmod:
@@ -514,13 +506,38 @@ char *file_read_info_file(char *file, char *file2)
         if(config.net.use_dhcp) net_config();
         break;
 
+      case key_domain:
+        if(config.net.domain) free(config.net.domain);
+        config.net.domain = strdup(f->value);
+        break;
+
+      case key_install:
+        url = parse_url(f->value);
+        if(url) {
+          if(!strcmp(url->proto, "nfs")) {
+            name2inet(&config.net.server, f->value);
+            if(config.serverdir) free(config.serverdir);
+            config.serverdir = NULL;
+            if(url->dir && *url->dir) {
+              config.serverdir = strdup(url->dir);
+            }
+          }
+        }
+        break;
+
       default:
     }
   }
 
-  if((valid_net_config_ig & 3) == 3) {
-    broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
-    network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+  if((net_config_mask() & 3) == 3) {
+    s_addr2inet(
+      &config.net.broadcast,
+      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+    );
+    s_addr2inet(
+      &config.net.network,
+      config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
+    );
   }
 
   file_free_file(f0);
@@ -588,7 +605,7 @@ int file_read_yast_inf()
 
 void file_write_str(FILE *f, file_key_t key, char *str)
 {
-  fprintf(f, "%s: %s\n", file_key2str(key), str);
+  if(str) fprintf(f, "%s: %s\n", file_key2str(key), str);
 }
 
 
@@ -612,9 +629,14 @@ void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num)
 }
 
 
-void file_write_inet(FILE *f, file_key_t key, struct in_addr *inet)
+void file_write_inet(FILE *f, file_key_t key, inet_t *inet)
 {
-  fprintf(f, "%s: %s\n", file_key2str(key), inet_ntoa(*inet));
+  char *s = NULL;
+
+  if(inet->ok) s = inet_ntoa(inet->ip);
+  if(!s) s = inet->name;
+
+  if(s) fprintf(f, "%s: %s\n", file_key2str(key), s);
 }
 
 
@@ -670,7 +692,7 @@ void file_write_install_inf(char *dir)
   if(bootmode_ig == BOOTMODE_HARDDISK) {
     file_write_str(f, key_partition, harddisk_tg);
     file_write_str(f, key_fstype, fstype_tg);
-    file_write_str(f, key_serverdir, server_dir_tg);
+    file_write_str(f, key_serverdir, config.serverdir);
   }
 
   if(
@@ -680,53 +702,37 @@ void file_write_install_inf(char *dir)
     bootmode_ig == BOOTMODE_CDWITHNET
   ) {
     file_write_str(f, key_netdevice, netdevice_tg);
-    file_write_inet(f, key_ip, &ipaddr_rg);
+    file_write_inet(f, key_ip, &config.net.hostname);
+    file_write_str(f, key_hostname, config.net.hostname.name);
 
     if(bootmode_ig == BOOTMODE_CDWITHNET) {
-      broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
-      network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
-      file_write_inet(f, key_broadcast, &broadcast_rg);
-      file_write_inet(f, key_network, &network_rg);
+      s_addr2inet(
+        &config.net.broadcast,
+        config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+      );
+      s_addr2inet(
+        &config.net.network,
+        config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
+      );
+      file_write_inet(f, key_broadcast, &config.net.broadcast);
+      file_write_inet(f, key_network, &config.net.network);
     }
 
-    if(plip_host_rg.s_addr) {
-      file_write_inet(f, key_pliphost, &plip_host_rg);
+    if(config.net.pliphost.ok) {
+      file_write_inet(f, key_pliphost, &config.net.pliphost);
     }
     else {
-      file_write_inet(f, key_netmask, &netmask_rg);
+      file_write_inet(f, key_netmask, &config.net.netmask);
     }
             
-    if(gateway_rg.s_addr) {
-      file_write_inet(f, key_gateway, &gateway_rg);
-    }
+    file_write_inet(f, key_gateway, &config.net.gateway);
 
-    if(nameserver_rg.s_addr) {
-      file_write_inet(f, key_dnsserver, &nameserver_rg);
-    }
+    file_write_inet(f, key_nameserver, &config.net.nameserver);
 
-    {
-      struct in_addr *server_address = &nfs_server_rg;
-      char *server_dir = server_dir_tg;
+    file_write_inet(f, key_server, &config.net.server);
+    file_write_str(f, key_serverdir, config.serverdir);
 
-      if(bootmode_ig == BOOTMODE_FTP) {
-        server_address = &ftp_server_rg;
-      }
-      else if(bootmode_ig == BOOTMODE_SMB) {
-        server_address = &config.net.smb.server.ip;
-        server_dir     = config.net.smb.share;
-      }
-
-      file_write_inet(f, key_server, server_address);
-      file_write_str(f, key_serverdir, server_dir);
-    }
-
-    if(*machine_name_tg) {
-      file_write_str(f, key_machine, machine_name_tg);
-    }
-
-    if(*domain_name_tg) {
-      file_write_str(f, key_domain, domain_name_tg);
-    }
+    file_write_str(f, key_domain, config.net.domain);
   }
 
   if(bootmode_ig == BOOTMODE_FTP) {
@@ -741,17 +747,9 @@ void file_write_install_inf(char *dir)
     }
   }
 
-  if(bootmode_ig == BOOTMODE_SMB) {
-    if(config.net.smb.user) {
-      file_write_str(f, key_username, config.net.smb.user);
-    }
-    if(config.net.smb.password) {
-      file_write_str(f, key_password, config.net.smb.password);
-    }
-    if(config.net.smb.workgroup) {
-      file_write_str(f, key_workdomain, config.net.smb.workgroup);
-    }
-  }
+  file_write_str(f, key_username, config.net.user);
+  file_write_str(f, key_password, config.net.password);
+  file_write_str(f, key_workdomain, config.net.workgroup);
 
   file_write_modparms(f);
 
@@ -800,7 +798,7 @@ void file_write_install_inf(char *dir)
 
 void file_write_mtab()
 {
-  char smb_mount_options[200];
+  char smb_mount_options[256];
   FILE *f;
 
   if(!(f = fopen(MTAB_FILE, "w"))) return;
@@ -820,7 +818,7 @@ void file_write_mtab()
       case BOOTMODE_NET:
         fprintf(f,
           "%s:%s %s nfs ro 0 0\n",
-          inet_ntoa(nfs_server_rg), server_dir_tg, mountpoint_tg
+          inet_ntoa(config.net.server.ip), config.serverdir ?: "", mountpoint_tg
         );
         break;
 
@@ -828,7 +826,7 @@ void file_write_mtab()
         net_smb_get_mount_options(smb_mount_options);
         fprintf(f,
           "//%s/%s %s smbfs ro,%s 0 0\n",
-          config.net.smb.server.name, config.net.smb.share,
+          config.net.server.name, config.serverdir ?: "",
           mountpoint_tg, smb_mount_options
         );
         break;
@@ -1025,7 +1023,6 @@ void file_dump_flist(file_t *ft)
   for(; ft; ft = ft->next) {
     fprintf(stderr, "%d: \"%s\" = \"%s\"\n", ft->key, ft->key_str, ft->value);
     if(ft->is.numeric) fprintf(stderr, "  num = %d\n", ft->nvalue);
-    if(ft->is.inet) fprintf(stderr, "  inet = %s\n", inet_ntoa(ft->ivalue));
   }
 }
 

@@ -166,13 +166,10 @@ typedef struct {
 
 
 typedef struct {
-  unsigned available:1;	/* set if SMB functionality is available */
-  inet_t server;	/* SMB server to install from */
-  char *share;
-  char *workgroup;
-  char *user;		/* if this is 0, perform guest login */
-  char *password;
-} smb_t;
+  char *proto;
+  char *server;
+  char *dir;
+} url_t;
 
 
 typedef struct module2_s {
@@ -206,8 +203,11 @@ typedef struct {
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
   char *instsys;		/* installation system mount point */
-  char *infofile;		/* 'info' file name */
-  char *infoloaded;		/* actual 'info' file that was loaded */
+  struct {
+    char *file;			/* 'info' file name */
+    char *loaded;		/* actual 'info' file that was loaded */
+    unsigned add_cmdline:1;	/* parse cmdline, too */
+  } info;
   char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
@@ -236,15 +236,20 @@ typedef struct {
   struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
+    unsigned smb_available:1;	/* set if SMB functionality is available */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
     inet_t netmask;
     inet_t network;
     inet_t broadcast;
     inet_t gateway;
+    inet_t nameserver;
     inet_t hostname;
-    inet_t nfsserver;
-    smb_t smb;			/* SMB installation info */
+    inet_t server;
+    inet_t pliphost;
+    char *workgroup;		/* SMB */
+    char *user;			/* if this is NULL, perform guest login */
+    char *password;
   } net;
 
 } config_t;
@@ -254,16 +259,6 @@ config_t config;
 extern int             max_x_ig;
 extern int             max_y_ig;
 extern colorset_t     *colors_prg;
-extern struct in_addr  ipaddr_rg;
-extern struct in_addr  netmask_rg;
-extern struct in_addr  broadcast_rg;
-extern struct in_addr  gateway_rg;
-extern struct in_addr  network_rg;
-extern struct in_addr  ftp_server_rg;
-extern struct in_addr  nfs_server_rg;
-extern struct in_addr  plip_host_rg;
-extern struct in_addr  nameserver_rg;
-extern char            server_dir_tg [MAX_FILENAME];
 extern char            rootimage_tg [MAX_FILENAME];
 extern char           *mountpoint_tg;
 extern char           *inst_mountpoint_tg;
@@ -289,7 +284,6 @@ extern int             demo_ig;
 extern int             auto2_ig;
 extern int             nfsport_ig;
 extern char            machine_name_tg [100];
-extern char            domain_name_tg [100];
 extern int             old_kernel_ig;
 extern int             bootp_wait_ig;
 extern int             bootp_timeout_ig;
@@ -311,7 +305,6 @@ extern int             has_floppy_ig;
 extern int             has_kbd_ig;
 extern unsigned        frame_buffer_mode_ig;
 extern int             yast_version_ig;
-extern int             valid_net_config_ig;
 extern int             reboot_ig;
 extern int             usb_ig;
 extern char            *usb_mods_ig;
