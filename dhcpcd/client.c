@@ -1065,7 +1065,7 @@ void deleteDhcpCache()
 /*****************************************************************************/
 void *dhcpStart()
 {
-  int o = 1;
+  int o = 1, i;
   struct ifreq	ifr;
   struct sockaddr_pkt sap;
   memset(&ifr,0,sizeof(struct ifreq));
@@ -1115,8 +1115,12 @@ void *dhcpStart()
     syslog(LOG_ERR,"dhcpStart: bind: %m\n");
 
   memcpy(ClientHwAddr,ifr.ifr_hwaddr.sa_data,ETH_ALEN);
-  ip_id=time(NULL)&0xffff;
-  srandom(ip_id);
+
+  i=time(NULL)+ClientHwAddr[5]+4*ClientHwAddr[4]+8*ClientHwAddr[3]+
+  16*ClientHwAddr[2]+32*ClientHwAddr[1]+64*ClientHwAddr[0];
+  srandom(i);
+  ip_id=i&0xffff;
+
   return &dhcpInit;
 }
 /*****************************************************************************/
