@@ -695,7 +695,7 @@ void mod_autoload (void)
             }
         }
 
-#ifdef 0
+#if 0
     if (!mod_getmoddisk ())
         {
         rc_ii = mod_get_ram_modules (MOD_TYPE_OTHER);
