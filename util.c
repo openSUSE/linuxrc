@@ -99,6 +99,7 @@ static int cmp_dir_entry(slist_t *sl0, slist_t *sl1);
 static int cmp_dir_entry_s(const void *p0, const void *p1);
 static void create_update_name(unsigned idx);
 
+static char *read_symlink(char *name);
 
 typedef struct {
   unsigned usb:1;
@@ -367,7 +368,7 @@ void util_print_banner (void)
 
     uname (&utsinfo_ri);
     if (config.linemode) {
-      printf (">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2003 SuSE Linux AG <<<\n", utsinfo_ri.release);
+      printf (">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2004 SuSE Linux AG <<<\n", utsinfo_ri.release);
         return;
     }
     memset (&win_ri, 0, sizeof (window_t));
@@ -398,7 +399,7 @@ void util_print_banner (void)
     win_ri.style = STYLE_SUNKEN;
     win_open (&win_ri);
 
-    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2003 SuSE Linux AG <<<",
+    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2004 SuSE Linux AG <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
@@ -4184,4 +4185,151 @@ void get_net_unique_id()
   hd_free_hd_data(hd_data);
 }
 
+
+
+
+static int is_there(char *name);
+static int is_dir(char *name);
+static int is_link(char *name);
+static char *read_symlink(char *name);
+static int make_links(char *src, char *dst);
+
+
+int util_lndir_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(argc != 2) return 1;
+
+  return make_links(argv[0], argv[1]);
+}
+
+
+int is_there(char *name)
+{
+  struct stat sbuf;
+
+  if(stat(name, &sbuf) == -1) return 0;
+
+  return 1;
+}
+
+
+int is_dir(char *name)
+{
+  struct stat sbuf;
+
+  if(stat(name, &sbuf) == -1) return 0;
+
+  if(S_ISDIR(sbuf.st_mode)) return 1;
+
+  return 0;
+}
+
+
+int is_link(char *name)
+{
+  struct stat sbuf;
+
+  if(lstat(name, &sbuf) == -1) return 0;
+
+  if(S_ISLNK(sbuf.st_mode)) return 1;
+
+  return 0;
+}
+
+
+/*
+ * Link directory tree src to dst. Keep existing files in dst.
+ */
+int make_links(char *src, char *dst)
+{
+  DIR *dir;
+  struct dirent *de;
+  struct stat sbuf;
+  struct utimbuf ubuf;
+  char src2[0x400], dst2[0x400], tmp_dir[0x400], tmp_link[0x400];
+  char *s;
+  int err = 0;
+
+  // fprintf(stderr, "make_links: %s -> %s\n", src, dst);
+
+  if((dir = opendir(src))) {
+    while((de = readdir(dir))) {
+      if(!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
+      sprintf(src2, "%s/%s", src, de->d_name);
+      sprintf(dst2, "%s/%s", dst, de->d_name);
+
+      if(is_dir(src2) && !is_link(src2)) {
+        /* add directory */
+
+        // fprintf(stderr, "dir: %s -> %s\n", src2, dst2);
+
+        if(is_dir(dst2)) {
+          if(is_link(dst2)) {
+            /* remove link and make directory */
+            sprintf(tmp_dir, "%s/mklXXXXXX", dst);
+            s = mkdtemp(tmp_dir);
+            if(!s) {
+              perror(tmp_dir);
+              err = 2;
+              continue;
+            }
+            s = read_symlink(dst2);
+            if(!*s) {
+              err = 3;
+              continue;
+            }
+            if(*s != '/') {
+              sprintf(tmp_link, "%s/%s", dst2, s);
+              s = tmp_link;
+            }
+            if((err = make_links(s, tmp_dir))) continue;
+            if(unlink(dst2)) {
+              perror(dst2);
+              err = 4;
+              continue;
+            }
+            if(rename(tmp_dir, dst2)) {
+              perror(tmp_dir);
+              err = 5;
+              continue;
+            }
+            if(stat(src2, &sbuf) != -1) {
+              chmod(dst2, sbuf.st_mode);
+              ubuf.actime = sbuf.st_atime;
+              ubuf.modtime = sbuf.st_mtime;
+              utime(dst2, &ubuf);
+              lchown(dst2, sbuf.st_uid, sbuf.st_gid);
+            }
+          }
+          if((err = make_links(src2, dst2))) continue;
+        }
+        else if(!is_there(dst2)) {
+          if(symlink(src2, dst2)) {
+            perror(src2);
+            err = 7;
+            continue;
+          }
+        }
+      }
+      else if(!is_there(dst2) || is_link(dst2)) {
+        unlink(dst2);
+        if(symlink(src2, dst2)) {
+          perror(src2);
+          err = 6;
+          continue;
+        }
+      }
+    }
+
+    closedir(dir);
+  }
+  else {
+    perror(src);
+    return 1;
+  }
+
+  return err;
+}
 

@@ -193,8 +193,6 @@ void mod_init(int autoload)
     util_update_netdevice_list(NULL, 1);
   }
 
-  setenv("MODPATH", config.module.dir, 1);
-
   sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
 
@@ -754,7 +752,7 @@ int mod_insmod(char *module, char *param)
 
   if(!config.forceinsmod) {
     if(!util_check_exist(module)) {
-      sprintf(buf, "%s/%s.o", config.module.dir, module);
+      sprintf(buf, "%s/%s." MODULE_SUFFIX, config.module.dir, module);
       if(!util_check_exist(buf)) return -1;
     }
   }
@@ -764,7 +762,7 @@ int mod_insmod(char *module, char *param)
     return -1;
   }
 
-  sprintf(buf, "insmod %s%s ", force, module);
+  sprintf(buf, "insmod %s%s/%s." MODULE_SUFFIX, force, config.module.dir, module);
 
   if(param && *param) strcat(buf, param);
 

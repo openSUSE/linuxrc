@@ -1,3 +1,9 @@
+28/1/2004:	v1.6.0
+	- no longer includes insmod et all
+	- links instsys tree itself (used to be done in inst_setup)
+	- removed /bin <-> /.bin renaming, linuxrc tools are kept in /lbin
+	- works with 2.6 modules
+
 8/1/2004:	v1.5.20
 	- hardlinks on driver update medium could cause segfault
 

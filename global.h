@@ -71,6 +71,8 @@
 
 #define MAX_FILENAME     300
 
+#define MODULE_SUFFIX	"ko"
+
 typedef struct {
                char c;
                char attr;

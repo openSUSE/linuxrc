@@ -1,5 +1,5 @@
 # SuSE release number
-LX_REL	?= -DLX_REL=\"9.0\"
+LX_REL	?= -DLX_REL=\"9.1\"
 
 # include pcmcia/config.mk
 
@@ -42,9 +42,8 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po insmod loadkeys pcmcia portmap dhcpcd
-LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a \
-	  portmap/portmap.a dhcpcd/dhcpcd.a
+SUBDIRS	= po loadkeys pcmcia portmap dhcpcd
+LIBS	= loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
     CFLAGS		+= -DLX_ARCH=\"i386\"
@@ -94,9 +93,6 @@ ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
-    SUBDIRS		:= $(filter-out insmod, $(SUBDIRS))
-    LIBS		:= $(filter-out insmod/insmod.a, $(LIBS))
-    OBJ			:= $(filter-out insmod.o, $(OBJ))
     SUBDIRS		:= $(filter-out loadkeys, $(SUBDIRS))
     LIBS		:= $(filter-out loadkeys/loadkeys.a, $(LIBS))
     OBJ			:= $(filter-out loadkeys.o, $(OBJ))

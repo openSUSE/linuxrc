@@ -59,7 +59,8 @@ static int   inst_try_cdrom           (char *device_tv);
 static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
 static int   inst_start_rescue        (void);
-static int   inst_prepare             (void);
+// static int   inst_prepare             (void);
+static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
@@ -892,6 +893,7 @@ int inst_start_rescue()
 }
 
 
+#if 0
 /*
  * Do some basic preparations before we can run programs from the
  * installation system. More must be done later in config.setupcmd.
@@ -982,6 +984,75 @@ int inst_prepare()
 
   return rc;
 }
+#endif
+
+
+int add_instsys()
+{
+  char link_source[MAX_FILENAME], buf[256];
+  int rc = 0;
+  struct dirent *de;
+  DIR *d;
+  char *argv[3] = { };
+
+  mod_free_modules();
+
+  util_free_mem();
+  if(config.memory.current - config.memory.free_swap < config.memory.min_modules) {
+    putenv("REMOVE_MODULES=1");
+  }
+  else {
+    unsetenv("REMOVE_MODULES");
+  }
+
+  setenv("INSTSYS", config.instsys, 1);
+
+  setenv("TERM", config.term ?: config.serial ? "vt100" : "linux", 1);
+
+  setenv("ESCDELAY", config.serial ? "1100" : "10", 1);
+
+  setenv("YAST_DEBUG", "/debug/yast.debug", 1);
+
+  file_write_install_inf("");
+  if(!config.test) {
+    // file_write_mtab();
+    system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
+
+    /*
+     * In these cases, part of the "/suse" tree is in the installation
+     * system. We add some symlinks needed by YaST2 to make it available
+     * below config.mountpoint.instdata.
+     */
+    if(
+      config.instmode == inst_ftp ||
+      config.instmode == inst_tftp ||
+      config.instmode == inst_http
+    ) {
+      if((d = opendir(config.mountpoint.instsys))) {
+        while((de = readdir(d))) {
+          if(
+            strstr(de->d_name, ".S.u.S.E") == de->d_name ||
+            !strcmp(de->d_name, config.product_dir)
+          ) {
+            sprintf(buf, "%s/%s", config.mountpoint.instdata, de->d_name);
+            unlink(buf);
+            if(!util_check_exist(buf)) {
+              sprintf(link_source, "%s/%s", config.mountpoint.instsys, de->d_name);
+              symlink(link_source, buf);
+            }
+          }
+        }
+        closedir(d);
+      }
+    }
+  }
+
+  argv[1] = config.instsys;
+  argv[2] = "/";
+  util_lndir_main(3, argv);
+
+  return rc;
+}
 
 
 void inst_yast_done()
@@ -1003,10 +1074,7 @@ void inst_yast_done()
   ramdisk_free(config.inst_ramdisk);
   config.inst_ramdisk = -1;
 
-  if(!config.initrd_has_ldso && !config.test) {
-    unlink("/bin");
-    rename("/.bin", "/bin");
-  }
+  find_shell();
 }
 
 
@@ -1015,7 +1083,8 @@ int inst_execute_yast()
   int i, rc;
   char cmd[256];
 
-  rc = inst_prepare();
+//  rc = inst_prepare();
+  rc = add_instsys();
   if(rc) return rc;
 
   if(!config.test) {

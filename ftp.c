@@ -178,7 +178,6 @@ int ftpOpen(char * host, char * name, char * password, char * proxy,
     /*static char * lastHost = NULL;*/
     struct in_addr serverAddress;
     struct sockaddr_in destPort;
-    struct passwd * pw;
     char * buf;
     int rc;
 
@@ -188,13 +187,7 @@ int ftpOpen(char * host, char * name, char * password, char * proxy,
 	name = "anonymous";
 
     if (!password) {
-	if (getuid() && (pw = getpwuid(getuid()))) {
-	    password = alloca(strlen(pw->pw_name) + 2);
-	    strcpy(password, pw->pw_name);
-	    strcat(password, "@");
-	} else {
-	    password = "root@";
-	}
+        password = "root@";
     }
 
     if (proxy) {

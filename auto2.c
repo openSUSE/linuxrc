@@ -758,7 +758,7 @@ int auto2_init()
     printf("Activating PCMCIA devices...");
     fflush(stdout);
 
-    if(!util_check_exist("/modules/pcmcia_core.o")) {
+    if(!util_check_exist("/modules/pcmcia_core." MODULE_SUFFIX)) {
       char buf[256], *t;
 
       util_disp_init();

@@ -2,7 +2,7 @@
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
  *
- * Copyright (c) 1996-2003  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
+ * Copyright (c) 1996-2004  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
  *
  */
 
@@ -67,12 +67,10 @@ static int  lxrc_main_cb       (dia_item_t di);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int do_not_kill         (char *name);
-static void save_environment   (void);
 static void lxrc_change_root   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
-static char **saved_environment;
 extern char **environ;
 static void lxrc_movetotmpfs(void);
 #if SWISS_ARMY_KNIFE 
@@ -81,12 +79,12 @@ static void lxrc_makelinks(char *name);
 
 #if SWISS_ARMY_KNIFE
 int cardmgr_main(int argc, char **argv);
-int insmod_main(int argc, char **argv);
+// int insmod_main(int argc, char **argv);
 int loadkeys_main(int argc, char **argv);
 int dhcpcd_main(int argc, char **argv);
 int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
-int rmmod_main(int argc, char **argv);
+// int rmmod_main(int argc, char **argv);
 int setfont_main(int argc, char **argv);
 int smbmnt_main(int argc, char **argv);
 
@@ -97,8 +95,8 @@ static struct {
   { "sh",          util_sh_main          },
   { "lsh",         lsh_main              },
   { "mkdevs",      mkdevs_main           },
-  { "insmod",      insmod_main           },
-  { "rmmod",       rmmod_main            },
+//  { "insmod",      insmod_main           },
+//  { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
   { "loadkeys",    loadkeys_main         },
   { "dhcpcd",      dhcpcd_main           },
@@ -134,6 +132,7 @@ static struct {
   { "fstype",      util_fstype_main      },
   { "modprobe",    util_modprobe_main    },
   { "usbscsi",     util_usbscsi_main     },
+  { "lndir",       util_lndir_main       },
   { "nothing",     util_nothing_main     }
 };
 #endif
@@ -201,6 +200,7 @@ int main(int argc, char **argv, char **env)
 #if SWISS_ARMY_KNIFE 
       lxrc_makelinks(*argv);
 #endif
+      find_shell();
       mount("proc", "/proc", "proc", 0, 0);
       ft = file_get_cmdline(key_tmpfs);
       if(ft && ft->is.numeric) {
@@ -220,7 +220,7 @@ int main(int argc, char **argv, char **env)
       config.tmpfs = 0;
 
       if(!config.serial && config.debugwait) {
-        util_start_shell("/dev/tty9", "/bin/lsh", 0);
+        util_start_shell("/dev/tty9", "/lbin/lsh", 0);
         config.shell_started = 1;
       }
       deb_wait;
@@ -232,9 +232,9 @@ int main(int argc, char **argv, char **env)
     }
   }
 
-  save_environment();
-
   util_mkdevs();
+
+  setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin", 1);
 
   lxrc_init();
 
@@ -322,18 +322,6 @@ void lxrc_halt()
   if(dia_yesno("Do you want to halt the system now?", 1) == YES) {
     reboot(RB_POWER_OFF);
   }
-}
-
-static void save_environment (void)
-{
-    int i;
-
-    i = 0;
-    while (environ[i++])
-	;
-    saved_environment = malloc (i * sizeof (char *));
-    if (saved_environment)
-	memcpy (saved_environment, environ, i * sizeof (char *));
 }
 
 
@@ -675,7 +663,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2003 SuSE Linux AG <<<\n",
+      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2004 SuSE Linux AG <<<\n",
       config.product
     );
     if (config.linemode)
@@ -748,7 +736,7 @@ void lxrc_init()
   util_update_cdrom_list();
 
   if(!(config.test || config.serial || config.shell_started || config.noshell)) {
-    util_start_shell("/dev/tty9", "/bin/lsh", 0);
+    util_start_shell("/dev/tty9", "/lbin/lsh", 0);
     config.shell_started = 1;
   }
 
@@ -1075,13 +1063,29 @@ void lxrc_makelinks(char *name)
   int i;
   char buf[64];
 
-  if(!util_check_exist("/bin")) mkdir("/bin", 0755);
+  if(!util_check_exist("/lbin")) mkdir("/lbin", 0755);
 
   if(!util_check_exist("/etc/nothing")) link(name, "/etc/nothing");
 
   for(i = 0; (unsigned) i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
-    sprintf(buf, "/bin/%s", lxrc_internal[i].name);
+    sprintf(buf, "/lbin/%s", lxrc_internal[i].name);
     if(!util_check_exist(buf)) link(name, buf);
   }
 }
 #endif
+
+
+/*
+ * Ensure /bin/sh points to some shell.
+ */
+void find_shell()
+{
+  if(util_check_exist("/bin/sh") == 'r') return;
+  if(!util_check_exist("/bin")) mkdir("/bin", 0755);
+
+  if(util_check_exist("/bin") == 'd') {
+    unlink("/bin/sh");
+    symlink("/lbin/sh", "/bin/sh");
+  }
+}
+
