@@ -226,6 +226,7 @@ typedef struct {
   unsigned use_usbscsi:1;	/* use new usb storage handling code */
   unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
+  unsigned idescsi;		/* use ide-scsi module */
   pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
@@ -258,10 +259,9 @@ typedef struct {
   instmode_t instmode_extra;	/* for the stranger things... */
   int inst_ramdisk;		/* ramdisk with instsys */
   char *new_root;		/* root device to boot */
-  char *installdir;		/* "/suse/inst-sys" */
-  char *rootimage;		/* "/suse/images/root" */
-  char *rescueimage;		/* "/suse/images/rescue" */
-  char *demoimage;		/* "/suse/images/cd-demo" */
+  char *installdir;		/* "/boot/inst-sys" */
+  char *rootimage;		/* "/boot/root" */
+  char *rescueimage;		/* "/boot/rescue" */
   char *term;			/* TERM var */
   char *cdid;			/* set if we found a install CD */
   int usbwait;			/* sleep this much after loading usb modules */
@@ -274,6 +274,19 @@ typedef struct {
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
   char *updatedir;		/* driver update dir */
+
+  struct {
+    char *image;		/* "/boot/liveeval" */
+    char *cfg;			/* live config file */
+    char *arg;			/* 'live' cmdline arg */
+    slist_t *args;		/* 'live' cmdline arg, splitted */
+    slist_t *useswap;		/* swap partitions to use */
+    slist_t *swaps;		/* swap partitions found */
+    slist_t *partitions;	/* live eval partitions */
+    unsigned newconfig:1;	/* ignore existing config */
+    unsigned nodisk:1;		/* don't save to disk */
+    unsigned swapfile:1;	/* use swap file */
+  } live;
 
   struct {
     char *buf;
@@ -327,7 +340,7 @@ typedef struct {
     char *extra;
     char *instdata;
     char *instsys;
-    char *eval;
+    char *live;
   } mountpoint;
 
   struct {

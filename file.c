@@ -32,6 +32,7 @@
 #define INSTALL_INF_FILE	"/etc/install.inf"
 #define MTAB_FILE		"/etc/mtab"
 #define CMDLINE_FILE		"/proc/cmdline"
+#define LIVE_CONF_FILE		"/etc/liveeval.conf"
 
 // #define DEBUG_FILE
 
@@ -56,7 +57,7 @@ static struct {
   { key_none,           ""                 },
   { key_swap,           "Swap"             },
   { key_root,           "Root"             },
-  { key_live,           "Live"             },
+  { key_live,           "live"             },
   { key_keytable,       "Keytable"         },
   { key_language,       "Language"         },
   { key_rebootmsg,      "RebootMsg"        },
@@ -200,7 +201,9 @@ static struct {
   { key_usbscsi,        "USBSCSI"          },
   { key_useusbscsi,     "UseUSBSCSI"       },
   { key_lxrcdebug,      "LXRCDebug"        },
-  { key_kernel_pcmcia,  "KernelPCMCIA"     }
+  { key_kernel_pcmcia,  "KernelPCMCIA"     },
+  { key_liveconfig,     "LiveConfig"       },
+  { key_useidescsi,     "UseIDESCSI"       }
 };
 
 static struct {
@@ -794,13 +797,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_demo:
-        if(f->is.numeric) {
-          config.demo = f->nvalue;
-          config.activate_storage = 1;
-        }
-        break;
-
       case key_nopcmcia:
         if(f->is.numeric) config.nopcmcia = f->nvalue;
         break;
@@ -907,8 +903,13 @@ void file_do_info(file_t *f0)
                     char *argv[2] = { };
 
                     argv[1] = buf;
-                    fprintf(stderr, "swapon %s\n", buf);
-                    util_swapon_main(2, argv);
+                    if(config.demo) {
+                      slist_append_str(&config.live.useswap, buf + sizeof "/dev/" - 1);
+                    }
+                    else {
+                      fprintf(stderr, "swapon %s\n", buf);
+                      util_swapon_main(2, argv);
+                    }
                     break;
                   }
                 }
@@ -926,8 +927,13 @@ void file_do_info(file_t *f0)
           t = fstype(s);
           if(t && !strcmp(t, "swap")) {
             argv[1] = s;
-            fprintf(stderr, "swapon %s\n", s);
-            util_swapon_main(2, argv);
+            if(config.demo) {
+              slist_append_str(&config.live.useswap, s + sizeof "/dev/" - 1);
+            }
+            else {
+              fprintf(stderr, "swapon %s\n", s);
+              util_swapon_main(2, argv);
+            }
           }
         }
         break;
@@ -1056,6 +1062,33 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.debug = f->nvalue;
         break;
 
+      case key_live:
+        str_copy(&config.live.arg, f->value);
+        config.live.args = slist_split(',', config.live.arg);
+        if(
+          slist_getentry(config.live.args, "new") ||
+          slist_getentry(config.live.args, "clean")
+        ) {
+          config.live.newconfig = 1;
+        }
+        if(slist_getentry(config.live.args, "nodisk")) {
+          config.live.newconfig = 1;
+          config.live.nodisk = 1;
+        }
+        break;
+
+      case key_liveconfig:
+        if(*f->value) {
+          config.demo = 1;
+          config.activate_storage = 1;
+          str_copy(&config.live.cfg, f->value);
+        }
+        break;
+
+      case key_useidescsi:
+        if(f->is.numeric) config.idescsi = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1083,18 +1116,6 @@ int file_read_yast_inf()
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {
-#if OBSOLETE_SWAPOFF
-      case key_swap:
-        swapoff(f->value);
-        break;
-#endif
-
-#if OBSOLETE_YAST_LIVECD
-      case key_live:		/* really obsolete */
-        yast_live_cd = f->nvalue;
-        break;
-#endif
-
       case key_root:
         root = 1;
         if(!f->is.numeric) root_set_root(f->value);
@@ -1773,4 +1794,29 @@ void file_dump_mlist(module_t *ml)
 
 #endif
 
+
+void file_write_live_config(char *dir)
+{
+  FILE *f;
+  char file_name[256];
+
+  strcat(strcpy(file_name, dir), LIVE_CONF_FILE);
+
+  if(!(f = fopen(file_name, "w"))) {
+    fprintf(stderr, "Cannot open live info file\n");
+    return;
+  }
+
+  if(config.live.arg) {
+    fprintf(f, "%s=%s\n", file_key2str(key_live), config.live.arg);
+  }
+  fprintf(f, "liveconfig=%s\n", config.live.cfg);
+  fprintf(f, "l_new=%s\n", config.live.newconfig ? "1" : "");
+  fprintf(f, "l_nodisk=%s\n", config.live.nodisk ? "1" : "");
+  fprintf(f, "l_swapfile=%s\n", config.live.swapfile ? "1" : "");
+  fprintf(f, "l_swappart=%s\n", config.live.useswap ? config.live.useswap->key : "");
+  fprintf(f, "l_partition=%s\n", config.partition ?: "");
+
+  fclose(f);
+}
 

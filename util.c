@@ -1101,7 +1101,7 @@ void util_status_info()
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "evalimage = \"%s\"", config.demoimage);
+  sprintf(buf, "evalimage = \"%s\"", config.live.image);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "installdir = \"%s\"", config.installdir);
@@ -3483,7 +3483,7 @@ void util_set_product_dir(char *prod)
   str_copy(&config.rootimage, "/boot/root");
 #endif
   str_copy(&config.rescueimage, "/boot/rescue");
-  str_copy(&config.demoimage, "/boot/cd-demo");
+  str_copy(&config.live.image, "/boot/liveeval");
 }
 
 

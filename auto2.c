@@ -629,7 +629,8 @@ int auto2_init()
 #ifdef __i386__
   int net_cfg;
 #endif
-//  hd_t *hd;
+  hd_t *hd;
+  char buf[256];
 
   auto2_chk_frame_buffer();
 
@@ -642,6 +643,29 @@ int auto2_init()
 
   printf("\r%64s\r", "");
   fflush(stdout);
+
+  if(config.idescsi) {
+    strcpy(buf, "ignore=");
+    for(i = 0, hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+      if(
+        hd->bus.id == bus_ide &&
+        (config.idescsi > 1 || hd->is.cdr || hd->is.cdrw || hd->is.dvdr) &&
+        hd->unix_dev_name &&
+        !strncmp(hd->unix_dev_name, "/dev/hd", sizeof "/dev/hd" - 1)
+      ) {
+        sprintf(buf + strlen(buf), "%s%s", i ? "," : "", hd->unix_dev_name + 5);
+        i = 1;
+      }
+    }
+
+    if(i) {
+      mod_unload_module("ide-cd");
+      mod_insmod("ide-cd", buf);
+      mod_insmod("ide-scsi", NULL);
+      hd_list(hd_data, hw_cdrom, 1, NULL);
+    }
+  }
+
   fprintf(stderr, "Hardware probing finished.\n");
   fflush(stderr);
 
@@ -656,13 +680,6 @@ int auto2_init()
   if(!config.test) {
     if(mod_is_loaded("usb-storage")) {
       config.module.keep_usb_storage = 1;
-#if 0
-      for(hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
-        if(hd->hotplug == hp_usb) {
-          config.module.keep_usb_storage = 1;
-        }
-      }
-#endif
     }
     if(!config.module.keep_usb_storage) {
       mod_unload_module("usb-storage");

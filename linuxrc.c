@@ -656,7 +656,7 @@ void lxrc_init()
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
   config.mountpoint.instsys = strdup("/mounts/instsys");
-  config.mountpoint.eval = strdup("/mounts/eval");
+  config.mountpoint.live = strdup("/mounts/live");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("/sbin/inst_setup yast");
@@ -773,6 +773,9 @@ void lxrc_init()
 
   ft = file_get_cmdline(key_useusbscsi);
   if(ft && ft->is.numeric) config.use_usbscsi = ft->nvalue;
+
+  ft = file_get_cmdline(key_useidescsi);
+  if(ft && ft->is.numeric) config.idescsi = ft->nvalue;
 
   ft = file_get_cmdline(key_lxrcdebug);
   if(ft && ft->is.numeric) config.debug = ft->nvalue;
