@@ -26,11 +26,14 @@ typedef struct
     int            nr_texts;
     } alltexts_t;
 
+#ifndef __alpha__
 #include "lang/brasil.txt"
 #include "lang/dutch.txt"
+#endif
 #include "lang/english.txt"
 #include "lang/french.txt"
 #include "lang/german.txt"
+#ifndef __alpha__
 #include "lang/greek.txt"
 #include "lang/hungarian.txt"
 #include "lang/indonesia.txt"
@@ -43,15 +46,18 @@ typedef struct
 #include "lang/romanian.txt"
 #include "lang/czech.txt"
 #include "lang/breton.txt"
-
+#endif
 #define LANG_ENTRY(lang) lang, sizeof (lang) / sizeof (lang [0])
 
 static alltexts_t alltexts_arm [] =
     {
     { LANG_ENGLISH,    LANG_ENTRY (txt_english_atm)    },
     { LANG_GERMAN,     LANG_ENTRY (txt_german_atm)     },
+#ifndef __alpha__
     { LANG_ITALIAN,    LANG_ENTRY (txt_italian_atm)    },
+#endif
     { LANG_FRENCH,     LANG_ENTRY (txt_french_atm)     },
+#ifndef __alpha__
     { LANG_BRETON,     LANG_ENTRY (txt_breton_atm)     },
     { LANG_SPANISH,    LANG_ENTRY (txt_spanish_atm)    },
     { LANG_BRAZIL,     LANG_ENTRY (txt_brasil_atm)     },
@@ -65,6 +71,7 @@ static alltexts_t alltexts_arm [] =
     { LANG_ROMANIAN,   LANG_ENTRY (txt_romanian_atm)   },
     { LANG_CZECH,      LANG_ENTRY (txt_czech_atm)   },
     { LANG_HUNGARIA,   LANG_ENTRY (txt_hungarian_atm)  }
+#endif
     };
 
 #define NR_LANGUAGES (sizeof(alltexts_arm)/sizeof(alltexts_arm[0]))
