@@ -408,6 +408,12 @@ void lxrc_change_root2()
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
 
+  /* really necessary? */
+  umount2("/", MNT_DETACH);
+
+  /* put / entry back into /proc/mounts */
+  mount("/", "/", "none", MS_BIND, 0);
+
   execl("/sbin/init", "init", NULL);
 
   perror("init failed\n");
@@ -758,7 +764,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2004 SUSE LINUX AG <<<\n",
+      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2005 SUSE LINUX Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
