@@ -1,4 +1,8 @@
+15/5/2002:	v1.3.33
 	- mips changes
+	- fixed addswap option
+	- added hwcheck option
+	- make /suse tree from inst-sys available for ftp/http/tftp install
 
 17/4/2002:	v1.3.32
 	- fixed liveeval mode

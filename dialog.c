@@ -34,12 +34,13 @@ struct {
   int text_id;
   char *text;
 } dia_texts[] = {
-  { di_main_settings, TXT_SETTINGS,      },
-  { di_main_info,     TXT_MENU_INFO,     },
-  { di_main_modules,  TXT_MENU_MODULES,  },
-  { di_main_start,    TXT_MENU_START,    },
-  { di_main_reboot,   TXT_END_REBOOT,    },
-  { di_main_halt,     0, "Power off"     },
+  { di_main_settings, TXT_SETTINGS,       },
+  { di_main_info,     TXT_MENU_INFO,      },
+  { di_main_modules,  TXT_MENU_MODULES,   },
+  { di_main_start,    TXT_MENU_START,     },
+  { di_main_hwcheck,  0, "Hardware Check" },
+  { di_main_reboot,   TXT_END_REBOOT,     },
+  { di_main_halt,     0, "Power off"      },
 
   { di_set_lang,    TXT_MENU_LANG,    },
   { di_set_display, TXT_MENU_DISPLAY, },

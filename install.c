@@ -873,7 +873,7 @@ int inst_start_rescue()
 int inst_prepare()
 {
   char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
-  char link_source[MAX_FILENAME];
+  char link_source[MAX_FILENAME], buf[256];
   int i = 0, rc = 0;
 
   mod_free_modules();
@@ -919,6 +919,23 @@ int inst_prepare()
   if(!config.test) {
     // file_write_mtab();
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
+
+    /*
+     * In these cases, part of the "/suse" tree is in the installation system.
+     * We add a symlink to make it available below config.mountpoint.instdata.
+     */
+    if(
+      config.instmode == inst_ftp ||
+      config.instmode == inst_tftp ||
+      config.instmode == inst_http
+    ) {
+      sprintf(buf, "%s/suse", config.mountpoint.instdata);
+      unlink(buf);
+      if(!util_check_exist(buf)) {
+        sprintf(link_source, "%s/suse", config.mountpoint.instsys);
+        symlink(link_source, buf);
+      }
+    }
   }
 
 //  if(!config.use_ramdisk) rc = inst_init_cache();

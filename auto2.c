@@ -610,7 +610,7 @@ int auto2_init()
     fprintf(stderr, "There seems to be no floppy disk.\n");
   }
 
-  file_read_info();
+  if(!config.hwcheck) file_read_info();
 
   util_debugwait("got info file");
 
@@ -681,6 +681,8 @@ int auto2_init()
   util_debugwait("starting search for inst-sys");
 
   i = auto2_find_install_medium();
+
+  if(!i && config.hwcheck) i = 1;
 
 #ifdef __i386__
   /* ok, found something */
@@ -850,7 +852,7 @@ void auto2_chk_frame_buffer()
  */
 int auto2_find_floppy()
 {
-  hd_t *hd;
+  hd_t *hd, *hd0;
   hd_res_t *res;
   int i, small_floppy = 0;
   char *s;
@@ -867,15 +869,16 @@ int auto2_find_floppy()
     config.floppy_dev[i] = NULL;
   }
 
-  for(hd = hd_data->hd; hd; hd = hd->next) {
+  hd0 = hd_list(hd_data, hw_floppy, 1, NULL);
+
+  for(hd = hd0; hd; hd = hd->next) {
     if(
       config.floppies < sizeof config.floppy_dev / sizeof *config.floppy_dev &&
-      hd->base_class == bc_storage_device &&	/* is a storage device... */
-      hd->sub_class == sc_sdev_floppy &&	/* a floppy actually... */
       hd->unix_dev_name &&			/* and has a device name */
       !hd->is.notready				/* medium inserted */
     ) {
       config.floppy_dev[config.floppies++] = strdup(hd->unix_dev_name);
+      fprintf(stderr, "floppy: %s\n", hd->unix_dev_name);
       for(res = hd->res; res; res = res->next) {
         if(
           !small_floppy &&
@@ -886,6 +889,8 @@ int auto2_find_floppy()
       }
     }
   }
+
+  hd_free_hd_list(hd0);
 
   /* try 'real' floppy first */
   if(small_floppy) {

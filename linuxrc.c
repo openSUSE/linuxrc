@@ -152,7 +152,7 @@ static struct {
   { "nocmdline",  lx_nocmdline  }
 };
 
-static dia_item_t di_lxrc_main_menu_last = di_main_start;
+static dia_item_t di_lxrc_main_menu_last;
 
 
 int main(int argc, char **argv, char **env)
@@ -240,7 +240,13 @@ int main(int argc, char **argv, char **env)
       if(!win_old) util_disp_done();
       
     }
-    err = inst_start_install();
+    if(config.hwcheck) {
+      util_hwcheck();
+      err = 11;
+    }
+    else {
+      err = inst_start_install();
+    }
   }
 #endif
   else {
@@ -895,7 +901,7 @@ void lxrc_init()
   }
 
   /* for 'manual' */
-  if(!config.info.loaded) file_read_info();
+  if(!config.info.loaded && !config.hwcheck) file_read_info();
 	
   if(!auto2_ig) {
     util_disp_init();
@@ -950,13 +956,23 @@ void lxrc_main_menu()
     di_main_settings,
     di_main_info,
     di_main_modules,
-    di_main_start, 
+    di_main_start,
+    di_main_hwcheck,
     di_main_reboot,
     di_main_halt,
     di_none
   };
 
   util_manual_mode();
+
+  di_lxrc_main_menu_last = config.hwcheck ? di_main_hwcheck : di_main_start;
+
+  if(config.hwcheck) {
+    items[0] = items[1] = items[2] = items[3] = di_skip;
+  }
+  else {
+    items[4] = di_skip;
+  }
 
   for(;;) {
     di = dia_menu2(txt_get(TXT_HDR_MAIN), 40, lxrc_main_cb, items, di_lxrc_main_menu_last);
@@ -1007,6 +1023,11 @@ int lxrc_main_cb(dia_item_t di)
 
     case di_main_start:
       rc = inst_menu();
+      break;
+
+    case di_main_hwcheck:
+      util_hwcheck();
+      rc = 1;
       break;
 
     case di_main_reboot:

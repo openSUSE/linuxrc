@@ -113,4 +113,4 @@ void util_update_swap_list(void);
 int util_is_dir(char *dir);
 int util_is_mountable(char *file);
 void util_debugwait(char *msg);
-
+void util_hwcheck(void);

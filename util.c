@@ -869,6 +869,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.demo, "demo");
   add_flag(&sl0, buf, config.vnc, "vnc");
+  add_flag(&sl0, buf, config.hwcheck, "hwcheck");
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
   add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
@@ -3121,4 +3122,86 @@ void util_debugwait(char *msg)
   }
 #endif
 }
+
+#include "hwcheck.h"
+
+void util_hwcheck()
+{
+  int i, j;
+  static char *floppy = NULL, *log = NULL;
+  char buf[256], old_bg, old_fg;
+  window_t win;
+
+  fprintf(stderr, "Checking hardware...\n");
+  if(config.win) {
+    dia_info(&win, "Checking hardware");
+  }
+  else {
+    printf("Checking hardware...\n");
+    fflush(stdout);
+  }
+
+  i = do_hwcheck();
+
+  if(config.win) win_close(&win);
+
+  if(!config.win) util_disp_init();
+
+  old_bg = colors_prg->msg_win;
+  old_fg = colors_prg->msg_fg;
+
+  if(i) {
+    colors_prg->msg_win = COL_RED;
+    colors_prg->msg_fg = COL_BWHITE;
+  }
+  dia_show_file(!i ? "Hardware check results: Ready for SuSE Linux" : "Hardware check results", "/tmp/hw_overview.log", FALSE);
+
+  colors_prg->msg_win = old_bg;
+  colors_prg->msg_fg = old_fg;
+
+  i = dia_yesno("Save results?", NO);
+  if(i != YES) return;
+
+  if(!floppy) {
+    floppy = strdup(config.floppy_dev[0] ?: "/dev/fd0");
+  }
+
+  i = dia_input2("Floppy device name", &floppy, 30, 0);
+  if(i) return;
+
+  if(util_mount_rw(floppy, config.mountpoint.floppy)) {
+    dia_message("Unable to mount floppy", MSGTYPE_ERROR);
+    return;
+  }
+
+  if(!log || sscanf(log, "hw_%d.log", &i) == 1) {
+    for(i = 0; i < 100; i++) {
+      sprintf(buf, "%s/hw_%02d.log", config.mountpoint.floppy, i);
+      if(!util_check_exist(buf)) break;
+    }
+    sprintf(buf, "hw_%02d.log", i);
+    str_copy(&log, buf);
+  }
+  
+  i = dia_input2("Logfile name", &log, 30, 0);
+  if(i || !log || !*log) return;
+
+  sprintf(buf,
+    "cat /tmp/hw_overview.log /tmp/hw_detail.log >%s/%s",
+    config.mountpoint.floppy,
+    log
+  );
+
+  i = system(buf);
+
+  j = util_umount(config.mountpoint.floppy);
+
+  if(i || j) {
+    dia_message("Error writing logfile", MSGTYPE_ERROR);
+    return;
+  }
+
+  dia_message("Results saved", MSGTYPE_INFO);
+}
+
 

@@ -17,6 +17,7 @@ typedef enum {
   di_main_info,
   di_main_modules,
   di_main_start,
+  di_main_hwcheck,
   di_main_reboot,
   di_main_halt,
 

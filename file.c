@@ -172,7 +172,8 @@ static struct {
   { key_exec,           "Exec"             },
   { key_usbwait,        "USBWait"          },
   { key_nfsrsize,       "NFS.RSize"        },
-  { key_nfswsize,       "NFS.WSize"        }
+  { key_nfswsize,       "NFS.WSize"        },
+  { key_hwcheck,        "HWCheck"          }
 };
 
 static struct {
@@ -747,15 +748,15 @@ void file_do_info(file_t *f0)
         str_copy(&config.installdir, f->value);
         break;
 
+      case key_hwcheck:
       case key_rescue:
       case key_install:
-        if(f->key == key_rescue) {
-          config.rescue = 1;
+        i = f->is.numeric ? f->nvalue : 1;
+        config.rescue = f->key == key_rescue ? i : 0;
+        config.hwcheck = f->key == key_hwcheck ? i : 0;
+        if(config.rescue || config.hwcheck) {
           config.activate_storage = 1;
           config.activate_network = 1;
-        }
-        else {
-          config.rescue = 0;
         }
         url = parse_url(f->value);
         if(url && url->scheme) {
@@ -806,7 +807,7 @@ void file_do_info(file_t *f0)
 
       case key_addswap:
         if(f->is.numeric) {
-          if(f->is.numeric <= 0) {
+          if(f->nvalue <= 0) {
             config.addswap = f->nvalue;
           }
           else {

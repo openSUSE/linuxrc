@@ -188,6 +188,7 @@ typedef struct {
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
   unsigned demo:1;		/* start live cd */
+  unsigned hwcheck:1;		/* do hardware check */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   unsigned extramount:1;	/* mountpoints.extra is in use */
   unsigned instdata_mounted:1;	/* install data are mounted */
