@@ -718,7 +718,7 @@ int auto2_init()
   hd_t *hd;
   char buf[256];
 #if WITH_PCMCIA
-  int j;
+//  int j;
   hd_hw_item_t hw_items[] = { hw_cdrom, hw_network, 0 };
 #endif
 
@@ -786,6 +786,7 @@ int auto2_init()
     printf("Activating PCMCIA devices...");
     fflush(stdout);
 
+#if 0
     if(!util_check_exist("/modules/pcmcia_core" MODULE_SUFFIX)) {
       char buf[256], *t;
 
@@ -809,12 +810,13 @@ int auto2_init()
 
       util_disp_done();
     }
+#endif
 
-    if(
-      (i = mod_insmod("pcmcia_core", NULL)) ||
-      (i = mod_insmod(pcmcia_driver(2), pcmcia_params))   ||
-      (i = mod_insmod("ds", NULL))
-    );
+    config.module.delay += 1;
+
+    i = mod_modprobe(pcmcia_driver(2), pcmcia_params);
+    if(i) fprintf(stderr, "Error %d loading PCMCIA modules.\n", i);
+    i = 0;
 
     if(!i) {
       fprintf(stderr, "PCMCIA modules loaded - starting card manager.\n");
@@ -826,7 +828,7 @@ int auto2_init()
         fprintf(stderr, "card manager ok.\n");
       }
       /* wait for cards to be activated... */
-      sleep(is_vaio ? 10 : 2);
+      sleep(config.usbwait > 0 ? config.usbwait : is_vaio ? 10 : 6);
       /* check for cdrom & net devs */
       hd_list2(hd_data, hw_items, 1);
     }
@@ -837,6 +839,9 @@ int auto2_init()
     printf("\r%s%s", "Activating PCMCIA devices...", i ? " failed\n" : " done\n");
     fflush(stdout);
   }
+
+  config.module.delay -= 1;
+
 #endif
 
   util_splash_bar(40);

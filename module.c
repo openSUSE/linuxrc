@@ -983,6 +983,7 @@ int mod_load_pcmcia()
 
   sprintf(buf, txt_get(TXT_FOUND_PCMCIA), pcmcia_driver(type));
   ok = mod_load_modules("pcmcia_core", 1);
+  mod_load_modules("rsrc_nonstatic", 1);
 
   if(ok) {
     sprintf(buf, txt_get(TXT_PCMCIA_PARAMS), pcmcia_driver(type));
@@ -991,7 +992,7 @@ int mod_load_pcmcia()
 
   mod_param_text = NULL;
 
-  if(ok) ok = mod_load_modules("ds", 0);
+  if(ok) ok = mod_load_modules("pcmcia", 0);
 
   if(ok) {
     dia_status_on(&status, txt_get(TXT_START_CARDMGR));
@@ -1013,7 +1014,7 @@ int mod_load_pcmcia()
     }
     else {
       dia_info(&win, txt_get(TXT_PCMCIA_SUCCESS));
-      sleep(2);
+      sleep(4);
       win_close(&win);
     }
   }
@@ -1039,7 +1040,7 @@ int mod_pcmcia_chipset()
   static int last_item = 0;
   int type;
 
-  type = system("probe");
+  type = system("probe >&2");
   type >>= 8;
 
   if(type != 1 && type != 2) {
