@@ -63,6 +63,7 @@ static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_manual_tm         = "Manual:";
+static const char  *file_txt_demo_tm           = "Demo:";
 #if WITH_PCMCIA
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #endif
@@ -238,6 +239,7 @@ void file_write_yast_info (char *file_name)
         fprintf (file_pri, "SMP: 0\n");
 
     fprintf (file_pri, "%s %d\n", file_txt_manual_tm, auto_ig || auto2_ig ? 0 : 1);
+    fprintf (file_pri, "%s %d\n", file_txt_demo_tm, demo_ig);
 
 #ifdef USE_LIBHD
     if (mouse_dev_ig)

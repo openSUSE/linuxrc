@@ -772,12 +772,14 @@ char *auto2_xserver()
 char *auto2_disk_list(int *boot_disk)
 {
   static char buf[256];
+  char bdev[64];
   hd_t *hd;
   int matches;
   unsigned boot_idx;
 
   *boot_disk = 0;
   *buf = 0;
+  *bdev = 0;
   if(!hd_data) return buf;
 
   boot_idx = hd_boot_disk(hd_data, &matches);
@@ -786,11 +788,12 @@ char *auto2_disk_list(int *boot_disk)
     if(hd && hd->unix_dev_name) {
       *boot_disk = boot_idx;
       strcpy(buf, hd->unix_dev_name);
+      strcpy(bdev, hd->unix_dev_name);
     }
   }
   
   for(hd = hd_disk_list(hd_data, 1); hd; hd = hd->next) {
-    if(hd->idx != boot_idx && hd->unix_dev_name) {
+    if(hd->unix_dev_name && strcmp(bdev, hd->unix_dev_name)) {
       if(*buf) strcat(buf, " ");
       strcat(buf, hd->unix_dev_name);
     }
