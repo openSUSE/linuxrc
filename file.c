@@ -95,6 +95,7 @@ static const char  *file_txt_disks_tm          = "Disks:";
 static const char  *file_txt_braille_tm        = "Braille:";
 static const char  *file_txt_braille_dev_tm    = "Brailledevice:";
 #endif
+static const char  *file_txt_livesrc_tm        = "LiveSRC:";
 
 static void file_get_value   (char *input_tv, char *value_tr);
 static void file_trim_buffer (char *buffer_tr);
@@ -483,6 +484,12 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_netdevice_tm, buffer_ti,
                           strlen (file_txt_netdevice_tm)))
             strncpy (netdevice_tg, value_ti, sizeof (netdevice_tg));
+
+        if (!strncasecmp (file_txt_livesrc_tm, buffer_ti, strlen (file_txt_livesrc_tm)))
+            {
+            strncpy (livesrc_tg, value_ti, sizeof (livesrc_tg));
+            if((valid_net_config_ig & 0x20)) bootmode_ig = BOOTMODE_NET;
+            }
 
         if (!strncasecmp (file_txt_bootp_wait_tm, buffer_ti,
                           strlen (file_txt_bootp_wait_tm)))

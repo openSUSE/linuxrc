@@ -199,11 +199,14 @@ int inst_start_demo (void)
     sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
     file_pri = fopen (filename_ti, "a");
 
-    if (bootmode_ig == BOOTMODE_NET)
-        sprintf (line_ti, "%s:%s /S.u.S.E. nfs ro 0 0\n",
-                 inet_ntoa (nfs_server_rg), server_dir_tg);
+    if (bootmode_ig == BOOTMODE_NET && !*livesrc_tg)
+        {
+        sprintf (line_ti, "%s:%s /S.u.S.E. nfs ro 0 0\n", inet_ntoa (nfs_server_rg), server_dir_tg);
+        }
     else
-        sprintf (line_ti, "/dev/%s /S.u.S.E. iso9660 ro 0 0\n", cdrom_tg);
+        {
+        sprintf (line_ti, "/dev/%s /S.u.S.E. %s ro 0 0\n", *livesrc_tg ? livesrc_tg : cdrom_tg, *livesrc_tg ? "auto" : "iso9660");
+        }
 
     fprintf (file_pri, line_ti);
     fclose (file_pri);
