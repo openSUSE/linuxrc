@@ -757,20 +757,65 @@ char *auto2_usb_module()
   return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
 }
 
-char *auto2_xserver()
+/*
+ * Assumes xf86_ver to be either "3" or "4" (or empty).
+ */
+char *auto2_xserver(char **version)
 {
   static char display[16];
-  driver_info_t *di;
+  static char xf86_ver[2];
+  char c, *x11i = getenv("x11i");
+  driver_info_t *di, *di0;
+
+  *display = *xf86_ver = c = 0;
+  *version = xf86_ver;
+
+  if(x11i) {
+    if(*x11i == '3' || *x11i == '4') {
+      c = *x11i;
+    }
+    else {
+      if(*x11i >= 'A' && *x11i <= 'Z') {
+        c = '3';
+      }
+      if(*x11i >= 'a' && *x11i <= 'z') {
+        c = '4';
+      }
+      if(c) {
+        strncpy(display, x11i, sizeof display - 1);
+        display[sizeof display - 1] = 0;
+      }
+    }
+  }
+
+  if(c) { xf86_ver[0] = c; xf86_ver[1] = 0; }
+
+  if(*display) return display;
 
   if(!hd_data) return NULL;
 
-  *display = 0;
-  di = hd_driver_info(hd_data, hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data)));
-  if(di && di->any.type == di_x11 && di->x11.server) {
-    strncpy(display, di->x11.server, sizeof display - 1);
-    display[sizeof display - 1] = 0;
+  di0 = hd_driver_info(hd_data, hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data)));
+  for(di = di0; di; di = di->next) {
+    if(di->any.type == di_x11 && di->x11.server && di->x11.xf86_ver && !di->x11.x3d) {
+      if(c == 0 || c == di->x11.xf86_ver[0]) {
+        xf86_ver[0] = di->x11.xf86_ver[0];
+        xf86_ver[1] = 0;
+        strncpy(display, di->x11.server, sizeof display - 1);
+        display[sizeof display - 1] = 0;
+        break;
+      }
+    }
   }
-  hd_free_driver_info(di);
+
+  hd_free_driver_info(di0);
+
+  if(*display) return display;
+
+  if(c == 0) c = '4';
+
+  xf86_ver[0] = c;
+  xf86_ver[1] = 0;
+  strcpy(display, c == '3' ? "VGA16" : "vga");
 
   return display;
 }

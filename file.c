@@ -82,6 +82,7 @@ static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
 static const char  *file_txt_usb_tm            = "USB:";
 static const char  *file_txt_xserver_tm        = "XServer:";
+static const char  *file_txt_xversion_tm       = "XVersion:";
 static const char  *file_probe_tm              = "probe:";
 static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
@@ -261,8 +262,12 @@ void file_write_yast_info (char *file_name)
 
     fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
     {
-      char *s = auto2_xserver();
-      if(s) fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
+      char *s, *t;
+      s = auto2_xserver(&t);
+      if(s && t) {
+        fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
+        fprintf (file_pri, "%s %s\n", file_txt_xversion_tm, t);
+      }
     }
     if(*xkbrules_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbrules_tm, xkbrules_tg);
     if(*xkbmodel_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbmodel_tm, xkbmodel_tg);
