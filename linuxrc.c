@@ -656,6 +656,7 @@ void lxrc_init()
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
   config.mountpoint.instsys = strdup("/mounts/instsys");
+  config.mountpoint.eval = strdup("/mounts/eval");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("/sbin/inst_setup yast");

@@ -327,6 +327,7 @@ typedef struct {
     char *extra;
     char *instdata;
     char *instsys;
+    char *eval;
   } mountpoint;
 
   struct {
