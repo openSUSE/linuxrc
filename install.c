@@ -77,7 +77,6 @@ static int   inst_ftp                 (void);
 static int   inst_get_ftpsetup        (void);
 static int   inst_choose_yast_version (void);
 
-
 int inst_auto_install (void)
     {
     int       rc_ii;
@@ -753,6 +752,8 @@ static int inst_prepare (void)
 
     setenv ("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
+    system ("/usr/sbin/syslogd");
+
 #ifdef USE_LIBHD   
     auto2_find_braille();
 #endif
@@ -1380,3 +1381,4 @@ int inst_auto2_install()
 }
 
 #endif	/* USE_LIBHD */
+
