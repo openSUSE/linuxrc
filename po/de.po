@@ -898,3 +898,7 @@ msgstr "Abbrechen"
 msgid "No new modules found."
 msgstr "Es wurden keine neuen Module gefunden."
 
+#. TXT_CHOOSE_PARTITION
+msgid "Please choose the harddisk partition."
+msgstr "Bitte wählen Sie die Festplatten-Partition."
+

@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <sys/kd.h>
 #include <sys/utsname.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <time.h>
 #include <syscall.h>
@@ -93,6 +94,10 @@ static int rec_level = 0;
 static int do_cp(char *src, char *dst);
 static char *walk_hlink_list(ino_t ino, dev_t dev, char *dst);
 static void free_hlink_list(void);
+
+static char *util_attach_loop(char *file, int ro);
+static int util_detach_loop(char *dev);
+
 
 void util_redirect_kmsg (void)
     {
@@ -596,40 +601,64 @@ void util_disp_done()
 }
 
 
-/*
- * umount() with error message
- */
-int util_umount(char *mp)
+int util_umount(char *dir)
 {
-#ifdef LXRC_DEBUG
   int i;
+  file_t *f0, *f;
+  struct stat sbuf;
 
-  if((i = umount(mp))) {
-    i = errno;
-    if(i != ENOENT && i != EINVAL) {
-      fprintf(stderr, "umount %s failed: %d\n", mp, i);
+  if(!dir) return -1;
+
+  if(stat(dir, &sbuf)) return -1;
+
+  // fprintf(stderr, "umount: >%s<\n", dir);
+
+  f0 = file_read_file("/proc/mounts");
+
+  if((i = umount(dir))) {
+    // fprintf(stderr, "umount: %s: %s\n", dir, strerror(errno));
+    if(errno != ENOENT && errno != EINVAL) {
+      if(config.run_as_linuxrc) fprintf(stderr, "umount: %s: %s\n", dir, strerror(errno));
     }
   }
-  else {
-    fprintf(stderr, "umount %s ok\n", mp);
+
+  if(!i) {
+    for(f = f0; f; f = f->next) {
+      if(
+        strstr(f->key_str, "/dev/loop") == f->key_str &&
+        strstr(f->value, dir) == f->value &&
+        isspace(f->value[strlen(dir)])
+      ) {
+        util_detach_loop(f->key_str);
+      }
+    }
+  }
+
+  file_free_file(f0);
+
+  if(!i && strstr(dir, "/mounts/") == dir) {
+    rmdir(dir);
   }
 
   return i;
-#else
-  return umount(mp);
-#endif
 }
 
 int _util_eject_cdrom(char *dev)
 {
   int fd;
+  char buf[64];
 
-  if(!dev || !*dev) return 0;
+  if(!dev) return 0;
+
+  if(strstr(dev, "/dev/") != dev) {
+    sprintf(buf, "/dev/%s", dev);
+    dev = buf;
+  }
 
   fprintf(stderr, "eject %s\n", dev);
 
   if((fd = open(dev, O_RDONLY | O_NONBLOCK)) < 0) return 1;
-  umount(dev);
+  util_umount(dev);
   if(ioctl(fd, CDROMEJECT, NULL) < 0) { close(fd); return 2; }
   close(fd);
 
@@ -638,22 +667,14 @@ int _util_eject_cdrom(char *dev)
 
 int util_eject_cdrom(char *dev)
 {
-#ifdef USE_LIBHD
-  hd_data_t *hd_data;
-  hd_t *hd;
-#endif
+  slist_t *sl;
 
-  if(dev && *dev) return _util_eject_cdrom(dev);
+  if(dev) return _util_eject_cdrom(dev);
+  util_update_cdrom_list();
 
-#ifdef USE_LIBHD
-  hd_data = calloc(1, sizeof *hd_data);
-  for(hd = hd_list(hd_data, hw_cdrom, 1, NULL); hd; hd = hd->next) {
-    _util_eject_cdrom(hd->unix_dev_name);
+  for(sl = config.cdroms; sl; sl = sl->next) {
+    _util_eject_cdrom(sl->key);
   }
-  hd_free_hd_list(hd);
-  hd_free_hd_data(hd_data);
-  free(hd_data);
-#endif
 
   return 0;
 }
@@ -880,9 +901,9 @@ void util_status_info()
   }
 
   sprintf(buf,
-    "memory (kB): total %d, free %d (%d), min %d",
+    "memory (kB): total %d, free %d (%d), min %d/%d",
     config.memory.total, config.memory.current,
-    config.memory.free, config.memory.min_free
+    config.memory.free, config.memory.min_free, config.memory.min_modules
   );
   slist_append_str(&sl0, buf);
 
@@ -950,7 +971,7 @@ void util_status_info()
   strcat(buf, " )");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
+  sprintf(buf, "suse_cd = %d", found_suse_cd_ig);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "driver_update = \"%s\"", driver_update_dir);
@@ -1040,6 +1061,35 @@ void util_status_info()
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
   slist_append_str(&sl0, buf);
+
+  strcpy(buf, "cdroms:");
+  slist_append_str(&sl0, buf);
+  for(sl = config.cdroms; sl; sl = sl->next) {
+    if(!sl->key) continue;
+    i = config.cdrom && !strcmp(sl->key, config.cdrom) ? 1 : 0;
+    sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
+    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+    slist_append_str(&sl0, buf);
+  }
+
+  strcpy(buf, "disks:");
+  slist_append_str(&sl0, buf);
+  for(sl = config.disks; sl; sl = sl->next) {
+    if(!sl->key) continue;
+    sprintf(buf, "  %s", sl->key);
+    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+    slist_append_str(&sl0, buf);
+  }
+
+  strcpy(buf, "partitions:");
+  slist_append_str(&sl0, buf);
+  for(sl = config.partitions; sl; sl = sl->next) {
+    if(!sl->key) continue;
+    i = config.partition && !strcmp(sl->key, config.partition) ? 1 : 0;
+    sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
+    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+    slist_append_str(&sl0, buf);
+  }
 
   for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
     if(config.ramdisk[i].inuse) {
@@ -1502,7 +1552,7 @@ int util_lsof_main(int argc, char **argv)
 
 int util_mount_main(int argc, char **argv)
 {
-  int i;
+  int i, notype = 0;
   char *dir, *srv_dir;
   char *type = NULL, *dev, *module;
   inet_t inet = {};
@@ -1538,12 +1588,19 @@ int util_mount_main(int argc, char **argv)
       type = "nfs";
     }
     else {
+      notype = 1;
       type = util_fstype(dev, &module);
       if(module) {
-        return fprintf(stderr, "fs type not supported, load module \"%s\" first\n", module), 2;
+        return fprintf(stderr, "mount: fs type not supported, load module \"%s\" first\n", module), 2;
       }
     }
-    if(!type) return fprintf(stderr, "no fs type given\n"), 2;
+    // if(!type) return fprintf(stderr, "mount: no fs type given\n"), 2;
+  }
+
+  if(notype) {
+    if(!util_mount(dev, dir, 0)) return 0;
+    perror("mount");
+    return errno;
   }
 
   if(strcmp(type, "nfs")) {
@@ -1584,7 +1641,7 @@ int util_umount_main(int argc, char **argv)
 
   if(argc != 1) fprintf(stderr, "u%s", "mount: invalid number of arguments\n"), 1;
 
-  i = force ? umount(*argv) : umount2(*argv, MNT_FORCE);
+  i = force ? umount2(*argv, MNT_FORCE) : util_umount(*argv);
 
   if(!i) return 0;
 
@@ -2378,12 +2435,13 @@ url_t *parse_url(char *str)
  */
 void str_copy(char **dst, char *src)
 {
+  char *s;
+
   if(!dst) return;
 
+  s = src ? strdup(src) : NULL;
   if(*dst) free(*dst);
-  *dst = NULL;
-
-  if(src) *dst = strdup(src);
+  *dst = s;
 }
 
 
@@ -2693,9 +2751,61 @@ char *util_fstype(char *dev, char **module)
 }
 
 
+
+/*
+ * returns loop device used
+ */
+char *util_attach_loop(char *file, int ro)
+{
+  struct loop_info loopinfo;
+  int fd, rc, i, device;
+  static char buf[32];
+
+  if((fd = open(file, ro ? O_RDONLY : O_RDWR)) < 0) {
+    perror(file);
+    return NULL;
+  }
+
+  for(i = 0; i < 8; i++) {
+    sprintf(buf, "/dev/loop%d", i);
+    if((device = open(buf, ro ? O_RDONLY : O_RDWR)) >= 0) {
+      memset(&loopinfo, 0, sizeof loopinfo);
+      strcpy(loopinfo.lo_name, file);
+      rc = ioctl(device, LOOP_SET_FD, fd);
+      if(rc != -1) rc = ioctl(device, LOOP_SET_STATUS, &loopinfo);
+      close(device);
+      if(rc != -1) break;
+    }
+  }
+
+  close(fd);
+
+  return i < 8 ? buf : NULL;
+}
+
+
+int util_detach_loop(char *dev)
+{
+  int i, fd;
+
+  if((fd = open(dev, O_RDONLY)) < 0) {
+    perror(dev);
+    return -1;
+  }
+
+  if((i = ioctl(fd, LOOP_CLR_FD, 0)) == -1) {
+    perror(dev);
+  }
+
+  close(fd);
+
+  return i;
+}
+
+
 int util_mount(char *dev, char *dir, unsigned long flags)
 {
-  char *type;
+  char *type, *loop_dev;
   int err = -1;
   static char *fs_types[] = {
     "minix", "ext2", "reiserfs", "xfs",
@@ -2703,13 +2813,55 @@ int util_mount(char *dev, char *dir, unsigned long flags)
     0
   };
   char **fs_type = fs_types;
+  struct stat sbuf;
 
   if(!dev || !dir) return -1;
 
+  if(strstr(dir, "/mounts/") == dir && stat(dir, &sbuf)) {
+    mkdir(dir, 0755);
+  }
+
+  if(stat(dev, &sbuf)) {
+    fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
+    return -1;
+  }
+
+  if(S_ISDIR(sbuf.st_mode)) {
+    err = mount(dev, dir, "none", MS_BIND, 0);
+    if(err && config.run_as_linuxrc) {
+      fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
+    }
+    return err;
+  }
+
+  if(!S_ISREG(sbuf.st_mode) && !S_ISBLK(sbuf.st_mode)) {
+    fprintf(stderr, "mount: %s: not a block device\n", dev);
+    return -1;
+  }
+
   type = util_fstype(dev, NULL);
+
+  if(type &&
+    (
+      S_ISREG(sbuf.st_mode) ||
+      (!strcmp(type, "cramfs") && strstr(dev, "/dev/ram") == dev)
+    )
+  ) {
+    if(config.run_as_linuxrc) fprintf(stderr, "mount: %s: we need a loop device\n", dev);
+    loop_dev = util_attach_loop(dev, (flags & MS_RDONLY) ? 1 : 0);
+    if(!loop_dev) {
+      fprintf(stderr, "mount: no usable loop device found\n");
+      return -1;
+    }
+    if(config.run_as_linuxrc) fprintf(stderr, "mount: using %s\n", loop_dev);
+    dev = loop_dev;
+  }
 
   if(type) {
     err = mount(dev, dir, type, flags, 0);
+    if(err && config.run_as_linuxrc) {
+      fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
+    }
   }
   else {
     fprintf(stderr, "%s: unknown fs type\n", dev);
@@ -2733,5 +2885,108 @@ int util_mount_ro(char *dev, char *dir)
 int util_mount_rw(char *dev, char *dir)
 {
   return util_mount(dev, dir, 0);
+}
+
+
+int util_update_disk_list(char *module, int add)
+{
+  str_list_t *hsl;
+  slist_t *sl;
+  int added = 0;
+
+  hd_data_t *hd_data = calloc(1, sizeof *hd_data);
+
+  hd_set_probe_feature(hd_data, pr_partition);
+  hd_scan(hd_data);
+
+  for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
+    sl = slist_getentry(config.disks, hsl->str);
+    if(!sl && add) {
+      sl = slist_append_str(&config.disks, hsl->str);
+      str_copy(&sl->value, module);
+      added++;
+    }
+    else if(sl && !add) {
+      str_copy(&sl->key, NULL);
+      str_copy(&sl->value, NULL);
+    }
+  }
+
+  for(hsl = hd_data->partitions; hsl; hsl = hsl->next) {
+    sl = slist_getentry(config.partitions, hsl->str);
+    if(!sl && add) {
+      sl = slist_append_str(&config.partitions, hsl->str);
+      str_copy(&sl->value, module);
+      added++;
+    }
+    else if(sl && !add) {
+      str_copy(&sl->key, NULL);
+      str_copy(&sl->value, NULL);
+    }
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  return added;
+}
+
+
+void util_update_cdrom_list()
+{
+  slist_t *sl;
+  file_t *f0, *f;
+  char *s, *t;
+
+  config.cdroms = slist_free(config.cdroms);
+
+  f0 = file_read_file("/proc/sys/dev/cdrom/info");
+
+  for(f = f0; f; f = f->next) {
+    if(!strcmp(f->key_str, "drive") && strstr(f->value, "name:") == f->value) {
+      s = strchr(f->value, ':') + 1;
+      while((t = strsep(&s, " \t\n"))) {
+        if(!*t) continue;
+        sl = slist_add(&config.cdroms, slist_new());
+        str_copy(&sl->key, t);
+      }
+      break;
+    }
+  }
+
+  file_free_file(f0);
+}
+
+
+int util_is_dir(char *dir)
+{
+  struct stat sbuf;
+
+  if(stat(dir, &sbuf)) return 0;
+
+  return S_ISDIR(sbuf.st_mode) ? 1 : 0;
+}
+
+
+int util_is_mountable(char *file)
+{
+  int i, compressed = 0;
+
+  i = util_fileinfo(file, NULL, &compressed);
+
+  return i || compressed ? 0 : 1;
+}
+
+
+void util_wait(char *msg)
+{
+#ifdef LXRC_DEBUG
+  if((guru_ig & 8)) {
+    int win_old;
+    if(!(win_old = config.win)) util_disp_init();
+    dia_message(msg ?: "hi", MSGTYPE_INFO);
+    if(!win_old) util_disp_done();
+  }
+#endif
 }
 

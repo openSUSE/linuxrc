@@ -1097,7 +1097,7 @@ void dia_handle_ctrlc (void)
       exit(0);
     }
     else if(i == -69) {
-      i = dia_input("run command", s, sizeof s - 1, 35);
+      i = dia_input("Run Command", s, sizeof s - 1, 35);
       if(!i) {
         if(strstr(s, "exec ") == s) {
           t = s + 5;

@@ -186,7 +186,7 @@ fstype(const char *device) {
     /* opening and reading an arbitrary unknown path can have
        undesired side effects - first check that `device' refers
        to a block device */
-    if (stat (device, &statbuf) || !S_ISBLK(statbuf.st_mode))
+    if (stat (device, &statbuf) || !(S_ISBLK(statbuf.st_mode) || S_ISREG(statbuf.st_mode)))
       return 0;
 
     fd = open(device, O_RDONLY);
@@ -413,8 +413,8 @@ fstype(const char *device) {
 io_error:
     if (errno)
 	 perror(device);
-    else
-	 fprintf(stderr, "fstype: error while guessing filesystem type\n");
+//    else
+//	 fprintf(stderr, "fstype: error while guessing filesystem type\n");
     close(fd);
     return 0;
 }

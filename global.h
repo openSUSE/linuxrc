@@ -213,9 +213,16 @@ typedef struct {
   unsigned rescue:1;		/* start rescue system */
   unsigned live:1;		/* start live cd */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
+  unsigned extramount:1;	/* mountpoints.extra is in use */
+  unsigned instdata_mounted:1;	/* install data are mounted */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
+  slist_t *disks;		/* list of harddisk */
+  slist_t *partitions;		/* list of partitions */
+  char *partition;		/* currently used partition (hd install) */
+  slist_t *cdroms;		/* list of cdroms */
+  char *cdrom;			/* currently used cdrom */
   char *instsys;		/* installation system mount point */
   struct {
     char *file;			/* 'info' file name */
@@ -235,6 +242,11 @@ typedef struct {
   instmode_t instmode;		/* ftp, nfs, smb, etc. */
   instmode_t instmode_extra;	/* for the stranger things... */
   int inst_ramdisk;		/* ramdisk with instsys */
+  char *new_root;		/* root device to boot */
+  char *installdir;		/* "/suse/inst-sys" */
+  char *rootimage;		/* "/suse/images/root" */
+  char *rescueimage;		/* "/suse/images/rescue" */
+  char *demoimage;		/* "/suse/images/cd-demo" */
 
   struct {
     char *buf;
@@ -262,6 +274,7 @@ typedef struct {
     int total;			/* memory size (in kB) */
     int free;			/* free memory (in kB) when linuxrc starts */
     int min_free;		/* don't let it drop below this */
+    int min_modules;		/* remove modules before starting yast, if it drops below this */
     int current;		/* currently free memory */
   } memory;
 
@@ -276,6 +289,9 @@ typedef struct {
   struct {			/* mountpoints */
     char *floppy;
     char *ramdisk2;
+    char *extra;
+    char *instdata;
+    char *instsys;
   } mountpoint;
 
   struct {
@@ -325,10 +341,7 @@ extern char           *inst_mountpoint_tg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
-extern char            installdir_tg [MAX_FILENAME];
-extern char            harddisk_tg [12];
 extern char            netdevice_tg [20];
-extern char            cdrom_tg [20];
 extern int             pcmcia_chip_ig;
 extern uint64_t        memory_ig;
 extern int             cpu_ig;
@@ -349,7 +362,6 @@ extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];
 extern char            console_parms_tg [30];
-extern int             smp_ig;
 extern int             guru_ig;
 extern int             text_mode_ig;
 extern int             yast2_update_ig;

@@ -39,6 +39,7 @@
 #define BLOCKSIZE	10240
 #define BLOCKSIZE_KB	(BLOCKSIZE >> 10)
 
+#if 0
 typedef struct
     {
     char *dev_name;
@@ -131,6 +132,7 @@ static device_t root_devices_arm [] =
     { "md3",         9,   3 },
     { 0,             0,   0 }
 };
+#endif
 
 static int       root_nr_blocks_im;
 static window_t  root_status_win_rm;
@@ -300,13 +302,15 @@ void ramdisk_free(int rd)
 
   ramdisk_close(rd);
 
-  if(ramdisk_umount(rd)) return;
+  ramdisk_umount(rd);
 
   i = util_free_ramdisk(config.ramdisk[rd].dev);
 
   if(!i) {
     config.ramdisk[rd].inuse = 0;
     config.ramdisk[rd].size = 0;
+    str_copy(&config.ramdisk[rd].mountpoint, NULL);
+    util_update_meminfo();
   }
 }
 
@@ -346,11 +350,9 @@ int ramdisk_umount(int rd)
 
   if(!config.ramdisk[rd].mountpoint) return 0;
 
-  if(!(i = umount(config.ramdisk[rd].mountpoint))) {
+  i = util_umount(config.ramdisk[rd].mountpoint);
+  if(!i || errno == ENOENT || errno == EINVAL) {
     str_copy(&config.ramdisk[rd].mountpoint, NULL);
-  }
-  else {
-    fprintf(stderr, "umount: %s: %s\n", config.ramdisk[rd].dev, strerror(errno));
   }
 
   return i;
@@ -393,6 +395,7 @@ int ask_for_swap(int size)
     if(!(win_old = config.win)) util_disp_init();
     strcpy(tmp, "There is not enough memory to load all data.\n\nTo continue, activate some swap space.");
     i = dia_contabort(tmp, NO);
+    util_free_mem();
     if(!win_old) util_disp_done();
     if(i != YES) return -1;
   }
@@ -408,7 +411,7 @@ int load_image(char *file_name, instmode_t mode)
 {
   char buffer[BLOCKSIZE], cramfs_name[17];
   int bytes_read, current_pos;
-  int i, rc, compressed;
+  int i, rc, compressed = 0;
   int err = 0, got_size = 0;
   char *real_name = NULL;
   char *buf2;
@@ -458,7 +461,7 @@ int load_image(char *file_name, instmode_t mode)
 
   if(err) {
     net_close(fd_read);
-    ramdisk_close(image.rd);
+    ramdisk_free(image.rd);
     return -1;
   }
 
@@ -605,16 +608,44 @@ int root_check_root(char *root_string_tv)
 }
 
 
-void root_set_root (char *root_string_tv)
-    {
+void root_set_root(char *dev)
+{
+  FILE  *f;
+  int root;
+  struct stat sbuf;
+
+  str_copy(&config.new_root, dev);
+
+  if(stat(dev, &sbuf) || !S_ISBLK(sbuf.st_mode)) {
+    fprintf(stderr, "new root: %s\n", config.new_root);
+    return;
+  }
+
+  root = (major(sbuf.st_rdev) << 8) + minor(sbuf.st_rdev);
+  root *= 0x10001;
+
+  fprintf(stderr,
+    "new root: %s (major 0x%x, minor 0x%x)\n",
+    config.new_root, major(sbuf.st_rdev), minor(sbuf.st_rdev)
+  );
+
+  if(!(f = fopen ("/proc/sys/kernel/real-root-dev", "w"))) return;
+  fprintf(f, "%d\n", root);
+  fclose(f);
+}
+
+
+#if 0
+void root_set_root(char *root_string_tv)
+{
     FILE  *proc_root_pri;
     int    root_ii;
     char  *tmp_string_pci;
     int    found_ii = FALSE;
     int    i_ii = 0;
 
+  str_copy(&config.new_root, root_string_tv);
 
-    lxrc_new_root = strdup (root_string_tv);
     if (!strncmp ("/dev/", root_string_tv, 5))
         tmp_string_pci = root_string_tv + 5;
     else
@@ -642,8 +673,8 @@ void root_set_root (char *root_string_tv)
 
     fprintf (proc_root_pri, "%d\n", root_ii);
     fclose (proc_root_pri);
-    }
-
+}
+#endif
 
 int root_boot_system()
 {

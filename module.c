@@ -578,7 +578,11 @@ void mod_unload_module(char *module)
   err = system(cmd);
   util_update_kernellog();
 
-  if(!err) mod_update_netdevice_list(module, 0);
+  if(!err) {
+    mod_update_netdevice_list(module, 0);
+    util_update_disk_list(module, 0);
+    util_update_cdrom_list();
+  }
 }
 
 
@@ -758,6 +762,10 @@ int mod_load_module(char *module, char *param)
 
   strcat(buf, " >&2");
 
+  mod_update_netdevice_list(NULL, 1);
+  util_update_disk_list(NULL, 1);
+  util_update_cdrom_list();
+
   if(mod_show_kernel_messages) kbd_switch_tty(4);
 
   err = system(buf);
@@ -781,7 +789,11 @@ int mod_load_module(char *module, char *param)
   }
 #endif
 
-  if(!err) mod_update_netdevice_list(module, 1);
+  if(!err) {
+    mod_update_netdevice_list(module, 1);
+    util_update_disk_list(module, 1);
+    util_update_cdrom_list();
+  }
 
   return err;
 }

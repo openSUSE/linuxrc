@@ -800,3 +800,7 @@ msgstr ""
 msgid "No new modules found."
 msgstr ""
 
+#. TXT_CHOOSE_PARTITION
+msgid "Please choose the harddisk partition."
+msgstr ""
+

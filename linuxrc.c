@@ -63,7 +63,6 @@ static void lxrc_halt          (void);
 static pid_t lxrc_mempid_rm;
 static int lxrc_sig11_im = FALSE;
 static char **lxrc_argv;
-const char *lxrc_new_root;
 static char **saved_environment;
 extern char **environ;
 static void lxrc_movetotmpfs(void);
@@ -215,7 +214,7 @@ int main(int argc, char **argv, char **env)
       util_disp_init();
       set_choose_keytable(1);
     }
-    err = inst_auto2_install();
+    err = inst_start_install();
   }
 #endif
   else {
@@ -306,7 +305,7 @@ void lxrc_change_root (void)
 
 #ifdef SYS_pivot_root
   umount ("/mnt");
-  util_mount_ro(lxrc_new_root, "/mnt");
+  util_mount_ro(config.new_root, "/mnt");
   chdir ("/mnt");
   if (
 #ifndef DIET
@@ -345,7 +344,6 @@ void lxrc_end (void)
     {
     int i;
 
-    deb_msg("lxrc_end()");
     kill (lxrc_mempid_rm, 9);
     lxrc_killall (1);
     while(waitpid(-1, NULL, WNOHANG) == 0);
@@ -358,6 +356,11 @@ void lxrc_end (void)
     (void) util_umount (mountpoint_tg);
     lxrc_set_modprobe ("/sbin/modprobe");
     lxrc_set_bdflush (40);
+
+    deb_str(config.new_root);
+
+    util_wait("leaving now");
+
     if(!config.test) {
       (void) util_umount ("/proc/bus/usb");
       (void) util_umount ("/proc");
@@ -366,7 +369,7 @@ void lxrc_end (void)
     kbd_end ();
     disp_end ();
 #ifdef USE_LXRC_CHANGE_ROOT
-    if (lxrc_new_root)
+    if (config.new_root)
       lxrc_change_root();
 #endif
     }
@@ -551,6 +554,14 @@ void lxrc_init()
   config.module.dir = strdup("/modules");
   config.mountpoint.floppy = strdup("/mounts/floppy");
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
+  config.mountpoint.extra = strdup("/mounts/extra");
+  config.mountpoint.instsys = strdup("/mounts/instsys");
+  config.mountpoint.instdata = strdup("/var/adm/mount");
+
+  config.installdir = strdup("/suse/inst-sys");
+  config.rootimage = strdup("/suse/images/root");
+  config.rescueimage = strdup("/suse/images/rescue");
+  config.demoimage = strdup("/suse/images/cd-demo");
 
   /* just a default for manual mode */
   config.floppies = 1;
@@ -574,10 +585,6 @@ void lxrc_init()
 
   config.inst_ramdisk = -1;
   config.module.ramdisk = -1;
-
-  util_free_mem();
-  config.memory.min_free = 10240;	// at least 10MB
-  if(config.memory.free < config.memory.min_free) config.memory.min_free = config.memory.free;
 
   if((s = getenv("lang"))) {
     i = set_langidbyname(s);
@@ -721,6 +728,14 @@ void lxrc_init()
     }
   }
 
+  util_free_mem();
+
+  config.memory.min_free = 10 * 1024;		// at least 10MB
+  config.memory.min_modules = 64 * 1024;	// at least 64MB
+  if(config.memory.free < config.memory.min_free) {
+    config.memory.min_free = config.memory.free;
+  }
+
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");
   lxrc_set_bdflush(5);
@@ -754,6 +769,8 @@ void lxrc_init()
   lxrc_memcheck();
 
   mod_init();
+  util_update_disk_list(NULL, 1);
+  util_update_cdrom_list();
 
   if(!(config.test || serial_ig)) {
     util_start_shell("/dev/tty9", "/bin/lsh", 0);

@@ -520,15 +520,11 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_expert_rootimage:
-      strcpy(tmp, rootimage_tg);
-      rc = dia_input(txt_get(TXT_ENTER_ROOTIMAGE), tmp, sizeof tmp - 1, 30);
-      if(!rc) strcpy(rootimage_tg, tmp);
+      rc = dia_input2(txt_get(TXT_ENTER_ROOTIMAGE), &config.rootimage, 30, 0);
       break;
 
     case di_expert_instsys:
-      strcpy(tmp, installdir_tg);
-      rc = dia_input(txt_get(TXT_ENTER_INST_SYS), tmp, sizeof tmp - 1, 30);
-      if(!rc) strcpy (installdir_tg, tmp);
+      rc = dia_input2(txt_get(TXT_ENTER_INST_SYS), &config.installdir, 30, 0);
       break;
 
     case di_expert_nfsport:

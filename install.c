@@ -47,6 +47,7 @@
 #include "install.h"
 #include "settings.h"
 #include "auto2.h"
+#include "fstype.h"
 
 
 #define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
@@ -55,16 +56,12 @@
 
 static char  inst_rootimage_tm [MAX_FILENAME];
 static int   inst_rescue_im = FALSE;
-static int   inst_loopmount_im = FALSE;
-static char *inst_tmpmount_tm = "/tmp/loopmount";
-static char  inst_rescuefile_tm [MAX_FILENAME];
 static char *inst_demo_sys_tm = "/suse/images/cd-demo";
 
 static int   inst_mount_harddisk      (void);
 static int   inst_try_cdrom           (char *device_tv);
 static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
-static int   inst_start_install       (void);
 static int   inst_start_rescue        (void);
 //static void  inst_start_shell         (char *tty_tv);
 static int   inst_prepare             (void);
@@ -142,8 +139,7 @@ int inst_auto_install (void)
         if (rc_ii)
             return (rc_ii);
 
-        mkdir (inst_mountpoint_tg, 0777);
-        rc_ii = util_mount_ro (RAMDISK_2, inst_mountpoint_tg);
+        rc_ii = util_mount_ro (RAMDISK_2, config.mountpoint.instsys);
         if (rc_ii)
             return (rc_ii);
         }
@@ -236,7 +232,7 @@ int inst_start_demo (void)
         {
         sprintf(line_ti,
           "/dev/%s /S.u.S.E. %s ro 0 0\n",
-          *livesrc_tg ? livesrc_tg : cdrom_tg,
+          *livesrc_tg ? livesrc_tg : config.cdrom,
           *livesrc_tg ? "auto" : "iso9660"
         );
         }
@@ -279,7 +275,6 @@ int inst_menu()
 int inst_menu_cb(dia_item_t di)
 {
   int error = 0;
-  char s[64];
   int rc = 1;
 
   di_inst_menu_last = di;
@@ -308,8 +303,7 @@ int inst_menu_cb(dia_item_t di)
       break;
 
     case di_inst_eject:
-      sprintf(s, "/dev/%s", cdrom_tg);
-      util_eject_cdrom(*cdrom_tg ? s : NULL);
+      util_eject_cdrom(config.cdrom);
       error = 1;
       break;
 
@@ -479,145 +473,175 @@ int inst_choose_source_cb(dia_item_t di)
 }
 
 
-static int inst_try_cdrom (char *device_tv)
-    {
-    char  path_device_ti [20];
-    int   rc_ii;
+int inst_try_cdrom(char *dev)
+{
+  char buf[64];
+  int rc;
+
+  sprintf(buf, "/dev/%s", dev);
+  rc = util_mount_ro(buf, config.mountpoint.instdata);
+
+  if(rc) return 1;
+
+  if((rc = inst_check_instsys())) {
+    inst_umount();
+    return 2;
+  }
+
+  return rc;
+}
 
 
-    sprintf (path_device_ti, "/dev/%s", device_tv);
-    rc_ii = mount (path_device_ti, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
-    return (rc_ii);
+int inst_mount_cdrom(int show_err)
+{
+  int rc;
+  slist_t *sl;
+  window_t win;
+
+  if(config.instmode_extra == inst_cdwithnet) {
+    rc = net_config();
+  }
+  else {
+    set_instmode(inst_cdrom);
+  }
+
+  dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
+
+  rc = 1;
+
+  if(config.cdrom) rc = inst_try_cdrom(config.cdrom);
+
+  if(rc) {
+    for(sl = config.cdroms; sl; sl = sl->next) {
+      if(!(rc = inst_try_cdrom(sl->key))) {
+        str_copy(&config.cdrom, sl->key);
+        break;
+      }
+    }
+  }
+
+  win_close(&win);
+
+  if(rc) {
+    if(show_err) {
+      dia_message(txt_get(rc == 2 ? TXT_RI_NOT_FOUND : TXT_ERROR_CD_MOUNT), MSGTYPE_ERROR);
+     }
+  }
+
+  return rc;
+}
+
+
+int inst_choose_hd()
+{
+  int i, item_cnt, rc;
+  char **items, **values;
+  char *type;
+  slist_t *sl;
+  char buf[256];
+  int found = 0;
+  static int last_item = 0;
+  char *s, *tmp = NULL;
+
+  util_update_disk_list(NULL, 1);
+
+  for(i = 0, sl = config.partitions; sl; sl = sl->next) i++;
+
+  items = calloc(i + 2, sizeof *items);
+  values = calloc(i + 2, sizeof *values);
+
+  for(item_cnt = 0, sl = config.partitions; sl; sl = sl->next) {
+    if(sl->key) {
+      sprintf(buf, "/dev/%s", sl->key);
+      type = fstype(buf);
+      if(type && strcmp(type, "swap")) {
+        if(config.partition && !strcmp(sl->key, config.partition)) found = 1;
+        sprintf(buf, "%-12s : %s", sl->key, type);
+        values[item_cnt] = strdup(sl->key);
+        items[item_cnt++] = strdup(buf);
+      }
+    }
+  }
+
+  if(config.partition && !found) {
+    sprintf(buf, "/dev/%s", config.partition);
+    type = fstype(buf);
+    sprintf(buf, "%-12s : %s", config.partition, type ?: "");
+    values[item_cnt] = strdup(config.partition);
+    items[item_cnt++] = strdup(buf);
+  }
+
+  rc = 1;
+  if(item_cnt) {
+    i = dia_list(txt_get(TXT_CHOOSE_PARTITION), 32, NULL, items, last_item, align_left);
+    if(i > 0) {
+      last_item = i;
+      str_copy(&config.partition, values[i - 1]);
+      rc = 0;
+    }
+  }
+  else {
+    str_copy(&tmp, config.partition);
+    rc = dia_input2(txt_get(TXT_ENTER_PARTITION), &tmp, 30, 0);
+    if(!rc) {
+      s = tmp;
+      if(tmp && strstr(tmp, "/dev/") == tmp) s = tmp  + sizeof "/dev/" - 1;
+      str_copy(&config.partition, s);
+      str_copy(&tmp, NULL);
+    }
+  }
+
+  for(i = 0; i < item_cnt; i++) { free(items[i]); free(values[i]); }
+  free(items);
+  free(values);
+
+  return rc;
+}
+
+
+int inst_mount_harddisk()
+{
+  int rc = 0;
+  char buf[256];
+
+  set_instmode(inst_hd);
+
+  do {
+    if(!auto_ig) {
+      rc = inst_choose_hd();
+      if(rc) return -1;
     }
 
-
-static int inst_mount_cdrom (int show_err)
-    {
-    static char  *device_tab_ats [] =
-                          {
-                          "hdb",   "hdc",    "hdd",     "sr0",    "sr1",
-                          "sr2",   "sr3",    "sr4",     "sr5",    "sr6",
-                          "sr7",   "sr8",    "sr9",     "sr10",   "sr11",
-                          "sr12",  "sr13",   "sr14",    "sr15",
-                          "hda",   "hde",    "hdf",     "hdg",    "hdh",
-                          "aztcd", "cdu535", "cm206cd", "gscd",   "sjcd",
-                          "mcd",   "mcdx0",  "mcdx1",   "optcd",  "sonycd",
-                          "sbpcd", "sbpcd1", "sbpcd2",  "sbpcd3", "pcd0",
-                          "pcd1",  "pcd2",   "pcd3",
-                          0
-                          };
-    int           rc_ii;
-    int           i_ii = 0;
-    char         *device_pci;
-    window_t      win_ri;
-    int           mount_success_ii = FALSE;
-
-
-    if(config.instmode_extra == inst_cdwithnet) {
-        rc_ii = net_config ();
+    if(config.partition) {
+      sprintf(buf, "/dev/%s", config.partition);
+      rc = util_mount_ro(buf, config.mountpoint.extra);
     }
     else {
-      set_instmode(inst_cdrom);
+      rc = -1;
     }
 
-    dia_info (&win_ri, txt_get (TXT_TRY_CD_MOUNT));
-
-    if (cdrom_tg [0])
-        device_pci = cdrom_tg;
-    else
-        device_pci = device_tab_ats [i_ii++];
-
-    rc_ii = inst_try_cdrom (device_pci);
-    if (!rc_ii)
-        {
-        cdrom_drives++;
-        mount_success_ii = TRUE;
-        rc_ii = inst_check_instsys ();
-        if (rc_ii)
-            inst_umount ();
-        }
-
-    while (rc_ii < 0 && device_tab_ats [i_ii])
-        {
-        device_pci = device_tab_ats [i_ii++];
-        rc_ii = inst_try_cdrom (device_pci);
-        if (!rc_ii)
-            {
-            cdrom_drives++;
-            mount_success_ii = TRUE;
-            rc_ii = inst_check_instsys ();
-            if (rc_ii)
-                inst_umount ();
-            }
-        }
-
-    win_close (&win_ri);
-
-    if (rc_ii < 0)
-        {
-        if (show_err)
-             dia_message (txt_get (mount_success_ii ? TXT_RI_NOT_FOUND :
-                                                     TXT_ERROR_CD_MOUNT),
-                         MSGTYPE_ERROR);
-        }
-    else
-        strcpy (cdrom_tg, device_pci);
-
-    return (rc_ii);
+    if(rc) {
+      dia_message (txt_get(TXT_ERROR_HD_MOUNT), MSGTYPE_ERROR);
     }
-
-
-static int inst_mount_harddisk (void)
-    {
-    int   rc_ii = 0;
-    char *mountpoint_pci;
-
-    set_instmode(inst_hd);
-
-    do
-        {
-        if (!auto_ig)
-            {
-            rc_ii = dia_input (txt_get (TXT_ENTER_PARTITION), harddisk_tg, 17, 17);
-            if (rc_ii)
-                return (rc_ii);
-            }
-
-        if (!inst_rescue_im && !force_ri_ig)
-            {
-            mkdir (inst_tmpmount_tm, 0777);
-            inst_loopmount_im = TRUE;
-            mountpoint_pci = inst_tmpmount_tm;
-            }
-        else
-            {
-            inst_loopmount_im = FALSE;
-            mountpoint_pci = mountpoint_tg;
-            }
-
-        rc_ii = util_mount_ro(harddisk_tg, mountpoint_pci);
-
-        if (rc_ii)
-            dia_message (txt_get (TXT_ERROR_HD_MOUNT), MSGTYPE_ERROR);
-        else
-            {
-            if (!auto_ig)
-                {
-                rc_ii = dia_input2 (txt_get (TXT_ENTER_HD_DIR), &config.serverdir, 30, 0);
-                if (rc_ii)
-                    {
-                    inst_umount ();
-                    return (rc_ii);
-                    }
-
-                util_truncate_dir (config.serverdir);
-                }
-            }
+    else {
+      if(!auto_ig) {
+        rc = dia_input2(txt_get(TXT_ENTER_HD_DIR), &config.serverdir, 30, 0);
+        util_truncate_dir(config.serverdir);
+        sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
+        if(!rc) rc = util_mount_ro(buf, config.mountpoint.instdata);
+        if(rc) {
+          fprintf(stderr, "doing umount\n");
+          inst_umount();
+          return rc;
         }
-    while (rc_ii);
-
-    return (0);
+      }
     }
+  } while(rc);
+
+  config.extramount = 1;
+
+  return 0;
+}
 
 
 int inst_mount_nfs()
@@ -703,82 +727,75 @@ int inst_mount_smb()
 }
 
 
-int inst_check_instsys (void)
-    {
-    char  filename_ti [MAX_FILENAME];
-    char  filename2_ti [MAX_FILENAME];
-    char *instsys_loop_ti = "/suse/setup/inst-img";
-    int hdmount_ok = 0;
+int inst_check_instsys()
+{
+  char filename[MAX_FILENAME];
 
-    if ((action_ig & ACT_RESCUE)) 
-        {
-        action_ig &= ~ACT_RESCUE;
-        inst_rescue_im = TRUE;
-        }
+  if((action_ig & ACT_RESCUE)) {
+    action_ig &= ~ACT_RESCUE;
+    inst_rescue_im = TRUE;
+  }
 
-    if (memory_ig > 8000000)
-        strcpy (inst_rescuefile_tm, "/suse/images/rescue");
-    else
-        strcpy (inst_rescuefile_tm, "/disks/rescue");
+  switch(config.instmode) {
+    case inst_floppy:
+      ramdisk_ig = 1;
+      config.instdata_mounted = 0;
 
-    switch (config.instmode)
-        {
-        case inst_floppy:
-            ramdisk_ig = TRUE;
-            strcpy (inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
-            break;
-        case inst_hd:
-          if(inst_loopmount_im) {
-            ramdisk_ig = FALSE;
-            sprintf(filename_ti, "%s%s", inst_tmpmount_tm, config.serverdir ?: "");
-            if(!mount(filename_ti, mountpoint_tg, "none", MS_BIND, 0)) {
-              sprintf(filename_ti, "%s%s", mountpoint_tg, installdir_tg);
-              sprintf(filename2_ti, "%s%s", mountpoint_tg, instsys_loop_ti);
-              if(!util_mount_loop(filename2_ti, filename_ti)) {
-                hdmount_ok = 1;
-              }
-              else if(!inst_rescue_im && util_check_exist(filename_ti)) {
-                hdmount_ok = 1;
-              }
-            }
-          }
-          if(!hdmount_ok) {
-            ramdisk_ig = TRUE;
-            sprintf(
-              inst_rootimage_tm, "%s%s%s",
-              mountpoint_tg,
-              config.serverdir ?: "",
-              inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg
-            );
-          }
-          break;
-        case inst_cdrom:
-        case inst_nfs:
-	case inst_smb:
-            ramdisk_ig = FALSE;
-            sprintf (filename_ti, "%s%s", mountpoint_tg, installdir_tg);
-            if (inst_rescue_im || force_ri_ig || !util_check_exist (filename_ti))
-                ramdisk_ig = TRUE;
-            sprintf (inst_rootimage_tm, "%s%s", mountpoint_tg,
-                     inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
-            if (!util_check_exist (inst_rootimage_tm))
-                {
-                if (util_check_exist (filename_ti))
-                    ramdisk_ig = FALSE;
-                else
-                    sprintf (inst_rootimage_tm, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
-                }
-            break;
-        case inst_ftp:
-        case inst_http:
-        case inst_tftp:
-            ramdisk_ig = TRUE;
-            sprintf (inst_rootimage_tm, "%s%s", config.serverdir ?: "",
-                     inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
-            break;
-        default:
-            break;
-        }
+      strcpy(inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
+      break;
+
+    case inst_hd:
+    case inst_cdrom:
+    case inst_nfs:
+    case inst_smb:
+      ramdisk_ig = 0;
+      config.instdata_mounted = 1;
+
+      sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
+      if(inst_rescue_im || !util_is_dir(filename)) {
+        sprintf(filename, "%s%s",
+          config.mountpoint.instdata,
+          inst_rescue_im ? config.rescueimage : config.rootimage
+        );
+      }
+
+#if 0
+      deb_int(inst_rescue_im);
+      deb_int(force_ri_ig);
+      deb_int(util_is_mountable(filename));
+      deb_int(util_is_dir(filename));
+#endif
+
+      if(
+        inst_rescue_im ||
+        force_ri_ig ||
+        !(util_is_mountable(filename) || util_is_dir(filename))
+      ) {
+        ramdisk_ig = 1;
+      }
+      strcpy(inst_rootimage_tm, filename);
+      
+      // TODO: handle demo image!
+
+      deb_int(ramdisk_ig);
+
+      break;
+
+    case inst_ftp:
+    case inst_http:
+    case inst_tftp:
+      ramdisk_ig = 1;
+      config.instdata_mounted = 0;
+
+      sprintf(inst_rootimage_tm, "%s%s",
+        config.serverdir ?: "",
+        inst_rescue_im ? config.rescueimage : config.rootimage
+      );
+      break;
+
+    default:
+      break;
+  }
 
   if(
     config.instmode != inst_ftp &&
@@ -794,82 +811,65 @@ int inst_check_instsys (void)
 }
 
 
-static int inst_start_install (void)
-    {
-    int       rc_ii;
+int inst_start_install()
+{
+  int rc;
+  char buf[256];
 
+  if(auto2_ig) {
+    fprintf(stderr, "going for automatic install\n");
+  }
+  else {
     inst_rescue_im = FALSE;
-    rc_ii = inst_choose_source ();
-    if (rc_ii)
-        return (rc_ii);
+    if((rc = inst_choose_source())) return rc;
+  }
 
-    if (ramdisk_ig)
-        {
-        rc_ii = root_load_rootimage (inst_rootimage_tm);
-        fprintf (stderr, "Loading of rootimage returns %d\n", rc_ii);
-        inst_umount ();
-        if (rc_ii)
-            return (rc_ii);
+  // deb_str(inst_rootimage_tm);
 
-        mkdir (inst_mountpoint_tg, 0777);
-        rc_ii = util_mount_ro (RAMDISK_2, inst_mountpoint_tg);
-        fprintf (stderr, "Mounting of inst-sys returns %d\n", rc_ii);
-        if (rc_ii)
-            return (rc_ii);
-        }
+  str_copy(&config.instsys, NULL);
 
-    rc_ii = inst_execute_yast ();
+  if(ramdisk_ig) {
+    config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode);
+    // maybe: inst_umount(); ???
+    if(config.inst_ramdisk < 0) return -1;
 
-    return (rc_ii);
-    }
+    rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.instsys);
+    if(rc) return rc;
+    str_copy(&config.instsys, config.mountpoint.instsys);
+  }
+  else if(!util_is_dir(inst_rootimage_tm)) {
+    rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
+    if(rc) return rc;
+    str_copy(&config.instsys, config.mountpoint.instsys);
+  }
+  else {
+    sprintf(buf, "%s%s", config.mountpoint.instdata, config.installdir);
+    str_copy(&config.instsys, buf);
+  }
 
-
-static int inst_start_rescue (void)
-    {
-    int   rc_ii;
-
-
-    inst_rescue_im = TRUE;
-    rc_ii = inst_choose_source ();
-    if (rc_ii)
-        return (rc_ii);
-
-    config.inst_ramdisk = load_image (inst_rootimage_tm, config.instmode);
-    if(config.inst_ramdisk < 0) rc_ii = -1;
-    rc_ii = -1;
-    inst_umount ();
-    return (rc_ii);
-    }
+  return inst_execute_yast();
+}
 
 
-#if 0
-static void inst_start_shell (char *tty_tv)
-    {
-    char  *args_apci [] = { "bash", 0 };
-    char  *env_pci [] =   { "TERM=linux",
-                            "PS1=`pwd -P` # ",
-                            "HOME=/",
-                            "PATH=/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", 0 };
-    int    fd_ii;
+int inst_start_rescue()
+{
+  int rc;
 
+  inst_rescue_im = 1;
+  if((rc = inst_choose_source())) return rc;
 
-    if (!fork ())
-        {
-        fclose (stdin);
-        fclose (stdout);
-        fclose (stderr);
-        setsid ();
-        fd_ii = open (tty_tv, O_RDWR);
-        ioctl (fd_ii, TIOCSCTTY, (void *)1);
-        dup (fd_ii);
-        dup (fd_ii);
+  config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode);
 
-        execve ("/bin/bash", args_apci, env_pci);
-        fprintf (stderr, "Couldn't start shell (errno = %d)\n", errno);
-        exit (-1);
-        }
-    }
-#endif
+  inst_umount();
+
+  if(config.inst_ramdisk >= 0) {
+    root_set_root(config.ramdisk[config.inst_ramdisk].dev);
+  }
+
+  util_wait("rescue system loaded");
+
+  return config.inst_ramdisk < 0 ? -1 : 0;
+}
 
 
 /*
@@ -883,34 +883,27 @@ int inst_prepare()
 {
   char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
   char link_source[MAX_FILENAME];
-  char instsys[MAX_FILENAME];
-  int i = 0;
-  int rc = 0;
+  int i = 0, rc = 0;
 
   mod_free_modules();
   if(!config.initrd_has_ldso && !config.test) {
     rename("/bin", "/.bin");
   }
 
-  if(inst_loopmount_im) {
-    sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
+  setenv("INSTSYS", config.instsys, TRUE);
+
+  if(config.memory.current < config.memory.min_modules) {
+    putenv("REMOVE_MODULES=1");
   }
   else {
-    if(ramdisk_ig)
-      strcpy(instsys, inst_mountpoint_tg);
-    else
-      sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
+    unsetenv("REMOVE_MODULES");
   }
-
-  str_copy(&config.instsys, instsys);
-
-  setenv("INSTSYS", instsys, TRUE);
 
   if(!config.initrd_has_ldso && !config.test)
     for(i = 0; i < sizeof links / sizeof *links; i++) {
       if(!util_check_exist(links[i])) {
 	unlink(links[i]);
-	sprintf(link_source, "%s%s", instsys, links[i]);
+	sprintf(link_source, "%s%s", config.instsys, links[i]);
 	symlink(link_source, links[i]);
       }
     }
@@ -951,7 +944,8 @@ int inst_execute_yast()
   if(inst_choose_yast_version()) {
     lxrc_killall(0);
     inst_umount ();
-    if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
+    ramdisk_free(config.inst_ramdisk);
+    config.inst_ramdisk = -1;
 
     if(!config.initrd_has_ldso && !config.test) {
       unlink("/bin");
@@ -1001,29 +995,30 @@ int inst_execute_yast()
   disp_set_color(COL_WHITE, COL_BLACK);
   if(config.win) util_disp_done();
 
-  sprintf(command_ti, "%s%s", config.instsys, SETUP_COMMAND);
-
-//  deb_str(command_ti);
-
-  if(util_check_exist(command_ti)) {
-    sprintf(command_ti, "%s%s yast%d%s",
-      config.instsys,
-      SETUP_COMMAND,
-      yast_version_ig == 2 ? 2 : 1,
-      (action_ig & ACT_YAST2_AUTO_INSTALL) ? " --autofloppy" : ""
-    );
-    fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
+  if(config.test) {
+    system("/bin/bash 2>&1");
   }
   else {
-    sprintf(command_ti, "%s%s",
-      yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND,
-      auto_ig ? " --autofloppy" : ""
-    );
-    fprintf(stderr, "starting \"%s\"\n", command_ti);
-  }
+    sprintf(command_ti, "%s%s", config.instsys, SETUP_COMMAND);
 
-  deb_str(command_ti);
-  rc_ii = system(command_ti);
+    if(util_check_exist(command_ti)) {
+      sprintf(command_ti, "%s%s yast%d",
+        config.instsys,
+        SETUP_COMMAND,
+        yast_version_ig == 2 ? 2 : 1
+      );
+      fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
+    }
+    else {
+      sprintf(command_ti, "%s",
+        yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND
+      );
+      fprintf(stderr, "starting \"%s\"\n", command_ti);
+    }
+
+    deb_str(command_ti);
+    rc_ii = system(command_ti);
+  }
 
   fprintf(stderr,
     "yast%d return code is %d (errno = %d)\n",
@@ -1079,8 +1074,7 @@ int inst_execute_yast()
     mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
   }
 
-//  inst_umount();
-  if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
+  inst_umount();
 
   if(!config.initrd_has_ldso && !config.test) {
     unlink("/bin");
@@ -1100,6 +1094,9 @@ int inst_execute_yast()
   /* wait a bit */
   count = 5;
   while((i = inst_umount()) == EBUSY && count--) sleep(1);
+
+  ramdisk_free(config.inst_ramdisk);
+  config.inst_ramdisk = -1;
 
 #ifdef LXRC_DEBUG
   if((guru_ig & 2)) {
@@ -1269,24 +1266,18 @@ static int inst_init_cache (void)
 int inst_umount()
 {
   int i = 0, j;
-  char fname[MAX_FILENAME];
 
-  if(inst_loopmount_im) {
-    sprintf(fname, "%s%s", mountpoint_tg, installdir_tg);
-    util_umount_loop(fname);
-    util_umount(mountpoint_tg);
-    j = util_umount(inst_tmpmount_tm);
-    if(j == EBUSY) i = EBUSY;
-    rmdir(inst_tmpmount_tm);
-    inst_loopmount_im = FALSE;
-  }
-  else {
-    j = util_umount(mountpoint_tg);
-    if(j == EBUSY) i = EBUSY;
-  }
-
-  j = util_umount(inst_mountpoint_tg);
+  j = util_umount(config.mountpoint.instsys);
   if(j == EBUSY) i = EBUSY;
+
+  j = util_umount(config.mountpoint.instdata);
+  if(j == EBUSY) i = EBUSY;
+
+  if(config.extramount) {
+    j = util_umount(config.mountpoint.extra);
+    if(j == EBUSY) i = EBUSY;
+    config.extramount = 0;
+  }
 
   return i;
 }
@@ -1297,12 +1288,6 @@ int inst_do_ftp()
   int rc;
   window_t win;
   char buf[256];
-
-  if(!inst_rescue_im && memory_ig <= MEM_LIMIT_RAMDISK_FTP) {
-    sprintf(buf, txt_get(TXT_NOMEM_FTP), (MEM_LIMIT_RAMDISK_FTP >> 20) + 2);
-    dia_message(buf, MSGTYPE_ERROR);
-    return -1;
-  }
 
   set_instmode(inst_ftp);
 
@@ -1507,37 +1492,6 @@ int inst_choose_yast_version()
 
   return yast_version_ig ? 0 : -1;
 }
-
-
-#ifdef USE_LIBHD
-
-int inst_auto2_install()
-{
-  int i;
-
-  deb_msg("going for automatic install");
-
-  if(ramdisk_ig) {
-    deb_msg("using RAM disk");
-
-    i = root_load_rootimage(inst_rootimage_tm);
-    fprintf(stderr, "Loading of rootimage returns %d\n", i);
-//    umount(mountpoint_tg);
-//    umount(inst_mountpoint_tg);
-    inst_umount();
-
-    if(i || inst_rescue_im) return i;
-
-    mkdir(inst_mountpoint_tg, 0777);
-    i = util_mount_ro(RAMDISK_2, inst_mountpoint_tg);
-    fprintf(stderr, "Mounting of %s returns %d\n", inst_mountpoint_tg, i);
-    if(i) return i;
-  }
-
-  return inst_execute_yast();
-}
-
-#endif	/* USE_LIBHD */
 
 
 int inst_update_cd()

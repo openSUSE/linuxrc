@@ -74,10 +74,8 @@ int auto2_mount_cdrom(char *device)
       fprintf(stderr, "%s is not a SuSE Installation CD.\n", device);
       umount(mountpoint_tg);
     } else {
-      /*
-       * skip "/dev/"; instead, cdrom_tg should hold the *full* device name
-       */
-      strcpy(cdrom_tg, device + sizeof "/dev/" - 1);
+      /* skip "/dev/" !!! */
+      str_copy(&config.cdrom, device + sizeof "/dev/" - 1);
     }
   }
   else {
@@ -341,7 +339,7 @@ int auto2_cdrom_dev(hd_t **hd0)
     ) {
       ci = hd->detail->cdrom.data;
 
-      if(*cdrom_tg) {
+      if(config.cdrom) {
         i = 0;
       }
       else {
@@ -733,13 +731,16 @@ int auto2_find_install_medium()
   int i;
   unsigned last_idx;
   hd_t *hd_devs = NULL;
+  char buf[256];
 
-  if(config.instmode == inst_hd) 
-    if(!(i = auto2_mount_harddisk(harddisk_tg)))
-      return TRUE;
+  if(config.instmode == inst_hd) {
+    if(!config.partition) return FALSE;
+    sprintf(buf, "/dev/%s", config.partition);
+    if(!(i = auto2_mount_harddisk(buf))) return TRUE;
+  }
     
   if(config.instmode == inst_cdrom || !config.instmode) {
-    *cdrom_tg = 0;
+    str_copy(&config.cdrom, NULL);
 
     fprintf(stderr, "Looking for a SuSE CD...\n");
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
@@ -769,7 +770,7 @@ int auto2_find_install_medium()
       }
     }
 
-    if(*cdrom_tg) {
+    if(config.cdrom) {
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }

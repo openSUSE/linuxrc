@@ -141,6 +141,7 @@ static struct {
   { key_swaptotal,      "SwapTotal"        },
   { key_swapfree,       "SwapFree"         },
   { key_minmemfree,     "MinMemFree"       },
+  { key_minmemmodules,  "MinMemModules"    },
   { key_info,           "Info"             },
   { key_proxy,          "Proxy"            },
   { key_proxyport,      "ProxyPort"        },
@@ -538,8 +539,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_partition:
-        strncpy(harddisk_tg, f->value, sizeof harddisk_tg);
-        harddisk_tg[sizeof harddisk_tg - 1] = 0;
+        if(*f->value) str_copy(&config.partition, f->value);
         break;
 
       case key_serverdir:
@@ -624,6 +624,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.memory.min_free = f->nvalue;
         break;
 
+      case key_minmemmodules:
+        if(f->is.numeric) config.memory.min_modules = f->nvalue;
+        break;
+
       case key_tmpfs:
         if(f->is.numeric) config.tmpfs = f->nvalue;
         break;
@@ -653,8 +657,10 @@ void file_do_info(file_t *f0)
         auto2_ig = TRUE;
         yast_version_ig = 2;
         action_ig |= ACT_YAST2_AUTO_INSTALL;
-        url = parse_url(config.autoyast);   
-        if(url && url->scheme) set_instmode(url->scheme);
+        if(!config.instmode) {
+          url = parse_url(config.autoyast);
+          if(url && url->scheme) set_instmode(url->scheme);
+        }
         break;
 
       default:
@@ -774,8 +780,7 @@ void file_write_install_inf(char *dir)
 
   if(config.language) set_write_info(f);
 
-  // is that really true???
-  file_write_num(f, key_sourcemounted, ramdisk_ig ? 0 : 1);
+  file_write_num(f, key_sourcemounted, config.instdata_mounted);
 
   file_write_sym(f, key_display, "Undef", config.color);
 
@@ -783,7 +788,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_keytable, config.keymap);
   }
 
-  if(*cdrom_tg) file_write_str(f, key_cdrom, cdrom_tg);
+  file_write_str(f, key_cdrom, config.cdrom);
   if(
     config.insttype == inst_net &&
     *netdevice_tg &&
@@ -812,7 +817,7 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_instmode, get_instmode_name(config.instmode));
 
   if(config.insttype == inst_hd) {
-    file_write_str(f, key_partition, harddisk_tg);
+    file_write_str(f, key_partition, config.partition);
 //    file_write_str(f, key_fstype, fstype_tg);
     file_write_str(f, key_serverdir, config.serverdir);
   }
@@ -877,6 +882,9 @@ void file_write_install_inf(char *dir)
 
   file_write_num(f, key_usb, usb_ig);
 
+  util_update_meminfo();
+  file_write_num(f, key_memfree, config.memory.current);
+
   if(yast2_color_ig) {
     fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
   }
@@ -913,13 +921,17 @@ void file_write_mtab()
   if(!ramdisk_ig) {
     switch(config.instmode) {
       case inst_cdrom:
-        fprintf(f, "/dev/%s %s iso9660 ro 0 0\n", cdrom_tg, mountpoint_tg);
+        if(config.cdrom) {
+          fprintf(f, "/dev/%s %s iso9660 ro 0 0\n",
+            config.cdrom, config.mountpoint.instdata
+          );
+        }
         break;
 
       case inst_nfs:
         fprintf(f,
           "%s:%s %s nfs ro 0 0\n",
-          inet_ntoa(config.net.server.ip), config.serverdir ?: "", mountpoint_tg
+          inet_ntoa(config.net.server.ip), config.serverdir ?: "", config.mountpoint.instdata
         );
         break;
 
@@ -932,7 +944,7 @@ void file_write_mtab()
         fprintf(f,
           "//%s/%s %s smbfs ro,%s 0 0\n",
           config.net.server.name, config.serverdir ?: "",
-          mountpoint_tg, smb_mount_options
+          config.mountpoint.instdata, smb_mount_options
         );
         break;
 
@@ -940,7 +952,12 @@ void file_write_mtab()
     }
   }
   else {
-    fprintf(f, "/dev/ram2 %s ext2 ro 0 0\n", inst_mountpoint_tg);
+    if(config.inst_ramdisk >= 0) {
+      fprintf(f, "%s %s ext2 ro 0 0\n",
+        config.ramdisk[config.inst_ramdisk].dev,
+        config.mountpoint.instsys
+      );
+    }
   }
 
   fclose(f);
