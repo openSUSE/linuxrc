@@ -35,7 +35,8 @@ msgstr "Non"
 
 # TLABEL linuxrc_2002_03_29_0036__4
 #. TXT_CHOOSE_LANGUAGE
-msgid "Please choose the language"
+#, fuzzy
+msgid "Select the language."
 msgstr "Choisissez la langue"
 
 # TLABEL linuxrc_2002_03_29_0036__5
@@ -48,10 +49,9 @@ msgstr "Écran couleur"
 msgid "Monochrome display"
 msgstr "Écran monochrome"
 
-# TLABEL linuxrc_2002_03_29_0036__7
 #. TXT_CHOOSE_DISPLAY
-msgid "What kind of display do you use?"
-msgstr "Quel est le type de votre écran?"
+msgid "Select the display type."
+msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__8
 #. TXT_MENU_LANG
@@ -60,22 +60,26 @@ msgstr "Langue"
 
 # TLABEL linuxrc_2002_03_29_0036__9
 #. TXT_MENU_MODULES
-msgid "Kernel modules (hardware drivers)"
+#, fuzzy
+msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Modules du noyau (pilote matériel)"
 
 # TLABEL linuxrc_2002_03_29_0036__10
 #. TXT_MENU_START
-msgid "Start installation / system"
+#, fuzzy
+msgid "Start Installation or System"
 msgstr "Démarrer l'installation / le système"
 
 # TLABEL linuxrc_2002_03_29_0036__11
 #. TXT_MENU_INFO
-msgid "System information"
+#, fuzzy
+msgid "System Information"
 msgstr "Informations système"
 
 # TLABEL linuxrc_2002_03_29_0036__12
 #. TXT_HDR_MAIN
-msgid "Main menu"
+#, fuzzy
+msgid "Main Menu"
 msgstr "Menu principal"
 
 # TLABEL linuxrc_2002_03_29_0036__13
@@ -95,46 +99,52 @@ msgstr "Disposition du clavier"
 
 # TLABEL linuxrc_2002_03_29_0036__16
 #. TXT_LOAD_NET
-msgid "Load network card modules"
+#, fuzzy
+msgid "Load Network Card Modules"
 msgstr "Chargement des modules de la carte réseau"
 
 # TLABEL linuxrc_2002_03_29_0036__17
 #. TXT_SHOW_MODULES
-msgid "Show loaded modules"
+#, fuzzy
+msgid "Show Loaded Modules"
 msgstr "Affichage des modules chargés"
 
 # TLABEL linuxrc_2002_03_29_0036__18
 #. TXT_AUTO_LOAD
-msgid "Load modules automatically"
+#, fuzzy
+msgid "Load Modules Automatically"
 msgstr "Chargement automatique des modules"
 
 # TLABEL linuxrc_2002_03_29_0036__19
 #. TXT_DEL_MODULES
-msgid "Unload modules"
+#, fuzzy
+msgid "Unload Modules"
 msgstr "Déchargement de modules"
 
 # TLABEL linuxrc_2002_03_29_0036__20
 #. TXT_TRY_TO_LOAD
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console "
+"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Tentative de charger le module \"%s\"...\n"
 "\n"
-"Pendant le chargement, vous pouvez visualiser les messages du noyau sur la console 4 (ALT-F4)."
+"Pendant le chargement, vous pouvez visualiser les messages du noyau sur la "
+"console 4 (ALT-F4)."
 
 # TLABEL linuxrc_2002_03_29_0036__21
 #. TXT_LOAD_SUCCESSFUL
-#, c-format
-msgid "Module \"%s\" loaded successfully!"
+#, fuzzy, c-format
+msgid "Module \"%s\" loaded successfully."
 msgstr "Le \"%s\" a été chargé!"
 
 # TLABEL linuxrc_2002_03_29_0036__22
 #. TXT_LOAD_FAILED
-#, c-format
-msgid "Failed to load module \"%s\"!"
+#, fuzzy, c-format
+msgid "Failed to load module \"%s\"."
 msgstr "Le chargement du module \"%s\" a échoué!"
 
 # TLABEL linuxrc_2002_03_29_0036__23
@@ -149,27 +159,32 @@ msgstr "Disquette"
 
 # TLABEL linuxrc_2002_03_29_0036__25
 #. TXT_HARDDISK
-msgid "Harddisk"
+#, fuzzy
+msgid "Hard Disk"
 msgstr "Disque dur"
 
 # TLABEL linuxrc_2002_03_29_0036__26
 #. TXT_START_INSTALL
-msgid "Start installation/update"
+#, fuzzy
+msgid "Start Installation or Update"
 msgstr "Démarrer l'installation"
 
 # TLABEL linuxrc_2002_03_29_0036__27
 #. TXT_START_RESCUE
-msgid "Start rescue system"
+#, fuzzy
+msgid "Start Rescue System"
 msgstr "Démarrer le système de secours"
 
 # TLABEL linuxrc_2002_03_29_0036__28
 #. TXT_LOAD_RS_NFS
-msgid "Load rescue system via NFS"
+#, fuzzy
+msgid "Load Rescue System via NFS"
 msgstr "Charger le système de secours via NFS"
 
 # TLABEL linuxrc_2002_03_29_0036__29
 #. TXT_BOOT_SYSTEM
-msgid "Boot installed system"
+#, fuzzy
+msgid "Boot Installed System"
 msgstr "Amorcer le système installé"
 
 # TLABEL linuxrc_2002_03_29_0036__30
@@ -180,10 +195,11 @@ msgstr "Recherche de l'image \"%s\"..."
 
 # TLABEL linuxrc_2002_03_29_0036__31
 #. TXT_RI_NOT_FOUND
+#, fuzzy
 msgid ""
-"Cannot find the image!\n"
+"Cannot find the image.\n"
 "\n"
-"Check the directory specification!"
+"Check the directory specification."
 msgstr ""
 "L'image n'a pas pu être repérée!\n"
 "\n"
@@ -191,12 +207,14 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__32
 #. TXT_LOADING
-msgid "Loading data into ramdisk"
+#, fuzzy
+msgid "Loading data into RAM disk..."
 msgstr "Chargement des données"
 
 # TLABEL linuxrc_2002_03_29_0036__33
 #. TXT_INFO_KERNEL
-msgid "Kernel messages"
+#, fuzzy
+msgid "Kernel Messages"
 msgstr "Messages du noyau"
 
 # TLABEL linuxrc_2002_03_29_0036__34
@@ -211,7 +229,8 @@ msgstr "Périphériques"
 
 # TLABEL linuxrc_2002_03_29_0036__36
 #. TXT_INFO_NETDEV
-msgid "Network cards"
+#, fuzzy
+msgid "Network Cards"
 msgstr "Cartes réseau"
 
 # TLABEL linuxrc_2002_03_29_0036__37
@@ -246,54 +265,75 @@ msgstr "PCI"
 
 # TLABEL linuxrc_2002_03_29_0036__43
 #. TXT_INSERT_DISK
-msgid "Please insert the disk and press ENTER"
+#, fuzzy
+msgid "Insert the disk and press ENTER."
 msgstr "Insérez la disquette et pressez ENTRÉE"
 
 # TLABEL linuxrc_2002_03_29_0036__44
 #. TXT_ERROR_READ_DISK
-msgid "Error reading from floppy disk!"
+#, fuzzy
+msgid "Error reading from floppy disk."
 msgstr "Erreur à la lecture de la disquette!"
 
 # TLABEL linuxrc_2002_03_29_0036__45
 #. TXT_ENTER_ROOT_FS
-msgid "Please enter your root partition (eg. /dev/sda3)"
+#, fuzzy
+msgid "Enter your root partition (e.g., /dev/sda3)"
 msgstr "Spécifiez votre partition racine (p.ex. /dev/sda3)"
 
 # TLABEL linuxrc_2002_03_29_0036__46
 #. TXT_INVALID_ROOT_FS
-msgid "Invalid root device!"
+#, fuzzy
+msgid "Invalid root device."
 msgstr "Partition racine non valide!"
 
 # TLABEL linuxrc_2002_03_29_0036__47
 #. TXT_INVALID_INPUT
-msgid "Invalid input!"
+#, fuzzy
+msgid "Invalid input."
 msgstr "Entrée non valide!"
 
 # TLABEL linuxrc_2002_03_29_0036__48
 #. TXT_INPUT_IPADDR
-msgid "Please enter your IP address"
+#, fuzzy
+msgid "Enter your IP address."
 msgstr "Entrez votre adresse IP."
 
 # TLABEL linuxrc_2002_03_29_0036__49
 #. TXT_INPUT_NETMASK
-msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
-msgstr "Entrez votre masque réseau. Pour un réseau normal classe C, c'est habituellement 255.255.255.0"
+#, fuzzy
+msgid ""
+"Enter your netmask. For a normal class C network, this is usually "
+"255.255.255.0."
+msgstr ""
+"Entrez votre masque réseau. Pour un réseau normal classe C, c'est "
+"habituellement 255.255.255.0"
 
 # TLABEL linuxrc_2002_03_29_0036__50
 #. TXT_INPUT_GATEWAY
-msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
-msgstr "Entrez l'adresse de votre passerelle s'il vous en faut une pour pouvoir accéder au serveur. Sinon entrez simplement votre propre adresse IP."
+#, fuzzy
+msgid ""
+"If you need a gateway to reach the server, enter the IP address of the "
+"gateway. If you do not need a gateway, enter your own IP address."
+msgstr ""
+"Entrez l'adresse de votre passerelle s'il vous en faut une pour pouvoir "
+"accéder au serveur. Sinon entrez simplement votre propre adresse IP."
 
 # TLABEL linuxrc_2002_03_29_0036__51
 #. TXT_INPUT_NAMED
-msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Entrez l'adresse IP de votre serveur de noms. Si vous n'utilisez pas de serveur de noms, appuyez sur ESC."
+#, fuzzy
+msgid ""
+"Enter the IP address of your name server. If you do not use a name server, "
+"press ESC."
+msgstr ""
+"Entrez l'adresse IP de votre serveur de noms. Si vous n'utilisez pas de "
+"serveur de noms, appuyez sur ESC."
 
 # TLABEL linuxrc_2002_03_29_0036__52
 #. TXT_FOUND_HOST
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"The following data have been retrieved:\n"
+"The following data has been retrieved:\n"
 "\n"
 "IP address: %s\n"
 "Name: %s\n"
@@ -307,28 +347,36 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__53
 #. TXT_ERROR_CONF_NET
-msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
-msgstr "Erreur pendant la configuration du réseau. Votre carte réseau n'a probablement pas été reconnue par le noyau!"
+#, fuzzy
+msgid ""
+"An error occurred during the network configuration. Your network card "
+"probably was not recognized by the kernel."
+msgstr ""
+"Erreur pendant la configuration du réseau. Votre carte réseau n'a "
+"probablement pas été reconnue par le noyau!"
 
 # TLABEL linuxrc_2002_03_29_0036__54
 #. TXT_INPUT_SERVER
-msgid "Please enter the IP address of the NFS server."
+#, fuzzy
+msgid "Enter the IP address of the NFS server."
 msgstr "Entrez l'adresse IP du serveur NFS."
 
 # TLABEL linuxrc_2002_03_29_0036__55
 #. TXT_INPUT_FTPSERVER
-msgid "Please enter the IP address of the FTP server."
+#, fuzzy
+msgid "Enter the IP address of the FTP server."
 msgstr "Entrez l'adresse IP du serveur FTP."
 
 # TLABEL linuxrc_2002_03_29_0036__56
 #. TXT_INPUT_DIR
-msgid "Please enter the directory on the server."
+#, fuzzy
+msgid "Enter the directory on the server."
 msgstr "Entrez le nom du répertoire sur le serveur."
 
 # TLABEL linuxrc_2002_03_29_0036__57
 #. TXT_ENTER_PARAMS
-#, c-format
-msgid "Please enter parameters for \"%s\"."
+#, fuzzy, c-format
+msgid "Enter parameters for \"%s\"."
 msgstr "Entrez les éventuels paramètres pour \"%s\"."
 
 # TLABEL linuxrc_2002_03_29_0036__58
@@ -347,9 +395,9 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__59
 #. TXT_ERROR_NFSMOUNT
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"An error occurred while trying to mount the nfs directory.\n"
+"An error occurred while trying to mount the NFS directory.\n"
 "\n"
 "Reason given by server: %s"
 msgstr ""
@@ -359,22 +407,25 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__60
 #. TXT_CHOOSE_KEYMAP
+#, fuzzy
 msgid ""
-"Please choose a keyboard map.\n"
-"YaST will offer you additional keyboard tables later on."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
 "Sélectionnez une disposition du clavier.\n"
 "YaST vous offrira plus tard d'autres dispositions."
 
 # TLABEL linuxrc_2002_03_29_0036__61
 #. TXT_DELETE_MODULE
-msgid "Choose the module to be unloaded."
+#, fuzzy
+msgid "Choose the module to unload."
 msgstr "Sélectionnez le module à supprimer."
 
-# TLABEL linuxrc_2002_03_29_0036__62
+# TLABEL linuxrc_2002_03_29_0036__168
 #. TXT_NO_MODULES
-msgid "Currently there are no modules loaded!"
-msgstr "Actuellement aucun module n'est chargé!"
+#, fuzzy
+msgid "No modules currently loaded."
+msgstr "Aucun nouveau module n'a été trouvé"
 
 # TLABEL linuxrc_2002_03_29_0036__63
 #. TXT_AUTO_RUNNING
@@ -384,17 +435,20 @@ msgstr "Détection automatique (%s)...    "
 
 # TLABEL linuxrc_2002_03_29_0036__64
 #. TXT_WANT_MORE_SCSI
-msgid "Do you want to search for additional SCSI host adaptors?"
+#, fuzzy
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Voulez-vous rechercher d'autres adaptateurs SCSI?"
 
 # TLABEL linuxrc_2002_03_29_0036__65
 #. TXT_WANT_MORE_NET
-msgid "Do you want to search for additional network cards?"
+#, fuzzy
+msgid "Search for additional network cards?"
 msgstr "Voulez-vous rechercher d'autres cartes réseau?"
 
 # TLABEL linuxrc_2002_03_29_0036__66
 #. TXT_WANT_MORE_CDROM
-msgid "Do you want to search for additional CD-ROM drives?"
+#, fuzzy
+msgid "Search for additional CD-ROM drives?"
 msgstr "Voulez-vous rechercher d'autres lecteurs de CD-ROM?"
 
 # TLABEL linuxrc_2002_03_29_0036__67
@@ -429,26 +483,33 @@ msgstr "Carte réseau HIPPI"
 
 # TLABEL linuxrc_2002_03_29_0036__73
 #. TXT_CHOOSE_NET
-msgid "Please choose the network device."
-msgstr "Sélectionnez le type de réseau que vous voulez utiliser pour l'installation."
+#, fuzzy
+msgid "Choose the network device."
+msgstr ""
+"Sélectionnez le type de réseau que vous voulez utiliser pour l'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__74
 #. TXT_INPUT_PLIP_IP
-msgid "Please enter the IP address of the PLIP partner."
+#, fuzzy
+msgid "Enter the IP address of the PLIP partner."
 msgstr "Entrez l'adresse IP de la machine PLIP distante."
 
 # TLABEL linuxrc_2002_03_29_0036__75
 #. TXT_NO_PCMCIA
-msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
-msgstr "Impossible de détecter automatiquement le chipset PCMCIA. Spécifiez-le manuellement."
+#, fuzzy
+msgid ""
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr ""
+"Impossible de détecter automatiquement le chipset PCMCIA. Spécifiez-le "
+"manuellement."
 
 # TLABEL linuxrc_2002_03_29_0036__76
 #. TXT_FOUND_PCMCIA
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\"!\n"
+"Found PCMCIA chipset \"%s\".\n"
 "\n"
-"Please enter parameters for PCMCIA core modules"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
 "Chipset PCMCIA \"%s\" détecté!\n"
 "\n"
@@ -456,8 +517,8 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__77
 #. TXT_PCMCIA_PARAMS
-#, c-format
-msgid "Please enter specific parameters for chipset \"%s\""
+#, fuzzy, c-format
+msgid "Enter specific parameters for chipset \"%s\"."
 msgstr "Entrez les éventuels paramètres spécifiques pour le chipset \"%s\""
 
 # TLABEL linuxrc_2002_03_29_0036__78
@@ -472,37 +533,43 @@ msgstr "PCMCIA Card Services démarrés avec succès."
 
 # TLABEL linuxrc_2002_03_29_0036__80
 #. TXT_PCMCIA_FAIL
-msgid "Start of PCMCIA card services failed!"
+#, fuzzy
+msgid "Start of PCMCIA card services failed."
 msgstr "Le démarrage de PCMCIA Card Services a échoué!"
 
 # TLABEL linuxrc_2002_03_29_0036__81
 #. TXT_PCMCIA_ALREADY
-msgid "PCMCIA card services already running!"
+#, fuzzy
+msgid "PCMCIA card services already running."
 msgstr "PCMCIA Card Services tournent déjà!"
 
 # TLABEL linuxrc_2002_03_29_0036__82
 #. TXT_NO_LXRC_END
+#, fuzzy
 msgid ""
-"You can exit Linuxrc only via the menu item\n"
+"You can leave Linuxrc only via \n"
 "\n"
-"\"Start installation / system\"\n"
+"\"Start Installation or System\"\n"
 "\n"
-"In order to allow this, you might need to load some drivers (modules) to support your hardware."
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
 "Vous ne pouvez quitter Linuxrc que par l'option de menu\n"
 "\n"
 "\"Démarrer l'installation / le système\"\n"
 "\n"
-"Pour que ce soit possible, vous devrez éventuellement charger les pilotes (modules) pour le support de votre matériel."
+"Pour que ce soit possible, vous devrez éventuellement charger les pilotes "
+"(modules) pour le support de votre matériel."
 
 # TLABEL linuxrc_2002_03_29_0036__83
 #. TXT_NO_CTRLC
-msgid "You cannot exit Linuxrc with <ctrl-c>!"
+#, fuzzy
+msgid "You cannot exit Linuxrc with <Ctrl-C>."
 msgstr "Vous ne pouvez pas quitter Linuxrc avec <ctrl-c>!"
 
 # TLABEL linuxrc_2002_03_29_0036__84
 #. TXT_REMOVE_DISK
-msgid "Please remove the disk from the drive now!"
+#, fuzzy
+msgid "Remove the disk from the drive now."
 msgstr "Retirez maintenant la disquette du lecteur!"
 
 # TLABEL linuxrc_2002_03_29_0036__85
@@ -518,7 +585,8 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__86
 #. TXT_CHOOSE_SOURCE
-msgid "Please choose the source medium"
+#, fuzzy
+msgid "Choose the source medium."
 msgstr "Sélectionnez le support source"
 
 # TLABEL linuxrc_2002_03_29_0036__87
@@ -528,79 +596,83 @@ msgstr "Tentative de monter le CD-ROM..."
 
 # TLABEL linuxrc_2002_03_29_0036__88
 #. TXT_ERROR_CD_MOUNT
-msgid "Unable to mount the CD-ROM!"
+#, fuzzy
+msgid "Unable to mount the CD-ROM."
 msgstr "Impossible de monter le CD-ROM!"
-
-# TLABEL linuxrc_2002_03_29_0036__89
-#. TXT_START_YAST
-msgid "Starting YaST..."
-msgstr "Démarrage de YaST..."
 
 # TLABEL linuxrc_2002_03_29_0036__90
 #. TXT_ASK_REBOOT
-msgid "Do you want to reboot the system now?"
+#, fuzzy
+msgid "Reboot the system now?"
 msgstr "Souhaitez-vous maintenant redémarrer le système?"
 
 # TLABEL linuxrc_2002_03_29_0036__91
 #. TXT_INSTALL_SUCCESS
-msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
-msgstr "Le système de base a été installé avec succès. Ce système est maintenant démarré pour terminer l'installation."
+#, fuzzy
+msgid ""
+"The base system has been successfully installed. This newly installed system "
+"will now be started to commit the installation."
+msgstr ""
+"Le système de base a été installé avec succès. Ce système est maintenant "
+"démarré pour terminer l'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__92
 #. TXT_ENTER_PARTITION
-msgid "Please enter the harddisk partition (eg. /dev/sda1)"
+#, fuzzy
+msgid "Enter the hard disk partition (e.g., /dev/sda1)"
 msgstr "Spécifiez la partition du disque (p.ex. /dev/sda1)"
 
 # TLABEL linuxrc_2002_03_29_0036__93
 #. TXT_ERROR_HD_MOUNT
-msgid "Could not mount the specified partition!"
+#, fuzzy
+msgid "Could not mount the specified partition."
 msgstr "La partition spécifiée n'a pas pu être montée!"
 
 # TLABEL linuxrc_2002_03_29_0036__94
 #. TXT_ENTER_HD_DIR
-msgid "Please enter the source directory"
+#, fuzzy
+msgid "Enter the source directory."
 msgstr "Entrez le nom du répertoire source"
 
 # TLABEL linuxrc_2002_03_29_0036__95
 #. TXT_ERROR_INSTALL
-msgid "An error occurred during the installation!"
+#, fuzzy
+msgid "An error occurred during the installation."
 msgstr "Erreur au cours de l'installation!"
 
 # TLABEL linuxrc_2002_03_29_0036__96
 #. TXT_DRIVES
-msgid "Harddisks / CD-ROMs"
+#, fuzzy
+msgid "Hard Disks or CD-ROMs"
 msgstr "Disques durs / CD-ROMs"
 
 # TLABEL linuxrc_2002_03_29_0036__97
 #. TXT_LITTLE_MEM
+#, fuzzy
 msgid ""
-"Your computer has extremely little memory!\n"
+"Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space!"
+"Before you acknowledge this message, you must switch to virtual console 2 "
+"(press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Votre machine a extrêmement peu de mémoire!\n"
 "\n"
-"Avant de confirmer ce message, vous devez passer à la console virtuelle 2 (pressez ALT-F2) pour créer et activer un espace de swap!"
+"Avant de confirmer ce message, vous devez passer à la console virtuelle 2 "
+"(pressez ALT-F2) pour créer et activer un espace de swap!"
 
 # TLABEL linuxrc_2002_03_29_0036__98
 #. TXT_ASK_ANIMATE
 msgid "Animation"
 msgstr "Animation"
 
-# TLABEL linuxrc_2002_03_29_0036__99
 #. TXT_ASK_EXPLODE
-msgid ""
-"Do you like \"animated\" windows?\n"
-"\n"
-"Of course ;-)"
+msgid "Use animated windows?"
 msgstr ""
-"Voulez-vous des fenêtres \"animées\"?\n"
-"\n"
-"Bien sûr ;-)"
 
 # TLABEL linuxrc_2002_03_29_0036__100
 #. TXT_NO_DRIVES
-msgid "No harddisks or CD-ROM drives have been detected so far."
+#, fuzzy
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Aucun disque dur ou lecteur de CD-ROM n'a été détecté jusqu'à présent."
 
 # TLABEL linuxrc_2002_03_29_0036__101
@@ -610,37 +682,46 @@ msgstr "Débogage (experts)"
 
 # TLABEL linuxrc_2002_03_29_0036__102
 #. TXT_FORCE_ROOTIMAGE
-msgid "Load rootimage into ramdisk"
+#, fuzzy
+msgid "Load Root Image into RAM Disk"
 msgstr "Chargement de l'image de root dans le disque RAM"
 
 # TLABEL linuxrc_2002_03_29_0036__103
 #. TXT_NEW_ROOTIMAGE
-msgid "Enter rootimage"
+#, fuzzy
+msgid "Enter Root Image"
 msgstr "Spécifier l'image de root"
 
-# TLABEL linuxrc_2002_03_29_0036__104
 #. TXT_ASK_RI_FORCE
-msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
-msgstr "Faut-il charger l'image de root dans le disque RAM même si un système d'installation valide a été détecté?"
+msgid "Should the root image be loaded into the RAM disk?"
+msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__105
 #. TXT_ENTER_ROOTIMAGE
-msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
-msgstr "Entrez le chemin et le nom du fichier que vous voulez charger comme système de fichiers racine dans le disque RAM."
+#, fuzzy
+msgid ""
+"Enter the path and name of the file to load into the RAM disk as the root "
+"file system."
+msgstr ""
+"Entrez le chemin et le nom du fichier que vous voulez charger comme système "
+"de fichiers racine dans le disque RAM."
 
 # TLABEL linuxrc_2002_03_29_0036__106
 #. TXT_NOT_IMPLEMENTED
-msgid "Not yet implemented!"
+#, fuzzy
+msgid "Not yet implemented."
 msgstr "Pas encore implémenté!"
 
 # TLABEL linuxrc_2002_03_29_0036__107
 #. TXT_NEW_INST_SYS
-msgid "Installation system"
+#, fuzzy
+msgid "Installation System"
 msgstr "Système d'installation"
 
 # TLABEL linuxrc_2002_03_29_0036__108
 #. TXT_ENTER_INST_SYS
-msgid "Please enter the directory that contains the installation system."
+#, fuzzy
+msgid "Enter the directory that contains the installation system."
 msgstr "Entrez le nom du répertoire contenant le système d'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__109
@@ -660,58 +741,67 @@ msgstr "Démarrer le CD live"
 
 # TLABEL linuxrc_2002_03_29_0036__112
 #. TXT_INSERT_LIVECD
-msgid "Please insert the Live CD."
+#, fuzzy
+msgid "Insert the Live CD."
 msgstr "Insérez le CD live."
 
 # TLABEL linuxrc_2002_03_29_0036__113
 #. TXT_END_REBOOT
-msgid "Exit / Reboot"
+#, fuzzy
+msgid "Exit or Reboot"
 msgstr "Quitter / Réamorcer"
 
 # TLABEL linuxrc_2002_03_29_0036__114
 #. TXT_SEARCH_INFOFILE
-msgid "Searching for infofile..."
+#, fuzzy
+msgid "Searching for info file..."
 msgstr "Recherche du fichier info..."
 
 # TLABEL linuxrc_2002_03_29_0036__115
 #. TXT_NFSPORT
-msgid "Specify NFS port"
+#, fuzzy
+msgid "Specify the NFS port."
 msgstr "Spécification du port NFS"
 
 # TLABEL linuxrc_2002_03_29_0036__116
 #. TXT_ASKING_NAMED
-msgid "Asking nameserver..."
+#, fuzzy
+msgid "Asking name server..."
 msgstr "Interrogation du serveur de noms..."
 
 # TLABEL linuxrc_2002_03_29_0036__117
 #. TXT_HOST_NOT_FOUND
-#, c-format
-msgid "Host %s was not found!"
+#, fuzzy, c-format
+msgid "Host %s was not found."
 msgstr "L'hôte %s n'a pas été trouvé!"
 
 # TLABEL linuxrc_2002_03_29_0036__118
 #. TXT_NET_CONFIGURED
-msgid "Your network is already configured. Do you want to keep this configuration?"
-msgstr "Votre réseau est déjà configuré. Voulez-vous conserver la configuration?"
+#, fuzzy
+msgid "Your network is already configured. Keep this configuration?"
+msgstr ""
+"Votre réseau est déjà configuré. Voulez-vous conserver la configuration?"
 
-# TLABEL linuxrc_2002_03_29_0036__119
+# TLABEL linuxrc_2002_03_29_0036__167
 #. TXT_ASK_BREAK
-msgid "Do want to abort?"
-msgstr "Voulez-vous annuler?"
+#, fuzzy
+msgid "Abort?"
+msgstr "Annuler"
 
 # TLABEL linuxrc_2002_03_29_0036__120
 #. TXT_NO_NETDEVICE
+#, fuzzy
 msgid ""
-"No network device found!\n"
-"Please load a network module first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
 "Il n'a pas été détecté de carte réseau!\n"
 "Chargez d'abord un module réseau."
 
 # TLABEL linuxrc_2002_03_29_0036__121
 #. TXT_ALREADY_FOUND
-#, c-format
-msgid "A %s was already found in your system!\n"
+#, fuzzy, c-format
+msgid "A %s was already found in your system.\n"
 msgstr "Dans votre système, il a déjà été détecté un %s!\n"
 
 # TLABEL linuxrc_2002_03_29_0036__122
@@ -728,47 +818,62 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__123
 #. TXT_ENTER_FTPUSER
-msgid "Please enter the user name under which you want to access the FTP server"
-msgstr "Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP"
+#, fuzzy
+msgid "Enter the user name with which to access the FTP server."
+msgstr ""
+"Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP"
 
 # TLABEL linuxrc_2002_03_29_0036__124
 #. TXT_ENTER_FTPPASSWD
-msgid "Please enter the password for the FTP user account"
+#, fuzzy
+msgid "Enter the password for the FTP user account."
 msgstr "Entrez votre mot de passe pour le compte utilisateur FTP"
 
 # TLABEL linuxrc_2002_03_29_0036__125
 #. TXT_ENTER_FTPPROXY
-msgid "Please enter the address of the FTP proxy"
+#, fuzzy
+msgid "Enter the address of the FTP proxy."
 msgstr "Entrez l'adresse du proxy FTP"
 
 # TLABEL linuxrc_2002_03_29_0036__126
 #. TXT_ENTER_FTPPORT
-msgid "Please enter the port of the FTP proxy"
+#, fuzzy
+msgid "Enter the port of the FTP proxy."
 msgstr "Spécifiez le port du proxy FTP"
 
 # TLABEL linuxrc_2002_03_29_0036__127
 #. TXT_WANT_FTPPROXY
-msgid "Do you want to use an FTP proxy?"
+#, fuzzy
+msgid "Use an FTP proxy?"
 msgstr "Voulez-vous utiliser un proxy FTP?"
 
 # TLABEL linuxrc_2002_03_29_0036__128
 #. TXT_NOMEM_FTP
-#, c-format
-msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
-msgstr "Votre machine n'a pas assez de RAM pour une installation via FTP! (%d Mo de RAM sont nécessaires)"
+#, fuzzy, c-format
+msgid ""
+"Your computer does not have enough RAM to install via FTP (%d MB RAM "
+"required)."
+msgstr ""
+"Votre machine n'a pas assez de RAM pour une installation via FTP! (%d Mo de "
+"RAM sont nécessaires)"
 
 # TLABEL linuxrc_2002_03_29_0036__129
 #. TXT_ANONYM_FTP
+#, fuzzy
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
-"Do you want this?"
+"Usually an FTP installation is performed via anonymous FTP. It is possible "
+"to specify a user name and password for the FTP server access.\n"
+"Use a user name and password?"
 msgstr ""
-"Normalement, une installation FTP se déroule via FTP anonyme. Il est cependant possible de spécifier un nom d'utilisateur et un mot de passe pour l'accès au serveur FTP.\n"
+"Normalement, une installation FTP se déroule via FTP anonyme. Il est "
+"cependant possible de spécifier un nom d'utilisateur et un mot de passe pour "
+"l'accès au serveur FTP.\n"
 "Voulez-vous le faire?"
 
 # TLABEL linuxrc_2002_03_29_0036__130
 #. TXT_MORE_MODULES
-msgid "-- More modules --"
+#, fuzzy
+msgid "-- More Modules --"
 msgstr "-- Davantage de modules --"
 
 # TLABEL linuxrc_2002_03_29_0036__131
@@ -778,28 +883,14 @@ msgstr "Initialisation du port parallèle..."
 
 # TLABEL linuxrc_2002_03_29_0036__132
 #. TXT_ENTER_NFSPORT
-msgid "Please enter the port number on which the nfs server is running"
+#, fuzzy
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Entrez le numéro du port sur lequel tourne le serveur nfs"
-
-# TLABEL linuxrc_2002_03_29_0036__133
-#. TXT_YAST1
-msgid "YaST1 - text based"
-msgstr "YaST1 - mode texte"
-
-# TLABEL linuxrc_2002_03_29_0036__134
-#. TXT_YAST2
-msgid "YaST2 - graphical"
-msgstr "YaST2 - mode graphique"
-
-# TLABEL linuxrc_2002_03_29_0036__135
-#. TXT_CHOOSE_YAST
-msgid "Please choose the version of YaST you want to use for the installation."
-msgstr "Choisissez la version de YaST que vous voulez utiliser pour l'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__136
 #. TXT_INSERT_CD
-#, c-format
-msgid "Please make sure that CD number %d is in your drive!"
+#, fuzzy, c-format
+msgid "Make sure that CD number %d is in your drive."
 msgstr "Assurez-vous que le CD %d se trouve dans votre lecteur!"
 
 # TLABEL linuxrc_2002_03_29_0036__137
@@ -809,12 +900,14 @@ msgstr "Éjecter le CD"
 
 # TLABEL linuxrc_2002_03_29_0036__138
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp timeout"
+#, fuzzy
+msgid "Bootp Time-Out"
 msgstr "Délai pour Bootp"
 
 # TLABEL linuxrc_2002_03_29_0036__139
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Please enter the timeout value for bootp."
+#, fuzzy
+msgid "Enter the time-out value for bootp."
 msgstr "Spécifiez la valeur du délai pour bootp."
 
 # TLABEL linuxrc_2002_03_29_0036__141
@@ -839,50 +932,55 @@ msgstr "Routeur cisco relié au canal "
 
 # TLABEL linuxrc_2002_03_29_0036__145
 #. TXT_SMB_ENTER_SHARE
-msgid "Please enter the share name on the SMB server"
+#, fuzzy
+msgid "Enter the share name on the SMB server."
 msgstr "Entrez le nom du partage sur le serveur SMB"
 
 # TLABEL linuxrc_2002_03_29_0036__146
 #. TXT_SMB_GUEST_LOGIN
+#, fuzzy
 msgid ""
-"If you want to access the share as guest,"
-"you don't need do specify username, password and workgroup.\n"
-"Do you want to access the share as quest?"
+"If you want to access the share as guest,you do not need to specify user "
+"name, password, and workgroup.\n"
+"Access the share as guest?"
 msgstr ""
-"Si vous voulez accéder au partage en tant qu'invité,"
-"vous n'avez pas à spécifier de nom d'utilisateur "
-"de mot de passe ni de groupe de travail.\n"
+"Si vous voulez accéder au partage en tant qu'invité,vous n'avez pas à "
+"spécifier de nom d'utilisateur de mot de passe ni de groupe de travail.\n"
 "Voulez-vous accéder au partage en tant qu'invité?"
-
 
 # TLABEL linuxrc_2002_03_29_0036__147
 #. TXT_SMB_ENTER_USER
-msgid "Please enter yor user name on the SMB server"
+#, fuzzy
+msgid "Enter your user name on the SMB server."
 msgstr "Entrez votre nom d'utilisateur sur le serveur SMB"
 
 # TLABEL linuxrc_2002_03_29_0036__148
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter yor password on the SMB server"
+#, fuzzy
+msgid "Enter your password on the SMB server."
 msgstr "Entrez votre mot de passe sur le serveur SMB"
 
 # TLABEL linuxrc_2002_03_29_0036__149
 #. TXT_SMB_ENTER_WORKGROUP
+#, fuzzy
 msgid ""
-"Please enter yor workgroup."
-"If you don't need to specify a workgroup,"
-"just leave the field empty."
+"Enter your workgroup.If you do not need to specify a workgroup,leave the "
+"field empty."
 msgstr ""
-"Entrez votre groupe de travail."
-"Si vous n'avez pas à spécifier de groupe de travail,"
-"laissez ce champ vide."
-
+"Entrez votre groupe de travail.Si vous n'avez pas à spécifier de groupe de "
+"travail,laissez ce champ vide."
 
 # TLABEL linuxrc_2002_03_29_0036__150
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr "Tentative de monter le partage\n\n\"//%s/%s\""
-
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
+msgstr ""
+"Tentative de monter le partage\n"
+"\n"
+"\"//%s/%s\""
 
 # TLABEL linuxrc_2002_03_29_0036__151
 # %s is either BOOTP or DHCP
@@ -912,30 +1010,35 @@ msgstr "Utiliser DHCP au lieu de BOOTP?"
 
 # TLABEL linuxrc_2002_03_29_0036__155
 #. TXT_MODDISK0
-msgid "Please insert a modules disk."
+#, fuzzy
+msgid "Insert a modules disk."
 msgstr "Insérez une disquette de modules."
 
 # TLABEL linuxrc_2002_03_29_0036__156
 #. TXT_MODDISK1
-#, c-format
-msgid "Please insert modules disk %d."
+#, fuzzy, c-format
+msgid "Insert modules disk %d."
 msgstr "Insérez la disquette de modules %d."
 
 # TLABEL linuxrc_2002_03_29_0036__157
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD1."
-msgstr "Vous trouverez des instructions pour la créer dans boot/README sur le CD1 ou le DVD1."
+#, fuzzy
+msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
+msgstr ""
+"Vous trouverez des instructions pour la créer dans boot/README sur le CD1 ou "
+"le DVD1."
 
 # TLABEL linuxrc_2002_03_29_0036__158
 #. TXT_CHOOSE_NETSOURCE
-msgid "Please choose the network protocol"
+#, fuzzy
+msgid "Choose the network protocol."
 msgstr "Choisissez le protocole réseau"
 
 # TLABEL linuxrc_2002_03_29_0036__159
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
+#, fuzzy, c-format
+msgid "Enter the IP address of the %s server."
 msgstr "Entrez l'adresse IP sur le serveur %s."
 
 # TLABEL linuxrc_2002_03_29_0036__160
@@ -953,18 +1056,20 @@ msgstr "Réseau"
 # TLABEL linuxrc_2002_03_29_0036__162
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
-#, c-format
-msgid "Load %s modules"
+#, fuzzy, c-format
+msgid "Load %s Modules"
 msgstr "Chargement des modules %s"
 
 # TLABEL linuxrc_2002_03_29_0036__163
 #. TXT_LOAD_FS
-msgid "Load file system modules"
+#, fuzzy
+msgid "Load File System Modules"
 msgstr "Chargement des modules système de fichiers"
 
 # TLABEL linuxrc_2002_03_29_0036__164
 #. TXT_LOAD_OTHER
-msgid "Load unknown modules"
+#, fuzzy
+msgid "Load Unknown Modules"
 msgstr "Chargement de modules inconnus"
 
 # TLABEL linuxrc_2002_03_29_0036__165
@@ -991,17 +1096,20 @@ msgstr "Aucun nouveau module n'a été trouvé"
 
 # TLABEL linuxrc_2002_03_29_0036__169
 #. TXT_CHOOSE_PARTITION
-msgid "Please choose the harddisk partition."
+#, fuzzy
+msgid "Choose the hard disk partition."
 msgstr "Choisissez la partition de disque dur."
 
 # TLABEL linuxrc_2002_03_29_0036__170
 #. TXT_CHOOSE_ROOT_FS
-msgid "Please choose the root partition."
+#, fuzzy
+msgid "Choose the root partition."
 msgstr "Choisissez la partition root."
 
 # TLABEL linuxrc_2002_03_29_0036__171
 #. TXT_CHOOSE_SWAP
-msgid "Please choose the swap partition."
+#, fuzzy
+msgid "Choose the swap partition."
 msgstr "Choisissez la partition de swap."
 
 # TLABEL linuxrc_2002_03_29_0036__172
@@ -1011,7 +1119,8 @@ msgstr "Il y a trop peu de mémoire pour charger toutes les données."
 
 # TLABEL linuxrc_2002_03_29_0036__173
 #. TXT_LOW_MEMORY2
-msgid "Your computer doesn't have enough memory to run YaST."
+#, fuzzy
+msgid "Your computer does not have enough memory to run YaST."
 msgstr "Votre machine n'a pas suffisamment de mémoire pour exécuter YaST."
 
 # TLABEL linuxrc_2002_03_29_0036__174
@@ -1026,36 +1135,43 @@ msgstr "Erreur lors de l'activation de l'espace de swap"
 
 # TLABEL linuxrc_2002_03_29_0036__176
 #. TXT_ENTER_SWAP
-msgid "Please enter the swap partition (eg. /dev/sda2)"
+#, fuzzy
+msgid "Enter the swap partition (e.g., /dev/sda2)"
 msgstr "Entrez le nom de la partition de swap (p.ex. /dev/sda2)"
 
+# TLABEL linuxrc_2002_03_29_0036__123
 #. TXT_ENTER_USER
-#, c-format
-msgid "Please enter the user name under which you want to access the %s server"
+#, fuzzy, c-format
+msgid "Enter the user name with which to access the %s server."
 msgstr ""
+"Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP"
 
+# TLABEL linuxrc_2002_03_29_0036__159
+# %s is NFS, FTP, HTTP or SMB
 #. TXT_ENTER_PASSWORD
-#, c-format
-msgid "Please enter the password for the %s server"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the password for the %s server."
+msgstr "Entrez l'adresse IP sur le serveur %s."
 
 #. TXT_WANT_PROXY
 #, c-format
-msgid "Do you want to use a %s proxy?"
+msgid "Use a %s proxy?"
 msgstr ""
 
+# TLABEL linuxrc_2002_03_29_0036__125
 #. TXT_ENTER_PROXY
-#, c-format
-msgid "Please enter the address of the %s proxy"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the address of the %s proxy."
+msgstr "Entrez l'adresse du proxy FTP"
 
+# TLABEL linuxrc_2002_03_29_0036__126
 #. TXT_ENTER_PROXYPORT
-#, c-format
-msgid "Please enter the port of the %s proxy"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the port of the %s proxy."
+msgstr "Spécifiez le port du proxy FTP"
 
 #. TXT_VNC_SWITCH
-msgid "VNC Enable/Disable"
+msgid "VNC Enable or Disable"
 msgstr ""
 
 #. TXT_VNC_YES_NO
@@ -1063,7 +1179,7 @@ msgid "Use VNC for install?"
 msgstr ""
 
 #. TXT_SSH_SWITCH
-msgid "Enable/Disable SSH Mode"
+msgid "Enable or Disable SSH Mode"
 msgstr ""
 
 #. TXT_SSH_YES_NO
@@ -1071,20 +1187,18 @@ msgid "Start SSH for Text Install?"
 msgstr ""
 
 #. TXT_VNC_PASSWORD
-msgid "Please enter your VNC password"
+msgid "Enter your VNC password."
 msgstr ""
 
 #. TXT_SSH_PASSWORD
-msgid "Please enter your temporary SSH password"
+msgid "Enter your temporary SSH password."
 msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be "
+"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -1095,15 +1209,32 @@ msgstr ""
 msgid "Show Driver Updates"
 msgstr ""
 
+# TLABEL linuxrc_2002_03_29_0036__51
 #. TXT_INPUT_NAMED1
-#, c-format
-msgid "Please enter the IP of name server %u, or press ESC."
+#, fuzzy, c-format
+msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
+"Entrez l'adresse IP de votre serveur de noms. Si vous n'utilisez pas de "
+"serveur de noms, appuyez sur ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
-"Enter temporary Root Password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"Enter temporary root password.\n"
+"You will be required to change this password on initial root user login."
+msgstr ""
+
+#. TXT_REBOOT
+msgid "Reboot"
+msgstr ""
+
+#. TXT_NO_RAM
+#, c-format
+msgid ""
+"Your computer does not have enough RAM for the installation of %s. "
+"You need at least %d MB."
+msgstr ""
+
+#. TXT_VNC_PASSWORD_TOO_SHORT
+msgid "Password is too short (must have at least 5 characters)."
 msgstr ""
 
