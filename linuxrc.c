@@ -2,7 +2,7 @@
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
  *
- * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2001  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -310,7 +310,7 @@ static void lxrc_init (void)
     char  *linuxrc_pci;
     int    rc_ii;
 
-    printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2000 SuSE GmbH <<<\n");
+    printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2001 SuSE GmbH <<<\n");
     fflush(stdout);
 
     if (!testing_ig && getpid () > 19)

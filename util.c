@@ -2,7 +2,7 @@
  *
  * util.c        Utility functions for linuxrc
  *
- * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2001  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -337,7 +337,7 @@ void util_print_banner (void)
     win_open (&win_ri);
 
     uname (&utsinfo_ri);
-    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2000 SuSE GmbH <<<",
+    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2001 SuSE GmbH <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,

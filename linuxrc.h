@@ -2,7 +2,7 @@
  *
  * linuxrc.h     Header file for linuxrc.c
  *
- * Copyright (c) 1996-1998  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2001  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
