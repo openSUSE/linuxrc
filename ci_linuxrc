@@ -19,6 +19,7 @@ mkdir $linuxrc
 tar -cf - * | tar -C $linuxrc -xf -
 cd $linuxrc
 find . -depth -name CVS -exec rm -r {} \;
+find . -depth -name .cvsignore -exec rm -r {} \;
 rm -f ci_linuxrc Makefile.new
 cd /tmp
 
