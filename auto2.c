@@ -32,11 +32,13 @@
 #include "install.h"
 #include "auto2.h"
 #include "settings.h"
+#include "modparms.h"
 
 #ifdef USE_LIBHD
 
 static hd_data_t *hd_data = NULL;
 static char *auto2_loaded_module = NULL;
+static char *auto2_loaded_module_args = NULL;
 
 static char *auto2_device_name(hd_t *hd);
 static int auto2_cdrom_dev(void);
@@ -281,8 +283,18 @@ int auto2_activate_devices(unsigned base_class, int last_idx)
           fprintf(stderr, "Going to load module \"%s\" to activate it...\n", di->module.name);
           system(mod_cmd);
           if(hd_module_is_active(hd_data, di->module.name)) {
-            if(auto2_loaded_module) { free(auto2_loaded_module); auto2_loaded_module = NULL; }
+            if(auto2_loaded_module) {
+              free(auto2_loaded_module); auto2_loaded_module = NULL;
+            }
+            if(auto2_loaded_module_args) {
+              free(auto2_loaded_module_args); auto2_loaded_module_args = NULL;
+            }
             auto2_loaded_module = strdup(di->module.name);
+            if(di->module.mod_args)
+              auto2_loaded_module_args = strdup(di->module.mod_args);
+
+            mpar_save_modparams(auto2_loaded_module, auto2_loaded_module_args);
+
             fprintf(stderr, "Ok, that seems to have worked. :-)\n");
             break;
           }
@@ -365,7 +377,12 @@ int auto2_init()
 
   if((valid_net_config_ig & 0x2f) != 0x2f) return FALSE;
   
-  if(auto2_loaded_module) { free(auto2_loaded_module); auto2_loaded_module = NULL; }
+  if(auto2_loaded_module) {
+    free(auto2_loaded_module); auto2_loaded_module = NULL;
+  }
+  if(auto2_loaded_module_args) {
+    free(auto2_loaded_module_args); auto2_loaded_module_args = NULL;
+  }
 
   deb_msg("Well, maybe there is a NFS/FTP server...");
 
