@@ -1,3 +1,6 @@
+8/1/2004:	v1.4.57
+	- hardlinks on driver update medium could cause segfault
+
 13/10/2003:	v1.4.56
 	- fixed evil bug causing linuxrc to do some unexpected things
 	  (introduced by 1.4.55, first item)

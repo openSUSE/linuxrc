@@ -1838,6 +1838,8 @@ void free_hlink_list()
     if(hl->dst) free(hl->dst);
     free(hl);
   }
+
+  hlink_list = NULL;
 }
 
 
