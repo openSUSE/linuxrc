@@ -445,7 +445,7 @@ static void lxrc_init (void)
                action_ig |= ACT_LOAD_DISK;
 
            if (strstr (s, ",french,"))
-               language_ig = LANG_FRENCH;
+               language_ig = LANG_fr;
 
            if (strstr (s, ",color,"))
                color_ig = TRUE;

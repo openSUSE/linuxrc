@@ -1,0 +1,110 @@
+#! /usr/bin/perl
+
+# convert *.po files to *.txt file suitabe for linuxrc
+# usage: po2txt file.po >file.txt
+
+sub read_texts;
+
+for $lang (@ARGV) {
+  $lang =~ s/\.po$//;
+  read_texts $lang;
+}
+
+
+sub read_texts
+{
+  local $_;
+
+  my ($lang, @f, $txt, $context, $t, $p, $ids, $file);
+
+  $lang = shift;
+
+  $file = $lang;
+  if($file =~ s/(^|\/)en$/$1de/) {
+    $ids = 1;
+  }
+  $file .= ".po";
+
+  open F, $file;
+  @f = (<F>);
+  close F;
+
+  $_ = $lang;
+  s/.*\///;
+  print "/*\n * This file is generated automatically. Editing it is pointless.\n */\n\n";
+  print "static text_t txt_${_}_atm [] =\n{\n";
+
+  for (@f) {
+    if(/^\s*#\.\s*(TXT_\S+)/) {
+      if($txt) {
+        @msgstr = @msgid if $ids;
+        printf "{ %-25s", "$txt,";
+        $p = pop @msgstr;
+        for $t (@msgstr) {
+          printf "%s\n%-27s", $t, "";
+        }
+        printf "%-56s},\n", $p;
+      }
+
+      $txt = $1;
+
+      push @txts, $txt if $ids;
+
+      undef @msgid;
+      undef @msgstr;
+      undef $context;
+      next;
+    }
+
+    next if /^\s*#.*|^\s*$/;
+    
+    if(/^\s*msgid\s*(\".*\")\s*$/) {
+      push @msgid, $1 unless $1 eq '""';
+      $context = 1;
+      next;
+    }
+
+    if(/^\s*msgstr\s*(\".*\")\s*$/) {
+      push @msgstr, $1 unless $1 eq '""';
+      $context = 2;
+      next;
+    }
+
+    if(/^\s*(\".*\")\s*$/) {
+      if($context == 1) {
+        push @msgid, $1;
+      }
+      elsif($context == 2) {
+        push @msgstr, $1;
+      }
+      else {
+        die "format oops in ${lang}.po: $_"
+      }
+    }
+  }
+
+  if($txt) {
+    printf "{ %-25s", "$txt,";
+    @msgstr = @msgid if $ids;
+    $p = pop @msgstr;
+    for $t (@msgstr) {
+      printf "%s\n%-27s", $t, "";
+    }
+    printf "%-56s}\n", $p;
+  }
+
+  print "};\n";
+
+  if($ids) {
+    open W, ">text_textids.h";
+    print W "/*\n * This file is generated automatically. Editing it is pointless.\n */\n\n";
+    print W "enum textid_t {\n";
+    $p = pop @txts;
+    for (@txts) { print W "  $_,\n" }
+    print W "  $p\n};\n";
+    close W;
+  }
+
+}
+
+

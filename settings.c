@@ -45,52 +45,80 @@ typedef struct
 #define LANG_DEFAULT	1
 static language_t set_languages_arm [] =
 {
-{ LANG_GERMAN,       "Deutsch",              "de-lat1-nd",   "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 0,      "de_DE",        "german"        },
-{ LANG_ENGLISH,      "English",              "us",           "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 0,      "en_US",        "english"       },
-{ LANG_SPANISH,      "Español",              "es",           "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 1,      "es_ES",        "spanish"       },
-{ LANG_FRENCH,       "Français",             "fr-latin1",    "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 0,      "fr_FR",        "french"        },
-#if LXRC_TINY < 1
-{ LANG_BRETON,       "Brezhoneg",            "fr-latin1",    "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 0,      "fr_FR",        "breton"        },
-{ LANG_GREEK,        "Hellenic",             "gr",           "lat7-16.psfu",
-  "trivial",         "lat7u.uni", 1, 1,      "el_EL",        "greek"         },
-{ LANG_INDONESIA,    "Indonesia",            "us",           "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 1,      "de_DE",        "indonesian"    },
+#ifdef TRANS_de
+{ LANG_de, "Deutsch", "de-lat1-nd", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "de_DE", "german" },
 #endif
-{ LANG_ITALIAN,      "Italiano",             "it",           "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 0,      "it_IT",        "italian"       },
-#if LXRC_TINY < 1
-{ LANG_HUNGARIA,     "Magyar",               "hu",           "lat2-16.psfu",
-  "trivial",         "lat2u.uni", 1, 1,      "hu_HU",        "hungarian"     },
+
+#ifdef TRANS_en
+{ LANG_en, "English", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "en_US", "english" },
 #endif
-{ LANG_DUTCH,        "Nederlands",           "us",           "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 1,      "nl_NL",        "dutch"         },
-#if LXRC_TINY < 1
-{ LANG_POLISH,       "Polski",               "Pl02",         "lat2-16.psfu",
-  "trivial",         "lat2u.uni", 1, 1,      "pl_PL",        "polish"        },
+
+#ifdef TRANS_es
+{ LANG_es, "Español", "es", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
 #endif
-{ LANG_PORTUGUESE,   "Português",            "pt-latin1",    "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 1,      "pt_PT",        "portuguese"    },
-#if LXRC_TINY < 1
-{ LANG_BRAZIL,       "Português Brasileiro", "br-abnt2",     "lat1-16.psfu",
-  "none",            "lat1u.uni", 0, 1,      "pt_BR",        "brazilian"     },
-{ LANG_ROMANIAN,     "Romania",              "us",           "lat2-16.psfu",
-  "trivial",         "lat2u.uni", 1, 1,      "en_US",        "romanian"      },
-{ LANG_RUSSIA,       "Russian",              "ru1",          "Cyr_a8x16.psfu",
-  "koi2alt",         "cyralt.uni",1, 1,      "ru_RU.KOI8-R", "russian"       },
-{ LANG_CZECH,        "Cestina",              "cz-us-qwertz", "lat2-16.psfu",
-  "trivial",         "lat2u.uni", 1, 1,      "cs_CZ",        "czech"         },
-{ LANG_SLOVAK,       "Slovencina",           "sk-qwerty",    "lat2-16.psfu",
-  "trivial",         "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
+
+#ifdef TRANS_fr
+{ LANG_fr, "Français", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
+#endif
+
+#ifdef TRANS_br
+{ LANG_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
+#endif
+
+#ifdef TRANS_el
+{ LANG_el, "Hellenic", "gr", "lat7-16.psfu", "trivial", "lat7u.uni", 1, 1, "el_EL", "greek" },
+#endif
+
+#ifdef TRANS_id
+{ LANG_id, "Indonesia", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "de_DE", "indonesian" },
+#endif
+
+#ifdef TRANS_it
+{ LANG_it, "Italiano", "it", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
+#endif
+
+#ifdef TRANS_hu
+{ LANG_hu, "Magyar", "hu", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
+#endif
+
+#ifdef TRANS_nl
+{ LANG_nl, "Nederlands", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "nl_NL", "dutch" },
+#endif
+
+#ifdef TRANS_pl
+{ LANG_pl, "Polski", "Pl02", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "pl_PL", "polish" },
+#endif
+
+#ifdef TRANS_pt
+{ LANG_pt, "Português", "pt-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
+#endif
+
+#ifdef TRANS_pt_BR
+{ LANG_pt_BR, "Português Brasileiro", "br-abnt2", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
+#endif
+
+#ifdef TRANS_ro
+{ LANG_ro, "Romania", "us", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "en_US", "romanian" },
+#endif
+
+#ifdef TRANS_ru
+{ LANG_ru, "Russian", "ru1", "Cyr_a8x16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU.KOI8-R", "russian" },
+#endif
+
+#ifdef TRANS_cs
+{ LANG_cs, "Cestina", "cz-us-qwertz", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
+#endif
+
+#ifdef TRANS_sk
+{ LANG_sk, "Slovencina", "sk-qwerty", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
 #endif
 };
 #endif
 
-#if defined(__alpha__)
+
+/* Is this really still needed ??????? */
+// #if defined(__alpha__)
+#if 0
 
 #define LANG_DEFAULT    1
 static language_t set_languages_arm [] =

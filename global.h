@@ -78,29 +78,7 @@
 #define ACT_NO_PCMCIA		(1 << 6)
 #define ACT_DEBUG		(1 << 7)
 
-enum langid_t
-    {
-    LANG_UNDEF,
-    LANG_GERMAN,
-    LANG_ENGLISH,
-    LANG_SPANISH,
-    LANG_ITALIAN,
-    LANG_FRENCH,
-    LANG_BRAZIL,
-    LANG_GREEK,
-    LANG_HUNGARIA,
-    LANG_POLISH,
-    LANG_DUTCH,
-    LANG_ROMANIA,
-    LANG_RUSSIA,
-    LANG_SLOVAK,
-    LANG_INDONESIA,
-    LANG_PORTUGUESE,
-    LANG_ROMANIAN,
-    LANG_CZECH,
-    LANG_TURKEY,
-    LANG_BRETON
-    };
+#include "po/text_langids.h"
 
 #define RAMDISK_2  "/dev/ram2"
 

@@ -27,7 +27,7 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= insmod loadkeys pcmcia portmap
+SUBDIRS	= po insmod loadkeys pcmcia portmap
 LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a
 
 ifeq ($(ARCH),i386)
@@ -114,6 +114,7 @@ clean: libs
 
 ifneq ($(MAKECMDGOALS),clean)
 .depend: $(SRC) $(INC)
+	@$(MAKE) -C po
 	@$(CC) -MM $(CFLAGS) $(SRC) >$@
 -include .depend
 endif

@@ -1,0 +1,778 @@
+#. TXT_OK
+msgid "Ok"
+msgstr "Ok"
+
+#. TXT_CANCEL
+msgid "Back"
+msgstr "Indietro"
+
+#. TXT_YES
+msgid "Yes"
+msgstr "Si"
+
+#. TXT_NO
+msgid "No"
+msgstr "No"
+
+#. TXT_CHOOSE_LANGUAGE
+msgid "Please choose the language"
+msgstr "Scegliere la lingua"
+
+#. TXT_COLOR_DISPLAY
+msgid "Color display"
+msgstr "Schermo a colori"
+
+#. TXT_MONO_DISPLAY
+msgid "Monochrome display"
+msgstr "Schermo monocromo"
+
+#. TXT_CHOOSE_DISPLAY
+msgid "What kind of display do you use?"
+msgstr "Quale tipo di schermo usa?"
+
+#. TXT_MENU_LANG
+msgid "Language"
+msgstr "Lingua"
+
+#. TXT_MENU_MODULES
+msgid "Kernel modules (hardware drivers)"
+msgstr "Modulo-Kernel (Hardware-Driver)"
+
+#. TXT_MENU_START
+msgid "Start installation / system"
+msgstr "Installazione / iniziare il sistema"
+
+#. TXT_MENU_INFO
+msgid "System information"
+msgstr "Sistema-Informazioni"
+
+#. TXT_HDR_MAIN
+msgid "Main menu"
+msgstr "Menu principale"
+
+#. TXT_SETTINGS
+msgid "Settings"
+msgstr "Settaggi"
+
+#. TXT_MENU_DISPLAY
+msgid "Display"
+msgstr "Schermo"
+
+#. TXT_MENU_KEYMAP
+msgid "Keymap"
+msgstr "Formattazione della tastiera"
+
+#. TXT_LOAD_SCSI
+msgid "Load SCSI module"
+msgstr "Caricare lo SCSI-driver"
+
+#. TXT_LOAD_CDROM
+msgid "Load CD-ROM module"
+msgstr "Caricare CD-ROM-driver"
+
+#. TXT_LOAD_NET
+msgid "Load network card module"
+msgstr "Caricare i driver per la rete"
+
+#. TXT_SHOW_MODULES
+msgid "Show loaded modules"
+msgstr "Mostrare i moduli caricati"
+
+#. TXT_AUTO_LOAD
+msgid "Autoload of modules"
+msgstr "Carica automatica dei Moduli"
+
+#. TXT_DEL_MODULES
+msgid "Unload modules"
+msgstr "Rimuovere i moduli caricati"
+
+#. TXT_TRY_TO_LOAD
+msgid ""
+"Trying to load module \"%s\"...\n\n"
+"During loading you may want to watch the kernel "
+"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
+"to switch back to this menu."
+msgstr ""
+"Cerca di caricare il Modulo \"%s\"...\n\n"
+"Durante il proceso di caricamento potete controllare "
+"i messaggi del Kernel sulla Consolle 4 (ALT-F4)"
+
+#. TXT_LOAD_SUCCESSFUL
+msgid "Module \"%s\" has been successfully loaded!"
+msgstr "Il modulo \"%s\" è stato caricato con successo!"
+
+#. TXT_LOAD_FAILED
+msgid "Failed to load module \"%s\"!"
+msgstr "Il caricamento del modulo \"%s\" è fallito!"
+
+#. TXT_CDROM
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#. TXT_FLOPPY
+msgid "Floppy"
+msgstr "Dischetto"
+
+#. TXT_NFS
+msgid "Network (NFS)"
+msgstr "Rete (NFS)"
+
+#. TXT_FTP
+msgid "Network (FTP)"
+msgstr "Rete (FTP)"
+
+#. TXT_HARDDISK
+msgid "Harddisk"
+msgstr "Disk rigido"
+
+#. TXT_START_INSTALL
+msgid "Start installation/update"
+msgstr "Iniziare l'installazione"
+
+#. TXT_START_RESCUE
+msgid "Start rescue system"
+msgstr "Iniziare il sistema del aiuto"
+
+#. TXT_LOAD_RS_NFS
+msgid "Load rescue system via NFS"
+msgstr "Iniziare il sistema via NFS"
+
+#. TXT_BOOT_SYSTEM
+msgid "Boot installed system"
+msgstr "Fare il boot del sistema installato"
+
+#. TXT_SEARCH_FOR_RI
+msgid "Searching for image \"%s\"..."
+msgstr "Cerca Image \"%s\"..."
+
+#. TXT_RI_NOT_FOUND
+msgid ""
+"Cannot find the image!\n\n"
+"Check the directory specification!"
+msgstr ""
+"Image non è stato trovato!\n\n"
+"Controllate le indicazioni del directory."
+
+#. TXT_LOADING
+msgid "Loading data into ramdisk"
+msgstr "Carica i dati nel Ramdisk"
+
+#. TXT_INFO_KERNEL
+msgid "Kernel messages"
+msgstr "Comunicazioni del Kernel"
+
+#. TXT_INFO_CPU
+msgid "Processor"
+msgstr "Processore"
+
+#. TXT_INFO_DEVICES
+msgid "Devices"
+msgstr "Attrezzi"
+
+#. TXT_INFO_NETDEV
+msgid "Network cards"
+msgstr "Carte rete"
+
+#. TXT_INFO_DMA
+msgid "DMA"
+msgstr "DMA"
+
+#. TXT_INFO_IRQS
+msgid "Interrupts"
+msgstr "Interrupts"
+
+#. TXT_INFO_IOPORTS
+msgid "I/O Ports"
+msgstr "I/O Ports"
+
+#. TXT_INFO_MEM
+msgid "Memory"
+msgstr "Memoria"
+
+#. TXT_INFO_MODULES
+msgid "Modules"
+msgstr "Moduli"
+
+#. TXT_INFO_PCI
+msgid "PCI"
+msgstr "PCI"
+
+#. TXT_INSERT_DISK
+msgid "Please insert the disk and press ENTER"
+msgstr ""
+"Inserite il dischetto\n"
+"e premete il tasto ENTER"
+
+#. TXT_ERROR_READ_DISK
+msgid "Error while reading disk!"
+msgstr "Errore alla lettura dal dischetto!"
+
+#. TXT_ENTER_ROOT_FS
+msgid "Please enter your root partition (eg. /dev/sda3)"
+msgstr ""
+"Indicate la Vostra partizione Root\n"
+"(p.e. /dev/sda3)"
+
+#. TXT_INVALID_ROOT_FS
+msgid "Invalid root device!"
+msgstr "Partizione Root non valida!"
+
+#. TXT_INVALID_INPUT
+msgid "Invalid input!"
+msgstr "Indicazione non valida!"
+
+#. TXT_INPUT_IPADDR
+msgid "Please enter your IP address"
+msgstr "Indicate il Vostro indirizzo IP."
+
+#. TXT_INPUT_NETMASK
+msgid ""
+"Please enter your netmask. For a normal class C "
+"network, this is usually 255.255.255.0"
+msgstr ""
+"Indicate la Vostra maschera-rete. Per una normale "
+"Class-C-rete è 255.255.255.0"
+
+#. TXT_INPUT_GATEWAY
+msgid ""
+"If you need a gateway to reach the server, please "
+"enter the IP address of the gateway. If you do not "
+"need a gateway, just enter your own IP address."
+msgstr ""
+"Indicate l'indirizzo del Vostro Gateways, nel caso che "
+"ne serva uno, per poter indirizzare il Server. "
+"Altrimeni indicate solo il Vostro indirizzo IP."
+
+#. TXT_INPUT_NAMED
+msgid ""
+"Please enter the IP address of your name server. If "
+"you don't use a name server, just press ESC."
+msgstr ""
+"Indicate l'indirizzo IP del Vostro Nameserver. Se non "
+"volete usare nessun Nameserver, premete solamente ESC."
+
+#. TXT_FOUND_HOST
+msgid ""
+"The following data have been retrieved:\n\n"
+"IP address: %s\n"
+"Name: %s\n"
+"Domain: %s"
+msgstr ""
+"I seguenti computer-dati sono stati determinati:\n\n"
+"Indirizzo IP: %s\n"
+"Nom d'hôte: %s\n"
+"Domain: %s"
+
+#. TXT_ERROR_CONF_NET
+msgid ""
+"An error occurred while configuring the network. "
+"Probably your network card has not been recognized "
+"by the kernel!"
+msgstr ""
+"È avvenuto un errore nel configurare la rete. "
+"O non avete caricato il modulo adatto o "
+"la Vostra carta-rete non è stata "
+"riconosciuta correttamente dal Kernel!"
+
+#. TXT_INPUT_SERVER
+msgid "Please enter the IP address of the NFS server."
+msgstr "Indicate l'indirizzo IP del NFS-Server."
+
+#. TXT_INPUT_FTPSERVER
+msgid "Please enter the IP address of the FTP server."
+msgstr "Indicate l'indirizzo IP del FTP-Server."
+
+#. TXT_INPUT_DIR
+msgid "Please enter the directory on the server."
+msgstr "Indicate il directory sull' Server."
+
+#. TXT_ENTER_PARAMS
+msgid "Please enter parameters for \"%s\"."
+msgstr "Indicate eventuali parametri per \"%s\"."
+
+#. TXT_TRY_NFS_MOUNT
+msgid "Trying to mount the directory\n\n\"%s:%s\"..."
+msgstr ""
+"Cerca di fare il mount del directory"
+"\n\n\"%s:%s\""
+
+#. TXT_ERROR_NFSMOUNT
+msgid ""
+"An error occurred while trying to mount the nfs "
+"directory.\n\nReason given by server: %s"
+msgstr ""
+"Nel fare il mount del directory NFS del Server "
+"è subentrato il seguente errore:\n\n"
+"Errore dell' NFS-Server: %s"
+
+#. TXT_CHOOSE_KEYMAP
+msgid ""
+"Please choose a keyboard map.\nYaST will offer "
+"you additional keyboard tables later on."
+msgstr ""
+"Scegliete un settaggio della tastiera.\nYaST "
+"Vi darà in seguito altri settaggi."
+
+#. TXT_DELETE_MODULE
+msgid "Choose the module to be unloaded."
+msgstr "Scegliete il modulo che desiderate eliminare."
+
+#. TXT_NO_MODULES
+msgid "Currently there are no modules loaded!"
+msgstr "Al momento non sono caricati alcuni moduli!"
+
+#. TXT_AUTO_RUNNING
+msgid "Autoprobing (%s)...      "
+msgstr "Autoprobing (%s)...      "
+
+#. TXT_WANT_MORE_SCSI
+msgid ""
+"Do you want to search for additional SCSI host "
+"adaptors?"
+msgstr "Volete cercare altri SCSI-Adapter?"
+
+#. TXT_WANT_MORE_NET
+msgid "Do you want to search for additional network cards?"
+msgstr "Volete cercare altre schede rete?"
+
+#. TXT_WANT_MORE_CDROM
+msgid "Do you want to search for additional CD-ROM drives?"
+msgstr "Volete cercare altri CD-ROM?"
+
+#. TXT_NET_ETH0
+msgid "ethernet network card"
+msgstr "Scheda rete Ethernet"
+
+#. TXT_NET_PLIP
+msgid "parallel port"
+msgstr "Parallelport"
+
+#. TXT_NET_TR0
+msgid "token ring network card"
+msgstr "Scheda rete Token Ring"
+
+#. TXT_NET_ARC0
+msgid "arcnet network card"
+msgstr "Scheda rete Arcnet"
+
+#. TXT_NET_FDDI
+msgid "FDDI network card"
+msgstr "Scheda rete FDDI"
+
+#. TXT_NET_HIPPI
+msgid "HIPPI network card"
+msgstr "Scheda rete HIPPI"
+
+#. TXT_CHOOSE_NET
+msgid "Please choose the network device."
+msgstr ""
+"Scegliete il tipo di rete che volete usare per "
+"l'installazione."
+
+#. TXT_INPUT_PLIP_IP
+msgid "Please enter the IP-address of the PLIP partner."
+msgstr "Indicate l'indirizzo IP del PLIP-partner."
+
+#. TXT_LOAD_PCMCIA
+msgid "Load PCMCIA modules"
+msgstr "Carica moduli PCMCIA"
+
+#. TXT_NO_PCMCIA
+msgid ""
+"The PCMCIA chipset could not be automatically "
+"detected! Please specify manually."
+msgstr ""
+"Impossibile rilevare automaticamente il "
+"pset PCMCIA! Specificatelo manualmente."
+
+#. TXT_FOUND_PCMCIA
+msgid ""
+"Found PCMCIA chipset \"%s\"!\n\nPlease enter "
+"parameters for PCMCIA core modules"
+msgstr ""
+"Trovato PCMCIA Chipset \"%s\"!\n\nIndicate eventuali "
+"parametri per i moduli Core PCMCIA"
+
+#. TXT_PCMCIA_PARAMS
+msgid "Please enter specific parameters for chipset \"%s\""
+msgstr ""
+"Indicate eventuali parametri specifici per il "
+"Chipset \"%s\"."
+
+#. TXT_START_CARDMGR
+msgid "Starting cardmanager..."
+msgstr "Il Cardmanager viene iniziato..."
+
+#. TXT_PCMCIA_SUCCESS
+msgid "Successfully started PCMCIA card services."
+msgstr "PCMCIA Card Services iniziati con successo."
+
+#. TXT_PCMCIA_FAIL
+msgid "Start of PCMCIA card services failed!"
+msgstr "L'inizio del PCMCIA Card Services è fallito!"
+
+#. TXT_PCMCIA_ALREADY
+msgid "PCMCIA card services already running!"
+msgstr "I PCMCIA Card Services funzionano già!"
+
+#. TXT_NO_LXRC_END
+msgid ""
+"You can exit Linuxrc only via the menu item\n\n"
+"» Start installation / system «\n\n"
+"In order to allow this, you might need to load some "
+"drivers (modules) to support your hardware."
+msgstr ""
+"Si può lasciare Linuxrc solo tramite il Menu\n\n"
+"» Installazione / Iniziare il system «\n\n"
+"Affinchè ciò sia possibile, dovete eventualmente "
+"caricare prima l' Hardware-Driver (Moduli)."
+
+#. TXT_NO_CTRLC
+msgid "You cannot exit Linuxrc by pressing <ctrl-c>!"
+msgstr "Linuxrc non può venire interrotto tramite <ctrl-c>!"
+
+#. TXT_REMOVE_DISK
+msgid "Please remove the disk from the drive now!"
+msgstr "Togliete ora il dischetto!"
+
+#. TXT_EXAMPLE_PAR
+msgid "\n\nExample: "
+msgstr "\n\nEsempio: "
+
+#. TXT_CHOOSE_SOURCE
+msgid "Please choose the source media"
+msgstr "Scegliete ora il source-medium"
+
+#. TXT_TRY_CD_MOUNT
+msgid "Trying to mount the CD-ROM..."
+msgstr "Provate a fare il mount del CD-ROM..."
+
+#. TXT_ERROR_CD_MOUNT
+msgid "Could not mount the CD-ROM!"
+msgstr "Il mount del CD-ROM non è stato possibile!"
+
+#. TXT_START_YAST
+msgid "Starting YaST..."
+msgstr "Iniziare YaST..."
+
+#. TXT_ASK_REBOOT
+msgid "Do you want to reboot the system now?"
+msgstr "Desiderate ora reiniziare il sistema?"
+
+#. TXT_INSTALL_SUCCESS
+msgid ""
+"The base system has been successfully installed. This "
+"new installed system will now be started in order to "
+"commit the installation."
+msgstr ""
+"Il sistema di base è stato installato con successo. "
+"Questo nuovo sistema viene ora avviato, per "
+"chiudere l'installazione."
+
+#. TXT_ENTER_PARTITION
+msgid "Please enter the harddisk partition (eg. /dev/sda1)"
+msgstr ""
+"Indicate la partizione del disk rigido\n"
+"(p.e. /dev/sda1)"
+
+#. TXT_ERROR_HD_MOUNT
+msgid "Could not mount the specified partition!"
+msgstr ""
+"Non si è potuto fare il mount della partizione "
+"indicata!"
+
+#. TXT_ENTER_HD_DIR
+msgid "Please enter the source directory"
+msgstr "Indicate il source-directory"
+
+#. TXT_ERROR_INSTALL
+msgid "An error occurred during installation!"
+msgstr ""
+"L'installazione non è sata terminata "
+"regolarmente!"
+
+#. TXT_DRIVES
+msgid "Harddisks / CD-ROMs"
+msgstr "Disk rigidi / CD-ROMs"
+
+#. TXT_LITTLE_MEM
+msgid ""
+"Your computer has extremely little memory!\n\n"
+"Before you acknowledge this message you must switch to "
+"virtual console 2 (just press ALT-F2) and create and "
+"activate some swap space!"
+msgstr ""
+"Il Vostro computer ha a disposizione pochissima "
+"memoria!\n. Prima di confermare questo messaggio e "
+"iniziare YaST, dovete cambiare sulla Consolle 2 "
+"(premere ALT-F2) e sistemare e attivare manualmente "
+"le memorie Swap!"
+
+#. TXT_ASK_ANIMATE
+msgid "Animation"
+msgstr "Animazione"
+
+#. TXT_ASK_EXPLODE
+msgid "Do you like \"exploding\" windows?\n\nOf course ;-)"
+msgstr ""
+"Desiderate finestre \"esplosive\"?\n\n"
+"Certamente ;-)"
+
+#. TXT_NO_DRIVES
+msgid ""
+"No harddisks and CD-ROM drives have been detected so "
+"far."
+msgstr ""
+"Fin'ora non sono stati riconosciuti nè disk rigidi "
+"nè CD-ROM."
+
+#. TXT_MENU_EXPERT
+msgid "Debug (expert)"
+msgstr "Debug (Esperti)"
+
+#. TXT_FORCE_ROOTIMAGE
+msgid "Force rootimage"
+msgstr "Forzare il Rootimage"
+
+#. TXT_NEW_ROOTIMAGE
+msgid "Enter rootimage"
+msgstr "Inserire il Rootimage"
+
+#. TXT_ASK_RI_FORCE
+msgid ""
+"Do you want the rootimage to be loaded into the "
+"RAM disk even when a valid installation system could "
+"be found?"
+msgstr ""
+"Caricare il Rootimage nel RAM-Disk, anche se è stato "
+"trovato un sistema di installazione "
+"valido?"
+
+#. TXT_ENTER_ROOTIMAGE
+msgid ""
+"Please enter the path and name of the file you want to"
+" be loaded into the RAM disk as the root file system"
+msgstr ""
+"Indicate Path e Nome del file, che volete caricare "
+"come Root Filesystem nel RAM-Disk."
+
+#. TXT_NOT_IMPLEMENTED
+msgid "Not yet implemented!"
+msgstr "Non ancora implementato!"
+
+#. TXT_NEW_INST_SYS
+msgid "Installation system"
+msgstr "Sistema d'installazione"
+
+#. TXT_ENTER_INST_SYS
+msgid ""
+"Please enter the directory that contains the "
+"installation system."
+msgstr ""
+"Indicare il directory, che contiene "
+"il sistema d'installazione."
+
+#. TXT_NO_INFO_AVAIL
+msgid "No information available."
+msgstr "Nessuna informazione a disposizione."
+
+#. TXT_PREPARE_INST
+msgid "Preparing installation..."
+msgstr "L'installazione viene preparata..."
+
+#. TXT_START_DEMO
+msgid "Start Live CD"
+msgstr "Cominciare il Live-CD"
+
+#. TXT_INSERT_LIVECD
+msgid "Please insert the Live CD."
+msgstr "Inserite il Live-CD."
+
+#. TXT_END_REBOOT
+msgid "End / Reboot"
+msgstr "Interruzione / Reboot"
+
+#. TXT_ASK_BOOTP
+msgid "Automatic configuration via bootp/DHCP?"
+msgstr "Configurazione automatica via Bootp/DHCP?"
+
+#. TXT_SEND_BOOTP
+msgid "Sending bootp request..."
+msgstr "Bootp-Domanda viene inviata..."
+
+#. TXT_ERROR_BOOTP
+msgid "Bootp configuration failed."
+msgstr "Bootp-Configurazione è fallita."
+
+#. TXT_SEARCH_INFOFILE
+msgid "Searching for infofile..."
+msgstr "Cerca l' Info-File..."
+
+#. TXT_NFSPORT
+msgid "Specify NFS port"
+msgstr "Indicare il Port NFS"
+
+#. TXT_ASKING_NAMED
+msgid "Asking nameserver..."
+msgstr "Interrogare il Nameserver..."
+
+#. TXT_HOST_NOT_FOUND
+msgid "Machine %s is unknown!"
+msgstr "Il computer %s è sconosciuto!"
+
+#. TXT_NET_CONFIGURED
+msgid ""
+"Your network is already configured. Do you want to "
+"keep this configuration?"
+msgstr ""
+"La Vostra rete è già configurata. Desiderate "
+"mantenere la configurazione?"
+
+#. TXT_ASK_BREAK
+msgid "Do want to abort?"
+msgstr "Volete interrompere?"
+
+#. TXT_NO_NETDEVICE
+msgid ""
+"No network device found!\nPlease load a network module "
+"first."
+msgstr ""
+"Non è stata trovata una scheda rete!\nCaricate "
+"eventualmente un modulo corrispondente."
+
+#. TXT_ALREADY_FOUND
+msgid "A %s was already found in your system!\n"
+msgstr "Nel Vostro sistema è giá stato trovato un %s!\n"
+
+#. TXT_SCSI_ADAPTER
+msgid "SCSI-Adapter"
+msgstr "SCSI-adapter"
+
+#. TXT_ANOTHER_MOD
+msgid "Do you want to load an additional module?"
+msgstr "Volete caricare un altro modulo?"
+
+#. TXT_ERROR_FTP
+msgid "Error while accessing the FTP server:\n\n%s"
+msgstr "Errore durante l'accesso all server FTP:\n\n%s"
+
+#. TXT_TRY_REACH_FTP
+msgid "Trying to connect to the FTP server..."
+msgstr "Prova di collegamento con il server FTP..."
+
+#. TXT_ENTER_FTPUSER
+msgid ""
+"Please enter the user name under which you want to "
+"access the FTP server"
+msgstr ""
+"Inserire il nome dell'utente con cui volete accedere "
+"al server FTP"
+
+#. TXT_ENTER_FTPPASSWD
+msgid "Please enter the password for the FTP user account"
+msgstr "Inserire la password per l'FTP user account"
+
+#. TXT_ENTER_FTPPROXY
+msgid "Please enter the address of the FTP proxy"
+msgstr "Inserire il l'indirizzo dell' FTP proxy"
+
+#. TXT_ENTER_FTPPORT
+msgid "Please enter the port of the FTP proxy"
+msgstr "Indicate il port dell' FTP Proxy"
+
+#. TXT_WANT_FTPPROXY
+msgid "Do you want to use a FTP proxy?"
+msgstr "Desiderate usare un FTP Proxy?"
+
+#. TXT_NOMEM_FTP
+msgid ""
+"Your computer does not have enough RAM to do an "
+"installation via FTP! (%d MB RAM required)"
+msgstr ""
+"Il Vostro computer non ha abbastanza RAM per fare "
+"un'installazione via FTP! (sono necessari %d MB RAM)"
+
+#. TXT_ANONYM_FTP
+msgid ""
+"Normally a FTP installation is performed via "
+"anonymous FTP. But there is the possibility to specify "
+"a user name and password on the FTP server.\n"
+"Do you want this?"
+msgstr ""
+"Normalement, une installation FTP est réalisée via "
+"FTP anonyme. Mais il est possible de spécifier un nom "
+"d'utilisateur et un mot de passe sur le serveur FTP.\n"
+"Souhaitez-vous le faire?"
+
+#. TXT_ENTER_MODDISK
+msgid "Please insert the modules disk"
+msgstr "Inserire il dischetto dei moduli"
+
+#. TXT_MORE_MODULES
+msgid "-- More modules --"
+msgstr "-- Piu moduli --"
+
+#. TXT_INIT_PARPORT
+msgid "Initializing parallel port..."
+msgstr "Inizializzare il port parallelo..."
+
+#. TXT_ENTER_NFSPORT
+msgid ""
+"Please enter the port number the nfs server is running "
+"on"
+msgstr ""
+"Inserite il numero del Port, sul quale funziona "
+"il Server NFS"
+
+#. TXT_YAST1
+msgid "YaST1 - text based"
+msgstr "YaST1 - modo testuale"
+
+#. TXT_YAST2
+msgid "YaST2 - graphical"
+msgstr "YaST2 - modo grafico"
+
+#. TXT_CHOOSE_YAST
+msgid ""
+"Please choose the version of YaST to use for the "
+"installation."
+msgstr ""
+"Scegliete la versione di YaST da utilizzare per "
+"l'installazione."
+
+#. TXT_INSERT_CD
+msgid "Please make sure that CD number %d is in your drive!"
+msgstr "Assicuratevi che il CD numero %d si trovi nel lettore!"
+
+#. TXT_EJECT_CD
+msgid "Eject CD"
+msgstr "Espelli CD"
+
+#. TXT_BOOTP_TIMEOUT
+msgid "Bootp timeout"
+msgstr "Bootp timeout"
+
+#. TXT_ENTER_BOOTP_TIMEOUT
+msgid "Please enter the timeout value for bootp."
+msgstr "Inserite il valore di timeout per bootp."
+
+#. TXT_DO_REBOOT
+msgid ""
+"The base system has been successfully installed.  This "
+"new installed system will now be started in order to "
+"commit the installation. "
+"Please remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the Linux Loader (LILO) "
+"has been installed on it."
+msgstr ""
+"Il sistema di base è stato installato con successo. "
+"Ora viene avviato il nuovo sistema allo scopo di "
+"eseguire l'installazione. Togliete tutti i mezzi "
+"d'installazione (CD-ROM, dischetto).\nSe il Linux "
+"Loader (LILO) è stato installato sul dischetto, non "
+"toglietelo."
+
+#. TXT_REISERFS
+msgid "Reiserfs file system found."
+msgstr "Reiserfs filesystem trovato."
+
