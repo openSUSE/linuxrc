@@ -125,6 +125,7 @@ static struct {
   { "mkdir",       util_mkdir_main       },
   { "chroot",      util_chroot_main      },
   { "kill",        util_kill_main        },
+  { "killall",     util_killall_main     },
   { "bootpc",      util_bootpc_main      },
   { "swapon",      util_swapon_main      },
   { "swapoff",     util_swapoff_main     },

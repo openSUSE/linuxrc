@@ -71,6 +71,7 @@ extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_chroot_main       (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
+extern int  util_killall_main      (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
 extern int  util_wget_main         (int argc, char **argv);
 extern int  util_fstype_main       (int argc, char **argv);
@@ -135,3 +136,5 @@ void get_net_unique_id(void);
 int util_lndir_main(int argc, char **argv);
 
 void util_notty(void);
+void util_killall(char *name, int sig);
+

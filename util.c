@@ -2631,6 +2631,27 @@ int util_kill_main(int argc, char **argv)
 }
 
 
+int util_killall_main(int argc, char **argv)
+{
+  int sig = SIGTERM;
+  char *s;
+
+  argv++; argc--;
+
+  if(**argv == '-') {
+    sig = strtol(*argv + 1, &s, 0);
+    if(*s) return fprintf(stderr, "kill: bad signal spec \"%s\"\n", *argv + 1), 1;
+
+    argv++;
+    argc--;
+  }
+
+  while(argc--) util_killall(*argv++, sig);
+
+  return 0;
+}
+
+
 int util_bootpc_main(int argc, char **argv)
 {
   int i;
@@ -4168,5 +4189,48 @@ void util_notty()
     ioctl(fd, TIOCNOTTY);
     close(fd);
   }
+}
+
+
+void util_killall(char *name, int sig)
+{
+  pid_t mypid, pid;
+  struct dirent *de;
+  DIR *d;
+  char *s;
+  slist_t *sl0 = NULL, *sl;
+
+  if(!name) return;
+
+  mypid = getpid();
+
+  if(!(d = opendir("/proc"))) return;
+
+  /* make a (reversed) list of all process ids */
+  while((de = readdir(d))) {
+    pid = strtoul(de->d_name, &s, 10);
+    if(!*s && *util_process_cmdline(pid)) {
+      sl = slist_add(&sl0, slist_new());
+      sl->key = strdup(de->d_name);
+      sl->value = strdup(util_process_name(pid));
+    }
+  }
+
+  closedir(d);
+
+  for(sl = sl0; sl; sl = sl->next) {
+    pid = strtoul(sl->key, NULL, 10);
+    if(pid == mypid) continue;
+    if(!strcmp(sl->value, name)) {
+      if(config.debug) fprintf(stderr, "kill -%d %d\n", sig, pid);
+      kill(pid, sig);
+      usleep(20000);
+    }
+  }
+
+
+  slist_free(sl0);
+
+  while(waitpid(-1, NULL, WNOHANG) > 0);
 }
 

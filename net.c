@@ -29,6 +29,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <signal.h>
 #include <net/if.h>
 #include <net/route.h>
 #include <netinet/in.h>
@@ -1547,7 +1548,11 @@ void net_dhcp_stop()
 {
   if(!config.net.dhcp_active) return;
 
-  system("dhcpcd -k");
+//  system("dhcpcd -k");
+  /* kill them all */
+  util_killall("dhcpcd", SIGHUP);
+  /* give them some time */
+  sleep(2);
 
   config.net.dhcp_active = 0;
 }
