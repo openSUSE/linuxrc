@@ -229,6 +229,7 @@ typedef struct {
   unsigned forceinsmod:1;	/* use 'insmod -f' if set */
   unsigned tmpfs:1;		/* we're using tmpfs for / */
   unsigned run_as_linuxrc:1;	/* set if we really are linuxrc */
+  unsigned initramfs:1;		/* initramfs mode */
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
   unsigned demo:1;		/* start live cd */

@@ -73,6 +73,7 @@ static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int do_not_kill         (char *name);
 static void lxrc_change_root   (void);
+static void lxrc_change_root2  (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
@@ -173,6 +174,8 @@ int main(int argc, char **argv, char **env)
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
 
+  if(!strcmp(prog, "init")) config.initramfs = 1;
+
   str_copy(&config.console, "/dev/console");
   str_copy(&config.stderr_name, "/dev/tty3");
 
@@ -223,12 +226,14 @@ int main(int argc, char **argv, char **env)
       util_free_mem();
       umount("/proc");
 
-//      fprintf(stderr, "free: %d, %d, %d\n", config.memory.free, config.tmpfs, tmpfs_opt);
+      // fprintf(stderr, "free: %d, %d, %d\n", config.memory.free, config.tmpfs, tmpfs_opt);
 
-      if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
-        lxrc_movetotmpfs();	/* does not return if successful */
+      if(!config.initramfs) {
+        if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
+          lxrc_movetotmpfs();	/* does not return if successful */
+        }
+        config.tmpfs = 0;
       }
-      config.tmpfs = 0;
 
       if(!config.serial && config.debugwait) {
         util_start_shell("/dev/tty9", "/lbin/lsh", 0);
@@ -381,6 +386,40 @@ void lxrc_change_root()
 }
 
 
+#ifndef MS_MOVE
+#define MS_MOVE		(1 << 13)
+#endif
+
+#ifndef MNT_DETACH
+#define MNT_DETACH	(1 << 1)
+#endif
+
+void lxrc_change_root2()
+{
+  if(config.test) return;
+
+  fprintf(stderr, "starting %s\n", config.new_root);
+
+  umount("/mnt");
+  util_mount_ro(config.new_root, "/mnt");
+  chdir("/mnt");
+
+  umount2("/", MNT_DETACH);
+  mount(".", "/", NULL, MS_MOVE, NULL);
+  chroot(".");
+
+  execl("/sbin/init", "init", NULL);
+
+  perror("init failed\n");
+
+  chdir("/");
+  umount("/mnt");
+  fprintf(stderr, "system start failed\n");
+
+  deb_wait;
+}
+
+
 void lxrc_end()
 {
   FILE *f;
@@ -394,7 +433,11 @@ void lxrc_end()
 
   lxrc_killall(1);
 
-  while(waitpid(-1, NULL, WNOHANG) == 0);
+  fprintf(stderr, "all killed\n");
+
+//  while(waitpid(-1, NULL, WNOHANG) == 0);
+
+  fprintf(stderr, "all done\n");
 
   /* screen saver on */
   if(!config.linemode) printf("\033[9;15]");
@@ -413,7 +456,7 @@ void lxrc_end()
   util_debugwait("leaving now");
 
   if(!config.test) {
-    if(config.new_root && config.pivotroot) {
+    if(config.new_root && (config.pivotroot || config.initramfs)) {
       // tell kernel root is /dev/ram0, prevents remount after initrd
       if(!(f = fopen ("/proc/sys/kernel/real-root-dev", "w"))) return;
       fprintf(f, "256\n");
@@ -430,6 +473,7 @@ void lxrc_end()
   kbd_end (1);
   disp_end ();
 
+  if(config.new_root && config.initramfs) lxrc_change_root2();
   if(config.new_root && config.pivotroot) lxrc_change_root();
 }
 
@@ -567,7 +611,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
     state[0] = config.win ? '1' : '0';
     state[1] = 0;
     kbd_end(1);		/* restore terminal settings */
-    execl(*config.argv, "linuxrc", "segv", addr, state, NULL);
+    execl(*config.argv, config.initramfs ? "init" : "linuxrc", "segv", addr, state, NULL);
   }
 
   /* stop here */

@@ -1229,6 +1229,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
   add_flag(&sl0, buf, config.manual, "manual");
+  add_flag(&sl0, buf, config.initramfs, "ramfs");
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.demo, "demo");
   add_flag(&sl0, buf, config.vnc, "vnc");

@@ -1,3 +1,5 @@
+	- prepare for initramfs
+
 17/2/2005:	v1.7.24
 	- use cifs instead of smb (#38423)
 	- build dynamically linked linuxrc
