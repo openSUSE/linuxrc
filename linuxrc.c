@@ -47,6 +47,7 @@
 #include "auto2.h"
 #include "lsh.h"
 #include "multiple_info.h"
+#include "mkdevs.h"
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -95,6 +96,7 @@ static struct {
 } lxrc_internal[] = {
   { "sh",          util_sh_main          },
   { "lsh",         lsh_main              },
+  { "mkdevs",      mkdevs_main           },
   { "insmod",      insmod_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
@@ -231,6 +233,9 @@ int main(int argc, char **argv, char **env)
   }
 
   save_environment();
+
+  util_mkdevs();
+
   lxrc_init();
 
   if(config.demo) {
@@ -688,6 +693,8 @@ void lxrc_init()
 
   file_read_info_file("cmdline", kf_cmd_early);
 
+  util_set_stderr(config.stderr_name);
+
   if(config.had_segv) config.manual = 1;
 
   if(!config.test && !config.had_segv) {
@@ -1013,7 +1020,7 @@ void lxrc_movetotmpfs()
     return;
   }
 
-  i = mount("shmfs", newroot, "shm", 0, "nr_inodes=10240");
+  i = mount("shmfs", newroot, "shm", 0, "nr_inodes=20480");
   if(i) {
     perror(newroot);
     return;

@@ -63,6 +63,7 @@
 #include "bootpc.h"
 #include "http.h"
 #include "fstype.h"
+#include "mkdevs.h"
 
 #define LED_TIME     50000
 
@@ -2308,11 +2309,6 @@ int util_ls_main(int argc, char **argv)
  */
 int util_sh_main(int argc, char **argv)
 {
-#if 0
-  freopen("/dev/tty3", "a", stdout);
-  freopen("/dev/tty3", "a", stderr);
-  printf("Executing: \"%s\"\n", argv[2]);
-#endif
   dup2(2, 1);
 
   return lsh_main(argc, argv);
@@ -4098,5 +4094,29 @@ char *long_dev(char *dev)
   }
 
   return dev;
+}
+
+/* create device files */
+void util_mkdevs()
+{
+  FILE *f;
+  size_t len;
+  unsigned char *buf;
+  int i;
+
+  if((f = fopen("/devz", "r"))) {
+    len = (fgetc(f) & 0xff) << 8;
+    len += fgetc(f) & 0xff;
+    if(len) {
+      buf = malloc(len);
+      if(fread(buf, len, 1, f) == 1) {
+        i = mkdevs(buf, 1);
+        unlink("/devz");
+        fprintf(stderr, "created /dev tree (%d inodes)\n", i);
+      }
+      free(buf);
+    }
+    fclose(f);
+  }
 }
 

@@ -1,3 +1,6 @@
+15/7/2003:	v1.5.4
+	- create /dev tree
+
 11/7/2003:	v1.5.3
 	- better control over option parsing
 	- rewrote driver update handling (#27792)

@@ -130,3 +130,5 @@ char *pcmcia_driver(int pcmcia_type);
 
 char *short_dev(char *dev);
 char *long_dev(char *dev);
+
+void util_mkdevs(void);
