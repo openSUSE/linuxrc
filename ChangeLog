@@ -1,3 +1,6 @@
+2/8/2001:	v1.2.6
+	- drop reboot message on sparc
+
 31/7/2001:	v1.2.5
 	- removed even more languages from linuxrc_tiny
 	- mantel: changed text from "bootp" to "bootp/DHCP"

@@ -1023,7 +1023,7 @@ static int inst_commit_install (void)
             !strncasecmp (root_ti, "reboot", 6) ||
             reboot_ig)
             {
-#ifndef __PPC__
+#if ! ( defined(__PPC__) || defined(__sparc__) )
             if(!auto_ig || reboot_wait_ig) {
               disp_clear_screen();
               util_disp_init();
