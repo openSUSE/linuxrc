@@ -1014,11 +1014,13 @@ static int inst_commit_install (void)
             !strncasecmp (root_ti, "reboot", 6) ||
             reboot_ig)
             {
-            if(reboot_wait_ig) {
+#ifndef __PPC__
+            if(!auto_ig || reboot_wait_ig) {
               disp_clear_screen();
               util_disp_init();
               dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
             }
+#endif
             reboot (RB_AUTOBOOT);
             rc_ii = -1;
             }
