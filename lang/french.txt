@@ -199,10 +199,10 @@ static text_t txt_french_atm [] =
 { TXT_INIT_PARPORT,   "Initialisation du port parallèle..."                   },
 { TXT_ENTER_NFSPORT,  "Entrez le numéro du port sur lequel tourne le "
                       "serveur NFS"                                           },
-{ TXT_YAST1,          "YaST1 - text based"                                    },
-{ TXT_YAST2,          "YaST2 - grafical"                                      },
-{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
-                      "installation."                                         },
+{ TXT_YAST1,          "YaST1 - mode texte"                                    },
+{ TXT_YAST2,          "YaST2 - mode graphique"                                },
+{ TXT_CHOOSE_YAST,    "Choisissez la version de YaST à utiliser pour "
+                      "l'installation."                                       },
 { TXT_INSERT_CD,      "Assurez-vous que le CD %d se trouve dans votre "
                       "lecteur!"                                              }
 };

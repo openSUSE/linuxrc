@@ -178,9 +178,8 @@ static text_t txt_russian_atm [] =
 { TXT_INIT_PARPORT,   "Инициализирую параллельный порт..."                    },
 { TXT_ENTER_NFSPORT,  "Пожалуйста, введите номер порта, на котором работает "
                       "сервер nfs"                                            },
-{ TXT_YAST1,          "YaST1 - text based"                                    },
-{ TXT_YAST2,          "YaST2 - grafical"                                      },
-{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
-                      "installation."                                         },
+{ TXT_YAST1,          "YaST1 - текстовый"                                     },
+{ TXT_YAST2,          "YaST2 - графический"                                   },
+{ TXT_CHOOSE_YAST,    "Выберите версию YaST для использования при установке." },
 { TXT_INSERT_CD,      "Убедитесь, что CD номер %d есть в дисководе!"          }
 };

@@ -183,9 +183,8 @@ static text_t txt_indonesia_atm [] =
 { TXT_INIT_PARPORT,   "Menginisialisasi port parallel ... "                   },
 { TXT_ENTER_NFSPORT,  "Berikan nomor port server NFS yang"
                       "digunakan"                                             },
-{ TXT_YAST1,          "YaST1 - text based"                                    },
-{ TXT_YAST2,          "YaST2 - grafical"                                      },
-{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
-                      "installation."                                         },
+{ TXT_YAST1,          "YaST1 - mode teks"                                     },
+{ TXT_YAST2,          "YaST2 - mode grafis"                                   },
+{ TXT_CHOOSE_YAST,    "Pilihlah versi YaST yang digunakan untuk instalasi."   },
 { TXT_INSERT_CD,      "Pastikanlah CD nomer %d ada pada drive anda!"          }
 };
