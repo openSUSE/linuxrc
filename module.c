@@ -748,6 +748,8 @@ int mod_insmod(char *module, char *param)
   char *force = config.forceinsmod ? "-f " : "";
   slist_t *sl;
 
+  if(config.debug) fprintf(stderr, "mod_insmod(\"%s\", \"%s\")\n", module, param);
+
   if(mod_is_loaded(module)) return 0;
 
   if(!config.forceinsmod) {
@@ -764,7 +766,7 @@ int mod_insmod(char *module, char *param)
 
   sprintf(buf, "insmod %s%s/%s" MODULE_SUFFIX, force, config.module.dir, module);
 
-  if(param && *param) strcat(buf, param);
+  if(param && *param) strcat(strcat(buf, " "), param);
 
   fprintf(stderr, "%s\n", buf);
 
