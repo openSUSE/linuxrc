@@ -272,7 +272,7 @@ int load_image(char *file_name, instmode_t mode)
   if(mode != inst_floppy && mode != inst_net) {
     rc = util_fileinfo(file_name, &i, &compressed);
     if(rc) {
-      if(!config.suppress_warnings) {
+      if(!config.suppress_warnings && !config.noerrors) {
         dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
       }
       return -1;
@@ -285,7 +285,7 @@ int load_image(char *file_name, instmode_t mode)
   if(mode == inst_net) {
     fd_read = net_open(file_name);
     if(fd_read < 0) {
-      util_print_net_error();
+      if(!config.noerrors) util_print_net_error();
       err = 1;
     }
   }
@@ -295,7 +295,7 @@ int load_image(char *file_name, instmode_t mode)
   }
 
   if((image.rd = ramdisk_open()) < 0) {
-    dia_message("No usable ramdisk found.", MSGTYPE_ERROR);
+    if(!config.noerrors) dia_message("No usable ramdisk found.", MSGTYPE_ERROR);
     err = 1;
   }
 
@@ -444,7 +444,7 @@ int root_check_root(char *root_string_tv)
 
   umount(mountpoint_tg);
 
-  return rc == TRUE ? 0 : -1;
+  return rc == 'r' ? 0 : -1;
 }
 
 
