@@ -344,7 +344,7 @@ msgstr ""
 
 #. TXT_WANT_MORE_SCSI
 msgid "Do you want to search for additional SCSI host adaptors?"
-msgstr "Volete cercare altri SCSI-Adapter?"
+msgstr "Volete cercare altri adattatori SCSI?"
 
 #. TXT_WANT_MORE_NET
 msgid "Do you want to search for additional network cards?"
@@ -648,8 +648,8 @@ msgid "A %s was already found in your system!\n"
 msgstr "Nel Vostro sistema è giá stato trovato un %s!\n"
 
 #. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "SCSI-adapter"
+msgid "Adattatore SCSI"
+msgstr "Adattatore SCSI"
 
 #. TXT_ANOTHER_MOD
 msgid "Do you want to load an additional module?"
@@ -767,7 +767,7 @@ msgstr "Reiserfs filesystem trovato."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr ""
+msgstr "connessione tra canali"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -779,11 +779,11 @@ msgstr ""
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr ""
+msgstr "router cisco connesso a canale"
 
 #. TXT_SMB
 msgid "Network (Windows Share aka SMB)"
-msgstr ""
+msgstr "Rete (Windows Share aka SMB)"
 
 #. TXT_SMB_ENTER_SERVER
 msgid "Please enter the IP-address of the SMB server"
