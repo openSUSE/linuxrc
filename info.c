@@ -17,6 +17,7 @@
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include <linux/hdreg.h>
+#include <hd.h>
 
 #include "global.h"
 #include "text.h"
@@ -27,12 +28,10 @@
 #include "info.h"
 #include "auto2.h"
 
-static char *info_hwfile_tm = "/tmp/hwinfo";
-
-static void info_hw_header(FILE *outfile_prv, char *text_tv);
 static int info_show_cb(dia_item_t di);
 
 static dia_item_t di_info_menu_last = di_none;
+static char *pr_dev_num(hd_dev_num_t *d);
 
 void info_menu()
 {
@@ -205,224 +204,109 @@ void info_init (void)
     }
 
 
-void info_show_hardware (void)
-    {
-    struct hd_driveid  driveinfo_ri;
-    int                rc_ii;
-    int                fd_ii;
-    FILE              *outfile_pri;
-    FILE              *infile_pri;
-    int                i_ii;
-    char               devname_ti [30];
-    char               inline1_ti [MAX_X];
-    char               inline2_ti [MAX_X];
-    char               inline3_ti [MAX_X];
-    char               outline_ti [MAX_X];
-    int                found_ii = FALSE;
-    int                nothing_ii = TRUE;
-    int                wrote_header_ii = FALSE;
+void info_show_hardware()
+{
+  slist_t *sl0 = NULL;
+  char buf[256];
+  hd_data_t *hd_data;
+  hd_t *hd, *hd0;
+  hd_hw_item_t hw_items[] = { hw_cdrom, hw_disk, 0 };
+  hd_res_t *res;
 
+  hd_data = calloc(1, sizeof *hd_data);
 
-    outfile_pri = fopen (info_hwfile_tm, "w");
-    if (!outfile_pri)
-        return;
+  hd0 = hd_list2(hd_data, hw_items, 1);
 
-    for (i_ii = 0; i_ii < 8; i_ii++)
-        {
-        sprintf (devname_ti, "/dev/hd%c", i_ii + 'a');
-        fd_ii = open (devname_ti, O_RDONLY);
-        if (fd_ii >= 0)
-            {
-            if (!found_ii)
-                {
-                info_hw_header (outfile_pri, "(E)IDE");
-                found_ii = TRUE;
-                }
+  for(hd = hd0; hd; hd = hd->next) {
+    if(!hd->unix_dev_name) continue;
+    if(sl0) slist_append_str(&sl0, "");
+    sprintf(buf, "%s (%s", hd->unix_dev_name, hd_is_hw_class(hd, hw_cdrom) ? "cdrom" : "disk");
+    if(hd->unix_dev_num.type == 'b') {
+      sprintf(buf + strlen(buf), ", dev %s", pr_dev_num(&hd->unix_dev_num));
+    }
+    sprintf(buf + strlen(buf), ")");
+    slist_append_str(&sl0, buf);
 
-            rc_ii = ioctl (fd_ii, HDIO_GET_IDENTITY, &driveinfo_ri);
-            if (!rc_ii)
-                {
-                nothing_ii = FALSE;
-                if (driveinfo_ri.cyls)
-                    fprintf (outfile_pri, "%-11s: ", txt_get (TXT_HARDDISK));
-                else
-                    fprintf (outfile_pri, "%-11s: ", txt_get (TXT_CDROM));
+    if(hd->model) {
+      sprintf(buf, "  Model: \"%s\"", hd->model);
+      slist_append_str(&sl0, buf);
+    }
 
-                fprintf (outfile_pri, "%s\n", driveinfo_ri.model);
-                fprintf (outfile_pri, "%22s %.8s  SerialNo: %.8s\n",
-                         "Firmware:", driveinfo_ri.fw_rev, driveinfo_ri.serial_no);
-                if (driveinfo_ri.cyls)
-                    fprintf (outfile_pri, "%22s: %d/%d/%d\n", "Geometry",
-                             driveinfo_ri.cyls, driveinfo_ri.heads, driveinfo_ri.sectors);
-                }
+    if(hd->revision.name && *hd->revision.name) {
+      sprintf(buf, "  Revision: \"%s\"", hd->revision.name);
+      slist_append_str(&sl0, buf);
+    }
 
-            close (fd_ii);
+    if(hd->serial && *hd->serial) {
+      sprintf(buf, "  Serial: \"%s\"", hd->serial);
+      slist_append_str(&sl0, buf);
+    }
+
+    if(hd->drivers) {
+      sprintf(buf, "  Driver: \"%s\"", hd->drivers->str);
+      slist_append_str(&sl0, buf);
+    }
+
+    for(res = hd->res; res; res = res->next) {
+      switch(res->any.type) {
+        case res_size:
+          if(res->size.unit == size_unit_sectors && res->size.val1) {
+            sprintf(buf, "  Size: %"PRIu64" sectors", res->size.val1);
+            if(res->size.val1 > (1 << 21)) {
+              sprintf(buf + strlen(buf), " (%"PRIu64" GB)", ((res->size.val1 >> 20) + 1) >> 1);
             }
-        }
+            slist_append_str(&sl0, buf);
+          }
+          break;
 
-    infile_pri = fopen ("/proc/scsi/scsi", "r");
-    if (infile_pri)
-        {
-        if (found_ii)
-            fprintf (outfile_pri, "\n");
+        case res_disk_geo:
+          sprintf(buf,
+            "  Geometry (%s): CHS %u/%u/%u",
+            res->disk_geo.logical ? "Logical" : "Physical",
+            res->disk_geo.cyls, res->disk_geo.heads, res->disk_geo.sectors
+          );
+          slist_append_str(&sl0, buf);
+          break;
 
-        while (fgets (inline1_ti, sizeof (inline1_ti) - 1, infile_pri))
-            if (!strncmp (inline1_ti, "Host", 4))
-                {
-                if (!wrote_header_ii)
-                    {
-                    info_hw_header (outfile_pri, "SCSI");
-                    wrote_header_ii = TRUE;
-                    }
-
-                found_ii = FALSE;
-                fgets (inline2_ti, sizeof (inline2_ti) - 1, infile_pri);
-                fgets (inline3_ti, sizeof (inline3_ti) - 1, infile_pri);
-                if (strstr (inline3_ti, "Direct"))
-                    {
-                    fprintf (outfile_pri, "%-11s: ", txt_get (TXT_HARDDISK));
-                    found_ii = TRUE;
-                    }
-                else if (strstr (inline3_ti, "CD-ROM"))
-                    {
-                    fprintf (outfile_pri, "%-11s: ", txt_get (TXT_CDROM));
-                    found_ii = TRUE;
-                    }
-
-                if (found_ii)
-                    {
-                    nothing_ii = FALSE;
-                    memset (outline_ti, 0, sizeof (outline_ti));
-                    memcpy (outline_ti, inline2_ti + 10, 8);
-                    memcpy (outline_ti + 8, inline2_ti + 26, 26);
-                    strcat (outline_ti, "\n");
-                    fprintf (outfile_pri, outline_ti);
-                    memset (outline_ti, 0, sizeof (outline_ti));
-                    memset (outline_ti, ' ', 20);
-                    memcpy (outline_ti + 13, inline1_ti, 39);
-                    fprintf (outfile_pri, outline_ti);
-                    }
-                }
-
-        fclose (infile_pri);
-        }
-
-    fclose (outfile_pri);
-
-    if (nothing_ii)
-        dia_message (txt_get (TXT_NO_DRIVES), MSGTYPE_INFO);
-    else
-        (void) dia_show_file (txt_get (TXT_DRIVES), info_hwfile_tm, FALSE);
-
-    unlink (info_hwfile_tm);
+        default:
+          break;
+      }
     }
 
+  }
 
-int info_eide_cd_exists (void)
-    {
-    struct hd_driveid  driveinfo_ri;
-    int                i_ii;
-    int                fd_ii;
-    int                rc_ii;
-    char               devname_ti [30];
-    int                found_ii;
+  if(!sl0) slist_append_str(&sl0, txt_get(TXT_NO_DRIVES));
+
+  dia_show_lines2(txt_get(TXT_DRIVES), sl0, 60);
+
+  slist_free(sl0);
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+}
 
 
-    i_ii = 0;
-    found_ii = FALSE;
+char *pr_dev_num(hd_dev_num_t *d)
+{
+  static char *buf = NULL;
 
-    while (i_ii < 8 && !found_ii)
-        {
-        sprintf (devname_ti, "/dev/hd%c", i_ii + 'a');
-        fd_ii = open (devname_ti, O_RDONLY);
-        if (fd_ii >= 0)
-            {
-            rc_ii = ioctl (fd_ii, HDIO_GET_IDENTITY, &driveinfo_ri);
-            if (!rc_ii && !driveinfo_ri.cyls)
-                found_ii = TRUE;
-
-            close (fd_ii);
-            }
-
-        i_ii++;
-        }
-
-    return (found_ii);
+  if(d->type) {
+    if(d->range > 1) {
+      strprintf(&buf, "%u:%u-%u:%u",
+        d->major, d->minor,
+        d->major, d->minor + d->range - 1
+      );
     }
-
-
-int info_scsi_exists (void)
-    {
-    FILE  *infile_pri;
-    int    found_ii;
-    char   line_ti [MAX_X];
-
-
-    found_ii = FALSE;
-
-    infile_pri = fopen ("/proc/scsi/scsi", "r");
-    if (infile_pri)
-        {
-        while (fgets (line_ti, sizeof (line_ti) - 1, infile_pri) && !found_ii)
-            if (strstr (line_ti, "CD-ROM") ||
-                strstr (line_ti, "Direct") ||
-                strstr (line_ti, "Sequential"))
-                found_ii = TRUE;
-
-        fclose (infile_pri);
-        }
-
-    return (found_ii);
+    else {
+      strprintf(&buf, "%u:%u",
+        d->major, d->minor
+      );
     }
+  }
+  else {
+    strprintf(&buf, "%s", "");
+  }
 
-
-int info_scsi_cd_exists (void)
-    {
-    FILE  *infile_pri;
-    int    found_ii;
-    char   line_ti [MAX_X];
-
-
-    found_ii = FALSE;
-
-    infile_pri = fopen ("/proc/scsi/scsi", "r");
-    if (infile_pri)
-        {
-        while (fgets (line_ti, sizeof (line_ti) - 1, infile_pri) && !found_ii)
-            if (strstr (line_ti, "CD-ROM"))
-                found_ii = TRUE;
-
-        fclose (infile_pri);
-        }
-
-    return (found_ii);
-    }
-
-/*
- *
- * Local functions
- *
- */
-
-static void info_hw_header (FILE *outfile_prv, char *text_tv)
-    {
-    int  i_ii;
-    char outline_ti [MAX_X];
-    int  width_ii = 51;
-
-
-    memset (outline_ti, 0, sizeof (outline_ti));
-    for (i_ii = 0; i_ii < width_ii; i_ii++)
-        outline_ti [i_ii] = '*';
-    outline_ti [width_ii] = '\n';
-    fprintf (outfile_prv, outline_ti);
-    strcpy (outline_ti, text_tv);
-    util_center_text (outline_ti, width_ii);
-    strcat (outline_ti, "\n");
-    fprintf (outfile_prv, outline_ti);
-    for (i_ii = 0; i_ii < width_ii; i_ii++)
-        outline_ti [i_ii] = '*';
-    strcat (outline_ti, "\n\n");
-    fprintf (outfile_prv, outline_ti);
-    }
+  return buf;
+}
 

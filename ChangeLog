@@ -3,6 +3,7 @@
 	  module loading order (#40018)
 	- updated translations
 	- added VNC password length check (#30434)
+	- replaced disk/cdrom info screen (#39092)
 
 8/5/2004:	v1.6.25
 	- fixed compiling on s390
