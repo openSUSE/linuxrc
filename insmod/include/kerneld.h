@@ -1,10 +1,10 @@
-/* Definitions for the Linux kerneld SYSV IPC interface.  
+/* Definitions for the Linux kerneld SYSV IPC interface.
    This file was part of the Linux kernel, and so is covered by the GPL.  */
 
 #ifndef MODUTILS_KERNELD_H
 #define MODUTILS_KERNELD_H
 
-#ident "$Id: kerneld.h,v 1.1 2000/03/23 17:09:55 snwint Exp $"
+#ident "$Id: kerneld.h,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 #define KERNELD_SYSTEM 1
 #define KERNELD_REQUEST_MODULE 2		/* "insmod" */

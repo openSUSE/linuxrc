@@ -18,7 +18,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: sys_nim.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: sys_nim.c,v 1.3 2000/11/22 15:45:23 snwint Exp $"
 
 #include <stdlib.h>
 #include <errno.h>
@@ -34,7 +34,7 @@
 
 /*======================================================================*/
 
-#if defined(ARCH_ia64)
+#ifndef CONFIG_USE_SYSCALL
 
 extern int init_module(const char *name, const struct module *info);
 

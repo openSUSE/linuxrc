@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_common.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_common.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 #include <string.h>
 #include <assert.h>
@@ -60,7 +60,7 @@ obj_elf_hash (const char *name)
 
 void
 obj_set_symbol_compare (struct obj_file *f,
-		        int (*cmp)(const char *, const char *),
+			int (*cmp)(const char *, const char *),
 			unsigned long (*hash)(const char *))
 {
   if (cmp)
@@ -116,11 +116,11 @@ obj_add_symbol (struct obj_file *f, const char *name, unsigned long symidx,
 	       by ld -r.  The only reason locals are now seen at this
 	       level at all is so that we can do semi-sensible things
 	       with parameters.  */
-	    
+
 	    struct obj_symbol *nsym, **p;
 
 	    nsym = arch_new_symbol();
-  	    nsym->next = sym->next;
+	    nsym->next = sym->next;
 	    nsym->ksymidx = -1;
 
 	    /* Excise the old (local) symbol from the hash chain.  */
@@ -167,8 +167,13 @@ obj_add_symbol (struct obj_file *f, const char *name, unsigned long symidx,
   f->symtab[hash] = sym;
   sym->ksymidx = -1;
 
-  if (ELFW(ST_BIND)(info) == STB_LOCAL && symidx != -1)
-    f->local_symtab[symidx] = sym;
+  if (ELFW(ST_BIND)(info) == STB_LOCAL && symidx != -1) {
+    if (symidx >= f->local_symtab_size)
+      error("local symbol %s with index %ld exceeds local_symtab_size %ld",
+        name, (long) symidx, (long) f->local_symtab_size);
+    else
+      f->local_symtab[symidx] = sym;
+  }
 
 found:
   sym->name = name;
@@ -176,6 +181,7 @@ found:
   sym->size = size;
   sym->secidx = secidx;
   sym->info = info;
+  sym->r_type = 0;	/* should be R_arch_NONE for all arch */
 
   return sym;
 }

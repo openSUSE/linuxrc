@@ -20,12 +20,13 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
   */
 
-#ident "$Id: snap_shot.c,v 1.1 2000/03/23 17:09:56 snwint Exp $"
+#ident "$Id: snap_shot.c,v 1.2 2000/11/22 15:45:23 snwint Exp $"
 
 #include <errno.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "module.h"
 #include "obj.h"

@@ -24,7 +24,7 @@
 #ifndef MODUTILS_OBJ_H
 #define MODUTILS_OBJ_H 1
 
-#ident "$Id: obj.h,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj.h,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 /* The relocatable object is manipulated using elfin types.  */
 
@@ -42,14 +42,14 @@
 # endif
 #endif
 
-#if defined(__sparc__) && !defined(__sparc_v9__)
-# if ELFCLASSM == ELFCLASS32
+#if defined(COMMON_3264) && defined(ONLY_32)
 #  define ObjW(x)  obj32_ ## x
-# else
-#  define ObjW(x)  obj64_ ## x
-# endif
 #else
-#define ObjW(x)    obj_ ## x
+#  if defined(COMMON_3264) && defined(ONLY_64)
+#    define ObjW(x)  obj64_ ## x
+#  else
+#    define ObjW(x)    obj_ ## x
+#  endif
 #endif
 
 /* For some reason this is missing from lib5.  */
@@ -82,7 +82,7 @@ struct obj_symbol
   int secidx;			/* the defining section index/module */
   int info;
   int ksymidx;			/* for export to the kernel symtab */
-  int referenced;		/* actually used in the link */
+  int r_type;			/* relocation type */
 };
 
 /* Hardcode the hash table size.  We shouldn't be needing so many
@@ -105,6 +105,7 @@ struct obj_file
   unsigned long local_symtab_size;
   struct obj_symbol **local_symtab;
   struct obj_symbol *symtab[HASH_BUCKETS];
+  const char *filename;
 };
 
 enum obj_reloc
@@ -112,7 +113,8 @@ enum obj_reloc
   obj_reloc_ok,
   obj_reloc_overflow,
   obj_reloc_dangerous,
-  obj_reloc_unhandled
+  obj_reloc_unhandled,
+  obj_reloc_constant_gp
 };
 
 struct obj_string_patch_struct
@@ -148,7 +150,8 @@ struct obj_symbol_patch_struct
 #define obj_extend_section		ObjW(extend_section)
 #define obj_string_patch		ObjW(string_patch)
 #define obj_symbol_patch		ObjW(symbol_patch)
-#define obj_check_undefineds 		ObjW(check_undefineds)
+#define obj_check_undefineds		ObjW(check_undefineds)
+#define obj_clear_undefineds		ObjW(clear_undefineds)
 #define obj_allocate_commons		ObjW(allocate_commons)
 #define obj_load_size			ObjW(load_size)
 #define obj_relocate			ObjW(relocate)
@@ -163,10 +166,11 @@ struct obj_symbol_patch_struct
 #define arch_init_module		ObjW(arch_init_module)
 #define arch_load_proc_section		ObjW(arch_load_proc_section)
 #define arch_finalize_section_address	ObjW(arch_finalize_section_address)
+#define arch_archdata			ObjW(arch_archdata)
 
-unsigned long obj_elf_hash(const char *);
+unsigned long obj_elf_hash (const char *);
 
-unsigned long obj_elf_hash_n(const char *, unsigned long len);
+unsigned long obj_elf_hash_n (const char *, unsigned long len);
 
 struct obj_symbol *obj_add_symbol (struct obj_file *f, const char *name,
 				   unsigned long symidx, int info, int secidx,
@@ -175,10 +179,10 @@ struct obj_symbol *obj_add_symbol (struct obj_file *f, const char *name,
 struct obj_symbol *obj_find_symbol (struct obj_file *f,
 					 const char *name);
 
-ElfW(Addr) obj_symbol_final_value(struct obj_file *f,
+ElfW(Addr) obj_symbol_final_value (struct obj_file *f,
 				  struct obj_symbol *sym);
 
-void obj_set_symbol_compare(struct obj_file *f,
+void obj_set_symbol_compare (struct obj_file *f,
 			    int (*cmp)(const char *, const char *),
 			    unsigned long (*hash)(const char *));
 
@@ -200,25 +204,29 @@ struct obj_section *obj_create_alloced_section_first (struct obj_file *f,
 
 void *obj_extend_section (struct obj_section *sec, unsigned long more);
 
-int obj_string_patch(struct obj_file *f, int secidx, ElfW(Addr) offset,
+int obj_string_patch (struct obj_file *f, int secidx, ElfW(Addr) offset,
 		     const char *string);
 
-int obj_symbol_patch(struct obj_file *f, int secidx, ElfW(Addr) offset,
+int obj_symbol_patch (struct obj_file *f, int secidx, ElfW(Addr) offset,
 		     struct obj_symbol *sym);
 
-int obj_check_undefineds(struct obj_file *f, int quiet);
+int obj_check_undefineds (struct obj_file *f, int quiet);
 
-void obj_allocate_commons(struct obj_file *f);
+void obj_clear_undefineds (struct obj_file *f);
+
+void obj_allocate_commons (struct obj_file *f);
 
 unsigned long obj_load_size (struct obj_file *f);
 
 int obj_relocate (struct obj_file *f, ElfW(Addr) base);
 
-struct obj_file *obj_load(FILE *f);
+struct obj_file *obj_load (int f, Elf32_Half e_type, const char *filename);
 
-void obj_free(struct obj_file *f);
+void obj_free (struct obj_file *f);
 
 int obj_create_image (struct obj_file *f, char *image);
+
+int obj_kallsyms (struct obj_file *fin, struct obj_file **fout);
 
 /* Architecture specific manipulation routines.  */
 
@@ -239,8 +247,12 @@ int arch_create_got (struct obj_file *f);
 struct module;
 int arch_init_module (struct obj_file *f, struct module *);
 
-int arch_load_proc_section(struct obj_section *sec, FILE *fp);
- 
+int arch_load_proc_section (struct obj_section *sec, int fp);
+
 int arch_finalize_section_address (struct obj_file *f, ElfW(Addr) base);
+
+int arch_archdata (struct obj_file *fin, struct obj_section *sec);
+
+#define ARCHDATA_SEC_NAME "__archdata"
 
 #endif /* obj.h */

@@ -23,7 +23,7 @@
 #ifndef MODUTILS_MODULE_H
 #define MODUTILS_MODULE_H 1
 
-#ident "$Id: module.h,v 1.1 2000/03/23 17:09:55 snwint Exp $"
+#ident "$Id: module.h,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 /* This file contains the structures used by the 2.0 and 2.1 kernels.
    We do not use the kernel headers directly because we do not wish
@@ -97,16 +97,23 @@ int old_sys_init_module(const char *name, char *code, unsigned codesize,
 #define tgt_sizeof_char_p	sizeof(char *)
 #define tgt_sizeof_void_p	sizeof(void *)
 #define tgt_long		long
+#define tgt_long_fmt		"l"
 
-#if defined(__sparc__) && !defined(__sparc_v9__) && defined(ARCH_sparc64)
+/* This assumes that long long on a 32 bit system is equivalent to long on the
+ * equivalent 64 bit system.  Also that void and char pointers are 8 bytes on
+ * all 64 bit systems.  Add per system tweaks if it ever becomes necessary.
+ */
+#if defined(COMMON_3264) && defined(ONLY_64)
+#undef tgt_long
+#undef tgt_long_fmt
 #undef tgt_sizeof_long
 #undef tgt_sizeof_char_p
 #undef tgt_sizeof_void_p
-#undef tgt_long
-#define tgt_sizeof_long		8
-#define tgt_sizeof_char_p	8
-#define tgt_sizeof_void_p	8
-#define tgt_long		long long
+#define tgt_long                long long
+#define tgt_long_fmt		"ll"
+#define tgt_sizeof_long         8
+#define tgt_sizeof_char_p       8
+#define tgt_sizeof_void_p       8
 #endif
 
 /*======================================================================*/
@@ -156,6 +163,11 @@ struct module
   unsigned tgt_long persist_end;
   unsigned tgt_long can_unload;
   unsigned tgt_long runsize;
+  unsigned tgt_long kallsyms_start;
+  unsigned tgt_long kallsyms_end;
+  unsigned tgt_long archdata_start;
+  unsigned tgt_long archdata_end;
+  unsigned tgt_long kernel_data;
 };
 
 struct module_info
@@ -192,5 +204,9 @@ int query_module(const char *name, int which, void *buf, size_t bufsize,
 unsigned long create_module(const char *, size_t);
 int delete_module(const char *);
 
+/* In safe mode the last parameter is forced to be a module name and meta
+ * expansion is not allowed on that name.
+ */
+extern unsigned long safemode;
 
 #endif /* module.h */

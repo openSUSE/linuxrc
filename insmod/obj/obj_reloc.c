@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_reloc.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_reloc.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 #include <string.h>
 #include <assert.h>
@@ -95,7 +95,7 @@ obj_check_undefineds(struct obj_file *f, int quiet)
 		sym->secidx = SHN_ABS;
 		sym->value = 0;
 	      }
-	    else
+	    else if (sym->r_type) /* assumes R_arch_NONE is 0 on all arch */
 	      {
 		if (!quiet)
 			error("unresolved symbol %s", sym->name);
@@ -105,6 +105,22 @@ obj_check_undefineds(struct obj_file *f, int quiet)
     }
 
   return ret;
+}
+
+void
+obj_clear_undefineds(struct obj_file *f)
+{
+  unsigned long i;
+  struct obj_symbol *sym;
+  for (i = 0; i < HASH_BUCKETS; ++i)
+    {
+      for (sym = f->symtab[i]; sym ; sym = sym->next)
+	if (sym->secidx == SHN_UNDEF)
+	  {
+	    sym->secidx = SHN_ABS;
+	    sym->value = 0;
+	  }
+    }
 }
 
 void
@@ -307,23 +323,22 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
 	      else
 		{
 		  /* Others we look up in the hash table.  */
-	          const char *name;
+		  const char *name;
 		  if (extsym->st_name)
 		    name = strtab + extsym->st_name;
-	          else
+		  else
 		    name = f->sections[extsym->st_shndx]->name;
-	          intsym = obj_find_symbol(f, name);
+		  intsym = obj_find_symbol(f, name);
 		}
 
 	      value = obj_symbol_final_value(f, intsym);
-	      intsym->referenced = 1;
 	    }
 
 #if SHT_RELM == SHT_RELA
 #if defined(__alpha__) && defined(AXP_BROKEN_GAS)
-          /* Work around a nasty GAS bug, that is fixed as of 2.7.0.9.  */
-          if (!extsym || !extsym->st_name ||
-              ELFW(ST_BIND)(extsym->st_info) != STB_LOCAL)
+	  /* Work around a nasty GAS bug, that is fixed as of 2.7.0.9.  */
+	  if (!extsym || !extsym->st_name ||
+	      ELFW(ST_BIND)(extsym->st_info) != STB_LOCAL)
 #endif
 	  value += rel->r_addend;
 #endif
@@ -342,6 +357,10 @@ obj_relocate (struct obj_file *f, ElfW(Addr) base)
 	      goto bad_reloc;
 	    case obj_reloc_unhandled:
 	      errmsg = "Unhandled relocation";
+	      goto bad_reloc;
+	    case obj_reloc_constant_gp:
+	      errmsg = "Modules compiled with -mconstant-gp cannot be loaded";
+	      goto bad_reloc;
 	    bad_reloc:
 	      if (extsym)
 		{

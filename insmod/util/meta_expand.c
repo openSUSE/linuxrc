@@ -154,13 +154,14 @@ static int glob_it(char *pt, GLOB_LIST *g)
  *
  * Return 0 if OK else -1
  */
-int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
+int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type)
 {
 	FILE *fin;
 	int len = 0;
 	char *line = NULL;
-	char *p;
-	char tmpline[PATH_MAX + 11];
+	char *p, *p1;
+	char tmpline[PATH_MAX + 1];
+	char tmpcmd[2*sizeof(tmpline)+20];	/* room for /bin/echo "text" */
 
 	g->pathc = 0;
 	g->pathv = NULL;
@@ -169,9 +170,9 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 	 * Take care of version dependent expansions
 	 * Needed for forced version handling
 	 */
-	if ((p = strchr(pt, '`')) != NULL) {
+	if ((p = strchr(pt, '`')) != NULL && (type & ME_BUILTIN_COMMAND)) {
 		do {
-			char wrk[PATH_MAX + 1];
+			char wrk[sizeof(tmpline)];
 			char *s;
 
 			for (s = p + 1; isspace(*s); ++s)
@@ -182,12 +183,13 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 					++s;
 				if (*s == '`') {
 					*p = '\0';
-					sprintf(wrk, "%s%s%s",
+					snprintf(wrk, sizeof(wrk), "%s%s%s",
 						     pt,
 						     version,
 						     s + 1);
+					*p = '`';
 				}
-				strcpy(tmpline, wrk);
+				strcpy(tmpline, wrk);	/* safe, same size */
 				pt = tmpline;
 			} else if (strncmp(s, "kernelversion", 13) == 0) {
 				while (*s && (*s != '`'))
@@ -201,20 +203,21 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 						if (*k == '.' && ++n == 2)
 							break;
 					}
-					sprintf(wrk, "%s%.*s%s",
+					snprintf(wrk, sizeof(wrk), "%s%.*s%s",
 						     pt,
 						     /* typecast for Alpha */
 						     (int)(k - version),
 						     version,
 						     s + 1);
-					strcpy(tmpline, wrk);
+					*p = '`';
+					strcpy(tmpline, wrk);	/* safe, same size */
 					pt = tmpline;
 				}
 			} else
 				break;
 		} while ((p = strchr(pt, '`')) != NULL);
 	}
-	
+
 	/*
 	 * Any remaining meta-chars?
 	 */
@@ -223,7 +226,7 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 		 * No meta-chars.
 		 * Split into words, delimited by whitespace.
 		 */
-		sprintf(tmpline, "%s%s", (base_dir ? base_dir : ""), pt);
+		snprintf(tmpline, sizeof(tmpline), "%s%s", (base_dir ? base_dir : ""), pt);
 		if ((p = strtok(tmpline, " \t\n")) != NULL) {
 			while (p) {
 				g->pathv = (char **)xrealloc(g->pathv,
@@ -267,7 +270,7 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 	if (strpbrk(pt, "&();|<>$`\"'\\!{}~=+:") == NULL &&
 	    strpbrk(pt, "[]~?*"))
 #endif
-		if (glob_it(pt, g) == 0)
+		if ((type & ME_GLOB) && glob_it(pt, g) == 0)
 			return 0;
 
 	if (strpbrk(pt, "&();|<>$`\"'\\!{}~+:[]~?*") == NULL) {
@@ -277,11 +280,34 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 	}
 
 	/*
-	 * Last resort: Use "echo"
+	 * Last resort: Use "echo".
+	 * DANGER: Applying shell expansion to user supplied input is a
+	 *         major security risk.  Modutils code should only do meta
+	 *         expansion via shell commands for trusted data.  Basically
+	 *         this means only for data in the config file.   Even that
+	 *         assumes that the user cannot run modprobe as root with
+	 *         their own config file.  Programs (including the kernel)
+	 *         that invoke modprobe as root with user supplied input must
+	 *         pass exactly one user supplied parameter and must set
+	 *         safe mode.
 	 */
-	sprintf(tmpline, "/bin/echo %s%s", (base_dir ? base_dir : ""), pt);
-	if ((fin = popen(tmpline, "r")) == NULL) {
-		error("Can't execute: %s", tmpline);
+	if (!(type & ME_SHELL_COMMAND))
+		return 0;
+	snprintf(tmpline, sizeof(tmpline), "%s%s", (base_dir ? base_dir : ""), pt);
+	snprintf(tmpcmd, sizeof(tmpcmd), "/bin/echo \"");
+	for (p = tmpline, p1 = tmpcmd + strlen(tmpcmd); *p; ++p, ++p1) {
+		if (*p == '"' || *p == '\\')
+			*p1++ = '\\';
+		*p1 = *p;
+	}
+	*p1++ = '"';
+	*p1++ = '\0';
+	if (p1 - tmpcmd > sizeof(tmpcmd)) {
+		error("tmpcmd overflow, should never happen");
+		exit(1);
+	}
+	if ((fin = popen(tmpcmd, "r")) == NULL) {
+		error("Can't execute: %s", tmpcmd);
 		return -1;
 	}
 	/* else */
@@ -289,18 +315,21 @@ int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version)
 	/*
 	 * Collect the result
 	 */
-	while (fgets(tmpline, PATH_MAX, fin) != NULL) {
-		int l = strlen(tmpline);
+	while (fgets(tmpcmd, PATH_MAX, fin) != NULL) {
+		int l = strlen(tmpcmd);
 
 		line = (char *)xrealloc(line, len + l + 1);
 		line[len] = '\0';
-		strcat(line + len, tmpline);
+		strcat(line + len, tmpcmd);	/* safe, realloc */
 		len += l;
 	}
 	pclose(fin);
 
 	if (line) {
-		split_line(g, line, 0);
+		/* Ignore result if no expansion occurred */
+		xstrcat(tmpline, "\n", sizeof(tmpline));
+		if (strcmp(tmpline, line))
+			split_line(g, line, 0);
 		free(line);
 	}
 

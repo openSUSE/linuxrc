@@ -4,7 +4,7 @@
    New implementation contributed by Richard Henderson <rth@tamu.edu>
    Based on original work by Bjorn Ekwall <bj0rn@blox.se>
    Restructured (and partly rewritten) by:
-   	Björn Ekwall <bj0rn@blox.se> February 1999
+	Björn Ekwall <bj0rn@blox.se> February 1999
 
    This file is part of the Linux modutils.
 
@@ -39,14 +39,22 @@
      More flexible recognition of the way the utility was called.
      Suggested by Stepan Kasal, implemented in a different way by Keith
      Owens <kaos@ocs.com.au> December 1999.
- 
+
      Rationalize common code for 32/64 bit architectures.
        Keith Owens <kaos@ocs.com.au> December 1999.
      Add arch64().
        Keith Owens <kaos@ocs.com.au> December 1999.
+     kallsyms support
+       Keith Owens <kaos@ocs.com.au> April 2000.
+     archdata support
+       Keith Owens <kaos@ocs.com.au> August 2000.
+     Add insmod -O, move print map before sys_init_module.
+       Keith Owens <kaos@ocs.com.au> October 2000.
+     Add insmod -S.
+       Keith Owens <kaos@ocs.com.au> November 2000.
    */
 
-#ident "$Id: insmod.c,v 1.1 2000/03/23 17:09:55 snwint Exp $"
+#ident "$Id: insmod.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 #include <sys/types.h>
 #include <stdlib.h>
@@ -63,6 +71,7 @@
 
 #include "module.h"
 #include "obj.h"
+#include "kallsyms.h"
 #include "util.h"
 #include "version.h"
 
@@ -74,8 +83,7 @@
 /*======================================================================*/
 
 static int flag_force_load = 0;
-static int flag_silent_poll = 0;
-static int flag_verbose = 0;
+static int flag_silent_probe = 0;
 static int flag_export = 1;
 static int flag_load_map = 0;
 static int flag_ksymoops = 1;
@@ -90,6 +98,7 @@ extern int modprobe_main(int argc, char **argv);
 extern int rmmod_main(int argc, char **argv);
 extern int ksyms_main(int argc, char **argv);
 extern int lsmod_main(int argc, char **argv);
+extern int kallsyms_main(int argc, char **argv);
 
 /*======================================================================*/
 
@@ -116,7 +125,7 @@ static int get_kernel_version(char str[STRVERSIONLEN])
 	return a << 16 | b << 8 | c;
 }
 
-/* String comparison for non-co-versioned kernel and module. 
+/* String comparison for non-co-versioned kernel and module.
  * prefix should be the same as used by genksyms for this kernel.
  */
 static char *ncv_prefix = NULL;	/* Overridden by --prefix option */
@@ -130,9 +139,11 @@ static int ncv_plen = 0;
 static void set_ncv_prefix(char *prefix)
 {
 	static char derived_prefix[256];
-	static const char well_known_symbol[] = "get_module_symbol_R";
+	static const char *well_known_symbol[] = { "get_module_symbol_R",
+						   "inter_module_get_R",
+						 };
 	struct module_symbol *s;
-	int i, l, pl;
+	int i, j, l, m, pl;
 	const char *name;
 	char *p;
 
@@ -142,18 +153,22 @@ static void set_ncv_prefix(char *prefix)
 	if (prefix)
 		ncv_prefix = prefix;
 	else {
-		/* Extract the prefix (if any) from the well known symbol */
+		/* Extract the prefix (if any) from well known symbols */
 		for (i = 0, s = ksyms; i < nksyms; ++i, ++s) {
 			name = (char *) s->name;
-			if (strncmp(name, well_known_symbol, sizeof(well_known_symbol)-1) == 0) {
-				l = strlen(name);
-				pl = l - sizeof(well_known_symbol) - 7;
-				if (pl < 0 || pl > sizeof(derived_prefix)-1)
+			l = strlen(name);
+			for (j = 0; j < sizeof(well_known_symbol)/sizeof(well_known_symbol[0]); ++j) {
+				m = strlen(well_known_symbol[j]);
+				if (m + 8 > l ||
+				    strncmp(name, well_known_symbol[j], m))
+					continue;
+				pl = l - m - 8;
+				if (pl > sizeof(derived_prefix)-1)
 					continue;	/* Prefix is wrong length */
 				/* Must end with 8 hex digits */
 				(void) strtoul(name+l-8, &p, 16);
 				if (*p == 0) {
-					strncpy(derived_prefix, name+sizeof(well_known_symbol)-1, pl);
+					strncpy(derived_prefix, name+m, pl);
 					*(derived_prefix+pl) = '\0';
 					ncv_prefix = derived_prefix;
 					break;
@@ -170,7 +185,7 @@ static void set_ncv_prefix(char *prefix)
 	}
 	ncv_plen = strlen(ncv_prefix);
 	if (flag_verbose)
-		printf("Symbol version prefix '%s'\n", ncv_prefix);
+		lprintf("Symbol version prefix '%s'", ncv_prefix);
 }
 
 static int ncv_strcmp(const char *a, const char *b)
@@ -183,7 +198,7 @@ static int ncv_strcmp(const char *a, const char *b)
 	    !(ncv_plen && strncmp(b + alen + 2, ncv_prefix, ncv_plen))) {
 		return strncmp(a, b, alen);
 	} else if (alen == blen + 10 + ncv_plen &&
-	           a[blen] == '_' && a[blen + 1] == 'R' &&
+		   a[blen] == '_' && a[blen + 1] == 'R' &&
 		   !(ncv_plen && strncmp(a + blen + 2, ncv_prefix, ncv_plen))) {
 		return strncmp(a, b, blen);
 	} else
@@ -599,16 +614,17 @@ static int is_module_checksummed(struct obj_file *f)
 		return obj_find_symbol(f, "Using_Versions") != NULL;
 }
 
-/* add module source, timestamp, kernel version and a symbol for the start of some sections.
- * this info is used by ksymoops to do better debugging.
+/* add module source, timestamp, kernel version and a symbol for the
+ * start of some sections.  this info is used by ksymoops to do better
+ * debugging.
  */
-static void add_ksymoops_symbols(struct obj_file *f, const char *filename, const char *m_name)
+static void add_ksymoops_symbols(struct obj_file *f, const char *filename,
+				 const char *m_name)
 {
 	struct obj_section *sec;
 	struct obj_symbol *sym;
-	char *name;
-	char str[STRVERSIONLEN];
-	const char symprefix[] = "__insmod_";
+	char *name, *absolute_filename;
+	char str[STRVERSIONLEN], real[PATH_MAX];
 	int i, l, lm_name, lfilename, use_ksymtab, version;
 	struct stat statbuf;
 
@@ -619,8 +635,19 @@ static void add_ksymoops_symbols(struct obj_file *f, const char *filename, const
 		".bss"
 	};
 
+	if (realpath(filename, real)) {
+		absolute_filename = xstrdup(real);
+	}
+	else {
+		int save_errno = errno;
+		error("cannot get realpath for %s", filename);
+		errno = save_errno;
+		perror("");
+		absolute_filename = xstrdup(filename);
+	}
+
 	lm_name = strlen(m_name);
-	lfilename = strlen(filename);
+	lfilename = strlen(absolute_filename);
 
 	/* add to ksymtab if it already exists or there is no ksymtab and other symbols
 	 * are not to be exported.  otherwise leave ksymtab alone for now, the
@@ -645,11 +672,11 @@ static void add_ksymoops_symbols(struct obj_file *f, const char *filename, const
 		    8+					/* version in dec */
 		    1;					/* nul */
 		name = xmalloc(l);
-		if (stat(filename, &statbuf) != 0)
+		if (stat(absolute_filename, &statbuf) != 0)
 			statbuf.st_mtime = 0;
 		version = get_module_version(f, str);	/* -1 if not found */
 		snprintf(name, l, "%s%s_O%s_M%0*lX_V%d",
-			 symprefix, m_name, filename,
+			 symprefix, m_name, absolute_filename,
 			 2*sizeof(statbuf.st_mtime), statbuf.st_mtime,
 			 version);
 		sym = obj_add_symbol(f, name, -1,
@@ -658,6 +685,7 @@ static void add_ksymoops_symbols(struct obj_file *f, const char *filename, const
 		if (use_ksymtab)
 			add_ksymtab(f, sym);
 	}
+	free(absolute_filename);
 
 	/* tag the desired sections if size is non-zero */
 
@@ -850,13 +878,13 @@ static int process_module_arguments(struct obj_file *f, int argc, char **argv)
 					charssize = strtoul(fmt + 1, (char **) NULL, 10);
 
 					/* Check length */
-					if (strlen(str) >= charssize) {
+					if (strlen(str) >= charssize-1) {
 						error("string too long for %s (max %ld)",
 						      key, charssize - 1);
 						return 0;
 					}
 					/* Copy to location */
-					strcpy((char *) loc, str);
+					strcpy((char *) loc, str);	/* safe, see check above */
 					loc += charssize;
 				}
 				/*
@@ -921,12 +949,94 @@ static int process_module_arguments(struct obj_file *f, int argc, char **argv)
 	return 1;
 }
 
-static int init_module(const char *m_name, struct obj_file *f, unsigned long m_size)
+
+/* Add a kallsyms section if the kernel supports all symbols. */
+static int add_kallsyms(struct obj_file *f,
+			struct obj_section **module_kallsyms, int force_kallsyms)
+{
+	struct module_symbol *s;
+	struct obj_file *f_kallsyms;
+	struct obj_section *sec_kallsyms;
+	size_t i;
+	int l;
+	const char *p, *pt_R;
+	unsigned long start = 0, stop = 0;
+
+	for (i = 0, s = ksyms; i < nksyms; ++i, ++s) {
+		p = (char *)s->name;
+		pt_R = strstr(p, "_R");
+		if (pt_R)
+			l = pt_R - p;
+		else
+			l = strlen(p);
+		if (strncmp(p, "__start_" KALLSYMS_SEC_NAME, l) == 0)
+			start = s->value;
+		else if (strncmp(p, "__stop_" KALLSYMS_SEC_NAME, l) == 0)
+			stop = s->value;
+	}
+
+	if (start >= stop && !force_kallsyms)
+		return(0);
+
+	/* The kernel contains all symbols, do the same for this module. */
+
+	/* Add an empty kallsyms section to the module if necessary */
+	for (i = 0; i < f->header.e_shnum; ++i) {
+		if (strcmp(f->sections[i]->name, KALLSYMS_SEC_NAME) == 0) {
+			*module_kallsyms = f->sections[i];
+			break;
+		}
+	    }
+	if (!*module_kallsyms)
+		*module_kallsyms = obj_create_alloced_section(f, KALLSYMS_SEC_NAME, 0, 0);
+
+	/* Size and populate kallsyms */
+	if (obj_kallsyms(f, &f_kallsyms))
+		return(1);
+	sec_kallsyms = f_kallsyms->sections[KALLSYMS_IDX];
+	(*module_kallsyms)->header.sh_addralign = sec_kallsyms->header.sh_addralign;
+	(*module_kallsyms)->header.sh_size = sec_kallsyms->header.sh_size;
+	free((*module_kallsyms)->contents);
+	(*module_kallsyms)->contents = sec_kallsyms->contents;
+	sec_kallsyms->contents = NULL;
+	obj_free(f_kallsyms);
+
+	return 0;
+}
+
+
+/* Add an arch data section if the arch wants it. */
+static int add_archdata(struct obj_file *f,
+			struct obj_section **sec)
+{
+	size_t i;
+
+	*sec = NULL;
+	/* Add an empty archdata section to the module if necessary */
+	for (i = 0; i < f->header.e_shnum; ++i) {
+		if (strcmp(f->sections[i]->name, ARCHDATA_SEC_NAME) == 0) {
+			*sec = f->sections[i];
+			break;
+		}
+	    }
+	if (!*sec)
+		*sec = obj_create_alloced_section(f, ARCHDATA_SEC_NAME, 16, 0);
+
+	/* Size and populate archdata */
+	if (arch_archdata(f, *sec))
+		return(1);
+	return 0;
+}
+
+
+static int init_module(const char *m_name, struct obj_file *f,
+		       unsigned long m_size, const char *blob_name,
+		       unsigned int noload, unsigned int flag_load_map)
 {
 	struct module *module;
 	struct obj_section *sec;
 	void *image;
-	int ret;
+	int ret = 0;
 	tgt_long m_addr;
 
 	sec = obj_find_section(f, ".this");
@@ -948,7 +1058,8 @@ static int init_module(const char *m_name, struct obj_file *f, unsigned long m_s
 		module->ndeps = n_ext_modules_used;
 	}
 	module->init = obj_symbol_final_value(f, obj_find_symbol(f, "init_module"));
-	module->cleanup = obj_symbol_final_value(f, obj_find_symbol(f, "cleanup_module"));
+	module->cleanup = obj_symbol_final_value(f,
+		obj_find_symbol(f, "cleanup_module"));
 
 	sec = obj_find_section(f, "__ex_table");
 	if (sec) {
@@ -965,6 +1076,16 @@ static int init_module(const char *m_name, struct obj_file *f, unsigned long m_s
 		    module->runsize > sec->header.sh_addr - m_addr)
 			module->runsize = sec->header.sh_addr - m_addr;
 	}
+	sec = obj_find_section(f, ARCHDATA_SEC_NAME);
+	if (sec && sec->header.sh_size) {
+		module->archdata_start = sec->header.sh_addr;
+		module->archdata_end = module->archdata_start + sec->header.sh_size;
+	}
+	sec = obj_find_section(f, KALLSYMS_SEC_NAME);
+	if (sec && sec->header.sh_size) {
+		module->kallsyms_start = sec->header.sh_addr;
+		module->kallsyms_end = module->kallsyms_start + sec->header.sh_size;
+	}
 	if (!arch_init_module(f, module))
 		return 0;
 
@@ -975,12 +1096,33 @@ static int init_module(const char *m_name, struct obj_file *f, unsigned long m_s
 	image = xmalloc(m_size);
 	obj_create_image(f, image);
 
-	ret = sys_init_module(m_name, (struct module *) image);
-	if (ret) {
-		error("init_module: %m");
-		if (ret == -EBUSY)
-			lprintf("Hint: this error can be caused by incorrect module parameters, "
-				"including invalid IO and IRQ parameters\n");
+	if (flag_load_map)
+		print_load_map(f);
+
+	if (blob_name) {
+		int fd, l;
+		fd = open(blob_name, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+		if (fd < 0) {
+			error("open %s failed %m", blob_name);
+			ret = -1;
+		}
+		else {
+			if ((l = write(fd, image, m_size)) != m_size) {
+				error("write %s failed %m", blob_name);
+				ret = -1;
+			}
+			close(fd);
+		}
+	}
+
+	if (ret == 0 && !noload) {
+		fflush(stdout);		/* Flush any debugging output */
+		ret = sys_init_module(m_name, (struct module *) image);
+		if (ret) {
+			error("init_module: %m");
+			lprintf("Hint: insmod errors can be caused by incorrect module parameters, "
+				"including invalid IO or IRQ parameters");
+		}
 	}
 
 	free(image);
@@ -989,7 +1131,8 @@ static int init_module(const char *m_name, struct obj_file *f, unsigned long m_s
 }
 
 #ifdef COMPAT_2_0
-static int old_init_module(const char *m_name, struct obj_file *f, unsigned long m_size)
+static int old_init_module(const char *m_name, struct obj_file *f,
+			   unsigned long m_size)
 {
 	char *image;
 	struct old_mod_routines routines;
@@ -1014,7 +1157,7 @@ static int old_init_module(const char *m_name, struct obj_file *f, unsigned long
 	}
 	total = (sizeof(struct old_symbol_table) +
 		 nsyms * sizeof(struct old_module_symbol) +
-	         n_ext_modules_used * sizeof(struct old_module_ref) +
+		 n_ext_modules_used * sizeof(struct old_module_ref) +
 		 strsize);
 	symtab = xmalloc(total);
 	symtab->size = total;
@@ -1061,7 +1204,8 @@ static int old_init_module(const char *m_name, struct obj_file *f, unsigned long
 	/* Fill in routines.  */
 
 	routines.init = obj_symbol_final_value(f, obj_find_symbol(f, "init_module"));
-	routines.cleanup = obj_symbol_final_value(f, obj_find_symbol(f, "cleanup_module"));
+	routines.cleanup = obj_symbol_final_value(f,
+		obj_find_symbol(f, "cleanup_module"));
 
 	/*
 	 * Whew!  All of the initialization is complete.
@@ -1078,7 +1222,7 @@ static int old_init_module(const char *m_name, struct obj_file *f, unsigned long
 	 */
 	ret = old_sys_init_module(m_name, image + sizeof(long),
 				  (m_size - sizeof(long)) |
-			          (flag_autoclean ? OLD_MOD_AUTOCLEAN : 0),
+				  (flag_autoclean ? OLD_MOD_AUTOCLEAN : 0),
 				  &routines,
 				  symtab);
 	if (ret)
@@ -1101,25 +1245,28 @@ extern void insmod_usage(void);		/* Use the copy in the 64 bit version */
 void insmod_usage(void)
 {
 	fputs("Usage:\n"
-	      "insmod [-fkmopsvVxXyY] [-o name] [-P prefix] module [[sym=value]...]\n"
-
+	      "insmod [-fhkLmnpqrsSvVxXyY] [-o module_name] [-O blob_name] [-P prefix] module [ symbol=value ... ]\n"
 	      "\n"
-	      "  module                Filename of a loadable kernel module (*.o)\n"
+	      "  module                Name of a loadable kernel module ('.o' can be omitted)\n"
 	      "  -f, --force           Force loading under wrong kernel version\n"
+	      "  -h, --help            Print this message\n"
 	      "  -k, --autoclean       Make module autoclean-able\n"
+	      "  -L, --lock            Prevent simultaneous loads of the same module\n"
 	      "  -m, --map             Generate load map (so crashes can be traced)\n"
 	      "  -n, --noload          Don't load, just show\n"
-	      "  -o NAME, --name=NAME  Set internal module name to NAME\n"
-	      "  -p, --poll            Poll mode; check if the module matches the kernel\n"
+	      "  -p, --probe           Probe mode; check if the module matches the kernel\n"
+	      "  -q, --quiet           Don't print unresolved symbols\n"
+	      "  -r, --root            Allow root to load modules not owned by root\n"
 	      "  -s, --syslog          Report errors via syslog\n"
+	      "  -S, --kallsyms        Force kallsyms on module\n"
 	      "  -v, --verbose         Verbose output\n"
-	      "  -L, --lock            Prevent simultaneous loads of the same module\n"
 	      "  -V, --version         Show version\n"
-	      "  -x                    Do not export externs\n"
-	      "  -X                    Do export externs (default)\n"
-	      "  -y                    Do not add ksymoops symbols\n"
-	      "  -Y                    Do add ksymoops symbols (default)\n"
-	      "  -r                    Allow root to load modules not owned by root\n"
+	      "  -x, --noexport        Do not export externs\n"
+	      "  -X, --export          Do export externs (default)\n"
+	      "  -y, --noksymoops      Do not add ksymoops symbols\n"
+	      "  -Y, --ksymoops        Do add ksymoops symbols (default)\n"
+	      "  -o NAME, --name=NAME  Set internal module name to NAME\n"
+	      "  -O NAME, --blob=NAME  Save the object as a binary blob in NAME\n"
 	      "  -P PREFIX\n"
 	      "      --prefix=PREFIX   Prefix for kernel or module symbols\n"
 	      ,stderr);
@@ -1142,38 +1289,45 @@ int INSMOD_MAIN(int argc, char **argv)
 	char k_strversion[STRVERSIONLEN];
 	struct option long_opts[] = {
 		{"force", 0, 0, 'f'},
+		{"help", 0, 0, 'h'},
 		{"autoclean", 0, 0, 'k'},
+		{"lock", 0, 0, 'L'},
 		{"map", 0, 0, 'm'},
 		{"noload", 0, 0, 'n'},
-		{"name", 1, 0, 'o'},
-		{"poll", 0, 0, 'p'},
+		{"probe", 0, 0, 'p'},
+		{"poll", 0, 0, 'p'},	/* poll is deprecated, remove in 2.5 */
+		{"quiet", 0, 0, 'q'},
+		{"root", 0, 0, 'r'},
 		{"syslog", 0, 0, 's'},
+		{"kallsyms", 0, 0, 'S'},
 		{"verbose", 0, 0, 'v'},
 		{"version", 0, 0, 'V'},
-		{"lock", 0, 0, 'L'},
-		{"prefix", 1, 0, 'P'},
 		{"noexport", 0, 0, 'x'},
 		{"export", 0, 0, 'X'},
-		{"quiet", 0, 0, 'q'},
 		{"noksymoops", 0, 0, 'y'},
 		{"ksymoops", 0, 0, 'Y'},
-		{"root", 0, 0, 'r'},
+		{"name", 1, 0, 'o'},
+		{"blob", 1, 0, 'O'},
+		{"prefix", 1, 0, 'P'},
 		{0, 0, 0, 0}
 	};
 	char *m_name = NULL;
+	char *blob_name = NULL;		/* Save object as binary blob */
 	int m_version;
 	ElfW(Addr) m_addr;
 	unsigned long m_size;
 	int m_crcs;
 	char m_strversion[STRVERSIONLEN];
 	char *filename;
-	FILE *fp;
+	int fp;
 	struct obj_file *f;
+	struct obj_section *kallsyms = NULL, *archdata = NULL;
 	int o;
 	int noload = 0;
 	int dolock = 1; /*Note: was: 0; */
 	int quiet = 0;
 	int exit_status = 1;
+	int force_kallsyms = 0;
 	int i;
 
 	error_file = "insmod";
@@ -1182,11 +1336,14 @@ int INSMOD_MAIN(int argc, char **argv)
 	errors = optind = 0;
 
 	/* Process the command line.  */
-	while ((o = getopt_long(argc, argv, "fkmno:pqsvVxXLP:yYr",
+	while ((o = getopt_long(argc, argv, "fhkLmnpqrsSvVxXyYo:O:P:",
 				&long_opts[0], NULL)) != EOF)
 		switch (o) {
 		case 'f':	/* force loading */
 			flag_force_load = 1;
+			break;
+		case 'h':       /* Print the usage message. */
+			insmod_usage();
 			break;
 		case 'k':	/* module loaded by kerneld, auto-cleanable */
 			flag_autoclean = 1;
@@ -1200,17 +1357,20 @@ int INSMOD_MAIN(int argc, char **argv)
 		case 'n':	/* don't load, just check */
 			noload = 1;
 			break;
-		case 'o':	/* name the output module */
-			m_name = optarg;
-			break;
-		case 'p':	/* silent poll mode */
-			flag_silent_poll = 1;
+		case 'p':	/* silent probe mode */
+			flag_silent_probe = 1;
 			break;
 		case 'q':	/* Don't print unresolved symbols */
 			quiet = 1;
 			break;
+		case 'r':	/* allow root to load non-root modules */
+			root_check_off = !root_check_off;
+			break;
 		case 's':	/* start syslog */
 			setsyslog("insmod");
+			break;
+		case 'S':	/* Force kallsyms */
+			force_kallsyms = 1;
 			break;
 		case 'v':	/* verbose output */
 			flag_verbose = 1;
@@ -1230,12 +1390,17 @@ int INSMOD_MAIN(int argc, char **argv)
 		case 'Y':	/* do define ksymoops symbols */
 			flag_ksymoops = 1;
 			break;
-		case 'r':	/* allow root to load non-root modules */
-			root_check_off = 1;
+
+		case 'o':	/* name the output module */
+			m_name = optarg;
+			break;
+		case 'O':	/* save the output module object */
+			blob_name = optarg;
 			break;
 		case 'P':	/* use prefix on crc */
 			set_ncv_prefix(optarg);
 			break;
+
 		default:
 			insmod_usage();
 			break;
@@ -1246,7 +1411,7 @@ int INSMOD_MAIN(int argc, char **argv)
 	}
 	filename = argv[optind++];
 
-	if (config_read(0, NULL, NULL, NULL) < 0) {
+	if (config_read(0, NULL, "", NULL) < 0) {
 		error("Failed handle configuration");
 	}
 
@@ -1264,6 +1429,10 @@ int INSMOD_MAIN(int argc, char **argv)
 		else if (len > 4 && p[len - 4] == '.' && p[len - 3] == 'm'
 			 && p[len - 2] == 'o' && p[len - 1] == 'd')
 			len -= 4;
+#ifdef CONFIG_USE_ZLIB
+		else if (len > 5 && !strcmp(p + len - 5, ".o.gz"))
+			len -= 5;
+#endif
 
 		m_name = xmalloc(len + 1);
 		memcpy(m_name, p, len);
@@ -1278,19 +1447,19 @@ int INSMOD_MAIN(int argc, char **argv)
 			return 1;
 		}
 		filename = tmp;
-		printf("Using %s\n", filename);
+		lprintf("Using %s", filename);
 	} else if (flag_verbose)
-		printf("Using %s\n", filename);
+		lprintf("Using %s", filename);
 
 	/* And open it.  */
-	if ((fp = fopen(filename, "r")) == NULL) {
+	if ((fp = gzf_open(filename, O_RDONLY)) == -1) {
 		error_file = filename;
 		error("%s: %m", filename);
 		return 1;
 	}
 	/* Try to prevent multiple simultaneous loads.  */
 	if (dolock)
-		flock(fileno(fp), LOCK_EX);
+		flock(fp, LOCK_EX);
 
 	if (!get_kernel_info(K_SYMBOLS))
 		goto out;
@@ -1309,7 +1478,7 @@ int INSMOD_MAIN(int argc, char **argv)
 	}
 
 	error_file = filename;
-	if ((f = obj_load(fp)) == NULL)
+	if ((f = obj_load(fp, ET_REL, filename)) == NULL)
 		goto out;
 
 	/* Version correspondence?  */
@@ -1327,7 +1496,7 @@ int INSMOD_MAIN(int argc, char **argv)
 		if (flag_force_load) {
 			lprintf("Warning: kernel-module version mismatch\n"
 			      "\t%s was compiled for kernel version %s\n"
-				"\twhile this kernel is version %s\n",
+				"\twhile this kernel is version %s",
 				filename, m_strversion, k_strversion);
 		} else {
 			if (!quiet)
@@ -1344,7 +1513,13 @@ int INSMOD_MAIN(int argc, char **argv)
 	/* Let the module know about the kernel symbols.  */
 	add_kernel_symbols(f);
 
-	/* Allocate common symbols, symbol tables, and string tables.  */
+	/* Allocate common symbols, symbol tables, and string tables.
+	 *
+	 * The calls marked DEPMOD indicate the bits of code that depmod
+	 * uses to do a pseudo relocation, ignoring undefined symbols.
+	 * Any changes made to the relocation sequence here should be
+	 * checked against depmod.
+	 */
 #ifdef COMPAT_2_0
 	if (k_new_syscalls
 	    ? !create_this_module(f, m_name)
@@ -1355,15 +1530,15 @@ int INSMOD_MAIN(int argc, char **argv)
 		goto out;
 #endif
 
-	if (!obj_check_undefineds(f, quiet))
+	if (!obj_check_undefineds(f, quiet))	/* DEPMOD, obj_clear_undefineds */
 		goto out;
-	obj_allocate_commons(f);
+	obj_allocate_commons(f);	/* DEPMOD */
 
 	if (optind < argc) {
 		if (!process_module_arguments(f, argc - optind, argv + optind))
 			goto out;
 	}
-	arch_create_got(f);
+	arch_create_got(f);	/* DEPMOD */
 	hide_special_symbols(f);
 	if (flag_ksymoops)
 		add_ksymoops_symbols(f, filename, m_name);
@@ -1371,16 +1546,25 @@ int INSMOD_MAIN(int argc, char **argv)
 	if (k_new_syscalls)
 		create_module_ksymtab(f);
 
+	/* archdata based on relocatable addresses */
+	if (add_archdata(f, &archdata))
+		goto out;
+
+	/* kallsyms based on relocatable addresses */
+	if (add_kallsyms(f, &kallsyms, force_kallsyms))
+		goto out;
+	/**** No symbols or sections to be changed after kallsyms above ***/
+
 	if (errors)
 		goto out;
 
 	/* If we were just checking, we made it.  */
-	if (flag_silent_poll) {
+	if (flag_silent_probe) {
 		exit_status = 0;
 		goto out;
 	}
 	/* Module has now finished growing; find its size and install it.  */
-	m_size = obj_load_size(f);
+	m_size = obj_load_size(f);	/* DEPMOD */
 
 	if (noload) {
 		/* Don't bother actually touching the kernel.  */
@@ -1413,34 +1597,39 @@ int INSMOD_MAIN(int argc, char **argv)
 		}
 	}
 
-	if (!obj_relocate(f, m_addr)) {
+	if (!obj_relocate(f, m_addr)) {	/* DEPMOD */
 		if (!noload)
 			delete_module(m_name);
 		goto out;
 	}
-	if (!noload) {
+
+	/* Do archdata again, this time we have the final addresses */
+	if (add_archdata(f, &archdata))
+		goto out;
+
+	/* Do kallsyms again, this time we have the final addresses */
+	if (add_kallsyms(f, &kallsyms, force_kallsyms))
+		goto out;
+
 #ifdef COMPAT_2_0
-		if (k_new_syscalls)
-			init_module(m_name, f, m_size);
-		else
-			old_init_module(m_name, f, m_size);
+	if (k_new_syscalls)
+		init_module(m_name, f, m_size, blob_name, noload, flag_load_map);
+	else if (!noload)
+		old_init_module(m_name, f, m_size);
 #else
-		init_module(m_name, f, m_size);
+	init_module(m_name, f, m_size, blob_name, noload, flag_load_map);
 #endif
-	}
 	if (errors) {
 		if (!noload)
 			delete_module(m_name);
 		goto out;
 	}
-	if (flag_load_map)
-		print_load_map(f);
 	exit_status = 0;
 
       out:
 	if (dolock)
-		flock(fileno(fp), LOCK_UN);
-	fclose(fp);
+		flock(fp, LOCK_UN);
+	close(fp);
 	if (!noload)
 		snap_shot(NULL, 0);
 
@@ -1460,79 +1649,81 @@ int insmod_main(int argc, char **argv)
 
 
 /* For common 3264 code, only compile main in the 64 bit version. */
-#if defined(COMMON_3264) && defined(ONLY_32)
+#if 1 || (defined(COMMON_3264) && defined(ONLY_32))
 /* Use the main in the 64 bit version */
 #else
-/* List of possible program names and the corresponding mainline routines */
-static struct { char *name; int (*handler)(int, char **); } mains[] =
-	{
-		{ "insmod", &insmod_main },
-#ifdef COMBINE_modprobe
-		{ "modprobe", &modprobe_main },
-#endif
-#ifdef COMBINE_rmmod
-		{ "rmmod", &rmmod_main },
-#endif
-#ifdef COMBINE_ksyms
-		{ "ksyms", &ksyms_main },
-#endif
-#ifdef COMBINE_lsmod
-		{ "lsmod", &lsmod_main },
-#endif
-	};
-
-#define MAINS_NO (sizeof(mains)/sizeof(mains[0]))
-
 /* This mainline looks at the name it was invoked under, checks that the name
  * contains exactly one of the possible combined targets and invokes the
  * corresponding handler for that function.
  */
-static inline int mainline(char *name)
+int main(int argc, char **argv)
 {
-	int mains_which;
-	int mains_match = 0;
+	/* List of possible program names and the corresponding mainline routines */
+	static struct { char *name; int (*handler)(int, char **); } mains[] =
+		{
+			{ "insmod", &insmod_main },
+	#ifdef COMBINE_modprobe
+			{ "modprobe", &modprobe_main },
+	#endif
+	#ifdef COMBINE_rmmod
+			{ "rmmod", &rmmod_main },
+	#endif
+	#ifdef COMBINE_ksyms
+			{ "ksyms", &ksyms_main },
+	#endif
+	#ifdef COMBINE_lsmod
+			{ "lsmod", &lsmod_main },
+	#endif
+	#ifdef COMBINE_kallsyms
+			{ "kallsyms", &kallsyms_main },
+	#endif
+		};
+	#define MAINS_NO (sizeof(mains)/sizeof(mains[0]))
+	static int mains_match;
+	static int mains_which;
+
+	char *p = strrchr(argv[0], '/');
 	char error_id1[2048] = "The ";		/* Way oversized */
 	char error_id2[2048] = "";		/* Way oversized */
 	int i;
-	char *p = strrchr(name, '/');
 
-	p = p ? p + 1 : name;
+	p = p ? p + 1 : argv[0];
 
 	for (i = 0; i < MAINS_NO; ++i) {
 		if (i) {
-			strcat(error_id1, "/");
+			xstrcat(error_id1, "/", sizeof(error_id1));
 			if (i == MAINS_NO-1)
-				strcat(error_id2, " or ");
+				xstrcat(error_id2, " or ", sizeof(error_id2));
 			else
-				strcat(error_id2, ", ");
+				xstrcat(error_id2, ", ", sizeof(error_id2));
 		}
-		strcat(error_id1, mains[i].name);
-		strcat(error_id2, mains[i].name);
+		xstrcat(error_id1, mains[i].name, sizeof(error_id1));
+		xstrcat(error_id2, mains[i].name, sizeof(error_id2));
 		if (strstr(p, mains[i].name)) {
 			++mains_match;
 			mains_which = i;
 		}
 	}
 
-	strcat(error_id1, " combined binary");
+	/* Finish the error identifiers */
+	if (MAINS_NO != 1)
+		xstrcat(error_id1, " combined", sizeof(error_id1));
+	xstrcat(error_id1, " binary", sizeof(error_id1));
 
-	if (mains_match != 1) {
-		error( ( !mains_match ?
-			"%s does not have a recognisable name, the name must contain one of %s."
-			: "%s has an ambiguous name, it must contain exactly one of %s." ),
+	if (mains_match == 0 && MAINS_NO == 1)
+		++mains_match;		/* Not combined, any name will do */
+	if (mains_match == 0) {
+		error("%s does not have a recognisable name, "
+		      "the name must contain one of %s.",
 			error_id1, error_id2);
-		exit(1);
+		return(1);
 	}
-
-	return mains_which;
+	else if (mains_match > 1) {
+		error("%s has an ambiguous name, it must contain %s%s.",
+			error_id1, MAINS_NO == 1 ? "" : "exactly one of ", error_id2);
+		return(1);
+	}
+	else
+		return((mains[mains_which].handler)(argc, argv));
 }
-
-#if 0
-int main(int argc, char **argv)
-{
-	return (mains[ ( (MAINS_NO > 1) ? mainline(argv[0]) : 0 ) ].handler)
-			(argc, argv);
-}
-#endif
 #endif	/* defined(COMMON_3264) && defined(ONLY_32) */
-

@@ -18,7 +18,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_mips.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_mips.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 #include <string.h>
 #include <stdlib.h>
@@ -70,7 +70,7 @@ arch_new_symbol (void)
 }
 
 int
-arch_load_proc_section(struct obj_section *sec, FILE *fp)
+arch_load_proc_section(struct obj_section *sec, int fp)
 {
   switch (sec->header.sh_type)
     {
@@ -129,8 +129,8 @@ arch_apply_relocation (struct obj_file *f,
 
     case R_MIPS_26:
       if (v % 4)
-        ret = obj_reloc_dangerous;
-      if ((v & 0xf0000000) != (dot & 0xf0000000))
+	ret = obj_reloc_dangerous;
+      if ((v & 0xf0000000) != ((dot + 4) & 0xf0000000))
 	ret = obj_reloc_overflow;
       *loc = (*loc & ~0x03ffffff) | ((*loc + (v >> 2)) & 0x03ffffff);
       break;
@@ -139,15 +139,15 @@ arch_apply_relocation (struct obj_file *f,
       {
 	struct mips_hi16 *n;
 
-        /* We cannot relocate this one now because we don't know the value
-           of the carry we need to add.  Save the information, and let LO16
+	/* We cannot relocate this one now because we don't know the value
+	   of the carry we need to add.  Save the information, and let LO16
 	   do the actual relocation.  */
-        n = (struct mips_hi16 *) xmalloc (sizeof *n);
-        n->addr = loc;
-        n->value = v;
-        n->next = mf->mips_hi16_list;
-        mf->mips_hi16_list = n;
-        break;
+	n = (struct mips_hi16 *) xmalloc (sizeof *n);
+	n->addr = loc;
+	n->value = v;
+	n->next = mf->mips_hi16_list;
+	mf->mips_hi16_list = n;
+	break;
       }
 
     case R_MIPS_LO16:
@@ -199,7 +199,7 @@ arch_apply_relocation (struct obj_file *f,
 	*loc = insnlo;
 	break;
       }
-      
+
     default:
       ret = obj_reloc_unhandled;
       break;
@@ -229,4 +229,10 @@ arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
   for (i = 0; i < n; ++i)
     f->sections[i]->header.sh_addr += base;
   return 1;
+}
+
+int
+arch_archdata (struct obj_file *fin, struct obj_section *sec)
+{
+  return 0;
 }

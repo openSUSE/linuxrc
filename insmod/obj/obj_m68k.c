@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_m68k.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_m68k.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 #include <stddef.h>
 #include <module.h>
@@ -48,7 +48,7 @@ arch_new_symbol (void)
 }
 
 int
-arch_load_proc_section(struct obj_section *sec, FILE *fp)
+arch_load_proc_section(struct obj_section *sec, int fp)
 {
     /* Assume it's just a debugging section that we can safely
        ignore ...  */
@@ -138,4 +138,10 @@ arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
   for (i = 0; i < n; ++i)
     f->sections[i]->header.sh_addr += base;
   return 1;
+}
+
+int
+arch_archdata (struct obj_file *fin, struct obj_section *sec)
+{
+  return 0;
 }

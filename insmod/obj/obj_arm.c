@@ -21,7 +21,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_arm.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_arm.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 #include <string.h>
 #include <assert.h>
@@ -90,7 +90,7 @@ arch_new_symbol (void)
 }
 
 int
-arch_load_proc_section(struct obj_section *sec, FILE *fp)
+arch_load_proc_section(struct obj_section *sec, int fp)
 {
     /* Assume it's just a debugging section that we can safely
        ignore ...  */
@@ -124,7 +124,7 @@ arch_apply_relocation (struct obj_file *f,
     {
     case R_ARM_NONE:
       break;
- 
+
     case R_ARM_ABS32:
       *loc += v;
       break;
@@ -132,21 +132,21 @@ arch_apply_relocation (struct obj_file *f,
     case R_ARM_GOT32:
       /* needs an entry in the .got: set it, once */
       if (! asym->gotent.reloc_done)
-        {
+	{
 	  asym->gotent.reloc_done = 1;
 	  *(Elf32_Addr *)(afile->got->contents + asym->gotent.offset) = v;
-        }
+	}
       /* make the reloc with_respect_to_.got */
       *loc += asym->gotent.offset;
       break;
-        
+
       /* relative reloc, always to _GLOBAL_OFFSET_TABLE_ (which is .got)
 	 similar to branch, but is full 32 bits relative */
     case R_ARM_GOTPC:
       assert(got);
       *loc += got - dot;
       break;
-      
+
     case R_ARM_PC24:
     case R_ARM_PLT32:
       /* find the plt entry and initialize it if necessary */
@@ -155,11 +155,11 @@ arch_apply_relocation (struct obj_file *f,
       if (! pe->inited)
 	{
 	  ip = (unsigned long *) (afile->plt->contents + pe->offset);
-          ip[0] = 0xe51ff004;			/* ldr pc,[pc,#-4] */
-	  ip[1] = v;	 			/* sym@ */
+	  ip[0] = 0xe51ff004;			/* ldr pc,[pc,#-4] */
+	  ip[1] = v;				/* sym@ */
 	  pe->inited = 1;
 	}
-      
+
       /* relative distance to target */
       v -= dot;
       /* if the target is too far away.... */
@@ -183,7 +183,7 @@ arch_apply_relocation (struct obj_file *f,
       assert(got);
       *loc += v - got;
       break;
-        
+
     default:
       printf("Warning: unhandled reloc %d\n",ELF32_R_TYPE(rel->r_info));
       ret = obj_reloc_unhandled;
@@ -214,7 +214,7 @@ arch_create_got (struct obj_file *f)
 	continue;
       syms = f->sections[sec->header.sh_link];
       strs = f->sections[syms->header.sh_link];
-      
+
       rel = (ElfW(RelM) *) sec->contents;
       relend = rel + (sec->header.sh_size / sizeof(ElfW(RelM)));
       symtab = (ElfW(Sym) *) syms->contents;
@@ -222,54 +222,54 @@ arch_create_got (struct obj_file *f)
 
       for (; rel < relend; ++rel)
 	{
-          extsym = &symtab[ELF32_R_SYM(rel->r_info)];
-	  
-          switch(ELF32_R_TYPE(rel->r_info)) {
-          case R_ARM_PC24:
-          case R_ARM_PLT32:
+	  extsym = &symtab[ELF32_R_SYM(rel->r_info)];
+
+	  switch(ELF32_R_TYPE(rel->r_info)) {
+	  case R_ARM_PC24:
+	  case R_ARM_PLT32:
 	    if (extsym->st_name)
 	      name = strtab + extsym->st_name;
 	    else
 	      name = f->sections[extsym->st_shndx]->name;
 	    intsym = (struct arm_symbol *) obj_find_symbol(f, name);
-	    
+
 	    pe = &intsym->pltent;
-	    
+
 	    if (! pe->allocated)
-              {
+	      {
 		pe->allocated = 1;
 		pe->offset = plt_offset;
 		plt_offset += 8;
 		pe->inited = 0;
-              }
+	      }
 	    break;
-	    
+
 	    /* these two don_t need got entries, but they need
-               the .got to exist */
-          case R_ARM_GOTOFF:
-          case R_ARM_GOTPC:
+	       the .got to exist */
+	  case R_ARM_GOTOFF:
+	  case R_ARM_GOTPC:
 	    if (got_offset==0) got_offset = 4;
 	    break;
-	    
-          case R_ARM_GOT32:
+
+	  case R_ARM_GOT32:
 	    if (extsym->st_name)
 	      name = strtab + extsym->st_name;
 	    else
 	      name = f->sections[extsym->st_shndx]->name;
 	    intsym = (struct arm_symbol *) obj_find_symbol(f, name);
-	    
+
 	    ge = (struct arm_got_entry *) &intsym->gotent;
 	    if (! ge->allocated)
-              {
+	      {
 		ge->allocated = 1;
 		ge->offset = got_offset;
 		got_offset += sizeof(void*);
-              }
+	      }
 	    break;
 
-          default:
+	  default:
 	    continue;
-          }
+	  }
 	}
     }
 
@@ -280,10 +280,10 @@ arch_create_got (struct obj_file *f)
       struct obj_section* sec = obj_find_section(f, ".got");
       if (sec)
 	obj_extend_section(sec, got_offset);
-      else 
+      else
 	{
 	  sec = obj_create_alloced_section(f, ".got", 8, got_offset);
-          assert(sec);
+	  assert(sec);
 	}
       afile->got = sec;
   }
@@ -309,4 +309,10 @@ arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
   for (i = 0; i < n; ++i)
     f->sections[i]->header.sh_addr += base;
   return 1;
+}
+
+int
+arch_archdata (struct obj_file *fin, struct obj_section *sec)
+{
+  return 0;
 }

@@ -10,14 +10,14 @@ CFLAGS		= -O2 -Wall
 AR		= ar
 RANLIB		= ranlib
 
-DEFSNOARCH	:= -I../include -D_GNU_SOURCE  -DCOMPAT_2_0=1  $(EXTRA_DEFS)
+DEFSNOARCH	:= -I../include -D_GNU_SOURCE -DCONFIG_ROOT_CHECK_OFF=0 $(EXTRA_DEFS)
 DEFS		:= -DELF_MACHINE_H='"elf_$(ARCH).h"' -DARCH_$(ARCH)
 
-LIBOBJ_OBJS	:= obj_common.o obj_load.o obj_reloc.o obj_$(ARCH).o
+LIBOBJ_OBJS	:= obj_kallsyms.o obj_common.o obj_load.o obj_reloc.o obj_$(ARCH).o
 LIBOBJ_SRCS	:= $(LIBOBJ_OBJS:.o=.c)
 
 ifeq ($(ARCH),sparc)
-LIBOBJ_OBJS	+= obj_common_64.o obj_load_64.o obj_reloc_64.o obj_sparc64_64.o
+LIBOBJ_OBJS	+= obj_kallsyms_64.o obj_common_64.o obj_load_64.o obj_reloc_64.o obj_sparc64_64.o
 LIBOBJ_SRCS	+= obj_sparc64.c
 DEFSNOARCH	+= -DCOMMON_3264
 DEFS		+= -DONLY_32

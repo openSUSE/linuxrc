@@ -24,11 +24,13 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ident "$Id: rmmod.c,v 1.1 2000/03/23 17:09:55 snwint Exp $"
+#ident "$Id: rmmod.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 #include <errno.h>
 #include <malloc.h>
+#include <memory.h>
 #include <unistd.h>
+#include <getopt.h>
 
 #include "module.h"
 #include "version.h"
@@ -43,6 +45,19 @@
 #define main rmmod_main
 #endif
 
+void rmmod_usage(void)
+{
+	fputs("Usage:\n"
+	      "rmmod [-arshV] module ...\n"
+	      "\n"
+	      "  -a, --all     Remove all unused modules\n"
+	      "  -r, --stacks  Remove stacks, starting at the named module\n"
+	      "  -s, --syslog  Use syslog for error messages\n"
+	      "  -h, --help    Print this message\n"
+	      "  -V, --version Print the release version number\n"
+	      ,stderr);
+}
+
 int main(int argc, char **argv)
 {
 	struct module_stat *m;
@@ -53,6 +68,15 @@ int main(int argc, char **argv)
 	size_t n_module_names;
 	char *module_names = NULL;
 
+	struct option long_opts[] = {
+		{"all", 0, 0, 'a'},
+		{"stacks", 0, 0, 'r'},
+		{"syslog", 0, 0, 's'},
+		{"version", 0, 0, 'V'},
+		{"help", 0, 0, 'h'},
+		{0, 0, 0, 0}
+	};
+
 	error_file = "rmmod";
 
 	/*
@@ -60,12 +84,13 @@ int main(int argc, char **argv)
 	 * gives no indication that any modules were deleted so we have to
 	 * do it the hard way.
 	 */
-	get_kernel_info(0); 
+	get_kernel_info(0);
 	module_names = xmalloc(l_module_name_list);
 	memcpy(module_names, module_name_list, l_module_name_list);
 	n_module_names = n_module_stat;
 
-	while ((i = getopt(argc, argv, "arsV")) != EOF)
+	while ((i = getopt_long(argc, argv, "arsVh",
+				&long_opts[0], NULL)) != EOF)
 		switch (i) {
 		case 'a':
 			/* Remove all unused modules and stacks.  */
@@ -93,9 +118,12 @@ int main(int argc, char **argv)
 			fputs("rmmod version " MODUTILS_VERSION "\n", stderr);
 			break;
 
+		case 'h':
+			rmmod_usage();
+			return 0;
 		default:
-		      usage:
-			fputs("Usage: rmmod [-a] [-r] [-s] module ...\n", stderr);
+		usage:
+			rmmod_usage();
 			return 1;
 		}
 

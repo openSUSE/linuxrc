@@ -10,7 +10,7 @@ CFLAGS		= -O2 -Wall
 AR		= ar
 RANLIB		= ranlib
 
-DEFS = -I../include -D_GNU_SOURCE  -DCOMPAT_2_0=1 
+DEFS = -I../include -D_GNU_SOURCE -DCONFIG_ROOT_CHECK_OFF=0
 DEFS += -DELF_MACHINE_H='"elf_$(ARCH).h"' -DARCH_$(ARCH) $(EXTRA_DEFS)
 
 %.o: %.c
@@ -20,8 +20,10 @@ DEFS += -DELF_MACHINE_H='"elf_$(ARCH).h"' -DARCH_$(ARCH) $(EXTRA_DEFS)
 
 all: .depend libutil.a
 
-OBJS = xmalloc.o xrealloc.o xstrdup.o logger.o modstat.o \
-	meta_expand.o config.o snap_shot.o arch64.o sys_nim.o
+OBJS = xmalloc.o xrealloc.o xstrcat.o xstrdup.o xsystem.o \
+	logger.o modstat.o \
+	meta_expand.o config.o snap_shot.o arch64.o gzfiles.o sys_nim.o \
+	xftw.o
 ifneq ($(ARCH),ia64)
 OBJS += sys_cm.o sys_dm.o sys_gks.o sys_nim.o sys_oim.o sys_qm.o
 endif

@@ -10,13 +10,7 @@ CFLAGS		= -O2 -Wall
 AR		= ar
 RANLIB		= ranlib
 
-ifeq ($(ARCH),ia64)
-COMPAT_2_0	=
-else
-COMPAT_2_0	= -DCOMPAT_2_0
-endif
-
-DEFSNOARCH	:= -I../include -D_GNU_SOURCE  $(COMPAT_2_0)  $(EXTRA_DEFS)
+DEFSNOARCH	:= -I../include -D_GNU_SOURCE -DCONFIG_ROOT_CHECK_OFF=0 $(EXTRA_DEFS)
 DEFS		:= -DELF_MACHINE_H='"elf_$(ARCH).h"' -DARCH_$(ARCH)
 COMBDEFS	:= -DCOMBINE_rmmod
 

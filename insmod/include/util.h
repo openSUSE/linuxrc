@@ -23,19 +23,32 @@
 #ifndef MODUTILS_UTIL_H
 #define MODUTILS_UTIL_H 1
 
-#ident "$Id: util.h,v 1.1 2000/03/23 17:09:55 snwint Exp $"
+#ident "$Id: util.h,v 1.2 2000/11/22 15:45:22 snwint Exp $"
+
+#define verbose modutils_verbose
+
+#include <stdio.h>
+#include <sys/stat.h>
 
 #define SHELL_META "&();|<>$`\"'\\!{}[]~=+:?*" /* Sum of bj0rn and Debian */
 
 void *xmalloc(size_t);
 void *xrealloc(void *, size_t);
 char *xstrdup(const char *);
+char *xstrcat(char *, const char *, size_t);
+int   xsystem(const char *, char *const[]);
 int   arch64(void);
+
+typedef int (*xftw_func_t)(const char *, const struct stat *);
+extern int xftw(const char *directory, xftw_func_t);
 
 /* Error logging */
 extern int log;
 extern int errors;
 extern const char *error_file;
+
+extern int flag_verbose;
+extern void verbose(const char *ctl,...);
 
 void error(const char *fmt, ...)
 #ifdef __GNUC__
@@ -58,8 +71,31 @@ typedef struct {
 	int pathc;       /* Count of paths matched so far  */
 	char **pathv;    /* List of matched pathnames.  */
 } GLOB_LIST;
-int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version);
+int meta_expand(char *pt, GLOB_LIST *g, char *base_dir, char *version, int type);
+#define ME_BUILTIN_COMMAND	1
+#define ME_SHELL_COMMAND	2
+#define ME_GLOB			4
+#define ME_ALL			(ME_GLOB|ME_SHELL_COMMAND|ME_BUILTIN_COMMAND)
 
 extern void snap_shot(const char *module_name, int number);
+
+#ifdef CONFIG_USE_ZLIB
+int gzf_open(const char *name, int mode);
+int gzf_read(int fd, void *buf, size_t count);
+off_t gzf_lseek(int fd, off_t offset, int whence);
+void gzf_close(int fd);
+
+#else /* ! CONFIG_USE_ZLIB */
+
+#include <unistd.h>
+
+#define gzf_open	open
+#define gzf_read	read
+#define gzf_lseek	lseek
+#define gzf_close	close
+
+#endif /* CONFIG_USE_ZLIB */
+
+static const char symprefix[] = "__insmod_";
 
 #endif /* util.h */

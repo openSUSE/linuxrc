@@ -19,10 +19,11 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ident "$Id: obj_ia64.c,v 1.1 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_ia64.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include <module.h>
 #include <obj.h>
@@ -33,17 +34,6 @@
 #endif
 #ifndef TRUE
 #define TRUE  ~FALSE
-#endif
-
-/* Missing from <elf.h>. */
-#ifndef R_IA64_GPREL32LSB
-#define R_IA64_GPREL32LSB	0x2d	/* @gprel(sym + add), data4 LSB */
-#endif
-#ifndef R_IA64_LTOFF_FPTR32LSB
-#define R_IA64_LTOFF_FPTR32LSB	0x55	/* @ltoff(@fptr(s+a)), data4 LSB */
-#endif
-#ifndef R_IA64_LTOFF_FPTR64LSB
-#define R_IA64_LTOFF_FPTR64LSB	0x57	/* @ltoff(@fptr(s+a)), data8 LSB */
 #endif
 
 /*======================================================================*/
@@ -129,14 +119,14 @@ obj_ia64_ins_extract_from_bundle(Elf64_Addr *bundle, Elf64_Xword slot)
     switch (slot)
     {
     case 0 :
-        return (*bundle >> 5) & 0x1ffffffffff;
+	return (*bundle >> 5) & 0x1ffffffffff;
 
     case 1 :
-        return (((*bundle >> 46) & 0x3ffff) |
-            (*(bundle + 1) << 18)) & 0x1ffffffffff;
+	return (((*bundle >> 46) & 0x3ffff) |
+	    (*(bundle + 1) << 18)) & 0x1ffffffffff;
 
     case 2 :
-        return (*(bundle + 1) >> 23) & 0x1ffffffffff;
+	return (*(bundle + 1) >> 23) & 0x1ffffffffff;
 
     default:
     }
@@ -155,24 +145,24 @@ obj_ia64_ins_insert_in_bundle(Elf64_Addr *bundle, Elf64_Xword slot, Elf64_Xword 
     switch (slot)
     {
     case 0 :
-        i = *bundle & 0xffffc0000000001f;
+	i = *bundle & 0xffffc0000000001f;
        *bundle = i | (in << 5);
-        break;
+	break;
 
     case 1 :
-        i = *bundle & 0x00003fffffffffff;
-        *bundle = i | (in << 46);
+	i = *bundle & 0x00003fffffffffff;
+	*bundle = i | (in << 46);
 
-        ++bundle;
-        i = *bundle & 0xffffffffff800000;
-        *bundle = i | (in >> 18);
-        break;
+	++bundle;
+	i = *bundle & 0xffffffffff800000;
+	*bundle = i | (in >> 18);
+	break;
 
     case 2 :
-        ++bundle;
-        i = *bundle & 0x00000000007fffff;
-        *bundle = i | (in << 23);
-        break;
+	++bundle;
+	i = *bundle & 0x00000000007fffff;
+	*bundle = i | (in << 23);
+	break;
     }
 }
 
@@ -189,7 +179,7 @@ obj_ia64_ins_imm14(Elf64_Xword v, Elf64_Addr *bundle, Elf64_Xword slot)
     ins |= ((v & 0x2000) << 23) | ((v & 0x1f80) << 20) | ((v & 0x007f) << 13);
     obj_ia64_ins_insert_in_bundle(bundle, slot, ins);
     if (((Elf64_Sxword) v > 8191) || ((Elf64_Sxword) v < -8192))
-        return obj_reloc_overflow;
+	return obj_reloc_overflow;
     return obj_reloc_ok;
 }
 
@@ -204,10 +194,10 @@ obj_ia64_ins_imm22(Elf64_Xword v, Elf64_Addr *bundle, Elf64_Xword slot)
     ins = obj_ia64_ins_extract_from_bundle(bundle, slot);
     ins &= 0xffffffe000301fff;
     ins |= ((v & 0x200000) << 15) | ((v & 0x1f0000) << 6) |
-           ((v & 0x00ff80) << 20) | ((v & 0x00007f) << 13);
+	   ((v & 0x00ff80) << 20) | ((v & 0x00007f) << 13);
     obj_ia64_ins_insert_in_bundle(bundle, slot, ins);
     if (((Elf64_Sxword) v > 2097151) || ((Elf64_Sxword) v < -2097152))
-        return obj_reloc_overflow;
+	return obj_reloc_overflow;
     return obj_reloc_ok;
 }
 
@@ -237,7 +227,7 @@ obj_ia64_ins_pcrel21m(Elf64_Xword v, Elf64_Addr *bundle, Elf64_Xword slot)
     ins = obj_ia64_ins_extract_from_bundle(bundle, slot);
     ins &= 0xffffffee000fe03f;
     ins |= ((v & 0x1000000) << 12) | ((v & 0x0fff800) << 9) |
-           ((v & 0x00007f0) << 2);
+	   ((v & 0x00007f0) << 2);
     obj_ia64_ins_insert_in_bundle(bundle, slot, ins);
     return obj_reloc_ok;
 }
@@ -269,8 +259,8 @@ obj_ia64_ins_imm64(Elf64_Xword v, Elf64_Addr *bundle, Elf64_Xword slot)
     ins = obj_ia64_ins_extract_from_bundle(bundle, slot);
     ins &= 0xffffffee000101ff;
     ins |= ((v & 0x8000000000000000) >> 28) | ((v & 0x0000000000200000)) |
-           ((v & 0x00000000001f0000) <<  6) | ((v & 0x000000000000ff80) << 20) |
-           ((v & 0x000000000000007f) << 13);
+	   ((v & 0x00000000001f0000) <<  6) | ((v & 0x000000000000ff80) << 20) |
+	   ((v & 0x000000000000007f) << 13);
     obj_ia64_ins_insert_in_bundle(bundle, slot, ins);
     obj_ia64_ins_insert_in_bundle(bundle, ++slot, ((v & 0x7fffffffffc00000) >> 22));
     return obj_reloc_ok;
@@ -281,28 +271,28 @@ obj_ia64_ins_imm64(Elf64_Xword v, Elf64_Addr *bundle, Elf64_Xword slot)
  */
 enum obj_reloc
 obj_ia64_generate_plt(Elf64_Addr v,
-                       Elf64_Addr gp,
-                       ia64_file_t *ifile,
-                       ia64_symbol_t *isym,
-                       ia64_plt_t *pltent)
+		       Elf64_Addr gp,
+		       ia64_file_t *ifile,
+		       ia64_symbol_t *isym,
+		       ia64_plt_t *pltent)
 {
     *(Elf64_Addr *)(ifile->pltd->contents + pltent->data_offset) = v;
     if (isym->root.secidx <= SHN_HIRESERVE)
     {
-        /* local entry */
-        *(Elf64_Addr *)(ifile->pltd->contents + pltent->data_offset + 8) = gp;
-        memcpy((Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset),
-            ia64_plt_local, sizeof(ia64_plt_local));
+	/* local entry */
+	*(Elf64_Addr *)(ifile->pltd->contents + pltent->data_offset + 8) = gp;
+	memcpy((Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset),
+	    ia64_plt_local, sizeof(ia64_plt_local));
     }
     else
     {
-        /* external entry */
-        memcpy((Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset),
-            ia64_plt_extern, sizeof(ia64_plt_extern));
+	/* external entry */
+	memcpy((Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset),
+	    ia64_plt_extern, sizeof(ia64_plt_extern));
     }
     return obj_ia64_ins_imm22(
-        (ifile->pltd->header.sh_addr + pltent->data_offset - gp),
-        (Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset), 0);
+	(ifile->pltd->header.sh_addr + pltent->data_offset - gp),
+	(Elf64_Addr *)(ifile->pltt->contents + pltent->text_offset), 0);
 }
 
 struct obj_section *
@@ -323,7 +313,7 @@ obj_ia64_create_alloced_section (struct obj_file *f, const char *name,
     sec->name = name;
     sec->idx = newidx;
     if (size)
-        sec->contents = xmalloc(size);
+	sec->contents = xmalloc(size);
 
     obj_insert_section_load_order(f, sec);
 
@@ -362,28 +352,28 @@ arch_new_symbol (void)
 }
 
 int
-arch_load_proc_section(struct obj_section *sec, FILE *fp)
+arch_load_proc_section(struct obj_section *sec, int fp)
 {
     switch (sec->header.sh_type)
     {
     case SHT_IA_64_EXT :
-        sec->contents = NULL;
-        break;
+	sec->contents = NULL;
+	break;
 
     case SHT_IA_64_UNWIND :
-        if (sec->header.sh_size > 0)
-        {
-            sec->contents = xmalloc(sec->header.sh_size);
-            fseek(fp, sec->header.sh_offset, SEEK_SET);
-            if (fread(sec->contents, sec->header.sh_size, 1, fp) != 1)
-            {
-                error("error reading ELF section data: %m");
-                return -1;
-            }
-        }
-        else
-            sec->contents = NULL;
-        break;
+	if (sec->header.sh_size > 0)
+	{
+	    sec->contents = xmalloc(sec->header.sh_size);
+	    gzf_lseek(fp, sec->header.sh_offset, SEEK_SET);
+	    if (gzf_read(fp, sec->contents, sec->header.sh_size) != sec->header.sh_size)
+	    {
+		error("error reading ELF section data: %m");
+		return -1;
+	    }
+	}
+	else
+	    sec->contents = NULL;
+	break;
 
     default:
       error("Unknown section header type: %08x", sec->header.sh_type);
@@ -406,171 +396,171 @@ arch_create_got(struct obj_file *f)
     n = ifile->root.header.e_shnum;
     for (i = 0; i < n; ++i)
     {
-        struct obj_section *relsec, *symsec, *strsec;
-        Elf64_Rela *rel, *relend;
-        Elf64_Sym *symtab;
-        const char *strtab;
+	struct obj_section *relsec, *symsec, *strsec;
+	Elf64_Rela *rel, *relend;
+	Elf64_Sym *symtab;
+	const char *strtab;
 
-        relsec = ifile->root.sections[i];
-        if (relsec->header.sh_type != SHT_RELA)
-            continue;
+	relsec = ifile->root.sections[i];
+	if (relsec->header.sh_type != SHT_RELA)
+	    continue;
 
-        symsec = ifile->root.sections[relsec->header.sh_link];
-        strsec = ifile->root.sections[symsec->header.sh_link];
+	symsec = ifile->root.sections[relsec->header.sh_link];
+	strsec = ifile->root.sections[symsec->header.sh_link];
 
-        rel = (Elf64_Rela *)relsec->contents;
-        relend = rel + (relsec->header.sh_size / sizeof(Elf64_Rela));
-        symtab = (Elf64_Sym *)symsec->contents;
-        strtab = (const char *)strsec->contents;
+	rel = (Elf64_Rela *)relsec->contents;
+	relend = rel + (relsec->header.sh_size / sizeof(Elf64_Rela));
+	symtab = (Elf64_Sym *)symsec->contents;
+	strtab = (const char *)strsec->contents;
 
-        for (; rel < relend; ++rel)
-        {
-            int need_got = FALSE;
-            int need_opd = FALSE;
-            int need_plt = FALSE;
+	for (; rel < relend; ++rel)
+	{
+	    int need_got = FALSE;
+	    int need_opd = FALSE;
+	    int need_plt = FALSE;
 
-            switch (ELF64_R_TYPE(rel->r_info))
-            {
-            default:
-                continue;
+	    switch (ELF64_R_TYPE(rel->r_info))
+	    {
+	    default:
+		continue;
 
-            case R_IA64_FPTR64I :       /* @fptr(sym + add), mov imm64 */
-            case R_IA64_FPTR32LSB :     /* @fptr(sym + add), data4 LSB */
-            case R_IA64_FPTR64LSB :     /* @fptr(sym + add), data8 LSB */
-                need_opd = TRUE;
-                break;
+	    case R_IA64_FPTR64I :       /* @fptr(sym + add), mov imm64 */
+	    case R_IA64_FPTR32LSB :     /* @fptr(sym + add), data4 LSB */
+	    case R_IA64_FPTR64LSB :     /* @fptr(sym + add), data8 LSB */
+		need_opd = TRUE;
+		break;
 
-            case R_IA64_LTOFF22 :       /* @ltoff(sym + add), add imm22 */
-            case R_IA64_LTOFF22X :
-            case R_IA64_LTOFF64I :      /* @ltoff(sym + add), mov imm64 */
-                need_got = TRUE;
-                break;
+	    case R_IA64_LTOFF22 :       /* @ltoff(sym + add), add imm22 */
+	    case R_IA64_LTOFF22X :
+	    case R_IA64_LTOFF64I :      /* @ltoff(sym + add), mov imm64 */
+		need_got = TRUE;
+		break;
 
-            case R_IA64_LTOFF_FPTR22 :  /* @ltoff(@fptr(s+a)), imm22 */
-            case R_IA64_LTOFF_FPTR64I : /* @ltoff(@fptr(s+a)), imm64 */
-            case R_IA64_LTOFF_FPTR32LSB :
-            case R_IA64_LTOFF_FPTR64LSB :
-                need_got = TRUE;
-                need_opd = TRUE;
-                break;
+	    case R_IA64_LTOFF_FPTR22 :  /* @ltoff(@fptr(s+a)), imm22 */
+	    case R_IA64_LTOFF_FPTR64I : /* @ltoff(@fptr(s+a)), imm64 */
+	    case R_IA64_LTOFF_FPTR32LSB :
+	    case R_IA64_LTOFF_FPTR64LSB :
+		need_got = TRUE;
+		need_opd = TRUE;
+		break;
 
-            case R_IA64_PLTOFF22 :      /* @pltoff(sym + add), add imm22 */
-            case R_IA64_PLTOFF64I :     /* @pltoff(sym + add), mov imm64 */
-            case R_IA64_PLTOFF64LSB :   /* @pltoff(sym + add), data8 LSB */
+	    case R_IA64_PLTOFF22 :      /* @pltoff(sym + add), add imm22 */
+	    case R_IA64_PLTOFF64I :     /* @pltoff(sym + add), mov imm64 */
+	    case R_IA64_PLTOFF64LSB :   /* @pltoff(sym + add), data8 LSB */
 
-            case R_IA64_PCREL21B :      /* @pcrel(sym + add), ptb, call */
-            case R_IA64_PCREL21M :      /* @pcrel(sym + add), chk.s */
-            case R_IA64_PCREL21F :      /* @pcrel(sym + add), fchkf */
-                need_plt = TRUE;
-                break;
-            }
+	    case R_IA64_PCREL21B :      /* @pcrel(sym + add), ptb, call */
+	    case R_IA64_PCREL21M :      /* @pcrel(sym + add), chk.s */
+	    case R_IA64_PCREL21F :      /* @pcrel(sym + add), fchkf */
+		need_plt = TRUE;
+		break;
+	    }
 
-            if (need_got || need_opd || need_plt)
-            {
-                Elf64_Sym     *extsym;
-                ia64_symbol_t *isym;
-                const char    *name;
-                int            local;
-                unsigned long  symndx;
+	    if (need_got || need_opd || need_plt)
+	    {
+		Elf64_Sym     *extsym;
+		ia64_symbol_t *isym;
+		const char    *name;
+		int            local;
+		unsigned long  symndx;
 
-                symndx = ELF64_R_SYM(rel->r_info);
-                extsym = &symtab[symndx];
-                if (ELF64_ST_BIND(extsym->st_info) == STB_LOCAL)
-                {
-                    isym = (ia64_symbol_t *) f->local_symtab[symndx];
-                }
-                else
-                {
-                    if (extsym->st_name)
-                        name = strtab + extsym->st_name;
-                    else
-                        name = f->sections[extsym->st_shndx]->name;
-                    isym = (ia64_symbol_t *)obj_find_symbol(f, name);
-                }
-                local = isym->root.secidx <= SHN_HIRESERVE;
+		symndx = ELF64_R_SYM(rel->r_info);
+		extsym = &symtab[symndx];
+		if (ELF64_ST_BIND(extsym->st_info) == STB_LOCAL)
+		{
+		    isym = (ia64_symbol_t *) f->local_symtab[symndx];
+		}
+		else
+		{
+		    if (extsym->st_name)
+			name = strtab + extsym->st_name;
+		    else
+			name = f->sections[extsym->st_shndx]->name;
+		    isym = (ia64_symbol_t *)obj_find_symbol(f, name);
+		}
+		local = isym->root.secidx <= SHN_HIRESERVE;
 
-                if (need_plt)
-                {
-                    ia64_plt_t *plt;
+		if (need_plt)
+		{
+		    ia64_plt_t *plt;
 
-                    for (plt = isym->pltent; plt != NULL; plt = plt->next)
-                        if (plt->addend == rel->r_addend)
-                            break;
-                    if (plt == NULL)
-                    {
-                        plt = (ia64_plt_t *) xmalloc(sizeof(ia64_plt_t));
-                        plt->next = isym->pltent;
-                        plt->addend = rel->r_addend;
-                        plt->text_offset = plt_text_offset;
-                        plt->data_offset = plt_data_offset;
-                        plt->reloc_done = FALSE;
-                        isym->pltent = plt;
-                        if (local)
-                        {
-                            plt_text_offset += sizeof(ia64_plt_local);
-                            plt_data_offset += 16;
-                        }
-                        else
-                        {
-                            plt_text_offset += sizeof(ia64_plt_extern);
-                            plt_data_offset += 8;
-                        }
-                        need_plt = FALSE;
-                    }
-                }
-                if (need_got)
-                {
-                    ia64_got_t *got;
+		    for (plt = isym->pltent; plt != NULL; plt = plt->next)
+			if (plt->addend == rel->r_addend)
+			    break;
+		    if (plt == NULL)
+		    {
+			plt = (ia64_plt_t *) xmalloc(sizeof(ia64_plt_t));
+			plt->next = isym->pltent;
+			plt->addend = rel->r_addend;
+			plt->text_offset = plt_text_offset;
+			plt->data_offset = plt_data_offset;
+			plt->reloc_done = FALSE;
+			isym->pltent = plt;
+			if (local)
+			{
+			    plt_text_offset += sizeof(ia64_plt_local);
+			    plt_data_offset += 16;
+			}
+			else
+			{
+			    plt_text_offset += sizeof(ia64_plt_extern);
+			    plt_data_offset += 8;
+			}
+			need_plt = FALSE;
+		    }
+		}
+		if (need_got)
+		{
+		    ia64_got_t *got;
 
-                    for (got = isym->gotent; got != NULL; got = got->next)
-                        if (got->addend == rel->r_addend)
-                            break;
-                    if (got == NULL)
-                    {
-                        got = (ia64_got_t *) xmalloc(sizeof(ia64_got_t));
-                        got->next = isym->gotent;
-                        got->addend = rel->r_addend;
-                        got->offset = got_offset;
-                        got->reloc_done = FALSE;
-                        isym->gotent = got;
-                        got_offset += 8;
-                        need_got = FALSE;
-                    }
-                }
-                if (need_opd && local)
-                {
-                    ia64_opd_t *opd;
+		    for (got = isym->gotent; got != NULL; got = got->next)
+			if (got->addend == rel->r_addend)
+			    break;
+		    if (got == NULL)
+		    {
+			got = (ia64_got_t *) xmalloc(sizeof(ia64_got_t));
+			got->next = isym->gotent;
+			got->addend = rel->r_addend;
+			got->offset = got_offset;
+			got->reloc_done = FALSE;
+			isym->gotent = got;
+			got_offset += 8;
+			need_got = FALSE;
+		    }
+		}
+		if (need_opd && local)
+		{
+		    ia64_opd_t *opd;
 
-                    if (isym->opdent == NULL)
-                    {
-                        opd = (ia64_opd_t *) xmalloc(sizeof(ia64_opd_t));
-                        opd->offset = opd_offset;
-                        opd->reloc_done = FALSE;
-                        isym->opdent = opd;
-                        opd_offset += 16;
-                        need_opd = FALSE;
-                    }
-                }
-            }
-        }
+		    if (isym->opdent == NULL)
+		    {
+			opd = (ia64_opd_t *) xmalloc(sizeof(ia64_opd_t));
+			opd->offset = opd_offset;
+			opd->reloc_done = FALSE;
+			isym->opdent = opd;
+			opd_offset += 16;
+			need_opd = FALSE;
+		    }
+		}
+	    }
+	}
     }
 
     ifile->got = obj_ia64_create_alloced_section(f, ".got", 8, got_offset,
-        (SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
+	(SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
     assert(ifile->got != NULL);
 
     ifile->opd = obj_ia64_create_alloced_section(f, ".opd", 16, opd_offset,
-        (SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
+	(SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
     assert(ifile->opd != NULL);
 
     if (plt_text_offset > 0)
     {
-        ifile->pltt = obj_ia64_create_alloced_section(f, ".plt", 16,
-            plt_text_offset, (SHF_ALLOC | SHF_EXECINSTR | SHF_IA_64_SHORT));
-        ifile->pltd = obj_ia64_create_alloced_section(f, ".IA_64.pltoff",
-            16, plt_data_offset, (SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
-        assert(ifile->pltt != NULL);
-        assert(ifile->pltd != NULL);
+	ifile->pltt = obj_ia64_create_alloced_section(f, ".plt", 16,
+	    plt_text_offset, (SHF_ALLOC | SHF_EXECINSTR | SHF_IA_64_SHORT));
+	ifile->pltd = obj_ia64_create_alloced_section(f, ".IA_64.pltoff",
+	    16, plt_data_offset, (SHF_ALLOC | SHF_WRITE | SHF_IA_64_SHORT));
+	assert(ifile->pltt != NULL);
+	assert(ifile->pltd != NULL);
     }
 
     return 1;
@@ -602,36 +592,36 @@ arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
     f->baseaddr = base;
     for (i = 0; i < n; ++i)
     {
-        Elf64_Shdr *header = &f->sections[i]->header;
-        Elf64_Addr lo;
-        Elf64_Addr hi;
+	Elf64_Shdr *header = &f->sections[i]->header;
+	Elf64_Addr lo;
+	Elf64_Addr hi;
 
-        header->sh_addr += base;
-        if (header->sh_flags & SHF_ALLOC)
-        {
-            lo = header->sh_addr;
-            hi = header->sh_addr + header->sh_size;
-            if (hi < lo)
-                hi = (Elf64_Addr) -1;
+	header->sh_addr += base;
+	if (header->sh_flags & SHF_ALLOC)
+	{
+	    lo = header->sh_addr;
+	    hi = header->sh_addr + header->sh_size;
+	    if (hi < lo)
+		hi = (Elf64_Addr) -1;
 
-            if (min_addr > lo)
-                min_addr = lo;
-            if (max_addr < hi)
-                max_addr = hi;
-            if (header->sh_flags & SHF_IA_64_SHORT)
-            {
-                if (min_short_addr > lo)
-                    min_short_addr = lo;
-                if (max_short_addr < hi)
-                    max_short_addr = hi;
-            }
-            if ((header->sh_type & SHT_NOBITS) && (lo < bss))
-                bss = lo;
-            else if ((header->sh_flags & SHF_EXECINSTR) && (lo < text))
-                text = lo;
-            else if (lo < data)
-                data = lo;
-        }
+	    if (min_addr > lo)
+		min_addr = lo;
+	    if (max_addr < hi)
+		max_addr = hi;
+	    if (header->sh_flags & SHF_IA_64_SHORT)
+	    {
+		if (min_short_addr > lo)
+		    min_short_addr = lo;
+		if (max_short_addr < hi)
+		    max_short_addr = hi;
+	    }
+	    if ((header->sh_type & SHT_NOBITS) && (lo < bss))
+		bss = lo;
+	    else if ((header->sh_flags & SHF_EXECINSTR) && (lo < text))
+		text = lo;
+	    else if (lo < data)
+		data = lo;
+	}
     }
     /* Pick a sensible value for gp */
 
@@ -643,19 +633,19 @@ arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
      * don't with the choice above, adjust.
      */
     if ((max_addr - min_addr < 0x400000) && (max_addr - gp <= 0x200000) &&
-        (gp - min_addr > 0x200000))
+	(gp - min_addr > 0x200000))
     {
-        gp = min_addr + 0x200000;
+	gp = min_addr + 0x200000;
     }
     else if (max_short_addr != 0)
     {
-        /* If we don't cover all the short data, adjust */
-        if (max_short_addr - gp >= 0x200000)
-            gp = min_short_addr + 0x200000;
+	/* If we don't cover all the short data, adjust */
+	if (max_short_addr - gp >= 0x200000)
+	    gp = min_short_addr + 0x200000;
 
-        /* If we're addressing stuff past the end, adjust back */
-        if (gp > max_addr)
-            gp = max_addr - 0x200000 + 8;
+	/* If we're addressing stuff past the end, adjust back */
+	if (gp > max_addr)
+	    gp = max_addr - 0x200000 + 8;
     }
 
     /*
@@ -664,18 +654,18 @@ arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
      */
     if (max_short_addr != 0)
     {
-        if (max_short_addr - min_short_addr >= 0x400000)
-        {
-            error("short data segment overflowed (0x%lx >= 0x400000)",
-                (unsigned long)(max_short_addr - min_short_addr));
-            return 0;
-        }
-        else if (((gp > min_short_addr) && (gp - min_short_addr > 0x200000)) ||
-            ((gp < max_short_addr) && (max_short_addr - gp >= 0x200000)))
-        {
-            error("GP does not cover short data segment");
-            return 0;
-        }
+	if (max_short_addr - min_short_addr >= 0x400000)
+	{
+	    error("short data segment overflowed (0x%lx >= 0x400000)",
+		(unsigned long)(max_short_addr - min_short_addr));
+	    return 0;
+	}
+	else if (((gp > min_short_addr) && (gp - min_short_addr > 0x200000)) ||
+	    ((gp < max_short_addr) && (max_short_addr - gp >= 0x200000)))
+	{
+	    error("GP does not cover short data segment");
+	    return 0;
+	}
     }
     ifile->gp = gp;
     ifile->text = text;
@@ -684,302 +674,301 @@ arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
     return 1;
 }
 
+/* Targets can be unaligned, use memcpy instead of assignment */
+#define COPY_64LSB(loc, v) \
+    do { \
+    Elf64_Xword reloc = (v); \
+    memcpy((void *)(loc), &reloc, 8); \
+    } while(0)
+#define COPY_32LSB(loc, v) \
+    do { \
+    Elf32_Xword reloc = (v); \
+    memcpy((void *)(loc), &reloc, 4); \
+    if ((v) != reloc) \
+	ret = obj_reloc_overflow; \
+    } while(0)
+
 enum obj_reloc
 arch_apply_relocation(struct obj_file *f,
-                       struct obj_section *targsec,
-                       struct obj_section *symsec,
-                       struct obj_symbol *sym,
-                       Elf64_Rela *rel,
-                       Elf64_Addr v)
+		       struct obj_section *targsec,
+		       struct obj_section *symsec,
+		       struct obj_symbol *sym,
+		       Elf64_Rela *rel,
+		       Elf64_Addr v)
 {
     ia64_file_t *ifile = (ia64_file_t *) f;
     ia64_symbol_t *isym  = (ia64_symbol_t *) sym;
 
-    Elf64_Addr *loc = (Elf64_Addr *)(targsec->contents + rel->r_offset);
+    Elf64_Addr  loc = (Elf64_Addr)(targsec->contents + rel->r_offset);
     Elf64_Addr  dot = (targsec->header.sh_addr + rel->r_offset) & ~0x03;
 
     Elf64_Addr  got = ifile->got->header.sh_addr;
     Elf64_Addr  gp = ifile->gp;
 
-    Elf64_Addr *bundle = (Elf64_Addr *)((Elf64_Xword)(loc) & ~0x03);
-    Elf64_Xword slot = (Elf64_Xword)(loc) & 0x03;
+    Elf64_Addr *bundle = (Elf64_Addr *)(loc & ~0x03);
+    Elf64_Xword slot = loc & 0x03;
 
     Elf64_Xword r_info = ELF64_R_TYPE(rel->r_info);
 
     enum obj_reloc ret = obj_reloc_ok;
 
+    /* We cannot load modules compiled with -mconstant-gp */
+#ifndef EF_IA_64_CONS_GP
+#define EF_IA_64_CONS_GP 0x00000040
+#endif
+#ifndef EF_IA_64_NOFUNCDESC_CONS_GP
+#define EF_IA_64_NOFUNCDESC_CONS_GP 0x00000080
+#endif
+    if (f->header.e_flags & (EF_IA_64_CONS_GP | EF_IA_64_NOFUNCDESC_CONS_GP))
+	return obj_reloc_constant_gp;
+
     switch (r_info)
     {
     case R_IA64_NONE :          /* none */
     case R_IA64_LDXMOV :        /* Use of LTOFF22X.  */
-        break;
+	break;
 
     case R_IA64_IMM14 :         /* symbol + addend, add imm14 */
-        ret = obj_ia64_ins_imm14(v, bundle, slot);
-        break;
+	ret = obj_ia64_ins_imm14(v, bundle, slot);
+	break;
 
     case R_IA64_IMM22 :         /* symbol + addend, add imm22 */
-        ret = obj_ia64_ins_imm22(v, bundle, slot);
-        break;
+	ret = obj_ia64_ins_imm22(v, bundle, slot);
+	break;
 
     case R_IA64_IMM64 :         /* symbol + addend, movl imm64 */
-        ret = obj_ia64_ins_imm64(v, bundle, slot);
-        break;
+	ret = obj_ia64_ins_imm64(v, bundle, slot);
+	break;
 
     case R_IA64_DIR32LSB :      /* symbol + addend, data4 LSB */
-        *((Elf32_Addr *) loc) = (Elf32_Xword) v;
-        if (((Elf64_Sxword) v > 4294967295) ||
-            ((Elf64_Sxword) v < -4294967296))
-            ret = obj_reloc_overflow;
-        break;
+	COPY_32LSB(loc, v);
+	break;
 
     case R_IA64_DIR64LSB :      /* symbol + addend, data8 LSB */
-        *loc = v;
-        break;
+	COPY_64LSB(loc, v);
+	break;
 
     case R_IA64_GPREL22 :       /* @gprel(sym + add), add imm22 */
-        v -= gp;
-        ret = obj_ia64_ins_imm22(v, bundle, slot);
-        break;
+	v -= gp;
+	ret = obj_ia64_ins_imm22(v, bundle, slot);
+	break;
 
     case R_IA64_GPREL64I :      /* @gprel(sym + add), mov imm64 */
-        v -= gp;
-        ret = obj_ia64_ins_imm64(v, bundle, slot);
-        break;
+	v -= gp;
+	ret = obj_ia64_ins_imm64(v, bundle, slot);
+	break;
 
     case R_IA64_GPREL32LSB :    /* @gprel(sym + add), data4 LSB */
-        v -= gp;
-        *((Elf32_Addr *) loc) = (Elf32_Xword) v;
-        if (((Elf64_Sxword) v > 4294967295) ||
-            ((Elf64_Sxword) v < -4294967296))
-            ret = obj_reloc_overflow;
-        break;
+	COPY_32LSB(loc, v-gp);
+	break;
 
     case R_IA64_GPREL64LSB :    /* @gprel(sym + add), data8 LSB */
-        *loc = v - gp;
-        break;
+	COPY_64LSB(loc, v-gp);
+	break;
 
     case R_IA64_LTOFF22 :       /* @ltoff(sym + add), add imm22 */
     case R_IA64_LTOFF22X :      /* LTOFF22, relaxable.  */
     case R_IA64_LTOFF64I :      /* @ltoff(sym + add), mov imm64 */
-        {
-            ia64_got_t *ge;
+	{
+	    ia64_got_t *ge;
 
-            assert(isym != NULL);
-            for (ge = isym->gotent; ge != NULL && ge->addend != rel->r_addend; )
-                ge = ge->next;
-            assert(ge != NULL);
-            if (!ge->reloc_done)
-            {
-                ge->reloc_done = TRUE;
-                *(Elf64_Addr *)(ifile->got->contents + ge->offset) = v;
-            }
-            v = got + ge->offset - gp;
-            if (r_info == R_IA64_LTOFF64I)
-                ret = obj_ia64_ins_imm64(v, bundle, slot);
-            else
-                ret = obj_ia64_ins_imm22(v, bundle, slot);
-        }
-        break;
+	    assert(isym != NULL);
+	    for (ge = isym->gotent; ge != NULL && ge->addend != rel->r_addend; )
+		ge = ge->next;
+	    assert(ge != NULL);
+	    if (!ge->reloc_done)
+	    {
+		ge->reloc_done = TRUE;
+		*(Elf64_Addr *)(ifile->got->contents + ge->offset) = v;
+	    }
+	    v = got + ge->offset - gp;
+	    if (r_info == R_IA64_LTOFF64I)
+		ret = obj_ia64_ins_imm64(v, bundle, slot);
+	    else
+		ret = obj_ia64_ins_imm22(v, bundle, slot);
+	}
+	break;
 
     case R_IA64_PLTOFF22 :      /* @pltoff(sym + add), add imm22 */
     case R_IA64_PLTOFF64I :     /* @pltoff(sym + add), mov imm64 */
     case R_IA64_PLTOFF64LSB :   /* @pltoff(sym + add), data8 LSB */
-        {
-            ia64_plt_t *pe;
+	{
+	    ia64_plt_t *pe;
 
-            assert(isym != NULL);
-            for (pe = isym->pltent; pe != NULL && pe->addend != rel->r_addend; )
-                pe = pe->next;
-            assert(pe != NULL);
-            if (!pe->reloc_done)
-            {
-                pe->reloc_done = TRUE;
-                ret = obj_ia64_generate_plt(v, gp, ifile, isym, pe);
-            }
-            v = ifile->pltt->header.sh_addr + pe->text_offset - gp;
-            switch (r_info)
-            {
-            case R_IA64_PLTOFF22 :
-                ret = obj_ia64_ins_imm22(v, bundle, slot);
-                break;
+	    assert(isym != NULL);
+	    for (pe = isym->pltent; pe != NULL && pe->addend != rel->r_addend; )
+		pe = pe->next;
+	    assert(pe != NULL);
+	    if (!pe->reloc_done)
+	    {
+		pe->reloc_done = TRUE;
+		ret = obj_ia64_generate_plt(v, gp, ifile, isym, pe);
+	    }
+	    v = ifile->pltt->header.sh_addr + pe->text_offset - gp;
+	    switch (r_info)
+	    {
+	    case R_IA64_PLTOFF22 :
+		ret = obj_ia64_ins_imm22(v, bundle, slot);
+		break;
 
-            case R_IA64_PLTOFF64I :
-                ret = obj_ia64_ins_imm64(v, bundle, slot);
-                break;
+	    case R_IA64_PLTOFF64I :
+		ret = obj_ia64_ins_imm64(v, bundle, slot);
+		break;
 
-            case R_IA64_PLTOFF64LSB :
-                *loc = v;
-                break;
-            }
-        }
-        break;
+	    case R_IA64_PLTOFF64LSB :
+		COPY_64LSB(loc, v);
+		break;
+	    }
+	}
+	break;
 
     case R_IA64_FPTR64I :       /* @fptr(sym + add), mov imm64 */
     case R_IA64_FPTR32LSB :     /* @fptr(sym + add), data4 LSB */
     case R_IA64_FPTR64LSB :     /* @fptr(sym + add), data8 LSB */
-        assert(isym != NULL);
-        if (isym->root.secidx <= SHN_HIRESERVE)
-        {
-            assert(isym->opdent != NULL);
-            if (!isym->opdent->reloc_done)
-            {
-                isym->opdent->reloc_done = TRUE;
-                *(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset) = v;
-                *(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset + 8) = gp;
-            }
-            v = ifile->opd->header.sh_addr + isym->opdent->offset;
-        }
-        switch (r_info)
-        {
-        case R_IA64_FPTR64I :
-            ret = obj_ia64_ins_imm64(v, bundle, slot);
-            break;
+	assert(isym != NULL);
+	if (isym->root.secidx <= SHN_HIRESERVE)
+	{
+	    assert(isym->opdent != NULL);
+	    if (!isym->opdent->reloc_done)
+	    {
+		isym->opdent->reloc_done = TRUE;
+		*(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset) = v;
+		*(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset + 8) = gp;
+	    }
+	    v = ifile->opd->header.sh_addr + isym->opdent->offset;
+	}
+	switch (r_info)
+	{
+	case R_IA64_FPTR64I :
+	    ret = obj_ia64_ins_imm64(v, bundle, slot);
+	    break;
 
-        case R_IA64_FPTR32LSB :
-            *((Elf32_Addr *) loc) = (Elf32_Xword) v;
-            if (((Elf64_Sxword) v > 4294967295) ||
-                ((Elf64_Sxword) v < -4294967296))
-                ret = obj_reloc_overflow;
-            break;
+	case R_IA64_FPTR32LSB :
+	    COPY_32LSB(loc, v);
+	    break;
 
-        case R_IA64_FPTR64LSB :     /* @fptr(sym + add), data8 LSB */
-            *loc = v;
-            break;
-        }
-        break;
+	case R_IA64_FPTR64LSB :     /* @fptr(sym + add), data8 LSB */
+	    /* Target can be unaligned */
+	    COPY_64LSB(loc, v);
+	    break;
+	}
+	break;
 
     case R_IA64_PCREL21B :      /* @pcrel(sym + add), ptb, call */
     case R_IA64_PCREL21M :      /* @pcrel(sym + add), chk.s */
     case R_IA64_PCREL21F :      /* @pcrel(sym + add), fchkf */
-        assert(isym != NULL);
-        if ((isym->root.secidx > SHN_HIRESERVE) || 
-           ((Elf64_Sxword) (v - dot) > 16777215) ||
-           ((Elf64_Sxword) (v - dot) < -16777216))
-        {
-            ia64_plt_t *pe;
+	assert(isym != NULL);
+	if ((isym->root.secidx > SHN_HIRESERVE) ||
+	   ((Elf64_Sxword) (v - dot) > 16777215) ||
+	   ((Elf64_Sxword) (v - dot) < -16777216))
+	{
+	    ia64_plt_t *pe;
 
-            for (pe = isym->pltent; pe != NULL && pe->addend != rel->r_addend; )
-                pe = pe->next;
-            assert(pe != NULL);
-            if (!pe->reloc_done)
-            {
-                pe->reloc_done = TRUE;
-                ret = obj_ia64_generate_plt(v, gp, ifile, isym, pe);
-            }
-            v = ifile->pltt->header.sh_addr + pe->text_offset;
-        }
-        v -= dot;
-        switch (r_info)
-        {
-        case R_IA64_PCREL21B :
-            ret = obj_ia64_ins_pcrel21b(v, bundle, slot);
-            break;
+	    for (pe = isym->pltent; pe != NULL && pe->addend != rel->r_addend; )
+		pe = pe->next;
+	    assert(pe != NULL);
+	    if (!pe->reloc_done)
+	    {
+		pe->reloc_done = TRUE;
+		ret = obj_ia64_generate_plt(v, gp, ifile, isym, pe);
+	    }
+	    v = ifile->pltt->header.sh_addr + pe->text_offset;
+	}
+	v -= dot;
+	switch (r_info)
+	{
+	case R_IA64_PCREL21B :
+	    ret = obj_ia64_ins_pcrel21b(v, bundle, slot);
+	    break;
 
-        case R_IA64_PCREL21M :
-            ret = obj_ia64_ins_pcrel21m(v, bundle, slot);
-            break;
+	case R_IA64_PCREL21M :
+	    ret = obj_ia64_ins_pcrel21m(v, bundle, slot);
+	    break;
 
-        case R_IA64_PCREL21F :
-            ret = obj_ia64_ins_pcrel21f(v, bundle, slot);
-            break;
-        }
-        break;
+	case R_IA64_PCREL21F :
+	    ret = obj_ia64_ins_pcrel21f(v, bundle, slot);
+	    break;
+	}
+	break;
 
     case R_IA64_PCREL32LSB :    /* @pcrel(sym + add), data4 LSB */
-        *((Elf32_Addr *) loc) = (Elf32_Xword) (v - dot);
-        if (((Elf64_Sxword) (v - dot) > 4294967295) ||
-            ((Elf64_Sxword) (v - dot) < -4294967296))
-            ret = obj_reloc_overflow;
-        break;
+	COPY_32LSB(loc, v-dot);
+	break;
 
     case R_IA64_PCREL64LSB :    /* @pcrel(sym + add), data8 LSB */
-        *loc = (v - dot);
-        break;
+	COPY_64LSB(loc, v-dot);
+	break;
 
     case R_IA64_LTOFF_FPTR22 :  /* @ltoff(@fptr(s+a)), imm22 */
     case R_IA64_LTOFF_FPTR64I : /* @ltoff(@fptr(s+a)), imm64 */
     case R_IA64_LTOFF_FPTR32LSB : /* @ltoff(@fptr(s+a)), data4 */
     case R_IA64_LTOFF_FPTR64LSB : /* @ltoff(@fptr(s+a)), data8 */
-        {
-            ia64_got_t *ge;
+	{
+	    ia64_got_t *ge;
 
-            assert(isym != NULL);
-            if (isym->root.secidx <= SHN_HIRESERVE)
-            {
-                assert(isym->opdent != NULL);
-                if (!isym->opdent->reloc_done)
-                {
-                    isym->opdent->reloc_done = TRUE;
-                    *(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset) = v;
-                    *(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset + 8) = gp;
-                }
-                v = ifile->opd->header.sh_addr + isym->opdent->offset;
-            }
-            for (ge = isym->gotent; ge != NULL && ge->addend != rel->r_addend; )
-                ge = ge->next;
-            assert(ge != NULL);
-            if (!ge->reloc_done)
-            {
-                ge->reloc_done = TRUE;
-                *(Elf64_Addr *)(ifile->got->contents + ge->offset) =  v;
-            }
-            v = got + ge->offset - gp;
-            switch (r_info)
-            {
-            case R_IA64_LTOFF_FPTR22 :
-                ret = obj_ia64_ins_imm22(v, bundle, slot);
-                break;
-    
-            case R_IA64_LTOFF_FPTR64I :
-                ret = obj_ia64_ins_imm64(v, bundle, slot);
-                break;
-    
-            case R_IA64_LTOFF_FPTR32LSB :
-                *((Elf32_Addr *) loc) = (Elf32_Xword) v;
-                if (((Elf64_Sxword) v > 4294967295) ||
-                    ((Elf64_Sxword) v < -4294967296))
-                    ret = obj_reloc_overflow;
-                break;
-    
-            case R_IA64_LTOFF_FPTR64LSB :
-                *loc = v;
-                break;
-            }
-        }
-        break;
+	    assert(isym != NULL);
+	    if (isym->root.secidx <= SHN_HIRESERVE)
+	    {
+		assert(isym->opdent != NULL);
+		if (!isym->opdent->reloc_done)
+		{
+		    isym->opdent->reloc_done = TRUE;
+		    *(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset) = v;
+		    *(Elf64_Addr *)(ifile->opd->contents + isym->opdent->offset + 8) = gp;
+		}
+		v = ifile->opd->header.sh_addr + isym->opdent->offset;
+	    }
+	    for (ge = isym->gotent; ge != NULL && ge->addend != rel->r_addend; )
+		ge = ge->next;
+	    assert(ge != NULL);
+	    if (!ge->reloc_done)
+	    {
+		ge->reloc_done = TRUE;
+		*(Elf64_Addr *)(ifile->got->contents + ge->offset) =  v;
+	    }
+	    v = got + ge->offset - gp;
+	    switch (r_info)
+	    {
+	    case R_IA64_LTOFF_FPTR22 :
+		ret = obj_ia64_ins_imm22(v, bundle, slot);
+		break;
+
+	    case R_IA64_LTOFF_FPTR64I :
+		ret = obj_ia64_ins_imm64(v, bundle, slot);
+		break;
+
+	    case R_IA64_LTOFF_FPTR32LSB :
+		COPY_32LSB(loc, v);
+		break;
+
+	    case R_IA64_LTOFF_FPTR64LSB :
+		COPY_64LSB(loc, v);
+		break;
+	    }
+	}
+	break;
 
     case R_IA64_SEGREL32LSB :   /* @segrel(sym + add), data4 LSB */
     case R_IA64_SEGREL64LSB :   /* @segrel(sym + add), data8 LSB */
-        if (targsec->header.sh_type & SHT_NOBITS)
-            v = ifile->bss - v;
-        else if (targsec->header.sh_flags & SHF_EXECINSTR)
-            v = ifile->text - v;
-        else
-            v = ifile->data - v;
-        if (r_info == R_IA64_SEGREL32LSB)
-        {
-            *((Elf32_Addr *) loc) = (Elf32_Xword) v;
-            if (((Elf64_Sxword) v > 4294967295) ||
-                ((Elf64_Sxword) v < -4294967296))
-                ret = obj_reloc_overflow;
-        }
-        else
-            *loc = v;
-        break;
+	if (targsec->header.sh_type & SHT_NOBITS)
+	    v = ifile->bss - v;
+	else if (targsec->header.sh_flags & SHF_EXECINSTR)
+	    v = ifile->text - v;
+	else
+	    v = ifile->data - v;
+	if (r_info == R_IA64_SEGREL32LSB)
+	    COPY_32LSB(loc, v);
+	else
+	    COPY_64LSB(loc, v);
+	break;
 
     case R_IA64_SECREL32LSB :   /* @secrel(sym + add), data4 LSB */
-        v = targsec->header.sh_addr - v;
-        *((Elf32_Addr *) loc) = (Elf32_Xword) v;
-        if (((Elf64_Sxword) v > 4294967295) ||
-            ((Elf64_Sxword) v < -4294967296))
-            ret = obj_reloc_overflow;
-        break;
+	COPY_32LSB(loc, targsec->header.sh_addr - v);
+	break;
 
     case R_IA64_SECREL64LSB :   /* @secrel(sym + add), data8 LSB */
-        v = targsec->header.sh_addr - v;
-        *loc = v;
-        break;
+	COPY_64LSB(loc, targsec->header.sh_addr - v);
+	break;
 
     /*
      * We don't handle the big-endian relocates
@@ -1009,8 +998,8 @@ arch_apply_relocation(struct obj_file *f,
     case R_IA64_LTV32LSB :      /* symbol + addend, data4 LSB */
     case R_IA64_LTV64LSB :      /* symbol + addend, data8 LSB */
     case R_IA64_IPLTLSB :       /* dynamic reloc, imported PLT, LSB */
-        ret = obj_reloc_unhandled;
-        break;
+	ret = obj_reloc_unhandled;
+	break;
     }
     return ret;
 }
@@ -1021,14 +1010,55 @@ arch_init_module (struct obj_file *f, struct module *mod)
     ia64_file_t *ifile = (ia64_file_t *)f;
     Elf64_Addr *opd = (Elf64_Addr *)(ifile->opd->contents);
 
-    *opd++ = mod->init;
+    if ((*opd++ = mod->init) == 0)
+	return 0;
     *opd++ = ifile->gp;
     mod->init = ifile->opd->header.sh_addr;
 
-    *opd++ = mod->cleanup;
-    *opd++ = ifile->gp;
-    mod->cleanup = ifile->opd->header.sh_addr + 16;
+    if ((*opd++ = mod->cleanup) != 0)
+    {
+	*opd = ifile->gp;
+	mod->cleanup = ifile->opd->header.sh_addr + 16;
+    }
 
     return 1;
 }
 
+int
+arch_archdata (struct obj_file *f, struct obj_section *archdata_sec)
+{
+    ia64_file_t *ifile = (ia64_file_t *)f;
+    struct archdata {
+	unsigned tgt_long unw_table;
+	unsigned tgt_long segment_base;
+	unsigned tgt_long unw_start;
+	unsigned tgt_long unw_end;
+	unsigned tgt_long gp;
+    } *ad;
+    int i;
+    struct obj_section *sec;
+
+    free(archdata_sec->contents);
+    archdata_sec->contents = xmalloc(sizeof(struct archdata));
+    memset(archdata_sec->contents, 0, sizeof(struct archdata));
+    archdata_sec->header.sh_size = sizeof(struct archdata);
+
+    ad = (struct archdata *)(archdata_sec->contents);
+    ad->gp = ifile->gp;
+    ad->unw_start = 0;
+    ad->unw_end = 0;
+    ad->unw_table = 0;
+    ad->segment_base = f->sections[1]->header.sh_addr;
+    for (i = 0; i < f->header.e_shnum; ++i)
+    {
+	sec = f->sections[i];
+	if (sec->header.sh_type == SHT_IA_64_UNWIND)
+	{
+	    ad->unw_start = sec->header.sh_addr;
+	    ad->unw_end = sec->header.sh_addr + sec->header.sh_size;
+	    break;
+	}
+    }
+
+    return 0;
+}

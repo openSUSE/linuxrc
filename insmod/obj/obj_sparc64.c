@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_sparc64.c,v 1.2 2000/05/18 10:51:17 schwab Exp $"
+#ident "$Id: obj_sparc64.c,v 1.3 2000/11/22 15:45:22 snwint Exp $"
 
 #include <stddef.h>
 #include <module.h>
@@ -103,11 +103,11 @@ arch_new_symbol (void)
 #define R_SPARC_PC_LM22		39
 
 #endif
-                                    
+
 #endif
 
 int
-arch_load_proc_section(struct obj_section *sec, FILE *fp)
+arch_load_proc_section(struct obj_section *sec, int fp)
 {
     /* Assume it's just a debugging section that we can safely
        ignore ...  */
@@ -115,6 +115,9 @@ arch_load_proc_section(struct obj_section *sec, FILE *fp)
 
     return 0;
 }
+
+#define ELF64_R_TYPE_ID(info)	((info) & 0xff)
+#define ELF64_R_TYPE_DATA(info) ((info) >> 8)
 
 enum obj_reloc
 arch_apply_relocation (struct obj_file *ef,
@@ -129,28 +132,53 @@ arch_apply_relocation (struct obj_file *ef,
 
   enum obj_reloc ret = obj_reloc_ok;
 
-  switch (ELF64_R_TYPE(rel->r_info))
+  switch (ELF64_R_TYPE_ID(rel->r_info))
     {
     case R_SPARC_NONE:
       break;
-    case R_SPARC_8:
-      if (v > 0xff)
-	ret = obj_reloc_overflow;
-      *loc = (*loc & ~0xff) | (v & 0xff);
+
+    case R_SPARC_64:
+    case R_SPARC_UA64:
+      if (! ((long) loc & 3)) {
+	/* Common in .eh_frame */
+	((unsigned int *) loc) [0] = v >> 32;
+	((unsigned int *) loc) [1] = v;
+	break;
+      }
+      ((unsigned char *) loc) [0] = v >> 56;
+      ((unsigned char *) loc) [1] = v >> 48;
+      ((unsigned char *) loc) [2] = v >> 40;
+      ((unsigned char *) loc) [3] = v >> 32;
+      ((unsigned char *) loc) [4] = v >> 24;
+      ((unsigned char *) loc) [5] = v >> 16;
+      ((unsigned char *) loc) [6] = v >> 8;
+      ((unsigned char *) loc) [7] = v;
+      break;
+    case R_SPARC_32:
+    case R_SPARC_UA32:
+      if (! ((long) loc & 3)) {
+	*loc = v;
+	break;
+      }
+      ((unsigned char *) loc) [0] = v >> 24;
+      ((unsigned char *) loc) [1] = v >> 16;
+      ((unsigned char *) loc) [2] = v >> 8;
+      ((unsigned char *) loc) [3] = v;
       break;
     case R_SPARC_16:
       if (v > 0xffff)
 	ret = obj_reloc_overflow;
       *loc = (*loc & ~0xffff) | (v & 0xffff);
       break;
-    case R_SPARC_32:
-      *loc = v;
-      break;
-    case R_SPARC_DISP8:
-      v -= dot;
+    case R_SPARC_8:
       if (v > 0xff)
-        ret = obj_reloc_overflow;
+	ret = obj_reloc_overflow;
       *loc = (*loc & ~0xff) | (v & 0xff);
+      break;
+
+    case R_SPARC_DISP32:
+      v -= dot;
+      *loc = v;
       break;
     case R_SPARC_DISP16:
       v -= dot;
@@ -158,9 +186,11 @@ arch_apply_relocation (struct obj_file *ef,
 	ret = obj_reloc_overflow;
       *loc = (*loc & ~0xffff) | (v & 0xffff);
       break;
-    case R_SPARC_DISP32:
+    case R_SPARC_DISP8:
       v -= dot;
-      *loc = v;
+      if (v > 0xff)
+        ret = obj_reloc_overflow;
+      *loc = (*loc & ~0xff) | (v & 0xff);
       break;
     case R_SPARC_WDISP30:
       v -= dot;
@@ -168,14 +198,45 @@ arch_apply_relocation (struct obj_file *ef,
 	ret = obj_reloc_dangerous;
       *loc = (*loc & ~0x3fffffff) | ((v >> 2) & 0x3fffffff);
       break;
+
+    /* MEDLOW code model relocs */
+    case R_SPARC_LO10:
+      *loc = (*loc & ~0x3ff) | (v & 0x3ff);
+      break;
+    case R_SPARC_HI22:
+      *loc = (*loc & ~0x3fffff) | (v >> 10);
+      break;
+    case R_SPARC_OLO10:
+      *loc = (*loc & ~0x1fff) | (((v & 0x3ff) + ELF64_R_TYPE_DATA (rel->r_info)) & 0x1fff);
+      break;
+
+    /* MEDMID code model relocs */
+    case R_SPARC_H44:
+      *loc = (*loc & ~0x3fffff) | (v >> 22);
+      break;
+    case R_SPARC_M44:
+      *loc = (*loc & ~0x3ff) | ((v >> 12) & 0x3ff);
+      break;
+    case R_SPARC_L44:
+      *loc = (*loc & ~0xfff) | (v & 0xfff);
+      break;
+
+    /* MEDANY code model relocs */
+    case R_SPARC_HH22:
+      *loc = (*loc & ~0x3fffff) | (v >> 42);
+      break;
+    case R_SPARC_HM10:
+      *loc = (*loc & ~0x3ff) | ((v >> 32) & 0x3ff);
+      break;
+    case R_SPARC_LM22:
+      *loc = (*loc & ~0x3fffff) | ((v >> 10) & 0x3fffff);
+      break;
+
     case R_SPARC_WDISP22:
       v -= dot;
       if (v % 4)
 	ret = obj_reloc_dangerous;
       *loc = (*loc & ~0x3fffff) | ((v >> 2) & 0x3fffff);
-      break;
-    case R_SPARC_HI22:
-      *loc = (*loc & ~0x3fffff) | (v >> 10);
       break;
     case R_SPARC_22:
       if (v > 0x3fffff)
@@ -187,9 +248,6 @@ arch_apply_relocation (struct obj_file *ef,
 	ret = obj_reloc_overflow;
       *loc = (*loc & ~0x1fff) | (v & 0x1fff);
       break;
-    case R_SPARC_LO10:
-      *loc = (*loc & ~0x3ff) | (v & 0x3ff);
-      break;
 
     case R_SPARC_PC10:
       v -= dot;
@@ -198,13 +256,6 @@ arch_apply_relocation (struct obj_file *ef,
     case R_SPARC_PC22:
       v -= dot;
       *loc = (*loc & ~0x3fffff) | ((v >> 10) & 0x3fffff);
-      break;
-
-    case R_SPARC_UA32:
-      *(((char *)loc) + 0) = (char)(v >> 24);
-      *(((char *)loc) + 1) = (char)(v >> 16);
-      *(((char *)loc) + 2) = (char)(v >> 8);
-      *(((char *)loc) + 3) = (char)v;
       break;
 
 #ifdef R_SPARC_10
@@ -219,23 +270,7 @@ arch_apply_relocation (struct obj_file *ef,
       *loc = (*loc & ~0x7ff) | (v & 0x7ff);
       break;
 
-#ifdef R_SPARC_64      
-    case R_SPARC_64:
-      loc[0] = (v >> 32);
-      loc[1] = v;
-      break;
-    case R_SPARC_OLO10:
-      *loc = (*loc & ~0x3ff) | (v & 0x3ff);
-      break;
-    case R_SPARC_HH22:
-      *loc = (*loc & ~0x3fffff) | (v >> 42);
-      break;
-    case R_SPARC_HM10:
-      *loc = (*loc & ~0x3ff) | ((v >> 32) & 0x3ff);
-      break;
-    case R_SPARC_LM22:
-      *loc = (*loc & ~0x3fffff) | ((v >> 10) & 0x3fffff);
-      break;
+#ifdef R_SPARC_64
     case R_SPARC_PC_HH22:
       v -= dot;
       *loc = (*loc & ~0x3fffff) | (v >> 42);
@@ -249,7 +284,7 @@ arch_apply_relocation (struct obj_file *ef,
       *loc = (*loc & ~0x3fffff) | ((v >> 10) & 0x3fffff);
       break;
 #endif
-      
+
     case R_SPARC_WDISP16:
       v -= dot;
       if (v % 4)
@@ -308,4 +343,10 @@ arch_finalize_section_address(struct obj_file *f, Elf64_Addr base)
   for (i = 0; i < n; ++i)
     f->sections[i]->header.sh_addr += base;
   return 1;
+}
+
+int
+arch_archdata (struct obj_file *fin, struct obj_section *sec)
+{
+  return 0;
 }

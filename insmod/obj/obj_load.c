@@ -3,6 +3,7 @@
 
    Contributed by Richard Henderson <rth@tamu.edu>
    obj_free() added by Björn Ekwall <bj0rn@blox.se> March 1999
+   Support for kallsyms Keith Owens <kaos@ocs.com.au> April 2000
 
    This file is part of the Linux modutils.
 
@@ -20,11 +21,12 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_load.c,v 1.1 2000/03/23 17:09:56 snwint Exp $"
+#ident "$Id: obj_load.c,v 1.2 2000/11/22 15:45:22 snwint Exp $"
 
 #include <alloca.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "obj.h"
 #include "util.h"
@@ -32,7 +34,7 @@
 /*======================================================================*/
 
 struct obj_file *
-obj_load (FILE *fp)
+obj_load (int fp, Elf32_Half e_type, const char *filename)
 {
   struct obj_file *f;
   ElfW(Shdr) *section_headers;
@@ -47,10 +49,10 @@ obj_load (FILE *fp)
   f->symbol_hash = obj_elf_hash;
   f->load_order_search_start = &f->load_order;
 
-  fseek(fp, 0, SEEK_SET);
-  if (fread(&f->header, sizeof(f->header), 1, fp) != 1)
+  gzf_lseek(fp, 0, SEEK_SET);
+  if (gzf_read(fp, &f->header, sizeof(f->header)) != sizeof(f->header))
     {
-      error("error reading ELF header: %m");
+      error("error reading ELF header %s: %m", filename);
       return NULL;
     }
 
@@ -59,7 +61,7 @@ obj_load (FILE *fp)
       || f->header.e_ident[EI_MAG2] != ELFMAG2
       || f->header.e_ident[EI_MAG3] != ELFMAG3)
     {
-      error("not an ELF file");
+      error("%s is not an ELF file", filename);
       return NULL;
     }
   if (f->header.e_ident[EI_CLASS] != ELFCLASSM
@@ -67,12 +69,23 @@ obj_load (FILE *fp)
       || f->header.e_ident[EI_VERSION] != EV_CURRENT
       || !MATCH_MACHINE(f->header.e_machine))
     {
-      error("ELF file not for this architecture");
+      error("ELF file %s not for this architecture", filename);
       return NULL;
     }
-  if (f->header.e_type != ET_REL)
+  if (f->header.e_type != e_type && e_type != ET_NONE)
     {
-      error("ELF file not a relocatable object");
+      switch (e_type) {
+      case ET_REL:
+	error("ELF file %s not a relocatable object", filename);
+	break;
+      case ET_EXEC:
+	error("ELF file %s not an executable object", filename);
+	break;
+      default:
+	error("ELF file %s has wrong type, expecting %d got %d",
+		filename, e_type, f->header.e_type);
+	break;
+      }
       return NULL;
     }
 
@@ -80,7 +93,8 @@ obj_load (FILE *fp)
 
   if (f->header.e_shentsize != sizeof(ElfW(Shdr)))
     {
-      error("section header size mismatch: %lu != %lu",
+      error("section header size mismatch %s: %lu != %lu",
+	    filename, 
 	    (unsigned long)f->header.e_shentsize,
 	    (unsigned long)sizeof(ElfW(Shdr)));
       return NULL;
@@ -91,10 +105,10 @@ obj_load (FILE *fp)
   memset(f->sections, 0, sizeof(struct obj_section *) * shnum);
 
   section_headers = alloca(sizeof(ElfW(Shdr)) * shnum);
-  fseek(fp, f->header.e_shoff, SEEK_SET);
-  if (fread(section_headers, sizeof(ElfW(Shdr)), shnum, fp) != shnum)
+  gzf_lseek(fp, f->header.e_shoff, SEEK_SET);
+  if (gzf_read(fp, section_headers, sizeof(ElfW(Shdr))*shnum) != sizeof(ElfW(Shdr))*shnum)
     {
-      error("error reading ELF section headers: %m");
+      error("error reading ELF section headers %s: %m", filename);
       return NULL;
     }
 
@@ -111,7 +125,7 @@ obj_load (FILE *fp)
       sec->idx = i;
 
       switch (sec->header.sh_type)
- 	{
+	{
 	case SHT_NULL:
 	case SHT_NOTE:
 	case SHT_NOBITS:
@@ -125,12 +139,12 @@ obj_load (FILE *fp)
 	  if (sec->header.sh_size > 0)
 	    {
 	      sec->contents = xmalloc(sec->header.sh_size);
-	      fseek(fp, sec->header.sh_offset, SEEK_SET);
-	      if (fread(sec->contents, sec->header.sh_size, 1, fp) != 1)
-	        {
-	          error("error reading ELF section data: %m");
-	          return NULL;
-	        }
+	      gzf_lseek(fp, sec->header.sh_offset, SEEK_SET);
+	      if (gzf_read(fp, sec->contents, sec->header.sh_size) != sec->header.sh_size)
+		{
+		  error("error reading ELF section data %s: %m", filename);
+		  return NULL;
+		}
 	    }
 	  else
 	    sec->contents = NULL;
@@ -138,11 +152,13 @@ obj_load (FILE *fp)
 
 #if SHT_RELM == SHT_REL
 	case SHT_RELA:
-	  error("RELA relocations not supported on this architecture");
+	  if (sec->header.sh_size)
+	    error("RELA relocations not supported on this architecture %s", filename);
 	  return NULL;
 #else
 	case SHT_REL:
-	  error("REL relocations not supported on this architecture");
+	  if (sec->header.sh_size)
+	    error("REL relocations not supported on this architecture %s", filename);
 	  return NULL;
 #endif
 
@@ -150,12 +166,12 @@ obj_load (FILE *fp)
 	  if (sec->header.sh_type >= SHT_LOPROC)
 	    {
 	      if (arch_load_proc_section(sec, fp) < 0)
-	        return NULL;
+		return NULL;
 	      break;
 	    }
 
-	  error("can't handle sections of type %ld",
-		(long)sec->header.sh_type);
+	  error("can't handle sections of type %ld %s",
+		(long)sec->header.sh_type, filename);
 	  return NULL;
 	}
     }
@@ -174,6 +190,12 @@ obj_load (FILE *fp)
     {
       struct obj_section *sec = f->sections[i];
 
+      /* .modinfo should be contents only but gcc has no attribute for that.
+       * The kernel may have marked .modinfo as ALLOC, ignore this bit.
+       */
+      if (strcmp(sec->name, ".modinfo") == 0)
+        sec->header.sh_flags &= ~SHF_ALLOC;
+
       if (sec->header.sh_flags & SHF_ALLOC)
 	obj_insert_section_load_order(f, sec);
 
@@ -187,7 +209,8 @@ obj_load (FILE *fp)
 
 	    if (sec->header.sh_entsize != sizeof(ElfW(Sym)))
 	      {
-		error("symbol size mismatch: %lu != %lu",
+		error("symbol size mismatch %s: %lu != %lu",
+		      filename, 
 		      (unsigned long)sec->header.sh_entsize,
 		      (unsigned long)sizeof(ElfW(Sym)));
 		return NULL;
@@ -217,18 +240,70 @@ obj_load (FILE *fp)
 	      }
 	  }
 	break;
+	}
+    }
 
+  /* second pass to add relocation data to symbols */
+  for (i = 0; i < shnum; ++i)
+    {
+      struct obj_section *sec = f->sections[i];
+      switch (sec->header.sh_type)
+	{
 	case SHT_RELM:
-	  if (sec->header.sh_entsize != sizeof(ElfW(RelM)))
-	    {
-	      error("relocation entry size mismatch: %lu != %lu",
-		    (unsigned long)sec->header.sh_entsize,
-		    (unsigned long)sizeof(ElfW(RelM)));
-	      return NULL;
-	    }
+	  {
+	    unsigned long nrel, j;
+	    ElfW(RelM) *rel;
+	    struct obj_section *symtab;
+	    char *strtab;
+	    if (sec->header.sh_entsize != sizeof(ElfW(RelM)))
+	      {
+		error("relocation entry size mismatch %s: %lu != %lu",
+		      filename, 
+		      (unsigned long)sec->header.sh_entsize,
+		      (unsigned long)sizeof(ElfW(RelM)));
+		return NULL;
+	      }
+
+	    nrel = sec->header.sh_size / sizeof(ElfW(RelM));
+	    rel = (ElfW(RelM) *) sec->contents;
+	    symtab = f->sections[sec->header.sh_link];
+	    strtab = f->sections[symtab->header.sh_link]->contents;
+
+	    /* Save the relocate type in each symbol entry.  */
+	    for (j = 0; j < nrel; ++j, ++rel)
+	      {
+		ElfW(Sym) *extsym;
+		struct obj_symbol *intsym;
+		unsigned long symndx;
+		symndx = ELFW(R_SYM)(rel->r_info);
+		if (symndx)
+		  {
+		    extsym = ((ElfW(Sym) *) symtab->contents) + symndx;
+		    if (ELFW(ST_BIND)(extsym->st_info) == STB_LOCAL)
+		      {
+			/* Local symbols we look up in the local table to be sure
+			   we get the one that is really intended.  */
+			intsym = f->local_symtab[symndx];
+		      }
+		    else
+		      {
+			/* Others we look up in the hash table.  */
+			const char *name;
+			if (extsym->st_name)
+			  name = strtab + extsym->st_name;
+			else
+			  name = f->sections[extsym->st_shndx]->name;
+			intsym = obj_find_symbol(f, name);
+		      }
+		    intsym->r_type = ELFW(R_TYPE)(rel->r_info);
+		  }
+	      }
+	  }
 	  break;
 	}
     }
+
+  f->filename = xstrdup(filename);
 
   return f;
 }
@@ -262,6 +337,9 @@ void obj_free(struct obj_file *f)
 
 	if (f->local_symtab)
 		free(f->local_symtab);
+
+	if (f->filename)
+		free((char *)(f->filename));
 
 	free(f);
 }

@@ -280,7 +280,7 @@ static int old_get_kernel_info(int type)
 				module_name_list =
 					xrealloc(module_name_list,
 					l_module_name_list + i);
-				strcpy(module_name_list+l_module_name_list,
+				strcpy(module_name_list+l_module_name_list,	/* safe, xrealloc */
 					k->name+1);
 				l_module_name_list += i;	/* NUL separated strings */
 			}

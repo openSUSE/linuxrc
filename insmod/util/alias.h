@@ -3,20 +3,19 @@
  */
 
 /*
- * tbpath and tbtype are used to build the complete set of paths for
- * finding modules.
+ * tbpath and tbtype are used to build the complete set of paths for finding
+ * modules, but only when we search for individual directories, they are not
+ * used for [boot] and [toplevel] searches.
  */
 static char *tbpath[] =
 {
-	"/lib/modules/VERSION",	/* just a placeholder, look at config_read */
-	"/lib/modules/KVERSION",/* just a placeholder, look at config_read */
-	"/lib/modules/default",
 	"/lib/modules",
 	NULL			/* marks the end of the list! */
 };
 
-static char *tbtype[] =
+char *tbtype[] =
 {
+	"kernel",		/* as of 2.3.14 this must be first */
 	"fs",
 	"net",
 	"scsi",
@@ -32,6 +31,8 @@ static char *tbtype[] =
 	"atm",
 	"usb",
 	"ide",
+	"ieee1394",
+	"mtd",
 	NULL			/* marks the end of the list! */
 };
 
@@ -73,6 +74,8 @@ char *aliaslist[] =
 	"block-major-33 ide-probe",
 	"block-major-34 ide-probe",
 	"block-major-37 ide-tape",
+	"block-major-44 ftl",		/* from David Woodhouse <dwmw2@infradead.org> */
+	"block-major-93 nftl",		/* from David Woodhouse <dwmw2@infradead.org> */
 
 	"char-major-4 serial",
 	"char-major-5 serial",
@@ -80,23 +83,25 @@ char *aliaslist[] =
 	"char-major-9 st",
 	"char-major-10 off",		/* was: mouse, was: misc */
 	"char-major-10-0 busmouse",	/* /dev/logibm Logitech bus mouse */
-	"char-major-10-1 psaux",	/* /dev/psaux PS/2-style mouse port */
+	"char-major-10-1 off",		/* /dev/psaux PS/2-style mouse port */
 	"char-major-10-2 msbusmouse",	/* /dev/inportbm Microsoft Inport bus mouse */
 	"char-major-10-3 atixlmouse",	/* /dev/atibm ATI XL bus mouse */
- 					/* /dev/jbm J-mouse */
- 					/* /dev/amigamouse Amiga mouse (68k/Amiga) */
- 					/* /dev/atarimouse Atari mouse */
- 					/* /dev/sunmouse Sun mouse */
- 					/* /dev/beep Fancy beep device */
- 					/* /dev/modreq Kernel module load request */
+					/* /dev/jbm J-mouse */
+					/* /dev/amigamouse Amiga mouse (68k/Amiga) */
+					/* /dev/atarimouse Atari mouse */
+					/* /dev/sunmouse Sun mouse */
+					/* /dev/beep Fancy beep device */
+					/* /dev/modreq Kernel module load request */
 	"char-major-10-130 wdt",	/* /dev/watchdog Watchdog timer port */
 	"char-major-10-131 wdt",	/* /dev/temperature Machine internal temperature */
- 					/* /dev/hwtrap Hardware fault trap */
- 					/* /dev/exttrp External device trap */
+					/* /dev/hwtrap Hardware fault trap */
+					/* /dev/exttrp External device trap */
 	"char-major-10-135 off",	/* rtc cannot be compiled as a module */
 	"char-major-10-139 openprom",	/* /dev/openprom Linux/Sparc interface */
-	"char-major-10-144 nvram", /* from Tigran Aivazian <tigran@sco.COM> */
-	 
+	"char-major-10-144 nvram",	/* from Tigran Aivazian <tigran@sco.COM> */
+	"char-major-10-157 applicom",	/* from David Woodhouse <dwmw2@infradead.org> */
+	"char-major-10-175 agpgart",    /* /dev/agpgart GART AGP mapping access */
+
 	"char-major-14 soundcore",
 	"char-major-19 cyclades",
 	"char-major-20 cyclades",
@@ -113,6 +118,7 @@ char *aliaslist[] =
 	"char-major-57 esp",
 	"char-major-58 esp",
 	"char-major-63 kdebug",
+	"char-major-90 mtdchar",	/* from David Woodhouse <dwmw2@infradead.org> */
 	"char-major-99 ppdev",
 	"char-major-107 3dfx", /* from Tigran Aivazian <tigran@sco.COM> */
 
@@ -123,16 +129,19 @@ char *aliaslist[] =
 	"iso9660 isofs",
 	"md-personality-1 linear",
 	"md-personality-2 raid0",
+        "md-personality-3 raid1",
+        "md-personality-4 raid5",
+
 	"net-pf-1 unix",	/* PF_UNIX	1  Unix domain sockets */
 	"net-pf-2 ipv4",	/* PF_INET	2  Internet IP Protocol */
 	"net-pf-3 off",		/* PF_AX25	3  Amateur Radio AX.25 */
 	"net-pf-4 off",		/* PF_IPX	4  Novell IPX */
 	"net-pf-5 off",		/* PF_APPLETALK	5  Appletalk DDP */
- 	"net-pf-6 off",		/* PF_NETROM	6  Amateur radio NetROM */
- 				/* PF_BRIDGE	7  Multiprotocol bridge */
- 				/* PF_AAL5	8  Reserved for Werner's ATM */
- 				/* PF_X25	9  Reserved for X.25 project */
- 				/* PF_INET6	10 IP version 6 */
+	"net-pf-6 off",		/* PF_NETROM	6  Amateur radio NetROM */
+				/* PF_BRIDGE	7  Multiprotocol bridge */
+				/* PF_AAL5	8  Reserved for Werner's ATM */
+				/* PF_X25	9  Reserved for X.25 project */
+				/* PF_INET6	10 IP version 6 */
 
 	/* next two from <dairiki@matthews.dairiki.org>  Thanks! */
 	"net-pf-17 af_packet",
@@ -152,7 +161,11 @@ char *aliaslist[] =
 	"ppp-compress-24 ppp_deflate",
 	"ppp-compress-26 ppp_deflate",
 
+#ifndef __sparc__
 	"parport_lowlevel parport_pc",
+#else
+        "parport_lowlevel parport_ax",
+#endif
 
 	NULL			/* marks the end of the list! */
 };
@@ -186,5 +199,27 @@ char *above[] =
  */
 char *below[] =
 {
+	NULL			/* marks the end of the list! */
+};
+
+/*
+ * This is the list of pre-defined "prune"s,
+ * used to exclude paths from scan of /lib/modules.
+ * /etc/modules.conf can add entries but not remove them.
+ */
+char *prune[] =
+{
+	"modules.dep",
+	"modules.pcimap",
+	"modules.isapnpmap",
+	"modules.usbmap",
+	"System.map",
+	".config",
+	"build",		/* symlink to source tree */
+	"vmlinux",
+	"vmlinuz",
+	"bzImage",
+	"zImage",
+	".rhkmvtag",		/* wish RedHat had told me before they did this */
 	NULL			/* marks the end of the list! */
 };
