@@ -389,6 +389,7 @@ int auto2_init()
   fflush(stdout);
   deb_msg("Hardware probing finished.");
 
+#if WITH_PCMCIA
   if(hd_has_pcmcia(hd_data)) {
     deb_msg("Going to load PCMCIA support...");
 
@@ -400,6 +401,7 @@ int auto2_init()
 
     if(!i) {
       deb_msg("PCMCIA modules loaded - starting card manager.");
+      pcmcia_chip_ig = 2;	/* i82365 */
       i = system("cardmgr -v -m /modules");
       if(i)
         deb_msg("Oops: card manager didn't start.");
@@ -409,8 +411,8 @@ int auto2_init()
     else {
       deb_msg("Error loading PCMCIA modules.");
     }
-
   }
+#endif
 
   if(!auto2_find_floppy()) {
     deb_msg("There seems to be no floppy drive.");
