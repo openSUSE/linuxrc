@@ -856,9 +856,6 @@ int inst_start_install()
     }
   }
 
-  /* write update.pre script for compatibility, if necessary */
-  util_write_update_pre();
-
   free(buf);
 
   util_splash_bar(60);

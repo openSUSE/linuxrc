@@ -1,5 +1,10 @@
 26/5/2004:	v1.6.31
 	- code that asks for module floppies reactivated (#40904)
+	- driver update:
+	  * copy inst-sys dir
+	  * keep y2update in separate dirs, too
+	  * added UpdatePriority to make it possible to have them applied
+	    in a defined order
 
 24/5/2004:	v1.6.30
 	- removed some old texts

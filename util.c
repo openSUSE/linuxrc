@@ -698,7 +698,7 @@ void add_driver_update(char *dir, char *loc)
 {
   unsigned u;
   size_t len;
-  char *copy_dir[] = { "install", "modules", "y2update" };
+  char *copy_dir[] = { "install", "modules", "y2update", "inst-sys" };
   char *src = NULL, *dst = NULL, *buf1 = NULL, *buf2 = NULL;
   char *argv[3];
   struct dirent *de;
@@ -706,6 +706,7 @@ void add_driver_update(char *dir, char *loc)
   FILE *f;
   file_t *ft0, *ft;
   slist_t *sl;
+  unsigned prio;
 
   /* create destination, if missing */
   if(util_check_exist(config.update.dst) != 'd') {
@@ -718,27 +719,43 @@ void add_driver_update(char *dir, char *loc)
   /* module version may not match kernel exactly */
   config.forceinsmod = 1;
 
-  /* preliminary config file read just for the update id */
+  prio = config.update.count++;
+
+  /* preliminary config file read for update id & priority */
   strprintf(&buf1, "%s/dud.config", dir);
   ft0 = file_read_file(buf1, kf_cfg);
   for(ft = ft0; ft; ft = ft->next) {
     if(ft->key == key_updateid && *ft->value) {
       str_copy(&config.update.id, ft->value);
-      break;
+    }
+    if(ft->key == key_updateprio && ft->is.numeric) {
+      prio = ft->nvalue;
+      if(prio > MAX_UPDATES - 100) prio = MAX_UPDATES - 100;
     }
   }
   file_free_file(ft0);
   free(buf1); buf1 = NULL;
+
+  for(; prio < MAX_UPDATES; prio++) {
+    if(!config.update.map[prio]) break;
+  }
+
+  if(prio >= MAX_UPDATES) {
+    fprintf(stderr, "Error: Too many driver updates!!!\n");
+    return;
+  }
+
+  config.update.map[prio] = 1;
 
   if((sl = slist_getentry(config.update.id_list, config.update.id))) {
     fprintf(stderr, "dud: %s (duplicate of %s, skipped)\n", loc, sl->value);
     return;
   }
 
-  strprintf(&dst, "%s/%03u", config.update.dst, config.update.count);
+  strprintf(&dst, "%s/%03u", config.update.dst, prio);
   if(mkdir(dst, 0755)) return;
 
-  fprintf(stderr, "dud %u: %s", config.update.count, loc);
+  fprintf(stderr, "dud %u: %s", prio, loc);
   if(config.update.id) {
     fprintf(stderr, " (id %s)", config.update.id);
   }
@@ -746,24 +763,27 @@ void add_driver_update(char *dir, char *loc)
 
   if(config.update.id) {
     sl = slist_append_str(&config.update.id_list, config.update.id);
-    strprintf(&sl->value, "%u", config.update.count);
+    strprintf(&sl->value, "%u", prio);
   }
-
-  config.update.count++;
 
   /* copy directories */
   for(u = 0; u < sizeof copy_dir / sizeof *copy_dir; u++) {
     strprintf(&src, "%s/%s", dir, copy_dir[u]);
     if(util_check_exist(src) != 'd') continue;
 
-    strprintf(&buf1,
-      "%s/%s",
-      strcmp(copy_dir[u], "y2update") ? dst : config.update.dst,
-      copy_dir[u]
-    );
+    strprintf(&buf1, "%s/%s", dst, copy_dir[u]);
 
     if(util_check_exist(buf1) == 'd' || !mkdir(buf1, 0755)) {
       util_do_cp(src, buf1);
+    }
+
+    /* for compatibility */
+    if(!strcmp(copy_dir[u], "y2update")) {
+      strprintf(&buf1, "%s/%s", config.update.dst, copy_dir[u]);
+
+      if(util_check_exist(buf1) == 'd' || !mkdir(buf1, 0755)) {
+        util_do_cp(src, buf1);
+      }
     }
   }
 
@@ -785,13 +805,6 @@ void add_driver_update(char *dir, char *loc)
       }
     }
     closedir(d);
-    if(config.update.style) {
-      /* make compat link */
-      config.update.compat = config.update.count - 1;
-      strprintf(&buf2, "%s/install", config.update.dst);
-      unlink(buf2);
-      symlink(buf1, buf2);
-    }
   }
 
   /* module things: save order to "module.order" */
@@ -1005,73 +1018,22 @@ void create_update_name(unsigned idx)
 }
 
 
+/*
+ * Apply all new driver updates.
+ */
 void util_do_driver_updates()
 {
+  unsigned u;
+
   if(!config.tmpfs) return;
 
-  while(config.update.next < config.update.count) {
-    util_do_driver_update(config.update.next++);
-  }
-}
-
-
-/* write update.pre for compatibility */
-void util_write_update_pre()
-{
-  char *buf1 = NULL, *buf2 = NULL, *buf3 = NULL;
-  unsigned u;
-  slist_t *sl0 = NULL, *sl;
-  FILE *f;
-
-  if(
-    !config.tmpfs ||
-    !config.update.style ||
-    config.update.compat == config.update.compat_last
-  ) return;
-
-  for(u = config.update.compat_last; u < config.update.compat; u++) {
-    strprintf(&buf1, "%s/%03u/install/update.pre", config.update.dst, u);
-    if(util_check_exist(buf1) == 'r') slist_append_str(&sl0, buf1);
-  }
-
-  /* write update.pre for compatibility */
-  if(sl0) {
-    strprintf(&buf1, "%s/install/update.pre.tmp", config.update.dst);
-    if((f = fopen(buf1, "w"))) {
-      fprintf(f, "#! /bin/sh\n\n");
-      for(sl = sl0; sl; sl = sl->next) {
-        fprintf(f, "%s\n", sl->key);
-      }
-      fprintf(f, "\n");
-      fclose(f);
+  for(u = 0; u < MAX_UPDATES; u++) {
+    if(config.update.map[u] == 1) {
+      util_do_driver_update(u);
+      config.update.map[u] = 2;
     }
-    strprintf(&buf2, "%s/install/update.pre", config.update.dst);
-    if(util_check_exist(buf2) == 'r') {
-      strprintf(&buf3, "cat %s >>%s", buf2, buf1);
-      system(buf3);
-    }
-    unlink(buf2);
-    rename(buf1, buf2);
-    chmod(buf2, 0755);
-  }
-
-  config.update.compat_last = config.update.compat;
-
-  slist_free(sl0);
-  free(buf1);
-  free(buf2);
-  free(buf3);
-}
-
-
-#if 0
-void util_umount_driver_update()
-{
-  if(util_check_exist(config.update.dst) == 'd') {
-    util_umount(config.update.dst);
   }
 }
-#endif
 
 
 int show_driver_updates()

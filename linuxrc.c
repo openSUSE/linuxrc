@@ -639,6 +639,8 @@ void lxrc_init()
   config.update.dir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
   config.update.dst = strdup("/update");
 
+  config.update.map = calloc(1, MAX_UPDATES);
+
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;

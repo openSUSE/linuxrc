@@ -194,6 +194,7 @@ static struct {
   { key_updatename,     "UpdateName",     kf_cfg + kf_cmd                },
   { key_updatestyle,    "UpdateStyle",    kf_cfg + kf_cmd                },
   { key_updateid,       "UpdateID",       kf_cfg                         },
+  { key_updateprio,     "UpdatePriority", kf_cfg                         },
   { key_updateask,      "DriverUpdate",   kf_cfg + kf_cmd                },
   { key_updateask,      "DUD",            kf_cfg + kf_cmd                },
   { key_initrd,         "Initrd",         kf_boot                        },
