@@ -1,7 +1,7 @@
 9/9/2002:	v1.4.25
 	- don't write server info for VNC/ssh install (#18882)
-	- disks/REAME --> boot/README
-	- lower limit for yast2 (44MB->40MB)
+	- disks/README --> boot/README 
+	- lower limit for yast2 (44MB --> 40MB)
 
 8/9/2002:	v1.4.24
 	- make linuxrc_tiny even smaller
