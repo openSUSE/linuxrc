@@ -841,16 +841,16 @@ msgstr "Nincs elég memória minden adat betöltéséhez."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer doesn't have enough memory to run YaST."
-msgstr ""
+msgstr "Nincs elég memória a YaST futtatásához."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr ""
+msgstr "A folytatáshoz aktiváljon csereterületet."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr ""
+msgstr "Hiba a csereterület aktiválása során."
 
 #. TXT_ENTER_SWAP
 msgid "Please enter the swap partition (eg. /dev/sda2)"
-msgstr ""
+msgstr "Adja meg a cserepartíciót (pl. /dev/sda2)"
