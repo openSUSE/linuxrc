@@ -218,7 +218,8 @@ fstype(const char *device) {
 			  sizeof(xsb.ntfssb.s_magic)))
 	      type = "ntfs";
 #endif
-	 else if(cramfsmagic(xsb.cramfssb) == CRAMFS_SUPER_MAGIC)
+	 else if(cramfsmagic(xsb.cramfssb) == CRAMFS_SUPER_MAGIC ||
+	 	 cramfsmagic(xsb.cramfssb) == CRAMFS_SUPER_MAGIC_BIG)
 	      type = "cramfs";
 	 else if ((!strncmp(xsb.fatsb.s_os, "MSDOS", 5) ||
 		   !strncmp(xsb.fatsb.s_os, "MSWIN", 5) ||

@@ -146,6 +146,7 @@ struct xfs_super_block {
 };
 
 #define CRAMFS_SUPER_MAGIC 0x28cd3d45
+#define CRAMFS_SUPER_MAGIC_BIG 0x453dcd28
 struct cramfs_super_block {
 	u_char    s_magic[4];
 	u_char    s_dummy[12];

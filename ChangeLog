@@ -1,3 +1,6 @@
+15/7/2002:	v1.4.5
+	- fixed cramfs detection (byte order issue)
+
 11/7/2002:	v1.4.4
 	- lowered mem limit for loading of inst-sys into ramdisk to 200MB (#16976)
 	- dropped byte order workaround for setting realrootdev
