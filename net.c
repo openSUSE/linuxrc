@@ -161,7 +161,7 @@ int net_config()
   if(
     config.win &&
     config.net.is_configured &&
-    dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES
+    (!config.manual || dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES)
   ) {
     return 0;
   }

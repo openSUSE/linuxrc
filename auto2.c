@@ -52,6 +52,7 @@ static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, char *type);
+static void get_zen_config(void);
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -846,6 +847,8 @@ int auto2_init()
 
   util_splash_bar(40);
 
+  if(config.zen) get_zen_config();
+
   util_debugwait("starting search for inst-sys");
 
   i = auto2_find_install_medium();
@@ -1264,6 +1267,8 @@ int auto2_ask_for_modules(int prompt, char *type)
   char buf[256];
   int mtype = mod_get_type(type);
 
+  if(!config.module.disks) return do_something;
+
   if(mod_check_modules(type)) return do_something;
 
   util_disp_init();
@@ -1295,4 +1300,58 @@ void load_storage_mods()
   auto2_activate_devices(hw_storage_ctrl, 0);
 }
 
+
+void get_zen_config()
+{
+  static char *zen_mp = "/mounts/zen";
+  char *cfg = NULL;
+  slist_t *sl, sl0 = { };
+  int cfg_ok = 0;
+
+  if(!config.zenconfig) return;
+
+  strprintf(&cfg, "%s/%s", zen_mp, config.zenconfig);
+
+  printf("Looking for ZENworks config");
+  fflush(stdout);
+
+  sl = config.cdroms;
+
+  if(config.cdromdev) {
+    sl0.key = config.cdromdev;
+    sl0.next = sl;
+    sl = &sl0;
+  }
+
+  if(config.insttype == inst_hd && config.partition) {
+    sl0.key = config.partition;
+    sl0.next = NULL;
+    sl = &sl0;
+  }
+
+  for(; !cfg_ok && sl; sl = sl->next) {
+    if(util_mount_ro(long_dev(sl->key), zen_mp)) continue;
+    if(util_check_exist(cfg) == 'r') {
+      char *argv[3];
+      unlink("/settings.txt");
+      argv[1] = cfg;
+      argv[2] = "/";
+      util_cp_main(3, argv);
+      cfg_ok = 1;
+      fprintf(stderr, "copied %s:%s\n", sl->key, config.zenconfig);
+      if(config.zen == 2) {
+        file_read_info_file("file:/settings.txt", kf_cfg);
+        fprintf(stderr, "read /settings.txt\n");
+      }
+    }
+    util_umount(zen_mp);
+  }
+  
+  printf(cfg_ok ? " - got it\n" : " - not found\n");
+
+  free(cfg);
+}
+
+
 #endif	/* USE_LIBHD */
+

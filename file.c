@@ -54,6 +54,9 @@ static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
 static void file_write_inet_str(FILE *f, char *name, inet_t *inet);
 static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
 
+static void add_driver(char *str);
+
+
 static struct {
   file_key_t key;
   char *value;
@@ -225,7 +228,11 @@ static struct {
   { key_datachan,	"DataChannel",	  kf_cfg + kf_cmd		 },
   { key_ctcprotocol,	"CTCProtocol",	  kf_cfg + kf_cmd		 },
 #endif
-  { key_netwait,        "NetWait",        kf_cfg + kf_cmd                }
+  { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
+  { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
+  { key_moduledisks,    "ModuleDisks",    kf_cfg + kf_cmd                },
+  { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
+  { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -1208,6 +1215,26 @@ void file_do_info(file_t *f0)
         break;        
 #endif      
 
+      case key_netwait:
+        if(f->is.numeric) config.net.ifup_wait = f->nvalue;
+        break;
+
+      case key_newid:
+        add_driver(f->value);
+        break;
+
+      case key_moduledisks:
+        if(f->is.numeric) config.module.disks = f->nvalue;
+        break;
+
+      case key_zen:
+        if(f->is.numeric) config.zen = f->nvalue;
+        break;
+
+      case key_zenconfig:
+        if(*f->value) str_copy(&config.zenconfig, f->value);
+        break;
+
       default:
         break;
     }
@@ -1255,10 +1282,6 @@ int file_read_yast_inf()
 
       case key_aborted:
         config.aborted = f->nvalue;
-        break;
-
-      case key_netwait:
-        if(f->is.numeric) config.net.ifup_wait = f->nvalue;
         break;
 
       default:
@@ -1952,5 +1975,63 @@ void file_write_live_config(char *dir)
   fprintf(f, "l_partition=%s\n", config.partition ?: "");
 
   fclose(f);
+}
+
+
+void add_driver(char *str)
+{
+  driver_t drv = { vendor:~0, device:~0, subvendor:~0, subdevice:~0 };
+  slist_t *sl0;
+  char *pci = NULL, *mod = NULL, *sys = NULL;
+  int i;
+
+  if(!str || !*str) return;
+
+  sl0 = slist_split(',', str);
+
+  if(sl0 && sl0->key) {
+    pci = sl0->key;
+    if(!*pci) pci = NULL;
+    if(sl0->next && sl0->next->key) {
+      mod = sl0->next->key;
+      if(!*mod) mod = NULL;
+      if(sl0->next->next && sl0->next->next->key) {
+        sys = sl0->next->next->key;
+        if(!*sys) sys = NULL;
+      }
+    }
+  }
+
+  if(pci && (mod || sys)) {
+
+    i = sscanf(pci, " %x %x %x %x %x %x %lx",
+      &drv.vendor, &drv.device,
+      &drv.subvendor, &drv.subdevice,
+      &drv.class, &drv.class_mask,
+      &drv.driver_data
+    );
+
+    if(i > 0) {
+      if(mod) drv.name = strdup(mod);
+      if(sys) drv.sysfs_name = strdup(sys);
+
+      drv.next = config.module.drivers;
+      config.module.drivers = malloc(sizeof *config.module.drivers);
+      memcpy(config.module.drivers, &drv, sizeof *config.module.drivers);
+
+      fprintf(stderr, "new id: %s,%s,%s\n",
+        print_driverid(config.module.drivers, 1),
+        config.module.drivers->name ?: "",
+        config.module.drivers->sysfs_name ?: ""
+      );
+
+      store_driverid(config.module.drivers);
+
+      if(apply_driverid(config.module.drivers)) sleep(config.module.delay + 1);
+
+    }
+  }
+
+  slist_free(sl0);
 }
 

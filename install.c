@@ -877,10 +877,26 @@ int inst_start_install()
   }
 
   /* load some extra files, if they exist */
-  get_file("/content", "/content");
-  get_file("/media.1/info.txt", "/info.txt");
-  get_file("/part.info", "/part.info");
-  get_file("/control.xml", "/control.xml");
+
+  if(!config.zen) {
+    get_file("/content", "/content");
+    get_file("/media.1/info.txt", "/info.txt");
+    get_file("/part.info", "/part.info");
+    get_file("/control.xml", "/control.xml");
+  }
+  else if(
+    config.zenconfig &&
+    config.insttype != inst_hd &&
+    config.insttype != inst_cdrom
+  ) {
+    strprintf(&buf, "/%s", config.zenconfig);
+    get_file(buf, "/settings.txt");
+    if(config.zen == 2) {
+      file_read_info_file("file:/settings.txt", kf_cfg);
+      fprintf(stderr, "read /settings.txt\n");
+    }
+  }
+
   /* only if we need it for ftp/http installs, too */
   /* if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE); */
 

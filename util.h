@@ -139,3 +139,8 @@ void util_get_ram_size(void);
 void util_load_usb(void);
 
 int util_set_sysfs_attr(char* attr, char* value);
+
+char *print_driverid(driver_t *drv, int with_0x);
+int apply_driverid(driver_t *drv);
+void store_driverid(driver_t *drv);
+

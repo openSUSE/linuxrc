@@ -1174,6 +1174,7 @@ void util_status_info()
   slist_t *sl, *sl0 = NULL;
   char buf[256];
   language_t *lang;
+  driver_t *drv;
 
   hd_data = calloc(1, sizeof *hd_data);
   hd_data->debug = 1;
@@ -1251,6 +1252,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
+  add_flag(&sl0, buf, config.zen, "zen");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
@@ -1523,6 +1525,20 @@ void util_status_info()
       if(config.ramdisk[i].mountpoint) {
         sprintf(buf + strlen(buf), " mounted at \"%s\"", config.ramdisk[i].mountpoint);
       }
+      slist_append_str(&sl0, buf);
+    }
+  }
+
+  if(config.module.drivers) {
+    strcpy(buf, "new driver info (v d sv sd c cm, module, sysfs, usage):");
+    slist_append_str(&sl0, buf);
+    for(drv = config.module.drivers; drv; drv = drv->next) {
+      sprintf(buf, "  %s, %s, %s, %u",   
+        print_driverid(drv, 1),
+        drv->name ?: "",
+        drv->sysfs_name ?: "",
+        drv->used
+      );
       slist_append_str(&sl0, buf);
     }
   }
@@ -2995,7 +3011,7 @@ url_t *parse_url(char *str)
     if(s0[0] == '/' && s0[1] == '/') {
       s0 += 2;
       if((s = strchr(s0, '/'))) {
-        url.dir = strdup(s);
+        url.dir = strdup(config.zenconfig ? s + 1 : s);
         *s = 0;
       }
       else {
@@ -3335,6 +3351,10 @@ void net_close(int fd)
 
     ftpGetFileDone(config.net.ftp_sock);
     ftpClose(config.net.ftp_sock);
+  }
+
+  if(config.instmode == inst_tftp) {
+    tftp_close(&config.net.tftp);
   }
 
   net_read_cleanup();
@@ -4385,3 +4405,132 @@ int util_set_sysfs_attr(char* attr, char* value)
   sysfs_close_attribute(sa);
   return rc;
 }
+
+char *print_driverid(driver_t *drv, int with_0x)
+{
+  static char buf[256], *s;
+  int items;
+
+  *buf = 0;
+
+  if(!drv) return buf;
+
+  items = 7;
+  if(!drv->driver_data) {
+    items = 6;
+    if(!drv->class_mask) {
+      items = 4;
+      if(drv->subdevice == ~0) {
+        items--;
+        if(drv->subvendor == ~0) {
+          items--;
+          if(drv->device == ~0) {
+            items--;
+            if(drv->vendor == ~0) {
+              items--;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if(!items) return buf;
+
+  s = with_0x ? "0x" : "";
+
+  sprintf(buf, "%s%x", s, drv->vendor);
+  if(items >= 2) sprintf(buf + strlen(buf), " %s%x", s, drv->device);
+  if(items >= 3) sprintf(buf + strlen(buf), " %s%x", s, drv->subvendor);
+  if(items >= 4) sprintf(buf + strlen(buf), " %s%x", s, drv->subdevice);
+  if(items >= 5) sprintf(buf + strlen(buf), " %s%x %s%x", s, drv->class, s, drv->class_mask);
+  if(items >= 7) sprintf(buf + strlen(buf), " %s%lx", s, drv->driver_data);
+
+  return buf;
+}
+
+
+int apply_driverid(driver_t *drv)
+{
+  char buf[256], *name;
+  FILE *f;
+
+  if(!drv) return 0;
+
+  if(!(name = drv->sysfs_name ?: drv->name)) return 0;
+
+  sprintf(buf, "/sys/bus/pci/drivers/%s/new_id", name);
+
+  if(util_check_exist(buf) != 'r') return 0;
+
+  if(!(f = fopen(buf, "w"))) return 0;
+  fprintf(f, "%s\n", print_driverid(drv, 0));
+  fclose(f);
+
+  fprintf(stderr, "new id [%s]: %s\n", name, print_driverid(drv, 0));
+
+  return 1;
+}
+
+
+void store_driverid(driver_t *drv)
+{
+  char first = ' ';
+  FILE *f;
+
+  if(!drv) return;
+
+  if(drv->name && (f = fopen("/var/lib/hardware/hd.ids", "a"))) {
+    fprintf(f, "\n# %s\n", print_driverid(drv, 1));
+
+    if(((drv->class_mask >> 16) & 0xff) == 0xff) {
+      fprintf(f, "%cbaseclass.id\t\t0x%03x\n", first, (drv->class >> 16) & 0xff);
+      first = '&';
+    }
+
+    if(((drv->class_mask >> 8) & 0xff) == 0xff) {
+      fprintf(f, "%csubclass.id\t\t0x%02x\n", first, (drv->class >> 8) & 0xff);
+      first = '&';
+    }
+
+    if((drv->class_mask & 0xff) == 0xff) {
+      fprintf(f, "%cprogif.id\t\t0x%02x\n", first, drv->class & 0xff);
+      first = '&';
+    }
+
+    if(drv->vendor != ~0) {
+      fprintf(f, "%cvendor.id\t\tpci 0x%04x\n", first, drv->vendor & 0xffff);
+      first = '&';
+    }
+
+    if(drv->device != ~0) {
+      fprintf(f, "%cdevice.id\t\tpci 0x%04x\n", first, drv->device & 0xffff);
+      first = '&';
+    }
+
+    if(drv->subvendor != ~0) {
+      fprintf(f, "%csubvendor.id\t\tpci 0x%04x\n", first, drv->subvendor & 0xffff);
+      first = '&';
+    }
+
+    if(drv->subdevice != ~0) {
+      fprintf(f, "%csubdevice.id\t\tpci 0x%04x\n", first, drv->subdevice & 0xffff);
+      first = '&';
+    }
+
+    fprintf(f, "+driver.module.modprobe\t%s\n", drv->name);
+
+    fclose(f);
+  }
+
+  if((f = fopen("/etc/newids", "a"))) {
+    fprintf(f, "%s,%s", print_driverid(drv, 1), drv->name ?: "");
+    if(drv->sysfs_name) fprintf(f, ",%s", drv->sysfs_name);
+    fprintf(f, "\n");
+
+    fclose(f);
+  }
+
+}
+
+

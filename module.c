@@ -746,11 +746,14 @@ void mod_load_module_manual(char *module, int show)
 int mod_insmod(char *module, char *param)
 {
   char buf[512];
-  int err;
+  int err, cnt;
   char *force = config.forceinsmod ? "-f " : "";
   slist_t *sl;
+  driver_t *drv;
 
   if(config.debug) fprintf(stderr, "mod_insmod(\"%s\", \"%s\")\n", module, param);
+
+  if(!module) return 0;
 
   if(mod_is_loaded(module)) return 0;
 
@@ -785,6 +788,18 @@ int mod_insmod(char *module, char *param)
   err = system(buf);
 
   if(config.module.delay > 0) sleep(config.module.delay);
+
+  cnt = 0;
+
+  if(!err) {
+    for(drv = config.module.drivers; drv; drv = drv->next) {
+      if(drv->name && !strcmp(drv->name, module)) {
+        cnt += apply_driverid(drv);
+      }
+    }
+  }
+
+  if(cnt) sleep(config.module.delay + 1);
 
   if(config.run_as_linuxrc) {
     scsi_rename();

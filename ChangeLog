@@ -1,3 +1,13 @@
+8/2/2005:	v1.7.21
+	- don't show unnecessary network config popup during autoinstall (#47690)
+	- add config option to make it possible to turn off automatic module
+	  disk requests (#47909, #46809)
+	- added 'newid' option to add new driver ids to pci modules (#36084, #49128)
+	- netwait=N option fixed
+	- close tftp connection
+	- some zenworks stuff
+	- zen: urls specfify relative paths
+
 7/2/2005:	v1.7.20
 	- pcmcia fixes
 

@@ -174,6 +174,22 @@ typedef struct module2_s {
   unsigned dontask:1;	/* don't ask for module params */
 } module_t;
 
+
+typedef struct driver_s {
+  struct driver_s *next;
+  char *name;		/* module name */
+  char *sysfs_name;	/* sysfs directory name */
+  unsigned vendor;
+  unsigned device;
+  unsigned subvendor;
+  unsigned subdevice;
+  unsigned class;
+  unsigned class_mask;
+  unsigned long driver_data;
+  unsigned used;
+} driver_t;
+
+
 typedef enum {
   nc_none, nc_static, nc_bootp, nc_dhcp
 } net_config_t;
@@ -251,6 +267,8 @@ typedef struct {
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
   unsigned fb:1;		/* has frame buffer */
+  unsigned zen;			/* zenworks mode */
+  char *zenconfig;		/* zenworks config file */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -355,6 +373,8 @@ typedef struct {
     slist_t *initrd;		/* extra modules for initrd */
     unsigned keep_usb_storage:1;	/* don't unload usb-storage */
     int delay;			/* wait this much after insmod */
+    driver_t *drivers;		/* list of extra drive info */
+    unsigned disks:1;		/* automatically ask for module disks */
   } module;
 
   struct {

@@ -646,6 +646,8 @@ void lxrc_init()
 
   config.update.map = calloc(1, MAX_UPDATES);
 
+  config.zenconfig = strdup("settings.txt");
+
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;
@@ -669,6 +671,8 @@ void lxrc_init()
 
   config.scsi_rename = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
+
+  config.module.disks = 1;
 
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
