@@ -11,7 +11,7 @@ dhcpcd.a: $(SRC) $(OBJ) $(INC)
 	ar rcs $@ $(OBJ)
 
 clean:
-	rm -f $(OBJ) *~ dhcpd.a .depend
+	rm -f $(OBJ) *~ dhcpcd.a .depend
 
 ifneq ($(MAKECMDGOALS),clean)
 .depend: $(SRC) $(INC)
