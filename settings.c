@@ -314,6 +314,13 @@ void set_choose_language (void)
             system (command_ti);
             set_activate_font (set_languages_arm [rc_ii - 1].usermap);
             }
+        /* Maybe we should always load the keymap??? */
+        if (demo_ig && !serial_ig)
+            {
+            sprintf (command_ti, "loadkeys %s.map", set_languages_arm [rc_ii - 1].keymap);
+            system (command_ti);
+            strcpy (keymap_tg, set_languages_arm [rc_ii - 1].keymap);
+            }
         }
 
     util_free_items (items_ari, NR_LANGUAGES);

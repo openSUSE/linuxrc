@@ -163,6 +163,14 @@ int inst_start_demo (void)
         if (rc_ii)
             return (rc_ii);
         }
+    else
+        {
+        auto2_ig = FALSE;
+        util_disp_init ();
+        set_choose_language ();
+        util_print_banner ();
+        set_choose_keytable ();
+        }
 
     sprintf (filename_ti, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
     if (!util_check_exist (filename_ti))
@@ -692,6 +700,7 @@ static int inst_prepare (void)
                           "/etc/ld.so.cache",
                           "/etc/host.conf",
                           "/etc/modules.conf",
+                          "/etc/fb.modes",
                           "/bin",
                           "/boot",
                           "/root",
