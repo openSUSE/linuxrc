@@ -57,6 +57,8 @@ enum modid_t
     ID_AACRAID,
     ID_DMX3191D,
     ID_MPTSCSIH,
+    ID_PDCRAID,
+    ID_HPTRAID,
     ID_AZTECH,
     ID_GOLDSTAR,
     ID_SBPCD,
