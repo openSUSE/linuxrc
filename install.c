@@ -740,37 +740,6 @@ static void inst_start_shell (char *tty_tv)
         }
     }
 
-static void inst_setup_dirs(char *instsys)
-{
-  char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
-  char link_source[MAX_FILENAME];
-  char *backup_dir = "/.saved_files";
-  char backup_name[MAX_FILENAME];
-  int i;
-
-  if (!util_check_exist(backup_dir))
-    mkdir(backup_dir,755);
-
-  for(i = 0; i < sizeof links / sizeof *links; i++) {
-    sprintf(backup_name, "%s%s", backup_dir, links[i]);
-    if(instsys) {
-      if(util_check_exist(links[i])) {
-	rename(links[i], backup_name);
-      } else {
-	// links[i] might be an existing symlink
-	unlink(links[i]);
-      }
-      sprintf(link_source, "%s%s", instsys, links[i]);
-      symlink(link_source, links[i]);
-    } else {
-      if(util_check_exist(backup_name)) {
-	// links[i] might be an existing symlink
-	unlink(links[i]);
-	rename(backup_name, links[i]);
-      }
-    }
-  }
-}
 
 /*
  * Do some basic preparations before we can run programs from the
@@ -781,10 +750,14 @@ static void inst_setup_dirs(char *instsys)
  */
 int inst_prepare()
 {
+  char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
+  char link_source[MAX_FILENAME];
   char instsys[MAX_FILENAME];
+  int i = 0;
   int rc = 0;
 
   mod_free_modules();
+  rename("/bin", "/.bin");
 
   if(inst_loopmount_im) {
     strcpy(instsys, mountpoint_tg);
@@ -801,7 +774,13 @@ int inst_prepare()
 
   setenv("INSTSYS", instsys, TRUE);
 
-  inst_setup_dirs(instsys);
+  for(i = 0; i < sizeof links / sizeof *links; i++) {
+    if(!util_check_exist(links[i])) {
+      unlink(links[i]);
+      sprintf(link_source, "%s%s", instsys, links[i]);
+      symlink(link_source, links[i]);
+    }
+  }
 
   setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
 
@@ -841,7 +820,8 @@ int inst_execute_yast()
     inst_umount ();
     if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
-    inst_setup_dirs(NULL);
+    unlink("/bin");
+    rename("/.bin", "/bin");
 
     return -1;
   }
@@ -884,8 +864,14 @@ int inst_execute_yast()
   }
   fflush (stdout);
 
-  if(util_check_exist(SETUP_COMMAND)) {
-    sprintf(command_ti, "%s yast%d%s",
+  
+  sprintf(command_ti, "%s%s",
+    config.instsys,
+    SETUP_COMMAND);
+  deb_str(command_ti);
+  if(util_check_exist(command_ti)) {
+    sprintf(command_ti, "%s%s yast%d%s",
+      config.instsys,
       SETUP_COMMAND,
       yast_version_ig == 2 ? 2 : 1,
       auto_ig ? " --autofloppy" : ""
@@ -900,6 +886,7 @@ int inst_execute_yast()
     fprintf(stderr, "starting \"%s\"\n", command_ti);
   }
 
+  deb_str(command_ti);
   rc_ii = system(command_ti);
 
   fprintf(stderr,
@@ -955,7 +942,8 @@ int inst_execute_yast()
   inst_umount();
   if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
-  inst_setup_dirs(NULL);
+  unlink("/bin");
+  rename("/.bin", "/bin");
 
   /* turn off swap */
   inst_swapoff();
