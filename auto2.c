@@ -971,19 +971,31 @@ int auto2_find_floppy()
   return has_floppy_ig = floppy_tg ? TRUE : FALSE;
 }
 
+
 int auto2_has_i2o()
 {
   hd_t *hd;
+  driver_info_t *di = NULL;
+  int i2o_needed = -1;
 
   if(hd_data) {
     for(hd = hd_data->hd; hd; hd = hd->next) {
       if(hd->base_class == bc_i2o) {
-        return TRUE;
+        di = hd_driver_info(hd_data, hd);
+
+        /* don't use i2o if we have an alternative driver */
+        if(di && di->any.type == di_module) {
+          i2o_needed = 0;
+        } else {
+          if(i2o_needed == -1) i2o_needed = 1;
+        }
+
+        di = hd_free_driver_info(di);
       }
     }
   }
 
-  return FALSE;
+  return i2o_needed > 0 ? TRUE : FALSE;
 }
 
 int auto2_pcmcia()

@@ -1,3 +1,7 @@
+11/5/2001:	v1.1.19.010
+	- do not load i2o modules if the controller is already supported by
+	  an alternative driver (#6335)
+
 8/5/2001:	v1.1.19.009
 	- adjusted YaST2 memory limit
 
