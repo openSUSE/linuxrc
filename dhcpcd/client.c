@@ -415,13 +415,13 @@ void (*buildUdpIpMsg)(unsigned);
   struct sockaddr addr;
   struct timeval begin, current, diff;
   int i,len;
-  int j=DHCP_INITIAL_RTO/2;
+  int j=0;
   int timeout;
   do
     {
       do
     	{
-	  j+=j;
+	  j+=DHCP_INITIAL_RTO;
 	  if (j > DHCP_MAX_RTO) j = DHCP_MAX_RTO;
       	  memset(&addr,0,sizeof(struct sockaddr));
       	  memcpy(addr.sa_data,IfName,IfName_len);

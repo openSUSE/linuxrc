@@ -1218,7 +1218,7 @@ int net_dhcp()
 
   strcpy(cmd, "dhcpcd -B");
   if(config.net.dhcp_timeout != 60) {
-    sprintf(cmd + strlen(cmd), "-t %d", config.net.dhcp_timeout);
+    sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
   }
   if(*machine_name_tg) {
     sprintf(cmd + strlen(cmd), " %s", machine_name_tg);

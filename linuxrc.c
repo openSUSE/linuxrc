@@ -661,7 +661,7 @@ void lxrc_init()
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;
-  config.net.dhcp_timeout = 60;
+  config.net.dhcp_timeout = 90;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
 

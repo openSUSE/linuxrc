@@ -1,3 +1,8 @@
+20/6/2003:	v1.4.49
+	- make dhcptimeout option work (#26974)
+	- change dhcpcd to use linear backoff (#26974)
+	- increased default dhcp timeout to 90s (#26974)
+
 21/5/2003:	v1.4.48
 	- ask for cd1 on all archs
 
