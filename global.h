@@ -293,7 +293,7 @@ typedef struct {
     slist_t *broken;		/* list of modules that must not be loaded */
     slist_t *initrd;		/* extra modules for initrd */
     unsigned keep_usb_storage:1;	/* don't unload usb-storage */
-    unsigned delay;		/* wait this much after insmod */
+    int delay;			/* wait this much after insmod */
   } module;
 
   struct {

@@ -194,7 +194,8 @@ static struct {
   { key_testpivotroot,  "_TestPivotRoot"   },
   { key_scsibeforeusb,  "SCSIBeforeUSB"    },
   { key_hostip,         "HostIP"           },
-  { key_linemode,       "Linemode"         }
+  { key_linemode,       "Linemode"         },
+  { key_moduledelay,    "ModuleDelay"      }
 };
 
 static struct {
@@ -1001,6 +1002,10 @@ void file_do_info(file_t *f0)
 
       case key_linemode:
         if(f->is.numeric) config.linemode = f->nvalue;
+        break;
+
+      case key_moduledelay:
+        if(f->is.numeric) config.module.delay = f->nvalue;
         break;
 
       default:

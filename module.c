@@ -776,7 +776,7 @@ int mod_insmod(char *module, char *param)
 
   err = system(buf);
 
-  if(config.module.delay) sleep(config.module.delay);
+  if(config.module.delay > 0) sleep(config.module.delay);
 
   if(!err && param) {
     while(isspace(*param)) param++;

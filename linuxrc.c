@@ -751,6 +751,12 @@ void lxrc_init()
   ft = file_get_cmdline(key_linemode);
   if(ft && ft->is.numeric) config.linemode = ft->nvalue;
 
+  ft = file_get_cmdline(key_usbwait);
+  if(ft && ft->is.numeric) config.usbwait = ft->nvalue;
+
+  ft = file_get_cmdline(key_moduledelay);
+  if(ft && ft->is.numeric) config.module.delay = ft->nvalue;
+
   ft = file_get_cmdline(key_linuxrc);
   str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));
 

@@ -170,7 +170,7 @@ void auto2_scan_hardware(char *log_file)
     printf("Activating usb devices...");
     hd_data->progress = NULL;
 
-    config.module.delay = 1;
+    config.module.delay += 1;
 
     for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, &usb_modules);
     hd_usb = hd_free_hd_list(hd_usb);
@@ -181,18 +181,15 @@ void auto2_scan_hardware(char *log_file)
     mod_insmod("hid", NULL);
     mod_insmod("keybdev", NULL);
 
-    config.module.delay = 0;
+    config.module.delay -= 1;
 
     k = mount("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
     if(config.usbwait > 0) sleep(config.usbwait);
 
     if(with_usb) {
+      mod_insmod("usb-storage", NULL);
+      if(config.usbwait > 0) sleep(config.usbwait);
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
-      if(load_usb_storage(hd_data)) {
-        mod_insmod("usb-storage", NULL);
-        if(config.usbwait > 0) sleep(config.usbwait);
-        hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
-      }
     }
     printf(" done\n"); fflush(stdout);
     if(!log_file) hd_data->progress = auto2_progress;
@@ -206,14 +203,14 @@ void auto2_scan_hardware(char *log_file)
     printf("Activating ieee1394 devices...");
     fflush(stdout);
 
-    config.module.delay = 3;
+    config.module.delay += 3;
 
     for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd, NULL);
     hd_usb = hd_free_hd_list(hd_fw);
 
     mod_insmod("sbp2", NULL);
 
-    config.module.delay = 0;
+    config.module.delay -= 3;
 
     if(config.usbwait > 0) sleep(config.usbwait);
 
