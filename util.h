@@ -91,6 +91,7 @@ void str_copy(char **dst, char *src);
 
 void set_instmode(instmode_t instmode);
 char *get_instmode_name(instmode_t instmode);
+char *get_instmode_name_up(instmode_t instmode);
 
 int net_open(char *filename);
 void net_close(int fd);

@@ -520,6 +520,10 @@ char *file_read_info_file(char *file, char *file2)
         reboot_wait_ig = f->nvalue;
         break;
 
+      case key_textmode:
+        text_mode_ig = f->nvalue;
+        break;
+
       case key_username:
         if(config.net.user) free(config.net.user);
         config.net.user = strdup(f->value);
@@ -725,7 +729,7 @@ void file_write_install_inf(char *dir)
 
   if(serial_ig) file_write_str(f, key_console, console_parms_tg);
 
-  file_write_sym(f, key_instmode, "no scheme", config.instmode);
+  file_write_str(f, key_instmode, get_instmode_name(config.instmode));
 
   if(config.insttype == inst_hd) {
     file_write_str(f, key_partition, harddisk_tg);
@@ -1145,8 +1149,14 @@ module2_t *file_read_modinfo(char *name)
         if(!strncasecmp(field[0], "MoreModules", sizeof "MoreModules" - 1)) {
           s = field[0] + sizeof "MoreModules" - 1;
           while(*s == '=' || isspace(*s)) s++;
-          if(!config.module.more_file[current_type]) free(config.module.more_file[current_type]);
-          config.module.more_file[current_type] = strdup(s);
+          str_copy(config.module.more_file + current_type, s);
+          free(field[--fields]);
+        }
+        else if(!strncasecmp(field[0], "ModDisk", sizeof "ModDisk" - 1)) {
+          s = field[0] + sizeof "ModDisk" - 1;
+          while(*s == '=' || isspace(*s)) s++;
+          j = strtol(s, &s1, 0);
+          if(!*s1) config.module.disk[current_type] = j;
           free(field[--fields]);
         }
       }
@@ -1169,7 +1179,15 @@ module2_t *file_read_modinfo(char *name)
       ml1->type = current_type;
       ml1->name = strdup(field[0]);
       if(fields > 1 && *field[1]) ml1->descr = strdup(field[1]);
-      if(fields > 2 && *field[2]) ml1->param = strdup(field[2]);
+      if(fields > 2 && *field[2]) {
+        if(*field[2] == '-') {
+          ml1->dontask = 1;
+          if(field[2][1]) ml1->param = strdup(field[2] + 1);
+        }
+        else {
+          ml1->param = strdup(field[2]);
+        }
+      }
       if(fields > 3 && *field[3]) ml1->pre_inst = strdup(field[3]);
       if(fields > 4 && *field[4]) ml1->post_inst = strdup(field[4]);
       if(fields > 5 && *field[5]) ml1->initrd = atoi(field[5]);
@@ -1205,10 +1223,11 @@ void file_dump_mlist(module2_t *ml)
       config.module.more_file[ml->type] ?: "-",
       ml->descr ?: ""
     );
-    fprintf(stderr, "  initrd = %s, show = %s, auto = %s\n",
+    fprintf(stderr, "  initrd = %s, show = %s, auto = %s, ask = %s\n",
       ml->initrd ? "yes" : "no",
       ml->descr ? "yes" : "no",
-      ml->autoload ? "yes" : "no"
+      ml->autoload ? "yes" : "no",
+      ml->dontask ? "no" : "yes"
     );
     if(ml->param) fprintf(stderr, "  param: \"%s\"\n", ml->param);
     if(ml->pre_inst) fprintf(stderr, "  pre_inst: \"%s\"\n", ml->pre_inst);

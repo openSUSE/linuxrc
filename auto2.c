@@ -619,44 +619,59 @@ int auto2_init()
 
   auto2_chk_frame_buffer();
 
-  deb_msg("Beginning hardware probing...");
+  fprintf(stderr, "Beginning hardware probing...");
   printf("Starting hardware detection...\n");
 
   auto2_scan_hardware(NULL);
 
   printf("\r%64s\r", "");
   fflush(stdout);
-  deb_msg("Hardware probing finished.");
+  fprintf(stderr, "Hardware probing finished.");
 
   if(!auto2_find_floppy()) {
-    deb_msg("There seems to be no floppy disk.");
+    fprintf(stderr, "There seems to be no floppy disk.");
   }
 
   file_read_info();
 
 #if WITH_PCMCIA
-  if(!(action_ig & ACT_NO_PCMCIA) && hd_has_pcmcia(hd_data)) {
-    deb_msg("Going to load PCMCIA support...");
+  if(
+    !(action_ig & ACT_NO_PCMCIA) &&
+    hd_has_pcmcia(hd_data) &&
+    !mod_pcmcia_ok()
+  ) {
+    fprintf(stderr, "Going to load PCMCIA support...");
 
-    if(!mod_check_modules("pcmcia")) {
-      char s[200], *t;
+    if(!util_check_exist("/modules/pcmcia_core.o")) {
+      char buf[256], *t;
+      int mtype;
 
       util_disp_init();
 
-      sprintf(s, txt_get(TXT_FOUND_PCMCIA), "i82365");
-      t = strchr(s, '\n');
+      mtype = mod_get_type("pcmcia");
+
+      sprintf(buf, txt_get(TXT_FOUND_PCMCIA), "i82365");
+      t = strchr(buf, '\n');
       if(t) {
         *t = 0;
         strcat(t, "\n\n");
       }
       else {
-        *s = 0;
+        *buf = 0;
       }
-      strcat(s, txt_get(TXT_ENTER_MODDISK));
 
-      j = dia_okcancel(s, YES) == YES ? 1 : 0;
+      if(mtype) {
+        sprintf(buf + strlen(buf), txt_get(TXT_MODDISK1), config.module.disk[mtype]);
+      }
+      else {
+        strcat(buf, txt_get(TXT_MODDISK0));
+      }
 
-      if(j) mod_add_disk(0, mod_get_type("pcmcia"));
+      strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
+
+      j = dia_okcancel(buf, YES) == YES ? 1 : 0;
+
+      if(j) mod_add_disk(0, mtype);
 
       util_disp_done();
     }
@@ -668,13 +683,13 @@ int auto2_init()
     );
 
     if(!i) {
-      deb_msg("PCMCIA modules loaded - starting card manager.");
+      fprintf(stderr, "PCMCIA modules loaded - starting card manager.");
       pcmcia_chip_ig = 2;	/* i82365 */
-      i = system("cardmgr -v -m /modules");
+      i = system("cardmgr -v -m /modules >&2");
       if(i)
-        deb_msg("Oops: card manager didn't start.");
+        fprintf(stderr, "Oops: card manager didn't start.");
       else {
-        deb_msg("card manager ok.");
+        fprintf(stderr, "card manager ok.");
       }
       /* wait for cards to be activated... */
       sleep(is_vaio ? 10 : 2);
@@ -690,7 +705,7 @@ int auto2_init()
 
 //  auto2_find_mouse();
 
-  deb_int(net_config_mask());
+//  deb_int(net_config_mask());
 
   i = auto2_find_install_medium();
 
@@ -735,7 +750,7 @@ int auto2_find_install_medium()
     if(!(i = auto2_mount_harddisk(harddisk_tg)))
       return TRUE;
     
-  if(config.instmode == inst_cdrom) {
+  if(config.instmode == inst_cdrom || !config.instmode) {
     *cdrom_tg = 0;
 
     deb_msg("Looking for a SuSE CD...");

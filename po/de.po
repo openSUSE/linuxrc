@@ -896,3 +896,44 @@ msgstr "%s-Konfiguration ist gescheitert."
 msgid "Use DHCP instead of BOOTP?"
 msgstr "Soll DHCP anstelle von BOOTP verwendet werden?"
 
+#. TXT_MODDISK0
+msgid "Please insert a modules disk."
+msgstr "Bitte legen Sie eine Modul-Diskette ein."
+
+#. TXT_MODDISK1
+#, c-format
+msgid "Please insert modules disk %d."
+msgstr "Bitte legen Sie Modul-Diskette %d ein."
+
+#. TXT_MODDISK2
+msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
+msgstr ""
+"Sie finden eine Anleitung zum Erstellen dieser Diskette in disks/LIESMICH "
+"auf der CD1 oder DVD."
+
+#. TXT_CHOOSE_NETSOURCE
+msgid "Please choose the network protocol"
+msgstr "Wählen Sie bitte das Netzwerkprotokol"
+
+# %s is NFS, FTP, HTTP or SMB
+#. TXT_TXT_INPUT_NETSERVER
+#, c-format
+msgid "Please enter the IP address of the %s server."
+msgstr ""
+
+# %s is NFS, FTP, HTTP or SMB
+#. TXT_INPUT_NETSERVER
+#, c-format
+msgid "Please enter the IP address of the %s server."
+msgstr "Geben Sie bitte die IP-Adresse des %s-Servers ein."
+
+# %s is FTP or HTTP
+#. TXT_TRY_REACH_SERVER
+#, c-format
+msgid "Trying to connect to the %s server..."
+msgstr "Versuche, den %s-Server zu erreichen..."
+
+#. TXT_NET
+msgid "Network"
+msgstr "Netzwerk"
+

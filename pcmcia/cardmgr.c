@@ -65,7 +65,7 @@
 
 /*====================================================================*/
 
-#define syslog my_syslog
+// #define syslog my_syslog
 
 typedef struct socket_info_t {
     int			fd;
@@ -1350,8 +1350,8 @@ int cardmgr_main(int argc, char *argv[])
 #ifdef DEBUG
     openlog("cardmgr", LOG_PID|LOG_PERROR, LOG_DAEMON);
 #else
-    openlog("cardmgr", LOG_PID|LOG_CONS, LOG_DAEMON);
-    close(0); close(1); close(2);
+    openlog("cardmgr", LOG_PID|LOG_PERROR, LOG_DAEMON);
+    close(0); close(1); // close(2);
     if (!delay_fork && !one_pass)
 	fork_now();
 #endif

@@ -2,7 +2,7 @@
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
  *
  */
 
@@ -201,6 +201,7 @@ int main(int argc, char **argv, char **env)
   }
 #ifdef USE_LIBHD
   else if(auto2_ig) {
+    printf("***** rescue 0x%x *****\n", action_ig); fflush(stdout);
     if((action_ig & ACT_RESCUE)) {
       util_manual_mode();
       util_disp_init();
@@ -224,6 +225,7 @@ int main(int argc, char **argv, char **env)
 }
 
 
+#if 0
 int my_syslog (int type_iv, char *buffer_pci, ...)
     {
     va_list  args_ri;
@@ -234,6 +236,7 @@ int my_syslog (int type_iv, char *buffer_pci, ...)
     fprintf (stderr, "\n");
     return (0);
     }
+#endif
 
 
 int my_logmessage (char *buffer_pci, ...)
@@ -497,7 +500,7 @@ void lxrc_init()
   char *s, *t0, *t, buf[256];
   url_t *url;
 
-  printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE GmbH <<<\n");
+  printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n");
   fflush(stdout);
 
   if(!config.test && getpid() > 19) {

@@ -1162,10 +1162,10 @@ int net_dhcp()
   }
 
   if(*machine_name_tg) {
-    sprintf(cmd, "dhcpcd -h %s %s", machine_name_tg, netdevice_tg);
+    sprintf(cmd, "dhcpcd -B -h %s %s", machine_name_tg, netdevice_tg);
   }
   else {
-    sprintf(cmd, "dhcpcd %s", netdevice_tg);
+    sprintf(cmd, "dhcpcd -B %s", netdevice_tg);
   }
 
   sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", netdevice_tg);

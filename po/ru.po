@@ -818,3 +818,42 @@ msgstr ""
 msgid "Use DHCP instead of BOOTP?"
 msgstr ""
 
+#. TXT_MODDISK0
+msgid "Please insert a modules disk."
+msgstr ""
+
+#. TXT_MODDISK1
+#, c-format
+msgid "Please insert modules disk %d."
+msgstr ""
+
+#. TXT_MODDISK2
+msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
+msgstr ""
+
+#. TXT_CHOOSE_NETSOURCE
+msgid "Please choose the network protocol"
+msgstr ""
+
+# %s is NFS, FTP, HTTP or SMB
+#. TXT_TXT_INPUT_NETSERVER
+#, c-format
+msgid "Please enter the IP address of the %s server."
+msgstr ""
+
+# %s is NFS, FTP, HTTP or SMB
+#. TXT_INPUT_NETSERVER
+#, c-format
+msgid "Please enter the IP address of the %s server."
+msgstr ""
+
+# %s is FTP or HTTP
+#. TXT_TRY_REACH_SERVER
+#, c-format
+msgid "Trying to connect to the %s server..."
+msgstr ""
+
+#. TXT_NET
+msgid "Network"
+msgstr ""
+

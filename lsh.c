@@ -17,14 +17,20 @@ static int do_internal(int argc, char **argv);
 static void redirect(char **args);
 static void expand(int max_args, char **args);
 static int internal_cd(int argc, char **argv);
+static int internal_exit(int argc, char **argv);
 
 static int last_exit = 0;
+static int do_exit = 0;
+static int global_argc;
+static char **global_argv;
+
 
 static struct {
   char *name;
   int (*func)(int, char **);
 } internal_cmd[] = {
-  { "cd", internal_cd }
+  { "cd", internal_cd },
+  { "exit", internal_exit }
 };
 
 int lsh_main(int argc, char **argv)
@@ -35,17 +41,25 @@ int lsh_main(int argc, char **argv)
 
   *buf = 0;
 
-  if(isatty(0)) {
+  global_argc = argc - 1;
+  global_argv = argv + 1;
+
+  if(isatty(0) && argc == 1) {
     interactive = 1;
     signal(SIGINT, SIG_IGN);
   }
 
-  if(argc == 2) f = fopen(argv[1], "r");
-
-  if(argc == 3 && !strcmp(argv[1], "-c")) {
+  if(argc > 2 && !strcmp(argv[1], "-c")) {
     f = NULL;
     strncpy(buf, argv[2], sizeof buf);
     buf[sizeof buf - 1] = 0;
+    global_argv += 2;
+    global_argc -= 2;
+  }
+  else {
+    if(argc > 1) f = fopen(argv[1], "r");
+    global_argv++;
+    global_argc--;
   }
 
   if(!f && *buf) {
@@ -147,6 +161,8 @@ char *parse_line(char *buf)
     }
   }
 
+  if(do_exit) return NULL;
+
   return next;
 }
 
@@ -229,7 +245,7 @@ void redirect(char **args)
 
 void expand(int max_args, char **args)
 {
-  int i;
+  int i, j;
   char *s, *t, buf[8];
 
   for(i = 0; i < max_args ; i++) {
@@ -239,6 +255,15 @@ void expand(int max_args, char **args)
       if(!strcmp(s, "?")) {
         sprintf(buf, "%d", last_exit & 255);
         t = buf;
+      }
+      else if(isdigit(*s)) {
+        j = atoi(s) - 1;
+        if(j >= 0 && j < global_argc) {
+          t = global_argv[j];
+        }
+        else {
+          *(t = buf) = 0;
+        }
       }
       else {
         t = getenv(s);
@@ -260,5 +285,13 @@ int internal_cd(int argc, char **argv)
   if(!chdir(argv[1] ? argv[1] : "/")) return 0;
 
   return errno;
+}
+
+int internal_exit(int argc, char **argv)
+{
+  do_exit = 1;
+  if(argv[1]) last_exit = atoi(argv[1]);
+
+  return last_exit;
 }
 

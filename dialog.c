@@ -61,11 +61,7 @@ struct {
   { di_inst_update,  0, "Driver Update CD" },
 
   { di_source_cdrom,  TXT_CDROM,    },
-  { di_source_net,    0, "Network"  },
-  { di_source_nfs,    TXT_NFS,      },
-  { di_source_smb,    TXT_SMB,      },
-  { di_source_ftp,    TXT_FTP,      },
-  { di_source_http,   0, "Network (HTTP)" },
+  { di_source_net,    TXT_NET,      },
   { di_source_hd,     TXT_HARDDISK, },
   { di_source_floppy, TXT_FLOPPY,   },
 
@@ -562,7 +558,7 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     window_t  tmp_win_ri;
     char      tmp_txt_ti [STATUS_SIZE + 1];
 
-    if(auto2_ig) { printf("%s", txt_tv); return; }
+    if(!config.win) { printf("%s", txt_tv); return; }
 
     disp_toggle_output (DISP_OFF);
     strncpy (tmp_txt_ti, txt_tv, STATUS_SIZE);
@@ -620,7 +616,7 @@ void dia_status (window_t *win_prv, int percent_iv)
     int  i_ii;
     static unsigned count = 0;
 
-    if(auto2_ig) {
+    if(!config.win) {
       if(percent_iv >= 100) {
         printf(".");
       }

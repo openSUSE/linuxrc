@@ -343,9 +343,9 @@ int inst_choose_netsource()
 
   config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
 
-  if(!config.net.smb_available) items[1] = di_skip;
+  if(!config.net.smb_available) items[3] = di_skip;
 
-  di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
+  di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
   return di == di_none ? -1 : 0;
 }
@@ -623,7 +623,8 @@ int inst_mount_nfs()
   if((rc = net_config())) return rc;
 
   if(config.win && !auto_ig) {
-    if((rc = net_get_address(txt_get(TXT_INPUT_SERVER), &config.net.server, 1))) return rc;
+    sprintf(text, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(text, &config.net.server, 1))) return rc;
     if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
   }
   util_truncate_dir(config.serverdir);
@@ -653,7 +654,8 @@ int inst_mount_smb()
   if((rc = net_config())) return rc;
 
   if(config.win && !auto_ig) {
-    if((rc = net_get_address(txt_get(TXT_SMB_ENTER_SERVER), &config.net.server, 1))) return rc;
+    sprintf(msg, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(msg, &config.net.server, 1))) return rc;
     if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.serverdir, 30, 0))) return rc;
   }
   util_truncate_dir(config.serverdir);
@@ -1290,10 +1292,12 @@ int inst_do_ftp()
   if((rc = net_config())) return rc;
 
   do {
-    if((rc = net_get_address(txt_get(TXT_INPUT_FTPSERVER), &config.net.server, 1))) return rc;
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
     if((rc = inst_get_ftpsetup())) return rc;
 
-    dia_info(&win, txt_get(TXT_TRY_REACH_FTP));
+    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
+    dia_info(&win, buf);
     rc = net_open(NULL);
     win_close(&win);
 
@@ -1371,16 +1375,19 @@ int inst_do_http()
 {
   int rc;
   window_t win;
+  char buf[256];
 
   set_instmode(inst_http);
 
   if((rc = net_config())) return rc;
 
   do {
-    if((rc = net_get_address(txt_get(TXT_INPUT_FTPSERVER), &config.net.server, 1))) return rc;
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
 //    if((rc = inst_get_ftpsetup())) return rc;
 
-    dia_info(&win, txt_get(TXT_TRY_REACH_FTP));
+    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
+    dia_info(&win, buf);
     rc = net_open(NULL);
     win_close(&win);
 

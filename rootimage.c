@@ -210,7 +210,7 @@ int root_load_rootimage (char *infile_tv)
     int32_t filesize_li;
     int   error_ii = FALSE;
 
-    fprintf (stderr, "Loading Image \"%s\"%s\n", infile_tv, auto2_ig ? "" : "...");
+    fprintf (stderr, "Loading Image \"%s\"%s\n", infile_tv, config.win ? "" : "...");
     mod_free_modules ();
     if (
       config.instmode == inst_floppy ||
@@ -223,7 +223,7 @@ int root_load_rootimage (char *infile_tv)
         else
             root_nr_blocks_im = (int) ((11151L * 1024L) / BLOCKSIZE);
         compressed_ii = TRUE;
-        sprintf (buffer_ti, "%s%s", txt_get (TXT_LOADING), auto2_ig ? "" : "...");
+        sprintf (buffer_ti, "%s%s", txt_get (TXT_LOADING), config.win ? "" : "...");
         }
     else
         {
@@ -239,7 +239,7 @@ int root_load_rootimage (char *infile_tv)
 
         sprintf (buffer_ti, "%s (%d kB)%s", txt_get (TXT_LOADING),
                  (int) ((long) root_nr_blocks_im * BLOCKSIZE / 1024L),
-                 auto2_ig ? "" : "...");
+                 config.win ? "" : "...");
         }
 
     dia_status_on (&root_status_win_rm, buffer_ti);

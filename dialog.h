@@ -42,10 +42,6 @@ typedef enum {
 
   di_source_cdrom,
   di_source_net,
-  di_source_nfs,
-  di_source_smb,
-  di_source_ftp,
-  di_source_http,
   di_source_hd,
   di_source_floppy,
 

@@ -1,3 +1,12 @@
+4/2/2002:	v1.3.11
+	- added new texts
+	- show module disk number
+
+31/1/2002:	v1.3.10
+	- fixed 'cd not found' bug
+	- don't ask for module params for certain modules
+	- fixed some pcmcia issues
+
 30/1/2002:	v1.3.9
 	- http mostly works
 	- updated docs

@@ -78,7 +78,6 @@ static int mod_is_loaded(char *module);
 static int mod_unload_modules(char *modules);
 static char *mod_get_params(module2_t *mod);
 static void mod_load_module_manual(char *module, int show);
-static int mod_pcmcia_ok(void);
 static int mod_load_pcmcia(void);
 static int mod_pcmcia_chipset(void);
 
@@ -244,7 +243,7 @@ void mod_update_list()
   struct dirent *de;
   DIR *d;
   char buf[32];
-  int i;
+  int i, found;
 
   for(ml1 = &config.module.list; *ml1; ml1 = &(*ml1)->next) (*ml1)->exists = 0;
 
@@ -261,15 +260,17 @@ void mod_update_list()
       strcpy(buf, de->d_name);
       buf[i - 2] = 0;
 
-      for(ml = config.module.list; ml; ml = ml->next) {
+      for(found = 0, ml = config.module.list; ml; ml = ml->next) {
+        /* Don't stop if it is an 'autoload' entry! */
         if(!strcmp(ml->name, buf)) {
+          found = 1;
           ml->exists = 1;
-          break;
+          if(ml->type != 0) break;	/* 0: autoload, cf. file_read_modinfo() */
         }
       }
 
       /* unknown module */
-      if(!ml) {
+      if(!found) {
         ml = *ml1 = calloc(1, sizeof **ml1);
         ml->exists = 1;
         ml->type = MAX_MODULE_TYPES - 1;	/* reserved for 'other' */
@@ -505,7 +506,15 @@ int mod_add_disk(int prompt, int type)
 
   if(type < 0) return 0;
 
-  if(prompt && dia_message(txt_get(TXT_ENTER_MODDISK), MSGTYPE_INFO) == -1) return 0;
+  if(prompt) {
+    i = config.module.disk[type];
+    strcpy(buf, txt_get(TXT_MODDISK0));
+    if(i) {
+      sprintf(buf, txt_get(TXT_MODDISK1), i);
+    }
+    strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
+    if(dia_message(buf, MSGTYPE_INFO) == -1) return 0;
+  }
 
   mod_free_modules();
 
@@ -705,11 +714,11 @@ void mod_load_module_manual(char *module, int show)
 
   if(!config.win) show = 0;
 
-  if(show) {
+  if(show && !ml->dontask) {
     s = mod_get_params(ml);
   }
   else {
-    s = ml->param && ml->autoload ? ml->param : "";
+    s = ml->param && (ml->autoload || ml->dontask) ? ml->param : "";
   }
 
   if(show) {
@@ -1355,7 +1364,7 @@ int mod_load_pcmcia()
 
   if(ok) {
     dia_status_on(&status, txt_get(TXT_START_CARDMGR));
-    system("cardmgr -v -m /modules");
+    system("cardmgr -v -m /modules >&2");
     for(i = 0; i <= 100; i++) {
       dia_status(&status, i++);
       usleep(100000);

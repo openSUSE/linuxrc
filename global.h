@@ -147,14 +147,6 @@ typedef enum {
   inst_dvd, inst_cdwithnet, inst_net
 } instmode_t;
 
-#define BOOTMODE_FLOPPY    inst_floppy
-#define BOOTMODE_CD        inst_cdrom
-#define BOOTMODE_NET       inst_nfs
-#define BOOTMODE_HARDDISK  inst_hd
-#define BOOTMODE_FTP       inst_ftp
-#define BOOTMODE_CDWITHNET inst_cdwithnet
-#define BOOTMODE_SMB       inst_smb
-
 
 typedef struct {
   char *text;
@@ -197,6 +189,7 @@ typedef struct module2_s {
   unsigned initrd:1;	/* add it to initrd */
   unsigned autoload:1;	/* can be autoloaded */
   unsigned exists:1;	/* module really exists */
+  unsigned dontask:1;	/* don't ask for module params */
 } module2_t;
 
 
@@ -213,6 +206,8 @@ typedef struct {
   unsigned tmpfs:1;		/* we're using tmpfs for / */
   unsigned run_as_linuxrc:1;	/* set if we really are linuxrc */
   unsigned test:1;		/* we are in test mode */
+  unsigned rescue:1;		/* start rescue system */
+  unsigned live:1;		/* start live cd */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -235,6 +230,7 @@ typedef struct {
     char *dir;				/* modules directory */
     char *type_name[MAX_MODULE_TYPES];	/* module type names */
     char *more_file[MAX_MODULE_TYPES];	/* file name of module archive */
+    int disk[MAX_MODULE_TYPES];		/* number of module disk */
     module2_t *list;			/* list of all modules */
     int scsi_type;		/* for historical reasons... */
     int cdrom_type;		/* dto. */
