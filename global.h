@@ -222,6 +222,8 @@ typedef struct {
   unsigned hwdetect:1;		/* do automatic hardware detection */
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
+  unsigned use_usbscsi:1;	/* use new usb storage handling code */
+  unsigned debug;		/* debug */
   pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */

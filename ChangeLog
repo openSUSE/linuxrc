@@ -1,3 +1,10 @@
+15/1/2003:	v1.4.41
+	- fixed 'usbwait' option handling (had no effect when given
+	  on command line)
+	- 'floppydevice' option now really sets floppy device
+	- added new usb storage handling code; must be explicitly
+	  activated  using the 'useusbscsi' option (#20103, #21017)
+
 4/11/2002:	v1.4.40
 	- sparc64 needs different inst-sys
 

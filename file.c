@@ -195,7 +195,10 @@ static struct {
   { key_scsibeforeusb,  "SCSIBeforeUSB"    },
   { key_hostip,         "HostIP"           },
   { key_linemode,       "Linemode"         },
-  { key_updatedir,      "UpdateDir"        }
+  { key_updatedir,      "UpdateDir"        },
+  { key_usbscsi,        "USBSCSI"          },
+  { key_useusbscsi,     "UseUSBSCSI"       },
+  { key_lxrcdebug,      "LXRCDebug"        }
 };
 
 static struct {
@@ -952,6 +955,10 @@ void file_do_info(file_t *f0)
           &config.floppydev,
           strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
         );
+        config.floppies = 1;
+        config.floppy = 0;
+        sprintf(buf, "/dev/%s", config.floppydev);
+        str_copy(&config.floppy_dev[0], buf);
         break;
 
       case key_cdromdevice:
@@ -1013,6 +1020,18 @@ void file_do_info(file_t *f0)
 
       case key_updatedir:
         if(*f->value) str_copy(&config.updatedir, f->value);
+        break;
+
+      case key_usbscsi:
+        if(f->is.numeric) f->nvalue ? usbscsi_on() : usbscsi_off();
+        break;
+
+      case key_useusbscsi:
+        if(f->is.numeric) config.use_usbscsi = f->nvalue;
+        break;
+
+      case key_lxrcdebug:
+        if(f->is.numeric) config.debug = f->nvalue;
         break;
 
       default:

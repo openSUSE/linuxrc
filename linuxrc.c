@@ -2,7 +2,7 @@
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
+ * Copyright (c) 1996-2003  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
  *
  */
 
@@ -131,6 +131,7 @@ static struct {
   { "wget",        util_wget_main        },
   { "fstype",      util_fstype_main      },
   { "modprobe",    util_modprobe_main    },
+  { "usbscsi",     util_usbscsi_main     },
   { "nothing",     util_nothing_main     }
 };
 #endif
@@ -708,7 +709,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n",
+      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2003 SuSE Linux AG <<<\n",
       config.product
     );
     if (config.linemode)
@@ -758,6 +759,18 @@ void lxrc_init()
 
   ft = file_get_cmdline(key_linemode);
   if(ft && ft->is.numeric) config.linemode = ft->nvalue;
+
+  ft = file_get_cmdline(key_usbwait);
+  if(ft && ft->is.numeric) config.usbwait = ft->nvalue;
+
+  ft = file_get_cmdline(key_scsibeforeusb);
+  if(ft && ft->is.numeric) config.scsi_before_usb = ft->nvalue;
+
+  ft = file_get_cmdline(key_useusbscsi);
+  if(ft && ft->is.numeric) config.use_usbscsi = ft->nvalue;
+
+  ft = file_get_cmdline(key_lxrcdebug);
+  if(ft && ft->is.numeric) config.debug = ft->nvalue;
 
   ft = file_get_cmdline(key_linuxrc);
   str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));

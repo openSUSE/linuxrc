@@ -659,9 +659,14 @@ int auto2_init()
 
   if(!config.test) {
     if(mod_is_loaded("usb-storage")) {
-      for(hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
-        if(hd->hotplug == hp_usb) {
-          config.module.keep_usb_storage = 1;
+      if(config.use_usbscsi) {
+        config.module.keep_usb_storage = 1;
+      }
+      else {
+        for(hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+          if(hd->hotplug == hp_usb) {
+            config.module.keep_usb_storage = 1;
+          }
         }
       }
     }
