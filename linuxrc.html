@@ -1,0 +1,153 @@
+<html>
+<head>
+<title>Linuxrc</title>
+</head>
+
+<body>
+<h1>Linuxc</h1>
+
+Linuxrc is a program used for setting up the kernel for installation
+purposes. It allows the user to load modules, start an installed system, a
+rescue system or an installation via YaST.
+<p>
+Linuxrc is designed to be as small as possible. Therefore, all needed
+programs are linked directly into one binary. So there is no need for shared
+libraries in the initdisk.
+<p>
+NOTE: If you run Linuxrc on an installed system, it will work slightly
+different as it tries not to destroy your installation. :-) As a consequence you
+cannot test all features this way.
+
+<h2>Passing parameters to Linuxrc</h2>
+
+Unless Linuxrc is in manual mode it will look for an 'info' file in these
+locations: first <code>/info</code> on the floppy disk and if that does not
+exsist for <code>/info</code> in the initrd. After that it parses the kernel
+command line for parameters. You may change the 'info' file Linuxrc reads
+using the <code>info</code> command line parameter. If you don't want
+Linuxrc to read the kernel command line (say, because you need to give a
+kernel parameter that accidentally is recognized by Linuxrc, too), use
+<code>linuxrc=nocmdline</code>.
+<p>
+Independend if the above, Linuxrc will always look for and parse a file
+<code>/linuxrc.config</code>. You can use this file to change default
+values, if you need to. But in general, use the <code>info</code> file
+instead. Note that <code>/linuxrc.config</code> is read before any 'info'
+file and even in manual mode.
+
+<h2>'info' file format</h2>
+
+Lines starting with '<code>#</code>' are comments, valid entries are of the form
+<pre>
+  key: value
+</pre>
+Note that <code>value</code> extends to the end of the line and so may contain spaces.
+<code>key</code> is matched case insensitive.
+<p>
+You can use the same key - value pairs on the kernel command line using the syntax
+<pre>
+  key=value
+</pre>
+Lines that don't have the form described above are ignored.
+<p>
+Valid keys are (values given are just examples)
+<ul>
+  <li><code>Language: de_DE</code><br>
+  set the language<br>
+  <li><code>Keytable: de-lat1-nd</code><br>
+  load this keytable<br>
+  <li><code>Display: Color|Mono|Alt</code><br>
+  set the menu color scheme<br>
+  <li><code>Install: nfs://server/install/8.0-i386</code><br>
+  install via NFS from <code>server</code><br>
+  note: you can give username, password etc. in the URL, too<br>
+  <li><code>InstMode: cd|hd|nfs|smb|ftp|http|tftp</code><br>
+  set installation mode<br>
+  <li><code>IP: 10.10.0.2</code><br>
+  the client ip address<br>
+  <li><code>Netmask: 255.255.0.0</code><br>
+  network mask<br>
+  <li><code>Gateway: 10.10.0.1</code><br>
+  gateway<br>
+  <li><code>Server: 10.10.0.1</code><br>
+  installation server address<br>
+  <li><code>Nameserver: 10.10.0.1</code><br>
+  nameserver<br>
+  <li><code>Proxy: 10.10.0.1</code><br>
+  proxy (either ftp or http)<br>
+  <li><code>ProxyPort: 10.10.0.1</code><br>
+  proxy port<br>
+  <li><code>Partition: hda1</code><br>
+  partition with install sources for hard disk install<br>
+  <li><code>Serverdir: /install/8.0-i386</code><br>
+  base directory of the installation sources<br>
+  <li><code>Netdevice: eth0</code><br>
+  network interface to use<br>
+  <li><code>BOOTPWait: 5</code><br>
+  sleep 5 seconds between network activation and starting bootp<br>
+  <li><code>BOOTPTimeout: 10</code><br>
+  10 seconds timeout for BOOTP requests<br>
+  <li><code>DHCPTimeout: 60</code><br>
+  60 seconds timeout for DHCP requests<br>
+  <li><code>TFTPTimeout: 10</code><br>
+  10 seconds timeout for TFTP connection<br>
+  <li><code>ForceRootimage: 0|1</code><br>
+  load the installation system into ramdisk<br>
+  <li><code>Textmode: 0|1</code><br>
+  start YaST in text mode<br>
+  <li><code>Username: name</code><br>
+  set user name (e.g. for FTP install)<br>
+  <li><code>Password: password</code><br>
+  set password (e.g. for FTP install)<br>
+  <li><code>WorkDomain: domain</code><br>
+  set work domain for SMB install<br>
+  <li><code>ForceInsmod: 0|1</code><br>
+  use '<code>-f</code>' option when running <code>insmod</code><br>
+  <li><code>DHCP: 0|1</code><br>
+  start DHCP daemon <strong>now</strong>, but see <code>UseDHCP</code><br>
+  <li><code>UseDHCP: 0|1</code><br>
+  use DHCP instead of BOOTP (DHCP is default)<br>
+  <li><code>MemLimit: 10000</code><br>
+  ask for swap if free memory drops below 10000 kB<br>
+  <li><code>MemYaST: 20000</code><br>
+  run YaST in text mode if free memory is below 20000 kB<br>
+  <li><code>MemYaSTText: 10000</code><br>
+  ask for swap before starting YaST if free memory is below 10000 kB<br>
+  <li><code>MemModules: 20000</code><br>
+  delete all modules before starting YaST if free memory is below 20000 kB<br>
+  <li><code>MemLoadImage: 50000</code><br>
+  load installation system into ramdisk if free memory is above 50000 kB<br>
+  <li><code>Manual: 0|1</code><br>
+  start Linuxrc in manual mode<br>
+  <li><code>NoPCMCIA: 0|1</code><br>
+  don't start card manager<br>
+  <li><code>Domain: zap.de</code><br>
+  set domain name (used for name server lookups)<br>
+  <li><code>RootImage: /suse/images/root</code><br>
+  installation system image<br>
+  <li><code>RescueImage: /suse/images/rescue</code><br>
+  rescue system image<br>
+  <li><code>InstallDir: /suse/inst-sys</code><br>
+  installation system<br>
+  <li><code>Rescue: 1|nfs://server/dir</code><br>
+  load rescue system; the URL variant specifies the location of the rescue image explicitly<br>
+  <li><code>AutoYaST: ftp://autoyastfile</code><br>
+  location of autoinstall file; activates autoinstall mode<br>
+  <li><code>VNC: 0|1</code><br>
+  setup VNC server<br>
+  <li><code>VNCPassword: password</code><br>
+  sets VNC server password<br>
+  <li><code>AddSwap: 0|3|/dev/hda5</code><br>
+  if 0, do never ask for swap; if the argument is a positive number <code>n</code>,
+  activate the <code>n</code>'th swap partition; is the argument is a partition name,
+  activate this swap partition<br>
+  <li><code>Exec: command</code><br>
+  run <code>command</code><br>
+  <li><code>USBWait: 4</code><br>
+  wait 4 seconds after loading USB modules<br>
+  <li><code>Insmod: module params</code><br>
+  load this module<br>
+</ul>
+
+</body>
+</html>

@@ -1,3 +1,8 @@
+25/3/2002:	v1.3.27
+	- removed breton translations
+	- copy "y2update" dir from update disk, too
+	- started new documentation
+
 24/3/2002:	v1.3.26
 	- fixed driver update disk handling
 	- finalized VNC support

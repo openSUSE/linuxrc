@@ -710,13 +710,13 @@ int util_chk_driver_update(char *dir)
   int i;
   struct dirent *de;
   DIR *d;
+  char *copy_dir[] = { "y2update", "install" };		/* "install" _must_ be last! */
 
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
   sprintf(drv_src, "%s/linux/suse/" LX_ARCH "-" LX_REL, dir);
   sprintf(mods_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/modules", dir);
-  sprintf(inst_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/install", dir);
 
   if(stat(drv_src, &st) == -1) return 0;
   if(!S_ISDIR(st.st_mode)) return 0;
@@ -728,26 +728,26 @@ int util_chk_driver_update(char *dir)
 
   mkdir(driver_update_dir, 0755);
 
-  i = mount("shmfs", driver_update_dir, "shm", 0, 0);
+  if(mount("shmfs", driver_update_dir, "shm", 0, 0)) return 0;
 
-  if(i) return 0;
+  for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
+    sprintf(inst_src, "%s/linux/suse/" LX_ARCH "-" LX_REL "/%s", dir, copy_dir[i]);
+    sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
 
-  sprintf(inst_dst, "%s/install", driver_update_dir);
-
-  if(
-    !stat(inst_src, &st) &&
-    S_ISDIR(st.st_mode) &&
-    !mkdir(inst_dst, 0755)
-  ) {
-    fprintf(stderr, "copying install dir\n");
-    d = opendir(inst_src);
-    if(d) {
-      while((de = readdir(d))) {
-        if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
-          do_file_cp(inst_src, inst_dst, de->d_name);
+    if(
+      !stat(inst_src, &st) &&
+      S_ISDIR(st.st_mode) &&
+      !mkdir(inst_dst, 0755)
+    ) {
+      fprintf(stderr, "copying %s dir\n", copy_dir[i]);
+      if((d = opendir(inst_src))) {
+        while((de = readdir(d))) {
+          if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
+            do_file_cp(inst_src, inst_dst, de->d_name);
+          }
         }
+        closedir(d);
       }
-      closedir(d);
     }
   }
 
