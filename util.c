@@ -1295,7 +1295,7 @@ void util_status_info()
   strcpy(buf, "net devices = (");
   for(i = 0, sl = config.net.devices; sl; sl = sl->next) {
     if(!sl->key) continue;
-    j = strcmp(sl->key, netdevice_tg) ? 0 : 1;
+    j = !config.net.device || strcmp(sl->key, config.net.device) ? 0 : 1;
     sprintf(buf + strlen(buf), "%s%s%s", i ? ", " : " ", sl->key, j ? "*" : "");
     if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
     i = 1;
@@ -4154,11 +4154,11 @@ void get_net_unique_id()
   hd_t *hd, *hd_card;
   hd_res_t *res;
 
-  if(!*netdevice_tg) return;
+  if(!config.net.device) return;
 
   hd_data = calloc(1, sizeof *hd_data);
 
-  add_str_list(&hd_data->only, netdevice_tg);
+  add_str_list(&hd_data->only, config.net.device);
 
   hd = hd_list(hd_data, hw_network, 1, NULL);
 

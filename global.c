@@ -24,7 +24,6 @@ colorset_t     *colors_prg;
 char           *kernellog_tg = "/etc/kernellog";
 char           *lastlog_tg = "/etc/lastlog";
 char           *bootmsg_tg = "/var/log/boot.msg";
-char            netdevice_tg [20] = "eth0";
 int             pcmcia_chip_ig = 0;
 int             cpu_ig = 0;
 int             force_ri_ig = FALSE;

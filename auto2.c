@@ -45,8 +45,9 @@ static void auto2_user_netconfig(void);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
+static int hwaddr_cmp(char *str, char *addr);
 static int auto2_net_dev(hd_t **);
-static int auto2_net_dev1(char *device);
+static int auto2_net_dev1(hd_t *hd);
 static int driver_is_active(hd_t *hd);
 static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
@@ -459,10 +460,35 @@ int auto2_net_dev(hd_t **hd0)
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
 
-    if(!auto2_net_dev1(hd->unix_dev_name)) return 0;
+    if(!auto2_net_dev1(hd)) return 0;
   }
 
   return 1;
+}
+
+
+/*
+ * 0: match, 1: no match
+ */
+int hwaddr_cmp(char *str, char *addr)
+{
+  int alen, slen;
+  int wc = 0;
+
+  alen = strlen(addr);
+
+  if(*str == '*') {
+    str++;
+    wc = 1;
+  }
+
+  slen = strlen(str);
+
+  if(slen > alen) return 1;
+
+  if(wc) addr += alen - slen;
+
+  return strcasecmp(addr, str);
 }
 
 
@@ -473,23 +499,56 @@ int auto2_net_dev(hd_t **hd0)
  *   0: ok
  *   1: failed
  */
-int auto2_net_dev1(char *device)
+int auto2_net_dev1(hd_t *hd)
 {
-  int i;
+  int i /*, link */;
   char buf[256];
+  char *device, *hwaddr = NULL;
+  hd_res_t *res;
 
-  if(!device) return 1;
+  if(!hd || !(device = hd->unix_dev_name)) return 1;
 
   if(!strncmp(device, "lo", sizeof "lo" - 1)) return 1;
 
-  if(config.net.device_given && strcmp(device, netdevice_tg)) return 1;
+  for(res = hd->res; res; res = res->next) {
+    if(res->any.type == res_hwaddr) {
+      hwaddr = res->hwaddr.addr;
+      break;
+    }
+  }
+
+  if(
+    config.net.device_given &&
+    strcmp(config.net.device, device) &&
+    hwaddr_cmp(config.net.device, hwaddr)
+  ) return 1;
 
   /* net_stop() - just in case */
   net_stop();
 
   fprintf(stderr, "Trying to activate %s\n", device);
 
-  strcpy(netdevice_tg, device);
+#if 0
+  // not useful - too many false negatives
+
+  link = 1;
+
+  if(!config.net.device_given) {
+    for(res = hd->res; res; res = res->next) {
+      if(res->any.type == res_link) {
+        link = res->link.state;
+        break;
+      }
+    }
+  }
+
+  if(!link) {
+    fprintf(stderr, "no link - skipping %s\n", device);
+    return 1;
+  }
+#endif
+
+  str_copy(&config.net.device, device);
 
   net_setup_localhost();
 
@@ -502,9 +561,9 @@ int auto2_net_dev1(char *device)
     (net_config_mask() || config.insttype == inst_net) &&
     (net_config_mask() & 0x2b) != 0x2b
   ) {
-    printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+    printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device);
     fflush(stdout);
-    fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+    fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device);
     config.net.use_dhcp ? net_dhcp() : net_bootp();
     if(
       !config.serverdir || !*config.serverdir ||

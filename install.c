@@ -903,6 +903,14 @@ int inst_start_install()
       if(!util_mount_ro(buf, config.mountpoint.instsys2)) {
         str_copy(&config.instsys2, config.mountpoint.instsys2);
       }
+      else {
+        config.inst2_ramdisk = load_image(buf, config.instmode);
+        if(config.inst2_ramdisk >= 0) {
+          if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
+            str_copy(&config.instsys2, config.mountpoint.instsys2);
+          }
+        }
+      }
     }
   }
   else {
@@ -1011,7 +1019,7 @@ int add_instsys()
 
   setenv("INSTSYS", config.instsys, 1);
 
-  setenv("TERM", config.term ?: config.serial ? "vt100" : "linux", 1);
+  setenv("TERM", config.term ?: config.serial ? "screen" : "linux", 1);
 
   setenv("ESCDELAY", config.serial ? "1100" : "10", 1);
 

@@ -667,9 +667,10 @@ void file_do_info(file_t *f0)
         break;
 
       case key_netdevice:
-        strncpy(netdevice_tg, f->value, sizeof netdevice_tg);
-        netdevice_tg[sizeof netdevice_tg - 1] = 0;
-        config.net.device_given = 1;
+        if(*f->value) {
+          str_copy(&config.net.device, f->value);
+          config.net.device_given = 1;
+        }
         break;
 
       case key_livesrc:
@@ -1394,7 +1395,7 @@ void file_write_install_inf(char *dir)
   }
 
   file_write_str(f, key_cdrom, config.cdrom);
-  if(config.net.do_setup && *netdevice_tg) {
+  if(config.net.do_setup && config.net.device) {
     for(sl = config.net.devices; sl; sl = sl->next) {
       if(sl->key && sl->value) {
       fprintf(f, "%s: %s %s\n", file_key2str(key_alias), sl->key, sl->value);
@@ -1445,7 +1446,7 @@ void file_write_install_inf(char *dir)
         break;
     }
     file_write_str(f, key_netconfig, s);
-    file_write_str(f, key_netdevice, netdevice_tg);
+    file_write_str(f, key_netdevice, config.net.device);
     if(config.manual < 2) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);

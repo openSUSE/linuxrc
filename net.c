@@ -227,7 +227,7 @@ int net_config()
  * Global vars changed:
  *  config.net.is_configured
  *
- * netdevice_tg:    interface
+ * config.net.device:    interface
  * /proc/net/route: configured interfaces
  */
 void net_stop()
@@ -248,7 +248,7 @@ void net_stop()
   if(!config.net.is_configured) return;
 
   /* build list of configured interfaces */
-  slist_append_str(&sl0, netdevice_tg);
+  slist_append_str(&sl0, config.net.device);
 
   f0 = file_read_file("/proc/net/route", kf_none);
   for((f = f0) && (f = f->next); f; f = f->next) {
@@ -360,7 +360,7 @@ int net_setup_localhost()
  * Does nothing if DHCP is active.
  * Writes nameserver & domain to /etc/resolv.conf.
  *
- * netdevice_tg: interface
+ * config.net.device: interface
  */
 int net_activate_ns()
 {
@@ -386,7 +386,7 @@ int net_activate_ns()
  *
  * Does nothing if DHCP is active.
  *
- * netdevice_tg: interface
+ * config.net.device: interface
  */
 int net_activate()
 {
@@ -405,7 +405,7 @@ int net_activate()
         return (socket_ii);
 
     memset (&interface_ri, 0, sizeof (struct ifreq));
-    strcpy (interface_ri.ifr_name, netdevice_tg);
+    strcpy (interface_ri.ifr_name, config.net.device);
 
     sockaddr_ri.sin_family = AF_INET;
     sockaddr_ri.sin_port = 0;
@@ -448,7 +448,7 @@ int net_activate()
         error_ii = TRUE;
 
     memset (&route_ri, 0, sizeof (struct rtentry));
-    route_ri.rt_dev = netdevice_tg;
+    route_ri.rt_dev = config.net.device;
 
     if (net_is_ptp_im)
         {
@@ -993,7 +993,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
  * Note: expects window mode.
  *
  * Global vars changed:
- *  netdevice_tg
+ *  config.net.device
  *
  * config.net.device_given: do nothing if != 0
  */
@@ -1062,11 +1062,11 @@ int net_choose_device()
   if(choice > 0) {
     s = strchr(items[choice - 1], ' ');
     if(s) *s = 0;
-    strcpy(netdevice_tg, items[choice - 1]);
+    str_copy(&config.net.device, items[choice - 1]);
     net_is_ptp_im=FALSE;
-    if(strstr(netdevice_tg, "plip") == netdevice_tg) net_is_ptp_im=TRUE;
-    if(strstr(netdevice_tg, "iucv") == netdevice_tg) net_is_ptp_im=TRUE;
-    if(strstr(netdevice_tg, "ctc") == netdevice_tg) net_is_ptp_im=TRUE;
+    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im=TRUE;
+    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im=TRUE;
+    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im=TRUE;
   }
 
   for(i = 0; i < item_cnt; i++) free(items[i]);
@@ -1310,7 +1310,7 @@ int net_input_data()
  *  config.serverdir
  * 
  * config.net.bootp_wait: delay between interface setup & bootp request
- * netdevice_tg: interface
+ * config.net.device: interface
  */
 int net_bootp()
 {
@@ -1349,7 +1349,7 @@ int net_bootp()
   if(config.net.bootp_wait) sleep(config.net.bootp_wait);
 
   rc = performBootp(
-    netdevice_tg, "255.255.255.255", "",
+    config.net.device, "255.255.255.255", "",
     config.net.bootp_timeout, 0, NULL, 0, 1, BP_PUT_ENV, 1
   );
 
@@ -1493,9 +1493,9 @@ int net_dhcp()
     sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
   }
 
-  sprintf(cmd + strlen(cmd), " %s", netdevice_tg);
+  sprintf(cmd + strlen(cmd), " %s", config.net.device);
 
-  sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", netdevice_tg);
+  sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", config.net.device);
 
   unlink(file);
 

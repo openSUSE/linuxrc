@@ -424,6 +424,7 @@ typedef struct {
     unsigned is_configured:1;	/* set if network is configured */
     unsigned do_setup;		/* do network setup */
     unsigned setup;		/* bitmask: do these network setup things */
+    char *device;		/* currently used device */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
     int ftp_sock;		/* used internally by ftp code */
@@ -504,7 +505,6 @@ extern colorset_t     *colors_prg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
-extern char            netdevice_tg [20];
 extern int             pcmcia_chip_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
