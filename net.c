@@ -799,7 +799,7 @@ int net_bootp (void)
     data_pci = getenv ("BOOTP_BOOTFILE");
     if (data_pci && strlen (data_pci))
         {
-        fprintf (stderr, "»%s«\n", data_pci);
+        fprintf (stderr, "\"%s\"\n", data_pci);
 
         i_ii = 0;
         memset (tmp_ti, 0, sizeof (tmp_ti));

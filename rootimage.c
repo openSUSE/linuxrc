@@ -146,7 +146,7 @@ int root_load_rootimage (char *infile_tv)
     int   socket_ii = -1;
 
 
-    fprintf (stderr, "Loading Image »%s«%s\n", infile_tv, auto2_ig ? "" : "...");
+    fprintf (stderr, "Loading Image \"%s\"%s\n", infile_tv, auto2_ig ? "" : "...");
     mod_free_modules ();
     if (bootmode_ig == BOOTMODE_FLOPPY || bootmode_ig == BOOTMODE_FTP)
         {

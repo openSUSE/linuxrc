@@ -112,7 +112,7 @@ static text_t txt_brasil_atm [] =
 { TXT_PCMCIA_FAIL,    "Erro ao iniciar o servico de cartões PCMCIA!"          },
 { TXT_PCMCIA_ALREADY, "Os serviços de cartões PCMCIA já estão ativos!"        },
 { TXT_NO_LXRC_END,    "Linuxrc somente pode ser encerrado através do \n\n"            
-                      "ponto de menu » Iniciar instalação / sistema «\n\n"
+                      "ponto de menu \" Iniciar instalação / sistema \"\n\n"
                       "Para possibilitar isto, eventualmente será necessário "
                       "carregar drivers de hardware (módulos)."               },
 { TXT_NO_CTRLC,       "Linuxrc não permite interrupção com <ctrl-c>!"         },

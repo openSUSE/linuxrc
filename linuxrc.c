@@ -659,7 +659,7 @@ static void lxrc_do_shell (int argc, char **argv, char **env)
 
     freopen ("/dev/tty3", "a", stdout);
     freopen ("/dev/tty3", "a", stderr);
-    printf ("Executing: »%s«\n", argv [2]);
+    printf ("Executing: \"%s\"\n", argv [2]);
 
     while (argv [2][i_ii] == ' ')
         i_ii++;
