@@ -1288,6 +1288,7 @@ int net_dhcp()
         break;
 
       default:
+        break;
     }
   }
 

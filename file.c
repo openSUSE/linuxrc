@@ -198,7 +198,12 @@ static struct {
   { key_updatedir,      "UpdateDir"        },
   { key_usbscsi,        "USBSCSI"          },
   { key_useusbscsi,     "UseUSBSCSI"       },
-  { key_lxrcdebug,      "LXRCDebug"        }
+  { key_lxrcdebug,      "LXRCDebug"        },
+  { key_updatename,     "UpdateName"       },
+  { key_updatestyle,    "UpdateStyle"      },
+  { key_updateid,       "UpdateID"         },
+  { key_updateask,      "DriverUpdate"     },
+  { key_updateask,      "DUD"              }
 };
 
 static struct {
@@ -425,6 +430,7 @@ int file_read_info()
   else {
     printf("%s...", txt_get(TXT_SEARCH_INFOFILE));
     fflush(stdout);
+    config.linebreak = 1;
   }
 
   if(!config.info.file || !strcmp(config.info.file, "default")) {
@@ -449,7 +455,10 @@ int file_read_info()
     win_close(&win_ri);
   }
   else {
-    printf("\n");
+    if(config.linebreak) {
+      printf("\n");
+      config.linebreak = 0;
+    }
   }
 
   if(file) {
@@ -465,7 +474,7 @@ int file_read_info()
 char *file_read_info_file(char *file, char *file2)
 {
   char filename[MAX_FILENAME];
-  int i, mounted = 0;
+  int i, mounted = 0, dud = 0;
   file_t *f0 = NULL;
 
 #ifdef DEBUG_FILE
@@ -485,7 +494,8 @@ char *file_read_info_file(char *file, char *file2)
     if(i < config.floppies) {
       config.floppy = i;	// remember currently used floppy
       mounted = 1;
-      util_chk_driver_update(mountpoint_tg);
+      util_chk_driver_update(mountpoint_tg, "floppy");
+      dud = 1;
       sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
       f0 = file_read_file(filename);
       if(!f0 && file2) {
@@ -496,10 +506,11 @@ char *file_read_info_file(char *file, char *file2)
     }
   }
 
-  if(!f0) {
-    if(mounted) umount(mountpoint_tg);
-    return NULL;
-  }
+  if(mounted) umount(mountpoint_tg);
+
+  if(dud) util_do_driver_updates();
+
+  if(!f0) return NULL;
 
 #ifdef DEBUG_FILE
   fprintf(stderr, "info file read from \"%s\":\n", file);
@@ -509,8 +520,6 @@ char *file_read_info_file(char *file, char *file2)
   file_do_info(f0);
 
   file_free_file(f0);
-
-  if(mounted) umount(mountpoint_tg);
 
 //  if(config.info.mod_autoload) mod_autoload();
 
@@ -784,7 +793,7 @@ void file_do_info(file_t *f0)
       case key_expert:
         if(f->is.numeric) {
           if((f->nvalue & 1)) config.textmode = 1;
-          if((f->nvalue & 2)) yast2_update_ig = 1;
+          if((f->nvalue & 2)) config.update.ask = 1;
           if((f->nvalue & 4)) yast2_serial_ig = 1;
         }
         break;
@@ -974,6 +983,7 @@ void file_do_info(file_t *f0)
           &config.floppydev,
           strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
         );
+        config.floppy_probed = 1;
         config.floppies = 1;
         config.floppy = 0;
         sprintf(buf, "/dev/%s", config.floppydev);
@@ -1038,7 +1048,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_updatedir:
-        if(*f->value) str_copy(&config.updatedir, f->value);
+        if(*f->value) str_copy(&config.update.dir, f->value);
         break;
 
       case key_usbscsi:
@@ -1051,6 +1061,21 @@ void file_do_info(file_t *f0)
 
       case key_lxrcdebug:
         if(f->is.numeric) config.debug = f->nvalue;
+        break;
+
+      case key_updatename:
+        if(*f->value) {
+          slist_append_str(&config.update.name_list, f->value);
+          config.update.name_added = 1;
+        }
+        break;
+
+      case key_updatestyle:
+        if(f->is.numeric) config.update.style = f->nvalue;
+        break;
+
+      case key_updateask:
+        if(f->is.numeric) config.update.ask = f->nvalue;
         break;
 
       default:
@@ -1303,8 +1328,8 @@ void file_write_install_inf(char *dir)
   }
 
   file_write_num(f, key_keyboard, has_kbd_ig);
-  file_write_str(f, key_updatedir, config.updatedir);
-  file_write_num(f, key_yast2update, yast2_update_ig || *driver_update_dir ? 1 : 0);
+  file_write_str(f, key_updatedir, config.update.dir);
+  file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
 
   file_write_num(f, key_yast2serial, yast2_serial_ig);
   file_write_num(f, key_textmode, config.textmode);

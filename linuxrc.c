@@ -189,6 +189,8 @@ int main(int argc, char **argv, char **env)
 
   str_copy(&config.product, "SuSE Linux");
 
+  config.update.next_name = &config.update.name_list;
+
   /* maybe we had a segfault recently... */
   if(argc == 4 && !strcmp(argv[1], "segv")) {
     for(i = 0; i < 16 && argv[2][i]; i++) {
@@ -421,7 +423,7 @@ void lxrc_end()
 /*    reboot (RB_ENABLE_CAD); */
     mod_free_modules();
 
-    util_umount_driver_update();
+//    util_umount_driver_update();
     util_umount(mountpoint_tg);
 
     lxrc_set_modprobe("/sbin/modprobe");
@@ -616,8 +618,7 @@ void lxrc_catch_signal(int signum)
 
 void lxrc_init()
 {
-  int i;
-  int j;
+  int i, j;
   file_t *ft;
   char *s, *t0, *t, buf[256];
   url_t *url;
@@ -653,10 +654,12 @@ void lxrc_init()
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
   config.mountpoint.instsys = strdup("/mounts/instsys");
+  config.mountpoint.update = strdup("/mounts/update");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("/sbin/inst_setup yast");
-  config.updatedir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
+  config.update.dir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
+  config.update.dst = strdup("/update");
 
   util_set_product_dir("suse");
 
@@ -911,7 +914,7 @@ void lxrc_init()
     config.module.broken = slist_split(',', ft->value);
   }
 
-  mod_init();
+  mod_init(1);
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 

@@ -73,9 +73,13 @@ static int   inst_do_ftp              (void);
 static int   inst_do_http             (void);
 static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
-static int   inst_update_cd           (void);
+// static int   inst_update_cd           (void);
+static int choose_dud(char **dev);
+static int dud_probe_cdrom(char **dev);
+static int dud_probe_floppy(char **dev);
 static void  inst_swapoff             (void);
 static void get_file(char *src, char *dst);
+static void save_1st_content_file(char *dir, char *loc);
 
 #ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
@@ -221,7 +225,7 @@ int inst_menu()
     di_inst_system,
     di_inst_rescue,
     di_inst_eject,
-    di_inst_update,
+//    di_inst_update,
     di_none
   };
 
@@ -276,10 +280,12 @@ int inst_menu_cb(dia_item_t di)
       error = 1;
       break;
 
+#if 0
     case di_inst_update:
       inst_update_cd();
       error = 1;
       break;
+#endif
 
     default:
       break;
@@ -728,6 +734,10 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
+      save_1st_content_file(config.mountpoint.instdata, get_instmode_name(config.instmode));
+      util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
+      util_do_driver_updates();
+
       sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
       if(config.rescue || force_ri_ig || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
@@ -835,6 +845,9 @@ int inst_start_install()
   get_file("/content", "/content");
   get_file("/media.1/info.txt", "/info.txt");
   get_file("/part.info", "/part.info");
+
+  /* write update.pre script for compatibility, if necessary */
+  util_write_update_pre();
 
   return inst_execute_yast();
 }
@@ -948,8 +961,6 @@ int inst_prepare()
       }
     }
   }
-
-//  if(!config.use_ramdisk) rc = inst_init_cache();
 
   return rc;
 }
@@ -1480,55 +1491,245 @@ int inst_do_tftp()
 }
 
 
+/*
+ * Ask for and apply driver update.
+ *
+ * return values:
+ *  0    : ok
+ *  1    : abort
+ */
 int inst_update_cd()
 {
-  int  i, cdroms = 0;
-  char *mp = "/tmp/drvupdate";
-  hd_data_t *hd_data;
-  hd_t *hd0, *hd;
+  int  i;
+  char *dev;
+  unsigned old_count;
+  slist_t **names;
   window_t win;
 
-  *driver_update_dir = 0;
+  config.update.shown = 1;
 
-  mkdir(mp, 0755);
+  while(choose_dud(&dev));
 
-  dia_message("Please insert the Driver Update CD-ROM", MSGTYPE_INFOENTER);
-  dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
+  if(!dev) return 1;
 
-  hd_data = calloc(1, sizeof *hd_data);
-  hd0 = hd_list(hd_data, hw_cdrom, 1, NULL);
+  /* ok, mount it */
+  i = util_mount_ro(long_dev(dev), config.mountpoint.update);
 
-  for(hd = hd0; hd; hd = hd->next) {
-    if(hd->unix_dev_name) {
-      cdrom_drives++;
-      i = util_mount_ro(hd->unix_dev_name, mp);
-      if(!i) {
-        cdroms++;
-        fprintf(stderr, "Update CD mounted\n");
-        util_chk_driver_update(mp);
-        umount(mp);
-      }
-      else {
-        fprintf(stderr, "Update CD mount failed\n");
-      }
-    }
-    if(*driver_update_dir) break;
+  if(i) {
+    dia_message("Failed to access Driver Update medium.", MSGTYPE_ERROR);
+    return 0;
   }
 
-  hd_free_hd_list(hd0);
-  hd_free_hd_data(hd_data);
-  free(hd_data);
+  old_count = config.update.count;
+
+  /* point at list end */
+  for(names = &config.update.name_list; *names; names = &(*names)->next);
+
+  dia_info(&win, "Reading Driver Update...");
+
+  util_chk_driver_update(config.mountpoint.update, dev);
+
+  util_umount(config.mountpoint.update);
+
+  util_do_driver_updates();
 
   win_close(&win);
 
-  if(!*driver_update_dir) {
-    dia_message(cdroms ? "Driver Update failed" : txt_get(TXT_ERROR_CD_MOUNT), MSGTYPE_ERROR);
+  if(old_count == config.update.count) {
+    dia_message("No new Driver Updates found", MSGTYPE_INFO);
   }
   else {
-    dia_message("Driver Update ok", MSGTYPE_INFO);
+    if(*names) {
+      dia_show_lines2("Driver Updates added", *names, 64);
+    }
+    else {
+      dia_message("Driver Update ok", MSGTYPE_INFO);
+    }
   }
 
   return 0;
+}
+
+
+/*
+ * Let user enter a device for driver updates
+ * (*dev = NULL if she changed her mind).
+ *
+ * return values:
+ *  0    : ok
+ *  other: call choose_dud() again
+ */
+int choose_dud(char **dev)
+{
+  int i, j, item_cnt, last_item, restart = 0, probe;
+  char *s, *s1, *buf = NULL, **items, **values;
+  slist_t *sl;
+
+  *dev = NULL;
+
+  for(i = 4 /* max 4 floppies */, sl = config.cdroms; sl; sl = sl->next) i++;
+
+  /* just max values, actual lists might be shorter */
+  items = calloc(i + 5, sizeof *items);
+  values = calloc(i + 5, sizeof *values);
+
+  item_cnt = 0;
+
+  if(config.floppies && config.floppy_probed) {
+    for(i = 0; i < config.floppies; i++) {
+      s = short_dev(config.floppy_dev[i]);
+      strprintf(&buf, "%s (floppy)", s);
+      values[item_cnt] = strdup(s);
+      items[item_cnt++] = strdup(buf);
+    }
+  }
+  else {
+    values[item_cnt] = strdup(" floppy");
+    items[item_cnt++] = strdup("floppy");
+  }
+
+  if(config.cdroms) {
+    for(sl = config.cdroms; sl; sl = sl->next) {
+      if(sl->key) {
+        strprintf(&buf, "%s (cdrom)", sl->key);
+        values[item_cnt] = strdup(sl->key);
+        items[item_cnt++] = strdup(buf);
+      }
+    }
+  }
+  else {
+    values[item_cnt] = strdup(" cdrom");
+    items[item_cnt++] = strdup("cdrom");
+  }
+
+  last_item = 0;
+
+  if(config.update.dev) {
+    for(i = 0; i < item_cnt; i++) {
+      if(values[i] && !strcmp(values[i], config.update.dev)) {
+        last_item = i + 1;
+        break;
+      }
+    }
+
+    if(!last_item) {
+      values[item_cnt] = strdup(config.update.dev);
+      items[item_cnt++] = strdup(config.update.dev);
+      last_item = item_cnt;
+    }
+  }
+
+  values[item_cnt] = NULL;
+  items[item_cnt++] = strdup("other");
+
+  i = dia_list("Please choose the Driver Update medium.", 30, NULL, items, last_item, align_left);
+  if(i > 0) {
+    s = values[i - 1];
+    if(s) {
+      probe = 0;
+      if(!strcmp(s, " floppy")) {
+        probe = 1;
+      }
+      else if(!strcmp(s, " cdrom")) {
+        probe = 2;
+      }
+
+      if(probe) {
+        j = probe == 1 ? dud_probe_floppy(&s1) : dud_probe_cdrom(&s1);
+        if(j) {
+          str_copy(&config.update.dev, s1);
+          *dev = config.update.dev;
+        }
+        if(j != 1) restart = 1;
+      }
+      else {
+        str_copy(&config.update.dev, values[i - 1]);
+        *dev = config.update.dev;
+      }
+    }
+    else {
+      str_copy(&buf, NULL);
+      i = dia_input2("Please enter the Driver Update device.", &buf, 30, 0);
+      if(!i) {
+        if(util_check_exist(long_dev(buf)) == 'b') {
+          str_copy(&config.update.dev, short_dev(buf));
+          *dev = config.update.dev;
+        }
+        else {
+          dia_message("Invalid device name.", MSGTYPE_ERROR);
+        }
+      }
+    }
+  }
+
+  for(i = 0; i < item_cnt; i++) { free(items[i]); free(values[i]); }
+  free(items);
+  free(values);
+
+  free(buf);
+
+  // fprintf(stderr, "dud dev = %s\n", *dev);
+
+  return restart;
+}
+
+
+/*
+ * Look for cdrom drives. Returns number of devices found (0, 1, many).
+ */
+int dud_probe_cdrom(char **dev)
+{
+  window_t win;
+  int cnt = 0;
+
+  if(dev) *dev = NULL;
+
+  dia_info(&win, "Looking for cdrom drives...");
+
+  util_update_cdrom_list();
+
+  if(!config.cdroms) {
+    load_storage_mods();
+    util_update_cdrom_list();		/* probably not needed */
+  }
+
+  if(!config.cdroms) {
+    win_close(&win);
+    dia_message("No cdrom drives found.", MSGTYPE_ERROR);
+  }
+  else {
+    win_close(&win);
+    if(dev)  *dev = config.cdroms->key;
+    cnt = config.cdroms->next ? 2 : 1;
+  }
+ 
+  return cnt;
+}
+
+
+/*
+ * Look for floppy disks. Returns number of disks found.
+ */
+int dud_probe_floppy(char **dev)
+{
+  window_t win;
+  int cnt = 0;
+
+  if(dev) *dev = NULL;
+
+  dia_info(&win, "Looking for floppy disks...");
+
+  if(!auto2_find_floppy()) {
+    win_close(&win);
+    dia_message("No floppy disk found.", MSGTYPE_ERROR);
+  }
+  else {
+    win_close(&win);
+    if(dev) *dev = short_dev(config.floppy_dev[0]);
+    cnt = config.floppies;
+  }
+
+  return cnt;
 }
 
 
@@ -1598,4 +1799,25 @@ void get_file(char *src, char *dst)
     }
   }
 }
+
+
+/*
+ * get content file from first medium we see
+ */
+void save_1st_content_file(char *dir, char *loc)
+{
+  char *buf = NULL, *argv[3];
+
+  if(dir && loc && !util_check_exist("/tmp/content")) {
+    strprintf(&buf, "%s/content", dir);
+    if(util_check_exist(buf) == 'r') {
+      fprintf(stderr, "1st content file: %s:%s\n", loc, dir);
+      argv[1] = buf;
+      argv[2] = "/tmp";
+      util_cp_main(3, argv);
+    }
+    free(buf);
+  }
+}
+
 

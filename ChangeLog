@@ -1,3 +1,6 @@
+7/7/2003:	v1.4.50
+	- rewrote driver update handling
+
 20/6/2003:	v1.4.49
 	- make dhcptimeout option work (#26974)
 	- change dhcpcd to use linear backoff (#26974)
