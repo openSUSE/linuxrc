@@ -719,7 +719,7 @@ static int inst_prepare (void)
                           "/etc/X11/xserver",
                           "/etc/X11/xkb",
                           "/etc/suse-blinux.conf",
-                          "/etc/rc.d",		/* for braille displays */
+                          "/etc/init.d",		/* for braille displays */
                           "/bin",
                           "/boot",
                           "/root",
