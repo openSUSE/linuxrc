@@ -249,7 +249,7 @@ static int root_check_root (char *root_string_tv)
     sprintf (device_ti, "/dev/%s", tmp_string_pci);
     if (!mount (device_ti, mountpoint_tg, "ext2", MS_MGC_VAL | MS_RDONLY, 0))
         compare_file_pci = "/etc/passwd";
-    if (!mount (device_ti, mountpoint_tg, "reiserfs", MS_MGC_VAL | MS_RDONLY, 0))
+    else if (!mount (device_ti, mountpoint_tg, "reiserfs", MS_MGC_VAL | MS_RDONLY, 0))
         compare_file_pci = "/etc/passwd";
     else if (!mount (device_ti, mountpoint_tg, "msdos", MS_MGC_VAL | MS_RDONLY, 0))
         compare_file_pci = "/linux/etc/passwd";

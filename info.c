@@ -67,7 +67,7 @@ void info_menu (void)
 #endif
 
 #ifdef USE_LIBHD
-    strncpy (items_ari [nr_items_ii++].text, "Hardware Autoprobing", width_ii);
+    strncpy (items_ari [nr_items_ii++].text, "Hardware Info", width_ii);
 #endif
     strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_INFO_KERNEL), width_ii);
     strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_DRIVES), width_ii);
@@ -420,7 +420,7 @@ static int info_show_cb (int what_iv)
         {
 #ifdef USE_LIBHD
         auto2_scan_hardware(info_hwfile2_tm);
-        dia_show_file("Hardware Autoprobing Results", info_hwfile2_tm, TRUE);
+        dia_show_file("Hardware Info", info_hwfile2_tm, TRUE);
 #endif
         }
     else if (what_iv == 2)
