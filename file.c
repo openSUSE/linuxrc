@@ -205,6 +205,7 @@ static struct {
   { key_ro,             "ro",             kf_boot                        },
   { key_rw,             "rw",             kf_boot                        },
   { key_netid,          "NetUniqueID",    kf_none                        },
+  { key_nethwaddr,      "NetHWAddr",      kf_none                        },
   { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
   { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },
@@ -1309,6 +1310,7 @@ void file_write_install_inf(char *dir)
 #ifdef USE_LIBHD
   file_write_num(f, key_haspcmcia, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
 #endif
+  file_write_num(f, key_nopcmcia, config.nopcmcia);
 
   file_write_str(f, key_console, config.serial);
 
@@ -1340,6 +1342,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_netdevice, netdevice_tg);
     if(config.manual < 2 && !config.net.unique_id) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
+    file_write_str(f, key_nethwaddr, config.net.hwaddr);
     file_write_inet(f, key_ip, &config.net.hostname);
     if(config.net.realhostname) {
       file_write_str(f, key_hostname, config.net.realhostname);

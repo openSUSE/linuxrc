@@ -4164,10 +4164,12 @@ void get_net_unique_id()
 {
   hd_data_t *hd_data;
   hd_t *hd;
+  hd_res_t *res;
   driver_info_t *di;
   str_list_t *sl1;
   slist_t *sl;
   char *id = NULL;
+  char *hwaddr;
 
   if(!*netdevice_tg) return;
 
@@ -4182,11 +4184,17 @@ void get_net_unique_id()
   hd_data = calloc(1, sizeof *hd_data);
 
   for(hd = hd_list(hd_data, hw_network_ctrl, 1, NULL); hd && !id; hd = hd->next) {
+    for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+      if(res->any.type == res_hwaddr) {
+        hwaddr = res->hwaddr.addr;
+      }
+    }
     for(di = hd->driver_info; di && !id; di = di->next) {
       if(di->module.type == di_module) {
         for(sl1 = di->module.names; sl1; sl1 = sl1->next) {
           if(sl1->str && !strcmp(sl1->str, sl->value)) {
             str_copy(&config.net.unique_id, id = hd->unique_id);
+            str_copy(&config.net.hwaddr, hwaddr);
             break;
           }
         }

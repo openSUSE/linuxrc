@@ -1,3 +1,6 @@
+15/3/2004:	v1.6.9
+	- write 'NoPCMCIA' & 'NetHWAddr' entries
+
 9/3/2004:	v1.6.8
 	- mount /dev/pts
 	- support SLP
