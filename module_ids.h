@@ -133,6 +133,7 @@ enum modid_t
     ID_VIA_RHINE,
     ID_SK98X,
     ID_ACENIC,
+    ID_HAMACHI,
     ID_CS89X0,
     ID_DM9102,
     ID_ES3210,

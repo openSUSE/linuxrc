@@ -127,6 +127,7 @@ static module_t mod_net_mod_arm [] =
 { ID_SK55XX,     "SysKonnect FDDI (SK-55xx/SK-58xx)",  "skfp",       0, __LINE__
  },
 { ID_YELLOWFIN,  "Packet Engines Yellowfin Gigabit",   "yellowfin",  0, __LINE__ },
+{ ID_HAMACHI,    "Packet Engines GNIC-II (Hamachi)",   "hamachi",    0, __LINE__ },
 { ID_3C501,      "3Com 3c501",                         "3c501",      "io=0x280", __LINE__ },
 { ID_3C503,      "3Com 3c503",                         "3c503",      "io=0x280", __LINE__ },
 { ID_3C505,      "3Com 3c505",                         "3c505",      "io=0x300", __LINE__ },
