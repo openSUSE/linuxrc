@@ -353,7 +353,10 @@ int auto2_activate_devices(unsigned base_class, int last_idx)
             if(di->module.mod_args)
               auto2_loaded_module_args = strdup(di->module.mod_args);
 
-            mpar_save_modparams(auto2_loaded_module, auto2_loaded_module_args);
+            if(base_class == bc_storage) {
+              fprintf(stderr, "added %s to initrd\n", di->module.name);
+              mpar_save_modparams(auto2_loaded_module, auto2_loaded_module_args);
+            }
 
             fprintf(stderr, "Ok, that seems to have worked. :-)\n");
             break;

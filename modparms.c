@@ -107,20 +107,19 @@ void mpar_delete_modparams (char *module_tv)
 
 void mpar_write_modparms (FILE *file_prv)
     {
-    int  i_ii;
-
+    int  i_ii, mod_idx = usb_mods_ig ? 1 : 0;
 
     if (mpar_modnames_atm [0] || usb_mods_ig)
         {
-        fprintf (file_prv, "INITRD_MODULES=\"%s%s%s",
-            usb_mods_ig ? usb_mods_ig : "",
-            *mpar_modnames_atm [0] || usb_mods_ig ? " " : "",
-            mpar_modnames_atm [0] ? mpar_modnames_atm [0] : "");
+        fprintf (file_prv, "INITRD_MODULES=\"%s", usb_mods_ig ? usb_mods_ig : "");
 
-        for (i_ii = 1; i_ii < NR_MODPARAMS; i_ii++)
+        for (i_ii = 0; i_ii < NR_MODPARAMS; i_ii++)
+            {
             if (mpar_modnames_atm [i_ii] &&
                 mod_get_mod_type (mpar_modnames_atm [i_ii]) == MOD_TYPE_SCSI)
-                fprintf (file_prv, " %s", mpar_modnames_atm [i_ii]);
+                fprintf (file_prv, "%s%s", mod_idx ? " " : "", mpar_modnames_atm [i_ii]);
+                mod_idx++;
+            }
 
         fprintf (file_prv, "\"\n");
         }
