@@ -647,7 +647,7 @@ static int execute(char *msg, char *cmd)
     char line[256];
 
     syslog(LOG_INFO, "executing: '%s'", cmd);
-    strcat(cmd, " 2>&1");
+    strcat(cmd, " >&2");
     f = popen(cmd, "r");
     while (fgets(line, 255, f)) {
 	line[strlen(line)-1] = '\0';
@@ -1462,7 +1462,7 @@ int cardmgr_main(int argc, char *argv[])
     close(0); close(1); close(2);
     if (!delay_fork && !one_pass)
 	fork_now();
-    openlog("cardmgr", LOG_PID|LOG_CONS, LOG_DAEMON);
+    openlog("cardmgr", LOG_PID|LOG_PERROR, LOG_DAEMON);
     syslog(LOG_INFO, "starting, version is " CS_PKG_RELEASE);
 
     /* If we've gotten this far, then clean up pid and stab at exit */

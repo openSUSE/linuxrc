@@ -1,3 +1,6 @@
+7/3/2003:	v1.4.44
+	- don't log to console (#24753)
+
 3/3/2003:	v1.4.43
 	- updated slovak & czech translations
 	- fixed some gcc warnings
