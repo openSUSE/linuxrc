@@ -483,10 +483,8 @@ int util_check_break (void)
 int util_try_mount (const char *device_pcv,             char *dir_pcv,
                     unsigned long flags_lv, const void *data_prv)
     {
-    static  char *fs_types_ats [] = { "minix",   "ext2",  "reiserfs", "vfat",
-                                      "iso9660", "msdos", "hpfs",  0 };
-            int   i_ii;
-            int   rc_ii;
+    int   i_ii;
+    int   rc_ii;
 
 
     if (!device_pcv || !device_pcv [0])
@@ -494,9 +492,9 @@ int util_try_mount (const char *device_pcv,             char *dir_pcv,
 
     i_ii = 0;
     do
-        rc_ii = mount (device_pcv, dir_pcv, fs_types_ats [i_ii++],
+        rc_ii = mount (device_pcv, dir_pcv, fs_types_atg [i_ii++],
                        flags_lv, data_prv);
-    while (rc_ii && fs_types_ats [i_ii]);
+    while (rc_ii && fs_types_atg [i_ii]);
 
     return (rc_ii);
     }

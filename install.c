@@ -514,7 +514,6 @@ static int inst_mount_nfs (void)
 static int inst_mount_harddisk (void)
     {
             int   rc_ii;
-    static  char *fs_types_ati [] = { "vfat", "msdos", "reiserfs", "hpfs", "ext2", 0 };
             int   i_ii;
             char *mountpoint_pci;
 
@@ -540,15 +539,15 @@ static int inst_mount_harddisk (void)
 
         i_ii = 0;
         do
-            rc_ii = mount (harddisk_tg, mountpoint_pci, fs_types_ati [i_ii++],
+            rc_ii = mount (harddisk_tg, mountpoint_pci, fs_types_atg [i_ii++],
                            MS_MGC_VAL | MS_RDONLY, 0);
-        while (rc_ii && fs_types_ati [i_ii]);
+        while (rc_ii && fs_types_atg [i_ii]);
 
         if (rc_ii)
             dia_message (txt_get (TXT_ERROR_HD_MOUNT), MSGTYPE_ERROR);
         else
             {
-            fstype_tg = fs_types_ati [i_ii - 1];
+            fstype_tg = fs_types_atg [i_ii - 1];
             rc_ii = dia_input (txt_get (TXT_ENTER_HD_DIR), server_dir_tg,
                                sizeof (server_dir_tg) - 1, 30);
             if (rc_ii)

@@ -105,3 +105,5 @@ char            driver_update_dir[16] = "";
 int             cdrom_drives = 0;
 int             ask_for_moddisk = TRUE;
 int             splash_active = FALSE;
+char           *fs_types_atg [] = { "minix", "ext2",    "reiserfs", "xfs",
+                                    "vfat",  "iso9660", "msdos", "hpfs",  0 };

@@ -246,3 +246,4 @@ extern char            driver_update_dir[16];
 extern int             cdrom_drives;
 extern int             ask_for_moddisk;
 extern int             splash_active;
+extern char           *fs_types_atg [];

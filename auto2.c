@@ -137,15 +137,14 @@ int auto2_mount_cdrom(char *device)
 int auto2_mount_harddisk(char *device)
 {
     int rc;
-    static char *fs_types_ati [] = { "vfat", "msdos", "reiserfs", "hpfs", "ext2", 0 };
     int i_ii = 0;
     
     bootmode_ig = BOOTMODE_HARDDISK;
 
     do
-        rc = mount(device, mountpoint_tg, fs_types_ati[i_ii++],
+        rc = mount(device, mountpoint_tg, fs_types_atg[i_ii++],
                    MS_MGC_VAL | MS_RDONLY, 0);
-    while( rc && fs_types_ati[i_ii] );
+    while( rc && fs_types_atg[i_ii] );
     
     if(!rc) {
         if( (rc = inst_check_instsys()) ) {
