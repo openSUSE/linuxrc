@@ -1708,9 +1708,11 @@ int net_check_ccw_address(char* addr)
      if(addr[i] != '.') goto error;
     }
     else
-     if(addr[i] < 'a' || addr[i] > 'f') goto error;
+     if((addr[i] < 'a' || addr[i] > 'f') && (addr[i] < '0' || addr[i] > '9')) goto error;
   }
+
   return 0;
+
 error:
   if(!config.win) util_disp_init();
   dia_message(txt_get(TXT_INVALID_CCW_ADDRESS), MSGTYPE_ERROR);
