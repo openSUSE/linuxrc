@@ -9,6 +9,7 @@ LEX	= flex -8
 CFLAGS	= -O1 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 WARN	= -Wstrict-prototypes -Wall
+LIBHDFL	= -DUSE_LIBHD
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
@@ -16,8 +17,6 @@ OBJ	= $(SRC:.c=.o)
 
 SUBDIRS	= insmod loadkeys pcmcia portmap
 LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a
-
-# USE_MINI_GLIBC      = no
 
 ifeq ($(ARCH),alpha)
     USE_MINI_GLIBC	= no
@@ -50,7 +49,6 @@ ifeq ($(ARCH),ia64)
 endif
 
 ifneq ($(USE_MINI_GLIBC),no)
-#    CC		+= -V2.7.2.3			# doesn't work with newer gcc/egcs
     CFLAGS	+= -I$(TOPDIR)/libc/include
     LDFLAGS	+= -u__force_mini_libc_symbols
     SUBDIRS	+= libc
@@ -58,48 +56,33 @@ ifneq ($(USE_MINI_GLIBC),no)
 endif
 
 .EXPORT_ALL_VARIABLES:
-.PHONY:	all clean default install libs
+.PHONY:	all clean install libs
 
 %.o:	%.c
-	$(CC) $(CFLAGS) $(WARN) -o $@ $<
+	$(CC) $(CFLAGS) $(LIBHDFL) $(WARN) -o $@ $<
 
-default: libs linuxrc
+all: libs linuxrc
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-3 VERSION`\"" >$@
 	@echo "#define LXRC_FULL_VERSION \"`cat VERSION`\"" >>$@
 
 linuxrc: $(OBJ) $(LIBS)
-	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd -o $@
+	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd_tiny -o $@
 	@strip -R .note -R .comment $@
-ifdef EXTRA_FLAGS
-	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd_tiny -o $@_mini
-	@strip -R .note -R .comment $@_mini
-	@ls -l linuxrc{,_mini}
-else
 	@ls -l linuxrc
-endif
-
-all: libs linuxrc
-	@rm $(OBJ)
-	@mv linuxrc linuxrc_tiny
-	@make EXTRA_FLAGS=-DUSE_LIBHD linuxrc
-	@ls -l linuxrc{,_mini,_tiny}
 
 install: linuxrc
 	@install linuxrc /usr/sbin
-	-@install linuxrc_mini /usr/sbin
-	-@install linuxrc_tiny /usr/sbin
 
 libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done
 
 clean: libs
-	rm -f $(OBJ) *~ linuxrc linuxrc_mini linuxrc_tiny linuxrc.map .depend
+	rm -f $(OBJ) *~ linuxrc linuxrc.map .depend
 
 ifneq ($(MAKECMDGOALS),clean)
 .depend: $(SRC) $(INC)
 	@$(CC) -MM $(CFLAGS) $(SRC) >$@
 -include .depend
 endif
-
