@@ -755,7 +755,9 @@ static int inst_prepare (void)
     system ("/usr/sbin/syslogd");
 
 #ifdef USE_LIBHD   
+#ifdef __i386__
     auto2_find_braille();
+#endif
 #endif
 
     file_write_yast_info (NULL);
