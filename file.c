@@ -947,6 +947,7 @@ module2_t *file_read_modinfo(char *name)
 
   if(!config.module.type_name[0]) {
     config.module.type_name[0] = strdup("");
+    config.module.type_name[1] = strdup("autoload");
     config.module.type_name[MAX_MODULE_TYPES - 1] = strdup("other");
   }
 

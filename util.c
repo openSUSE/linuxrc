@@ -1155,7 +1155,7 @@ int do_cp(char *src, char *dst)
             perror(src2);
             break;
           }
-          fd2 = open(dst2, O_WRONLY | O_CREAT | O_TRUNC);
+          fd2 = open(dst2, O_WRONLY | O_CREAT | O_TRUNC, 0644);
           if(fd2 < 0) {
             err = 6;
             perror(dst2);
@@ -1438,18 +1438,24 @@ int util_nothing_main(int argc, char **argv)
 
 int util_cp_main(int argc, char **argv)
 {
-  int err = 0, rec = 0;
+  int err = 0, rec = 0, preserve = 0;
   char *src, *dst, *s;
   char dst2[0x100];
   int i, j, fd1, fd2;
   unsigned char buf[0x1000];
   struct stat sbuf;
+  struct utimbuf ubuf;
 
   argv++; argc--;
 
   if(argc >= 1 && !strcmp(*argv, "-a")) {
     argv++; argc--;
     rec = 1;
+  }
+
+  if(argc >= 1 && !strcmp(*argv, "-p")) {
+    argv++; argc--;
+    preserve = 1;
   }
 
   if(argc != 2) return 1;
@@ -1476,7 +1482,7 @@ int util_cp_main(int argc, char **argv)
       perror(src);
     }
     else {
-      fd2 = open(dst, O_WRONLY | O_CREAT | O_TRUNC);
+      fd2 = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0644);
       if(fd2 < 0) {
         err = 2;
         perror(dst);
@@ -1507,8 +1513,13 @@ int util_cp_main(int argc, char **argv)
     if(!err) {
       i = stat(src, &sbuf);
       if(!i) {
-        chown(dst, sbuf.st_uid, sbuf.st_gid);
         chmod(dst, sbuf.st_mode);
+        if(preserve) {
+          chown(dst, sbuf.st_uid, sbuf.st_gid);
+          ubuf.actime = sbuf.st_atime;
+          ubuf.modtime = sbuf.st_mtime;
+          utime(dst, &ubuf);
+        }
       }
     }
   }

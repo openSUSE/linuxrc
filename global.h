@@ -214,7 +214,12 @@ typedef struct {
     int pcmcia_type;		/* dto. */
     slist_t *input_params;	/* history for module loading dialog */
     slist_t *used_params;	/* parameters that were used for insmod */
+    unsigned ramdisk:1;		/* ramdisk currently mounted to dir */
   } module;
+  struct {			/* mountpoints */
+    char *floppy;
+    char *ramdisk2;
+  } mountpoint;
 } config_t;
 
 config_t config;

@@ -501,6 +501,11 @@ void lxrc_init()
 
   umask(022);
 
+  /* make it configurable? */
+  config.module.dir = strdup("/modules");
+  config.mountpoint.floppy = strdup("/mounts/floppy");
+  config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
+
   /* just a default for manual mode */
   config.floppies = 1;
   config.floppy_dev[0] = strdup("/dev/fd0");
@@ -667,9 +672,6 @@ void lxrc_init()
   }
 
   lxrc_memcheck();
-
-  /* make it configurable? */
-  config.module.dir = strdup("/modules");
 
   mod_init();
 

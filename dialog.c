@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -1043,8 +1044,9 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
 void dia_handle_ctrlc (void)
     {
     int i, j;
-    static int  is_in_ctrlc_is = FALSE;
+    static int is_in_ctrlc_is = FALSE;
     static char s[100] = { };
+    char *t;
 
     if (is_in_ctrlc_is)
         return;
@@ -1059,7 +1061,16 @@ void dia_handle_ctrlc (void)
     else if(i == -69) {
       i = dia_input("run command", s, sizeof s - 1, 35);
       if(!i) {
-        j = system(s);
+        if(strstr(s, "exec ") == s) {
+          t = s + 5;
+          while(isspace(*t)) t++;
+          kbd_end();	/* restore terminal settings */
+          j = execlp(t, t, NULL);
+          kbd_init();
+        }
+        else {
+          j = system(s);
+        }
         if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
       }
     }

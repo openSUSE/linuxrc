@@ -14,6 +14,7 @@
 #include <sys/mount.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <ctype.h>
 
@@ -46,7 +47,7 @@
 #define MENU_WIDTH          55
 
 
-static int       mod_ram_modules_im = FALSE;
+// static int       mod_ram_modules_im = FALSE;
 static module_t  mod_current_arm [NR_MODULES];
 static int       mod_show_kernel_im = FALSE;
 int       mod_force_moddisk_im = FALSE;
@@ -68,24 +69,105 @@ static int       mod_getmoddisk       (int mod_type);
 
 #define DEBUG_MODULE
 
+#define MODULE_CONFIG "module.config"
 
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};
 static int mod_menu_last = 0;
 
-
+static int mod_copy_modules(char *src_dir, int doit);
 static module2_t *mod_get_entry(char *name);
 static void mod_update_list(void);
 static char *mod_get_title(int type);
 static int mod_show_type(int type);
 static int mod_build_list(int type, char ***list, module2_t ***mod_list);
-static void mod_load_manually(int type);
+static int mod_load_manually(int type);
+static int mod_add_disk(int type);
 static int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align);
 static int mod_is_loaded(char *module);
 static int mod_unload_modules(char *modules);
 static int mod_load_modules(char *modules, int show);
 static char *mod_get_params(module2_t *mod);
 static void mod_load_module_manual(char *module, int show);
+
+
+int mod_copy_modules(char *src_dir, int doit)
+{
+  struct dirent *de;
+  DIR *d;
+  char buf[256];
+  int i, i1, i2, cnt = 0, ok;
+  window_t win;
+  static int files = 0;
+  struct stat sbuf1, sbuf2;
+
+  if(doit == 2 && !files) return 0;
+  if(!(d = opendir(src_dir))) return 0;
+
+  if(doit == 2) {
+    dia_status_on(&win, "Copying modules...");
+  }
+  else {
+    files = 0;
+  }
+
+  while((de = readdir(d))) {
+    i = strlen(de->d_name);
+    if(
+      i >= 3 &&
+      (
+        (de->d_name[i - 2] == '.' && de->d_name[i - 1] == 'o') ||
+        !strcmp(de->d_name, MODULE_CONFIG)
+      )
+    ) {
+      ok = 0;
+      if(doit == 2) {
+        /*
+         * Copy only modules that are 'new': different size & date. This is
+         * not perfect but will do in this case.
+         */
+        sprintf(buf, "%s/%s", src_dir, de->d_name);
+        i1 = stat(buf, &sbuf1);
+        sprintf(buf, "%s/%s", config.module.dir, de->d_name);
+        i2 = stat(buf, &sbuf2);
+        if(!i1 && !i2) {
+          if(sbuf1.st_size == sbuf2.st_size && sbuf1.st_mtime == sbuf2.st_mtime) ok = 1;
+        }
+      }
+      if(!ok) {
+        if(doit) {
+          sprintf(buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
+          fprintf(stderr, "%s\n", buf);
+          system(buf);
+          if(doit == 2) dia_status(&win, (cnt++ * 100) / files);
+        }
+        else {
+          files++;
+        }
+      }
+    }
+  }
+
+  closedir(d);
+
+  if(doit == 2) {
+    if(cnt) usleep(200000);
+    win_close(&win);
+  }
+
+  return cnt;
+}
+
+
+
+void mod_free_modules()
+{
+  if(config.module.ramdisk) {
+    umount(config.module.dir);
+    util_free_ramdisk(RAMDISK_2);
+    config.module.ramdisk = 0;
+  }
+}
 
 
 /*
@@ -98,11 +180,11 @@ void mod_init()
 
   setenv("MODPATH", config.module.dir, 1);
 
-  sprintf(tmp, "%s/module.config", config.module.dir);
+  sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
 
   for(ml = config.module.list; ml; ml = ml->next) {
-    if(ml->type == 0 && ml->autoload) {
+    if(ml->type == 1 /* 'autoload' section */ && ml->autoload) {
       mod_load_module(ml->name, ml->param);
     }
   }
@@ -262,29 +344,35 @@ void mod_menu(void)
 {
   char *items[MAX_MODULE_TYPES + 3];
   int i;
+  int again;
 
   net_stop();
 
-  mod_update_list();
+  do {
+    mod_update_list();
 
-  for(mod_types = 0, i = 1; i < MAX_MODULE_TYPES; i++) {
-    if(mod_show_type(i)) {
-      mod_type[mod_types] = i;
-      items[mod_types++] = mod_get_title(i);
+    for(mod_types = 0, i = 2; i < MAX_MODULE_TYPES; i++) {
+      if(mod_show_type(i)) {
+        mod_type[mod_types] = i;
+        items[mod_types++] = mod_get_title(i);
+      }
     }
+
+    i = mod_types;
+
+    items[i++] = txt_get(TXT_SHOW_MODULES);
+    items[i++] = txt_get(TXT_DEL_MODULES);
+#if 0
+    items[i++] = txt_get(TXT_AUTO_LOAD);
+#endif
+
+    items[i] = NULL;
+
+    again = dia_list(txt_get(TXT_MENU_MODULES), 40, mod_menu_cb, items, mod_menu_last, align_center);
+
+    for(i = 0; i < mod_types; i++) free(items[i]);
   }
-
-  i = mod_types;
-
-  items[i++] = txt_get(TXT_SHOW_MODULES);
-  items[i++] = txt_get(TXT_DEL_MODULES);
-  items[i++] = txt_get(TXT_AUTO_LOAD);
-
-  items[i] = NULL;
-
-  dia_list(txt_get(TXT_MENU_MODULES), 40, mod_menu_cb, items, mod_menu_last, align_center);
-
-  for(i = 0; i < mod_types; i++) free(items[i]);
+  while(again);
 }
 
 
@@ -299,97 +387,43 @@ int mod_menu_cb (int item)
   mod_menu_last = item--;
 
   if(item < mod_types) {
-    mod_load_manually(mod_type[item]);
-  }
-  else {
-    switch(item - mod_types) {
-      case 0:
-        mod_show_modules();
-        break;
-
-      case 1:
-        mod_delete_module();
-        break;
-
-      case 2:
-        mod_autoload();
-        break;
-    }
+    return mod_load_manually(mod_type[item]) ? 0 : 1;
   }
 
-#if 0
-    switch (what_iv)
-        {
-        case 1:
-            if (!warned_is && info_scsi_exists ())
-                {
-                sprintf (text_ti, txt_get (TXT_ALREADY_FOUND),
-                                  txt_get (TXT_SCSI_ADAPTER));
-                strcat (text_ti, txt_get (TXT_ANOTHER_MOD));
-                rc_ii = dia_yesno (text_ti, 1);
-                warned_is = TRUE;
-                }
-            else
-                rc_ii = YES;
+  switch(item - mod_types) {
+    case 0:
+      mod_show_modules();
+      break;
 
-            if (rc_ii == YES)
-                {
-                mod_show_kernel_im = TRUE;
-                rc_ii = mod_load_by_user (MOD_TYPE_SCSI);
-                if (rc_ii && !scsi_tg [0])
-                    {
-                    strcpy (scsi_tg, mod_current_arm [rc_ii - 1].module_name);
-                    strcpy (cdrom_tg, "sr0");
-                    }
-                mod_show_kernel_im = FALSE;
-                }
-            break;
-        case 2:
-            if (!warned_is && (info_scsi_cd_exists () || info_eide_cd_exists ()))
-                {
-                sprintf (text_ti, txt_get (TXT_ALREADY_FOUND),
-                                  txt_get (TXT_CDROM));
-                strcat (text_ti, txt_get (TXT_ANOTHER_MOD));
-                rc_ii = dia_yesno (text_ti, 1);
-                warned_is = TRUE;
-                }
-            else
-                rc_ii = YES;
+    case 1:
+      mod_delete_module();
+      break;
 
-            if (rc_ii == YES)
-                {
-                rc_ii = mod_load_by_user (MOD_TYPE_OTHER);
-                if (rc_ii && !mod_is_ppcd (mod_current_arm [rc_ii - 1].module_name))
-                    strcpy (cdrom_tg, mod_current_arm [rc_ii - 1].module_name);
-                }
-            break;
-        case 3:
-            rc_ii = mod_load_by_user (MOD_TYPE_NET);
-            if (rc_ii && !net_tg [0])
-                strcpy (net_tg, mod_current_arm [rc_ii - 1].module_name);
-            break;
-
-        case 4:
-            if (!mod_getmoddisk (MOD_TYPE_OTHER))
-                (void) pcmcia_load_core ();
-            break;
-#endif
-
+    case 2:
+      mod_autoload();
+      break;
+  }
 
   return 1;
 }
 
 
-void mod_load_manually(int type)
+int mod_load_manually(int type)
 {
   int i, ok;
   char *s;
   char **items;
   module2_t **mod_items;
+  int added = 0;
 
   i = mod_build_list(type, &items, &mod_items);
 
-  if(i) {
+  if(i == 1 && !*mod_items) {
+    /* list has just a 'more modules' line */
+    mod_add_disk(type);
+    added = 1;
+  }
+  else if(i) {
     s = mod_get_title(type);
     i = dia_list(s, MENU_WIDTH, NULL, items, 1, align_left);
 
@@ -405,112 +439,100 @@ void mod_load_manually(int type)
         }
       }
       else {
-        // more modules...
-
-
+        mod_add_disk(type);
+        added = 1;
       }
     }
 
     free(s);
   }
+
+  return added;
 }
 
 
-#if 0
-int mod_load_by_user (int mod_type_iv)
-    {
-    int     nr_modules_ii;
-    char   *header_ti;
-    item_t  items_ari [NR_MODULES];
-    int     i_ii;
-    int     rc_ii;
-    int     width_ii = MENU_WIDTH;
-    int     choice_ii;
-    int     more_ii;
-    int     ready_ii = FALSE;
+int mod_add_disk(int type)
+{
+  char buf[256];
+  int i, err = 0, added = 0;
+  int got_image = 0;
 
-    rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
+  if(dia_message(txt_get(TXT_ENTER_MODDISK), MSGTYPE_INFO) == -1) return -1;
 
-    switch (mod_type_iv)
-        {
-        case MOD_TYPE_SCSI:
-        default:
-            header_ti = txt_get (TXT_LOAD_SCSI);
-            if (rc_ii || !nr_modules_ii)
-            {
-                  if (mod_getmoddisk (MOD_TYPE_SCSI)) return 0;
-            }
-            break;
-        case MOD_TYPE_OTHER:
-            if (mod_getmoddisk (MOD_TYPE_OTHER))
-                return (0);
-            header_ti = txt_get (TXT_LOAD_CDROM);
-            break;
-        case MOD_TYPE_NET:
-            header_ti = txt_get (TXT_LOAD_NET);
-            if (rc_ii || !nr_modules_ii)
-            {
-                  if (mod_getmoddisk (MOD_TYPE_NET)) return 0;
-            }
-            break;
-        }
+  mod_free_modules();
 
-    mod_force_moddisk_im = FALSE;
+  for(i = 0; i < config.floppies; i++) {
+    if(!util_try_mount(config.floppy_dev[i], config.mountpoint.floppy, MS_MGC_VAL | MS_RDONLY, 0)) break;
+  }
 
-    do
-        {
-        rc_ii = mod_get_ram_modules (mod_type_iv);
-
-        if (rc_ii)
-            return (0);
-
-        rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
-        if (rc_ii || !nr_modules_ii)
-            return (0);
-
-        for (i_ii = 0; i_ii < nr_modules_ii; i_ii++)
-            {
-            items_ari [i_ii].text = malloc (width_ii);
-            sprintf (items_ari [i_ii].text, "%14s : %s",
-                     mod_current_arm [i_ii].module_name,
-                     mod_current_arm [i_ii].description);
-            util_fill_string (items_ari [i_ii].text, width_ii);
-            items_ari [i_ii].func = mod_choose_cb;
-            }
-
-        if (more_ii)
-            {
-            items_ari [nr_modules_ii].text = malloc (width_ii);
-            items_ari [nr_modules_ii].func = 0;
-            strcpy (items_ari [nr_modules_ii].text, txt_get (TXT_MORE_MODULES));
-            util_fill_string (items_ari [nr_modules_ii++].text, width_ii);
-            }
-
-        choice_ii = dia_menu (header_ti, items_ari, nr_modules_ii, 1);
-        
-        util_free_items (items_ari, nr_modules_ii);
-
-        if (choice_ii == nr_modules_ii && more_ii)
-            {
-            if (dia_message (txt_get (mod_type_iv == MOD_TYPE_NET ? TXT_ENTER_MODDISK2 : TXT_ENTER_MODDISK), MSGTYPE_INFO) == -1)
-                {
-                ready_ii = TRUE;
-                choice_ii = 0;
-                }
-            else
-                {
-                mod_force_moddisk_im = TRUE;
-                mod_free_modules ();
-                }
-            }
-        else
-            ready_ii = TRUE;
-        }
-    while (!ready_ii);
-
-    return (choice_ii);
+  if(i < config.floppies) {
+    config.floppy = i;	// remember currently used floppy
+  }
+  else {
+    err = 1;
+    /* Try /dev/fd0 anyway, in case the user has inserted a floppy _now_. */
+    if(!config.floppies) {
+      err = util_try_mount("/dev/fd0", config.mountpoint.floppy, MS_MGC_VAL | MS_RDONLY, 0);
     }
-#endif
+    if(err) {
+      dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+      return err;
+    }
+  }
+
+  *buf = 0;
+  if(config.module.more_file[type] && *config.module.more_file[type]) {
+    sprintf(buf, "%s/%s", config.mountpoint.floppy, config.module.more_file[type]);
+    if(util_check_exist(buf)) {
+      err = root_load_rootimage(buf);
+      if(!err) got_image = 1;
+    }
+  }
+
+  if(*buf && !err && got_image) {
+    err = util_try_mount(
+      RAMDISK_2,
+      config.tmpfs ? config.mountpoint.ramdisk2 : config.module.dir,
+      MS_MGC_VAL | MS_RDONLY,
+      0
+    );
+
+    if(err) {
+      dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+    }
+    else {
+      if(config.tmpfs) {
+        mod_copy_modules(config.mountpoint.ramdisk2, 1);
+        umount(config.mountpoint.ramdisk2);
+        util_free_ramdisk(RAMDISK_2);
+      }
+      else {
+        config.module.ramdisk = 1;
+      }
+      mod_init();
+    }
+  }
+
+  if(config.tmpfs) {
+    mod_copy_modules(config.mountpoint.floppy, 0);
+    added = mod_copy_modules(config.mountpoint.floppy, 2);
+    mod_init();
+  }
+
+  umount(config.mountpoint.floppy);
+
+  if(!err) {
+    if(!got_image && !added) {
+      dia_message("No new modules found.", MSGTYPE_INFO);
+    }
+    else {
+      /* not needed, we're falling back to mod_menu() anyway */
+      /* mod_update_list(); */
+    }
+  }
+
+  return err;
+}
 
 
 void mod_unload_module(char *module)
@@ -680,7 +702,7 @@ void mod_load_module_manual(char *module, int show)
 int mod_load_module(char *module, char *param)
 {
   char cmd[300];
-  int rc;
+  int err;
   char *force = config.forceinsmod ? "-f " : "";
   slist_t *sl;
 
@@ -691,6 +713,8 @@ int mod_load_module(char *module, char *param)
   }
 #endif
 
+  if(mod_is_loaded(module)) return 0;
+
   sprintf(cmd, "insmod %s%s ", force, module);
 
   if(param && *param) strcat(cmd, param);
@@ -699,9 +723,9 @@ int mod_load_module(char *module, char *param)
 
   if(mod_show_kernel_im) kbd_switch_tty(4);
 
-  rc = system(cmd);
+  err = system(cmd);
 
-  if(!rc && param) {
+  if(!err && param) {
     sl = slist_add(&config.module.used_params, slist_new());
     sl->key = strdup(module);
     sl->value = strdup(param);
@@ -717,7 +741,7 @@ int mod_load_module(char *module, char *param)
   }
 #endif
 
-  return rc;
+  return err;
 }
 
 
@@ -824,124 +848,6 @@ void mod_delete_module()
 }
 
 
-
-
-
-
-
-
-
-
-
-
-void mod_free_modules (void)
-    {
-    if (mod_ram_modules_im)
-        {
-        umount (config.module.dir);
-        util_free_ramdisk ("/dev/ram2");
-        mod_ram_modules_im = FALSE;
-        }
-    }
-
-
-#if 0
-int mod_load_by_user (int mod_type_iv)
-    {
-    int     nr_modules_ii;
-    char   *header_ti;
-    item_t  items_ari [NR_MODULES];
-    int     i_ii;
-    int     rc_ii;
-    int     width_ii = MENU_WIDTH;
-    int     choice_ii;
-    int     more_ii;
-    int     ready_ii = FALSE;
-
-    rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
-
-    switch (mod_type_iv)
-        {
-        case MOD_TYPE_SCSI:
-        default:
-            header_ti = txt_get (TXT_LOAD_SCSI);
-            if (rc_ii || !nr_modules_ii)
-            {
-                  if (mod_getmoddisk (MOD_TYPE_SCSI)) return 0;
-            }
-            break;
-        case MOD_TYPE_OTHER:
-            if (mod_getmoddisk (MOD_TYPE_OTHER))
-                return (0);
-            header_ti = txt_get (TXT_LOAD_CDROM);
-            break;
-        case MOD_TYPE_NET:
-            header_ti = txt_get (TXT_LOAD_NET);
-            if (rc_ii || !nr_modules_ii)
-            {
-                  if (mod_getmoddisk (MOD_TYPE_NET)) return 0;
-            }
-            break;
-        }
-
-    mod_force_moddisk_im = FALSE;
-
-    do
-        {
-        rc_ii = mod_get_ram_modules (mod_type_iv);
-
-        if (rc_ii)
-            return (0);
-
-        rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
-        if (rc_ii || !nr_modules_ii)
-            return (0);
-
-        for (i_ii = 0; i_ii < nr_modules_ii; i_ii++)
-            {
-            items_ari [i_ii].text = malloc (width_ii);
-            sprintf (items_ari [i_ii].text, "%14s : %s",
-                     mod_current_arm [i_ii].module_name,
-                     mod_current_arm [i_ii].description);
-            util_fill_string (items_ari [i_ii].text, width_ii);
-            items_ari [i_ii].func = mod_choose_cb;
-            }
-
-        if (more_ii)
-            {
-            items_ari [nr_modules_ii].text = malloc (width_ii);
-            items_ari [nr_modules_ii].func = 0;
-            strcpy (items_ari [nr_modules_ii].text, txt_get (TXT_MORE_MODULES));
-            util_fill_string (items_ari [nr_modules_ii++].text, width_ii);
-            }
-
-        choice_ii = dia_menu (header_ti, items_ari, nr_modules_ii, 1);
-        
-        util_free_items (items_ari, nr_modules_ii);
-
-        if (choice_ii == nr_modules_ii && more_ii)
-            {
-            if (dia_message (txt_get (mod_type_iv == MOD_TYPE_NET ? TXT_ENTER_MODDISK2 : TXT_ENTER_MODDISK), MSGTYPE_INFO) == -1)
-                {
-                ready_ii = TRUE;
-                choice_ii = 0;
-                }
-            else
-                {
-                mod_force_moddisk_im = TRUE;
-                mod_free_modules ();
-                }
-            }
-        else
-            ready_ii = TRUE;
-        }
-    while (!ready_ii);
-
-    return (choice_ii);
-    }
-#endif
-
-
 int mod_get_ram_modules (int type_iv)
     {
     char      testfile_ti [MAX_FILENAME];
@@ -1001,7 +907,7 @@ int mod_get_ram_modules (int type_iv)
             if (rc_ii)
                 dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
 
-            mod_ram_modules_im = TRUE;
+//            mod_ram_modules_im = TRUE;
             mod_force_moddisk_im = FALSE;
             }
         }
