@@ -7,7 +7,7 @@ CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
 CFLAGS	= -O2 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
-LDFLAGS	= -static -Wl,-Map=linuxrc.map
+LDFLAGS	= -static -Wl,-Map=linuxrc.map -lhd
 WARN	= -Wstrict-prototypes -Wall
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
@@ -46,7 +46,7 @@ endif
 
 all: libs linuxrc
 
-install: all
+install: linuxrc
 	@install linuxrc /usr/sbin
 
 linuxrc: $(OBJ) $(LIBS)
