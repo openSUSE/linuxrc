@@ -15,7 +15,7 @@ dep:	$(SRC) $(INC)
 	$(CC) -M $(CFLAGS) $(SRC) > .depend
 
 clean:
-	rm -f $(TARGET) *.o yacc_config.c lex_config.c
+	rm -f $(TARGET) *.o *~ y.tab.h yacc_config.c lex_config.c
 
 %.o:	%.c
 	$(CC) $(CFLAGS) $(WARN) -o $@ $<
