@@ -377,8 +377,8 @@ slp_get_install()
     return 1;
   descs[urlcnt] = 0;
   win_old = config.win;
-  if(!config.win) util_disp_init();
   if(config.language) set_activate_language(config.language);
+  if(!config.win) util_disp_init();
   i = dia_list("Choose an installation source", 60, NULL, descs, 0, align_center);
   if(config.win && !win_old) util_disp_done();
   *urlbuf = 0;

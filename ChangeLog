@@ -1,3 +1,7 @@
+6/4/2004:	v1.6.17
+	- fixed driver update (didn't load modules)
+	- set language a bit earlier (#37467)
+
 5/4/2004:	v1.6.16
 	- scsi rename code enabled
 

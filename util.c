@@ -802,8 +802,8 @@ void add_driver_update(char *dir, char *loc)
       if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
         while((de = readdir(d))) {
           if(
-            (len = strlen(de->d_name)) > 2 &&
-            !strcmp(de->d_name + len - 2, ".o")
+            (len = strlen(de->d_name)) > sizeof MODULE_SUFFIX - 1 &&
+            !strcmp(de->d_name + len - (sizeof MODULE_SUFFIX - 1), MODULE_SUFFIX)
           ) {
             fprintf(f, "%s\n", de->d_name);
           }
