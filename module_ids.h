@@ -126,6 +126,7 @@ enum modid_t
     ID_NI6510,
     ID_RTL8139,
     ID_8139TOO,
+    ID_8139CP,
     ID_EPIC100,
     ID_TLAN,
     ID_3C515,

@@ -115,6 +115,7 @@ static module_t mod_net_mod_arm [] =
 { ID_3C509,      "3Com 3c509/3c579",                   "3c509",      0, __LINE__ },
 { ID_RTL8139,    "RealTek RTL8129/8139",               "rtl8139",    0, __LINE__ },
 { ID_8139TOO,    "RealTek RTL8139",                    "8139too",    0, __LINE__ },
+{ ID_8139CP,     "RealTek RTL8139 C+",                 "8139cp",     0, __LINE__ },
 { ID_STARFIRE,   "Adaptec Starfire",                   "starfire",   0, __LINE__ },
 { ID_NE2000,     "NE 2000 / NE 1000 (ISA)",            "ne",         "io=0x300", __LINE__ },
 { ID_NE2K_PCI,   "NE 2000 (PCI)",                      "ne2k-pci",   0, __LINE__ },
