@@ -1396,7 +1396,7 @@ void util_status_info()
 
   lang = current_language();
 
-  sprintf(buf, "language = %s (%s), keymap = %s", lang->yastcode, lang->locale, config.keymap ?: "");
+  sprintf(buf, "language = %s, keymap = %s", lang->locale, config.keymap ?: "");
   slist_append_str(&sl0, buf);
 
   sprintf(buf,

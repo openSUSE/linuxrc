@@ -61,90 +61,104 @@ static language_t set_languages_arm [] =
 {
 #ifdef TRANS_ar
 // currently a fake
-{ lang_ar, "Arabic", "us", L1_FONT, UNI_FONT, 0, 0, "ar", "arabic" },
+{ lang_ar, "Arabic", "us", L1_FONT, UNI_FONT, 0, 0, "ar" },
+#endif
+
+#ifdef TRANS_bg
+{ lang_bg, "Български", "us", L2_FONT, UNI_FONT, 0, 0, "bg_BG" },
+#endif
+
+#ifdef TRANS_bn
+// currently a fake
+{ lang_bn, "Bengali", "us", L1_FONT, UNI_FONT, 0, 0, "bn_BD" },
 #endif
 
 #ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR", "breton" },
+{ lang_br, "Brezhoneg", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR" },
 #endif
 
 #ifdef TRANS_bs
-{ lang_bs, "Bosnia", "us", L2_FONT, UNI_FONT, 1, 1, "bs_BA", "bosnia" },
+{ lang_bs, "Bosnia", "us", L2_FONT, UNI_FONT, 1, 1, "bs_BA" },
 #endif
 
 #ifdef TRANS_cs
-{ lang_cs, "Cestina", "cz-us-qwertz", L2_FONT, UNI_FONT, 1, 1, "cs_CZ", "czech" },
+{ lang_cs, "Čeština", "cz-us-qwertz", L2_FONT, UNI_FONT, 1, 1, "cs_CZ" },
 #endif
 
 #ifdef TRANS_de
-{ lang_de, "Deutsch", "de-lat1-nd", L1_FONT, UNI_FONT, 0, 0, "de_DE", "german" },
+{ lang_de, "Deutsch", "de-lat1-nd", L1_FONT, UNI_FONT, 0, 0, "de_DE" },
 #endif
 
 #ifdef TRANS_en
-{ lang_en, "English", "us", L1_FONT, UNI_FONT, 0, 0, "en_US", "english" },
+{ lang_en, "English", "us", L1_FONT, UNI_FONT, 0, 0, "en_US" },
 #endif
 
 #ifdef TRANS_es
-{ lang_es, "Español", "es", L1_FONT, UNI_FONT, 0, 1, "es_ES", "spanish" },
+{ lang_es, "Español", "es", L1_FONT, UNI_FONT, 0, 1, "es_ES" },
 #endif
 
 #ifdef TRANS_fr
-{ lang_fr, "Français", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR", "french" },
+{ lang_fr, "Français", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR" },
 #endif
 
 #ifdef TRANS_el
-{ lang_el, "Hellenic", "gr", L7_FONT, L7_FONT, 1, 1, "el_EL", "greek" },
+{ lang_el, "Ελληνικά", "gr", L7_FONT, L7_FONT, 1, 1, "el_GR" },
 #endif
 
 #ifdef TRANS_id
-{ lang_id, "Indonesia", "us", L1_FONT, UNI_FONT, 0, 1, "de_DE", "indonesian" },
+{ lang_id, "Indonesia", "us", L1_FONT, UNI_FONT, 0, 1, "de_DE" },
 #endif
 
 #ifdef TRANS_it
-{ lang_it, "Italiano", "it", L1_FONT, UNI_FONT, 0, 0, "it_IT", "italian" },
+{ lang_it, "Italiano", "it", L1_FONT, UNI_FONT, 0, 0, "it_IT" },
 #endif
 
 #ifdef TRANS_ja
 // currently a fake
-{ lang_ja, "Japanese", "jp106", L1_FONT, UNI_FONT, 0, 0, "ja_JP", "japanese" },
+{ lang_ja, "Japanese", "jp106", L1_FONT, UNI_FONT, 0, 0, "ja_JP" },
 #endif
 
 #ifdef TRANS_hu
-{ lang_hu, "Magyar", "hu", L2_FONT, UNI_FONT, 1, 1, "hu_HU", "hungarian" },
+{ lang_hu, "Magyar", "hu", L2_FONT, UNI_FONT, 1, 1, "hu_HU" },
 #endif
 
 #ifdef TRANS_nl
-{ lang_nl, "Nederlands", "us", L1_FONT, UNI_FONT, 0, 1, "nl_NL", "dutch" },
+{ lang_nl, "Nederlands", "us", L1_FONT, UNI_FONT, 0, 1, "nl_NL" },
 #endif
 
 #ifdef TRANS_pl
-{ lang_pl, "Polski", "Pl02", L2_FONT, UNI_FONT, 1, 1, "pl_PL", "polish" },
+{ lang_pl, "Polski", "Pl02", L2_FONT, UNI_FONT, 1, 1, "pl_PL" },
 #endif
 
 #ifdef TRANS_pt
-{ lang_pt, "Português", "pt-latin1", L1_FONT, UNI_FONT, 0, 1, "pt_PT", "portuguese" },
+{ lang_pt, "Português", "pt-latin1", L1_FONT, UNI_FONT, 0, 1, "pt_PT" },
 #endif
 
 #ifdef TRANS_pt_BR
-{ lang_pt_BR, "Português Brasileiro", "br-abnt2", L1_FONT, UNI_FONT, 0, 1, "pt_BR", "brazilian" },
+{ lang_pt_BR, "Português Brasileiro", "br-abnt2", L1_FONT, UNI_FONT, 0, 1, "pt_BR" },
 #endif
 
 #ifdef TRANS_ro
-{ lang_ro, "Romania", "us", L2_FONT, UNI_FONT, 1, 1, "en_US", "romanian" },
+{ lang_ro, "Romanian", "us", L2_FONT, UNI_FONT, 1, 1, "ro_RO" },
 #endif
 
 #ifdef TRANS_ru
-{ lang_ru, "Russian", "ru1", CYR_FONT, UNI_FONT, 1, 1, "ru_RU", "russian" },
+{ lang_ru, "Русский", "ru1", CYR_FONT, UNI_FONT, 1, 1, "ru_RU" },
 #endif
 
 #ifdef TRANS_sk
-{ lang_sk, "Slovencina", "sk-qwerty", L2_FONT, UNI_FONT, 1, 1, "sk_SK", "slovak" },
+{ lang_sk, "Slovenčina", "sk-qwerty", L2_FONT, UNI_FONT, 1, 1, "sk_SK" },
 #endif
+
+#ifdef TRANS_sv
+{ lang_sv, "Svenska", "sv-latin1", L1_FONT, UNI_FONT, 0, 1, "sv_SE" },
+#endif
+
 };
 #endif
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
-#define KEYMAP_DEFAULT	1
+#define KEYMAP_DEFAULT	"us"
 static keymap_t set_keymaps_arm [] =
 {
 { "Ceske",                "cz-us-qwertz" },
@@ -165,12 +179,12 @@ static keymap_t set_keymaps_arm [] =
 { "Português",            "pt-latin1"    },
 { "Russian",              "ru1"          },
 { "Slovak",               "sk-qwerty"    },
-{ "Suomi/Svensk",         "fi"           }
+{ "Svensk",               "sv-latin1"    }
 };
 #endif
 
 #if defined(__sparc__)
-#define KEYMAP_DEFAULT 3
+#define KEYMAP_DEFAULT "us"
 static keymap_t set_keymaps_arm [] =
 {
 { "Ceske (PS/2)",                "cz-us-qwertz"    },
@@ -208,7 +222,7 @@ static keymap_t set_keymaps_arm [] =
 #define NR_KEYMAPS (sizeof(set_keymaps_arm)/sizeof(set_keymaps_arm[0]))
 
 #if defined(__PPC__)
-#define KEYMAP_DEFAULT	1
+#define KEYMAP_DEFAULT	"mac-us"
 static keymap_t set_keymaps_arm_mac [] =
 {
 { "Dansk",                "mac-dk-latin1"            },
@@ -255,12 +269,6 @@ static char *keymap_encoding(char *map);
 enum langid_t set_langidbyname(char *name)
 {
   int i, l;
-
-  for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
-    if(!strcasecmp(set_languages_arm[i].yastcode, name)) {
-      return set_languages_arm[i].id;
-    }
-  }
 
   for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
     if(!strcasecmp(set_languages_arm[i].locale, name)) {
@@ -373,11 +381,21 @@ void set_choose_keytable(int always_show)
   cur_lang = set_get_current_language();
   def_keymap = config.keymap ?: set_languages_arm[cur_lang - 1].keymap;
 
-  def_keymap_idx = KEYMAP_DEFAULT;
+  def_keymap_idx = 0;
+
   for(i = 0; i < keymaps; i++) {
     if(!strcmp(keymap[i].mapname, def_keymap)) {
       def_keymap_idx = i;
       break;
+    }
+  }
+
+  if(i == keymaps) {
+    for(i = 0; i < keymaps; i++) {
+      if(!strcmp(keymap[i].mapname, KEYMAP_DEFAULT)) {
+        def_keymap_idx = i;
+        break;
+      }
     }
   }
 
@@ -592,8 +610,6 @@ void set_write_info(FILE *f)
   char magic[3] = "( ";
 
   lang = set_languages_arm + set_get_current_language() - 1;
-
-//  file_write_str(f, key_language, lang->yastcode);
 
   if(lang->write_info) {
     file_write_str(f, key_font, lang->font1);

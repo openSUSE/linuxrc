@@ -1,0 +1,1199 @@
+# translation of linuxrc.po to Swedish
+# LANGUAGE translations for linuxrc.
+# Copyright (C) 2001 SuSE GmbH.
+# Mattias Newzella <newzella@linux.nu>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2004-09-03 19:38+0200\n"
+"Last-Translator: Mattias Newzella <newzella@linux.nu>\n"
+"Language-Team: Swedish <sv@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9\n"
+
+#. TXT_OK
+msgid "OK"
+msgstr "OK"
+
+#. TXT_CANCEL
+msgid "Back"
+msgstr "Tillbaka"
+
+#. TXT_YES
+msgid "Yes"
+msgstr "Ja"
+
+#. TXT_NO
+msgid "No"
+msgstr "Nej"
+
+#. TXT_CHOOSE_LANGUAGE
+msgid "Select the language."
+msgstr "Välj språket."
+
+#. TXT_COLOR_DISPLAY
+msgid "Color display"
+msgstr "Färgskärm"
+
+#. TXT_MONO_DISPLAY
+msgid "Monochrome display"
+msgstr "Svartvit skärm"
+
+#. TXT_CHOOSE_DISPLAY
+msgid "Select the display type."
+msgstr "Välj skärmtyp."
+
+#. TXT_MENU_LANG
+msgid "Language"
+msgstr "Språk"
+
+#. TXT_MENU_MODULES
+msgid "Kernel Modules (Hardware Drivers)"
+msgstr "Kärnmoduler (hårdvarudrivrutiner)"
+
+#. TXT_MENU_START
+msgid "Start Installation or System"
+msgstr "Starta installation eller system"
+
+#. TXT_MENU_INFO
+msgid "System Information"
+msgstr "Systeminformation"
+
+#. TXT_HDR_MAIN
+msgid "Main Menu"
+msgstr "Huvudmeny"
+
+#. TXT_SETTINGS
+msgid "Settings"
+msgstr "Inställningar"
+
+#. TXT_MENU_DISPLAY
+msgid "Display"
+msgstr "Skärm"
+
+#. TXT_MENU_KEYMAP
+msgid "Keymap"
+msgstr "Tangentkarta"
+
+#. TXT_LOAD_NET
+msgid "Load Network Card Modules"
+msgstr "Ladda moduler för nätverkskort"
+
+#. TXT_SHOW_MODULES
+msgid "Show Loaded Modules"
+msgstr "Visa laddade moduler"
+
+#. TXT_AUTO_LOAD
+msgid "Load Modules Automatically"
+msgstr "Ladda moduler automatiskt"
+
+#. TXT_DEL_MODULES
+msgid "Unload Modules"
+msgstr "Ladda ur moduler"
+
+#. TXT_TRY_TO_LOAD
+#, c-format
+msgid ""
+"Trying to load module \"%s\"...\n\n"
+"During loading, you may want to watch the kernel "
+"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
+"to switch back to this menu."
+msgstr ""
+"Försöker ladda modul \"%s\"...\n\n"
+"Vid laddningen kanske du vill titta på meddelanden "
+"från kärnan på den virtuella konsollen 4 (ALT+F4). Använd ALT+F1 "
+"för att växla tillbaka till den här menyn."
+
+#. TXT_LOAD_SUCCESSFUL
+#, c-format
+msgid "Module \"%s\" loaded successfully."
+msgstr "Modulen \"%s\" laddades."
+
+#. TXT_LOAD_FAILED
+#, c-format
+msgid "Failed to load module \"%s\"."
+msgstr "Misslyckades med att ladda modulen \"%s\"."
+
+#. TXT_CDROM
+msgid "CD-ROM"
+msgstr "Cd-rom"
+
+#. TXT_FLOPPY
+msgid "Floppy"
+msgstr "Diskett"
+
+#. TXT_HARDDISK
+msgid "Hard Disk"
+msgstr "Hårddisk"
+
+#. TXT_START_INSTALL
+msgid "Start Installation or Update"
+msgstr "Starta installation eller uppdatering"
+
+#. TXT_START_RESCUE
+msgid "Start Rescue System"
+msgstr "Starta räddningssystem"
+
+#. TXT_LOAD_RS_NFS
+msgid "Load Rescue System via NFS"
+msgstr "Ladda räddningssystem via NFS"
+
+#. TXT_BOOT_SYSTEM
+msgid "Boot Installed System"
+msgstr "Starta installerat system"
+
+#. TXT_SEARCH_FOR_RI
+#, c-format
+msgid "Searching for image \"%s\"..."
+msgstr "Söker efter avbild \"%s\"..."
+
+#. TXT_RI_NOT_FOUND
+msgid ""
+"Cannot find the image.\n\n"
+"Check the directory specification."
+msgstr ""
+"Kan inte hitta avbilden.\n\n"
+"Kontrollera katalogspecificeringen."
+
+#. TXT_LOADING
+msgid "Loading data into RAM disk..."
+msgstr "Laddar data till ramdisk..."
+
+#. TXT_INFO_KERNEL
+msgid "Kernel Messages"
+msgstr "Kärnmeddelanden"
+
+#. TXT_INFO_CPU
+msgid "Processor"
+msgstr "Processor"
+
+#. TXT_INFO_DEVICES
+msgid "Devices"
+msgstr "Enheter"
+
+#. TXT_INFO_NETDEV
+msgid "Network Cards"
+msgstr "Nätverkskort"
+
+#. TXT_INFO_DMA
+msgid "DMA"
+msgstr "DMA"
+
+#. TXT_INFO_IRQS
+msgid "Interrupts"
+msgstr "Avbrott"
+
+#. TXT_INFO_IOPORTS
+msgid "I/O Ports"
+msgstr "I/O-portar"
+
+#. TXT_INFO_MEM
+msgid "Memory"
+msgstr "Minne"
+
+#. TXT_INFO_MODULES
+msgid "Modules"
+msgstr "Moduler"
+
+#. TXT_INFO_PCI
+msgid "PCI"
+msgstr "PCI"
+
+#. TXT_INSERT_DISK
+msgid "Insert the disk and press ENTER."
+msgstr "Sätt i disketten och tryck på Enter."
+
+#. TXT_ERROR_READ_DISK
+msgid "Error reading from floppy disk."
+msgstr "Fel vid läsning från diskett."
+
+#. TXT_ENTER_ROOT_FS
+msgid "Enter your root partition (e.g., /dev/sda3)"
+msgstr "Ange rotpartition (t ex /dev/sda3)"
+
+#. TXT_INVALID_ROOT_FS
+msgid "Invalid root device."
+msgstr "Ogiltig rotenhet."
+
+#. TXT_INVALID_INPUT
+msgid "Invalid input."
+msgstr "Ogiltig indata."
+
+#. TXT_INPUT_IPADDR
+msgid "Enter your IP address."
+msgstr "Ange IP-adress."
+
+#. TXT_INPUT_NETMASK
+msgid ""
+"Enter your netmask. For a normal class C "
+"network, this is usually 255.255.255.0."
+msgstr ""
+"Ange nätmask. För vanliga C-klassnätverk "
+"är detta vanligtvis 255.255.255.0."
+
+#. TXT_INPUT_GATEWAY
+msgid ""
+"If you need a gateway to reach the server, "
+"enter the IP address of the gateway. If you do not "
+"need a gateway, enter your own IP address."
+msgstr ""
+"Om du behöver en gateway för att nå servern, ange "
+"dess IP-adress. Om du inte behöver en "
+"gateway, ange din egna IP-adress."
+
+#. TXT_INPUT_NAMED
+msgid ""
+"Enter the IP address of your name server. If "
+"you do not use a name server, press ESC."
+msgstr ""
+"Ange din namnservers IP-adress. Om du "
+"inte använder en namnserver, tryck på Esc."
+
+#. TXT_FOUND_HOST
+#, c-format
+msgid ""
+"The following data has been retrieved:\n\n"
+"IP address: %s\n"
+"Name: %s\n"
+"Domain: %s"
+msgstr ""
+"Följande data har hämtats:\n\n"
+"IP-adress: %s\n"
+"Namn: %s\n"
+"Domän: %s"
+
+#. TXT_ERROR_CONF_NET
+msgid ""
+"An error occurred during the network configuration. "
+"Your network card probably was not recognized by "
+"the kernel."
+msgstr ""
+"Ett fel uppstod när nätverket skulle ställas in. "
+"Ditt nätverkskort identifierades antagligen inte av "
+"kärnan."
+
+#. TXT_INPUT_SERVER
+msgid "Enter the IP address of the NFS server."
+msgstr "Ange NFS-serverns IP-adress."
+
+#. TXT_INPUT_FTPSERVER
+msgid "Enter the IP address of the FTP server."
+msgstr "Ange FTP-serverns IP-adress."
+
+#. TXT_INPUT_DIR
+msgid "Enter the directory on the server."
+msgstr "Ange katalogen på servern."
+
+#. TXT_ENTER_PARAMS
+#, c-format
+msgid "Enter parameters for \"%s\"."
+msgstr "Ange parametrar för \"%s\"."
+
+#. TXT_TRY_NFS_MOUNT
+#, c-format
+msgid "Trying to mount the directory\n\n\"%s:%s\"..."
+msgstr "Försöker montera katalogen\n\n\"%s:%s\"..."
+
+#. TXT_ERROR_NFSMOUNT
+#, c-format
+msgid ""
+"An error occurred while trying to mount the NFS "
+"directory.\n\nReason given by server: %s"
+msgstr ""
+"Ett fel uppstod när NFS-katalogen skulle "
+"monteras.\n\nAnledning enligt server: %s"
+
+#. TXT_CHOOSE_KEYMAP
+msgid ""
+"Choose a keyboard map.\nYaST will offer "
+"additional keyboard tables later."
+msgstr ""
+"Välj tangentbordslayout.\nYaST kommer att erbjuda "
+"dig ytterligare tangentbordslayouter senare."
+
+#. TXT_DELETE_MODULE
+msgid "Choose the module to unload."
+msgstr "Välj modulen som ska laddas ur."
+
+#. TXT_NO_MODULES
+msgid "No modules currently loaded."
+msgstr "För tillfället finns det inga laddade moduler."
+
+#. TXT_AUTO_RUNNING
+#, c-format
+msgid "Autoprobing (%s)...      "
+msgstr "Undersöker (%s)...      "
+
+#. TXT_WANT_MORE_SCSI
+msgid ""
+"Search for additional SCSI host "
+"adaptors?"
+msgstr "Vill du söka efter ytterligare SCSI-kort?"
+
+#. TXT_WANT_MORE_NET
+msgid "Search for additional network cards?"
+msgstr "Vill du söka efter ytterligare nätverkskort?"
+
+#. TXT_WANT_MORE_CDROM
+msgid "Search for additional CD-ROM drives?"
+msgstr "Vill du söka efter ytterligare cd-romenheter?"
+
+#. TXT_NET_ETH0
+msgid "ethernet network card"
+msgstr "Ethernet-nätverkskort"
+
+#. TXT_NET_PLIP
+msgid "parallel port"
+msgstr "parallellport"
+
+#. TXT_NET_TR0
+msgid "token ring network card"
+msgstr "token ring-nätverkskort"
+
+#. TXT_NET_ARC0
+msgid "arcnet network card"
+msgstr "Arcnet-nätverkskort"
+
+#. TXT_NET_FDDI
+msgid "FDDI network card"
+msgstr "FDDI-nätverkskort"
+
+#. TXT_NET_HIPPI
+msgid "HIPPI network card"
+msgstr "HIPPI-nätverkskort"
+
+#. TXT_CHOOSE_NET
+msgid "Choose the network device."
+msgstr "Välj nätverksenhet."
+
+#. TXT_INPUT_PLIP_IP
+msgid "Enter the IP address of the PLIP partner."
+msgstr "Ange PLIP-partnerns IP-adress."
+
+#. TXT_NO_PCMCIA
+msgid ""
+"The PCMCIA chipset could not be detected"
+"automatically. Specify it manually."
+msgstr ""
+"PCMCIA-kretsuppsättningen kunde inte identifieras"
+"automatiskt. Du måste ange manuellt."
+
+#. TXT_FOUND_PCMCIA
+#, c-format
+msgid ""
+"Found PCMCIA chipset \"%s\".\n\nEnter "
+"parameters for PCMCIA core modules."
+msgstr ""
+"Hittade PCMCIA-kretsuppsättningen \"%s\".\n\nAnge "
+"parametrar för PCMCIA-kärnmoduler."
+
+#. TXT_PCMCIA_PARAMS
+#, c-format
+msgid "Enter specific parameters for chipset \"%s\"."
+msgstr "Ange specifika parametrar för kretsuppsättningen \"%s\"."
+
+#. TXT_START_CARDMGR
+msgid "Starting card manager..."
+msgstr "Startar korthanterare..."
+
+#. TXT_PCMCIA_SUCCESS
+msgid "Successfully started PCMCIA card services."
+msgstr "PCMCIA-korttjänsten startades utan problem."
+
+#. TXT_PCMCIA_FAIL
+msgid "Start of PCMCIA card services failed."
+msgstr "Misslyckades med att starta PCMCIA-korttjänsten."
+
+#. TXT_PCMCIA_ALREADY
+msgid "PCMCIA card services already running."
+msgstr "PCMCIA-korttjänsten är redan startad."
+
+#. TXT_NO_LXRC_END
+msgid ""
+"You can leave Linuxrc only via \n\n"
+"\"Start Installation or System\"\n\n"
+"You may need to load some "
+"drivers (modules) to support your hardware."
+msgstr ""
+"Du kan endast avsluta Linuxrc via menyposten\n\n"
+"\"Starta installation/system\".\n\n"
+"För att kunna göra detta behöver du eventuellt "
+"ladda vissa drivrutiner (moduler) för att få stöd för hårdvaran."
+
+#. TXT_NO_CTRLC
+msgid "You cannot exit Linuxrc with <Ctrl-C>."
+msgstr "Du kan inte avsluta Linuxrc med <Ctrl-c>."
+
+#. TXT_REMOVE_DISK
+msgid "Remove the disk from the drive now."
+msgstr "Ta bort disken från enheten nu."
+
+#. TXT_EXAMPLE_PAR
+msgid "\n\nExample: "
+msgstr "\n\nExempel: "
+
+#. TXT_CHOOSE_SOURCE
+msgid "Choose the source medium."
+msgstr "Välj källmedia."
+
+#. TXT_TRY_CD_MOUNT
+msgid "Trying to mount the CD-ROM..."
+msgstr "Försöker montera cd-rom..."
+
+#. TXT_ERROR_CD_MOUNT
+msgid "Unable to mount the CD-ROM."
+msgstr "Kunde inte montera cd-rom."
+
+#. TXT_ASK_REBOOT
+msgid "Reboot the system now?"
+msgstr "Starta om nu?"
+
+#. TXT_INSTALL_SUCCESS
+msgid ""
+"The base system has been successfully installed. This "
+"newly installed system will now be started to "
+"commit the installation."
+msgstr ""
+"Bassystemet har installerats. Det installerade systemet "
+"kommer nu att startas för att slutföra "
+"installationen."
+
+#. TXT_ENTER_PARTITION
+msgid "Enter the hard disk partition (e.g., /dev/sda1)"
+msgstr "Ange hårddiskpartitionen (t ex /dev/sda1)"
+
+#. TXT_ERROR_HD_MOUNT
+msgid "Could not mount the specified partition."
+msgstr "Kunde inte montera den specificerade partitionen."
+
+#. TXT_ENTER_HD_DIR
+msgid "Enter the source directory."
+msgstr "Ange källkatalog."
+
+#. TXT_ERROR_INSTALL
+msgid "An error occurred during the installation."
+msgstr "Ett fel uppstod under installationen."
+
+#. TXT_DRIVES
+msgid "Hard Disks or CD-ROMs"
+msgstr "Hårddiskar/cd-rom"
+
+#. TXT_LITTLE_MEM
+msgid ""
+"Your computer has extremely little memory.\n\n"
+"Before you acknowledge this message, you must switch to "
+"virtual console 2 (press ALT-F2) to create and "
+"activate some swap space."
+msgstr ""
+"Datorn har extremt lite minne.\n\n"
+"Innan du bekräftar det här meddelandet måste du "
+"växla till den virtuella konsollen 2 (tryck ALT+F2) för att skapa "
+"och aktivera växlingsutrymme."
+
+#. TXT_ASK_ANIMATE
+msgid "Animation"
+msgstr "Animation"
+
+#. TXT_ASK_EXPLODE
+msgid "Use animated windows?"
+msgstr "Använda animerade fönster?"
+
+#. TXT_NO_DRIVES
+msgid ""
+"No hard disks or CD-ROM drives have been detected so "
+"far."
+msgstr "Inga hårddiskar eller cd-romenheter har hittats hittills."
+
+#. TXT_MENU_EXPERT
+msgid "Debug (expert)"
+msgstr "Felsökning (expert)"
+
+#. TXT_FORCE_ROOTIMAGE
+msgid "Load Root Image into RAM Disk"
+msgstr "Ladda rotavbild till ram-disk"
+
+#. TXT_NEW_ROOTIMAGE
+msgid "Enter Root Image"
+msgstr "Ange rotavbild"
+
+#. TXT_ASK_RI_FORCE
+msgid "Should the root image be loaded into the RAM disk?"
+msgstr "Vill du att rotavbilden ska laddas till ram-disken?"
+
+#. TXT_ENTER_ROOTIMAGE
+msgid ""
+"Enter the path and name of the file to "
+"load into the RAM disk as the root file system."
+msgstr ""
+"Ange sökvägen och namnet på filen som du vill ska "
+"laddas till ram-disken som rotfilsystemet."
+
+#. TXT_NOT_IMPLEMENTED
+msgid "Not yet implemented."
+msgstr "Inte implementerad ännu."
+
+#. TXT_NEW_INST_SYS
+msgid "Installation System"
+msgstr "Installationssystem"
+
+#. TXT_ENTER_INST_SYS
+msgid ""
+"Enter the directory that contains the "
+"installation system."
+msgstr "Ange katalogen som innehåller installationssystemet."
+
+#. TXT_NO_INFO_AVAIL
+msgid "No information available."
+msgstr "Ingen information tillgänglig."
+
+#. TXT_PREPARE_INST
+msgid "Preparing installation..."
+msgstr "Förbereder installation..."
+
+#. TXT_START_DEMO
+msgid "Start Live CD"
+msgstr "Starta live-cd"
+
+#. TXT_INSERT_LIVECD
+msgid "Insert the Live CD."
+msgstr "Lägg i live-cd:n."
+
+#. TXT_END_REBOOT
+msgid "Exit or Reboot"
+msgstr "Avsluta eller starta om"
+
+#. TXT_SEARCH_INFOFILE
+msgid "Searching for info file..."
+msgstr "Söker efter informationsfil..."
+
+#. TXT_NFSPORT
+msgid "Specify the NFS port."
+msgstr "Ange NFS-port."
+
+#. TXT_ASKING_NAMED
+msgid "Asking name server..."
+msgstr "Frågar namnserver..."
+
+#. TXT_HOST_NOT_FOUND
+#, c-format
+msgid "Host %s was not found."
+msgstr "Datorn %s hittades inte."
+
+#. TXT_NET_CONFIGURED
+msgid ""
+"Your network is already configured. "
+"Keep this configuration?"
+msgstr ""
+"Nätverket är redan inställt. Vill du behålla den "
+"inställningen?"
+
+#. TXT_ASK_BREAK
+msgid "Abort?"
+msgstr "Avbryt?"
+
+#. TXT_NO_NETDEVICE
+msgid ""
+"No network device found.\nLoad a network module "
+"first."
+msgstr "Inga nätverksenheter hittades.\nLadda en nätverksmodul först."
+
+#. TXT_ALREADY_FOUND
+#, c-format
+msgid "A %s was already found in your system.\n"
+msgstr "Ett %s har redan hittats i systemet.\n"
+
+#. TXT_ERROR_FTP
+#, c-format
+msgid "Error while accessing the FTP server:\n\n%s"
+msgstr "Fel uppstod vid åtkomst till FTP-server:\n\n%s"
+
+#. TXT_ENTER_FTPUSER
+msgid ""
+"Enter the user name with which to "
+"access the FTP server."
+msgstr ""
+"Ange under vilket användarnamn du vill komma åt "
+"FTP-servern."
+
+#. TXT_ENTER_FTPPASSWD
+msgid "Enter the password for the FTP user account."
+msgstr "Ange lösenordet för FTP-användarkontot."
+
+#. TXT_ENTER_FTPPROXY
+msgid "Enter the address of the FTP proxy."
+msgstr "Ange adressen för FTP-proxy."
+
+#. TXT_ENTER_FTPPORT
+msgid "Enter the port of the FTP proxy."
+msgstr "Ange porten för FTP-proxy."
+
+#. TXT_WANT_FTPPROXY
+msgid "Use an FTP proxy?"
+msgstr "Vill du använda en FTP-proxy?"
+
+#. TXT_NOMEM_FTP
+#, c-format
+msgid ""
+"Your computer does not have enough RAM to install "
+"via FTP (%d MB RAM required)."
+msgstr ""
+"Datorn har inte tillräckligt med minne för att installera "
+"via FTP. (%d MB ram krävs)."
+
+#. TXT_ANONYM_FTP
+msgid ""
+"Usually an FTP installation is performed via "
+"anonymous FTP. It is possible to specify "
+"a user name and password for the FTP server access.\n"
+"Use a user name and password?"
+msgstr ""
+"Vanligtvis utförs FTP-installationer via "
+"anonym FTP. Det är trots allt möjligt att ange "
+"ett användarnamn och lösenord för åtkomst till FTP-servern.\n"
+"Vill du göra det?"
+
+#. TXT_MORE_MODULES
+msgid "-- More Modules --"
+msgstr "-- Fler moduler --"
+
+#. TXT_INIT_PARPORT
+msgid "Initializing parallel port..."
+msgstr "Initierar parallellport..."
+
+#. TXT_ENTER_NFSPORT
+msgid ""
+"Enter the port number on which the NFS server "
+"is running."
+msgstr "Ange portnumret på vilken NFS-servern körs."
+
+#. TXT_INSERT_CD
+#, c-format
+msgid "Make sure that CD number %d is in your drive."
+msgstr "Se till så att cd nummer %d finns i enheten."
+
+#. TXT_EJECT_CD
+msgid "Eject CD"
+msgstr "Mata ut cd"
+
+#. TXT_BOOTP_TIMEOUT
+msgid "Bootp Time-Out"
+msgstr "Tidsgräns för Bootp"
+
+#. TXT_ENTER_BOOTP_TIMEOUT
+msgid "Enter the time-out value for bootp."
+msgstr "Ange tidsgränsen för Bootp."
+
+#. TXT_NET_CTC
+msgid "channel to channel connection"
+msgstr "kanal till kanalanslutning"
+
+#. TXT_NET_ESCON
+msgid "ESCON connection"
+msgstr "ESCON-anslutning"
+
+#. TXT_NET_IUCV
+msgid "IUCV connection"
+msgstr "IUCV-anslutning"
+
+#. TXT_NET_CLAW
+msgid "channel attached cisco router"
+msgstr "kanal ansluten till en Cisco-router"
+
+#. TXT_SMB_ENTER_SHARE
+msgid "Enter the share name on the SMB server."
+msgstr "Ange utdelningsnamnet på SMB-servern."
+
+#. TXT_SMB_GUEST_LOGIN
+msgid ""
+"If you want to access the share as guest,"
+"you do not need to specify user name, password, and workgroup.\n"
+"Access the share as guest?"
+msgstr ""
+"Om du vill komma åt utdelningen som gäst "
+"behöver du inte ange användarnamn, lösenord och arbetsgrupp.\n"
+"Vill du komma åt utdelningen som gäst?"
+
+#. TXT_SMB_ENTER_USER
+msgid "Enter your user name on the SMB server."
+msgstr "Ange ditt användarnamn på SMB-servern."
+
+#. TXT_SMB_ENTER_PASSWORD
+msgid "Enter your password on the SMB server."
+msgstr "Ange ditt lösenord på SMB-servern."
+
+#. TXT_SMB_ENTER_WORKGROUP
+msgid ""
+"Enter your workgroup."
+"If you do not need to specify a workgroup,"
+"leave the field empty."
+msgstr ""
+"Ange din arbetsgrupp."
+"Om du inte behöver ange en arbetsgrupp,"
+"lämna fältet tomt."
+
+#. TXT_SMB_TRYING_MOUNT
+#, c-format
+msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgstr "Försöker montera utdelningen\n\n\"//%s/%s\""
+
+# %s is either BOOTP or DHCP
+#. TXT_ASK_DHCP
+#, c-format
+msgid "Automatic configuration via %s?"
+msgstr "Automatisk inställning via %s?"
+
+# %s is either BOOTP or DHCP
+#. TXT_SEND_DHCP
+#, c-format
+msgid "Sending %s request..."
+msgstr "Skickar %s-begäran..."
+
+# %s is either BOOTP or DHCP
+#. TXT_ERROR_DHCP
+#, c-format
+msgid "%s configuration failed."
+msgstr "%s-inställning misslyckades."
+
+#. TXT_DHCP_VS_BOOTP
+msgid "Use DHCP instead of BOOTP?"
+msgstr "Använda DHCP istället för Bootp?"
+
+#. TXT_MODDISK0
+msgid "Insert a modules disk."
+msgstr "Sätt i en moduldiskett."
+
+#. TXT_MODDISK1
+#, c-format
+msgid "Insert modules disk %d."
+msgstr "Sätt i moduldiskett %d."
+
+#. TXT_MODDISK2
+msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
+msgstr "Du hittar instruktioner på hur du gör för att skapa den under boot/README på cd1 eller dvd1."
+
+#. TXT_CHOOSE_NETSOURCE
+msgid "Choose the network protocol."
+msgstr "Välj nätverksprotokoll."
+
+# %s is NFS, FTP, HTTP or SMB
+#. TXT_INPUT_NETSERVER
+#, c-format
+msgid "Enter the IP address of the %s server."
+msgstr "Ange %s-serverns IP-adress."
+
+# %s is FTP or HTTP
+#. TXT_TRY_REACH_SERVER
+#, c-format
+msgid "Trying to connect to the %s server..."
+msgstr "Försöker ansluta till %s-servern..."
+
+#. TXT_NET
+msgid "Network"
+msgstr "Nätverk"
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s Modules"
+msgstr "Ladda %s-moduler"
+
+#. TXT_LOAD_FS
+msgid "Load File System Modules"
+msgstr "Ladda filsystemsmoduler"
+
+#. TXT_LOAD_OTHER
+msgid "Load Unknown Modules"
+msgstr "Ladda okända moduler"
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
+msgstr "%s-filsystem hittat."
+
+#. TXT_CONTINUE
+msgid "Continue"
+msgstr "Fortsätt"
+
+#. TXT_ABORT
+msgid "Abort"
+msgstr "Avbryt"
+
+#. TXT_NO_NEW_MODULES
+msgid "No new modules found."
+msgstr "Inga nya moduler hittades."
+
+#. TXT_CHOOSE_PARTITION
+msgid "Choose the hard disk partition."
+msgstr "Välj hårddiskpartitionen."
+
+#. TXT_CHOOSE_ROOT_FS
+msgid "Choose the root partition."
+msgstr "Välj rotpartitionen."
+
+#. TXT_CHOOSE_SWAP
+msgid "Choose the swap partition."
+msgstr "Välj växlingspartitionen."
+
+#. TXT_LOW_MEMORY1
+msgid "There is not enough memory to load all data."
+msgstr "Det finns inte tillräckligt med minne för att ladda all data."
+
+#. TXT_LOW_MEMORY2
+msgid "Your computer does not have enough memory to run YaST."
+msgstr "Datorn har inte tillräckligt med minne för att köra YaST."
+
+#. TXT_ADD_SWAP
+msgid "To continue, activate some swap space."
+msgstr "För att fortsätta måste du aktivera växlingsutrymme."
+
+#. TXT_ERROR_SWAP
+msgid "Error activating swap space."
+msgstr "Fel vid aktivering av växlingsutrymme."
+
+#. TXT_ENTER_SWAP
+msgid "Enter the swap partition (e.g., /dev/sda2)"
+msgstr "Ange växlingspartitionen (t ex /dev/sda2)"
+
+#. TXT_ENTER_USER
+#, c-format
+#, fuzzy
+msgid "Enter the user name with which to access the %s server."
+msgstr "Enter användare namn med till s server."
+
+#. TXT_ENTER_PASSWORD
+#, c-format
+#, fuzzy
+msgid "Enter the password for the %s server."
+msgstr "Enter lösenord för s server."
+
+#. TXT_WANT_PROXY
+#, c-format
+#, fuzzy
+msgid "Use a %s proxy?"
+msgstr "Använd a s?"
+
+#. TXT_ENTER_PROXY
+#, c-format
+#, fuzzy
+msgid "Enter the address of the %s proxy."
+msgstr "Enter adress av s."
+
+#. TXT_ENTER_PROXYPORT
+#, c-format
+#, fuzzy
+msgid "Enter the port of the %s proxy."
+msgstr "Enter port av s."
+
+#. TXT_VNC_SWITCH
+#, fuzzy
+msgid "VNC Enable or Disable"
+msgstr "Aktivera eller Inaktivera"
+
+#. TXT_VNC_YES_NO
+#, fuzzy
+msgid "Use VNC for install?"
+msgstr "Använd för installera?"
+
+#. TXT_SSH_SWITCH
+#, fuzzy
+msgid "Enable or Disable SSH Mode"
+msgstr "Aktivera eller Inaktivera SSH Läge"
+
+#. TXT_SSH_YES_NO
+#, fuzzy
+msgid "Start SSH for Text Install?"
+msgstr "Starta SSH för Text Installera?"
+
+#. TXT_VNC_PASSWORD
+#, fuzzy
+msgid "Enter your VNC password."
+msgstr "Enter lösenord."
+
+#. TXT_SSH_PASSWORD
+#, fuzzy
+msgid "Enter your temporary SSH password."
+msgstr "Enter SSH lösenord."
+
+#. TXT_DO_REBOOT
+#, fuzzy
+msgid ""
+"The base system was successfully installed. Your "
+"machine must now be rebooted. "
+"Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager "
+"was installed on it."
+msgstr "bas nu Ta bort alla media Cd disk stövel hanterare på."
+
+#. TXT_ADD_DRIVER_UPDATE
+#, fuzzy
+msgid "Add Driver Update"
+msgstr "Lägg till Drivrutin Uppdatera"
+
+#. TXT_SHOW_DRIVER_UPDATES
+#, fuzzy
+msgid "Show Driver Updates"
+msgstr "Visa Drivrutin Uppdateringar"
+
+#. TXT_INPUT_NAMED1
+#, c-format
+#, fuzzy
+msgid "Enter the IP of name server %u or press ESC."
+msgstr "Enter IP av namn server u eller tryck."
+
+#. TXT_ROOT_PASSWORD
+#, fuzzy
+msgid ""
+"Enter temporary root password.\n"
+"You will be required to change this password "
+"on initial root user login."
+msgstr "Enter rot lösenord till ändring lösenord på rot användare inloggning."
+
+#. TXT_REBOOT
+msgid "Reboot"
+msgstr "Starta om"
+
+#. TXT_NO_RAM
+#, c-format
+#, fuzzy
+msgid ""
+"Your computer does not have enough RAM for the installation of %s. "
+"You need at least %d MB."
+msgstr "för av s Du vid Mibyte."
+
+#. TXT_VNC_PASSWORD_TOO_SHORT
+#, fuzzy
+msgid "Password is too short (must have at least 5 characters)."
+msgstr "Lösenord är short vid."
+
+#. TXT_XSERVER_IP
+#, fuzzy
+msgid "Enter the IP address of the host running the X11 server."
+msgstr "Enter IP adress av kör X11 server."
+
+#. TXT_CHOOSE_390NET
+#, fuzzy
+msgid "Please select the type of your network device."
+msgstr "Snälla välj typ av nätverk."
+
+#. TXT_IUCV_PEER
+#, fuzzy
+msgid "Please enter the name (user ID) of the target VM guest."
+msgstr "Snälla namn användare ID av."
+
+#. TXT_390NET_OSATR
+#, fuzzy
+msgid "OSA Token Ring (LCS)"
+msgstr "Ring"
+
+#. TXT_390NET_OSAETH
+msgid "OSA Ethernet"
+msgstr "OSA Ethernet"
+
+#. TXT_390NET_OSAEXETH
+#, fuzzy
+msgid "OSA Gigabit Ethernet or OSA Express Fast Ethernet"
+msgstr "Ethernet eller Snabb Ethernet"
+
+#. TXT_390NET_CTC
+#, fuzzy
+msgid "Channel To Channel (CTC)"
+msgstr "Kanal Till Kanal CTC"
+
+#. TXT_390NET_ESCON
+msgid "ESCON"
+msgstr "ESCON"
+
+#. TXT_390NET_IUCV
+#, fuzzy
+msgid "Inter-User Communication Vehicle (IUCV)"
+msgstr "Användare IUCV"
+
+#. TXT_390NET_HSI
+msgid "Hipersockets"
+msgstr ""
+
+#. TXT_390NET_OSAEXTR
+#, fuzzy
+msgid "OSA High Speed Token Ring"
+msgstr "Hög Hastighet Ring"
+
+#. TXT_CTC_CHANNEL_READ
+#, fuzzy
+msgid "Device address for read channel"
+msgstr "Enhet adress för läst kanal"
+
+#. TXT_CTC_CHANNEL_WRITE
+#, fuzzy
+msgid "Device address for write channel"
+msgstr "Enhet adress för skriv kanal"
+
+#. TXT_CTC_CHANNEL_DATA
+#, fuzzy
+msgid "Device address for data channel"
+msgstr "Enhet adress för kanal"
+
+#. TXT_CHOOSE_CTC_PROTOCOL
+#, fuzzy
+msgid "Select protocol for this CTC device."
+msgstr "Välj för CTC."
+
+#. TXT_CTC_PROT_COMPAT
+#, fuzzy
+msgid "Compatibility mode (default)"
+msgstr "Kompatibilitet läge standard"
+
+#. TXT_CTC_PROT_EXT
+msgid "Extended mode"
+msgstr "Utökat läge"
+
+#. TXT_CTC_PROT_ZOS390
+#, fuzzy
+msgid "Compatibility mode for OS/390 and z/OS peers"
+msgstr "Kompatibilitet läge för Operativsystem och z Operativsystem"
+
+#. TXT_QETH_PORTNAME
+#, fuzzy
+msgid "Portname to use"
+msgstr "till"
+
+#. TXT_HOSTNAME
+#, fuzzy
+msgid "Fully qualified hostname"
+msgstr "Fullständig"
+
+#. TXT_OSA_PORTNO
+#, fuzzy
+msgid "Enter the relative port number"
+msgstr "Enter port nummer"
+
+#. TXT_CHECK_CD
+#, fuzzy
+msgid "Verify Installation CD-ROM/DVD"
+msgstr "Verifiera Installation Cd Dvd"
+
+# turn the computer off
+#. TXT_POWER_OFF
+msgid "Power off"
+msgstr "Stäng av"
+
+#. TXT_DUD_FAIL
+#, fuzzy
+msgid "Failed to access Driver Update medium."
+msgstr "Misslyckades till Drivrutin Uppdatera mellan."
+
+#. TXT_DUD_READ
+#, fuzzy
+msgid "Reading Driver Update..."
+msgstr "Läser Drivrutin Uppdatera."
+
+#. TXT_DUD_NOTFOUND
+#, fuzzy
+msgid "No new Driver Updates found"
+msgstr "Nej ny Drivrutin Uppdateringar"
+
+#. TXT_DUD_ADDED
+#, fuzzy
+msgid "Driver Updates added"
+msgstr "Drivrutin Uppdateringar"
+
+# shown if driver update succeeded
+#. TXT_DUD_OK
+#, fuzzy
+msgid "Driver Update ok"
+msgstr "Drivrutin Uppdatera ok"
+
+#. TXT_DUD_SELECT
+#, fuzzy
+msgid "Please choose the Driver Update medium."
+msgstr "Snälla Drivrutin Uppdatera mellan."
+
+#. TXT_DUD_DEVICE
+#, fuzzy
+msgid "Please enter the Driver Update device."
+msgstr "Snälla Drivrutin Uppdatera."
+
+#. TXT_DUD_INVALID_DEVICE
+#, fuzzy
+msgid "Invalid device name."
+msgstr "Ogiltig namn."
+
+#. TXT_SEARCH_CDROM
+#, fuzzy
+msgid "Looking for CD-ROM drives..."
+msgstr "för Cd."
+
+#. TXT_NO_CDROM
+#, fuzzy
+msgid "No CD-ROM drives found."
+msgstr "Nej Cd."
+
+#. TXT_SEARCH_FLOPPY
+#, fuzzy
+msgid "Looking for floppy disks..."
+msgstr "för."
+
+#. TXT_NO_FLOPPY
+#, fuzzy
+msgid "No floppy disk found."
+msgstr "Nej disk."
+
+# heading for a listing of updates
+#. TXT_DUD_LIST
+#, fuzzy
+msgid "Driver Update list"
+msgstr "Drivrutin Uppdatera lista"
+
+#. TXT_DUD_NOT_YET
+#, fuzzy
+msgid "No Driver Updates so far."
+msgstr "Nej Drivrutin Uppdateringar."
+
+#. TXT_INSERT_CD_DVD
+#, fuzzy
+msgid "Insert Installation CD-ROM or DVD."
+msgstr "Infoga Installation Cd eller Dvd."
+
+#. TXT_NO_CD_DVD
+#, fuzzy
+msgid "No CD-ROM or DVD found."
+msgstr "Nej Cd eller Dvd."
+
+# e.g 'not a SUSE LINUX CD-ROM'
+#. TXT_WRONG_CD
+#, c-format
+#, fuzzy
+msgid "This is not a %s CD-ROM."
+msgstr "är a s Cd."
+
+#. TXT_CD_CHECK_OK
+#, fuzzy
+msgid "No errors found."
+msgstr "Nej."
+
+#. TXT_CD_MD5_FAILED
+#, fuzzy
+msgid "Checksum wrong."
+msgstr "Kontrollsumma."
+
+#. TXT_CD_READ_FAILED
+#, c-format
+#, fuzzy
+msgid "Error reading sector %u."
+msgstr "Fel sektor u."
+
+# %s is CD-ROM or DVD
+#. TXT_CD_BROKEN
+#, c-format
+#, fuzzy
+msgid "\nThis %s is broken."
+msgstr "s är."
+
+#. TXT_SLP_SOURCE
+#, fuzzy
+msgid "Choose an installation source"
+msgstr "Välj källa"
+

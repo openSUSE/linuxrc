@@ -35,6 +35,8 @@ extern int   txt_init (void);
 /* all we have */
 // #define TRANS_br
 #define TRANS_ar
+#define TRANS_bg
+#define TRANS_bn
 #define TRANS_bs
 #define TRANS_cs
 #define TRANS_de
@@ -53,6 +55,7 @@ extern int   txt_init (void);
 // #define TRANS_ro
 #define TRANS_ru
 #define TRANS_sk
+#define TRANS_sv
 
 #endif	/* LXRC_TINY */
 
