@@ -856,7 +856,7 @@ void mod_show_modules()
 
 #ifdef DEBUG_MODULE
   for(sl = config.module.used_params; sl; sl = sl->next) {
-    fprintf(stderr, "  %s: %s\n", sl->key, sl->value);
+    fprintf(stderr, "  %s: >%s<\n", sl->key, sl->value);
   }
 #endif
 

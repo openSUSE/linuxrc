@@ -25,7 +25,9 @@
 #include <inttypes.h>
 #include <ctype.h>
 
+#ifdef DIET
 #include <asm/sigcontext.h>
+#endif
 
 #include "global.h"
 #include "text.h"

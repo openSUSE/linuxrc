@@ -1009,7 +1009,7 @@ void show_proc(FILE *f, unsigned pid)
   char *s;
 
 #ifdef DIET
-  memset(buf1, 0, sizeof buf1);
+//  memset(buf1, 0, sizeof buf1);
 #endif
   sprintf(pe, "/proc/%u/status", pid);
   if((p = fopen(pe, "r"))) {
@@ -1017,6 +1017,8 @@ void show_proc(FILE *f, unsigned pid)
     if(fscanf(p, "\nState: %1s", buf2) == 1) status |= 2;
     fclose(p);
   }
+
+  fprintf(stderr, "buf1 = \"%s\"\n", buf1);
 
   sprintf(pe, "/proc/%u/cmdline", pid);
   if((p = fopen(pe, "r"))) {

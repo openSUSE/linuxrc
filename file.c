@@ -765,6 +765,7 @@ void file_write_install_inf(char *dir)
     char *s;
     int boot_disk;
 
+    fflush(f);	/* really necessary! */
     s = auto2_disk_list(&boot_disk);
     if(*s) {
       file_write_num(f, key_bootdisk, boot_disk ? 1 : 0);
