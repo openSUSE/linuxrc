@@ -116,11 +116,21 @@ void net_ask_password()
 
 void net_ask_hostname()
 {
+  char* dot;
   int win_old = config.win;
-  if(!config.net.realhostname)
+  if(!config.net.realhostname || !config.net.domain)
   {
     if(!config.win) util_disp_init();
+repeat:
     dia_input2(txt_get(TXT_HOSTNAME), &config.net.realhostname, 20, 0);
+    dot=strstr(config.net.realhostname,".");	/* find first dot */
+    if(!dot)
+    {
+      dia_message(txt_get(TXT_INVALID_FQHOSTNAME), MSGTYPE_ERROR);
+      goto repeat;
+    }
+    str_copy(&config.net.domain,dot+1);	/* copy domain part */
+    *dot=0;	/* cut off domain */
     if(config.win && !win_old) util_disp_done();
   }
 }
@@ -158,7 +168,11 @@ int net_config()
 
 #if defined(__s390__) || defined(__s390x__)
   /* bring up network devices, write hwcfg */
-  if(net_activate_s390_devs()) return -1;
+  while(net_activate_s390_devs()) {
+    /* failed; switch to manual mode, repeat */
+    config.manual=1;
+    if(!config.win) util_disp_init();
+  }
 #endif
 
   if(net_choose_device()) return -1;
@@ -1647,15 +1661,60 @@ void if_down(char *dev)
 
 #if defined(__s390__) || defined(__s390x__)
 
-void net_list_s390_devs(char* driver, int cutype)
+/* switch to manual mode if expr is false, execute following statement if in manual mode */
+#define IFNOTAUTO(expr) if(!config.manual && !(expr)) { \
+                          config.manual=1; \
+                          if(!config.win) util_disp_init(); \
+                        } \
+                        if(config.manual)
+
+#include <sysfs/dlist.h>
+#include <sysfs/libsysfs.h>
+
+void net_list_s390_devs(char* driver, int model)
 {
-  printf("%s not implemented yet\n", __FUNCTION__);
+  char buf[4<<10];
+  struct sysfs_driver* driv;
+  struct dlist* devs;
+  struct sysfs_device* dev;
+  struct sysfs_attribute* attr;
+  char* bp=&buf[0];
+
+  if(!config.manual) return;
+  
+  driv=sysfs_open_driver("ccw",driver);
+  devs=sysfs_get_driver_devices(driv);
+  dlist_for_each_data(devs,dev,struct sysfs_device)
+  {
+    attr=sysfs_get_device_attr(dev,"cutype");
+    if(model && strtol(attr->value,NULL,16)!=model) continue;
+    bp+=sprintf(bp,"%s ",dev->bus_id);
+    bp+=sprintf(bp,"%s",attr->value);	/* attr->value contains a LF */
+  }
+  sysfs_close_list(devs);
+  sysfs_close_driver(driv);
+  dia_message(buf,MSGTYPE_INFO);
 }
 
 int net_check_ccw_address(char* addr)
 {
-  printf("%s not implemented yet\n", __FUNCTION__);
+  int i;
+  /* format: x.x.xxxx, each x is a hex digit */
+  if(strlen(addr)!=8) goto error;
+  for(i=0;i<8;i++)
+  {
+    if(i==1 || i==3)
+    {
+     if(addr[i] != '.') goto error;
+    }
+    else
+     if(addr[i] < 'a' || addr[i] > 'f') goto error;
+  }
   return 0;
+error:
+  if(!config.win) util_disp_init();
+  dia_message(txt_get(TXT_INVALID_CCW_ADDRESS), MSGTYPE_ERROR);
+  return -1;
 }
 
 /* set config variables common to CCW devices */
@@ -1670,9 +1729,9 @@ static void net_s390_set_config_ccwdev()
 static int net_s390_getrwchans()
 {
   int rc;
-  if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
+  IFNOTAUTO(config.hwp.readchan) if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
   if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
-  if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
+  IFNOTAUTO(config.hwp.writechan) if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
   if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
   return 0;
 }
@@ -1731,8 +1790,14 @@ int net_activate_s390_devs(void)
     di_390net_osaextr,
     di_none
   };
-  
-  di = dia_menu2(txt_get(TXT_CHOOSE_390NET), 60, 0, items, config.hwp.type?:di_390net_iucv);
+
+  IFNOTAUTO(config.hwp.type)
+  {
+    di = dia_menu2(txt_get(TXT_CHOOSE_390NET), 60, 0, items, config.hwp.type?:di_390net_iucv);
+    config.hwp.type=di;
+  }
+  else
+    di=config.hwp.type;
   
   /* hwcfg parms common to all devices */
   config.hwp.startmode="auto";
@@ -1742,7 +1807,8 @@ int net_activate_s390_devs(void)
   switch(di)
   {
   case di_390net_iucv:
-    if((rc=dia_input2(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
+    IFNOTAUTO(config.hwp.userid)
+      if((rc=dia_input2(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
 
     mod_modprobe("netiucv",NULL);	// FIXME: error handling
 
@@ -1777,13 +1843,16 @@ int net_activate_s390_devs(void)
       default: return -1;
       }
     else rc=0;    
-    rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 33, 0, protocols, rc);
-    switch(rc)
+    IFNOTAUTO(config.hwp.protocol)
     {
-    case di_ctc_compat: config.hwp.protocol=0+1; break;
-    case di_ctc_ext: config.hwp.protocol=1+1; break;
-    case di_ctc_zos390: config.hwp.protocol=3+1; break;
-    default: return -1;
+      rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 33, 0, protocols, rc);
+      switch(rc)
+      {
+      case di_ctc_compat: config.hwp.protocol=0+1; break;
+      case di_ctc_ext: config.hwp.protocol=1+1; break;
+      case di_ctc_zos390: config.hwp.protocol=3+1; break;
+      default: return -1;
+      }
     }
     
     if((rc=net_s390_group_chans(2,"ctc"))) return rc;
@@ -1813,11 +1882,15 @@ int net_activate_s390_devs(void)
     net_list_s390_devs("qeth",di==di_390net_hsi?5:1);
 
     if((rc=net_s390_getrwchans())) return rc;
-    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
+    IFNOTAUTO(config.hwp.datachan)
+      if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
     if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
     
-    if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
-    // FIXME: warn about problems related to empty portnames
+    IFNOTAUTO(config.hwp.portname)
+    {
+      if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
+      // FIXME: warn about problems related to empty portnames
+    }
     
     if((rc=net_s390_group_chans(3,"qeth"))) return rc;
 
@@ -1850,7 +1923,8 @@ int net_activate_s390_devs(void)
     
     if((rc=net_s390_getrwchans())) return rc;
     
-    if((rc=dia_input2(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
+    IFNOTAUTO(config.hwp.portname)
+      if((rc=dia_input2(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
 
     if((rc=net_s390_group_chans(2,"lcs"))) return rc;
     
@@ -1880,14 +1954,11 @@ int net_activate_s390_devs(void)
   }
   
   /* write hwcfg file */
-
   if (mkdir("/etc/sysconfig/hardware", (mode_t)0755) && errno != EEXIST)
     return -1;
-  
   sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
-
 # define HWE(var,string) if(config.hwp.var) fprintf(fp, #string "=\"%s\"\n",config.hwp.var);
   HWE(startmode,STARTMODE)
   HWE(module,MODULE)
@@ -1902,7 +1973,6 @@ int net_activate_s390_devs(void)
   if(config.hwp.protocol) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",config.hwp.protocol-1);
   HWE(portname,CCW_CHAN_MODE)
 # undef HWE
-  
   fclose(fp);
   
   net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
