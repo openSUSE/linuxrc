@@ -953,3 +953,11 @@ msgstr "Bitte geben Sie die Adresse des %s-Proxy ein"
 msgid "Please enter the port of the %s proxy"
 msgstr "Bitte geben Sie den Port des %s-Proxy ein"
 
+#. TXT_VNC_SWITCH
+msgid "VNC Enable/Disable"
+msgstr ""
+
+#. TXT_VNC_YES_NO
+msgid "Use VNC for install?"
+msgstr ""
+

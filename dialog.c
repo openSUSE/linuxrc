@@ -54,6 +54,7 @@ struct {
   { di_expert_nfsport,      TXT_NFSPORT,         },
   { di_expert_bootptimeout, TXT_BOOTP_TIMEOUT,   },
   { di_expert_dhcp,         0, "DHCP/BOOTP"      },
+  { di_expert_vnc,          TXT_VNC_SWITCH       },
 
   { di_inst_vnc,     0, "VNC Setup"        },
   { di_inst_install, TXT_START_INSTALL,    },

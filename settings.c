@@ -440,6 +440,7 @@ void set_expert()
     di_expert_nfsport,
     di_expert_bootptimeout,
     di_expert_dhcp,
+    di_expert_vnc,
     di_none
   };
 
@@ -507,6 +508,11 @@ int set_expert_cb(dia_item_t di)
     case di_expert_dhcp:
       rc = dia_yesno(txt_get(TXT_DHCP_VS_BOOTP), config.net.use_dhcp ? YES : NO);
       config.net.use_dhcp = rc == YES ? 1 : 0;
+      break;
+
+    case di_expert_vnc:
+      rc = dia_yesno(txt_get(TXT_VNC_YES_NO), config.vnc ? YES : NO);
+      config.vnc = rc == YES ? 1 : 0;
       break;
 
     default:
