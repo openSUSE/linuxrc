@@ -1,3 +1,6 @@
+15/9/2003:	v1.5.13
+	- updated slovak translations
+
 14/9/2003:	v1.5.12
 	- write 'Console' entry to install.inf again (#29569, #30451)
 	- make line drawing chars work on serial console

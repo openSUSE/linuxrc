@@ -1,18 +1,18 @@
 # translation of sk.po to Slovak
 # Slovak translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
-# Stanislav Visnovsky <visnovsky@kde.org>, 2003
+# Stanislav Visnovsky <visnovsky@kde.org>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
-"PO-Revision-Date: 2003-02-22 20:55+0100\n"
+"PO-Revision-Date: 2003-09-15 08:50+0200\n"
 "Last-Translator: Stanislav Visnovsky <visnovsky@kde.org>\n"
 "Language-Team: Slovak <sk-i18n@linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.2beta2\n"
+"X-Generator: KBabel 1.2\n"
 
 #. TXT_OK
 msgid "OK"
@@ -157,7 +157,7 @@ msgid ""
 msgstr ""
 "Nemô¾em nájs» obraz!\n"
 "\n"
-"Skontrolujte zadanie prieèinku!"
+"Skontrolujte zadaný prieèinok!"
 
 #. TXT_LOADING
 msgid "Loading data into ramdisk"
@@ -237,7 +237,7 @@ msgstr "Ak pre pripojenie k serveru potrebujete bránu, zadajte jej IP adresu. Ak
 
 #. TXT_INPUT_NAMED
 msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Zadajte IP adresu vá¹ho nameservera. Ak nepou¾ívate nameserver, stlaète iba ESC."
+msgstr "Zadajte IP adresu vá¹ho pomenovávacieho serveru. Ak ho nepou¾ívate, stlaète iba ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -260,11 +260,11 @@ msgstr "Chyba pri konfigurácii siete. Pravdepodobne jadro nerozpoznalo va¹u sie»
 
 #. TXT_INPUT_SERVER
 msgid "Please enter the IP address of the NFS server."
-msgstr "Zadajte IP adresu NFS servera."
+msgstr "Zadajte IP adresu NFS serveru."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Please enter the IP address of the FTP server."
-msgstr "Zadajte IP adresu FTP servera."
+msgstr "Zadajte IP adresu FTP serveru."
 
 #. TXT_INPUT_DIR
 msgid "Please enter the directory on the server."
@@ -295,7 +295,7 @@ msgid ""
 msgstr ""
 "Chyba pri pokuse o pripojenie NFS prieèinku.\n"
 "\n"
-"Odpoveï od servera: %s"
+"Odpoveï od serveru: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
@@ -565,7 +565,7 @@ msgstr "Zadajte NFS port"
 
 #. TXT_ASKING_NAMED
 msgid "Asking nameserver..."
-msgstr "Pýtam sa nameservera..."
+msgstr "Pýtam sa pomenovávacieho serveru..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format,fuzzy
@@ -614,11 +614,11 @@ msgstr "Zadajte heslo pre FTP úèet"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Please enter the address of the FTP proxy"
-msgstr "Zadajte IP adresu FTP proxy servera"
+msgstr "Zadajte IP adresu FTP proxy serveru"
 
 #. TXT_ENTER_FTPPORT
 msgid "Please enter the port of the FTP proxy"
-msgstr "Zadajte èíslo portu FTP proxy servera"
+msgstr "Zadajte èíslo portu FTP proxy serveru"
 
 #. TXT_WANT_FTPPROXY
 msgid "Do you want to use an FTP proxy?"
@@ -853,51 +853,51 @@ msgstr "Zadajte oddiel swap (napr. /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Please enter the user name under which you want to access the %s server"
-msgstr ""
+msgstr "Prosím, zadajte pou¾ívateµa, pomocou ktorého chcete pou¾i» server %s"
 
 #. TXT_ENTER_PASSWORD
 #, c-format
 msgid "Please enter the password for the %s server"
-msgstr ""
+msgstr "Prosím, zadajte heslo pre server %s"
 
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Do you want to use a %s proxy?"
-msgstr ""
+msgstr "Chcete pou¾i» proxy %s?"
 
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Please enter the address of the %s proxy"
-msgstr ""
+msgstr "Prosím, zadajte adresu proxy %s"
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Please enter the port of the %s proxy"
-msgstr ""
+msgstr "Prosím, zadajte port proxy %s"
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable/Disable"
-msgstr ""
+msgstr "Povoli»/zakáza» VNC"
 
 #. TXT_VNC_YES_NO
 msgid "Use VNC for install?"
-msgstr ""
+msgstr "Pou¾i» VNC pre in¹taláciu?"
 
 #. TXT_SSH_SWITCH
 msgid "Enable/Disable SSH Mode"
-msgstr ""
+msgstr "Povoli»/zakáza» re¾im SSH"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
-msgstr ""
+msgstr "Spusti» SSH pre textovú in¹taláciu?"
 
 #. TXT_VNC_PASSWORD
 msgid "Please enter your VNC password"
-msgstr ""
+msgstr "Prosím, zadajte va¹e heslo VNC"
 
 #. TXT_SSH_PASSWORD
 msgid "Please enter your temporary SSH password"
-msgstr ""
+msgstr "Prosím, zadajte va¹e doèasné heslo SSH"
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -907,12 +907,17 @@ msgid ""
 "Do not remove the floppy disk if the boot manager "
 "was installed on it."
 msgstr ""
+"Základný systém je úspe¹ne nain¹talovaný. Vá¹ "
+"poèítaè je teraz nutné re¹tartova». Prosím, "
+"odstráòte v¹etky in¹talaèné médiá (CD-ROM, disketa).\n"
+"Ak ste nain¹talovali správcu ¹tartu na disketu, "
+"nechajte ju v mechanike."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr ""
+msgstr "Prida» aktualizáciu ovládaèa"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr ""
+msgstr "Zobrazi» aktualizácie ovládaèov"
 
