@@ -348,7 +348,7 @@ static void lxrc_init (void)
     mod_init ();
 
 #ifdef USE_LIBHD
-    if(auto2_ig)
+    if(auto2_ig) {
       if(auto2_init()) {
         auto2_ig = TRUE;
         auto2_init_settings();
@@ -360,6 +360,7 @@ static void lxrc_init (void)
         disp_set_display(1);
         dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
       }
+    }
 #endif
 
     util_print_banner ();
