@@ -1,6 +1,7 @@
 static module_t mod_scsi_mod_arm [] =
 {
-{ ID_AHA_2940,   "Adaptec 274x/284x/294x",             "aic7xxx",    0, __LINE__ },
+{ ID_AIC7XXX,    "Adaptec 274x/284x/294x (new driver)","aic7xxx",    0, __LINE__ },
+{ ID_AHA_2940,   "Adaptec 274x/284x/294x (old driver)","aic7xxx_old",0, __LINE__ },
 { ID_NCR_53C8XX, "NCR 53c8xx",                         "ncr53c8xx",  0, __LINE__ },
 { ID_SYM_53C8XX, "Symbios 53c8xx",                     "sym53c8xx",  0, __LINE__ },
 { ID_BUSLOGIC,   "BusLogic",                           "BusLogic",   0, __LINE__ },

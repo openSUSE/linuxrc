@@ -4,6 +4,7 @@ enum modid_t
     ID_AHA_154x,
     ID_AHA_1740,
     ID_AHA_2940,
+    ID_AIC7XXX,
     ID_ADVANSYS,
     ID_BUSLOGIC,
     ID_DTC,
