@@ -1,0 +1,5 @@
+24/11/2000:	v1.1.16.001
+	- started this log
+	- moved linuxrc version number to VERSION
+	- started to adapt console fonts to new kbd package
+          (some latin2 langs don't work properly yet)
