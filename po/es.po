@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-09-10 19:44+02:00\n"
+"PO-Revision-Date: 2002-03-26 11:45+01:00\n"
 "Last-Translator: Jordi Jaen Pallares <jordi@suse.de>\n"
 "Language-Team: Spanish <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
@@ -563,7 +563,7 @@ msgid "Asking nameserver..."
 msgstr "Contactando con el DNS..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format,fuzzy
+#, c-format
 msgid "Host %s was not found!"
 msgstr "¡No se encuentra la máquina %s!"
 
@@ -699,7 +699,7 @@ msgstr "canal en router cisco"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
-msgstr ""
+msgstr "Por favor introduzca el nombre del recurso compartido en el servidor SMB"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
@@ -707,143 +707,149 @@ msgid ""
 "you don't need do specify username, password and workgroup.\n"
 "Do you want to access the share as quest?"
 msgstr ""
+"Si desea acceder al recurso compartido como invitado (guest),\n"
+"no necesita especificar nombre de usuario, contraseña ni grupo detrabajo.\n"
+"¿Desea acceder el recurso compartido como invitado?"
 
 #. TXT_SMB_ENTER_USER
-msgid "Please enter yor user name on the SMB server"
-msgstr ""
+msgid "Please enter your user name on the SMB server"
+msgstr "Introduzca su nombre de usuario en el servidor SMB"
 
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter yor password on the SMB server"
-msgstr ""
+msgid "Please enter your password on the SMB server"
+msgstr "Introduzca su contraseña para el servidor SMB"
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Please enter yor workgroup."
+"Please enter your workgroup."
 "If you don't need to specify a workgroup,"
 "just leave the field empty."
 msgstr ""
+"Introduzca su grupo de trabajo.\n"
+"Si no necesita especificar un grupo de trabajo,\n"
+"deje el campo vacío."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
+msgstr "Intentando montar el recurso compartido\n\n\"//%s/%s\""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr ""
+msgstr "¿Configurar automaticamente via %s?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr ""
+msgstr "Enviando petición %s..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr ""
+msgstr "Configuración %s ha fallado."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
-msgstr ""
+msgstr "¿Usar DHCP en vez de BOOTP?"
 
 #. TXT_MODDISK0
 msgid "Please insert a modules disk."
-msgstr ""
+msgstr "Por favor introduzca el disquette de módulos."
 
 #. TXT_MODDISK1
 #, c-format
 msgid "Please insert modules disk %d."
-msgstr ""
+msgstr "Por favor introduzca el disquette de módulos %d."
 
 #. TXT_MODDISK2
 msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
-msgstr ""
+msgstr "Encontrará instrucciones sobre cómo crear uno en disks/README en el CD1 o DVD."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Please choose the network protocol"
-msgstr ""
+msgstr "A continuación elija el protocolo de red."
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
-msgstr ""
+msgstr "Introduzca la dirección IP del servidor %s."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr ""
+msgstr "Intentando conectar al servidor %s..."
 
 #. TXT_NET
 msgid "Network"
-msgstr ""
+msgstr "Red"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s modules"
-msgstr ""
+msgstr "Cargar módulos %s"
 
 #. TXT_LOAD_FS
 msgid "Load file system modules"
-msgstr ""
+msgstr "Cargar módulos de sistema de ficheros"
 
 #. TXT_LOAD_OTHER
 msgid "Load unknown modules"
-msgstr ""
+msgstr "Cargar módulos desconocidos"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr ""
+msgstr "Encontrado sistema de ficheros %s"
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr ""
+msgstr "Abortar"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr ""
+msgstr "No se encontraron mñodulos nuevos."
 
 #. TXT_CHOOSE_PARTITION
 msgid "Please choose the harddisk partition."
-msgstr ""
+msgstr "A continuación elija la partición del disco duro."
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Please choose the root partition."
-msgstr ""
+msgstr "Por favor introduzca la partición raiz (root)."
 
 #. TXT_CHOOSE_SWAP
 msgid "Please choose the swap partition."
-msgstr ""
+msgstr "Por favor seleccione la partición de intercambio (swap)."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr ""
+msgstr "No hya suficiente memoria para cargar todos los datos."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer doesn't have enough memory to run YaST."
-msgstr ""
+msgstr "Su computadora no dispone de memoria suficiente para ejecutar YaST."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr ""
+msgstr "Para continuar, active más espacio de intercambio (swap)."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr ""
+msgstr "Error al activar el espacio de intercambio (swap)."
 
 #. TXT_ENTER_SWAP
 msgid "Please enter the swap partition (eg. /dev/sda2)"
-msgstr ""
+msgstr "Introduzca la partición de intercambio (p.ej. /dev/sda2)"
 

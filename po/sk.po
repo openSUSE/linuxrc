@@ -731,16 +731,16 @@ msgid ""
 msgstr ""
 
 #. TXT_SMB_ENTER_USER
-msgid "Please enter yor user name on the SMB server"
+msgid "Please enter your user name on the SMB server"
 msgstr ""
 
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter yor password on the SMB server"
+msgid "Please enter your password on the SMB server"
 msgstr ""
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Please enter yor workgroup."
+"Please enter your workgroup."
 "If you don't need to specify a workgroup,"
 "just leave the field empty."
 msgstr ""

@@ -4,9 +4,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2002-03-01 09:45\n"
+"PO-Revision-Date: 2002-03-27 16:27+0100\n"
 "Last-Translator: Petr Kania <kania@suse.cz>\n"
-"Language-Team: Czech <i18n@suse.de>\n"
+"Language-Team: Czech <local@suse.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -712,16 +712,16 @@ msgstr ""
 "Chcete pøistupovat jako host?"
 
 #. TXT_SMB_ENTER_USER
-msgid "Please enter yor user name on the SMB server"
+msgid "Please enter your user name on the SMB server"
 msgstr "Uveïte své u¾ivatelské jméno na SMB serveru"
 
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter yor password on the SMB server"
+msgid "Please enter your password on the SMB server"
 msgstr "Uveïte své heslo na SMB serveru"
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Please enter yor workgroup."
+"Please enter your workgroup."
 "If you don't need to specify a workgroup,"
 "just leave the field empty."
 msgstr ""
@@ -840,17 +840,17 @@ msgstr "Nemáte dostatek pamìti pro nahrání v¹ech dat."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer doesn't have enough memory to run YaST."
-msgstr ""
+msgstr "Poèítaè nemá dostatek operaèní pamìti pro spu¹tìní YaSTu."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr ""
+msgstr "Nejdøíve je tøeba aktivovat odkladový (swap) oddíl."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr ""
+msgstr "Chyba pøi aktivaci odkladového oddílu."
 
 #. TXT_ENTER_SWAP
 msgid "Please enter the swap partition (eg. /dev/sda2)"
-msgstr ""
+msgstr "Uveïte prosím název odkladového oddílu (napø. /dev/sda2)"
 

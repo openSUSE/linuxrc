@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-09-12 11:57GMT\n"
-"Last-Translator: Marcel Hilzinger <hili@suselinux.hu>\n"
+"PO-Revision-Date: 2002-03-26 22:55GMT\n"
+"Last-Translator: Gábor Szentiványi <szenti@suselinux.hu>\n"
 "Language-Team: hungarian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
@@ -42,7 +42,7 @@ msgstr "Egyszínû monitor"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "What kind of display do you use?"
-msgstr "Milyen típusu monitort használ?"
+msgstr "Milyen típusú monitort használ?"
 
 #. TXT_MENU_LANG
 msgid "Language"
@@ -54,11 +54,11 @@ msgstr "Rendszermag modulok (hardver meghajtók)"
 
 #. TXT_MENU_START
 msgid "Start installation / system"
-msgstr "Telepítés megkezdése / rendszer"
+msgstr "Telepítés megkezdése / rendszerindítás"
 
 #. TXT_MENU_INFO
 msgid "System information"
-msgstr "Rendszer információ"
+msgstr "Rendszerinformáció"
 
 #. TXT_HDR_MAIN
 msgid "Main menu"
@@ -74,24 +74,23 @@ msgstr "Monitor"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Billentyûzet kiosztás"
+msgstr "Billentyûzetkiosztás"
 
 #. TXT_LOAD_NET
 msgid "Load network card modules"
-msgstr "Hálozati kártya modulok betöltése"
+msgstr "Hálózati kártya modulok betöltése"
 
 #. TXT_SHOW_MODULES
 msgid "Show loaded modules"
 msgstr "Betöltött modulok megtekintése"
 
 #. TXT_AUTO_LOAD
-
 msgid "Load modules automatically"
 msgstr "Modulok automatikus betöltése"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
-msgstr "Modul eltávolítása"
+msgstr "Modulok eltávolítása"
 
 #. TXT_TRY_TO_LOAD
 #, c-format
@@ -100,10 +99,10 @@ msgid ""
 "\n"
 "During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Megprobálja betölteni a(z) \"%s\" modult...\n"
+"Megpróbálom betölteni a(z) \"%s\" modult...\n"
 "\n"
-"A betöltés alatt megtekintheti a rendszermag üzeneteit a 4-es virtuális konzolon (ALT-F4). "
-"Ehhez a képernyõhöz az ALT-F1 billentyûkombinációval juthat vissza."
+"A betöltés alatt megtekinthetõk a rendszermag üzenetei a 4-es virtuális konzolon (ALT-F4). "
+"Ehhez a képernyõhöz az ALT-F1 billentyûkombinációval lehet visszajutni."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -129,7 +128,7 @@ msgstr "Merevlemez"
 
 #. TXT_START_INSTALL
 msgid "Start installation/update"
-msgstr "Telepítés megkezdése"
+msgstr "Telepítés/frissítés megkezdése"
 
 #. TXT_START_RESCUE
 msgid "Start rescue system"
@@ -156,15 +155,15 @@ msgid ""
 msgstr ""
 "A YaST nem talált képmást!\n"
 "\n"
-"Ellenõrizze a könyvtár megadását!"
+"Ellenõrizze az elérési utat!"
 
 #. TXT_LOADING
 msgid "Loading data into ramdisk"
-msgstr "Adatok betöltése a ramdiskbe"
+msgstr "Adatok betöltése a ramdiszkbe"
 
 #. TXT_INFO_KERNEL
 msgid "Kernel messages"
-msgstr "Redszermagüzenetek"
+msgstr "Rendszermag üzenetek"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -188,7 +187,7 @@ msgstr "Megszakítások"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
-msgstr "Ki-/bemeneti kapuk"
+msgstr "Ki-/bemeneti (I/O) portok"
 
 #. TXT_INFO_MEM
 msgid "Memory"
@@ -204,12 +203,11 @@ msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
-msgstr "Kérem helyezze be a lemezt, majd nyomja az ENTER-t"
+msgstr "Kérem helyezze be a lemezt, majd nyomja meg az ENTER-t"
 
 #. TXT_ERROR_READ_DISK
-
 msgid "Error reading from floppy disk!"
-msgstr "Hiba a lemez olvasásakor!"
+msgstr "Hiba a hajlékony lemez olvasásakor!"
 
 #. TXT_ENTER_ROOT_FS
 msgid "Please enter your root partition (eg. /dev/sda3)"
@@ -217,7 +215,7 @@ msgstr "Kérem adja meg a gyökérpartició elérési útvonalát (pl. /dev/hda3)"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device!"
-msgstr "A megadott partíció nem a gyökérkönyvtár!"
+msgstr "A megadott partíción nincs gyökérkönyvtár!"
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input!"
@@ -229,7 +227,7 @@ msgstr "Kérem adja meg az IP címét"
 
 #. TXT_INPUT_NETMASK
 msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
-msgstr "Kérem adja meg a hálozati maszkot. Egy hagyományos C osztályú hálózatnál ez általában 255.255.255.0"
+msgstr "Kérem adja meg a hálózati maszkot. Egy hagyományos C osztályú hálózatnál ez általában 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
@@ -237,7 +235,7 @@ msgstr "Ha átjárón keresztül éri el a szervert, akkor adja meg az átjáró IP címé
 
 #. TXT_INPUT_NAMED
 msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Kérem adja meg a névszerver IP címét. Ha nem használ névszervert, nyomja meg az ESC billentyüt."
+msgstr "Kérem adja meg a névszerver IP címét. Ha nem használ névszervert, nyomja meg az ESC billentyût."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -248,7 +246,7 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Az alábbi adatokat kaptam meg:\n"
+"Az alábbi adatokat találtam:\n"
 "\n"
 "IP-cím: %s\n"
 "Név: %s\n"
@@ -256,7 +254,7 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
-msgstr "Hiba lépett fel a hálozat beállítása közben. Talán a rendszermag nem ismerte fel a hálozati kártyáját!"
+msgstr "Hiba lépett fel a hálózat beállítása közben. Valószínûleg a rendszermag nem ismerte fel a hálózati kártyát!"
 
 #. TXT_INPUT_SERVER
 msgid "Please enter the IP address of the NFS server."
@@ -273,7 +271,7 @@ msgstr "Kérem adja meg a szerveren lévõ könyvtárat."
 #. TXT_ENTER_PARAMS
 #, c-format
 msgid "Please enter parameters for \"%s\"."
-msgstr "Kérem adja meg a(z) \"%s\" paramétereit."
+msgstr "Kérem adja meg a(z) \"%s\" paramétereit:"
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -293,7 +291,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Hiba lépett fel az NFS könyvtár csatolása közben \n"
+"Hiba lépett fel az NFS könyvtár csatolása közben.\n"
 "\n"
 "A szerver szerint a következõ hiba miatt: %s"
 
@@ -302,8 +300,8 @@ msgid ""
 "Please choose a keyboard map.\n"
 "YaST will offer you additional keyboard tables later on."
 msgstr ""
-"Kérem válasszon billentykiosztást.\n"
-"További kiosztás közül késõbb választhat majd."
+"Kérem válasszon billentyûzetkiosztást.\n"
+"További kiosztások közül késõbb választhat majd."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to be unloaded."
@@ -324,7 +322,7 @@ msgstr "Kíván további SCSI kártyákat keresni?"
 
 #. TXT_WANT_MORE_NET
 msgid "Do you want to search for additional network cards?"
-msgstr "Kíván további hálozati kártyákat keresni?"
+msgstr "Kíván további hálózati kártyákat keresni?"
 
 #. TXT_WANT_MORE_CDROM
 msgid "Do you want to search for additional CD-ROM drives?"
@@ -332,11 +330,11 @@ msgstr "Kíván további CD-ROM meghajtókat keresni?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "ethernet hálózati kártya"
+msgstr "Ethernet hálózati kártya"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "párhuzamos kapu"
+msgstr "párhuzamos port"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
@@ -364,7 +362,7 @@ msgstr "Kérem adja meg PLIP partner IP címét."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
-msgstr "A PCMCIA lapkakészlet automatikus felismerése nem sikerült! Kérem adja meg az szükséges adatokat."
+msgstr "A PCMCIA lapkakészlet automatikus felismerése nem sikerült! Kérem adja meg manuálisan a szükséges adatokat."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -373,14 +371,14 @@ msgid ""
 "\n"
 "Please enter parameters for PCMCIA core modules"
 msgstr ""
-"Talált \"%s\" PCMCIA chipkészletet!\n"
+"Találtam egy \"%s\" PCMCIA chipkészletet!\n"
 "\n"
 "Kérem adja meg a PCMCIA alapmodul paramétereit"
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
 msgid "Please enter specific parameters for chipset \"%s\""
-msgstr "Adja meg a(z) \"%s\" lapkakészlet speciális paramétereit"
+msgstr "Adja meg a(z) \"%s\" lapkakészlet speciális paramétereit:"
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
@@ -388,11 +386,11 @@ msgstr "Kártyakezelõ indítása..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "A PCMCIA kártya szolgáltatások indítása sikerült.."
+msgstr "A PCMCIA kártya szolgáltatások elindítása sikerült."
 
 #. TXT_PCMCIA_FAIL
 msgid "Start of PCMCIA card services failed!"
-msgstr "Nem sikerült elindítani a PCMCIA kártya szolgáltatásokat!"
+msgstr "Nem sikerült elindítani a PCMCIA kártyaszolgáltatásokat!"
 
 #. TXT_PCMCIA_ALREADY
 msgid "PCMCIA card services already running!"
@@ -408,9 +406,9 @@ msgid ""
 msgstr ""
 "A Linuxrc programból csak a \n"
 "\n"
-"\"Telepítés megkezdése / rendszer \"\n"
+"\"Telepítés megkezdése / rendszerindítás\"\n"
 "\n"
-"menüponton keresztül lehet kilépni. Lehet, hogy ehhez még be kell tölteni néhány meghajtó(modul)t."
+"menüponton keresztül lehet kilépni. Lehet, hogy ehhez még be kell tölteni néhány meghajtómodult."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <ctrl-c>!"
@@ -418,7 +416,7 @@ msgstr "Nem léphet ki a Linuxrc programból a <ctrl-c> megnyomásával!"
 
 #. TXT_REMOVE_DISK
 msgid "Please remove the disk from the drive now!"
-msgstr "Kérem vegye ki most a lemezt a meghajtóból!"
+msgstr "Kérem vegye most ki a lemezt a meghajtóból!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -432,7 +430,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 msgid "Please choose the source medium"
-msgstr "Kérem válasszon forrásmediumot"
+msgstr "Kérem válasszon forrásmédiumot"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -444,36 +442,35 @@ msgstr "A CD-ROM csatolása nem sikerült!"
 
 #. TXT_START_YAST
 msgid "Starting YaST..."
-msgstr "YaST indítása..."
+msgstr "A YaST indítása..."
 
 #. TXT_ASK_REBOOT
 msgid "Do you want to reboot the system now?"
-msgstr "Most indítja újra a rendszert?"
+msgstr "Újraindítja most a rendszert?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
-msgstr "Az alaprendszer telepítése sikerült. Az újonan telepített rendszer a telepítést követõen fog indulni."
+msgstr "Az alaprendszer telepítése sikerült. Az újonan telepített rendszer most elindul, hogy befejezõdjön a telepítés."
 
 #. TXT_ENTER_PARTITION
 msgid "Please enter the harddisk partition (eg. /dev/sda1)"
-msgstr "Adja meg a megfelelõ particiót (pl. /dev/hda1)"
+msgstr "Adja meg a megfelelõ merevlemez partíciót (pl. /dev/hda1):"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition!"
-msgstr "A kijelölt partició csatolása nem sikerült"
+msgstr "A kijelölt partició csatolása nem sikerült!"
 
 #. TXT_ENTER_HD_DIR
 msgid "Please enter the source directory"
 msgstr "Kérem adja meg a forrás könyvtárat"
 
 #. TXT_ERROR_INSTALL
-
 msgid "An error occurred during the installation!"
 msgstr "Hiba történt a telepítés folyamán!"
 
 #. TXT_DRIVES
 msgid "Harddisks / CD-ROMs"
-msgstr "Merevlemezek / CD-ROM-ok"
+msgstr "Merevlemezek és CD-ROM-ok"
 
 #. TXT_LITTLE_MEM
 msgid ""
@@ -495,7 +492,7 @@ msgid ""
 "\n"
 "Of course ;-)"
 msgstr ""
-"Szereti az \"animált\" ablakokat?\n"
+"Szereti az animált ablakokat?\n"
 "\n"
 "Naná ;-)"
 
@@ -509,31 +506,31 @@ msgstr "Nyomkövetõ (szakértõ)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load rootimage into ramdisk"
-msgstr "Rootimage betöltése a ramdisk-ba"
+msgstr "Gyökérképmás betöltése a ramdiszkbe"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
-msgstr "Adja meg a rootimage nevét"
+msgstr "Adja meg a gyökérképmás nevét:"
 
 #. TXT_ASK_RI_FORCE
 msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
-msgstr "Mindenképpen betölti a rootimage fájlt a RAM lemezbe, akkor is, ha egy mûködõ telepítõrendszer van a gépen?"
+msgstr "Mindenképpen be akarja tölteni a gyökérkönyvtár képmás-fájlját a RAM lemezbe, még akkor is, ha egy mûködõ telepítõrendszert találtam a gépén?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
-msgstr "Adja meg a fájl elérési útját, amelyet root fájlrendszerként be akarja tölteni a RAM lemezbe"
+msgstr "Adja meg a fájl elérési útját, amelyet gyökér-fájlrendszerként be akar tölteni a RAM-diszkbe:"
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented!"
-msgstr "Még nincs beépítve!"
+msgstr "Még nincs implementálva!"
 
 #. TXT_NEW_INST_SYS
 msgid "Installation system"
-msgstr "Telepítõ rendszer"
+msgstr "Telepítõrendszer"
 
 #. TXT_ENTER_INST_SYS
 msgid "Please enter the directory that contains the installation system."
-msgstr "Kérem adja meg azt a könyvtárat, amely tartalmazza a telepítõ rendszert"
+msgstr "Kérem adja meg azt a könyvtárat, amely tartalmazza a telepítõrendszert"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -541,7 +538,7 @@ msgstr "Nincs elérhetõ információ."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "Telepítés elõkészítés..."
+msgstr "Telepítés elõkészítése ..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
@@ -553,7 +550,7 @@ msgstr "Kérem helyezze be a Live CD-t."
 
 #. TXT_END_REBOOT
 msgid "Exit / Reboot"
-msgstr "Kilpés / Újraindítás"
+msgstr "Kilépés vagy újraindítás"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
@@ -561,11 +558,11 @@ msgstr "Infofile keresése..."
 
 #. TXT_NFSPORT
 msgid "Specify NFS port"
-msgstr "NFS port meghatározása"
+msgstr "NFS port megadása"
 
 #. TXT_ASKING_NAMED
 msgid "Asking nameserver..."
-msgstr "Névszerver kérdezése..."
+msgstr "Névszerver lekérdezése..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
@@ -574,11 +571,11 @@ msgstr "A(z) %s gép ismeretlen!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
-msgstr "A hálozata jelenleg be van állítva. Megtartja ezt a beállítást?"
+msgstr "A hálózat jelenleg be van állítva. Megtartja ezt a beállítást?"
 
 #. TXT_ASK_BREAK
 msgid "Do want to abort?"
-msgstr "Beállítás megszakítása?"
+msgstr "Megszakítja a beállítást?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
@@ -610,7 +607,7 @@ msgstr "Kérem adja meg azt a felhasználó nevet, amellyel el kívánja érni az FTP-
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Please enter the password for the FTP user account"
-msgstr "Adjon meg egy jelszót az FTP-user jogosultsághoz"
+msgstr "Adjon meg egy jelszót az FTP használatához"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Please enter the address of the FTP proxy"
@@ -647,7 +644,7 @@ msgstr "a párhuzamos port inicializálása..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Please enter the port number on which the nfs server is running"
-msgstr "Kérem adja meg a NFS szerver által használt kapu számát"
+msgstr "Kérem adja meg a NFS szerver által használt port számát"
 
 #. TXT_YAST1
 msgid "YaST1 - text based"
@@ -672,11 +669,11 @@ msgstr "CD kiadása"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp timeout"
-msgstr "Várakozás a boot promptnál"
+msgstr "Bootp timeout"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Please enter the timeout value for bootp."
-msgstr "Itt határozhatja meg, hogy hány másodpercig jelenjen meg a boot menü"
+msgstr "Itt határozhatja meg, hogy hány másodpercig várjak bootp-re"
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -684,7 +681,7 @@ msgid ""
 "Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
 msgstr ""
 "Az alaprendszer telepítése sikerült. A rendszer most újraindul. Kérem, vegye ki a telepítéshez használt médiumokat (CD-ROM, hajlékonylemez) a meghajtóból.\n"
-"A hajlékonylemezt azonban bennt kell hagyni a meghajtóban, ha a Linux Loader (LILO) erre a lemezre lett telepítve."
+"A hajlékonylemezt azonban bent kell hagyni a meghajtóban, ha a Linux Loader (LILO) erre a lemezre lett telepítve."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -700,11 +697,11 @@ msgstr "IUCV kapcsolat"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "csatornához csatolt cisco router"
+msgstr "csatornához csatolt Cisco útválasztó"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
-msgstr ""
+msgstr "Adja meg az SMB szerver által kiajánlott nevet:"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
@@ -712,143 +709,133 @@ msgid ""
 "you don't need do specify username, password and workgroup.\n"
 "Do you want to access the share as quest?"
 msgstr ""
+"Ha guest-ként akara a kiajánlott könyvtárat elérni, "
+"nem kell megadjon felhasználói nevet, jeszót és munkacsoportot.\n"
+"Guest-ként akar csatlakozni?"
 
 #. TXT_SMB_ENTER_USER
-msgid "Please enter yor user name on the SMB server"
-msgstr ""
+msgid "Please enter your user name on the SMB server"
+msgstr "Adja meg a felhasználói nevét az SMB szerveren:"
 
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter yor password on the SMB server"
-msgstr ""
+msgid "Please enter your password on the SMB server"
+msgstr "Adja meg a jelszavát az SMB szerveren:"
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Please enter yor workgroup."
+"Please enter your workgroup."
 "If you don't need to specify a workgroup,"
 "just leave the field empty."
 msgstr ""
+"Adja meg a munkacsoportot:"
+"Ha nincs szükség munkacsoportra, "
+"hagyja üresen a mezõt."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
+msgstr "Próbálom csatolni a(z) \n\n\"//%s/%s\" kiajánlást"
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr ""
+msgstr "Automatikus konfiguráció a(z) %s-n keresztül?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr ""
+msgstr "A %s kérés küldése ..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr ""
+msgstr "A(z) %s konfiguráció nem sikerült."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
-msgstr ""
+msgstr "Használ DHCP-t a BOOTP helyett?"
 
 #. TXT_MODDISK0
 msgid "Please insert a modules disk."
-msgstr ""
+msgstr "Kérem tegye be a modulok lemezt."
 
 #. TXT_MODDISK1
 #, c-format
 msgid "Please insert modules disk %d."
-msgstr ""
+msgstr "Kérem tegye be a(z) %d modulok lemezt."
 
 #. TXT_MODDISK2
 msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
-msgstr ""
+msgstr "Az elsõ CD-n (vagy DVD-n) a disks/REAdme fájlban talál információt arról, hogy hogyan készítse el. "
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Please choose the network protocol"
-msgstr ""
+msgstr "Válasszon hálózati protokollt"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
-msgstr ""
+msgstr "Adja meg a(z) %s szerver IP címét:"
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr ""
+msgstr "Kapcsolódás a(z) %s szerverhez ..."
 
 #. TXT_NET
 msgid "Network"
-msgstr ""
+msgstr "Hálózat"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s modules"
-msgstr ""
+msgstr "A(z) %s modulok betöltése"
 
 #. TXT_LOAD_FS
 msgid "Load file system modules"
-msgstr ""
+msgstr "A fájlrendszer modulok betöltése"
 
 #. TXT_LOAD_OTHER
 msgid "Load unknown modules"
-msgstr ""
+msgstr "Ismeretlen modulok betöltése"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr ""
+msgstr "Találtam egy %s fájlrendszert."
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr ""
+msgstr "Folytatás"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr ""
+msgstr "Elvetés"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr ""
+msgstr "Nincs új modul."
 
 #. TXT_CHOOSE_PARTITION
 msgid "Please choose the harddisk partition."
-msgstr ""
+msgstr "Válasszon egy merevlemez partíciót."
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Please choose the root partition."
-msgstr ""
+msgstr "Válassza ki a gyökér partíciót."
 
 #. TXT_CHOOSE_SWAP
 msgid "Please choose the swap partition."
-msgstr ""
+msgstr "Válassza ki a cserepartíciót (swap)."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr ""
-
-#. TXT_LOW_MEMORY2
-msgid "Your computer doesn't have enough memory to run YaST."
-msgstr ""
-
-#. TXT_ADD_SWAP
-msgid "To continue, activate some swap space."
-msgstr ""
-
-#. TXT_ERROR_SWAP
-msgid "Error activating swap space."
-msgstr ""
-
-#. TXT_ENTER_SWAP
-msgid "Please enter the swap partition (eg. /dev/sda2)"
-msgstr ""
+msgstr "Nincs elég memória minden adat betöltéséhez."
 
