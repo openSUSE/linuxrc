@@ -89,3 +89,4 @@ int             do_disp_init_ig = TRUE;
 char            xkbrules_tg [20] = "";
 char            xkbmodel_tg [20] = "";
 char            xkblayout_tg [20] = "";
+unsigned        yast2_color_ig = 0;

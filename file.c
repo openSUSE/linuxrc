@@ -84,6 +84,7 @@ static const char  *file_probe_tm              = "probe:";
 static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
 static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
+static const char  *file_txt_yast2_color_tm    = "YaST2color:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
@@ -229,7 +230,7 @@ void file_write_yast_info (void)
 
     mpar_write_modparms (file_pri);
 
-    if (detectSMP ())
+    if (detectSMP () > 0)
         fprintf (file_pri, "SMP: 1\n");
     else
         fprintf (file_pri, "SMP: 0\n");
@@ -261,6 +262,9 @@ void file_write_yast_info (void)
     if(*xkbrules_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbrules_tm, xkbrules_tg);
     if(*xkbmodel_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbmodel_tm, xkbmodel_tg);
     if(*xkblayout_tg) fprintf (file_pri, "%s %s\n", file_txt_xkblayout_tm, xkblayout_tg);
+    if(yast2_color_ig) {
+      fprintf (file_pri, "%s %06x\n", file_txt_yast2_color_tm, yast2_color_ig);
+    }
     {
       char *s = getenv("probe");
       if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);

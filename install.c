@@ -828,6 +828,7 @@ static int inst_execute_yast (void)
     (void) system ("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
     /* if the initrd has an ext2 fs, we've just made / read-only */
     mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
+
     inst_umount ();
     if (ramdisk_ig)
         util_free_ramdisk ("/dev/ram2");

@@ -168,35 +168,31 @@ void lxrc_end (void)
     }
 
 
+char *lxrc_prog_name(pid_t pid)
+{
+  FILE *f;
+  char proc_status[64];
+  static char buf[64];
+
+  *buf = 0;
+  sprintf(proc_status, "/proc/%u/status", (unsigned) pid);
+  if((f = fopen(proc_status, "r"))) {
+    if(fscanf(f, "Name: %30s", buf) != 1) *buf = 0;
+    fclose(f);
+  }
+
+  return buf;
+}
+
 /*
  * Check if pid is either portmap or rpciod.
  *
  */
 int is_rpc_prog(pid_t pid)
 {
-  char proc_status[64], buf[64];
-  FILE *f;
+  if(!strcmp(lxrc_prog_name(pid), "portmap")) return 1;
+  if(!strcmp(lxrc_prog_name(pid), "rpciod")) return 1;
 
-  sprintf(proc_status, "/proc/%u/status", pid);
-
-  if((f = fopen(proc_status, "r"))) {
-    if(fscanf(f, "Name: %30s", buf) == 1) {
-      if(!strcmp(buf, "portmap")) {
-        deb_int(pid);
-        deb_msg("-> is portmap");
-        fclose(f);
-        return 1;
-      }
-      if(!strcmp(buf, "rpciod")) {
-        deb_int(pid);
-        deb_msg("-> is rpciod");
-        fclose(f);
-        return 1;
-      }
-    }
-    fclose(f);
-  }
-  
   return 0;
 }
 
@@ -208,16 +204,24 @@ int is_rpc_prog(pid_t pid)
  */
 void lxrc_killall(int really_all)
 {
-  pid_t i_ri;
-  pid_t mypid_ri;
+  pid_t i;
+  pid_t mypid;
+#ifdef LXRC_DEBUG
+  char *s;
+#endif
 
-  if (testing_ig)
-      return;
+  if(testing_ig) return;
 
-  mypid_ri = getpid ();
-  for(i_ri = 32767; i_ri > mypid_ri; i_ri--)
-    if(i_ri != lxrc_mempid_rm && (really_all || !is_rpc_prog(i_ri)))
-      kill(i_ri, 9);
+  mypid = getpid();
+  for(i = 32767; i > mypid; i--) {
+    if(i != lxrc_mempid_rm && (really_all || !is_rpc_prog(i))) {
+#ifdef LXRC_DEBUG
+      s = lxrc_prog_name(i);
+      if(*s) fprintf(stderr, "kill %s (%d)\n", s, (int) i);
+#endif
+      kill(i, 9);
+    }
+  }
 }
                           
 

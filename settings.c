@@ -96,8 +96,8 @@ static keymap_t set_keymaps_arm [] =
 { "Português Brasileiro", "br-abnt2"     },
 { "Russian",              "ru1"          },
 { "Czech",                "cz-us-qwertz" },
-{ "Dansk",                "dk",          },
-{ "Suomi/Svensk",         "fi",          },
+{ "Dansk",                "dk"           },
+{ "Suomi/Svensk",         "fi"           },
 { "Slovak",               "sk-qwerty"    }
 };
 #endif
@@ -113,17 +113,17 @@ static keymap_t set_keymaps_arm [] =
 { "sunt5-es",        "sunt5-es"        },
 { "sunt5-fi-latin1", "sunt5-fi-latin1" },
 { "sunt5-fr-latin1", "sunt5-fr-latin1" },
-{ "sunt5-ru.map",    "sunt5-ru.map"    }
+{ "sunt5-ru",        "sunt5-ru"        }
 };
 #endif
 
 #if defined(__PPC__)
 static keymap_t set_keymaps_arm [] =
 {
-{ "mac-de-latin1-nodeadkeys", "mac-de-latin1-nodeadkeys" },
-{ "mac-fr2-ext.map",          "mac-fr2-ext.map"          },
-{ "mac-us-ext.map",           "mac-us-ext.map"           },
-{ "mac-us-std.map",           "mac-us-std.map"           }
+{ "Deutsch",              "mac-de-latin1-nodeadkeys" },
+{ "English (US)",         "mac-us"                   },
+{ "English (UK)",         "mac-us"                   },
+{ "Français",             "mac-fr2-ext"              }
 };
 #endif
 
