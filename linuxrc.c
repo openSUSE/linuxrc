@@ -296,22 +296,22 @@ static void lxrc_init (void)
            *s = 0;
            strcat (strcat (strcat (s, ","), linuxrc_pci), ",");
 
-           if (strstr (linuxrc_pci, ",auto,"))
+           if (strstr (s, ",auto,"))
                auto_ig = TRUE;
            
-           if (strstr (linuxrc_pci, ",auto2,"))
+           if (strstr (s, ",auto2,"))
                auto2_ig = TRUE;
            
-           if (strstr (linuxrc_pci, ",demo,"))
+           if (strstr (s, ",demo,"))
                demo_ig = TRUE;
            
-           if (strstr (linuxrc_pci, ",reboot,"))
+           if (strstr (s, ",reboot,"))
                reboot_ig = TRUE;
 
-           if (strstr (linuxrc_pci, ",yast1,"))
+           if (strstr (s, ",yast1,"))
                yast_version_ig = 1;
 
-           if (strstr (linuxrc_pci, ",yast2,"))
+           if (strstr (s, ",yast2,"))
                yast_version_ig = 2;
 
            free (s);
