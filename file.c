@@ -56,7 +56,7 @@ static struct {
   file_key_flag_t flags;
 } keywords[] = {
   { key_none,           "",               kf_none                        },
-  { key_root,           "Root",           kf_yast                        },
+  { key_root,           "Root",           kf_yast + kf_boot              },
   { key_live,           "live",           kf_cfg + kf_cmd                },
   { key_keytable,       "Keytable",       kf_cfg + kf_cmd + kf_yast      },
   { key_language,       "Language",       kf_cfg + kf_cmd + kf_yast      },
@@ -199,7 +199,10 @@ static struct {
   { key_showopts,       "showopts",       kf_boot                        },
   { key_nosshkey,       "nosshkey",       kf_boot                        },
   { key_startshell,     "startshell",     kf_boot                        },
-  { key_y2debug,        "y2debug",        kf_boot                        }
+  { key_y2debug,        "y2debug",        kf_boot                        },
+  { key_ro,             "ro",             kf_boot                        },
+  { key_rw,             "rw",             kf_boot                        },
+  { key_netid,          "NetUniqueID",    kf_none                        }
 };
 
 static struct {
@@ -1235,8 +1238,9 @@ void file_write_install_inf(char *dir)
         s = "dhcp";
         break;
     }
-    if(s) file_write_str(f, key_netconfig, s);
+    file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, netdevice_tg);
+    file_write_str(f, key_netid, config.net.unique_id);
     file_write_inet(f, key_ip, &config.net.hostname);
     if(config.net.realhostname) {
       file_write_str(f, key_hostname, config.net.realhostname);

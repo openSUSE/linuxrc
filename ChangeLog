@@ -1,3 +1,7 @@
+31/7/2003:	v1.5.6
+	- make 'boot installed system' work again
+	- shut down correct network interface (#27839, #28261)
+
 16/7/2003:	v1.5.5
 	- use static resolv lib
 

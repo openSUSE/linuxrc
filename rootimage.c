@@ -444,7 +444,7 @@ int root_check_root(char *root_string_tv)
 
   umount(mountpoint_tg);
 
-  return rc == TRUE ? 0 : -1;
+  return rc == 'r' ? 0 : -1;
 }
 
 

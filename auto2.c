@@ -256,7 +256,7 @@ void auto2_scan_hardware(char *log_file)
       /* is a Sony Vaio */
       fprintf(stderr, "is a Vaio\n");
       is_vaio = 1;
-      pcmcia_params = "irq_list=9,10,11,15";
+      if(!config.kernel_pcmcia) pcmcia_params = "irq_list=9,10,11,15";
       slist_append(&config.module.initrd, usb_modules);
       usb_modules = NULL;
     }
@@ -459,7 +459,7 @@ int auto2_net_dev(hd_t **hd0)
 
       config.net.configured = nc_static;
 
-      /* do bootp of there's some indication that a net install is intended
+      /* do bootp if there's some indication that a net install is intended
        * but some data are still missing
        */
       if(
@@ -499,6 +499,7 @@ int auto2_net_dev(hd_t **hd0)
       }
       else {
         fprintf(stderr, "%s activated\n", hd->unix_dev_name);
+        str_copy(&config.net.unique_id, hd->unique_id);
       }
 
       net_is_configured_im = TRUE;

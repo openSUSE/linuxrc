@@ -398,6 +398,7 @@ typedef struct {
     char *vncpassword;
     char *sshpassword;
     net_config_t configured;	/* how we configured the network device */
+    char *unique_id;		/* unique id of network card */
   } net;
 
 } config_t;

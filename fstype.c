@@ -413,8 +413,8 @@ fstype(const char *device) {
     return(type);
 
 io_error:
-    if (errno)
-	 perror(device);
+//    if (errno)
+//	 perror(device);
 //    else
 //	 fprintf(stderr, "fstype: error while guessing filesystem type\n");
     close(fd);
