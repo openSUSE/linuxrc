@@ -832,14 +832,12 @@ void file_do_info(file_t *f0)
 
       case key_vncpassword:
         str_copy(&config.net.vncpassword, *f->value ? f->value : NULL);
-        config.vnc = 1;
-        config.activate_network = 1;
+	/* do not enable vnc nor network ... this is done with vnc=1 */
         break;
 
       case key_sshpassword:
         str_copy(&config.net.sshpassword, *f->value ? f->value : NULL);
-        config.usessh = 1;
-        config.activate_network = 1;
+	/* do not enable ssh nor network ... this is done with usessh=1 */
         break;
 
       case key_usepivotroot:
