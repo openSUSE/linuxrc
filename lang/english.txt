@@ -185,7 +185,7 @@ static text_t txt_english_atm [] =
 { TXT_ENTER_NFSPORT,  "Please enter the port number the nfs server is running "
                       "on"                                                    },
 { TXT_YAST1,          "YaST1 - text based"                                    },
-{ TXT_YAST2,          "YaST2 - grafical"                                      },
+{ TXT_YAST2,          "YaST2 - graphical"                                     },
 { TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
                       "installation."                                         },
 { TXT_INSERT_CD,      "Please make sure that CD number %d is in your drive!"  }
