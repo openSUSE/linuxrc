@@ -472,7 +472,15 @@ void mod_autoload (void)
     window_t  win_ri;
     char      text_ti [200];
     int       rc_ii;
+    int       nr_modules_ii, more_ii;
 
+    rc_ii = mod_get_current_list (MOD_TYPE_SCSI, &nr_modules_ii, &more_ii);
+
+    /* what if there are _no_ network mods on the modules disk??? */
+    if (rc_ii || !nr_modules_ii)
+    {
+        if (mod_getmoddisk ()) return;
+    }
 
     dia_status_on (&win_ri, "");
     rc_ii = mod_get_ram_modules (MOD_TYPE_SCSI);
