@@ -335,7 +335,7 @@ int ia64DetectSMP(void)
 	char buff[1024];
 
 	while (fgets (buff, 1024, f) != NULL)
-	    if (!strncmp (buff, "CPU# ", 5))
+	    if (!strncmp (buff, "processor ", 10))
 		n_cpu++;
 	fclose(f);
     } else
