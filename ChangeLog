@@ -1,3 +1,6 @@
+21/5/2003:	v1.4.48
+	- ask for cd1 on all archs
+
 13/5/2003:	v1.4.47
 	- make hd installs work properly (#26906)
 
