@@ -268,7 +268,7 @@ void auto2_scan_hardware(char *log_file)
     usb_mods_ig = usb_mods;
   }
 
-#if 0
+#ifdef __PPC__
   switch(hd_mac_color(hd_data)) {
     case 0x01:
       disp_vgacolors_rm.bg = COL_BLUE;
@@ -399,18 +399,25 @@ int auto2_net_dev(hd_t **hd0)
 
       net_setup_localhost();
 
-      if((valid_net_config_ig & 0x2b) != 0x2b) {
-        fprintf(stderr, "Sending bootp request...");
+      /* do bootp of there's some indication that a net install is intended
+       * but some data are still missing
+       */
+      if(
+        (valid_net_config_ig || bootmode_ig == BOOTMODE_NET) &&
+        (valid_net_config_ig & 0x2b) != 0x2b
+      ) {
+        printf("Sending bootp request to %s... ", netdevice_tg);
+        fflush(stdout);
         net_bootp();
         if(
           !server_dir_tg || !*server_dir_tg || !ipaddr_rg.s_addr ||
           !netmask_rg.s_addr || !broadcast_rg.s_addr ||
           !gateway_rg.s_addr || !nfs_server_rg.s_addr
         ) {
-          fprintf(stderr, "no/incomplete answer.\n");
+          printf("no/incomplete answer.\n");
           return 1;
         }
-        fprintf(stderr, "done.\n");
+        printf("ok.\n");
       }
 
       if(net_activate()) {
@@ -647,7 +654,7 @@ int auto2_init()
 
 #ifdef __i386__
   {
-//    int net_cfg = (valid_net_config_ig & 0x2b) == 0x2b;
+    /* int net_cfg = (valid_net_config_ig & 0x2b) == 0x2b; */
     int net_cfg = valid_net_config_ig || bootmode_ig == BOOTMODE_NET;
 
     /* ok, found something */
@@ -717,22 +724,6 @@ int auto2_find_install_medium()
       return TRUE;
     }
   }
-
-#if 0
-  net_setup_localhost();
-  if((valid_net_config_ig & 0x2b) != 0x2b) {
-    printf("Sending bootp request...");
-    fflush(stdout);
-    net_bootp();
-    if(!server_dir_tg || !*server_dir_tg || !ipaddr_rg.s_addr || !netmask_rg.s_addr || !broadcast_rg.s_addr || !gateway_rg.s_addr || !nfs_server_rg.s_addr) {
-      printf("no/incomplete answer.\n");
-      return FALSE;
-    }
-    printf("done.\n");
-  }
-#endif
-
-  /* if((valid_net_config_ig & 0x2b) != 0x2b) return FALSE; */
 
   if(auto2_loaded_module) {
     free(auto2_loaded_module); auto2_loaded_module = NULL;

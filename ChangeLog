@@ -1,16 +1,22 @@
-21/2/2001:	v1.1.18.13
+23/2/2001:	v1.1.18.015
+	- re-enabled mac color detection
+
+21/2/2001:	v1.1.18.014
+	- nice bootp message
+
+21/2/2001:	v1.1.18.013
 	- changed language name: Norway -> Norsk
 	- bootp & auto2 now hopefully _really_ work together
 	- enlarged 'boot installed system' input field
 
-21/2/2001:	v1.1.18.12
+21/2/2001:	v1.1.18.012
 	- schwab: remember original environment and pass it when launching init
 	- kukuk: fix typo for norwegian keyboard, add finish type4 keyboard
 	- mls: allow automatic bootp requests in auto2 mode
 	- mls: fix network setup (5 min timeout bug again)
 	- fixed bootp (hw address got lost)
 
-7/2/2001:	v1.1.18.11
+7/2/2001:	v1.1.18.011
 	- starting a Live CD now works again
 
 2/2/2001:	v1.1.18.010

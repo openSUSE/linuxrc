@@ -97,8 +97,8 @@ static const char  *file_probe_tm              = "probe:";
 static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
 static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
-static const char  *file_txt_yast2_color_tm    = "YaST2color:";
 #endif
+static const char  *file_txt_yast2_color_tm    = "YaST2color:";
 static const char  *file_txt_boot_disk_tm      = "BootDisk:";
 static const char  *file_txt_disks_tm          = "Disks:";
 #if 0
@@ -305,10 +305,10 @@ void file_write_yast_info (char *file_name)
     if(*xkbrules_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbrules_tm, xkbrules_tg);
     if(*xkbmodel_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbmodel_tm, xkbmodel_tg);
     if(*xkblayout_tg) fprintf (file_pri, "%s %s\n", file_txt_xkblayout_tm, xkblayout_tg);
+#endif
     if(yast2_color_ig) {
       fprintf (file_pri, "%s %06x\n", file_txt_yast2_color_tm, yast2_color_ig);
     }
-#endif
 #if 0
     {
       char *s = getenv("probe");
