@@ -11,3 +11,4 @@ extern int inst_auto_install  (void);
 extern int inst_start_demo    (void);
 extern int inst_check_instsys (void);
 extern int inst_start_install (void);
+int inst_choose_hd(char *txt_menu, char *txt_input);

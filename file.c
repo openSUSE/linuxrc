@@ -41,7 +41,6 @@ static void parse_value(file_t *ft);
 
 static char *file_read_info_file(char *file, char *file2);
 void file_write_modparms(FILE *f);
-static file_t *file_read_cmdline(void);
 static void file_module_load (char *insmod_arg);
 #ifdef DEBUG_FILE
 static void file_dump_flist(file_t *ft);
@@ -150,7 +149,10 @@ static struct {
   { key_nfsport,        "NFSPort"          },
   { key_dhcptimeout,    "DHCPTimeout"      },
   { key_tftptimeout,    "TFTPTimeout"      },
-  { key_tmpfs,          "TmpFS"            }
+  { key_tmpfs,          "_TmpFS"           },
+  { key_testmode,       "_TestMode"        },
+  { key_debugwait,      "_DebugWait"       },
+  { key_expert,         "Expert"           }
 };
 
 static struct {
@@ -208,12 +210,14 @@ file_key_t file_str2key(char *str)
   if(!str || !*str) return key_none;
 
   /* remove all '-' and '_' */
-  for(i = 0, s = str; str[i]; i++) {
-    if(str[i] != '_' && str[i] != '-') {
-      *s++ = str[i];
+  if(*str != '_') {
+    for(i = 0, s = str; str[i]; i++) {
+      if(str[i] != '_' && str[i] != '-') {
+        *s++ = str[i];
+      }
     }
+    *s = 0;
   }
-  *s = 0;
 
   if(!*str) return key_none;
 
@@ -489,8 +493,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_keytable:
-        if(config.keymap) free(config.keymap);
-        config.keymap = *f->value ? strdup(f->value) : NULL;
+        str_copy(&config.keymap, *f->value ? f->value : NULL);
         break;
 
       case key_bootmode:
@@ -582,7 +585,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_textmode:
-        text_mode_ig = f->nvalue;
+        config.textmode = f->nvalue;
         break;
 
       case key_username:
@@ -630,6 +633,22 @@ void file_do_info(file_t *f0)
 
       case key_tmpfs:
         if(f->is.numeric) config.tmpfs = f->nvalue;
+        break;
+
+      case key_testmode:
+        if(f->is.numeric) config.test = f->nvalue;
+        break;
+
+      case key_debugwait:
+        if(f->is.numeric) config.debugwait = f->nvalue;
+        break;
+
+      case key_expert:
+        if(f->is.numeric) {
+          if((f->nvalue & 1)) config.textmode = 1;
+          if((f->nvalue & 2)) yast2_update_ig = 1;
+          if((f->nvalue & 4)) yast2_serial_ig = 1;
+        }
         break;
 
       case key_domain:
@@ -876,7 +895,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_yast2update, yast2_update_ig || *driver_update_dir ? 1 : 0);
 
   file_write_num(f, key_yast2serial, yast2_serial_ig);
-  file_write_num(f, key_textmode, text_mode_ig);
+  file_write_num(f, key_textmode, config.textmode);
 
   file_write_str(f, key_autoyast, config.autoyast);
 

@@ -32,107 +32,13 @@
 #include "module.h"
 #include "ftp.h"
 #include "linuxrc.h"
+#include "install.h"
 
 #include "linux_fs.h"
 
 
 #define BLOCKSIZE	10240
 #define BLOCKSIZE_KB	(BLOCKSIZE >> 10)
-
-#if 0
-typedef struct
-    {
-    char *dev_name;
-    int   major;
-    int   minor;
-    } device_t;
-
-static device_t root_devices_arm [] =
-{
-    { "hda",           3,   0 },
-    { "hdb",           3,  64 },
-    { "hdc",          22,   0 },
-    { "hdd",          22,  64 },
-    { "hde",          33,   0 },
-    { "hdf",          33,  64 },
-    { "hdg",          34,   0 },
-    { "hdh",          34,  64 },
-    { "hdi",          56,   0 },
-    { "hdj",          56,  64 },
-    { "hdk",          57,   0 },
-    { "hdl",          57,  64 },
-    { "sda",           8,   0 },
-    { "sdb",           8,  16 },
-    { "sdc",           8,  32 },
-    { "sdd",           8,  48 },
-    { "sde",           8,  64 },
-    { "sdf",           8,  80 },
-    { "sdg",           8,  96 },
-    { "sdh",           8, 112 },
-    { "sdi",           8, 128 },
-    { "sdj",           8, 144 },
-    { "sdk",           8, 160 },
-    { "sdl",           8, 176 },
-    { "sdm",           8, 192 },
-    { "sdn",           8, 208 },
-    { "sdo",           8, 224 },
-    { "sdp",           8, 240 },
-    { "rd/c0d0p",     48,   0 },
-    { "rd/c0d1p",     48,   8 },
-    { "rd/c0d2p",     48,  16 },
-    { "rd/c0d3p",     48,  24 },
-    { "rd/c0d4p",     48,  32 },
-    { "rd/c0d5p",     48,  40 },
-    { "rd/c0d6p",     48,  48 },
-    { "rd/c0d7p",     48,  56 },
-    { "rd/c1d0p",     49,   0 },
-    { "rd/c1d1p",     49,   8 },
-    { "rd/c1d2p",     49,  16 },
-    { "rd/c1d3p",     49,  24 },
-    { "rd/c1d4p",     49,  32 },
-    { "rd/c1d5p",     49,  40 },
-    { "rd/c1d6p",     49,  48 },
-    { "rd/c1d7p",     49,  56 },
-    { "ida/c0d0p",    72,   0 },
-    { "ida/c0d1p",    72,  16 },
-    { "ida/c0d2p",    72,  32 },
-    { "ida/c0d3p",    72,  48 },
-    { "ida/c0d4p",    72,  64 },
-    { "ida/c0d5p",    72,  80 },
-    { "ida/c0d6p",    72,  96 },
-    { "ida/c0d7p",    72, 112 },
-    { "ida/c1d0p",    73,   0 },
-    { "ida/c1d1p",    73,  16 },
-    { "ida/c1d2p",    73,  32 },
-    { "ida/c1d3p",    73,  48 },
-    { "ida/c1d4p",    73,  64 },
-    { "ida/c1d5p",    73,  80 },
-    { "ida/c1d6p",    73,  96 },
-    { "ida/c1d7p",    73, 112 },
-    { "cciss/c0d0p", 104,   0 },
-    { "cciss/c0d1p", 104,  16 },
-    { "cciss/c0d2p", 104,  32 },
-    { "cciss/c0d3p", 104,  48 },
-    { "cciss/c0d4p", 104,  64 },
-    { "cciss/c0d5p", 104,  80 },
-    { "cciss/c0d6p", 104,  96 },
-    { "cciss/c0d7p", 104, 112 },
-    { "cciss/c1d0p", 105,   0 },
-    { "cciss/c1d1p", 105,  16 },
-    { "cciss/c1d2p", 105,  32 },
-    { "cciss/c1d3p", 105,  48 },
-    { "cciss/c1d4p", 105,  64 },
-    { "cciss/c1d5p", 105,  80 },
-    { "cciss/c1d6p", 105,  96 },
-    { "cciss/c1d7p", 105, 112 },
-    { "ram",         1,   0 },
-    { "md0",         9,   0 },
-    { "md1",         9,   1 },
-    { "md2",         9,   2 },
-    { "md3",         9,   3 },
-    { 0,             0,   0 }
-};
-#endif
 
 static int       root_nr_blocks_im;
 static window_t  root_status_win_rm;
@@ -635,61 +541,16 @@ void root_set_root(char *dev)
 }
 
 
-#if 0
-void root_set_root(char *root_string_tv)
-{
-    FILE  *proc_root_pri;
-    int    root_ii;
-    char  *tmp_string_pci;
-    int    found_ii = FALSE;
-    int    i_ii = 0;
-
-  str_copy(&config.new_root, root_string_tv);
-
-    if (!strncmp ("/dev/", root_string_tv, 5))
-        tmp_string_pci = root_string_tv + 5;
-    else
-        tmp_string_pci = root_string_tv;
-
-    while (!found_ii && root_devices_arm [i_ii].dev_name)
-        if (!strncmp (tmp_string_pci, root_devices_arm [i_ii].dev_name,
-                      strlen (root_devices_arm [i_ii].dev_name)))
-            found_ii = TRUE;
-        else
-            i_ii++;
-
-    if (!found_ii)
-        return;
-
-    root_ii = root_devices_arm [i_ii].major * 256 +
-              root_devices_arm [i_ii].minor +
-              atoi (tmp_string_pci + strlen (root_devices_arm [i_ii].dev_name));
-
-    root_ii *= 65537;
-
-    proc_root_pri = fopen ("/proc/sys/kernel/real-root-dev", "w");
-    if (!proc_root_pri)
-        return;
-
-    fprintf (proc_root_pri, "%d\n", root_ii);
-    fclose (proc_root_pri);
-}
-#endif
-
 int root_boot_system()
 {
   int  rc, mtype;
-  char *root = NULL;
   char *module, *type;
-  char buf[256];
-
-  str_copy(&root, "/dev/");
+  char buf[256], root[64];
 
   do {
-    if((rc = dia_input2(txt_get(TXT_ENTER_ROOT_FS), &root, 25, 0))) {
-      str_copy(&root, NULL);
-      return rc;
-    }
+    rc = inst_choose_hd(txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
+    if(rc || !config.partition) return -1;
+    sprintf(root, "/dev/%s", config.partition);
 
     if((type = util_fstype(root, &module))) {
       if(module && config.module.dir) {
@@ -717,8 +578,6 @@ int root_boot_system()
   while(rc);
 
   root_set_root(root);
-
-  free(root);
 
   return 0;
 }

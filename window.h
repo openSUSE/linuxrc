@@ -26,4 +26,4 @@ extern void win_button_unselect  (button_t *button_prv);
 extern int  win_choose_button    (button_t *buttons_arr [], int nr_buttons_iv,
                                   int default_iv);
 extern int  win_input            (int x_iv,   int y_iv, char *input_tr,
-                                  int len_iv, int fieldlen_iv);
+                                  int len_iv, int fieldlen_iv, int pw_mode);

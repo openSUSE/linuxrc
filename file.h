@@ -26,7 +26,8 @@ typedef enum {
   key_install, key_instmode, key_memtotal, key_memfree, key_buffers,
   key_cached, key_swaptotal, key_swapfree, key_minmemfree,
   key_minmemmodules, key_info, key_proxy, key_proxyport, key_proxyproto,
-  key_usedhcp, key_nfsport, key_dhcptimeout, key_tftptimeout, key_tmpfs
+  key_usedhcp, key_nfsport, key_dhcptimeout, key_tftptimeout, key_tmpfs,
+  key_testmode, key_debugwait, key_expert
 } file_key_t;
 
 typedef struct file_s {
@@ -52,6 +53,7 @@ void file_write_mtab(void);
 int file_read_info(void);
 int file_read_yast_inf(void);
 file_t *file_get_cmdline(file_key_t key);
+file_t *file_read_cmdline(void);
 module2_t *file_read_modinfo(char *name);
 int file_sym2num(char *sym);
 char *file_num2sym(char *base_sym, int num);

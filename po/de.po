@@ -902,3 +902,7 @@ msgstr "Es wurden keine neuen Module gefunden."
 msgid "Please choose the harddisk partition."
 msgstr "Bitte wählen Sie die Festplatten-Partition."
 
+#. TXT_CHOOSE_ROOT_FS
+msgid "Please choose the root partition."
+msgstr "Bitte wählen Sie die Root-Partition."
+

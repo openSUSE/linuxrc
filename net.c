@@ -1045,7 +1045,7 @@ int net_bootp()
 
   if(rc || !getenv("BOOTP_IPADDR")) {
     if(config.instmode_extra == inst_cdwithnet) {
-      dia_input("HOSTNAME", machine_name_tg, sizeof machine_name_tg - 1, 16);
+      dia_input("HOSTNAME", machine_name_tg, sizeof machine_name_tg - 1, 16, 0);
 
       if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 0)) netconf_error++;
 
@@ -1160,7 +1160,7 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
   if(inet->name) strcpy(input, inet->name);
 
   do {
-    if((rc = dia_input(text, input, sizeof input - 1, 16))) return rc;
+    if((rc = dia_input(text, input, sizeof input - 1, 16, 0))) return rc;
     name2inet(inet, input);
     rc = net_check_address2(inet, do_dns);
     if(rc) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);

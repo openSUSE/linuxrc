@@ -1046,7 +1046,7 @@ void util_status_info()
   sprintf(buf, "language = %s (%s), keymap = %s", lang->yastcode, lang->locale, config.keymap ?: "");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
+  sprintf(buf, "textmode = %d, yast2update = %d, yast2serial = %d", config.textmode, yast2_update_ig, yast2_serial_ig);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "vga = 0x%04x", frame_buffer_mode_ig);
@@ -2978,10 +2978,10 @@ int util_is_mountable(char *file)
 }
 
 
-void util_wait(char *msg)
+void util_debugwait(char *msg)
 {
 #ifdef LXRC_DEBUG
-  if((guru_ig & 8)) {
+  if(config.debugwait) {
     int win_old;
     if(!(win_old = config.win)) util_disp_init();
     dia_message(msg ?: "hi", MSGTYPE_INFO);

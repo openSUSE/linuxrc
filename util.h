@@ -107,5 +107,5 @@ int util_update_disk_list(char *module, int add);
 void util_update_cdrom_list(void);
 int util_is_dir(char *dir);
 int util_is_mountable(char *file);
-void util_wait(char *msg);
+void util_debugwait(char *msg);
 

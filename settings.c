@@ -532,13 +532,13 @@ int set_expert_cb(dia_item_t di)
         sprintf(tmp, "%d", config.net.nfs_port);
       else
         *tmp = 0;
-      rc = dia_input(txt_get(TXT_ENTER_NFSPORT), tmp, 6, 6);
+      rc = dia_input(txt_get(TXT_ENTER_NFSPORT), tmp, 6, 6, 0);
       if(!rc) config.net.nfs_port = atoi(tmp);
       break;
 
     case di_expert_bootptimeout:
       sprintf(tmp, "%d", config.net.bootp_timeout);
-      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4);
+      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4, 0);
       if(!rc) config.net.bootp_timeout = atoi(tmp);
       break;
 

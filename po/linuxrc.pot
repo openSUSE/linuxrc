@@ -804,3 +804,7 @@ msgstr ""
 msgid "Please choose the harddisk partition."
 msgstr ""
 
+#. TXT_CHOOSE_ROOT_FS
+msgid "Please choose the root partition."
+msgstr ""
+

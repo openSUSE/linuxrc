@@ -1,3 +1,7 @@
+20/2/2002:	v1.3.17
+	- show list of prtitions in 'boot installed system'
+	- set root image name properly for systems > 256MB
+
 18/2/2002:	v1.3.16
 	- internal rework on fs mounting
 	- make cramfs cooperate with ramdisk

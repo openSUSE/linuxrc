@@ -344,6 +344,8 @@ void lxrc_end (void)
     {
     int i;
 
+    util_debugwait("kill remaining procs");
+
     kill (lxrc_mempid_rm, 9);
     lxrc_killall (1);
     while(waitpid(-1, NULL, WNOHANG) == 0);
@@ -359,7 +361,7 @@ void lxrc_end (void)
 
     deb_str(config.new_root);
 
-    util_wait("leaving now");
+    util_debugwait("leaving now");
 
     if(!config.test) {
       (void) util_umount ("/proc/bus/usb");
@@ -752,7 +754,7 @@ void lxrc_init()
   util_redirect_kmsg();
   disp_init();
 
-  auto2_chk_expert();
+  // auto2_chk_expert();
 
   printf("\033[9;0]");		/* screen saver off */
   fflush(stdout);
@@ -1050,7 +1052,7 @@ static void lxrc_check_console (void)
         sprintf (console_tg, "/dev/%s", found_pci);
         if (!strncmp (found_pci, "ttyS", 4)) {
             serial_ig = TRUE;
-            text_mode_ig = TRUE;
+            config.textmode = 1;
           }
 
         fprintf (stderr, "Console: %s, serial=%d\n", console_tg, serial_ig);
@@ -1065,7 +1067,7 @@ static void lxrc_check_console (void)
     if (cp && strlen (cp) > 0)
       {
 	serial_ig = TRUE;
-        text_mode_ig = TRUE;
+        config.textmode = 1;
 
 	strcpy (console_tg, cp);
 

@@ -154,8 +154,6 @@ void auto2_scan_hardware(char *log_file)
   }
 #endif
 
-  if((guru_ig & 4)) hd_data->debug=-1 & ~HD_DEB_DRIVER_INFO;
-
   with_usb = hd_probe_feature(hd_data, pr_usb);
   hd_clear_probe_feature(hd_data, pr_usb);
   hd_scan(hd_data);
@@ -832,6 +830,7 @@ int auto2_find_install_medium()
 }
 
 
+#if 0
 /*
  * Read *all* "expert=" entries from the kernel command line.
  *
@@ -853,14 +852,14 @@ void auto2_chk_expert()
     fclose(f);
   }
 
-  if((i & 0x01)) text_mode_ig = 1;
+  if((i & 0x01)) config.textmode = 1;
   if((i & 0x02)) yast2_update_ig = 1;
   if((i & 0x04)) yast2_serial_ig = 1;
   if((i & 0x08)) auto2_ig = 1;
-  guru_ig = i >> 4;
 }
+#endif
 
-
+#if 0
 /*
  * Read "vga=" entry from the kernel command line.
  */
@@ -882,6 +881,31 @@ void auto2_chk_frame_buffer()
     fclose(f);
   }
 
+  if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
+}
+#endif
+
+/*
+ * Read "vga=" entry from the kernel command line.
+ */
+void auto2_chk_frame_buffer()
+{
+  file_t *f0, *f;
+  int fb_mode = -1;
+
+  f0 = file_read_cmdline();
+  for(f = f0; f; f = f->next) {
+    if(strcmp(f->key_str, "vga")) {
+      if(strcmp(f->value, "normal")) {
+        fb_mode = 0;
+      }
+      else if(f->is.numeric) {
+        fb_mode = f->nvalue;
+      }
+    }
+  }
+  file_free_file(f0);
+  
   if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
 }
 

@@ -670,7 +670,7 @@ void dia_status (window_t *win_prv, int percent_iv)
     }
 
 
-int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv)
+int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
     {
     window_t  win_ri;
     int       width_ii;
@@ -697,7 +697,7 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv)
     disp_flush_area (&win_ri);
 
     rc_ii = win_input (max_x_ig / 2 - fieldlen_iv / 2, win_ri.y_right - 2,
-                       input_tr, len_iv, fieldlen_iv);
+                       input_tr, len_iv, fieldlen_iv, pw_mode);
 
     win_close (&win_ri);
     return (rc_ii);
@@ -1097,7 +1097,7 @@ void dia_handle_ctrlc (void)
       exit(0);
     }
     else if(i == -69) {
-      i = dia_input("Run Command", s, sizeof s - 1, 35);
+      i = dia_input("Run Command", s, sizeof s - 1, 35, 0);
       if(!i) {
         if(strstr(s, "exec ") == s) {
           t = s + 5;
@@ -1116,7 +1116,7 @@ void dia_handle_ctrlc (void)
       util_status_info();
     }
     else if(i == -73) {
-      i = dia_input("Change Config", s, sizeof s - 1, 35);
+      i = dia_input("Change Config", s, sizeof s - 1, 35, 0);
       if(!i) {
         f = file_parse_buffer(s);
         file_do_info(f);
@@ -1268,9 +1268,7 @@ int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
   if(*input) strncpy(buf, *input, sizeof buf - 1);
   buf[sizeof buf - 1] = 0;
 
-  passwd_mode_ig = pw_mode;
-  i = dia_input(txt, buf, sizeof buf - 1, fieldlen);
-  passwd_mode_ig = 0;
+  i = dia_input(txt, buf, sizeof buf - 1, fieldlen, pw_mode);
 
   if(*input) {
     free(*input);

@@ -71,7 +71,7 @@
 #define  LXRC_DEBUG
 
 #ifdef LXRC_DEBUG
-# define deb_wait if((guru_ig & 2)) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
+# define deb_wait if(config.debugwait) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
 # define deb_msg(a) fprintf(stderr, __FUNCTION__ ":%u %s\n", __LINE__, a)
 # define deb_str(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = \"%s\"\n", __LINE__, a)
 # define deb_int(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = %d\n", __LINE__, a)
@@ -215,6 +215,8 @@ typedef struct {
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   unsigned extramount:1;	/* mountpoints.extra is in use */
   unsigned instdata_mounted:1;	/* install data are mounted */
+  unsigned textmode:1;		/* start yast2 in text mode */
+  unsigned debugwait:1;		/* pop up dialogs at some critical points */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -353,17 +355,10 @@ extern int             demo_ig;
 extern int             auto2_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
-extern int             passwd_mode_ig;
-extern char            ftp_user_tg [20];
-extern char            ftp_password_tg [20];
-extern char            ftp_proxy_tg [50];
-extern int             ftp_proxyport_ig;
 extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];
 extern char            console_parms_tg [30];
-extern int             guru_ig;
-extern int             text_mode_ig;
 extern int             yast2_update_ig;
 extern int             yast2_serial_ig;
 extern int             has_floppy_ig;

@@ -532,7 +532,7 @@ int inst_mount_cdrom(int show_err)
 }
 
 
-int inst_choose_hd()
+int inst_choose_hd(char *txt_menu, char *txt_input)
 {
   int i, item_cnt, rc;
   char **items, **values;
@@ -573,7 +573,7 @@ int inst_choose_hd()
 
   rc = 1;
   if(item_cnt) {
-    i = dia_list(txt_get(TXT_CHOOSE_PARTITION), 32, NULL, items, last_item, align_left);
+    i = dia_list(txt_menu, 32, NULL, items, last_item, align_left);
     if(i > 0) {
       last_item = i;
       str_copy(&config.partition, values[i - 1]);
@@ -582,7 +582,7 @@ int inst_choose_hd()
   }
   else {
     str_copy(&tmp, config.partition);
-    rc = dia_input2(txt_get(TXT_ENTER_PARTITION), &tmp, 30, 0);
+    rc = dia_input2(txt_input, &tmp, 30, 0);
     if(!rc) {
       s = tmp;
       if(tmp && strstr(tmp, "/dev/") == tmp) s = tmp  + sizeof "/dev/" - 1;
@@ -608,7 +608,7 @@ int inst_mount_harddisk()
 
   do {
     if(!auto_ig) {
-      rc = inst_choose_hd();
+      rc = inst_choose_hd(txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));
       if(rc) return -1;
     }
 
@@ -752,7 +752,7 @@ int inst_check_instsys()
       config.instdata_mounted = 1;
 
       sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
-      if(inst_rescue_im || !util_is_dir(filename)) {
+      if(inst_rescue_im || force_ri_ig || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
           config.mountpoint.instdata,
           inst_rescue_im ? config.rescueimage : config.rootimage
@@ -866,7 +866,7 @@ int inst_start_rescue()
     root_set_root(config.ramdisk[config.inst_ramdisk].dev);
   }
 
-  util_wait("rescue system loaded");
+  util_debugwait("rescue system loaded");
 
   return config.inst_ramdisk < 0 ? -1 : 0;
 }
@@ -1027,10 +1027,6 @@ int inst_execute_yast()
     rc_ii ? errno : 0
   );
 
-#ifdef LXRC_DEBUG
-  if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }
-#endif
-
   lxrc_set_modprobe("/etc/nothing");
 
   /* Redraw erverything and go back to the main menu. */
@@ -1083,13 +1079,7 @@ int inst_execute_yast()
   /* turn off swap */
   inst_swapoff();
 
-#ifdef LXRC_DEBUG
-  if((guru_ig & 2)) {
-    util_manual_mode();
-    util_disp_init();
-    dia_message("Installation part 0 finished...", MSGTYPE_INFO);
-  }
-#endif
+  util_debugwait("about to umount inst-sys");
 
   /* wait a bit */
   count = 5;
@@ -1098,13 +1088,7 @@ int inst_execute_yast()
   ramdisk_free(config.inst_ramdisk);
   config.inst_ramdisk = -1;
 
-#ifdef LXRC_DEBUG
-  if((guru_ig & 2)) {
-    util_manual_mode();
-    util_disp_init();
-    dia_message("Installation part 1 finished...", MSGTYPE_INFO);
-  }
-#endif
+  util_debugwait("inst-sys umount done");
 
   if(!rc_ii) {
     rc_ii = inst_commit_install();
@@ -1352,7 +1336,7 @@ int inst_get_ftpsetup()
     if(config.net.proxyport) sprintf(tmp, "%u", config.net.proxyport);
 
     do {
-      rc = dia_input(txt_get(TXT_ENTER_FTPPORT), tmp, 6, 6);
+      rc = dia_input(txt_get(TXT_ENTER_FTPPORT), tmp, 6, 6, 0);
       if(rc) return rc;
       u = strtoul(tmp, &s, 0);
       if(*s) {

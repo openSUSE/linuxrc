@@ -674,7 +674,7 @@ char *mod_get_params(module2_t *mod)
 
   if(sl && sl->value) strcpy(buf2, sl->value);
 
-  if(dia_input(buf, buf2, sizeof buf2 - 1, 30)) return NULL;
+  if(dia_input(buf, buf2, sizeof buf2 - 1, 30, 0)) return NULL;
 
   if(!sl) {
     sl = slist_add(&config.module.input_params, slist_new());

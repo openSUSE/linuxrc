@@ -344,7 +344,7 @@ int win_choose_button (button_t *buttons_arr [], int nr_buttons_iv,
     }
     
 
-int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv)
+int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
     {
     int   key_ii;
     char  field_ti [MAX_FIELD + 1];
@@ -507,7 +507,7 @@ int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv)
 
         input_tr [len_iv - 1] = ' ';
         for (i_ii = 0; i_ii < fieldlen_iv; i_ii++)
-            if (passwd_mode_ig && offset_ii + i_ii < end_ii)
+            if (pw_mode && offset_ii + i_ii < end_ii)
                 field_ti [i_ii] = '*';
             else
                 field_ti [i_ii] = input_tr [offset_ii + i_ii];
