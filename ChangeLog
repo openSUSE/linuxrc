@@ -1,3 +1,6 @@
+31/5/2002:	v1.3.36
+	- fixed proxy code
+
 27/5/2002:	v1.3.35
 	- added 'ProxyProto' entry to install.inf
 	- ask for http proxy

@@ -1429,7 +1429,7 @@ int inst_get_proxysetup()
   else {
     name2inet(&config.net.proxy, "");
     config.net.proxyport = 0;
-    config.net.proxyproto = config.instmode;
+    config.net.proxyproto = 0;
   }
 
   return 0;
@@ -1443,6 +1443,8 @@ int inst_do_tftp()
   char buf[256];
 
   set_instmode(inst_tftp);
+
+  config.net.proxyport = 0;
 
   if((rc = net_config())) return rc;
 
