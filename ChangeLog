@@ -1,5 +1,7 @@
+21/8/2001:	v1.2.15
 	- handle >1 swap partitions
 	- 'swap' entry in yast.inf obsolete
+	- back to main menu if we return from yast with an error
 
 20/8/2001:	v1.2.14
 	- set font & language according to yast.inf
