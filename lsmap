@@ -1,0 +1,17 @@
+#! /usr/bin/perl
+
+while(<>) {
+  if(/^\s*\.(text|rodata|data|fini|init|eh_frame)/) {
+    @s = split;
+    if(@s == 4) {
+      $obj{$s[3]} += $s[2];
+    }
+  }
+}
+
+for (sort keys %obj) {
+  $sum += $obj{$_};
+  printf "%7d  %s\n", $obj{$_}, $_;
+}
+
+printf "%7d  total\n", $sum;
