@@ -6,7 +6,7 @@ ARCH	:= $(shell uname -m)
 CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
-CFLAGS	= -O2 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
+CFLAGS	= -O1 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 WARN	= -Wstrict-prototypes -Wall
 
