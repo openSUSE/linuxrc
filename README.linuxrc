@@ -242,16 +242,27 @@ Example (boot via NFS, language german):
 After YaST finishes, Linuxrc reads a file "/etc/yast.inf"; it can have these
 entries:
 
-  #
+
   # yast info file ("/etc/yast.inf")
   #
-
-  # swap partition
-  Swap /dev/hda2
+  # Note1: the colon (':') after the keyword is optional.
+  # Entries not listed below are silently ignored.
+  #
+  # Note2: the entries are processed in the order they appear in the
+  # file, so specifying 'Keytable' before 'Language' is useless.
 
   # root fs, or reboot if linuxrc should do a reboot
-  Root /dev/hda3|reboot
+  Root: /dev/hda3|reboot
 
-  # prompt for Live-CD
-  Live 0|1
+  # set language
+  Language: german
+
+  # alternatively, use the locale string
+  Language: de_DE
+
+  # load keytable (Note: 'Language' does implicitly set a useful keytable.)
+  Keytable: de-lat1-nd
+
+  # show reboot message
+  RebootMsg: 0|1
 

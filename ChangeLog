@@ -1,3 +1,6 @@
+	- handle >1 swap partitions
+	- 'swap' entry in yast.inf obsolete
+
 20/8/2001:	v1.2.14
 	- set font & language according to yast.inf
 	- don't start syslogd (done by inst_setup now)
