@@ -109,7 +109,7 @@ extern FILE __iob [];
 
 #endif
 
-#if !defined(_LIBPTHREAD) && defined(__ELF__)
+#if 0 && !defined(_LIBPTHREAD) && defined(__ELF__)
 #define _IO_attr_weak __attribute__((weak))
 #else
 #define _IO_attr_weak /* nothing */
