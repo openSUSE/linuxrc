@@ -77,6 +77,7 @@ static const char  *file_txt_has_floppy_tm     = "Floppydisk:";
 static const char  *file_txt_has_kbd_tm        = "Keyboard:";
 static const char  *file_txt_yast2_update_tm   = "YaST2update:";
 static const char  *file_txt_yast2_serial_tm   = "YaST2serial:";
+static const char  *file_txt_yast2_autoinst_tm = "YaST2AutoInstall:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
 static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
@@ -266,6 +267,8 @@ void file_write_yast_info (char *file_name)
     fprintf (file_pri, "%s %d\n", file_txt_yast2_update_tm, yast2_update_ig);
     fprintf (file_pri, "%s %d\n", file_txt_yast2_serial_tm, yast2_serial_ig);
     fprintf (file_pri, "%s %d\n", file_txt_text_mode_tm, text_mode_ig);
+    if ((action_ig & ACT_YAST2_AUTO_INSTALL))
+        fprintf (file_pri, "%s %d\n", file_txt_yast2_autoinst_tm, 1);
 
     if (frame_buffer_mode_ig)
         fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);

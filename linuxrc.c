@@ -334,6 +334,12 @@ static void lxrc_init (void)
                auto2_ig = TRUE;
            if (strstr (s, ",noauto2,"))
                auto2_ig = FALSE;
+           if (strstr (s, ",y2autoinst,"))
+               {
+               auto2_ig = TRUE;
+               yast_version_ig = 2;
+               action_ig |= ACT_YAST2_AUTO_INSTALL;
+               }
 #endif
 
            if (strstr (s, ",demo,"))

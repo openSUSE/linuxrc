@@ -73,6 +73,7 @@
 #define ACT_DEMO_LANG_SEL	(1 << 1)
 #define ACT_LOAD_NET		(1 << 2)
 #define ACT_LOAD_DISK		(1 << 3)
+#define ACT_YAST2_AUTO_INSTALL	(1 << 4)
 
 enum langid_t
     {
