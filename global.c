@@ -17,7 +17,8 @@ int             max_y_ig = Y_DEFAULT;
 enum langid_t   language_ig = LANG_UNDEF;
 
 config_t config = {
-  rebootmsg: 0
+  rebootmsg: 0,
+  redraw_menu: 0
 };
 
 colorset_t     *colors_prg;

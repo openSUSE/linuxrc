@@ -151,6 +151,7 @@ typedef struct {
 
 typedef struct {
   unsigned rebootmsg:1;
+  unsigned redraw_menu:1;	/* we need a better solution for this */
 } config_t;
 
 config_t config;

@@ -272,6 +272,7 @@ static int inst_menu_cb (int what_iv)
     {
     int  error_ii = FALSE;
     char s[64];
+    int rc;
 
     switch (what_iv)
         {
@@ -304,10 +305,14 @@ static int inst_menu_cb (int what_iv)
             break;
         }
 
-    if (error_ii)
-        return (what_iv);
-    else
-        return (0);
+    /*
+     * Fall through to the main menu if we return from a failed installation
+     * attempt.
+     */
+    rc = error_ii ? what_iv == 1 && config.redraw_menu ? -1 : what_iv : 0;
+    config.redraw_menu = 0;
+
+    return rc;
     }
 
 
@@ -786,8 +791,6 @@ int inst_prepare()
 
   setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
-//  system("/sbin/syslogd");
-
   file_write_yast_info(NULL);
 
   if(!ramdisk_ig) rc = inst_init_cache();
@@ -888,9 +891,12 @@ int inst_execute_yast()
   lxrc_set_modprobe("/etc/nothing");
   do_disp_init_ig = TRUE;
 
-  deb_msg("sync...");
+  /* Redraw erverything and go back to the main menu. */
+  config.redraw_menu = 1;
+
+  fprintf(stderr, "sync...");
   sync();
-  deb_msg("sync ok");
+  fprintf(stderr, " ok\n");
 
   rc_ii = inst_read_yast_file();
 
