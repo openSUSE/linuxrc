@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
-"PO-Revision-Date: 2003-09-15 08:50+0200\n"
+"PO-Revision-Date: 2003-09-15 13:04+0200\n"
 "Last-Translator: Stanislav Visnovsky <visnovsky@kde.org>\n"
 "Language-Team: Slovak <sk-i18n@linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -568,9 +568,9 @@ msgid "Asking nameserver..."
 msgstr "Pýtam sa pomenovávacieho serveru..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format,fuzzy
+#, c-format
 msgid "Host %s was not found!"
-msgstr "Hostiteµ %s je nenájdený!"
+msgstr "Hostiteµ %s nenájdený."
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
