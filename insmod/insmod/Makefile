@@ -33,7 +33,7 @@ ifeq ($(ARCH),xx_hppa)
 DEFS64		:= -DELF_MACHINE_H='"elf_hppa64.h"' -DARCH_hppa64
 endif
 
-ifeq ($(ARCH),xx_ppc)
+ifeq ($(ARCH),ppc)
 DEFS64		:= -DELF_MACHINE_H='"elf_ppc64.h"' -DARCH_ppc64
 endif
 

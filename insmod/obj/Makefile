@@ -30,7 +30,7 @@ LIBOBJ_SRCS	+= obj_hppa64.c
 DEFS64		:= -DELF_MACHINE_H='"elf_hppa64.h"' -DARCH_hppa64
 endif
 
-ifeq ($(ARCH),xx_ppc)
+ifeq ($(ARCH),ppc)
 LIBOBJ_OBJS	+= obj_ppc64_64.o
 LIBOBJ_SRCS	+= obj_ppc64.c
 DEFS64		:= -DELF_MACHINE_H='"elf_ppc64.h"' -DARCH_ppc64

@@ -1,5 +1,6 @@
 	- schwab: fix ia64 unwind section processing
 	- improved vnc handling
+	- build insmod correctly on ppc64
 
 18/7/2002:	v1.4.7
 	- you can use an arbitrary install program now
