@@ -109,7 +109,6 @@ int main (int argc, char **argv, char **env)
             lxrc_main_menu ();
 
         lxrc_end ();
-        deb_wait;
         }
 
     return (rc_ii);
@@ -160,7 +159,6 @@ void lxrc_end (void)
     lxrc_set_bdflush (40);
     (void) util_umount ("/proc/bus/usb");
     (void) util_umount ("/proc");
-    deb_wait;
     disp_cursor_on ();
     kbd_end ();
     disp_end ();
@@ -303,13 +301,15 @@ static void lxrc_init (void)
 
            if (strstr (s, ",auto,"))
                auto_ig = TRUE;
-           
+
+#ifdef USE_LIBHD
            if (strstr (s, ",auto2,"))
                auto2_ig = TRUE;
-           
+#endif
+
            if (strstr (s, ",demo,"))
                demo_ig = TRUE;
-           
+
            if (strstr (s, ",reboot,"))
                reboot_ig = TRUE;
 
@@ -385,7 +385,14 @@ static void lxrc_init (void)
         printf("\033[9;0]");
         disp_cursor_off();
         disp_set_display(1);
-        dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
+        if(found_suse_cd_ig) {
+          char s[200];
+          sprintf(s, txt_get(TXT_INSERT_CD), 1);
+          dia_message(s, MSGTYPE_INFO);
+        }
+        else {
+          dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
+        }
       }
     }
 #endif

@@ -223,6 +223,7 @@ int auto2_cdrom_dev()
       ci = hd->detail->cdrom.data;
       if(ci->volume && strstr(ci->volume, "SU") == ci->volume) {
         fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
+        found_suse_cd_ig = TRUE;
         break;
       }
     }
@@ -517,6 +518,8 @@ void auto2_find_mouse()
   driver_info_t *di;
   hd_t *hd;
 
+  if(!hd_data) return;
+
   mouse_type_xf86_ig = mouse_type_gpm_ig = mouse_dev_ig = NULL;
 
   for(di = NULL, hd = hd_data->hd; hd; hd = hd->next) {
@@ -546,6 +549,8 @@ void auto2_find_mouse()
 int auto2_find_floppy()
 {
   hd_t *hd;
+
+  if(!hd_data) return has_floppy_ig;
 
   for(hd = hd_data->hd; hd; hd = hd->next) {
     if(
@@ -625,11 +630,15 @@ int auto2_get_probe_env(hd_data_t *hd_data)
 
 int auto2_pcmcia()
 {
+  if(!hd_data) return 0;
+
   return hd_has_pcmcia(hd_data);
 }
 
 int auto2_full_libhd()
 {
+  if(!hd_data) return 0;
+
   return hd_bus_name(hd_data, bus_none) ? 1 : 0;
 }
 
@@ -644,6 +653,8 @@ char *auto2_xserver()
 {
   static char display[16];
   driver_info_t *di;
+
+  if(!hd_data) return NULL;
 
   *display = 0;
   di = hd_driver_info(hd_data, hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data)));

@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
-#define LXRC_VERSION  "1.0.5"
+#define LXRC_VERSION  "1.0.6"
 
 #ifdef LINUXRC_AXP
 #define MEM_LIMIT1_RAMDISK    50000000
@@ -220,3 +220,5 @@ extern int             valid_net_config_ig;
 extern int             reboot_ig;
 extern int             usb_ig;
 extern char            *usb_mods_ig;
+extern int             reboot_ig;
+extern int             found_suse_cd_ig;

@@ -79,6 +79,7 @@ static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
 static const char  *file_txt_usb_tm            = "USB:";
 static const char  *file_txt_xserver_tm        = "XServer:";
+static const char  *file_probe_tm              = "probe:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
@@ -248,6 +249,10 @@ void file_write_yast_info (void)
 
     fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
     fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, auto2_xserver());
+    {
+      char *s = getenv("probe");
+      if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);
+    }
 #endif
 
     fclose (file_pri);

@@ -685,7 +685,6 @@ static int inst_prepare (void)
     int    i_ii;
     int    rc_ii = 0;
 
-
     mod_free_modules ();
     file_write_yast_info ();
     rename ("/bin", "/.bin");
@@ -734,7 +733,6 @@ static int inst_execute_yast (void)
     int       i_ii = 0;
     window_t  status_ri;
     char      command_ti [50];
-
 
     rc_ii = inst_prepare ();
     if (rc_ii)
