@@ -96,7 +96,7 @@ void net_ask_password()
 {
   int win_old = config.win;
 
-  if(config.vnc && !config.net.vncpassword) {
+  if(config.vnc && (!config.net.vncpassword || strlen(config.net.vncpassword) < 5)) {
     if(!config.win) util_disp_init();
     for(;;) {
       if(dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1)) break;

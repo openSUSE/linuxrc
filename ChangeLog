@@ -1,3 +1,6 @@
+13/5/2004:	v1.6.26
+	- VNC password check refined
+
 10/5/2004:	v1.6.26
 	- linuxrc missed some storage controllers, leading to unexpected
 	  module loading order (#40018)
