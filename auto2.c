@@ -41,7 +41,6 @@ static char *pcmcia_params = NULL;
 static int is_vaio = 0;
 static int need_modules = 0;
 
-static void auto2_check_cdrom_update(char *dev);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
@@ -50,13 +49,11 @@ static int driver_is_active(hd_t *hd);
 static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
-static int auto2_find_floppy(void);
 // static int load_usb_storage(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 #ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
 #endif
-static void load_storage_mods();
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -124,7 +121,6 @@ int auto2_mount_harddisk(char *dev)
     else {
       fprintf(stderr, "using %s::%s\n", dev, config.serverdir);
     }
-    util_chk_driver_update(config.mountpoint.instdata);
   }
 
   if(rc) {
@@ -132,20 +128,11 @@ int auto2_mount_harddisk(char *dev)
     inst_umount();
   }
 
+  util_do_driver_updates();
+
   return rc;
 }
 
-
-void auto2_check_cdrom_update(char *dev)
-{
-  int i;
-
-  i = mount(dev, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
-  if(!i) {
-    util_chk_driver_update(mountpoint_tg);
-    umount(mountpoint_tg);
-  }
-}
 
 /*
  * probe for installed hardware
@@ -185,7 +172,7 @@ void auto2_scan_hardware(char *log_file)
   hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL);
 
   if(hd_usb) {
-    load_storage_mods();
+    if(config.scsi_before_usb) load_storage_mods();
     storage_loaded = 1;
 
     printf("Activating usb devices...");
@@ -219,7 +206,7 @@ void auto2_scan_hardware(char *log_file)
   hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL);
 
   if(hd_fw) {
-    if(!storage_loaded) load_storage_mods();
+    if(!storage_loaded && config.scsi_before_usb) load_storage_mods();
 
     printf("Activating ieee1394 devices...");
     fflush(stdout);
@@ -401,9 +388,6 @@ int auto2_cdrom_dev(hd_t **hd0)
   if(config.cdromdev) {
     sprintf(buf, "/dev/%s", config.cdromdev);
     i = auto2_mount_cdrom(buf) ? 1 : 0;
-    if(i && !*driver_update_dir) {
-      auto2_check_cdrom_update(buf);
-    }
     return i;
   }
 
@@ -432,11 +416,7 @@ int auto2_cdrom_dev(hd_t **hd0)
         }
       }
 
-      if(i && !*driver_update_dir && ci->iso9660.ok) {
-        auto2_check_cdrom_update(hd->unix_dev_name);
-      }
-
-      if(yast2_update_ig && !*driver_update_dir && i == 0) i = 3;
+      if(config.update.ask && i == 0) i = 3;
 
       if(i == 0) break;
     }
@@ -690,7 +670,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
  */
 int auto2_init()
 {
-  int i, j;
+  int i, j, win_old;
 #ifdef __i386__
   int net_cfg;
 #endif
@@ -738,9 +718,18 @@ int auto2_init()
     fprintf(stderr, "There seems to be no floppy disk.\n");
   }
 
-  if(!config.hwcheck) file_read_info();
-
-  util_debugwait("got info file");
+  if(!config.hwcheck) {
+    file_read_info();
+    util_debugwait("got info file");
+    if(config.update.ask && !config.update.shown) {
+      if(!(win_old = config.win)) util_disp_init();
+      if(config.update.name_list) {
+        dia_show_lines2("Driver Updates added", config.update.name_list, 64);
+      }
+      while(!inst_update_cd());
+      if(!win_old) util_disp_done();
+    }
+  }
 
   if(!config.test) {
     if(mod_is_loaded("usb-storage")) {
@@ -884,7 +873,6 @@ int auto2_find_install_medium()
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
-      if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       auto2_ask_net_if_vnc();
       return TRUE;
     }
@@ -904,14 +892,12 @@ int auto2_find_install_medium()
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
         if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
         auto2_ask_net_if_vnc();
         return TRUE;
       }
     }
 
     if(config.cdrom) {
-      if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       auto2_ask_net_if_vnc();
       return TRUE;
     }
@@ -974,7 +960,6 @@ int auto2_find_install_medium()
     if(!auto2_net_dev(&hd_devs)) {
       if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
-      if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }
 
@@ -990,7 +975,6 @@ int auto2_find_install_medium()
       if(!auto2_net_dev(&hd_devs)) {
         if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
         return TRUE;
       }
     }
@@ -1040,6 +1024,8 @@ int auto2_find_floppy()
   int i, small_floppy = 0;
   char *s, buf[256];
 
+  config.floppy_probed = 1;
+
   if(config.floppydev) {
     config.floppy = 0;
     sprintf(buf, "/dev/%s", config.floppydev);
@@ -1047,7 +1033,12 @@ int auto2_find_floppy()
     return config.floppies = 1;
   }
 
-  if(!hd_data) return config.floppies;
+  if(!hd_data) {
+    hd_data = calloc(1, sizeof *hd_data);
+    hd_set_probe_feature(hd_data, pr_lxrc);
+    hd_clear_probe_feature(hd_data, pr_parallel);
+    hd_scan(hd_data);
+  }
 
   config.floppy = config.floppies = 0;
   for(
@@ -1285,7 +1276,12 @@ int auto2_ask_for_modules(int prompt, char *type)
 
 void load_storage_mods()
 {
-  if(!config.scsi_before_usb) return;
+  if(!hd_data) {
+    hd_data = calloc(1, sizeof *hd_data);
+    hd_set_probe_feature(hd_data, pr_lxrc);
+    hd_clear_probe_feature(hd_data, pr_parallel);
+    hd_scan(hd_data);
+  }
 
   config.activate_storage = 1;
   auto2_activate_devices(bc_storage, 0);

@@ -6,3 +6,5 @@ int auto2_pcmcia(void);
 char *auto2_disk_list(int *boot_disk);
 char *auto2_serial_console(void);
 int auto2_find_install_medium(void);
+int auto2_find_floppy(void);
+void load_storage_mods(void);

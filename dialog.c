@@ -62,7 +62,7 @@ struct {
   { di_inst_system,  TXT_BOOT_SYSTEM,      },
   { di_inst_rescue,  TXT_START_RESCUE,     },
   { di_inst_eject,   TXT_EJECT_CD,         },
-  { di_inst_update,  0, "Driver Update CD" },
+  { di_inst_update,  0, "Add Driver Update" },
 
   { di_source_cdrom,  TXT_CDROM,    },
   { di_source_net,    TXT_NET,      },
@@ -427,7 +427,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
       }
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
-    width_ii = strlen (head_tv) + 6;
+    width_ii = strwidth (head_tv) + 6;
     if (width_ii < (ssize_t) strlen (items_arv [0].text) + 6)
         width_ii = strlen (items_arv [0].text) + 6;
 

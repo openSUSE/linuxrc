@@ -34,7 +34,8 @@ typedef enum {
   key_kbdtimeout, key_brokenmodules, key_testpivotroot, key_scsibeforeusb,
   key_hostip, key_linemode, key_moduledelay, key_updatedir, key_usbscsi,
   key_useusbscsi, key_lxrcdebug, key_kernel_pcmcia, key_liveconfig,
-  key_useidescsi
+  key_useidescsi, key_updatename, key_updatestyle, key_updateid,
+  key_updateask
 } file_key_t;
 
 typedef enum {

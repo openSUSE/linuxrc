@@ -225,6 +225,8 @@ typedef struct {
   unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
   unsigned idescsi;		/* use ide-scsi module */
+  unsigned floppy_probed:1;	/* tried to detect floppy device */
+  unsigned linebreak:1;		/* internal: print a newline first */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -268,7 +270,23 @@ typedef struct {
   char *product;		/* product name */
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
-  char *updatedir;		/* driver update dir */
+  struct {
+    char *dir;			/* driver update source dir */
+    char *dst;			/* driver update destination dir */
+    char *dev;			/* device recently used for updates (if any) */
+    unsigned count;		/* driver update count */
+    unsigned next;		/* next driver update to do */
+    unsigned compat_last;	/* where last compat link pointed to (old style) */
+    unsigned compat;		/* where compat link points to (old style) */
+    unsigned style:1;		/* 0: new style, 1: old style */
+    unsigned ask:1;		/* 1: ask for update disk */
+    unsigned shown:1;		/* 1: update dialog has been shown at least once */
+    unsigned name_added:1;	/* set if driver update has a name */
+    char *id;			/* current id, if any */
+    slist_t *id_list;		/* list of updates */
+    slist_t *name_list;		/* list of update names */
+    slist_t **next_name;	/* points into name_list */
+  } update;
 
   struct {
     char *image;		/* "/boot/liveeval" */
@@ -336,6 +354,7 @@ typedef struct {
     char *instdata;
     char *instsys;
     char *live;
+    char *update;
   } mountpoint;
 
   struct {
@@ -400,7 +419,6 @@ extern int             auto2_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
 extern char            ppcd_tg [10];
-extern int             yast2_update_ig;
 extern int             yast2_serial_ig;
 extern int             has_floppy_ig;
 extern int             has_kbd_ig;
@@ -413,6 +431,5 @@ extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;
 extern char            livesrc_tg[16];
-extern char            driver_update_dir[16];
 extern int             cdrom_drives;
 extern int             has_modprobe;

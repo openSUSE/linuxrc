@@ -31,6 +31,7 @@
 #include "keyboard.h"
 #include "auto2.h"
 #include "file.h"
+#include "install.h"
 
 // #define DEBUG_MODULE
 
@@ -377,9 +378,8 @@ void mod_menu()
 
     items[i++] = txt_get(TXT_SHOW_MODULES);
     items[i++] = txt_get(TXT_DEL_MODULES);
-#if 0
-    items[i++] = txt_get(TXT_AUTO_LOAD);
-#endif
+    items[i++] = "Add Driver Update";
+    items[i++] = "Show Driver Updates";
 
     items[i] = NULL;
 
@@ -414,11 +414,13 @@ int mod_menu_cb(int item)
       mod_delete_module();
       break;
 
-#if 0
     case 2:
-      mod_autoload();
+      inst_update_cd();
       break;
-#endif
+
+    case 3:
+      show_driver_updates();
+      break;
   }
 
   return 1;
