@@ -66,10 +66,10 @@ static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #endif
 static const char  *file_txt_console_tm        = "Console:";
 #ifdef USE_LIBHD
-static const char  *file_txt_mouse_dev_tm      = "Mouse-Device:";
-static const char  *file_txt_mouse_type_tm     = "Mouse-Type:";
-static const char  *file_txt_has_floppy_tm     = "Floppy-Disk:";
-static const char  *file_txt_yast2_update_tm   = "YaST2-Update:";
+static const char  *file_txt_mouse_dev_tm      = "Mousedevice:";
+static const char  *file_txt_mouse_type_tm     = "Mousetype:";
+static const char  *file_txt_has_floppy_tm     = "Floppydisk:";
+static const char  *file_txt_yast2_update_tm   = "YaST2update:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
 static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 #endif
