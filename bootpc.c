@@ -7,8 +7,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.9 $
-  $Date: 2001/12/14 18:10:57 $
+  $Revision: 1.10 $
+  $Date: 2002/01/24 16:59:26 $
 */
 
 #include "dietlibc.h"
@@ -41,11 +41,14 @@
 #define logMessage my_logmessage
 #define perror logMessage
 
+#define BOOTP_BUFSIZ	2096
+
 extern int my_logmessage (char *buffer_pci, ...);
 
 /* My global variables */
-int bootp_verbose = 1 ;   /* verbose mode or not 10/02/94 JSP */
+int bootp_verbose = 0 ;   /* verbose mode or not 10/02/94 JSP */
 int bootp_debug   = 0 ;   /* debug mode or not 14/02/94 JSP */
+int bootp_testing = 0;
 
 static int returniffail ;  /* Return to the user if we fail */
 static int printflag;      /* Print control */
@@ -80,8 +83,6 @@ int performBootp(char *device,
   char cbuf[CMSG_SPACE(sizeof(struct in_pktinfo))];
   struct iovec iov;
 
-  bootp_debug = bootmode_ig == BOOTMODE_CDWITHNET;
-
   returniffail=bp_rif ;
   printflag=bp_pr ;
 
@@ -113,11 +114,11 @@ int performBootp(char *device,
   }
 
 /* allocate bootp packet before we use it */
-  bootp_xmit = (struct bootp *) malloc(BUFSIZ) ;
-  memset((char *) bootp_xmit, 0, BUFSIZ) ;
+  bootp_xmit = (struct bootp *) malloc(BOOTP_BUFSIZ) ;
+  memset((char *) bootp_xmit, 0, BOOTP_BUFSIZ) ;
 
-  bootp_recv = (struct bootp *) malloc(BUFSIZ) ;
-  memset((char *) bootp_recv, 0, BUFSIZ) ;
+  bootp_recv = (struct bootp *) malloc(BOOTP_BUFSIZ) ;
+  memset((char *) bootp_recv, 0, BOOTP_BUFSIZ) ;
 
   /* Server needs to broadcast for me to see it */
   if (broadcast || givenhwaddr)
@@ -133,20 +134,22 @@ int performBootp(char *device,
 
     memcpy(ifr.ifr_name, device, strlen(device)+1);
 
-    /* Set the interface flags. */
-    ifr.ifr_flags = IFF_UP | IFF_BROADCAST | IFF_NOTRAILERS | IFF_RUNNING;
-    if (ioctl(sockfd, SIOCSIFFLAGS, &ifr)) {
-      perror("bootpc: ioctl SIOCSIFFLAGS");
-      return BootpFatal();
-    }
+    if(!bootp_testing) {
+      /* Set the interface flags. */
+      ifr.ifr_flags = IFF_UP | IFF_BROADCAST | IFF_NOTRAILERS | IFF_RUNNING;
+      if (ioctl(sockfd, SIOCSIFFLAGS, &ifr)) {
+        perror("bootpc: ioctl SIOCSIFFLAGS");
+        return BootpFatal();
+      }
 
-    /* Set a non-zero internet address. */
-    memset((struct sockaddr_in *)&ifr.ifr_addr, 0, sizeof(struct sockaddr_in));
-    ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr = htonl(1);
-    ((struct sockaddr_in *)&ifr.ifr_addr)->sin_family = AF_INET;
-    if (ioctl(sockfd, SIOCSIFADDR, &ifr)) {
-      perror("bootpc: ioctl SIOCSIFADDR");
-      return BootpFatal();
+      /* Set a non-zero internet address. */
+      memset((struct sockaddr_in *)&ifr.ifr_addr, 0, sizeof(struct sockaddr_in));
+      ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr = htonl(1);
+      ((struct sockaddr_in *)&ifr.ifr_addr)->sin_family = AF_INET;
+      if (ioctl(sockfd, SIOCSIFADDR, &ifr)) {
+        perror("bootpc: ioctl SIOCSIFADDR");
+        return BootpFatal();
+      }
     }
 
     if (ioctl(sockfd, SIOCGIFHWADDR, &ifr) < 0) {
@@ -296,7 +299,7 @@ int performBootp(char *device,
     if(!FD_ISSET(sockfd, &rfds)) {
       retry_wait = retry_wait*2;
     } else {
-      if ((plen = recvfrom(sockfd, bootp_recv, BUFSIZ, 0,
+      if ((plen = recvfrom(sockfd, bootp_recv, BOOTP_BUFSIZ, 0,
 			   (struct sockaddr *)NULL, (int *)NULL)) < 0){
 	perror("bootpc: recvfrom");
 	return BootpFatal();
@@ -581,6 +584,12 @@ void ParsePacket(struct bootp * bootp_recv,
       i += len + 2 ;
       break ;
 
+/* DHCP Server Identifier */
+    case TAG_DHCP_SERVER_ID :
+      OutList("DHCPSID", cookie+i+2, len) ;
+      i += len + 2 ;
+      break ; 
+
 /* END of cookie (phew) */
     case TAG_END :
       if (bootp_verbose)
@@ -644,7 +653,7 @@ void OutList(char *name,
 	       int len)
 {
   struct in_addr temp ;
-  char lenv[BUFSIZ], *ptr ;
+  char lenv[BOOTP_BUFSIZ], *ptr ;
   int n, c, i;
 
   if (bootp_verbose)
@@ -659,7 +668,7 @@ void OutList(char *name,
     return ;
 
   for (n=0,i=1 ; len; len -= 4, cookie += 4, i++) {
-    char lbuf[BUFSIZ] ;
+    char lbuf[BOOTP_BUFSIZ] ;
     memcpy((char *)&temp, cookie, 4) ;
     ptr = inet_ntoa(temp) ;
     c = strlen(ptr) ;
@@ -680,7 +689,7 @@ void OutString(char *name,
 	       unsigned char *cookie,
 	       int len)
 {
-  char lenv[BUFSIZ];
+  char lenv[BOOTP_BUFSIZ];
   if (len == -1)
     len = strlen((char *)cookie) ;
 
@@ -698,7 +707,7 @@ void OutSearch(char *name,
 {
   unsigned char *ptr, *nptr ;
   unsigned char buf[258] ;  /* Max len is 255 */
-  char lenv[BUFSIZ] ;
+  char lenv[BOOTP_BUFSIZ] ;
   int n=0;
 
   strncpy((char *)buf, (char *)(cookie), len) ;
@@ -761,7 +770,7 @@ void doOut(char *name,
     printf("%s='%s'\n", name, lenv) ;
   }
   if (printflag & BP_PUT_ENV) {
-    char envb[BUFSIZ], *envp ;
+    char envb[BOOTP_BUFSIZ], *envp ;
     sprintf(envb, "BOOTP_%s=%s", name, lenv) ;
     envp = strdup(envb) ;
     if (bootp_debug)

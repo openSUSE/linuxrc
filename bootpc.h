@@ -6,8 +6,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.2 $
-  $Date: 2000/06/07 16:52:32 $
+  $Revision: 1.3 $
+  $Date: 2002/01/24 16:59:26 $
 */
 
 #define BPCVERSION "BOOTPclient V0.64"
@@ -82,6 +82,7 @@ int performBootp(char *device,
 /* My global variables */
 extern int bootp_verbose ;   /* verbose mode or not 10/02/94 JSP */
 extern int bootp_debug ;     /* debug mode or not 14/02/94 JSP */
+extern int bootp_testing ;     /* debug mode or not 14/02/94 JSP */
 
 #define BP_PRINT_OUT (1)
 #define BP_PUT_ENV (2)
