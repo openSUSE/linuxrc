@@ -1,3 +1,89 @@
+17/6/2004:	v1.6.34
+	- netsetup=0 turns off *all* net setup dialogs (#41664)
+	- url scheme 'file' was treated as network install (#41664)
+
+9/6/2004:	v1.6.33
+	- fixed division by zero bug (#41819)
+	- FreeDOS vfat detection again (#40462)
+
+1/6/2004:	v1.6.32
+	- always load font; the kernel default font is unusable
+
+27/5/2004:	v1.6.31
+	- code that asks for module floppies reactivated (#40904)
+	- driver update:
+	  * copy inst-sys dir
+	  * keep y2update in separate dirs, too
+	  * added UpdatePriority so it's possible to have them applied
+	    in a defined order
+
+24/5/2004:	v1.6.30
+	- removed some old texts
+	- no echo for passwords in linemode (#41072)
+
+21/5/2004:	v1.6.29
+	- make vfat detection see FreeDOS disks (#40462)
+	- ensure ehci-hcd is loaded first (#40840)
+	- load basic usb support in manual mode, to get usb keyboards
+	  working (#39615)
+
+14/5/2004:	v1.6.28
+	- fixed code that writes mac address to install.inf (#40088)
+
+13/5/2004:	v1.6.27
+	- VNC password check refined
+
+10/5/2004:	v1.6.26
+	- linuxrc missed some storage controllers, leading to unexpected
+	  module loading order (#40018)
+	- updated translations
+	- added VNC password length check (#30434)
+	- replaced disk/cdrom info screen (#39092)
+
+8/5/2004:	v1.6.25
+	- fixed compiling on s390
+	- added memory size test (#38826)
+	- added japanese language entry (#40124)
+
+6/5/2004:	v1.6.24
+	- run modprobe, not insmod if possible (#39946)
+
+5/5/2004:	v1.6.23
+	- fixed name server setup for static ip config (#38750)
+	- fixed module loading with parameters
+	- added killall command, needed for:
+	- kill all dhcp clients (#38617)
+	- fixed network interface activation; linuxrc used to miss interfaces
+	  if one module activates several interfaces
+	- removed code that tried a network install on i386 if
+	  CD installation failed
+
+28/4/2004:	v1.6.22
+	- improved slp support
+
+21/4/2004:	v1.6.21
+	- add root=halt feature to yast.inf (tell linuxrc to halt the machine)
+	- always report keyboard to yast (#38922, #39235)
+	- rewrote serial console handling (#23322)
+	- reopen & init console when we return from yast (#39316)
+	- query & set terminal size
+
+20/4/2004:	v1.6.20
+	- linuxrc should not have a controlling terminal (#37177)
+
+7/4/2004:	v1.6.19
+	- use HWAddr (not NetHWAddr) in install.inf
+
+7/4/2004:	v1.6.18
+	- slp fix
+
+6/4/2004:	v1.6.17
+	- fixed driver update (didn't load modules)
+	- set language a bit earlier (#37467)
+
+5/4/2004:	v1.6.16
+	- scsi rename code enabled
+
 3/4/2004:	v1.6.15
 	- updated code that ensures usb/firewire devices are always
 	  the last scsi devices (#36187)

@@ -14,6 +14,8 @@
 #include <sys/mount.h>
 #include <arpa/inet.h>
 
+#include <hd.h>
+
 #include "global.h"
 #include "file.h"
 #include "text.h"
@@ -85,7 +87,7 @@ static struct {
   { key_cdrom,          "Cdrom",          kf_none                        },
   { key_pcmcia,         "PCMCIA",         kf_none                        },
   { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
-  { key_console,        "Console",        kf_cmd                         },	/* tricky */
+  { key_console,        "Console",        kf_none                        },
   { key_pliphost,       "PLIPHost",       kf_none                        },	/* drop it? */
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
@@ -192,6 +194,7 @@ static struct {
   { key_updatename,     "UpdateName",     kf_cfg + kf_cmd                },
   { key_updatestyle,    "UpdateStyle",    kf_cfg + kf_cmd                },
   { key_updateid,       "UpdateID",       kf_cfg                         },
+  { key_updateprio,     "UpdatePriority", kf_cfg                         },
   { key_updateask,      "DriverUpdate",   kf_cfg + kf_cmd                },
   { key_updateask,      "DUD",            kf_cfg + kf_cmd                },
   { key_initrd,         "Initrd",         kf_boot                        },
@@ -206,11 +209,13 @@ static struct {
   { key_ro,             "ro",             kf_boot                        },
   { key_rw,             "rw",             kf_boot                        },
   { key_netid,          "NetUniqueID",    kf_none                        },
-  { key_nethwaddr,      "NetHWAddr",      kf_none                        },
+  { key_nethwaddr,      "HWAddr",         kf_none                        },
   { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
   { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },
-  { key_loghost,        "Loghost",        kf_cfg + kf_cmd                }
+  { key_loghost,        "Loghost",        kf_cfg + kf_cmd                },
+  { key_escdelay,       "ESCDelay",       kf_cfg + kf_cmd                },
+  { key_minmem,         "MinMemory",      kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -228,6 +233,7 @@ static struct {
   { "Color",     2                  },
   { "Alt"  ,     3                  },
   { "Reboot",    1                  },
+  { "Halt",      2                  },
   { "no scheme", inst_none          },
   { "file",      inst_file          },
   { "nfs",       inst_nfs           },
@@ -241,9 +247,10 @@ static struct {
   { "dvd",       inst_dvd           },
   { "cdwithnet", inst_cdwithnet     },
   { "net",       inst_net           },
+  { "slp",       inst_slp           },
+  /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
-  { "cdrom",     inst_cdrom         },
-  { "slp",       inst_slp           }
+  { "cdrom",     inst_cdrom         }
 };
 
 
@@ -961,12 +968,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-#if 0
-      case key_console:
-        if(*f->value) util_set_serial_console(f->value);
-        break;
-#endif
-
       case key_product:
         if(*f->value) str_copy(&config.product, f->value);
         break;
@@ -1140,6 +1141,7 @@ void file_do_info(file_t *f0)
 
           slist_free(sl);
         }
+        if(!config.net.setup) config.net.do_setup = 0;
         break;
 
       case key_rootpassword:
@@ -1148,6 +1150,14 @@ void file_do_info(file_t *f0)
 
       case key_loghost:
         str_copy(&config.loghost, f->value);
+        break;
+
+      case key_escdelay:
+        if(f->is.numeric) config.escdelay = f->nvalue;
+        break;
+
+      case key_minmem:
+        if(f->is.numeric) config.memory.ram_min = f->nvalue;
         break;
 
       default:
@@ -1347,7 +1357,7 @@ void file_write_install_inf(char *dir)
     }
     file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, netdevice_tg);
-    if(config.manual < 2 && !config.net.unique_id) get_net_unique_id();
+    if(config.manual < 2) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
     file_write_inet(f, key_ip, &config.net.hostname);
@@ -1410,7 +1420,8 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_floppydisk, config.floppy_dev[config.floppy]);
   }
 
-  file_write_num(f, key_keyboard, has_kbd_ig);
+  /*we always have one */
+  file_write_num(f, key_keyboard, 1 /* has_kbd_ig */);
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
 
@@ -1452,10 +1463,7 @@ void file_write_install_inf(char *dir)
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
   for(i = 0, ft = ft0; ft; ft = ft->next) {
-    if(
-      ft->key == key_none ||
-      ft->key == key_console	/* keep serial console setting */
-    ) {
+    if(ft->key == key_none) {
       fprintf(f, "%s%s", i ? " " : "Cmdline: ", ft->unparsed);
       i = 1;
     }
