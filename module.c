@@ -64,6 +64,7 @@ static int       mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
 static void      mod_sort_list        (module_t modlist_parr [], int nr_modules_iv);
 static int       mod_is_ppcd          (char *name_tv);
 static int       mod_load_ppcd_core   (void);
+static int       mod_load_i2o_core    (void);
 static int       mod_load_plip_core   (void);
 static void      mod_unload_plip_core (void);
 static int       mod_getmoddisk       (void);
@@ -415,6 +416,8 @@ int mod_get_mod_type (char *name_tv)
     int  i_ii;
     int  found_ii = FALSE;
 
+    /* This really needs fixing! -- snwint */
+    if(strstr(name_tv, "i2o_") == name_tv) return MOD_TYPE_SCSI;
 
     i_ii = 0;
     while (i_ii < NR_SCSI_MODULES && !found_ii)
@@ -572,6 +575,16 @@ static int mod_choose_cb (int what_iv)
     if (!strcmp (mod_current_arm [what_iv - 1].module_name, "plip"))
         {
         rc_ii = mod_load_plip_core ();
+        if (rc_ii)
+            return (rc_ii);
+        }
+
+    if (
+        !strcmp (mod_current_arm [what_iv - 1].module_name, "i2o_block") ||
+        !strcmp (mod_current_arm [what_iv - 1].module_name, "i2o_scsi")
+       )
+        {
+        rc_ii = mod_load_i2o_core ();
         if (rc_ii)
             return (rc_ii);
         }
@@ -1011,6 +1024,27 @@ static int mod_load_ppcd_core (void)
 
     return (0);
     }
+
+
+static int mod_load_i2o_core()
+{
+  static int i2o_core_loaded = FALSE;
+  char *i2o_modules[] = { "i2o_pci", "i2o_core", "i2o_config" };
+  int i, err;
+
+  if(!i2o_core_loaded) {
+    for(i = 0; i < sizeof i2o_modules / sizeof *i2o_modules; i++) {
+      err = mod_load_module(i2o_modules[i], 0);
+      if(err && i < 2) return -1;	/* ignore i2o_config loading errors */
+    }
+    i2o_core_loaded = TRUE;
+    for(i = 0; i < sizeof i2o_modules / sizeof *i2o_modules; i++) {
+      mpar_save_modparams(i2o_modules[i], 0);
+    }
+  }
+
+  return 0;
+}
 
 
 static int mod_load_plip_core (void)

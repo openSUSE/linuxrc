@@ -54,6 +54,7 @@ static void auto2_chk_frame_buffer(void);
 static void auto2_chk_x11i(void);
 static int auto2_find_floppy(void);
 static void auto2_find_mouse(void);
+static int auto2_has_i2o(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 
@@ -195,6 +196,26 @@ void auto2_scan_hardware(char *log_file)
         if(di->kbd.keymap) strcpy(keymap_tg, di->kbd.keymap);
       }
       di = hd_free_driver_info(di);
+    }
+  }
+
+  if(auto2_has_i2o()) {
+    i = 0;
+    if(
+      (i = mod_load_module("i2o_pci", NULL))    ||
+      (i = mod_load_module("i2o_core", NULL))   ||
+      (i = mod_load_module("i2o_config", NULL)) ||
+      (i = mod_load_module("i2o_block", NULL))
+    );
+    if(!i) {
+      mpar_save_modparams("i2o_pci", NULL);
+      mpar_save_modparams("i2o_core", NULL);
+      mpar_save_modparams("i2o_config", NULL);
+      mpar_save_modparams("i2o_block", NULL);
+
+      hd_clear_probe_feature(hd_data, pr_all);
+      hd_set_probe_feature(hd_data, pr_i2o);
+      hd_scan(hd_data);
     }
   }
 
@@ -810,6 +831,21 @@ int auto2_find_kbd()
 }
 #endif
 
+int auto2_has_i2o()
+{
+  hd_t *hd;
+
+  if(hd_data) {
+    for(hd = hd_data->hd; hd; hd = hd->next) {
+      if(hd->base_class == bc_i2o) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
 int auto2_get_probe_env(hd_data_t *hd_data)
 {
   char *s, *t, *env = getenv("probe");
@@ -1065,15 +1101,15 @@ void auto2_print_x11_opts(FILE *f)
   if(!x11_driver) return;
 
   for(sl = x11_driver->x11.extensions; sl; sl = sl->next) {
-    fprintf(f, "XF86Ext:   Load\t\t\"%s\"\n", sl->str);
+    if(*sl->str) fprintf(f, "XF86Ext:   Load\t\t\"%s\"\n", sl->str);
   }
 
   for(sl = x11_driver->x11.options; sl; sl = sl->next) {
-    fprintf(f, "XF86Raw:   Option\t\"%s\"\n", sl->str);
+    if(*sl->str) fprintf(f, "XF86Raw:   Option\t\"%s\"\n", sl->str);
   }
 
   for(sl = x11_driver->x11.raw; sl; sl = sl->next) {
-    fprintf(f, "XF86Raw:   %s\n", sl->str);
+    if(*sl->str) fprintf(f, "XF86Raw:   %s\n", sl->str);
   }
 }
 
