@@ -460,6 +460,9 @@ static int inst_mount_cdrom (int show_err)
     if( bootmode_ig == BOOTMODE_CDWITHNET ) {
         rc_ii = net_config ();
     }
+    else {
+      bootmode_ig = BOOTMODE_CD;
+    }
 
     dia_info (&win_ri, txt_get (TXT_TRY_CD_MOUNT));
 

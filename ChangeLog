@@ -5,6 +5,8 @@
 	- always look on /dev/fd0, too when searching fo module disk (#10829)
 	- module autoloading no longer stops on missing modules (#10235)
 	- fixed segfault due to too long translations
+	- it was impossible to make a CD install after choosing hard disk
+	  install in linuxrc (#10883)
 
 18/9/2001:	v1.2.23
 	- linuxrc copies the intrd into an tmpfs at startup and uses this
