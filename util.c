@@ -845,9 +845,9 @@ void util_umount_driver_update()
 
 void util_status_info()
 {
-  char *l[16];		/* WATCH this!!! */
+  char *l[17];		/* WATCH this!!! */
   int i, lc;
-  char *s, t[100];
+  char *s, t[100], t2[100];
   hd_data_t *hd_data;
   char *lxrc;
 
@@ -883,7 +883,19 @@ void util_status_info()
     action_ig,
     splash_active ? "on" : "off"
   );
-  sprintf(l[lc++], "floppy = \"%s\", cdrom = \"%s\", suse_cd = %d", floppy_tg, cdrom_tg, found_suse_cd_ig);
+  s = l[lc++];
+  strcpy(s, "floppies = (");
+  for(i = 0; i < config.floppies; i++) {
+    sprintf(t2, "%s\"%s\"%s",
+      i ? ", " : " ",
+      config.floppy_dev[i],
+      i == config.floppy && config.floppies != 1 ? "*" : ""
+    );
+    strcat(s, t2);
+  }
+  strcat(s, " )");
+
+  sprintf(l[lc++], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
   sprintf(l[lc++], "driver_update_dir = \"%s\"", driver_update_dir);
 
   strcpy(t, inet_ntoa(ipaddr_rg));

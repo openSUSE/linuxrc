@@ -162,7 +162,8 @@ void info_init (void)
                 if (strstr (driveinfo_ri.model, "LS-120"))
                     {
                     fprintf (stderr, "Found LS-120 as %s\n", devname_ti);
-                    strcpy (floppy_tg, devname_ti);
+                    config.floppies = 1;
+                    config.floppy_dev[0] = strdup(devname_ti);
                     i_ii = 8;
                     }
                 }

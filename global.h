@@ -222,7 +222,6 @@ extern char            ftp_user_tg [20];
 extern char            ftp_password_tg [20];
 extern char            ftp_proxy_tg [50];
 extern int             ftp_proxyport_ig;
-extern char            floppy_tg [20];
 extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];

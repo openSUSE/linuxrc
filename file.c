@@ -406,8 +406,8 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
     if (mouse_type_gpm_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
 
-    if (*floppy_tg)
-        fprintf (file_pri, "%s %s\n", file_txt_has_floppy_tm, floppy_tg);
+    if(config.floppies)
+        fprintf(file_pri, "%s %s\n", file_txt_has_floppy_tm, config.floppy_dev[config.floppy]);
     fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
     fprintf(file_pri, "%s %d\n",
       file_txt_yast2_update_tm,
@@ -485,64 +485,55 @@ WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
     }
 
 
-int file_read_info (void)
-    {
-    char      filename_ti [MAX_FILENAME] = "/info";
-    FILE     *fd_pri;
-    char      buffer_ti [MAX_X];
-    window_t  win_ri;
-    char      value_ti [MAX_X];
-    int       do_autoprobe_ii = FALSE;
+int file_read_info()
+{
+  char filename_ti[MAX_FILENAME] = "/info";
+  FILE *fd;
+  window_t win_ri;
+  char value_ti[MAX_X], buffer_ti[MAX_X];
+  int do_autoprobe = FALSE;
 #if WITH_PCMCIA
-    int       start_pcmcia_ii = FALSE;
+  int start_pcmcia = FALSE;
 #endif
-    int       need_mount_ii = FALSE;
+  int i, mounted = FALSE;
 
+  if(auto2_ig) {
+    printf("%s...", txt_get(TXT_SEARCH_INFOFILE));
+    fflush(stdout);
+  }
+  else {
+    dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
+  }
 
-    if(auto2_ig)
-        {
-        printf("%s...", txt_get (TXT_SEARCH_INFOFILE));
-        fflush(stdout);
+  fd = fopen(filename_ti, "r");
+
+  if(!fd) {
+    for(i = 0; i < config.floppies; i++) {
+      if(!util_try_mount(config.floppy_dev[i], mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0)) break;
+    }
+    if(i < config.floppies) {
+      config.floppy = i;	// remember currently used floppy
+
+      util_chk_driver_update(mountpoint_tg);
+
+      sprintf(filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
+      fd = fopen(filename_ti, "r");
+      if(!fd) {
+        sprintf(filename_ti, "%s/info", mountpoint_tg);
+        fd = fopen (filename_ti, "r");
+        if(!fd) {
+          umount(mountpoint_tg);
+          if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+          return (-1);
         }
-    else
-        {
-        dia_info (&win_ri, txt_get (TXT_SEARCH_INFOFILE));
-        }
+      }
+      mounted = TRUE;
+    }
+  }
 
-    fd_pri = fopen (filename_ti, "r");
-    if (!fd_pri)
-        {
-// What's this for??? -- snwint
-//        if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+  valid_net_config_ig = 0;
 
-        if (!*floppy_tg || util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-            {
-            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-            return (-1);
-            }
-
-        util_chk_driver_update (mountpoint_tg);
-
-        sprintf (filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
-        fd_pri = fopen (filename_ti, "r");
-        if (!fd_pri)
-            {
-            sprintf (filename_ti, "%s/info", mountpoint_tg);
-            fd_pri = fopen (filename_ti, "r");
-            if (!fd_pri)
-                {
-                umount (mountpoint_tg);
-                if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-                return (-1);
-                }
-            }
-
-        need_mount_ii = TRUE;
-        }
-
-    valid_net_config_ig = 0;
-
-    while (fgets (buffer_ti, sizeof (buffer_ti) - 1, fd_pri))
+    while (fgets (buffer_ti, sizeof (buffer_ti) - 1, fd))
         {
         fprintf (stderr, "%s", buffer_ti);
         file_trim_buffer (buffer_ti);
@@ -552,12 +543,12 @@ int file_read_info (void)
 
         if (!strncasecmp (buffer_ti, file_txt_autoprobe_tm,
                       strlen (file_txt_autoprobe_tm)))
-            do_autoprobe_ii = TRUE;
+            do_autoprobe = TRUE;
 
 #if WITH_PCMCIA
         if (!strncasecmp (buffer_ti, file_txt_start_pcmcia_tm,
                       strlen (file_txt_start_pcmcia_tm)))
-            start_pcmcia_ii = TRUE;
+            start_pcmcia = TRUE;
 #endif
 
         file_get_value (buffer_ti, value_ti);
@@ -678,26 +669,20 @@ int file_read_info (void)
             }
         }
 
-    fclose (fd_pri);
+  fclose(fd);
 
-    if (need_mount_ii)
-        umount (mountpoint_tg);
+  if(mounted) umount(mountpoint_tg);
 
-    if (auto2_ig)
-        printf ("\n");
-    else
-        win_close (&win_ri);
+  if(auto2_ig) printf("\n"); else win_close(&win_ri);
 
-    if (do_autoprobe_ii)
-        mod_autoload ();
+  if(do_autoprobe) mod_autoload();
 
 #if WITH_PCMCIA
-    if (start_pcmcia_ii)
-        pcmcia_load_core ();
+  if(start_pcmcia) pcmcia_load_core();
 #endif
 
-    return (0);
-    }
+  return 0;
+}
 
 
 static void file_get_value (char *input_tv, char *value_tr)

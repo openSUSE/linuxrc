@@ -301,6 +301,7 @@ int mod_get_ram_modules (int type_iv)
     char      testfile_ti [MAX_FILENAME];
     char     *modfile_pci;
     int       rc_ii = 0;
+    int i;
 
 
     strcpy (testfile_ti, mod_modpath_tm);
@@ -325,12 +326,17 @@ int mod_get_ram_modules (int type_iv)
 
     if (!util_check_exist (testfile_ti) || mod_force_moddisk_im)
         {
-        if (util_try_mount (*floppy_tg ? floppy_tg : "/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-            {
-            dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-            mod_force_moddisk_im = FALSE;
-            return (-1);
-            }
+        for(i = 0; i < config.floppies; i++) {
+          if(!util_try_mount(config.floppy_dev[i], mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0)) break;
+        }
+        if(i < config.floppies) {
+          config.floppy = i;	// remember currently used floppy
+        }
+        else {
+          dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+          mod_force_moddisk_im = FALSE;
+          return -1;
+        }
 
         sprintf (testfile_ti, "%s/%s", mountpoint_tg, modfile_pci);
         rc_ii = root_load_rootimage (testfile_ti);

@@ -623,9 +623,8 @@ int auto2_init()
   if(!auto2_find_floppy()) {
     deb_msg("There seems to be no floppy disk.");
   }
-  else {
-    file_read_info();
-  }
+
+  file_read_info();
 
 #if WITH_PCMCIA
   if(!(action_ig & ACT_NO_PCMCIA) && hd_has_pcmcia(hd_data)) {
@@ -985,8 +984,8 @@ int auto2_find_floppy()
       hd->unix_dev_name &&			/* and has a device name */
       !hd->is.notready				/* medium inserted */
     ) {
+      config.floppy_dev[config.floppies++] = strdup(hd->unix_dev_name);
       for(res = hd->res; res; res = res->next) {
-        config.floppy_dev[config.floppies++] = strdup(hd->unix_dev_name);
         if(
           !small_floppy &&
           res->any.type == res_size &&
