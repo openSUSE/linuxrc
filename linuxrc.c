@@ -676,6 +676,7 @@ void lxrc_init()
   config.usbwait = 4;		/* 4 seconds */
 
   config.hwdetect = 1;
+  config.update.style = 1;	/* default to old style */
 
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
