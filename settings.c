@@ -117,8 +117,8 @@ static keymap_t set_keymaps_arm [] =
 { "Português Brasileiro", "br-abnt2"     },
 { "Português",            "pt-latin1"    },
 { "Russian",              "ru1"          },
-{ "Slovak",               "sk-qwerty"    }
-{ "Suomi/Svensk",         "fi"           },
+{ "Slovak",               "sk-qwerty"    },
+{ "Suomi/Svensk",         "fi"           }
 };
 #endif
 
@@ -150,10 +150,10 @@ static keymap_t set_keymaps_arm [] =
 { "Português Brasileiro (PS/2)", "br-abnt2"        },
 { "Russian (PS/2)",              "ru1"             },
 { "Russian (Sun Type5)",         "sunt5-ru"        },
-{ "Slovak",                      "sk-qwerty"       }
+{ "Slovak",                      "sk-qwerty"       },
 { "Suomi/Svensk (PS/2)",         "fi"              },
 { "Suomi/Svensk (Sun Type4)",    "sunt4-fi-latin1" },
-{ "Suomi/Svensk (Sun Type5)",    "sunt5-fi-latin1" },
+{ "Suomi/Svensk (Sun Type5)",    "sunt5-fi-latin1" }
 };
 #endif
 
@@ -174,9 +174,9 @@ static keymap_t set_keymaps_arm_mac [] =
 { "Français (CH)",        "mac-fr_CH"                },
 { "Français",             "mac-fr-latin1"            },
 { "Italiano",             "mac-it"                   },
-{ "Português",            "mac-pt"                   }
+{ "Português",            "mac-pt"                   },
 { "Suomi/Svensk",         "mac-fi"                   },
-{ "Svenska",              "mac-se"                   },
+{ "Svenska",              "mac-se"                   }
 };
 /* !!! ***MUST NOT*** be bigger than NR_KEYMAPS !!! */
 #define NR_KEYMAPS_MAC (sizeof set_keymaps_arm_mac / sizeof *set_keymaps_arm_mac)

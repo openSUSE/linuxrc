@@ -37,13 +37,13 @@
 #include <linux/major.h>
 #include <linux/raid/md_u.h>
 
-// #include <linux/cdrom.h>
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
-/* Glibc 2.2 defines __dev_t_defined instead. */
-#ifndef dev_t
-#define dev_t dev_t
-#endif
+
+#include <linux/posix_types.h>
+#undef dev_t
+#define dev_t __kernel_dev_t
 #include <linux/loop.h>
+#undef dev_t
 
 #include <hd.h>
 

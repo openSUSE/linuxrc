@@ -1,3 +1,4 @@
 lex_config.c
 y.tab.h
 yacc_config.c
+yacc_config.h
