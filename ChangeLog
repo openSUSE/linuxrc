@@ -1,3 +1,6 @@
+17/9/2003:	v1.5.16
+	- fixed typo in serial console code (#31183)
+
 17/9/2003:	v1.5.15
 	- look for driver updates on floppy
 

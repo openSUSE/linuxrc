@@ -3779,7 +3779,7 @@ void util_set_serial_console(char *str)
   /* not a serial console */
   if(
     !strncmp(str, "tty", 3) &&
-    (str[3] == 0 || (str[3] >= 0 && str[3] <= 9))
+    (str[3] == 0 || (str[3] >= '0' && str[3] <= '9'))
   ) return;
 
   str_copy(&config.serial, str);
