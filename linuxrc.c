@@ -167,7 +167,7 @@ int main(int argc, char **argv, char **env)
   str_copy(&config.console, "/dev/console");
   str_copy(&config.stderr_name, "/dev/tty3");
 
-  str_copy(&config.product, "SuSE Linux");
+  str_copy(&config.product, "SUSE Linux");
 
   config.update.next_name = &config.update.name_list;
 
@@ -684,7 +684,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2004 SuSE Linux AG <<<\n",
+      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2004 SUSE Linux AG <<<\n",
       config.product
     );
     if (config.linemode)
