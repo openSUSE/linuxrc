@@ -102,7 +102,7 @@ endif
 all: libs linuxrc
 
 tiny:
-	$(MAKE) EXTRA_FLAGS="-DLXRC_TINY=1"
+	$(MAKE) EXTRA_FLAGS+="-DLXRC_TINY=1"
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
@@ -121,6 +121,9 @@ libs:
 
 clean: libs
 	rm -f $(OBJ) *~ linuxrc linuxrc.map .depend
+
+TAGS: *.c *.h */*.c */*.h
+	etags *.c *.h */*.c */*.h
 
 ifneq ($(MAKECMDGOALS),clean)
 .depend: $(SRC) $(INC)
