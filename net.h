@@ -13,7 +13,10 @@ extern int  net_mount_smb       (void);
 extern void net_smb_get_mount_options (char* options);
 extern void net_stop            (void);
 extern int  net_check_address   (char *input_tv, struct in_addr *address_prr);
+extern int  net_check_address2  (inet_t *inet);
 extern int  net_setup_localhost (void);
 
 extern int  net_activate        (void);
 extern int  net_is_configured_im;
+extern int  net_dhcp            (void);
+extern void net_dhcp_stop       (void);

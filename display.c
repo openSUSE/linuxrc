@@ -103,7 +103,7 @@ void disp_init (void)
     disp_mono_rm.error_win  = COL_BLACK;
     disp_mono_rm.error_fg   = COL_WHITE;
 
-    if (testing_ig)
+    if (config.test)
         {
         disp_mono_rm.bg         = COL_WHITE;
         disp_mono_rm.msg_win    = COL_WHITE;
@@ -121,7 +121,7 @@ void disp_init (void)
         disp_mono_rm.error_fg   = COL_BLACK;
         }
 
-    if (testing_ig || serial_ig)
+    if (config.test || serial_ig)
         {
         fprintf (stderr, "ACS activated\n");
 
@@ -170,7 +170,7 @@ void disp_end (void)
 
 
     disp_set_color (COL_WHITE, COL_BLACK);
-    printf ("[2J");
+    printf ("\033[2J");
     disp_gotoxy (1, 1);
     disp_graph_off ();
     printf ("\033c");
@@ -187,7 +187,7 @@ void disp_end (void)
         fd_pri = fopen (tty_ti, "a");
         if (fd_pri)
             {
-            fprintf (fd_pri, "[2J[1;1f");
+            fprintf (fd_pri, "\033[2J\033[1;1f");
             fflush (fd_pri);
             fclose (fd_pri);
             }
@@ -201,7 +201,7 @@ void disp_gotoxy (int x_iv, int y_iv)
         {
         if (x_iv > 0 && x_iv <= max_x_ig && y_iv > 0 && y_iv <= max_y_ig)
             {
-            printf ("[%d;%df", y_iv, x_iv);
+            printf ("\033[%d;%df", y_iv, x_iv);
             disp_x_im = x_iv;
             disp_y_im = y_iv;
             }
@@ -224,7 +224,7 @@ void disp_set_color (char fg_cv, char bg_cv)
         else
             attr_ci = ATTR_NORMAL;
 
-        printf ("[%d;%d;%dm",
+        printf ("\033[%d;%d;%dm",
                 (int) attr_ci, (int) (fg_cv & 0x07) + 30, (int) bg_cv + 40);
         }
     }
@@ -246,13 +246,13 @@ void disp_set_attr (char attr_cv)
 
 void disp_cursor_off (void)
     {
-    printf ("[?25l");
+    printf ("\033[?25l");
     }
 
 
 void disp_cursor_on (void)
     {
-    printf ("[?25h");
+    printf ("\033[?25h");
     }
 
 
@@ -260,10 +260,10 @@ void disp_graph_on (void)
     {
     if (!IS_ALTERNATE (disp_attr_cm))
         {
-        if (serial_ig || testing_ig)
+        if (serial_ig || config.test)
             printf ("%c", 14);
         else
-            printf ("[11m");
+            printf ("\033[11m");
         disp_attr_cm |= 0x80;
         }
     }
@@ -273,10 +273,10 @@ void disp_graph_off (void)
     {
     if (IS_ALTERNATE (disp_attr_cm))
         {
-        if (serial_ig || testing_ig)
+        if (serial_ig || config.test)
             printf ("%c", 15);
         else
-            printf ("[10m");
+            printf ("\033[10m");
         disp_attr_cm &= 0x7f;
         }
     }

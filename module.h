@@ -37,4 +37,4 @@ extern void  mod_init            (void);
 extern int   mod_get_mod_type    (char *name_tv);
 extern void  mod_autoload        (void);
 extern int   mod_force_moddisk_im;
-
+extern int   mod_load_modules    (char *modules, int show);

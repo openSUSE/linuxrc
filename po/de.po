@@ -874,3 +874,25 @@ msgstr ""
 "Sie finden eine Anleitung zum Erstellen dieser Diskette in disks/LIESMICH "
 "auf der CD1 oder DVD."
 
+# %s is either BOOTP or DHCP
+#. TXT_ASK_DHCP
+#, c-format
+msgid "Automatic configuration via %s?"
+msgstr "Automatische Konfiguration via %s?"
+
+# %s is either BOOTP or DHCP
+#. TXT_SEND_DHCP
+#, c-format
+msgid "Sending %s request..."
+msgstr "%s-Anfrage wird gesendet..."
+
+# %s is either BOOTP or DHCP
+#. TXT_ERROR_DHCP
+#, c-format
+msgid "%s configuration failed."
+msgstr "%s-Konfiguration ist gescheitert."
+
+#. TXT_DHCP_VS_BOOTP
+msgid "Use DHCP instead of BOOTP?"
+msgstr "Soll DHCP anstelle von BOOTP verwendet werden?"
+

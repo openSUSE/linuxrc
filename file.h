@@ -19,7 +19,10 @@ typedef enum {
   key_yast2serial, key_textmode, key_yast2autoinst, key_usb, key_yast2color,
   key_bootdisk, key_disks, key_username, key_password, key_workdomain,
   key_alias, key_options, key_initrdmodules, key_locale, key_font,
-  key_screenmap, key_fontmagic, key_autoyast, key_linuxrc, key_forceinsmod
+  key_screenmap, key_fontmagic, key_autoyast, key_linuxrc, key_forceinsmod,
+  key_dhcp, key_ipaddr, key_hostname, key_nisdomain, key_nisservers,
+  key_dns, key_nptservers, key_dhcpsid, key_dhcpgiaddr, key_dhcpsiaddr,
+  key_dhcpchaddr, key_dhcpshaddr, key_dhcpsname, key_rootpath, key_bootfile
 } file_key_t;
 
 typedef struct file_s {

@@ -51,6 +51,7 @@ struct {
   { di_expert_instsys,      TXT_NEW_INST_SYS,    },
   { di_expert_nfsport,      TXT_NFSPORT,         },
   { di_expert_bootptimeout, TXT_BOOTP_TIMEOUT,   },
+  { di_expert_dhcp,         0, "DHCP/BOOTP"      },
 
   { di_inst_install, TXT_START_INSTALL,    },
   { di_inst_demo,    TXT_START_DEMO,       },

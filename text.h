@@ -39,13 +39,13 @@ extern int   txt_init (void);
 #define TRANS_es
 #define TRANS_fr
 #define TRANS_hu
-#define TRANS_id
+// #define TRANS_id
 #define TRANS_it
 #define TRANS_nl
 #define TRANS_pl
 #define TRANS_pt
 #define TRANS_pt_BR
-#define TRANS_ro
+// #define TRANS_ro
 #define TRANS_ru
 #define TRANS_sk
 

@@ -85,6 +85,8 @@ static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
 
+static int inst_get_smbserver(void);
+
 #ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
 static int yast_live_cd = 0;
@@ -333,9 +335,9 @@ int inst_choose_source()
 
   inst_umount();
 
-  config.smb.available = util_check_exist("/bin/smbmount");
+  config.net.smb.available = config.test || util_check_exist("/bin/smbmount");
 
-  if(!config.smb.available) items[3] = di_skip;
+  if(!config.net.smb.available) items[3] = di_skip;
   if(!inst_rescue_im) items[5] = di_skip;
 
   di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
@@ -816,18 +818,17 @@ int inst_prepare()
 
 int inst_execute_yast()
 {
-  int rc_ii, i_ii = 0;
+  int rc_ii;
+//  int i_ii = 0;
   int i, count;
-  window_t status_ri;
-  char command_ti[80];
+//  window_t status_ri;
+  char command_ti[256];
 
   rc_ii = inst_prepare();
   if(rc_ii) return rc_ii;
 
   if(inst_choose_yast_version()) {
     lxrc_killall(0);
-    waitpid (-1, NULL, WNOHANG);
-
     inst_umount ();
     if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
@@ -838,29 +839,34 @@ int inst_execute_yast()
     return -1;
   }
 
+#if 0
   if(!auto2_ig) dia_status_on(&status_ri, txt_get(TXT_START_YAST));
+#endif
 
   lxrc_set_modprobe("/sbin/modprobe");
 
   if(util_check_exist("/sbin/update")) system("/sbin/update");
 
+#if 0
   if(!auto2_ig) {
     while(i_ii < 50) {
       dia_status(&status_ri, i_ii++);
       usleep(10000);
     }
   }
+#endif
 
   util_start_shell("/dev/tty2", "/bin/bash", 1);
 
   if(memory_ig < MEM_LIMIT_SWAP_MSG) {
-    if(!auto2_ig) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
+    if(config.win) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
   }
   else {
     util_start_shell("/dev/tty5", "/bin/bash", 1);
     util_start_shell("/dev/tty6", "/bin/bash", 1);
   }
 
+#if 0
   if(!auto2_ig) {
     while(i_ii <= 100) {
       dia_status (&status_ri, i_ii++);
@@ -868,19 +874,15 @@ int inst_execute_yast()
     }
     win_close(&status_ri);
   }
+#endif
 
   disp_set_color(COL_WHITE, COL_BLACK);
-  if(!auto2_ig) {
-    disp_clear_screen();
-    printf("\033c");
-  }
-  fflush (stdout);
+  if(config.win) util_disp_done();
 
-  
-  sprintf(command_ti, "%s%s",
-    config.instsys,
-    SETUP_COMMAND);
-  deb_str(command_ti);
+  sprintf(command_ti, "%s%s", config.instsys, SETUP_COMMAND);
+
+//  deb_str(command_ti);
+
   if(util_check_exist(command_ti)) {
     sprintf(command_ti, "%s%s yast%d%s",
       config.instsys,
@@ -939,19 +941,21 @@ int inst_execute_yast()
     dia_message(txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
   }
 
-  lxrc_killall (0);
+  lxrc_killall(0);
 
-  waitpid (-1, NULL, WNOHANG);
-
+#if 0
   system("rm -f /tmp/stp* > /dev/null 2>&1");
   system("rm -f /var/lib/YaST/* > /dev/null 2>&1");
+#endif
 
+#if 0
   system("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
+#endif
 
   /* if the initrd has an ext2 fs, we've just made / read-only */
   mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
 
-  inst_umount();
+//  inst_umount();
   if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
   if(!config.initrd_has_ldso) {
@@ -960,6 +964,14 @@ int inst_execute_yast()
   }
   /* turn off swap */
   inst_swapoff();
+
+#ifdef LXRC_DEBUG
+  if((guru_ig & 2)) {
+    util_manual_mode();
+    util_disp_init();
+    dia_message("Installation part 0 finished...", MSGTYPE_INFO);
+  }
+#endif
 
   /* wait a bit */
   count = 5;
@@ -1207,45 +1219,39 @@ static int inst_get_ftpserver (void)
     return (0);
     }
 
-static int inst_get_smbserver (void)
-    {
-    char            input_ti [100];
-    int             rc_ii;
+int inst_get_smbserver()
+{
+  char input[128];
+  int rc;
 
+  *input = 0;
+  if(config.net.smb.server.name) strcpy(input, config.net.smb.server.name);
 
-    if (config.smb.server.s_addr)
-        strcpy (input_ti, inet_ntoa (config.smb.server));
-    //    else if (inst_rescue_im)
-    //    strcpy (input_ti, "209.81.41.5");
-    else
-        input_ti [0] = '\0';
+  rc = dia_input(txt_get(TXT_SMB_ENTER_SERVER), input, sizeof input - 1, 20);
 
-    do
-        {
-        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_SERVER), input_ti,
-                           sizeof (input_ti) - 1, 20);
-        if (rc_ii)
-            return (rc_ii);
+  if(rc) return rc;
 
-        rc_ii = net_check_address (input_ti, &config.smb.server);
-        if (rc_ii)
-            (void) dia_message (txt_get (TXT_INVALID_INPUT), MSGTYPE_ERROR);
+  if(config.net.smb.server.name) free(config.net.smb.server.name);
+  config.net.smb.server.name = strdup(input);
 
-	if (config.smb.share)
-	  strcpy (input_ti, config.smb.share);
-	else
-	  input_ti[0] = '\0';
-        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_SHARE), input_ti,
-                           50, 20);
-        if (rc_ii)
-            return (rc_ii);
-	free(config.smb.share);
-	if (!(config.smb.share = strdup(input_ti))) return -1;
-        }
-    while (rc_ii);
+  rc = net_check_address2(&config.net.smb.server);
+  if(rc) {
+    dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+    return rc;
+  }
 
-    return (0);
-    }
+  *input = 0;
+  if(config.net.smb.share) strcpy(input, config.net.smb.share);
+
+  rc = dia_input(txt_get(TXT_SMB_ENTER_SHARE), input, 50, 20);
+
+  if(rc) return rc;
+
+  if(config.net.smb.share) free(config.net.smb.share);
+  config.net.smb.share = strdup(input);
+
+  return 0;
+}
 
 
 static int inst_get_smbsetup (void)
@@ -1260,24 +1266,24 @@ static int inst_get_smbsetup (void)
 
     if (rc_ii == YES)
         {
-	  free(config.smb.user);
-	  config.smb.user=0;
+	  free(config.net.smb.user);
+	  config.net.smb.user=0;
         }
     else
         {
-	if(config.smb.user)
-	  strcpy (tmp_ti, config.smb.user);
+	if(config.net.smb.user)
+	  strcpy (tmp_ti, config.net.smb.user);
 	else
 	  tmp_ti[0] = '\0';
         rc_ii = dia_input (txt_get (TXT_SMB_ENTER_USER), tmp_ti,
                            50, 20);
         if (rc_ii)
             return (rc_ii);
-	free(config.smb.user);
-	if (!(config.smb.user = strdup(tmp_ti))) return -1;
+	free(config.net.smb.user);
+	if (!(config.net.smb.user = strdup(tmp_ti))) return -1;
 
-	if(config.smb.password)
-	  strcpy (tmp_ti, config.smb.password);
+	if(config.net.smb.password)
+	  strcpy (tmp_ti, config.net.smb.password);
 	else
 	  tmp_ti[0] = '\0';
         passwd_mode_ig = TRUE;
@@ -1286,20 +1292,20 @@ static int inst_get_smbsetup (void)
         passwd_mode_ig = FALSE;
         if (rc_ii)
             return (rc_ii);
-	free(config.smb.password);
-	if (!(config.smb.password = strdup(tmp_ti))) return -1;
+	free(config.net.smb.password);
+	if (!(config.net.smb.password = strdup(tmp_ti))) return -1;
 
-        if(config.smb.workgroup)
-	  strcpy (tmp_ti, config.smb.workgroup);
+        if(config.net.smb.workgroup)
+	  strcpy (tmp_ti, config.net.smb.workgroup);
 	else
 	  tmp_ti[0] = '\0';
         rc_ii = dia_input (txt_get (TXT_SMB_ENTER_WORKGROUP), tmp_ti,
                            50, 20);
         if (rc_ii)
             return (rc_ii);
-	free(config.smb.workgroup);
+	free(config.net.smb.workgroup);
 	if (strlen(tmp_ti) > 0)
-	    if (!(config.smb.workgroup = strdup(tmp_ti))) return -1;
+	    if (!(config.net.smb.workgroup = strdup(tmp_ti))) return -1;
         }
 
     return (0);
@@ -1458,15 +1464,14 @@ static int inst_get_ftpsetup (void)
     }
 
 
-static int inst_mount_smb (void)
-    {
-    int       rc_ii;
-    window_t  win_ri;
-    char msg[256];
+int inst_mount_smb()
+{
+  int rc;
+  window_t  win_ri;
+  char msg[256];
 
-    rc_ii = net_config ();
-    if (rc_ii)
-      return (rc_ii);
+  rc = net_config();
+  if(rc) return rc;
 
     /*******************************************************************
   
@@ -1486,34 +1491,28 @@ static int inst_mount_smb (void)
   
     *******************************************************************/
     
-    do
-	{
-        rc_ii = inst_get_smbserver ();
-        if (rc_ii)
-            return (rc_ii);
+  rc = inst_get_smbserver();
+  if(rc) return rc;
 
-        rc_ii = inst_get_smbsetup ();
-        if (rc_ii)
-            return (rc_ii);
+  rc = inst_get_smbsetup();
+  if(rc) return rc;
 
-	sprintf(msg, txt_get(TXT_SMB_TRYING_MOUNT),
-		inet_ntoa(config.smb.server),
-		config.smb.share);
+  sprintf(msg, txt_get(TXT_SMB_TRYING_MOUNT),
+    config.net.smb.server.name,
+    config.net.smb.share
+  );
 
-	dia_info (&win_ri, msg);
+  dia_info(&win_ri, msg);
 
-        rc_ii = net_mount_smb ();
-        win_close (&win_ri);
+  rc = net_mount_smb();
 
-        if (rc_ii < 0)
-	  return(-1);
-        }
-    while (rc_ii);
+  win_close(&win_ri);
 
-    bootmode_ig = BOOTMODE_SMB;
-    return (0);
-    }
+  if(rc) return -1;
 
+  bootmode_ig = BOOTMODE_SMB;
+  return 0;
+}
 
 
 int inst_choose_yast_version()

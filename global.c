@@ -20,7 +20,10 @@ config_t config = {
 #else
   initrd_has_ldso: 0,
 #endif
-  color:2			/* default: 'color'; cf. disp_init(), too! */
+  color:2,			/* default: 'color'; cf. disp_init(), too! */
+  net: {
+    use_dhcp: 1
+  }
 };
 
 colorset_t     *colors_prg;
@@ -67,7 +70,6 @@ char            domain_name_tg [100];
 int             old_kernel_ig = TRUE;
 int             bootp_wait_ig = 0;
 int             bootp_timeout_ig = 10;
-int             testing_ig = FALSE;
 int             passwd_mode_ig = FALSE;
 char            ftp_user_tg [20];
 char            ftp_password_tg [20];

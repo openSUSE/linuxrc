@@ -25,6 +25,7 @@
 #include <syscall.h>
 #include <dirent.h>
 #include <errno.h>
+#include <signal.h>
 #include <sys/swap.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -52,6 +53,7 @@
 #include "ftp.h"
 #include "net.h"
 #include "auto2.h"
+#include "file.h"
 #include "lsh.h"
 
 #define LED_TIME     50000
@@ -67,6 +69,8 @@ static void put_int(int fd, unsigned data);
 static unsigned mkdosfs(int fd, unsigned size);
 #endif
 static void do_file_cp(char *src_dir, char *dst_dir, char *name);
+static void show_lsof_info(FILE *f, unsigned pid);
+static void show_ps_info(FILE *f, unsigned pid);
 
 static struct hlink_s {
   struct hlink_s *next;
@@ -983,7 +987,6 @@ void util_get_splash_status()
 }
 
 
-
 char *read_symlink(char *file)
 {
   static char buf[256];
@@ -997,20 +1000,109 @@ char *read_symlink(char *file)
   return buf;
 }
 
-void show_proc(FILE *f, unsigned pid)
+
+void show_lsof_info(FILE *f, unsigned pid)
 {
-  char pe[100];
-  char buf1[64], buf2[2], buf3[256];
+  char pe[128];
+  char buf1[64], buf2[128], buf3[256];
   FILE *p;
   DIR *dir;
   struct dirent *de;
   unsigned status = 0;
-  unsigned u, v;
-  char *s;
+  char *s, c;
+  struct stat sbuf;
+  file_t *f0, *f1;
+  slist_t *sl0 = NULL, *sl;
 
-#ifdef DIET
-//  memset(buf1, 0, sizeof buf1);
-#endif
+  sprintf(pe, "/proc/%u/status", pid);
+  if((p = fopen(pe, "r"))) {
+    if(fscanf(p, "Name: %63[^\n]", buf1) == 1) status = 1;
+    fclose(p);
+  }
+
+  if(!status) *buf1 = 0;
+
+  sprintf(buf2, "%-9s %5u ", buf1, pid);
+
+  sprintf(pe, "/proc/%u/cwd", pid);
+  if(*(s = read_symlink(pe))) fprintf(f, "%s cwd  %s\n", buf2, s);
+
+  sprintf(pe, "/proc/%u/root", pid);
+  if(*(s = read_symlink(pe))) fprintf(f, "%s rtd  %s\n", buf2, s);
+
+  sprintf(pe, "/proc/%u/exe", pid);
+  if(*(s = read_symlink(pe))) fprintf(f, "%s txt  %s\n", buf2, s);
+
+  sprintf(pe, "/proc/%u/fd", pid);
+  if((dir = opendir(pe))) {
+    while((de = readdir(dir))) {
+      if(*de->d_name != '.') {
+        sprintf(pe, "/proc/%u/fd/%s", pid, de->d_name);
+        if(*(s = read_symlink(pe))) {
+          c = ' ';
+          if(!lstat(pe, &sbuf)) {
+            if((sbuf.st_mode & S_IRUSR)) c = 'r';
+            if((sbuf.st_mode & S_IWUSR)) c = c == 'r' ? 'u' : 'w';
+          }
+          fprintf(f, "%s %3s%c %s\n", buf2, de->d_name, c, s);
+        }
+      }
+    }
+    closedir(dir);
+  }
+
+  sprintf(pe, "/proc/%u/maps", pid);
+  f0 = file_read_file(pe);
+
+  for(f1 = f0; f1; f1 = f1->next) {
+    *buf3 = 0;
+    if(sscanf(f1->value, "%*s %*s %*s %*s %255[^\n]", buf3)) {
+      if(*buf3 && !slist_getentry(sl0, buf3)) {
+        sl = slist_append(&sl0, slist_new());
+        sl->key = strdup(buf3);
+      }
+    }
+  }
+
+  file_free_file(f0);
+
+  for(sl = sl0; sl; sl = sl->next) {
+    fprintf(f, "%s mem  %s\n", buf2, sl->key);
+  }
+
+  slist_free(sl0);
+}
+
+char *util_process_cmdline(pid_t pid)
+{
+  char pe[100];
+  static char buf[256];
+  FILE *p;
+  unsigned status = 0;
+  unsigned u, v;
+
+  sprintf(pe, "/proc/%u/cmdline", pid);
+  if((p = fopen(pe, "r"))) {
+    u = fread(buf, 1, sizeof buf, p);
+    if(u > sizeof buf - 1) u = sizeof buf - 1;
+    for(v = 0; v < u; v++) if(!buf[v]) buf[v] = ' ';
+    buf[u] = 0;
+    status = 1;
+    fclose(p);
+  }
+
+  if(!status) *buf = 0;
+
+  return buf;
+}
+
+void show_ps_info(FILE *f, unsigned pid)
+{
+  char pe[100];
+  char buf1[64], buf2[2], *buf3;
+  FILE *p;
+  unsigned status = 0;
+
   sprintf(pe, "/proc/%u/status", pid);
   if((p = fopen(pe, "r"))) {
     if(fscanf(p, "Name: %63[^\n]", buf1) == 1) status |= 1;
@@ -1018,59 +1110,12 @@ void show_proc(FILE *f, unsigned pid)
     fclose(p);
   }
 
-  fprintf(stderr, "buf1 = \"%s\"\n", buf1);
-
-  sprintf(pe, "/proc/%u/cmdline", pid);
-  if((p = fopen(pe, "r"))) {
-    u = fread(buf3, 1, sizeof buf3, p);
-    if(u > sizeof buf3 - 1) u = sizeof buf3 - 1;
-    for(v = 0; v < u; v++) if(!buf3[v]) buf3[v] = ' ';
-    buf3[u] = 0;
-    status |= 4;
-    fclose(p);
-  }
+  buf3 = util_process_cmdline(pid);
 
   if(!(status & 1)) *buf1 = 0;
   if(!(status & 2)) *buf2 = 0;
-  if(!(status & 4)) *buf3 = 0;
 
   fprintf(f, "%5u %s %-16s %s\n", pid, buf2, buf1, buf3);
-
-  sprintf(pe, "/proc/%u/exe", pid);
-  if(*(s = read_symlink(pe))) fprintf(f, "  exe: %s\n", s);
-
-  sprintf(pe, "/proc/%u/cwd", pid);
-  if(*(s = read_symlink(pe))) fprintf(f, "  cwd: %s\n", s);
-
-  sprintf(pe, "/proc/%u/fd", pid);
-
-  if((dir = opendir(pe))) {
-    while((de = readdir(dir))) {
-      if(*de->d_name != '.') {
-        sprintf(pe, "/proc/%u/fd/%s", pid, de->d_name);
-        if(*(s = read_symlink(pe))) fprintf(f, "  fd%s: %s\n", de->d_name, s);
-      }
-    }
-    closedir(dir);
-  }
-}
-
-void util_ps(FILE *f)
-{
-  DIR *proc;
-  struct dirent *de;
-  unsigned u;
-  char *s;
-
-  if((proc = opendir("/proc"))) {
-    while((de = readdir(proc))) {
-      if(de->d_name) {
-        u = strtoul(de->d_name, &s, 10);
-        if(!*s) show_proc(f, u);
-      }
-    }
-    closedir(proc);
-  }
 }
 
 int util_do_cp(char *src, char *dst)
@@ -1302,9 +1347,7 @@ void util_start_shell(char *tty, char *shell, int new_env)
   *args = (s = strrchr(shell, '/')) ? s + 1 : shell;
 
   if(!fork()) {
-    fclose(stdin);
-    fclose(stdout);
-    fclose(stderr);
+    for(fd = 0; fd < 20; fd++) close(fd);
     setsid();
     fd = open(tty, O_RDWR);
     ioctl(fd, TIOCSCTTY, (void *) 1);
@@ -1320,7 +1363,41 @@ void util_start_shell(char *tty, char *shell, int new_env)
 
 int util_ps_main(int argc, char **argv)
 {
-  util_ps(stderr);
+  DIR *proc;
+  struct dirent *de;
+  unsigned u;
+  char *s;
+
+  if((proc = opendir("/proc"))) {
+    while((de = readdir(proc))) {
+      if(de->d_name) {
+        u = strtoul(de->d_name, &s, 10);
+        if(!*s) show_ps_info(stdout, u);
+      }
+    }
+    closedir(proc);
+  }
+
+  return 0;
+}
+
+
+int util_lsof_main(int argc, char **argv)
+{
+  DIR *proc;
+  struct dirent *de;
+  unsigned u;
+  char *s;
+
+  if((proc = opendir("/proc"))) {
+    while((de = readdir(proc))) {
+      if(de->d_name) {
+        u = strtoul(de->d_name, &s, 10);
+        if(!*s) show_lsof_info(stdout, u);
+      }
+    }
+    closedir(proc);
+  }
 
   return 0;
 }
@@ -1335,21 +1412,34 @@ int util_mount_main(int argc, char **argv)
 
   argv++; argc--;
 
-  if(argc != 3 && argc != 4) return 1;
+  if(!argc) {
+    return system("cat /proc/mounts");
+  }
+
+  if(argc < 2) return fprintf(stderr, "mount: invalid number of arguments\n"), 1;
 
   if(strstr(*argv, "-t") == *argv) {
     type = *argv + 2;
+
+    if(!*type) {
+      type = *++argv;
+      argc--;
+    }
+
+    argv++;
+    argc--;
   }
 
-  if(type && !*type) {
-    type = *++argv;
+  if(argc != 2) return fprintf(stderr, "mount: invalid number of arguments\n"), 1;
+
+  dev = strcmp(*argv, "none") ? *argv : NULL;
+
+  dir = argv[1];
+
+  if(!type) {
+    if(strchr(dev, ':')) type = "nfs";
+    if(!type) return fprintf(stderr, "no fs type given\n"), 2;
   }
-
-  dev = strcmp(argv[1], "none") ? argv[1] : NULL;
-
-  dir = argv[2];
-
-  if(!type) return 2;
 
   if(strcmp(type, "nfs")) {
     if(!mount(dev, dir, type, 0, 0)) return 0;
@@ -1358,16 +1448,18 @@ int util_mount_main(int argc, char **argv)
   }
 
   srv_dir = strchr(dev, ':');
-  if(!srv_dir) {
-    fprintf(stderr, "invalid mount src \"%s\"\n", dev);
-    return 77;
-  }
+  if(!srv_dir) return fprintf(stderr, "mount: directory to mount not in host:dir format\n"), 1;
 
   *srv_dir++ = 0;
 
   mountpoint_tg = dir;
 
   i = net_mount_nfs(dev, srv_dir);
+
+  if(i && errno) {
+    i = errno;
+    perror("mount");
+  }
 
   mountpoint_tg = mp_tmp;
 
@@ -1377,13 +1469,24 @@ int util_mount_main(int argc, char **argv)
 
 int util_umount_main(int argc, char **argv)
 {
+  int force = 0;
+  int i;
+
   argv++; argc--;
 
-  if(argc != 1) return 1;
+  if(argc == 2 && !strcmp(*argv, "-f")) {
+    force = 1;
+    argv++;
+    argc--;
+  }
 
-  if(!umount(*argv)) return 0;
+  if(argc != 1) fprintf(stderr, "u%s", "mount: invalid number of arguments\n"), 1;
 
-  perror(*argv);
+  i = force ? umount(*argv) : umount2(*argv, MNT_FORCE);
+
+  if(!i) return 0;
+
+  fprintf(stderr, "umount: "); perror(*argv);
 
   return errno;
 }
@@ -1647,6 +1750,7 @@ int util_sh_main(int argc, char **argv)
   printf("Executing: \"%s\"\n", argv[2]);
 #endif
   dup2(2, 1);
+  printf("Executing: \"%s\"\n", argv[2]);
 
   return lsh_main(argc, argv);
 }
@@ -1678,7 +1782,7 @@ int util_rm_main(int argc, char **argv)
   while(argc--) {
     i = unlink(*argv);
     if(i) {
-      perror(*argv);
+      fprintf(stderr, "rm: "); perror(*argv);
       return errno;
     }
     argv++;
@@ -1699,7 +1803,7 @@ int util_mv_main(int argc, char **argv)
   i = rename(argv[0], argv[1]);
   if(i) {
     i = errno;
-    fprintf(stderr, "mv %s %s failed\n", argv[0], argv[1]);
+    fprintf(stderr, "mv: "); perror(argv[0]);
   }
 
   return i;
@@ -1718,7 +1822,7 @@ int util_swapon_main(int argc, char **argv)
 
   if(i) {
     i = errno;
-    perror(*argv);
+    fprintf(stderr, "swapon: "); perror(*argv);
   }
 
   return i;
@@ -1737,11 +1841,69 @@ int util_swapoff_main(int argc, char **argv)
 
   if(i) {
     i = errno;
-    perror(*argv);
+    fprintf(stderr, "swapoff: "); perror(*argv);
   }
 
   return i;
 }
+
+
+int util_lsmod_main(int argc, char **argv)
+{
+  return system("cat /proc/modules");
+}
+
+
+int util_mkdir_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  while(argc--) {
+    i = mkdir(*argv, 0755);
+    if(i) {
+      fprintf(stderr, "mkdir: "); perror(*argv);
+      return errno;
+    }
+    argv++;
+  }
+
+  return 0;
+}
+
+
+int util_kill_main(int argc, char **argv)
+{
+  int i, sig = SIGTERM;
+  pid_t pid;
+  char *s;
+
+  argv++; argc--;
+
+  if(**argv == '-') {
+    sig = strtol(*argv + 1, &s, 0);
+    if(*s) return fprintf(stderr, "kill: bad signal spec \"%s\"\n", *argv + 1), 1;
+
+    argv++;
+    argc--;
+  }
+
+  while(argc--) {
+    pid = strtoul(*argv, &s, 0);
+    if(*s) return fprintf(stderr, "kill: %s: no such pid\n", *argv), 1;
+    i = kill(pid, sig);
+    if(i) {
+      fprintf(stderr, "kill: "); perror(*argv);
+      return errno;
+    }
+    argv++;
+  }
+
+  return 0;
+}
+
+
 
 
 slist_t *slist_new()

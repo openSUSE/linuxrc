@@ -45,6 +45,7 @@
 #include "linuxrc.h"
 #include "auto2.h"
 #include "lsh.h"
+#include "wget.h"
 #include "multiple_info.h"
 
 #define LINUXRC_DEFAULT_STDERR "/dev/tty3"
@@ -55,7 +56,7 @@ static int  lxrc_main_cb       (dia_item_t di);
 static void lxrc_memcheck      (void);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
-static int do_not_kill         (pid_t pid);
+static int do_not_kill         (char *name);
 static void save_environment   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
@@ -89,6 +90,7 @@ static struct {
   { "lsh",      lsh_main          },
   { "insmod",   insmod_main       },
   { "rmmod",    rmmod_main        },
+  { "lsmod",    util_lsmod_main   },
   { "loadkeys", loadkeys_main     },
   { "dhcpcd",   dhcpcd_main       },
 #if WITH_PCMCIA
@@ -102,12 +104,16 @@ static struct {
   { "cat",      util_cat_main     },
   { "echo",     util_echo_main    },
   { "ps",       util_ps_main      },
+  { "lsof",     util_lsof_main    },
   { "cp",       util_cp_main      },
   { "ls",       util_ls_main      },
   { "rm",       util_rm_main      },
   { "mv",       util_mv_main      },
+  { "mkdir",    util_mkdir_main   },
+  { "kill",     util_kill_main    },
   { "swapon",   util_swapon_main  },
   { "swapoff",  util_swapoff_main },
+  { "wget",     wget_main         },
   { "nothing",  util_nothing_main }
 };
 #endif
@@ -160,6 +166,8 @@ int main(int argc, char **argv, char **env)
     }
   }
 #endif
+
+  config.run_as_linuxrc = 1;
 
   lxrc_argv = argv;
 
@@ -337,7 +345,7 @@ void lxrc_end (void)
  * Check if pid is either portmap or rpciod.
  *
  */
-int do_not_kill(pid_t pid)
+int do_not_kill(char *name)
 {
   static char *progs[] = {
     "portmap", "rpciod", "lockd", "lsh"
@@ -345,7 +353,7 @@ int do_not_kill(pid_t pid)
   int i;
 
   for(i = 0; i < sizeof progs / sizeof *progs; i++) {
-    if(!strcmp(util_process_name(pid), progs[i])) return 1;
+    if(!strcmp(name, progs[i])) return 1;
   }
 
   return 0;
@@ -357,41 +365,53 @@ int do_not_kill(pid_t pid)
  * really_all = 1: kill really everything
  *
  */
-void lxrc_killall (int really_all_iv)
-    {
-    pid_t          mypid_ri;
-    struct dirent *process_pri;
-    DIR           *directory_ri;
-    pid_t          pid_ri;
+void lxrc_killall(int really_all_iv)
+{
+  pid_t mypid;
+  struct dirent *de;
+  DIR *d;
+  pid_t pid;
+  char *s;
+  slist_t *sl0 = NULL, *sl;
+  int sig;
 
+  if(config.test) return;
 
-    if (testing_ig)
-        return;
+  mypid = getpid();
 
-    mypid_ri = getpid ();
-    directory_ri = opendir ("/proc");
-    if (!directory_ri)
-        return;
+  if(!(d = opendir("/proc"))) return;
 
-    process_pri = readdir (directory_ri);
-    while (process_pri)
-        {
-        pid_ri = (pid_t) atoi (process_pri->d_name);
-        if (pid_ri > mypid_ri && pid_ri != lxrc_mempid_rm &&
-            (really_all_iv || !do_not_kill (pid_ri)))
-            {
-            fprintf (stderr, "Killing %s (%d)\n", util_process_name (pid_ri),
-                                                  pid_ri);
-            kill (pid_ri, 15);
-            usleep (10000);
-            kill (pid_ri, 9);
-            }
-
-        process_pri = readdir (directory_ri);
-        }
-
-    (void) closedir (directory_ri);
+  /* make a (reversed) list of all process ids */
+  while((de = readdir(d))) {
+    pid = strtoul(de->d_name, &s, 10);
+    if(!*s && *util_process_cmdline(pid)) {
+      sl = slist_add(&sl0, slist_new());
+      sl->key = strdup(de->d_name);
+      sl->value = strdup(util_process_name(pid));
     }
+  }
+
+  closedir(d);
+
+  for(sig = 15; sig >= 9; sig -= 6) {
+    for(sl = sl0; sl; sl = sl->next) {
+      pid = strtoul(sl->key, NULL, 10);
+      if(
+        pid > mypid &&
+        pid != lxrc_mempid_rm &&
+        (really_all_iv || !do_not_kill(sl->value))
+      ) {
+        fprintf(stderr, "sending signal %d to %s (%d)\n", sig, sl->value, pid);
+        kill(pid, sig);
+        usleep(20000);
+      }
+    }
+  }
+
+  slist_free(sl0);
+
+  while(waitpid(-1, NULL, WNOHANG) > 0);
+}
 
 
 /*
@@ -475,9 +495,9 @@ void lxrc_init()
   printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2001 SuSE GmbH <<<\n");
   fflush(stdout);
 
-  if(!testing_ig && getpid() > 19) {
+  if(!config.test && getpid() > 19) {
     printf ("Seems we are on a running system; activating testmode...\n");
-    testing_ig = TRUE;
+    config.test = 1;
     strcpy(console_tg, "/dev/tty");
   }
 
@@ -679,7 +699,7 @@ void lxrc_init()
 
   mod_init();
 
-  if(!(testing_ig || serial_ig)) {
+  if(!(config.test || serial_ig)) {
     util_start_shell("/dev/tty9", "/bin/lsh", 0);
   }
 

@@ -1015,6 +1015,9 @@ DhcpMsgRecv->sname,
 ntohl(*(unsigned int *)DhcpOptions.val[dhcpIPaddrLeaseTime]),
 ntohl(*(unsigned int *)DhcpOptions.val[dhcpT1value]),
 ntohl(*(unsigned int *)DhcpOptions.val[dhcpT2value]));
+
+if(*DhcpMsgRecv->file) fprintf(f,"BOOTFILE=%s\n", DhcpMsgRecv->file);
+
       fclose(f);
     }
   else

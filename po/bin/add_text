@@ -2,13 +2,19 @@
 
 # add a new text to *.po files
 
-die "usage: add_text id text_line1 text_line2 ... \nexample:\n  add_text MENU_LANG Language\n" if @ARGV < 2;
+die "usage: add_text [-c comment] id text_line1 text_line2 ... \nexample:\n  add_text MENU_LANG Language\n" if @ARGV < 2;
+
+if($ARGV[0] eq '-c') {
+  shift;
+  $comment = shift;
+}
 
 $id = shift;
 @texts = @ARGV;
 
 $_ = join '', @texts;
 
+push @l, "# $comment\n" if $comment;
 push @l, "#. TXT_$id\n";
 push @l, "#, c-format\n" if /%/;
 

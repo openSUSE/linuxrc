@@ -151,6 +151,7 @@ typedef struct {
   int di;
 } item_t;
 
+
 typedef struct slist_s {
   struct slist_s *next;
   char *key, *value;
@@ -158,12 +159,19 @@ typedef struct slist_s {
 
 
 typedef struct {
-  unsigned       available:1;	/* set if SMB functionality is available */
-  struct in_addr server;	/* SMB server to install from */
-  char           *share;
-  char           *workgroup;
-  char           *user;		/* if this is 0, perform guest login */
-  char           *password;
+  unsigned ok:1;		/* ip field is valid */
+  struct in_addr ip;
+  char *name;
+} inet_t;
+
+
+typedef struct {
+  unsigned available:1;	/* set if SMB functionality is available */
+  inet_t server;	/* SMB server to install from */
+  char *share;
+  char *workgroup;
+  char *user;		/* if this is 0, perform guest login */
+  char *password;
 } smb_t;
 
 
@@ -192,17 +200,20 @@ typedef struct {
   unsigned win:1;		/* set if we are drawing windows */
   unsigned forceinsmod:1;	/* use 'insmod -f' if set */
   unsigned tmpfs:1;		/* we're using tmpfs for / */
+  unsigned run_as_linuxrc:1;	/* set if we really are linuxrc */
+  unsigned test:1;		/* we are in test mode */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
   char *instsys;		/* installation system mount point */
-  smb_t smb;			/* SMB installation info */
   char *infofile;		/* 'info' file name */
   char *infoloaded;		/* actual 'info' file that was loaded */
   char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
+  char *serverdir;		/* install base directory on server */
+
   struct {
     char *dir;				/* modules directory */
     char *type_name[MAX_MODULE_TYPES];	/* module type names */
@@ -216,10 +227,26 @@ typedef struct {
     slist_t *used_params;	/* parameters that were used for insmod */
     unsigned ramdisk:1;		/* ramdisk currently mounted to dir */
   } module;
+
   struct {			/* mountpoints */
     char *floppy;
     char *ramdisk2;
   } mountpoint;
+
+  struct {
+    unsigned use_dhcp:1;	/* use dhcp instead of bootp */
+    unsigned dhcp_active:1;	/* dhcpd is running */
+    char *domain;		/* domain name */
+    char *nisdomain;		/* NIS domain name */
+    inet_t netmask;
+    inet_t network;
+    inet_t broadcast;
+    inet_t gateway;
+    inet_t hostname;
+    inet_t nfsserver;
+    smb_t smb;			/* SMB installation info */
+  } net;
+
 } config_t;
 
 config_t config;
@@ -266,7 +293,6 @@ extern char            domain_name_tg [100];
 extern int             old_kernel_ig;
 extern int             bootp_wait_ig;
 extern int             bootp_timeout_ig;
-extern int             testing_ig;
 extern int             passwd_mode_ig;
 extern char            ftp_user_tg [20];
 extern char            ftp_password_tg [20];

@@ -413,9 +413,9 @@ int auto2_net_dev(hd_t **hd0)
         (valid_net_config_ig || bootmode_ig == BOOTMODE_NET) &&
         (valid_net_config_ig & 0x2b) != 0x2b
       ) {
-        printf("Sending bootp request to %s... ", netdevice_tg);
+        printf("Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
         fflush(stdout);
-        net_bootp();
+        config.net.use_dhcp ? net_dhcp() : net_bootp();
         if(
           !server_dir_tg || !*server_dir_tg || !ipaddr_rg.s_addr ||
           !netmask_rg.s_addr || !broadcast_rg.s_addr ||
@@ -437,7 +437,11 @@ int auto2_net_dev(hd_t **hd0)
       net_is_configured_im = TRUE;
 
       if(bootmode_ig == BOOTMODE_SMB) {
-        fprintf(stderr, "OK, going to mount //%s/%s ...\n", inet_ntoa(config.smb.server), config.smb.share);
+        fprintf(stderr,
+          "OK, going to mount //%s/%s ...\n",
+          config.net.smb.server.name,
+          config.net.smb.share
+        );
         
         if(net_mount_smb()) {
           deb_msg("SMB mount failed.");

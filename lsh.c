@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,6 +6,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
@@ -33,7 +35,10 @@ int lsh_main(int argc, char **argv)
 
   *buf = 0;
 
-  if(isatty(0)) interactive = 1;
+  if(isatty(0)) {
+    interactive = 1;
+    signal(SIGINT, SIG_IGN);
+  }
 
   if(argc == 2) f = fopen(argv[1], "r");
 
@@ -176,6 +181,7 @@ void redirect(char **args)
 {
   char *s;
   int fd, new_fd, io;
+  int noclose = 0;
 
   for(; (s = *args); args++) {
     io = 1;
@@ -199,15 +205,21 @@ void redirect(char **args)
       s += 2;
     }
     if(fd >= 0) {
-      if(io == 2) {
-        new_fd = open(s, O_CREAT | O_WRONLY | O_APPEND, 0644);
+      if(io == 1 && *s == '&' && isdigit(s[1]) && !s[2]) {
+        new_fd = s[1] - '0';
+        noclose = 1;
       }
       else {
-        new_fd = io ? open(s, O_CREAT | O_WRONLY | O_TRUNC, 0644) : open(s, O_RDONLY);
+        if(io == 2) {
+          new_fd = open(s, O_CREAT | O_WRONLY | O_APPEND, 0644);
+        }
+        else {
+          new_fd = io ? open(s, O_CREAT | O_WRONLY | O_TRUNC, 0644) : open(s, O_RDONLY);
+        }
       }
       if(new_fd) {
         dup2(new_fd, fd);
-        close(new_fd);
+        if(!noclose) close(new_fd);
       }
       free(*args);
       *args = NULL;

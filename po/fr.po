@@ -804,3 +804,25 @@ msgid ""
 "You'll find instructions on how to create it in disks/README on CD1 or DVD."
 msgstr ""
 
+# %s is either BOOTP or DHCP
+#. TXT_ASK_DHCP
+#, c-format
+msgid "Automatic configuration via %s?"
+msgstr ""
+
+# %s is either BOOTP or DHCP
+#. TXT_SEND_DHCP
+#, c-format
+msgid "Sending %s request..."
+msgstr ""
+
+# %s is either BOOTP or DHCP
+#. TXT_ERROR_DHCP
+#, c-format
+msgid "%s configuration failed."
+msgstr ""
+
+#. TXT_DHCP_VS_BOOTP
+msgid "Use DHCP instead of BOOTP?"
+msgstr ""
+

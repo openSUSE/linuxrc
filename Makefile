@@ -125,6 +125,7 @@ version.h: VERSION
 
 linuxrc: $(OBJ) $(LIBS)
 	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -o $@
+	@cp $@ $(@)-debug
 	@strip -R .note -R .comment $@
 	@ls -l linuxrc
 
@@ -135,7 +136,7 @@ libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done
 
 clean: libs
-	rm -f $(OBJ) *~ linuxrc linuxrc.map .depend
+	rm -f $(OBJ) *~ linuxrc linuxrc.map linuxrc-debug .depend
 
 TAGS: *.c *.h */*.c */*.h
 	etags *.c *.h */*.c */*.h

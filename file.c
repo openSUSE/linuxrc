@@ -116,7 +116,22 @@ static struct {
   { key_fontmagic,      "Fontmagic"        },
   { key_autoyast,       "autoyast"         },
   { key_linuxrc,        "linuxrc"          },
-  { key_forceinsmod,    "ForceInsmod"      }
+  { key_forceinsmod,    "ForceInsmod"      },
+  { key_dhcp,           "DHCP"             },
+  { key_ipaddr,         "IPAddr"           },
+  { key_hostname,       "Hostname"         },
+  { key_nisdomain,      "NISDomain"        },
+  { key_nisservers,     "NISServers"       },
+  { key_dns,            "DNS"              },
+  { key_nptservers,     "NTPServers"       },
+  { key_dhcpsid,        "DHCPSID"          },
+  { key_dhcpgiaddr,     "DHCPGIAddr"       },
+  { key_dhcpsiaddr,     "DHCPSIAddr"       },
+  { key_dhcpchaddr,     "DHCPCHAddr"       },
+  { key_dhcpshaddr,     "DHCPSHAddr"       },
+  { key_dhcpsname,      "DHCPSName"        },
+  { key_rootpath,       "RootPath"         },
+  { key_bootfile,       "BootFile"         }
 };
 
 static struct {
@@ -479,19 +494,24 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_username:
-        config.smb.user = strdup(f->value);
+        config.net.smb.user = strdup(f->value);
         break;
 
       case key_password:
-        config.smb.password = strdup(f->value);
+        config.net.smb.password = strdup(f->value);
         break;
 
       case key_workdomain:
-        config.smb.workgroup = strdup(f->value);
+        config.net.smb.workgroup = strdup(f->value);
         break;
 
       case key_forceinsmod:
         config.forceinsmod = f->nvalue;
+        break;
+
+      case key_dhcp:
+        config.net.use_dhcp = f->is.numeric ? f->nvalue : 1;
+        if(config.net.use_dhcp) net_config();
         break;
 
       default:
@@ -692,8 +712,8 @@ void file_write_install_inf(char *dir)
         server_address = &ftp_server_rg;
       }
       else if(bootmode_ig == BOOTMODE_SMB) {
-        server_address = &config.smb.server;
-        server_dir     = config.smb.share;
+        server_address = &config.net.smb.server.ip;
+        server_dir     = config.net.smb.share;
       }
 
       file_write_inet(f, key_server, server_address);
@@ -722,14 +742,14 @@ void file_write_install_inf(char *dir)
   }
 
   if(bootmode_ig == BOOTMODE_SMB) {
-    if(config.smb.user) {
-      file_write_str(f, key_username, config.smb.user);
+    if(config.net.smb.user) {
+      file_write_str(f, key_username, config.net.smb.user);
     }
-    if(config.smb.password) {
-      file_write_str(f, key_password, config.smb.password);
+    if(config.net.smb.password) {
+      file_write_str(f, key_password, config.net.smb.password);
     }
-    if(config.smb.workgroup) {
-      file_write_str(f, key_workdomain, config.smb.workgroup);
+    if(config.net.smb.workgroup) {
+      file_write_str(f, key_workdomain, config.net.smb.workgroup);
     }
   }
 
@@ -808,7 +828,7 @@ void file_write_mtab()
         net_smb_get_mount_options(smb_mount_options);
         fprintf(f,
           "//%s/%s %s smbfs ro,%s 0 0\n",
-          inet_ntoa(config.smb.server), config.smb.share,
+          config.net.smb.server.name, config.net.smb.share,
           mountpoint_tg, smb_mount_options
         );
         break;

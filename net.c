@@ -50,6 +50,7 @@
 #include "net.h"
 #include "bootpc.h"
 #include "file.h"
+#include "module.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -78,49 +79,54 @@ static void net_show_error       (enum nfs_stat status_rv);
 #endif
 static int  net_get_address      (char *text_tv, struct in_addr *address_prr);
 
-int net_config (void)
-    {
+int net_config()
+{
 #if NETWORK_CONFIG
-    int   rc_ii;
+  int rc;
+  char buf[256];
 
+  if(
+    net_is_configured_im &&
+    dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES
+  ) {
+    return 0;
+  }
 
-    if (net_is_configured_im &&
-        dia_yesno (txt_get (TXT_NET_CONFIGURED), YES) == YES)
-        return (0);
+  if(net_choose_device()) return -1;
 
-    if (net_choose_device ())
-        return (-1);
+  net_stop();
 
-    net_stop ();
+  if(!config.win) {
+    rc = YES;
+  }
+  else {
+    sprintf(buf, txt_get(TXT_ASK_DHCP), config.net.use_dhcp ? "DHCP" : "BOOTP");
+    rc = dia_yesno(buf, NO);
+  }
 
-    if (auto_ig)
-        rc_ii = YES;
-    else
-        rc_ii = dia_yesno (txt_get (TXT_ASK_BOOTP), NO);
+  if(rc == ESCAPE) return -1;
 
-    if (rc_ii == ESCAPE)
-        return (-1);
+  if(rc == YES) {
+    rc = config.net.use_dhcp ? net_dhcp() : net_bootp();
+  }
+  else {
+    rc = net_input_data();
+  }
 
-    if (rc_ii == YES)
-        rc_ii = net_bootp ();
-    else
-        rc_ii = net_input_data ();
+  if(rc) return -1;
 
-    if (rc_ii)
-        return (-1);
+  if(net_activate()) {
+    dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
+    return -1;
+  }
 
-    if (net_activate ())
-        {
-        (void) dia_message (txt_get (TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
-        return (-1);
-        }
+  net_setup_nameserver();
 
-    net_setup_nameserver ();
-
-    net_is_configured_im = TRUE;
+  net_is_configured_im = TRUE;
 #endif
-    return (0);
-    }
+
+  return 0;
+}
 
 
 void net_stop (void)
@@ -128,6 +134,11 @@ void net_stop (void)
     int             socket_ii;
     struct ifreq    interface_ri;
 
+    if(config.net.dhcp_active) {
+      net_dhcp_stop();
+      net_is_configured_im = FALSE;
+      return;
+    }
 
     if (!net_is_configured_im)
         return;
@@ -157,6 +168,7 @@ int net_setup_localhost (void)
     struct sockaddr_in  sockaddr_ri;
     int                 error_ii = FALSE;
 
+    if(config.test) return 0;
 
     fprintf (stderr, "Setting up localhost...");
     fflush (stdout);
@@ -233,6 +245,7 @@ int net_activate (void)
     struct sockaddr_in  sockaddr_ri;
     int                 error_ii = FALSE;
 
+    if(config.test || config.net.dhcp_active) return 0;
 
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)
@@ -379,23 +392,115 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
     return (0);
     }
 
+
+int net_check_address2(inet_t *inet)
+{
+  struct hostent *he = NULL;
+  struct in_addr iaddr;
+#ifdef DIET
+  file_t *f0, *f;
+  char *s;
+  char *has_dots;
+#endif
+
+  if(!inet) return -1;
+
+  if(inet->ok) return 0;
+
+  if(!inet->name || !*inet->name) return -1;
+
+  if(!net_check_address(inet->name, &iaddr)) {
+    inet->ok = 1;
+    inet->ip = iaddr;
+
+//    fprintf(stderr, "%s is %s\n", inet->name, inet_ntoa(inet->ip));
+
+    return 0;
+  }
+
+  /* ####### should be something like nameserver_active */
+  if(!config.net.dhcp_active && !config.test && config.run_as_linuxrc) {
+    return -1;
+  }
+
+#ifdef DIET
+  has_dots = strchr(inet->name, '.');
+
+  if(has_dots) {
+//    fprintf(stderr, "trying >%s<\n", inet->name);
+    he = gethostbyname(inet->name);
+//    fprintf(stderr, "%p\n", he);  
+  }
+
+  if(!he) {
+    f0 = file_read_file("/etc/resolv.conf");
+    for(f = f0; f; f = f->next) {
+      if(!strcmp(f->key_str, "search")) {
+        s = malloc(strlen(inet->name) + strlen(f->value) + 2);
+        sprintf(s, "%s.%s", inet->name, f->value);
+//        fprintf(stderr, "trying >%s<\n", s);
+        he = gethostbyname(s);
+//        fprintf(stderr, "%p\n", he);
+        if(!he) {
+          he = gethostbyname(s);
+//          fprintf(stderr, "%p\n", he);
+        }
+        free(s);
+        if(he) break;
+      }
+    }
+    file_free_file(f0);
+  }
+
+#if 0
+  if(!he && !has_dots) {
+//    fprintf(stderr, "trying >%s<\n", inet->name);
+    he = gethostbyname(inet->name);
+//    fprintf(stderr, "%p\n", he);  
+  }
+#endif
+
+#else
+  he = gethostbyname(inet->name);
+#endif
+
+  if(!he) {
+    if(config.run_as_linuxrc) {
+      fprintf(stderr, "dns: what is \"%s\"?\n", inet->name);
+    }
+    return -1;
+  }
+
+  inet->ok = 1;
+  inet->ip = *((struct in_addr *) *he->h_addr_list);
+
+  if(config.run_as_linuxrc) {
+    fprintf(stderr, "dns: %s is %s\n", inet->name, inet_ntoa(inet->ip));
+  }
+
+  return 0;
+}
+
+
 void net_smb_get_mount_options (char* options)
 {
-    sprintf(options,"ip=%s", inet_ntoa(config.smb.server));
-    if (config.smb.user) {
+    sprintf(options,"ip=%s", inet_ntoa(config.net.smb.server.ip));
+    if (config.net.smb.user) {
 	strcat(options, ",username=");
-	strcat(options, config.smb.user);
+	strcat(options, config.net.smb.user);
 	strcat(options, ",password=");
-	strcat(options, config.smb.password);
-	if (config.smb.workgroup) {
+	strcat(options, config.net.smb.password);
+	if (config.net.smb.workgroup) {
 	    strcat(options,",workgroup=");
-	    strcat(options,config.smb.workgroup);
+	    strcat(options,config.net.smb.workgroup);
 	}
     } else {
 	strcat(options,",guest");
     }
 }
-int net_mount_smb ()
+
+
+int net_mount_smb()
 {
     /*******************************************************************
 
@@ -415,22 +520,40 @@ int net_mount_smb ()
 	 "mount -t smbfs" + device + " " + mountpoint + " " + options
 
     *******************************************************************/
-    char mount_command[1000];
-    char mount_options[200];
-    net_smb_get_mount_options(mount_options);
+  char tmp[1024];
+  char mount_options[256];
+
+  net_smb_get_mount_options(mount_options);
+
 #if !defined(SUDO)
 #  define SUDO
 #endif
-    sprintf(mount_command, SUDO "smbmount //%s/%s %s -o %s",
-	    inet_ntoa(config.smb.server),
-	    config.smb.share,
-	    mountpoint_tg,
-	    mount_options
-	);
-    deb_str(mount_command);
-    if (system(mount_command))
-	return(-1);
-    return(0);
+
+  sprintf(tmp,
+    SUDO "smbmount //%s/%s %s -o %s >&2",
+    config.net.smb.server.name,
+    config.net.smb.share,
+    mountpoint_tg,
+    mount_options
+  );
+
+  mod_load_modules("smbfs", 0);
+
+  if(system(tmp)) {
+
+    sprintf(tmp, "%s", "Error trying to mount the SMB share.");
+
+    if(config.win) {
+      dia_message(tmp, MSGTYPE_ERROR);
+    }
+    else {
+      fprintf(stderr, "%s\n", tmp);
+    }
+
+    return -1;
+  }
+
+  return 0;
 }
 
 #ifdef WITH_NFS
@@ -448,14 +571,24 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     struct fhstatus        status_ri;
     char                   tmp_ti [1024];
     char                  *opts_pci;
+    inet_t inet = {};
 
+    inet.name = strdup(server_addr_tv);
+    if(net_check_address2(&inet)) {
+      free(inet.name);
+      return -1;
+    }
 
     memset (&server_ri, 0, sizeof (struct sockaddr_in));
     server_ri.sin_family = AF_INET;
-    server_ri.sin_addr.s_addr = inet_addr (server_addr_tv);
+    server_ri.sin_addr.s_addr = inet.ip.s_addr;
     memcpy (&mount_server_ri, &server_ri, sizeof (struct sockaddr_in));
 
+    free(inet.name);
+    inet.name = NULL; inet.ok = 0;
+
     memset (&mount_data_ri, 0, sizeof (struct nfs_mount_data));
+//    mount_data_ri.flags = NFS_MOUNT_NONLM;
     mount_data_ri.rsize = 0;
     mount_data_ri.wsize = 0;
     mount_data_ri.timeo = 70;
@@ -500,7 +633,6 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
                                            MOUNTVERS, timeout_ri, &socket_ii);
         if (!mount_client_pri)
             {
-            deb_msg("net");
             net_show_error ((enum nfs_stat) -1);
             return (-1);
             }
@@ -516,14 +648,12 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
                        timeout_ri);
     if (rc_ii)
         {
-        deb_msg("net");
         net_show_error ((enum nfs_stat) -1);
         return (-1);
         }
 
     if (status_ri.fhs_status)
         {
-        deb_msg("net");
         net_show_error (status_ri.fhs_status);
         return (-1);
         }
@@ -539,14 +669,12 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     fsock_ii = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (fsock_ii < 0)
         {
-        deb_msg("net");
         net_show_error ((enum nfs_stat) -1);
         return (-1);
         }
 
     if (bindresvport (fsock_ii, 0) < 0)
         {
-        deb_msg("net");
         net_show_error ((enum nfs_stat) -1);
         return (-1);
         }
@@ -635,7 +763,7 @@ int net_choose_device()
     char *dev;
     int name;
   } net_dev[] = {
-    { "sit",   TXT_NET_TR0   },
+//    { "sit",   TXT_NET_TR0   },
     { "eth",   TXT_NET_ETH0  },
     { "veth",  TXT_NET_ETH0  },
     { "plip",  TXT_NET_PLIP  },
@@ -692,51 +820,70 @@ int net_choose_device()
 #endif
 
 #ifdef WITH_NFS
-static void net_show_error (enum nfs_stat status_rv)
-    {
-    struct { enum nfs_stat stat;
-             int           errnumber;
-           } nfs_err_ari [] = {
-                              { NFS_OK,                 0               },
-                              { NFSERR_PERM,            EPERM           },
-                              { NFSERR_NOENT,           ENOENT          },
-                              { NFSERR_IO,              EIO             },
-                              { NFSERR_NXIO,            ENXIO           },
-                              { NFSERR_ACCES,           EACCES          },
-                              { NFSERR_EXIST,           EEXIST          },
-                              { NFSERR_NODEV,           ENODEV          },
-                              { NFSERR_NOTDIR,          ENOTDIR         },
-                              { NFSERR_ISDIR,           EISDIR          },
-                              { NFSERR_INVAL,           EINVAL          },
-                              { NFSERR_FBIG,            EFBIG           },
-                              { NFSERR_NOSPC,           ENOSPC          },
-                              { NFSERR_ROFS,            EROFS           },
-                              { NFSERR_NAMETOOLONG,     ENAMETOOLONG    },
-                              { NFSERR_NOTEMPTY,        ENOTEMPTY       },
-                              { NFSERR_DQUOT,           EDQUOT          },
-                              { NFSERR_STALE,           ESTALE          }
-                              };
-    int   i_ii = 0;
-    char  tmp_ti [1024];
-    int   found_ii = FALSE;
+static void net_show_error(enum nfs_stat status_rv)
+{
+  int i;
+  char *s, tmp[1024], tmp2[64];
 
+  struct {
+    enum nfs_stat stat;
+    int errnumber;
+  } nfs_err[] = {
+    { NFS_OK,                 0               },
+    { NFSERR_PERM,            EPERM           },
+    { NFSERR_NOENT,           ENOENT          },
+    { NFSERR_IO,              EIO             },
+    { NFSERR_NXIO,            ENXIO           },
+    { NFSERR_ACCES,           EACCES          },
+    { NFSERR_EXIST,           EEXIST          },
+    { NFSERR_NODEV,           ENODEV          },
+    { NFSERR_NOTDIR,          ENOTDIR         },
+    { NFSERR_ISDIR,           EISDIR          },
+    { NFSERR_INVAL,           EINVAL          },
+    { NFSERR_FBIG,            EFBIG           },
+    { NFSERR_NOSPC,           ENOSPC          },
+    { NFSERR_ROFS,            EROFS           },
+    { NFSERR_NAMETOOLONG,     ENAMETOOLONG    },
+    { NFSERR_NOTEMPTY,        ENOTEMPTY       },
+    { NFSERR_DQUOT,           EDQUOT          },
+    { NFSERR_STALE,           ESTALE          }
+  };
 
-    while (i_ii < sizeof (nfs_err_ari) / sizeof (nfs_err_ari [0]) && !found_ii)
-        if (nfs_err_ari [i_ii].stat == status_rv)
-            found_ii = TRUE;
-        else
-            i_ii++;
+  s = NULL;
 
-    sprintf (tmp_ti, txt_get (TXT_ERROR_NFSMOUNT), found_ii ?
-             strerror (nfs_err_ari [i_ii].errnumber) : "unknown error");
-
-    dia_message (tmp_ti, MSGTYPE_ERROR);
+  for(i = 0; i < sizeof nfs_err / sizeof *nfs_err; i++) {
+    if(nfs_err[i].stat == status_rv) {
+      s = strerror(nfs_err[i].errnumber);
+      break;
     }
+  }
+
+  if(!s) {
+    sprintf(tmp2, "unknown error %d\n", status_rv);
+    s = tmp2;
+  }
+
+  if(config.run_as_linuxrc) {
+    sprintf(tmp, txt_get(TXT_ERROR_NFSMOUNT), s);
+
+    if(config.win) {
+      dia_message(tmp, MSGTYPE_ERROR);
+    }
+    else {
+      fprintf(stderr, "%s\n", tmp);
+    }
+  }
+  else {
+    fprintf(stderr, "mount: nfs mount failed, reason given by server: %s\n", s);
+  }
+}
 #endif
 
 #if NETWORK_CONFIG
 static void net_setup_nameserver (void)
     {
+    if(config.net.dhcp_active) return;
+
     if (!nameserver_rg.s_addr)
         nameserver_rg = ipaddr_rg;
 
@@ -800,7 +947,7 @@ int net_bootp (void)
     window_t  win_ri;
     int       rc_ii;
     char     *data_pci;
-    char      tmp_ti [30];
+    char      tmp_ti [256];
     int       i_ii;
     int	      netconf_error;
 
@@ -825,7 +972,10 @@ int net_bootp (void)
         }
 
     if (!auto2_ig)
-	dia_info (&win_ri, txt_get (TXT_SEND_BOOTP));
+        {
+        sprintf (tmp_ti, txt_get (TXT_SEND_DHCP), "BOOTP");
+	dia_info (&win_ri, tmp_ti);
+	}
 
     if (bootp_wait_ig)
         sleep (bootp_wait_ig);
@@ -856,8 +1006,11 @@ int net_bootp (void)
 	    net_stop ();
 	    return(0);
         } else {
-            if (!auto2_ig) 
-                (void) dia_message (txt_get (TXT_ERROR_BOOTP), MSGTYPE_ERROR);
+            if (!auto2_ig)
+                {
+                sprintf (tmp_ti, txt_get (TXT_ERROR_DHCP), "BOOTP");
+                dia_message (tmp_ti, MSGTYPE_ERROR);
+                }
             return (-1);
         }
     }
@@ -973,3 +1126,107 @@ static int net_get_address (char *text_tv, struct in_addr *address_prr)
 
     return (0);
     }
+
+int net_dhcp()
+{
+  char cmd[256], file[256];
+  file_t *f0, *f;
+  window_t win;
+
+  if(config.net.dhcp_active) return 0;
+
+  if(!auto2_ig) {
+    sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");
+    dia_info(&win, cmd);
+  }
+
+  if(*machine_name_tg) {
+    sprintf(cmd, "dhcpcd -h %s %s", machine_name_tg, netdevice_tg);
+  }
+  else {
+    sprintf(cmd, "dhcpcd %s", netdevice_tg);
+  }
+
+  sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", netdevice_tg);
+
+  unlink(file);
+
+  system(cmd);
+
+  f0 = file_read_file(file);
+
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+      case key_ipaddr:
+        if(f->is.inet) ipaddr_rg = f->ivalue;
+        break;
+
+      case key_netmask:
+        if(f->is.inet) netmask_rg = f->ivalue;
+        break;
+
+      case key_network:
+        if(f->is.inet) network_rg = f->ivalue;
+        break;
+
+      case key_broadcast:
+        if(f->is.inet) broadcast_rg = f->ivalue;
+        break;
+
+      case key_gateway:
+        if(f->is.inet) gateway_rg = f->ivalue;
+        break;
+
+      case key_domain:
+        if(*f->value) {
+          if(config.net.domain) free(config.net.domain);
+          config.net.domain = strdup(f->value);
+          strcpy(domain_name_tg, config.net.domain);
+        }
+        break;
+
+      case key_dhcpsiaddr:
+        if(f->is.inet) nfs_server_rg = f->ivalue;
+        break;
+
+      case key_rootpath:
+      case key_bootfile:
+        if(*f->value) {
+          if(config.serverdir) free(config.serverdir);
+          config.serverdir = strdup(f->value);
+          strcpy(server_dir_tg, config.serverdir);
+        }
+        break;
+
+      default:
+    }
+  }
+
+  win_close(&win);
+
+  if(f0) {
+    config.net.dhcp_active = 1;
+  }
+  else {
+    if(!auto2_ig) {
+      sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
+      dia_message(cmd, MSGTYPE_ERROR);
+    }
+  }
+
+  file_free_file(f0);
+
+  return config.net.dhcp_active ? 0 : 1;
+}
+
+
+void net_dhcp_stop()
+{
+  if(!config.net.dhcp_active) return;
+
+  system("dhcpcd -k");
+
+  config.net.dhcp_active = 0;
+}
+
+

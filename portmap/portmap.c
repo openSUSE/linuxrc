@@ -293,6 +293,7 @@ portmap_main(argc, argv)
 	abort();
 }
 
+#if 0
 #ifndef lint
 /* need to override perror calls in rpc library */
 void
@@ -302,6 +303,7 @@ perror(what)
 
 	syslog(LOG_ERR, "%s: %m", what);
 }
+#endif
 #endif
 
 static struct pmaplist *

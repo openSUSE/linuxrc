@@ -31,6 +31,7 @@ typedef enum {
   di_expert_instsys,
   di_expert_nfsport,
   di_expert_bootptimeout,
+  di_expert_dhcp,
 
   di_inst_install,
   di_inst_demo,

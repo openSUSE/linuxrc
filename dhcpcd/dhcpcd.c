@@ -232,7 +232,7 @@ usage:	    print_version();
   if ( killFlag ) killPid(killFlag);
   checkIfAlreadyRunning();
   if ( versionFlag ) print_version();
-  openlog(PROGRAM_NAME,LOG_PID|LOG_CONS,LOG_LOCAL0);
+  openlog(PROGRAM_NAME,LOG_PID|LOG_PERROR,LOG_LOCAL0);
   signalSetup();
   magic_cookie = htonl(MAGIC_COOKIE);
   dhcpMsgSize = htons(sizeof(dhcpMessage));

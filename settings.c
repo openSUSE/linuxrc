@@ -346,7 +346,7 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_expert:
-      set_expert ();
+      set_expert();
       rc = 1;
       break;
 
@@ -497,6 +497,7 @@ void set_expert()
     di_expert_instsys,
     di_expert_nfsport,
     di_expert_bootptimeout,
+    di_expert_dhcp,
     di_none
   };
 
@@ -563,6 +564,11 @@ int set_expert_cb(dia_item_t di)
       sprintf(tmp, "%d", bootp_timeout_ig);
       rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4);
       if(!rc) bootp_timeout_ig = atoi(tmp);
+      break;
+
+    case di_expert_dhcp:
+      rc = dia_yesno(txt_get(TXT_DHCP_VS_BOOTP), config.net.use_dhcp ? YES : NO);
+      config.net.use_dhcp = rc == YES ? 1 : 0;
       break;
 
     default:

@@ -76,7 +76,6 @@ static int mod_load_manually(int type);
 static int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align);
 static int mod_is_loaded(char *module);
 static int mod_unload_modules(char *modules);
-static int mod_load_modules(char *modules, int show);
 static char *mod_get_params(module2_t *mod);
 static void mod_load_module_manual(char *module, int show);
 static int mod_pcmcia_ok(void);
