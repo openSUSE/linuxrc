@@ -39,7 +39,7 @@ typedef int (*xftw_func_t)(const char *, const struct stat *);
 extern int xftw(const char *directory, xftw_func_t);
 
 /* Error logging */
-extern int log;
+extern int err_log;
 extern int errors;
 extern const char *error_file;
 

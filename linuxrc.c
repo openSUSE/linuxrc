@@ -1020,7 +1020,7 @@ void lxrc_movetotmpfs()
     return;
   }
 
-  i = mount("shmfs", newroot, "shm", 0, "nr_inodes=20480");
+  i = mount("tmpfs", newroot, "tmpfs", 0, "nr_inodes=20480");
   if(i) {
     perror(newroot);
     return;

@@ -1,3 +1,9 @@
+25/8/2003:	v1.5.8
+	- reduce number of warnings: include stdlib.h for exit
+	- rename "int log" to "int err_log" in insmod stuff
+	- use tmpfs instead of shmfs (will be deprecated soon) 
+	- allow more net devices in selection list (#28659)
+
 11/8/2003:	v1.5.7
 	- support modprobe libhd entries
 

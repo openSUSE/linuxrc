@@ -56,7 +56,7 @@
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
 
-#define MAX_NETDEVICE      10
+#define MAX_NETDEVICE      64
 
 int net_is_configured_im = FALSE;
 

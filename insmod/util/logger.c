@@ -31,7 +31,7 @@
 
 /*======================================================================*/
 
-int log;
+int err_log;
 static int silent;
 
 int errors;
@@ -75,7 +75,7 @@ void error(const char *fmt,...)
 
 	if (silent)
 		;
-	else if (log) {
+	else if (err_log) {
 		char buf[2*PATH_MAX];
 		int n;
 
@@ -108,7 +108,7 @@ void lprintf(const char *fmt,...)
 	va_list args;
 
 	if (silent);
-	else if (log) {
+	else if (err_log) {
 		char buf[2*PATH_MAX];
 		va_start(args, fmt);
 		vsnprintf(buf, sizeof(buf), fmt, args);
@@ -132,5 +132,5 @@ void setsyslog(const char *program)
 #ifdef STOREMSG
 	atexit(dumpmsg);
 #endif
-	log = 1;
+	err_log = 1;
 }

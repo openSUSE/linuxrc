@@ -5,6 +5,7 @@
  * Hide the differences in this file.
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <linux/kd.h>

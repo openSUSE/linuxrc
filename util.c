@@ -724,7 +724,7 @@ void add_driver_update(char *dir, char *loc)
   /* create destination, if missing */
   if(util_check_exist(config.update.dst) != 'd') {
     if(mkdir(config.update.dst, 0755)) return;
-    // if(mount("shmfs", config.update.dst, "shm", 0, 0)) return;
+    // if(mount("tmpfs", config.update.dst, "tmpfs", 0, 0)) return;
   }
 
   str_copy(&config.update.id, NULL);
