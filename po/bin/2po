@@ -1,5 +1,7 @@
 #! /usr/bin/perl
 
+# convert old linuxrc *.txt files to *.po files
+
 sub read_texts;
 
 %pmap = (

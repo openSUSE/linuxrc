@@ -1,7 +1,8 @@
 #! /usr/bin/perl
 
-# convert *.po files to *.txt file suitabe for linuxrc
-# usage: po2txt file.po >file.txt
+# convert *.po files to *.txt files suitable for linuxrc
+# usage: po2h file.po >file.h
+# Note: en.po ist treated specially!
 
 sub read_texts;
 
