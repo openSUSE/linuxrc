@@ -398,6 +398,7 @@ static void lxrc_init (void)
         mod_load_module("hid", NULL);
         mod_load_module("keybdev", NULL);
         mod_load_module("mousedev", NULL);
+        mount (0, "/dev/usb", "usbdevfs", 0, 0);
       }
     }
 #endif
