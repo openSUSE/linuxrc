@@ -11,6 +11,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include "global.h"
 #include "window.h"
 #include "keyboard.h"
@@ -988,7 +991,7 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
 
 void dia_handle_ctrlc (void)
     {
-    int i;
+    int i, j;
     static int  is_in_ctrlc_is = FALSE;
     static char s[100] = { };
 
@@ -1005,7 +1008,8 @@ void dia_handle_ctrlc (void)
     else if(i == -69) {
       i = dia_input("run command", s, sizeof s - 1, 35);
       if(!i) {
-        system(s);
+        j = system(s);
+        if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
       }
     }
 

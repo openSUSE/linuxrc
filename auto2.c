@@ -40,62 +40,25 @@
 static hd_data_t *hd_data = NULL;
 static char *auto2_loaded_module = NULL;
 static char *auto2_loaded_module_args = NULL;
-#if 0
-static driver_info_t *x11_driver = NULL;
-#endif
 static char *pcmcia_params = NULL;
 static int is_vaio = 0;
 
 static void auto2_check_cdrom_update(char *dev);
-#if 0
-static char *auto2_device_name(hd_t *hd);
-#endif
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
 static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
-#if 0
-static void auto2_chk_x11i(void);
-#endif
 static int auto2_find_floppy(void);
 static void auto2_find_mouse(void);
 static int auto2_has_i2o(void);
-#if 0
-static int auto2_get_probe_env(hd_data_t *hd_data);
-#endif
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, int mod_type);
-
-#if 0
-char *auto2_device_name(hd_t *hd)
-{
-  static char *s;
-
-  if(hd->dev_name) return hd->dev_name;
-
-  s = hd_device_name(hd_data, hd->vend, hd->dev);
-
-  return s ? s : "?";
-}
-#endif
 
 int auto2_init_settings()
 {
   disp_set_display(1);
-
-#if 0	// #####
-  char *s;
-
-  color_ig = get_rc_int(rc_color_screen);
-
-  language_ig = getlangidbyname(get_rc_str(rc_language));
-
-  s = get_rc_str(rc_keymap);
-  if(!*s) s = get_rc_str(rc_language);
-  strcpy(keymap_tg, getkeymapbyname(s));
-#endif
 
   return 0;
 }
@@ -961,47 +924,58 @@ void auto2_find_mouse()
 
 
 /*
- * Scans the hardware list for a floppy and puts the result in
- * has_floppy_ig.
+ * Scans the hardware list for a floppy and puts the result into
+ * config.floppies & config.floppy_dev[].
+ *
+ * Returns number of floppies (with medium inserted!) found.
  */
 int auto2_find_floppy()
 {
   hd_t *hd;
-  char *floppy_0 = NULL;
-  char *floppy_1 = NULL;
   hd_res_t *res;
+  int i, small_floppy = 0;
+  char *s;
 
-  if(!hd_data) return has_floppy_ig;
+  if(!hd_data) return config.floppies;
+
+  config.floppy = config.floppies = 0;
+  for(
+    i = 0;
+    i < sizeof config.floppy_dev / sizeof *config.floppy_dev && config.floppy_dev[i];
+    i++
+  ) {
+    free(config.floppy_dev[i]);
+    config.floppy_dev[i] = NULL;
+  }
 
   for(hd = hd_data->hd; hd; hd = hd->next) {
     if(
+      config.floppies < sizeof config.floppy_dev / sizeof *config.floppy_dev &&
       hd->base_class == bc_storage_device &&	/* is a storage device... */
       hd->sub_class == sc_sdev_floppy &&	/* a floppy actually... */
       hd->unix_dev_name &&			/* and has a device name */
       !hd->is.notready				/* medium inserted */
     ) {
       for(res = hd->res; res; res = res->next) {
-        if(!floppy_1) floppy_1 = hd->unix_dev_name;
+        config.floppy_dev[config.floppies++] = strdup(hd->unix_dev_name);
         if(
+          !small_floppy &&
           res->any.type == res_size &&
           res->size.unit == size_unit_sectors &&
           res->size.val1 >= 0 && res->size.val1 <= 2880 * 2
-        ) {
-          if(!floppy_0) floppy_0 = hd->unix_dev_name;
-        }
+        ) small_floppy = config.floppies - 1;
       }
     }
   }
 
-  if(!floppy_0) floppy_0 = floppy_1;		/* prefer <= 2.88MB floppies */
-
-  *floppy_tg = 0;
-
-  if(floppy_0 && strlen(floppy_0) < sizeof floppy_tg) {
-    strcpy(floppy_tg, floppy_0);
+  /* try 'real' floppy first */
+  if(small_floppy) {
+    s = config.floppy_dev[0];
+    config.floppy_dev[0] = config.floppy_dev[small_floppy];
+    config.floppy_dev[small_floppy] = s;
   }
 
-  return has_floppy_ig = floppy_tg ? TRUE : FALSE;
+  return config.floppies;
 }
 
 

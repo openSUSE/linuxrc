@@ -580,7 +580,7 @@ static int net_choose_device (void)
         while (buffer_ti [i_ii] == ' ')
             i_ii++;
 
-        if (!strncmp (&buffer_ti [i_ii], "eth", 3))
+        if (!strncmp (&buffer_ti [i_ii], "eth", 3) || !strncmp (&buffer_ti [i_ii], "veth", 4))
             sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
                      &buffer_ti [i_ii], txt_get (TXT_NET_ETH0));
         else if (!strncmp (&buffer_ti [i_ii], "plip", 4))

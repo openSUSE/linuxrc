@@ -105,6 +105,8 @@ int main (int argc, char **argv, char **env)
         rc_ii = util_umount_main (argc, argv);
     else if (!strcmp (progname_pci, "cat"))
         rc_ii = util_cat_main (argc, argv);
+    else if (!strcmp (progname_pci, "ps"))
+        rc_ii = util_ps_main (argc, argv);
     else if (!strcmp (progname_pci, "nothing"))
         rc_ii = 0;
     else
@@ -433,6 +435,10 @@ static void lxrc_init (void)
 /*    reboot (RB_DISABLE_CAD); */
 
     umask(022);
+
+    /* just a default for manual mode */
+    config.floppies = 1;
+    config.floppy_dev[0] = strdup("/dev/fd0");
 
     language_pci = getenv ("lang");
     if(language_pci) {

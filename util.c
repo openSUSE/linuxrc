@@ -573,10 +573,13 @@ int util_umount(char *mp)
 #ifdef LXRC_DEBUG
   int i;
 
-  if((i = umount(mp)))
+  if((i = umount(mp))) {
+    i = errno;
     fprintf(stderr, "umount(%s) failed: %d\n", mp, errno);
-  else
+  }
+  else {
     fprintf(stderr, "umount(%s) ok\n", mp);
+  }
 
   return i;
 #else
@@ -1120,4 +1123,11 @@ void util_ps(FILE *f)
     }
     closedir(proc);
   }
+}
+
+int util_ps_main(int argc, char **argv)
+{
+  util_ps(stderr);
+
+  return 0;
 }

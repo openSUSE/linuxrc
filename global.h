@@ -152,6 +152,9 @@ typedef struct {
 typedef struct {
   unsigned rebootmsg:1;
   unsigned redraw_menu:1;	/* we need a better solution for this */
+  int floppies;
+  int floppy;
+  char *floppy_dev[4];
 } config_t;
 
 config_t config;

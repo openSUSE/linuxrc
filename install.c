@@ -75,7 +75,7 @@ static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (int what_iv);
 static int   inst_menu_cb             (int what_iv);
 static int   inst_init_cache          (void);
-static void  inst_umount              (void);
+static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
 static int   inst_get_nfsserver       (void);
 static int   inst_get_ftpserver       (void);
@@ -610,7 +610,7 @@ int inst_check_instsys (void)
         {
         case BOOTMODE_FLOPPY:
             ramdisk_ig = TRUE;
-            strcpy (inst_rootimage_tm, *floppy_tg ? floppy_tg : "/dev/fd0");
+            strcpy (inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
             break;
         case BOOTMODE_HARDDISK:
             if (inst_loopmount_im)
@@ -936,6 +936,30 @@ int inst_execute_yast()
   /* turn off swap */
   inst_swapoff();
 
+  {
+    int i = -1, count = 5;
+
+    while((i = inst_umount()) == 16 && count--) {
+      deb_int(i);
+      sleep(1);
+    }
+    deb_int(i);
+  }
+
+
+#ifdef LXRC_DEBUG
+  if((guru_ig & 2)) {
+    int i;
+
+    util_manual_mode();
+    util_disp_init();
+    do {
+      i = dia_message("Installation part 1 finished...", MSGTYPE_INFO);
+      inst_umount();
+    } while(i);
+  }
+#endif
+
   if(!rc_ii) {
     rc_ii = inst_commit_install();
     if(rc_ii) {
@@ -948,27 +972,39 @@ int inst_execute_yast()
 }
 
 
-static int inst_check_floppy (void)
-    {
-    int  fd_ii;
+/*
+ * Look for a usable (aka with medium) floppy drive.
+ *
+ * return: 0: ok, < 0: failed
+ */
+// ####### We should make sure the floppy has the rescue system on it!
+int inst_check_floppy()
+{
+  int i, fd = -1;
+  char *s;
 
+  bootmode_ig = BOOTMODE_FLOPPY;
+  i = dia_message(txt_get(TXT_INSERT_DISK), MSGTYPE_INFO);
+  if(i) return i;
 
-    bootmode_ig = BOOTMODE_FLOPPY;
-    fd_ii = dia_message (txt_get (TXT_INSERT_DISK), MSGTYPE_INFO);
-    if (fd_ii)
-        return (fd_ii);
+  for(i = -1; i < config.floppies; i++) {
+    /* try last working floppy first */
+    if(i == config.floppy) continue;
+    s = config.floppy_dev[i == -1 ? config.floppy : i];
+    if(!s) continue;
+    fd = open(s, O_RDONLY);
+    if(fd < 0) continue;
+    config.floppy = i == -1 ? config.floppy : i;
+    break;
+  }
 
-    fd_ii = open (*floppy_tg ? floppy_tg : "/dev/fd0", O_RDONLY);
-    if (fd_ii < 0)
-        dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-    else
-        close (fd_ii);
+  if(fd < 0)
+    dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+  else
+    close(fd);
 
-    if (fd_ii < 0)
-        return (fd_ii);
-    else
-        return (0);
-    }
+  return fd < 0 ? fd : 0;
+}
 
 
 int inst_read_yast_file()
@@ -1134,20 +1170,27 @@ static int inst_init_cache (void)
     }
 
 
-static void inst_umount (void)
-    {
-    if (inst_loopmount_im)
-        {
-        util_umount_loop (mountpoint_tg);
-        umount (inst_tmpmount_tm);
-        rmdir (inst_tmpmount_tm);
-        inst_loopmount_im = FALSE;
-        }
-    else
-        umount (mountpoint_tg);
+int inst_umount()
+{
+  int i = 0, j;
 
-    umount (inst_mountpoint_tg);
-    }
+  if(inst_loopmount_im) {
+    util_umount_loop(mountpoint_tg);
+    j = util_umount(inst_tmpmount_tm);
+    if(j == 16) i = 16;
+    rmdir(inst_tmpmount_tm);
+    inst_loopmount_im = FALSE;
+  }
+  else {
+    j = util_umount(mountpoint_tg);
+    if(j == 16) i = 16;
+  }
+
+  j = util_umount(inst_mountpoint_tg);
+  if(j == 16) i = 16;
+
+  return i;
+}
 
 
 static int inst_get_nfsserver (void)
