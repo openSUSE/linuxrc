@@ -8,6 +8,8 @@ static module_t mod_scsi_mod_arm [] =
 { ID_GDTH,       "ICP Vortex GDTH Disk Array",         "gdth",       0, __LINE__ },
 { ID_DAC960,     "Mylex DAC-960/DAC1100",              "DAC960",     0, __LINE__ },
 { ID_SMART2,     "Compaq SMART2 RAID",                 "cpqarray",   0, __LINE__ },
+{ ID_CCISS,      "Compaq CISS Array",                  "cciss",      0, __LINE__
+ },
 { ID_DPT_I2O,    "DPT I2O SmartRAID V",                "dpt_i2o",    0, __LINE__ },
 { ID_AACRAID,    "Adaptec RAID",                       "aacraid",    0, __LINE__ },
 { ID_IPS,        "IBM ServeRAID",                      "ips",        0, __LINE__ },

@@ -40,6 +40,7 @@ enum modid_t
     ID_SYM53C416,
     ID_DAC960,
     ID_SMART2,
+    ID_CCISS,
     ID_QLOGIC_FC,
     ID_SYM_53C8XX,
     ID_IPS,
