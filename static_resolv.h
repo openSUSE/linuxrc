@@ -1,4 +1,4 @@
-#if !defined(DIET) && !defined(UC)
+#if !defined(DIET) && !defined(UCLIBC)
 
 struct hostent *res_gethostbyaddr(const char *addr, int len, int type);
 struct hostent *res_gethostbyname(const char *name);
