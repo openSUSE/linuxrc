@@ -141,6 +141,10 @@ void auto2_scan_hardware(char *log_file)
   with_usb = hd_probe_feature(hd_data, pr_usb);
   hd_clear_probe_feature(hd_data, pr_usb);
   hd_scan(hd_data);
+  if(hd_data->progress) {
+    printf("\r%64s\r", "");
+    fflush(stdout);
+  }
 
   if((usb_mod = auto2_usb_module())) {
     if(
@@ -203,7 +207,6 @@ void auto2_scan_hardware(char *log_file)
  *   1: no CD found
  *   2: CD found, but mount failed
  *
- * ##### FIXME: check only *new* devices (e.g. check every device only *once*)
  */
 int auto2_cdrom_dev()
 {
@@ -218,11 +221,19 @@ int auto2_cdrom_dev()
       hd->detail->type == hd_detail_cdrom
     ) {
       ci = hd->detail->cdrom.data;
+#if 1
       if(ci->volume && strstr(ci->volume, "SU") == ci->volume) {
         fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
         found_suse_cd_ig = TRUE;
         break;
       }
+#else
+      if(ci->volume) {
+        fprintf(stderr, "Found a CD in %s.\n", hd->unix_dev_name);
+        found_suse_cd_ig = TRUE;
+        break;
+      }
+#endif
     }
   }
 
