@@ -942,7 +942,8 @@ int inst_execute_yast()
   sync();
   fprintf(stderr, " ok\n");
 
-  rc_ii = inst_read_yast_file();
+  i = inst_read_yast_file();
+  if(!rc_ii) rc_ii = i;
 
   // if(!auto2_ig) disp_restore_screen();
   disp_cursor_off();

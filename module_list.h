@@ -55,9 +55,8 @@ static module_t mod_scsi_mod_arm [] =
 { ID_SIM710,     "Simple 53c710 (Compaq, NCR)",        "sim710",     0, __LINE__ },
 { ID_QLOGICPTI,  "PTI Qlogic ISP Driver",              "qlogicpti",  0, __LINE__ },
 { ID_3WARE,      "3ware ATA RAID (pseudo SCSI)",       "3w-xxxx",    0, __LINE__ },
-{ ID_PDCRAID,    "Promise Fasttrak software RAID",     "pdcraid",    0, __LINE__ },
-{ ID_HPTRAID,    "Highpoint 370 software RAID",        "hptraid",    0, __LINE__ },
 { ID_DMX3191D,   "Domex DMX3191D SCSI",                "dmx3191d",   0, __LINE__ },
+{ ID_MPTSCSIH,   "LSIFC9xx/LSI409xx Fibre Channel",    "mptscsih",   0, __LINE__ },
 #if 0
 /* loaded implicitly */
 { ID_I2O_PCI,    "Intelligent I/O PCI",                "i2o_pci",    0, __LINE__ },
@@ -228,7 +227,10 @@ static enum modid_t mod_noauto_arm [] =
   ID_I2O_CONFIG,
   ID_I2O_BLOCK,
   ID_I2O_SCSI,
-  ID_IN2000
+  ID_IN2000,
+  ID_TMSISA,
+  ID_TMSPCI,
+  ID_MPTSCSIH
 };
 
 static enum modid_t mod_is_ppcd_arm [] =

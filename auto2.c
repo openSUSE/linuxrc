@@ -51,6 +51,7 @@ static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
+static int auto2_load_usb_storage(void);
 static void auto2_find_mouse(void);
 static int auto2_has_i2o(void);
 static void auto2_progress(char *pos, char *msg);
@@ -188,7 +189,6 @@ void auto2_scan_hardware(char *log_file)
       );
       mod_load_module("keybdev", NULL);
       mod_load_module("mousedev", NULL);
-      mod_load_module("usb-storage", NULL);
     }
     k = mount ("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
     if(!i) sleep(4);
@@ -198,6 +198,14 @@ void auto2_scan_hardware(char *log_file)
       hd_set_probe_feature(hd_data, pr_scsi);
       hd_set_probe_feature(hd_data, pr_int);
       hd_scan(hd_data);
+      if(auto2_load_usb_storage()) {
+        mod_load_module("usb-storage", NULL);
+        hd_clear_probe_feature(hd_data, pr_all);
+        hd_set_probe_feature(hd_data, pr_usb);
+        hd_set_probe_feature(hd_data, pr_scsi);
+        hd_set_probe_feature(hd_data, pr_int);
+        hd_scan(hd_data);
+      }
     }
   }
 
@@ -1004,6 +1012,48 @@ int auto2_find_floppy()
   }
 
   return config.floppies;
+}
+
+
+/*
+ * Return != 0 if we should load the usb-storage module.
+ */
+int auto2_load_usb_storage()
+{
+  hd_t *hd;
+  int nonusb_floppy_drives = 0;
+  int usb_floppy_drives = 0;
+
+  if(!hd_data) return 0;
+
+  for(hd = hd_data->hd; hd; hd = hd->next) {
+    if(
+      hd->base_class == bc_storage_device &&
+      hd->sub_class == sc_sdev_floppy
+    ) {
+      if(hd->bus == bus_usb) {
+        if(
+          !(
+            (
+              (hd->vend_name && !strcasecmp(hd->vend_name, "iomega")) ||
+              (hd->sub_vend_name && !strcasecmp(hd->sub_vend_name, "iomega"))
+            ) &&
+            (
+              (hd->dev_name && strstr(hd->dev_name, "ZIP")) ||
+              (hd->sub_dev_name && strstr(hd->sub_dev_name, "Zip"))
+            )
+          )
+        ) {
+          usb_floppy_drives++;
+        }
+      }
+      else {
+        nonusb_floppy_drives++;
+      }
+    }
+  }
+
+  return usb_floppy_drives != 0;
 }
 
 

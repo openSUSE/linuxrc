@@ -130,7 +130,8 @@ int mod_load_module (char *module_tv, char *params_tv)
       { "smc-ultra", "isa-pnp isapnp_reset=0" },
       { "sym53c416", "isa-pnp isapnp_reset=0" },
       { "tmsisa",    "tms380tr" },
-      { "tmspci",    "tms380tr" }
+      { "tmspci",    "tms380tr" },
+      { "mptscsih",  "mptbase"  }
     };
 
     sprintf (command_ti, "insmod %s ", module_tv);

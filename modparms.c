@@ -128,6 +128,11 @@ void mpar_write_modparms (FILE *file_prv)
               ) && !isapnp_loaded
             ) {
               fprintf (file_prv, "%s%s", mod_idx ? " " : "", "isa-pnp");
+              isapnp_loaded = 1;
+              mod_idx++;
+            }
+            if(!strcmp(mpar_modnames_atm[i_ii], "mptscsih")) {
+              fprintf (file_prv, "%s%s", mod_idx ? " " : "", "mptbase");
               mod_idx++;
             }
             fprintf (file_prv, "%s%s", mod_idx ? " " : "", mpar_modnames_atm [i_ii]);

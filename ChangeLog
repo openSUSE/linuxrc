@@ -1,3 +1,10 @@
+24/9/2001:	v1.2.29
+	- removed spanish and italian from tiny linuxrc
+	- no module autoload for tms 380 token ring cards (#11244)
+	- support LSIFC9xx/LSI409xx Fibre Channel (#11251)
+	- load usb-storage module only on computers that have only
+	  an usb floppy (#9490)
+
 22/9/2001:	v1.2.28
 	- don't run empty commands
 	- /sbin/update no longer exists
