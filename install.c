@@ -208,7 +208,7 @@ int inst_start_demo (void)
 
     if (bootmode_ig == BOOTMODE_NET && !*livesrc_tg)
         {
-        sprintf (line_ti, "%s:%s /S.u.S.E. nfs ro 0 0\n", inet_ntoa (nfs_server_rg), server_dir_tg);
+        sprintf (line_ti, "%s:%s /S.u.S.E. nfs ro,nolock 0 0\n", inet_ntoa (nfs_server_rg), server_dir_tg);
         }
     else
         {

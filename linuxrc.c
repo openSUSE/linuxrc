@@ -14,6 +14,7 @@
 #include <sys/mount.h>
 #include <sys/reboot.h>
 #include <sys/syscall.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
@@ -179,8 +180,13 @@ static void save_environment (void)
 	memcpy (saved_environment, environ, i * sizeof (char *));
 }
 
+#ifdef USE_LXRC_CHANGE_ROOT
 void lxrc_change_root (void)
 {
+  char *new_mp;
+
+  new_mp = (action_ig & ACT_DEMO) ? ".mnt" : "mnt";
+
 #ifdef SYS_pivot_root
   umount ("/mnt");
   util_try_mount (lxrc_new_root, "/mnt", MS_MGC_VAL | MS_RDONLY, 0);
@@ -188,15 +194,27 @@ void lxrc_change_root (void)
   if (
 #if 1
       /* XXX Until glibc is fixed to provide pivot_root. */
-      syscall (SYS_pivot_root, ".", "mnt")
+      syscall (SYS_pivot_root, ".", new_mp)
 #else
-      pivot_root (".", "mnt")
+      pivot_root (".", new_mp)
 #endif
       == 0)
     {
+#if 0
       close (0); close (1); close (2);
       chroot (".");
       execve ("/sbin/init", lxrc_argv, saved_environment ? : environ);
+#endif
+      int i;
+
+      for(i = 0; i < 20 ; i++) close(i);
+      chroot(".");
+      if((action_ig & ACT_DEMO)) {
+        execve("/sbin/init", lxrc_argv, saved_environment ? : environ);
+      }
+      else {
+        execl("/bin/umount", "umount", "/mnt", NULL);
+      }
     }
     else {
       chdir ("/");
@@ -204,12 +222,18 @@ void lxrc_change_root (void)
     }
 #endif
 }
+#endif
 
 void lxrc_end (void)
     {
+    int i;
+
     deb_msg("lxrc_end()");
     kill (lxrc_mempid_rm, 9);
     lxrc_killall (1);
+    while(waitpid(-1, NULL, WNOHANG) == 0);
+    i = waitpid(lxrc_mempid_rm, NULL, 0);
+    fprintf(stderr, "lxrc_mempid_rm = %d, wait = %d\n", lxrc_mempid_rm, i);
     printf ("\033[9;15]");	/* screen saver on */
 /*    reboot (RB_ENABLE_CAD); */
     mod_free_modules ();
@@ -222,8 +246,10 @@ void lxrc_end (void)
     disp_cursor_on ();
     kbd_end ();
     disp_end ();
+#ifdef USE_LXRC_CHANGE_ROOT
     if (lxrc_new_root)
       lxrc_change_root();
+#endif
     }
 
 
@@ -427,6 +453,12 @@ static void lxrc_init (void)
            if (strstr (s, ",rescue,"))
                action_ig |= ACT_RESCUE;
 
+           if (strstr (s, ",nopcmcia,"))
+               action_ig |= ACT_NO_PCMCIA;
+
+           if (strstr (s, ",debug,"))
+               action_ig |= ACT_DEBUG;
+
            free (s);
            }
         }
@@ -487,6 +519,17 @@ static void lxrc_init (void)
         force_ri_ig = TRUE;
 
     if ((guru_ig & 8)) force_ri_ig = FALSE;
+
+#if 0
+    if((action_ig & ACT_DEBUG)) {
+      FILE *f = fopen("/dev/tty1", "w");
+      if(f) {
+        util_ps(f);
+        fclose(f);
+      }
+      getchar();
+    }
+#endif
 
     lxrc_memcheck ();
 
@@ -806,8 +849,10 @@ static void lxrc_check_console (void)
 
         *tmp_pci = 0;
         sprintf (console_tg, "/dev/%s", found_pci);
-        if (!strncmp (found_pci, "ttyS", 4))
+        if (!strncmp (found_pci, "ttyS", 4)) {
             serial_ig = TRUE;
+            text_mode_ig = TRUE;
+          }
 
         fprintf (stderr, "Console: %s, serial=%d\n", console_tg, serial_ig);
         }
@@ -821,6 +866,7 @@ static void lxrc_check_console (void)
     if (cp && strlen (cp) > 0)
       {
 	serial_ig = TRUE;
+        text_mode_ig = TRUE;
 
 #ifdef __PPC__
         yast_version_ig = 1;

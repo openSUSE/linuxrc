@@ -75,6 +75,8 @@
 #define ACT_LOAD_DISK		(1 << 3)
 #define ACT_YAST2_AUTO_INSTALL	(1 << 4)
 #define ACT_RESCUE		(1 << 5)
+#define ACT_NO_PCMCIA		(1 << 6)
+#define ACT_DEBUG		(1 << 7)
 
 enum langid_t
     {

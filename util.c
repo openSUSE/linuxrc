@@ -56,10 +56,10 @@ static inline _syscall3 (int,syslog,int,type,char *,b,int,len);
 
 static char  *util_loopdev_tm = "/dev/loop0";
 
+#ifdef USE_VFAT
 static void put_byte(int fd, unsigned char data);
 static void put_short(int fd, unsigned short data);
 static void put_int(int fd, unsigned data);
-#ifdef USE_VFAT
 static unsigned mkdosfs(int fd, unsigned size);
 #endif
 static void do_cp(char *src_dir, char *dst_dir, char *name);
@@ -628,6 +628,7 @@ void util_manual_mode()
   auto2_ig = 0;
 }
 
+#ifdef USE_VFAT
 void put_byte(int fd, unsigned char data)
 {
   write(fd, &data, 1);
@@ -643,7 +644,6 @@ void put_int(int fd, unsigned data)
   write(fd, &data, 4);
 }
 
-#ifdef USE_VFAT
 /*
  * Create a FAT file system on fd; size in kbyte.
  * Return the actual free space in kbyte.
@@ -1036,3 +1036,88 @@ void util_get_splash_status()
   }
 }
 
+
+
+char *read_symlink(char *file)
+{
+  static char buf[256];
+  int i;
+
+  i = readlink(file, buf, sizeof buf);
+  buf[sizeof buf - 1] = 0;
+  if(i >= 0 && i < sizeof buf) buf[i] = 0;
+  if(i < 0) *buf = 0;
+
+  return buf;
+}
+
+void show_proc(FILE *f, unsigned pid)
+{
+  char pe[100];
+  char buf1[64], buf2[2], buf3[256];
+  FILE *p;
+  DIR *dir;
+  struct dirent *de;
+  unsigned status = 0;
+  unsigned u, v;
+  char *s;
+
+  sprintf(pe, "/proc/%u/status", pid);
+  if((p = fopen(pe, "r"))) {
+    if(fscanf(p, "Name: %63[^\n]", buf1) == 1) status |= 1;
+    if(fscanf(p, "\nState: %1s", buf2) == 1) status |= 2;
+    fclose(p);
+  }
+
+  sprintf(pe, "/proc/%u/cmdline", pid);
+  if((p = fopen(pe, "r"))) {
+    u = fread(buf3, 1, sizeof buf3, p);
+    if(u > sizeof buf3 - 1) u = sizeof buf3 - 1;
+    for(v = 0; v < u; v++) if(!buf3[v]) buf3[v] = ' ';
+    buf3[u] = 0;
+    status |= 4;
+    fclose(p);
+  }
+
+  if(!(status & 1)) *buf1 = 0;
+  if(!(status & 2)) *buf2 = 0;
+  if(!(status & 4)) *buf3 = 0;
+
+  fprintf(f, "%5u %s %-16s %s\n", pid, buf2, buf1, buf3);
+
+  sprintf(pe, "/proc/%u/exe", pid);
+  if(*(s = read_symlink(pe))) fprintf(f, "  exe: %s\n", s);
+
+  sprintf(pe, "/proc/%u/cwd", pid);
+  if(*(s = read_symlink(pe))) fprintf(f, "  cwd: %s\n", s);
+
+  sprintf(pe, "/proc/%u/fd", pid);
+
+  if((dir = opendir(pe))) {
+    while((de = readdir(dir))) {
+      if(*de->d_name != '.') {
+        sprintf(pe, "/proc/%u/fd/%s", pid, de->d_name);
+        if(*(s = read_symlink(pe))) fprintf(f, "  fd%s: %s\n", de->d_name, s);
+      }
+    }
+    closedir(dir);
+  }
+}
+
+void util_ps(FILE *f)
+{
+  DIR *proc;
+  struct dirent *de;
+  unsigned u;
+  char *s;
+
+  if((proc = opendir("/proc"))) {
+    while((de = readdir(proc))) {
+      if(de->d_name) {
+        u = strtoul(de->d_name, &s, 10);
+        if(!*s) show_proc(f, u);
+      }
+    }
+    closedir(proc);
+  }
+}

@@ -23,7 +23,6 @@
 #include "dialog.h"
 #include "net.h"
 #include "settings.h"
-#include "smp.h"
 #include "auto2.h"
 #if WITH_PCMCIA
 #include "pcmcia.h"
@@ -253,10 +252,12 @@ void file_write_yast_info (char *file_name)
 
     mpar_write_modparms (file_pri);
 
+#if 0
     if (detectSMP () > 0)
         fprintf (file_pri, "SMP: 1\n");
     else
         fprintf (file_pri, "SMP: 0\n");
+#endif
 
     fprintf (file_pri, "%s %d\n", file_txt_manual_tm, auto_ig || auto2_ig ? 0 : 1);
     fprintf (file_pri, "%s %d\n", file_txt_demo_tm, demo_ig);

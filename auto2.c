@@ -611,7 +611,7 @@ int auto2_init()
   }
 
 #if WITH_PCMCIA
-  if(hd_has_pcmcia(hd_data)) {
+  if(!(action_ig & ACT_NO_PCMCIA) && hd_has_pcmcia(hd_data)) {
     deb_msg("Going to load PCMCIA support...");
 
     if(!util_check_exist("modules/pcmcia_core.o")) {
@@ -825,7 +825,7 @@ void auto2_chk_expert()
   int i = 0, j;
 
   if((f = fopen("/proc/cmdline", "r"))) {
-    if(fread(buf, 1, sizeof buf, f)) {
+    if(fgets(buf, sizeof buf, f)) {
       t = buf;
       while((s = strsep(&t, " "))) {
         if(sscanf(s, "expert=%i", &j) == 1) i |= j;
@@ -853,10 +853,11 @@ void auto2_chk_frame_buffer()
   int fb_mode = -1;
 
   if((f = fopen("/proc/cmdline", "r"))) {
-    if(fread(buf, 1, sizeof buf, f)) {
+    if(fgets(buf, sizeof buf, f)) {
       t = buf;
       while((s = strsep(&t, " "))) {
         if(sscanf(s, "vga=%i", &j) == 1) fb_mode = j;
+        if(strstr(s, "vga=normal") == s) fb_mode = 0;
       }
     }
     fclose(f);
@@ -879,7 +880,7 @@ void auto2_chk_x11i()
   *x11i = 0;
 
   if((f = fopen("/proc/cmdline", "r"))) {
-    if(fread(buf, 1, sizeof buf, f)) {
+    if(fgets(buf, sizeof buf, f)) {
       t = buf;
       while((s = strsep(&t, " "))) {
         if(sscanf(s, "x11i=%60s", x11i) == 1) {
@@ -1109,9 +1110,9 @@ char *auto2_serial_console (void)
 	strcpy (console, hd->unix_dev_name);
 	/* Create a string like: ttyS0,38400n8 */
 #if defined(__sparc__)
-	sprintf (console_parms_tg, "%s,%d%s%d", &console[5],
+	sprintf (console_parms_tg, "%s,%d%c%d", &console[5],
 		 hd->res->baud.speed,
-		 hd->res->baud.parity ? "p" : "n",
+		 hd->res->baud.parity,
 		 hd->res->baud.bits);
 #else
 	sprintf (console_parms_tg, "%s,%d", &console[5], hd->res->baud.speed);

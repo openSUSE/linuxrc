@@ -1,3 +1,23 @@
+13/6/2001:	v1.2.0
+	- new version scheme
+	- disabled pivot_root, we just exit() as before
+	- fixed framebuffer mode detection bug (#8620)
+	- added function to do a simple 'ps' (for debugging, normally disabled)
+	- kukuk: fix output of SERIAL_CONSOLE entry
+	- kukuk: set "Textmode" if we install over serial console
+	- kukuk: add SunGEM network card
+	- mantel: new parameter for info file: ForceRootimage
+	- mantel: don't ask silly questions when doing auto install from hard disk
+	- mantel: load rootimage into ramdisk when loop mount failes on installation via HD
+	- mantel: added new filesystem type xfs. Centralized list of known filesystems
+
+25/5/2001:	v1.1.19.015
+	- use /.mnt for pivot_root call, not /mnt
+
+22/5/2001:	v1.1.19.014
+	- workaround for nfs mount problem
+	- now _really_ remove smp stuff
+
 22/5/2001:	v1.1.19.013
 	- fixed stupid reiserfs typo
 	- in2000 no longer auto loaded

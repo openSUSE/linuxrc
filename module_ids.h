@@ -161,6 +161,7 @@ enum modid_t
     ID_SUNBIGMAC,
     ID_SUNHAPPYMEAL,
     ID_SUNQUADE,
+    ID_SUNGEM,
 
     /* SPARC - SCSI */
     ID_QLOGICPTI,

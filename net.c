@@ -411,8 +411,22 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
         timeout_ri.tv_usec = 0;
         mount_client_pri = clntudp_create (&mount_server_ri, MOUNTPROG,
                                            MOUNTVERS, timeout_ri, &socket_ii);
+        }
+
+    if (!mount_client_pri)
+        {
+        sleep(2);
+
+	mount_data_ri.timeo = 7;
+        mount_server_ri.sin_port = htons (0);
+        socket_ii = RPC_ANYSOCK;
+        timeout_ri.tv_sec = 3;
+        timeout_ri.tv_usec = 0;
+        mount_client_pri = clntudp_create (&mount_server_ri, MOUNTPROG,
+                                           MOUNTVERS, timeout_ri, &socket_ii);
         if (!mount_client_pri)
             {
+            deb_msg("net");
             net_show_error ((enum nfs_stat) -1);
             return (-1);
             }
@@ -428,12 +442,14 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
                        timeout_ri);
     if (rc_ii)
         {
+        deb_msg("net");
         net_show_error ((enum nfs_stat) -1);
         return (-1);
         }
 
     if (status_ri.fhs_status)
         {
+        deb_msg("net");
         net_show_error (status_ri.fhs_status);
         return (-1);
         }
@@ -449,12 +465,14 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     fsock_ii = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (fsock_ii < 0)
         {
+        deb_msg("net");
         net_show_error ((enum nfs_stat) -1);
         return (-1);
         }
 
     if (bindresvport (fsock_ii, 0) < 0)
         {
+        deb_msg("net");
         net_show_error ((enum nfs_stat) -1);
         return (-1);
         }
@@ -486,8 +504,7 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
 
     sprintf (tmp_ti, "%s:%s", server_addr_tv, hostdir_tv);
     opts_pci = (char *) &mount_data_ri;
-    rc_ii = mount (tmp_ti, mountpoint_tg, "nfs", MS_RDONLY | MS_MGC_VAL,
-                   opts_pci);
+    rc_ii = mount (tmp_ti, mountpoint_tg, "nfs", MS_RDONLY | MS_MGC_VAL, opts_pci);
 
     return (rc_ii);
     }

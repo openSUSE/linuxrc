@@ -88,7 +88,7 @@ endif
 all: libs linuxrc
 
 version.h: VERSION
-	@echo "#define LXRC_VERSION \"`cut -d. -f1-3 VERSION`\"" >$@
+	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
 	@echo "#define LXRC_FULL_VERSION \"`cat VERSION`\"" >>$@
 
 linuxrc: $(OBJ) $(LIBS)

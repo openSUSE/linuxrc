@@ -170,6 +170,7 @@ static module_t mod_net_mod_arm [] =
 { ID_SUNBIGMAC,  "Sun BigMAC 10/100baseT",             "sunbmac",    0, __LINE__ },
 { ID_SUNHAPPYMEAL, "Sun Happy Meal 10/100baseT",       "sunhme",     0, __LINE__ },
 { ID_SUNQUADE,   "Sun QuadEthernet",                   "sunqe",      0, __LINE__ },
+{ ID_SUNGEM,	 "Sun GEM",                            "sungem",     0, __LINE__ },
 };
 
 static enum modid_t mod_noauto_arm [] =
