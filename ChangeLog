@@ -1,6 +1,7 @@
 24/3/2003:	v1.4.45
 	- module unloading used to clear internal network/disk lists (#24606)
 	- keep proxy scheme (#23611)
+	- fixed bison warning about missing ';'
 
 4/3/2003:	v1.4.44
 	- don't check for gateway config (#22430)
