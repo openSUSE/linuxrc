@@ -101,11 +101,11 @@ void util_redirect_kmsg (void)
     char  newvt_aci [2];
 
 
-    if (serial_ig)
+    if (config.serial)
         syslog (8, 0, 1);
     else
         {
-        fd_ii = open (console_tg, O_RDONLY);
+        fd_ii = open (config.console, O_RDONLY);
         if (fd_ii)
             {
             newvt_aci [0] = 11;
@@ -834,6 +834,9 @@ void util_status_info()
     }
   }
 
+  sprintf(buf, "product = \"%s\"", config.product);
+  slist_append_str(&sl0, buf);
+
   sprintf(buf,
     "memory (kB): total %d, free %d (%d), ramdisk %d",
     config.memory.total, config.memory.current,
@@ -886,6 +889,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.splash, "splash");
   add_flag(&sl0, buf, config.noshell, "noshell");
   add_flag(&sl0, buf, config.run_memcheck, "memcheck");
+  add_flag(&sl0, buf, config.hwdetect, "hwdetect");
+  add_flag(&sl0, buf, config.had_segv, "segv");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {
@@ -1042,7 +1047,11 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
+  sprintf(buf, "console = \"%s\"", config.console);
+  if(config.serial) sprintf(buf + strlen(buf), ", serial line params = \"%s\"", config.serial);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "stderr = \"%s\"", config.stderr_name);
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
@@ -2331,24 +2340,41 @@ slist_t *slist_reverse(slist_t *sl0)
 }
 
 
-slist_t *slist_split(char *text)
+/*
+ * split a string
+ *
+ * Note: works differently depending on whether 'del' is whitespace or not!
+ */
+slist_t *slist_split(char del, char *text)
 {
   slist_t *sl0 = NULL, *sl;
   int i, len;
-  char *s;
+  char *s, *t;
 
   if(!text) return NULL;
 
   text = strdup(text);
-  len = strlen(text);
 
-  for(i = 0; i < len; i++) if(isspace(text[i])) text[i] = 0;
+  if(isspace(del)) {
+    len = strlen(text);
 
-  for(s = text; s < text + len; s++) {
-    if(*s && (s == text || !s[-1])) {
+    for(i = 0; i < len; i++) if(isspace(text[i])) text[i] = 0;
+
+    for(s = text; s < text + len; s++) {
+      if(*s && (s == text || !s[-1])) {
+        sl = slist_append(&sl0, slist_new());
+        sl->key = strdup(s);
+      }
+    }
+  }
+  else {
+    for(s = text; (t = strchr(s, del)); s = t + 1) {
+      *t = 0;
       sl = slist_append(&sl0, slist_new());
       sl->key = strdup(s);
     }
+    sl = slist_append(&sl0, slist_new());
+    sl->key = strdup(s);
   }
 
   free(text);
@@ -3199,7 +3225,9 @@ void util_hwcheck()
     colors_prg->msg_win = COL_RED;
     colors_prg->msg_fg = COL_BWHITE;
   }
-  dia_show_file(!i ? "Hardware check results: Ready for SuSE Linux" : "Hardware check results", "/tmp/hw_overview.log", FALSE);
+
+  sprintf(buf, "Hardware check results: Ready for %s", config.product);
+  dia_show_file(!i ? buf : "Hardware check results", "/tmp/hw_overview.log", FALSE);
 
   colors_prg->msg_win = old_bg;
   colors_prg->msg_fg = old_fg;
@@ -3247,6 +3275,50 @@ void util_hwcheck()
   }
 
   dia_message("Results saved", MSGTYPE_INFO);
+}
+
+
+void util_set_serial_console(char *str)
+{
+  slist_t *sl;
+  char buf[256];
+
+  if(!str || !*str) return;
+
+  str_copy(&config.serial, str);
+
+  sl = slist_split(',', config.serial);
+
+  if(sl) {
+    sprintf(buf, "/dev/%s", sl->key);
+    if(!config.console || strcmp(buf, config.console)) {
+      str_copy(&config.console, buf);
+      freopen(config.console, "r", stdin);
+      freopen(config.console, "a", stdout);
+    }
+    config.textmode = 1;
+  }
+     
+  slist_free(sl);
+}
+
+
+void util_set_stderr(char *name)
+{
+  if(!name || !*name) return;
+
+  str_copy(&config.stderr_name, name);
+
+  freopen(config.stderr_name, "a", stderr);
+
+#ifndef DIET
+  setlinebuf(stderr);
+#else
+  {
+    static char buf[128];
+    setvbuf(stderr, buf, _IOLBF, sizeof buf);
+  }
+#endif
 }
 
 

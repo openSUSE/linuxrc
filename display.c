@@ -121,7 +121,7 @@ void disp_init (void)
         disp_mono_rm.error_fg   = COL_BLACK;
         }
 
-    if (config.test || serial_ig)
+    if (config.test || config.serial)
         {
         if(!config.had_segv) fprintf (stderr, "ACS activated\n");
 
@@ -263,7 +263,7 @@ void disp_graph_on (void)
     {
     if (!IS_ALTERNATE (disp_attr_cm))
         {
-        if (serial_ig || config.test)
+        if (config.serial || config.test)
             printf ("%c", 14);
         else
             printf ("\033[11m");
@@ -276,7 +276,7 @@ void disp_graph_off (void)
     {
     if (IS_ALTERNATE (disp_attr_cm))
         {
-        if (serial_ig || config.test)
+        if (config.serial || config.test)
             printf ("%c", 15);
         else
             printf ("\033[10m");
@@ -402,7 +402,7 @@ void disp_restore_area (window_t *win_prr, int mode_iv)
     if (save_y_ii + win_prr->y_left > max_y_ig)
         save_y_ii = max_y_ig - win_prr->y_left + 1;
 
-    if (explode_win_ig == FALSE || serial_ig == TRUE)
+    if (!config.explode_win || config.serial)
         mode_iv = DISP_RESTORE_NORMAL;
 
     switch (mode_iv)

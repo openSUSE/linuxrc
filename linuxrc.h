@@ -8,5 +8,5 @@
 
 extern void lxrc_killall (int);
 extern void lxrc_end     (void);
-extern void lxrc_set_modprobe  (char *program_tv);
+extern void lxrc_set_modprobe(char *prog);
 extern const char *lxrc_new_root;

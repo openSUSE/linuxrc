@@ -614,7 +614,7 @@ int mod_unload_modules(char *modules)
   int ok = 1;
   slist_t *sl0, *sl;
 
-  sl0 = slist_reverse(slist_split(modules));
+  sl0 = slist_reverse(slist_split(' ', modules));
 
   for(sl = sl0; sl; sl = sl->next) {
     if(mod_is_loaded(sl->key)) {
@@ -635,7 +635,7 @@ int mod_load_modules(char *modules, int show)
   int ok = 1;
   slist_t *sl0, *sl;
 
-  sl0 = slist_split(modules);
+  sl0 = slist_split(' ', modules);
 
   for(sl = sl0; sl && ok; sl = sl->next) {
     if(mod_is_loaded(sl->key)) {

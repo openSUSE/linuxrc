@@ -82,7 +82,7 @@ slist_t *slist_append_str(slist_t **sl0, char *str);
 slist_t *slist_add(slist_t **sl0, slist_t *sl);
 slist_t *slist_getentry(slist_t *sl, char *key);
 slist_t *slist_reverse(slist_t *sl0);
-slist_t *slist_split(char *text);
+slist_t *slist_split(char del, char *text);
 
 void name2inet(inet_t *inet, char *name);
 void s_addr2inet(inet_t *inet, unsigned long s_addr);
@@ -114,3 +114,5 @@ int util_is_dir(char *dir);
 int util_is_mountable(char *file);
 void util_debugwait(char *msg);
 void util_hwcheck(void);
+void util_set_serial_console(char *str);
+void util_set_stderr(char *name);

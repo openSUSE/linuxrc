@@ -493,10 +493,13 @@ int inst_mount_cdrom(int show_err)
   if(config.cdrom) rc = inst_try_cdrom(config.cdrom);
 
   if(rc) {
-    for(sl = config.cdroms; sl; sl = sl->next) {
-      if(!(rc = inst_try_cdrom(sl->key))) {
-        str_copy(&config.cdrom, sl->key);
-        break;
+    if(config.cdromdev) rc = inst_try_cdrom(config.cdromdev);
+    if(rc) {
+      for(sl = config.cdroms; sl; sl = sl->next) {
+        if(!(rc = inst_try_cdrom(sl->key))) {
+          str_copy(&config.cdrom, sl->key);
+          break;
+        }
       }
     }
   }
@@ -903,7 +906,7 @@ int inst_prepare()
 
   setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
 
-  if(serial_ig) {
+  if(config.serial) {
     setenv("TERM", "vt100", TRUE);
     setenv("ESCDELAY", "1100", TRUE);
   }

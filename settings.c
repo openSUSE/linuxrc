@@ -365,7 +365,6 @@ void set_activate_language(enum langid_t lang_id)
 {
   int i;
   language_t *lang;
-//  char cmd[MAX_FILENAME];
 
   config.language = lang_id;
   i = set_get_current_language();
@@ -373,16 +372,9 @@ void set_activate_language(enum langid_t lang_id)
   if(i > 0) {
     lang = set_languages_arm + i - 1;
 
-    if(!serial_ig && lang->font) {
+    if(!config.serial && lang->font) {
       set_font(lang->font, lang->mapscreen, NULL);
     }
-
-#if 0
-    /* Maybe we should always load the keymap??? */
-    if(demo_ig && !serial_ig) {
-      set_activate_keymap(lang->keymap);
-    }
-#endif
   }
 }
 
@@ -468,11 +460,11 @@ int set_expert_cb(dia_item_t di)
 
   switch(di) {
     case di_expert_animate:
-      rc = dia_yesno(txt_get(TXT_ASK_EXPLODE), explode_win_ig == TRUE ? YES : NO);
+      rc = dia_yesno(txt_get(TXT_ASK_EXPLODE), config.explode_win ? YES : NO);
       if(rc == YES)
-        explode_win_ig = TRUE;
+        config.explode_win = 1;
       else if(rc == NO)
-        explode_win_ig = FALSE;
+        config.explode_win = 0;
       break;
 
     case di_expert_forceroot:

@@ -33,7 +33,8 @@ typedef enum {
   key_fullnetsetup, key_aborted, key_memyasttext, key_netstop, key_exec,
   key_usbwait, key_nfsrsize, key_nfswsize, key_hwcheck, key_setupcmd,
   key_setupnetif, key_netconfig, key_usessh, key_noshell, key_memcheck,
-  key_hwdetect, key_floppydevice, key_cdromdevice
+  key_hwdetect, key_floppydevice, key_cdromdevice, key_consoledevice,
+  key_product, key_linuxrcstderr
 } file_key_t;
 
 typedef struct file_s {

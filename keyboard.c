@@ -66,7 +66,7 @@ void kbd_init (void)
       close (kbd_tty_im);
     }
 
-    kbd_tty_im = open (console_tg, O_RDWR);
+    kbd_tty_im = open (config.console, O_RDWR);
 
     tcgetattr (kbd_tty_im, &kbd_norm_tio_rm);
     kbd_tio_rm = kbd_norm_tio_rm;

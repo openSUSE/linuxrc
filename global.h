@@ -215,9 +215,10 @@ typedef struct {
   unsigned netstop:1;		/* shut down network iface at end */
   unsigned noshell:1;		/* don't start any shells */
   volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
+  unsigned had_segv:1;		/* last linuxrc run ended with segv */
   unsigned run_memcheck:1;	/* run memcheck thread */
   unsigned hwdetect:1;		/* do automatic hardware detection */
-  unsigned had_segv;		/* last linuxrc run ended with segv */
+  unsigned explode_win:1;	/* animated windows */
   pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
@@ -260,6 +261,9 @@ typedef struct {
   char *setupcmd;		/* command used to start the install program */
   char **argv;			/* store argv here */
   uint64_t segv_addr;		/* segfault addr if last linuxrc run */
+  char *console;		/* console device */
+  char *serial;			/* serial console parameters, e.g. ttyS0,38400 or ttyS1,9600n8 */
+  char *product;		/* product name */
 
   struct {
     char *buf;
@@ -367,15 +371,11 @@ extern char            netdevice_tg [20];
 extern int             pcmcia_chip_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
-extern int             explode_win_ig;
 extern int             auto_ig;
 extern int             auto2_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
 extern char            ppcd_tg [10];
-extern int             serial_ig;
-extern char            console_tg [30];
-extern char            console_parms_tg [30];
 extern int             yast2_update_ig;
 extern int             yast2_serial_ig;
 extern int             has_floppy_ig;

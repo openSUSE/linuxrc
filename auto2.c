@@ -71,7 +71,7 @@ int auto2_mount_cdrom(char *device)
   rc = mount(device, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
   if(!rc) {
     if((rc = inst_check_instsys())) {
-      fprintf(stderr, "%s is not a SuSE Installation CD.\n", device);
+      fprintf(stderr, "%s is not a %s Installation CD.\n", device, config.product);
       umount(mountpoint_tg);
     } else {
       /* skip "/dev/" !!! */
@@ -102,7 +102,7 @@ int auto2_mount_harddisk(char *device)
 
   if(!(rc = util_mount_ro(device, mountpoint_tg))) {
     if((rc = inst_check_instsys())) {
-      fprintf(stderr, "%s is not a SuSE installation media.\n", device);
+      fprintf(stderr, "%s is not a %s installation media.\n", device, config.product);
       umount(mountpoint_tg);
     }
   }
@@ -310,6 +310,16 @@ int auto2_cdrom_dev(hd_t **hd0)
   int i = 1;
   hd_t *hd;
   cdrom_info_t *ci;
+  char buf[256];
+
+  if(config.cdromdev) {
+    sprintf(buf, "/dev/%s", config.cdromdev);
+    i = auto2_mount_cdrom(buf) ? 1 : 0;
+    if(i && !*driver_update_dir) {
+      auto2_check_cdrom_update(buf);
+    }
+    return i;
+  }
 
   for(hd = hd_list(hd_data, hw_cdrom, 1, *hd0); hd; hd = hd->next) {
     fprintf(stderr, "Checking CD: %s\n", hd->unix_dev_name);
@@ -717,7 +727,7 @@ int auto2_find_install_medium()
 
     need_modules = 0;
 
-    fprintf(stderr, "Looking for a SuSE CD...\n");
+    fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
@@ -736,7 +746,7 @@ int auto2_find_install_medium()
         break;
       }
 
-      fprintf(stderr, "Looking for a SuSE CD again...\n");
+      fprintf(stderr, "Looking for a %s CD again...\n", config.product);
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
         if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
@@ -837,7 +847,14 @@ int auto2_find_floppy()
   hd_t *hd, *hd0;
   hd_res_t *res;
   int i, small_floppy = 0;
-  char *s;
+  char *s, buf[256];
+
+  if(config.floppydev) {
+    config.floppy = 0;
+    sprintf(buf, "/dev/%s", config.floppydev);
+    str_copy(&config.floppy_dev[0], buf);
+    return config.floppies = 1;
+  }
 
   if(!hd_data) return config.floppies;
 
@@ -1022,7 +1039,7 @@ char *auto2_disk_list(int *boot_disk)
 extern void hd_scan_kbd(hd_data_t *hd_data);
 char *auto2_serial_console (void)
 {
-  static char console[32];
+  char console[32], buf[256];
   hd_data_t *hd_data2;
   hd_t *hd;
 
@@ -1042,7 +1059,7 @@ char *auto2_serial_console (void)
   if (hd_data2 == NULL)
     return NULL;
 
-  console[0] = 0;
+  *console = 0;
 
   for(hd = hd_data2->hd; hd; hd = hd->next)
     if(hd->base_class.id == bc_keyboard && hd->bus.id == bus_serial &&
@@ -1052,13 +1069,14 @@ char *auto2_serial_console (void)
 	strcpy (console, hd->unix_dev_name);
 	/* Create a string like: ttyS0,38400n8 */
 #if defined(__sparc__)
-	sprintf (console_parms_tg, "%s,%d%c%d", &console[5],
+	sprintf (buf, "%s,%d%c%d", &console[5],
 		 hd->res->baud.speed,
 		 hd->res->baud.parity,
 		 hd->res->baud.bits);
 #else
-	sprintf (console_parms_tg, "%s,%d", &console[5], hd->res->baud.speed);
+	sprintf (buf, "%s,%d", &console[5], hd->res->baud.speed);
 #endif
+	str_copy(&config.serial, buf);
       }
 
   if (hd_data == NULL)

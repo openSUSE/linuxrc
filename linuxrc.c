@@ -48,8 +48,6 @@
 #include "lsh.h"
 #include "multiple_info.h"
 
-#define LINUXRC_DEFAULT_STDERR "/dev/tty3"
-
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
 #else	// __i386__ __x86_64__ __PPC__ __sparc__ __s390__ __s390x__ __MIPSEB__
@@ -180,6 +178,11 @@ int main(int argc, char **argv, char **env)
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
 
+  str_copy(&config.console, "/dev/console");
+  str_copy(&config.stderr_name, "/dev/tty3");
+
+  str_copy(&config.product, "SuSE Linux");
+
   /* maybe we had a segfault recently... */
   if(argc == 4 && !strcmp(argv[1], "segv")) {
     for(i = 0; i < 16 && argv[2][i]; i++) {
@@ -203,7 +206,7 @@ int main(int argc, char **argv, char **env)
   if(util_check_exist("/opt") || getuid()) {
     printf("Seems we are on a running system; activating testmode...\n");
     config.test = 1;
-    strcpy(console_tg, "/dev/tty");
+    str_copy(&config.console, "/dev/tty");
   }
 
   if(!config.test && !config.had_segv) {
@@ -229,7 +232,7 @@ int main(int argc, char **argv, char **env)
       }
       config.tmpfs = 0;
 
-      if(!serial_ig && config.debugwait) {
+      if(!config.serial && config.debugwait) {
         util_start_shell("/dev/tty9", "/bin/lsh", 0);
         config.shell_started = 1;
       }
@@ -589,17 +592,21 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
 
 void lxrc_catch_signal(int signum)
 {
- if(signum) {
-   fprintf(stderr, "Caught signal %d!\n", signum);
-   sleep(10);
- }
+  if(signum) {
+    fprintf(stderr, "Caught signal %d!\n", signum);
+    sleep(10);
+  }
 
- signal(SIGHUP,  lxrc_catch_signal);
- signal(SIGBUS,  lxrc_catch_signal);
- signal(SIGINT,  lxrc_catch_signal);
- signal(SIGTERM, lxrc_catch_signal);
- signal(SIGSEGV, (void (*)(int)) lxrc_catch_signal_11);
- signal(SIGPIPE, lxrc_catch_signal);
+  signal(SIGHUP,  lxrc_catch_signal);
+  signal(SIGBUS,  lxrc_catch_signal);
+
+  if(!config.test) {
+    signal(SIGINT,  lxrc_catch_signal);
+    signal(SIGTERM, lxrc_catch_signal);
+  }
+
+  signal(SIGSEGV, (void (*)(int)) lxrc_catch_signal_11);
+  signal(SIGPIPE, lxrc_catch_signal);
 }
 
 
@@ -614,7 +621,10 @@ void lxrc_init()
   url_t *url;
 
   if(!config.had_segv) {
-    printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n");
+    printf(
+      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n",
+      config.product
+    );
     fflush(stdout);
   }
 
@@ -815,17 +825,8 @@ void lxrc_init()
     free(s);
   }
 
-  config.stderr_name = getenv("LINUXRC_STDERR");
-  config.stderr_name = strdup(config.stderr_name ?: LINUXRC_DEFAULT_STDERR);
-  freopen(config.stderr_name, "a", stderr);
-#ifndef DIET
-  setlinebuf(stderr);
-#else
-  {
-    static char buf[128];
-    setvbuf(stderr, buf, _IOLBF, sizeof buf);
-  }
-#endif
+  if((s = getenv("LINUXRC_STDERR"))) str_copy(&config.stderr_name, s);
+  util_set_stderr(config.stderr_name);
 
   if(!config.test && !config.had_segv) {
     fprintf(stderr, "Remount of / ");
@@ -859,8 +860,8 @@ void lxrc_init()
   lxrc_set_bdflush(5);
 
   lxrc_check_console();
-  freopen(console_tg, "r", stdin);
-  freopen(console_tg, "a", stdout);
+  freopen(config.console, "r", stdin);
+  freopen(config.console, "a", stdout);
 
   util_get_splash_status();
 
@@ -883,7 +884,7 @@ void lxrc_init()
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
-  if(!(config.test || serial_ig || config.shell_started || config.noshell)) {
+  if(!(config.test || config.serial || config.shell_started || config.noshell)) {
     util_start_shell("/dev/tty9", "/bin/lsh", 0);
     config.shell_started = 1;
   }
@@ -918,7 +919,7 @@ void lxrc_init()
         util_manual_mode();
         util_disp_init();
         if(j) {
-          strcpy(buf, "Could not find the SuSE Linux ");
+          sprintf(buf, "Could not find the %s ", config.product);
           if(config.insttype == inst_cdrom) {
             sprintf(buf + strlen(buf),
               "%s CD.", config.demo ? "LiveEval" : "Installation"
@@ -980,7 +981,7 @@ void lxrc_init()
     if(old_win) util_print_banner(); else util_disp_done();
   }
 
-  if(!(serial_ig || config.is_iseries)) {
+  if(!(config.serial || config.is_iseries)) {
     set_choose_keytable(0);
   }
 
@@ -1117,94 +1118,48 @@ void lxrc_memcheck()
 }
 
 
-void lxrc_set_modprobe (char *program_tv)
-    {
-    FILE  *proc_file_pri;
+void lxrc_set_modprobe(char *prog)
+{
+  FILE *f;
 
-    /* do nothing if we have a modprobe */
-    if (has_modprobe || config.test) return;
+  /* do nothing if we have a modprobe */
+  if (has_modprobe || config.test) return;
 
-    proc_file_pri = fopen ("/proc/sys/kernel/modprobe", "w");
-    if (proc_file_pri)
-        {
-        fprintf (proc_file_pri, "%s\n", program_tv);
-        fclose (proc_file_pri);
-        }
-    }
+  if((f = fopen("/proc/sys/kernel/modprobe", "w"))) {
+    fprintf(f, "%s\n", prog);
+    fclose(f);
+  }
+}
 
 
 /* Check if we start linuxrc on a serial console. On Intel and
    Alpha, we look if the "console" parameter was used on the
    commandline. On SPARC, we use the result from hardwareprobing. */
-static void lxrc_check_console (void)
-    {
+void lxrc_check_console()
+{
 #if !defined(__sparc__) && !defined(__PPC__)
-    FILE  *fd_pri;
-    char   buffer_ti [300];
-    char  *tmp_pci = NULL;
-    char  *found_pci = NULL;
 
-    fd_pri = fopen ("/proc/cmdline", "r");
-    if (!fd_pri)
-        return;
+  file_t *ft;
 
-    if (fgets (buffer_ti, sizeof buffer_ti - 1, fd_pri))
-        {
-        tmp_pci = strstr (buffer_ti, "console");
-        while (tmp_pci)
-            {
-            found_pci = tmp_pci;
-            tmp_pci = strstr (found_pci + 1, "console");
-            }
-        }
+  if(!(ft = file_get_cmdline(key_console)) || !*ft->value) return;
 
-    if (found_pci)
-        {
-        while (*found_pci && *found_pci != '=')
-            found_pci++;
+  util_set_serial_console(ft->value);
 
-        found_pci++;
-
-	/* Find the whole console= entry for the install.inf file */
-        tmp_pci = found_pci;
-        while (*tmp_pci && !isspace(*tmp_pci)) tmp_pci++;
-        *tmp_pci = 0;
-
-	strncpy (console_parms_tg, found_pci, sizeof console_parms_tg);
-	console_parms_tg[sizeof console_parms_tg - 1] = '\0';
-
-	/* Now search only for the device name */
-	tmp_pci = found_pci;
-        while (*tmp_pci && *tmp_pci != ',') tmp_pci++;
-        *tmp_pci = 0;
-
-        sprintf (console_tg, "/dev/%s", found_pci);
-        if (!strncmp (found_pci, "ttyS", 4)) {
-            serial_ig = TRUE;
-            config.textmode = 1;
-          }
-
-        fprintf (stderr, "Console: %s, serial=%d\n", console_tg, serial_ig);
-        }
-
-    fclose (fd_pri);
 #else
 #ifdef USE_LIBHD
-    char *cp;
 
-    cp = auto2_serial_console ();
-    if (cp && strlen (cp) > 0)
-      {
-	serial_ig = TRUE;
-        config.textmode = 1;
+  util_set_serial_console(auto2_serial_console());
 
-	strcpy (console_tg, cp);
-
-        fprintf (stderr, "Console: %s, serial=%d\n", console_tg, serial_ig);
-      }
 #endif
 #endif
-    }
+
+  if(config.serial) {
+    fprintf(stderr,
+      "Console: %s, serial line params \"%s\"\n",
+      config.console, config.serial
+    );
+  }
+}
 
 
 static void lxrc_set_bdflush (int percent_iv)

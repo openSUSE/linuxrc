@@ -183,7 +183,10 @@ static struct {
   { key_memcheck,       "_MemCheck"        },
   { key_hwdetect,       "HWDetect"         },
   { key_floppydevice,   "FloppyDevice"     },
-  { key_cdromdevice,    "CDROMDevice"      }
+  { key_cdromdevice,    "CDROMDevice"      },
+  { key_consoledevice,  "ConsoleDevice"    },
+  { key_product,        "Product"          },
+  { key_linuxrcstderr,  "LinuxrcSTDERR"    }
 };
 
 static struct {
@@ -918,6 +921,28 @@ void file_do_info(file_t *f0)
         );
         break;
 
+      case key_consoledevice:
+        if(*f->value) {
+          if(!config.console || strcmp(config.console, f->value)) {
+            str_copy(&config.console, f->value);
+            freopen(config.console, "r", stdin);
+            freopen(config.console, "a", stdout);
+          }
+        }
+        break;
+
+      case key_console:
+        if(*f->value) util_set_serial_console(f->value);
+        break;
+
+      case key_product:
+        if(*f->value) str_copy(&config.product, f->value);
+        break;
+
+      case key_linuxrcstderr:
+        if(*f->value) util_set_stderr(f->value);
+        break;
+
       default:
         break;
     }
@@ -1073,7 +1098,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_haspcmcia, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
 #endif
 
-  if(serial_ig) file_write_str(f, key_console, console_parms_tg);
+  file_write_str(f, key_console, config.serial);
 
   file_write_str(f, key_instmode,
     get_instmode_name(config.instmode_extra == inst_dvd ? config.instmode_extra : config.instmode)
@@ -1286,7 +1311,7 @@ void file_write_modparms(FILE *f)
   for(sl = sl0; sl; sl = sl->next) {
     ml = mod_get_entry(sl->key);
     if(ml) {	/* just to be sure... */
-      pl0 = slist_split(ml->pre_inst);
+      pl0 = slist_split(' ', ml->pre_inst);
       for(pl = pl0; pl; pl = pl->next) {
         if(!slist_getentry(initrd0, pl->key) && slist_getentry(modules0, pl->key)) {
           initrd = slist_append(&initrd0, slist_new());
@@ -1298,7 +1323,7 @@ void file_write_modparms(FILE *f)
         initrd = slist_append(&initrd0, slist_new());
         initrd->key = strdup(sl->key);
       }
-      pl0 = slist_split(ml->post_inst);
+      pl0 = slist_split(' ', ml->post_inst);
       for(pl = pl0; pl; pl = pl->next) {
         if(!slist_getentry(initrd0, pl->key) && slist_getentry(modules0, pl->key)) {
           initrd = slist_append(&initrd0, slist_new());

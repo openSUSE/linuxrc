@@ -1,6 +1,8 @@
 20/8/2002:	v1.4.14
 	- turn off (most) automatic hardware detection via 'hwdetect=0'
 	- no longer require CD label to start with 'SU'
+	- made more things configurable
+	- cleaned up serial line detection code
 
 19/8/2002:	v1.4.13
 	- copy shadow and passwd from inst-sys before calling chpasswd
