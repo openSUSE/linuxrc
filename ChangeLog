@@ -1,3 +1,6 @@
+10/4/2003:	v1.4.46
+	- copy 'part.info' file from install medium
+
 24/3/2003:	v1.4.45
 	- module unloading used to clear internal network/disk lists (#24606)
 	- keep proxy scheme (#23611)
