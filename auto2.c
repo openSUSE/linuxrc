@@ -207,7 +207,7 @@ void auto2_scan_hardware(char *log_file)
   ) {
     if(st->model && strstr(st->model, "PCG-") == st->model) {
       /* is a Sony Vaio */
-      deg_msg("Vaio");
+      fprintf(stderr, "is a Vaio\n");
       is_vaio = 1;
       pcmcia_params = "irq_list=9,10,11,15";
       if(usb_mod && *usb_mod) {
