@@ -120,7 +120,7 @@ void auto2_scan_hardware(char *log_file)
   hd_t *hd;
   char *usb_mod;
   static char usb_mods[128];
-  int i, j, ju, k, ku, with_usb;
+  int i, j, ju, k, with_usb;
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -162,21 +162,17 @@ void auto2_scan_hardware(char *log_file)
   /* look for keyboards & mice */
   has_kbd_ig = FALSE;
 
-  j = ju = k = ku = 0;
+  j = ju = 0;
   for(hd = hd_data->hd; hd; hd = hd->next) {
     if(hd->base_class == bc_keyboard) {
       has_kbd_ig = TRUE;
       j++;
       if(hd->bus == bus_usb) ju++;
     }
-    if(hd->base_class == bc_mouse) {
-      k++;
-      if(hd->bus == bus_usb) ku++;
-    }
   }
 
-  /* usb mouse only || usb keyboard only ? */
-  if(((j && j == ju) || (k && k == ku)) && usb_mod) {
+  /* usb keyboard only ? */
+  if((j && j == ju) && usb_mod) {
     sprintf(usb_mods, "usbcore %s input hid keybdev mousedev", usb_mod);
     usb_mods_ig = usb_mods;
   }
@@ -392,6 +388,29 @@ int auto2_init()
   printf("\r%64s\r", "");
   fflush(stdout);
   deb_msg("Hardware probing finished.");
+
+  if(hd_has_pcmcia(hd_data)) {
+    deb_msg("Going to load PCMCIA support...");
+
+    if(
+      (i = mod_load_module("pcmcia_core", NULL)) ||
+      (i = mod_load_module("i82365", NULL))   ||
+      (i = mod_load_module("ds", NULL))
+    );
+
+    if(!i) {
+      deb_msg("PCMCIA modules loaded - starting card manager.");
+      i = system("cardmgr -v -m /modules");
+      if(i)
+        deb_msg("Oops: card manager didn't start.");
+      else
+        deb_msg("card manager ok.");
+    }
+    else {
+      deb_msg("Error loading PCMCIA modules.");
+    }
+
+  }
 
   if(!auto2_find_floppy()) {
     deb_msg("There seems to be no floppy drive.");

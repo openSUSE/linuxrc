@@ -85,3 +85,4 @@ int             reboot_ig;
 int             usb_ig = 0;
 char            *usb_mods_ig = NULL;
 int             found_suse_cd_ig = FALSE;
+int             do_disp_init_ig = TRUE;

@@ -106,7 +106,10 @@ int main (int argc, char **argv, char **env)
 #endif
 
         if (!(auto_ig || demo_ig || auto2_ig) || rc_ii)
+            {
+            util_disp_init();
             lxrc_main_menu ();
+            }
 
         lxrc_end ();
         }

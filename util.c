@@ -517,6 +517,18 @@ int util_cd1_boot (void)
     }
 
 
+void util_disp_init()
+{
+  int i_ii;
+
+  for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
+  disp_cursor_off();
+  util_print_banner();
+
+  do_disp_init_ig = FALSE;
+}
+
+
 /*
  * umount() with error message
  */

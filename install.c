@@ -797,6 +797,7 @@ static int inst_execute_yast (void)
 #endif
 
     lxrc_set_modprobe ("/etc/nothing");
+    do_disp_init_ig = TRUE;
 
     sync ();
     if (!auto2_ig)
@@ -804,15 +805,13 @@ static int inst_execute_yast (void)
     disp_cursor_off ();
     kbd_reset ();
 
+    yast_version_ig = 0;
     if (rc_ii)
         {
-        yast_version_ig = 0;
         if (auto2_ig)
             {
             auto2_ig = 0;
-            for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
-            disp_cursor_off();
-            util_print_banner();
+            util_disp_init();
             }
         
         dia_message (txt_get (TXT_ERROR_INSTALL), MSGTYPE_ERROR);
@@ -1218,7 +1217,7 @@ static int inst_get_ftpsetup (void)
 static int inst_choose_yast_version (void)
     {
     item_t   items_ari [2];
-    int      i_ii, width_ii = 30;
+    int      width_ii = 30;
     int      yast1_ii, yast2_ii;
 
     yast1_ii = util_check_exist (YAST1_COMMAND);
@@ -1248,9 +1247,7 @@ static int inst_choose_yast_version (void)
     if (auto2_ig)
         {
         auto2_ig = 0;
-        for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
-        disp_cursor_off();
-        util_print_banner();
+        util_disp_init();
         }
 
     util_create_items (items_ari, 2, width_ii);
