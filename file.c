@@ -64,6 +64,7 @@ static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_manual_tm         = "Manual:";
 static const char  *file_txt_demo_tm           = "Demo:";
+static const char  *file_txt_reboot_wait       = "WaitReboot:";
 #if WITH_PCMCIA
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #endif
@@ -469,6 +470,17 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_bootp_wait_tm, buffer_ti,
                           strlen (file_txt_bootp_wait_tm)))
             bootp_wait_ig = atoi (value_ti);
+
+        if (!strncasecmp (file_txt_reboot_wait, buffer_ti,
+                          strlen (file_txt_reboot_wait)))
+            {
+            if (value_ti [0] == '1' ||
+                value_ti [0] == 'y' || value_ti [0] == 'Y' ||
+                value_ti [0] == 'j' || value_ti [0] == 'J')
+                reboot_wait_ig = TRUE;
+            else
+                reboot_wait_ig = FALSE;
+            }
         }
 
     fclose (fd_pri);

@@ -966,7 +966,7 @@ static int inst_commit_install (void)
             reboot_ig)
             {
 #ifndef __PPC__
-            if(!auto_ig) {
+            if(!auto_ig || reboot_wait_ig) {
               disp_clear_screen();
               util_disp_init();
               dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);

@@ -96,3 +96,4 @@ char            xkbmodel_tg [20] = "";
 char            xkblayout_tg [20] = "";
 unsigned        yast2_color_ig = 0;
 unsigned        action_ig = 0;
+int             reboot_wait_ig = FALSE;

@@ -793,12 +793,17 @@ static int net_bootp (void)
 
         if (tmp_ti [0] && data_pci [i_ii] == ':')
             {
-            strncpy (server_dir_tg, data_pci + i_ii + 1,
-                     sizeof (server_dir_tg));
+            if ((valid_net_config_ig & 0x20) != 0x20)
+                strncpy (server_dir_tg, data_pci + i_ii + 1,
+                         sizeof (server_dir_tg));
+
             inet_aton (tmp_ti, &nfs_server_rg);
             }
         else
-            strncpy (server_dir_tg, data_pci, sizeof (server_dir_tg));
+            {
+            if ((valid_net_config_ig & 0x20) != 0x20)
+                strncpy (server_dir_tg, data_pci, sizeof (server_dir_tg));
+            }
         }
 
 

@@ -232,3 +232,4 @@ extern char            xkbmodel_tg [20];
 extern char            xkblayout_tg [20];
 extern unsigned        yast2_color_ig;
 extern unsigned        action_ig;
+extern int             reboot_wait_ig;
