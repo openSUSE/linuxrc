@@ -256,6 +256,14 @@ void kbd_clear_buffer (void)
     while (kbd_getch (FALSE));
     }
 
+void kbd_echo_off (void)
+    {
+	struct termios tios;
+	tios = kbd_tio_rm;
+	tios.c_lflag &= ~ECHO;
+	tcsetattr (kbd_tty_im, TCSAFLUSH, &tios);
+    }
+
 
 /*
  *

@@ -856,11 +856,13 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	    putchar('\n');
 	    c = 0;
 	  }
-	if (*input_tr)
+	if (*input_tr && !pw_mode)
 	  printf(" [%s]> " + (c == 0), input_tr);
         else
 	  printf("> ");
 	fflush(stdout);
+	if (pw_mode)
+	  kbd_echo_off();
 	for (i = 0; ; i++)
 	  {
 	    c = getchar();
@@ -875,7 +877,11 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	      {
 		c = getchar();
 		if (c == '\n' || c == '\r' || c == EOF)
-		  return -1;
+		  {
+		    if (pw_mode)
+		      kbd_reset();
+		    return -1;
+		  }
 	      }
 	    if ((unsigned char)c < ' ')
 	      {
@@ -885,6 +891,8 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	    if (i < len_iv - 1)
 	      input_tr[i] = c;
 	  }
+	if (pw_mode)
+	  kbd_reset();
 	return 0;
       }
     disp_toggle_output (DISP_OFF);
