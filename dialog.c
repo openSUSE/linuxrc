@@ -1352,7 +1352,7 @@ void dia_handle_ctrlc (void)
 	    while(isspace(*t)) t++;
 	    kbd_end();	/* restore terminal settings */
 	    j = execlp(t, t, NULL);
-	    kbd_init();
+	    kbd_init(0);
 	  }
 	  else {
 	    j = system(s);

@@ -764,7 +764,7 @@ int mod_insmod(char *module, char *param)
 
   sprintf(buf, "insmod %s%s/%s" MODULE_SUFFIX, force, config.module.dir, module);
 
-  if(param && *param) strcat(buf, param);
+  if(param && *param) strcat(strcat(buf, " "), param);
 
   fprintf(stderr, "%s\n", buf);
 
