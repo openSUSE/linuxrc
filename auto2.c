@@ -122,11 +122,12 @@ int auto2_mount_cdrom(char *device)
 void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
-  hd_t *hd;
+  hd_t *hd, *hd_sys;
   driver_info_t *di;
   char *usb_mod;
   static char usb_mods[128];
   int i, j, ju, k, with_usb;
+  sys_info_t *st;
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -192,6 +193,22 @@ void auto2_scan_hardware(char *log_file)
         if(di->kbd.keymap) strcpy(keymap_tg, di->kbd.keymap);
       }
       di = hd_free_driver_info(di);
+    }
+  }
+
+  hd_sys = hd_list(hd_data, hw_sys, 0, NULL);
+
+  if(
+    hd_sys &&
+    hd_sys->detail && hd_sys->detail->type == hd_detail_sys &&
+    (st = hd_sys->detail->sys.data)
+  ) {
+    if(strstr(st->model, "PCG-") == st->model) {
+      /* is a Sony Vaio */
+      if(usb_mod && *usb_mod) {
+        sprintf(usb_mods, "usbcore %s", usb_mod);
+        usb_mods_ig = usb_mods;
+      }
     }
   }
 
