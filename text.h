@@ -34,6 +34,7 @@ extern int   txt_init (void);
 
 /* all we have */
 // #define TRANS_br
+#define TRANS_ar
 #define TRANS_bs
 #define TRANS_cs
 #define TRANS_de
