@@ -11,15 +11,22 @@ They are ('|' stands for alternatives, other entries are examples):
     -> sets the language
 
  - linuxrc (linuxrc=auto,auto2,demo,reboot,yast1,yast2)
-    - auto:   'classical' auto install mode
-    - auto2:  libhd based auto install mode
-    - demo:   Live CD
-    - reboot: do a real reboot when YaST exits
-    - yast1:  start YaST1
-    - yast2:  start YaST2 (if none of yast1/2 are set, you get a dialog)
+    - auto:	'classical' auto install mode
+    - auto2:	libhd based auto install mode
+    - noauto2:	!auto2 (on ppc is 'auto2' the default)
+    - demo:	Live CD
+    - eval:	Liveeval CD
+    - reboot:	do a real reboot when YaST exits
+    - yast1:	start YaST1
+    - yast2:	start YaST2 (if none of yast1/2 are set, you get a dialog)
+    - loadnet:	load all network mods (only in connection with 'auto2')
+    - loaddisk:	load all storage mods (only in connection with 'auto2')
 
  - probe (e.g. probe=-isapnp,-mouse)
     - control libhd based hardware probing (see libhd docu)
+
+ - x11i (e.g. x11i=3 or x11i=nv)
+    - specify the X server to use during the installation
 
  - bootp stuff
     BOOTP_IPADDR,BOOTP_IPADDR,BOOTP_NETMASK,BOOTP_BROADCAST,BOOTP_NETWORK,

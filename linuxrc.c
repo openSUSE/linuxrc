@@ -341,9 +341,10 @@ static void lxrc_init (void)
                yast_version_ig = 2;
 
            if (strstr (s, ",loadnet,"))
-               {
                action_ig |= ACT_LOAD_NET;
-               }
+
+           if (strstr (s, ",loaddisk,"))
+               action_ig |= ACT_LOAD_DISK;
 
            free (s);
            }

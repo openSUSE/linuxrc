@@ -382,7 +382,9 @@ void mod_init (void)
     {
     static int   core_loaded_is = FALSE;
            char *core_modules_ati [] = {
+#ifdef __sparc__
 				       "openprom",
+#endif
                                        "nvram",
                                        "8390"
                                        };

@@ -492,9 +492,8 @@ int auto2_init()
   if(bootmode_ig == BOOTMODE_CD) {
     deb_msg("Looking for a SuSE CD...");
     if(!(i = auto2_cdrom_dev())) {
-      if(demo_ig) {
-        auto2_activate_devices(bc_storage, 0);
-      }
+      if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
+      if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
       return TRUE;
     }
 
@@ -513,7 +512,11 @@ int auto2_init()
       }
 
       fprintf(stderr, "Looking for a SuSE CD again...\n");
-      if(!(i = auto2_cdrom_dev())) return TRUE;
+      if(!(i = auto2_cdrom_dev())) {
+        if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
+        if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+        return TRUE;
+      }
     }
   }
 
@@ -538,7 +541,10 @@ int auto2_init()
   if((valid_net_config_ig & 0x10))
     fprintf(stderr, "name srv:  %s\n", inet_ntoa(nameserver_rg));
 
-  if(!auto2_net_dev()) return TRUE;
+  if(!auto2_net_dev()) {
+    if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+    return TRUE;
+  }
 
   for(last_idx = 0;;) {
     deb_msg("Ok, that didn't work; see if we can activate another network device...");
@@ -549,7 +555,10 @@ int auto2_init()
     }
 
     fprintf(stderr, "Looking for a NFS/FTP server again...\n");
-    if(!auto2_net_dev()) return TRUE;
+    if(!auto2_net_dev()) {
+      if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+      return TRUE;
+    }
   }
 
   bootmode_ig = BOOTMODE_CD;		/* reset value */
