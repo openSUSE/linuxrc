@@ -25,7 +25,7 @@
 #define MEM_LIMIT_SWAP_MSG	6500000
 #define MEM_LIMIT_CACHE_LIBS	15000000
 
-#if defined(__sparc__) || defined(__PPC__)
+#if defined(__sparc__) || defined(__PPC__) || defined(__s390__) || defined(__s390x__)
 #define WITH_PCMCIA	0
 #else
 #define WITH_PCMCIA	1

@@ -69,6 +69,10 @@ ifeq ($(ARCH),ia64)
 endif
 
 ifeq ($(ARCH),s390)
+    USE_MINI_GLIBC	= no
+    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
+    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
+    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"s390\"
 endif
 

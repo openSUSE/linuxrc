@@ -417,6 +417,10 @@ void mod_init (void)
             /* unlink (tmp_ti);  */
             }
 
+#ifdef __i386__
+        mod_load_module ("isa-pnp", "isapnp_reset=0");
+#endif
+
         core_loaded_is = TRUE;
         }
     }

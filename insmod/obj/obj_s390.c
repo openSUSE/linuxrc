@@ -19,7 +19,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ident "$Id: obj_s390.c,v 1.1 2000/11/22 15:46:44 snwint Exp $"
+#ident "$Id: obj_s390.c,v 1.2 2001/06/21 08:43:51 snwint Exp $"
 
 #include <string.h>
 #include <assert.h>
@@ -242,16 +242,5 @@ int
 arch_archdata (struct obj_file *fin, struct obj_section *sec)
 {
   return 0;
-}
-
-int
-arch_finalize_section_address(struct obj_file *f, Elf32_Addr base)
-{
-  int  i, n = f->header.e_shnum;
-
-  f->baseaddr = base;
-  for (i = 0; i < n; ++i)
-    f->sections[i]->header.sh_addr += base;
-  return 1;
 }
 
