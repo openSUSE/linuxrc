@@ -47,6 +47,7 @@ enum modid_t
     ID_SIM710,
     ID_IMM,
     ID_DPT_I2O,
+    ID_AACRAID,
 
     ID_AZTECH,
     ID_GOLDSTAR,

@@ -9,6 +9,7 @@ static module_t mod_scsi_mod_arm [] =
 { ID_DAC960,     "Mylex DAC-960/DAC1100",              "DAC960",     0, __LINE__ },
 { ID_SMART2,     "Compaq SMART2 RAID",                 "cpqarray",   0, __LINE__ },
 { ID_DPT_I2O,    "DPT I2O SmartRAID V",                "dpt_i2o",    0, __LINE__ },
+{ ID_AACRAID,    "Adaptec RAID",                       "aacraid",    0, __LINE__ },
 { ID_IPS,        "IBM ServeRAID",                      "ips",        0, __LINE__ },
 { ID_EATA_DMA,   "EATA-DMA (DPT, NEC, AT&T, SNI etc)", "eata_dma",   0, __LINE__ },
 { ID_DC390T,     "Tekram DC390(T) (AM53C974 chip)",    "tmscsim",    0, __LINE__ },
