@@ -18,6 +18,8 @@
 #include <fcntl.h>
 #include <ctype.h>
 
+#include <hd.h>
+
 #include "global.h"
 #include "text.h"
 #include "module.h"

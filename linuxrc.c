@@ -30,6 +30,8 @@
 #include <asm/sigcontext.h>
 #endif
 
+#include <hd.h>
+
 #include "global.h"
 #include "text.h"
 #include "info.h"
@@ -771,7 +773,8 @@ void lxrc_init()
 
   if(config.had_segv) config.manual = 1;
 
-  fprintf(stderr, "min = %d\n", config.memory.ram_min);
+  /* get usb keyboard working */
+  if(config.manual == 1 && !config.had_segv) util_load_usb();
 
   if(config.memory.ram_min && !config.had_segv) {
     int window = config.win, ram;

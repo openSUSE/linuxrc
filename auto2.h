@@ -8,3 +8,4 @@ char *auto2_serial_console(void);
 int auto2_find_install_medium(void);
 int auto2_find_floppy(void);
 void load_storage_mods(void);
+int activate_driver(hd_t *hd, slist_t **mod_list);

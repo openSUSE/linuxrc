@@ -4253,3 +4253,39 @@ void util_get_ram_size()
   hd_free_hd_data(hd_data);
 }
 
+
+/*
+ * Load basic usb support.
+ */
+void util_load_usb()
+{
+  hd_data_t *hd_data;
+  hd_t *hd, *hd_usb;
+  static int loaded = 0;
+
+  if(loaded) return;
+
+  loaded = 1;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  hd_usb = hd_list(hd_data, hw_usb_ctrl, 1, NULL);
+
+  /* ehci needs to be loaded first */
+  for(hd = hd_usb; hd; hd = hd->next) {
+    if(
+      hd->base_class.id == bc_serial &&
+      hd->sub_class.id == sc_ser_usb &&
+      hd->prog_if.id == pif_usb_ehci
+    ) {
+      mod_modprobe("ehci-hcd", NULL);
+      break;
+    }
+  }
+
+  for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, NULL);
+
+  hd_free_hd_data(hd_data);
+}
+
+

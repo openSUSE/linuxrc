@@ -1,6 +1,8 @@
 21/5/2004:	v1.6.29
 	- make vfat detection see FreeDOS disks (#40462)
 	- ensure ehci-hcd is loaded first (#40840)
+	- load basic usb support in manual mode, to get usb keyboards
+	  working (#39615)
 
 14/5/2004:	v1.6.28
 	- fixed code that writes mac address to install.inf (#40088)

@@ -48,7 +48,6 @@ static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
 static int auto2_net_dev1(char *device);
 static int driver_is_active(hd_t *hd);
-static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
@@ -1135,38 +1134,6 @@ int auto2_find_floppy()
 
   return config.floppies;
 }
-
-
-#if 0
-/*
- * Return != 0 if we should load the usb-storage module.
- */
-int load_usb_storage(hd_data_t *hd_data)
-{
-  hd_t *hd, *hd_floppy, *hd_cdrom, *hd_usb;
-  int usb_floppies = 0, usb_cdroms = 0, usb_other = 0;
-
-  hd_floppy = hd_list(hd_data, hw_floppy, 0, NULL);
-  for(hd = hd_floppy; hd; hd = hd->next) {
-    if(hd->bus.id == bus_usb && !hd->is.zip) usb_floppies++;
-  }
-  hd_free_hd_list(hd_floppy);
-
-  hd_cdrom = hd_list(hd_data, hw_cdrom, 0, NULL);
-  for(hd = hd_cdrom; hd; hd = hd->next) {
-    if(hd->bus.id == bus_usb) usb_cdroms++;
-  }
-  hd_free_hd_list(hd_cdrom);
-
-  hd_usb = hd_list(hd_data, hw_usb, 0, NULL);
-  for(hd = hd_usb; hd; hd = hd->next) {
-    if(hd->hw_class == hw_unknown) usb_other++;
-  }
-  hd_free_hd_list(hd_usb);
-
-  return usb_floppies || usb_cdroms || usb_other;
-}
-#endif
 
 
 int auto2_pcmcia()

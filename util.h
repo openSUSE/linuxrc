@@ -139,4 +139,5 @@ void util_notty(void);
 void util_killall(char *name, int sig);
 
 void util_get_ram_size(void);
+void util_load_usb(void);
 

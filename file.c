@@ -14,6 +14,8 @@
 #include <sys/mount.h>
 #include <arpa/inet.h>
 
+#include <hd.h>
+
 #include "global.h"
 #include "file.h"
 #include "text.h"
