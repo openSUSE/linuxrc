@@ -1,19 +1,20 @@
 # Dutch translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
-#
+# Arthur & Ettie Kerkmeester <ask_murphy@bigfoot.com>, 2000-2001
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2001-09-17 17:40+0100\n"
+"Last-Translator: Arthur & Ettie Kerkmeester <info@flashbios.org>\n"
 "Language-Team: Dutch <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.8\n"
 
 #. TXT_OK
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -29,19 +30,19 @@ msgstr "Nee"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Please choose the language"
-msgstr "Kies een taal"
+msgstr "Kies een taal aub"
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr "Kleurenbeeldscherm"
+msgstr "Kleuren beeldscherm"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
-msgstr "Monochroom-beeldscherm"
+msgstr "Monochroom beeldscherm"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "What kind of display do you use?"
-msgstr "Wat voor een soort beeldscherm gebruikt U?"
+msgstr "Wat voor een soort beeldscherm gebruikt u?"
 
 #. TXT_MENU_LANG
 msgid "Language"
@@ -49,15 +50,15 @@ msgstr "Taal"
 
 #. TXT_MENU_MODULES
 msgid "Kernel modules (hardware drivers)"
-msgstr "Kernel-Module (Hardware-driver)"
+msgstr "Kernel modules (hardware-drivers)"
 
 #. TXT_MENU_START
 msgid "Start installation / system"
-msgstr "Installatie / Systeem starten"
+msgstr "Installatie / systeem starten"
 
 #. TXT_MENU_INFO
 msgid "System information"
-msgstr "Systeem-Informatie"
+msgstr "Systeem informatie"
 
 #. TXT_HDR_MAIN
 msgid "Main menu"
@@ -76,32 +77,28 @@ msgid "Keymap"
 msgstr "Toetsenbord layout"
 
 #. TXT_LOAD_SCSI
-#, fuzzy
 msgid "Load SCSI modules"
-msgstr "SCSI-Driver laden"
+msgstr "SCSI modules laden"
 
 #. TXT_LOAD_CDROM
-#, fuzzy
 msgid "Load CD-ROM modules"
-msgstr "CD-ROM-Driver laden"
+msgstr "CD-ROM modules laden"
 
 #. TXT_LOAD_NET
-#, fuzzy
 msgid "Load network card modules"
-msgstr "Netwerkdriver laden"
+msgstr "Netwerk kaart modules laden"
 
 #. TXT_SHOW_MODULES
 msgid "Show loaded modules"
-msgstr "Laat geladen Module zien"
+msgstr "Geladen modules bekijken"
 
 #. TXT_AUTO_LOAD
-#, fuzzy
 msgid "Load modules automatically"
-msgstr "Automatisch Laden van Modules"
+msgstr "Modules automatisch laden"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
-msgstr "Verwijder geladen Module"
+msgstr "Verwijder geladen modules"
 
 #. TXT_TRY_TO_LOAD
 #, c-format
@@ -110,23 +107,23 @@ msgid ""
 "\n"
 "During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Probeer, de Module \"%s\" te laden...\n"
+"Probeer module \"%s\" te laden...\n"
 "\n"
-"Tijdens het Laden kunt U de Kernelmeldingen op Consool 4 (ALT-F4) bekijken."
+"Tijdens het laden kunt u de kernel meldingen op virtuele console 4 (ALT-F4) bekijken. Gebruik ALT-F1 om terug te gaan naar dit menu."
 
 #. TXT_LOAD_SUCCESSFUL
-#, fuzzy, c-format
+#, c-format
 msgid "Module \"%s\" loaded successfully!"
-msgstr "De Module \"%s\" is succesvol geladen!"
+msgstr "Module \"%s\" is correct geladen!"
 
 #. TXT_LOAD_FAILED
 #, c-format
 msgid "Failed to load module \"%s\"!"
-msgstr "Het Laden van de Module \"%s\" is mislukt!"
+msgstr "Het laden van module \"%s\" is mislukt!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr ""
+msgstr "CD-ROM"
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -142,15 +139,15 @@ msgstr "Netwerk (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
-msgstr "Harde schijf"
+msgstr "Harddisk"
 
 #. TXT_START_INSTALL
 msgid "Start installation/update"
-msgstr "Installatie starten"
+msgstr "Start installatie/update"
 
 #. TXT_START_RESCUE
 msgid "Start rescue system"
-msgstr "Reddingssystem starten"
+msgstr "Start reddingssysteem"
 
 #. TXT_LOAD_RS_NFS
 msgid "Load rescue system via NFS"
@@ -158,12 +155,12 @@ msgstr "Reddingssystem via NFS laden"
 
 #. TXT_BOOT_SYSTEM
 msgid "Boot installed system"
-msgstr "Geinstalleerd System booten"
+msgstr "Boot geïnstalleerd systeem"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Zoek naar Image \"%s\"..."
+msgstr "Er wordt gezocht naar image \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
@@ -171,41 +168,41 @@ msgid ""
 "\n"
 "Check the directory specification!"
 msgstr ""
-"Image kan niet gevonden worden!\n"
+"De image is niet gevonden!\n"
 "\n"
-"Check de directorie specificatie."
+"Controleer de directory specificatie!"
 
 #. TXT_LOADING
 msgid "Loading data into ramdisk"
-msgstr "Laad Data in de Ramdisk"
+msgstr "De data wordt in de ramdisk geladen"
 
 #. TXT_INFO_KERNEL
 msgid "Kernel messages"
-msgstr "Kernel-Berichten"
+msgstr "Kernel berichten"
 
 #. TXT_INFO_CPU
 msgid "Processor"
-msgstr ""
+msgstr "Processor"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "Aparaten"
+msgstr "Apparaten"
 
 #. TXT_INFO_NETDEV
 msgid "Network cards"
-msgstr "Netwerkkaarten"
+msgstr "Netwerk kaarten"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr ""
+msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr ""
+msgstr "Interrupts"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
-msgstr ""
+msgstr "I/O poorten"
 
 #. TXT_INFO_MEM
 msgid "Memory"
@@ -213,32 +210,27 @@ msgstr "Geheugen"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
-msgstr "Module"
+msgstr "Modules"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr ""
+msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
-msgstr ""
-"Plaats de Diskette \n"
-"en druk op ENTER"
+msgstr "Plaats de diskette aub en druk op ENTER"
 
 #. TXT_ERROR_READ_DISK
-#, fuzzy
 msgid "Error reading from floppy disk!"
-msgstr "Fout bij Lezen van de Diskette!"
+msgstr "Fout opgetreden bij het lezen van de diskette!"
 
 #. TXT_ENTER_ROOT_FS
 msgid "Please enter your root partition (eg. /dev/sda3)"
-msgstr ""
-"Geef uw Root-Partitie aan\n"
-"(b.v. /dev/sda3)"
+msgstr "Geef uw root partitie op (bijv: /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device!"
-msgstr "Ongeldige Root-Partitie!"
+msgstr "Ongeldig root apparaat!"
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input!"
@@ -246,21 +238,19 @@ msgstr "Ongeldige opgave!"
 
 #. TXT_INPUT_IPADDR
 msgid "Please enter your IP address"
-msgstr "Vul hier uw IP-Adres in."
+msgstr "Geef uw IP-adres op"
 
 #. TXT_INPUT_NETMASK
-#, fuzzy
 msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
-msgstr "Vul hier uw Netmasker in. Voor een normaal Class-C-Netwerk luid het 255.255.255.0"
+msgstr "Geef uw netmasker op. Voor een normaal klasse C netwerk is dit meestal 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
-msgstr "Vul hier het adres van uw Gateway in, voor zover U er een nodig heeft, om de Server aan te kunnen spreken. Anders vult u eenvoudig uw eigen IP-Adres in."
+msgstr "Geef het adres van de gateway op indien u er één nodig heeft om de server te kunnen bereiken. Geef uw eigen IP adres op wanneer u geen gateway nodig heeft."
 
 #. TXT_INPUT_NAMED
-#, fuzzy
 msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Vul hier het IP-Adres van uw Nameserver in. Als U geen Nameserver wilt gebruiken, dan drukt U ESC."
+msgstr "Geef het IP-adres van uw naamserver op. Druk op ESC wanneer u geen naamserver gebruikt."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -273,31 +263,30 @@ msgid ""
 msgstr ""
 "De volgende gegevens zijn gevonden:\n"
 "\n"
-"IP-Adres: %s\n"
+"IP-adres: %s\n"
 "Naam: %s\n"
-"Domain: %s"
+"Domein: %s"
 
 #. TXT_ERROR_CONF_NET
-#, fuzzy
 msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
-msgstr "Bij het configureren van het netwerk is een fout opgetreden. Of U heeft geen passende Module geladen of uw Netwerkkaart wordt niet correct door de Kernel herkent!"
+msgstr "Bij de configuratie van het netwerk is een fout opgetreden. Waarschijnlijk is uw netwerk kaart niet door de kernel herkent!"
 
 #. TXT_INPUT_SERVER
 msgid "Please enter the IP address of the NFS server."
-msgstr "Vul hier het IP-Adres van de NFS-Server in."
+msgstr "Geef het IP adres van de NFS-server op."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Please enter the IP address of the FTP server."
-msgstr "Vul hier het IP-Adres van de FTP-Server in."
+msgstr "Geef het IP adres van de FTP-server op."
 
 #. TXT_INPUT_DIR
 msgid "Please enter the directory on the server."
-msgstr "Vul hier de directorie op de server in."
+msgstr "Geef de server-directory op."
 
 #. TXT_ENTER_PARAMS
 #, c-format
 msgid "Please enter parameters for \"%s\"."
-msgstr "Vul hier de parameters in voor \"%s\" ."
+msgstr "Geef de parameters op voor \"%s\" ."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -306,11 +295,9 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Probeer de directorie\n"
+"Probeer de directory\n"
 "\n"
-"\"%s:%s\"\n"
-"\n"
-" te mounten..."
+"\"%s:%s\"\n te mounten..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
@@ -319,84 +306,82 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Bij de poging, de NFS-directorie van de Server te mounten, is de volgende Fout opgetreden:\n"
+"Er is een fout opgetreden tijdens het mounten van de NFS-directory.\n"
 "\n"
-"Fout van de NFS-Server: %s"
+"De door de server opgegeven reden: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
 "Please choose a keyboard map.\n"
 "YaST will offer you additional keyboard tables later on."
 msgstr ""
-"Kies een toetsenbord-layout uit.\n"
-"YaST biedt U later meer layouts aan."
+"Selecteer een toetsenbord-layout aub.\n"
+"YaST zal u later meer toetsenbord layouts aanbieden."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to be unloaded."
-msgstr "Kies de module uit, die U wilt verwijderen."
+msgstr "Selecteer de module die u wilt gaan verwijderen."
 
 #. TXT_NO_MODULES
 msgid "Currently there are no modules loaded!"
-msgstr "Momenteel zijn er geen Modules geladen!"
+msgstr "Momenteel zijn er geen modules geladen!"
 
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr ""
+msgstr "Automatisch zoeken (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Do you want to search for additional SCSI host adaptors?"
-msgstr "Wilt U naar andere SCSI-Adapters zoeken?"
+msgstr "Wilt u naar extra SCSI host adapters zoeken?"
 
 #. TXT_WANT_MORE_NET
 msgid "Do you want to search for additional network cards?"
-msgstr "Wilt U naar andere Netwerkkaarten zoeken?"
+msgstr "Wilt u naar extra netwerk kaarten zoeken?"
 
 #. TXT_WANT_MORE_CDROM
 msgid "Do you want to search for additional CD-ROM drives?"
-msgstr "Wilt U naar andere CD-ROM-Loopwerken zoeken?"
+msgstr "Wilt u naar extra CD-ROM drives zoeken?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "Ethernet Netwerkkaart"
+msgstr "ethernet netwerk kaart"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "Parallelpoort"
+msgstr "parallele poort"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "Token Ring Netwerkkaart"
+msgstr "token ring netwerk kaart"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "Arcnet Netwerkkaart"
+msgstr "arcnet netwerk kaart"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "FDDI Netwerkkaart"
+msgstr "FDDI netwerk kaart"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "HIPPI Netwerkkaart"
+msgstr "HIPPI netwerk kaart"
 
 #. TXT_CHOOSE_NET
 msgid "Please choose the network device."
-msgstr "Kies hier het Type Netwerk, die U voor de Installatie wilt gebruiken."
+msgstr "Kies het netwerk apparaat aub."
 
 #. TXT_INPUT_PLIP_IP
-#, fuzzy
 msgid "Please enter the IP address of the PLIP partner."
-msgstr "Vul uw  IP-Adres van de PLIP-Partner in."
+msgstr "Geef het IP-adres van de PLIP-partner op."
 
 #. TXT_LOAD_PCMCIA
 msgid "Load PCMCIA modules"
-msgstr "Laad PCMCIA Module"
+msgstr "Laad PCMCIA modules"
 
 #. TXT_NO_PCMCIA
-#, fuzzy
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
-msgstr "De PCMCIA chipset werd niet automatisch gevonden! A.u.b. handmatig specificeren."
+msgstr "De PCMCIA chipset kon niet automatisch worden gedetecteerd. Doe een handmatige specificatie aub."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -405,34 +390,32 @@ msgid ""
 "\n"
 "Please enter parameters for PCMCIA core modules"
 msgstr ""
-"PCMCIA Chipset \"%s\" gevonden!\n"
+"PCMCIA chipset \"%s\" gevonden!\n"
 "\n"
-"Vul hier uw Parameter voor de PCMCIA Core-Module in"
+"Geef de parameters voor de PCMCIA core-modules op"
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
 msgid "Please enter specific parameters for chipset \"%s\""
-msgstr "Vul hier uw specifieke Parameters voor de Chipset \"%s\" in"
+msgstr "Geef de specifieke parameters voor de chipset \"%s\" op"
 
 #. TXT_START_CARDMGR
-#, fuzzy
 msgid "Starting card manager..."
-msgstr "Cardmanager wordt gestart..."
+msgstr "De kaart manager wordt gestart..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "PCMCIA Card Services zijn succesvol gestart."
+msgstr "PCMCIA kaart services zijn met succes gestart."
 
 #. TXT_PCMCIA_FAIL
 msgid "Start of PCMCIA card services failed!"
-msgstr "Het Starten van de PCMCIA Card Services is mislukt!"
+msgstr "Het starten van de PCMCIA kaart services is mislukt!"
 
 #. TXT_PCMCIA_ALREADY
 msgid "PCMCIA card services already running!"
-msgstr "PCMCIA Card Services lopen al!"
+msgstr "De PCMCIA kaart services draaien al!"
 
 #. TXT_NO_LXRC_END
-#, fuzzy
 msgid ""
 "You can exit Linuxrc only via the menu item\n"
 "\n"
@@ -440,20 +423,19 @@ msgid ""
 "\n"
 "In order to allow this, you might need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Linuxrc kan alleen via het Menupunt\n"
+"Linuxrc kan alleen via het menu\n"
 "\n"
-"» Installatie / System starten «\n"
+"\"Installatie / system starten\"\n"
 "\n"
-"verlaten worden! Dat dit mogelijk wordt, moet U eventueel eerst de Hardware-driver (Module) laden."
+"verlaten worden. Het is mogelijk dat u enige drivers (modules) moet laden voor de ondersteuning van uw hardware."
 
 #. TXT_NO_CTRLC
-#, fuzzy
 msgid "You cannot exit Linuxrc with <ctrl-c>!"
-msgstr "Linuxrc kan niet door <ctrl-c> afgebroken worden!"
+msgstr "U kunt Linuxrc niet afbreken met <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 msgid "Please remove the disk from the drive now!"
-msgstr "Haal nu de diskette uit de diskdrive!"
+msgstr "Verwijder nu de diskette uit de drive!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -463,59 +445,53 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Bijvoorbeeld: "
+"Voorbeeld: "
 
 #. TXT_CHOOSE_SOURCE
-#, fuzzy
 msgid "Please choose the source medium"
-msgstr "Kies de bronmedium"
+msgstr "Kies het bronmedium aub"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Probeer, de CD-ROM te mounten..."
+msgstr "Probeer de CD-ROM te mounten..."
 
 #. TXT_ERROR_CD_MOUNT
-#, fuzzy
 msgid "Unable to mount the CD-ROM!"
-msgstr "CD-ROM kan niet gemount worden!"
+msgstr "De CD-ROM kan niet gemount worden!"
 
 #. TXT_START_YAST
 msgid "Starting YaST..."
-msgstr "YaST  start..."
+msgstr "Even YaST starten..."
 
 #. TXT_ASK_REBOOT
 msgid "Do you want to reboot the system now?"
-msgstr "Wilt U het systeem opnieuw starten?"
+msgstr "Wilt u het systeem nu opnieuw booten?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
-msgstr "Het Basissysteem is succesvol geinstalleert. Dit nieuw geinstalleerde Systeem wordt nu gestart, om de Installatie af te sluiten."
+msgstr "Het basissysteem is met succes geïnstalleerd. Dit nieuwe geïnstalleerde systeem wordt nu gestart om de installatie af te ronden."
 
 #. TXT_ENTER_PARTITION
 msgid "Please enter the harddisk partition (eg. /dev/sda1)"
-msgstr ""
-"Geef hier de Harde-schijf-Partitie aan\n"
-"(b.v. /dev/sda1)"
+msgstr "Geef de harddisk partitie op (bijv: /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition!"
-msgstr "De opgegeven Partitie kan niet gemount worden!"
+msgstr "Kon de gespecificeerde partitie niet mounten!"
 
 #. TXT_ENTER_HD_DIR
 msgid "Please enter the source directory"
-msgstr "Geef hier de bron-directorie op"
+msgstr "Geef de bron directory op"
 
 #. TXT_ERROR_INSTALL
-#, fuzzy
 msgid "An error occurred during the installation!"
 msgstr "Er is een fout opgetreden tijdens de installatie!"
 
 #. TXT_DRIVES
 msgid "Harddisks / CD-ROMs"
-msgstr "Harde-schijf / CD-ROMs"
+msgstr "Harddisks / CD-ROM's"
 
 #. TXT_LITTLE_MEM
-#, fuzzy
 msgid ""
 "Your computer has extremely little memory!\n"
 "\n"
@@ -523,65 +499,61 @@ msgid ""
 msgstr ""
 "Uw computer beschikt over erg weinig geheugen!\n"
 "\n"
-"Voordat U deze melding bevestigd en YaST gestart kan worden , moet U naar console 2 omschakelen (druk hier voor ALT-F2) en met de hand Swap-geheugen instellen en activieren!"
+"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (mbv ALT-F2) om enige swapruimte te maken en te activeren!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
 msgstr "Animatie"
 
 #. TXT_ASK_EXPLODE
-#, fuzzy
 msgid ""
 "Do you like \"animated\" windows?\n"
 "\n"
 "Of course ;-)"
 msgstr ""
-"Wilt U \"exploderende\" venster?\n"
+"Vindt u \"geanimeerde\" vensters leuk?\n"
 "\n"
-"maar natuurlijk ;-)"
+"Ja natuurlijk ;-)"
 
 #. TXT_NO_DRIVES
-#, fuzzy
 msgid "No harddisks or CD-ROM drives have been detected so far."
-msgstr "Tot nu toe is er geen harde-schijf en CD-rom drive gevonden."
+msgstr "Er zijn tot nu toe geen harddisks of CD-ROM drives gevonden."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Debug (Expert)"
+msgstr "Debug (expert)"
 
 #. TXT_FORCE_ROOTIMAGE
-#, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Forceer Root-image"
+msgstr "Rootimage in ramdisk laden"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
-msgstr "Opgave van de Root-image"
+msgstr "Geef rootimage op"
 
 #. TXT_ASK_RI_FORCE
-#, fuzzy
 msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
-msgstr "Moet de Root-image ook dan in de RAM-disk geladen worden, als er een geldig Installatie-systeem gevonden wordt?"
+msgstr "Wilt u dat de root-image ook in de RAM-disk geladen worden wanneer er een geldig installatie-systeem gevonden is?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
-msgstr "Geef hier path en naam van de bestand, die U als Root Filesysteem in de RAM-disk geladen wilt hebben."
+msgstr "Geef de path en de naam van het bestand op dat u als root bestandssysteem in de RAM disk geladen wilt hebben"
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented!"
-msgstr "Nog niet geimplementeerd!"
+msgstr "Nog niet geïmplementeerd!"
 
 #. TXT_NEW_INST_SYS
 msgid "Installation system"
-msgstr "Installatie-systeem"
+msgstr "Installatie systeem"
 
 #. TXT_ENTER_INST_SYS
 msgid "Please enter the directory that contains the installation system."
-msgstr "Geef hier de directorie op, die het Installatie-systeem bevat."
+msgstr "Geef de directory op dat het installatie systeem bevat."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "Geen Informatie beschikbaar."
+msgstr "Geen informatie beschikbaar."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
@@ -589,16 +561,15 @@ msgstr "Installatie wordt voorbereidt..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Live-CD starten"
+msgstr "Start Live CD"
 
 #. TXT_INSERT_LIVECD
 msgid "Please insert the Live CD."
-msgstr "plaats de Live-CD in de drive."
+msgstr "Plaats de Live CD aub."
 
 #. TXT_END_REBOOT
-#, fuzzy
 msgid "Exit / Reboot"
-msgstr "Einde / Reboot"
+msgstr "Einde / reboot"
 
 #. TXT_ASK_BOOTP
 msgid "Automatic configuration via bootp/DHCP?"
@@ -606,57 +577,57 @@ msgstr "Automatische configuratie via Bootp/DHCP?"
 
 #. TXT_SEND_BOOTP
 msgid "Sending bootp request..."
-msgstr "Bootp-Aanvraag wordt verstuurd..."
+msgstr "Bootp aanvraag wordt verzonden..."
 
 #. TXT_ERROR_BOOTP
 msgid "Bootp configuration failed."
-msgstr "Bootp-configuratie is afgebroken."
+msgstr "Bootp configuratie is mislukt."
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
-msgstr "Zoek naar Info-file..."
+msgstr "Even zoeken naar het info-bestand..."
 
 #. TXT_NFSPORT
 msgid "Specify NFS port"
-msgstr "Geef de NFS-Port op"
+msgstr "Specificeer de NFS-poort"
 
 #. TXT_ASKING_NAMED
 msgid "Asking nameserver..."
-msgstr "Bevraag de Nameserver..."
+msgstr "Even navraag doen bij de naamserver..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format,fuzzy
 msgid "Host %s was not found!"
-msgstr "Computer %s is onbekendt!"
+msgstr "Host %s is niet gevonden!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
-msgstr "Uw Netwerk is al geconfigureerd. Wilt U de configuratie behouden?"
+msgstr "Uw netwerk is al geconfigureerd. Wilt u deze configuratie behouden?"
 
 #. TXT_ASK_BREAK
 msgid "Do want to abort?"
-msgstr "Wilt U afbreken?"
+msgstr "Wilt u nu stoppen?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
 "No network device found!\n"
 "Please load a network module first."
 msgstr ""
-"Er is geen netwerkkaart gevonden!\n"
-"Laadt nu een passende Module."
+"Er is geen netwerk apparaat gevonden!\n"
+"Laad eerst een netwerk module aub."
 
 #. TXT_ALREADY_FOUND
 #, c-format
 msgid "A %s was already found in your system!\n"
-msgstr "In uw Systeem is al een %s gevonden!\n"
+msgstr "Een %s is al op uw systeem gevonden!\n"
 
 #. TXT_SCSI_ADAPTER
 msgid "SCSI-Adapter"
-msgstr ""
+msgstr "SCSI-adapter"
 
 #. TXT_ANOTHER_MOD
 msgid "Do you want to load an additional module?"
-msgstr "Wilt U nog een Module laden?"
+msgstr "Wilt u een extra module laden?"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -665,125 +636,123 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Fout bij het aanspreken van de FTP-Server:\n"
+"Fout opgetreden bij het verbinding maken met de FTP server:\n"
 "\n"
 "%s"
 
 #. TXT_TRY_REACH_FTP
 msgid "Trying to connect to the FTP server..."
-msgstr "Probeer, de FTP-Server te bereiken..."
+msgstr "Probeer verbinding te maken met de FTP server..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
-msgstr "Vul hier de gebruikersnaam in, waarmee U  de FTP-Server wilt aanspreken"
+msgstr "Geef de gebruikersnaam op waarmee u verbinding wilt maken met de FTP server"
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Please enter the password for the FTP user account"
-msgstr "Vul hier het paswoord van de FTP-Server in"
+msgstr "Geef het wachtwoord voor het FTP server account op"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Please enter the address of the FTP proxy"
-msgstr "Vul hier het adres van de FTP Proxy in"
+msgstr "Geef het adres van de FTP proxy op"
 
 #. TXT_ENTER_FTPPORT
 msgid "Please enter the port of the FTP proxy"
-msgstr "Vul hier de Port van de FTP Proxy in"
+msgstr "Geef de poort van de FTP proxy op"
 
 #. TXT_WANT_FTPPROXY
-#, fuzzy
 msgid "Do you want to use an FTP proxy?"
-msgstr "Wilt U een FTP Proxy gebruiken?"
+msgstr "Wilt u een FTP proxy gebruiken?"
 
 #. TXT_NOMEM_FTP
-#, fuzzy, c-format
+#, c-format
 msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
-msgstr "Voor een installatie via FTP heeft uw computer niet genoeg geheugen! (min. %d MB nodig)"
+msgstr "Voor een installatie via FTP heeft uw computer niet genoeg RAM geheugen! (%d MB RAM benodigd)"
 
 #. TXT_ANONYM_FTP
-#, fuzzy
 msgid ""
 "Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
 "Do you want this?"
 msgstr ""
-"Normaal word de FTP-Installatie via een anoniem FTPgeinstalleerd. U heeft de Mogelijkheid, om een gebruikersnaam en een paswoord in te vullen.\n"
-"Wilt U dat?"
+"Normaal wordt een FTP-installatie via een anoniem FTP gedaan. U heeft echter de mogelijkheid om een gebruikersnaam en een wachtwoord te specificeren voor de toegang tot de FTP server.\n"
+"Wilt u dit gaan doen?"
 
 #. TXT_ENTER_MODDISK
 msgid "Please insert the modules disk"
-msgstr "Plaats de  Module-Diskette"
+msgstr "Plaats de module disk aub"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
-msgstr "-- andere Modules --"
+msgstr "-- Meer modules --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "Initialiseer de Parallel-Poort..."
+msgstr "Bezig met de initialisering van de parallele poort..."
 
 #. TXT_ENTER_NFSPORT
-#, fuzzy
 msgid "Please enter the port number on which the nfs server is running"
-msgstr "Vul hier het nummer in van de poort, waarop de NFS-Server draait"
+msgstr "Geef het poortnummer van de NFS-server op"
 
 #. TXT_YAST1
 msgid "YaST1 - text based"
-msgstr "YaST1 - tekst venster"
+msgstr "YaST1 - tekst grondslag"
 
 #. TXT_YAST2
 msgid "YaST2 - graphical"
 msgstr "YaST2 - grafisch"
 
 #. TXT_CHOOSE_YAST
-#, fuzzy
 msgid "Please choose the version of YaST you want to use for the installation."
-msgstr "Kies een versie van YaST om te gebruiken voor de installatie."
+msgstr "Selecteer de YaST versie die u wilt gaan gebruiken voor de installatie."
 
 #. TXT_INSERT_CD
 #, c-format
 msgid "Please make sure that CD number %d is in your drive!"
-msgstr "Plaats aub CD nummer %d in uw drive!"
+msgstr "Wees er aub zeker van dat CD nummer %d in uw drive zit!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr ""
+msgstr "CD uitwerpen"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp timeout"
-msgstr ""
+msgstr "Bootp timeout"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Please enter the timeout value for bootp."
-msgstr ""
+msgstr "Geef de timeout waarde voor bootp op."
 
 #. TXT_DO_REBOOT
 msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
 msgstr ""
+"Het basissysteem is met succes geïnstalleerd. Uw computer moet nu opnieuw geboot worden. Verwijder aub alle installatie media (CD-ROM, floppy).\n"
+"De diskette niet verwijderen wanneer de Linux Loader (LILO)  er op is geïnstalleerd."
 
 #. TXT_REISERFS
 msgid "Reiserfs file system found."
-msgstr ""
+msgstr "Reiserfs bestandssysteem gevonden."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr ""
+msgstr "kanaal tot kanaal verbinding"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr ""
+msgstr "ESCON verbinding"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr ""
+msgstr "IUCV verbinding"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr ""
+msgstr "kanaal verbonden cisco router"
 
 #. TXT_SMB
 msgid "Network (Windows Share aka SMB)"
-msgstr ""
+msgstr "Netwerk (Windows share aka SMB)"
 
 #. TXT_SMB_ENTER_SERVER
 msgid "Please enter the IP-address of the SMB server"
@@ -819,4 +788,5 @@ msgstr ""
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
+
 
