@@ -1182,7 +1182,11 @@ int inst_commit_install()
       fprintf(stderr, "*** reboot ***\n");
     }
     else {
+#if	defined(__s390__)
+      reboot(RB_POWER_OFF);
+#else
       reboot(RB_AUTOBOOT);
+#endif
     }
     err = -1;
   }
