@@ -2,7 +2,7 @@
  *
  * net.c         Network related functions
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -784,6 +784,7 @@ static int net_bootp (void)
                data_pci [i_ii] != ':')
             tmp_ti [i_ii] = data_pci [i_ii++];
 
+/*
         if (tmp_ti [0] && data_pci [i_ii] == ':')
             {
             strncpy (server_dir_tg, data_pci + i_ii + 1,
@@ -793,6 +794,7 @@ static int net_bootp (void)
         else
             strncpy (server_dir_tg, data_pci, sizeof (server_dir_tg));
         }
+*/
 
     data_pci = getenv ("BOOTP_SERVER");
     if (data_pci && !nfs_server_rg.s_addr)
