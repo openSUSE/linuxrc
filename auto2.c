@@ -52,7 +52,7 @@ static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
-#ifdef __i386__
+#if 0	/* __i386__ */
 static int auto2_ask_for_modules(int prompt, char *type);
 #endif
 
@@ -1252,7 +1252,7 @@ void auto2_progress(char *pos, char *msg)
 }
 
 
-#ifdef __i386__
+#if 0	/* __i386__ */
 int auto2_ask_for_modules(int prompt, char *type)
 {
   int do_something = 0;

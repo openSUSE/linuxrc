@@ -1145,6 +1145,14 @@ void util_status_info()
   );
   slist_append_str(&sl0, buf);
 
+  util_get_ram_size();
+
+  sprintf(buf,
+    "RAM size (MB): total %u, min %u",
+    config.memory.ram, config.memory.ram_min
+  );
+  slist_append_str(&sl0, buf);
+
   sprintf(buf,
     "instmode = %s%s%s [%s], net_config_mask = 0x%x",
     get_instmode_name(config.instmode),
@@ -3012,6 +3020,8 @@ url_t *parse_url(char *str)
     free(s);
   }
 
+  /* implicitly add a directory so people can use just 'install=slp' */
+  if(url.scheme == inst_slp && !url.dir) str_copy(&url.dir, "/");
 
 #if 0
   fprintf(stderr,
@@ -4232,5 +4242,31 @@ void util_killall(char *name, int sig)
   slist_free(sl0);
 
   while(waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+
+void util_get_ram_size()
+{
+  hd_data_t *hd_data;
+  hd_t *hd;
+  hd_res_t *res;
+
+  if(config.memory.ram) return;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  hd = hd_list(hd_data, hw_memory, 1, NULL);
+
+  if(hd && hd->base_class.id == bc_internal && hd->sub_class.id == sc_int_main_mem) {
+    for(res = hd->res; res; res = res->next) {
+      if(res->any.type == res_phys_mem) {
+        config.memory.ram = res->phys_mem.range >> 20;
+        fprintf(stderr, "RAM size: %u MB\n", config.memory.ram);
+        break;
+      }
+    }
+  }
+
+  hd_free_hd_data(hd_data);
 }
 

@@ -357,6 +357,8 @@ typedef struct {
     int min_yast;		/* minimum for yast */
     int min_yast_text;		/* minimum for yast in text mode */
     int load_image;		/* _load_ rootimage, if we have at least that much */
+    int ram;			/* ram size in MB */
+    int ram_min;		/* min required memory (ram size) needed for install in MB */
   } memory;
 
   struct {

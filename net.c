@@ -70,10 +70,10 @@ static int  net_is_plip_im = FALSE;
 #endif
 
 static int net_activate(void);
+static void net_setup_nameserver(void);
 
 #if NETWORK_CONFIG
 static int net_choose_device(void);
-static void net_setup_nameserver(void);
 static int net_input_data(void);
 #endif
 #ifdef WITH_NFS
@@ -1102,7 +1102,6 @@ static void net_show_error(enum nfs_stat status_rv)
 #endif
 
 
-#if NETWORK_CONFIG
 /*
  * Let user enter nameservers.
  *
@@ -1164,6 +1163,7 @@ void net_setup_nameserver()
 }
 
 
+#if NETWORK_CONFIG
 /*
  * Let user enter some network config data.
  *

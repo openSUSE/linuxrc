@@ -211,7 +211,8 @@ static struct {
   { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
   { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },
   { key_loghost,        "Loghost",        kf_cfg + kf_cmd                },
-  { key_escdelay,       "ESCDelay",       kf_cfg + kf_cmd                }
+  { key_escdelay,       "ESCDelay",       kf_cfg + kf_cmd                },
+  { key_minmem,         "MinMemory",      kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -243,9 +244,10 @@ static struct {
   { "dvd",       inst_dvd           },
   { "cdwithnet", inst_cdwithnet     },
   { "net",       inst_net           },
+  { "slp",       inst_slp           },
+  /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
-  { "cdrom",     inst_cdrom         },
-  { "slp",       inst_slp           }
+  { "cdrom",     inst_cdrom         }
 };
 
 
@@ -1148,6 +1150,10 @@ void file_do_info(file_t *f0)
 
       case key_escdelay:
         if(f->is.numeric) config.escdelay = f->nvalue;
+        break;
+
+      case key_minmem:
+        if(f->is.numeric) config.memory.ram_min = f->nvalue;
         break;
 
       default:

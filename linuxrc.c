@@ -771,6 +771,35 @@ void lxrc_init()
 
   if(config.had_segv) config.manual = 1;
 
+  fprintf(stderr, "min = %d\n", config.memory.ram_min);
+
+  if(config.memory.ram_min && !config.had_segv) {
+    int window = config.win, ram;
+    char *msg = NULL;
+
+    util_get_ram_size();
+
+    ram = config.memory.ram_min - config.memory.ram_min / 8;
+
+    if(config.memory.ram < ram) {
+      if(!window) util_disp_init();
+      strprintf(&msg,
+        "Your computer does not have enough RAM for the installation of %s. "
+        "You need at least %d MB.",
+      config.product, config.memory.ram_min);
+      dia_message(msg, MSGTYPE_REBOOT);
+      free(msg);
+      if(!window) util_disp_done();
+      config.manual = 1;
+      if(config.test) {
+        fprintf(stderr, "*** reboot ***\n");
+      }
+      else {
+        reboot(RB_AUTOBOOT);
+      }
+    }
+  }
+
 #ifdef USE_LIBHD
   if(!config.manual) {
     if(auto2_init()) {

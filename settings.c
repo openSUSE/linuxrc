@@ -67,6 +67,11 @@ static language_t set_languages_arm [] =
 { lang_it, "Italiano", "it", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
 #endif
 
+#ifdef TRANS_ja
+// currently a fake
+{ lang_ja, "Japanese", "jp106", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "ja_JP", "japanese" },
+#endif
+
 #ifdef TRANS_hu
 { lang_hu, "Magyar", "hu", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
 #endif

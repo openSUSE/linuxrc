@@ -138,3 +138,5 @@ int util_lndir_main(int argc, char **argv);
 void util_notty(void);
 void util_killall(char *name, int sig);
 
+void util_get_ram_size(void);
+

@@ -930,3 +930,7 @@ msgid ""
 "on initial root user login."
 msgstr ""
 
+#. TXT_REBOOT
+msgid "Reboot"
+msgstr ""
+

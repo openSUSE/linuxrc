@@ -1,3 +1,8 @@
+8/5/2004:	v1.6.25
+	- fixed compiling on s390
+	- added memory size test (#38826)
+	- added japanese language entry (#40124)
+
 6/5/2004:	v1.6.24
 	- run modprobe, not insmod if possible (#39946)
 
