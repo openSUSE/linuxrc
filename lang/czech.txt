@@ -17,7 +17,7 @@ static text_t txt_czech_atm [] =
 { TXT_MENU_DISPLAY,   "Monitor"                                               },
 { TXT_MENU_KEYMAP,    "Rozlo¾ení klávesnice"                                  },
 { TXT_LOAD_SCSI,      "Zavést SCSI modul"                                     },
-{ TXT_LOAD_CDROM,     "Zavést CD-ROM modul"                                   },
+{ TXT_LOAD_CDROM,     "Zavést modul CD mechaniky"                             },
 { TXT_LOAD_NET,       "Zavést modul sí»ové karty"                             },
 { TXT_SHOW_MODULES,   "Zobrazit nahrané moduly"                               },
 { TXT_AUTO_LOAD,      "Automatické zavedení modulù"                           },
@@ -27,11 +27,11 @@ static text_t txt_czech_atm [] =
                       "na virtuální konsoli 4 (Alt-F4)."                      },
 { TXT_LOAD_SUCCESSFUL,"Modul \"%s\" byl úspì¹nì zaveden!"                     },
 { TXT_LOAD_FAILED,    "Chyba pøi zavádìní modulu \"%s\"!"                     },
-{ TXT_CDROM,          "CD-ROM"                                                },
+{ TXT_CDROM,          "CD disk"                                               },
 { TXT_FLOPPY,         "Disketa"                                               },
 { TXT_NFS,            "Sí» (NFS)"                                             },
 { TXT_FTP,            "Sí» (FTP)"                                             },
-{ TXT_HARDDISK,       "Disk"                                                  },
+{ TXT_HARDDISK,       "Pevný disk"                                            },
 { TXT_START_INSTALL,  "Spu¹tìní instalace"                                    },
 { TXT_START_RESCUE,   "Spu¹tìní záchranného systému"                          },
 { TXT_LOAD_RS_NFS,    "Nahrání záchranného systému pøes NFS"                  },
@@ -57,7 +57,7 @@ static text_t txt_czech_atm [] =
 { TXT_INVALID_INPUT,  "Neplatný vstup!"                                       },
 { TXT_INPUT_IPADDR,   "Zadejte prosím va¹i IP addresu"                        },
 { TXT_INPUT_NETMASK,  "Zadejte prosím va¹i sí»ovou masku. Pro bì¾nou (class C) "
-                      "sí» je to obvykle 255.255.255.0"                      },
+                      "sí» je to obvykle 255.255.255.0"                       },
 { TXT_INPUT_GATEWAY,  "Pokud potøebujete bránu pro pøístup k serveru, zadejte "
                       "prosím IP addresu této brány. Pokud nepotøebujete "
                       "bránu, zadejte va¹i vlastní IP addresu."               },
@@ -83,7 +83,7 @@ static text_t txt_czech_atm [] =
 { TXT_AUTO_RUNNING,   "Autodetekce (%s)...      "                             },
 { TXT_WANT_MORE_SCSI, "Chcete vyhledat dal¹í SCSI øadièe?"                    },
 { TXT_WANT_MORE_NET,  "Chcete vyhledat dal¹í sí»ové karty?"                   },
-{ TXT_WANT_MORE_CDROM,"Chcete vyhledat dal¹í CD-ROM mechaniky?"               },
+{ TXT_WANT_MORE_CDROM,"Chcete vyhledat dal¹í CD mechaniky?"                   },
 { TXT_NET_ETH0,       "sí»ová karta typu Ethernet"                            },
 { TXT_NET_PLIP,       "paralelní port"                                        },
 { TXT_NET_TR0,        "sí»ová karta typu Token ring"                          },
@@ -110,8 +110,8 @@ static text_t txt_czech_atm [] =
 { TXT_REMOVE_DISK,    "Prosím, vyndejte nyní disketu z mechaniky!"            },
 { TXT_EXAMPLE_PAR,    "\n\nPøíklad: "                                         },
 { TXT_CHOOSE_SOURCE,  "Vyberte prosím zdrojové médium"                        },
-{ TXT_TRY_CD_MOUNT,   "Pokou¹ím se pøipojit CD-ROM..."                        },
-{ TXT_ERROR_CD_MOUNT, "Nemohu pøipojit CD-ROM!"                               },
+{ TXT_TRY_CD_MOUNT,   "Pokou¹ím se pøipojit CD mechaniku..."                  },
+{ TXT_ERROR_CD_MOUNT, "Nemohu pøipojit CD mechaniku!"                         },
 { TXT_START_YAST,     "Startuje se YaST..."                                   },
 { TXT_ASK_REBOOT,     "Chcete vá¹ systém nyní restartovat?"                   },
 { TXT_INSTALL_SUCCESS,"Základní systém byl úspì¹nì nainstalován. Tento "
@@ -121,14 +121,14 @@ static text_t txt_czech_atm [] =
 { TXT_ERROR_HD_MOUNT, "Nemohu pøipojit zadaný diskový oddíl!"                 },
 { TXT_ENTER_HD_DIR,   "Zadejte prosím zdrojový adresáø"                       },
 { TXT_ERROR_INSTALL,  "Objevila se chyba bìhem instalace!"                    },
-{ TXT_DRIVES,         "Disky / mechaniky CD"                                  },
+{ TXT_DRIVES,         "Disky / CD mechaniky"                                  },
 { TXT_LITTLE_MEM,     "Vá¹ poèítaè má extrémnì málo operaèní pamìti!\n\n"
                       "Ne¾ potvrdíte toto hlá¹ení, musíte se pøepnout na "
                       "virtuální konsoli 2 (stiskem ALT-F2) a vytvoøit "
                       "a aktivovat dodateènou odkládací (swap) pamì»!"        },
 { TXT_ASK_ANIMATE,    "Animace"                                               },
 { TXT_ASK_EXPLODE,    "Chcete mít \"explodující\" okna?\n\nAle jistì ;-)"     },
-{ TXT_NO_DRIVES,      "Nebyly detekovány ¾ádné disky ani mechaniky CD."       },
+{ TXT_NO_DRIVES,      "Nebyly detekovány ¾ádné disky ani CD mechaniky."       },
 { TXT_MENU_EXPERT,    "Debug (expert)"                                        },
 { TXT_FORCE_ROOTIMAGE,"Vynutit root image"                                    },
 { TXT_NEW_ROOTIMAGE,  "Zadat root image"                                      },
@@ -183,12 +183,12 @@ static text_t txt_czech_atm [] =
 { TXT_CHOOSE_YAST,    "Vyberte prosím, která verze YaSTu bude pou¾ita pro "
                       "instalaci."                                            },
 { TXT_INSERT_CD,      "Ujistìte se prosím, ¾e máte v mechanice CD èíslo %d!"  },
-{ TXT_EJECT_CD,       "Eject CD"                                              },
-{ TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
-{ TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
+{ TXT_EJECT_CD,       "Vysounout CD"                                          },
+{ TXT_BOOTP_TIMEOUT,  "Lhùta pro bootp"                                       },
+{ TXT_ENTER_BOOTP_TIMEOUT, "Zadejte prosím lhùtu pro bootp."                  },
 { TXT_DO_REBOOT,      "Základní systém byl úspì¹nì nainstalován. "
                       "Nyní bude spu¹tìn, aby se instalace projevila. "
-                      "Prosím odstraòte instalaèní média (CD-ROM, disketu).\n"
+                      "Prosím odstraòte instalaèní média (CD, disketu).\n"
                       "(Nevyjímejte ov¹em disketu, pokud na ní je LILO.)"     },
-{ TXT_REISERFS,       "Reiserfs file system found."                           }
+{ TXT_REISERFS,       "Byl nalezen Reiserfs."                                 }
 };
