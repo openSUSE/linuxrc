@@ -843,9 +843,11 @@ defkeys(int fd) {
 		  fprintf(stderr, _("%s: failed to restore keyboard mode\n"),
 			  progname);
 	     }
+#if 0
 	     fprintf(stderr, _("%s: warning: this map uses Unicode symbols\n"
 		             "    (perhaps you want to do `kbd_mode -u'?)\n"),
 		     progname);
+#endif
 	}
 	return ct;
 }
