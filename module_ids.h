@@ -45,6 +45,7 @@ enum modid_t
     ID_QLOGIC_FC,
     ID_SYM_53C8XX,
     ID_IPS,
+    ID_3WXXX,
     ID_CPQFC,
     ID_DC395,
     ID_SIM710,
