@@ -1371,7 +1371,7 @@ void file_write_install_inf(char *dir)
     return;
   }
 
-  if(config.language) set_write_info(f);
+  set_write_info(f);
 
   file_write_num(f, key_sourcemounted, config.instdata_mounted);
 

@@ -144,3 +144,5 @@ char *print_driverid(driver_t *drv, int with_0x);
 int apply_driverid(driver_t *drv);
 void store_driverid(driver_t *drv);
 
+char *url_decode(char *str);
+

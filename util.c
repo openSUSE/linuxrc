@@ -3011,11 +3011,11 @@ url_t *parse_url(char *str)
     if(s0[0] == '/' && s0[1] == '/') {
       s0 += 2;
       if((s = strchr(s0, '/'))) {
-        url.dir = strdup(config.zenconfig ? s + 1 : s);
+        url.dir = strdup(s + 1);
         *s = 0;
       }
       else {
-        url.dir = strdup("/");
+        url.dir = strdup("");
       }
 
       if((s = strchr(s1 = s0, '@'))) {
@@ -3039,7 +3039,7 @@ url_t *parse_url(char *str)
       if(*s0) url.server = strdup(s0);
     }
     else {
-      url.dir = strdup(*s0 ? s0 : "/");
+      url.dir = strdup(*s0 ? s0 : "");
     }
   }
   else {
@@ -3049,10 +3049,7 @@ url_t *parse_url(char *str)
     }
   }
 
-  if(scheme == inst_smb && url.dir && *url.dir == '/') {
-    str_copy(&url.dir, url.dir + 1);
-  }
-
+  if(url.dir && !*url.dir) str_copy(&url.dir, NULL);
 
   free(str);
   if(scheme >= 0) url.scheme = scheme;
@@ -3064,10 +3061,10 @@ url_t *parse_url(char *str)
       url.scheme == inst_hd
     ) && (url.dir || url.server)
   ) {
-    s = malloc(strlen(s0 = url.dir ?: "") + strlen(s1 = url.server ?: "") + 2);
+    s = malloc(strlen(s0 = url.dir ?: "") + strlen(s1 = url.server ?: "") + 3);
     *s = 0;
     if(*s1) strcat(strcat(s, "/"), s1);
-    strcat(s, s0);
+    strcat(strcat(s, "/"), *s0 == '/' ? s0 + 1 : s0);
 
     // fprintf(stderr, "s = \"%s\"\n", s);
 
@@ -3106,17 +3103,24 @@ url_t *parse_url(char *str)
     free(s);
   }
 
-  /* implicitly add a directory so people can use just 'install=slp' */
-  if(url.scheme == inst_slp && !url.dir) str_copy(&url.dir, "/");
+  if(!url.dir) str_copy(&url.dir, "");
 
-#if 0
-  fprintf(stderr,
-    "  scheme = %s, server = \"%s\", dir = \"%s\"\n"
-    "  user = \"%s\", password = \"%s\", port = %u\n",
-    get_instmode_name(url.scheme), url.server, url.dir,
-    url.user, url.password, url.port
-  );
-#endif
+  if(
+    url.scheme == inst_http ||
+    (url.scheme == inst_slp && !*url.dir) ||
+    (url.scheme == inst_nfs && *url.dir != '/')
+  ) {
+    strprintf(&url.dir, "/%s", url.dir);
+  }
+
+  if(config.debug >= 2) {
+    fprintf(stderr,
+      "  scheme = %s, server = \"%s\", dir = \"%s\"\n"
+      "  user = \"%s\", password = \"%s\", port = %u\n",
+      get_instmode_name(url.scheme), url.server, url.dir,
+      url.user, url.password, url.port
+    );
+  }
 
   if(url.scheme || url.dir || url.server) return &url;
 
@@ -3284,7 +3288,7 @@ int net_open(char *filename)
       return 0;
     }
 
-    fd = ftpGetFileDesc(config.net.ftp_sock, filename);
+    fd = ftpGetFileDesc(config.net.ftp_sock, url_decode(filename));
 
     if(fd < 0) {
       str_copy(&config.net.error, (char *) ftpStrerror(fd));
@@ -4530,7 +4534,41 @@ void store_driverid(driver_t *drv)
 
     fclose(f);
   }
-
 }
+
+/*
+ * replace %XX
+ */
+char *url_decode(char *str)
+{
+  static char *s0, *s = NULL;
+  char t[3];
+  unsigned u;
+
+  str_copy(&s0, NULL);
+
+  if(!str) return s0;
+
+  s = s0 = malloc(strlen(str));
+
+  while(*str) {
+    if(*str == '%' && isxdigit(str[1]) && isxdigit(str[2])) {
+      t[0] = str[1];
+      t[1] = str[2];
+      t[2] = 0;
+      u = strtoul(t, NULL, 16);
+      *s++ = u;
+      str += 3;
+    }
+    else {
+      *s++ = *str++;
+    }
+  }
+
+  *s = 0;
+
+  return s0;
+}
+
 
 
