@@ -995,10 +995,13 @@ int inst_read_yast_file()
 
       case key_root:
         root = 1;
-        if(!strcasecmp(f->value, "reboot"))
+        if(!strcasecmp(f->value, "reboot")) {
           reboot_ig = TRUE;
-        else
+        }
+        else {
           root_set_root(f->value);
+          reboot_ig = FALSE;
+        }
         break;
 
       case key_keytable:
