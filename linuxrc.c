@@ -98,6 +98,7 @@ static struct {
   { "echo",     util_echo_main    },
   { "ps",       util_ps_main      },
   { "cp",       util_cp_main      },
+  { "ls",       util_ls_main      },
   { "nothing",  util_nothing_main }
 };
 #endif

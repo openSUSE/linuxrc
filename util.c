@@ -20,6 +20,7 @@
 #include <sys/kd.h>
 #include <sys/utsname.h>
 #include <fcntl.h>
+#include <time.h>
 #include <syscall.h>
 #include <dirent.h>
 #include <errno.h>
@@ -1525,6 +1526,109 @@ int util_cp_main(int argc, char **argv)
   }
 
   return err;
+}
+
+
+int util_ls_main(int argc, char **argv)
+{
+  int full = 0, fulltime = 0;
+  char *src;
+  int i;
+  char buf[0x100], c, *s, *t;
+  struct stat sbuf;
+  struct dirent *de;
+  DIR *d;
+
+  argv++; argc--;
+
+  if(argc >= 1 && !strcmp(*argv, "-l")) {
+    argv++; argc--;
+    full = 1;
+  }
+
+  if(argc >= 1 && !strcmp(*argv, "--full-time")) {
+    argv++; argc--;
+    fulltime = 1;
+  }
+
+  src = argc ? *argv : ".";
+
+  if(!(d = opendir(src))) {
+    fprintf(stderr, "%s: No such file or directory\n", src);
+    return 1;
+  }
+
+  while((de = readdir(d))) {
+    if(full) {
+      sprintf(buf, "%s/%s", src, de->d_name);
+      i = lstat(buf, &sbuf);
+      if(i) {
+        printf("?????????  %s\n", de->d_name);
+      }
+      else {
+             if(S_ISREG(sbuf.st_mode))  c = '-';
+        else if(S_ISDIR(sbuf.st_mode))  c = 'd';
+        else if(S_ISLNK(sbuf.st_mode))  c = 'l';
+        else if(S_ISCHR(sbuf.st_mode))  c = 'c';
+        else if(S_ISBLK(sbuf.st_mode))  c = 'b';
+        else if(S_ISFIFO(sbuf.st_mode)) c = 'p';
+        else if(S_ISSOCK(sbuf.st_mode)) c = 's';
+        else c = '?';
+
+        t = NULL;
+        if(c == 'l') t = read_symlink(buf);
+
+        buf[10] = 0;
+        buf[0] = c;
+
+        buf[1] = (sbuf.st_mode & S_IRUSR) ? 'r' : '-';
+        buf[4] = (sbuf.st_mode & S_IRGRP) ? 'r' : '-';
+        buf[7] = (sbuf.st_mode & S_IROTH) ? 'r' : '-';
+        buf[2] = (sbuf.st_mode & S_IWUSR) ? 'w' : '-';
+        buf[5] = (sbuf.st_mode & S_IWGRP) ? 'w' : '-';
+        buf[8] = (sbuf.st_mode & S_IWOTH) ? 'w' : '-';
+        buf[3] = (sbuf.st_mode & S_IXUSR) ? 'x' : '-';
+        buf[6] = (sbuf.st_mode & S_IXGRP) ? 'x' : '-';
+        buf[9] = (sbuf.st_mode & S_IXOTH) ? 'x' : '-';
+        if((sbuf.st_mode & S_ISUID)) {
+          buf[3] = (sbuf.st_mode & S_IXUSR) ? 's' : 'S';
+        }
+        if((sbuf.st_mode & S_ISGID)) {
+          buf[6] = (sbuf.st_mode & S_IXGRP) ? 's' : 'S';
+        }
+        if((sbuf.st_mode & S_ISVTX)) {
+          buf[9] = (sbuf.st_mode & S_IXOTH) ? 't' : 'T';
+        }
+
+        s = ctime(&sbuf.st_mtime);
+        if(fulltime) {
+          s[24] = 0;
+        }
+        else {
+          s += 4; s[12] = 0;
+        }
+
+        printf("%s %4d %-8d %-8d %8ld %s %s",
+          buf,
+          (int) sbuf.st_nlink,
+          (int) sbuf.st_uid,
+          (int) sbuf.st_gid,
+          (long) sbuf.st_size,
+          s,
+          de->d_name
+        );
+        if(t) printf(" -> %s", t);
+        printf("\n");
+      }
+    }
+    else {
+      printf("%s\n", de->d_name);
+    }
+  }
+
+  closedir(d);
+
+  return 0;
 }
 
 

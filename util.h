@@ -58,6 +58,7 @@ extern void util_ps                (FILE *f);
 extern int  util_ps_main           (int argc, char **argv);
 extern int  util_cp_main           (int argc, char **argv);
 extern int  util_do_cp             (char *src, char *dst);
+extern int  util_ls_main           (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
 
 slist_t *slist_new(void);

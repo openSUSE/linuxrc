@@ -136,6 +136,7 @@ char *parse_line(char *buf)
       else {
         redirect(args);
         execvp(*args, args);
+        fprintf(stderr, "%s: command not found\n", *args);
         exit(127);
       }
     }
