@@ -173,8 +173,10 @@ typedef enum {
   nc_none, nc_static, nc_bootp, nc_dhcp
 } net_config_t;
 
+/* > 100 and <= 1000 */
+#define MAX_UPDATES		1000
 
-#define MAX_MODULE_TYPES 10
+#define MAX_MODULE_TYPES	10
 
 /* config.net.do_setup bitmasks */
 
@@ -285,6 +287,7 @@ typedef struct {
   char *product;		/* product name */
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
+  int escdelay;			/* timeout to differ esc from function keys */
   int loglevel;			/* set kernel log level */
   char *loghost;		/* syslog host */
   char *rootpassword;
@@ -294,13 +297,13 @@ typedef struct {
     char *dev;			/* device recently used for updates (if any) */
     unsigned count;		/* driver update count */
     unsigned next;		/* next driver update to do */
-    unsigned compat_last;	/* where last compat link pointed to (old style) */
-    unsigned compat;		/* where compat link points to (old style) */
     unsigned style:1;		/* 0: new style, 1: old style */
     unsigned ask:1;		/* 1: ask for update disk */
     unsigned shown:1;		/* 1: update dialog has been shown at least once */
     unsigned name_added:1;	/* set if driver update has a name */
     char *id;			/* current id, if any */
+    unsigned prio;		/* priority */
+    unsigned char *map;		/* track updates */
     slist_t *id_list;		/* list of updates */
     slist_t *name_list;		/* list of update names */
     slist_t **next_name;	/* points into name_list */
@@ -356,6 +359,8 @@ typedef struct {
     int min_yast;		/* minimum for yast */
     int min_yast_text;		/* minimum for yast in text mode */
     int load_image;		/* _load_ rootimage, if we have at least that much */
+    int ram;			/* ram size in MB */
+    int ram_min;		/* min required memory (ram size) needed for install in MB */
   } memory;
 
   struct {
