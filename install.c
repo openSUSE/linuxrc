@@ -837,6 +837,7 @@ int inst_start_install()
 
   get_file("/content", "/content");
   get_file("/media.1/info.txt", "/info.txt");
+  get_file("/part.info", "/part.info");
 
   return inst_execute_yast();
 }
