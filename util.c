@@ -114,26 +114,23 @@ static void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action);
 static void usbscsi_rename(void);
 static void usbscsi_rename_single(char *old_name, char *new_name);
 
-void util_redirect_kmsg (void)
-    {
-    int   fd_ii;
-    char  newvt_aci [2];
+void util_redirect_kmsg()
+{
+  static char newvt[2] = { 11, 4 /* console 4 */ };
+  int fd, loglevel;
 
+  loglevel = config.loglevel;
 
-    if (config.serial)
-        klogctl (8, 0, 1);
-    else
-        {
-        fd_ii = open (config.console, O_RDONLY);
-        if (fd_ii)
-            {
-            newvt_aci [0] = 11;
-            newvt_aci [1] = 4;
-            ioctl (fd_ii, TIOCLINUX, &newvt_aci);
-            close (fd_ii);
-            }
-        }
-    }
+  /* serial: default to 1 (no logging) */
+  if(!loglevel && config.serial) loglevel = 1;
+
+  if(loglevel) klogctl(8, NULL, loglevel);
+
+  if(!config.serial && (fd = open(config.console, O_RDONLY))) {
+    ioctl(fd, TIOCLINUX, &newvt);
+    close(fd);
+  }
+}
 
 
 void util_center_text (char *txt_tr, int size_iv)
@@ -3775,21 +3772,24 @@ void util_hwcheck()
 void util_set_serial_console(char *str)
 {
   slist_t *sl;
-  char buf[256];
+  char *s;
 
   if(!str || !*str) return;
+
+  /* not a serial console */
+  if(
+    !strncmp(str, "tty", 3) &&
+    (str[3] == 0 || (str[3] >= 0 && str[3] <= 9))
+  ) return;
 
   str_copy(&config.serial, str);
 
   sl = slist_split(',', config.serial);
 
   if(sl) {
-    if (strncmp("/dev/", sl->key, 5) == 0)
-      sprintf(buf, "%s", sl->key);
-    else
-      sprintf(buf, "/dev/%s", sl->key);
-    if(!config.console || strcmp(buf, config.console)) {
-      str_copy(&config.console, buf);
+    s = long_dev(sl->key);
+    if(!config.console || strcmp(s, config.console)) {
+      str_copy(&config.console, s);
       freopen(config.console, "r", stdin);
       freopen(config.console, "a", stdout);
     }

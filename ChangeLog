@@ -1,3 +1,11 @@
+13/9/2003:	v1.5.12
+	- write 'Console' entry to install.inf again (#29569, #30451)
+	- make line drawing chars work on serial console
+	- use *last* console arg for linuxrc (#18592)
+	- tty and tty%d are known not to be serial lines (#18592)
+	- 'loglevel' parameter can be used to change kernel log level (#18592)
+	- add translations for driver update menu entry (#30395)
+
 8/9/2003:	v1.5.11
 	- use time() *and* CLientHwAddr for xid calculation in dhcpcd (#29334)
 

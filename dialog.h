@@ -42,7 +42,8 @@ typedef enum {
   di_inst_system,
   di_inst_rescue,
   di_inst_eject,
-  di_inst_update,
+  di_inst_update_add,
+  di_inst_update_show,
 
   di_source_cdrom,
   di_source_net,

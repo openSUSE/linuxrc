@@ -36,7 +36,8 @@ typedef enum {
   key_lxrcdebug, key_kernel_pcmcia, key_liveconfig, key_useidescsi,
   key_updatename, key_updatestyle, key_updateid, key_updateask, key_initrd,
   key_vga, key_bootimage, key_ramdisksize, key_suse, key_showopts,
-  key_nosshkey, key_startshell, key_y2debug, key_ro, key_rw, key_netid
+  key_nosshkey, key_startshell, key_y2debug, key_ro, key_rw, key_netid,
+  key_loglevel
 } file_key_t;
 
 typedef enum {

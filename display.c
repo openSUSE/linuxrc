@@ -566,6 +566,10 @@ void disp_set_display()
       config.color = 2;
       break;
   }
+
+  if((config.serial || config.test) && !config.linemode) {
+    printf("\033)0");
+  }
 }
 
 

@@ -905,3 +905,11 @@ msgid ""
 "was installed on it."
 msgstr ""
 
+#. TXT_ADD_DRIVER_UPDATE
+msgid "Add Driver Update"
+msgstr ""
+
+#. TXT_SHOW_DRIVER_UPDATES
+msgid "Show Driver Updates"
+msgstr ""
+

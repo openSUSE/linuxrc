@@ -378,8 +378,8 @@ void mod_menu()
 
     items[i++] = txt_get(TXT_SHOW_MODULES);
     items[i++] = txt_get(TXT_DEL_MODULES);
-    items[i++] = "Add Driver Update";
-    items[i++] = "Show Driver Updates";
+    items[i++] = txt_get(TXT_ADD_DRIVER_UPDATE);
+    items[i++] = txt_get(TXT_SHOW_DRIVER_UPDATES);
 
     items[i] = NULL;
 

@@ -232,7 +232,6 @@ int inst_menu()
     di_inst_system,
     di_inst_rescue,
     di_inst_eject,
-//    di_inst_update,
     di_none
   };
 
@@ -286,13 +285,6 @@ int inst_menu_cb(dia_item_t di)
       util_eject_cdrom(config.cdrom);
       error = 1;
       break;
-
-#if 0
-    case di_inst_update:
-      inst_update_cd();
-      error = 1;
-      break;
-#endif
 
     default:
       break;

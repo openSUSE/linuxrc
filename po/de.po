@@ -977,3 +977,11 @@ msgstr ""
 "Entfernen Sie die Floppy nicht, wenn der Bootmanager "
 "darauf installiert wurde."
 
+#. TXT_ADD_DRIVER_UPDATE
+msgid "Add Driver Update"
+msgstr ""
+
+#. TXT_SHOW_DRIVER_UPDATES
+msgid "Show Driver Updates"
+msgstr ""
+

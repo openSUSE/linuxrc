@@ -82,7 +82,7 @@ static struct {
   { key_cdrom,          "Cdrom",          kf_none                        },
   { key_pcmcia,         "PCMCIA",         kf_none                        },
   { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
-  { key_console,        "Console",        kf_none                        },	/* tricky */
+  { key_console,        "Console",        kf_cmd                         },	/* tricky */
   { key_pliphost,       "PLIPHost",       kf_none                        },	/* drop it? */
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
@@ -202,7 +202,8 @@ static struct {
   { key_y2debug,        "y2debug",        kf_boot                        },
   { key_ro,             "ro",             kf_boot                        },
   { key_rw,             "rw",             kf_boot                        },
-  { key_netid,          "NetUniqueID",    kf_none                        }
+  { key_netid,          "NetUniqueID",    kf_none                        },
+  { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -1058,6 +1059,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.update.ask = f->nvalue;
         break;
 
+      case key_loglevel:
+        if(f->is.numeric) config.loglevel = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1561,17 +1566,20 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
 }
 
 
+/*
+ * Returns last matching entry.
+ */
 file_t *file_get_cmdline(file_key_t key)
 {
-  static file_t *cmdline = NULL, *ft;
+  static file_t *cmdline = NULL, *ft, *ft_ok = NULL;
 
   if(!cmdline) cmdline = file_read_cmdline(kf_cmd + kf_cmd_early);
 
   for(ft = cmdline; ft; ft = ft->next) {
-    if(ft->key == key) break;
+    if(ft->key == key) ft_ok = ft;
   }
 
-  return ft;
+  return ft_ok;
 }
 
 
