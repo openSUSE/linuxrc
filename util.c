@@ -516,7 +516,11 @@ void util_free_ramdisk (char *ramdisk_dev_tv)
     fd_ii = open (ramdisk_dev_tv, O_RDWR);
     if (fd_ii)
         {
-        ioctl (fd_ii, BLKFLSBUF);
+        if (ioctl (fd_ii, BLKFLSBUF))
+            fprintf (stderr, "Cannot free ramdisk memory\n");
+        else
+            fprintf (stderr, "Ramdisk memory successfully freed\n");
+
         close (fd_ii);
         }
     else
