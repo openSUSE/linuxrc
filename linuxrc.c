@@ -57,11 +57,14 @@ static void lxrc_memcheck      (void);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int is_rpc_prog         (pid_t pid);
+static void save_environment   (void);
 
 static pid_t  lxrc_mempid_rm;
 static int    lxrc_sig11_im = FALSE;
 static char **lxrc_argv;
 const char *lxrc_new_root;
+static char **saved_environment;
+extern char **environ;
 
 
 int main (int argc, char **argv, char **env)
@@ -105,6 +108,7 @@ int main (int argc, char **argv, char **env)
     else
         {
 	lxrc_argv = argv;
+	save_environment ();
         lxrc_init ();
         if (auto_ig)
             rc_ii = inst_auto_install ();
@@ -164,6 +168,18 @@ void lxrc_reboot (void)
         reboot (RB_AUTOBOOT);
     }
 
+static void save_environment (void)
+{
+    int i;
+
+    i = 0;
+    while (environ[i++])
+	;
+    saved_environment = malloc (i * sizeof (char *));
+    if (saved_environment)
+	memcpy (saved_environment, environ, i * sizeof (char *));
+}
+
 void lxrc_change_root (void)
 {
 #ifdef SYS_pivot_root
@@ -181,7 +197,7 @@ void lxrc_change_root (void)
     {
       close (0); close (1); close (2);
       chroot (".");
-      execv ("/sbin/init", lxrc_argv);
+      execve ("/sbin/init", lxrc_argv, saved_environment ? : environ);
     }
     else {
       chdir ("/");
