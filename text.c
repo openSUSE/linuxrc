@@ -43,7 +43,7 @@ char *txt_get (enum textid_t id_iv)
     int      i_ii = 0;
 
 
-    while (i_ii < NR_LANGUAGES && !found_ii)
+    while ((unsigned) i_ii < NR_LANGUAGES && !found_ii)
         if (alltexts_arm [i_ii].language == config.language)
             found_ii = TRUE;
         else
@@ -56,7 +56,7 @@ char *txt_get (enum textid_t id_iv)
 
     i_ii = 0;
     found_ii = FALSE;
-    while (!found_ii && i_ii < NR_TEXTS)
+    while (!found_ii && (unsigned) i_ii < NR_TEXTS)
         if (txt_pci [i_ii].id == id_iv)
             found_ii = TRUE;
         else
@@ -73,7 +73,7 @@ int txt_init (void)
     {
     int  i_ii;
 
-    for (i_ii = 0; i_ii < NR_LANGUAGES; i_ii++)
+    for (i_ii = 0; (unsigned) i_ii < NR_LANGUAGES; i_ii++)
         if (alltexts_arm [i_ii].nr_texts != NR_TEXTS)
             {
             fprintf (stderr, "Nr of texts in language %d: %d != %d\n",

@@ -1,5 +1,5 @@
 /*
- * cs_types.h 1.18 2000/06/12 21:55:40
+ * cs_types.h 1.20 2002/04/17 02:52:39
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -16,8 +16,8 @@
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
- * terms of the GNU Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
+ * terms of the GNU General Public License version 2 (the "GPL"), in
+ * which case the provisions of the GPL are applicable instead of the
  * above.  If you wish to allow the use of your version of this file
  * only under the terms of the GPL and not to allow others to use
  * your version of this file under the MPL, indicate your decision by
@@ -38,8 +38,13 @@
 #endif
 #endif
 
-typedef u_short	socket_t;
+#ifdef __arm__
+typedef u_int	ioaddr_t;
+#else
 typedef u_short	ioaddr_t;
+#endif
+
+typedef u_short	socket_t;
 typedef u_int	event_t;
 typedef u_char	cisdata_t;
 typedef u_short	page_t;

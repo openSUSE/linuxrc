@@ -428,7 +428,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
     width_ii = strlen (head_tv) + 6;
-    if (width_ii < strlen (items_arv [0].text) + 6)
+    if (width_ii < (ssize_t) strlen (items_arv [0].text) + 6)
         width_ii = strlen (items_arv [0].text) + 6;
 
     if (width_ii < MIN_WIN_SIZE)
@@ -499,7 +499,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     curr_button_pri = &yes_button_ri;
     win_button_select (curr_button_pri);
 
-    if (width_ii > strlen (items_arv [0].text) + 4)
+    if (width_ii > (ssize_t) strlen (items_arv [0].text) + 4)
         width_ii = strlen (items_arv [0].text) + 4;
     memset (&tmp_win_ri, 0, sizeof (window_t));
     tmp_win_ri.x_left = max_x_ig / 2 - width_ii / 2;
@@ -1176,7 +1176,7 @@ int dia_show_file (char *head_tv, char *file_tv, int eof_iv)
                 buffer_ti [i_ii] = ' ';
         strncpy (lines_ati [nr_lines_ii], buffer_ti, MAX_X - 1);
         lines_ati [nr_lines_ii][MAX_X - 1] = 0;
-        if (strlen (lines_ati [nr_lines_ii]) + 6 > width_ii)
+        if ((ssize_t) strlen (lines_ati [nr_lines_ii]) + 6 > width_ii)
             width_ii = strlen (lines_ati [nr_lines_ii]) + 6;
         util_fill_string (lines_ati [nr_lines_ii], MAX_X);
         nr_lines_ii++;
@@ -1389,7 +1389,7 @@ char *dia_get_text(dia_item_t di)
   int i;
   char *s = "";
 
-  for(i = 0; i < sizeof dia_texts / sizeof *dia_texts; i++) {
+  for(i = 0; (unsigned) i < sizeof dia_texts / sizeof *dia_texts; i++) {
     if(dia_texts[i].item == di) {
       s = dia_texts[i].text ?: txt_get(dia_texts[i].text_id);
       break;

@@ -52,7 +52,7 @@ sub read_texts
 
       $txt = $1;
 
-      push @txts, $txt if $ids;
+      push @txts, $txt;
 
       undef @msgid;
       undef @msgstr;
@@ -107,6 +107,38 @@ sub read_texts
     for (@txts) { print W "  $_,\n" }
     print W "  $p\n};\n";
     close W;
+  }
+  else {
+    open F, "text_textids.h";
+    for (<F>) {
+      if(/\s+(TXT_.+?)(\s|,)/) {
+        $txt_ref{$1} = undef;
+      }
+    }
+    close F;
+    for (@txts) {
+      $txt_list{$_}++;
+      $txt_multi{$_} = 1 if $txt_list{$_} > 1;
+    }
+    for (@txts) {
+      $txt_unknown{$_} = 1 unless exists $txt_ref{$_};
+    }
+    for (keys %txt_ref) {
+      $txt_miss{$_} = 1 unless exists $txt_list{$_};
+    }
+
+    if(defined(%txt_miss) || defined(%txt_unknown) || defined(%txt_multi)) {
+      print STDERR "$lang:\n";
+      for (sort keys %txt_miss) {
+        print STDERR "  missing: $_\n"
+      }
+      for (sort keys %txt_unknown) {
+        print STDERR "  unknown: $_\n"
+      }
+      for (sort keys %txt_multi) {
+        print STDERR "  multi: $_\n"
+      }
+    }
   }
 
 }

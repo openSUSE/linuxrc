@@ -400,7 +400,7 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
     strncpy (tmp_ti, input_tv, sizeof (tmp_ti));
     tmp_ti [sizeof (tmp_ti) - 1] = 0;
 
-    for (i_ii = 0; i_ii < strlen (tmp_ti); i_ii++)
+    for (i_ii = 0; i_ii < (int) strlen (tmp_ti); i_ii++)
         if (!isdigit (tmp_ti [i_ii]) && tmp_ti [i_ii] != '.')
             return (-1);
 
@@ -850,8 +850,8 @@ int net_choose_device()
   f0 = file_read_file("/proc/net/dev");
   if(!f0) return -1;
 
-  for(item_cnt = 0, f = f0; f && item_cnt < sizeof items / sizeof *items - 1; f = f->next) {
-    for(i = 0; i < sizeof net_dev / sizeof *net_dev; i++) {
+  for(item_cnt = 0, f = f0; f && (unsigned) item_cnt < sizeof items / sizeof *items - 1; f = f->next) {
+    for(i = 0; (unsigned) i < sizeof net_dev / sizeof *net_dev; i++) {
       if(strstr(f->key_str, net_dev[i].dev) == f->key_str) {
         sprintf(buf, "%-6s : %s", f->key_str, txt_get(net_dev[i].name));
         items[item_cnt++] = strdup(buf);
@@ -919,7 +919,7 @@ static void net_show_error(enum nfs_stat status_rv)
 
   s = NULL;
 
-  for(i = 0; i < sizeof nfs_err / sizeof *nfs_err; i++) {
+  for(i = 0; (unsigned) i < sizeof nfs_err / sizeof *nfs_err; i++) {
     if(nfs_err[i].stat == status_rv) {
       s = strerror(nfs_err[i].errnumber);
       break;

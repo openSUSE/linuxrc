@@ -1,7 +1,7 @@
 # SuSE release number, needed for driver update feature
-LX_REL	?= -DLX_REL=\"8.1\"
+LX_REL	?= -DLX_REL=\"8.2\"
 
-include pcmcia/config.mk
+# include pcmcia/config.mk
 
 TOPDIR	:= $(CURDIR)
 ARCH	:= $(shell uname -m)

@@ -923,8 +923,8 @@ msgstr "Insérez la disquette de modules %d."
 
 # TLABEL linuxrc_2002_03_29_0036__157
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD."
-msgstr "Vous trouverez des instructions pour la créer dans boot/README sur le CD1 ou le DVD."
+msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD1."
+msgstr "Vous trouverez des instructions pour la créer dans boot/README sur le CD1 ou le DVD1."
 
 # TLABEL linuxrc_2002_03_29_0036__158
 #. TXT_CHOOSE_NETSOURCE

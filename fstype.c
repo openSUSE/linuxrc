@@ -108,7 +108,7 @@ static int
 may_be_udf(const char *id) {
     char **m;
 
-    for (m = udf_magic; m - udf_magic < SIZE(udf_magic); m++)
+    for (m = udf_magic; m - udf_magic < (ssize_t) SIZE(udf_magic); m++)
        if (!strncmp(*m, id, 5))
 	  return 1;
     return 0;
@@ -397,7 +397,7 @@ fstype(const char *device) {
 	    rd = pagesize;
 	    if (rd < 8192)
 		    rd = 8192;
-	    if (rd > sizeof(buf))
+	    if (rd > (int) sizeof(buf))
 		    rd = sizeof(buf);
 	    if (lseek(fd, 0, SEEK_SET) != 0
 		|| read(fd, buf, rd) != rd)

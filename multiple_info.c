@@ -48,7 +48,7 @@ int	read_info_list_file(
 				strcpy(name_array[i],strtok(tmp_ptr,":"));
 				data_array[i].text=malloc(MULTI_MSG_LEN+1);
 				strcpy(data_array[i].text,strtok(NULL,":"));
-				if(strlen(data_array[i].text)>max_len){
+				if((ssize_t) strlen(data_array[i].text)>max_len){
 					max_len=strlen(data_array[i].text);
 				}
 				data_array[i].func=0;

@@ -1,5 +1,5 @@
 /*
- * driver_ops.h 1.15 2000/06/12 21:55:40
+ * driver_ops.h 1.17 2001/10/04 03:15:22
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -16,8 +16,8 @@
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
- * terms of the GNU Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
+ * terms of the GNU General Public License version 2 (the "GPL"), in
+ * which case the provisions of the GPL are applicable instead of the
  * above.  If you wish to allow the use of your version of this file
  * only under the terms of the GPL and not to allow others to use
  * your version of this file under the MPL, indicate your decision by
@@ -67,15 +67,6 @@ typedef struct driver_operations {
 
 int register_driver(struct driver_operations *ops);
 void unregister_driver(struct driver_operations *ops);
-
-#ifdef __BEOS__
-#define CB_ENABLER_MODULE_NAME	"bus_managers/cb_enabler/v1"
-typedef struct cb_enabler_module_info {
-    bus_manager_info	binfo;
-    int (*register_driver)(struct driver_operations *ops);
-    void (*unregister_driver)(struct driver_operations *ops);
-} cb_enabler_module_info;
-#endif /* __BEOS__ */
 
 #endif /* __KERNEL__ */
 

@@ -211,13 +211,13 @@ enum langid_t set_langidbyname(char *name)
 {
   int i, l;
 
-  for(i = 0; i < NR_LANGUAGES; i++) {
+  for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
     if(!strcasecmp(set_languages_arm[i].yastcode, name)) {
       return set_languages_arm[i].id;
     }
   }
 
-  for(i = 0; i < NR_LANGUAGES; i++) {
+  for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
     if(!strcasecmp(set_languages_arm[i].locale, name)) {
       return set_languages_arm[i].id;
     }
@@ -225,7 +225,7 @@ enum langid_t set_langidbyname(char *name)
 
   l = strlen(name);
   if(l) {
-    for(i = 0; i < NR_LANGUAGES; i++) {
+    for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
       if(
         !strncasecmp(set_languages_arm[i].locale, name, l) &&
         set_languages_arm[i].locale[l] == '_'
@@ -406,7 +406,7 @@ void set_choose_language()
   char *items[NR_LANGUAGES + 1];
   int i;
 
-  for(i = 0; i < NR_LANGUAGES; i++) {
+  for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
     items[i] = set_languages_arm[i].descr;
   }
   items[i] = NULL;
@@ -546,7 +546,7 @@ int set_get_current_language()
 {
   int i;
 
-  for(i = 0; i < NR_LANGUAGES; i++) {
+  for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
     if(set_languages_arm[i].id == config.language) return i + 1;
   }
 

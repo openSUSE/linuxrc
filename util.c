@@ -329,7 +329,7 @@ void util_update_kernellog (void)
     for (pos_ii = 0; pos_ii < size_ii; pos_ii++)
         {
         line_ti [i_ii] = buffer_ti [pos_ii];
-        if (line_ti [i_ii] == '\n' || i_ii >= sizeof (line_ti) - 2)
+        if (line_ti [i_ii] == '\n' || i_ii >= (int) sizeof (line_ti) - 2)
             {
             line_ti [i_ii + 1] = 0;
             if (line_ti [1] == '<')
@@ -744,7 +744,7 @@ int util_chk_driver_update(char *dir)
 
   if(mount("shmfs", driver_update_dir, "shm", 0, 0)) return 0;
 
-  for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
+  for(i = 0; (unsigned) i < sizeof copy_dir / sizeof *copy_dir; i++) {
     sprintf(inst_src, "%s%s/%s", dir, config.updatedir, copy_dir[i]);
     sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
     if(
@@ -777,7 +777,7 @@ int util_chk_driver_update(char *dir)
     if(config.tmpfs && util_check_exist(buf)) {
       fprintf(stderr, "copying modules\n");
       mod_copy_modules(mods_src, 1);
-      mod_init();
+      mod_init(1);
       sprintf(buf, "%s/hd.ids", mods_src);
       if(util_check_exist(buf)) {
         sprintf(buf, "cp %s/hd.ids /var/lib/hardware", mods_src);
@@ -1084,9 +1084,9 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "pcmcia = %d, pcmcia_chip = %s",
+    "pcmcia = %d, pcmcia_chip = \"%s\"",
     auto2_pcmcia(),
-    pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
+    pcmcia_driver(pcmcia_chip_ig)
   );
   slist_append_str(&sl0, buf);
 
@@ -1168,7 +1168,7 @@ void util_status_info()
   sprintf(buf, "inst_ramdisk = %d", config.inst_ramdisk);
   slist_append_str(&sl0, buf);
 
-  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
     if(config.ramdisk[i].inuse) {
       sprintf(buf, "ramdisk %s: %d kB",
         config.ramdisk[i].dev, (config.ramdisk[i].size + 1023) >> 10
@@ -1211,7 +1211,7 @@ char *read_symlink(char *file)
 
   i = readlink(file, buf, sizeof buf);
   buf[sizeof buf - 1] = 0;
-  if(i >= 0 && i < sizeof buf) buf[i] = 0;
+  if(i >= 0 && (unsigned) i < sizeof buf) buf[i] = 0;
   if(i < 0) *buf = 0;
 
   return buf;
@@ -2248,7 +2248,7 @@ void util_update_meminfo()
   int i;
   int rd_mem = 0;
 
-  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
     if(config.ramdisk[i].inuse) rd_mem += config.ramdisk[i].size;
   }
 
@@ -2279,6 +2279,32 @@ int util_mkdir_main(int argc, char **argv)
       return errno;
     }
     argv++;
+  }
+
+  return 0;
+}
+
+
+int util_chroot_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  if(argc) {
+    i = chroot(*argv);
+    if(i) {
+      fprintf(stderr, "chroot: "); perror(*argv);
+      return errno;
+    }
+    argv++;
+    argc--;
+    chdir("/");
+    i = argc ? execvp(*argv, argv) : execlp("sh", "/bin/sh", NULL);
+    if(i) {
+      fprintf(stderr, "chroot: "); perror(*argv);
+      return errno;
+    }
   }
 
   return 0;
@@ -2962,7 +2988,13 @@ int util_modprobe_main(int argc, char **argv)
 {
   argv++; argc--;
 
+  /* skip all options */
+  while(argc && **argv == '-') { argc--; argv++; }
+
   if(!argc) return fprintf(stderr, "usage: modprobe module [module params]\n"), 1;
+
+  str_copy(&config.module.dir, "/modules");
+  mod_init(0);
 
   return mod_modprobe(argv[0], argc > 1 ? argv[1] : NULL);
 }
@@ -3285,6 +3317,7 @@ void util_debugwait(char *msg)
 #endif
 }
 
+#if 0
 #include "hwcheck.h"
 
 void util_hwcheck()
@@ -3367,7 +3400,7 @@ void util_hwcheck()
 
   dia_message("Results saved", MSGTYPE_INFO);
 }
-
+#endif
 
 void util_set_serial_console(char *str)
 {
@@ -3554,7 +3587,7 @@ void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action)
                 }
                 fclose(f);
               }
-              if(attached && u2 < scsidevs) {
+              if(attached && u2 < (unsigned) scsidevs) {
                 scsidev[u2].usb = 1;
               }
             }
@@ -3661,7 +3694,7 @@ void usbscsi_rename_single(char *old_name, char *new_name)
   int i;
   char buf[16];
 
-  for(i = 0; i < sizeof config.floppy_dev / sizeof *config.floppy_dev; i++) {
+  for(i = 0; (unsigned) i < sizeof config.floppy_dev / sizeof *config.floppy_dev; i++) {
     if(config.floppy_dev[i] && !strcmp(config.floppy_dev[i] + 5, old_name)) {
       sprintf(buf, "/dev/%s", new_name);
       str_copy(&config.floppy_dev[i], buf);
@@ -3670,5 +3703,20 @@ void usbscsi_rename_single(char *old_name, char *new_name)
   if(config.floppydev && !strcmp(config.floppydev, old_name)) {
     str_copy(&config.floppydev, new_name);
   }
+}
+
+char *pcmcia_driver(int pcmcia_type)
+{
+  char *s;
+
+  switch(pcmcia_type) {
+    case 1:
+      s = "tcic"; break;
+    case 2: 
+    default:
+      s = config.kernel_pcmcia ? "yenta_socket" : "i82365";
+  }
+
+  return s;
 }
 

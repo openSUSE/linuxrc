@@ -1,3 +1,13 @@
+3/3/2003:	v1.4.43
+	- updated slovak & czech translations
+	- fixed some gcc warnings
+	- don't check for gateway config (#22430)
+	- added chroot command
+	- write alias lines for all net interfaces (#22444)
+	- updated cardmgr (#23839)
+	- support kernel-pcmcia
+	- fixed linuxrc modprobe
+
 18/2/2003:	v1.4.42
 	- fix for current bison (end all rules with ";")
 	- added new usb storage device handling code

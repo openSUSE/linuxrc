@@ -891,7 +891,7 @@ int inst_prepare()
   }
 
   if(!config.initrd_has_ldso && !config.test)
-    for(i = 0; i < sizeof links / sizeof *links; i++) {
+    for(i = 0; (unsigned) i < sizeof links / sizeof *links; i++) {
       if(!util_check_exist(links[i])) {
 	unlink(links[i]);
 	sprintf(link_source, "%s%s", config.instsys, links[i]);

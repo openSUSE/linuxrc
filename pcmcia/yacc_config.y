@@ -1,6 +1,6 @@
 %{
 /*
- * yacc_config.y 1.51 2000/06/12 21:33:02
+ * yacc_config.y 1.57 2002/08/19 03:19:56
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -17,8 +17,8 @@
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
- * terms of the GNU Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
+ * terms of the GNU General Public License version 2 (the "GPL"), in
+ * which case the provisions of the GPL are applicable instead of the
  * above.  If you wish to allow the use of your version of this file
  * only under the terms of the GPL and not to allow others to use
  * your version of this file under the MPL, indicate your decision by
@@ -27,8 +27,6 @@
  * provisions above, a recipient may use your version of this file
  * under either the MPL or the GPL.
  */
-
-#include "dietlibc.h"
     
 #include <stdlib.h>
 #include <stdarg.h>
@@ -53,7 +51,7 @@ extern int current_lineno;
 
 void yyerror(char *msg, ...);
 
-static int add_binding(card_info_t *card, char *name, int fn);
+static int add_binding(card_info_t *card, char *name, char *class, int fn);
 static int add_module(device_info_t *card, char *name);
 
 %}
@@ -62,7 +60,7 @@ static int add_module(device_info_t *card, char *name);
 %token BIND CIS TO NEEDS_MTD MODULE OPTS CLASS
 %token REGION JEDEC DTYPE DEFAULT MTD
 %token INCLUDE EXCLUDE RESERVE IRQ_NO PORT MEMORY
-%token STRING NUMBER
+%token STRING NUMBER SOURCE
 
 %union {
     char *str;
@@ -96,11 +94,11 @@ list:	  /* nothing */
 	| list mtd
 		{
 		    if ($2->mtd_type == 0) {
-			yyerror("no ID method for this card");
+			yyerror("no ID method for '%s'", $2->name);
 			YYERROR;
 		    }
 		    if ($2->module == NULL) {
-			yyerror("no MTD module specified");
+			yyerror("no MTD module for '%s'", $2->name);
 			YYERROR;
 		    }
 		    $2->next = root_mtd;
@@ -109,11 +107,11 @@ list:	  /* nothing */
 	| list card
 		{
 		    if ($2->ident_type == 0) {
-			yyerror("no ID method for this card");
+			yyerror("no ID method for '%s'", $2->name);
 			YYERROR;
 		    }
 		    if ($2->bindings == 0) {
-			yyerror("no function bindings");
+			yyerror("no driver bindings for '%s'", $2->name);
 			YYERROR;
 		    }
 		    if ($2->ident_type == FUNC_IDENT) {
@@ -126,6 +124,7 @@ list:	  /* nothing */
 		}
 	| list opts
 	| list mtd_opts
+	| list SOURCE
 	| list error
 	;
 
@@ -163,7 +162,7 @@ resource: IRQ_NO NUMBER
 	| PORT NUMBER '-' NUMBER
 		{
 		    if (($4 < $2) || ($4 > 0xffff)) {
-			yyerror("invalid port range");
+			yyerror("invalid port range 0x%x-0x%x", $2, $4);
 			YYERROR;
 		    }
 		    $$ = calloc(sizeof(adjust_list_t), 1);
@@ -174,7 +173,7 @@ resource: IRQ_NO NUMBER
 	| MEMORY NUMBER '-' NUMBER
 		{
 		    if ($4 < $2) {
-			yyerror("invalid address range");
+			yyerror("invalid address range 0x%x-0x%x", $2, $4);
 			YYERROR;
 		    }
 		    $$ = calloc(sizeof(adjust_list_t), 1);
@@ -214,8 +213,8 @@ card:	  CARD STRING
 
 anonymous: card ANONYMOUS
 		{
-		    if ($1->ident_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->ident_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    if (blank_card) {
@@ -229,8 +228,8 @@ anonymous: card ANONYMOUS
 
 tuple:	  card TUPLE NUMBER ',' NUMBER ',' STRING
 		{
-		    if ($1->ident_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->ident_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->ident_type = TUPLE_IDENT;
@@ -242,40 +241,42 @@ tuple:	  card TUPLE NUMBER ',' NUMBER ',' STRING
 
 manfid:	  card MANFID NUMBER ',' NUMBER
 		{
-		    if ($1->ident_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->ident_type & (EXCL_IDENT|MANFID_IDENT)) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
-		    $1->ident_type = MANFID_IDENT;
-		    $1->id.manfid.manf = $3;
-		    $1->id.manfid.card = $5;
-		} ;
+		    $1->ident_type |= MANFID_IDENT;
+		    $1->manfid.manf = $3;
+		    $1->manfid.card = $5;
+		}
+	;
 
 pci:	  card PCI NUMBER ',' NUMBER
 		{
-		    if ($1->ident_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->ident_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->ident_type = PCI_IDENT;
-		    $1->id.manfid.manf = $3;
-		    $1->id.manfid.card = $5;
-		} ;
+		    $1->manfid.manf = $3;
+		    $1->manfid.card = $5;
+		}
+	;
 
 version:  card VERSION STRING
 		{
-		    if ($1->ident_type != 0) {
-			yyerror("ID method already defined\n");
+		    if ($1->ident_type & (EXCL_IDENT|VERS_1_IDENT)) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
-		    $1->ident_type = VERS_1_IDENT;
+		    $1->ident_type |= VERS_1_IDENT;
 		    $1->id.vers.ns = 1;
 		    $1->id.vers.pi[0] = $3;
 		}
 	| version ',' STRING
 		{
 		    if ($1->id.vers.ns == 4) {
-			yyerror("too many version strings");
+			yyerror("too many version strings for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->id.vers.pi[$1->id.vers.ns] = $3;
@@ -285,8 +286,8 @@ version:  card VERSION STRING
 
 function: card FUNCTION NUMBER
 		{
-		    if ($1->ident_type != 0) {
-			yyerror("ID method already defined\n");
+		    if ($1->ident_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->ident_type = FUNC_IDENT;
@@ -300,22 +301,42 @@ cis:	  card CIS STRING
 
 bind:	  card BIND STRING
 		{
-		    if (add_binding($1, $3, 0) != 0)
+		    if (add_binding($1, $3, NULL, 0) != 0)
+			YYERROR;
+		}
+	| card BIND STRING CLASS STRING
+		{
+		    if (add_binding($1, $3, $5, 0) != 0)
 			YYERROR;
 		}
 	| card BIND STRING TO NUMBER
 		{
-		    if (add_binding($1, $3, $5) != 0)
+		    if (add_binding($1, $3, NULL, $5) != 0)
+			YYERROR;
+		}
+	| card BIND STRING CLASS STRING TO NUMBER
+		{
+		    if (add_binding($1, $3, $5, $7) != 0)
 			YYERROR;
 		}
 	| bind ',' STRING
 		{
-		    if (add_binding($1, $3, 0) != 0)
+		    if (add_binding($1, $3, NULL, 0) != 0)
+			YYERROR;
+		}
+	| bind ',' STRING CLASS STRING
+		{
+		    if (add_binding($1, $3, $5, 0) != 0)
 			YYERROR;
 		}
 	| bind ',' STRING TO NUMBER
 		{
-		    if (add_binding($1, $3, $5) != 0)
+		    if (add_binding($1, $3, NULL, $5) != 0)
+			YYERROR;
+		}
+	| bind ',' STRING CLASS STRING TO NUMBER
+		{
+		    if (add_binding($1, $3, $5, $7) != 0)
 			YYERROR;
 		}
 	;
@@ -342,7 +363,7 @@ opts:	  MODULE STRING OPTS STRING
 		    }
 		    free($2); free($4);
 		    if (!found) {
-			yyerror("module name not found!");
+			yyerror("module name '%s' not found", $2);
 			YYERROR;
 		    }
 		}
@@ -358,7 +379,8 @@ module:	  device MODULE STRING
 		    if ($1->opts[$1->modules-1] == NULL) {
 			$1->opts[$1->modules-1] = $3;
 		    } else {
-			yyerror("too many options");
+			yyerror("too many module options for '%s'",
+				$1->module[$1->modules-1]);
 			YYERROR;
 		    }
 		}
@@ -372,7 +394,7 @@ module:	  device MODULE STRING
 class:	  device CLASS STRING
 		{
 		    if ($1->class != NULL) {
-			yyerror("extra class string");
+			yyerror("extra class string '%s'", $3);
 			YYERROR;
 		    }
 		    $1->class = $3;
@@ -392,8 +414,8 @@ region:	  REGION STRING
 
 dtype:	  region DTYPE NUMBER
 		{
-		    if ($1->mtd_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->mtd_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->mtd_type = DTYPE_MTD;
@@ -403,8 +425,8 @@ dtype:	  region DTYPE NUMBER
 
 jedec:	  region JEDEC NUMBER NUMBER
 		{
-		    if ($1->mtd_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->mtd_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->mtd_type = JEDEC_MTD;
@@ -415,8 +437,8 @@ jedec:	  region JEDEC NUMBER NUMBER
 
 default:  region DEFAULT
 		{
-		    if ($1->mtd_type != 0) {
-			yyerror("ID method already defined");
+		    if ($1->mtd_type) {
+			yyerror("ID method already defined for '%s'", $1->name);
 			YYERROR;
 		    }
 		    if (default_mtd) {
@@ -431,7 +453,7 @@ default:  region DEFAULT
 mtd:	  region MTD STRING
 		{
 		    if ($1->module != NULL) {
-			yyerror("extra MTD entry");
+			yyerror("extra MTD entry for '%s'", $1->name);
 			YYERROR;
 		    }
 		    $1->module = $3;
@@ -441,7 +463,7 @@ mtd:	  region MTD STRING
 		    if ($1->opts == NULL) {
 			$1->opts = $3;
 		    } else {
-			yyerror("too many options");
+			yyerror("too many module options for '%s'", $1->module);
 			YYERROR;
 		    }
 		}
@@ -460,7 +482,7 @@ mtd_opts:  MTD STRING OPTS STRING
 		    }
 		    free($2); free($4);
 		    if (!found) {
-			yyerror("MTD name not found!");
+			yyerror("MTD name '%s' not found", $2);
 			YYERROR;
 		    }
 		}
@@ -473,7 +495,7 @@ void yyerror(char *msg, ...)
      char str[256];
 
      va_start(ap, msg);
-     sprintf(str, "config error, file '%s' line %d: ",
+     sprintf(str, "error in file '%s' line %d: ",
 	     current_file, current_lineno);
      vsprintf(str+strlen(str), msg, ap);
 #if YYDEBUG
@@ -484,7 +506,7 @@ void yyerror(char *msg, ...)
      va_end(ap);
 }
 
-static int add_binding(card_info_t *card, char *name, int fn)
+static int add_binding(card_info_t *card, char *name, char *class, int fn)
 {
     device_info_t *dev = root_device;
     if (card->bindings == MAX_BINDINGS) {
@@ -494,11 +516,13 @@ static int add_binding(card_info_t *card, char *name, int fn)
     for (; dev; dev = dev->next)
 	if (strcmp((char *)dev->dev_info, name) == 0) break;
     if (dev == NULL) {
-	yyerror("unknown device: %s", name);
+	yyerror("unknown device '%s'", name);
 	return -1;
     }
     card->device[card->bindings] = dev;
     card->dev_fn[card->bindings] = fn;
+    if (class)
+	card->class[card->bindings] = strdup(class);
     card->bindings++;
     free(name);
     return 0;
@@ -507,7 +531,7 @@ static int add_binding(card_info_t *card, char *name, int fn)
 static int add_module(device_info_t *dev, char *name)
 {
     if (dev->modules == MAX_MODULES) {
-	yyerror("too many modules");
+	yyerror("too many modules for '%s'", dev->dev_info);
 	return -1;
     }
     dev->module[dev->modules] = name;

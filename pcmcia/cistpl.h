@@ -1,5 +1,5 @@
 /*
- * cistpl.h 1.34 2000/06/19 23:18:12
+ * cistpl.h 1.35 2001/08/24 12:16:12
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -16,8 +16,8 @@
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
- * terms of the GNU Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
+ * terms of the GNU General Public License version 2 (the "GPL"), in
+ * which case the provisions of the GPL are applicable instead of the
  * above.  If you wish to allow the use of your version of this file
  * only under the terms of the GPL and not to allow others to use
  * your version of this file under the MPL, indicate your decision by

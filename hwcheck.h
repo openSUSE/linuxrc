@@ -280,7 +280,7 @@ static char *scanner_info(hd_t *hd)
 
   if(!hd->vendor.name || !hd->device.name) return NULL;
 
-  for(i = 0; i < sizeof scanner_data / sizeof *scanner_data; i++) {
+  for(i = 0; (unsigned) i < sizeof scanner_data / sizeof *scanner_data; i++) {
     if(
       !strcasecmp(scanner_data[i].vendor, hd->vendor.name) &&
       !strcasecmp(scanner_data[i].model, hd->device.name)
@@ -338,7 +338,7 @@ static int do_hwcheck()
 
   f = fopen("/tmp/hw_overview.log", "w");
 
-  for(i = 0; i < sizeof items / sizeof *items; i++) {
+  for(i = 0; (unsigned) i < sizeof items / sizeof *items; i++) {
     item = items[i];
     hd0 = hd_list(hd_data, item, 0, NULL);
 

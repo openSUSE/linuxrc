@@ -392,7 +392,7 @@ DEBG1("1 ");
         w += l;                 /* previous table always l bits */
 
         /* compute minimum size table less than or equal to l bits */
-        z = (z = g - w) > (unsigned)l ? l : z;  /* upper limit on table size */
+        z = (z = g - w) > (unsigned)l ? (unsigned)l : z;  /* upper limit on table size */
         if ((f = 1 << (j = k - w)) > a + 1)     /* try a k-w bit table */
         {                       /* too few codes for k-w bit table */
 DEBG1("2 ");
@@ -1027,7 +1027,7 @@ makecrc(void)
 
   /* Make exclusive-or pattern from polynomial */
   e = 0;
-  for (i = 0; i < sizeof(p)/sizeof(int); i++)
+  for (i = 0; (unsigned) i < sizeof(p)/sizeof(int); i++)
     e |= 1L << (31 - p[i]);
 
   crc_32_tab[0] = 0;
@@ -1159,7 +1159,7 @@ static int gunzip(void)
 	    error("crc error");
 	    return -1;
     }
-    if (orig_len != bytes_out) {
+    if (orig_len != (unsigned long) bytes_out) {
 	    error("length error");
 	    return -1;
     }

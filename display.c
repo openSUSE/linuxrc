@@ -320,7 +320,7 @@ void disp_write_string (char *string_tv)
         if (disp_state_im == DISP_ON)
             printf ("%s", string_tv);
 
-        for (i_ii = 0; i_ii < strlen (string_tv); i_ii++)
+        for (i_ii = 0; (unsigned) i_ii < strlen (string_tv); i_ii++)
             if (i_ii + disp_x_im <= max_x_ig)
                 {
                 disp_screen_aprm [disp_y_im - 1][i_ii + disp_x_im - 1].attr =

@@ -37,7 +37,7 @@ typedef enum {
   key_product, key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
   key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
   key_linemode, key_moduledelay, key_updatedir, key_usbscsi, key_useusbscsi,
-  key_lxrcdebug
+  key_lxrcdebug, key_kernel_pcmcia
 } file_key_t;
 
 typedef struct file_s {

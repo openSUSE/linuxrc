@@ -1,5 +1,5 @@
 /*
- * ds.h 1.56 2000/06/12 21:55:40
+ * ds.h 1.58 2001/10/04 03:15:22
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -16,8 +16,8 @@
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
- * terms of the GNU Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
+ * terms of the GNU General Public License version 2 (the "GPL"), in
+ * which case the provisions of the GPL are applicable instead of the
  * above.  If you wish to allow the use of your version of this file
  * only under the terms of the GPL and not to allow others to use
  * your version of this file under the MPL, indicate your decision by
@@ -142,21 +142,6 @@ int unregister_pccard_driver(dev_info_t *dev_info);
 
 #define register_pcmcia_driver register_pccard_driver
 #define unregister_pcmcia_driver unregister_pccard_driver
-
-#ifdef __BEOS__
-#define DS_MODULE_NAME "bus_managers/pcmcia_ds/v1"
-typedef struct ds_module_info {
-    bus_manager_info binfo;
-    int (*_register_pccard_driver)(dev_info_t *,
-				   dev_link_t *(*)(void),
-				   void (*)(dev_link_t *));
-    int (*_unregister_pccard_driver)(dev_info_t *);
-    struct driver_info_t **root_driver;
-    int *sockets;
-    struct socket_info_t **socket_table;
-    sem_id *list_sem;
-} ds_module_info;
-#endif /* __BEOS__ */
 
 #endif /* __KERNEL__ */
 

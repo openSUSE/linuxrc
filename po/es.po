@@ -758,8 +758,8 @@ msgid "Please insert modules disk %d."
 msgstr "Por favor introduzca el disquette de módulos %d."
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD."
-msgstr "Encontrará instrucciones sobre cómo crear uno en boot/README en el CD1 o DVD."
+msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD1."
+msgstr "Encontrará instrucciones sobre cómo crear uno en boot/README en el CD1 o DVD1."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Please choose the network protocol"

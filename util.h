@@ -66,6 +66,7 @@ extern int  util_lsmod_main        (int argc, char **argv);
 extern int  util_raidautorun_main  (int argc, char **argv);
 extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
+extern int  util_chroot_main       (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
 extern int  util_wget_main         (int argc, char **argv);
@@ -122,4 +123,5 @@ int util_usbscsi_main(int argc, char **argv);
 int usbscsi_change(int action);
 void usbscsi_off(void);
 void usbscsi_on(void);
+char *pcmcia_driver(int pcmcia_type);
 

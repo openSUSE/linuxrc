@@ -2,7 +2,7 @@
 
     PCMCIA Card Manager daemon
 
-    cardmgr.c 1.139 2000/06/12 21:33:02
+    cardmgr.c 1.180 2002/10/13 19:18:10
 
     The contents of this file are subject to the Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
@@ -19,8 +19,8 @@
     are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
 
     Alternatively, the contents of this file may be used under the
-    terms of the GNU Public License version 2 (the "GPL"), in which
-    case the provisions of the GPL are applicable instead of the
+    terms of the GNU General Public License version 2 (the "GPL"), in
+    which case the provisions of the GPL are applicable instead of the
     above.  If you wish to allow the use of your version of this file
     only under the terms of the GPL and not to allow others to use
     your version of this file under the MPL, indicate your decision
@@ -30,12 +30,6 @@
     file under either the MPL or the GPL.
     
 ======================================================================*/
-
-#include "dietlibc.h"
-
-#ifndef __linux__
-#include <pcmcia/u_compat.h>
-#endif
 
 #include <sys/types.h>
 #include <stdio.h>
@@ -47,6 +41,7 @@
 #include <syslog.h>
 #include <getopt.h>
 #include <signal.h>
+#include <stdarg.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
@@ -65,19 +60,20 @@
 
 /*====================================================================*/
 
-// #define syslog my_syslog
-
 typedef struct socket_info_t {
     int			fd;
     int			state;
     card_info_t		*card;
     bind_info_t		*bind[MAX_BINDINGS];
     mtd_ident_t		*mtd[2*CISTPL_MAX_DEVICES];
+    cistpl_funcid_t	funcid;
+    cistpl_manfid_t	manfid;
+    cistpl_vers_1_t	prodid;
 } socket_info_t;
 
 #define SOCKET_PRESENT	0x01
 #define SOCKET_READY	0x02
-#define SOCKET_BOUND	0x04
+#define SOCKET_HOTPLUG	0x04
 
 /* Linked list of resource adjustments */
 struct adjust_list_t *root_adjust = NULL;
@@ -111,12 +107,15 @@ static char *configpath = "/etc/pcmcia";
 #endif
 
 /* Default path for pid file */
-char *pidfile = "/var/run/cardmgr.pid";
+static char *pidfile = "/var/run/cardmgr.pid";
 
-#ifdef __linux__
 /* Default path for finding modules */
 static char *modpath = NULL;
-#endif
+
+/*zoz*/
+static char *modsubdir = NULL;
+static int use_mysubdir = 0;
+/*ozo*/
 
 /* Default path for socket info table */
 static char *stabfile;
@@ -133,9 +132,9 @@ static int one_pass = 0;
 /* Extra message logging? */
 static int verbose = 0;
 
-/*====================================================================*/
+#define EITHER_OR(a, b) ((a) ? (a) : (b))
 
-#ifdef __linux__
+/*====================================================================*/
 
 static int major = 0;
 
@@ -162,33 +161,35 @@ static int lookup_dev(char *name)
 
 int open_dev(dev_t dev, int mode)
 {
-    char *fn;
+    static char *paths[] = {
+	"/var/lib/pcmcia", "/var/run", "/dev", "/tmp", NULL
+    };
+    static int nd = 0;
+    char **p, fn[64];
     int fd;
-    if ((fn = tmpnam(NULL)) == NULL)
-	return -1;
-    if (mknod(fn, mode, dev) != 0)
-	return -1;
-    fd = open(fn, (mode&S_IWRITE)?O_RDWR:O_RDONLY);
-    if (fd < 0)
-	fd = open(fn, O_NONBLOCK|((mode&S_IWRITE)?O_RDWR:O_RDONLY));
-    unlink(fn);
-    return fd;
-}
 
-#endif /* __linux__ */
+    int o_mode = (mode & S_IWRITE) ? O_RDWR : O_RDONLY;
+    for (p = paths; *p; p++) {
+	sprintf(fn, "%s/cm-%d-%d", *p, getpid(), nd++);
+	if (mknod(fn, mode, dev) == 0) {
+	    fd = open(fn, o_mode);
+	    if (fd < 0)
+		fd = open(fn, O_NONBLOCK|o_mode);
+	    unlink(fn);
+	    if (fd >= 0)
+		return fd;
+	    if (errno == ENODEV)
+		break;
+	}
+
+    }
+    return -1;
+}
 
 int open_sock(int sock, int mode)
 {
-#ifdef __linux__
     dev_t dev = (major<<8)+sock;
     return open_dev(dev, mode);
-#endif
-#ifdef __BEOS__
-    int fd;
-    char fn[B_OS_NAME_LENGTH];
-    sprintf(fn, "/dev/pcmcia/sock%d", sock);
-    return open(fn, (mode & S_IWRITE) ? O_RDWR: O_RDONLY);
-#endif
 }
 
 /*======================================================================
@@ -199,12 +200,9 @@ int open_sock(int sock, int mode)
     
 ======================================================================*/
 
-#ifdef __linux__
-
 #include <linux/major.h>
 #include <scsi/scsi.h>
-#define VERSION(v,p,s) (((v)<<16)+(p<<8)+s)
-#if (LINUX_VERSION_CODE < VERSION(2,1,126))
+#ifndef SCSI_DISK0_MAJOR
 #define SCSI_DISK0_MAJOR SCSI_DISK_MAJOR
 #endif
 
@@ -247,7 +245,6 @@ static int xlate_scsi_name(bind_info_t *bind)
     }
     return -1;
 }
-#endif
 
 /*====================================================================*/
 
@@ -255,8 +252,6 @@ static int xlate_scsi_name(bind_info_t *bind)
 #define BEEP_OK   1000
 #define BEEP_WARN 2000
 #define BEEP_ERR  4000
-
-#ifdef __linux__
 
 #include <sys/kd.h>
 
@@ -274,15 +269,6 @@ static void beep(unsigned int ms, unsigned int freq)
     close(fd);
     usleep(ms*1000);
 }
-
-#endif /* __linux__ */
-
-#ifdef __BEOS__
-static void beep(unsigned int ms, unsigned int freq)
-{
-    if (!be_quiet) system("/bin/beep");
-}
-#endif
 
 /*====================================================================*/
 
@@ -310,26 +296,29 @@ static void write_stab(void)
 	syslog(LOG_WARNING, "fopen(stabfile) failed: %m");
 	return;
     }
-#ifndef __BEOS__
     if (flock(fileno(f), LOCK_EX) != 0) {
 	syslog(LOG_ERR, "flock(stabfile) failed: %m");
 	return;
     }
-#endif
     for (i = 0; i < sockets; i++) {
 	s = &socket[i];
-	if (!(s->state & SOCKET_PRESENT))
-	    fprintf(f, "Socket %d: empty\n", i);
-	else if (!s->card)
-	    fprintf(f, "Socket %d: unsupported card\n", i);
-	else {
-	    fprintf(f, "Socket %d: %s\n", i, s->card->name);
+	fprintf(f, "Socket %d: ", i);
+	if (!(s->state & SOCKET_PRESENT)) {
+	    fprintf(f, "empty\n");
+	} else if (s->state & SOCKET_HOTPLUG) {
+	    fprintf(f, "CardBus hotplug device\n");
+	} else if (!s->card) {
+	    fprintf(f, "unsupported card\n");
+	} else {
+	    fprintf(f, "%s\n", s->card->name);
 	    for (j = 0; j < s->card->bindings; j++)
 		for (k = 0, bind = s->bind[j];
 		     bind != NULL;
 		     k++, bind = bind->next) {
+		    char *class = s->card->class[j];
+		    if (!class) class = s->card->device[j]->class;
 		    fprintf(f, "%d\t%s\t%s\t%d\t%s",
-			    i, s->card->device[j]->class,
+			    i, (class ? class : "none"),
 			    bind->dev_info, k, bind->name);
 		    if (bind->major)
 			fprintf(f, "\t%d\t%d\n",
@@ -340,9 +329,7 @@ static void write_stab(void)
 	}
     }
     fflush(f);
-#ifndef __BEOS__
     flock(fileno(f), LOCK_UN);
-#endif
     fclose(f);
 }
 
@@ -368,11 +355,35 @@ static int get_tuple(int ns, cisdata_t code, ds_ioctl_arg_t *arg)
     return 0;
 }
 
+/*======================================================================
+
+    For configurations with the standalone PCMCIA modules, this is
+    used to get PCI device ID's for CardBus cards.
+
+======================================================================*/
+
+typedef struct pci_id {
+    u_short vendor, device;
+    struct pci_id *next;
+} pci_id_t;
+
+static int get_pci_id(int ns, pci_id_t *id)
+{
+    socket_info_t *s = &socket[ns];
+    config_info_t config;
+
+    config.Function = config.ConfigBase = 0;
+    if ((ioctl(s->fd, DS_GET_CONFIGURATION_INFO, &config) != 0) ||
+	(config.IntType != INT_CARDBUS) || !config.ConfigBase)
+	return 0;
+    id->vendor = config.ConfigBase & 0xffff;
+    id->device = config.ConfigBase >> 16;
+    return 1;
+}
+
 /*====================================================================*/
 
-static void log_card_info(cistpl_vers_1_t *vers,
-			  cistpl_manfid_t *manfid,
-			  cistpl_funcid_t *funcid)
+static void log_card_info(socket_info_t *s, pci_id_t *pci_id)
 {
     char v[256] = "";
     int i;
@@ -381,35 +392,39 @@ static void log_card_info(cistpl_vers_1_t *vers,
 	"video", "network", "AIMS", "SCSI"
     };
     
-    if (vers) {
-	for (i = 0; i < vers->ns; i++)
+    if (s->prodid.ns) {
+	for (i = 0; i < s->prodid.ns; i++)
 	    sprintf(v+strlen(v), "%s\"%s\"",
-		    (i>0) ? ", " : "", vers->str+vers->ofs[i]);
+		    (i>0) ? ", " : "", s->prodid.str+s->prodid.ofs[i]);
 	syslog(LOG_INFO, "  product info: %s", v);
     } else {
 	syslog(LOG_INFO, "  no product info available");
     }
     *v = '\0';
-    if (manfid->manf != 0)
+    if (s->manfid.manf != 0)
 	sprintf(v, "  manfid: 0x%04x, 0x%04x",
-		manfid->manf, manfid->card);
-    if (funcid->func != 0xff)
-	sprintf(v+strlen(v), "  function: %d (%s)", funcid->func,
-		fn[funcid->func]);
+		s->manfid.manf, s->manfid.card);
+    if (s->funcid.func != 0xff)
+	sprintf(v+strlen(v), "  function: %d (%s)", s->funcid.func,
+		fn[s->funcid.func]);
     if (strlen(v) > 0) syslog(LOG_INFO, "%s", v);
+    if (pci_id->vendor != 0)
+	syslog(LOG_INFO, "  PCI id: 0x%04x, 0x%04x",
+	       pci_id->vendor, pci_id->device);
 }
 
 static card_info_t *lookup_card(int ns)
 {
     socket_info_t *s = &socket[ns];
-    card_info_t *card;
+    card_info_t *card = NULL;
     ds_ioctl_arg_t arg;
-    cistpl_vers_1_t *vers = NULL;
-    cistpl_manfid_t manfid = { 0, 0 };
-    cistpl_funcid_t funcid = { 0xff, 0xff };
+    pci_id_t pci_id = { 0, 0 };
     cs_status_t status;
-    int i, ret, match;
-    int has_cis = 0;
+    int i, ret, has_cis = 0;
+
+    s->manfid = (cistpl_manfid_t) { 0, 0 };
+    s->funcid = (cistpl_funcid_t) { 0xff, 0xff };
+    s->prodid = (cistpl_vers_1_t) { 0, 0, 0 };
 
     /* Do we have a CIS structure? */
     ret = ioctl(s->fd, DS_VALIDATE_CIS, &arg);
@@ -420,93 +435,102 @@ static card_info_t *lookup_card(int ns)
 	/* rule of thumb: cards with no FUNCID, but with common memory
 	   device geometry information, are probably memory cards */
 	if (get_tuple(ns, CISTPL_FUNCID, &arg) == 0)
-	    memcpy(&funcid, &arg.tuple_parse.parse.funcid,
-		   sizeof(funcid));
+	    s->funcid = arg.tuple_parse.parse.funcid;
 	else if (get_tuple(ns, CISTPL_DEVICE_GEO, &arg) == 0)
-	    funcid.func = CISTPL_FUNCID_MEMORY;
+	    s->funcid.func = CISTPL_FUNCID_MEMORY;
 	if (get_tuple(ns, CISTPL_MANFID, &arg) == 0)
-	    memcpy(&manfid, &arg.tuple_parse.parse.manfid,
-		   sizeof(manfid));
+	    s->manfid = arg.tuple_parse.parse.manfid;
 	if (get_tuple(ns, CISTPL_VERS_1, &arg) == 0)
-	    vers = &arg.tuple_parse.parse.version_1;
+	    s->prodid = arg.tuple_parse.parse.version_1;
 
-	match = 0;
 	for (card = root_card; card; card = card->next) {
-	    switch (card->ident_type) {
-		
-	    case VERS_1_IDENT:
-		if (vers == NULL)
-		    break;
+
+	    if (card->ident_type &
+		~(VERS_1_IDENT|MANFID_IDENT|TUPLE_IDENT))
+		continue;
+
+	    if (card->ident_type & VERS_1_IDENT) {
+		if (!s->prodid.ns)
+		    continue;
 		for (i = 0; i < card->id.vers.ns; i++) {
 		    if (strcmp(card->id.vers.pi[i], "*") == 0)
 			continue;
-		    if (i >= vers->ns)
+		    if (i >= s->prodid.ns)
 			break;
 		    if (strcmp(card->id.vers.pi[i],
-			       vers->str+vers->ofs[i]) != 0)
+			       s->prodid.str+s->prodid.ofs[i]) != 0)
 			break;
 		}
 		if (i < card->id.vers.ns)
-		    break;
-		match = 1;
-		break;
-
-	    case MANFID_IDENT:
-		if ((manfid.manf == card->id.manfid.manf) &&
-		    (manfid.card == card->id.manfid.card))
-		    match = 1;
-		break;
+		    continue;
+	    }
+	    
+	    if (card->ident_type & MANFID_IDENT) {
+		if ((s->manfid.manf != card->manfid.manf) ||
+		    (s->manfid.card != card->manfid.card))
+		    continue;
+	    }
 		
-	    case TUPLE_IDENT:
+	    if (card->ident_type & TUPLE_IDENT) {
 		arg.tuple.DesiredTuple = card->id.tuple.code;
 		arg.tuple.Attributes = 0;
 		ret = ioctl(s->fd, DS_GET_FIRST_TUPLE, &arg);
-		if (ret != 0) break;
+		if (ret != 0) continue;
 		arg.tuple.TupleOffset = card->id.tuple.ofs;
 		ret = ioctl(s->fd, DS_GET_TUPLE_DATA, &arg);
-		if (ret != 0) break;
+		if (ret != 0) continue;
 		if (strncmp((char *)arg.tuple_parse.data,
 			    card->id.tuple.info,
 			    strlen(card->id.tuple.info)) != 0)
-		    break;
-		match = 1;
-		break;
-
-	    default:
-		/* Skip */
-		break;
+		    continue;
 	    }
-	    if (match) break;
+
+	    break; /* we have a match */
 	}
-	if (match) {
-	    syslog(LOG_INFO, "socket %d: %s", ns, card->name);
-	    beep(BEEP_TIME, BEEP_OK);
-	    if (verbose) log_card_info(vers, &manfid, &funcid);
-	    return card;
+    }
+
+    /* Check PCI vendor/device info */
+    status.Function = 0;
+    ioctl(s->fd, DS_GET_STATUS, &status);
+    if (status.CardState & CS_EVENT_CB_DETECT) {
+	if (get_pci_id(ns, &pci_id)) {
+	    if (!card) {
+		for (card = root_card; card; card = card->next)
+		    if ((card->ident_type == PCI_IDENT) &&
+			(pci_id.vendor == card->manfid.manf) &&
+			(pci_id.device == card->manfid.card))
+			break;
+	    }
+	} else {
+	    /* this is a 2.4 kernel; hotplug handles these cards */
+	    s->state |= SOCKET_HOTPLUG;
+	    syslog(LOG_INFO, "socket %d: CardBus hotplug device", ns);
+	    //beep(BEEP_TIME, BEEP_OK);
+	    return NULL;
 	}
     }
 
     /* Try for a FUNCID match */
-    if (funcid.func != 0xff) {
+    if (!card && (s->funcid.func != 0xff)) {
 	for (card = root_func; card; card = card->next)
-	    if (card->id.func.funcid == funcid.func)
+	    if (card->id.func.funcid == s->funcid.func)
 		break;
-	if (card) {
-	    syslog(LOG_INFO, "socket %d: %s", ns, card->name);
-	    beep(BEEP_TIME, BEEP_OK);
-	    if (verbose) log_card_info(vers, &manfid, &funcid);
-	    return card;
-	}
     }
 
-    status.Function = 0;
-    if ((ioctl(s->fd, DS_GET_STATUS, &status) != 0) ||
-	(status.CardState & CS_EVENT_CB_DETECT) ||
-	manfid.manf || manfid.card || vers || !blank_card) {
+    if (card) {
+	syslog(LOG_INFO, "socket %d: %s", ns, card->name);
+	beep(BEEP_TIME, BEEP_OK);
+	if (verbose) log_card_info(s, &pci_id);
+	return card;
+    }
+
+    if (!blank_card || (status.CardState & CS_EVENT_CB_DETECT) ||
+	s->manfid.manf || s->manfid.card || s->prodid.ns || pci_id.vendor) {
 	syslog(LOG_INFO, "unsupported card in socket %d", ns);
 	if (one_pass) return NULL;
 	beep(BEEP_TIME, BEEP_ERR);
-	log_card_info(vers, &manfid, &funcid);
+	log_card_info(s, &pci_id);
+	write_stab();
 	return NULL;
     } else {
 	card = blank_card;
@@ -550,6 +574,9 @@ static void free_card(card_info_t *card)
 	default:
 	    break;
 	}
+	for (i = 0; i < card->bindings; i++)
+	    if (card->class[i])
+		free(card->class[i]);
 	free(card);
     }
 }
@@ -618,8 +645,9 @@ static int execute(char *msg, char *cmd)
     int ret;
     FILE *f;
     char line[256];
-    
+
     syslog(LOG_INFO, "executing: '%s'", cmd);
+    strcat(cmd, " 2>&1");
     f = popen(cmd, "r");
     while (fgets(line, 255, f)) {
 	line[strlen(line)-1] = '\0';
@@ -641,27 +669,60 @@ static int execute(char *msg, char *cmd)
 
 static int execute_on_dev(char *action, char *class, char *dev)
 {
-    char msg[128], cmd[512];
+    /* Fixed length strings are ok here */
+    char msg[128], cmd[128];
 
     sprintf(msg, "%s cmd", action);
     sprintf(cmd, "./%s %s %s", class, action, dev);
     return execute(msg, cmd);
 }
 
+static void eprintf(char *name, char *fmt, ...)
+{
+    va_list args;
+    char s[32];
+    va_start(args, fmt);
+    vsprintf(s, fmt, args);
+    setenv(name, s, 1);
+    va_end(args);
+}
+
 static int execute_on_all(char *cmd, char *class, int sn, int fn)
 {
     socket_info_t *s = &socket[sn];
     bind_info_t *bind;
-    int ret = 0;
-    for (bind = s->bind[fn]; bind != NULL; bind = bind->next)
-	if (bind->name[2] != '#')
+    int i, k, ret = 0;
+    char m[10];
+
+    eprintf("MANFID", "%04x,%04x", s->manfid.manf, s->manfid.card);
+    eprintf("FUNCID", "%d", s->funcid.func);
+    for (i = 0; i < 4; i++) {
+	sprintf(m, "PRODID_%d", i+1);
+	if (i < s->prodid.ns)
+	    setenv(m, s->prodid.str+s->prodid.ofs[i], 1);
+	else
+	    unsetenv(m);
+    }
+    eprintf("SOCKET", "%d", sn);
+
+    for (k = 0, bind = s->bind[fn]; bind != NULL; k++, bind = bind->next)
+	if (bind->name[0] && (bind->name[2] != '#')) {
+	    setenv("CLASS", class, 1);
+	    setenv("DRIVER", bind->dev_info, 1);
+	    eprintf("INSTANCE", "%d", k);
+	    if (bind->major) {
+		eprintf("MAJOR", "%d", bind->major);
+		eprintf("MINOR", "%d", bind->minor);
+	    } else {
+		unsetenv("MAJOR");
+		unsetenv("MINOR");
+	    }
 	    ret |= execute_on_dev(cmd, class, bind->name);
+	}
     return ret;
 }
 
 /*====================================================================*/
-
-#ifdef __linux__
 
 typedef struct module_list_t {
     char *mod;
@@ -673,24 +734,56 @@ static module_list_t *module_list = NULL;
 
 static int try_insmod(char *mod, char *opts)
 {
-    char cmd[128], *s = strrchr(mod, '/');
-    sprintf(cmd, "insmod %s", (s) ? s+1 : mod);
+/*zoz*/
+/*  char *cmd = malloc(strlen(mod) + strlen(modpath) +*/
+    char *cmd = malloc(strlen(mod) + strlen(modpath) + strlen(modsubdir) +
+		       (opts ? strlen(opts) : 0) + 30);
+    int ret;
+
+/*  strcpy(cmd, "insmod ");*/
+    strcpy(cmd, "insmod -v ");
+/*  if (strchr(mod, '/') != NULL)*/
+    if (strchr(mod, '/') != NULL && !use_mysubdir)
+/*      sprintf(cmd+7, "%s/%s.o", modpath, mod);*/
+        sprintf(cmd+10, "%s/%s.o", modpath, mod);
+    else
+/*      sprintf(cmd+7, "%s/pcmcia/%s.o", modpath, mod);*/
+        sprintf(cmd+10, "%s/%s/%s.o", modpath, modsubdir, mod);
+/*  if (access(cmd+7, R_OK) != 0) {*/
+    if (access(cmd+10, R_OK) != 0) {
+/*      syslog(LOG_INFO, "module %s not available", cmd+7);*/
+        syslog(LOG_INFO, "module %s not available", cmd+10);
+/*ozo*/
+	free(cmd);
+	return -1;
+    }
     if (opts) {
 	strcat(cmd, " ");
 	strcat(cmd, opts);
     }
-    return execute("insmod", cmd);
+    ret = execute("insmod", cmd);
+    free(cmd);
+    return ret;
 }
 
 static int try_modprobe(char *mod, char *opts)
 {
-    char cmd[128], *s = strrchr(mod, '/');
-    sprintf(cmd, "modprobe %s", (s) ? s+1 : mod);
+/*zoz*/
+/*  char *cmd = malloc(strlen(mod) + (opts ? strlen(opts) : 0) + 20);*/
+    char *cmd = malloc(strlen(mod) + (opts ? strlen(opts) : 0) + 23);
+    char *s = strrchr(mod, '/');
+    int ret;
+
+/*  sprintf(cmd, "modprobe %s", (s) ? s+1 : mod);*/
+    sprintf(cmd, "modprobe -v %s", (s) ? s+1 : mod);
+/*ozo*/
     if (opts) {
 	strcat(cmd, " ");
 	strcat(cmd, opts);
     }
-    return execute("modprobe", cmd);
+    ret = execute("modprobe", cmd);
+    free(cmd);
+    return ret;
 }
 
 static void install_module(char *mod, char *opts)
@@ -710,7 +803,6 @@ static void install_module(char *mod, char *opts)
     if (ml->usage != 1)
 	return;
 
-#ifdef __linux__
     if (access("/proc/bus/pccard/drivers", R_OK) == 0) {
 	FILE *f = fopen("/proc/bus/pccard/drivers", "r");
 	if (f) {
@@ -727,7 +819,6 @@ static void install_module(char *mod, char *opts)
 	    fclose(f);
 	}
     }
-#endif
 
     if (do_modprobe) {
 	if (try_modprobe(mod, opts) != 0)
@@ -756,24 +847,6 @@ static void remove_module(char *mod)
 	}
     }
 }
-
-#endif /* __linux__ */
-
-/*====================================================================*/
-
-#ifdef __BEOS__
-
-#define install_module(a,b)
-#define remove_module(a)
-
-static void republish_driver(char *mod)
-{
-    int fd = open("/dev", O_RDWR);
-    write(fd, mod, strlen(mod));
-    close(fd);
-}
-
-#endif /* __BEOS__ */
 
 /*====================================================================*/
 
@@ -830,7 +903,7 @@ static void bind_mtd(int sn)
 		    mtd->refs++;
 		    nr++;
 		}
-		syslog(LOG_INFO, "  %s memory region at 0x%lx: %s",
+		syslog(LOG_INFO, "  %s memory region at 0x%x: %s",
 		       attr ? "Attribute" : "Common", region.CardOffset,
 		       mtd->name);
 		/* Bind MTD to this region */
@@ -839,7 +912,7 @@ static void bind_mtd(int sn)
 		mtd_info.CardOffset = region.CardOffset;
 		if (ioctl(s->fd, DS_BIND_MTD, &mtd_info) != 0) {
 		    syslog(LOG_INFO,
-			   "bind MTD '%s' to region at 0x%lx failed: %m",
+			   "bind MTD '%s' to region at 0x%x failed: %m",
 			   (char *)mtd_info.dev_info, region.CardOffset);
 		}
 	    }
@@ -851,6 +924,7 @@ static void bind_mtd(int sn)
     /* Now bind each unique MTD as a normal client of this socket */
     for (i = 0; i < nr; i++) {
 	strcpy(bind.dev_info, s->mtd[i]->module);
+	bind.function = 0;
 	if (ioctl(s->fd, DS_BIND_REQUEST, &bind) != 0)
 	    syslog(LOG_INFO, "bind MTD '%s' to socket %d failed: %m",
 		   (char *)bind.dev_info, sn);
@@ -886,9 +960,13 @@ static void do_insert(int sn)
     /* Already identified? */
     if ((s->card != NULL) && (s->card != blank_card))
 	return;
-    
-    syslog(LOG_INFO, "initializing socket %d", sn);
+
+    if (verbose) syslog(LOG_INFO, "initializing socket %d", sn);
     card = lookup_card(sn);
+    if (s->state & SOCKET_HOTPLUG) {
+	write_stab();
+	return;
+    }
     /* Make sure we've learned something new before continuing */
     if (card == s->card)
 	return;
@@ -905,14 +983,12 @@ static void do_insert(int sn)
     if (i < card->bindings)
 	bind_mtd(sn);
 
-#ifdef __linux__
     /* Install kernel modules */
     for (i = 0; i < card->bindings; i++) {
 	dev[i]->refs++;
 	for (j = 0; j < dev[i]->modules; j++)
 	    install_module(dev[i]->module[j], dev[i]->opts[j]);
     }
-#endif
     
     /* Bind drivers by their dev_info identifiers */
     for (i = 0; i < card->bindings; i++) {
@@ -935,10 +1011,6 @@ static void do_insert(int sn)
 	    }
 	}
 
-#ifdef __BEOS__
-	republish_driver(dev[i]->module[0]);
-#endif
-
 	for (ret = j = 0; j < 10; j++) {
 	    ret = ioctl(s->fd, DS_GET_DEVICE_INFO, bind);
 	    if ((ret == 0) || (errno != EAGAIN))
@@ -948,6 +1020,12 @@ static void do_insert(int sn)
 	if (ret != 0) {
 	    syslog(LOG_INFO, "get dev info on socket %d failed: %m",
 		   sn);
+	    if ((errno == EAGAIN) &&
+		(strcmp(dev[i]->module[dev[i]->modules-1],
+			(char *)bind->dev_info) != 0))
+		syslog(LOG_INFO, "wrong module '%s' for device '%s'?",
+		       dev[i]->module[dev[i]->modules-1],
+		       (char *)bind->dev_info);
 	    ioctl(s->fd, DS_UNBIND_REQUEST, bind);
 	    beep(BEEP_TIME, BEEP_ERR);
 	    write_stab();
@@ -956,11 +1034,8 @@ static void do_insert(int sn)
 	tail = &s->bind[i];
 	while (ret == 0) {
 	    bind_info_t *old;
-#ifdef __linux__
-	    if ((strlen(bind->name) > 3) &&
-		(bind->name[2] == '#'))
+	    if ((strlen(bind->name) > 3) && (bind->name[2] == '#'))
 		xlate_scsi_name(bind);
-#endif
 	    old = *tail = bind; tail = (bind_info_t **)&bind->next;
 	    bind = (bind_info_t *)malloc(sizeof(bind_info_t));
 	    memcpy(bind, old, sizeof(bind_info_t));
@@ -971,13 +1046,12 @@ static void do_insert(int sn)
     }
 
     /* Run "start" commands */
-    for (i = ret = 0; i < card->bindings; i++)
-	if (dev[i]->class)
-	    ret |= execute_on_all("start", dev[i]->class, sn, i);
-    if (ret)
-	beep(BEEP_TIME, BEEP_ERR);
-    else
-	beep(BEEP_TIME, BEEP_OK);
+    for (i = ret = 0; i < card->bindings; i++) {
+	char *class = EITHER_OR(card->class[i], dev[i]->class);
+	if (class)
+	    ret |= execute_on_all("start", class, sn, i);
+    }
+    beep(BEEP_TIME, (ret) ? BEEP_ERR : BEEP_OK);
     
 }
 
@@ -988,7 +1062,7 @@ static int do_check(int sn)
     socket_info_t *s = &socket[sn];
     card_info_t *card;
     device_info_t **dev;
-    int i, ret;
+    int i;
 
     card = s->card;
     if (card == NULL)
@@ -997,11 +1071,9 @@ static int do_check(int sn)
     /* Run "check" commands */
     dev = card->device;
     for (i = 0; i < card->bindings; i++) {
-	if (dev[i]->class) {
-	    ret = execute_on_all("check", dev[i]->class, sn, i);
-	    if (ret != 0)
-		return CS_IN_USE;
-	}
+	char *class = EITHER_OR(card->class[i], dev[i]->class);
+	if (class && execute_on_all("check", class, sn, i))
+	    return CS_IN_USE;
     }
     return 0;
 }
@@ -1016,18 +1088,18 @@ static void do_remove(int sn)
     bind_info_t *bind;
     int i, j;
 
+    if (verbose) syslog(LOG_INFO, "shutting down socket %d", sn);
+
     card = s->card;
     if (card == NULL)
 	goto done;
-    
-    syslog(LOG_INFO, "shutting down socket %d", sn);
-    
+
     /* Run "stop" commands */
     dev = card->device;
     for (i = 0; i < card->bindings; i++) {
-	if (dev[i]->class) {
-	    execute_on_all("stop", dev[i]->class, sn, i);
-	}
+	char *class = EITHER_OR(card->class[i], dev[i]->class);
+	if (class)
+	    execute_on_all("stop", class, sn, i);
     }
 
     /* unbind driver instances */
@@ -1046,6 +1118,7 @@ static void do_remove(int sn)
     for (i = 0; (s->mtd[i] != NULL); i++) {
 	bind_info_t b;
 	strcpy(b.dev_info, s->mtd[i]->module);
+	b.function = 0;
 	if (ioctl(s->fd, DS_UNBIND_REQUEST, &b) != 0)
 	    syslog(LOG_INFO, "unbind MTD '%s' from socket %d failed: %m",
 		   s->mtd[i]->module, sn);
@@ -1078,18 +1151,16 @@ static void do_suspend(int sn)
     socket_info_t *s = &socket[sn];
     card_info_t *card;
     device_info_t **dev;
-    int i, ret;
+    int i;
     
     card = s->card;
     if (card == NULL)
 	return;
     dev = card->device;
     for (i = 0; i < card->bindings; i++) {
-	if (dev[i]->class) {
-	    ret = execute_on_all("suspend", dev[i]->class, sn, i);
-	    if (ret != 0)
-		beep(BEEP_TIME, BEEP_ERR);
-	}
+	char *class = EITHER_OR(card->class[i], dev[i]->class);
+	if (class && execute_on_all("suspend", class, sn, i))
+	    beep(BEEP_TIME, BEEP_ERR);
     }
 }
 
@@ -1100,18 +1171,16 @@ static void do_resume(int sn)
     socket_info_t *s = &socket[sn];
     card_info_t *card;
     device_info_t **dev;
-    int i, ret;
+    int i;
     
     card = s->card;
     if (card == NULL)
 	return;
     dev = card->device;
     for (i = 0; i < card->bindings; i++) {
-	if (dev[i]->class) {
-	    ret = execute_on_all("resume", dev[i]->class, sn, i);
-	    if (ret != 0)
-		beep(BEEP_TIME, BEEP_ERR);
-	}
+	char *class = EITHER_OR(card->class[i], dev[i]->class);
+	if (class && execute_on_all("resume", class, sn, i))
+	    beep(BEEP_TIME, BEEP_ERR);
     }
 }
 
@@ -1188,15 +1257,11 @@ static void adjust_resources(void)
     
 /*====================================================================*/
 
-static int cleanup_files = 0;
-
 static void fork_now(void)
 {
     int ret;
-    if ((ret = fork()) > 0) {
-	cleanup_files = 0;
-	exit(0);
-    }
+    if ((ret = fork()) > 0)
+	_exit(0);
     if (ret == -1)
 	syslog(LOG_ERR, "forking: %m");
     if (setsid() < 0)
@@ -1206,10 +1271,8 @@ static void fork_now(void)
 static void done(void)
 {
     syslog(LOG_INFO, "exiting");
-    if (cleanup_files) {
-	unlink(pidfile);
-	unlink(stabfile);
-    }
+    unlink(pidfile);
+    unlink(stabfile);
 }
 
 /*====================================================================*/
@@ -1255,9 +1318,7 @@ static void handle_signal(void)
 static int init_sockets(void)
 {
     int fd, i;
-    servinfo_t serv;
 
-#ifdef __linux__
     major = lookup_dev("pcmcia");
     if (major < 0) {
 	if (major == -ENODEV)
@@ -1266,7 +1327,6 @@ static int init_sockets(void)
 	    syslog(LOG_ERR, "could not open /proc/devices: %m");
 	exit(EXIT_FAILURE);
     }
-#endif
     for (fd = -1, i = 0; i < MAX_SOCKS; i++) {
 	fd = open_sock(i, S_IFCHR|S_IREAD|S_IWRITE);
 	if (fd < 0) break;
@@ -1277,18 +1337,14 @@ static int init_sockets(void)
 	syslog(LOG_ERR, "open_sock(socket %d) failed: %m", i);
     sockets = i;
     if (sockets == 0) {
-	syslog(LOG_ERR, "no sockets found!");
+	if (errno == ENODEV)
+	    syslog(LOG_ERR, "no sockets found!");
+	else if (errno == EBUSY)
+	    syslog(LOG_ERR, "another cardmgr is already running?");
 	return -1;
     } else
 	syslog(LOG_INFO, "watching %d sockets", sockets);
 
-    if (ioctl(socket[0].fd, DS_GET_CARD_SERVICES_INFO, &serv) == 0) {
-//	if (serv.Revision != CS_RELEASE_CODE)
-//	    syslog(LOG_INFO, "Card Services release does not match");
-    } else {
-	syslog(LOG_ERR, "could not get CS revision info!");
-	return -1;
-    }
     adjust_resources();
     return 0;
 }
@@ -1308,12 +1364,19 @@ int cardmgr_main(int argc, char *argv[])
     } else {
 	stabfile = "/var/run/stab";
     }
+/*zoz*/
+/*we have to use insmod because of our two module dirs*/
+/*    do_modprobe = (access("/sbin/modprobe", X_OK) == 0);*/
+/*ozo*/
 
     errflg = 0;
-    while ((optch = getopt(argc, argv, "Vqdvofc:m:p:s:")) != -1) {
+/*zoz*/
+/*  while ((optch = getopt(argc, argv, "Vqdvofc:m:p:s:")) != -1) {*/
+    while ((optch = getopt(argc, argv, "Vqdvofc:m:n:p:s:")) != -1) {
+/*ozo*/
 	switch (optch) {
 	case 'V':
-	    fprintf(stderr, "cardmgr version " CS_RELEASE "\n");
+	    fprintf(stderr, "cardmgr version " CS_PKG_RELEASE "\n");
 	    return 0;
 	    break;
 	case 'q':
@@ -1326,12 +1389,17 @@ int cardmgr_main(int argc, char *argv[])
 	    delay_fork = 1; break;
 	case 'c':
 	    configpath = strdup(optarg); break;
-#ifdef __linux__
 	case 'd':
+/*zoz*/
 	    do_modprobe = 1; break;
+/*ozo*/
 	case 'm':
 	    modpath = strdup(optarg); break;
-#endif
+/*zoz*/
+	case 'n':
+	    modsubdir = strdup(optarg);
+	    use_mysubdir = 1; break;
+/*ozo*/
 	case 'p':
 	    pidfile = strdup(optarg); break;
 	case 's':
@@ -1341,26 +1409,23 @@ int cardmgr_main(int argc, char *argv[])
 	}
     }
     if (errflg || (optind < argc)) {
-	fprintf(stderr, "usage: %s [-V] [-q] [-v] [-d] [-o] [-f] "
-		"[-c configpath] [-m modpath]\n               "
+	fprintf(stderr, "usage: %s [-V] [-q] [-v] [-o] [-f] "
+/*zoz*/
+/*		"[-c configpath] [-m modpath]\n               " */
+		"[-c configpath] [-m modpath] [-n modsubdir]\n               "
+/*ozo*/
 		"[-p pidfile] [-s stabfile]\n", argv[0]);
 	exit(EXIT_FAILURE);
     }
 
-#ifdef DEBUG
     openlog("cardmgr", LOG_PID|LOG_PERROR, LOG_DAEMON);
-#else
-    openlog("cardmgr", LOG_PID|LOG_PERROR, LOG_DAEMON);
-    close(0); close(1); // close(2);
-    if (!delay_fork && !one_pass)
-	fork_now();
-#endif
     
-    syslog(LOG_INFO, "starting, version is " CS_RELEASE);
-    atexit(&done);
     putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin");
+    if (verbose)
+	putenv("VERBOSE=1");
+    if (one_pass)
+	putenv("ONEPASS=1");
 
-#ifdef __linux__
     if (modpath == NULL) {
 	if (access("/lib/modules/preferred", X_OK) == 0)
 	    modpath = "/lib/modules/preferred";
@@ -1376,19 +1441,34 @@ int cardmgr_main(int argc, char *argv[])
     }
     if (access(modpath, X_OK) != 0)
 	syslog(LOG_INFO, "cannot access %s: %m", modpath);
+/*zoz*/
+    if (modsubdir == NULL) {
+       modsubdir = "pcmcia";
+       use_mysubdir = 0;
+    }
+    syslog(LOG_INFO, "modpath = %s", modpath);
+    syslog(LOG_INFO, "modsubdir = %s", modsubdir);
     /* We default to using modprobe if it is available */
-    do_modprobe |= (access("/sbin/modprobe", X_OK) == 0);
-#endif /* __linux__ */
+/*  No, we don't, because we have two modsubdirs!!!*/
+/*  do_modprobe |= (access("/sbin/modprobe", X_OK) == 0);*/
+/*ozo*/
     
     load_config();
     
     if (init_sockets() != 0)
 	exit(EXIT_FAILURE);
 
+    closelog();
+    close(0); close(1); close(2);
+    if (!delay_fork && !one_pass)
+	fork_now();
+    openlog("cardmgr", LOG_PID|LOG_CONS, LOG_DAEMON);
+    syslog(LOG_INFO, "starting, version is " CS_PKG_RELEASE);
+
     /* If we've gotten this far, then clean up pid and stab at exit */
+    atexit(&done);
     write_pid();
     write_stab();
-    cleanup_files = 1;
     
     if (signal(SIGHUP, catch_signal) == SIG_ERR)
 	syslog(LOG_ERR, "signal(SIGHUP): %m");
@@ -1400,7 +1480,7 @@ int cardmgr_main(int argc, char *argv[])
     if (signal(SIGPWR, catch_signal) == SIG_ERR)
 	syslog(LOG_ERR, "signal(SIGPWR): %m");
 #endif
-    
+
     for (i = max_fd = 0; i < sockets; i++)
 	max_fd = (socket[i].fd > max_fd) ? socket[i].fd : max_fd;
 
@@ -1437,13 +1517,13 @@ int cardmgr_main(int argc, char *argv[])
 	    
 	    switch (event) {
 	    case CS_EVENT_CARD_REMOVAL:
-		socket[i].state &= ~(SOCKET_PRESENT | SOCKET_READY);
+		socket[i].state = 0;
 		do_remove(i);
 		break;
 	    case CS_EVENT_EJECTION_REQUEST:
 		ret = do_check(i);
 		if (ret == 0) {
-		    socket[i].state &= ~(SOCKET_PRESENT | SOCKET_READY);
+		    socket[i].state = 0;
 		    do_remove(i);
 		}
 		write(socket[i].fd, &ret, 4);
@@ -1473,6 +1553,7 @@ int cardmgr_main(int argc, char *argv[])
 	if (delay_fork) {
 	    fork_now();
 	    write_pid();
+	    delay_fork = 0;
 	}
 	
     } /* repeat */

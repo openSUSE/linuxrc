@@ -199,7 +199,8 @@ static struct {
   { key_updatedir,      "UpdateDir"        },
   { key_usbscsi,        "USBSCSI"          },
   { key_useusbscsi,     "UseUSBSCSI"       },
-  { key_lxrcdebug,      "LXRCDebug"        }
+  { key_lxrcdebug,      "LXRCDebug"        },
+  { key_kernel_pcmcia,  "KernelPCMCIA"     }
 };
 
 static struct {
@@ -238,7 +239,7 @@ char *file_key2str(file_key_t key)
 {
   int i;
 
-  for(i = 0; i < sizeof keywords / sizeof *keywords; i++) {
+  for(i = 0; (unsigned) i < sizeof keywords / sizeof *keywords; i++) {
     if(keywords[i].key == key) {
       return keywords[i].value;
     }
@@ -268,7 +269,7 @@ file_key_t file_str2key(char *str)
 
   if(!*str) return key_none;
 
-  for(i = 0; i < sizeof keywords / sizeof *keywords; i++) {
+  for(i = 0; (unsigned) i < sizeof keywords / sizeof *keywords; i++) {
     if(!strcasecmp(keywords[i].value, str)) {
       return keywords[i].key;
     }
@@ -282,7 +283,7 @@ int sym2index(char *sym)
 {
   int i;
 
-  for(i = 0; i < sizeof sym_constants / sizeof *sym_constants; i++) {
+  for(i = 0; (unsigned) i < sizeof sym_constants / sizeof *sym_constants; i++) {
     if(!strcasecmp(sym_constants[i].name, sym)) return i;
   }
 
@@ -306,7 +307,7 @@ char *file_num2sym(char *base_sym, int num)
 
   i = sym2index(base_sym);
 
-  if(i < 0 || num < 0 || i + num >= sizeof sym_constants / sizeof *sym_constants) {
+  if(i < 0 || num < 0 || (unsigned) i + num >= sizeof sym_constants / sizeof *sym_constants) {
     return NULL;
   }
 
@@ -1129,7 +1130,7 @@ void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num)
 
   i = sym2index(base_sym);
 
-  if(i < 0 || num < 0 || i + num >= sizeof sym_constants / sizeof *sym_constants) {
+  if(i < 0 || num < 0 || (unsigned) i + num >= sizeof sym_constants / sizeof *sym_constants) {
     file_write_num(f, key, num);
   }
 
@@ -1152,6 +1153,7 @@ void file_write_install_inf(char *dir)
 {
   FILE *f;
   char file_name[256], *s;
+  slist_t *sl;
 
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
@@ -1173,10 +1175,14 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_cdrom, config.cdrom);
   if(
     (config.insttype == inst_net || (config.vnc || config.usessh)) &&
-    *netdevice_tg &&
-    (s = net_if2module(netdevice_tg))
+    *netdevice_tg
+    /* && (s = net_if2module(netdevice_tg)) */
   ) {
-    fprintf(f, "%s: %s %s\n", file_key2str(key_alias), netdevice_tg, s);
+    for(sl = config.net.devices; sl; sl = sl->next) {
+      if(sl->key && sl->value) {
+      fprintf(f, "%s: %s %s\n", file_key2str(key_alias), sl->key, sl->value);
+      }
+    }
   }
 
   if(*ppcd_tg) {
@@ -1186,7 +1192,7 @@ void file_write_install_inf(char *dir)
 
 #if WITH_PCMCIA
   if(pcmcia_chip_ig == 1 || pcmcia_chip_ig == 2) {
-    file_write_str(f, key_pcmcia, pcmcia_chip_ig == 1 ? "tcic" : "i82365");
+    file_write_str(f, key_pcmcia, pcmcia_driver(pcmcia_chip_ig));
   }
 #endif
 
@@ -1618,7 +1624,7 @@ module_t *file_read_modinfo(char *name)
 
       if(*current == ',') current++;
     }
-    while(*current && fields < sizeof field / sizeof *field);
+    while(*current && (unsigned) fields < sizeof field / sizeof *field);
 
     if(fields == 1) {
       if(*(s = *field ) == '[' && (i = strlen(s)) && s[i - 1] == ']') {

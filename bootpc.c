@@ -7,8 +7,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.10 $
-  $Date: 2002/01/24 16:59:26 $
+  $Revision: 1.11 $
+  $Date: 2003/03/03 17:27:51 $
 */
 
 #include "dietlibc.h"
@@ -311,7 +311,7 @@ int performBootp(char *device,
       }
       cookielength = 64 + plen - sizeof(struct bootp) ;
       
-      if (bootp_recv->bp_xid == rancopy) {
+      if (bootp_recv->bp_xid == (uint32_t) rancopy) {
 	if (!received_packet) {
 	  /* If we haven't already recieved a packet then set the time to wait
 	     further to be now + time user specified */

@@ -183,7 +183,7 @@ void mod_free_modules()
 /*
  * openprom, nvram
  */
-void mod_init()
+void mod_init(int autoload)
 {
   char tmp[256];
   module_t *ml;
@@ -197,9 +197,11 @@ void mod_init()
   sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
 
-  for(ml = config.module.list; ml; ml = ml->next) {
-    if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
-      mod_insmod(ml->name, ml->param);
+  if(autoload) {
+    for(ml = config.module.list; ml; ml = ml->next) {
+      if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
+        mod_insmod(ml->name, ml->param);
+      }
     }
   }
 }
@@ -235,7 +237,7 @@ void mod_update_list()
     i = strlen(de->d_name);
     if(
       i >= 3 &&
-      i < sizeof buf &&
+      i < (int) sizeof buf &&
       de->d_name[i - 2] == '.' &&
       de->d_name[i - 1] == 'o'
     ) {
@@ -545,7 +547,7 @@ int mod_add_disk(int prompt, int type)
         ramdisk_free(config.module.ramdisk);
         config.module.ramdisk = -1;
       }
-      mod_init();
+      mod_init(1);
     }
   }
 
@@ -557,7 +559,7 @@ int mod_add_disk(int prompt, int type)
     sprintf(buf, "%s/" MODULE_CONFIG, config.mountpoint.floppy);
     file_read_modinfo(buf);
   }
-  mod_init();
+  mod_init(1);
 
   umount(config.mountpoint.floppy);
 
@@ -973,12 +975,12 @@ int mod_load_pcmcia()
 
   mod_param_text = buf;
 
-  sprintf(buf, txt_get(TXT_FOUND_PCMCIA), type == 1 ? "tcic" : "i82365");
+  sprintf(buf, txt_get(TXT_FOUND_PCMCIA), pcmcia_driver(type));
   ok = mod_load_modules("pcmcia_core", 1);
 
   if(ok) {
-    sprintf(buf, txt_get(TXT_PCMCIA_PARAMS), type == 1 ? "tcic" : "i82365");
-    ok = mod_load_modules(type == 1 ? "tcic" : "i82365", 1);
+    sprintf(buf, txt_get(TXT_PCMCIA_PARAMS), pcmcia_driver(type));
+    ok = mod_load_modules(pcmcia_driver(type), 1);
   }
 
   mod_param_text = NULL;
@@ -987,7 +989,7 @@ int mod_load_pcmcia()
 
   if(ok) {
     dia_status_on(&status, txt_get(TXT_START_CARDMGR));
-    system("cardmgr -v -m /modules >&2");
+    system("cardmgr -v -m /modules -n \"\" >&2");
     for(i = 0; i <= 100; i++) {
       dia_status(&status, i++);
       usleep(100000);
@@ -1024,8 +1026,8 @@ int mod_load_pcmcia()
 int mod_pcmcia_chipset()
 {
   char *items[] = {
-    "tcic",
-    "i82365",
+    pcmcia_driver(1),
+    pcmcia_driver(2),
     NULL
   };
   static int last_item = 0;

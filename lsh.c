@@ -97,7 +97,7 @@ char *parse_line(char *buf)
       if(arg_len == -1 && c != ';') continue;
       if(arg_len != -1) {
         arg[arg_len] = 0;
-        if(arg_cnt < sizeof args / sizeof *args - 1) {
+        if(arg_cnt < (int) (sizeof args / sizeof *args) - 1) {
           args[arg_cnt++] = strdup(arg);
           args[arg_cnt] = NULL;
         }
@@ -125,7 +125,7 @@ char *parse_line(char *buf)
         }
       }
       if(arg_len == -1) arg_len = 0;
-      if(arg_len < sizeof arg - 1) {
+      if(arg_len < (int) sizeof arg - 1) {
         arg[arg_len++] = c;
       }
     }
@@ -183,7 +183,7 @@ int do_internal(int argc, char **argv)
 {
   int i;
 
-  for(i = 0; i < sizeof internal_cmd / sizeof *internal_cmd; i++) {
+  for(i = 0; (unsigned) i < sizeof internal_cmd / sizeof *internal_cmd; i++) {
     if(!strcmp(*argv, internal_cmd[i].name)) {
       last_exit = internal_cmd[i].func(argc, argv);
       return 1;

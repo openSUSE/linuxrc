@@ -56,10 +56,10 @@
 #define  LXRC_DEBUG
 
 #ifdef LXRC_DEBUG
-# define deb_wait if(config.debugwait) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
-# define deb_msg(a) fprintf(stderr, __FUNCTION__ ":%u %s\n", __LINE__, a)
-# define deb_str(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = \"%s\"\n", __LINE__, a)
-# define deb_int(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = %d\n", __LINE__, a)
+# define deb_wait if(config.debugwait) printf("%s:%d: Press a key...\n", __func__, __LINE__), getchar()
+# define deb_msg(a) fprintf(stderr, "%s:%u %s\n", __func__, __LINE__, a)
+# define deb_str(a) fprintf(stderr, "%s:%u " #a " = \"%s\"\n", __func__, __LINE__, a)
+# define deb_int(a) fprintf(stderr, "%s:%u " #a " = %d\n", __func__, __LINE__, a)
 #else
 # define deb_wait
 # define deb_msg(a)
@@ -223,6 +223,7 @@ typedef struct {
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
   unsigned use_usbscsi:1;	/* use new usb storage handling code */
+  unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
   pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */

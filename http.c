@@ -194,7 +194,7 @@ int http_connect(inet_t *server, char *name, char *proto, inet_t *proxy, int ser
   }
 
   if(atoi(buf + 9) != 200) {
-    for(i = 9; i < sizeof buf; i++) {
+    for(i = 9; i < (int) sizeof buf; i++) {
       if(buf[i] == '\n' || buf[i] == '\r') buf[i] = 0;
       if(!buf[i]) break;
     }

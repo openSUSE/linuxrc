@@ -760,8 +760,8 @@ msgid "Please insert modules disk %d."
 msgstr "Kérem tegye be a(z) %d modulok lemezt."
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD."
-msgstr "Az elsõ CD-n (vagy DVD-n) a disks/REAdme fájlban talál információt arról, hogy hogyan készítse el. "
+msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD1."
+msgstr "Az elsõ CD-n (vagy DVD1-n) a disks/REAdme fájlban talál információt arról, hogy hogyan készítse el. "
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Please choose the network protocol"

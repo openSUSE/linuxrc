@@ -121,6 +121,7 @@ static struct {
   { "mv",          util_mv_main          },
   { "ln",          util_ln_main          },
   { "mkdir",       util_mkdir_main       },
+  { "chroot",      util_chroot_main      },
   { "kill",        util_kill_main        },
   { "bootpc",      util_bootpc_main      },
   { "swapon",      util_swapon_main      },
@@ -172,7 +173,7 @@ int main(int argc, char **argv, char **env)
   prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
 
 #if SWISS_ARMY_KNIFE
-  for(i = 0; i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
+  for(i = 0; (unsigned) i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
     if(!strcmp(prog, lxrc_internal[i].name)) {
       return lxrc_internal[i].func(argc, argv);
     }
@@ -270,7 +271,7 @@ int main(int argc, char **argv, char **env)
       
     }
     if(config.hwcheck) {
-      util_hwcheck();
+      // util_hwcheck();
       err = 11;
     }
     else {
@@ -461,7 +462,7 @@ int do_not_kill(char *name)
   };
   int i;
 
-  for(i = 0; i < sizeof progs / sizeof *progs; i++) {
+  for(i = 0; (unsigned) i < sizeof progs / sizeof *progs; i++) {
     if(!strcmp(name, progs[i])) return 1;
   }
 
@@ -695,7 +696,7 @@ void lxrc_init()
   config.initrd_has_ldso = 1;
 #endif
 
-  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
     sprintf(buf, "/dev/ram%d", i + 2);
     str_copy(&config.ramdisk[i].dev, buf);
   }
@@ -782,7 +783,7 @@ void lxrc_init()
     s = strdup(config.linuxrc);
 
     for(t0 = s; (t = strsep(&t0, ",")); ) {
-      for(i = 0; i < sizeof lxrc_params / sizeof *lxrc_params; i++) {
+      for(i = 0; (unsigned) i < sizeof lxrc_params / sizeof *lxrc_params; i++) {
         if(!strcasecmp(lxrc_params[i].name, t)) {
           switch(lxrc_params[i].key) {
             case lx_auto:
@@ -916,7 +917,7 @@ void lxrc_init()
     config.module.broken = slist_split(',', ft->value);
   }
 
-  mod_init();
+  mod_init(1);
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
@@ -1108,10 +1109,12 @@ int lxrc_main_cb(dia_item_t di)
       rc = inst_menu();
       break;
 
+#if 0
     case di_main_hwcheck:
       util_hwcheck();
       rc = 1;
       break;
+#endif
 
     case di_main_reboot:
       lxrc_reboot();
@@ -1286,7 +1289,7 @@ void lxrc_makelinks(char *name)
 
   if(!util_check_exist("/etc/nothing")) link(name, "/etc/nothing");
 
-  for(i = 0; i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
+  for(i = 0; (unsigned) i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
     sprintf(buf, "/bin/%s", lxrc_internal[i].name);
     if(!util_check_exist(buf)) link(name, buf);
   }

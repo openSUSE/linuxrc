@@ -429,8 +429,7 @@ int auto2_net_dev(hd_t **hd0)
           !config.serverdir || !*config.serverdir ||
           !config.net.hostname.ok ||
           !config.net.netmask.ok ||
-          !config.net.broadcast.ok ||
-          !config.net.gateway.ok
+          !config.net.broadcast.ok
         ) {
           fprintf(stderr, "no/incomplete answer.\n");
           config.net.configured = nc_none;
@@ -685,7 +684,7 @@ int auto2_init()
 
       util_disp_init();
 
-      sprintf(buf, txt_get(TXT_FOUND_PCMCIA), "i82365");
+      sprintf(buf, txt_get(TXT_FOUND_PCMCIA), pcmcia_driver(2));
       t = strchr(buf, '\n');
       if(t) {
         *t = 0;
@@ -706,14 +705,14 @@ int auto2_init()
 
     if(
       (i = mod_insmod("pcmcia_core", NULL)) ||
-      (i = mod_insmod("i82365", pcmcia_params))   ||
+      (i = mod_insmod(pcmcia_driver(2), pcmcia_params))   ||
       (i = mod_insmod("ds", NULL))
     );
 
     if(!i) {
       fprintf(stderr, "PCMCIA modules loaded - starting card manager.\n");
-      pcmcia_chip_ig = 2;	/* i82365 */
-      i = system("cardmgr -v -m /modules >&2");
+      pcmcia_chip_ig = 2;
+      i = system("cardmgr -v -m /modules -n \"\" >&2");
       if(i)
         fprintf(stderr, "Oops: card manager didn't start.\n");
       else {
@@ -947,7 +946,7 @@ int auto2_find_floppy()
   config.floppy = config.floppies = 0;
   for(
     i = 0;
-    i < sizeof config.floppy_dev / sizeof *config.floppy_dev && config.floppy_dev[i];
+    (unsigned) i < sizeof config.floppy_dev / sizeof *config.floppy_dev && config.floppy_dev[i];
     i++
   ) {
     free(config.floppy_dev[i]);
@@ -958,7 +957,7 @@ int auto2_find_floppy()
 
   for(hd = hd0; hd; hd = hd->next) {
     if(
-      config.floppies < sizeof config.floppy_dev / sizeof *config.floppy_dev &&
+      (unsigned) config.floppies < sizeof config.floppy_dev / sizeof *config.floppy_dev &&
       hd->unix_dev_name &&			/* and has a device name */
       !hd->is.notready				/* medium inserted */
     ) {

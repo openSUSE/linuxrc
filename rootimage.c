@@ -63,7 +63,7 @@ int ramdisk_open()
 {
   int i;
 
-  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
     if(!config.ramdisk[i].inuse) {
       config.ramdisk[i].fd = open(config.ramdisk[i].dev, O_RDWR | O_CREAT | O_TRUNC, 0644);
       if(config.ramdisk[i].fd < 0) {
@@ -84,7 +84,7 @@ int ramdisk_open()
 
 void ramdisk_close(int rd)
 {
-  if(rd < 0 || rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return;
+  if(rd < 0 || (unsigned) rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return;
 
   if(!config.ramdisk[rd].inuse) return;
 
@@ -99,7 +99,7 @@ void ramdisk_free(int rd)
 {
   int i;
 
-  if(rd < 0 || rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return;
+  if(rd < 0 || (unsigned) rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return;
 
   if(!config.ramdisk[rd].inuse) return;
 
@@ -124,7 +124,7 @@ int ramdisk_write(int rd, void *buf, int count)
 
   if(
     rd < 0 ||
-    rd >= sizeof config.ramdisk / sizeof *config.ramdisk ||
+    (unsigned) rd >= sizeof config.ramdisk / sizeof *config.ramdisk ||
     !config.ramdisk[rd].inuse
   ) {
     fprintf(stderr, "oops: trying to write to invalid ramdisk %d\n", rd);
@@ -147,7 +147,7 @@ int ramdisk_umount(int rd)
 {
   int i;
 
-  if(rd < 0 || rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return -1;
+  if(rd < 0 || (unsigned) rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return -1;
 
   if(!config.ramdisk[rd].inuse) return -1;
 
@@ -166,7 +166,7 @@ int ramdisk_mount(int rd, char *dir)
 {
   int i;
 
-  if(rd < 0 || rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return -1;
+  if(rd < 0 || (unsigned) rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return -1;
 
   if(!config.ramdisk[rd].inuse) return -1;
 
@@ -310,7 +310,7 @@ int load_image(char *file_name, instmode_t mode)
     buf2 = malloc(config.cache.size = 256);
     config.cache.cnt = 0;
 
-    for(i = 0; i < config.cache.size; i += bytes_read) {
+    for(i = 0; (unsigned) i < config.cache.size; i += bytes_read) {
       bytes_read = net_read(fd_read, buf2 + i, config.cache.size - i);
       // fprintf(stderr, "got %d bytes\n", bytes_read);
       if(bytes_read <= 0) break;
@@ -337,7 +337,7 @@ int load_image(char *file_name, instmode_t mode)
 
         if((buf2[3] & 0x08)) {
           real_name = buf2 + 10;
-          for(i = 0; i < config.cache.size - 10 && i < 128; i++) {
+          for(i = 0; i < (int) config.cache.size - 10 && i < 128; i++) {
             if(!real_name[i]) break;
           }
           if(i > 128) real_name = NULL;
