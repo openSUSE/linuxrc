@@ -858,7 +858,7 @@ int net_choose_device()
     { "iucv",  TXT_NET_CLAW  }
   };
     
-  if(auto_ig || config.net.device_given) return 0;
+  if(config.net.device_given) return 0;
 
   /* re-read - just in case... */
   util_update_netdevice_list(NULL, 1);
@@ -1062,7 +1062,7 @@ int net_bootp()
   char *s, *t;
   char tmp[256];
 
-  if(auto_ig && config.net.hostname.ok) return 0;
+  if(config.net.hostname.ok) return 0;
 
   if(config.test) return 0;
 

@@ -142,7 +142,6 @@ static struct {
   { key_netstop,        "_NetStop",       kf_cfg + kf_cmd                },
   { key_testmode,       "_TestMode",      kf_cfg                         },
   { key_debugwait,      "_DebugWait",     kf_cfg + kf_cmd                },	/* tricky */
-  { key_auto,           "_Auto",          kf_cfg + kf_cmd                },	/* drop old auto mode? */
   { key_expert,         "Expert",         kf_cfg + kf_cmd                },	/* drop it? */
   { key_rescue,         "Rescue",         kf_cfg + kf_cmd                },
   { key_rootimage,      "RootImage",      kf_cfg + kf_cmd                },
@@ -192,7 +191,16 @@ static struct {
   { key_updatestyle,    "UpdateStyle",    kf_cfg + kf_cmd                },
   { key_updateid,       "UpdateID",       kf_cfg                         },
   { key_updateask,      "DriverUpdate",   kf_cfg + kf_cmd                },
-  { key_updateask,      "DUD",            kf_cfg + kf_cmd                }
+  { key_updateask,      "DUD",            kf_cfg + kf_cmd                },
+  { key_initrd,         "Initrd",         kf_boot                        },
+  { key_vga,            "VGA",            kf_none                        },
+  { key_bootimage,      "BOOTIMAGE",      kf_boot                        },
+  { key_ramdisksize,    "ramdisksize",    kf_boot                        },
+  { key_suse,           "SuSE",           kf_boot                        },
+  { key_showopts,       "showopts",       kf_boot                        },
+  { key_nosshkey,       "nosshkey",       kf_boot                        },
+  { key_startshell,     "startshell",     kf_boot                        },
+  { key_y2debug,        "y2debug",        kf_boot                        }
 };
 
 static struct {
@@ -400,6 +408,7 @@ void file_free_file(file_t *file)
 
   for(; file; file = next) {
     next = file->next;
+    if(file->unparsed) free(file->unparsed);
     if(file->key_str) free(file->key_str);
     if(file->value) free(file->value);
     free(file);
@@ -411,7 +420,6 @@ int file_read_info()
 {
   window_t win_ri;
   char *file = NULL, *s;
-  char *info_file_old = NULL;
 
   if(config.win) {
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
@@ -423,11 +431,8 @@ int file_read_info()
   }
 
   if(!config.info.file || !strcmp(config.info.file, "default")) {
-    if(config.info.file || auto2_ig || auto_ig) {
-      strprintf(&info_file_old, "floppy:/%s/setup/descr/info", config.product_dir);
-      file = file_read_info_file(info_file_old, "floppy:/info", kf_cfg);
-      free(info_file_old);
-      info_file_old = NULL;
+    if(config.info.file || !config.manual) {
+      file = file_read_info_file("floppy:/info", NULL, kf_cfg);
     }
     if(!file) file = file_read_info_file("file:/info", NULL, kf_cfg);
   }
@@ -730,34 +735,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_manual:
-        if(f->is.numeric) {
-          config.manual = f->nvalue;
-          auto_ig = 0;
-          auto2_ig = config.manual ^ 1;
-        }
-        break;
-
-      case key_auto:
-        if(f->is.numeric) {
-          switch(f->nvalue) {
-            case 0:
-              config.manual = 1;
-              auto_ig = auto2_ig = 0;
-              break;
-
-            case 1:
-              config.manual = 0;
-              auto_ig = 1;
-              auto2_ig = 0;
-              break;
-
-            case 2:
-              config.manual = 0;
-              auto_ig = 0;
-              auto2_ig = 1;
-              break;
-          }
-        }
+        if(f->is.numeric) config.manual = f->nvalue;
         break;
 
       case key_expert:
@@ -820,7 +798,7 @@ void file_do_info(file_t *f0)
 
       case key_autoyast:
         str_copy(&config.autoyast, f->value);
-        auto2_ig = TRUE;
+        config.manual = 0;
         if(!config.instmode) {
           url = parse_url(config.autoyast);
           if(url && url->scheme) set_instmode(url->scheme);
@@ -1180,6 +1158,8 @@ void file_write_install_inf(char *dir)
   FILE *f;
   char file_name[256], *s;
   slist_t *sl;
+  file_t *ft0, *ft;
+  int i;
 
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
@@ -1194,7 +1174,7 @@ void file_write_install_inf(char *dir)
 
   file_write_sym(f, key_display, "Undef", config.color);
 
-  if(config.keymap && !auto2_ig) {
+  if(config.keymap && config.manual) {
     file_write_str(f, key_keytable, config.keymap);
   }
 
@@ -1346,6 +1326,18 @@ void file_write_install_inf(char *dir)
     }
   }
 #endif
+
+  ft0 = file_read_cmdline(kf_cmd + kf_boot);
+
+  for(i = 0, ft = ft0; ft; ft = ft->next) {
+    if(ft->key == key_none) {
+      fprintf(f, "%s%s", i ? " " : "Cmdline: ", ft->unparsed);
+      i = 1;
+    }
+  }
+  if(i) fprintf(f, "\n");
+
+  file_free_file(ft0);
 
   fclose(f);
 }
@@ -1502,7 +1494,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
 file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
 {
   file_t *ft0 = NULL, **ft = &ft0;
-  char *current, *s, *s1, *t;
+  char *current, *s, *s1, *t, *t1;
   int i, quote;
 
   current = buf;
@@ -1514,6 +1506,10 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
     }
     if(s > current) {
       t = malloc(s - current + 1);
+      t1 = malloc(s - current + 1);
+
+      memcpy(t1, current, s - current);
+      t1[s - current] = 0;
 
       for(s1 = t; s > current; current++) {
         if(*current != '"') *s1++ = *current;
@@ -1527,6 +1523,7 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
       i = strlen(t);
       if(i && t[i - 1] == ':') t[i - 1] = 0;
 
+      (*ft)->unparsed = t1;
       (*ft)->key_str = strdup(t);
       (*ft)->key = file_str2key(t, flags);	/* destroys t!!! */
       (*ft)->value = strdup(s1 ?: "");

@@ -137,15 +137,13 @@ static struct {
 #endif
 
 typedef enum {
-  lx_auto, lx_auto2, lx_reboot, lx_loadnet, lx_loaddisk, lx_nocmdline
+  lx_reboot, lx_loadnet, lx_loaddisk, lx_nocmdline
 } lx_param_t;
 
 static struct {
   char *name;
   lx_param_t key;
 } lxrc_params[] = {
-  { "auto",       lx_auto       },
-  { "auto2",      lx_auto2      },
   { "reboot",     lx_reboot     },
   { "loadnet",    lx_loadnet    },
   { "loaddisk",   lx_loaddisk   },
@@ -249,14 +247,11 @@ int main(int argc, char **argv, char **env)
   save_environment();
   lxrc_init();
 
-  if(auto_ig) {
-    err = inst_auto_install();
-  }
-  else if(config.demo) {
+  if(config.demo) {
     err = inst_start_demo();
   }
 #ifdef USE_LIBHD
-  else if(auto2_ig) {
+  else if(!config.manual) {
     if(config.rescue) {
       int win_old;
       if(!(win_old = config.win)) util_disp_init();
@@ -321,7 +316,7 @@ void lxrc_reboot()
     return;
   }
 
-  if(auto_ig || auto2_ig || dia_yesno(txt_get(TXT_ASK_REBOOT), 1) == YES) {
+  if(dia_yesno(txt_get(TXT_ASK_REBOOT), 1) == YES) {
     reboot(RB_AUTOBOOT);
   }
 }
@@ -333,7 +328,7 @@ void lxrc_halt()
     return;
   }
 
-  if(auto_ig || auto2_ig || dia_yesno("Do you want to halt the system now?", 1) == YES) {
+  if(dia_yesno("Do you want to halt the system now?", 1) == YES) {
     reboot(RB_POWER_OFF);
   }
 }
@@ -672,9 +667,6 @@ void lxrc_init()
   if(config.test || config.had_segv) {
     config.manual = 1;
   }
-  else {
-    auto2_ig = 1;
-  }
 
 #if defined(__s390__) || defined(__s390x__)
   config.initrd_has_ldso = 1;
@@ -717,11 +709,7 @@ void lxrc_init()
 
   if(!config.had_segv) {
     ft = file_get_cmdline(key_manual);
-    if(ft && ft->is.numeric) {
-      config.manual = ft->nvalue;
-      auto_ig = 0;
-      auto2_ig = config.manual ^ 1;
-    }
+    if(ft && ft->is.numeric) config.manual = ft->nvalue;
   }
 
   ft = file_get_cmdline(key_info);
@@ -735,8 +723,6 @@ void lxrc_init()
   str_copy(&config.autoyast, s);
 
   if(config.autoyast) {
-    auto_ig = 0;
-    auto2_ig = 1;
     config.manual = 0;
     url = parse_url(config.autoyast);
     if(url && url->scheme) set_instmode(url->scheme);
@@ -773,16 +759,6 @@ void lxrc_init()
       for(i = 0; (unsigned) i < sizeof lxrc_params / sizeof *lxrc_params; i++) {
         if(!strcasecmp(lxrc_params[i].name, t)) {
           switch(lxrc_params[i].key) {
-            case lx_auto:
-              auto_ig = 1;
-              config.manual = 0;
-              break;
-
-            case lx_auto2:
-              auto2_ig = 1;
-              config.manual = 0;
-              break;
-
             case lx_reboot:
               reboot_ig = TRUE;
               break;
@@ -868,14 +844,12 @@ void lxrc_init()
     config.shell_started = 1;
   }
 
-  if(config.had_segv) util_manual_mode();
+  if(config.had_segv) config.manual = 1;
 
 #ifdef USE_LIBHD
-  if(auto2_ig) {
+  if(!config.manual) {
     if(auto2_init()) {
-      auto_ig = 0;
-      auto2_ig = 1;
-      config.manual = 0;
+      config.manual = 0;	/* ###### does it make sense? */
     } else {
       fprintf(stderr, "Automatic setup not possible.\n");
 
@@ -894,7 +868,7 @@ void lxrc_init()
 
       if(!i) {
         config.rescue = 0;
-        util_manual_mode();
+        config.manual = 1;
         util_disp_init();
         if(j) {
           sprintf(buf, "Could not find the %s ", config.product);
@@ -914,13 +888,7 @@ void lxrc_init()
   }
 #endif
 
-  /* note: for auto2, file_read_info() is called in auto2_init() */
-  if(auto_ig) {
-    rename_info_file();
-    file_read_info();
-  }
-
-  /* for 'manual' */
+  /* file_read_info() is called in auto2_init(), too */
   if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
 
   if(config.had_segv) {
@@ -934,7 +902,7 @@ void lxrc_init()
     );
     dia_message(buf, MSGTYPE_ERROR);
   }
-  else if(!auto2_ig) {
+  else if(config.manual) {
     util_disp_init();
   }
 
@@ -966,7 +934,7 @@ void lxrc_init()
   net_setup_localhost();
 
 #if !(defined(__PPC__) || defined(__sparc__))
-  if(!auto_ig || reboot_wait_ig) {
+  if(config.manual || reboot_wait_ig) {
     config.rebootmsg = 1;
   }
 #endif
@@ -986,7 +954,7 @@ void lxrc_main_menu()
     di_none
   };
 
-  util_manual_mode();
+  config.manual = 1;
 
   di_lxrc_main_menu_last = config.hwcheck ? di_main_hwcheck : di_main_start;
 

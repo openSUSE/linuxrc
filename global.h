@@ -415,8 +415,6 @@ extern char            netdevice_tg [20];
 extern int             pcmcia_chip_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
-extern int             auto_ig;
-extern int             auto2_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
 extern char            ppcd_tg [10];

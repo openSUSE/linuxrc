@@ -23,19 +23,20 @@ typedef enum {
   key_buffers, key_cached, key_swaptotal, key_swapfree, key_memlimit,
   key_memyast, key_memmodules, key_memloadimage, key_info, key_proxy,
   key_proxyport, key_proxyproto, key_usedhcp, key_nfsport, key_dhcptimeout,
-  key_tftptimeout, key_tmpfs, key_testmode, key_debugwait, key_auto,
-  key_expert, key_rescue, key_rootimage, key_rescueimage, key_installdir,
-  key_nopcmcia, key_vnc, key_vncpassword, key_sshpassword, key_usepivotroot,
-  key_term, key_addswap, key_aborted, key_memyasttext, key_netstop,
-  key_exec, key_usbwait, key_nfsrsize, key_nfswsize, key_hwcheck,
-  key_setupcmd, key_setupnetif, key_netconfig, key_usessh, key_noshell,
-  key_hwdetect, key_floppydevice, key_cdromdevice, key_consoledevice,
-  key_product, key_productdir, key_linuxrcstderr, key_comment,
-  key_kbdtimeout, key_brokenmodules, key_testpivotroot, key_scsibeforeusb,
-  key_hostip, key_linemode, key_moduledelay, key_updatedir, key_usbscsi,
-  key_useusbscsi, key_lxrcdebug, key_kernel_pcmcia, key_liveconfig,
-  key_useidescsi, key_updatename, key_updatestyle, key_updateid,
-  key_updateask
+  key_tftptimeout, key_tmpfs, key_testmode, key_debugwait, key_expert,
+  key_rescue, key_rootimage, key_rescueimage, key_installdir, key_nopcmcia,
+  key_vnc, key_vncpassword, key_sshpassword, key_usepivotroot, key_term,
+  key_addswap, key_aborted, key_memyasttext, key_netstop, key_exec,
+  key_usbwait, key_nfsrsize, key_nfswsize, key_hwcheck, key_setupcmd,
+  key_setupnetif, key_netconfig, key_usessh, key_noshell, key_hwdetect,
+  key_floppydevice, key_cdromdevice, key_consoledevice, key_product,
+  key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
+  key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
+  key_linemode, key_moduledelay, key_updatedir, key_usbscsi, key_useusbscsi,
+  key_lxrcdebug, key_kernel_pcmcia, key_liveconfig, key_useidescsi,
+  key_updatename, key_updatestyle, key_updateid, key_updateask, key_initrd,
+  key_vga, key_bootimage, key_ramdisksize, key_suse, key_showopts,
+  key_nosshkey, key_startshell, key_y2debug
 } file_key_t;
 
 typedef enum {
@@ -45,12 +46,14 @@ typedef enum {
   kf_cmd_early = 1 << 2,	/* /proc/cmdline, before info  */
   kf_yast = 1 << 3,		/* /etc/yast.inf */
   kf_dhcp = 1 << 4,		/* dhcp info file */
-  kf_mem = 1 << 5		/* /proc/meminfo */
+  kf_mem = 1 << 5,		/* /proc/meminfo */
+  kf_boot = 1 << 6		/* things the boot loader used */
 } file_key_flag_t;
 
 typedef struct file_s {
   struct file_s *next, *prev;
   file_key_t key;
+  char *unparsed;
   char *key_str;
   char *value;
   int nvalue;

@@ -89,6 +89,7 @@ static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
 
+#if 0
 int inst_auto_install()
 {
   int rc;
@@ -141,6 +142,7 @@ int inst_auto_install()
 
   return inst_start_install();
 }
+#endif
 
 
 int inst_start_demo()
@@ -593,10 +595,8 @@ int inst_mount_harddisk()
   if((config.vnc || config.usessh) && (rc = net_config())) return rc;
 
   do {
-    if(!auto_ig) {
-      rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));
-      if(rc) return -1;
-    }
+    rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));
+    if(rc) return -1;
 
     if(config.partition) {
       sprintf(buf, "/dev/%s", config.partition);
@@ -610,16 +610,14 @@ int inst_mount_harddisk()
       dia_message (txt_get(TXT_ERROR_HD_MOUNT), MSGTYPE_ERROR);
     }
     else {
-      if(!auto_ig) {
-        rc = dia_input2(txt_get(TXT_ENTER_HD_DIR), &config.serverdir, 30, 0);
-        util_truncate_dir(config.serverdir);
-        sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
-        if(!rc) rc = util_mount_ro(buf, config.mountpoint.instdata);
-        if(rc) {
-          fprintf(stderr, "doing umount\n");
-          inst_umount();
-          return rc;
-        }
+      rc = dia_input2(txt_get(TXT_ENTER_HD_DIR), &config.serverdir, 30, 0);
+      util_truncate_dir(config.serverdir);
+      sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
+      if(!rc) rc = util_mount_ro(buf, config.mountpoint.instdata);
+      if(rc) {
+        fprintf(stderr, "doing umount\n");
+        inst_umount();
+        return rc;
       }
     }
   } while(rc);
@@ -640,7 +638,7 @@ int inst_mount_nfs()
 
   if((rc = net_config())) return rc;
 
-  if(config.win && !auto_ig) {
+  if(config.win) {	/* ###### check really needed? */
     sprintf(text, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
     if((rc = net_get_address(text, &config.net.server, 1))) return rc;
     if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
@@ -671,7 +669,7 @@ int inst_mount_smb()
 
   if((rc = net_config())) return rc;
 
-  if(config.win && !auto_ig) {
+  if(config.win) {	/* ###### check really needed? */
     sprintf(msg, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
     if((rc = net_get_address(msg, &config.net.server, 1))) return rc;
     if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.serverdir, 30, 0))) return rc;
@@ -1132,7 +1130,7 @@ int inst_execute_yast()
 
   if(rc || config.aborted) {
     config.rescue = 0;
-    util_manual_mode();
+    config.manual = 1;
   }
 
   if(config.manual) util_disp_init();
@@ -1160,7 +1158,7 @@ int inst_execute_yast()
     rc = inst_commit_install();
     if(rc) {
       config.rescue = 0;
-      util_manual_mode();
+      config.manual = 1;
       util_disp_init();
     }
   }
@@ -1208,7 +1206,6 @@ int inst_check_floppy()
 int inst_commit_install()
 {
   int err = 0;
-  window_t win;
 
   if(reboot_ig) {
 
@@ -1229,14 +1226,6 @@ int inst_commit_install()
 #endif
     }
     err = -1;
-  }
-  else {
-    if(auto_ig) {
-      util_disp_init();
-      dia_info(&win, txt_get(TXT_INSTALL_SUCCESS));
-      sleep(2);
-      win_close(&win);
-    }
   }
 
   return err;

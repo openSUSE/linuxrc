@@ -707,12 +707,6 @@ int util_eject_cdrom(char *dev)
   return 0;
 }
 
-void util_manual_mode()
-{
-  config.manual = 1;
-  auto_ig = 0;
-  auto2_ig = 0;
-}
 
 void add_driver_update(char *dir, char *loc)
 {
@@ -1217,9 +1211,6 @@ void util_status_info()
   sprintf(buf, "info = ");
   if(*s) sprintf(buf + strlen(buf), "%s", s);
   if(*t) sprintf(buf + strlen(buf), ", %s", t);
-  slist_append_str(&sl0, buf);
-
-  sprintf(buf, "auto = %d", auto2_ig ? 2 : auto_ig ? 1 : 0);
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "floppies = (");

@@ -1,6 +1,9 @@
 7/7/2003:	v1.5.3
 	- better control over option parsing
 	- rewrote driver update handling (#27792)
+	- put cmdline args into /etc/install.inf (#25745)
+	- updated FAT fs detection (#27814)
+	- cleaned up manual mode
 
 14/5/2003:	v1.5.2
 	- make hd installs work properly (#26906)
