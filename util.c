@@ -3396,7 +3396,19 @@ void util_set_product_dir(char *prod)
   str_copy(&config.product_dir, prod);
 
   str_copy(&config.installdir, "/boot/inst-sys");
+#if defined(__sparc__)
+  {
+     struct utsname buf;
+
+     uname (&buf);
+     if (strcmp (buf.machine, "sparc64") == 0)
+	str_copy(&config.rootimage, "/boot/root64");
+     else
+	str_copy(&config.rootimage, "/boot/root");
+  }
+#else
   str_copy(&config.rootimage, "/boot/root");
+#endif
   str_copy(&config.rescueimage, "/boot/rescue");
   str_copy(&config.demoimage, "/boot/cd-demo");
 }
