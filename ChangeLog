@@ -1,3 +1,8 @@
+11/7/2002:	v1.4.4
+	- lowered mem limit for loading of inst-sys into ramdisk to 200MB
+	- dropped byte order workaround for setting realrootdev
+	- sf: fixed error in memory allocation for menu items
+
 20/6/2002:	v1.4.3
 	- merge (mainly ftp) changes from 8.0 branch:
 	  - raised min free memory limit to 12MB

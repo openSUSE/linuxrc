@@ -811,7 +811,7 @@ void lxrc_init()
   config.memory.min_yast_text =  32 * 1024;
   config.memory.min_yast =       44 * 1024;
   config.memory.min_modules =    64 * 1024;
-  config.memory.load_image =    256 * 1024;
+  config.memory.load_image =    200 * 1024;
 
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;

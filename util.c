@@ -218,7 +218,7 @@ void util_create_items (item_t items_arr [], int nr_iv, int size_iv)
 
     for (i_ii = 0; i_ii < nr_iv; i_ii++)
         {
-        items_arr [i_ii].text = malloc (size_iv);
+        items_arr [i_ii].text = malloc (size_iv + 1);
         items_arr [i_ii].func = 0;
         items_arr [i_ii].di = 0;
         }

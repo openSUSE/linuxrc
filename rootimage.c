@@ -462,7 +462,9 @@ void root_set_root(char *dev)
   }
 
   root = (major(sbuf.st_rdev) << 8) + minor(sbuf.st_rdev);
+#if 0
   root *= 0x10001;
+#endif
 
   fprintf(stderr,
     "new root: %s (major 0x%x, minor 0x%x)\n",
