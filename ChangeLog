@@ -1,3 +1,6 @@
+12/9/2001:	v1.2.22
+	- fixed info file reading
+
 11/9/2001:	v1.2.21
 	- SMB support
 	- support more than one floppy drive

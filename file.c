@@ -514,21 +514,23 @@ int file_read_info()
     if(i < config.floppies) {
       config.floppy = i;	// remember currently used floppy
 
+      mounted = TRUE;
+
       util_chk_driver_update(mountpoint_tg);
 
       sprintf(filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
       fd = fopen(filename_ti, "r");
       if(!fd) {
         sprintf(filename_ti, "%s/info", mountpoint_tg);
-        fd = fopen (filename_ti, "r");
-        if(!fd) {
-          umount(mountpoint_tg);
-          if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-          return (-1);
-        }
+        fd = fopen(filename_ti, "r");
       }
-      mounted = TRUE;
     }
+  }
+
+  if(!fd) {
+    if(mounted) umount(mountpoint_tg);
+    if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+    return -1;
   }
 
   valid_net_config_ig = 0;
