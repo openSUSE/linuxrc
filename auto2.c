@@ -185,7 +185,7 @@ void auto2_scan_hardware(char *log_file)
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
       if(load_usb_storage(hd_data)) {
         mod_insmod("usb-storage", NULL);
-        if(config.usbwait > 0) sleep(1);
+        if(config.usbwait > 0) sleep(3);
         hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
       }
     }
@@ -978,22 +978,28 @@ int auto2_find_floppy()
  */
 int load_usb_storage(hd_data_t *hd_data)
 {
-  hd_t *hd, *hd_floppy, *hd_cdrom;
-  int usb_floppies = 0, usb_cdroms = 0;
+  hd_t *hd, *hd_floppy, *hd_cdrom, *hd_usb;
+  int usb_floppies = 0, usb_cdroms = 0, usb_other = 0;
 
   hd_floppy = hd_list(hd_data, hw_floppy, 0, NULL);
   for(hd = hd_floppy; hd; hd = hd->next) {
-    if(hd->bus.id == bus_usb /* && !hd->is.zip */) usb_floppies++;
+    if(hd->bus.id == bus_usb && !hd->is.zip) usb_floppies++;
   }
   hd_free_hd_list(hd_floppy);
 
   hd_cdrom = hd_list(hd_data, hw_cdrom, 0, NULL);
-  for(hd = hd_floppy; hd; hd = hd->next) {
-    if(hd->bus.id == bus_usb /* && !hd->is.zip */) usb_cdroms++;
+  for(hd = hd_cdrom; hd; hd = hd->next) {
+    if(hd->bus.id == bus_usb) usb_cdroms++;
   }
   hd_free_hd_list(hd_cdrom);
 
-  return usb_floppies || usb_cdroms;
+  hd_usb = hd_list(hd_data, hw_usb, 0, NULL);
+  for(hd = hd_usb; hd; hd = hd->next) {
+    if(hd->hw_class == hw_unknown) usb_other++;
+  }
+  hd_free_hd_list(hd_usb);
+
+  return usb_floppies || usb_cdroms || usb_other;
 }
 
 

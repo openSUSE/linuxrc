@@ -1283,8 +1283,8 @@ static int init_sockets(void)
 	syslog(LOG_INFO, "watching %d sockets", sockets);
 
     if (ioctl(socket[0].fd, DS_GET_CARD_SERVICES_INFO, &serv) == 0) {
-	if (serv.Revision != CS_RELEASE_CODE)
-	    syslog(LOG_INFO, "Card Services release does not match");
+//	if (serv.Revision != CS_RELEASE_CODE)
+//	    syslog(LOG_INFO, "Card Services release does not match");
     } else {
 	syslog(LOG_ERR, "could not get CS revision info!");
 	return -1;

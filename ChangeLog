@@ -1,3 +1,7 @@
+6/9/2002:	v1.4.22
+	- better usb cdrom handling (#18583, #19004)
+	- no pcmcia version mismatch message
+
 5/9/2002:	v1.4.21
 	- fixed check for inst-sys
 	- fixed ieee1394 handling
