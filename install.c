@@ -757,7 +757,8 @@ int inst_prepare()
   int rc = 0;
 
   mod_free_modules();
-  rename("/bin", "/.bin");
+  if(!config.initrd_has_ldso)
+    rename("/bin", "/.bin");
 
   if(inst_loopmount_im) {
     strcpy(instsys, mountpoint_tg);
@@ -774,13 +775,14 @@ int inst_prepare()
 
   setenv("INSTSYS", instsys, TRUE);
 
-  for(i = 0; i < sizeof links / sizeof *links; i++) {
-    if(!util_check_exist(links[i])) {
-      unlink(links[i]);
-      sprintf(link_source, "%s%s", instsys, links[i]);
-      symlink(link_source, links[i]);
+  if(!config.initrd_has_ldso)
+    for(i = 0; i < sizeof links / sizeof *links; i++) {
+      if(!util_check_exist(links[i])) {
+	unlink(links[i]);
+	sprintf(link_source, "%s%s", instsys, links[i]);
+	symlink(link_source, links[i]);
+      }
     }
-  }
 
   setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
 
@@ -820,9 +822,10 @@ int inst_execute_yast()
     inst_umount ();
     if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
-    unlink("/bin");
-    rename("/.bin", "/bin");
-
+    if(!config.initrd_has_ldso) {
+      unlink("/bin");
+      rename("/.bin", "/bin");
+    }
     return -1;
   }
 
@@ -942,9 +945,10 @@ int inst_execute_yast()
   inst_umount();
   if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
-  unlink("/bin");
-  rename("/.bin", "/bin");
-
+  if(!config.initrd_has_ldso) {
+    unlink("/bin");
+    rename("/.bin", "/bin");
+  }
   /* turn off swap */
   inst_swapoff();
 

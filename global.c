@@ -18,7 +18,12 @@ enum langid_t   language_ig = LANG_UNDEF;
 
 config_t config = {
   rebootmsg: 0,
-  redraw_menu: 0
+  redraw_menu: 0,
+#if defined(__s390__) || defined(__s390x__)
+  initrd_has_ldso: 1
+#else
+  initrd_has_ldso: 0
+#endif
 };
 
 colorset_t     *colors_prg;

@@ -152,6 +152,7 @@ typedef struct {
 typedef struct {
   unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
+  unsigned initrd_has_ldso:1;	/* instsys contains a dynamic linker */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
