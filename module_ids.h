@@ -55,6 +55,7 @@ enum modid_t
     ID_IMM,
     ID_DPT_I2O,
     ID_AACRAID,
+    ID_DMX3191D,
 
     ID_AZTECH,
     ID_GOLDSTAR,
@@ -156,6 +157,12 @@ enum modid_t
     ID_RRUNNER,
     ID_SIS900,
     ID_STARFIRE,
+    ID_IPH5526,
+    ID_ABYSS,
+    ID_SMCTR,
+    ID_TMSISA,
+    ID_TMSPCI,
+    ID_DL2K,
 
     /* Yea, another comment ;) */
     /* SPARC - network */

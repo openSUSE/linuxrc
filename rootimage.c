@@ -120,6 +120,10 @@ static device_t root_devices_arm [] =
     { "cciss/c1d6p", 105,  96 },
     { "cciss/c1d7p", 105, 112 },
     { "ram",         1,   0 },
+    { "md0",         9,   0 },
+    { "md1",         9,   1 },
+    { "md2",         9,   2 },
+    { "md3",         9,   3 },
     { 0,             0,   0 }
 };
 

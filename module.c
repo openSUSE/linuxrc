@@ -114,16 +114,42 @@ void mod_menu (void)
 int mod_load_module (char *module_tv, char *params_tv)
     {
     char  command_ti [300];
+    char  command1_ti [300];
     int   rc_ii;
-
+    int i;
+    static struct {
+      char *mod;
+      char *dep;
+    } deps[] = {
+      { "3c509",     "isa-pnp isapnp_reset=0" },
+      { "aha152x",   "isa-pnp isapnp_reset=0" },
+      { "aha1542",   "isa-pnp isapnp_reset=0" },
+      { "g_NCR5380", "isa-pnp isapnp_reset=0" },
+      { "ne",        "isa-pnp isapnp_reset=0" },
+      { "sb1000",    "isa-pnp isapnp_reset=0" },
+      { "smc-ultra", "isa-pnp isapnp_reset=0" },
+      { "sym53c416", "isa-pnp isapnp_reset=0" },
+      { "tmsisa",    "tms380tr" },
+      { "tmspci",    "tms380tr" }
+    };
 
     sprintf (command_ti, "insmod %s ", module_tv);
+
+    *command1_ti = 0;
+    for(i = 0; i < sizeof deps / sizeof *deps; i++ ) {
+      if(!strcmp(module_tv, deps[i].mod)) {
+        sprintf(command1_ti, "insmod %s ", deps[i].dep);
+        break;
+      }
+    }
+
     if (params_tv && params_tv [0])
         strcat (command_ti, params_tv);
 
     if (mod_show_kernel_im)
         kbd_switch_tty (4);
 
+    system (command1_ti);
     rc_ii = system (command_ti);
 
     if (mod_show_kernel_im)

@@ -123,6 +123,7 @@ void mpar_write_modparms (FILE *file_prv)
             if(
               (
                 !strcmp(mpar_modnames_atm[i_ii], "aha1542") ||
+                !strcmp(mpar_modnames_atm[i_ii], "aha152x") ||
                 !strcmp(mpar_modnames_atm[i_ii], "g_NCR5380")
               ) && !isapnp_loaded
             ) {
