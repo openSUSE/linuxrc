@@ -101,7 +101,7 @@ static text_t txt_german_atm [] =
 { TXT_CHOOSE_NET,     "Bitte wählen Sie den Typ Netzwerk, den Sie für die "
                       "Installation verwenden möchten."                       },
 { TXT_INPUT_PLIP_IP,  "Geben Sie bitte die IP-Adresse des PLIP-Partners ein." },
-{ TXT_LOAD_PCMCIA,    "Lade PCMCIA Module"                                    },
+{ TXT_LOAD_PCMCIA,    "PCMCIA-Module laden"                                   },
 { TXT_NO_PCMCIA,      "Der verwendete PCMCIA Chipsatz konnte nicht "
                       "automatisch ermittelt werden. Bitte wählen Sie "
                       "manuell aus."                                          },
