@@ -1032,7 +1032,7 @@ int inst_execute_yast()
   }
 
   /* start shells only _after_ the swap dialog */
-  if(!config.test) {
+  if(!config.test && !config.noshell) {
     util_start_shell("/dev/tty2", "/bin/bash", 1);
     if(config.memory.current >= config.memory.min_yast) {
       util_start_shell("/dev/tty5", "/bin/bash", 1);

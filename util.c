@@ -884,6 +884,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.pivotroot, "pivotroot");
   add_flag(&sl0, buf, config.addswap, "addswap");
   add_flag(&sl0, buf, config.splash, "splash");
+  add_flag(&sl0, buf, config.noshell, "noshell");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {

@@ -1,6 +1,8 @@
+8/8/2002:	v1.4.9
 	- add an SSH mode. relayout SSH and VNC mode to be similar.
 	- make it possible to enable/disable VNC in expert mode
 	- adapted to libhd interface changes
+	- implemented 'NoShell' option
 
 5/8/2002:	v1.4.8
 	- schwab: fix ia64 unwind section processing

@@ -178,7 +178,8 @@ static struct {
   { key_hwcheck,        "HWCheck"          },
   { key_setupcmd,       "SetupCmd"         },
   { key_setupnetif,     "SetupNetIF"       },
-  { key_netconfig,      "NetConfig"        }
+  { key_netconfig,      "NetConfig"        },
+  { key_noshell,        "NoShell"          }
 };
 
 static struct {
@@ -887,6 +888,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.net.ifconfig = f->nvalue;
         break;
 
+      case key_noshell:
+        if(f->is.numeric) config.noshell = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1149,6 +1154,8 @@ void file_write_install_inf(char *dir)
   if(yast2_color_ig) {
     fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
   }
+
+  if(config.noshell) file_write_num(f, key_noshell, config.noshell);
 
   {
     char *s;
