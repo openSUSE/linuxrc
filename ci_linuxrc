@@ -3,7 +3,7 @@
 # check in linuxrc to /work/src/done/STABLE
 # call from the linuxrc directory
 
-ver=`perl -ne 'print $1 if /^#define\s+LXRC_VERSION\s+\"(.+)\"/' global.h`
+ver=`cut -d. -f1-3 VERSION`
 linuxrc=/tmp/linuxrc-$ver
 
 if [ "$ver" = "" ] ; then

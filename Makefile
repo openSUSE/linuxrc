@@ -65,6 +65,10 @@ endif
 
 default: libs linuxrc
 
+version.h: VERSION
+	@echo "#define LXRC_VERSION \"`cut -d. -f1-3 VERSION`\"" >$@
+	@echo "#define LXRC_FULL_VERSION \"`cat VERSION`\"" >>$@
+
 linuxrc: $(OBJ) $(LIBS)
 	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd -o $@
 	@strip -R .note -R .comment $@

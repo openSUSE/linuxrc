@@ -40,44 +40,44 @@ typedef struct
       char *mapname;
       } keymap_t;
 
-#if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__)
+#if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__sparc__)
 
 #define LANG_DEFAULT	1
 static language_t set_languages_arm [] =
 {
-{ LANG_GERMAN,       "Deutsch",              "de-lat1-nd",   "lat1u-16.psf",
+{ LANG_GERMAN,       "Deutsch",              "de-lat1-nd",   "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "de_DE",        "german"        },
-{ LANG_ENGLISH,      "English",              "us",           "lat1u-16.psf",
+{ LANG_ENGLISH,      "English",              "us",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "en_US",        "english"       },
-{ LANG_SPANISH,      "Español",              "es",           "lat1u-16.psf",
+{ LANG_SPANISH,      "Español",              "es",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "es_ES",        "spanish"       },
-{ LANG_FRENCH,       "Français",             "fr-latin1",    "lat1u-16.psf",
+{ LANG_FRENCH,       "Français",             "fr-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "fr_FR",        "french"        },
-{ LANG_BRETON,       "Brezhoneg",            "fr-latin1",    "lat1u-16.psf",
+{ LANG_BRETON,       "Brezhoneg",            "fr-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "fr_FR",        "breton"        },
 { LANG_GREEK,        "Hellenic",             "gr",           "lat7-16.psfu",
   "trivial",         "lat7u.uni", 1, 1,      "el_EL",        "greek"         },
-{ LANG_INDONESIA,    "Indonesia",            "us",           "lat1u-16.psf",
+{ LANG_INDONESIA,    "Indonesia",            "us",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "de_DE",        "indonesian"    },
-{ LANG_ITALIAN,      "Italiano",             "it",           "lat1u-16.psf",
+{ LANG_ITALIAN,      "Italiano",             "it",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "it_IT",        "italian"       },
-{ LANG_HUNGARIA,     "Magyar",               "hu",           "lat2u-16.psf",
+{ LANG_HUNGARIA,     "Magyar",               "hu",           "lat2-16.psfu",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "hu_HU",        "hungarian"     },
-{ LANG_DUTCH,        "Nederlands",           "us",           "lat1u-16.psf",
+{ LANG_DUTCH,        "Nederlands",           "us",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "nl_NL",        "dutch"         },
-{ LANG_POLISH,       "Polski",               "Pl02",         "lat2u-16.psf",
+{ LANG_POLISH,       "Polski",               "Pl02",         "lat2-16.psfu",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "pl_PL",        "polish"        },
-{ LANG_PORTUGUESE,   "Português",            "pt-latin1",    "lat1u-16.psf",
+{ LANG_PORTUGUESE,   "Português",            "pt-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "pt_PT",        "portuguese"    },
-{ LANG_BRAZIL,       "Português Brasileiro", "br-abnt2",     "lat1u-16.psf",
+{ LANG_BRAZIL,       "Português Brasileiro", "br-abnt2",     "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "pt_BR",        "brazilian"     },
-{ LANG_ROMANIAN,     "Romania",              "us",           "lat2u-16.psf",
+{ LANG_ROMANIAN,     "Romania",              "us",           "lat2-16.psfu",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "en_US",        "romanian"      },
-{ LANG_RUSSIA,       "Russian",              "ru1",          "Cyr_a8x16",
+{ LANG_RUSSIA,       "Russian",              "ru1",          "Cyr_a8x16.psfu",
   "koi2alt",         "cyralt.uni",1, 1,      "ru_RU.KOI8-R", "russian"       },
-{ LANG_CZECH,        "Czech",                "cz-us-qwertz", "lat2u-16.psf",
+{ LANG_CZECH,        "Czech",                "cz-us-qwertz", "lat2-16.psfu",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "cs_CZ",        "czech"         },
-{ LANG_SLOVAK,       "Slovensky",            "sk-qwerty",    "lat2u-16.psf",
+{ LANG_SLOVAK,       "Slovensky",            "sk-qwerty",    "lat2-16.psfu",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
 };
 #endif
@@ -391,10 +391,10 @@ void set_choose_language (void)
         language_ig = set_languages_arm [rc_ii - 1].id;
         if (!serial_ig && set_languages_arm [rc_ii - 1].font)
             {
-            sprintf (command_ti, "setfont %s -m %s -u %s",
+            sprintf (command_ti, "setfont %s -m %s",
                      set_languages_arm [rc_ii - 1].font,
-                     set_languages_arm [rc_ii - 1].mapscreen,
-                     set_languages_arm [rc_ii - 1].unimap);
+                     set_languages_arm [rc_ii - 1].mapscreen /*,
+                     set_languages_arm [rc_ii - 1].unimap */);
 
             system (command_ti);
             set_activate_font (set_languages_arm [rc_ii - 1].usermap);
@@ -600,6 +600,8 @@ static void set_activate_font (int usermap_iv)
         strcpy (text_ti, "(K");
     else
         strcpy (text_ti, "(B");
+
+    printf("%s", text_ti); fflush(stdout);
 
     for (i_ii = 1; i_ii <= 6; i_ii++)
         {

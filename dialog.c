@@ -115,7 +115,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
         if (key_ii == KEY_ENTER)
             win_button_pressed (&button_ri, FALSE);
         }
-    while (key_ii != KEY_ENTER && key_ii != KEY_ESC && key_ii != 'q');
+    while (key_ii != KEY_ENTER && key_ii != KEY_ESC && key_ii != 'q' && key_ii != 'r');
 
     win_close (&win_ri);
 
@@ -123,6 +123,8 @@ int dia_message (char *txt_tv, int msgtype_iv)
         return (0);
     else if (key_ii == KEY_ESC)
         return (-1);
+    else if (key_ii == 'r')
+        return (-69);
     else
         return (-42);
     }
@@ -945,17 +947,26 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
 
 void dia_handle_ctrlc (void)
     {
+    int i;
     static int  is_in_ctrlc_is = FALSE;
+    static char s[100] = { };
 
     if (is_in_ctrlc_is)
         return;
 
     is_in_ctrlc_is = TRUE;
-    if (dia_message (txt_get (TXT_NO_CTRLC), MSGTYPE_ERROR) == -42)
-        {
-        lxrc_end ();
-        exit (0);
-        }
+
+    i = dia_message(txt_get(TXT_NO_CTRLC), MSGTYPE_ERROR);
+    if(i == -42) {
+      lxrc_end();
+      exit(0);
+    }
+    else if(i == -69) {
+      i = dia_input("run command", s, sizeof s - 1, 35);
+      if(!i) {
+        system(s);
+      }
+    }
 
     is_in_ctrlc_is = FALSE;
     }

@@ -2,7 +2,7 @@ TARGET=loadkeys.a
 
 all: $(TARGET)
 
-DEFS=-DDATADIR=\"/usr/lib/kbd\"
+DEFS=-DDATADIR=\"/kbd\"
 
 SRC=loadkeys.c findfile.c analyze.c ksyms.c getfd.c setfont.c \
     mapscrn.c loadunimap.c \
