@@ -1,5 +1,5 @@
 11/7/2002:	v1.4.4
-	- lowered mem limit for loading of inst-sys into ramdisk to 200MB
+	- lowered mem limit for loading of inst-sys into ramdisk to 200MB (#16976)
 	- dropped byte order workaround for setting realrootdev
 	- sf: fixed error in memory allocation for menu items
 
