@@ -1,5 +1,5 @@
 	- added installation display selection (X11/VNC/SSH)
-	- initial support for S/390 network device setup (IUCV and CTC)
+	- initial support for S/390 network device setup (IUCV, CTC, QDIO)
 
 16/8/2004:	v1.7.3
 	- some font adjustments

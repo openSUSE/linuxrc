@@ -1134,3 +1134,7 @@ msgstr ""
 msgid "Compatibility mode for OS/390 and z/OS peers"
 msgstr ""
 
+#. TXT_QETH_PORTNAME
+msgid "Portname to use"
+msgstr ""
+
