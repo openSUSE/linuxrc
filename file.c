@@ -428,7 +428,7 @@ int file_read_info()
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
   }
   else {
-    printf("%s...", txt_get(TXT_SEARCH_INFOFILE));
+    printf("%s", txt_get(TXT_SEARCH_INFOFILE));
     fflush(stdout);
     config.linebreak = 1;
   }
