@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TXT_OK
-msgid "Ok"
+msgid "OK"
 msgstr ""
 
 #. TXT_CANCEL
@@ -76,15 +76,18 @@ msgid "Keymap"
 msgstr "Επιλογή Πληκτρολογίου"
 
 #. TXT_LOAD_SCSI
-msgid "Load SCSI module"
+#, fuzzy
+msgid "Load SCSI modules"
 msgstr "Εγκατάσταση οδηγού SCSI"
 
 #. TXT_LOAD_CDROM
-msgid "Load CD-ROM module"
+#, fuzzy
+msgid "Load CD-ROM modules"
 msgstr "Εγκατάσταση οδηγού CD-ROM"
 
 #. TXT_LOAD_NET
-msgid "Load network card module"
+#, fuzzy
+msgid "Load network card modules"
 msgstr "Εγκατάσταση οδηγού κάρτας δικτύου"
 
 #. TXT_SHOW_MODULES
@@ -92,8 +95,8 @@ msgid "Show loaded modules"
 msgstr "Εμφάνιση ήδη εγκατεστημένων οδηγών"
 
 #. TXT_AUTO_LOAD
-msgid "Autoload of modules"
-msgstr "Αυτόματη εγκατάσταση οδηγών"
+msgid "Load modules automatically"
+msgstr ""
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -102,19 +105,17 @@ msgstr "Απεγκατάσταση οδηγών"
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Γίνεται προσπάθεια να φορτωθεί το \"%s\"...\n\n"
-"Κατα τη διάρκεια της διαδικασίας μπορείς"
-"να παρακολουθείς τα μυνήματα του συστήματος"
-"στήν εικονική κονσόλα 4 (ALT-F4)."
+"Γίνεται προσπάθεια να φορτωθεί το \"%s\"...\n"
+"\n"
+"Κατα τη διάρκεια της διαδικασίας μπορείςνα παρακολουθείς τα μυνήματα του συστήματοςστήν εικονική κονσόλα 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
-#, c-format
-msgid "Module \"%s\" has been successfully loaded!"
+#, fuzzy, c-format
+msgid "Module \"%s\" loaded successfully!"
 msgstr "Ο οδηγός \"%s\" εγκαταστάθηκε με επιτυχία"
 
 #. TXT_LOAD_FAILED
@@ -165,10 +166,12 @@ msgstr "Αναζήτηση βασικών αρχείων εγκατάστασης \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image!\n\n"
+"Cannot find the image!\n"
+"\n"
 "Check the directory specification!"
 msgstr ""
-"Ανεπιτυχής εύρεση αρχείων εγκατάστασης!\n\n"
+"Ανεπιτυχής εύρεση αρχείων εγκατάστασης!\n"
+"\n"
 "Ελεγξε τον κατάλογο!"
 
 #. TXT_LOADING
@@ -220,14 +223,13 @@ msgid "Please insert the disk and press ENTER"
 msgstr "Παρακαλώ τοποθετήστε τη δισκέτα και πατήστε ENTER"
 
 #. TXT_ERROR_READ_DISK
-msgid "Error while reading disk!"
+#, fuzzy
+msgid "Error reading from floppy disk!"
 msgstr "Σφάλμα κατα την ανάγνωση της δισκέτας!"
 
 #. TXT_ENTER_ROOT_FS
 msgid "Please enter your root partition (eg. /dev/sda3)"
-msgstr ""
-"Παρακαλώ πληκτρολογήστε το root partition"
-"(πχ. /dev/sda3)"
+msgstr "Παρακαλώ πληκτρολογήστε το root partition(πχ. /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device!"
@@ -242,55 +244,38 @@ msgid "Please enter your IP address"
 msgstr "Παρακαλώ πληκτρολογήστε την διεύθυνση ΙΡ"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Please enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0"
-msgstr ""
-"Παρακαλώ πληκτρολογήστε την netmask."
-"Για ενα δικτυο class C αυτή συνήθως "
-"είναι 255.255.255.0"
+#, fuzzy
+msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
+msgstr "Παρακαλώ πληκτρολογήστε την netmask.Για ενα δικτυο class C αυτή συνήθως είναι 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, please "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, just enter your own IP address."
-msgstr ""
-"Εάν χρειαζεστε gateway για πρόσβαση στο διακομιστή"
-"τότε πληκτρολογήστε την διεύθυνση ΙΡ του gateway."
-"Εαν δεν χρειάζεστε gateway, πληκτρολογήστε την"
-"δική σας διεύθυνση ΙΡ."
+msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
+msgstr "Εάν χρειαζεστε gateway για πρόσβαση στο διακομιστήτότε πληκτρολογήστε την διεύθυνση ΙΡ του gateway.Εαν δεν χρειάζεστε gateway, πληκτρολογήστε τηνδική σας διεύθυνση ΙΡ."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Please enter the IP address of your name server. If "
-"you don't use a name server, just press ESC."
-msgstr ""
-"Πληκτρολογήστε την διεύθυνση ΙΡ του διακομιστή"
-"ονομάτων, αν δεν χρησιμοποιείτε πατήστε ESC."
+#, fuzzy
+msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
+msgstr "Πληκτρολογήστε την διεύθυνση ΙΡ του διακομιστήονομάτων, αν δεν χρησιμοποιείτε πατήστε ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data have been retrieved:\n\n"
+"The following data have been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Βρέθηκαν τα παρακάτω δεδομένα:\n\n"
+"Βρέθηκαν τα παρακάτω δεδομένα:\n"
+"\n"
 "διεύθυνση IP: %s\n"
 "Ονομα: %s\n"
 "Τομέας: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred while configuring the network. "
-"Probably your network card has not been recognized "
-"by the kernel!"
-msgstr ""
-"Σφάλμα κατά την διάρκεια διαμόρφωσης του δικτύου. "
-"Η κάρτα δικτύου δεν αναγνωρίστηκε πιθανώς απο το "
-"σύστημα!"
+#, fuzzy
+msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
+msgstr "Σφάλμα κατά την διάρκεια διαμόρφωσης του δικτύου. Η κάρτα δικτύου δεν αναγνωρίστηκε πιθανώς απο το σύστημα!"
 
 #. TXT_INPUT_SERVER
 msgid "Please enter the IP address of the NFS server."
@@ -311,25 +296,33 @@ msgstr "Παρακαλώ εισάγετε τις παραμέτρους για  \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
-msgstr "Προσπάθεια αντιστοίχισης δίσκου\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Προσπάθεια αντιστοίχισης δίσκου\n"
+"\n"
+"\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the nfs "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the nfs directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
-"Σφάλμα στήν προσπάθεια αντιστοίχισης του καταλόγου "
-"nfs .\n\nΗ αιτία είναι: %s"
+"Σφάλμα στήν προσπάθεια αντιστοίχισης του καταλόγου nfs .\n"
+"\n"
+"Η αιτία είναι: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Please choose a keyboard map.\nYaST will offer "
-"you additional keyboard tables later on."
+"Please choose a keyboard map.\n"
+"YaST will offer you additional keyboard tables later on."
 msgstr ""
-"Παρακαλώ επιλέξτε πληκτρολόγιο.\nΤο YaST θα σου "
-"προσφέρει περισσότερες επιλογές στην συνέχεια."
+"Παρακαλώ επιλέξτε πληκτρολόγιο.\n"
+"Το YaST θα σου προσφέρει περισσότερες επιλογές στην συνέχεια."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to be unloaded."
@@ -345,12 +338,8 @@ msgid "Autoprobing (%s)...      "
 msgstr "Αυτόματη ανίχνευση (%s).."
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Do you want to search for additional SCSI host "
-"adaptors?"
-msgstr ""
-"Επιθυμείτε να ψάξετε για συμπληρωματικούς οδηγούς "
-"SCSI?"
+msgid "Do you want to search for additional SCSI host adaptors?"
+msgstr "Επιθυμείτε να ψάξετε για συμπληρωματικούς οδηγούς SCSI?"
 
 #. TXT_WANT_MORE_NET
 msgid "Do you want to search for additional network cards?"
@@ -389,7 +378,8 @@ msgid "Please choose the network device."
 msgstr "Παρακαλώ επιλέξτε την συσκευή δικτύου."
 
 #. TXT_INPUT_PLIP_IP
-msgid "Please enter the IP-address of the PLIP partner."
+#, fuzzy
+msgid "Please enter the IP address of the PLIP partner."
 msgstr "Πληκτρολογήστε την διεύθυνση ΙΡ του PLIP partner."
 
 #. TXT_LOAD_PCMCIA
@@ -397,21 +387,20 @@ msgid "Load PCMCIA modules"
 msgstr "Φόρτωμα οδηγού PCMCIA "
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be automatically "
-"detected! Please specify manually."
-msgstr ""
-"Δεν μπόρεσε να ανιχνευθεί αυτόματα κανένα PCMCIA "
-"chipset. Παρακαλώ ορίστε το."
+#, fuzzy
+msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
+msgstr "Δεν μπόρεσε να ανιχνευθεί αυτόματα κανένα PCMCIA chipset. Παρακαλώ ορίστε το."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\"!\n\nPlease enter "
-"parameters for PCMCIA core modules"
+"Found PCMCIA chipset \"%s\"!\n"
+"\n"
+"Please enter parameters for PCMCIA core modules"
 msgstr ""
-"Βρέθηκε το PCMCIA chipset \"%s\"!\n\nΠαρακαλώ "
-"δώστε τις παραμέτρους για το  PCMCIA"
+"Βρέθηκε το PCMCIA chipset \"%s\"!\n"
+"\n"
+"Παρακαλώ δώστε τις παραμέτρους για το  PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
@@ -419,7 +408,8 @@ msgid "Please enter specific parameters for chipset \"%s\""
 msgstr "Δώστε λεπτομερείς παραμέτρους για το chipset \"%s\""
 
 #. TXT_START_CARDMGR
-msgid "Starting cardmanager..."
+#, fuzzy
+msgid "Starting card manager..."
 msgstr "Εκκίνηση του  cardmanager..."
 
 #. TXT_PCMCIA_SUCCESS
@@ -435,19 +425,23 @@ msgid "PCMCIA card services already running!"
 msgstr "Ο οδηγός του PCMCIA λειτουργεί ήδη!"
 
 #. TXT_NO_LXRC_END
+#, fuzzy
 msgid ""
-"You can exit Linuxrc only via the menu item\n\n"
-"» Start installation / system «\n\n"
-"In order to allow this, you might need to load some "
-"drivers (modules) to support your hardware."
+"You can exit Linuxrc only via the menu item\n"
+"\n"
+"\"Start installation / system\"\n"
+"\n"
+"In order to allow this, you might need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Μπορείτε να βγείτε απο το Linuxrc απο το μενού\n\n"
-"» Εκκίνηση εγκατάστασης / σύστημα «\n\n"
-"Για να είναι αυτό εφικτό, ίσως χρειαστεί να φορτώσετε "
-"κάποιους drivers(modules)για υποστήριξη του hardware."
+"Μπορείτε να βγείτε απο το Linuxrc απο το μενού\n"
+"\n"
+"» Εκκίνηση εγκατάστασης / σύστημα «\n"
+"\n"
+"Για να είναι αυτό εφικτό, ίσως χρειαστεί να φορτώσετε κάποιους drivers(modules)για υποστήριξη του hardware."
 
 #. TXT_NO_CTRLC
-msgid "You cannot exit Linuxrc by pressing <ctrl-c>!"
+#, fuzzy
+msgid "You cannot exit Linuxrc with <ctrl-c>!"
 msgstr "Δεν μπορείτε να βγείτε απο το Linuxrc με <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
@@ -455,11 +449,18 @@ msgid "Please remove the disk from the drive now!"
 msgstr "Παρακαλώ αφαιρέστε την δισκέτα τώρα!"
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
-msgstr "\n\nΠαράδειγμα: "
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Παράδειγμα: "
 
 #. TXT_CHOOSE_SOURCE
-msgid "Please choose the source media"
+#, fuzzy
+msgid "Please choose the source medium"
 msgstr "Παρακαλώ επιλέξτε το μέσο εγκατάστασης"
 
 #. TXT_TRY_CD_MOUNT
@@ -467,7 +468,8 @@ msgid "Trying to mount the CD-ROM..."
 msgstr "Γίνεται προσπάθεια πρόσβασης στο CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
-msgid "Could not mount the CD-ROM!"
+#, fuzzy
+msgid "Unable to mount the CD-ROM!"
 msgstr "Ανεπιτυχής πρόσβαση στο CD-ROM!"
 
 #. TXT_START_YAST
@@ -479,14 +481,8 @@ msgid "Do you want to reboot the system now?"
 msgstr "Θέλετε να επανεκκινήσετε το σύστημα τώρα ?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"new installed system will now be started in order to "
-"commit the installation."
-msgstr ""
-"Το βασικό σύστημα έχει εγκατασταθεί επιτυχώς.Αυτό "
-"το νέο εγκατεστημένο σύστημα θα ξεκινήσει τώρα για  "
-"να διασφαλιστεί η εγκατάσταση."
+msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
+msgstr "Το βασικό σύστημα έχει εγκατασταθεί επιτυχώς.Αυτό το νέο εγκατεστημένο σύστημα θα ξεκινήσει τώρα για  να διασφαλιστεί η εγκατάσταση."
 
 #. TXT_ENTER_PARTITION
 msgid "Please enter the harddisk partition (eg. /dev/sda1)"
@@ -501,7 +497,8 @@ msgid "Please enter the source directory"
 msgstr "Παρακαλώ δώστε τον πηγαίο κατάλογο"
 
 #. TXT_ERROR_INSTALL
-msgid "An error occurred during installation!"
+#, fuzzy
+msgid "An error occurred during the installation!"
 msgstr "Προκλήθηκε σφάλμα κατα την διάρκεια της εγκατάστασης!"
 
 #. TXT_DRIVES
@@ -509,62 +506,57 @@ msgid "Harddisks / CD-ROMs"
 msgstr ""
 
 #. TXT_LITTLE_MEM
+#, fuzzy
 msgid ""
-"Your computer has extremely little memory!\n\n"
-"Before you acknowledge this message you must switch to "
-"virtual console 2 (just press ALT-F2) and create and "
-"activate some swap space!"
+"Your computer has extremely little memory!\n"
+"\n"
+"Before you acknowledge this message you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space!"
 msgstr ""
-"Ο υπολογιστής έχει εξαιρετικά μικρή μνήμη!\n\n"
-"Πριν επιβεβαιώσεις το παρόν μηνύμα πρέπει να μεταβείς"
-"στην εικονική κονσόλα 2 (ALT-F2) να δημιουργήσεις  "
-"και να ενεργοποιήσεις την εικονική μνήμη!"
+"Ο υπολογιστής έχει εξαιρετικά μικρή μνήμη!\n"
+"\n"
+"Πριν επιβεβαιώσεις το παρόν μηνύμα πρέπει να μεταβείςστην εικονική κονσόλα 2 (ALT-F2) να δημιουργήσεις  και να ενεργοποιήσεις την εικονική μνήμη!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
 msgstr ""
 
 #. TXT_ASK_EXPLODE
-msgid "Do you like \"exploding\" windows?\n\nOf course ;-)"
-msgstr "Θέλετε να \"ανατρέψετε\"τα windows?\n\nΒεβαίως ;-)"
+#, fuzzy
+msgid ""
+"Do you like \"animated\" windows?\n"
+"\n"
+"Of course ;-)"
+msgstr ""
+"Θέλετε να \"ανατρέψετε\"τα windows?\n"
+"\n"
+"Βεβαίως ;-)"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No harddisks and CD-ROM drives have been detected so "
-"far."
-msgstr ""
-"Μέχρι στιγμής δεν έχουν βρεθεί σκληροί δίσκοι και"
-"CD ROMS."
+#, fuzzy
+msgid "No harddisks or CD-ROM drives have been detected so far."
+msgstr "Μέχρι στιγμής δεν έχουν βρεθεί σκληροί δίσκοι καιCD ROMS."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
 msgstr ""
 
 #. TXT_FORCE_ROOTIMAGE
-msgid "Force rootimage"
-msgstr ""
+#, fuzzy
+msgid "Load rootimage into ramdisk"
+msgstr "Φόρτωση δεδομένων στο ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
 msgstr ""
 
 #. TXT_ASK_RI_FORCE
-msgid ""
-"Do you want the rootimage to be loaded into the "
-"RAM disk even when a valid installation system could "
-"be found?"
-msgstr ""
-"Θέλετε να φορτωθεί το rootimage στο "
-"RAM disk ακόμα και άν έχει βρεθεί ένα ισχύον σύστημα "
-"εγκατάστασης?"
+#, fuzzy
+msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
+msgstr "Θέλετε να φορτωθεί το rootimage στο RAM disk ακόμα και άν έχει βρεθεί ένα ισχύον σύστημα εγκατάστασης?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Please enter the path and name of the file you want to"
-" be loaded into the RAM disk as the root file system"
-msgstr ""
-"Παρακαλώ δώστε τον κατάλογο και το όνομα του αρχείου"
-"που θα φορτωθεί στο RAM disk σαν το root file system"
+msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
+msgstr "Παρακαλώ δώστε τον κατάλογο και το όνομα του αρχείουπου θα φορτωθεί στο RAM disk σαν το root file system"
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented!"
@@ -575,12 +567,8 @@ msgid "Installation system"
 msgstr "Σύστημα εγκατάστασης"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Please enter the directory that contains the "
-"installation system."
-msgstr ""
-"Παρακαλώ δώστε τον κατάλογο που περιέχει το "
-"σύστημα εγκατάστασης."
+msgid "Please enter the directory that contains the installation system."
+msgstr "Παρακαλώ δώστε τον κατάλογο που περιέχει το σύστημα εγκατάστασης."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -599,7 +587,8 @@ msgid "Please insert the Live CD."
 msgstr "Εκκίνηση του  Live CD."
 
 #. TXT_END_REBOOT
-msgid "End / Reboot"
+#, fuzzy
+msgid "Exit / Reboot"
 msgstr "Τέλος/ Επανεκκίνηση"
 
 #. TXT_ASK_BOOTP
@@ -628,16 +617,12 @@ msgstr "Ερώτηση του διακομιστή ονομάτων..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
-msgid "Machine %s is unknown!"
-msgstr "Ο Υπολογιστής %s είναι άγνωστος!"
+msgid "Host %s was not found!"
+msgstr ""
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. Do you want to "
-"keep this configuration?"
-msgstr ""
-"Το δίκτυό σας έχει ήδη διαμορφωθεί. Θέλετε να "
-"κρατήσετε αυτή τη διαμόρφωση?"
+msgid "Your network is already configured. Do you want to keep this configuration?"
+msgstr "Το δίκτυό σας έχει ήδη διαμορφωθεί. Θέλετε να κρατήσετε αυτή τη διαμόρφωση?"
 
 #. TXT_ASK_BREAK
 msgid "Do want to abort?"
@@ -645,11 +630,11 @@ msgstr "Θέλετε να εγκαταλείψετε?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found!\nPlease load a network module "
-"first."
+"No network device found!\n"
+"Please load a network module first."
 msgstr ""
-"Δε βρέθηκε συσκευή δικτύου!\nΦορτώστε πρώτα οδηγό  "
-"δικτύου."
+"Δε βρέθηκε συσκευή δικτύου!\n"
+"Φορτώστε πρώτα οδηγό  δικτύου."
 
 #. TXT_ALREADY_FOUND
 #, c-format
@@ -666,20 +651,22 @@ msgstr "Θέλετε να φορτώσετε επιπλέον οδηγό?"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
-msgstr "Σφάλμα πρόσβασης στο διακομιστή  FTP:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Σφάλμα πρόσβασης στο διακομιστή  FTP:\n"
+"\n"
+"%s"
 
 #. TXT_TRY_REACH_FTP
 msgid "Trying to connect to the FTP server..."
 msgstr "Προσπάθεια σύνδεσης στο διακομιστή FTP..."
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Please enter the user name under which you want to "
-"access the FTP server"
-msgstr ""
-"Παρακαλώ δώστε το όνομα χρήστη με το οποίο θέλετε να "
-"αποκτήσετε πρόσβαση στον διακομιστή FTP"
+msgid "Please enter the user name under which you want to access the FTP server"
+msgstr "Παρακαλώ δώστε το όνομα χρήστη με το οποίο θέλετε να αποκτήσετε πρόσβαση στον διακομιστή FTP"
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Please enter the password for the FTP user account"
@@ -694,28 +681,22 @@ msgid "Please enter the port of the FTP proxy"
 msgstr "Παρακαλώ δώστε την θύρα του FTP proxy"
 
 #. TXT_WANT_FTPPROXY
-msgid "Do you want to use a FTP proxy?"
+#, fuzzy
+msgid "Do you want to use an FTP proxy?"
 msgstr "Θέλετε να χρησιμοποιήσετε το FTP proxy?"
 
 #. TXT_NOMEM_FTP
-#, c-format
-msgid ""
-"Your computer does not have enough RAM to do an "
-"installation via FTP! (%d MB RAM required)"
-msgstr ""
-"Ο Υπολογιστής δεν έχει αρκετή διαθέσιμη μνήμη για να "
-"γίνει εγκατάσταση μέσω FTP! (%d MB RAM απαιτούνται)"
+#, fuzzy, c-format
+msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
+msgstr "Ο Υπολογιστής δεν έχει αρκετή διαθέσιμη μνήμη για να γίνει εγκατάσταση μέσω FTP! (%d MB RAM απαιτούνται)"
 
 #. TXT_ANONYM_FTP
+#, fuzzy
 msgid ""
-"Normally a FTP installation is performed via "
-"anonymous FTP. But there is the possibility to specify "
-"a user name and password on the FTP server.\n"
+"Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
 "Do you want this?"
 msgstr ""
-"Συνήθως μια εγκατάσταση FTP πραγματοποιείται μέσω  "
-"anonymous FTP. Υπάρχει ομως η δυνατότητα να  "
-"διευκρινιστεί όνομα και κωδικός στον διακομιστή FTP.\n"
+"Συνήθως μια εγκατάσταση FTP πραγματοποιείται μέσω  anonymous FTP. Υπάρχει ομως η δυνατότητα να  διευκρινιστεί όνομα και κωδικός στον διακομιστή FTP.\n"
 "Θέλετε να γίνει αυτό?"
 
 #. TXT_ENTER_MODDISK
@@ -731,12 +712,9 @@ msgid "Initializing parallel port..."
 msgstr "Ενεργοποίηση παράλληλης θύρας..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Please enter the port number the nfs server is running "
-"on"
-msgstr ""
-"Παρακαλώ δώστε τον αριθμό της θύρας στην οποία τρέχει"
-"ο διακομιστή nfs"
+#, fuzzy
+msgid "Please enter the port number on which the nfs server is running"
+msgstr "Παρακαλώ δώστε τον αριθμό της θύρας στην οποία τρέχειο διακομιστή nfs"
 
 #. TXT_YAST1
 msgid "YaST1 - text based"
@@ -747,19 +725,14 @@ msgid "YaST2 - graphical"
 msgstr "YaST2 - Γραφικό Περιβάλλον"
 
 #. TXT_CHOOSE_YAST
-msgid ""
-"Please choose the version of YaST to use for the "
-"installation."
-msgstr ""
-"Παρακαλούμε επιλέξτε την έκδοση του YaST που θα "
-"χρησιμοποιηθεί για την εγκατάσταση."
+#, fuzzy
+msgid "Please choose the version of YaST you want to use for the installation."
+msgstr "Παρακαλούμε επιλέξτε την έκδοση του YaST που θα χρησιμοποιηθεί για την εγκατάσταση."
 
 #. TXT_INSERT_CD
 #, c-format
 msgid "Please make sure that CD number %d is in your drive!"
-msgstr ""
-"Παρακαλώ βεβαιωθείτε ότι έχετε βάλει στο drive το CD "
-"με αριθμό %d!"
+msgstr "Παρακαλώ βεβαιωθείτε ότι έχετε βάλει στο drive το CD με αριθμό %d!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
@@ -775,15 +748,16 @@ msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system has been successfully installed.  This "
-"new installed system will now be started in order to "
-"commit the installation. "
-"Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the Linux Loader (LILO) "
-"has been installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
 msgstr ""
 
 #. TXT_REISERFS
 msgid "Reiserfs file system found."
 msgstr ""
 
+#~ msgid "Autoload of modules"
+#~ msgstr "Αυτόματη εγκατάσταση οδηγών"
+
+#~ msgid "Machine %s is unknown!"
+#~ msgstr "Ο Υπολογιστής %s είναι άγνωστος!"

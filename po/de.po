@@ -12,8 +12,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TXT_OK
-msgid "Ok"
-msgstr ""
+msgid "OK"
+msgstr "Ok"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -41,7 +41,7 @@ msgstr "Monochrom-Bildschirm"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "What kind of display do you use?"
-msgstr "Welche Art von Bildschirm verwenden Sie?"
+msgstr "Welche Art von Display verwenden Sie?"
 
 #. TXT_MENU_LANG
 msgid "Language"
@@ -76,15 +76,15 @@ msgid "Keymap"
 msgstr "Tastaturbelegung"
 
 #. TXT_LOAD_SCSI
-msgid "Load SCSI module"
+msgid "Load SCSI modules"
 msgstr "SCSI-Treiber laden"
 
 #. TXT_LOAD_CDROM
-msgid "Load CD-ROM module"
+msgid "Load CD-ROM modules"
 msgstr "CD-ROM-Treiber laden"
 
 #. TXT_LOAD_NET
-msgid "Load network card module"
+msgid "Load network card modules"
 msgstr "Netzwerktreiber laden"
 
 #. TXT_SHOW_MODULES
@@ -92,8 +92,8 @@ msgid "Show loaded modules"
 msgstr "Zeige geladene Module"
 
 #. TXT_AUTO_LOAD
-msgid "Autoload of modules"
-msgstr "Automatisches Laden von Modulen"
+msgid "Load modules automatically"
+msgstr "Module automatisch laden"
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -114,7 +114,7 @@ msgstr ""
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
-msgid "Module \"%s\" has been successfully loaded!"
+msgid "Module \"%s\" loaded successfully!"
 msgstr "Das Modul \"%s\" wurde erfolgreich geladen!"
 
 #. TXT_LOAD_FAILED
@@ -222,7 +222,7 @@ msgstr ""
 "und drücken Sie ENTER"
 
 #. TXT_ERROR_READ_DISK
-msgid "Error while reading disk!"
+msgid "Error reading from floppy disk!"
 msgstr "Fehler beim Lesen von der Diskette!"
 
 #. TXT_ENTER_ROOT_FS
@@ -246,7 +246,7 @@ msgstr "Geben Sie bitte Ihre IP-Adresse ein."
 #. TXT_INPUT_NETMASK
 msgid ""
 "Please enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0"
+"network this is usually 255.255.255.0"
 msgstr ""
 "Geben Sie bitte Ihre Netzmaske ein. Für ein normales "
 "Class-C-Netzwerk lautet sie 255.255.255.0"
@@ -264,7 +264,7 @@ msgstr ""
 #. TXT_INPUT_NAMED
 msgid ""
 "Please enter the IP address of your name server. If "
-"you don't use a name server, just press ESC."
+"you don't use a name server, press ESC."
 msgstr ""
 "Geben Sie die IP-Adresse Ihres Nameservers ein. Wenn "
 "Sie keinen Nameserver verwenden möchten, drücken Sie "
@@ -285,9 +285,9 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 msgid ""
-"An error occurred while configuring the network. "
-"Probably your network card has not been recognized "
-"by the kernel!"
+"An error occurred during the network configuration. "
+"Probably your network card was not recognized by "
+"the kernel!"
 msgstr ""
 "Beim Konfigurieren des Netzwerks ist ein Fehler "
 "aufgetreten. Entweder Sie haben kein passendes Modul "
@@ -394,7 +394,7 @@ msgstr ""
 "Installation verwenden möchten."
 
 #. TXT_INPUT_PLIP_IP
-msgid "Please enter the IP-address of the PLIP partner."
+msgid "Please enter the IP address of the PLIP partner."
 msgstr "Geben Sie bitte die IP-Adresse des PLIP-Partners ein."
 
 #. TXT_LOAD_PCMCIA
@@ -403,8 +403,8 @@ msgstr "PCMCIA-Module laden"
 
 #. TXT_NO_PCMCIA
 msgid ""
-"The PCMCIA chipset could not be automatically "
-"detected! Please specify manually."
+"The PCMCIA chipset could not be detected"
+"automatically. Please specify manually."
 msgstr ""
 "Der verwendete PCMCIA Chipsatz konnte nicht "
 "automatisch ermittelt werden. Bitte wählen Sie "
@@ -427,7 +427,7 @@ msgstr ""
 "Chipsatz \"%s\" ein"
 
 #. TXT_START_CARDMGR
-msgid "Starting cardmanager..."
+msgid "Starting card manager..."
 msgstr "Cardmanager wird gestartet..."
 
 #. TXT_PCMCIA_SUCCESS
@@ -445,17 +445,17 @@ msgstr "PCMCIA Card Services laufen bereits!"
 #. TXT_NO_LXRC_END
 msgid ""
 "You can exit Linuxrc only via the menu item\n\n"
-"» Start installation / system «\n\n"
+"\"Start installation / system\"\n\n"
 "In order to allow this, you might need to load some "
 "drivers (modules) to support your hardware."
 msgstr ""
 "Linuxrc kann nur über den Menüpunkt\n\n"
-"» Installation / System starten «\n\n"
+"\"Installation / System starten\"\n\n"
 "verlassen werden! Damit dies möglich ist, müssen Sie "
 "eventuell vorher Hardware-Treiber (Module) laden."
 
 #. TXT_NO_CTRLC
-msgid "You cannot exit Linuxrc by pressing <ctrl-c>!"
+msgid "You cannot exit Linuxrc with <ctrl-c>!"
 msgstr "Linuxrc kann nicht durch <ctrl-c> abgebrochen werden!"
 
 #. TXT_REMOVE_DISK
@@ -467,7 +467,7 @@ msgid "\n\nExample: "
 msgstr "\n\nBeispiel: "
 
 #. TXT_CHOOSE_SOURCE
-msgid "Please choose the source media"
+msgid "Please choose the source medium"
 msgstr "Wählen Sie bitte das Quellmedium"
 
 #. TXT_TRY_CD_MOUNT
@@ -475,7 +475,7 @@ msgid "Trying to mount the CD-ROM..."
 msgstr "Versuche, die CD-ROM zu mounten..."
 
 #. TXT_ERROR_CD_MOUNT
-msgid "Could not mount the CD-ROM!"
+msgid "Unable to mount the CD-ROM!"
 msgstr "CD-ROM konnte nicht gemountet werden!"
 
 #. TXT_START_YAST
@@ -513,7 +513,7 @@ msgid "Please enter the source directory"
 msgstr "Bitte geben Sie das Quellverzeichnis ein"
 
 #. TXT_ERROR_INSTALL
-msgid "An error occurred during installation!"
+msgid "An error occurred during the installation!"
 msgstr ""
 "Die Installation wurde nicht ordnungsgemäß "
 "abgeschlossen!"
@@ -526,7 +526,7 @@ msgstr "Festplatten / CD-ROMs"
 msgid ""
 "Your computer has extremely little memory!\n\n"
 "Before you acknowledge this message you must switch to "
-"virtual console 2 (just press ALT-F2) and create and "
+"virtual console 2 (press ALT-F2) to create and "
 "activate some swap space!"
 msgstr ""
 "Ihr Rechner verfügt über extrem wenig Hauptspeicher!\n"
@@ -540,14 +540,14 @@ msgid "Animation"
 msgstr ""
 
 #. TXT_ASK_EXPLODE
-msgid "Do you like \"exploding\" windows?\n\nOf course ;-)"
+msgid "Do you like \"animated\" windows?\n\nOf course ;-)"
 msgstr ""
 "Möchten Sie \"explodierende\" Fenster?\n\n"
 "Aber klar ;-)"
 
 #. TXT_NO_DRIVES
 msgid ""
-"No harddisks and CD-ROM drives have been detected so "
+"No harddisks or CD-ROM drives have been detected so "
 "far."
 msgstr ""
 "Bislang wurden weder Festplatten noch CD-ROM Laufwerke"
@@ -558,7 +558,7 @@ msgid "Debug (expert)"
 msgstr "Debug (Experte)"
 
 #. TXT_FORCE_ROOTIMAGE
-msgid "Force rootimage"
+msgid "Load rootimage into ramdisk"
 msgstr "Erzwinge Rootimage"
 
 #. TXT_NEW_ROOTIMAGE
@@ -567,9 +567,9 @@ msgstr "Eingabe des Rootimage"
 
 #. TXT_ASK_RI_FORCE
 msgid ""
-"Do you want the rootimage to be loaded into the "
-"RAM disk even when a valid installation system could "
-"be found?"
+"Do you want the root image to be loaded into the "
+"RAM disk even when a valid installation system was "
+"found?"
 msgstr ""
 "Soll das Rootimage auch dann in die RAM-Disk geladen "
 "werden, wenn ein gültiges Installationssystem "
@@ -616,7 +616,7 @@ msgid "Please insert the Live CD."
 msgstr "Bitte legen Sie die Live-CD ein."
 
 #. TXT_END_REBOOT
-msgid "End / Reboot"
+msgid "Exit / Reboot"
 msgstr "Abbruch / Reboot"
 
 #. TXT_ASK_BOOTP
@@ -645,7 +645,7 @@ msgstr "Befrage Nameserver..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
-msgid "Machine %s is unknown!"
+msgid "Host %s was not found!"
 msgstr "Rechner %s ist unbekannt!"
 
 #. TXT_NET_CONFIGURED
@@ -711,23 +711,23 @@ msgid "Please enter the port of the FTP proxy"
 msgstr "Bitte geben Sie den Port des FTP Proxy ein"
 
 #. TXT_WANT_FTPPROXY
-msgid "Do you want to use a FTP proxy?"
+msgid "Do you want to use an FTP proxy?"
 msgstr "Möchten Sie einen FTP Proxy verwenden?"
 
 #. TXT_NOMEM_FTP
 #, c-format
 msgid ""
-"Your computer does not have enough RAM to do an "
-"installation via FTP! (%d MB RAM required)"
+"Your computer does not have enough RAM to install "
+"via FTP! (%d MB RAM required)"
 msgstr ""
 "Für eine Installation via FTP hat Ihr Rechner nicht "
 "genügend Hauptspeicher! (mind. %d MB erforderlich)"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Normally a FTP installation is performed via "
-"anonymous FTP. But there is the possibility to specify "
-"a user name and password on the FTP server.\n"
+"Usually an FTP installation is performed via "
+"anonymous FTP. Nevertheless it is possible to specify "
+"a user name and password for the FTP server access.\n"
 "Do you want this?"
 msgstr ""
 "Normalerweise erfolgt eine FTP-Installation via "
@@ -749,8 +749,8 @@ msgstr "Initialisiere den Parallel-Port..."
 
 #. TXT_ENTER_NFSPORT
 msgid ""
-"Please enter the port number the nfs server is running "
-"on"
+"Please enter the port number on which the nfs server "
+"is running"
 msgstr ""
 "Bitte geben Sie die Nummer des Ports ein, auf dem der "
 "NFS-Server läuft"
@@ -765,8 +765,8 @@ msgstr "YaST2 - grafisch"
 
 #. TXT_CHOOSE_YAST
 msgid ""
-"Please choose the version of YaST to use for the "
-"installation."
+"Please choose the version of YaST you want to use for "
+"the installation."
 msgstr ""
 "Sie können die Installation wahlweise mit dem bekannten "
 "textbasierten YaST1 oder dem neuen grafischen YaST2 "
@@ -793,12 +793,11 @@ msgstr "Bitte geben Sie den Timeout für Bootp ein."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system has been successfully installed.  This "
-"new installed system will now be started in order to "
-"commit the installation. "
+"The base system was successfully installed. Your "
+"machine must now be rebooted. "
 "Please remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the Linux Loader (LILO) "
-"has been installed on it."
+"was installed on it."
 msgstr ""
 "Das Basissystem wurde erfolgreich installiert. Zum Abschluß "
 "der Installation muß neu gebootet werden. Entfernen Sie dazu "

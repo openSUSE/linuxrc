@@ -50,7 +50,7 @@ sub join_msg;
   "br", "iso-8859-1",
   "cs", "iso-8859-2",
   "nl", "iso-8859-1",
-  "en", "CHARSET",
+  "en", "ascii",
   "fr", "iso-8859-1",
   "de", "iso-8859-1",
   "el", "iso-8859-7",

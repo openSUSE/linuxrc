@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TXT_OK
-msgid "Ok"
+msgid "OK"
 msgstr ""
 
 #. TXT_CANCEL
@@ -76,15 +76,18 @@ msgid "Keymap"
 msgstr ""
 
 #. TXT_LOAD_SCSI
-msgid "Load SCSI module"
+#, fuzzy
+msgid "Load SCSI modules"
 msgstr "Muatkan (load) modul SCSI"
 
 #. TXT_LOAD_CDROM
-msgid "Load CD-ROM module"
+#, fuzzy
+msgid "Load CD-ROM modules"
 msgstr "Muatkan (load) modul CD-ROM"
 
 #. TXT_LOAD_NET
-msgid "Load network card module"
+#, fuzzy
+msgid "Load network card modules"
 msgstr "Muatkan (load) modul network"
 
 #. TXT_SHOW_MODULES
@@ -92,8 +95,8 @@ msgid "Show loaded modules"
 msgstr "Tampilkan modul yang sudah dimuatkan"
 
 #. TXT_AUTO_LOAD
-msgid "Autoload of modules"
-msgstr "Pemuatan modul otomatis (autoload)"
+msgid "Load modules automatically"
+msgstr ""
 
 #. TXT_DEL_MODULES
 msgid "Unload modules"
@@ -102,18 +105,17 @@ msgstr "Turunkan (unload) modul"
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Mencoba memuatkan (load) modul \"%s\"...\n\n"
-"Selama memuatkan, anda dapat melihat pesan"
-"kernel pada konsol virtual 4 (ALT-F4)."
+"Mencoba memuatkan (load) modul \"%s\"...\n"
+"\n"
+"Selama memuatkan, anda dapat melihat pesankernel pada konsol virtual 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
-#, c-format
-msgid "Module \"%s\" has been successfully loaded!"
+#, fuzzy, c-format
+msgid "Module \"%s\" loaded successfully!"
 msgstr "Modul \"%s\" telah dimuatkan dengan sukses!"
 
 #. TXT_LOAD_FAILED
@@ -164,10 +166,12 @@ msgstr "Mencari image \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image!\n\n"
+"Cannot find the image!\n"
+"\n"
 "Check the directory specification!"
 msgstr ""
-"Tak bisa menemukan image!\n\n"
+"Tak bisa menemukan image!\n"
+"\n"
 "Periksa direktori yang diberikan!"
 
 #. TXT_LOADING
@@ -219,7 +223,8 @@ msgid "Please insert the disk and press ENTER"
 msgstr "Masukkan disket dan tekan ENTER"
 
 #. TXT_ERROR_READ_DISK
-msgid "Error while reading disk!"
+#, fuzzy
+msgid "Error reading from floppy disk!"
 msgstr "Gagal ketika membaca disk!"
 
 #. TXT_ENTER_ROOT_FS
@@ -239,53 +244,38 @@ msgid "Please enter your IP address"
 msgstr "Harap berikan dengan alamat IP anda"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Please enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0"
-msgstr ""
-"Harap berikan netmask anda. Untuk suatu jaringan"
-"klas C normal, nilai ini biasanya 255.255.255.0"
+#, fuzzy
+msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
+msgstr "Harap berikan netmask anda. Untuk suatu jaringanklas C normal, nilai ini biasanya 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, please "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, just enter your own IP address."
-msgstr ""
-"Jika anda memakai gateway untuk mencapai server, harap"
-"berikan alamat IP gateway. Jika anda tidak "
-"membutuhkan gateway, cukup isikan alamat IP anda."
+msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
+msgstr "Jika anda memakai gateway untuk mencapai server, harapberikan alamat IP gateway. Jika anda tidak membutuhkan gateway, cukup isikan alamat IP anda."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Please enter the IP address of your name server. If "
-"you don't use a name server, just press ESC."
-msgstr ""
-"Harap berikan alamat IP name-server anda. Jika "
-"anda tak memakai name-server, cukup tekan ESC."
+#, fuzzy
+msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
+msgstr "Harap berikan alamat IP name-server anda. Jika anda tak memakai name-server, cukup tekan ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data have been retrieved:\n\n"
+"The following data have been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Data berikut ini telah dibaca:\n\n"
+"Data berikut ini telah dibaca:\n"
+"\n"
 "Alamat IP : %s\n"
 "Nama: %s\n"
 "Domain: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred while configuring the network. "
-"Probably your network card has not been recognized "
-"by the kernel!"
-msgstr ""
-"Kesalahan timbul ketika mengkonfigurasi "
-"network.  Mungkin network card anda belum dikenali "
-"oleh kernel!"
+#, fuzzy
+msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
+msgstr "Kesalahan timbul ketika mengkonfigurasi network.  Mungkin network card anda belum dikenali oleh kernel!"
 
 #. TXT_INPUT_SERVER
 msgid "Please enter the IP address of the NFS server."
@@ -306,25 +296,33 @@ msgstr "Harap berikan parameter untuk \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
-msgstr "Mencoba mengaitkan (mount) ke direktori\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Mencoba mengaitkan (mount) ke direktori\n"
+"\n"
+"\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the nfs "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the nfs directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
-"Suatu kesalahan timbul ketika mencoba mengaitkan "
-"(mount) ke direktori pada nfs.\n\nAlasan server: %s"
+"Suatu kesalahan timbul ketika mencoba mengaitkan (mount) ke direktori pada nfs.\n"
+"\n"
+"Alasan server: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Please choose a keyboard map.\nYaST will offer "
-"you additional keyboard tables later on."
+"Please choose a keyboard map.\n"
+"YaST will offer you additional keyboard tables later on."
 msgstr ""
-"Harap pilih model keyboard..\nNanti YaST memberi"
-"tawaran pilihan tabel keyboard lainnya lagi."
+"Harap pilih model keyboard..\n"
+"Nanti YaST memberitawaran pilihan tabel keyboard lainnya lagi."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to be unloaded."
@@ -340,12 +338,8 @@ msgid "Autoprobing (%s)...      "
 msgstr ""
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Do you want to search for additional SCSI host "
-"adaptors?"
-msgstr ""
-"Apakah anda ingin mencari adapter SCSI "
-"host tambahan ?"
+msgid "Do you want to search for additional SCSI host adaptors?"
+msgstr "Apakah anda ingin mencari adapter SCSI host tambahan ?"
 
 #. TXT_WANT_MORE_NET
 msgid "Do you want to search for additional network cards?"
@@ -384,7 +378,8 @@ msgid "Please choose the network device."
 msgstr "Harap pilih network device."
 
 #. TXT_INPUT_PLIP_IP
-msgid "Please enter the IP-address of the PLIP partner."
+#, fuzzy
+msgid "Please enter the IP address of the PLIP partner."
 msgstr "Harap berikan alamat IP partner PLIP."
 
 #. TXT_LOAD_PCMCIA
@@ -392,21 +387,20 @@ msgid "Load PCMCIA modules"
 msgstr "Muatkan (load ) modul PCMCIA"
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be automatically "
-"detected! Please specify manually."
-msgstr ""
-"Chipset PCMCIA tak dapat dideteksi secara otomatis! "
-"Tentukanlah secara manual."
+#, fuzzy
+msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
+msgstr "Chipset PCMCIA tak dapat dideteksi secara otomatis! Tentukanlah secara manual."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\"!\n\nPlease enter "
-"parameters for PCMCIA core modules"
+"Found PCMCIA chipset \"%s\"!\n"
+"\n"
+"Please enter parameters for PCMCIA core modules"
 msgstr ""
-"Dideteksi chipset PCMCIA \"%s\"!\n\nHarap berikan "
-"parameters untuk modul utama PCMCIA "
+"Dideteksi chipset PCMCIA \"%s\"!\n"
+"\n"
+"Harap berikan parameters untuk modul utama PCMCIA "
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
@@ -414,7 +408,8 @@ msgid "Please enter specific parameters for chipset \"%s\""
 msgstr "Harap berikan parameter khusus untuk chipset \"%s\""
 
 #. TXT_START_CARDMGR
-msgid "Starting cardmanager..."
+#, fuzzy
+msgid "Starting card manager..."
 msgstr "Memulai cardmanager..."
 
 #. TXT_PCMCIA_SUCCESS
@@ -430,19 +425,23 @@ msgid "PCMCIA card services already running!"
 msgstr "Service PCMCIA card telah berjalan !"
 
 #. TXT_NO_LXRC_END
+#, fuzzy
 msgid ""
-"You can exit Linuxrc only via the menu item\n\n"
-"» Start installation / system «\n\n"
-"In order to allow this, you might need to load some "
-"drivers (modules) to support your hardware."
+"You can exit Linuxrc only via the menu item\n"
+"\n"
+"\"Start installation / system\"\n"
+"\n"
+"In order to allow this, you might need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Anda dapat keluar dari Linuxrc melalui pilihan menu\n\n"
-"; Mulai instalasi / sistem «\n\n"
-"Agar dapat menjalankan ini, anda harus memuatkan (load)"
-"beberapa driver (modul) yang mendukung hardware."
+"Anda dapat keluar dari Linuxrc melalui pilihan menu\n"
+"\n"
+"; Mulai instalasi / sistem «\n"
+"\n"
+"Agar dapat menjalankan ini, anda harus memuatkan (load)beberapa driver (modul) yang mendukung hardware."
 
 #. TXT_NO_CTRLC
-msgid "You cannot exit Linuxrc by pressing <ctrl-c>!"
+#, fuzzy
+msgid "You cannot exit Linuxrc with <ctrl-c>!"
 msgstr "Anda tak dapat keluar dari Linuxrc dengan <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
@@ -450,11 +449,18 @@ msgid "Please remove the disk from the drive now!"
 msgstr "Harap keluarkan disket dari disk drive sekarang!"
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
-msgstr "\n\nContoh: "
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Contoh: "
 
 #. TXT_CHOOSE_SOURCE
-msgid "Please choose the source media"
+#, fuzzy
+msgid "Please choose the source medium"
 msgstr "Harap pilih media sumber (source)"
 
 #. TXT_TRY_CD_MOUNT
@@ -462,7 +468,8 @@ msgid "Trying to mount the CD-ROM..."
 msgstr "Mencoba mengaitkan (mount) CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
-msgid "Could not mount the CD-ROM!"
+#, fuzzy
+msgid "Unable to mount the CD-ROM!"
 msgstr "Tak dapat mengaitkan (mount) CD-ROM!"
 
 #. TXT_START_YAST
@@ -474,14 +481,8 @@ msgid "Do you want to reboot the system now?"
 msgstr "Apakah anda ingin me-reboot sistem sekarang?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"new installed system will now be started in order to "
-"commit the installation."
-msgstr ""
-"Sistem utama (base) telah berhasil diinstal. Sistem "
-"baru ini sekarang akan mulai dijalankan untuk "
-"menyelesaikan proses instalasi."
+msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
+msgstr "Sistem utama (base) telah berhasil diinstal. Sistem baru ini sekarang akan mulai dijalankan untuk menyelesaikan proses instalasi."
 
 #. TXT_ENTER_PARTITION
 msgid "Please enter the harddisk partition (eg. /dev/sda1)"
@@ -496,7 +497,8 @@ msgid "Please enter the source directory"
 msgstr "Harap berikan nama direktori sumber (source)"
 
 #. TXT_ERROR_INSTALL
-msgid "An error occurred during installation!"
+#, fuzzy
+msgid "An error occurred during the installation!"
 msgstr "Kesalahan terjadi selama proses instalasi!"
 
 #. TXT_DRIVES
@@ -504,62 +506,57 @@ msgid "Harddisks / CD-ROMs"
 msgstr "Harddisk / CD-ROM"
 
 #. TXT_LITTLE_MEM
+#, fuzzy
 msgid ""
-"Your computer has extremely little memory!\n\n"
-"Before you acknowledge this message you must switch to "
-"virtual console 2 (just press ALT-F2) and create and "
-"activate some swap space!"
+"Your computer has extremely little memory!\n"
+"\n"
+"Before you acknowledge this message you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space!"
 msgstr ""
-"Komputer anda memiliki memori sedikit sekali!\n\n"
-"Sebelum anda meng-iyakan pesan ini, anda harus pindah "
-"ke konsol virtual 2 (tekan Alt-F2) dan buat serta "
-"aktifkanlah swap space !"
+"Komputer anda memiliki memori sedikit sekali!\n"
+"\n"
+"Sebelum anda meng-iyakan pesan ini, anda harus pindah ke konsol virtual 2 (tekan Alt-F2) dan buat serta aktifkanlah swap space !"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
 msgstr "Animasi"
 
 #. TXT_ASK_EXPLODE
-msgid "Do you like \"exploding\" windows?\n\nOf course ;-)"
-msgstr "Apakah anda menyukai \"exploding\" windows?\n\n 8-)"
+#, fuzzy
+msgid ""
+"Do you like \"animated\" windows?\n"
+"\n"
+"Of course ;-)"
+msgstr ""
+"Apakah anda menyukai \"exploding\" windows?\n"
+"\n"
+" 8-)"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No harddisks and CD-ROM drives have been detected so "
-"far."
-msgstr ""
-"Tak ada harddisk dan CD-ROM drive yang terdeteksi "
-"hingga kini."
+#, fuzzy
+msgid "No harddisks or CD-ROM drives have been detected so far."
+msgstr "Tak ada harddisk dan CD-ROM drive yang terdeteksi hingga kini."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
 msgstr ""
 
 #. TXT_FORCE_ROOTIMAGE
-msgid "Force rootimage"
-msgstr "Paksakan (force) rootimage"
+#, fuzzy
+msgid "Load rootimage into ramdisk"
+msgstr "Memuatkan data ke ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
 msgstr "Masukkan rootimage"
 
 #. TXT_ASK_RI_FORCE
-msgid ""
-"Do you want the rootimage to be loaded into the "
-"RAM disk even when a valid installation system could "
-"be found?"
-msgstr ""
-"Apakah anda ingin rootimage dimuatkan (load) ke "
-"RAM disk, walaupun ketika suatu sistem instalasi yang "
-"benar dapat ditemukan ?"
+#, fuzzy
+msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
+msgstr "Apakah anda ingin rootimage dimuatkan (load) ke RAM disk, walaupun ketika suatu sistem instalasi yang benar dapat ditemukan ?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Please enter the path and name of the file you want to"
-" be loaded into the RAM disk as the root file system"
-msgstr ""
-"Harap isikan path, dan nama file yang ingin "
-"dimuatkan (load) ke RAM disk sebagai sistem file root"
+msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
+msgstr "Harap isikan path, dan nama file yang ingin dimuatkan (load) ke RAM disk sebagai sistem file root"
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented!"
@@ -570,12 +567,8 @@ msgid "Installation system"
 msgstr "Sistem instalasi"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Please enter the directory that contains the "
-"installation system."
-msgstr ""
-"Harap berikan nama direktori yang berisi "
-"sistem instalasi."
+msgid "Please enter the directory that contains the installation system."
+msgstr "Harap berikan nama direktori yang berisi sistem instalasi."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -594,7 +587,8 @@ msgid "Please insert the Live CD."
 msgstr "Harap masukkan Live CD."
 
 #. TXT_END_REBOOT
-msgid "End / Reboot"
+#, fuzzy
+msgid "Exit / Reboot"
 msgstr "Selesai / Reboot"
 
 #. TXT_ASK_BOOTP
@@ -623,16 +617,12 @@ msgstr "Mengirim request kepada nameserver..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
-msgid "Machine %s is unknown!"
-msgstr "Mesin %s tidak dikenal!"
+msgid "Host %s was not found!"
+msgstr ""
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. Do you want to "
-"keep this configuration?"
-msgstr ""
-"Network anda telah dikonfigurasi. Apakah anda ingin "
-"menyimpan konfigurasi ini ?"
+msgid "Your network is already configured. Do you want to keep this configuration?"
+msgstr "Network anda telah dikonfigurasi. Apakah anda ingin menyimpan konfigurasi ini ?"
 
 #. TXT_ASK_BREAK
 msgid "Do want to abort?"
@@ -640,11 +630,11 @@ msgstr "Apakah anda ingin membatalkan ?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found!\nPlease load a network module "
-"first."
+"No network device found!\n"
+"Please load a network module first."
 msgstr ""
-"Tak ada divais network ditemukan!\nHarap muatkan "
-"(load) modul network terlebih dahulu."
+"Tak ada divais network ditemukan!\n"
+"Harap muatkan (load) modul network terlebih dahulu."
 
 #. TXT_ALREADY_FOUND
 #, c-format
@@ -661,20 +651,22 @@ msgstr "Apakah anda ingin memuatkan (laod) modul tambahan ?"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
-msgstr "Terjadi kesalahan ketika mengakses server FTP:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Terjadi kesalahan ketika mengakses server FTP:\n"
+"\n"
+"%s"
 
 #. TXT_TRY_REACH_FTP
 msgid "Trying to connect to the FTP server..."
 msgstr "Mencoba melakukan koneksi ke server FTP..."
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Please enter the user name under which you want to "
-"access the FTP server"
-msgstr ""
-"Harap berikan nama yang digunakan untuk "
-"mengakses FTP server"
+msgid "Please enter the user name under which you want to access the FTP server"
+msgstr "Harap berikan nama yang digunakan untuk mengakses FTP server"
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Please enter the password for the FTP user account"
@@ -689,28 +681,22 @@ msgid "Please enter the port of the FTP proxy"
 msgstr "Harap tentukan port untuk FTP proxy"
 
 #. TXT_WANT_FTPPROXY
-msgid "Do you want to use a FTP proxy?"
+#, fuzzy
+msgid "Do you want to use an FTP proxy?"
 msgstr "Apakah anda memakai FTP proxy ?"
 
 #. TXT_NOMEM_FTP
-#, c-format
-msgid ""
-"Your computer does not have enough RAM to do an "
-"installation via FTP! (%d MB RAM required)"
-msgstr ""
-"Komputer anda tidak memiliki RAM yang cukup untuk "
-"melakukan instalasi melalui FTP (minimal %d MB RAM)"
+#, fuzzy, c-format
+msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
+msgstr "Komputer anda tidak memiliki RAM yang cukup untuk melakukan instalasi melalui FTP (minimal %d MB RAM)"
 
 #. TXT_ANONYM_FTP
+#, fuzzy
 msgid ""
-"Normally a FTP installation is performed via "
-"anonymous FTP. But there is the possibility to specify "
-"a user name and password on the FTP server.\n"
+"Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
 "Do you want this?"
 msgstr ""
-"Biasanya instalasi dengan FTP dilakukan melalui "
-"FTP anonymous.  Tetapi ada juga kemungkinan untuk "
-"memberikan nama dan password user untuk FTP server.\n"
+"Biasanya instalasi dengan FTP dilakukan melalui FTP anonymous.  Tetapi ada juga kemungkinan untuk memberikan nama dan password user untuk FTP server.\n"
 "Apakah anda menginginkan ini ?"
 
 #. TXT_ENTER_MODDISK
@@ -726,12 +712,9 @@ msgid "Initializing parallel port..."
 msgstr "Menginisialisasi port parallel ... "
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Please enter the port number the nfs server is running "
-"on"
-msgstr ""
-"Berikan nomor port server NFS yang"
-"digunakan"
+#, fuzzy
+msgid "Please enter the port number on which the nfs server is running"
+msgstr "Berikan nomor port server NFS yangdigunakan"
 
 #. TXT_YAST1
 msgid "YaST1 - text based"
@@ -742,9 +725,8 @@ msgid "YaST2 - graphical"
 msgstr "YaST2 - mode grafis"
 
 #. TXT_CHOOSE_YAST
-msgid ""
-"Please choose the version of YaST to use for the "
-"installation."
+#, fuzzy
+msgid "Please choose the version of YaST you want to use for the installation."
 msgstr "Pilihlah versi YaST yang digunakan untuk instalasi."
 
 #. TXT_INSERT_CD
@@ -766,15 +748,19 @@ msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system has been successfully installed.  This "
-"new installed system will now be started in order to "
-"commit the installation. "
-"Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the Linux Loader (LILO) "
-"has been installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
 msgstr ""
 
 #. TXT_REISERFS
 msgid "Reiserfs file system found."
 msgstr ""
 
+#~ msgid "Autoload of modules"
+#~ msgstr "Pemuatan modul otomatis (autoload)"
+
+#~ msgid "Force rootimage"
+#~ msgstr "Paksakan (force) rootimage"
+
+#~ msgid "Machine %s is unknown!"
+#~ msgstr "Mesin %s tidak dikenal!"
