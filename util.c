@@ -3135,6 +3135,7 @@ int util_update_disk_list(char *module, int add)
   hd_data_t *hd_data = calloc(1, sizeof *hd_data);
 
   hd_set_probe_feature(hd_data, pr_partition);
+  hd_data->flags.list_md = 1;
   hd_scan(hd_data);
 
   for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
