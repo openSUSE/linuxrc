@@ -1,3 +1,6 @@
+4/9/2002:	v1.4.20
+	- show md/lvm devices
+
 2/9/2002:	v1.4.19
 	- made pivot_root a config option
 	- autoload network modules on auto cd/hd install with vnc/ssh.
