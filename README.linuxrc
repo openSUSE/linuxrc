@@ -90,8 +90,25 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # lxrc's language name
   Language: german
 
+  # loale
+  Locale: de_DE
+
   # lxrc's loaded keytable
   Keytable: de-kat1-nd
+
+  # the next 4 entries are set on some languages only
+
+  # font ?
+  Font: Cyr_a8x16
+
+  # unicode map ?
+  Unicodemap: cyralt.uni
+
+  # ??
+  Screenmap: koi2alt
+
+  # ???
+  Fontmagic: (K | (B
 
   # color/mono display
   Display: Color|Mono
@@ -168,6 +185,8 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # is a frame buffer mode active (mode number)?
   Framebuffer: 0x0301
 
+Note: the installation tree is always mounted to /var/adm/mount.
+
 Example (boot via CD):
 
   Sourcemounted: 0
@@ -182,10 +201,13 @@ Example (boot via CD):
   Textmode: 0
   Framebuffer: 0x0301
 
-Example (boot via NFS):
+Example (boot via NFS, language german):
 
+  Language: german
+  Locale: de_DE
   Sourcemounted: 0
   Display: Color
+  Keytable: de-lat1-nd
   alias eth0 de4x5
   Bootmode: Net
   Netdevice: eth0
