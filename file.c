@@ -100,7 +100,6 @@ static struct {
   { key_yast2update,    "YaST2update"      },
   { key_yast2serial,    "YaST2serial"      },
   { key_textmode,       "Textmode"         },
-  { key_yast2autoinst,  "YaST2AutoInstall" },
   { key_usb,            "USB"              },
   { key_yast2color,     "YaST2color"       },
   { key_bootdisk,       "BootDisk"         },
@@ -861,10 +860,6 @@ void file_write_install_inf(char *dir)
 
   file_write_num(f, key_yast2serial, yast2_serial_ig);
   file_write_num(f, key_textmode, text_mode_ig);
-
-  if((action_ig & ACT_YAST2_AUTO_INSTALL)) {
-    file_write_num(f, key_yast2autoinst, 1);
-  }
 
   file_write_str(f, key_autoyast, config.autoyast);
 
