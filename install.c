@@ -614,7 +614,9 @@ static int inst_mount_harddisk (void)
 int inst_check_instsys (void)
     {
     char  filename_ti [MAX_FILENAME];
+    char  filename2_ti [MAX_FILENAME];
     char *instsys_loop_ti = "/suse/setup/inst-img";
+    int hdmount_ok = 0;
 
     if ((action_ig & ACT_RESCUE)) 
         {
@@ -634,25 +636,30 @@ int inst_check_instsys (void)
             strcpy (inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
             break;
         case BOOTMODE_HARDDISK:
-            if (inst_loopmount_im)
-                {
-                ramdisk_ig = FALSE;
-                sprintf (filename_ti, "%s%s%s", inst_tmpmount_tm,
-                         server_dir_tg, instsys_loop_ti);
-                if (util_mount_loop (filename_ti, mountpoint_tg))
-                    {
-                    ramdisk_ig = TRUE;
-                    sprintf (inst_rootimage_tm, "%s%s%s", mountpoint_tg, server_dir_tg,
-                             inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
-                    }
-                }
-            else
-                {
-                ramdisk_ig = TRUE;
-                sprintf (inst_rootimage_tm, "%s%s%s", mountpoint_tg, server_dir_tg,
-                         inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
-                }
-            break;
+          if(inst_loopmount_im) {
+            ramdisk_ig = FALSE;
+            sprintf(filename_ti, "%s%s", inst_tmpmount_tm, server_dir_tg);
+            if(!mount(filename_ti, mountpoint_tg, "none", MS_BIND, 0)) {
+              sprintf(filename_ti, "%s%s", mountpoint_tg, installdir_tg);
+              sprintf(filename2_ti, "%s%s", mountpoint_tg, instsys_loop_ti);
+              if(!util_mount_loop(filename2_ti, filename_ti)) {
+                hdmount_ok = 1;
+              }
+              else if(!inst_rescue_im && util_check_exist(filename_ti)) {
+                hdmount_ok = 1;
+              }
+            }
+          }
+          if(!hdmount_ok) {
+            ramdisk_ig = TRUE;
+            sprintf(
+              inst_rootimage_tm, "%s%s%s",
+              mountpoint_tg,
+              server_dir_tg,
+              inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg
+            );
+          }
+          break;
         case BOOTMODE_CDWITHNET:
         case BOOTMODE_CD:
         case BOOTMODE_NET:
@@ -783,7 +790,7 @@ int inst_prepare()
     rename("/bin", "/.bin");
 
   if(inst_loopmount_im) {
-    strcpy(instsys, mountpoint_tg);
+    sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
   }
   else {
     if(ramdisk_ig)
@@ -1199,9 +1206,12 @@ static int inst_init_cache (void)
 int inst_umount()
 {
   int i = 0, j;
+  char fname[MAX_FILENAME];
 
   if(inst_loopmount_im) {
-    util_umount_loop(mountpoint_tg);
+    sprintf(fname, "%s%s", mountpoint_tg, installdir_tg);
+    util_umount_loop(fname);
+    util_umount(mountpoint_tg);
     j = util_umount(inst_tmpmount_tm);
     if(j == EBUSY) i = EBUSY;
     rmdir(inst_tmpmount_tm);
