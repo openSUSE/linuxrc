@@ -1,3 +1,6 @@
+18/9/2002:	v1.4.30
+	- enable samba support
+
 18/9/2002:	v1.4.29
 	- serial console fix (superfluous '/dev', #19635)
 
