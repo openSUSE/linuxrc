@@ -147,17 +147,17 @@ static keymap_t set_keymaps_arm [] =
 static keymap_t set_keymaps_arm_mac [] =
 {
 { "Deutsch",              "mac-de-latin1-nodeadkeys" },
-{ "Deutsch (CH)",         "mac-de_CH"                },
 { "English (US)",         "mac-us"                   },
 { "English (UK)",         "mac-uk"                   },
 { "Français",             "mac-fr-latin1"            },
+{ "Deutsch (CH)",         "mac-de_CH"                },
 { "Dansk",                "mac-dk-latin1"            },
 { "Suomi/Svensk",         "mac-fi"                   },
 { "Italiano",             "mac-it"                   },
 { "Flamish",              "mac-be"                   },
 { "Español",              "mac-es"                   },
 { "Svenska",              "mac-se"                   },
-{ "Småländska",           "mac-se"                   }
+{ "Português",            "mac-pt"                   }
 };
 /* !!! ***MUST NOT*** be bigger than NR_KEYMAPS !!! */
 #define NR_KEYMAPS_MAC (sizeof set_keymaps_arm_mac / sizeof *set_keymaps_arm_mac)
