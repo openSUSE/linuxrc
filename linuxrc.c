@@ -406,6 +406,8 @@ static void lxrc_init (void)
     int    i_ii;
     char  *language_pci;
     char  *linuxrc_pci;
+    char  *stderr_where_to;
+#define LINUXRC_DEFAULT_STDERR "/dev/tty3"
     int    rc_ii;
 
     printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2001 SuSE GmbH <<<\n");
@@ -518,7 +520,10 @@ static void lxrc_init (void)
            }
         }
 
-    freopen ("/dev/tty3", "a", stderr);
+    if (!(stderr_where_to = getenv("LINUXRC_STDERR")))
+      stderr_where_to = LINUXRC_DEFAULT_STDERR;
+
+    freopen (stderr_where_to, "a", stderr);
     (void) mount ("proc", "/proc", "proc", 0, 0);
     fprintf (stderr, "Remount of / ");
     rc_ii = mount (0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
