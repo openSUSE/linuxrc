@@ -1,3 +1,7 @@
+20/12/2000:	v1.1.16.007
+	- no longer generate X11 info entries in install.inf
+	- pivot_root stuff fixed
+
 11/12/2000:	v1.1.16.006
 	- disabled andreas' pivot_root changes
 	- kukuk: use small libc on SPARC, too

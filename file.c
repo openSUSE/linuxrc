@@ -79,20 +79,26 @@ static const char  *file_txt_yast2_update_tm   = "YaST2update:";
 static const char  *file_txt_yast2_serial_tm   = "YaST2serial:";
 static const char  *file_txt_yast2_autoinst_tm = "YaST2AutoInstall:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
+#if 0
 static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
+#endif
 static const char  *file_txt_has_pcmcia_tm     = "HasPCMCIA:";
 static const char  *file_txt_usb_tm            = "USB:";
+#if 0
 static const char  *file_txt_xserver_tm        = "XServer:";
 static const char  *file_txt_xversion_tm       = "XVersion:";
 static const char  *file_txt_xbusid_tm         = "XBusID:";
 static const char  *file_txt_x11i_tm           = "X11i:";
+#endif
 #if 0
 static const char  *file_probe_tm              = "probe:";
 #endif
+#if 0
 static const char  *file_txt_xkbrules_tm       = "XkbRules:";
 static const char  *file_txt_xkbmodel_tm       = "XkbModel:";
 static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
 static const char  *file_txt_yast2_color_tm    = "YaST2color:";
+#endif
 static const char  *file_txt_boot_disk_tm      = "BootDisk:";
 static const char  *file_txt_disks_tm          = "Disks:";
 #if 0
@@ -276,10 +282,12 @@ void file_write_yast_info (char *file_name)
     if ((action_ig & ACT_YAST2_AUTO_INSTALL))
         fprintf (file_pri, "%s %d\n", file_txt_yast2_autoinst_tm, 1);
 
+    fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
+
+#if 0
     if (frame_buffer_mode_ig)
         fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);
 
-    fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
     {
       char *s, *t, *v;
       s = auto2_xserver(&t, &v);
@@ -297,6 +305,7 @@ void file_write_yast_info (char *file_name)
     if(yast2_color_ig) {
       fprintf (file_pri, "%s %06x\n", file_txt_yast2_color_tm, yast2_color_ig);
     }
+#endif
 #if 0
     {
       char *s = getenv("probe");

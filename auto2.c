@@ -50,8 +50,10 @@ static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
 static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
+#if 0
 static void auto2_chk_frame_buffer(void);
 static void auto2_chk_x11i(void);
+#endif
 static int auto2_find_floppy(void);
 static void auto2_find_mouse(void);
 static int auto2_has_i2o(void);
@@ -248,6 +250,7 @@ void auto2_scan_hardware(char *log_file)
     usb_mods_ig = usb_mods;
   }
 
+#if 0
   switch(hd_mac_color(hd_data)) {
     case 0x01:
       disp_vgacolors_rm.bg = COL_BLUE;
@@ -270,6 +273,7 @@ void auto2_scan_hardware(char *log_file)
       yast2_color_ig = 0x7f7f7f;
       break;
   }
+#endif
 
   if(log_file && (f = fopen(log_file, "w+"))) {
 
@@ -506,8 +510,10 @@ int auto2_init()
   unsigned last_idx;
   hd_t *hd_devs = NULL;
 
+#if 0
   auto2_chk_x11i();
   auto2_chk_frame_buffer();
+#endif
 
   deb_msg("Beginning hardware probing...");
   printf("Starting hardware detection...\n");
@@ -667,6 +673,7 @@ void auto2_chk_expert()
 }
 
 
+#if 0
 /*
  * Read "vga=" entry from the kernel command line.
  */
@@ -689,8 +696,10 @@ void auto2_chk_frame_buffer()
 
   if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
 }
+#endif
 
 
+#if 0
 /*
  * Read "x11i=" entry from the kernel command line.
  */
@@ -715,6 +724,7 @@ void auto2_chk_x11i()
     fclose(f);
   }
 }
+#endif
 
 
 /*
@@ -891,6 +901,7 @@ char *auto2_usb_module()
   return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
 }
 
+#if 0
 /*
  * Assumes xf86_ver to be either "3" or "4" (or empty).
  */
@@ -969,6 +980,7 @@ char *auto2_xserver(char **version, char **busid)
 
   return display;
 }
+#endif
 
 char *auto2_disk_list(int *boot_disk)
 {
@@ -1072,6 +1084,7 @@ void auto2_progress(char *pos, char *msg)
   fflush(stdout);
 }
 
+#if 0
 void auto2_print_x11_opts(FILE *f)
 {
   str_list_t *sl;
@@ -1090,5 +1103,7 @@ void auto2_print_x11_opts(FILE *f)
     if(*sl->str) fprintf(f, "XF86Raw:   %s\n", sl->str);
   }
 }
+#endif
+
 
 #endif	/* USE_LIBHD */

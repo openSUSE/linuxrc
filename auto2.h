@@ -9,7 +9,11 @@ int auto2_full_libhd(void);
 void auto2_find_braille(void);
 #endif
 char *auto2_usb_module(void);
+#if 0
 char *auto2_xserver(char **version, char **busid);
+#endif
 char *auto2_disk_list(int *boot_disk);
 char *auto2_serial_console(void);
+#if 0
 void auto2_print_x11_opts(FILE *);
+#endif
