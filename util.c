@@ -4283,7 +4283,7 @@ void util_load_usb()
     }
   }
 
-  for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, NULL);
+  for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
 
   hd_free_hd_data(hd_data);
 }

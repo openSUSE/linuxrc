@@ -194,7 +194,7 @@ void auto2_scan_hardware(char *log_file)
       }
     }
 
-    for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, &usb_modules);
+    for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, &usb_modules);
     hd_usb = hd_free_hd_list(hd_usb);
 
     fflush(stdout);
@@ -227,7 +227,7 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay += 3;
 
-    for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd, NULL);
+    for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
     hd_usb = hd_free_hd_list(hd_fw);
 
     mod_modprobe("sbp2", NULL);
@@ -614,7 +614,7 @@ int driver_is_active(hd_t *hd)
  * Activate device driver.
  * Returns 1 if it worked, else 0.
  */
-int activate_driver(hd_t *hd, slist_t **mod_list)
+int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list)
 {
   driver_info_t *di;
   str_list_t *sl1, *sl2;
@@ -677,7 +677,7 @@ int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
 
   for(; hd; hd = hd->next) {
     if(hd_is_hw_class(hd, hw_class) && !driver_is_active(hd)) {
-      if((ok = activate_driver(hd, NULL))) {
+      if((ok = activate_driver(hd_data, hd, NULL))) {
         last_idx = hd->idx;
         fprintf(stderr, "Ok, that seems to have worked. :-)\n");
       }
