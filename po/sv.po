@@ -981,7 +981,7 @@ msgstr "Snälla välj typ av nätverk."
 
 #. TXT_IUCV_PEER
 #, fuzzy
-msgid "Please enter the name (user ID) of the target VM guest."
+msgid "Please enter the name (user ID) of the VM peer to connect to."
 msgstr "Snälla namn användare ID av."
 
 #. TXT_390NET_OSATR

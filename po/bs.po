@@ -1060,7 +1060,7 @@ msgid "Please select the type of your network device."
 msgstr ""
 
 #. TXT_IUCV_PEER
-msgid "Please enter the name (user ID) of the target VM guest."
+msgid "Please enter the name (user ID) of the VM peer to connect to."
 msgstr ""
 
 #. TXT_390NET_OSATR

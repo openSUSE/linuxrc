@@ -1153,7 +1153,7 @@ msgid "Please select the type of your network device."
 msgstr "Veuillez sélectionner le type de votre périphérique réseau."
 
 #. TXT_IUCV_PEER
-msgid "Please enter the name (user ID) of the target VM guest."
+msgid "Please enter the name (user ID) of the VM peer to connect to."
 msgstr "Veuillez entrer le nom (utilisateur ID) de l'invité VM cible."
 
 #. TXT_390NET_OSATR

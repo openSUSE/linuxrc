@@ -1,3 +1,5 @@
+	- s390: enhanced IUCV parameter description (bug #42789)
+
 28/9/2004:	v1.7.15
 	- basic chinese support
 	- added some hebrew chars to linuxrc font
