@@ -1,3 +1,6 @@
+14/10/2002:	v1.4.36
+	- specify driver update dir explicitly (#19442)
+
 8/10/2002:	v1.4.35
 	- skip LS120 detection on ppc (#12514)
 

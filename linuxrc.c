@@ -657,6 +657,7 @@ void lxrc_init()
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("/sbin/inst_setup yast");
+  config.updatedir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
 
   util_set_product_dir("suse");
 

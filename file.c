@@ -194,7 +194,8 @@ static struct {
   { key_testpivotroot,  "_TestPivotRoot"   },
   { key_scsibeforeusb,  "SCSIBeforeUSB"    },
   { key_hostip,         "HostIP"           },
-  { key_linemode,       "Linemode"         }
+  { key_linemode,       "Linemode"         },
+  { key_updatedir,      "UpdateDir"        }
 };
 
 static struct {
@@ -1006,6 +1007,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.linemode = f->nvalue;
         break;
 
+      case key_updatedir:
+        if(*f->value) str_copy(&config.updatedir, f->value);
+        break;
+
       default:
         break;
     }
@@ -1251,6 +1256,7 @@ void file_write_install_inf(char *dir)
   }
 
   file_write_num(f, key_keyboard, has_kbd_ig);
+  file_write_str(f, key_updatedir, config.updatedir);
   file_write_num(f, key_yast2update, yast2_update_ig || *driver_update_dir ? 1 : 0);
 
   file_write_num(f, key_yast2serial, yast2_serial_ig);
