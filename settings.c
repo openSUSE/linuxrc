@@ -365,7 +365,7 @@ void set_choose_display()
     NULL
   };
 
-  last_item = dia_list(txt_get(TXT_CHOOSE_DISPLAY), 30, items, last_item, align_center);
+  last_item = dia_list(txt_get(TXT_CHOOSE_DISPLAY), 30, NULL, items, last_item, align_center);
 
   config.color = 3 - last_item;
 
@@ -410,7 +410,7 @@ void set_choose_keytable(int always_show)
   for(i = 0; i < keymaps; i++) items[i] = keymap[i].descr;
   items[i] = NULL;
 
-  i = dia_list(txt_get(TXT_CHOOSE_KEYMAP), 24, items, def_keymap_idx + 1, align_left);
+  i = dia_list(txt_get(TXT_CHOOSE_KEYMAP), 24, NULL, items, def_keymap_idx + 1, align_left);
 
   if(i) set_activate_keymap(keymap[i - 1].mapname);
 }
@@ -477,7 +477,7 @@ void set_choose_language()
   }
   items[i] = NULL;
 
-  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 24, items, set_get_current_language(), align_left);
+  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 24, NULL, items, set_get_current_language(), align_left);
 
   if(i > 0) set_activate_language(set_languages_arm[i - 1].id);
 }

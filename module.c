@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <ctype.h>
 
 #include "global.h"
 #include "text.h"
@@ -72,43 +73,477 @@ static void      mod_unload_plip_core (void);
 static int       mod_getmoddisk       (int mod_type);
 
 
-void mod_menu (void)
-    {
-#if WITH_PCMCIA
-    item_t  items_ari [7];
-#else
-    item_t  items_ari [6];
-#endif
-    int     nr_items = sizeof (items_ari) / sizeof (items_ari [0]);
-    int     i_ii;
+
+static int mod_types = 0;
+static int mod_type[MAX_MODULE_TYPES] = {};
+static int mod_menu_last = 0;
 
 
-    net_stop ();
-    util_create_items (items_ari, nr_items, 40);
-    strcpy (items_ari [0].text, txt_get (TXT_LOAD_SCSI));
-    strcpy (items_ari [1].text, txt_get (TXT_LOAD_CDROM));
-    strcpy (items_ari [2].text, txt_get (TXT_LOAD_NET));
-#if WITH_PCMCIA
-    strcpy (items_ari [3].text, txt_get (TXT_LOAD_PCMCIA));
-    strcpy (items_ari [4].text, txt_get (TXT_SHOW_MODULES));
-    strcpy (items_ari [5].text, txt_get (TXT_DEL_MODULES));
-    strcpy (items_ari [6].text, txt_get (TXT_AUTO_LOAD));
-#else
-    strcpy (items_ari [3].text, txt_get (TXT_SHOW_MODULES));
-    strcpy (items_ari [4].text, txt_get (TXT_DEL_MODULES));
-    strcpy (items_ari [5].text, txt_get (TXT_AUTO_LOAD));
-#endif
-    for (i_ii = 0; i_ii < nr_items; i_ii++)
+static module2_t *mod_get_entry(char *name);
+static void mod_update_list(void);
+static int mod_show_type(int type);
+static void mod_load_manually(int type);
+static int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align);
+static int mod_is_loaded(char *module);
+static int mod_unload_modules(char *modules);
+
+
+/*
+ * openprom, nvram
+ */
+void mod_init()
+{
+  char tmp[256];
+  module2_t *ml;
+
+  setenv("MODPATH", config.module.dir, 1);
+
+  sprintf(tmp, "%s/module.config", config.module.dir);
+  file_read_modinfo(tmp);
+
+  for(ml = config.module.list; ml; ml = ml->next) {
+    if(ml->type == 0 && ml->autoload) {
+      mod_load_module(ml->name, ml->param);
+    }
+  }
+}
+
+
+module2_t *mod_get_entry(char *name)
+{
+  module2_t *ml;
+
+  if(!name) return NULL;
+
+  for(ml = config.module.list; ml; ml = ml->next) {
+    if(!strcmp(ml->name, name)) break;
+  }
+
+  return ml;
+}
+
+
+void mod_update_list()
+{
+  module2_t *ml;
+
+  for(ml = config.module.list; ml; ml = ml->next) {
+    ml->exists = 1;
+  }
+}
+
+
+int mod_show_type(int type)
+{
+  module2_t *ml;
+
+  if(!config.module.type_name[type]) return 0;
+  if(config.module.more_file[type]) return 1;
+
+  for(ml = config.module.list; ml; ml = ml->next) {
+    if(ml->type == type && ml->exists) return 1;
+  }
+
+  return 0;
+}
+
+
+void mod_menu(void)
+{
+  char *items[MAX_MODULE_TYPES + 3];
+  char buf[256], *s;
+  int i;
+
+  net_stop();
+
+  mod_update_list();
+
+  for(mod_types = 0, i = 1; i < MAX_MODULE_TYPES; i++) {
+    if(mod_show_type(i)) {
+      if(!strcasecmp(config.module.type_name[i], "scsi"))
+        s = txt_get(TXT_LOAD_SCSI);
+      else if(!strcasecmp(config.module.type_name[i], "cdrom")) {
+        s = txt_get(TXT_LOAD_CDROM);
+      }
+      else if(!strcasecmp(config.module.type_name[i], "network")) {
+        s = txt_get(TXT_LOAD_NET);
+      }
+      else if(!strcasecmp(config.module.type_name[i], "pcmcia")) {
+        s = txt_get(TXT_LOAD_PCMCIA);
+      }
+      else {
+        sprintf(buf, "Load %s modules", config.module.type_name[i]);
+        s = buf;
+      }
+      mod_type[mod_types] = i;
+      items[mod_types++] = strdup(s);
+    }
+  }
+
+  i = mod_types;
+
+  items[i++] = txt_get(TXT_SHOW_MODULES);
+  items[i++] = txt_get(TXT_DEL_MODULES);
+  items[i++] = txt_get(TXT_AUTO_LOAD);
+
+  items[i] = NULL;
+
+  dia_list(txt_get(TXT_MENU_MODULES), 40, mod_menu_cb, items, mod_menu_last, align_center);
+
+  for(i = 0; i < mod_types; i++) free(items[i]);
+}
+
+
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int mod_menu_cb (int item)
+{
+  mod_menu_last = item--;
+
+  if(item < mod_types) {
+    mod_load_manually(mod_type[item]);
+  }
+  else {
+    switch(item - mod_types) {
+      case 0:
+        mod_show_modules();
+        break;
+
+      case 1:
+        mod_delete_module();
+        break;
+
+      case 2:
+        mod_autoload();
+        break;
+    }
+  }
+
+#if 0
+    switch (what_iv)
         {
-        util_center_text (items_ari [i_ii].text, 40);
-        items_ari [i_ii].func = mod_menu_cb;
+        case 1:
+            if (!warned_is && info_scsi_exists ())
+                {
+                sprintf (text_ti, txt_get (TXT_ALREADY_FOUND),
+                                  txt_get (TXT_SCSI_ADAPTER));
+                strcat (text_ti, txt_get (TXT_ANOTHER_MOD));
+                rc_ii = dia_yesno (text_ti, 1);
+                warned_is = TRUE;
+                }
+            else
+                rc_ii = YES;
+
+            if (rc_ii == YES)
+                {
+                mod_show_kernel_im = TRUE;
+                rc_ii = mod_load_by_user (MOD_TYPE_SCSI);
+                if (rc_ii && !scsi_tg [0])
+                    {
+                    strcpy (scsi_tg, mod_current_arm [rc_ii - 1].module_name);
+                    strcpy (cdrom_tg, "sr0");
+                    }
+                mod_show_kernel_im = FALSE;
+                }
+            break;
+        case 2:
+            if (!warned_is && (info_scsi_cd_exists () || info_eide_cd_exists ()))
+                {
+                sprintf (text_ti, txt_get (TXT_ALREADY_FOUND),
+                                  txt_get (TXT_CDROM));
+                strcat (text_ti, txt_get (TXT_ANOTHER_MOD));
+                rc_ii = dia_yesno (text_ti, 1);
+                warned_is = TRUE;
+                }
+            else
+                rc_ii = YES;
+
+            if (rc_ii == YES)
+                {
+                rc_ii = mod_load_by_user (MOD_TYPE_OTHER);
+                if (rc_ii && !mod_is_ppcd (mod_current_arm [rc_ii - 1].module_name))
+                    strcpy (cdrom_tg, mod_current_arm [rc_ii - 1].module_name);
+                }
+            break;
+        case 3:
+            rc_ii = mod_load_by_user (MOD_TYPE_NET);
+            if (rc_ii && !net_tg [0])
+                strcpy (net_tg, mod_current_arm [rc_ii - 1].module_name);
+            break;
+
+        case 4:
+            if (!mod_getmoddisk (MOD_TYPE_OTHER))
+                (void) pcmcia_load_core ();
+            break;
+#endif
+
+
+  return 1;
+}
+
+
+void mod_load_manually(int type)
+{
+
+
+}
+
+
+#if 0
+int mod_load_by_user (int mod_type_iv)
+    {
+    int     nr_modules_ii;
+    char   *header_ti;
+    item_t  items_ari [NR_MODULES];
+    int     i_ii;
+    int     rc_ii;
+    int     width_ii = MENU_WIDTH;
+    int     choice_ii;
+    int     more_ii;
+    int     ready_ii = FALSE;
+
+    rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
+
+    switch (mod_type_iv)
+        {
+        case MOD_TYPE_SCSI:
+        default:
+            header_ti = txt_get (TXT_LOAD_SCSI);
+            if (rc_ii || !nr_modules_ii)
+            {
+                  if (mod_getmoddisk (MOD_TYPE_SCSI)) return 0;
+            }
+            break;
+        case MOD_TYPE_OTHER:
+            if (mod_getmoddisk (MOD_TYPE_OTHER))
+                return (0);
+            header_ti = txt_get (TXT_LOAD_CDROM);
+            break;
+        case MOD_TYPE_NET:
+            header_ti = txt_get (TXT_LOAD_NET);
+            if (rc_ii || !nr_modules_ii)
+            {
+                  if (mod_getmoddisk (MOD_TYPE_NET)) return 0;
+            }
+            break;
         }
 
-    (void) dia_menu (txt_get (TXT_MENU_MODULES), items_ari,
-                     nr_items, 1);
+    mod_force_moddisk_im = FALSE;
 
-    util_free_items (items_ari, nr_items);
+    do
+        {
+        rc_ii = mod_get_ram_modules (mod_type_iv);
+
+        if (rc_ii)
+            return (0);
+
+        rc_ii = mod_get_current_list (mod_type_iv, &nr_modules_ii, &more_ii);
+        if (rc_ii || !nr_modules_ii)
+            return (0);
+
+        for (i_ii = 0; i_ii < nr_modules_ii; i_ii++)
+            {
+            items_ari [i_ii].text = malloc (width_ii);
+            sprintf (items_ari [i_ii].text, "%14s : %s",
+                     mod_current_arm [i_ii].module_name,
+                     mod_current_arm [i_ii].description);
+            util_fill_string (items_ari [i_ii].text, width_ii);
+            items_ari [i_ii].func = mod_choose_cb;
+            }
+
+        if (more_ii)
+            {
+            items_ari [nr_modules_ii].text = malloc (width_ii);
+            items_ari [nr_modules_ii].func = 0;
+            strcpy (items_ari [nr_modules_ii].text, txt_get (TXT_MORE_MODULES));
+            util_fill_string (items_ari [nr_modules_ii++].text, width_ii);
+            }
+
+        choice_ii = dia_menu (header_ti, items_ari, nr_modules_ii, 1);
+        
+        util_free_items (items_ari, nr_modules_ii);
+
+        if (choice_ii == nr_modules_ii && more_ii)
+            {
+            if (dia_message (txt_get (mod_type_iv == MOD_TYPE_NET ? TXT_ENTER_MODDISK2 : TXT_ENTER_MODDISK), MSGTYPE_INFO) == -1)
+                {
+                ready_ii = TRUE;
+                choice_ii = 0;
+                }
+            else
+                {
+                mod_force_moddisk_im = TRUE;
+                mod_free_modules ();
+                }
+            }
+        else
+            ready_ii = TRUE;
+        }
+    while (!ready_ii);
+
+    return (choice_ii);
     }
+#endif
+
+
+void mod_unload_module (char *module)
+{
+  char cmd[300];
+
+  sprintf(cmd, "rmmod %s", module);
+  system(cmd);
+  util_update_kernellog();
+}
+
+
+int mod_is_loaded(char *module)
+{
+  file_t *f0, *f;
+
+  f0 = file_read_file("/proc/modules");
+
+  for(f = f0; f; f = f->next) {
+    if(!strcmp(f->key_str, module)) break;
+  }
+
+  file_free_file(f0);
+
+  return f ? 1 : 0;
+}
+
+
+int mod_unload_modules(char *modules)
+{
+  char *s;
+  int i, len, ok = 1;
+
+  modules = strdup(modules);
+
+  len = strlen(modules);
+
+  for(i = 0; i < len; i++) if(isspace(modules[i])) modules[i] = 0;
+
+  for(s = modules + len - 1; s >= modules; s--) {
+    if(s == modules || !s[-1]) {
+      if(mod_is_loaded(s)) {
+        mod_unload_module(s);
+        if(mod_is_loaded(s)) ok = 0;
+      }
+    }
+  }
+
+  free(modules);
+
+  return ok;
+}
+
+
+int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align)
+{
+  static char *item[64] = {};
+  static module2_t *mods[64] = {};
+  char *s;
+  int i, items = 0;
+  module2_t *mod;
+  file_t *f0, *f;
+
+  for(i = 0; i < sizeof item / sizeof *item; i++) {
+    if(item[i]) {
+      free(item[i]);
+      item[i] = NULL;
+    }
+  }
+
+  f0 = file_read_file("/proc/modules");
+
+  for(f = f0; f; f = f->next) {
+    mod = mod_get_entry(f->key_str);
+    if(mod && mod->descr) {
+      if(align == align_left) {
+        s = malloc(MENU_WIDTH);
+        strncpy(s, mod->descr, MENU_WIDTH);
+        s[MENU_WIDTH - 1] = 0;
+        util_fill_string(s, MENU_WIDTH - 4);
+      }
+      else {
+        s = strdup(mod->descr);
+      }
+      mods[items] = mod;
+      item[items++] = s;
+      if(items >= sizeof item / sizeof *item - 1) break;
+    }
+  }
+
+  file_free_file(f0);
+
+  mods[items] = NULL;
+  item[items] = NULL;
+
+  if(list) *list = item;
+  if(mod_list) *mod_list = mods;
+
+  return items;
+}
+
+
+void mod_show_modules()
+{
+  char **list;
+  int items;
+
+  items = mod_list_loaded_modules(&list, NULL, align_left);
+
+  if(items) {
+    dia_show_lines(txt_get(TXT_SHOW_MODULES), list, items, MENU_WIDTH, FALSE);
+  }
+  else {
+    dia_message(txt_get(TXT_NO_MODULES), MSGTYPE_INFO);
+  }
+}
+
+
+void mod_delete_module()
+{
+  char **list;
+  int items, choice;
+  module2_t *mod, **mod_list;
+
+  items = mod_list_loaded_modules(&list, &mod_list, align_none);
+
+  if(items) {
+    choice = dia_list(txt_get(TXT_DELETE_MODULE), MENU_WIDTH, NULL, list, 1, align_left);
+    if(choice > 0) {
+      mod = mod_list[choice - 1];
+      if(mod->post_inst) {
+        mod_unload_modules(mod->post_inst);
+        mpar_delete_modparams(mod->post_inst);
+      }
+      mod_unload_modules(mod->name);
+      mpar_delete_modparams(mod->name);
+    }
+  }
+  else {
+    dia_message(txt_get(TXT_NO_MODULES), MSGTYPE_INFO);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 int mod_load_module (char *module_tv, char *params_tv)
@@ -175,62 +610,6 @@ int mod_load_module (char *module_tv, char *params_tv)
 #endif
 
     return (rc_ii);
-    }
-
-
-void mod_unload_module (char *module_tv)
-    {
-    char  command_ti [300];
-
-    sprintf (command_ti, "rmmod %s", module_tv);
-    system (command_ti);
-    util_update_kernellog ();
-    }
-
-
-void mod_show_modules (void)
-    {
-    char     *items_ari [20];
-    int       i_ii;
-    int       nr_items_ii = 0;
-    char      buffer_ti [MAX_X];
-    FILE     *fd_pri;
-    module_t *module_pri;
-
-
-    fd_pri = fopen ("/proc/modules", "r");
-    if (!fd_pri)
-        return;
-
-    while (fgets (buffer_ti, MAX_X - 1, fd_pri) &&
-           nr_items_ii < sizeof (items_ari) / sizeof (items_ari [0]))
-        {
-        i_ii = 0;
-        while (buffer_ti [i_ii] != ' ')
-            i_ii++;
-        buffer_ti [i_ii] = 0;
-        module_pri = mod_get_description (buffer_ti);
-        if (module_pri)
-            {
-            items_ari [nr_items_ii] = malloc (MENU_WIDTH);
-            strncpy (items_ari [nr_items_ii],
-                     module_pri->description, MENU_WIDTH);
-            util_fill_string (items_ari [nr_items_ii], MENU_WIDTH - 4);
-            nr_items_ii++;
-            }
-        }
-    fclose (fd_pri);
-
-    if (!nr_items_ii)
-        (void) dia_message (txt_get (TXT_NO_MODULES), MSGTYPE_INFO);
-    else
-        {
-        dia_show_lines (txt_get (TXT_SHOW_MODULES), items_ari, nr_items_ii,
-                        MENU_WIDTH, FALSE);
-
-        for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-            free (items_ari [i_ii]);
-        }
     }
 
 
@@ -445,27 +824,6 @@ int mod_auto (int type_iv)
     else
         return (-1);
     }
-
-
-/*
- * openprom, nvram
- */
-void mod_init()
-{
-  char tmp[256];
-  module2_t *ml;
-
-  setenv("MODPATH", config.module.dir, 1);
-
-  sprintf(tmp, "%s/module.config", config.module.dir);
-  file_read_modinfo(tmp);
-
-  for(ml = config.module.list; ml; ml = ml->next) {
-    if(ml->type == 0 && ml->autoload) {
-      mod_load_module(ml->name, ml->param);
-    }
-  }
-}
 
 
 int mod_get_mod_type (char *name_tv)
@@ -843,154 +1201,6 @@ static module_t *mod_get_description (char *name_tv)
         return (&mod_net_mod_arm [i_ii]);
     else
         return (0);
-    }
-
-
-static void mod_delete_module (void)
-    {
-    item_t    items_ari [20];
-    module_t *modules_apri [20];
-    int       i_ii;
-    int       nr_items_ii = 0;
-    char      buffer_ti [MAX_X];
-    FILE     *fd_pri;
-    int       choice_ii;
-
-
-    fd_pri = fopen ("/proc/modules", "r");
-    if (!fd_pri)
-        return;
-
-    while (fgets (buffer_ti, MAX_X - 1, fd_pri) &&
-           nr_items_ii < sizeof (items_ari) / sizeof (items_ari [0]))
-        {
-        i_ii = 0;
-        while (buffer_ti [i_ii] != ' ')
-            i_ii++;
-        buffer_ti [i_ii] = 0;
-        modules_apri [nr_items_ii] = mod_get_description (buffer_ti);
-        if (modules_apri [nr_items_ii])
-            {
-            items_ari [nr_items_ii].text = malloc (MENU_WIDTH);
-            items_ari [nr_items_ii].func = 0;
-            strncpy (items_ari [nr_items_ii].text,
-                     modules_apri [nr_items_ii]->description, MENU_WIDTH);
-            util_fill_string (items_ari [nr_items_ii].text, MENU_WIDTH);
-            nr_items_ii++;
-            }
-        }
-    fclose (fd_pri);
-
-    if (!nr_items_ii)
-        (void) dia_message (txt_get (TXT_NO_MODULES), MSGTYPE_INFO);
-    else
-        {
-        choice_ii = dia_menu (txt_get (TXT_DELETE_MODULE), items_ari, nr_items_ii, 1);
-        if (choice_ii)
-            {
-            if (mod_is_ppcd (modules_apri [choice_ii - 1]->module_name))
-                {
-                mod_unload_module ("pcd");
-                mpar_delete_modparams ("pcd");
-                }
-
-            mod_unload_module (modules_apri [choice_ii - 1]->module_name);
-            mpar_delete_modparams (modules_apri [choice_ii - 1]->module_name);
-            }
-
-        for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-            free (items_ari [i_ii].text);
-        }
-    }
-
-
-static int mod_menu_cb (int what_iv)
-    {
-           int   rc_ii;
-           char  text_ti [200];
-    static int   warned_is = FALSE;
-
-
-    switch (what_iv)
-        {
-        case 1:
-            if (!warned_is && info_scsi_exists ())
-                {
-                sprintf (text_ti, txt_get (TXT_ALREADY_FOUND),
-                                  txt_get (TXT_SCSI_ADAPTER));
-                strcat (text_ti, txt_get (TXT_ANOTHER_MOD));
-                rc_ii = dia_yesno (text_ti, 1);
-                warned_is = TRUE;
-                }
-            else
-                rc_ii = YES;
-
-            if (rc_ii == YES)
-                {
-                mod_show_kernel_im = TRUE;
-                rc_ii = mod_load_by_user (MOD_TYPE_SCSI);
-                if (rc_ii && !scsi_tg [0])
-                    {
-                    strcpy (scsi_tg, mod_current_arm [rc_ii - 1].module_name);
-                    strcpy (cdrom_tg, "sr0");
-                    }
-                mod_show_kernel_im = FALSE;
-                }
-            break;
-        case 2:
-            if (!warned_is && (info_scsi_cd_exists () || info_eide_cd_exists ()))
-                {
-                sprintf (text_ti, txt_get (TXT_ALREADY_FOUND),
-                                  txt_get (TXT_CDROM));
-                strcat (text_ti, txt_get (TXT_ANOTHER_MOD));
-                rc_ii = dia_yesno (text_ti, 1);
-                warned_is = TRUE;
-                }
-            else
-                rc_ii = YES;
-
-            if (rc_ii == YES)
-                {
-                rc_ii = mod_load_by_user (MOD_TYPE_OTHER);
-                if (rc_ii && !mod_is_ppcd (mod_current_arm [rc_ii - 1].module_name))
-                    strcpy (cdrom_tg, mod_current_arm [rc_ii - 1].module_name);
-                }
-            break;
-        case 3:
-            rc_ii = mod_load_by_user (MOD_TYPE_NET);
-            if (rc_ii && !net_tg [0])
-                strcpy (net_tg, mod_current_arm [rc_ii - 1].module_name);
-            break;
-#if WITH_PCMCIA
-        case 4:
-            if (!mod_getmoddisk (MOD_TYPE_OTHER))
-                (void) pcmcia_load_core ();
-            break;
-        case 5:
-            mod_show_modules ();
-            break;
-        case 6:
-            mod_delete_module ();
-            break;
-        case 7:
-            mod_autoload ();
-            break;
-#else
-        case 4:
-            mod_show_modules ();
-            break;
-        case 5:
-            mod_delete_module ();
-            break;
-        case 6:
-            mod_autoload ();
-            break;
-#endif
-        default:
-            break;
-        }
-
-    return (what_iv);
     }
 
 

@@ -941,7 +941,7 @@ module2_t *file_read_modinfo(char *name)
   char *s, *s1, *t, *current;
   module2_t *ml0 = NULL, **ml = &ml0, *ml1;
   int i, j, quote, fields, esc;
-  char *field[9];
+  char *field[8];
   int current_type = 0;
 
   if(!config.module.type_name[0]) {
@@ -1042,8 +1042,7 @@ module2_t *file_read_modinfo(char *name)
       if(fields > 3 && *field[3]) ml1->pre_inst = strdup(field[3]);
       if(fields > 4 && *field[4]) ml1->post_inst = strdup(field[4]);
       if(fields > 5 && *field[5]) ml1->initrd = atoi(field[5]);
-      ml1->show = fields > 6 && *field[6] ? atoi(field[6]) : current_type ? 1 : 0;
-      ml1->autoload = fields > 7 && *field[7] ? atoi(field[7]) : current_type ? 1 : 0;
+      ml1->autoload = fields > 6 && *field[6] ? atoi(field[6]) : current_type ? 1 : 0;
 
       ml = &(*ml)->next;
     }
@@ -1077,7 +1076,7 @@ void file_dump_mlist(module2_t *ml)
     );
     fprintf(stderr, "  initrd = %s, show = %s, auto = %s\n",
       ml->initrd ? "yes" : "no",
-      ml->show ? "yes" : "no",
+      ml->descr ? "yes" : "no",
       ml->autoload ? "yes" : "no"
     );
     if(ml->param) fprintf(stderr, "  param: \"%s\"\n", ml->param);

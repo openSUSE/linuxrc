@@ -1557,7 +1557,7 @@ int inst_choose_yast_version()
     util_disp_init();
   }
 
-  yast_version_ig = dia_list(txt_get(TXT_CHOOSE_YAST), 30, items, last_item, align_center);
+  yast_version_ig = dia_list(txt_get(TXT_CHOOSE_YAST), 30, NULL, items, last_item, align_center);
   if(yast_version_ig) last_item = 0;
 
   return yast_version_ig ? 0 : -1;

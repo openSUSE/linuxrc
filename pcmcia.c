@@ -139,7 +139,7 @@ int pcmcia_find_chipset()
   type >>= 8;
 
   if(type != 1 && type != 2) {
-    type = dia_list(txt_get(TXT_NO_PCMCIA), 10, items, last_item, align_center);
+    type = dia_list(txt_get(TXT_NO_PCMCIA), 10, NULL, items, last_item, align_center);
     if(type) last_item = type;
   }
 

@@ -659,7 +659,7 @@ int net_choose_device()
     choice = 1;
   }
   else {
-    choice = dia_list(txt_get(TXT_CHOOSE_NET), 32, items, last_item, align_left);
+    choice = dia_list(txt_get(TXT_CHOOSE_NET), 32, NULL, items, last_item, align_left);
     if(choice) last_item = choice;
   }
 

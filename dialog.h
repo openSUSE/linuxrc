@@ -61,6 +61,7 @@ typedef enum {
 } dia_item_t;
 
 typedef enum {
+  align_none,
   align_center,
   align_left
 } dia_align_t;
@@ -82,5 +83,5 @@ extern void dia_handle_ctrlc (void);
 
 char *dia_get_text(dia_item_t di);
 dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t *items, dia_item_t default_item);
-int dia_list(char *title, int width, char **items, int default_item, dia_align_t align);
+int dia_list(char *title, int width, int (*func)(int), char **items, int default_item, dia_align_t align);
 

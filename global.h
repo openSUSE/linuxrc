@@ -171,8 +171,8 @@ typedef struct module2_s {
   char *post_inst;	/* load these after */
   int type;		/* category, e.g. scsi, cdrom, network... */
   unsigned initrd:1;	/* add it to initrd */
-  unsigned show:1;	/* show it in module list */
   unsigned autoload:1;	/* can be autoloaded */
+  unsigned exists:1;	/* module really exists */
 } module2_t;
 
 

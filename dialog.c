@@ -1138,7 +1138,7 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
 /*
  * returns selected item (1 based), or 0 (ESC pressed)
  */
-int dia_list(char *title, int width, char **items, int default_item, dia_align_t align)
+int dia_list(char *title, int width, int (*func)(int), char **items, int default_item, dia_align_t align)
 {
   int item_cnt, i;
   char **it;
@@ -1157,6 +1157,7 @@ int dia_list(char *title, int width, char **items, int default_item, dia_align_t
   for(i = 0, it = items; *it; it++, i++) {
     strncpy(item_list[i].text, *it, width);
     item_list[i].text[width] = 0;
+    item_list[i].func = func;
     if(align == align_center) {
       util_center_text(item_list[i].text, width);
     }
