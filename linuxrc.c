@@ -358,17 +358,11 @@ static void lxrc_init (void)
 /*    reboot (RB_DISABLE_CAD); */
 
     language_pci = getenv ("lang");
-    if (language_pci)
-        {
-        if (!strncasecmp (language_pci, "english", 7))
-            language_ig = LANG_ENGLISH;
-        else if (!strncasecmp (language_pci, "german", 6))
-            language_ig = LANG_GERMAN;
-        else if (!strncasecmp (language_pci, "italian", 7))
-            language_ig = LANG_ITALIAN;
-        else if (!strncasecmp (language_pci, "french", 6))
-            language_ig = LANG_FRENCH;
-        }
+    if(language_pci) {
+      int i = set_langidbyname(language_pci);
+
+      if(i != LANG_UNDEF) language_ig = i;
+    }
 
     linuxrc_pci = getenv ("linuxrc");
     if (linuxrc_pci)
@@ -425,12 +419,15 @@ static void lxrc_init (void)
            if (strstr (s, ",french,"))
                language_ig = LANG_FRENCH;
 
+           if (strstr (s, ",color,"))
+               color_ig = TRUE;
+
            free (s);
            }
         }
 
     freopen ("/dev/tty3", "a", stderr);
-    (void) mount (0, "/proc", "proc", 0, 0);
+    (void) mount ("proc", "/proc", "proc", 0, 0);
     fprintf (stderr, "Remount of / ");
     rc_ii = mount (0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
     fprintf (stderr, rc_ii ? "failure\n" : "success\n");
@@ -453,6 +450,7 @@ static void lxrc_init (void)
     kbd_init ();
     util_redirect_kmsg ();
     disp_init ();
+    if(color_ig) disp_set_display(color_ig);
 
     auto2_chk_expert ();
 

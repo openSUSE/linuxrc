@@ -443,14 +443,9 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_language_tm, buffer_ti,
                           strlen (file_txt_language_tm)))
             {
-            if (!strncasecmp (value_ti, "english", 7))
-                language_ig = LANG_ENGLISH;
-            else if (!strncasecmp (value_ti, "german", 6))
-                language_ig = LANG_GERMAN;
-            else if (!strncasecmp (value_ti, "italian", 8))
-                language_ig = LANG_ITALIAN;
-            else if (!strncasecmp (value_ti, "french", 6))
-                language_ig = LANG_FRENCH;
+              int i = set_langidbyname (value_ti);
+
+              if(i != LANG_UNDEF) language_ig = i;
             }
 
         if (!strncasecmp (file_txt_display_tm, buffer_ti,

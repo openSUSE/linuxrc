@@ -872,7 +872,10 @@ static int inst_execute_yast (void)
     lxrc_set_modprobe ("/etc/nothing");
     do_disp_init_ig = TRUE;
 
+    fprintf (stderr, "sync...\n");
     sync ();
+    fprintf (stderr, "sync ok\n");
+
     if (!auto2_ig)
         disp_restore_screen ();
     disp_cursor_off ();

@@ -193,7 +193,7 @@ void auto2_scan_hardware(char *log_file)
       mod_load_module("keybdev", NULL);
       mod_load_module("mousedev", NULL);
     }
-    k = mount (0, "/proc/bus/usb", "usbdevfs", 0, 0);
+    k = mount ("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
     if(!i) sleep(4);
     if(with_usb) {
       hd_clear_probe_feature(hd_data, pr_all);

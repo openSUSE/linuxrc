@@ -247,6 +247,11 @@ enum langid_t set_langidbyname(char *name)
       return set_languages_arm[i].id;
   }
 
+  for(i = 0; i < NR_LANGUAGES; i++) {
+    if(!strcasecmp(set_languages_arm[i].locale, name))
+      return set_languages_arm[i].id;
+  }
+
   return LANG_UNDEF;
 }
 

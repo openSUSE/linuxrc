@@ -1,3 +1,13 @@
+23/3/2001	v1.1.19.001
+	- debug msg around sync()
+	- fixed proc & usbdevfs mount() calls
+
+20/3/2001:	v1.1.19.000
+	- start new version
+
+15/3/2001:	v1.1.18.018
+	- mantel: allow specification of bootp timeout via info file or expert menu
+
 6/3/2001:	v1.1.18.017
 	- don't try to do too much networking without a proper net config
 
