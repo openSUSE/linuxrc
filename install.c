@@ -73,7 +73,7 @@ static int   inst_get_nfsserver       (void);
 static int   inst_get_ftpserver       (void);
 static int   inst_ftp                 (void);
 static int   inst_get_ftpsetup        (void);
-static void  inst_choose_yast_version (void);
+static int   inst_choose_yast_version (void);
 
 
 int inst_auto_install (void)
@@ -739,7 +739,8 @@ static int inst_execute_yast (void)
     if (rc_ii)
         return (rc_ii);
 
-    inst_choose_yast_version ();
+    if (inst_choose_yast_version ())
+        return (-1);
 
     if (!auto2_ig)
         dia_status_on (&status_ri, txt_get (TXT_START_YAST));
@@ -1211,7 +1212,7 @@ static int inst_get_ftpsetup (void)
     }
 
 
-static void inst_choose_yast_version (void)
+static int inst_choose_yast_version (void)
     {
     item_t   items_ari [2];
     int      i_ii, width_ii = 30;
@@ -1224,21 +1225,21 @@ static void inst_choose_yast_version (void)
         yast_version_ig = 1;
 
     if (yast_version_ig == 1 && yast1_ii)
-        return;
+        return (0);
 
     if (yast_version_ig == 2 && yast2_ii)
-        return;
+        return (0);
 
     if (yast1_ii && !yast2_ii)
         {
         yast_version_ig = 1;
-        return;
+        return (0);
         }
 
     if (!yast1_ii && yast2_ii)
         {
         yast_version_ig = 2;
-        return;
+        return (0);
         }
 
     if (auto2_ig)
@@ -1258,6 +1259,10 @@ static void inst_choose_yast_version (void)
                                 items_ari, 2, 2);
     util_free_items (items_ari, 2);
 
+    if (!yast_version_ig)
+        return (-1);
+    else
+        return (0);
     }
 
 #ifdef USE_LIBHD
