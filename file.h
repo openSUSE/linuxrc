@@ -36,7 +36,8 @@ typedef enum {
   key_hwdetect, key_floppydevice, key_cdromdevice, key_consoledevice,
   key_product, key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
   key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
-  key_linemode
+  key_linemode, key_updatedir, key_usbscsi, key_useusbscsi, key_lxrcdebug,
+  key_updatename, key_updatestyle, key_updateid, key_updateask, key_loglevel
 } file_key_t;
 
 typedef struct file_s {
@@ -50,6 +51,7 @@ typedef struct file_s {
   } is; 
 } file_t;
 
+file_t *file_getentry(file_t *f, char *key);
 file_t *file_read_file(char *name);
 void file_free_file(file_t *file);
 

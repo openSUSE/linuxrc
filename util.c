@@ -94,27 +94,43 @@ static void free_hlink_list(void);
 static char *util_attach_loop(char *file, int ro);
 static int util_detach_loop(char *dev);
 
+static void add_driver_update(char *dir, char *loc);
+static int cmp_dir_entry(slist_t *sl0, slist_t *sl1);
+static int cmp_dir_entry_s(const void *p0, const void *p1);
+static void create_update_name(unsigned idx);
 
-void util_redirect_kmsg (void)
-    {
-    int   fd_ii;
-    char  newvt_aci [2];
 
+typedef struct {
+  unsigned usb:1;
+  unsigned active:1;
+  unsigned disk:1;
+  char name[5];
+  char last_name[5];
+} scsidev_t;
 
-    if (config.serial)
-        syslog (8, 0, 1);
-    else
-        {
-        fd_ii = open (config.console, O_RDONLY);
-        if (fd_ii)
-            {
-            newvt_aci [0] = 11;
-            newvt_aci [1] = 4;
-            ioctl (fd_ii, TIOCLINUX, &newvt_aci);
-            close (fd_ii);
-            }
-        }
-    }
+static scsidev_t scsidev[16 /* arbitrary, just large enough */] = {};
+
+static void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action);
+static void usbscsi_rename(void);
+static void usbscsi_rename_single(char *old_name, char *new_name);
+
+void util_redirect_kmsg()
+{
+  static char newvt[2] = { 11, 4 /* console 4 */ };
+  int fd, loglevel;
+
+  loglevel = config.loglevel;
+
+  /* serial: default to 1 (no logging) */
+  if(!loglevel && config.serial) loglevel = 1;
+
+  if(loglevel) klogctl(8, NULL, loglevel);
+
+  if(!config.serial && (fd = open(config.console, O_RDONLY))) {
+    ioctl(fd, TIOCLINUX, &newvt);
+    close(fd);
+  }
+}
 
 
 void util_center_text (char *txt_tr, int size_iv)
@@ -490,16 +506,18 @@ void util_truncate_dir(char *dir)
 }
 
 
-int util_check_exist (char *filename_tv)
-    {
-    struct stat  dummy_status_ri;
+int util_check_exist(char *file)
+{
+  struct stat sbuf;
 
+  if(stat(file, &sbuf)) return 0;
 
-    if (stat (filename_tv, &dummy_status_ri))
-        return (FALSE);
-    else
-        return (TRUE);
-    }
+  if(S_ISREG(sbuf.st_mode)) return 'r';
+  if(S_ISDIR(sbuf.st_mode)) return 'd';
+  if(S_ISBLK(sbuf.st_mode)) return 'b';
+
+  return 1;
+}
 
 
 int util_check_break (void)
@@ -693,114 +711,398 @@ void util_manual_mode()
   auto2_ig = 0;
 }
 
-/*
- * Check for a valid driver update directory below <dir>; copy the
- * necessary stuff into a ramdisk and mount it at /update. The global
- * variable driver_update_dir[] then holds the mount point (and is ""
- * otherwise).
- *
- * Do nothing if *driver_update_dir != 0 (stay with the first driver
- * update medium).
- */
-int util_chk_driver_update(char *dir)
+
+void add_driver_update(char *dir, char *loc)
 {
-  char drv_src[100], mods_src[100], inst_src[100];
-  char inst_dst[100], buf[256], rmod[100], *s;
-  struct stat st;
-  int i;
+  unsigned u;
+  size_t len;
+  char *copy_dir[] = { "install", "modules", "y2update" };
+  char *src = NULL, *dst = NULL, *buf1 = NULL, *buf2 = NULL;
+  char *argv[3];
   struct dirent *de;
   DIR *d;
-  char *copy_dir[] = { "y2update", "install" };		/* "install" _must_ be last! */
+  FILE *f;
+  file_t *ft0, *ft;
+  slist_t *sl;
 
-  if(!dir) return 0;
-  if(*driver_update_dir) return 0;
+  /* create destination, if missing */
+  if(util_check_exist(config.update.dst) != 'd') {
+    if(mkdir(config.update.dst, 0755)) return;
+    // if(mount("shmfs", config.update.dst, "shm", 0, 0)) return;
+  }
 
-  sprintf(drv_src, "%s/linux/%s/" LX_ARCH "-" LX_REL, dir, config.product_dir);
-  sprintf(mods_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/modules", dir, config.product_dir);
+  str_copy(&config.update.id, NULL);
 
-  if(stat(drv_src, &st) == -1) return 0;
-  if(!S_ISDIR(st.st_mode)) return 0;
+  /* module version may not match kernel exactly */
+  config.forceinsmod = 1;
 
-  /* Driver update disk, even if the update dir is empty! */
-  strcpy(driver_update_dir, "/update");
+  /* preliminary config file read just for the update id */
+  strprintf(&buf1, "%s/dud.config", dir);
+  ft0 = file_read_file(buf1);
+  for(ft = ft0; ft; ft = ft->next) {
+    if(ft->key == key_updateid && *ft->value) {
+      str_copy(&config.update.id, ft->value);
+      break;
+    }
+  }
+  file_free_file(ft0);
+  free(buf1); buf1 = NULL;
 
-  fprintf(stderr, "found driver update disk\n");
+  if((sl = slist_getentry(config.update.id_list, config.update.id))) {
+    fprintf(stderr, "dud: %s (duplicate of %s, skipped)\n", loc, sl->value);
+    return;
+  }
 
-  mkdir(driver_update_dir, 0755);
+  strprintf(&dst, "%s/%03u", config.update.dst, config.update.count);
+  if(mkdir(dst, 0755)) return;
 
-  if(mount("shmfs", driver_update_dir, "shm", 0, 0)) return 0;
+  fprintf(stderr, "dud %u: %s", config.update.count, loc);
+  if(config.update.id) {
+    fprintf(stderr, " (id %s)", config.update.id);
+  }
+  fprintf(stderr, "\n");
 
-  for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
-    sprintf(inst_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/%s", dir, config.product_dir, copy_dir[i]);
-    sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
-    if(
-      !stat(inst_src, &st) &&
-      S_ISDIR(st.st_mode) &&
-      !mkdir(inst_dst, 0755)
-    ) {
-      fprintf(stderr, "copying %s dir\n", copy_dir[i]);
-      util_do_cp(inst_src, inst_dst);
+  if(config.update.id) {
+    sl = slist_append_str(&config.update.id_list, config.update.id);
+    strprintf(&sl->value, "%u", config.update.count);
+  }
+
+  config.update.count++;
+
+  /* copy directories */
+  for(u = 0; u < sizeof copy_dir / sizeof *copy_dir; u++) {
+    strprintf(&src, "%s/%s", dir, copy_dir[u]);
+    if(util_check_exist(src) != 'd') continue;
+
+    strprintf(&buf1,
+      "%s/%s",
+      strcmp(copy_dir[u], "y2update") ? dst : config.update.dst,
+      copy_dir[u]
+    );
+
+    if(util_check_exist(buf1) == 'd' || !mkdir(buf1, 0755)) {
+      util_do_cp(src, buf1);
     }
   }
 
-  // make sure scripts are executable
-  sprintf(inst_dst, "%s/install", driver_update_dir);
-  if((d = opendir(inst_dst))) {
+  /* copy config file */
+  strprintf(&src, "%s/dud.config", dir);
+  if(util_check_exist(src) == 'r') {
+    argv[1] = src;
+    argv[2] = dst;
+    util_cp_main(3, argv);
+  }
+
+  /* make sure scripts are executable */
+  strprintf(&buf1, "%s/install", dst);
+  if((d = opendir(buf1))) {
     while((de = readdir(d))) {
       if(strstr(de->d_name, "update.") == de->d_name) {
-        sprintf(buf, "%ss/%s", inst_dst, de->d_name);
-        chmod(buf, 0755);
+        strprintf(&buf2, "%s/%s", buf1, de->d_name);
+        chmod(buf2, 0755);
+      }
+    }
+    closedir(d);
+    if(config.update.style) {
+      /* make compat link */
+      config.update.compat = config.update.count - 1;
+      strprintf(&buf2, "%s/install", config.update.dst);
+      unlink(buf2);
+      symlink(buf1, buf2);
+    }
+  }
+
+  /* module things: save order to "module.order" */
+  strprintf(&buf1, "%s/modules", dir);
+  if(util_check_exist(buf1) == 'd') {
+    if((d = opendir(buf1))) {
+      strprintf(&buf2, "%s/modules/module.order", dst);
+      if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
+        while((de = readdir(d))) {
+          if(
+            (len = strlen(de->d_name)) > 2 &&
+            !strcmp(de->d_name + len - 2, ".o")
+          ) {
+            fprintf(f, "%s\n", de->d_name);
+          }
+        }
+        fclose(f);
+      }
+      closedir(d);
+    }
+  }
+
+  free(src);
+  free(dst);
+  free(buf1);
+  free(buf2);
+}
+
+
+int cmp_dir_entry(slist_t *sl0, slist_t *sl1)
+{
+  int i0, i1;
+
+  i0 = strtol(sl0->key, NULL, 10);
+  i1 = strtol(sl1->key, NULL, 10);
+
+  return i0 - i1;
+}
+
+
+/* wrapper for qsort */
+int cmp_dir_entry_s(const void *p0, const void *p1)
+{
+  slist_t **sl0, **sl1;
+
+  sl0 = (slist_t **) p0;
+  sl1 = (slist_t **) p1;
+
+  return cmp_dir_entry(*sl0, *sl1);
+}
+
+
+/*
+ * Check for a valid driver update directory below <dir>; copy the
+ * necessary stuff into a ramdisk and mount it at /update.
+ *
+ * Note: you must call util_do_driver_updates() to actuall apply
+ * the update.
+ */
+int util_chk_driver_update(char *dir, char *loc)
+{
+  char *drv_src = NULL, *dud_loc = NULL, *s;
+  slist_t *sl0 = NULL, *sl;
+  struct dirent *de;
+  DIR *d;
+
+  if(!dir || !loc || !config.tmpfs) return 0;
+
+  /* never delete module dir */
+  config.memory.min_modules = 0;
+
+  strprintf(&drv_src, "%s%s", dir, config.update.dir);
+
+  if(util_check_exist(drv_src) == 'd') {
+    strprintf(&dud_loc, "%s:%s", loc, config.update.dir);
+    add_driver_update(drv_src, dud_loc);
+  }
+
+  d = opendir(dir);
+  if(d) {
+    while((de = readdir(d))) {
+      strtol(de->d_name, &s, 10);
+      if(!*s) {
+        strprintf(&drv_src, "%s/%s%s", dir, de->d_name, config.update.dir);
+        if(util_check_exist(drv_src) == 'd') {
+          slist_append_str(&sl0, de->d_name);
+        }
       }
     }
     closedir(d);
   }
 
-  if(
-    !stat(mods_src, &st) &&
-    S_ISDIR(st.st_mode)
-  ) {
-    sprintf(buf, "%s/module.config", mods_src);
-    if(config.tmpfs && util_check_exist(buf)) {
-      fprintf(stderr, "copying modules\n");
-      mod_copy_modules(mods_src, 1);
-      mod_init();
-      sprintf(buf, "%s/hd.ids", mods_src);
-      if(util_check_exist(buf)) {
-        sprintf(buf, "cp %s/hd.ids /var/lib/hardware", mods_src);
-        system(buf);
-      }
-    }
-    else {
-      fprintf(stderr, "loading modules\n");
-      d = opendir(mods_src);
-      if(d) {
-        while((de = readdir(d))) {
-          if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
-            if((s = strstr(de->d_name, ".o")) && !s[2]) {
-              sprintf(buf, "%s/%s", mods_src, de->d_name);
-              strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
-              mod_unload_module(rmod);
-              mod_insmod(buf, NULL);
-            }
-          }
-        }
-        closedir(d);
-      }
-    }
+  sl0 = slist_sort(sl0, cmp_dir_entry_s);
+
+  for(sl = sl0; sl; sl = sl->next) {
+    strprintf(&drv_src, "%s/%s%s", dir, sl->key, config.update.dir);
+    strprintf(&dud_loc, "%s:/%s%s", loc, sl->key, config.update.dir);
+    add_driver_update(drv_src, dud_loc);
   }
 
-  sprintf(buf, "file:/%s/linuxrc.config", inst_src);
-  file_read_info_file(buf, NULL);
+  free(drv_src);
+  free(dud_loc);
 
   return 0;
 }
 
+
+void util_do_driver_update(unsigned idx)
+{
+  char *s, *buf1 = NULL, *buf2 = NULL, *dst = NULL;
+  file_t *f0, *f;
+  slist_t *sl;
+
+  strprintf(&dst, "%s/%03u", config.update.dst, idx);
+
+  /* read config file */
+  config.update.name_added = 0;
+  strprintf(&buf1, "file:/%s/dud.config", dst);
+  file_read_info_file(buf1, NULL);
+
+  if(!config.update.name_added) create_update_name(idx);
+
+  /* write update name, if there is one */
+  fprintf(stderr, "dud %u:\n", idx);
+  for(
+    ;
+    (sl = *config.update.next_name);
+    config.update.next_name = &(*config.update.next_name)->next
+  ) {
+    fprintf(stderr, "  %s\n", sl->key);
+    if(!config.win) {
+      if(config.linebreak) {
+        printf("\n");
+        config.linebreak = 0;
+      }
+      printf("Driver Update: %s\n", sl->key);
+    }
+  }
+
+  /* read new driver data */
+  strprintf(&buf1, "%s/modules/hd.ids", dst);
+  if(util_check_exist(buf1) == 'r') {
+    strprintf(&buf2,
+      "cat %s %s >/var/lib/hardware/tmp.ids",
+      buf1,
+      util_check_exist("/var/lib/hardware/hd.ids") ? "/var/lib/hardware/hd.ids" : ""
+    );
+    system(buf2);
+    rename("/var/lib/hardware/tmp.ids", "/var/lib/hardware/hd.ids");
+  }
+
+  /* link new modules */
+  strprintf(&buf1, "%s/modules/module.order", dst);
+  f0 = file_read_file(buf1);
+  for(f = f0; f; f = f->next) {
+    strprintf(&buf1, "%s/modules/%s", dst, f->key_str);
+    strprintf(&buf2, "/modules/%s", f->key_str);
+    unlink(buf2);
+    symlink(buf1, buf2);
+  }
+
+  /* load new modules */
+  strprintf(&buf1, "%s/modules/module.config", dst);
+  if(util_check_exist(buf1) == 'r') {
+    strprintf(&buf2, "cp %s/modules/module.config /modules", dst);
+    system(buf2);
+    mod_init(1);
+  }
+  else {
+    for(f = f0; f; f = f->next) {
+//      strprintf(&buf2, "/modules/%s", f->key_str);
+      if((s = strrchr(f->key_str, '.'))) *s = 0;
+      if(mod_is_loaded(f->key_str)) mod_unload_module(f->key_str);
+      mod_modprobe(f->key_str, NULL);
+    }
+  }
+
+  file_free_file(f0);
+  free(dst);
+  free(buf1);
+  free(buf2);
+
+}
+
+
+/*
+ * In case the update description is missing, create it using module names.
+ */
+void create_update_name(unsigned idx)
+{
+  char *buf1 = NULL, *mod;
+  file_t *f0, *f;
+  size_t len;
+  module_t *ml;
+
+  strprintf(&buf1, "%s/%03u/modules/module.order", config.update.dst, idx);
+  f0 = file_read_file(buf1);
+  for(f = f0; f; f = f->next) {
+    len = strlen(mod = f->key_str);
+    if(len > 2 && !strcmp(mod + len - 2, ".o")) {
+      mod[len - 2] = 0;
+      ml = mod_get_entry(mod);
+      if(ml && ml->descr && *ml->descr) mod = ml->descr;
+      slist_append_str(&config.update.name_list, mod);
+    }
+  }
+
+  file_free_file(f0);
+  free(buf1);
+
+}
+
+
+void util_do_driver_updates()
+{
+  if(!config.tmpfs) return;
+
+  while(config.update.next < config.update.count) {
+    util_do_driver_update(config.update.next++);
+  }
+}
+
+
+/* write update.pre for compatibility */
+void util_write_update_pre()
+{
+  char *buf1 = NULL, *buf2 = NULL, *buf3 = NULL;
+  unsigned u;
+  slist_t *sl0 = NULL, *sl;
+  FILE *f;
+
+  if(
+    !config.tmpfs ||
+    !config.update.style ||
+    config.update.compat == config.update.compat_last
+  ) return;
+
+  for(u = config.update.compat_last; u < config.update.compat; u++) {
+    strprintf(&buf1, "%s/%03u/install/update.pre", config.update.dst, u);
+    if(util_check_exist(buf1) == 'r') slist_append_str(&sl0, buf1);
+  }
+
+  /* write update.pre for compatibility */
+  if(sl0) {
+    strprintf(&buf1, "%s/install/update.pre.tmp", config.update.dst);
+    if((f = fopen(buf1, "w"))) {
+      fprintf(f, "#! /bin/sh\n\n");
+      for(sl = sl0; sl; sl = sl->next) {
+        fprintf(f, "%s\n", sl->key);
+      }
+      fprintf(f, "\n");
+      fclose(f);
+    }
+    strprintf(&buf2, "%s/install/update.pre", config.update.dst);
+    if(util_check_exist(buf2) == 'r') {
+      strprintf(&buf3, "cat %s >>%s", buf2, buf1);
+      system(buf3);
+    }
+    unlink(buf2);
+    rename(buf1, buf2);
+    chmod(buf2, 0755);
+  }
+
+  config.update.compat_last = config.update.compat;
+
+  slist_free(sl0);
+  free(buf1);
+  free(buf2);
+  free(buf3);
+}
+
+
+#if 0
 void util_umount_driver_update()
 {
-  if(!*driver_update_dir) return;
+  if(util_check_exist(config.update.dst) == 'd') {
+    util_umount(config.update.dst);
+  }
+}
+#endif
 
-  util_umount(driver_update_dir);
-  *driver_update_dir = 0;
+
+int show_driver_updates()
+{
+
+  if(config.update.name_list) {
+    dia_show_lines2("Driver Update list", config.update.name_list, 64);
+  }
+  else {
+    dia_message("No Driver Updates so far.", MSGTYPE_INFO);
+  }
+
+  return 0;
 }
 
 
@@ -875,6 +1177,7 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "flags = ");
+  add_flag(&sl0, buf, config.debug, "debug");
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
   add_flag(&sl0, buf, config.manual, "manual");
@@ -900,6 +1203,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.run_memcheck, "memcheck");
   add_flag(&sl0, buf, config.hwdetect, "hwdetect");
   add_flag(&sl0, buf, config.had_segv, "segv");
+  add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
+  add_flag(&sl0, buf, config.use_usbscsi, "usbscsi");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {
@@ -928,6 +1233,9 @@ void util_status_info()
     );
   }
   strcat(buf, " )");
+  if(config.floppydev) {
+    sprintf(buf + strlen(buf), " [%s]", config.floppydev);
+  }
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "net devices = (");
@@ -943,11 +1251,6 @@ void util_status_info()
 
   if(config.cdid) {
     sprintf(buf, "cdrom id = %s", config.cdid);
-    slist_append_str(&sl0, buf);
-  }
-
-  if(*driver_update_dir) {
-    sprintf(buf, "driver_update = %s", driver_update_dir);
     slist_append_str(&sl0, buf);
   }
 
@@ -1045,7 +1348,10 @@ void util_status_info()
   sprintf(buf, "language = %s (%s), keymap = %s", lang->yastcode, lang->locale, config.keymap ?: "");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "yast2update = %d, yast2serial = %d", yast2_update_ig, yast2_serial_ig);
+  sprintf(buf,
+    "dud = %d, updates = %d, yast2serial = %d",
+    config.update.ask, config.update.count, yast2_serial_ig
+  );
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "vga = 0x%04x", frame_buffer_mode_ig);
@@ -1532,6 +1838,8 @@ void free_hlink_list()
     if(hl->dst) free(hl->dst);
     free(hl);
   }
+
+  hlink_list = NULL;
 }
 
 
@@ -2385,6 +2693,31 @@ slist_t *slist_reverse(slist_t *sl0)
 }
 
 
+slist_t *slist_sort(slist_t *sl0, int (*cmp_func)(const void *, const void *))
+{
+  int i, list_len;
+  slist_t *sl1 = NULL, *sl;
+  slist_t **slist_array;
+
+  for(list_len = 0, sl = sl0; sl; sl = sl->next) list_len++;
+  if(list_len < 2) return sl0;
+
+  slist_array = malloc(list_len * sizeof *slist_array);
+
+  for(i = 0, sl = sl0; sl; sl = sl->next) slist_array[i++] = sl;
+
+  qsort(slist_array, list_len, sizeof *slist_array, cmp_func);
+
+  for(i = 0; i < list_len; i++) {
+    slist_append(&sl1, slist_array[i])->next = NULL;
+  }
+
+  free(slist_array);
+
+  return sl1;
+}
+
+
 /*
  * split a string
  *
@@ -2502,7 +2835,10 @@ url_t *parse_url(char *str)
   static url_t url = {};
   char *s, *s0, *s1;
   unsigned u;
-  int scheme = -1, i;
+  int scheme = -1, i, ok;
+  char buf[256];
+  slist_t *sl, *sl0;
+  struct stat sbuf;
 
   if(!str) return NULL;
   str = strdup(str);
@@ -2571,6 +2907,56 @@ url_t *parse_url(char *str)
 
   free(str);
   if(scheme >= 0) url.scheme = scheme;
+
+  if(
+    (
+      url.scheme == inst_cdrom ||
+      url.scheme == inst_dvd ||
+      url.scheme == inst_hd
+    ) && (url.dir || url.server)
+  ) {
+    s = malloc(strlen(s0 = url.dir ?: "") + strlen(s1 = url.server ?: "") + 2);
+    *s = 0;
+    if(*s1) strcat(strcat(s, "/"), s1);
+    strcat(s, s0);
+
+    // fprintf(stderr, "s = \"%s\"\n", s);
+
+    sl0 = slist_split('/', *s == '/' ? s + 1 : s);
+
+    sl = sl0;
+    if(sl && !strcmp(sl->key, "dev")) sl = sl->next;
+
+    strcpy(buf, "/dev");
+
+    for(ok = 0; sl; sl = sl->next) {
+      snprintf(buf + strlen(buf), sizeof buf - 1, "/%s", sl->key);
+      if(stat(buf, &sbuf)) break;
+      if(S_ISDIR(sbuf.st_mode)) continue;
+      if(S_ISBLK(sbuf.st_mode)) {
+        str_copy(&url.server, buf + sizeof "/dev/" - 1);
+        *s = 0;
+        for(sl = sl->next; sl; sl = sl->next) {
+          strcat(strcat(s, "/"), sl->key);
+        }
+        str_copy(&url.dir, s);
+        ok = 1;
+        break;
+      }
+      else {
+        break;
+      }
+    }
+
+    if(!ok) {
+      str_copy(&url.server, NULL);
+      str_copy(&url.dir, s);
+    }
+
+    slist_free(sl0);
+    free(s);
+  }
+
 
 #if 0
   fprintf(stderr,
@@ -2937,6 +3323,9 @@ int util_modprobe_main(int argc, char **argv)
 
   if(!argc) return fprintf(stderr, "usage: modprobe module [module params]\n"), 1;
 
+  str_copy(&config.module.dir, "/modules");
+  mod_init(0);
+
   return mod_modprobe(argv[0], argc > 1 ? argv[1] : NULL);
 }
 
@@ -3111,22 +3500,28 @@ int util_mount_rw(char *dev, char *dir)
 
 void util_update_netdevice_list(char *module, int add)
 {
-  file_t *f0, *f;
+  file_t *f0, *f1, *f;
   slist_t *sl;
 
   f0 = file_read_file("/proc/net/dev");
   if(!f0) return;
 
-  if((f = f0) && (f = f->next)) {	/* skip 2 lines */
-    for(f = f->next; f; f = f->next) {
+  /* skip 2 lines */
+  if((f1 = f0->next)) f1 = f1->next;
+
+  if(add) {
+    for(f = f1; f; f = f->next) {
       if(!strcmp(f->key_str, "lo")) continue;
       if(strstr(f->key_str, "sit") == f->key_str) continue;
-      sl = slist_getentry(config.net.devices, f->key_str);
-      if(!sl && add) {
+      if(!slist_getentry(config.net.devices, f->key_str)) {
         sl = slist_append_str(&config.net.devices, f->key_str);
         str_copy(&sl->value, module);
       }
-      else if(sl && !add) {
+    }
+  }
+  else {
+    for(sl = config.net.devices; sl; sl = sl->next) {
+      if(!file_getentry(f1, sl->key)) {
         str_copy(&sl->key, NULL);
         str_copy(&sl->value, NULL);
       }
@@ -3136,6 +3531,8 @@ void util_update_netdevice_list(char *module, int add)
   file_free_file(f0);
 }
 
+
+extern str_list_t *search_str_list(str_list_t *sl, char *str);
 
 int util_update_disk_list(char *module, int add)
 {
@@ -3149,29 +3546,34 @@ int util_update_disk_list(char *module, int add)
   hd_data->flags.list_md = 1;
   hd_scan(hd_data);
 
-  for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
-    sl = slist_getentry(config.disks, hsl->str);
-    if(!sl && add) {
-      sl = slist_append_str(&config.disks, hsl->str);
-      str_copy(&sl->value, module);
-      added++;
+  if(add) {
+    for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
+      if(!slist_getentry(config.disks, hsl->str)) {
+        sl = slist_append_str(&config.disks, hsl->str);
+        str_copy(&sl->value, module);
+        added++;
+      }
     }
-    else if(sl && !add) {
-      str_copy(&sl->key, NULL);
-      str_copy(&sl->value, NULL);
+    for(hsl = hd_data->partitions; hsl; hsl = hsl->next) {
+      if(!slist_getentry(config.partitions, hsl->str)) {
+        sl = slist_append_str(&config.partitions, hsl->str);
+        str_copy(&sl->value, module);
+        added++;
+      }
     }
   }
-
-  for(hsl = hd_data->partitions; hsl; hsl = hsl->next) {
-    sl = slist_getentry(config.partitions, hsl->str);
-    if(!sl && add) {
-      sl = slist_append_str(&config.partitions, hsl->str);
-      str_copy(&sl->value, module);
-      added++;
+  else {
+    for(sl = config.disks; sl; sl = sl->next) {
+      if(!search_str_list(hd_data->disks, sl->key)) {
+        str_copy(&sl->key, NULL);
+        str_copy(&sl->value, NULL);
+      }
     }
-    else if(sl && !add) {
-      str_copy(&sl->key, NULL);
-      str_copy(&sl->value, NULL);
+    for(sl = config.partitions; sl; sl = sl->next) {
+      if(!search_str_list(hd_data->partitions, sl->key)) {
+        str_copy(&sl->key, NULL);
+        str_copy(&sl->value, NULL);
+      }
     }
   }
 
@@ -3345,21 +3747,24 @@ void util_hwcheck()
 void util_set_serial_console(char *str)
 {
   slist_t *sl;
-  char buf[256];
+  char *s;
 
   if(!str || !*str) return;
+
+  /* not a serial console */
+  if(
+    !strncmp(str, "tty", 3) &&
+    (str[3] == 0 || (str[3] >= '0' && str[3] <= '9'))
+  ) return;
 
   str_copy(&config.serial, str);
 
   sl = slist_split(',', config.serial);
 
   if(sl) {
-    if (strncmp("/dev/", sl->key, 5) == 0)
-      sprintf(buf, "%s", sl->key);
-    else
-      sprintf(buf, "/dev/%s", sl->key);
-    if(!config.console || strcmp(buf, config.console)) {
-      str_copy(&config.console, buf);
+    s = long_dev(sl->key);
+    if(!config.console || strcmp(s, config.console)) {
+      str_copy(&config.console, s);
       freopen(config.console, "r", stdin);
       freopen(config.console, "a", stdout);
     }
@@ -3396,8 +3801,276 @@ void util_set_product_dir(char *prod)
   str_copy(&config.product_dir, prod);
 
   str_copy(&config.installdir, "/boot/inst-sys");
+#if defined(__sparc__)
+  {
+     struct utsname buf;
+
+     uname (&buf);
+     if (strcmp (buf.machine, "sparc64") == 0)
+	str_copy(&config.rootimage, "/boot/root64");
+     else
+	str_copy(&config.rootimage, "/boot/root");
+  }
+#else
   str_copy(&config.rootimage, "/boot/root");
+#endif
   str_copy(&config.rescueimage, "/boot/rescue");
   str_copy(&config.demoimage, "/boot/cd-demo");
+}
+
+
+int util_usbscsi_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(!argc) {
+    return fprintf(stderr, "usage: usbscsi 0|1|2\n"), 1;
+  }
+
+  while(argc--) usbscsi_change(atoi(*argv++));
+
+  return 0;
+}
+
+
+/*
+ * action
+ *   0: detach
+ *   1: attach
+ *   2: detach disks only
+ *
+ * returns number of devices attached/detached
+ */
+int usbscsi_change(int action)
+{
+  int i, cnt = 0;
+  FILE *f;
+  int scsidevs = sizeof scsidev / sizeof *scsidev;
+  static int proc_scsi_ext = 0;
+
+  if(!proc_scsi_ext) {
+    proc_scsi_ext = 1;
+    if((f = fopen("/proc/scsi/scsi", "w"))) {
+      fprintf(f, "scsi report-devs 1\n");
+      fclose(f);
+    }
+  }
+
+  usbscsi_read(scsidevs, scsidev, action);
+
+  if(config.debug) {
+    for(i = 0; i < scsidevs; i++) {
+      if(scsidev[i].usb) {
+        fprintf(stderr, "%d: %u (%s) (%s)\n", i, scsidev[i].active, scsidev[i].name, scsidev[i].last_name);
+      }
+    }
+  }
+
+  /* attach or detach them */
+  for(i = 0; i < scsidevs; i++) {
+    if(
+      scsidev[i].usb &&
+      (scsidev[i].disk || action == 0 || action == 1) &&
+      (
+        ((action == 0 || action == 2) && scsidev[i].active) ||
+        (action == 1 && !scsidev[i].active)
+      )
+    ) {
+      cnt++;
+      if(config.debug) {
+        fprintf(stderr, "%sing %d\n", action == 1 ? "attach" : "detach", i);
+      }
+      if((f = fopen("/proc/scsi/scsi", "w"))) {
+        fprintf(f, "scsi %s-single-device %d 0 0 0\n", action == 1 ? "add" : "remove", i);
+        fclose(f);
+      }
+    }
+  }
+
+  usbscsi_read(scsidevs, scsidev, action);
+
+  if(config.debug) {
+    for(i = 0; i < scsidevs; i++) {
+      if(scsidev[i].usb) {
+        fprintf(stderr, "%d: %u (%s) (%s)\n", i, scsidev[i].active, scsidev[i].name, scsidev[i].last_name);
+      }
+    }
+  }
+
+  return cnt;
+}
+
+
+/*
+ * reads info from /proc/scsi/scsi
+ */
+void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action)
+{
+  struct dirent *de1, *de2;
+  DIR *d1, *d2;
+  unsigned u0, u1, u2, u3;
+  char buf[256], *s;
+  FILE *f;
+  int i, attached, ha;
+
+  /* find usb storage host adapters */
+  if((d1 = opendir("/proc/scsi"))) {
+    while((de1 = readdir(d1))) {
+      if(sscanf(de1->d_name, "usb-storage-%u", &u1) == 1) {
+        sprintf(buf, "/proc/scsi/%s", de1->d_name);
+        if((d2 = opendir(buf))) {
+          while((de2 = readdir(d2))) {
+            if(sscanf(de2->d_name, "%u", &u2) == 1) {
+              sprintf(buf + strlen(buf), "/%s", de2->d_name);
+              attached = 1;
+              if((f = fopen(buf, "r"))) {
+                while(fgets(buf, sizeof buf, f)) {
+                  if(strstr(buf, " Attached: No")) {
+                    attached = 0;
+                    break;
+                  }
+                }
+                fclose(f);
+              }
+              if(attached && u2 < scsidevs) {
+                scsidev[u2].usb = 1;
+              }
+            }
+          }
+          closedir(d2);
+        }
+      }
+    }
+    closedir(d1);
+  }
+
+  for(i = 0; i < scsidevs; i++) {
+    if(action == 0 || action == 2) {
+      memcpy(scsidev[i].last_name, scsidev[i].name, sizeof scsidev[i].last_name);
+      memset(scsidev[i].name, 0, sizeof scsidev[i].name);
+    }
+    scsidev[i].active = 0;
+  }
+
+  /* look for disk devices */
+  if((f = fopen("/proc/scsi/scsi", "r"))) {
+    ha = -1;
+    while(fgets(buf, sizeof buf, f)) {
+      if(
+        sscanf(buf, "Host: scsi%u Channel: %u Id: %u Lun: %u", &u0, &u1, &u2, &u3) == 4 &&
+        u1 == 0 && u2 == 0 && u3 == 0
+      ) {
+        ha = u0;
+        if(ha >= 0 && ha < scsidevs && scsidev[ha].usb) {
+          scsidev[ha].active = 1;
+        }
+      }
+      else if(strstr(buf, "Host:") == buf) {
+        ha = -1;
+      }
+      else if(
+        strstr(buf, "  Attached drivers:") == buf &&
+        (s = strstr(buf, " sd"))
+      ) {
+        if(ha >= 0 && ha < scsidevs && scsidev[ha].usb) {
+          scsidev[ha].disk = 1;
+          s++;
+          if(s[3] == '(') {
+            s[3] = 0;
+          }
+          else if(s[4] == '(') {
+            s[4] = 0;
+          }
+          else {
+            *s = 0;
+          }
+          if(*s) {
+            strcpy(scsidev[ha].name, s);
+          }
+        }
+      }
+    }
+    fclose(f);
+  }
+}
+
+
+void usbscsi_off()
+{
+  if(!config.use_usbscsi) return;
+
+  if(!mod_is_loaded("usb-storage")) return;
+
+  usbscsi_change(2);
+}
+
+
+void usbscsi_on()
+{
+  if(!config.use_usbscsi) return;
+
+  if(!mod_is_loaded("usb-storage")) return;
+
+  if(usbscsi_change(1)) usbscsi_rename();
+}
+
+
+void usbscsi_rename()
+{
+  int i;
+  int scsidevs = sizeof scsidev / sizeof *scsidev;
+
+  for(i = 0; i < scsidevs; i++) {
+    if(
+      scsidev[i].usb &&
+      *scsidev[i].name &&
+      *scsidev[i].last_name &&
+      strcmp(scsidev[i].name, scsidev[i].last_name)
+    ) {
+      fprintf(stderr, "%s --> %s\n", scsidev[i].last_name, scsidev[i].name);
+      usbscsi_rename_single(scsidev[i].last_name, scsidev[i].name);
+    }
+  }
+}
+
+
+void usbscsi_rename_single(char *old_name, char *new_name)
+{
+  size_t i;
+  char **rs[] = { &config.floppydev, &config.update.dev };
+
+  for(i = 0; i < sizeof config.floppy_dev / sizeof *config.floppy_dev; i++) {
+    if(config.floppy_dev[i] && !strcmp(short_dev(config.floppy_dev[i]), old_name)) {
+      str_copy(&config.floppy_dev[i], long_dev(new_name));
+    }
+  }
+
+  for(i = 0; i < sizeof rs / sizeof *rs; i++) {
+    if(*rs[i] && !strcmp(*rs[i], old_name)) {
+      str_copy(rs[i], new_name);
+    }
+  }
+}
+
+
+char *short_dev(char *dev)
+{
+  if(dev && !strncmp(dev, "/dev/", sizeof "/dev/" - 1)) {
+    dev += sizeof "/dev/" - 1;
+  }
+  return dev;
+}
+
+
+char *long_dev(char *dev)
+{
+  static char *buf = NULL;
+
+  if(dev && strncmp(dev, "/dev/", sizeof "/dev/" - 1)) {
+    strprintf(&buf, "/dev/%s", dev);
+    dev = buf;
+  }
+
+  return dev;
 }
 
