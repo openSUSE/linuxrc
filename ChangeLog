@@ -1,5 +1,6 @@
 	- s390: ask for hostname, enable portmapper, cleanups
 	- added 'start shell' menu entry
+	- s390: LCS configuration, cut-and-paste cleanup, minor fixes
 
 23/8/2004:	v1.7.4
 	- added installation display selection (X11/VNC/SSH)

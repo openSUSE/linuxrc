@@ -1155,3 +1155,7 @@ msgstr ""
 msgid "Fully qualified hostname"
 msgstr ""
 
+#. TXT_OSA_PORTNO
+msgid "Enter the relative port number"
+msgstr ""
+

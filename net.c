@@ -120,7 +120,7 @@ void net_ask_hostname()
   if(!config.net.realhostname)
   {
     if(!config.win) util_disp_init();
-    dia_input2(txt_get(TXT_HOSTNAME), &config.net.realhostname, 20, 1);
+    dia_input2(txt_get(TXT_HOSTNAME), &config.net.realhostname, 20, 0);
     if(config.win && !win_old) util_disp_done();
   }
 }
@@ -1658,6 +1658,60 @@ int net_check_ccw_address(char* addr)
   return 0;
 }
 
+/* set config variables common to CCW devices */
+static void net_s390_set_config_ccwdev()
+{
+    config.hwp.scriptup="hwup-ccw";
+    config.hwp.scriptup_ccw="hwup-ccw";
+    config.hwp.scriptdown="hwdown-ccw";
+}
+
+/* ask user for read and write channels */
+static int net_s390_getrwchans()
+{
+  int rc;
+  if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
+  if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
+  if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
+  if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
+  return 0;
+}
+
+/* group CCW channels */
+static int net_s390_group_chans(int num, char* driver)
+{
+  int rc;
+  char devs[8*3+1*3+1];	/* three channel addresses, commas/LF, zero */
+  char path[100];
+
+  if(num==2)
+    sprintf(devs,"%s,%s\n",config.hwp.readchan,config.hwp.writechan);
+  else if(num==3)
+    sprintf(devs,"%s,%s,%s\n",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
+  else
+    return -1;
+  
+  sprintf(path,"/sys/bus/ccwgroup/drivers/%s/group",driver);
+  hotplug_event_handled(); /* remove stale events */
+  if((rc=util_set_sysfs_attr(path,devs))) return rc;
+  if((rc=hotplug_wait_for_event("ccwgroup"))) return rc;
+  /* no hotplug_event_handled() call, we usually need the info later */
+  return 0;
+}
+
+/* put device online */
+static int net_s390_put_online(char* devpath)
+{
+  int rc;
+  char path[100];
+  sprintf(path,"/sys/%s/online",devpath);
+  hotplug_event_handled(); /* remove stale events */
+  if((rc=util_set_sysfs_attr(path,"1"))) return rc;
+  if((rc=hotplug_wait_for_event("net"))) return rc;
+  hotplug_event_handled();
+  return 0;
+}
+
 int net_activate_s390_devs(void)
 {
   int rc;
@@ -1703,13 +1757,11 @@ int net_activate_s390_devs(void)
   case di_390net_escon:
     mod_modprobe("ctc",NULL);	// FIXME: error handling
 
-    net_list_s390_devs("cu3088",0);
+    net_list_s390_devs("cu3088",0);	// FIXME: filter CTC/ESCON devices
 
-    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
-    if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
-    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
-    if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
+    if((rc=net_s390_getrwchans())) return rc;
     
+    /* ask for CTC protocol */
     dia_item_t protocols[] = {
       di_ctc_compat,
       di_ctc_ext,
@@ -1734,30 +1786,22 @@ int net_activate_s390_devs(void)
     default: return -1;
     }
     
-    /* group channels */
-    sprintf(buf,"%s,%s\n",config.hwp.readchan,config.hwp.writechan);
-    if((rc=util_set_sysfs_attr("/sys/bus/ccwgroup/drivers/ctc/group",buf))) return rc;
+    if((rc=net_s390_group_chans(2,"ctc"))) return rc;
 
     /* set protocol */
-    sprintf(buf,"/sys/devices/cu3088/%s/protocol",config.hwp.readchan);
+    devpath=hotplug_get_info("DEVPATH");
+    sprintf(buf,"/sys/%s/protocol",devpath);
     sprintf(hwcfg_name,"%d",config.hwp.protocol-1);
     if((rc=util_set_sysfs_attr(buf,hwcfg_name))) return rc;
 
-    /* put device online */
-    hotplug_event_handled();	/* remove stale events */
-    sprintf(buf,"/sys/devices/cu3088/%s/online",config.hwp.readchan);
-    if((rc=util_set_sysfs_attr(buf,"1"))) return rc;
-    if((rc=hotplug_wait_for_event("net"))) return rc;
-    hotplug_event_handled();
+    if((rc=net_s390_put_online(devpath))) return rc;
     
+    net_s390_set_config_ccwdev();
     sprintf(hwcfg_name, "ctc-bus-ccw-%s",config.hwp.readchan);
     config.hwp.module="ctc";
-    config.hwp.scriptup="hwup-ccw";
-    config.hwp.scriptup_ccw="hwup-ccw";
     config.hwp.scriptup_ccwgroup="hwup-ctc";
-    config.hwp.scriptdown="hwdown-ccw";
-    strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
     config.hwp.ccw_chan_num=2;
+    strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
     
     break;
     
@@ -1768,47 +1812,66 @@ int net_activate_s390_devs(void)
 
     net_list_s390_devs("qeth",di==di_390net_hsi?5:1);
 
-    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
-    if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
-    if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
-    if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
+    if((rc=net_s390_getrwchans())) return rc;
     if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
     if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
     
     if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
     // FIXME: warn about problems related to empty portnames
     
-    /* group channels */
-    sprintf(buf,"%s,%s,%s\n",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
-    hotplug_event_handled();	/* remove stale events */
-    if((rc=util_set_sysfs_attr("/sys/bus/ccwgroup/drivers/qeth/group",buf))) return rc;
-    if((rc=hotplug_wait_for_event("ccwgroup"))) return rc;
+    if((rc=net_s390_group_chans(3,"qeth"))) return rc;
 
     /* set portname */
     devpath=hotplug_get_info("DEVPATH");
     hotplug_event_handled();
-    if(devpath && strlen(config.hwp.portname)>0)
+    if(!devpath) return -1;
+    if(strlen(config.hwp.portname)>0)
     {
       sprintf(buf,"/sys/%s/portname",devpath);
       if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
     }
-    else
-      return -1;
 
-    /* put device online */
-    sprintf(buf,"/sys/%s/online",devpath);
-    if((rc=util_set_sysfs_attr(buf,"1"))) return rc;
-    if((rc=hotplug_wait_for_event("net"))) return rc;
-    hotplug_event_handled();
+    if((rc=net_s390_put_online(devpath))) return rc;
     
     sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
     config.hwp.module="qeth_mod";
-    config.hwp.scriptup="hwup-ccw";
-    config.hwp.scriptup_ccw="hwup-ccw";
+    net_s390_set_config_ccwdev();
     config.hwp.scriptup_ccwgroup="hwup-qeth";
-    config.hwp.scriptdown="hwdown-ccw";
     strprintf(&config.hwp.ccw_chan_ids,"%s %s %s",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
     config.hwp.ccw_chan_num=3;
+    
+    break;
+    
+  case di_390net_osatr:
+  case di_390net_osaeth:
+    mod_modprobe("lcs",NULL);	// FIXME: error handling
+    
+    net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
+    
+    if((rc=net_s390_getrwchans())) return rc;
+    
+    if((rc=dia_input2(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
+
+    if((rc=net_s390_group_chans(2,"lcs"))) return rc;
+    
+    /* set portname */
+    devpath=hotplug_get_info("DEVPATH");
+    hotplug_event_handled();
+    if(!devpath) return -1;
+    if(strlen(config.hwp.portname)>0)
+    {
+      sprintf(buf,"/sys/%s/portno",devpath);
+      if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
+    }
+    
+    if((rc=net_s390_put_online(devpath))) return rc;
+    
+    net_s390_set_config_ccwdev();
+    sprintf(hwcfg_name, "lcs-bus-ccw-%s",config.hwp.readchan);
+    config.hwp.module="lcs";
+    config.hwp.scriptup_ccwgroup="hwup-lcs";
+    config.hwp.ccw_chan_num=2;
+    strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
     
     break;
     
@@ -1825,18 +1888,20 @@ int net_activate_s390_devs(void)
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
 
-  if(config.hwp.startmode) fprintf(fp,"STARTMODE=\"%s\"\n",config.hwp.startmode);
-  if(config.hwp.module) fprintf(fp,"MODULE=\"%s\"\n",config.hwp.module);
-  if(config.hwp.module_options) fprintf(fp,"MODULE_OPTIONS=\"%s\"\n",config.hwp.module_options);
-  if(config.hwp.module_unload) fprintf(fp,"MODULE_UNLOAD=\"%s\"\n",config.hwp.module_unload);
-  if(config.hwp.scriptup) fprintf(fp,"SCRIPTUP=\"%s\"\n",config.hwp.scriptup);
-  if(config.hwp.scriptup_ccw) fprintf(fp,"SCRIPTUP_ccw=\"%s\"\n",config.hwp.scriptup_ccw);
-  if(config.hwp.scriptup_ccwgroup) fprintf(fp,"SCRIPTUP_ccwgroup=\"%s\"\n",config.hwp.scriptup_ccwgroup);
-  if(config.hwp.scriptdown) fprintf(fp,"SCRIPTDOWN=\"%s\"\n",config.hwp.scriptdown);
-  if(config.hwp.ccw_chan_ids) fprintf(fp,"CCW_CHAN_IDS=\"%s\"\n",config.hwp.ccw_chan_ids);
+# define HWE(var,string) if(config.hwp.var) fprintf(fp, #string "=\"%s\"\n",config.hwp.var);
+  HWE(startmode,STARTMODE)
+  HWE(module,MODULE)
+  HWE(module_options,MODULE_OPTIONS)
+  HWE(module_unload,MODULE_UNLOAD)
+  HWE(scriptup,SCRIPTUP)
+  HWE(scriptup_ccw,SCRIPTUP_CCW)
+  HWE(scriptup_ccwgroup,SCRIPTUP_CCWGROUP)
+  HWE(scriptdown,SCRIPTDOWN)
+  HWE(ccw_chan_ids,CCW_CHAN_IDS)
   if(config.hwp.ccw_chan_num) fprintf(fp,"CCW_CHAN_NUM=\"%d\"\n",config.hwp.ccw_chan_num);
   if(config.hwp.protocol) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",config.hwp.protocol-1);
-  if(config.hwp.portname) fprintf(fp,"CCW_CHAN_MODE=\"%s\"\n",config.hwp.portname);
+  HWE(portname,CCW_CHAN_MODE)
+# undef HWE
   
   fclose(fp);
   
