@@ -46,6 +46,8 @@ static void kbd_del_timeout (void);
 static void kbd_set_timeout (long timeout_lv);
 static void kbd_timeout     (int signal_iv);
 
+static int kbd_getch_raw    (int wait_iv);
+
 /*
  *
  * exported functions
@@ -69,6 +71,7 @@ void kbd_init (void)
     kbd_tio_rm.c_cc [VMIN] = 1;
     kbd_tio_rm.c_cc [VTIME] = 0;
     kbd_tio_rm.c_lflag &= ~(ECHO | ICANON | ISIG);
+    kbd_tio_rm.c_iflag &= ~(INLCR | IGNCR | ICRNL);
     if (!ioctl (kbd_tty_im, TIOCGWINSZ, &winsize_ri))
         {
         if (winsize_ri.ws_col && winsize_ri.ws_row)
@@ -103,7 +106,42 @@ void kbd_switch_tty (int  tty_iv)
     }
 
 
-int kbd_getch (int wait_iv)
+/*
+ * Do some tricks to work around broken terminals that send CR + LF.
+ */
+int kbd_getch(int wait_iv)
+{
+  int key;
+  static int last_was_nl = 0;
+
+  do {
+    key = kbd_getch_raw(wait_iv);
+//    fprintf(stderr, "rawkey(%d): %d\n", wait_iv, key);
+
+    if(key == KEY_ENTER || key == KEY_CTRL_M) {
+      if(!last_was_nl) {
+        last_was_nl = key;
+        break;
+      }
+      if(last_was_nl && key != last_was_nl) {
+        last_was_nl = key = 0;
+      }
+    }
+    else {
+      if(key) last_was_nl = 0;
+    }
+  }
+  while(!key && wait_iv);
+
+  if(key == KEY_CTRL_M) key = KEY_ENTER;
+
+//  fprintf(stderr, "key(%d): %d\n", wait_iv, key);
+
+  return key;
+}
+
+
+int kbd_getch_raw (int wait_iv)
     {
     char  keypress_ci;
     char  tmp_ci;

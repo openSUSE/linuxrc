@@ -1,3 +1,5 @@
+	- work around broken terminals that send CR + LF
+
 22/11/2001:	v1.3.1
 	- reimplemented info file read function
 	- file write function ("install.inf") rewritten
