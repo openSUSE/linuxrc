@@ -172,6 +172,10 @@ typedef struct module2_s {
   unsigned dontask:1;	/* don't ask for module params */
 } module_t;
 
+typedef enum {
+  nc_none, nc_static, nc_bootp, nc_dhcp
+} net_config_t;
+
 
 #define MAX_MODULE_TYPES 10
 
@@ -333,6 +337,7 @@ typedef struct {
     char *user;			/* if this is NULL, perform guest login */
     char *password;
     char *vncpassword;
+    net_config_t configured;	/* how we configured the network device */
   } net;
 
 } config_t;

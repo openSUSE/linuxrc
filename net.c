@@ -95,6 +95,8 @@ int net_config()
 
   net_stop();
 
+  config.net.configured = nc_none;
+
   if(!config.win) {
     rc = YES;
   }
@@ -107,15 +109,18 @@ int net_config()
 
   if(rc == YES) {
     rc = config.net.use_dhcp ? net_dhcp() : net_bootp();
+    if(!rc) config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
   }
   else {
     rc = net_input_data();
+    if(!rc) config.net.configured = nc_static;
   }
 
   if(rc) return -1;
 
   if(net_activate()) {
     dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
+    config.net.configured = nc_none;
     return -1;
   }
 

@@ -175,7 +175,8 @@ static struct {
   { key_nfswsize,       "NFS.WSize"        },
   { key_hwcheck,        "HWCheck"          },
   { key_setupcmd,       "SetupCmd"         },
-  { key_setupnetif,     "SetupNetIF"       }
+  { key_setupnetif,     "SetupNetIF"       },
+  { key_netconfig,      "NetConfig"        }
 };
 
 static struct {
@@ -1045,6 +1046,21 @@ void file_write_install_inf(char *dir)
     config.instmode_extra == inst_cdwithnet ||
     config.vnc
   ) {
+    s = NULL;
+    switch(config.net.configured) {
+      case nc_none:
+        break;
+      case nc_static:
+        s = "static";
+        break;
+      case nc_bootp:
+        s = "bootp";
+        break;
+      case nc_dhcp:
+        s = "dhcp";
+        break;
+    }
+    if(s) file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, netdevice_tg);
     file_write_inet(f, key_ip, &config.net.hostname);
     file_write_str(f, key_hostname, config.net.hostname.name);

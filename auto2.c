@@ -404,6 +404,8 @@ int auto2_net_dev(hd_t **hd0)
 
       net_setup_localhost();
 
+      config.net.configured = nc_static;
+
       /* do bootp of there's some indication that a net install is intended
        * but some data are still missing
        */
@@ -423,18 +425,23 @@ int auto2_net_dev(hd_t **hd0)
           !config.net.gateway.ok
         ) {
           fprintf(stderr, "no/incomplete answer.\n");
+          config.net.configured = nc_none;
           return 1;
         }
         fprintf(stderr, "ok.\n");
 
+        config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+
         if(net_check_address2(&config.net.server, 1)) {
           fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
+          config.net.configured = nc_none;
           return 1;
         }
       }
 
       if(net_activate()) {
         fprintf(stderr, "net activation failed\n");
+        config.net.configured = nc_none;
         return 1;
       }
       else {
