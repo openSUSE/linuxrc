@@ -575,10 +575,12 @@ int util_umount(char *mp)
 
   if((i = umount(mp))) {
     i = errno;
-    fprintf(stderr, "umount(%s) failed: %d\n", mp, errno);
+    if(i != ENOENT && i != EINVAL) {
+      fprintf(stderr, "umount %s failed: %d\n", mp, i);
+    }
   }
   else {
-    fprintf(stderr, "umount(%s) ok\n", mp);
+    fprintf(stderr, "umount %s ok\n", mp);
   }
 
   return i;

@@ -827,6 +827,7 @@ int inst_prepare()
 int inst_execute_yast()
 {
   int rc_ii, i_ii = 0;
+  int i, count;
   window_t status_ri;
   char command_ti[80];
 
@@ -959,27 +960,15 @@ int inst_execute_yast()
   /* turn off swap */
   inst_swapoff();
 
-  {
-    int i = -1, count = 5;
-
-    while((i = inst_umount()) == 16 && count--) {
-      deb_int(i);
-      sleep(1);
-    }
-    deb_int(i);
-  }
-
+  /* wait a bit */
+  count = 5;
+  while((i = inst_umount()) == EBUSY && count--) sleep(1);
 
 #ifdef LXRC_DEBUG
   if((guru_ig & 2)) {
-    int i;
-
     util_manual_mode();
     util_disp_init();
-    do {
-      i = dia_message("Installation part 1 finished...", MSGTYPE_INFO);
-      inst_umount();
-    } while(i);
+    dia_message("Installation part 1 finished...", MSGTYPE_INFO);
   }
 #endif
 
@@ -1200,17 +1189,17 @@ int inst_umount()
   if(inst_loopmount_im) {
     util_umount_loop(mountpoint_tg);
     j = util_umount(inst_tmpmount_tm);
-    if(j == 16) i = 16;
+    if(j == EBUSY) i = EBUSY;
     rmdir(inst_tmpmount_tm);
     inst_loopmount_im = FALSE;
   }
   else {
     j = util_umount(mountpoint_tg);
-    if(j == 16) i = 16;
+    if(j == EBUSY) i = EBUSY;
   }
 
   j = util_umount(inst_mountpoint_tg);
-  if(j == 16) i = 16;
+  if(j == EBUSY) i = EBUSY;
 
   return i;
 }
