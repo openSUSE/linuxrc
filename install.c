@@ -165,11 +165,14 @@ int inst_start_demo (void)
         }
     else
         {
-        auto2_ig = FALSE;
-        util_disp_init ();
-        set_choose_language ();
-        util_print_banner ();
-        set_choose_keytable ();
+        if ((action_ig & ACT_DEMO_LANG_SEL))
+            {
+            auto2_ig = FALSE;
+            util_disp_init ();
+            set_choose_language ();
+            util_print_banner ();
+            set_choose_keytable ();
+            }
         }
 
     sprintf (filename_ti, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
@@ -1015,7 +1018,7 @@ static int inst_init_cache (void)
                              "/bin/bash",
                              "/sbin/YaST"
                              };
-    long      size_li;
+    int32_t   size_li;
     long      allsize_li;
     int       dummy_ii;
     char      buffer_ti [10240];

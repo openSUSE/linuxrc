@@ -110,9 +110,11 @@ static keymap_t set_keymaps_arm [] =
 static keymap_t set_keymaps_arm [] =
 {
 { "sunkeymap",       "sunkeymap"       },
+{ "sundvorak",       "sundvorak"       },
 { "sun-pl-altgraph", "sun-pl-altgraph" },
 { "sun-pl",          "sun-pl"          },
 { "sunt4-es",        "sunt4-es"        },
+{ "sunt4-no-lotin1", "sunt4-no-lotin1" },
 { "sunt5-de-latin1", "sunt5-de-latin1" },
 { "sunt5-es",        "sunt5-es"        },
 { "sunt5-fi-latin1", "sunt5-fi-latin1" },
@@ -246,7 +248,7 @@ void set_choose_keytable (void)
     }
 #endif
 
-    if (auto_ig || auto2_ig)
+    if (auto_ig || auto2_ig || keymap_tg[0] != 0)
         {
         if (!*keymap_tg)
             strcpy (keymap_tg, keymap [KEYMAP_DEFAULT].mapname);

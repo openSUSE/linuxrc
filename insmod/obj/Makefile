@@ -16,7 +16,7 @@ DEFS		:= -DELF_MACHINE_H='"elf_$(ARCH).h"' -DARCH_$(ARCH)
 LIBOBJ_OBJS	:= obj_common.o obj_load.o obj_reloc.o obj_$(ARCH).o
 LIBOBJ_SRCS	:= $(LIBOBJ_OBJS:.o=.c)
 
-ifeq (no,yes)
+ifeq ($(ARCH),sparc)
 LIBOBJ_OBJS	+= obj_common_64.o obj_load_64.o obj_reloc_64.o obj_sparc64_64.o
 LIBOBJ_SRCS	+= obj_sparc64.c
 DEFSNOARCH	+= -DCOMMON_3264

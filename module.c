@@ -382,6 +382,7 @@ void mod_init (void)
     {
     static int   core_loaded_is = FALSE;
            char *core_modules_ati [] = {
+				       "openprom",
                                        "nvram",
                                        "8390"
                                        };

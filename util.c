@@ -23,7 +23,8 @@
 #include <syscall.h>
 #include <errno.h>
 
-#include <linux/cdrom.h>
+// #include <linux/cdrom.h>
+#define CDROMEJECT	0x5309	/* Ejects the cdrom media */
 #include <linux/loop.h>
 
 #include <hd.h>
@@ -117,8 +118,8 @@ int util_format_txt (char *txt_tv, char *lines_atr [], int width_iv)
                 {
                 do
                     {
-                    pos_ii--;
-                    i_ii--;
+                    --pos_ii;
+                    --i_ii;
                     }
                 while (lines_atr [current_line_ii][pos_ii] != ' ' && pos_ii);
 
@@ -131,7 +132,7 @@ int util_format_txt (char *txt_tv, char *lines_atr [], int width_iv)
 
             lines_atr [current_line_ii][pos_ii] = 0;
             pos_ii = 0;
-            i_ii++;
+            ++i_ii;
             if (txt_tv [i_ii])
                 lines_atr [++current_line_ii] = malloc (width_iv);
             }
@@ -151,7 +152,7 @@ void util_fill_string (char *txt_tr, int size_iv)
     int i_ii = 0;
 
     while (txt_tr [i_ii] && i_ii < size_iv - 1)
-        i_ii++;
+        ++i_ii;
 
     while (i_ii < size_iv - 1)
         txt_tr [i_ii++] = ' ';
@@ -181,40 +182,50 @@ void util_free_items (item_t items_arr [], int nr_iv)
     }
 
 
-int util_fileinfo (char *file_tv, long *size_plr, int *compressed_pir)
+/* This function can only handle images <= 2GB. I think this is enough
+   for the root image in the next month (kukuk@suse.de) */
+int
+util_fileinfo (char *file_tv, int32_t *size_plr, int *compressed_pir)
+{
+  unsigned char  buf_ti [2];
+  int            handle_ii;
+
+
+  *size_plr = 0;
+  handle_ii = open (file_tv, O_RDONLY);
+  if (!handle_ii)
+    return (-1);
+
+  if (read (handle_ii, buf_ti, 2) != 2)
     {
-    unsigned char  buf_ti [2];
-    int            handle_ii;
-
-
-    *size_plr = 0;
-    handle_ii = open (file_tv, O_RDONLY);
-    if (!handle_ii)
-        return (-1);
-
-    if (read (handle_ii, buf_ti, 2) != 2)
-        {
-        close (handle_ii);
-        return (-1L);
-        }
-
-    if (buf_ti [0] == 037 && (buf_ti [1] == 0213 || buf_ti [1] == 0236))
-        {
-        if ((long) lseek (handle_ii, (off_t) -4, SEEK_END) == -1L)
-            return (-1L);
-
-        read (handle_ii, (char *) size_plr, sizeof (long));
-        *compressed_pir = TRUE;
-        }
-    else
-        {
-        *size_plr = (long) lseek (handle_ii, (off_t) 0, SEEK_END);
-        *compressed_pir = FALSE;
-        }
-
-    close (handle_ii);
-    return (0);
+      close (handle_ii);
+      return (-1);
     }
+
+  if (buf_ti [0] == 037 && (buf_ti [1] == 0213 || buf_ti [1] == 0236))
+    {
+      unsigned char buf_size[4];
+
+      if (lseek (handle_ii, (off_t) -4, SEEK_END) == (off_t)-1)
+	{
+	  close (handle_ii);
+	  return (-1);
+	}
+
+      read (handle_ii, buf_size, sizeof (buf_size));
+      *size_plr = (buf_size[3] << 24) + (buf_size[2] << 16) +
+	(buf_size[1] << 8) + buf_size[0];
+      *compressed_pir = TRUE;
+    }
+  else
+    {
+      *size_plr = (int32_t) lseek (handle_ii, (off_t) 0, SEEK_END);
+      *compressed_pir = FALSE;
+    }
+
+  close (handle_ii);
+  return (0);
+}
 
 
 void util_update_kernellog (void)
@@ -268,7 +279,7 @@ void util_update_kernellog (void)
             i_ii = 0;
             }
 
-        i_ii++;
+        ++i_ii;
         }
 
     (void) syslog (5, 0, 0);
@@ -594,4 +605,3 @@ int util_eject_cdrom(char *dev)
 
   return 0;
 }
-

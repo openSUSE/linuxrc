@@ -50,7 +50,7 @@ int             force_ri_ig = FALSE;
 int             ramdisk_ig = FALSE;
 int             explode_win_ig = TRUE;
 int             auto_ig = FALSE;
-#if defined(__PPC__)
+#if defined(__PPC__) || defined(__sparc__)
 int             auto2_ig = TRUE;
 #else
 int             auto2_ig = FALSE;
@@ -94,3 +94,4 @@ char            xkbrules_tg [20] = "";
 char            xkbmodel_tg [20] = "";
 char            xkblayout_tg [20] = "";
 unsigned        yast2_color_ig = 0;
+unsigned        action_ig = 0;

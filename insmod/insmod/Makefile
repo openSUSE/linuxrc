@@ -22,7 +22,7 @@ COMBDEFS	:= -DCOMBINE_rmmod
 
 INSMODOBJS	:= insmod.o rmmod.o
 
-ifeq (no,yes)
+ifeq ($(ARCH),sparc)
 INSMODOBJS	+= insmod_64.o
 MODINFOOBJS	+= modinfo_64.o
 DEFSNOARCH	+= -DCOMMON_3264
@@ -51,11 +51,11 @@ INSMODOBJS	+= $(addsuffix .o, $(COMB))
 
 all: .depend ../insmod.a
 
-../insmod.a: ../obj/libobj.a ../util/libutil.a insmod.o rmmod.o
+../insmod.a: ../obj/libobj.a ../util/libutil.a $(INSMODOBJS)
 	@mkdir x
 	@cd x; $(AR) x ../../obj/libobj.a
 	@cd x; $(AR) x ../../util/libutil.a
-	@cp insmod.o rmmod.o x
+	@cp $(INSMODOBJS) x
 	@cd x; $(AR) r ../../insmod.a *.o
 	@rm -rf x
 

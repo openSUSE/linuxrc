@@ -22,7 +22,7 @@ extern int  util_format_txt       (char *txt_tv, char *lines_atr [],
 extern void util_fill_string      (char *txt_tr, int size_iv);
 extern void util_create_items     (item_t items_arr [], int nr_iv, int size_iv);
 extern void util_free_items       (item_t items_arr [], int nr_iv);
-extern int  util_fileinfo         (char *file_tv, long *size_plr,
+extern int  util_fileinfo         (char *file_tv, int32_t *size_plr,
                                    int *compressed_pir);
 extern void util_update_kernellog (void);
 extern void util_print_banner     (void);

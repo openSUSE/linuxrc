@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
-#define LXRC_VERSION  "1.1.6"
+#define LXRC_VERSION  "1.1.7"
 
 #ifdef LINUXRC_AXP
 #define MEM_LIMIT1_RAMDISK    50000000
@@ -67,6 +67,9 @@
 # define deb_str(a)
 # define deb_int(a)
 #endif
+
+#define ACT_DEMO		(1 << 0)
+#define ACT_DEMO_LANG_SEL	(1 << 1)
 
 enum langid_t
     {
@@ -227,3 +230,4 @@ extern char            xkbrules_tg [20];
 extern char            xkbmodel_tg [20];
 extern char            xkblayout_tg [20];
 extern unsigned        yast2_color_ig;
+extern unsigned        action_ig;

@@ -124,7 +124,7 @@ int root_load_rootimage (char *infile_tv)
     int   rc_ii;
     int   current_block_ii;
     int   compressed_ii;
-    long  filesize_li;
+    int32_t filesize_li;
     int   error_ii = FALSE;
     int   socket_ii = -1;
 

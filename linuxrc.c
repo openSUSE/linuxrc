@@ -320,7 +320,16 @@ static void lxrc_init (void)
 #endif
 
            if (strstr (s, ",demo,"))
+               {
                demo_ig = TRUE;
+               action_ig |= ACT_DEMO | ACT_DEMO_LANG_SEL;
+               }
+
+           if (strstr (s, ",eval,"))
+               {
+               demo_ig = TRUE;
+               action_ig |= ACT_DEMO;
+               }
 
            if (strstr (s, ",reboot,"))
                reboot_ig = TRUE;
@@ -403,9 +412,11 @@ static void lxrc_init (void)
           sprintf(s, txt_get(TXT_INSERT_CD), 1);
           dia_message(s, MSGTYPE_INFO);
         }
+#if defined(__i386__)
         else {
           dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
         }
+#endif
       }
     }
 #endif
