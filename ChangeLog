@@ -1,3 +1,8 @@
+10/5/2004:	v1.6.26
+	- linuxrc missed some storage controllers, leading to unexpected
+	  module loading order (#40018)
+	- updated translations
+
 8/5/2004:	v1.6.25
 	- fixed compiling on s390
 	- added memory size test (#38826)

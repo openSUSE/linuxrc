@@ -49,7 +49,7 @@ static int auto2_net_dev(hd_t **);
 static int auto2_net_dev1(char *device);
 static int driver_is_active(hd_t *hd);
 static int activate_driver(hd_t *hd, slist_t **mod_list);
-static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
+static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
 #if 0	/* __i386__ */
@@ -651,7 +651,7 @@ int activate_driver(hd_t *hd, slist_t **mod_list)
  * Activate storage/network devices.
  * Returns 0 or the index of the last controller we activated.
  */
-int auto2_activate_devices(unsigned base_class, unsigned last_idx)
+int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
 {
   hd_t *hd;
   int ok;
@@ -665,7 +665,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
   if(!hd) return 0;	/* no further entries */
 
   for(; hd; hd = hd->next) {
-    if(hd->base_class.id == base_class && !driver_is_active(hd)) {
+    if(hd_is_hw_class(hd, hw_class) && !driver_is_active(hd)) {
       if((ok = activate_driver(hd, NULL))) {
         last_idx = hd->idx;
         fprintf(stderr, "Ok, that seems to have worked. :-)\n");
@@ -678,8 +678,8 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
       /* some module was loaded...; in demo mode activate all disks */
       if(
         !(
-          (config.activate_storage && base_class == bc_storage) ||
-          (config.activate_network && base_class == bc_network)
+          (config.activate_storage && hw_class == hw_storage_ctrl) ||
+          (config.activate_network && hw_class == hw_network_ctrl)
         ) &&
         ok
       ) break;
@@ -872,7 +872,7 @@ void auto2_user_netconfig()
 
   if(!config.net.do_setup) return;
 
-  auto2_activate_devices(bc_network, 0);
+  auto2_activate_devices(hw_network_ctrl, 0);
 
   if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
     config.net.configured = nc_static;
@@ -913,11 +913,11 @@ int auto2_find_install_medium()
 
     need_modules = 0;
 
-    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
-      if(config.activate_network) auto2_activate_devices(bc_network, 0);
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
       auto2_user_netconfig();
       return TRUE;
     }
@@ -928,14 +928,14 @@ int auto2_find_install_medium()
         fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
       }
 
-      if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
+      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
         fprintf(stderr, "No further storage devices found; giving up.\n");
         break;
       }
 
       fprintf(stderr, "Looking for a %s CD again...\n", config.product);
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        if(config.activate_network) auto2_activate_devices(bc_network, 0);
+        if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
         auto2_user_netconfig();
         return TRUE;
       }
@@ -953,11 +953,11 @@ int auto2_find_install_medium()
 
     need_modules = 0;
   
-    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
-      if(config.activate_network) auto2_activate_devices(bc_network, 0);
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
       auto2_user_netconfig();
       return TRUE;
     }
@@ -968,14 +968,14 @@ int auto2_find_install_medium()
         fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
       }
 
-      if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
+      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
         fprintf(stderr, "No further storage devices found; giving up.\n");
         break;
       }
 
       fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
       if(!(i = auto2_harddisk_dev(&hd_devs))) {
-        if(config.activate_network) auto2_activate_devices(bc_network, 0);
+        if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
         auto2_user_netconfig();
         return TRUE;
       }
@@ -1002,8 +1002,8 @@ int auto2_find_install_medium()
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
-    if(config.activate_network) auto2_activate_devices(bc_network, 0);
-    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+    if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
     fprintf(stderr, "Looking for a network server...\n");
     if(!auto2_net_dev(&hd_devs)) return TRUE;
@@ -1011,7 +1011,7 @@ int auto2_find_install_medium()
     for(need_modules = 0, last_idx = 0;;) {
       fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
 
-      if(!(last_idx = auto2_activate_devices(bc_network, last_idx))) {
+      if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
         fprintf(stderr, "No further network cards found; giving up.\n");
         break;
       }
@@ -1287,7 +1287,7 @@ void load_storage_mods()
   }
 
   config.activate_storage = 1;
-  auto2_activate_devices(bc_storage, 0);
+  auto2_activate_devices(hw_storage_ctrl, 0);
 }
 
 #endif	/* USE_LIBHD */

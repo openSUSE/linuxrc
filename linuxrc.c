@@ -783,10 +783,7 @@ void lxrc_init()
 
     if(config.memory.ram < ram) {
       if(!window) util_disp_init();
-      strprintf(&msg,
-        "Your computer does not have enough RAM for the installation of %s. "
-        "You need at least %d MB.",
-      config.product, config.memory.ram_min);
+      strprintf(&msg, txt_get(TXT_NO_RAM), config.product, config.memory.ram_min);
       dia_message(msg, MSGTYPE_REBOOT);
       free(msg);
       if(!window) util_disp_done();
