@@ -849,7 +849,7 @@ void lxrc_init()
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
   config.memory.min_yast_text =  32 * 1024;
-  config.memory.min_yast =       44 * 1024;
+  config.memory.min_yast =       40 * 1024;
   config.memory.min_modules =    64 * 1024;
   config.memory.load_image =    200 * 1024;
 
