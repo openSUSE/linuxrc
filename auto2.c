@@ -41,6 +41,7 @@ static hd_data_t *hd_data = NULL;
 static char *auto2_loaded_module = NULL;
 static char *auto2_loaded_module_args = NULL;
 static driver_info_t *x11_driver = NULL;
+static char *pcmcia_params = NULL;
 
 static char *auto2_device_name(hd_t *hd);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
@@ -203,8 +204,9 @@ void auto2_scan_hardware(char *log_file)
     hd_sys->detail && hd_sys->detail->type == hd_detail_sys &&
     (st = hd_sys->detail->sys.data)
   ) {
-    if(strstr(st->model, "PCG-") == st->model) {
+    if((st->model && strstr(st->model, "PCG-") == st->model)) {
       /* is a Sony Vaio */
+      pcmcia_params = "irq_list=9,10,11,15";
       if(usb_mod && *usb_mod) {
         sprintf(usb_mods, "usbcore %s", usb_mod);
         usb_mods_ig = usb_mods;
@@ -494,7 +496,7 @@ int auto2_init()
 
     if(
       (i = mod_load_module("pcmcia_core", NULL)) ||
-      (i = mod_load_module("i82365", NULL))   ||
+      (i = mod_load_module("i82365", pcmcia_params))   ||
       (i = mod_load_module("ds", NULL))
     );
 

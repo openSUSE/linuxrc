@@ -248,6 +248,8 @@ void set_choose_keytable (int always_show)
     char    command_ti [MAX_FILENAME];
     int     keymaps = NR_KEYMAPS;
     keymap_t *keymap = set_keymaps_arm;
+    int i, cur_lang, def_keymap_idx;
+    char *def_keymap;
 
 #ifdef __PPC__
     if(!strcmp(xkbmodel_tg, "macintosh")) {
@@ -256,10 +258,22 @@ void set_choose_keytable (int always_show)
     }
 #endif
 
+    /* note that this works only for iaxx, axp and non-mac ppc */
+    cur_lang = set_get_current_language();
+    def_keymap = *keymap_tg ? keymap_tg : set_languages_arm[cur_lang - 1].keymap;
+
+    def_keymap_idx = KEYMAP_DEFAULT;
+    for(i = 0; i < keymaps; i++) {
+      if(!strcmp(keymap[i].mapname, def_keymap)) {
+        def_keymap_idx = i;
+        break;
+      }
+    }
+
     if ((auto_ig || auto2_ig || *keymap_tg) && !always_show)
         {
         if (!*keymap_tg)
-            strcpy (keymap_tg, keymap [KEYMAP_DEFAULT].mapname);
+            strcpy (keymap_tg, keymap [def_keymap_idx].mapname);
 
         sprintf (command_ti, "loadkeys %s.map", keymap_tg);
         system (command_ti);
@@ -273,7 +287,7 @@ void set_choose_keytable (int always_show)
         util_fill_string (items_ari [i_ii].text, width_ii);
         }
 
-    i_ii = dia_menu (txt_get (TXT_CHOOSE_KEYMAP), items_ari, keymaps, 1 + KEYMAP_DEFAULT);
+    i_ii = dia_menu (txt_get (TXT_CHOOSE_KEYMAP), items_ari, keymaps, 1 + def_keymap_idx);
     util_free_items (items_ari, keymaps);
 
     if (i_ii)
@@ -492,6 +506,7 @@ void set_write_info (FILE *file_prv)
     }
 
 
+/* Note: this *must* return a value in the range [1, NR_LANGUAGES]! */
 static int set_get_current_language (void)
     {
     int     found_ii = FALSE;
