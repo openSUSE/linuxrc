@@ -198,10 +198,10 @@ int main(int argc, char **argv, char **env)
   }
 
   if(!config.test && !config.had_segv) {
-    if(!util_check_exist("/oldroot")) {
 #if SWISS_ARMY_KNIFE 
-      lxrc_makelinks(*argv);
+    lxrc_makelinks(*argv);
 #endif
+    if(!util_check_exist("/oldroot")) {
       find_shell();
       mount("proc", "/proc", "proc", 0, 0);
       ft = file_get_cmdline(key_tmpfs);
