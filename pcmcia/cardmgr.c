@@ -1420,7 +1420,7 @@ int cardmgr_main(int argc, char *argv[])
 
     openlog("cardmgr", LOG_PID|LOG_PERROR, LOG_DAEMON);
     
-    putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin");
+    putenv("PATH=/lbin:/bin:/sbin:/usr/bin:/usr/sbin");
     if (verbose)
 	putenv("VERBOSE=1");
     if (one_pass)

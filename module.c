@@ -770,37 +770,41 @@ int mod_insmod(char *module, char *param)
 
   strcat(buf, " >&2");
 
-  util_update_netdevice_list(NULL, 1);
-  util_update_disk_list(NULL, 1);
-  util_update_cdrom_list();
+  if(config.run_as_linuxrc) {
+    util_update_netdevice_list(NULL, 1);
+    util_update_disk_list(NULL, 1);
+    util_update_cdrom_list();
 
-  if(mod_show_kernel_messages) kbd_switch_tty(4);
+    if(mod_show_kernel_messages) kbd_switch_tty(4);
 
-  usbscsi_off();
+    usbscsi_off();
+  }
 
   err = system(buf);
 
   if(config.module.delay > 0) sleep(config.module.delay);
 
-  usbscsi_on();
+  if(config.run_as_linuxrc) {
+    usbscsi_on();
 
-  if(!err && param) {
-    while(isspace(*param)) param++;
-    if(*param) {
-      sl = slist_add(&config.module.used_params, slist_new());
-      sl->key = strdup(module);
-      sl->value = strdup(param);
+    if(!err && param) {
+      while(isspace(*param)) param++;
+      if(*param) {
+        sl = slist_add(&config.module.used_params, slist_new());
+        sl->key = strdup(module);
+        sl->value = strdup(param);
+      }
     }
-  }
 
-  if(mod_show_kernel_messages) kbd_switch_tty(1);
+    if(mod_show_kernel_messages) kbd_switch_tty(1);
 
-  util_update_kernellog();
+    util_update_kernellog();
 
-  if(!err) {
-    util_update_netdevice_list(module, 1);
-    util_update_disk_list(module, 1);
-    util_update_cdrom_list();
+    if(!err) {
+      util_update_netdevice_list(module, 1);
+      util_update_disk_list(module, 1);
+      util_update_cdrom_list();
+    }
   }
 
   return err;

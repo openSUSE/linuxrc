@@ -1,3 +1,7 @@
+31/3/2004:	v1.6.13
+	- fixed cardmgr module loading
+	- fixed modprobe
+
 29/3/2004:	v1.6.12
 	- no pci info (#37245)
 	- japanese keyboard (#31417)
