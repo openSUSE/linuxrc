@@ -759,8 +759,8 @@ msgid "Please insert modules disk %d."
 msgstr "Vlo¾te disk s moduly èíslo %d."
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
-msgstr "Návod na vytvoøení naleznete na CD v adresáøi disks/README."
+msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD."
+msgstr "Návod na vytvoøení naleznete na CD v adresáøi boot/README."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Please choose the network protocol"

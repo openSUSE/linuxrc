@@ -823,9 +823,9 @@ msgid "Please insert modules disk %d."
 msgstr "Bitte legen Sie Modul-Diskette %d ein."
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
+msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD."
 msgstr ""
-"Sie finden eine Anleitung zum Erstellen dieser Diskette in disks/LIESMICH "
+"Sie finden eine Anleitung zum Erstellen dieser Diskette in boot/LIESMICH "
 "auf der CD1 oder DVD."
 
 #. TXT_CHOOSE_NETSOURCE

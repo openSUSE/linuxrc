@@ -1,5 +1,6 @@
 9/9/2002:	v1.4.25
 	- don't write server info for VNC/ssh install (#18882)
+	- disks/REAME --> boot/README
 
 8/9/2002:	v1.4.24
 	- make linuxrc_tiny even smaller

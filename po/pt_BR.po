@@ -784,7 +784,7 @@ msgid "Please insert modules disk %d."
 msgstr ""
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in disks/README on CD1 or DVD."
+msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD."
 msgstr ""
 
 #. TXT_CHOOSE_NETSOURCE
