@@ -31,6 +31,7 @@
 #include "keyboard.h"
 #include "auto2.h"
 #include "file.h"
+#include "install.h"
 
 // #define DEBUG_MODULE
 
@@ -183,7 +184,7 @@ void mod_free_modules()
 /*
  * openprom, nvram
  */
-void mod_init()
+void mod_init(int autoload)
 {
   char tmp[256];
   module_t *ml;
@@ -197,9 +198,11 @@ void mod_init()
   sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
 
-  for(ml = config.module.list; ml; ml = ml->next) {
-    if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
-      mod_insmod(ml->name, ml->param);
+  if(autoload) {
+    for(ml = config.module.list; ml; ml = ml->next) {
+      if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
+        mod_insmod(ml->name, ml->param);
+      }
     }
   }
 }
@@ -375,9 +378,8 @@ void mod_menu()
 
     items[i++] = txt_get(TXT_SHOW_MODULES);
     items[i++] = txt_get(TXT_DEL_MODULES);
-#if 0
-    items[i++] = txt_get(TXT_AUTO_LOAD);
-#endif
+    items[i++] = "Add Driver Update";
+    items[i++] = "Show Driver Updates";
 
     items[i] = NULL;
 
@@ -412,11 +414,13 @@ int mod_menu_cb(int item)
       mod_delete_module();
       break;
 
-#if 0
     case 2:
-      mod_autoload();
+      inst_update_cd();
       break;
-#endif
+
+    case 3:
+      show_driver_updates();
+      break;
   }
 
   return 1;
@@ -545,7 +549,7 @@ int mod_add_disk(int prompt, int type)
         ramdisk_free(config.module.ramdisk);
         config.module.ramdisk = -1;
       }
-      mod_init();
+      mod_init(1);
     }
   }
 
@@ -557,7 +561,7 @@ int mod_add_disk(int prompt, int type)
     sprintf(buf, "%s/" MODULE_CONFIG, config.mountpoint.floppy);
     file_read_modinfo(buf);
   }
-  mod_init();
+  mod_init(1);
 
   umount(config.mountpoint.floppy);
 
@@ -774,9 +778,13 @@ int mod_insmod(char *module, char *param)
 
   if(mod_show_kernel_messages) kbd_switch_tty(4);
 
+  usbscsi_off();
+
   err = system(buf);
 
   if(config.module.delay) sleep(config.module.delay);
+
+  usbscsi_on();
 
   if(!err && param) {
     while(isspace(*param)) param++;
