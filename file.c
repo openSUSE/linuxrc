@@ -166,7 +166,7 @@ static struct {
   { key_setupcmd,       "SetupCmd",       kf_cfg + kf_cmd                },
   { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
   { key_netconfig,      "NetConfig",      kf_none                        },
-  { key_noshell,        "NoShell",        kf_cfg + kf_cmd                },
+  { key_noshell,        "NoShell",        kf_cfg + kf_cmd + kf_cmd_early },
   { key_hwdetect,       "HWDetect",       kf_cfg + kf_cmd                },
   { key_floppydevice,   "FloppyDevice",   kf_cfg + kf_cmd                },
   { key_cdromdevice,    "CDROMDevice",    kf_cfg + kf_cmd                },
