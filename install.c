@@ -741,7 +741,9 @@ static int inst_execute_yast (void)
 
     inst_start_shell ("/dev/tty2");
     if (memory_ig < MEM_LIMIT_SWAP_MSG)
+        {
         if(!auto2_ig) dia_message (txt_get (TXT_LITTLE_MEM), MSGTYPE_ERROR);
+        }
     else
         {
         inst_start_shell ("/dev/tty5");
