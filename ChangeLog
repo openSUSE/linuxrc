@@ -1,3 +1,8 @@
+
+	- moved ssh/vnc password box so that it triggers even on predhcp 
+	  configured network settings.
+	  Also activate the GUI if it is not yet activated.
+
 21/8/2002:	v1.4.15
 	- accept AutoYaST XML files for config data
 	- delayed splash message a bit (until we got the product name)

@@ -84,6 +84,23 @@ int net_config()
   int rc;
   char buf[256];
 
+  /* If we use VNC or ssh install, ask for the login password */
+  if (config.vnc && !config.net.vncpassword) {
+    int win_old;
+
+    if(!(win_old = config.win)) util_disp_init();
+    rc = dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1);
+    if(!win_old) util_disp_done();
+    /* if(rc == ESCAPE) return -1; */
+  }
+  if (config.usessh && config.win && !config.net.sshpassword) {
+    int win_old;
+
+    if(!(win_old = config.win)) util_disp_init();
+    rc = dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
+    if(!win_old) util_disp_done();
+  }
+
   if(
     net_is_configured_im &&
     dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES
@@ -130,16 +147,6 @@ int net_config()
 
   net_check_address2(&config.net.server, 1);
   // net_check_address2(&..., 1);
-
-  /* If we use VNC or ssh install, ask for the login password */
-  if (config.vnc && config.win && !config.net.vncpassword) {
-    rc = dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1);
-    /* if(rc == ESCAPE) return -1; */
-  }
-  if (config.usessh && config.win && !config.net.sshpassword) {
-    rc = dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
-  }
-
 
 #endif
 
