@@ -1,3 +1,5 @@
+	- use get_txt(id) in the 2 password messageboxes, not just id.
+
 8/8/2002:	v1.4.10
 	- add an SSH mode. relayout SSH and VNC mode to be similar.
 	- make it possible to enable/disable VNC in expert mode
