@@ -12,18 +12,14 @@
 
 #include "version.h"
 
-#ifdef LINUXRC_AXP
-// was: 50000000
-#define MEM_LIMIT1_RAMDISK	124*1024*1024
-#define MEM_LIMIT2_RAMDISK	124*1024*1024
-#else
-// was: 46000000; 64MB will currently not do...
-#define MEM_LIMIT1_RAMDISK	30*1024*1024
-#define MEM_LIMIT2_RAMDISK	124*1024*1024
-#endif
+// should be architecture dependent!
+#define MEM_LIMIT_RAMDISK_YAST1	 93*1024*1024
+#define MEM_LIMIT_RAMDISK_YAST2	124*1024*1024
+#define MEM_LIMIT_RAMDISK_FTP	 30*1024*1024
+#define MEM_LIMIT_YAST2		 62*1024*1024
+
 #define MEM_LIMIT_SWAP_MSG	6500000
 #define MEM_LIMIT_CACHE_LIBS	15000000
-#define MEM_LIMIT_YAST2		62000000
 
 #if defined(__sparc__) || defined(__PPC__)
 #define WITH_PCMCIA	0

@@ -115,7 +115,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
         if (key_ii == KEY_ENTER)
             win_button_pressed (&button_ri, FALSE);
         }
-    while (key_ii != KEY_ENTER && key_ii != KEY_ESC && key_ii != 'q' && key_ii != 'r');
+    while (key_ii != KEY_ENTER && key_ii != KEY_ESC && key_ii != 'q' && key_ii != 'r' && key_ii != 'i');
 
     win_close (&win_ri);
 
@@ -125,6 +125,8 @@ int dia_message (char *txt_tv, int msgtype_iv)
         return (-1);
     else if (key_ii == 'r')
         return (-69);
+    else if (key_ii == 'i')
+        return (-71);
     else
         return (-42);
     }
@@ -966,6 +968,10 @@ void dia_handle_ctrlc (void)
       if(!i) {
         system(s);
       }
+    }
+
+    else if(i == -71) {
+      util_status_info();
     }
 
     is_in_ctrlc_is = FALSE;

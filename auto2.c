@@ -40,7 +40,9 @@
 static hd_data_t *hd_data = NULL;
 static char *auto2_loaded_module = NULL;
 static char *auto2_loaded_module_args = NULL;
+#if 0
 static driver_info_t *x11_driver = NULL;
+#endif
 static char *pcmcia_params = NULL;
 static int is_vaio = 0;
 
@@ -327,24 +329,15 @@ int auto2_cdrom_dev(hd_t **hd0)
       hd->detail->type == hd_detail_cdrom
     ) {
       ci = hd->detail->cdrom.data;
-#if 1
       if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
         fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
         found_suse_cd_ig = TRUE;
-        break;
+        /* CD found -> try to mount it */
+        i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
+        if(i == 0) break;
       }
-#else
-      if(ci->iso9660.ok && ci->iso9660.volume) {
-        fprintf(stderr, "Found a CD in %s.\n", hd->unix_dev_name);
-        found_suse_cd_ig = TRUE;
-        break;
-      }
-#endif
     }
   }
-
-  /* CD found -> try to mount it */
-  if(hd) i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
 
   hd = hd_free_hd_list(hd);
 
@@ -578,7 +571,6 @@ int auto2_init()
     for(last_idx = 0;;) {
       if(i == 2) {		/* CD found, but mount failed */
         deb_msg("So you don't have an intact SuSE CD.");
-        break;
       }
 
       /* i == 1 -> try to activate another storage device */

@@ -23,6 +23,9 @@
 #include <syscall.h>
 #include <dirent.h>
 #include <errno.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 // #include <linux/cdrom.h>
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
@@ -44,6 +47,7 @@
 #include "text.h"
 #include "dialog.h"
 #include "ftp.h"
+#include "net.h"
 
 #define LED_TIME     50000
 
@@ -621,7 +625,6 @@ void util_manual_mode()
   auto2_ig = 0;
 }
 
-
 void put_byte(int fd, unsigned char data)
 {
   write(fd, &data, 1);
@@ -804,5 +807,109 @@ void util_umount_driver_update()
   *driver_update_dir = 0;
 
   util_free_ramdisk("/dev/ram3");
+}
+
+
+void util_status_info()
+{
+  char *l[10];
+  int i;
+  char *s, t[100];
+
+  for(i = 0; i < sizeof l / sizeof *l; i++) {
+    l[i] = calloc(100, 1);
+  }
+
+  sprintf(l[0],
+    "memory = %" PRIu64 ", bootmode = %d, net_config = 0x%x",
+    memory_ig, bootmode_ig, valid_net_config_ig
+  );
+  sprintf(l[1], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
+  sprintf(l[2], "driver_update_dir = \"%s\"", driver_update_dir);
+
+  strcpy(t, inet_ntoa(ipaddr_rg));
+  s = inet_ntoa(network_rg);
+  sprintf(l[3], "ip = %s, network = %s", t, s);
+
+  strcpy(t, inet_ntoa(broadcast_rg));
+  s = inet_ntoa(netmask_rg);
+  sprintf(l[4], "broadcast = %s, netmask = %s", t, s);
+
+  strcpy(t, inet_ntoa(gateway_rg));
+  s = inet_ntoa(nameserver_rg);
+  sprintf(l[5], "gateway = %s, nameserver = %s", t, s);
+
+  strcpy(t, inet_ntoa(nfs_server_rg));
+  s = inet_ntoa(ftp_server_rg);
+  sprintf(l[6], "nfs server = %s, ftp server = %s", t, s);
+
+  s = inet_ntoa(plip_host_rg);
+  sprintf(l[7], "plip host = %s", s);
+
+  dia_show_lines("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", l, sizeof l / sizeof *l, 76, FALSE);
+
+  for(i = 0; i < sizeof l / sizeof *l; i++) free(l[i]);
+}
+
+int util_mount_main(int argc, char **argv)
+{
+  int i;
+  char *dir, *srv_dir;
+  char *mp_tmp = mountpoint_tg;
+  char *type = NULL, *dev;
+
+  argv++; argc--;
+
+  if(argc != 3 && argc != 4) return 1;
+
+  if(strstr(*argv, "-t") == *argv) {
+    type = *argv + 2;
+  }
+
+  if(type && !*type) {
+    type = *++argv;
+  }
+
+  dev = strcmp(argv[1], "none") ? argv[1] : NULL;
+
+  dir = argv[2];
+
+  if(!type) return 2;
+
+  if(strcmp(type, "nfs")) {
+    if(!mount(dev, dir, type, 0, 0)) return 0;
+    perror("mount");
+    return 3;
+  }
+
+  srv_dir = index(dev, ':');
+  if(!srv_dir) {
+    fprintf(stderr, "invalid mount src \"%s\"\n", dev);
+    return 7;
+  }
+
+  *srv_dir++ = 0;
+
+  mountpoint_tg = dir;
+
+  i = net_mount_nfs(dev, srv_dir);
+
+  mountpoint_tg = mp_tmp;
+
+  return i;
+}
+
+
+int util_umount_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(argc != 1) return 1;
+
+  if(!umount(*argv)) return 0;
+
+  perror(*argv);
+
+  return 1;
 }
 

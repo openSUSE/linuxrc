@@ -396,8 +396,13 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
 
     mount_server_ri.sin_port = htons (0);
     socket_ii = RPC_ANYSOCK;
+#if 0
     mount_client_pri = clnttcp_create (&mount_server_ri, MOUNTPROG, MOUNTVERS,
                                        &socket_ii, 0, 0);
+#else
+    mount_client_pri = NULL;
+#endif
+
     if (!mount_client_pri)
         {
 	mount_data_ri.timeo = 7;

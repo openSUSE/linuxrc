@@ -1,3 +1,13 @@
+9/1/2001:	v1.1.17.002
+	- fixed 5 min NFS timeout bug
+	- fixed rootimage loading
+
+8/1/2001:	v1.1.17.001
+	- mantel: updated copyright message
+	- mantel: added 8139too.o
+	- msvec@suse.cz: czech message update
+	- fixed CD detection with multiple CDROM drives
+
 20/12/2000:	v1.1.17.000
 	- started driver update stuff; should work with floppies now
 

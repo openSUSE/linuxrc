@@ -510,6 +510,11 @@ int file_read_info (void)
                           strlen (file_txt_netdevice_tm)))
             strncpy (netdevice_tg, value_ti, sizeof (netdevice_tg));
 
+        if((valid_net_config_ig & 3) == 3) {
+          broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+          network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+        }
+
         if (!strncasecmp (file_txt_livesrc_tm, buffer_ti, strlen (file_txt_livesrc_tm)))
             {
             strncpy (livesrc_tg, value_ti, sizeof (livesrc_tg));

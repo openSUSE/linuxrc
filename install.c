@@ -1176,9 +1176,9 @@ static int inst_ftp (void)
     /* currently YaST1 only */
     yast_version_ig = 1;
 
-    if (!inst_rescue_im && memory_ig <= (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
+    if (!inst_rescue_im && memory_ig <= MEM_LIMIT_RAMDISK_FTP)
         {
-        sprintf(msg, txt_get (TXT_NOMEM_FTP), (MEM_LIMIT1_RAMDISK >> 20) + 2);
+        sprintf(msg, txt_get (TXT_NOMEM_FTP), (MEM_LIMIT_RAMDISK_FTP >> 20) + 2);
         (void) dia_message (msg, MSGTYPE_ERROR);
         return (-1);
         }

@@ -94,6 +94,10 @@ int main (int argc, char **argv, char **env)
         rc_ii = setfont_main (argc, argv);
     else if (!strcmp (progname_pci, "portmap"))
         rc_ii = portmap_main (argc, argv);
+    else if (!strcmp (progname_pci, "mount"))
+        rc_ii = util_mount_main (argc, argv);
+    else if (!strcmp (progname_pci, "umount"))
+        rc_ii = util_umount_main (argc, argv);
     else if (!strcmp (progname_pci, "nothing"))
         rc_ii = 0;
     else
@@ -456,7 +460,7 @@ static void lxrc_init (void)
     if (memory_ig < MEM_LIMIT_YAST2)
         yast_version_ig = 1;
 
-    if (memory_ig > (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
+    if (memory_ig > (yast_version_ig == 1 ? MEM_LIMIT_RAMDISK_YAST1 : MEM_LIMIT_RAMDISK_YAST2))
         force_ri_ig = TRUE;
 
     if ((guru_ig & 8)) force_ri_ig = FALSE;

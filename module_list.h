@@ -103,7 +103,7 @@ static module_t mod_net_mod_arm [] =
 { ID_3C90X,      "3Com 3c90x/3c980 B/C series",        "3c90x",      0, __LINE__ },
 { ID_3C509,      "3Com 3c509/3c579",                   "3c509",      0, __LINE__ },
 { ID_RTL8139,    "RealTek RTL8129/8139",               "rtl8139",    0, __LINE__ },
-{ ID_8139TOO,	 "RealTek RTL8139",		       "8139too"     0, __LINE__ },
+{ ID_8139TOO,	 "RealTek RTL8139",		       "8139too",    0, __LINE__ },
 { ID_NE2000,     "NE 2000 / NE 1000 (ISA)",            "ne",         "io=0x300", __LINE__ },
 { ID_NE2K_PCI,   "NE 2000 (PCI)",                      "ne2k-pci",   0, __LINE__ },
 { ID_WD_80X3,    "Western Digital WD80x3",             "wd",         0, __LINE__ },

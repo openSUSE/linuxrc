@@ -75,9 +75,9 @@ static language_t set_languages_arm [] =
   "trivial",         "lat2u.uni", 1, 1,      "en_US",        "romanian"      },
 { LANG_RUSSIA,       "Russian",              "ru1",          "Cyr_a8x16.psfu",
   "koi2alt",         "cyralt.uni",1, 1,      "ru_RU.KOI8-R", "russian"       },
-{ LANG_CZECH,        "Czech",                "cz-us-qwertz", "lat2-16.psfu",
+{ LANG_CZECH,        "Cestina",              "cz-us-qwertz", "lat2-16.psfu",
   "trivial",         "lat2u.uni", 1, 1,      "cs_CZ",        "czech"         },
-{ LANG_SLOVAK,       "Slovensky",            "sk-qwerty",    "lat2-16.psfu",
+{ LANG_SLOVAK,       "Slovencina",           "sk-qwerty",    "lat2-16.psfu",
   "trivial",         "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
 };
 #endif
@@ -117,9 +117,9 @@ static language_t set_languages_arm [] =
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "en_US",        "romanian"      },
 { LANG_RUSSIA,       "Russian",              "ru1",          "Cyr_a8x16",
   "koi2alt",         "cyralt.uni",1, 1,      "ru_RU.KOI8-R", "russian"       },
-{ LANG_CZECH,        "Czech",                "cz-us-qwertz", "lat2u-16.psf",
+{ LANG_CZECH,        "Cestina",              "cz-us-qwertz", "lat2u-16.psf",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "cs_CZ",        "czech"         },
-{ LANG_SLOVAK,       "Slovensky",            "sk-qwerty",    "lat2u-16.psf",
+{ LANG_SLOVAK,       "Slovencina",           "sk-qwerty",    "lat2u-16.psf",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
 };
 #endif
@@ -143,7 +143,7 @@ static keymap_t set_keymaps_arm [] =
 { "Português",            "pt-latin1"    },
 { "Português Brasileiro", "br-abnt2"     },
 { "Russian",              "ru1"          },
-{ "Czech",                "cz-us-qwertz" },
+{ "Ceske",                "cz-us-qwertz" },
 { "Dansk",                "dk"           },
 { "Suomi/Svensk",         "fi"           },
 { "Slovak",               "sk-qwerty"    }
@@ -176,7 +176,7 @@ static keymap_t set_keymaps_arm [] =
 { "Português Brasileiro (PS/2)", "br-abnt2"        },
 { "Russian (PS/2)",              "ru1"             },
 { "Russian (Sun Type5)",         "sunt5-ru"        },
-{ "Czech (PS/2)",                "cz-us-qwertz"    },
+{ "Ceske (PS/2)",                "cz-us-qwertz"    },
 { "Dansk (PS/2)",                "dk"              },
 { "Suomi/Svensk (PS/2)",         "fi"              },
 { "Suomi/Svensk (Sun Type5)",    "sunt5-fi-latin1" },

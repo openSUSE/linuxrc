@@ -14,7 +14,7 @@ struct nfs2_fh {
         char                    data[32];
 };
 struct nfs3_fh {
-        unsigned short          size;
+        unsigned int          size;
         unsigned char           data[64];
 };
 
