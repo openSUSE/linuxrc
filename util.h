@@ -2,7 +2,7 @@
  *
  * util.h        Header file for util.c
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -37,3 +37,4 @@ extern int  util_try_mount        (char *device_pcv,      char *dir_pcv,
 extern void util_print_ftp_error  (int error_iv);
 extern void util_free_ramdisk     (char *ramdisk_dev_tv);
 extern int  util_open_ftp         (char *server_tv);
+extern int  util_cd1_boot         (void);

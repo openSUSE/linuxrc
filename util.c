@@ -2,7 +2,7 @@
  *
  * util.c        Utility functions for linuxrc
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/vfs.h>
 #include <sys/mount.h>
 #include <sys/ioctl.h>
 #include <sys/kd.h>
@@ -44,16 +45,15 @@ static char  *util_loopdev_tm = "/dev/loop0";
 void util_redirect_kmsg (void)
     {
     int  fd_ii;
-    char arg_aci [2];
+    int  newvt_ii;
 
 
+/*    fd_ii = open ("/dev/tty1", O_RDONLY); */
     fd_ii = open (console_tg, O_RDONLY);
     if (fd_ii)
         {
-        arg_aci [0] = 11;
-        arg_aci [1] = 4;
-
-        ioctl (fd_ii, TIOCLINUX, &arg_aci);
+        newvt_ii = (4 << 8) | 11;
+        ioctl (fd_ii, TIOCLINUX, &newvt_ii);
         close (fd_ii);
         }
     }
@@ -297,7 +297,7 @@ void util_print_banner (void)
     win_open (&win_ri);
 
     uname (&utsinfo_ri);
-    sprintf (text_ti, ">>> Linuxrc v1.0b (Kernel %s) (c) 1996-99 SuSE GmbH <<<",
+    sprintf (text_ti, ">>> Linuxrc v1.0b (Kernel %s) (c) 1996-2000 SuSE GmbH <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
@@ -484,4 +484,19 @@ int util_open_ftp (char *server_tv)
                      ftp_password_tg,
                      ftp_proxy_tg [0]    ? ftp_proxy_tg    : 0,
                      ftp_proxyport_ig));
+    }
+
+
+int util_cd1_boot (void)
+    {
+    struct statfs fs_status_ri;
+
+    (void) statfs ("/", &fs_status_ri);
+
+    fprintf (stderr, "Size of ramdisk is %ld\n", fs_status_ri.f_blocks);
+
+    if (fs_status_ri.f_blocks > 3200)
+        return (TRUE);
+    else
+        return (FALSE);
     }

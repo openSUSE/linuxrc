@@ -2,7 +2,7 @@
  *
  * install.c           Handling of installation
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
@@ -266,7 +266,7 @@ static int inst_choose_source_cb (int what_iv)
     switch (what_iv)
         {
         case 1:
-            if (!told_is)
+            if (!told_is && !util_cd1_boot ())
                 {
                 sprintf (tmp_ti, txt_get (TXT_INSERT_CD), 1);
                 (void) dia_message (tmp_ti, MSGTYPE_INFO);
