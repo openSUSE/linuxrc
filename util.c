@@ -1613,6 +1613,7 @@ int util_mount_main(int argc, char **argv)
   char *dir, *srv_dir;
   char *type = NULL, *dev, *module;
   inet_t inet = {};
+  unsigned long flags = 0;
 
   argv++; argc--;
 
@@ -1621,6 +1622,12 @@ int util_mount_main(int argc, char **argv)
   }
 
   if(argc < 2) return fprintf(stderr, "mount: invalid number of arguments\n"), 1;
+
+  if(!strcmp(*argv, "-r")) {
+    flags = MS_RDONLY;
+    argv++;
+    argc--;
+  }
 
   if(strstr(*argv, "-t") == *argv) {
     type = *argv + 2;
@@ -1655,13 +1662,13 @@ int util_mount_main(int argc, char **argv)
   }
 
   if(notype) {
-    if(!util_mount(dev, dir, 0)) return 0;
+    if(!util_mount(dev, dir, flags)) return 0;
     perror("mount");
     return errno;
   }
 
   if(strcmp(type, "nfs")) {
-    if(!mount(dev, dir, type, 0, 0)) return 0;
+    if(!mount(dev, dir, type, flags, 0)) return 0;
     perror("mount");
     return errno;
   }
