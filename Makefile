@@ -31,7 +31,7 @@ ifeq ($(ARCH),sparc)
 endif
 
 ifneq ($(USE_MINI_GLIBC),no)
-    CC		+= -V2.7.2.3			# doesn't work with newer gcc/egcs
+#    CC		+= -V2.7.2.3			# doesn't work with newer gcc/egcs
     CFLAGS	+= -I$(TOPDIR)/libc/include
     LDFLAGS	+= -u__force_mini_libc_symbols
     SUBDIRS	+= libc
