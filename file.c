@@ -141,7 +141,7 @@ void file_write_yast_info (void)
         }
 #endif
 #ifdef USE_LIBHD
-    fprintf (file_pri, "%s %d\n", file_txt_has_pcmcia_tm, auto2_pcmcia());
+    fprintf (file_pri, "%s %d\n", file_txt_has_pcmcia_tm, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
 #endif
 
     if (serial_ig)
