@@ -179,7 +179,8 @@ static struct {
   { key_setupcmd,       "SetupCmd"         },
   { key_setupnetif,     "SetupNetIF"       },
   { key_netconfig,      "NetConfig"        },
-  { key_noshell,        "NoShell"          }
+  { key_noshell,        "NoShell"          },
+  { key_memcheck,       "_MemCheck"        }
 };
 
 static struct {
@@ -890,6 +891,10 @@ void file_do_info(file_t *f0)
 
       case key_noshell:
         if(f->is.numeric) config.noshell = f->nvalue;
+        break;
+
+      case key_memcheck:
+        if(f->is.numeric) config.run_memcheck = f->nvalue;
         break;
 
       default:

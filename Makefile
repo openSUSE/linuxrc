@@ -125,6 +125,7 @@ linuxrc: $(OBJ) $(LIBS)
 	@cp $@ $(@)-debug
 	@strip -R .note -R .comment $@
 	@ls -l linuxrc
+	@mv $(@)-debug $@
 
 install: linuxrc
 	@install linuxrc /usr/sbin

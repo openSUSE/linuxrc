@@ -205,10 +205,10 @@ void auto2_scan_hardware(char *log_file)
 
   j = ju = 0;
   for(hd = hd_data->hd; hd; hd = hd->next) {
-    if(hd->base_class == bc_mouse && hd->bus == bus_usb) j++;
-    if(hd->base_class == bc_keyboard) {
+    if(hd->base_class.id == bc_mouse && hd->bus.id == bus_usb) j++;
+    if(hd->base_class.id == bc_keyboard) {
       has_kbd_ig = TRUE;
-      if(hd->bus == bus_usb) ju++;
+      if(hd->bus.id == bus_usb) ju++;
       di = hd->driver_info;
       if(di && di->any.type == di_kbd) {
 //        if(di->kbd.XkbRules) strcpy(xkbrules_tg, di->kbd.XkbRules);
@@ -534,7 +534,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 
   for(; hd; hd = hd->next) {
     if(
-      hd->base_class == base_class &&
+      hd->base_class.id == base_class &&
       hd->driver_info &&
       !auto2_driver_is_active(hd->driver_info)
     ) {
@@ -920,19 +920,19 @@ int auto2_load_usb_storage()
 
   for(hd = hd_data->hd; hd; hd = hd->next) {
     if(
-      hd->base_class == bc_storage_device &&
-      hd->sub_class == sc_sdev_floppy
+      hd->base_class.id == bc_storage_device &&
+      hd->sub_class.id == sc_sdev_floppy
     ) {
-      if(hd->bus == bus_usb) {
+      if(hd->bus.id == bus_usb) {
         if(
           !(
             (
-              (hd->vend_name && !strcasecmp(hd->vend_name, "iomega")) ||
-              (hd->sub_vend_name && !strcasecmp(hd->sub_vend_name, "iomega"))
+              (hd->vendor.name && !strcasecmp(hd->vendor.name, "iomega")) ||
+              (hd->sub_vendor.name && !strcasecmp(hd->sub_vendor.name, "iomega"))
             ) &&
             (
-              (hd->dev_name && strstr(hd->dev_name, "ZIP")) ||
-              (hd->sub_dev_name && strstr(hd->sub_dev_name, "Zip"))
+              (hd->device.name && strstr(hd->device.name, "ZIP")) ||
+              (hd->sub_device.name && strstr(hd->sub_device.name, "Zip"))
             )
           )
         ) {
@@ -984,20 +984,7 @@ int auto2_pcmcia()
 
 int auto2_full_libhd()
 {
-  hd_data_t *hd_data_tmp;
-  int i;
-
-  if(hd_data) {
-    return hd_bus_name(hd_data, bus_none) ? 1 : 0;
-  }
-
-  hd_data_tmp = calloc(1, sizeof *hd_data_tmp);
-  /* init data structures  */
-  hd_scan(hd_data_tmp);
-  i = hd_bus_name(hd_data_tmp, bus_none) ? 1 : 0;
-  hd_free_hd_data(hd_data_tmp);
-
-  return i;
+  return 0;
 }
 
 char *auto2_usb_module()

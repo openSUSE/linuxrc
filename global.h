@@ -215,7 +215,9 @@ typedef struct {
   unsigned netstop:1;		/* shut down network iface at end */
   unsigned noshell:1;		/* don't start any shells */
   volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
+  unsigned run_memcheck:1;	/* run memcheck thread */
   unsigned had_segv;		/* last linuxrc run ended with segv */
+  pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

@@ -69,7 +69,6 @@ static void save_environment   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
-static pid_t lxrc_mempid_rm;
 static char **saved_environment;
 extern char **environ;
 static void lxrc_movetotmpfs(void);
@@ -404,18 +403,27 @@ void lxrc_end (void)
 
     util_debugwait("kill remaining procs");
 
-    kill (lxrc_mempid_rm, 9);
-    lxrc_killall (1);
+    if(config.memcheck_pid) kill(config.memcheck_pid, 9);
+
+    lxrc_killall(1);
+
     while(waitpid(-1, NULL, WNOHANG) == 0);
-    i = waitpid(lxrc_mempid_rm, NULL, 0);
-    fprintf(stderr, "lxrc_mempid_rm = %d, wait = %d\n", lxrc_mempid_rm, i);
+
+    if(config.memcheck_pid) {
+      i = waitpid(config.memcheck_pid, NULL, 0);
+      fprintf(stderr, "memcheck pid = %d, wait = %d\n", config.memcheck_pid, i);
+    }
+
     printf ("\033[9;15]");	/* screen saver on */
+
 /*    reboot (RB_ENABLE_CAD); */
-    mod_free_modules ();
-    util_umount_driver_update ();
-    (void) util_umount (mountpoint_tg);
-    lxrc_set_modprobe ("/sbin/modprobe");
-    lxrc_set_bdflush (40);
+    mod_free_modules();
+
+    util_umount_driver_update();
+    util_umount(mountpoint_tg);
+
+    lxrc_set_modprobe("/sbin/modprobe");
+    lxrc_set_bdflush(40);
 
     deb_str(config.new_root);
 
@@ -492,7 +500,7 @@ void lxrc_killall(int really_all_iv)
       pid = strtoul(sl->key, NULL, 10);
       if(
         pid > mypid &&
-        pid != lxrc_mempid_rm &&
+        pid != config.memcheck_pid &&
         (really_all_iv || !do_not_kill(sl->value))
       ) {
         if(sig == 15) fprintf(stderr, "killing %s (%d)\n", sl->value, pid);
@@ -569,7 +577,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
     addr[16] = 0;
     state[0] = config.win ? '1' : '0';
     state[1] = 0;
-    kill(lxrc_mempid_rm, 9);
+    if(config.memcheck_pid) kill(config.memcheck_pid, 9);
     kbd_end();		/* restore terminal settings */
     execl(*config.argv, "linuxrc", "segv", addr, state, NULL);
   }
@@ -867,7 +875,7 @@ void lxrc_init()
 
   info_init();
 
-  lxrc_memcheck();
+  if(config.run_memcheck) lxrc_memcheck();
 
   mod_init();
   util_update_disk_list(NULL, 1);
@@ -1087,7 +1095,7 @@ void lxrc_memcheck()
   int nr_pages, max_pages, i;
   char *buf;
 
-  if((lxrc_mempid_rm = fork())) return;
+  if((config.memcheck_pid = fork())) return;
 
   lxrc_catch_signal(0);
 

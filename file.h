@@ -32,7 +32,7 @@ typedef enum {
   key_vncpassword, key_sshpassword, key_usepivotroot, key_term, key_addswap,
   key_fullnetsetup, key_aborted, key_memyasttext, key_netstop, key_exec,
   key_usbwait, key_nfsrsize, key_nfswsize, key_hwcheck, key_setupcmd,
-  key_setupnetif, key_netconfig, key_usessh, key_noshell
+  key_setupnetif, key_netconfig, key_usessh, key_noshell, key_memcheck
 } file_key_t;
 
 typedef struct file_s {

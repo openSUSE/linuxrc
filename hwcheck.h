@@ -278,12 +278,12 @@ static char *scanner_info(hd_t *hd)
 {
   int i;
 
-  if(!hd->vend_name || !hd->dev_name) return NULL;
+  if(!hd->vendor.name || !hd->device.name) return NULL;
 
   for(i = 0; i < sizeof scanner_data / sizeof *scanner_data; i++) {
     if(
-      !strcasecmp(scanner_data[i].vendor, hd->vend_name) &&
-      !strcasecmp(scanner_data[i].model, hd->dev_name)
+      !strcasecmp(scanner_data[i].vendor, hd->vendor.name) &&
+      !strcasecmp(scanner_data[i].model, hd->device.name)
     ) {
       return scanner_data[i].driver;
     }
@@ -310,7 +310,7 @@ static int do_hwcheck()
   int i, wheels, buttons, missing = 0;
   unsigned u;
   uint64_t ul;
-  char *s, *s1, *s2, *s3;
+  char *s, *s1;
   char *sep = "\n";
   hd_hw_item_t item, items[] = {
 #if 0
@@ -605,17 +605,7 @@ static int do_hwcheck()
         }
         else {
           for(hd = hd0; hd; hd = hd->next) {
-            s1 = hd_class_name(hd_data, 3, hd->base_class, hd->sub_class, hd->prog_if);
-            s2 = strchr(s1, '(');
-            s3 = strchr(s1, ')');
-            if(s2 && s3 && s2[1] && !s3[1]) {
-              *s3 = 0;
-              s1 = s2 + 1;
-            }
-            else {
-              s1 = "CD-ROM";
-            }
-            fprintf(f, "%-9s: ok    %s\n", s1, hd->model);
+            fprintf(f, "%-9s: ok    %s\n", hd->prog_if.name ?: "CD-ROM", hd->model);
           }
         }
         break;
@@ -779,7 +769,7 @@ static int do_hwcheck()
 
       case hw_storage_ctrl:
         for(hd = hd0; hd; hd = hd->next) {
-          if(hd->base_class == bc_storage && hd->sub_class == sc_sto_floppy) break;
+          if(hd->base_class.id == bc_storage && hd->sub_class.id == sc_sto_floppy) break;
         }
         if(hd) {
           fprintf(f, "Floppy   : ok\n");
