@@ -232,7 +232,6 @@ static int inst_menu_cb (int what_iv)
         case 1:
             error_ii = inst_start_install ();
             break;
-#ifndef LINUXRC_AXP
         case 2:
             error_ii = root_boot_system ();
             break;
@@ -242,7 +241,6 @@ static int inst_menu_cb (int what_iv)
         case 4:
             error_ii = inst_start_demo ();
             break;
-#endif
         default:
             dia_message (txt_get (TXT_NOT_IMPLEMENTED), MSGTYPE_ERROR);
             error_ii = -1;
@@ -875,10 +873,6 @@ static int inst_commit_install (void)
     if (swap_ti [0])
         swapoff (swap_ti);
 
-#ifdef LINUXRC_AXP
-    dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
-    reboot (RB_AUTOBOOT);
-#else
     if (root_ti [0])
         {
         if ((!auto_ig && pcmcia_chip_ig) || !strncasecmp (root_ti, "reboot", 6))
@@ -906,7 +900,6 @@ static int inst_commit_install (void)
         }
     else
         rc_ii = -1;
-#endif
 
     return (rc_ii);
     }
