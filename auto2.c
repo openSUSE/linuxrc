@@ -432,8 +432,7 @@ int auto2_net_dev(hd_t **hd0)
           !config.serverdir || !*config.serverdir ||
           !config.net.hostname.ok ||
           !config.net.netmask.ok ||
-          !config.net.broadcast.ok ||
-          !config.net.gateway.ok
+          !config.net.broadcast.ok
         ) {
           fprintf(stderr, "no/incomplete answer.\n");
           config.net.configured = nc_none;
