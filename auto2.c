@@ -46,6 +46,7 @@ static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
+static int auto2_net_dev1(char *device);
 static int driver_is_active(hd_t *hd);
 static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
@@ -442,131 +443,147 @@ int auto2_cdrom_dev(hd_t **hd0)
 int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
-  int i;
 
   if(!(net_config_mask() || config.insttype == inst_net)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
-    if(hd->unix_dev_name && strcmp(hd->unix_dev_name, "lo")) {
 
-      if(config.net.device_given && strcmp(netdevice_tg, hd->unix_dev_name)) continue;
-
-      /* net_stop() - just in case */
-      net_stop();
-
-      fprintf(stderr, "Trying to activate %s\n", hd->unix_dev_name);
-
-      strcpy(netdevice_tg, hd->unix_dev_name);
-
-      net_setup_localhost();
-
-      config.net.configured = nc_static;
-
-      /* do bootp if there's some indication that a net install is intended
-       * but some data are still missing
-       */
-      if(
-        (net_config_mask() || config.insttype == inst_net) &&
-        (net_config_mask() & 0x2b) != 0x2b
-      ) {
-        printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
-        fflush(stdout);
-        fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
-        config.net.use_dhcp ? net_dhcp() : net_bootp();
-        if(
-          !config.serverdir || !*config.serverdir ||
-          !config.net.hostname.ok ||
-          !config.net.netmask.ok ||
-          !config.net.broadcast.ok
-        ) {
-          fprintf(stderr, "no/incomplete answer.\n");
-          config.net.configured = nc_none;
-          return 1;
-        }
-        fprintf(stderr, "ok.\n");
-
-
-        config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
-
-        if(net_check_address2(&config.net.server, 1)) {
-          fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
-          config.net.configured = nc_none;
-          return 1;
-        }
-      }
-
-      if(net_activate_ns()) {
-        fprintf(stderr, "net activation failed\n");
-        config.net.configured = nc_none;
-        return 1;
-      }
-      else {
-        fprintf(stderr, "%s activated\n", hd->unix_dev_name);
-      }
-
-      while (config.instmode == inst_slp) {
-	extern int slp_get_install(void);
-	if (slp_get_install()) {
-            fprintf(stderr, "SLP failed\n");
-            return 1;
-        }
-      }
-
-      net_ask_password(); /* in case we have ssh or vnc in auto mode */
-
-      switch(config.instmode) {
-        case inst_smb:
-          fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.serverdir);
-
-          i = net_mount_smb(mountpoint_tg,
-            &config.net.server, config.serverdir,
-            config.net.user, config.net.password, config.net.workgroup
-          );
-          
-          if(i) {
-            fprintf(stderr, "SMB mount failed\n");
-            return 1;
-          }
-
-          fprintf(stderr, "SMB mount ok\n");
-          break;
-
-        case inst_nfs:
-          fprintf(stderr, "Starting portmap.\n");
-          system("portmap");
-
-          fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
-
-          if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
-            fprintf(stderr, "NFS mount failed\n");
-            return 1;
-          }
-
-          fprintf(stderr, "NFS mount ok\n");
-          break;
-
-        case inst_ftp:
-        case inst_tftp:
-        case inst_http:
-          i = net_open(NULL);
-          if(i < 0) {
-            util_print_net_error();
-            return 1;
-          }
-          break;
-
-        default:
-          fprintf(stderr, "unsupported inst mode: %s\n", get_instmode_name(config.instmode));
-          return 1;
-      }
-
-      return inst_check_instsys();
-    }
+    if(!auto2_net_dev1(hd->unix_dev_name)) return 0;
   }
 
   return 1;
 }
+
+
+/*
+ * Try to get inst-sys from network device.
+ *
+ * Return:
+ *   0: ok
+ *   1: failed
+ */
+int auto2_net_dev1(char *device)
+{
+  int i;
+
+  if(!device) return 1;
+
+  if(!strncmp(device, "lo", sizeof "lo" - 1)) return 1;
+
+  if(config.net.device_given && strcmp(device, netdevice_tg)) return 1;
+
+  /* net_stop() - just in case */
+  net_stop();
+
+  fprintf(stderr, "Trying to activate %s\n", device);
+
+  strcpy(netdevice_tg, device);
+
+  net_setup_localhost();
+
+  config.net.configured = nc_static;
+
+  /* do bootp if there's some indication that a net install is intended
+   * but some data are still missing
+   */
+  if(
+    (net_config_mask() || config.insttype == inst_net) &&
+    (net_config_mask() & 0x2b) != 0x2b
+  ) {
+    printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+    fflush(stdout);
+    fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+    config.net.use_dhcp ? net_dhcp() : net_bootp();
+    if(
+      !config.serverdir || !*config.serverdir ||
+      !config.net.hostname.ok ||
+      !config.net.netmask.ok ||
+      !config.net.broadcast.ok
+    ) {
+      fprintf(stderr, "no/incomplete answer.\n");
+      config.net.configured = nc_none;
+      return 1;
+    }
+    fprintf(stderr, "ok.\n");
+
+    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+
+    if(net_check_address2(&config.net.server, 1)) {
+      fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
+      config.net.configured = nc_none;
+      return 1;
+    }
+  }
+
+  if(net_activate_ns()) {
+    fprintf(stderr, "net activation failed\n");
+    config.net.configured = nc_none;
+    return 1;
+  }
+  else {
+    fprintf(stderr, "%s activated\n", device);
+  }
+
+  while(config.instmode == inst_slp) {
+    extern int slp_get_install(void);
+    if(slp_get_install()) {
+      fprintf(stderr, "SLP failed\n");
+      return 1;
+    }
+  }
+
+  net_ask_password(); /* in case we have ssh or vnc in auto mode */
+
+  switch(config.instmode) {
+    case inst_smb:
+      fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.serverdir);
+
+      i = net_mount_smb(mountpoint_tg,
+        &config.net.server, config.serverdir,
+        config.net.user, config.net.password, config.net.workgroup
+      );
+      
+      if(i) {
+        fprintf(stderr, "SMB mount failed\n");
+        return 1;
+      }
+
+      fprintf(stderr, "SMB mount ok\n");
+      break;
+
+    case inst_nfs:
+      fprintf(stderr, "Starting portmap.\n");
+      system("portmap");
+
+      fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
+
+      if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
+        fprintf(stderr, "NFS mount failed\n");
+        return 1;
+      }
+
+      fprintf(stderr, "NFS mount ok\n");
+      break;
+
+    case inst_ftp:
+    case inst_tftp:
+    case inst_http:
+      i = net_open(NULL);
+      if(i < 0) {
+        util_print_net_error();
+        return 1;
+      }
+      break;
+
+    default:
+      fprintf(stderr, "unsupported inst mode: %s\n", get_instmode_name(config.instmode));
+      return 1;
+  }
+
+  return inst_check_instsys();
+}
+
 
 int driver_is_active(hd_t *hd)
 {
@@ -684,7 +701,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 int auto2_init()
 {
   int i, j, win_old;
-#ifdef __i386__
+#if 0	/* def __i386__ */
   int net_cfg;
 #endif
   hd_t *hd;
@@ -818,7 +835,7 @@ int auto2_init()
 
   if(!i && config.hwcheck) i = 1;
 
-#ifdef __i386__
+#if 0	/* def __i386__ */
   /* ok, found something */
   if(i) return i;
 
@@ -982,12 +999,11 @@ int auto2_find_install_medium()
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
+    if(config.activate_network) auto2_activate_devices(bc_network, 0);
+    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+
     fprintf(stderr, "Looking for a network server...\n");
-    if(!auto2_net_dev(&hd_devs)) {
-      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
-      if(config.activate_network) auto2_activate_devices(bc_network, 0);
-      return TRUE;
-    }
+    if(!auto2_net_dev(&hd_devs)) return TRUE;
 
     for(need_modules = 0, last_idx = 0;;) {
       fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
@@ -998,11 +1014,7 @@ int auto2_find_install_medium()
       }
 
       fprintf(stderr, "Looking for a network server again...\n");
-      if(!auto2_net_dev(&hd_devs)) {
-        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
-        if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        return TRUE;
-      }
+      if(!auto2_net_dev(&hd_devs)) return TRUE;
     }
   }
 

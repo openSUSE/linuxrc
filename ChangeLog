@@ -1,8 +1,12 @@
-4/5/2004:	v1.6.23
+5/5/2004:	v1.6.23
 	- fixed name server setup for static ip config (#38750)
 	- fixed module loading with parameters
 	- added killall command, needed for:
 	- kill all dhcp clients (#38617)
+	- fixed network interface activation; linuxrc used to miss interfaces
+	  if one module activates several interfaces
+	- removed code that tried a network install on i386 if
+	  CD installation failed
 
 28/4/2004:	v1.6.22
 	- improved slp support
