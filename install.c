@@ -730,17 +730,6 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
-      /* copy content file */
-      sprintf(filename, "%s/content", config.mountpoint.instdata);
-      if(util_check_exist(filename)) {
-        char *argv[3];
-
-        unlink("/content");
-        argv[1] = filename;
-        argv[2] = "/";
-        util_cp_main(3, argv);
-      }
-
       sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
       if(config.rescue || force_ri_ig || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
@@ -830,9 +819,6 @@ int inst_start_install()
     rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.instsys);
     if(rc) return rc;
     str_copy(&config.instsys, config.mountpoint.instsys);
-
-    get_file("/content", "/content");
-    get_file("/media.1/info.txt", "/info.txt");
   }
   else if(!util_is_dir(inst_rootimage_tm)) {
     rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
@@ -843,6 +829,9 @@ int inst_start_install()
     sprintf(buf, "%s%s", config.mountpoint.instdata, config.installdir);
     str_copy(&config.instsys, buf);
   }
+
+  get_file("/content", "/content");
+  get_file("/media.1/info.txt", "/info.txt");
 
   return inst_execute_yast();
 }
@@ -1580,6 +1569,23 @@ void get_file(char *src, char *dst)
         }
       }
       net_close(fd_in);
+    }
+  }
+  else if(
+    config.instmode == inst_hd ||
+    config.instmode == inst_cdrom ||
+    config.instmode == inst_nfs ||
+    config.instmode == inst_smb
+  ) {
+    /* copy content file */
+    sprintf(fname, "%s%s", config.mountpoint.instdata, src);
+    if(util_check_exist(fname)) {
+      char *argv[3];
+
+      unlink(dst);
+      argv[1] = fname;
+      argv[2] = "/";
+      util_cp_main(3, argv);
     }
   }
 }
