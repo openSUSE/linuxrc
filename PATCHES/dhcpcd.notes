@@ -1,0 +1,6 @@
+SuSE has added a patch
+
+  dhcpcd-1.3.20pl0.resolv.conf.dif
+
+to dhcpcd. I dropped it, as it uses an external shell script to modify
+resolv.conf.
