@@ -181,7 +181,7 @@ int net_config()
 
   config.net.configured = nc_none;
 
-  if(config.win) {
+  if(config.win && config.net.setup != NS_DHCP) {
     if((config.net.setup & NS_DHCP)) {
       sprintf(buf, txt_get(TXT_ASK_DHCP), config.net.use_dhcp ? "DHCP" : "BOOTP");
       rc = dia_yesno(buf, NO);
