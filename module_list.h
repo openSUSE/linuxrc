@@ -214,7 +214,8 @@ static enum modid_t mod_noauto_arm [] =
   ID_I2O_CORE,
   ID_I2O_CONFIG,
   ID_I2O_BLOCK,
-  ID_I2O_SCSI
+  ID_I2O_SCSI,
+  ID_IN2000
 };
 
 static enum modid_t mod_is_ppcd_arm [] =
