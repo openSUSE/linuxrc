@@ -838,6 +838,12 @@ void file_do_info(file_t *f0)
           if(config.insttype == inst_net) {
             name2inet(&config.net.server, url->server);
           }
+          else if(config.insttype == inst_cdrom && url->server) {
+            str_copy(&config.cdromdev, url->server);
+          }
+          else if(config.insttype == inst_hd && url->server) {
+            str_copy(&config.partition, url->server);
+          }
         }
         break;
 
@@ -1087,6 +1093,10 @@ void file_do_info(file_t *f0)
 
       case key_useidescsi:
         if(f->is.numeric) config.idescsi = f->nvalue;
+        break;
+
+      case key_kernel_pcmcia:
+        if(f->is.numeric) config.kernel_pcmcia = f->nvalue;
         break;
 
       default:

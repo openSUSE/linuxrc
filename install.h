@@ -12,3 +12,4 @@ extern int inst_start_demo    (void);
 extern int inst_check_instsys (void);
 extern int inst_start_install (void);
 int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_input);
+int inst_umount (void);

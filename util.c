@@ -2555,7 +2555,10 @@ url_t *parse_url(char *str)
   static url_t url = {};
   char *s, *s0, *s1;
   unsigned u;
-  int scheme = -1, i;
+  int scheme = -1, i, ok;
+  char buf[256];
+  slist_t *sl, *sl0;
+  struct stat sbuf;
 
   if(!str) return NULL;
   str = strdup(str);
@@ -2624,6 +2627,56 @@ url_t *parse_url(char *str)
 
   free(str);
   if(scheme >= 0) url.scheme = scheme;
+
+  if(
+    (
+      url.scheme == inst_cdrom ||
+      url.scheme == inst_dvd ||
+      url.scheme == inst_hd
+    ) && (url.dir || url.server)
+  ) {
+    s = malloc(strlen(s0 = url.dir ?: "") + strlen(s1 = url.server ?: "") + 2);
+    *s = 0;
+    if(*s1) strcat(strcat(s, "/"), s1);
+    strcat(s, s0);
+
+    // fprintf(stderr, "s = \"%s\"\n", s);
+
+    sl0 = slist_split('/', *s == '/' ? s + 1 : s);
+
+    sl = sl0;
+    if(sl && !strcmp(sl->key, "dev")) sl = sl->next;
+
+    strcpy(buf, "/dev");
+
+    for(ok = 0; sl; sl = sl->next) {
+      snprintf(buf + strlen(buf), sizeof buf - 1, "/%s", sl->key);
+      if(stat(buf, &sbuf)) break;
+      if(S_ISDIR(sbuf.st_mode)) continue;
+      if(S_ISBLK(sbuf.st_mode)) {
+        str_copy(&url.server, buf + sizeof "/dev/" - 1);
+        *s = 0;
+        for(sl = sl->next; sl; sl = sl->next) {
+          strcat(strcat(s, "/"), sl->key);
+        }
+        str_copy(&url.dir, s);
+        ok = 1;
+        break;
+      }
+      else {
+        break;
+      }
+    }
+
+    if(!ok) {
+      str_copy(&url.server, NULL);
+      str_copy(&url.dir, s);
+    }
+
+    slist_free(sl0);
+    free(s);
+  }
+
 
 #if 0
   fprintf(stderr,

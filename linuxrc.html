@@ -58,9 +58,21 @@ Valid keys are (values given are just examples)
   load this keytable<br>
   <li><code>Display: Color|Mono|Alt</code><br>
   set the menu color scheme<br>
-  <li><code>Install: nfs://server/install/8.0-i386</code><br>
-  install via NFS from <code>server</code><br>
-  note: you can give username, password etc. in the URL, too<br>
+  <li><code>Install: URL</code><br>
+  install from URL; examples:<br>
+  <ul>
+    <li><code>nfs://server/install/i386</code><br>
+    install from NFS server<br>
+    <li><code>ftp://server/install/i386/CD1</code><br>
+    install from FTP server
+    <li><code>ftp://user:whocares@server/install/i386/CD1</code><br>
+    install from FTP server using account 'user' with password 'whocares'<br>
+    <li><code>hd:/suse/i386</code><br>
+    install from hard disk<br>
+    <li><code>hd:/sda3/suse/i386</code><br>
+    like the last example, but don't search for a partition, just use sda3<br>
+  </ul>
+  note: valid URL schemes are cd, hd, nfs, smb, ftp, http, tftp<br>
   <li><code>InstMode: cd|hd|nfs|smb|ftp|http|tftp</code><br>
   set installation mode<br>
   <li><code>HostIP: 10.10.0.2</code><br>
