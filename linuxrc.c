@@ -774,6 +774,11 @@ void lxrc_init()
   ft = file_get_cmdline(key_lxrcdebug);
   if(ft && ft->is.numeric) config.debug = ft->nvalue;
 
+  if((s = getenv("LINUXRC_STDERR"))) str_copy(&config.stderr_name, s);
+  ft = file_get_cmdline(key_linuxrcstderr);
+  if(ft) str_copy(&config.stderr_name, ft->value);
+  util_set_stderr(config.stderr_name);
+
   ft = file_get_cmdline(key_linuxrc);
   str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));
 
@@ -859,9 +864,6 @@ void lxrc_init()
     }
     free(s);
   }
-
-  if((s = getenv("LINUXRC_STDERR"))) str_copy(&config.stderr_name, s);
-  util_set_stderr(config.stderr_name);
 
   if(!config.test && !config.had_segv) {
     fprintf(stderr, "Remount of / ");

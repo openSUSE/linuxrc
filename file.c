@@ -1569,7 +1569,8 @@ file_t *file_parse_buffer(char *buf)
  */
 file_t *file_get_cmdline(file_key_t key)
 {
-  static file_t *cmdline = NULL, *ft, *ft_ok = NULL;
+  static file_t *cmdline = NULL;
+  file_t *ft, *ft_ok = NULL;
 
   if(!cmdline) cmdline = file_read_cmdline();
 

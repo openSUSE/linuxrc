@@ -1,3 +1,9 @@
+13/10/2003:	v1.4.56
+	- fixed evil bug causing linuxrc to do some unexpected things
+	  (introduced by 1.4.55, first item)
+	- parse linuxrcstderr option earlier to get more linuxrc
+	  messages redirected
+
 22/9/2003:	v1.4.55
 	- use *last* console arg for linuxrc (#18592)
 	- tty and tty%d are known not to be serial lines (#18592)
