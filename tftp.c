@@ -116,7 +116,11 @@ int timo;
   strcpy((char *)tftp->buf + 2 + nl + 1, "octet");
   r = sendget(tftp, 1, 2 + nl + 1 + 6);
   if (r == 3)
-    return 0;
+    {
+      if (tftp->len != 512)
+        tftp->nr = -1;
+      return 0;
+    }
   tftp->nr = -1;
   tftp->s = -1;
   tftp->len = 0;
