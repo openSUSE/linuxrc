@@ -9,6 +9,8 @@
 extern int  net_config          (void);
 extern int  net_bootp           (void);
 
+extern int  net_ask_password    (void);
+
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
 
 int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup);

@@ -78,11 +78,8 @@ static int  net_input_data       (void);
 static void net_show_error       (enum nfs_stat status_rv);
 #endif
 
-int net_config()
-{
-#if NETWORK_CONFIG
+int net_ask_password() {
   int rc;
-  char buf[256];
 
   /* If we use VNC or ssh install, ask for the login password */
   if (config.vnc && !config.net.vncpassword) {
@@ -93,13 +90,23 @@ int net_config()
     if(!win_old) util_disp_done();
     /* if(rc == ESCAPE) return -1; */
   }
-  if (config.usessh && config.win && !config.net.sshpassword) {
+  if (config.usessh && !config.net.sshpassword) {
     int win_old;
 
     if(!(win_old = config.win)) util_disp_init();
     rc = dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
     if(!win_old) util_disp_done();
   }
+  return 0;
+}
+
+int net_config()
+{
+#if NETWORK_CONFIG
+  int rc;
+  char buf[256];
+
+  if (net_ask_password()) return -1;
 
   if(
     net_is_configured_im &&

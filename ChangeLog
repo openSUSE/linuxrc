@@ -1,3 +1,5 @@
+	- also ask for ssh/vnc password in auto install.
+	
 21/8/2002:	v1.4.15
 	- accept AutoYaST XML files for config data
 	- delayed splash message a bit (until we got the product name)
