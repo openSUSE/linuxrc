@@ -6,9 +6,9 @@
  *
  */
 
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -16,6 +16,9 @@
 #include "dialog.h"
 #include "util.h"
 #include "multiple_info.h"
+
+// just to get rid of the warning
+extern int snprintf(char *, size_t, const char *, ...);
 
 #define	MULTI_INFO_FILE	"/info"
 #define	MULTI_LIST_FILE	"/info.lst"

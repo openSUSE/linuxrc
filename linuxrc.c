@@ -20,6 +20,8 @@
 #include <string.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <inttypes.h>
+#include <ctype.h>
 
 #include "global.h"
 #include "text.h"
@@ -330,6 +332,52 @@ void lxrc_killall (int really_all_iv)
  *
  */
 
+
+#if defined(__i386__) || defined(__PPC__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__)
+static void lxrc_catch_signal_11(int signum, struct sigcontext scp)
+#endif
+#if defined(__alpha__) || defined(__ia64__)
+static void lxrc_catch_signal_11(int signum, int x, struct sigcontext *scp)
+#endif
+{
+  volatile static unsigned cnt = 0;
+  uint64_t ip;
+
+#ifdef __i386__
+  ip = scp.eip;
+#endif
+
+#ifdef __PPC__
+  ip = (scp.regs)->nip;
+#endif
+
+#ifdef __sparc__
+  ip = scp.si_regs.pc;
+#endif
+
+#ifdef __alpha__
+  ip = scp->sc_pc;
+#endif
+
+#ifdef __ia64__
+  ip = scp->sc_ip;
+#endif
+
+#ifdef __s390__
+  ip = (scp.sregs)->regs.psw.addr;
+#endif
+
+#ifdef __s390x__
+  ip = (scp.sregs)->regs.psw.addr;
+#endif
+
+  if(++cnt < 3) fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
+  sleep(10);
+
+  lxrc_sig11_im = TRUE;
+}
+
+
 static void lxrc_catch_signal (int sig_iv)
     {
     if (sig_iv)
@@ -345,7 +393,7 @@ static void lxrc_catch_signal (int sig_iv)
     signal (SIGBUS,  lxrc_catch_signal);
     signal (SIGINT,  lxrc_catch_signal);
     signal (SIGTERM, lxrc_catch_signal);
-    signal (SIGSEGV, lxrc_catch_signal);
+    signal (SIGSEGV, (void (*)(int)) lxrc_catch_signal_11);
     signal (SIGPIPE, lxrc_catch_signal);
     }
 

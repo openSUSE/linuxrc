@@ -889,7 +889,7 @@ static int inst_execute_yast (void)
     rc_ii = system(command_ti);
 
     fprintf(stderr,
-      "yast%s return code is %d (errno = %d)\n",
+      "yast%d return code is %d (errno = %d)\n",
       yast_version_ig == 2 ? 2 : 1,
       rc_ii,
       rc_ii ? errno : 0

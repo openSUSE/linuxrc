@@ -47,7 +47,9 @@ static char *pcmcia_params = NULL;
 static int is_vaio = 0;
 
 static void auto2_check_cdrom_update(char *dev);
+#if 0
 static char *auto2_device_name(hd_t *hd);
+#endif
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
@@ -66,6 +68,7 @@ static int auto2_get_probe_env(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, int mod_type);
 
+#if 0
 char *auto2_device_name(hd_t *hd)
 {
   static char *s;
@@ -76,6 +79,7 @@ char *auto2_device_name(hd_t *hd)
 
   return s ? s : "?";
 }
+#endif
 
 int auto2_init_settings()
 {
