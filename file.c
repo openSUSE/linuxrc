@@ -167,15 +167,19 @@ file_t *file_read_file(char *name)
   FILE *f;
   char buf1[256], buf2[256];
   int i, l;
-  file_key_t fk;
   file_t *ft0 = NULL, **ft = &ft0;
 
   if(!(f = fopen(name, "r"))) return NULL;
 
   while((i = fscanf(f, "%255s %255[^\n]", buf1, buf2)) != EOF) {
     if(i) {
+      *ft = calloc(1, sizeof **ft);
+
       l = strlen(buf1);
       if(l && buf1[l - 1] == ':') buf1[l - 1] = 0;
+
+      (*ft)->key_str = strdup(buf1);	/* Maybe we should include ':'? */
+
       if(i == 2) {
         l = strlen(buf2);
         while(l && isspace(buf2[l - 1])) buf2[--l] = 0;
@@ -183,12 +187,11 @@ file_t *file_read_file(char *name)
       else {
         *buf2 = 0;
       }
-      if((fk = file_str2key(buf1)) != key_none) {
-        *ft = calloc(1, sizeof *ft);
-        (*ft)->key = fk;
-        (*ft)->value = strdup(buf2);
-        ft = &(*ft)->next;
-      }
+
+      (*ft)->key = file_str2key(buf1);
+      (*ft)->value = strdup(buf2);
+
+      ft = &(*ft)->next;
     }
   }
 

@@ -16,6 +16,10 @@ int             max_y_ig = Y_DEFAULT;
 
 enum langid_t   language_ig = LANG_UNDEF;
 
+config_t config = {
+  rebootmsg: 0
+};
+
 colorset_t     *colors_prg;
 struct in_addr  ipaddr_rg;
 struct in_addr  netmask_rg;

@@ -83,9 +83,12 @@ static int   inst_ftp                 (void);
 static int   inst_get_ftpsetup        (void);
 static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
+static void  inst_swapoff             (void);
 
+#ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
 static int yast_live_cd = 0;
+#endif
 
 int inst_auto_install (void)
     {
@@ -885,9 +888,9 @@ int inst_execute_yast()
   lxrc_set_modprobe("/etc/nothing");
   do_disp_init_ig = TRUE;
 
-  deb_msg("sync...\n");
+  deb_msg("sync...");
   sync();
-  deb_msg("sync ok\n");
+  deb_msg("sync ok");
 
   rc_ii = inst_read_yast_file();
 
@@ -903,7 +906,7 @@ int inst_execute_yast()
   }
 
   if(rc_ii) {
-    dia_message (txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
+    dia_message(txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
   }
 
   lxrc_killall (0);
@@ -913,7 +916,7 @@ int inst_execute_yast()
   system("rm -f /tmp/stp* > /dev/null 2>&1");
   system("rm -f /var/lib/YaST/* > /dev/null 2>&1");
 
-  system ("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
+  system("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
 
   /* if the initrd has an ext2 fs, we've just made / read-only */
   mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
@@ -923,6 +926,9 @@ int inst_execute_yast()
 
   unlink("/bin");
   rename("/.bin", "/bin");
+
+  /* turn off swap */
+  inst_swapoff();
 
   if(!rc_ii) {
     rc_ii = inst_commit_install();
@@ -969,9 +975,17 @@ int inst_read_yast_file()
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {
+#if OBSOLETE_SWAPOFF
       case key_swap:
         swapoff(f->value);
         break;
+#endif
+
+#if OBSOLETE_YAST_LIVECD
+      case key_live:		/* really obsolete */
+        yast_live_cd = atoi(f->value);
+        break;
+#endif
 
       case key_root:
         root = 1;
@@ -979,10 +993,6 @@ int inst_read_yast_file()
           reboot_ig = TRUE;
         else
           root_set_root(f->value);
-        break;
-
-      case key_live:		/* really obsolete */
-        yast_live_cd = atoi(f->value);
         break;
 
       case key_keytable:
@@ -995,6 +1005,10 @@ int inst_read_yast_file()
       case key_language:
         set_activate_language(set_langidbyname(f->value));
         do_disp_init_ig = TRUE;
+        break;
+
+      case key_rebootmsg:
+        config.rebootmsg = atoi(f->value);
         break;
 
       default:
@@ -1014,23 +1028,24 @@ int inst_commit_install()
 
   if(reboot_ig) {
 
-#if !defined(__PPC__) && !defined(__sparc__)
-    if(!auto_ig || reboot_wait_ig) {
+    if(config.rebootmsg) {
       disp_clear_screen();
       util_disp_init();
       dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
     }
-#endif
 
     reboot(RB_AUTOBOOT);
     err = -1;
   }
   else {
+#ifdef OBSOLETE_YAST_LIVECD
     if(yast_live_cd) {
       util_disp_init();
       dia_message(txt_get(TXT_INSERT_LIVECD), MSGTYPE_INFO);
     }
-    else {
+    else
+#endif
+    {
       if(auto_ig) {
         util_disp_init();
         dia_info(&win, txt_get(TXT_INSTALL_SUCCESS));
@@ -1341,7 +1356,7 @@ static int inst_mount_smb (void)
     {
     int       rc_ii;
     window_t  win_ri;
-    char msg[256];
+//    char msg[256];
 
     rc_ii = net_config ();
     if (rc_ii)
@@ -1509,36 +1524,6 @@ int inst_auto2_install()
 #endif	/* USE_LIBHD */
 
 
-#if 0
-int inst_update_cd()
-{
-  int  i;
-  char dev[20];
-  char *mp = "/tmp/drvupdate";
-
-  *driver_update_dir = 0;
-  strcpy(dev, "/dev/");
-  i = dia_input(txt_get(TXT_CHOOSE_SOURCE), dev, 17, 17);
-  if(i) return i;
-  mkdir(mp, 0755);
-  i = util_try_mount(dev, mp, MS_MGC_VAL | MS_RDONLY, 0);
-  if(!i) {
-    deb_msg("Update CD mounted");
-    util_chk_driver_update(mp);
-    umount(mp);
-  }
-  else {
-    deb_msg("Update CD mount failed");
-  }
-
-  if(!*driver_update_dir) dia_message("Driver Update failed", MSGTYPE_ERROR);
-
-  return 0;
-}
-
-#endif
-
-
 int inst_update_cd()
 {
   int  i, cdroms = 0;
@@ -1588,5 +1573,22 @@ int inst_update_cd()
   }
 
   return 0;
+}
+
+
+void inst_swapoff()
+{
+  file_t *f0, *f;
+
+  f0 = file_read_file("/proc/swaps");
+
+  for(f = f0; f; f = f->next) {
+    if(f->key == key_none && *f->key_str == '/') {
+      fprintf(stderr, "swapoff %s\n", f->key_str);
+      swapoff(f->key_str);
+    }
+  }
+
+  file_free_file(f0);
 }
 

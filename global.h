@@ -149,6 +149,12 @@ typedef struct {
                }
         item_t;
 
+typedef struct {
+  unsigned rebootmsg:1;
+} config_t;
+
+config_t config;
+
 extern int             max_x_ig;
 extern int             max_y_ig;
 extern enum langid_t   language_ig;

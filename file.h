@@ -7,12 +7,13 @@
  */
 
 typedef enum {
-  key_none, key_swap, key_root, key_live, key_keytable, key_language
+  key_none, key_swap, key_root, key_live, key_keytable, key_language, key_rebootmsg
 } file_key_t;
 
 typedef struct file_s {
   struct file_s *next;
   file_key_t key;
+  char *key_str;
   char *value;
 } file_t;
 

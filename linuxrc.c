@@ -74,7 +74,6 @@ int main (int argc, char **argv, char **env)
     int   rc_ii = 0;
     char *progname_pci;
 
-
     progname_pci = strrchr (argv [0], '/');
     if (progname_pci)
         progname_pci++;
@@ -670,6 +669,13 @@ static void lxrc_init (void)
     util_update_kernellog ();
 
     (void) net_setup_localhost ();
+
+#if !defined(__PPC__) && !defined(__sparc__)
+    if(!auto_ig || reboot_wait_ig) {
+      config.rebootmsg = 1;
+    }
+#endif
+
     }
 
 
