@@ -634,7 +634,8 @@ static void set_font(char *font, char *map, char *unimap)
   if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
 #endif
 
-  if(err) deb_int(err);
+
+  // if(err) deb_int(err);
 }
 
 

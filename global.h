@@ -269,6 +269,7 @@ typedef struct {
   char *product;		/* product name */
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
+  char *updatedir;		/* driver update dir */
 
   struct {
     char *buf;
@@ -357,6 +358,7 @@ typedef struct {
     inet_t hostname;
     inet_t server;
     inet_t pliphost;
+    char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *password;

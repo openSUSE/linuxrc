@@ -36,7 +36,7 @@ typedef enum {
   key_hwdetect, key_floppydevice, key_cdromdevice, key_consoledevice,
   key_product, key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
   key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
-  key_linemode, key_moduledelay
+  key_linemode, key_moduledelay, key_updatedir
 } file_key_t;
 
 typedef struct file_s {
