@@ -1418,7 +1418,8 @@ void dia_handle_ctrlc (void)
           fflush(stdout);
         }
 
-        system(util_check_exist("/lbin/lsh") ? "/lbin/lsh >/dev/console 2>/dev/console" : "/bin/sh");
+//        system(util_check_exist("/lbin/lsh") ? "/lbin/lsh >/dev/console 2>/dev/console" : "/bin/sh 2>&1");
+        system(util_check_exist("/lbin/lsh") ? "/lbin/lsh 2>&1" : "/bin/sh 2>&1");
 
         kbd_init(0);
         if(config.win) {

@@ -84,6 +84,6 @@ extern void disp_set_display    (void);
 extern void disp_restore_screen (void);
 extern void disp_clear_screen   (void);
 
-void disp_write_char(int c);
+int disp_write_char(int c);
 void disp_write_string(char *str);
 void disp_write_utf32string(int *str);

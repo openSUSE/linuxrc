@@ -56,7 +56,7 @@ struct {
 };
 
 
-#define LANG_DEFAULT	5
+#define LANG_DEFAULT lang_en
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_ar
@@ -442,7 +442,7 @@ void set_activate_keymap(char *keymap)
       sprintf(enc, " -c %s", s);
     }
     sprintf(cmd,
-      "loadkeys %s.map ; dumpkeys%s >/tmp/dk ; loadkeys --unicode </tmp/dk",
+      "loadkeys -q %s.map ; dumpkeys%s >/tmp/dk ; loadkeys -q --unicode </tmp/dk",
       keymap, enc
     );
     if(!config.test) {
@@ -608,13 +608,17 @@ void set_write_info(FILE *f)
 /* Note: this *must* return a value in the range [1, NR_LANGUAGES]! */
 int set_get_current_language()
 {
-  int i;
+  unsigned u;
 
-  for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
-    if(set_languages_arm[i].id == config.language) return i + 1;
+  for(u = 0; u < NR_LANGUAGES; u++) {
+    if(set_languages_arm[u].id == config.language) return u + 1;
   }
 
-  return LANG_DEFAULT + 1;
+  for(u = 0; u < NR_LANGUAGES; u++) {
+    if(set_languages_arm[u].id == LANG_DEFAULT) return u + 1;
+  }
+
+  return 1;
 }
 
 

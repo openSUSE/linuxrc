@@ -15,6 +15,10 @@
 #include "display.h"
 #include "utf8.h"
 
+#if 0
+void dump_screen(char *label);
+#endif
+
 /*
  *
  * data on module level
@@ -235,99 +239,107 @@ void disp_end (void)
     }
 
 
-void disp_gotoxy (int x_iv, int y_iv)
-    {
-    if (x_iv != disp_x_im || y_iv != disp_y_im)
-        {
-        if (x_iv > 0 && x_iv <= max_x_ig && y_iv > 0 && y_iv <= max_y_ig)
-            {
-            printf ("\033[%d;%df", y_iv, x_iv);
-            disp_x_im = x_iv;
-            disp_y_im = y_iv;
-            }
-        }
+void disp_gotoxy(int x, int y)
+{
+  if(x == disp_x_im && y == disp_y_im) return;
+
+//  fprintf(stderr, "gotoxy %d x %d\n", x, y);
+
+  if(
+    x > 0 && x <= max_x_ig &&
+    y > 0 && y <= max_y_ig
+  ) {
+    printf("\033[%d;%df", y, x);
+    disp_x_im = x;
+    disp_y_im = y;
+  }
+}
+
+
+void disp_set_color(char fg, char bg)
+{
+  char attr;
+
+  attr = (disp_attr_cm & 0x80) | (fg << 3) | bg;
+
+  if(attr != disp_attr_cm) {
+    disp_attr_cm = attr;
+
+    if(IS_BRIGHT(fg)) {
+      attr = ATTR_BRIGHT;
+    }
+    else {
+      attr = ATTR_NORMAL;
     }
 
+    if(!config.linemode) {
+      printf("\033[%d;%d;%dm", (int) attr, (int) (fg & 0x07) + 30, (int) bg + 40);
+    }
+  }
+}
 
-void disp_set_color (char fg_cv, char bg_cv)
-    {
-    char  attr_ci;
 
-    attr_ci = (disp_attr_cm & 0x80) | (fg_cv << 3) | bg_cv;
-
-    if (attr_ci != disp_attr_cm)
-        {
-        disp_attr_cm = attr_ci;
-
-        if (IS_BRIGHT (fg_cv))
-            attr_ci = ATTR_BRIGHT;
-        else
-            attr_ci = ATTR_NORMAL;
-
-        if(!config.linemode)
-        	printf ("\033[%d;%d;%dm", (int) attr_ci, (int) (fg_cv & 0x07) + 30, (int) bg_cv + 40);
-        }
+void disp_set_attr(char attr)
+{
+  if(attr != disp_attr_cm) {
+    if(IS_ALTERNATE(attr)) {
+      disp_graph_on();
+    }
+    else {
+      disp_graph_off();
     }
 
+    disp_set_color(FOREGROUND(attr), BACKGROUND(attr));
+  }
+}
 
-void disp_set_attr (char attr_cv)
-    {
-    if (attr_cv != disp_attr_cm)
-        {
-        if (IS_ALTERNATE (attr_cv))
-            disp_graph_on ();
-        else
-            disp_graph_off ();
 
-        disp_set_color (FOREGROUND (attr_cv), BACKGROUND (attr_cv));
-        }
+void disp_cursor_off()
+{
+  if(config.linemode) return;
+
+  printf("\033[?25l");
+}
+
+
+void disp_cursor_on()
+{
+  if(config.linemode) return;
+
+  printf("\033[?25h");
+}
+
+
+void disp_graph_on()
+{
+  if(config.utf8) return;
+
+  if(!IS_ALTERNATE(disp_attr_cm)) {
+    if(config.serial || config.test) {
+      printf("%c", 14);
     }
-
-
-void disp_cursor_off (void)
-    {
-    if (config.linemode)
-        return;
-    printf ("\033[?25l");
+    else {
+      printf("\033[11m");
     }
+    disp_attr_cm |= 0x80;
+  }
+}
 
 
-void disp_cursor_on (void)
-    {
-    if (config.linemode)
-      return;
-    printf ("\033[?25h");
+void disp_graph_off()
+{
+  if(config.utf8) return;
+
+  if(IS_ALTERNATE(disp_attr_cm)) {
+    if(config.serial || config.test) {
+      printf("%c", 15);
     }
-
-
-void disp_graph_on (void)
-    {
-    if(config.utf8) return;
-
-    if (!IS_ALTERNATE (disp_attr_cm))
-        {
-        if (config.serial || config.test)
-            printf ("%c", 14);
-        else
-            printf ("\033[11m");
-        disp_attr_cm |= 0x80;
-        }
+    else {
+      printf("\033[10m");
     }
-
-
-void disp_graph_off (void)
-    {
-    if(config.utf8) return;
-
-    if (IS_ALTERNATE (disp_attr_cm))
-        {
-        if (config.serial || config.test)
-            printf ("%c", 15);
-        else
-            printf ("\033[10m");
-        disp_attr_cm &= 0x7f;
-        }
-    }
+    disp_attr_cm &= 0x7f;
+  }
+}
 
 
 void disp_toggle_output(int state)
@@ -336,189 +348,170 @@ void disp_toggle_output(int state)
 }
 
 
-void disp_save_area (window_t *win_prr)
-    {
-    int  i_ii;
-    int  save_x_ii;
-    int  save_y_ii;
+void disp_save_area(window_t *win)
+{
+  int i, x_len, y_len;
+
+  x_len = win->x_right - win->x_left + 1;
+  y_len = win->y_right - win->y_left + 1;
+
+  if(win->shadow) {
+    x_len += 2;
+    y_len++;
+  }
+
+  if(x_len < 1 || y_len < 1) return;
+
+  if(x_len + win->x_left > max_x_ig) x_len = max_x_ig - win->x_left + 1;
+
+  if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
+
+//  fprintf(stderr, "save area at %d x %d (size %d x %d)\n", win->x_left, win->y_left, x_len, y_len);
+
+//  dump_screen("save area, start");
+
+  win->save_area = malloc(sizeof (character_t *) * y_len);
+
+  for(i = 0; i < y_len; i++) {
+    win->save_area[i] = malloc(sizeof (character_t) * x_len);
+    memcpy(
+      win->save_area[i],
+      &disp_screen_aprm[win->y_left + i - 1][win->x_left - 1],
+      sizeof (character_t) * x_len
+    );
+  }
+
+//  dump_screen("save area, end");
+}
 
 
-    save_x_ii = win_prr->x_right - win_prr->x_left + 1;
-    save_y_ii = win_prr->y_right - win_prr->y_left + 1;
-    if (win_prr->shadow)
-        {
-        save_x_ii += 2;
-        save_y_ii++;
+void disp_restore_area(window_t *win, int mode)
+{
+  int x, x_len, x_start, x_end;
+  int y, y_len, y_start, y_end;
+  int ready;
+  char save_attr;
+
+  disp_toggle_output(DISP_ON);
+  save_attr = disp_attr_cm;
+
+  x_len = win->x_right - win->x_left + 1;
+  y_len = win->y_right - win->y_left + 1;
+
+  if(win->shadow) {
+    x_len += 2;
+    y_len++;
+  }
+
+  if(x_len < 1 || y_len < 1) return;
+
+  if(x_len + win->x_left > max_x_ig) x_len = max_x_ig - win->x_left + 1;
+  if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
+
+  if(!config.explode_win || config.serial) mode = DISP_RESTORE_NORMAL;
+
+#if 0
+  fprintf(stderr,
+    "restore area at %d x %d (size %d x %d), mode %d\n",
+    win->x_left, win->y_left, x_len, y_len, mode
+  );
+#endif
+
+//  dump_screen("restore area, start");
+
+  switch(mode) {
+    case DISP_RESTORE_EXPLODE:
+    case DISP_RESTORE_IMPLODE:
+      if(mode == DISP_RESTORE_EXPLODE) {
+        if(x_len > y_len) {
+          y_start = (y_len - 1) / 2;
+          y_end = y_len / 2;
+          x_start = y_start;
+          x_end = x_len - x_start - 1;
+        }
+        else {
+          x_start = (x_len - 1) / 2;
+          x_end = x_len / 2;
+          y_start = x_start;
+          y_end = y_len - y_start - 1;
+        }
+      }
+      else {
+        x_start = 0;
+        x_end = x_len - 1;
+        y_start = 0;
+        y_end = y_len - 1;
+      }
+
+      ready = FALSE;
+
+      do {
+        disp_gotoxy (win->x_left + x_start, win->y_left + y_start);
+
+        for(x = x_start; x <= x_end; ) {
+          disp_set_attr(win->save_area[y_start][x].attr);
+          x+= disp_write_char(win->save_area[y_start][x].c);
         }
 
-    if (save_x_ii < 1 || save_y_ii < 1)
-        return;
+        for(y = y_start; y <= y_end; y++) {
+          disp_gotoxy(win->x_left + x_start, win->y_left + y);
+          disp_set_attr(win->save_area[y][x_start].attr);
+          disp_write_char(win->save_area[y][x_start].c);
 
-    if (save_x_ii + win_prr->x_left > max_x_ig)
-        save_x_ii = max_x_ig - win_prr->x_left + 1;
-
-    if (save_y_ii + win_prr->y_left > max_y_ig)
-        save_y_ii = max_y_ig - win_prr->y_left + 1;
-
-    win_prr->save_area = malloc (sizeof (character_t *) * save_y_ii);
-    for (i_ii = 0; i_ii < save_y_ii; i_ii++)
-        {
-        win_prr->save_area [i_ii] = malloc (sizeof (character_t) * save_x_ii);
-        memcpy (win_prr->save_area [i_ii],
-                &disp_screen_aprm [win_prr->y_left+i_ii-1][win_prr->x_left-1],
-                sizeof (character_t) * save_x_ii);
+          disp_gotoxy(win->x_left + x_end, win->y_left + y);
+          disp_set_attr(win->save_area[y][x_end].attr);
+          disp_write_char(win->save_area[y][x_end].c);
         }
 
-    }
-
-
-void disp_restore_area (window_t *win_prr, int mode_iv)
-    {
-    int  y_ii;
-    int  x_ii;
-    int  save_x_ii;
-    int  save_y_ii;
-    int  x_start_ii;
-    int  y_start_ii;
-    int  x_end_ii;
-    int  y_end_ii;
-    int  ready_ii;
-    char save_attr_ci;
-
-
-    disp_toggle_output (DISP_ON);
-    save_attr_ci = disp_attr_cm;
-    save_x_ii = win_prr->x_right - win_prr->x_left + 1;
-    save_y_ii = win_prr->y_right - win_prr->y_left + 1;
-    if (win_prr->shadow)
-        {
-        save_x_ii += 2;
-        save_y_ii++;
+        if(y_start != y_end) {
+          disp_gotoxy(win->x_left + x_start, win->y_left + y_end);
+          for(x = x_start; x <= x_end; ) {
+            disp_set_attr(win->save_area[y_end][x].attr);
+            x+= disp_write_char(win->save_area[y_end][x].c);
+          }
         }
 
-    if (save_x_ii < 1 || save_y_ii < 1)
-        return;
-
-    if (save_x_ii + win_prr->x_left > max_x_ig)
-        save_x_ii = max_x_ig - win_prr->x_left + 1;
-
-    if (save_y_ii + win_prr->y_left > max_y_ig)
-        save_y_ii = max_y_ig - win_prr->y_left + 1;
-
-    if (!config.explode_win || config.serial)
-        mode_iv = DISP_RESTORE_NORMAL;
-
-    switch (mode_iv)
-        {
-        case DISP_RESTORE_EXPLODE:
-        case DISP_RESTORE_IMPLODE:
-            if (mode_iv == DISP_RESTORE_EXPLODE)
-                {
-                if (save_x_ii > save_y_ii)
-                    {
-                    y_start_ii = (save_y_ii - 1) / 2;
-                    y_end_ii = save_y_ii / 2;
-                    x_start_ii = y_start_ii;
-                    x_end_ii = save_x_ii - x_start_ii - 1;
-                    }
-                else
-                    {
-                    x_start_ii = (save_x_ii - 1) / 2;
-                    x_end_ii = save_x_ii / 2;
-                    y_start_ii = x_start_ii;
-                    y_end_ii = save_y_ii - y_start_ii - 1;
-                    }
-                }
-            else
-                {
-                x_start_ii = 0;
-                x_end_ii = save_x_ii - 1;
-                y_start_ii = 0;
-                y_end_ii = save_y_ii - 1;
-                }
-
-            ready_ii = FALSE;
-
-            do
-                {
-                disp_gotoxy (win_prr->x_left + x_start_ii,
-                             win_prr->y_left + y_start_ii);
-                for (x_ii = x_start_ii; x_ii <= x_end_ii; x_ii++)
-                    {
-                    disp_set_attr (win_prr->save_area [y_start_ii][x_ii].attr);
-                    disp_write_char (win_prr->save_area [y_start_ii][x_ii].c);
-                    }
-
-                for (y_ii = y_start_ii; y_ii <= y_end_ii; y_ii++)
-                    {
-                    disp_gotoxy (win_prr->x_left + x_start_ii,
-                                 win_prr->y_left + y_ii);
-                    disp_set_attr (win_prr->save_area [y_ii][x_start_ii].attr);
-                    disp_write_char (win_prr->save_area [y_ii][x_start_ii].c);
-
-                    disp_gotoxy (win_prr->x_left + x_end_ii,
-                                 win_prr->y_left + y_ii);
-                    disp_set_attr (win_prr->save_area [y_ii][x_end_ii].attr);
-                    disp_write_char (win_prr->save_area [y_ii][x_end_ii].c);
-                    }
-
-                if (y_start_ii != y_end_ii)
-                    {
-                    disp_gotoxy (win_prr->x_left + x_start_ii,
-                                 win_prr->y_left + y_end_ii);
-                    for (x_ii = x_start_ii; x_ii <= x_end_ii; x_ii++)
-                        {
-                        disp_set_attr (win_prr->save_area [y_end_ii][x_ii].attr);
-                        disp_write_char (win_prr->save_area [y_end_ii][x_ii].c);
-                        }
-                    }
-
-                if (mode_iv == DISP_RESTORE_EXPLODE)
-                    {
-                    x_start_ii--;
-                    y_start_ii--;
-                    x_end_ii++;
-                    y_end_ii++;
-                    if (x_start_ii < 0)
-                        ready_ii = TRUE;
-                    }
-                else
-                    {
-                    x_start_ii++;
-                    y_start_ii++;
-                    x_end_ii--;
-                    y_end_ii--;
-                    if (x_end_ii - x_start_ii < 0 || y_end_ii - y_start_ii < 0)
-                        ready_ii = TRUE;
-                    }
-
-                fflush (stdout);
-
-                if (x_start_ii % 2)
-                    usleep (10000);
-                }
-            while (!ready_ii);
-            break;
-
-        default:
-            for (y_ii = 0; y_ii < save_y_ii; y_ii++)
-                {
-                disp_gotoxy (win_prr->x_left, win_prr->y_left + y_ii);
-                for (x_ii = 0; x_ii < save_x_ii; x_ii++)
-                    {
-                    disp_set_attr (win_prr->save_area [y_ii][x_ii].attr);
-                    disp_write_char (win_prr->save_area [y_ii][x_ii].c);
-                    }
-                }
-            fflush (stdout);
-            break;
+        if(mode == DISP_RESTORE_EXPLODE) {
+          x_start--;
+          y_start--;
+          x_end++;
+          y_end++;
+          if(x_start < 0) ready = TRUE;
+        }
+        else {
+          x_start++;
+          y_start++;
+          x_end--;
+          y_end--;
+          if(x_end - x_start < 0 || y_end - y_start < 0) ready = TRUE;
         }
 
+        fflush (stdout);
 
-    for (y_ii = 0; y_ii < save_y_ii; y_ii++) free (win_prr->save_area [y_ii]);
-    free (win_prr->save_area);
-    disp_set_attr (save_attr_ci);
-    }
+        if(x_start % 2) usleep (10000);
+      }
+      while(!ready);
+      break;
+
+    default:
+      for(y = 0; y < y_len; y++) {
+        disp_gotoxy(win->x_left, win->y_left + y);
+        for(x = 0; x < x_len;) {
+          disp_set_attr(win->save_area[y][x].attr);
+          x += disp_write_char(win->save_area[y][x].c);
+        }
+      }
+      fflush(stdout);
+      break;
+  }
+
+  for(y = 0; y < y_len; y++) free(win->save_area[y]);
+  free(win->save_area);
+
+  disp_set_attr(save_attr);
+
+//  dump_screen("restore area, end");
+}
 
 
 void disp_flush_area(window_t *win)
@@ -531,19 +524,24 @@ void disp_flush_area(window_t *win)
 }
 
 
-void disp_refresh_char (int x_iv, int y_iv)
-    {
-    if (x_iv > 0 && x_iv <= max_x_ig &&
-        y_iv > 0 && y_iv <= max_y_ig)
-        {
-        disp_gotoxy (x_iv, y_iv);
-        if (IS_ALTERNATE (disp_screen_aprm [y_iv - 1][x_iv - 1].attr))
-            disp_graph_on ();
-        else
-            disp_graph_off ();
-        disp_write_char (disp_screen_aprm [y_iv - 1][x_iv - 1].c);
-        }
+void disp_refresh_char(int x, int y)
+{
+  if(
+    x > 0 && x <= max_x_ig &&
+    y > 0 && y <= max_y_ig
+  ) {
+    disp_gotoxy(x, y);
+
+    if(IS_ALTERNATE(disp_screen_aprm[y - 1][x - 1].attr)) {
+      disp_graph_on();
     }
+    else {
+      disp_graph_off();
+    }
+
+    disp_write_char(disp_screen_aprm[y - 1][x - 1].c);
+  }
+}
 
 
 void disp_set_display()
@@ -571,6 +569,8 @@ void disp_restore_screen()
 {
   int x, y;
 
+  fprintf(stderr, "restore screen\n");
+
   disp_x_im = 0;
 
   for(y = 0; y < max_y_ig; y++) {
@@ -596,7 +596,7 @@ void disp_clear_screen()
  */
 void disp_write_utf32string(int *str)
 {
-  int i, len, buf_len, width;
+  int i, j, len, buf_len, width;
   unsigned char *buf;
 
   if(
@@ -618,20 +618,16 @@ void disp_write_utf32string(int *str)
 
       width = 1;
 
-#if 0
       width = utf32_char_width(str[i]);
       if(!width) width = 1;
-#endif
 
       if(disp_x_im <= max_x_ig) {
         disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].attr = disp_attr_cm;
         disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].c = str[i];
-#if 0
-        if(width > 1) {
-          disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].attr = disp_attr_cm;
-          disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].c = ' ';
+        for(j = 1; j < width; j++) {
+          disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + j].attr = disp_attr_cm;
+          disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + j].c = 0;
         }
-#endif
       }
 
       disp_x_im += width;
@@ -665,11 +661,11 @@ void disp_write_string(char *str)
 
 
 /*
- * Write utf32 char.
+ * Write utf32 char. Returns char width.
  */
-void disp_write_char(int c)
+int disp_write_char(int c)
 {
-  int width;
+  int i, width = 1;
 
   if(
     disp_x_im > 0 &&
@@ -677,27 +673,41 @@ void disp_write_char(int c)
     disp_y_im > 0 &&
     disp_y_im <= max_y_ig
   ) {
-    if(disp_state_im == DISP_ON) printf("%s", utf8_encode(c));
+    if(disp_state_im == DISP_ON && c) printf("%s", utf8_encode(c));
 
-    width = 1;
-
-#if 0
     width = utf32_char_width(c);
     if(!width) width = 1;
-#endif
 
     disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].attr = disp_attr_cm;
     disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].c = c;
 
-#if 0
-    if(width > 1) {
-      disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].attr = disp_attr_cm;
-      disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + 1].c = 0;
+    for(i = 1; i < width; i++) {
+      disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + i].attr = disp_attr_cm;
+      disp_screen_aprm[disp_y_im - 1][disp_x_im - 1 + i].c = 0;
     }
-#endif
 
     disp_x_im += width;
   }
+
+  return width;
 }
 
+
+#if 0
+void dump_screen(char *label)
+{
+  int x, y;
+
+  fprintf(stderr, "[%d x %d: %s\n", max_x_ig, max_y_ig, label);
+
+  for(y = 0; y < max_y_ig; y++) {
+    for(x = 0; x < max_x_ig; x++) {
+      fprintf(stderr, "%s", utf8_encode(disp_screen_aprm[y][x].c));
+    }
+    fprintf(stderr, "\n");
+  }
+
+  fprintf(stderr, "]\n");
+}
+#endif
 
