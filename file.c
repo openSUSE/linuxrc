@@ -575,6 +575,7 @@ void file_do_info(file_t *f0)
       case key_netdevice:
         strncpy(netdevice_tg, f->value, sizeof netdevice_tg);
         netdevice_tg[sizeof netdevice_tg - 1] = 0;
+        config.net.device_given = 1;
         break;
 
       case key_livesrc:
@@ -1061,6 +1062,10 @@ void file_write_install_inf(char *dir)
   file_write_inet(f, key_proxy, &config.net.proxy);
   if(config.net.proxyport) {
     file_write_num(f, key_proxyport, config.net.proxyport);
+    file_write_str(f,
+      key_proxyproto,
+      get_instmode_name(config.net.proxyproto ?: config.instmode)
+    );
   }
 
   file_write_str(f, key_username, config.net.user);

@@ -2542,6 +2542,13 @@ void set_instmode(instmode_t instmode)
       config.insttype = inst_net;
   }
 
+  if(
+    (instmode == inst_ftp || instmode == inst_http) &&
+    !config.net.proxyproto
+  ) {
+    config.net.proxyproto = inst_http;
+  }
+
   if(instmode == inst_ftp || instmode == inst_tftp || instmode == inst_http) {
     config.fullnetsetup = 1;
   }
@@ -2615,7 +2622,10 @@ int net_open(char *filename)
     return -1;
   }
 
-  if(config.instmode == inst_ftp) {
+  if(
+    config.instmode == inst_ftp &&
+    !(config.net.proxyport && config.net.proxyproto == inst_http)
+  ) {
 
     if(config.net.proxyport && config.net.proxy.ok) {
       config.net.ftp_sock = ftpOpen(inet_ntoa(config.net.server.ip), user, password, inet_ntoa(config.net.proxy.ip), config.net.proxyport);
@@ -2646,7 +2656,10 @@ int net_open(char *filename)
 
   }
 
-  if(config.instmode == inst_http) {
+  if(
+    config.instmode == inst_http ||
+    (config.net.proxyport && config.net.proxyproto == inst_http)
+  ) {
     if(config.net.proxyport && config.net.proxy.ok) {
       fd = http_connect(&config.net.server, filename, &config.net.proxy, config.net.proxyport, &len);
     }
