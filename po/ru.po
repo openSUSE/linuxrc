@@ -30,7 +30,8 @@ msgid "No"
 msgstr "Нет"
 
 #. TXT_CHOOSE_LANGUAGE
-msgid "Please choose the language"
+#, fuzzy
+msgid "Select the language."
 msgstr "Пожалуйста, выберите язык"
 
 #. TXT_COLOR_DISPLAY
@@ -42,27 +43,31 @@ msgid "Monochrome display"
 msgstr "Черно-белый монитор"
 
 #. TXT_CHOOSE_DISPLAY
-msgid "What kind of display do you use?"
-msgstr "Какой тип монитора вы используете?"
+msgid "Select the display type."
+msgstr ""
 
 #. TXT_MENU_LANG
 msgid "Language"
 msgstr "Язык"
 
 #. TXT_MENU_MODULES
-msgid "Kernel modules (hardware drivers)"
+#, fuzzy
+msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Модули ядра (драйвера устройств)"
 
 #. TXT_MENU_START
-msgid "Start installation / system"
+#, fuzzy
+msgid "Start Installation or System"
 msgstr "Запуск установки / системы"
 
 #. TXT_MENU_INFO
-msgid "System information"
+#, fuzzy
+msgid "System Information"
 msgstr "Информация о системе"
 
 #. TXT_HDR_MAIN
-msgid "Main menu"
+#, fuzzy
+msgid "Main Menu"
 msgstr "Главное меню"
 
 #. TXT_SETTINGS
@@ -78,40 +83,46 @@ msgid "Keymap"
 msgstr "Раскладка клавиатуры"
 
 #. TXT_LOAD_NET
-msgid "Load network card modules"
+#, fuzzy
+msgid "Load Network Card Modules"
 msgstr "Загрузить модули сетевых карт"
 
 #. TXT_SHOW_MODULES
-msgid "Show loaded modules"
+#, fuzzy
+msgid "Show Loaded Modules"
 msgstr "Показать загруженные модули"
 
 #. TXT_AUTO_LOAD
-msgid "Load modules automatically"
+#, fuzzy
+msgid "Load Modules Automatically"
 msgstr "Автоматическая загрузка модулей"
 
 #. TXT_DEL_MODULES
-msgid "Unload modules"
+#, fuzzy
+msgid "Unload Modules"
 msgstr "Выгрузить модули"
 
 #. TXT_TRY_TO_LOAD
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console "
+"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Пытаюсь загрузить модуль \"%s\"...\n"
 "\n"
-"Во время загрузки вы можете наблюдать за сообщениямиядра на виртуальной консоли номер 4 (ALT-F4)."
+"Во время загрузки вы можете наблюдать за сообщениямиядра на виртуальной "
+"консоли номер 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
-#, c-format
-msgid "Module \"%s\" loaded successfully!"
+#, fuzzy, c-format
+msgid "Module \"%s\" loaded successfully."
 msgstr "Модуль \"%s\" успешно загрузился!"
 
 #. TXT_LOAD_FAILED
-#, c-format
-msgid "Failed to load module \"%s\"!"
+#, fuzzy, c-format
+msgid "Failed to load module \"%s\"."
 msgstr "Не удалось загрузить модуль  \"%s\"!"
 
 #. TXT_CDROM
@@ -123,23 +134,28 @@ msgid "Floppy"
 msgstr "Флоппи"
 
 #. TXT_HARDDISK
-msgid "Harddisk"
+#, fuzzy
+msgid "Hard Disk"
 msgstr "Жесткий диск"
 
 #. TXT_START_INSTALL
-msgid "Start installation/update"
+#, fuzzy
+msgid "Start Installation or Update"
 msgstr "Запустить установку"
 
 #. TXT_START_RESCUE
-msgid "Start rescue system"
+#, fuzzy
+msgid "Start Rescue System"
 msgstr "Запустить спасательную систему"
 
 #. TXT_LOAD_RS_NFS
-msgid "Load rescue system via NFS"
+#, fuzzy
+msgid "Load Rescue System via NFS"
 msgstr "Загрузить спасательную систему через NFS"
 
 #. TXT_BOOT_SYSTEM
-msgid "Boot installed system"
+#, fuzzy
+msgid "Boot Installed System"
 msgstr "Загрузить установленную систему"
 
 #. TXT_SEARCH_FOR_RI
@@ -148,21 +164,24 @@ msgid "Searching for image \"%s\"..."
 msgstr "Ищу образ \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
+#, fuzzy
 msgid ""
-"Cannot find the image!\n"
+"Cannot find the image.\n"
 "\n"
-"Check the directory specification!"
+"Check the directory specification."
 msgstr ""
 "Не могу найти образ!\n"
 "\n"
 "Проверьте спецификацию каталога!"
 
 #. TXT_LOADING
-msgid "Loading data into ramdisk"
+#, fuzzy
+msgid "Loading data into RAM disk..."
 msgstr "Загружаю данные в ramdisk"
 
 #. TXT_INFO_KERNEL
-msgid "Kernel messages"
+#, fuzzy
+msgid "Kernel Messages"
 msgstr "Сообщения ядра"
 
 #. TXT_INFO_CPU
@@ -174,7 +193,8 @@ msgid "Devices"
 msgstr "Устройства"
 
 #. TXT_INFO_NETDEV
-msgid "Network cards"
+#, fuzzy
+msgid "Network Cards"
 msgstr "Сетевые платы"
 
 #. TXT_INFO_DMA
@@ -202,45 +222,66 @@ msgid "PCI"
 msgstr "Шина PCI"
 
 #. TXT_INSERT_DISK
-msgid "Please insert the disk and press ENTER"
+#, fuzzy
+msgid "Insert the disk and press ENTER."
 msgstr "Пожалуйста, вставьте диск и нажмите ENTER"
 
 #. TXT_ERROR_READ_DISK
-msgid "Error reading from floppy disk!"
+#, fuzzy
+msgid "Error reading from floppy disk."
 msgstr "Ошибка при чтении с дискеты!"
 
 #. TXT_ENTER_ROOT_FS
-msgid "Please enter your root partition (eg. /dev/sda3)"
+#, fuzzy
+msgid "Enter your root partition (e.g., /dev/sda3)"
 msgstr "Пожалуйста, укажите вашу корневой раздел (например /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
-msgid "Invalid root device!"
+#, fuzzy
+msgid "Invalid root device."
 msgstr "Неправильное корневое устройство!"
 
 #. TXT_INVALID_INPUT
-msgid "Invalid input!"
+#, fuzzy
+msgid "Invalid input."
 msgstr "Некорректный ввод!"
 
 #. TXT_INPUT_IPADDR
-msgid "Please enter your IP address"
+#, fuzzy
+msgid "Enter your IP address."
 msgstr "Введите ваш IP-адрес"
 
 #. TXT_INPUT_NETMASK
-msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
-msgstr "Введите маску вашей подсети. Для нормальной сети класса С, она обычно равна 255.255.255.0"
+#, fuzzy
+msgid ""
+"Enter your netmask. For a normal class C network, this is usually "
+"255.255.255.0."
+msgstr ""
+"Введите маску вашей подсети. Для нормальной сети класса С, она обычно равна "
+"255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
-msgstr "Если для достижения сервера вам нужен шлюз, пожалуйста, укажите IP-адрес шлюза. Если вам не нужен шлюз, просто укажите ваш собственный IP-адрес."
+#, fuzzy
+msgid ""
+"If you need a gateway to reach the server, enter the IP address of the "
+"gateway. If you do not need a gateway, enter your own IP address."
+msgstr ""
+"Если для достижения сервера вам нужен шлюз, пожалуйста, укажите IP-адрес "
+"шлюза. Если вам не нужен шлюз, просто укажите ваш собственный IP-адрес."
 
 #. TXT_INPUT_NAMED
-msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Укажите IP-адрес вашего сервера DNS. Если вы не используете сервер DNS, просто нажмите ESC."
+#, fuzzy
+msgid ""
+"Enter the IP address of your name server. If you do not use a name server, "
+"press ESC."
+msgstr ""
+"Укажите IP-адрес вашего сервера DNS. Если вы не используете сервер DNS, "
+"просто нажмите ESC."
 
 #. TXT_FOUND_HOST
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"The following data have been retrieved:\n"
+"The following data has been retrieved:\n"
 "\n"
 "IP address: %s\n"
 "Name: %s\n"
@@ -253,24 +294,32 @@ msgstr ""
 "Домен: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
-msgstr "Во время настройки сети произошла ошибка. Вероятно, ваша сетевая плата не была распознана ядром!"
+#, fuzzy
+msgid ""
+"An error occurred during the network configuration. Your network card "
+"probably was not recognized by the kernel."
+msgstr ""
+"Во время настройки сети произошла ошибка. Вероятно, ваша сетевая плата не "
+"была распознана ядром!"
 
 #. TXT_INPUT_SERVER
-msgid "Please enter the IP address of the NFS server."
+#, fuzzy
+msgid "Enter the IP address of the NFS server."
 msgstr "Пожалуйста, введите IP-адрес вашего сервера NFS."
 
 #. TXT_INPUT_FTPSERVER
-msgid "Please enter the IP address of the FTP server."
+#, fuzzy
+msgid "Enter the IP address of the FTP server."
 msgstr "Пожалуйста, введите IP-адрес вашего сервера FTP."
 
 #. TXT_INPUT_DIR
-msgid "Please enter the directory on the server."
+#, fuzzy
+msgid "Enter the directory on the server."
 msgstr "Пожалуйста, укажите каталог на сервере."
 
 #. TXT_ENTER_PARAMS
-#, c-format
-msgid "Please enter parameters for \"%s\"."
+#, fuzzy, c-format
+msgid "Enter parameters for \"%s\"."
 msgstr "Пожалуйста, введите параметры для \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
@@ -285,9 +334,9 @@ msgstr ""
 "\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"An error occurred while trying to mount the nfs directory.\n"
+"An error occurred while trying to mount the NFS directory.\n"
 "\n"
 "Reason given by server: %s"
 msgstr ""
@@ -296,20 +345,22 @@ msgstr ""
 "Сервер указал причину: %s"
 
 #. TXT_CHOOSE_KEYMAP
+#, fuzzy
 msgid ""
-"Please choose a keyboard map.\n"
-"YaST will offer you additional keyboard tables later on."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
 "Пожалуйста, выберите раскладку клавиатуры.\n"
 "YaST предложит вам дополнительные раскладки позже."
 
 #. TXT_DELETE_MODULE
-msgid "Choose the module to be unloaded."
+#, fuzzy
+msgid "Choose the module to unload."
 msgstr "Выберите выгружаемый модуль."
 
 #. TXT_NO_MODULES
-msgid "Currently there are no modules loaded!"
-msgstr "В настоящий момент нет загруженных модулей!"
+msgid "No modules currently loaded."
+msgstr ""
 
 #. TXT_AUTO_RUNNING
 #, c-format
@@ -317,15 +368,18 @@ msgid "Autoprobing (%s)...      "
 msgstr "Автопоиск (%s)...        "
 
 #. TXT_WANT_MORE_SCSI
-msgid "Do you want to search for additional SCSI host adaptors?"
+#, fuzzy
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Хотите поискать дополнительные контроллеры SCSI?"
 
 #. TXT_WANT_MORE_NET
-msgid "Do you want to search for additional network cards?"
+#, fuzzy
+msgid "Search for additional network cards?"
 msgstr "Хотите поискать дополнительные сетевые платы?"
 
 #. TXT_WANT_MORE_CDROM
-msgid "Do you want to search for additional CD-ROM drives?"
+#, fuzzy
+msgid "Search for additional CD-ROM drives?"
 msgstr "Хотите поискать дополнительные приводы CD-ROM?"
 
 #. TXT_NET_ETH0
@@ -353,31 +407,36 @@ msgid "HIPPI network card"
 msgstr "сетевая плата HIPPI"
 
 #. TXT_CHOOSE_NET
-msgid "Please choose the network device."
+#, fuzzy
+msgid "Choose the network device."
 msgstr "Пожалуйста, выберите сетевое устройство."
 
 #. TXT_INPUT_PLIP_IP
-msgid "Please enter the IP address of the PLIP partner."
+#, fuzzy
+msgid "Enter the IP address of the PLIP partner."
 msgstr "Укажите IP-адрес партнера PLIP."
 
 #. TXT_NO_PCMCIA
-msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
-msgstr "Не удается автоматически определить чипсет PCMCIA! Укажите его вручную."
+#, fuzzy
+msgid ""
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr ""
+"Не удается автоматически определить чипсет PCMCIA! Укажите его вручную."
 
 #. TXT_FOUND_PCMCIA
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\"!\n"
+"Found PCMCIA chipset \"%s\".\n"
 "\n"
-"Please enter parameters for PCMCIA core modules"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
 "Найден PCMCIA чипсет \"%s\"!\n"
 "\n"
 "Пожалуйста, введите параметры для основных модулей PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
-#, c-format
-msgid "Please enter specific parameters for chipset \"%s\""
+#, fuzzy, c-format
+msgid "Enter specific parameters for chipset \"%s\"."
 msgstr "Пожалуйста, введите специфические параметры для чипсета \"%s\""
 
 #. TXT_START_CARDMGR
@@ -389,33 +448,39 @@ msgid "Successfully started PCMCIA card services."
 msgstr "Успешно запущены услуги PCMCIA карт."
 
 #. TXT_PCMCIA_FAIL
-msgid "Start of PCMCIA card services failed!"
+#, fuzzy
+msgid "Start of PCMCIA card services failed."
 msgstr "Запуск услуг PCMCIA карт не удался!"
 
 #. TXT_PCMCIA_ALREADY
-msgid "PCMCIA card services already running!"
+#, fuzzy
+msgid "PCMCIA card services already running."
 msgstr "Услуги PCMCIA карт уже запущены!"
 
 #. TXT_NO_LXRC_END
+#, fuzzy
 msgid ""
-"You can exit Linuxrc only via the menu item\n"
+"You can leave Linuxrc only via \n"
 "\n"
-"\"Start installation / system\"\n"
+"\"Start Installation or System\"\n"
 "\n"
-"In order to allow this, you might need to load some drivers (modules) to support your hardware."
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
 "Вы можете выйти из Linuxrc только через пункт меню\n"
 "\n"
 "\"Запуск установки / системы\"\n"
 "\n"
-"Для этого вам может понадобиться загрузить некоторые драйвера (модули) для поддержки вашего аппаратного обеспечения."
+"Для этого вам может понадобиться загрузить некоторые драйвера (модули) для "
+"поддержки вашего аппаратного обеспечения."
 
 #. TXT_NO_CTRLC
-msgid "You cannot exit Linuxrc with <ctrl-c>!"
+#, fuzzy
+msgid "You cannot exit Linuxrc with <Ctrl-C>."
 msgstr "Вы не можете выйти из Linuxrc нажатием <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
-msgid "Please remove the disk from the drive now!"
+#, fuzzy
+msgid "Remove the disk from the drive now."
 msgstr "Пожалуйста, теперь выньте диск из дисковода!"
 
 #. TXT_EXAMPLE_PAR
@@ -429,7 +494,8 @@ msgstr ""
 "Пример: "
 
 #. TXT_CHOOSE_SOURCE
-msgid "Please choose the source medium"
+#, fuzzy
+msgid "Choose the source medium."
 msgstr "Выберите исходный носитель"
 
 #. TXT_TRY_CD_MOUNT
@@ -437,7 +503,8 @@ msgid "Trying to mount the CD-ROM..."
 msgstr "Пытаюсь смонтировать CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
-msgid "Unable to mount the CD-ROM!"
+#, fuzzy
+msgid "Unable to mount the CD-ROM."
 msgstr "Не удалось смонтировать CD-ROM!"
 
 #. TXT_START_YAST
@@ -445,59 +512,68 @@ msgid "Starting YaST..."
 msgstr "Запускаю YaST..."
 
 #. TXT_ASK_REBOOT
-msgid "Do you want to reboot the system now?"
+#, fuzzy
+msgid "Reboot the system now?"
 msgstr "Хотите перезагрузить систему?"
 
 #. TXT_INSTALL_SUCCESS
-msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
-msgstr "Базовая система была успешно установлена. Эта новая система будет сейчас запущена для окончательной установки."
+#, fuzzy
+msgid ""
+"The base system has been successfully installed. This newly installed system "
+"will now be started to commit the installation."
+msgstr ""
+"Базовая система была успешно установлена. Эта новая система будет сейчас "
+"запущена для окончательной установки."
 
 #. TXT_ENTER_PARTITION
-msgid "Please enter the harddisk partition (eg. /dev/sda1)"
+#, fuzzy
+msgid "Enter the hard disk partition (e.g., /dev/sda1)"
 msgstr "Пожалуйста, укажите раздел жесткого диска(например /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
-msgid "Could not mount the specified partition!"
+#, fuzzy
+msgid "Could not mount the specified partition."
 msgstr "Не удалось смонтировать указанный раздел!"
 
 #. TXT_ENTER_HD_DIR
-msgid "Please enter the source directory"
+#, fuzzy
+msgid "Enter the source directory."
 msgstr "Пожалуйста, укажите исходный каталог"
 
 #. TXT_ERROR_INSTALL
-msgid "An error occurred during the installation!"
+#, fuzzy
+msgid "An error occurred during the installation."
 msgstr "Во время установки произошла ошибка!"
 
 #. TXT_DRIVES
-msgid "Harddisks / CD-ROMs"
+#, fuzzy
+msgid "Hard Disks or CD-ROMs"
 msgstr "Жесткие диски / CD-ROM-ы"
 
 #. TXT_LITTLE_MEM
+#, fuzzy
 msgid ""
-"Your computer has extremely little memory!\n"
+"Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space!"
+"Before you acknowledge this message, you must switch to virtual console 2 "
+"(press ALT-F2) to create and activate some swap space."
 msgstr ""
 "В вашем компьютере очень мало памяти!\n"
 "\n"
-"Перед подтверждением этого сообщения вы должны переключиться на виртуальную консоль номер 2 (ALT-F2) и создать, а затем активировать swap!"
+"Перед подтверждением этого сообщения вы должны переключиться на виртуальную "
+"консоль номер 2 (ALT-F2) и создать, а затем активировать swap!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
 msgstr "Анимация"
 
 #. TXT_ASK_EXPLODE
-msgid ""
-"Do you like \"animated\" windows?\n"
-"\n"
-"Of course ;-)"
+msgid "Use animated windows?"
 msgstr ""
-"Вам нравятся \"анимированные\" окна?\n"
-"\n"
-"Конечно ;-)"
 
 #. TXT_NO_DRIVES
-msgid "No harddisks or CD-ROM drives have been detected so far."
+#, fuzzy
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "На данный момент не обнаружено ни одного жесткого диска или CD-ROMа."
 
 #. TXT_MENU_EXPERT
@@ -505,31 +581,41 @@ msgid "Debug (expert)"
 msgstr "Отладка (для экспертов)"
 
 #. TXT_FORCE_ROOTIMAGE
-msgid "Load rootimage into ramdisk"
+#, fuzzy
+msgid "Load Root Image into RAM Disk"
 msgstr "Загрузка образа в ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
-msgid "Enter rootimage"
+#, fuzzy
+msgid "Enter Root Image"
 msgstr "Введите название rootimage"
 
 #. TXT_ASK_RI_FORCE
-msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
-msgstr "Хотите ли вы загрузить образ в RAMdisk, даже если найдена нормальная установочная система?"
+msgid "Should the root image be loaded into the RAM disk?"
+msgstr ""
 
 #. TXT_ENTER_ROOTIMAGE
-msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
-msgstr "Пожалуйста, укажите имя и путь к файлу, который вы хотите загрузить в RAM disk в качестве корневой файловой системы"
+#, fuzzy
+msgid ""
+"Enter the path and name of the file to load into the RAM disk as the root "
+"file system."
+msgstr ""
+"Пожалуйста, укажите имя и путь к файлу, который вы хотите загрузить в RAM "
+"disk в качестве корневой файловой системы"
 
 #. TXT_NOT_IMPLEMENTED
-msgid "Not yet implemented!"
+#, fuzzy
+msgid "Not yet implemented."
 msgstr "Пока не реализовано!"
 
 #. TXT_NEW_INST_SYS
-msgid "Installation system"
+#, fuzzy
+msgid "Installation System"
 msgstr "Установочная система"
 
 #. TXT_ENTER_INST_SYS
-msgid "Please enter the directory that contains the installation system."
+#, fuzzy
+msgid "Enter the directory that contains the installation system."
 msgstr "Пожалуйста, укажите каталог, содержащий установочную систему."
 
 #. TXT_NO_INFO_AVAIL
@@ -545,49 +631,56 @@ msgid "Start Live CD"
 msgstr "Запустить Live CD"
 
 #. TXT_INSERT_LIVECD
-msgid "Please insert the Live CD."
+#, fuzzy
+msgid "Insert the Live CD."
 msgstr "Пожалуйста, вставьте Live CD."
 
 #. TXT_END_REBOOT
-msgid "Exit / Reboot"
+#, fuzzy
+msgid "Exit or Reboot"
 msgstr "Готово / Перезагрузка"
 
 #. TXT_SEARCH_INFOFILE
-msgid "Searching for infofile..."
+#, fuzzy
+msgid "Searching for info file..."
 msgstr "Ищу информационный файл..."
 
 #. TXT_NFSPORT
-msgid "Specify NFS port"
+#, fuzzy
+msgid "Specify the NFS port."
 msgstr "Укажите порт NFS"
 
 #. TXT_ASKING_NAMED
-msgid "Asking nameserver..."
+#, fuzzy
+msgid "Asking name server..."
 msgstr "Запрашиваю nameserver..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format,fuzzy
-msgid "Host %s was not found!"
+#, fuzzy, c-format
+msgid "Host %s was not found."
 msgstr "Машина %s неизвестна!"
 
 #. TXT_NET_CONFIGURED
-msgid "Your network is already configured. Do you want to keep this configuration?"
+#, fuzzy
+msgid "Your network is already configured. Keep this configuration?"
 msgstr "Ваша сеть уже сконфигурирована. Хотите оставить эту конфигурацию?"
 
 #. TXT_ASK_BREAK
-msgid "Do want to abort?"
-msgstr "Хотите прерваться?"
+msgid "Abort?"
+msgstr ""
 
 #. TXT_NO_NETDEVICE
+#, fuzzy
 msgid ""
-"No network device found!\n"
-"Please load a network module first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
 "Сетевое устройство не найдено!\n"
 "Пожалуйста, загрузите сетевой модуль."
 
 #. TXT_ALREADY_FOUND
-#, c-format
-msgid "A %s was already found in your system!\n"
+#, fuzzy, c-format
+msgid "A %s was already found in your system.\n"
 msgstr "%s уже был найден в вашей системе!\n"
 
 #. TXT_ERROR_FTP
@@ -602,40 +695,54 @@ msgstr ""
 "%s"
 
 #. TXT_ENTER_FTPUSER
-msgid "Please enter the user name under which you want to access the FTP server"
-msgstr "Пожалуйста, введите имя пользователя, под которым вы хотите связаться с сервером FTP"
+#, fuzzy
+msgid "Enter the user name with which to access the FTP server."
+msgstr ""
+"Пожалуйста, введите имя пользователя, под которым вы хотите связаться с "
+"сервером FTP"
 
 #. TXT_ENTER_FTPPASSWD
-msgid "Please enter the password for the FTP user account"
+#, fuzzy
+msgid "Enter the password for the FTP user account."
 msgstr "Пожалуйста, введите пароль для доступа к серверу FTP"
 
 #. TXT_ENTER_FTPPROXY
-msgid "Please enter the address of the FTP proxy"
+#, fuzzy
+msgid "Enter the address of the FTP proxy."
 msgstr "Пожалуйста, укажите адрес FTP proxy"
 
 #. TXT_ENTER_FTPPORT
-msgid "Please enter the port of the FTP proxy"
+#, fuzzy
+msgid "Enter the port of the FTP proxy."
 msgstr "Пожалуйста, укажите порт FTP proxy"
 
 #. TXT_WANT_FTPPROXY
-msgid "Do you want to use an FTP proxy?"
+#, fuzzy
+msgid "Use an FTP proxy?"
 msgstr "Хотите использовать FTP proxy?"
 
 #. TXT_NOMEM_FTP
-#, c-format
-msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
-msgstr "В вашем компьютере недостаточно RAM для проведения установки через FTP! (требуется %d MB RAM)"
+#, fuzzy, c-format
+msgid ""
+"Your computer does not have enough RAM to install via FTP (%d MB RAM "
+"required)."
+msgstr ""
+"В вашем компьютере недостаточно RAM для проведения установки через FTP! "
+"(требуется %d MB RAM)"
 
 #. TXT_ANONYM_FTP
+#, fuzzy
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
-"Do you want this?"
+"Usually an FTP installation is performed via anonymous FTP. It is possible "
+"to specify a user name and password for the FTP server access.\n"
+"Use a user name and password?"
 msgstr ""
-"Обычно FTP-установка осуществляется через анонимный FTP. Однако есть возможность указать имя пользователя и пароль. "
-"Хотите указать их?"
+"Обычно FTP-установка осуществляется через анонимный FTP. Однако есть "
+"возможность указать имя пользователя и пароль. Хотите указать их?"
 
 #. TXT_MORE_MODULES
-msgid "-- More modules --"
+#, fuzzy
+msgid "-- More Modules --"
 msgstr "-- Еще модули --"
 
 #. TXT_INIT_PARPORT
@@ -643,24 +750,28 @@ msgid "Initializing parallel port..."
 msgstr "Инициализирую параллельный порт..."
 
 #. TXT_ENTER_NFSPORT
-msgid "Please enter the port number on which the nfs server is running"
+#, fuzzy
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Введите номер порта, на котором работает сервер nfs"
 
 #. TXT_YAST1
-msgid "YaST1 - text based"
+#, fuzzy
+msgid "YaST1 -- Text-Based"
 msgstr "YaST1 - текстовый"
 
 #. TXT_YAST2
-msgid "YaST2 - graphical"
+#, fuzzy
+msgid "YaST2 -- Graphical"
 msgstr "YaST2 - графический"
 
 #. TXT_CHOOSE_YAST
-msgid "Please choose the version of YaST you want to use for the installation."
+#, fuzzy
+msgid "Choose the version of YaST to use for the installation."
 msgstr "Выберите версию YaST для использования при установке."
 
 #. TXT_INSERT_CD
-#, c-format
-msgid "Please make sure that CD number %d is in your drive!"
+#, fuzzy, c-format
+msgid "Make sure that CD number %d is in your drive."
 msgstr "Убедитесь, что CD номер %d есть в дисководе!"
 
 #. TXT_EJECT_CD
@@ -668,11 +779,13 @@ msgid "Eject CD"
 msgstr "Выброс CD"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp timeout"
+#, fuzzy
+msgid "Bootp Time-Out"
 msgstr "Таймаут bootp"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Please enter the timeout value for bootp."
+#, fuzzy
+msgid "Enter the time-out value for bootp."
 msgstr "Введите время-таймаут для bootp."
 
 #. TXT_NET_CTC
@@ -692,34 +805,37 @@ msgid "channel attached cisco router"
 msgstr "cisco-роутер, подключенный к каналу"
 
 #. TXT_SMB_ENTER_SHARE
-msgid "Please enter the share name on the SMB server"
-msgstr ""
+#, fuzzy
+msgid "Enter the share name on the SMB server."
+msgstr "Пожалуйста, введите IP-адрес вашего сервера NFS."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you don't need do specify username, password and workgroup.\n"
-"Do you want to access the share as quest?"
+"If you want to access the share as guest,you do not need to specify user "
+"name, password, and workgroup.\n"
+"Access the share as guest?"
 msgstr ""
 
 #. TXT_SMB_ENTER_USER
-msgid "Please enter your user name on the SMB server"
+msgid "Enter your user name on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter your password on the SMB server"
+msgid "Enter your password on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Please enter your workgroup."
-"If you don't need to specify a workgroup,"
-"just leave the field empty."
+"Enter your workgroup.If you do not need to specify a workgroup,leave the "
+"field empty."
 msgstr ""
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -745,27 +861,27 @@ msgid "Use DHCP instead of BOOTP?"
 msgstr ""
 
 #. TXT_MODDISK0
-msgid "Please insert a modules disk."
+msgid "Insert a modules disk."
 msgstr ""
 
 #. TXT_MODDISK1
 #, c-format
-msgid "Please insert modules disk %d."
+msgid "Insert modules disk %d."
 msgstr ""
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD1."
+msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
 
 #. TXT_CHOOSE_NETSOURCE
-msgid "Please choose the network protocol"
-msgstr ""
+#, fuzzy
+msgid "Choose the network protocol."
+msgstr "Пожалуйста, выберите сетевое устройство."
 
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the IP address of the %s server."
+msgstr "Пожалуйста, введите IP-адрес вашего сервера NFS."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -777,19 +893,19 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
-# %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
-#, c-format
-msgid "Load %s modules"
-msgstr ""
+#, fuzzy, c-format
+msgid "Load %s Modules"
+msgstr "Выгрузить модули"
 
 #. TXT_LOAD_FS
-msgid "Load file system modules"
+msgid "Load File System Modules"
 msgstr ""
 
 #. TXT_LOAD_OTHER
-msgid "Load unknown modules"
-msgstr ""
+#, fuzzy
+msgid "Load Unknown Modules"
+msgstr "Загрузить модули сетевых карт"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
@@ -810,24 +926,29 @@ msgid "No new modules found."
 msgstr ""
 
 #. TXT_CHOOSE_PARTITION
-msgid "Please choose the harddisk partition."
-msgstr ""
+#, fuzzy
+msgid "Choose the hard disk partition."
+msgstr "Пожалуйста, укажите раздел жесткого диска(например /dev/sda1)"
 
 #. TXT_CHOOSE_ROOT_FS
-msgid "Please choose the root partition."
+msgid "Choose the root partition."
 msgstr ""
 
 #. TXT_CHOOSE_SWAP
-msgid "Please choose the swap partition."
-msgstr ""
+#, fuzzy
+msgid "Choose the swap partition."
+msgstr "Не удалось смонтировать указанный раздел!"
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
 msgstr ""
 
 #. TXT_LOW_MEMORY2
-msgid "Your computer doesn't have enough memory to run YaST."
+#, fuzzy
+msgid "Your computer does not have enough memory to run YaST."
 msgstr ""
+"В вашем компьютере недостаточно RAM для проведения установки через FTP! "
+"(требуется %d MB RAM)"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -838,36 +959,39 @@ msgid "Error activating swap space."
 msgstr ""
 
 #. TXT_ENTER_SWAP
-msgid "Please enter the swap partition (eg. /dev/sda2)"
-msgstr ""
+#, fuzzy
+msgid "Enter the swap partition (e.g., /dev/sda2)"
+msgstr "Пожалуйста, укажите раздел жесткого диска(например /dev/sda1)"
 
 #. TXT_ENTER_USER
-#, c-format
-msgid "Please enter the user name under which you want to access the %s server"
+#, fuzzy, c-format
+msgid "Enter the user name with which to access the %s server."
 msgstr ""
+"Пожалуйста, введите имя пользователя, под которым вы хотите связаться с "
+"сервером FTP"
 
 #. TXT_ENTER_PASSWORD
-#, c-format
-msgid "Please enter the password for the %s server"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the password for the %s server."
+msgstr "Пожалуйста, введите пароль для доступа к серверу FTP"
 
 #. TXT_WANT_PROXY
 #, c-format
-msgid "Do you want to use a %s proxy?"
+msgid "Use a %s proxy?"
 msgstr ""
 
 #. TXT_ENTER_PROXY
-#, c-format
-msgid "Please enter the address of the %s proxy"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the address of the %s proxy."
+msgstr "Пожалуйста, укажите адрес FTP proxy"
 
 #. TXT_ENTER_PROXYPORT
-#, c-format
-msgid "Please enter the port of the %s proxy"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the port of the %s proxy."
+msgstr "Пожалуйста, укажите порт FTP proxy"
 
 #. TXT_VNC_SWITCH
-msgid "VNC Enable/Disable"
+msgid "VNC Enable or Disable"
 msgstr ""
 
 #. TXT_VNC_YES_NO
@@ -875,7 +999,7 @@ msgid "Use VNC for install?"
 msgstr ""
 
 #. TXT_SSH_SWITCH
-msgid "Enable/Disable SSH Mode"
+msgid "Enable or Disable SSH Mode"
 msgstr ""
 
 #. TXT_SSH_YES_NO
@@ -883,20 +1007,18 @@ msgid "Start SSH for Text Install?"
 msgstr ""
 
 #. TXT_VNC_PASSWORD
-msgid "Please enter your VNC password"
+msgid "Enter your VNC password."
 msgstr ""
 
 #. TXT_SSH_PASSWORD
-msgid "Please enter your temporary SSH password"
+msgid "Enter your temporary SSH password."
 msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be "
+"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -908,14 +1030,30 @@ msgid "Show Driver Updates"
 msgstr ""
 
 #. TXT_INPUT_NAMED1
-#, c-format
-msgid "Please enter the IP of name server %u, or press ESC."
+#, fuzzy, c-format
+msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
+"Укажите IP-адрес вашего сервера DNS. Если вы не используете сервер DNS, "
+"просто нажмите ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
-"Enter temporary Root Password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"Enter temporary root password.\n"
+"You will be required to change this password on initial root user login."
+msgstr ""
+
+#. TXT_REBOOT
+msgid "Reboot"
+msgstr ""
+
+#. TXT_NO_RAM
+#, c-format
+msgid ""
+"Your computer does not have enough RAM for the installation of %s. "
+"You need at least %d MB."
+msgstr ""
+
+#. TXT_VNC_PASSWORD_TOO_SHORT
+msgid "Password is too short (must have at least 5 characters)."
 msgstr ""
 
