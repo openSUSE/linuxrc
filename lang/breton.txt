@@ -1,0 +1,199 @@
+static text_t txt_breton_atm [] =
+{
+{ TXT_OK,             "Mat eo"                                                },
+{ TXT_CANCEL,         "Distreiñ"                                              },
+{ TXT_YES,            "Ya"                                                    },
+{ TXT_NO,             "Nann"                                                  },
+{ TXT_CHOOSE_LANGUAGE,"Diuzit ho yezh"                                        },
+{ TXT_COLOR_DISPLAY,  "Skramm liesliv"                                        },
+{ TXT_MONO_DISPLAY,   "Skramm gwenn ha du"                                    },
+{ TXT_CHOOSE_DISPLAY, "Pe zoare skramm ho peus?"                              },
+{ TXT_MENU_LANG,      "Yezh"                                                  },
+{ TXT_MENU_MODULES,   "Molladou ar graoñenn (sturier periantel)"              },
+{ TXT_MENU_START,     "Loc'hañ ar staliadur / ar reizhiad"                    },
+{ TXT_MENU_INFO,      "Titouroù a-zivout ar reizhiad"                         },
+{ TXT_HDR_MAIN,       "Pennlañser"                                            },
+{ TXT_SETTINGS,       "Kefluniadur"                                           },
+{ TXT_MENU_DISPLAY,   "Skramm"                                                },
+{ TXT_MENU_KEYMAP,    "Renkadur stokelloù ar c'hlavier"                       },
+{ TXT_LOAD_SCSI,      "Kargadur ar sturier SCSI"                              },
+{ TXT_LOAD_CDROM,     "Kargadur sturier ar CD-ROM"                            },
+{ TXT_LOAD_NET,       "Kargadur sturier ar rouedad"                           },
+{ TXT_SHOW_MODULES,   "Diskouez ar molladoù karget"                           },
+{ TXT_AUTO_LOAD,      "Kargadur emgefreek ar molladoù"                        },
+{ TXT_DEL_MODULES,    "Dilemel ar molladoù karget"                            },
+{ TXT_TRY_TO_LOAD,    "O klask kargañ ar mollad \"%s\"...\n\n"
+                      "E-doug ar c'hargañ e c'hellit gwelout kemennadoù"
+                      "ar graoñenn war al letrin 4 (ALT-F4)."                 },
+{ TXT_LOAD_SUCCESSFUL,"Kargadur ar mollad \"%s\" kaset da benn vat!"          },
+{ TXT_LOAD_FAILED,    "Kargadur ar mollad \"%s\" c'hwitet!"                   },
+{ TXT_CDROM,          "CD-ROM"                                                },
+{ TXT_FLOPPY,         "Pladennig"                                             },
+{ TXT_NFS,            "Rouedad (NFS)"                                         },
+{ TXT_FTP,            "Rouedad (FTP)"                                         },
+{ TXT_HARDDISK,       "Pladenn galet"                                         },
+{ TXT_START_INSTALL,  "Deraouiñ ar staliañ"                                   },
+{ TXT_START_RESCUE,   "Loc'hañ ar reizhiad sikour"                            },
+{ TXT_LOAD_RS_NFS,    "Kargañ ar reizhiad sikour dre NFS"                     },
+{ TXT_BOOT_SYSTEM,    "Boulc'hañ ar reizhiad staliet"                         },
+{ TXT_SEARCH_FOR_RI,  "O klask an adskeudenn \"%s\"..."                       },
+{ TXT_RI_NOT_FOUND,   "N'eus ket bet tu da gavout an adskeudenn!\n\n"
+                      "Gwiriit ha reizh eo anv ar c'havlec'h."                },
+{ TXT_LOADING,        "Kargañ ar roadennoù"                                   },
+{ TXT_INFO_KERNEL,    "Kemennadoù ar graoñell"                                },
+{ TXT_INFO_CPU,       "Kewerier"                                              },
+{ TXT_INFO_DEVICES,   "Trobarzhelloù"                                         },
+{ TXT_INFO_NETDEV,    "Kartennoù rouedad"                                     },
+{ TXT_INFO_DMA,       "DMA"                                                   },
+{ TXT_INFO_IRQS,      "Spanoù"                                                },
+{ TXT_INFO_IOPORTS,   "Porzhioù Enankañ/Ec'hankañ"                            },
+{ TXT_INFO_MEM,       "Memor"                                                 },
+{ TXT_INFO_MODULES,   "Molladoù"                                              },
+{ TXT_INFO_PCI,       "PCI"                                                   },
+{ TXT_INSERT_DISK,    "Ensoc'hit ar bladennig\n"
+                      "ha pouezit war ar stokell ENANK"                       },
+{ TXT_ERROR_READ_DISK,"Kammad e-doug lennadur ar bladennig!"                  },
+{ TXT_ENTER_ROOT_FS,  "Erspizit ho parzhad gwrizienn (root)\n"
+                      "(da skouer /dev/sda3)"                                 },
+{ TXT_INVALID_ROOT_FS,"Parzhad gwrizienn didalvoudek!"                        },
+{ TXT_INVALID_INPUT,  "Enankad didalvoudek!"                                  },
+{ TXT_INPUT_IPADDR,   "Enankit ho chomlec'h IP."                              },
+{ TXT_INPUT_NETMASK,  "Erspizit ho maskl rouedad. Evit ur rouedad "
+                      "reoliek eus ar rummad C e vo: 255.255.255.0"           },
+{ TXT_INPUT_GATEWAY,  "Enankit chomlec'h ho treuzell m'ho peus "
+                      "ezhomm eus unan evit tizhout ar servijer. "
+                      "A-hend-all, roit ho chomlec'h IP hepken."              },
+{ TXT_INPUT_NAMED,    "Enankit chomlec'h IP ho servijer envel. "
+                      "Ma ne fell ket deoc'h ober gant ur servijer "
+                      "envel, pouezit war ACHAP."                             },
+{ TXT_FOUND_HOST,     "Kavet eo bet ar stlennoù-da-heul:\n\n"     
+                      "Chomlec'h IP: %s\n"
+                      "Anv: %s\n"
+                      "Domani: %s"                                            },
+{ TXT_ERROR_CONF_NET, "Kammad e-doug kefluniadur ar rouedad. "
+                      "Marteze n'eo ket azas ar mollad ho peus "
+                      "karget, pe ho kartenn rouedad n'eo ket "
+                      "bet naouaet mat gant ar graoñell!"                     },
+{ TXT_INPUT_SERVER,   "Enankit chomlec'h IP ar servijer NFS."                 },
+{ TXT_INPUT_FTPSERVER,"Enankit chomlec'h IP ar servijer FTP."                 },
+{ TXT_INPUT_DIR,      "Enankit anv ar c'havlec'h war ar servijer."            },
+{ TXT_ENTER_PARAMS,   "Ebarzhit an arventennoù (mar bez) evit \"%s\"."        },
+{ TXT_TRY_NFS_MOUNT,  "O klask marc'hañ ar c'havlec'h\n\n\"%s:%s\"\n\n... "   },
+{ TXT_ERROR_NFSMOUNT, "C'hoarvezet ez eus ur c'hammad pa'z eus bet "
+                      "klasket marc'hañ kavlec'h NFS ar servijer:\n\n"
+                      "Fazi ar servijer NFS: %s"                              },
+{ TXT_CHOOSE_KEYMAP,  "Diuzit renkadur stokelloù ar c'hlavier.\nYaST "
+                      "a ginnigo deoc'h diwezhatoc'h dibarzhioù all."         },
+{ TXT_DELETE_MODULE,  "Diuzit ar mollad a fell deoc'h dilemel."               },
+{ TXT_NO_MODULES,     "Evit ar mare n'eus ket a volladoù karget!"             },
+{ TXT_AUTO_RUNNING,   "Dinoiñ emgefreek (%s)...        "                      },
+{ TXT_WANT_MORE_SCSI, "C'hoant ho peus da glask azasaerioù SCSI all?"         },
+{ TXT_WANT_MORE_NET,  "C'hoant ho peus da glask kartennoù rouedad all?"       },
+{ TXT_WANT_MORE_CDROM,"C'hoant ho peus da glask lennerioù CD-ROM all?"        },
+{ TXT_NET_ETH0,       "Kartenn rouedad Ethernet"                              },
+{ TXT_NET_PLIP,       "Porzh a-stur"                                          },
+{ TXT_NET_TR0,        "Kartenn rouedad Token Ring"                            },
+{ TXT_NET_ARC0,       "Kartenn rouedad Arcnet"                                },
+{ TXT_NET_FDDI,       "Kartenn rouedad FDDI"                                  },
+{ TXT_NET_HIPPI,      "Kartenn rouedad HIPPI"                                 },
+{ TXT_CHOOSE_NET,     "Diuzit an doare rouedad a fell deoc'h arverañ "
+                      "evit ar staliañ."                                      },
+{ TXT_INPUT_PLIP_IP,  "Roit chomlec'h IP an urzhiataer kevatal PLIP."         },
+{ TXT_LOAD_PCMCIA,    "Kargañ ar molladoù PCMCIA"                             },
+{ TXT_NO_PCMCIA,      "Ar spletad krugoù PCMCIA en implij n'eo ket bet "
+                      "naouaet ent emgefreek. Diuzit gant an dorn"            },
+{ TXT_FOUND_PCMCIA,   "Spletat krugoù PCMCIA \"%s\" kavet!\n\nEbarzhit "
+                      "an arventennoù (mar bez) evit ar molladoù PCMCIA "     },
+{ TXT_PCMCIA_PARAMS,  "Ebarzhit an arventennoù (mar bez) "
+                      "evit ar c'hrugoù \"%s\""                               },
+{ TXT_START_CARDMGR,  "Loc'hañ ar merour kartennoù..."                        },
+{ TXT_PCMCIA_SUCCESS, "PCMCIA Card Services loc'het gant berzh."              },
+{ TXT_PCMCIA_FAIL,    "Loc'hañ PCMCIA Card Services c'hwitet!"                },
+{ TXT_PCMCIA_ALREADY, "PCMCIA Card Services o vont en-dro!"                   },
+{ TXT_NO_LXRC_END,    "Ne c'hellit kuitaat Linuxrc nemet dre ar mellad\n\n"   
+                      "lañser » Loc'hañ ar staliadur / ar reizhiad «\n\n"
+                      "A-raok gallout kuitaat Linuxrc e vo ret deoc'h "
+                      "marteze kargañ sturioù periantel (molladoù)."          },
+{ TXT_NO_CTRLC,       "Ne c'hellit ket kuitaat Linuxrc gant "
+                      "<ctrl-c>!"                                             },
+{ TXT_REMOVE_DISK,    "Tennit bremañ ar bladennig eus al lenner!"             },
+{ TXT_EXAMPLE_PAR,    "\n\nskouer: "                                          },
+{ TXT_CHOOSE_SOURCE,  "Diuzit ar skor tarzh"                                  },
+{ TXT_TRY_CD_MOUNT,   "O klask marc'hañ ar CD-ROM..."                         },
+{ TXT_ERROR_CD_MOUNT, "N'eus ket bet tu da varc'hañ ar CD-ROM!"               },
+{ TXT_START_YAST,     "Loc'hañ YaST..."                                       },
+{ TXT_ASK_REBOOT,     "C'hoant ho peus bremañ da adloc'hañ ho reizhiad?"      },
+{ TXT_INSTALL_SUCCESS,"Staliet eo bet ar reizhiad diazez. Loc'het "
+                      "e vo bremañ ar reizhiad-se evit peurechuiñ "
+                      "ar staliadur."                                         },
+{ TXT_ENTER_PARTITION,"Erspizit parzhad ar bladenn galet\n"
+                      "(da skouer /dev/sda1)"                                 },
+{ TXT_ERROR_HD_MOUNT, "N'eus ket bet tu da varc'hañ ar parzhad erspizet!"     },
+{ TXT_ENTER_HD_DIR,   "Enankit anv ar c'havlec'h tarzh"                       },
+{ TXT_ERROR_INSTALL,  "Ar staliadur n'eo ket bet peurechuet ent reoliek!"     },
+{ TXT_DRIVES,         "Pladennoù kalet / CD-ROM"                              },
+{ TXT_LITTLE_MEM,     "Gant hoc'h urzhiataer ez eus gwall nebeut a vemor "
+                      "greiz!\n"
+                      "\nA-raok talvoudañ ar c'hemennad-mañ ha luskañ "
+                      "YaST, e rankit mont d'al letrin 2"
+                      "(pouezit war ALT-F2), neuze keflugnit ha"
+                      "gweredekait gant an dorn ar vemor disloañ!"            },
+{ TXT_ASK_ANIMATE,    "Buheziñ"                                               },
+{ TXT_ASK_EXPLODE,    "Dedennet oc'h gant prenester \"tarzhus\"?\n\n"
+                      "Evel just ;-)"                                         },
+{ TXT_NO_DRIVES,      "Betek-henn, n'eus bet naouaet na pladennoù kalet "
+                      "na lennerioù CD-ROM."                                  },
+{ TXT_MENU_EXPERT,    "Digammañ (mailhed hepken!)"                            },
+{ TXT_FORCE_ROOTIMAGE,"Forsiñ an adskeudenn root"                             },
+{ TXT_NEW_ROOTIMAGE,  "Ebarzhiñ an adskeudenn root"                           },
+{ TXT_ASK_RI_FORCE,   "Daoust hag a rank an adskeudenn root bezañ karget " 
+                      "war ar bladenn c'halloudel (RAM) zoken ma'z eus "
+                      "bet naouaet ur reizhiad staliañ talvoudek?"            },
+{ TXT_ENTER_ROOTIMAGE,"Erspizit treug hag anv ar restr a fell deoc'h "
+                      "kargañ evel reizhiad restroù gwrizienn war "        
+                      "ar bladenn c'halloudel (RAM)."                         },
+{ TXT_NOT_IMPLEMENTED,"N'eo ket kefloueraet c'hoazh!"                         },
+{ TXT_NEW_INST_SYS,   "Reizhiad staliañ"                                      },
+{ TXT_ENTER_INST_SYS, "Erspizit anv ar c'havlec'h oc'h enderc'hel "
+                      "ar reizhiad staliañ."                                  },
+{ TXT_NO_INFO_AVAIL,  "N'eus ket tu da gaout titouroù."                       },
+{ TXT_PREPARE_INST,   "O prientiñ ar staliadur..."                            },
+{ TXT_START_DEMO,     "Loc'hañ ar CD-ROM mod diskouez"                        },
+{ TXT_INSERT_LIVECD,  "Ensoc'hit ar CD mod bev."                              },
+{ TXT_END_REBOOT,     "Darniñ / Advoulc'hañ"                                  },
+{ TXT_ASK_BOOTP,      "Kefluniad emgefreek dre Bootp?"                        },
+{ TXT_SEND_BOOTP,     "O Kas aters Bootp..."                                  },
+{ TXT_ERROR_BOOTP,    "C'hwitet eo kefluniad Bootp."                          },
+{ TXT_SEARCH_INFOFILE,"O klask ar restr ditour..."                            },
+{ TXT_NFSPORT,        "Erspizañ ar porzh NFS"                                 },
+{ TXT_ASKING_NAMED,   "Atersiñ ar servijer envel..."                          },
+{ TXT_HOST_NOT_FOUND, "Dianav eo an urzhiataer %s!"                           },
+{ TXT_NET_CONFIGURED, "Kefluniet eo ho rouedad dija. Fellout a ra "
+                      "deoc'h mirout ar c'hefluniad-mañ?"                     },
+{ TXT_ASK_BREAK,      "Fellout a ra deoc'h darniñ?"                           },
+{ TXT_NO_NETDEVICE,   "N'eus bet kavet kartenn rouedad ebet!\nKargit "
+                      "ur mollad azas."                                       },
+{ TXT_ALREADY_FOUND,  "Kavet ez eus bet dija en ho reizhiad ur %s!\n"         },
+{ TXT_SCSI_ADAPTER,   "Azasaer SCSI"                                          },
+{ TXT_ANOTHER_MOD,    "C'hoant ho peus da gargañ ur mollad all?"              },
+{ TXT_ERROR_FTP,      "Kammad war ziraeziñ ar servijer FTP:\n\n%s"            },
+{ TXT_TRY_REACH_FTP,  "O klask tizhout ar servijer FTP..."                    },
+{ TXT_ENTER_FTPUSER,  "Enankit an anv arveriad ma fell deoc'h ober "
+                      "gantañ evit tizhout ar servijer FTP"                   },
+{ TXT_ENTER_FTPPASSWD,"Enankit ho ker-tremen war ar servijer FTP"             },
+{ TXT_ENTER_FTPPROXY, "Enankit chomlec'h ar proksi FTP"                       },
+{ TXT_ENTER_FTPPORT,  "Erspizit porzh ar proksi FTP"                          },
+{ TXT_WANT_FTPPROXY,  "Fellout a ra deoc'h ober gant ur proksi FTP?"          },
+{ TXT_NOMEM_FTP,      "Re nebeut a vemor greiz a zo gant hoc'h urzhiataer"
+                      "evit ur staliadur dre FTP! (32 MB da vihanañ)"         },
+{ TXT_ANONYM_FTP,     "Sevenet e vez peurvuiañ ur staliadur FTP dre "
+                      "FTP dizanv. Bez' e c'hellit ivez, ma karit, "
+                      "enankañ un anv arveriad hag ur ger-tremen.\n"
+                      "Fellout a ra deoc'h hen ober?"                         },
+{ TXT_ENTER_MODDISK,  "Ensoc'hit ar bladennig volladoù"                       },
+{ TXT_MORE_MODULES,   "-- Muioc'h a volladoù --"                              },
+{ TXT_INIT_PARPORT,   "Deraouekaat ar porzh a-stur..."                        },
+{ TXT_ENTER_NFSPORT,  "Enankit niverenn ar porzh arveriet gant ar "
+                      "servijer NFS"                                          },
+{ TXT_INSERT_CD,      "Diogelit emañ  en ho lenner ar CD niverenn %d!"        }
+};

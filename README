@@ -1,0 +1,107 @@
+Linuxrc
+=======
+
+Linuxrc is a program used for setting up the kernel for installation purposes.
+It allows the user to load modules, start an installed system, a rescue
+system or an installation via YaST.
+
+Linuxrc is designed to be as small as possible. Therefore, all needed programs
+are linked directly into one binary and linuxrc is compiled as a.out. So there
+is no need for shared libraries in the initdisk and there is space for up to
+100 kernel modules on a single bootdisk.
+
+WARNING: **** NEVER RUN LINUXRC ON AN INSTALLED SYSTEM AS ROOT!! *****
+
+
+Copyright:
+==========
+
+Linuxrc is copyright by S.u.S.E. GmbH, Hubert Mantel (mantel@suse.de).
+
+Linuxrc is placed under conditions of the GNU General Public License. See the
+file COPYING for further information.
+
+
+Credits:
+========
+
+Linuxrc makes use of several other programs which are linked into the binary:
+
+bootpc:   Copyright: University of Cambridge, 1993-1996
+          Author: J.S.Peatfield
+insmod:   Copyright: Anonymous (if you know better please let me know)
+          Author: Bas Laarhoven
+                  Jon Tombs
+                  Bjørn Ekwall
+                  Derek Atkins
+                  H.J.Lu
+                  James Bottomley
+                  Jacques Gelinas
+                  Eric Youngdale
+                  Andreas Schwab
+                  Eddie C. Dost
+                  Hans Lermen
+loadkeys: Copyright: unknown (found nothing in the sources)
+          Author: Eugene G. Crosser (?? only name to be found)
+cardmgr:  Copyright: David Hinds
+          Author: David Hinds
+inflate:  Non-Copyright: Mark Adler
+          Author: Mark Adler
+                  Hannu Savolainen
+linux:    Copyright: Linus Torvalds and many many other people
+          Author: Linus Torvalds and many many other people
+                  Please see /usr/src/linux/CREDITS
+
+
+Installation:
+=============
+
+Linuxrc can be compiled by simply typing "make" in the source directory. If
+you want to upgrade to a newer version of the pcmcia package, you'll have to
+adapt the new sources into the directory pcmcia. Also, the configuration
+files config.h and config.mk need to be updated when switching to a newer
+kernel release.
+
+The layout of the initdisk is as follows:
+
+Mandelbrot:/mnt # l
+total 343
+drwxr-xr-x  11 root     root          384 Oct 13 20:10 ./
+drwxr-xr-x  23 root     root         1024 Nov 14 13:29 ../
+drwxr-xr-x   2 root     root          256 Jan 21  1997 bin/
+drwxr-xr-x   3 root     root        15264 Jul 28 13:27 dev/
+drwxr-xr-x   3 root     root          160 Sep  2 15:30 etc/
+drwxr-xr-x   2 root     root          288 Jun 27 12:18 keytables/
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 linuxrc*
+drwxr-xr-x   2 root     root           64 Aug  7  1996 mnt/
+drwxr-xr-x   2 root     root          128 Jul 23 19:50 modules/
+drwxr-xr-x   2 root     root           64 Aug  7  1996 proc/
+drwxr-xr-x   2 root     root           64 Jan  8  1997 tmp/
+drwxr-xr-x   9 root     root          288 Apr  2  1997 var/
+Mandelbrot:/mnt # l bin
+total 1904
+drwxr-xr-x   2 root     root          256 Jan 21  1997 ./
+drwxr-xr-x  11 root     root          384 Oct 13 20:10 ../
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 cardmgr*
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 insmod*
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 loadkeys*
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 probe*
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 rmmod*
+-rwxr-xr-x   7 root     root       323584 Nov 14 14:33 sh*
+
+Please note the hardlinks in the /bin directory. For more detailed information,
+just take a look at one of our bootdisks.
+
+
+Todo:
+=====
+
+Documentation ;-)
+General improvements in all repects. Linuxrc is subject to be heavily modified
+in the future. In the beginning there was just a little kernel patch...
+
+Use and modify at your own risk. Modified versions of linuxrc are not supported
+by S.u.S.E. GmbH! Linuxrc has not yet been tested with kernel releases 2.1.xx.
+
+Have a lot of fun.
+                         Hubert Mantel, 15.11.1997

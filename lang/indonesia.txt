@@ -1,0 +1,187 @@
+static text_t txt_indonesia_atm [] =
+{
+{ TXT_OK,             "Ok"                                                    },
+{ TXT_CANCEL,         "Kembali"                                               },
+{ TXT_YES,            "Ya"                                                    },
+{ TXT_NO,             "No"                                                    },
+{ TXT_CHOOSE_LANGUAGE,"Silahkan pilih bahasa yang digunakan"                  },
+{ TXT_COLOR_DISPLAY,  "Layar berwarna"                                        },
+{ TXT_MONO_DISPLAY,   "Layar monokrom"                                        },
+{ TXT_CHOOSE_DISPLAY, "Layar jenis apakah yang anda gunakan ?"                },
+{ TXT_MENU_LANG,      "Bahasa"                                                },
+{ TXT_MENU_MODULES,   "Kernel modules (hardware drivers)"                     },
+{ TXT_MENU_START,     "Instalasi / sistem dijalankan"                         },
+{ TXT_MENU_INFO,      "Informasi sistem"                                      },
+{ TXT_HDR_MAIN,       "Menu utama"                                            },
+{ TXT_SETTINGS,       "Settings"                                              },
+{ TXT_MENU_DISPLAY,   "Display"                                               },
+{ TXT_MENU_KEYMAP,    "Keymap"                                                },
+{ TXT_LOAD_SCSI,      "Muatkan (load) modul SCSI"                             },
+{ TXT_LOAD_CDROM,     "Muatkan (load) modul CD-ROM"                           },
+{ TXT_LOAD_NET,       "Muatkan (load) modul network"                          },
+{ TXT_SHOW_MODULES,   "Tampilkan modul yang sudah dimuatkan"                  },
+{ TXT_AUTO_LOAD,      "Pemuatan modul otomatis (autoload)"                    },
+{ TXT_DEL_MODULES,    "Turunkan (unload) modul"                               },
+{ TXT_TRY_TO_LOAD,    "Mencoba memuatkan (load) modul \"%s\"...\n\n"
+                      "Selama memuatkan, anda dapat melihat pesan"
+                      "kernel pada konsol virtual 4 (ALT-F4)."                },
+{ TXT_LOAD_SUCCESSFUL,"Modul \"%s\" telah dimuatkan dengan sukses!"           },
+{ TXT_LOAD_FAILED,    "Gagal memuatkan (load) modul \"%s\"!"                  },
+{ TXT_CDROM,          "CD-ROM"                                                },
+{ TXT_FLOPPY,         "Disket"                                                },
+{ TXT_NFS,            "Network (NFS)"                                         },
+{ TXT_FTP,            "Network (FTP)"                                         },
+{ TXT_HARDDISK,       "Harddisk"                                              },
+{ TXT_START_INSTALL,  "Memulai instalasi"                                     },
+{ TXT_START_RESCUE,   "Memulai sistem penyelamat (rescue)"                    },
+{ TXT_LOAD_RS_NFS,    "Muatkan sistem penyelamat (rescue) via NFS"            },
+{ TXT_BOOT_SYSTEM,    "Mem-boot sistem yang telah terinstall"                 },
+{ TXT_SEARCH_FOR_RI,  "Mencari image \"%s\"..."                               },
+{ TXT_RI_NOT_FOUND,   "Tak bisa menemukan image!\n\n"
+                      "Periksa direktori yang diberikan!"                     },
+{ TXT_LOADING,        "Memuatkan data ke ramdisk"                             },
+{ TXT_INFO_KERNEL,    "Pesan Kernel"                                          },
+{ TXT_INFO_CPU,       "Prosesor"                                              },
+{ TXT_INFO_DEVICES,   "Device"                                                },
+{ TXT_INFO_NETDEV,    "Network card"                                          },
+{ TXT_INFO_DMA,       "DMA"                                                   },
+{ TXT_INFO_IRQS,      "Interrupt"                                             },
+{ TXT_INFO_IOPORTS,   "Port I/O"                                              },
+{ TXT_INFO_MEM,       "Memori"                                                },
+{ TXT_INFO_MODULES,   "Modul-modul"                                           },
+{ TXT_INFO_PCI,       "PCI"                                                   },
+{ TXT_INSERT_DISK,    "Masukkan disket dan tekan ENTER"                       },
+{ TXT_ERROR_READ_DISK,"Gagal ketika membaca disk!"                            },
+{ TXT_ENTER_ROOT_FS,  "Tentukan partisi root anda (misal. /dev/sda3)"         },
+{ TXT_INVALID_ROOT_FS,"Divais root tidak benar!"                              },
+{ TXT_INVALID_INPUT,  "Isian tidak benar!"                                    },
+{ TXT_INPUT_IPADDR,   "Harap berikan dengan alamat IP anda"                   },
+{ TXT_INPUT_NETMASK,  "Harap berikan netmask anda. Untuk suatu jaringan"
+                      "klas C normal, nilai ini biasanya 255.255.255.0"       },
+{ TXT_INPUT_GATEWAY,  "Jika anda memakai gateway untuk mencapai server, harap"
+                      "berikan alamat IP gateway. Jika anda tidak "
+                      "membutuhkan gateway, cukup isikan alamat IP anda."     },
+{ TXT_INPUT_NAMED,    "Harap berikan alamat IP name-server anda. Jika "
+                      "anda tak memakai name-server, cukup tekan ESC."        },
+{ TXT_FOUND_HOST,     "Data berikut ini telah dibaca:\n\n"
+                      "Alamat IP : %s\n"
+                      "Nama: %s\n"
+                      "Domain: %s"                                            },
+{ TXT_ERROR_CONF_NET, "Kesalahan timbul ketika mengkonfigurasi "
+                      "network.  Mungkin network card anda belum dikenali "
+                      "oleh kernel!"                                          },
+{ TXT_INPUT_SERVER,   "Harap berikan alamat IP server NFS."                   },
+{ TXT_INPUT_FTPSERVER,"Harap berikan alamat IP server FTP."                   },
+{ TXT_INPUT_DIR,      "Harap berikan nama direktori pada server."             },
+{ TXT_ENTER_PARAMS,   "Harap berikan parameter untuk \"%s\"."                 },
+{ TXT_TRY_NFS_MOUNT,  "Mencoba mengaitkan (mount) ke direktori\n\n\"%s:%s\"..."},
+{ TXT_ERROR_NFSMOUNT, "Suatu kesalahan timbul ketika mencoba mengaitkan "
+                      "(mount) ke direktori pada nfs.\n\nAlasan server: %s"   },
+{ TXT_CHOOSE_KEYMAP,  "Harap pilih model keyboard..\nNanti YaST memberi"    
+                      "tawaran pilihan tabel keyboard lainnya lagi."          },
+{ TXT_DELETE_MODULE,  "Pilihlah modul yang akan dicopot (unload)."            },
+{ TXT_NO_MODULES,     "Pada saat ini tak ada modul yang dimuatkan (load)!"    },
+{ TXT_AUTO_RUNNING,   "Autoprobing (%s)...      "                             },
+{ TXT_WANT_MORE_SCSI, "Apakah anda ingin mencari adapter SCSI " 
+                      "host tambahan ?"                                       },
+{ TXT_WANT_MORE_NET,  "Apakah anda ingin mencari card network tambahan ?"     },
+{ TXT_WANT_MORE_CDROM,"Apakah anda ingin mencari CD-ROM drive tambahan ?"     },
+{ TXT_NET_ETH0,       "ethernet network card"                                 },
+{ TXT_NET_PLIP,       "parallel port"                                         },
+{ TXT_NET_TR0,        "token ring network card"                               },
+{ TXT_NET_ARC0,       "arcnet network card"                                   },
+{ TXT_NET_FDDI,       "FDDI network card"                                     },
+{ TXT_NET_HIPPI,      "HIPPI network card"                                    },
+{ TXT_CHOOSE_NET,     "Harap pilih network device."                           },
+{ TXT_INPUT_PLIP_IP,  "Harap berikan alamat IP partner PLIP."                 },
+{ TXT_LOAD_PCMCIA,    "Muatkan (load ) modul PCMCIA"                          },
+{ TXT_NO_PCMCIA,      "Chipset PCMCIA tak dapat dideteksi secara otomatis! "
+                      "Tentukanlah secara manual."                            },
+{ TXT_FOUND_PCMCIA,   "Dideteksi chipset PCMCIA \"%s\"!\n\nHarap berikan "
+                      "parameters untuk modul utama PCMCIA "                  },
+{ TXT_PCMCIA_PARAMS,  "Harap berikan parameter khusus untuk chipset \"%s\""   },
+{ TXT_START_CARDMGR,  "Memulai cardmanager..."                                },
+{ TXT_PCMCIA_SUCCESS, "Sukses memulai service untuk PCMCIA card. "            },
+{ TXT_PCMCIA_FAIL,    "Gagal memulai service untuk PCMCIA card! "             },
+{ TXT_PCMCIA_ALREADY, "Service PCMCIA card telah berjalan !"                  },
+{ TXT_NO_LXRC_END,    "Anda dapat keluar dari Linuxrc melalui pilihan menu\n\n"
+                      "; Mulai instalasi / sistem «\n\n"
+                      "Agar dapat menjalankan ini, anda harus memuatkan (load)"
+                      "beberapa driver (modul) yang mendukung hardware."      },
+{ TXT_NO_CTRLC,       "Anda tak dapat keluar dari Linuxrc dengan <ctrl-c>!"   },
+{ TXT_REMOVE_DISK,    "Harap keluarkan disket dari disk drive sekarang!"      },
+{ TXT_EXAMPLE_PAR,    "\n\nContoh: "                                          },
+{ TXT_CHOOSE_SOURCE,  "Harap pilih media sumber (source)"                     },
+{ TXT_TRY_CD_MOUNT,   "Mencoba mengaitkan (mount) CD-ROM..."                  },
+{ TXT_ERROR_CD_MOUNT, "Tak dapat mengaitkan (mount) CD-ROM!"                  },
+{ TXT_START_YAST,     "Mulai menjalankan YaST..."                             },
+{ TXT_ASK_REBOOT,     "Apakah anda ingin me-reboot sistem sekarang?"          },
+{ TXT_INSTALL_SUCCESS,"Sistem utama (base) telah berhasil diinstal. Sistem "
+                      "baru ini sekarang akan mulai dijalankan untuk "
+                      "menyelesaikan proses instalasi."                       },
+{ TXT_ENTER_PARTITION,"Harap berikan nama partisi harddisk (mis. /dev/sda1)"  },
+{ TXT_ERROR_HD_MOUNT, "Tak dapat mengaitkan (mount) partisi yang diminta!"    },
+{ TXT_ENTER_HD_DIR,   "Harap berikan nama direktori sumber (source)"          },
+{ TXT_ERROR_INSTALL,  "Kesalahan terjadi selama proses instalasi!"            },
+{ TXT_DRIVES,         "Harddisk / CD-ROM"                                     },
+{ TXT_LITTLE_MEM,     "Komputer anda memiliki memori sedikit sekali!\n\n"
+                      "Sebelum anda meng-iyakan pesan ini, anda harus pindah "
+                      "ke konsol virtual 2 (tekan Alt-F2) dan buat serta "
+                      "aktifkanlah swap space !"                              },
+{ TXT_ASK_ANIMATE,    "Animasi"                                               },
+{ TXT_ASK_EXPLODE,    "Apakah anda menyukai \"exploding\" windows?\n\n 8-)"   },
+{ TXT_NO_DRIVES,      "Tak ada harddisk dan CD-ROM drive yang terdeteksi "
+                      "hingga kini."                                          },
+{ TXT_MENU_EXPERT,    "Debug (expert)"                                        },
+{ TXT_FORCE_ROOTIMAGE,"Paksakan (force) rootimage"                            },
+{ TXT_NEW_ROOTIMAGE,  "Masukkan rootimage"                                    },
+{ TXT_ASK_RI_FORCE,   "Apakah anda ingin rootimage dimuatkan (load) ke "
+                      "RAM disk, walaupun ketika suatu sistem instalasi yang "
+                      "benar dapat ditemukan ?"                               },
+{ TXT_ENTER_ROOTIMAGE,"Harap isikan path, dan nama file yang ingin "
+                      "dimuatkan (load) ke RAM disk sebagai sistem file root" },
+{ TXT_NOT_IMPLEMENTED,"Belum diimplementasikan."                              },
+{ TXT_NEW_INST_SYS,   "Sistem instalasi"                                      },
+{ TXT_ENTER_INST_SYS, "Harap berikan nama direktori yang berisi "
+                      "sistem instalasi."                                     },
+{ TXT_NO_INFO_AVAIL,  "Tak ada informasi yang tersedia."                      },
+{ TXT_PREPARE_INST,   "Mempersiapkan instalasi..."                            },
+{ TXT_START_DEMO,     "Memulai Live CD"                                       },
+{ TXT_INSERT_LIVECD,  "Harap masukkan Live CD."                               },
+{ TXT_END_REBOOT,     "Selesai / Reboot"                                      },
+{ TXT_ASK_BOOTP,      "Konfigurasi otomatis melalui bootp ?"                  },
+{ TXT_SEND_BOOTP,     "Mengirim permohonan (request) bootp..."                },
+{ TXT_ERROR_BOOTP,    "Konfigurasi bootp gagal."                              },
+{ TXT_SEARCH_INFOFILE,"Mencari infofile..."                                   },
+{ TXT_NFSPORT,        "Menentukan port NFS"                                   },
+{ TXT_ASKING_NAMED,   "Mengirim request kepada nameserver..."                 },
+{ TXT_HOST_NOT_FOUND, "Mesin %s tidak dikenal!"                               },
+{ TXT_NET_CONFIGURED, "Network anda telah dikonfigurasi. Apakah anda ingin "
+                      "menyimpan konfigurasi ini ?"                           },
+{ TXT_ASK_BREAK,      "Apakah anda ingin membatalkan ?"                       },
+{ TXT_NO_NETDEVICE,   "Tak ada divais network ditemukan!\nHarap muatkan "
+                      "(load) modul network terlebih dahulu."                 },
+{ TXT_ALREADY_FOUND,  "Sebuah %s telah ditemukan dalam sistem anda!\n"        },
+{ TXT_SCSI_ADAPTER,   "SCSI-Adapter"                                          },
+{ TXT_ANOTHER_MOD,    "Apakah anda ingin memuatkan (laod) modul tambahan ?"   },
+{ TXT_ERROR_FTP,      "Terjadi kesalahan ketika mengakses server FTP:\n\n%s"  },
+{ TXT_TRY_REACH_FTP,  "Mencoba melakukan koneksi ke server FTP..."            },
+{ TXT_ENTER_FTPUSER,  "Harap berikan nama yang digunakan untuk "
+                      "mengakses FTP server"                                  },
+{ TXT_ENTER_FTPPASSWD,"Harap berikan password untuk account pengguna FTP "    },
+{ TXT_ENTER_FTPPROXY, "Harap tentukan alamat FTP proxy "                      },
+{ TXT_ENTER_FTPPORT,  "Harap tentukan port untuk FTP proxy"                   },
+{ TXT_WANT_FTPPROXY,  "Apakah anda memakai FTP proxy ?"                       },
+{ TXT_NOMEM_FTP,      "Komputer anda tidak memiliki RAM yang cukup untuk "
+                      "melakukan instalasi melalui FTP (minimal 32 MB RAM)"   },
+{ TXT_ANONYM_FTP,     "Biasanya instalasi dengan FTP dilakukan melalui " 
+                      "FTP anonymous.  Tetapi ada juga kemungkinan untuk "
+                      "memberikan nama dan password user untuk FTP server.\n"
+                      "Apakah anda menginginkan ini ?"                        },
+{ TXT_ENTER_MODDISK,  "Harap masukkan disket modul"                           },
+{ TXT_MORE_MODULES,   "-- Modul lainnya --"                                   },
+{ TXT_INIT_PARPORT,   "Menginisialisasi port parallel ... "                   },
+{ TXT_ENTER_NFSPORT,  "Berikan nomor port server NFS yang"
+                      "digunakan"                                             },
+{ TXT_INSERT_CD,      "Pastikanlah CD nomer %d ada pada drive anda!"          }
+};

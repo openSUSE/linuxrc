@@ -1,0 +1,202 @@
+static text_t txt_german_atm [] =
+{
+{ TXT_OK,             "Ok"                                                    },
+{ TXT_CANCEL,         "Zurück"                                                },
+{ TXT_YES,            "Ja"                                                    },
+{ TXT_NO,             "Nein"                                                  },
+{ TXT_CHOOSE_LANGUAGE,"Bitte wählen Sie die Sprache"                          },
+{ TXT_COLOR_DISPLAY,  "Farbbildschirm"                                        },
+{ TXT_MONO_DISPLAY,   "Monochrom-Bildschirm"                                  },
+{ TXT_CHOOSE_DISPLAY, "Welche Art von Bildschirm verwenden Sie?"              },
+{ TXT_MENU_LANG,      "Sprache"                                               },
+{ TXT_MENU_MODULES,   "Kernel-Module (Hardware-Treiber)"                      },
+{ TXT_MENU_START,     "Installation / System starten"                         },
+{ TXT_MENU_INFO,      "System-Information"                                    },
+{ TXT_HDR_MAIN,       "Hauptmenü"                                             },
+{ TXT_SETTINGS,       "Einstellungen"                                         },
+{ TXT_MENU_DISPLAY,   "Bildschirm"                                            },
+{ TXT_MENU_KEYMAP,    "Tastaturbelegung"                                      },
+{ TXT_LOAD_SCSI,      "SCSI-Treiber laden"                                    },
+{ TXT_LOAD_CDROM,     "CD-ROM-Treiber laden"                                  },
+{ TXT_LOAD_NET,       "Netzwerktreiber laden"                                 },
+{ TXT_SHOW_MODULES,   "Zeige geladene Module"                                 },
+{ TXT_AUTO_LOAD,      "Automatisches Laden von Modulen"                       },
+{ TXT_DEL_MODULES,    "Entfernen geladener Module"                            },
+{ TXT_TRY_TO_LOAD,    "Versuche, das Modul \"%s\" zu laden...\n\n"
+                      "Während des Ladens können Sie die Kernelmeldungen auf "
+                      "Konsole 4 (ALT-F4) beobachten. Mit ALT-F1 kommen Sie "
+                      "wieder auf die erste Konsole zurück."                  },
+{ TXT_LOAD_SUCCESSFUL,"Das Modul \"%s\" wurde erfolgreich geladen!"           },
+{ TXT_LOAD_FAILED,    "Das Laden des Moduls \"%s\" ist fehlgeschlagen!"       },
+{ TXT_CDROM,          "CD-ROM"                                                },
+{ TXT_FLOPPY,         "Diskette"                                              },
+{ TXT_NFS,            "Netzwerk (NFS)"                                        },
+{ TXT_FTP,            "Netzwerk (FTP)"                                        },
+{ TXT_HARDDISK,       "Festplatte"                                            },
+{ TXT_START_INSTALL,  "Installation starten"                                  },
+{ TXT_START_RESCUE,   "Rettungssystem starten"                                },
+{ TXT_LOAD_RS_NFS,    "Rettungssystem via NFS laden"                          },
+{ TXT_BOOT_SYSTEM,    "Installiertes System booten"                           },
+{ TXT_SEARCH_FOR_RI,  "Suche nach Image \"%s\"..."                            },
+{ TXT_RI_NOT_FOUND,   "Image konnte nicht gefunden werden!\n\n"
+                      "Überprüfen Sie die Angabe des Verzeichnisses."         },
+{ TXT_LOADING,        "Lade Daten in die Ramdisk"                             },
+{ TXT_INFO_KERNEL,    "Kernel-Meldungen"                                      },
+{ TXT_INFO_CPU,       "Prozessor"                                             },
+{ TXT_INFO_DEVICES,   "Geräte"                                                },
+{ TXT_INFO_NETDEV,    "Netzwerkkarten"                                        },
+{ TXT_INFO_DMA,       "DMA"                                                   },
+{ TXT_INFO_IRQS,      "Interrupts"                                            },
+{ TXT_INFO_IOPORTS,   "I/O Ports"                                             },
+{ TXT_INFO_MEM,       "Speicher"                                              },
+{ TXT_INFO_MODULES,   "Module"                                                },
+{ TXT_INFO_PCI,       "PCI"                                                   },
+{ TXT_INSERT_DISK,    "Bitte legen Sie die Diskette ein\n"
+                      "und drücken Sie ENTER"                                 },
+{ TXT_ERROR_READ_DISK,"Fehler beim Lesen von der Diskette!"                   },
+{ TXT_ENTER_ROOT_FS,  "Bitte geben Sie Ihre Root-Partition an\n"
+                      "(z.B. /dev/sda3)"                                      },
+{ TXT_INVALID_ROOT_FS,"Ungültige Root-Partition!"                             },
+{ TXT_INVALID_INPUT,  "Ungültige Eingabe!"                                    },
+{ TXT_INPUT_IPADDR,   "Geben Sie bitte Ihre IP-Adresse ein."                  },
+{ TXT_INPUT_NETMASK,  "Geben Sie bitte Ihre Netzmaske ein. Für ein normales "
+                      "Class-C-Netzwerk lautet sie 255.255.255.0"             },
+{ TXT_INPUT_GATEWAY,  "Geben Sie die Adresse Ihres Gateways ein, sofern Sie "
+                      "eines benötigen, um den Server ansprechen zu können. "
+                      "Ansonsten geben Sie einfach Ihre eigene IP-Adresse an."},
+{ TXT_INPUT_NAMED,    "Geben Sie die IP-Adresse Ihres Nameservers ein. Wenn "
+                      "Sie keinen Nameserver verwenden möchten, drücken Sie "
+                      "ESC."                                                  },
+{ TXT_FOUND_HOST,     "Folgende Rechnerdaten wurden ermittelt:\n\n"
+                      "IP-Adresse: %s\n"
+                      "Name: %s\n"
+                      "Domain: %s"                                            },
+{ TXT_ERROR_CONF_NET, "Beim Konfigurieren des Netzwerks ist ein Fehler "
+                      "aufgetreten. Entweder Sie haben kein passendes Modul "
+                      "geladen oder Ihre Netzwerkkarte wurde "
+                      "nicht korrekt vom Kernel erkannt!"                     },
+{ TXT_INPUT_SERVER,   "Geben Sie bitte die IP-Adresse des NFS-Servers ein."   },
+{ TXT_INPUT_FTPSERVER,"Geben Sie bitte die IP-Adresse des FTP-Servers ein."   },
+{ TXT_INPUT_DIR,      "Geben Sie das Verzeichnis auf dem Server ein."         },
+{ TXT_ENTER_PARAMS,   "Bitte geben Sie etwaige Parameter für \"%s\" ein."     },
+{ TXT_TRY_NFS_MOUNT,  "Versuche, das Verzeichnis\n\n\"%s:%s\"\n\n zu "
+                      "mounten..."                                            },
+{ TXT_ERROR_NFSMOUNT, "Beim Versuch, das NFS-Verzeichnis des Servers zu "
+                      "mounten, ist folgender Fehler aufgetreten:\n\n"
+                      "Fehler vom NFS-Server: %s"                             },
+{ TXT_CHOOSE_KEYMAP,  "Bitte wählen Sie eine Tastaturbelegung aus.\nYaST "
+                      "bietet Ihnen später weitere Belegungen an."            },
+{ TXT_DELETE_MODULE,  "Wählen Sie das Modul aus, das Sie entfernen möchten."  },
+{ TXT_NO_MODULES,     "Momentan sind keine Module geladen!"                   },
+{ TXT_AUTO_RUNNING,   "Autoprobing (%s)...      "                             },
+{ TXT_WANT_MORE_SCSI, "Möchten Sie nach weiteren SCSI-Adaptern suchen?"       },
+{ TXT_WANT_MORE_NET,  "Möchten Sie nach weiteren Netzwerkkarten suchen?"      },
+{ TXT_WANT_MORE_CDROM,"Möchten Sie nach weiteren CD-ROM-Laufwerken suchen?"   },
+{ TXT_NET_ETH0,       "Ethernet Netzwerkkarte"                                },
+{ TXT_NET_PLIP,       "Parallelport"                                          },
+{ TXT_NET_TR0,        "Token Ring Netzwerkkarte"                              },
+{ TXT_NET_ARC0,       "Arcnet Netzwerkkarte"                                  },
+{ TXT_NET_FDDI,       "FDDI Netzwerkkarte"                                    },
+{ TXT_NET_HIPPI,      "HIPPI Netzwerkkarte"                                   },
+{ TXT_CHOOSE_NET,     "Bitte wählen Sie den Typ Netzwerk, den Sie für die "
+                      "Installation verwenden möchten."                       },
+{ TXT_INPUT_PLIP_IP,  "Geben Sie bitte die IP-Adresse des PLIP-Partners ein." },
+{ TXT_LOAD_PCMCIA,    "Lade PCMCIA Module"                                    },
+{ TXT_NO_PCMCIA,      "Der verwendete PCMCIA Chipsatz konnte nicht "
+                      "automatisch ermittelt werden. Bitte wählen Sie "
+                      "manuell aus."                                          },
+{ TXT_FOUND_PCMCIA,   "PCMCIA Chipsatz \"%s\" gefunden!\n\nBitte geben Sie "
+                      "etwaige Parameter für die PCMCIA Core-Module ein"      },
+{ TXT_PCMCIA_PARAMS,  "Bitte geben Sie etwaige spezifische Parameter für den "
+                      "Chipsatz \"%s\" ein"                                   },
+{ TXT_START_CARDMGR,  "Cardmanager wird gestartet..."                         },
+{ TXT_PCMCIA_SUCCESS, "PCMCIA Card Services wurden erfolgreich gestartet."    },
+{ TXT_PCMCIA_FAIL,    "Das Starten der PCMCIA Card Services ist gescheitert!" },
+{ TXT_PCMCIA_ALREADY, "PCMCIA Card Services laufen bereits!"                  },
+{ TXT_NO_LXRC_END,    "Linuxrc kann nur über den Menüpunkt\n\n"                 
+                      "» Installation / System starten «\n\n"
+                      "verlassen werden! Damit dies möglich ist, müssen Sie "
+                      "eventuell vorher Hardware-Treiber (Module) laden."     },
+{ TXT_NO_CTRLC,       "Linuxrc kann nicht durch <ctrl-c> abgebrochen werden!" },
+{ TXT_REMOVE_DISK,    "Bitte entfernen Sie nun die Diskette aus dem Laufwerk!"},
+{ TXT_EXAMPLE_PAR,    "\n\nBeispiel: "                                        },
+{ TXT_CHOOSE_SOURCE,  "Wählen Sie bitte das Quellmedium"                      },
+{ TXT_TRY_CD_MOUNT,   "Versuche, die CD-ROM zu mounten..."                    },
+{ TXT_ERROR_CD_MOUNT, "CD-ROM konnte nicht gemountet werden!"                 },
+{ TXT_START_YAST,     "Starte YaST..."                                        },
+{ TXT_ASK_REBOOT,     "Möchten Sie das System nun neu starten?"               },
+{ TXT_INSTALL_SUCCESS,"Das Basissystem wurde erfolgreich installiert. Dieses "
+                      "neu installierte System wird nun gestartet, um die "
+                      "Installation abzuschließen."                           },
+{ TXT_ENTER_PARTITION,"Bitte geben Sie die Festplatten-Partition an\n"
+                      "(z.B. /dev/sda1)"                                      },
+{ TXT_ERROR_HD_MOUNT, "Die angegebene Partition konnte nicht gemountet "
+                      "werden!"                                               },
+{ TXT_ENTER_HD_DIR,   "Bitte geben Sie das Quellverzeichnis ein"              },
+{ TXT_ERROR_INSTALL,  "Die Installation wurde nicht ordnungsgemäß "
+                      "abgeschlossen!"                                        },
+{ TXT_DRIVES,         "Festplatten / CD-ROMs"                                 },
+{ TXT_LITTLE_MEM,     "Ihr Rechner verfügt über extrem wenig Hauptspeicher!\n"
+                      "\nBevor Sie diese Meldung bestätigen und YaST gestartet "
+                      "werden kann, müssen Sie auf Konsole 2 wechseln "
+                      "(drücken Sie ALT-F2) und von Hand Swap-Speicher "
+                      "einrichten und aktivieren!"                            },
+{ TXT_ASK_ANIMATE,    "Animation"                                             },
+{ TXT_ASK_EXPLODE,    "Möchten Sie \"explodierende\" Fenster?\n\n"
+                      "Aber klar ;-)"                                         },
+{ TXT_NO_DRIVES,      "Bislang wurden weder Festplatten noch CD-ROM Laufwerke"
+                      " erkannt."                                             },
+{ TXT_MENU_EXPERT,    "Debug (Experte)"                                       },
+{ TXT_FORCE_ROOTIMAGE,"Erzwinge Rootimage"                                    },
+{ TXT_NEW_ROOTIMAGE,  "Eingabe des Rootimage"                                 },
+{ TXT_ASK_RI_FORCE,   "Soll das Rootimage auch dann in die RAM-Disk geladen "
+                      "werden, wenn ein gültiges Installationssystem "
+                      "gefunden wurde?"                                       },
+{ TXT_ENTER_ROOTIMAGE,"Geben Sie Pfad und Namen der Datei ein, die Sie als "
+                      "Root Filesystem in die RAM-Disk laden möchten."        },
+{ TXT_NOT_IMPLEMENTED,"Noch nicht implementiert!"                             },
+{ TXT_NEW_INST_SYS,   "Installationssystem"                                   },
+{ TXT_ENTER_INST_SYS, "Geben Sie das Verzeichnis ein, das das "
+                      "Installationssystem enthält."                          },
+{ TXT_NO_INFO_AVAIL,  "Keine Informationen verfügbar."                        },
+{ TXT_PREPARE_INST,   "Installation wird vorbereitet..."                      },
+{ TXT_START_DEMO,     "Live-CD starten"                                       },
+{ TXT_INSERT_LIVECD,  "Bitte legen Sie die Live-CD ein."                      },
+{ TXT_END_REBOOT,     "Abbruch / Reboot"                                      },
+{ TXT_ASK_BOOTP,      "Automatische Konfiguration via Bootp?"                 },
+{ TXT_SEND_BOOTP,     "Bootp-Anfrage wird gesendet..."                        },
+{ TXT_ERROR_BOOTP,    "Bootp-Konfiguration ist gescheitert."                  },
+{ TXT_SEARCH_INFOFILE,"Suche nach Info-Datei..."                              },
+{ TXT_NFSPORT,        "Angabe des NFS-Ports"                                  },
+{ TXT_ASKING_NAMED,   "Befrage Nameserver..."                                 },
+{ TXT_HOST_NOT_FOUND, "Rechner %s ist unbekannt!"                             },
+{ TXT_NET_CONFIGURED, "Ihr Netzwerk ist bereits konfiguriert. Möchten Sie "
+                      "die Konfiguration beibehalten?"                        },
+{ TXT_ASK_BREAK,      "Möchten Sie abbrechen?"                                },
+{ TXT_NO_NETDEVICE,   "Es wurde keine Netzwerkkarte gefunden!\nLaden Sie bitte "
+                      "ein entsprechendes Modul."                             },
+{ TXT_ALREADY_FOUND,  "In Ihrem System wurde bereits ein %s gefunden!\n"      },
+{ TXT_SCSI_ADAPTER,   "SCSI-Adapter"                                          },
+{ TXT_ANOTHER_MOD,    "Möchten Sie ein weiteres Modul laden?"                 },
+{ TXT_ERROR_FTP,      "Fehler beim Zugriff auf den FTP-Server:\n\n%s"         },
+{ TXT_TRY_REACH_FTP,  "Versuche, den FTP-Server zu erreichen..."              },
+{ TXT_ENTER_FTPUSER,  "Bitte geben Sie den Benutzernamen ein, unter dem Sie "
+                      "auf den FTP-Server zugreifen möchten"                  },
+{ TXT_ENTER_FTPPASSWD,"Bitte geben Sie Ihr Passwort auf dem FTP-Server ein"   },
+{ TXT_ENTER_FTPPROXY, "Bitte geben Sie die Adresse des FTP Proxy ein"         },
+{ TXT_ENTER_FTPPORT,  "Bitte geben Sie den Port des FTP Proxy ein"            },
+{ TXT_WANT_FTPPROXY,  "Möchten Sie einen FTP Proxy verwenden?"                },
+{ TXT_NOMEM_FTP,      "Für eine Installation via FTP hat Ihr Rechner nicht "
+                      "genügend Hauptspeicher! (mind. 32 MB erforderlich)"    },
+{ TXT_ANONYM_FTP,     "Normalerweise erfolgt eine FTP-Installation via "
+                      "anonymem FTP. Sie haben jedoch auch die Möglichkeit, "
+                      "einen Benutzernamen und ein Passwort anzugeben.\n"
+                      "Möchten Sie dies tun?"                                 },
+{ TXT_ENTER_MODDISK,  "Bitte legen Sie die Modul-Diskette ein"                },
+{ TXT_MORE_MODULES,   "-- Weitere Module --"                                  },
+{ TXT_INIT_PARPORT,   "Initialisiere den Parallel-Port..."                    },
+{ TXT_ENTER_NFSPORT,  "Bitte geben Sie die Nummer des Ports ein, auf dem der "
+                      "NFS-Server läuft"                                      },
+{ TXT_INSERT_CD,      "Bitte stellen Sie sicher, dass sich die CD Nummer %d "
+                      "in Ihrem Laufwerk befindet!"                           }
+};

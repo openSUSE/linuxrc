@@ -1,0 +1,198 @@
+static text_t txt_dutch_atm [] =
+{
+{ TXT_OK,             "Ok"                                                    },
+{ TXT_CANCEL,         "Terug"                                                 },
+{ TXT_YES,            "Ja"                                                    },
+{ TXT_NO,             "Nee"                                                   },
+{ TXT_CHOOSE_LANGUAGE,"Kies een taal"                                         },
+{ TXT_COLOR_DISPLAY,  "Kleurenbeeldscherm"                                    },
+{ TXT_MONO_DISPLAY,   "Monochroom-beeldscherm"                                },
+{ TXT_CHOOSE_DISPLAY, "Wat voor een soort beeldscherm gebruikt U?"            },
+{ TXT_MENU_LANG,      "Taal"                                                  },
+{ TXT_MENU_MODULES,   "Kernel-Module (Hardware-driver)"                       },
+{ TXT_MENU_START,     "Installatie / Systeem starten"                         },
+{ TXT_MENU_INFO,      "Systeem-Informatie"                                    },
+{ TXT_HDR_MAIN,       "Hoofdmenu"                                             },
+{ TXT_SETTINGS,       "Instellingen"                                          },
+{ TXT_MENU_DISPLAY,   "Beeldscherm"                                           },
+{ TXT_MENU_KEYMAP,    "Toetsenbord layout"                                    },
+{ TXT_LOAD_SCSI,      "SCSI-Driver laden"                                     },
+{ TXT_LOAD_CDROM,     "CD-ROM-Driver laden"                                   },
+{ TXT_LOAD_NET,       "Netwerkdriver laden"                                   },
+{ TXT_SHOW_MODULES,   "Laat geladen Module zien"                              },
+{ TXT_AUTO_LOAD,      "Automatisch Laden van Modules"                         },
+{ TXT_DEL_MODULES,    "Verwijder geladen Module"                              },
+{ TXT_TRY_TO_LOAD,    "Probeer, de Module \"%s\" te laden...\n\n"
+                      "Tijdens het Laden kunt U de Kernelmeldingen op "
+                      "Consool 4 (ALT-F4) bekijken."                          },
+{ TXT_LOAD_SUCCESSFUL,"De Module \"%s\" is succesvol geladen!"                },
+{ TXT_LOAD_FAILED,    "Het Laden van de Module \"%s\" is mislukt!"            },
+{ TXT_CDROM,          "CD-ROM"                                                },
+{ TXT_FLOPPY,         "Diskette"                                              },
+{ TXT_NFS,            "Netwerk (NFS)"                                         },
+{ TXT_FTP,            "Netwerk (FTP)"                                         },
+{ TXT_HARDDISK,       "Harde schijf"                                          },
+{ TXT_START_INSTALL,  "Installatie starten"                                   },
+{ TXT_START_RESCUE,   "Reddingssystem starten"                                },
+{ TXT_LOAD_RS_NFS,    "Reddingssystem via NFS laden"                          },
+{ TXT_BOOT_SYSTEM,    "Geinstalleerd System booten"                           },
+{ TXT_SEARCH_FOR_RI,  "Zoek naar Image \"%s\"..."                             },
+{ TXT_RI_NOT_FOUND,   "Image kan niet gevonden worden!\n\n"
+                      "Check de directorie specificatie."                     },
+{ TXT_LOADING,        "Laad Data in de Ramdisk"                               },
+{ TXT_INFO_KERNEL,    "Kernel-Berichten"                                      },
+{ TXT_INFO_CPU,       "Processor"                                             },
+{ TXT_INFO_DEVICES,   "Aparaten"                                              },
+{ TXT_INFO_NETDEV,    "Netwerkkaarten"                                        },
+{ TXT_INFO_DMA,       "DMA"                                                   },
+{ TXT_INFO_IRQS,      "Interrupts"                                            },
+{ TXT_INFO_IOPORTS,   "I/O Ports"                                             },
+{ TXT_INFO_MEM,       "Geheugen"                                              },
+{ TXT_INFO_MODULES,   "Module"                                                },
+{ TXT_INFO_PCI,       "PCI"                                                   },
+{ TXT_INSERT_DISK,    "Plaats de Diskette \n"
+                      "en druk op ENTER"                                      },
+{ TXT_ERROR_READ_DISK,"Fout bij Lezen van de Diskette!"                       },
+{ TXT_ENTER_ROOT_FS,  "Geef uw Root-Partitie aan\n"
+                      "(b.v. /dev/sda3)"                                      },
+{ TXT_INVALID_ROOT_FS,"Ongeldige Root-Partitie!"                              },
+{ TXT_INVALID_INPUT,  "Ongeldige opgave!"                                     },
+{ TXT_INPUT_IPADDR,   "Vul hier uw IP-Adres in."                              },
+{ TXT_INPUT_NETMASK,  "Vul hier uw Netmasker in. Voor een normaal "
+                      "Class-C-Netwerk luid het 255.255.255.0"                },
+{ TXT_INPUT_GATEWAY,  "Vul hier het adres van uw Gateway in, voor zover U "
+                      "er een nodig heeft, om de Server aan te kunnen spreken. "
+                      "Anders vult u eenvoudig uw eigen IP-Adres in."         },
+{ TXT_INPUT_NAMED,    "Vul hier het IP-Adres van uw Nameserver in. Als U "
+                      "geen Nameserver wilt gebruiken, dan drukt U ESC."      },
+{ TXT_FOUND_HOST,     "De volgende gegevens zijn gevonden:\n\n"
+                      "IP-Adres: %s\n"
+                      "Naam: %s\n"
+                      "Domain: %s"                                            },
+{ TXT_ERROR_CONF_NET, "Bij het configureren van het netwerk is een fout "
+                      "opgetreden. Of U heeft geen passende Module "
+                      "geladen of uw Netwerkkaart wordt "
+                      "niet correct door de Kernel herkent!"                  },
+{ TXT_INPUT_SERVER,   "Vul hier het IP-Adres van de NFS-Server in."           },
+{ TXT_INPUT_FTPSERVER,"Vul hier het IP-Adres van de FTP-Server in."           },
+{ TXT_INPUT_DIR,      "Vul hier de directorie op de server in."               },
+{ TXT_ENTER_PARAMS,   "Vul hier de parameters in voor \"%s\" ."               },
+{ TXT_TRY_NFS_MOUNT,  "Probeer de directorie\n\n\"%s:%s\"\n\n te "
+                      "mounten..."                                            },
+{ TXT_ERROR_NFSMOUNT, "Bij de poging, de NFS-directorie van de Server te "
+                      "mounten, is de volgende Fout opgetreden:\n\n"
+                      "Fout van de NFS-Server: %s"                            },
+{ TXT_CHOOSE_KEYMAP,  "Kies een toetsenbord-layout uit.\nYaST "
+                      "biedt U later meer layouts aan."                       },
+{ TXT_DELETE_MODULE,  "Kies de module uit, die U wilt verwijderen."           },
+{ TXT_NO_MODULES,     "Momenteel zijn er geen Modules geladen!"               },
+{ TXT_AUTO_RUNNING,   "Autoprobing (%s)...      "                             },
+{ TXT_WANT_MORE_SCSI, "Wilt U naar andere SCSI-Adapters zoeken?"              },
+{ TXT_WANT_MORE_NET,  "Wilt U naar andere Netwerkkaarten zoeken?"             },
+{ TXT_WANT_MORE_CDROM,"Wilt U naar andere CD-ROM-Loopwerken zoeken?"          },
+{ TXT_NET_ETH0,       "Ethernet Netwerkkaart"                                 },
+{ TXT_NET_PLIP,       "Parallelpoort"                                         },
+{ TXT_NET_TR0,        "Token Ring Netwerkkaart"                               },
+{ TXT_NET_ARC0,       "Arcnet Netwerkkaart"                                   },
+{ TXT_NET_FDDI,       "FDDI Netwerkkaart"                                     },
+{ TXT_NET_HIPPI,      "HIPPI Netwerkkaart"                                    },
+{ TXT_CHOOSE_NET,     "Kies hier het Type Netwerk, die U voor de "
+                      "Installatie wilt gebruiken."                           },
+{ TXT_INPUT_PLIP_IP,  "Vul uw  IP-Adres van de PLIP-Partner in."              },
+{ TXT_LOAD_PCMCIA,    "Laad PCMCIA Module"                                    },
+{ TXT_NO_PCMCIA,      "De PCMCIA chipset werd niet automatisch gevonden! "
+                      "A.u.b. handmatig specificeren."                        },
+{ TXT_FOUND_PCMCIA,   "PCMCIA Chipset \"%s\" gevonden!\n\nVul hier uw "
+                      "Parameter voor de PCMCIA Core-Module in"               },
+{ TXT_PCMCIA_PARAMS,  "Vul hier uw specifieke Parameters voor de "
+                      "Chipset \"%s\" in"                                     },
+{ TXT_START_CARDMGR,  "Cardmanager wordt gestart..."                          },
+{ TXT_PCMCIA_SUCCESS, "PCMCIA Card Services zijn succesvol gestart."          },
+{ TXT_PCMCIA_FAIL,    "Het Starten van de PCMCIA Card Services is mislukt!"   },
+{ TXT_PCMCIA_ALREADY, "PCMCIA Card Services lopen al!"                        },
+{ TXT_NO_LXRC_END,    "Linuxrc kan alleen via het Menupunt\n\n"                 
+                      "» Installatie / System starten «\n\n"
+                      "verlaten worden! Dat dit mogelijk wordt, moet U "
+                      "eventueel eerst de Hardware-driver (Module) laden."    },
+{ TXT_NO_CTRLC,       "Linuxrc kan niet door <ctrl-c> afgebroken worden!"     },
+{ TXT_REMOVE_DISK,    "Haal nu de diskette uit de diskdrive!"                 },
+{ TXT_EXAMPLE_PAR,    "\n\nBijvoorbeeld: "                                    },
+{ TXT_CHOOSE_SOURCE,  "Kies de bronmedium"                                    },
+{ TXT_TRY_CD_MOUNT,   "Probeer, de CD-ROM te mounten..."                      },
+{ TXT_ERROR_CD_MOUNT, "CD-ROM kan niet gemount worden!"                       },
+{ TXT_START_YAST,     "YaST  start..."                                        },
+{ TXT_ASK_REBOOT,     "Wilt U het systeem opnieuw starten?"                   },
+{ TXT_INSTALL_SUCCESS,"Het Basissysteem is succesvol geinstalleert. Dit "
+                      "nieuw geinstalleerde Systeem wordt nu gestart, om de "
+                      "Installatie af te sluiten."                            },
+{ TXT_ENTER_PARTITION,"Geef hier de Harde-schijf-Partitie aan\n"
+                      "(b.v. /dev/sda1)"                                      },
+{ TXT_ERROR_HD_MOUNT, "De opgegeven Partitie kan niet gemount "
+                      "worden!"                                               },
+{ TXT_ENTER_HD_DIR,   "Geef hier de bron-directorie op"                       },
+{ TXT_ERROR_INSTALL,  "Er is een fout opgetreden tijdens de "
+                      "installatie!"                                          },
+{ TXT_DRIVES,         "Harde-schijf / CD-ROMs"                                },
+{ TXT_LITTLE_MEM,     "Uw computer beschikt over erg weinig geheugen!\n"
+                      "\nVoordat U deze melding bevestigd en YaST gestart "
+                      "kan worden , moet U naar console 2 omschakelen "
+                      "(druk hier voor ALT-F2) en met de hand Swap-geheugen "
+                      "instellen en activieren!"                              },
+{ TXT_ASK_ANIMATE,    "Animatie"                                              },
+{ TXT_ASK_EXPLODE,    "Wilt U \"exploderende\" venster?\n\n"
+                      "maar natuurlijk ;-)"                                   },
+{ TXT_NO_DRIVES,      "Tot nu toe is er geen harde-schijf en CD-rom drive"
+                      " gevonden."                                            },
+{ TXT_MENU_EXPERT,    "Debug (Expert)"                                        },
+{ TXT_FORCE_ROOTIMAGE,"Forceer Root-image"                                    },
+{ TXT_NEW_ROOTIMAGE,  "Opgave van de Root-image"                              },
+{ TXT_ASK_RI_FORCE,   "Moet de Root-image ook dan in de RAM-disk geladen "
+                      "worden, als er een geldig Installatie-systeem "
+                      "gevonden wordt?"                                       },
+{ TXT_ENTER_ROOTIMAGE,"Geef hier path en naam van de bestand, die U als "
+                      "Root Filesysteem in de RAM-disk geladen wilt hebben."  },
+{ TXT_NOT_IMPLEMENTED,"Nog niet geimplementeerd!"                             },
+{ TXT_NEW_INST_SYS,   "Installatie-systeem"                                   },
+{ TXT_ENTER_INST_SYS, "Geef hier de directorie op, die het "
+                      "Installatie-systeem bevat."                            },
+{ TXT_NO_INFO_AVAIL,  "Geen Informatie beschikbaar."                          },
+{ TXT_PREPARE_INST,   "Installatie wordt voorbereidt..."                      },
+{ TXT_START_DEMO,     "Live-CD starten"                                       },
+{ TXT_INSERT_LIVECD,  "plaats de Live-CD in de drive."                        },
+{ TXT_END_REBOOT,     "Einde / Reboot"                                        },
+{ TXT_ASK_BOOTP,      "Automatische configuratie via Bootp?"                  },
+{ TXT_SEND_BOOTP,     "Bootp-Aanvraag wordt verstuurd..."                     },
+{ TXT_ERROR_BOOTP,    "Bootp-configuratie is afgebroken."                     },
+{ TXT_SEARCH_INFOFILE,"Zoek naar Info-file..."                                },
+{ TXT_NFSPORT,        "Geef de NFS-Port op"                                   },
+{ TXT_ASKING_NAMED,   "Bevraag de Nameserver..."                              },
+{ TXT_HOST_NOT_FOUND, "Computer %s is onbekendt!"                             },
+{ TXT_NET_CONFIGURED, "Uw Netwerk is al geconfigureerd. Wilt U "
+                      "de configuratie behouden?"                             },
+{ TXT_ASK_BREAK,      "Wilt U afbreken?"                                      },
+{ TXT_NO_NETDEVICE,   "Er is geen netwerkkaart gevonden!\nLaadt nu een "
+                      "passende Module."                                      },
+{ TXT_ALREADY_FOUND,  "In uw Systeem is al een %s gevonden!\n"                },
+{ TXT_SCSI_ADAPTER,   "SCSI-Adapter"                                          },
+{ TXT_ANOTHER_MOD,    "Wilt U nog een Module laden?"                          },
+{ TXT_ERROR_FTP,      "Fout bij het aanspreken van de FTP-Server:\n\n%s"      },
+{ TXT_TRY_REACH_FTP,  "Probeer, de FTP-Server te bereiken..."                 },
+{ TXT_ENTER_FTPUSER,  "Vul hier de gebruikersnaam in, waarmee U  "
+                      "de FTP-Server wilt aanspreken"                         },
+{ TXT_ENTER_FTPPASSWD,"Vul hier het paswoord van de FTP-Server in"            },
+{ TXT_ENTER_FTPPROXY, "Vul hier het adres van de FTP Proxy in"                },
+{ TXT_ENTER_FTPPORT,  "Vul hier de Port van de FTP Proxy in"                  },
+{ TXT_WANT_FTPPROXY,  "Wilt U een FTP Proxy gebruiken?"                       },
+{ TXT_NOMEM_FTP,      "Voor een installatie via FTP heeft uw computer niet "
+                      "genoeg geheugen! (min. 32 MB nodig)"                   },
+{ TXT_ANONYM_FTP,     "Normaal word de FTP-Installatie via een anoniem FTP"
+                      "geinstalleerd. U heeft de Mogelijkheid, om "
+                      "een gebruikersnaam en een paswoord in te vullen.\n"
+                      "Wilt U dat?"                                           },
+{ TXT_ENTER_MODDISK,  "Plaats de  Module-Diskette"                            },
+{ TXT_MORE_MODULES,   "-- andere Modules --"                                  },
+{ TXT_INIT_PARPORT,   "Initialiseer de Parallel-Poort..."                     },
+{ TXT_ENTER_NFSPORT,  "Vul hier het nummer in van de poort, waarop de "
+                      "NFS-Server draait"                                     },
+{ TXT_INSERT_CD,      "Plaats aub CD nummer %d in uw drive!"                  }
+};

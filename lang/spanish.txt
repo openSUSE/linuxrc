@@ -1,0 +1,185 @@
+static text_t txt_spanish_atm [] =
+{
+{ TXT_OK,             "Aceptar"                                               },
+{ TXT_CANCEL,         "Atrás"                                                 },
+{ TXT_YES,            "Sí"                                                    },
+{ TXT_NO,             "No"                                                    },
+{ TXT_CHOOSE_LANGUAGE,"Por favor, escoja el idioma"                           },
+{ TXT_COLOR_DISPLAY,  "Monitor Color"                                         },
+{ TXT_MONO_DISPLAY,   "Monitor Monocromo"                                     },
+{ TXT_CHOOSE_DISPLAY, "¿Qué tipo de pantalla utiliza?"                        },
+{ TXT_MENU_LANG,      "Idioma"                                                },
+{ TXT_MENU_MODULES,   "Módulos del Kernel (Drivers)"                          },
+{ TXT_MENU_START,     "Iniciar la instalación / Sistema"                      },
+{ TXT_MENU_INFO,      "Información del sistema"                               },
+{ TXT_HDR_MAIN,       "Menú Principal"                                        },
+{ TXT_SETTINGS,       "Configuración"                                         },
+{ TXT_MENU_DISPLAY,   "Pantalla"                                              },
+{ TXT_MENU_KEYMAP,    "Teclado"                                               },
+{ TXT_LOAD_SCSI,      "Cargar driver SCSI"                                    },
+{ TXT_LOAD_CDROM,     "Cargar driver CD-ROM"                                  },
+{ TXT_LOAD_NET,       "Cargar driver de la tarjeta de red"                    },
+{ TXT_SHOW_MODULES,   "Mostrar los drivers cargados"                          },
+{ TXT_AUTO_LOAD,      "Auto detección de hardware"                            },
+{ TXT_DEL_MODULES,    "Descarga de drivers"                                   },
+{ TXT_TRY_TO_LOAD,    "Intentando cargar el driver \"%s\"...\n\n"
+                      "Durante la carga, puede observar los mensajes "
+                      "del kernel en la consola virtual 4 (ALT-F4)."          },
+{ TXT_LOAD_SUCCESSFUL,"¡El driver \"%s\" ha sido instalado correctamente!"    },
+{ TXT_LOAD_FAILED,    "¡Fallo al cargar el driver \"%s\"!"                    },
+{ TXT_CDROM,          "CD-ROM"                                                },
+{ TXT_FLOPPY,         "Disquete"                                              },
+{ TXT_NFS,            "Red (NFS)"                                             },
+{ TXT_FTP,            "Red (FTP)"                                             },
+{ TXT_HARDDISK,       "Disco duro"                                            },
+{ TXT_START_INSTALL,  "Comenzar la instalación"                               },
+{ TXT_START_RESCUE,   "Iniciar sistema de rescate"                            },
+{ TXT_LOAD_RS_NFS,    "Cargar sistema de rescate por NFS"                     },
+{ TXT_BOOT_SYSTEM,    "Iniciar el sistema instalado"                          },
+{ TXT_SEARCH_FOR_RI,  "Buscando imagen \"%s\"..."                             },
+{ TXT_RI_NOT_FOUND,   "¡No puedo encontrar la imagen!\n\n"
+                      "¡Compruebe el directorio!"                             },
+{ TXT_LOADING,        "Cargando datos en el Disco RAM"                        },
+{ TXT_INFO_KERNEL,    "Mensajes del Kernel"                                   },
+{ TXT_INFO_CPU,       "Procesador"                                            },
+{ TXT_INFO_DEVICES,   "Dispositivos"                                          },
+{ TXT_INFO_NETDEV,    "Tarjetas de red"                                       },
+{ TXT_INFO_DMA,       "DMA"                                                   },
+{ TXT_INFO_IRQS,      "Interrupciones"                                        },
+{ TXT_INFO_IOPORTS,   "Puertos I/O"                                           },
+{ TXT_INFO_MEM,       "Memoria"                                               },
+{ TXT_INFO_MODULES,   "Drivers"                                               },
+{ TXT_INFO_PCI,       "PCI"                                                   },
+{ TXT_INSERT_DISK,    "Inserte el disco y presione ENTER"                     },
+{ TXT_ERROR_READ_DISK,"¡Error mientras se leía el disco!"                     },
+{ TXT_ENTER_ROOT_FS,  "Introduzca su partición raíz (p. ej. /dev/hda1)"       },
+{ TXT_INVALID_ROOT_FS,"Dispositivo raíz no válido"                            },
+{ TXT_INVALID_INPUT,  "¡Entrada no válida!"                                   },
+{ TXT_INPUT_IPADDR,   "Introduzca su dirección IP"                            },
+{ TXT_INPUT_NETMASK,  "Introduzca su máscara de red, para una red de clase "
+                      "C, es 255.255.255.0"                                   },
+{ TXT_INPUT_GATEWAY,  "Si necesita un gateway para conectar con su servidor, "
+                      "introduzca la IP del gateway. Si no lo necesita, "
+                      "introduzca su IP."                                     },
+{ TXT_INPUT_NAMED,    "Introduzca la IP de su DNS, si no lo necesita, "
+                      "simplemente presione ESC."                             },
+{ TXT_FOUND_HOST,     "Se obtuvo la siguiente información:\n\n"
+                      "Dirección IP: %s\n"
+                      "Nombre: %s\n"
+                      "Dominio: %s"                                           },
+{ TXT_ERROR_CONF_NET, "Ocurrió un error mientras se configuraba la red. "
+                      "Posiblemente su tarjeta de red no fue reconocida por "
+                      "el kernel"                                             },
+{ TXT_INPUT_SERVER,   "Introduzca la dirección IP del servidor NFS."          },
+{ TXT_INPUT_FTPSERVER,"Introduzca la dirección del servidor FTP."             },
+{ TXT_INPUT_DIR,      "Especifique el directorio en el servidor."             },
+{ TXT_ENTER_PARAMS,   "Introduzca los parámetros para \"%s\"."                },
+{ TXT_TRY_NFS_MOUNT,  "Intentando montar el directorio\n\n\"%s:%s\"..."       },
+{ TXT_ERROR_NFSMOUNT, "Ocurrió un error mientras se montaba el directorio "
+                      "NFS.\n\nRazón proporcionada por el servidor: %s"       },
+{ TXT_CHOOSE_KEYMAP,  "Escoja un tipo de teclado.\nYaST le permitirá "    
+                      "escoger otros tipos más adelante."                      },
+{ TXT_DELETE_MODULE,  "Seleccione el driver a descargar."                     },
+{ TXT_NO_MODULES,     "¡Actualmente no hay drivers cargados!"                 },
+{ TXT_AUTO_RUNNING,   "Autodetectando (%s)...   "                             },
+{ TXT_WANT_MORE_SCSI, "¿Desea buscar más adaptadores SCSI?"                   },
+{ TXT_WANT_MORE_NET,  "¿Desea buscar más tarjetas de red?"                    },
+{ TXT_WANT_MORE_CDROM,"¿Desea buscar más unidades de CD-ROM?"                 },
+{ TXT_NET_ETH0,       "Tarjeta de red ethernet"                               },
+{ TXT_NET_PLIP,       "Puerto paralelo"                                       },
+{ TXT_NET_TR0,        "Tarjeta de red Token Ring"                             },
+{ TXT_NET_ARC0,       "Tarjeta de red Arcnet"                                 },
+{ TXT_NET_FDDI,       "Tarjeta de red FDDI"                                   },
+{ TXT_NET_HIPPI,      "Tarjeta de red HIPPI"                                  },
+{ TXT_CHOOSE_NET,     "Escoja el dispositivo de red."                         },
+{ TXT_INPUT_PLIP_IP,  "Escriba la direccción IP del compañero PLIP.    "      },
+{ TXT_LOAD_PCMCIA,    "Cargar drivers PCMCIA"                                 },
+{ TXT_NO_PCMCIA,      "¡El chipset PCMCIA no puede detectarse automáticamente! "
+                      "Por favor, hágalo manualmente."                        },
+{ TXT_FOUND_PCMCIA,   "Se encontró el chipset PCMCIA \"%s\"!\n\nIntroduzca "
+                      "los parámetros para el driver de PCMCIA"               },
+{ TXT_PCMCIA_PARAMS,  "Escriba los parámetros específicos del chipset \"%s\"" },
+{ TXT_START_CARDMGR,  "Iniciando administrador de tarjetas..."                },
+{ TXT_PCMCIA_SUCCESS, "Los servicios PCMCIA se iniciaron satisfactoriamente." },
+{ TXT_PCMCIA_FAIL,    "¡Falló la iniciación de los servicios PCMCIA!"         },
+{ TXT_PCMCIA_ALREADY, "¡Los servicios de PCMCIA ya están inciados!"           },
+{ TXT_NO_LXRC_END,    "Sólo puede salir de Linuxrc mediante el menú\n\n"
+                      "» Iniciar la instalación / Sistema «\n\n"
+                      "Para poder hacerlo, necesita cargar algunos drivers "
+                      "que den soporte a su harware."                         },
+{ TXT_NO_CTRLC,       "¡No puede salir presionando <ctrl-c>!"                 },
+{ TXT_REMOVE_DISK,    "¡Retire el disco de la unidad ahora!"                  },
+{ TXT_EXAMPLE_PAR,    "\n\nEjemplo: "                                         },
+{ TXT_CHOOSE_SOURCE,  "Escoja el origen de los datos"                         },
+{ TXT_TRY_CD_MOUNT,   "Intentando montar el CD-ROM..."                        },
+{ TXT_ERROR_CD_MOUNT, "¡No puedo montar el CD-ROM!"                           },
+{ TXT_START_YAST,     "Iniciando YaST..."                                     },
+{ TXT_ASK_REBOOT,     "¿Desea reiniciar ahora el sistema?"                    },
+{ TXT_INSTALL_SUCCESS,"El sistema básico ha sido instalado correctamente. El "
+                      "sistema será ahora iniciado para terminar la "
+                      "instalación"                                           },
+{ TXT_ENTER_PARTITION,"Introduzca la partición (por ejemplo /dev/hda1)"       },
+{ TXT_ERROR_HD_MOUNT, "¡No puedo montar la partición especificada!"           },
+{ TXT_ENTER_HD_DIR,   "Introduzca el directorio fuente"                       },
+{ TXT_ERROR_INSTALL,  "¡Ocurrió un error durante la instalación!"             },
+{ TXT_DRIVES,         "Discos duros / CD-ROMS"                                },
+{ TXT_LITTLE_MEM,     "¡Su ordenador tiene muy poca memoria!\n\n"
+                      "Antes de aceptar este mensaje, cambie a la consola"
+                      "virtual 2 (ALT-F2) y cree y active el swapping "
+                      "(paginación)"                                          },
+{ TXT_ASK_ANIMATE,    "Animación"                                             },
+{ TXT_ASK_EXPLODE,    "Le gusta \"rebentar\" windows?\n\n¡Por supuesto! ;-)"  },
+{ TXT_NO_DRIVES,      "No se han detectado Discos duros no CD-ROM"            },
+{ TXT_MENU_EXPERT,    "Debug (experto)"                                       },
+{ TXT_FORCE_ROOTIMAGE,"Forzar imagen raíz (rootimage)"                        },
+{ TXT_NEW_ROOTIMAGE,  "Introduzca imagen raíz (rootimage)"                    },
+{ TXT_ASK_RI_FORCE,   "¿Desea que la imagen raíz (rootimage) se cargada en "
+                      "el disco RAM incluso cuando se encuentre una "
+                      "instalación válida?"                                   },
+{ TXT_ENTER_ROOTIMAGE,"Introduzca la ruta y nombre del fichero a cargar"
+                      " en el disco RAM como sistema de ficheros raíz"        },
+{ TXT_NOT_IMPLEMENTED,"¡Todavía no está implementado!"                        },
+{ TXT_NEW_INST_SYS,   "Sistema de instalación"                                },
+{ TXT_ENTER_INST_SYS, "Introduzca el directorio que contiene el sistema de "
+                      "instalación."                                          },
+{ TXT_NO_INFO_AVAIL,  "No hay información disponible."                        },
+{ TXT_PREPARE_INST,   "Preparando la instalación..."                          },
+{ TXT_START_DEMO,     "Iniciar Live CD"                                       },
+{ TXT_INSERT_LIVECD,  "Introduzca el Live CD."                                },
+{ TXT_END_REBOOT,     "Finalizar / Reiniciar"                                 },
+{ TXT_ASK_BOOTP,      "¿Configurar automáticamente vía BOOTP?"                },
+{ TXT_SEND_BOOTP,     "Enviando la petición bootp..."                         },
+{ TXT_ERROR_BOOTP,    "La configuración Bootp falló."                         },
+{ TXT_SEARCH_INFOFILE,"Buscando archivo de información (infofile)..."         },
+{ TXT_NFSPORT,        "Especifique el puerto NFS"                             },
+{ TXT_ASKING_NAMED,   "Contactando con el DNS..."                             },
+{ TXT_HOST_NOT_FOUND, "¡La máquina %s no es conocida!"                        },
+{ TXT_NET_CONFIGURED, "Su red ya está configurada. ¿Desea mantener esta "
+                      "configuración?"                                        },
+{ TXT_ASK_BREAK,      "¿Desea cancelar?"                                      },
+{ TXT_NO_NETDEVICE,   "¡No se encontró el dispositivo de red! \nCargue antes "
+                      "un driver."                                            },
+{ TXT_ALREADY_FOUND,  "¡Un %s ya se había detectado en su sistema!\n"         },
+{ TXT_SCSI_ADAPTER,   "Adaptador SCSI"                                        },
+{ TXT_ANOTHER_MOD,    "¿Desea cargar algún driver adicional?"                 },
+{ TXT_ERROR_FTP,      "Error accediendo al servidor FTP:\n\n%s"               },
+{ TXT_TRY_REACH_FTP,  "Conectando con el servidor FTP..."                     },
+{ TXT_ENTER_FTPUSER,  "Introduzca el nombre de usuario bajo el que se quiere "
+                      "conectar al servidor FTP"                              },
+{ TXT_ENTER_FTPPASSWD,"Introduzca el password para el acceso al FTP"},
+{ TXT_ENTER_FTPPROXY, "Introduzca la dirección del proxy FTP"                 },
+{ TXT_ENTER_FTPPORT,  "Introduzca el puerto del proxy FTP"                    },
+{ TXT_WANT_FTPPROXY,  "¿Desea utilizar un proxy de FTP?"                      },
+{ TXT_NOMEM_FTP,      "¡Su ordenador no dispone de la memoria necesaria para "
+                      "realizar la instalación por FTP! (32 MB RAM mínimo)"   },
+{ TXT_ANONYM_FTP,     "Normalmente la instalación por FTP, se realiza de modo "
+                      "anónimo. No obstante, existe la posibilidad de utilizar "
+                      "un nombre de usuario y un password para acceder.\n"
+                      "¿Quiere especificar uno?"                              },
+{ TXT_ENTER_MODDISK,  "Introduzca el disco de drivers"                        },
+{ TXT_MORE_MODULES,   "-- Más drivers --"                                     },
+{ TXT_INIT_PARPORT,   "Iniciando el puerto paralelo..."                       },
+{ TXT_ENTER_NFSPORT,  "Introduzca el número de puerto donde se ejecuta el "
+                      "servidor NFS"                                          },
+{ TXT_INSERT_CD,      "¡Asegúrese de que el CD número %d está en su unidad!"  }
+};

@@ -1,0 +1,85 @@
+diff -urN 2.9.7/cardmgr.c 2.9.7-suse/cardmgr.c
+--- 2.9.7/cardmgr.c	Mon Oct 13 18:37:59 1997
++++ 2.9.7-suse/cardmgr.c	Mon Oct 13 18:35:06 1997
+@@ -46,6 +46,8 @@
+ 
+ /*====================================================================*/
+ 
++#define syslog my_syslog
++
+ typedef struct socket_info_t {
+     int fd;
+     int state;
+@@ -90,7 +92,7 @@
+ #endif
+ 
+ /* Default path for pid file */
+-static char *pidfile = "/var/run/cardmgr.pid";
++char *pidfile = "/var/run/cardmgr.pid";
+ 
+ /* Default path for finding modules */
+ static char *modpath = NULL;
+@@ -490,7 +492,6 @@
+     char line[256];
+     
+     syslog(LOG_INFO, "executing: '%s'", cmd);
+-    strcat(cmd, " 2>&1");
+     f = popen(cmd, "r");
+     while (fgets(line, 255, f)) {
+ 	line[strlen(line)-1] = '\0';
+@@ -563,7 +564,7 @@
+ 	if (strchr(mod, '/') != NULL)
+ 	    sprintf(path, "%s/%s.o", modpath, mod);
+ 	else
+-	    sprintf(path, "%s/pcmcia/%s.o", modpath, mod);
++	    sprintf(path, "%s/%s.o", modpath, mod);
+ 	if (access(path, R_OK) != 0) {
+ 	    syslog(LOG_INFO, "module %s not available", path);
+ 	    return -1;
+@@ -1069,7 +1070,7 @@
+ 
+ /*====================================================================*/
+ 
+-void main(int argc, char *argv[])
++void cardmgr_main(int argc, char *argv[])
+ {
+     int optch, errflg;
+     int i, max_fd, ret, event, pass;
+diff -urN 2.9.7/probe.c 2.9.7-suse/probe.c
+--- 2.9.7/probe.c	Mon Oct 13 18:38:00 1997
++++ 2.9.7-suse/probe.c	Mon Oct 13 18:35:09 1997
+@@ -323,7 +323,7 @@
+ 
+ /*====================================================================*/
+ 
+-void main(int argc, char *argv[])
++int probe_main(int argc, char *argv[])
+ {
+     int optch, errflg;
+     extern char *optarg;
+@@ -346,20 +346,20 @@
+     }
+     if (errflg || (optind < argc)) {
+ 	fprintf(stderr, "usage: %s [-t tcic_base] [-v] [-m]\n", argv[0]);
+-	exit(EXIT_FAILURE);
++	exit(-1);
+     }
+ 
+     if (verbose) printf("%s", version);
+ 
+ #ifdef CONFIG_PCI
+     if (pci_probe(verbose, module) == 0)
+-	exit(EXIT_SUCCESS);
++	return(2);
+     else
+ #endif
+     if (i365_probe(verbose, module) == 0)
+-	exit(EXIT_SUCCESS);
++	return(2);
+     else if (tcic_probe(verbose, module, tcic_base) == 0)
+-	exit(EXIT_SUCCESS);
++	return(1);
+     else
+-	exit(EXIT_FAILURE);
++	return(-1);
+ }
