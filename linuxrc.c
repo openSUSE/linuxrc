@@ -400,6 +400,7 @@ void lxrc_end()
       fclose(f);
     }
 
+    util_umount("/sys");
     util_umount("/proc/bus/usb");
     util_umount("/proc");
   }
@@ -596,8 +597,12 @@ void lxrc_init()
   umask(022);
 
   if(!config.test) {
-    if(config.had_segv) umount("/proc");
+    if(config.had_segv) {
+      umount("/sys");
+      umount("/proc");
+    }
     mount("proc", "/proc", "proc", 0, 0);
+    mount("sysfs", "/sys", "sysfs", 0, 0);
   }
 
   /* add cmdline to info file */

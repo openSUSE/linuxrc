@@ -1,3 +1,5 @@
+	- mount sysfs
+
 28/1/2004:	v1.6.0
 	- no longer includes insmod et all
 	- links instsys tree itself (used to be done in inst_setup)
