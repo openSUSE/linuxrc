@@ -849,6 +849,8 @@ void lxrc_init()
   /* file_read_info() is called in auto2_init(), too */
   if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
 
+  set_activate_language(config.language);
+
   if(config.had_segv) {
     char buf[256];
 
@@ -867,11 +869,7 @@ void lxrc_init()
   /* after we've told the user about the last segv, turn it on... */
   config.restart_on_segv = 1;
 
-  if(!config.language && config.win) {
-    set_choose_language();
-  } else {
-    set_activate_language(config.language);
-  }
+  if(!config.language && config.win) set_choose_language();
 
   util_print_banner();
 

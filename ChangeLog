@@ -1,3 +1,6 @@
+1/6/2004:	v1.6.32
+	- always load font; the kernel default font is unusable
+
 27/5/2004:	v1.6.31
 	- code that asks for module floppies reactivated (#40904)
 	- driver update:
