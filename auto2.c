@@ -462,7 +462,7 @@ int auto2_net_dev(hd_t **hd0)
 
       config.net.configured = nc_static;
 
-      /* do bootp of there's some indication that a net install is intended
+      /* do bootp if there's some indication that a net install is intended
        * but some data are still missing
        */
       if(

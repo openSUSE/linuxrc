@@ -1,3 +1,6 @@
+28/7/2003:	v1.4.52
+	- shut down correct network interface (#27839, #28261)
+
 10/7/2003:	v1.4.51
 	- updated FAT fs detection (#27814)
 	- default to old driver update style for compatibility
