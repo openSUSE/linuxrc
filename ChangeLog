@@ -1,3 +1,6 @@
+17/9/2003:	v1.5.15
+	- look for driver updates on floppy
+
 15/9/2003:	v1.5.14
 	- leave pcmcia devices to card manager
 	- slovak translation fix

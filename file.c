@@ -434,7 +434,8 @@ int file_read_info()
   }
 
   if(!config.info.file || !strcmp(config.info.file, "default")) {
-    file = file_read_info_file("file:/info", kf_cfg);
+    file = file_read_info_file("floppy:/info", kf_cfg);
+    if(!file) file = file_read_info_file("file:/info", kf_cfg);
   }
   else {
     file = file_read_info_file(config.info.file, kf_cfg);
