@@ -349,6 +349,11 @@ void util_print_banner (void)
 
     if(!config.win) return;
 
+    uname (&utsinfo_ri);
+    if (config.linemode) {
+      printf (">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2002 SuSE Linux AG <<<\n", utsinfo_ri.release);
+        return;
+    }
     memset (&win_ri, 0, sizeof (window_t));
     win_ri.x_left = 1;
     win_ri.y_left = 1;
@@ -377,7 +382,6 @@ void util_print_banner (void)
     win_ri.style = STYLE_SUNKEN;
     win_open (&win_ri);
 
-    uname (&utsinfo_ri);
     sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2002 SuSE Linux AG <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
@@ -581,6 +585,8 @@ void util_disp_init()
 
   config.win = 1;
   disp_set_display();
+  if (config.linemode)
+    return;
   for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
   disp_cursor_off();
   util_print_banner();
@@ -589,6 +595,11 @@ void util_disp_init()
 
 void util_disp_done()
 {
+  if (config.linemode) {
+    printf("\n\n");
+    config.win = 0;
+    return;
+  }
   disp_clear_screen();
   printf("\033c");
   fflush(stdout);

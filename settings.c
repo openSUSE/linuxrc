@@ -372,7 +372,7 @@ void set_activate_language(enum langid_t lang_id)
   if(i > 0) {
     lang = set_languages_arm + i - 1;
 
-    if(!config.serial && lang->font) {
+    if(!config.serial && !config.linemode && lang->font) {
       set_font(lang->font, lang->mapscreen, NULL);
     }
   }

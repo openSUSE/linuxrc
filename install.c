@@ -151,7 +151,7 @@ int inst_start_demo()
       rc = inst_mount_nfs();
     }
     else {
-      dia_message(txt_get(TXT_INSERT_LIVECD), MSGTYPE_INFO);
+      dia_message(txt_get(TXT_INSERT_LIVECD), MSGTYPE_INFOENTER);
       rc = inst_mount_cdrom(1);
     }
 
@@ -420,7 +420,7 @@ int inst_choose_source_cb(dia_item_t di)
       error = inst_mount_cdrom(0);
       if(error) {
         sprintf(tmp, txt_get(TXT_INSERT_CD), 1);
-        dia_message(tmp, MSGTYPE_INFO);
+        dia_message(tmp, MSGTYPE_INFOENTER);
         error = inst_mount_cdrom(1);
       }
       break;
@@ -1146,7 +1146,7 @@ int inst_check_floppy()
 
   set_instmode(inst_floppy);
 
-  i = dia_message(txt_get(TXT_INSERT_DISK), MSGTYPE_INFO);
+  i = dia_message(txt_get(TXT_INSERT_DISK), MSGTYPE_INFOENTER);
   if(i) return i;
 
   for(i = -1; i < config.floppies; i++) {
@@ -1274,7 +1274,7 @@ static int inst_init_cache (void)
             close (fd_ii);
             }
         }
-    win_close (&status_ri);
+    dia_status_off (&status_ri);
     return (0);
     }
 #endif
@@ -1487,7 +1487,7 @@ int inst_update_cd()
 
   mkdir(mp, 0755);
 
-  dia_message("Please insert the Driver Update CD-ROM", MSGTYPE_INFO);
+  dia_message("Please insert the Driver Update CD-ROM", MSGTYPE_INFOENTER);
   dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
 
   hd_data = calloc(1, sizeof *hd_data);

@@ -85,7 +85,13 @@ struct {
   { di_info_interrupts, TXT_INFO_IRQS    },
   { di_info_devices,    TXT_INFO_DEVICES },
   { di_info_netdev,     TXT_INFO_NETDEV  },
-  { di_info_dma,        TXT_INFO_DMA     }
+  { di_info_dma,        TXT_INFO_DMA     },
+
+  { di_extras_info,     0, "Show config"    },
+  { di_extras_change,   0, "Change config"  },
+  { di_extras_command,  0, "Run command"    },
+  { di_extras_quit,     0, "Quit linuxrc"   }
+
 };
 
 
@@ -153,6 +159,72 @@ int dia_okcancel(char *txt, int def)
   }
 }
 
+static int dia_readnum()
+{
+  int c, n = 0, first = 1;
+  for (;;)
+    {
+      c = getchar();
+      if (c == '\r' || c == '\n' || c == EOF)
+	return n;
+      if (first && (c == 'x' || c == 033))
+	{
+	  n = c == 'x' ? -c : 0;
+	  c = getchar();
+          if (c == '\r' || c == '\n' || c == EOF)
+	    return n;
+	  c = 0;
+	}
+      if (c < '0' || c > '9')
+	{
+          while ((c = getchar()) != '\r' && c != '\n' && c != EOF)
+	    ;
+	  return -1;
+	}
+      n = n * 10 + (c - '0');
+      first = 0;
+    }
+}
+
+static int dia_printformatted(char *txt, int l, int width, int withnl)
+{
+  int i, j, r = 0;
+
+  if (l == 0)
+    l = strlen(txt);
+  while (l > 0 && txt[l - 1] == ' ')
+    l--;
+  for (j = 0; j < l; )
+    {
+      while(txt[j] == ' ' && j < l)
+	j++;
+      for (i = 0; i < width; i++)
+	if (i + j == l || txt[i + j] == '\n')
+	  break;
+      if (i == width)
+	{
+	  while (--i > 0 && txt[i + j] != ' ')
+	    ;
+	  if (i == 0)
+	    i = width - 1;
+	}
+      r = i;
+      while (i-- > 0)
+	putchar(txt[j++]);
+      if (j < l)
+	{
+	  putchar('\n');
+          if (txt[j] == '\n')
+	    j++;
+	}
+      i = 0;
+    }
+  if (withnl)
+    putchar('\n');
+  return withnl ? 0 : r;
+}
+
+
 /*
  * Show dialog with two buttons; returns the botton that was selected.
  */
@@ -164,6 +236,24 @@ int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
   int width, answer;
   int len0, len1, len_max;
 
+  if (config.linemode)
+    {
+      int current_ii;
+
+      for (;;)
+	{
+	  putchar('\n');
+	  dia_printformatted(txt, 0, max_x_ig - 1, 1);
+	  putchar('\n');
+	  printf("1) %s\n", button0_txt);
+	  printf("2) %s\n", button1_txt);
+	  printf("\n> ");fflush(stdout);
+	  current_ii = dia_readnum();
+	  if (current_ii < 0 || current_ii > 2)
+	    continue;
+	  return current_ii - 1;
+	}
+    }
   disp_toggle_output(DISP_OFF);
   memset(&win, 0, sizeof win);
   win.bg_color = colors_prg->choice_win;
@@ -199,6 +289,21 @@ int dia_message (char *txt_tv, int msgtype_iv)
     int       key_ii;
     char *s;
 
+    if (config.linemode)
+      {
+	putchar('\n');
+	if (msgtype_iv == MSGTYPE_ERROR)
+	  printf("*** ");
+        dia_printformatted(txt_tv, 0, max_x_ig - 5, 1);
+	if (msgtype_iv == MSGTYPE_INFOENTER)
+	  {
+	    int c;
+	    do
+	      c = getchar();
+	    while (c != '\n' && c != '\r' && c != EOF);
+	  }
+	return 0;
+      }
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
     memset (&win_ri, 0, sizeof (window_t));
@@ -282,6 +387,44 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     char *s0, *s1;
 
 
+    if (config.linemode)
+      {
+	int i;
+	char *p;
+
+        for (;;)
+	  {
+	    putchar('\n');
+	    dia_printformatted(head_tv, 0, max_x_ig - 1, 1);
+	    putchar('\n');
+	    for (i = 0; i < nr_items_iv; i++)
+	      {
+	        for (p = items_arv[i].text; *p == ' '; p++)
+		  ;
+	        printf(nr_items_iv >= 10 ? "%2d) %s\n" : "%d) %s\n", i + 1, p);
+	      }
+	    printf("\n> ");fflush(stdout);
+	    current_ii = dia_readnum();
+	    if (current_ii == -'x')
+	      dia_handle_ctrlc ();
+	    if (current_ii < 0 || current_ii > nr_items_iv)
+	      continue;
+	    current_ii--;
+	    if (current_ii == -1)
+	      break;
+	    if (items_arv[current_ii].func)
+	      {
+		i_ii = items_arv[current_ii].di ? : current_ii + 1;
+		rc_ii = items_arv[current_ii].func(i_ii);
+		if (rc_ii == -1)
+		  current_ii = -1;
+		else if (rc_ii)
+		  continue;
+	      }
+	    break;
+	  }
+	return current_ii + 1;
+      }
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
     width_ii = strlen (head_tv) + 6;
@@ -593,7 +736,7 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     window_t  tmp_win_ri;
     char      tmp_txt_ti [STATUS_SIZE + 1];
 
-    if(!config.win) { printf("%s", txt_tv); return; }
+    if(!config.win || config.linemode) { printf("%s", txt_tv); return; }
 
     disp_toggle_output (DISP_OFF);
     strncpy (tmp_txt_ti, txt_tv, STATUS_SIZE);
@@ -651,7 +794,7 @@ void dia_status (window_t *win_prv, int percent_iv)
     int  i_ii;
     static unsigned count = 0;
 
-    if(!config.win) {
+    if(!config.win || config.linemode) {
       if(percent_iv >= 100) {
         printf(".");
       }
@@ -675,6 +818,15 @@ void dia_status (window_t *win_prv, int percent_iv)
     fflush (stdout);
     }
 
+void dia_status_off (window_t *win_prv)
+{
+    if(!config.win || config.linemode) {
+      printf("\n");
+      fflush(stdout);
+      return;
+    }
+  win_close(win_prv);
+}
 
 int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
     {
@@ -683,7 +835,53 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
     window_t  tmp_win_ri;
     int       rc_ii;
 
+    if (config.linemode)
+      {
+	int i, c;
 
+	putchar('\n');
+	i = strlen(txt_tv);
+	if (i > 0 && txt_tv[i - 1] == '.')
+	  i--;
+	c = i = dia_printformatted(txt_tv, i, max_x_ig - 1, 0);
+	if (*input_tr)
+	  i += strlen(input_tr) + 3;
+	if (i > max_x_ig - fieldlen_iv - 2)
+	  {
+	    putchar('\n');
+	    c = 0;
+	  }
+	if (*input_tr)
+	  printf(" [%s]> " + (c == 0), input_tr);
+        else
+	  printf("> ");
+	fflush(stdout);
+	for (i = 0; ; i++)
+	  {
+	    c = getchar();
+	    if (c == '\n' || c == '\r' || c == EOF)
+	      {
+		if (i == 0)
+		  break;
+	        input_tr[i < len_iv - 1 ? i : len_iv - 1] = 0;
+	        break;
+	      }
+	    if (i == 0 && c == 033)
+	      {
+		c = getchar();
+		if (c == '\n' || c == '\r' || c == EOF)
+		  return -1;
+	      }
+	    if ((unsigned char)c < ' ')
+	      {
+		i--;
+		continue;
+	      }
+	    if (i < len_iv - 1)
+	      input_tr[i] = c;
+	  }
+	return 0;
+      }
     disp_toggle_output (DISP_OFF);
     memset (&win_ri, 0, sizeof (window_t));
     win_ri.bg_color = colors_prg->input_win;
@@ -734,6 +932,20 @@ int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
 
     if (!nr_lines_iv || width_iv < 8)
         return (-1);
+    if (config.linemode)
+      {
+	int l;
+
+	printf("\n%s\n\n", head_tv);
+        for (i_ii = 0; i_ii < nr_lines_iv; i_ii++)
+	  {
+	    l = strlen(lines_atv[i_ii]);
+	    while (l && lines_atv[i_ii][l - 1] == ' ')
+	      l--;
+	    printf("%.*s\n", l, lines_atv[i_ii]);
+	  }
+        return 0;
+      }
 
     disp_toggle_output (DISP_OFF);
     line_length_ii = width_iv;
@@ -985,6 +1197,12 @@ void dia_info (window_t *win_prr, char *txt_tv)
     int        i_ii;
 
 
+    if (config.linemode)
+      {
+	dia_printformatted(txt_tv, 0, max_x_ig - 1, 1);
+	return;
+      }
+
     disp_toggle_output (DISP_OFF);
     width_ii = strlen (txt_tv) + 6;
     if (width_ii < MIN_WIN_SIZE)
@@ -1085,7 +1303,7 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
 
 
 void dia_handle_ctrlc (void)
-    {
+{
     int i, j;
     static int is_in_ctrlc_is = FALSE;
     static char s[64] = { };
@@ -1097,45 +1315,68 @@ void dia_handle_ctrlc (void)
 
     is_in_ctrlc_is = TRUE;
 
-    i = dia_message(txt_get(TXT_NO_CTRLC), MSGTYPE_ERROR);
-    if(i == -42) {
-      lxrc_end();
-      exit(0);
-    }
-    else if(i == -69) {
-      i = dia_input("Run Command", s, sizeof s - 1, 35, 0);
-      if(!i) {
-        if(strstr(s, "exec ") == s) {
-          t = s + 5;
-          while(isspace(*t)) t++;
-          kbd_end();	/* restore terminal settings */
-          j = execlp(t, t, NULL);
-          kbd_init();
-        }
-        else {
-          j = system(s);
-        }
-        if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
+    for (;;) {
+      if (!config.linemode) {
+	i = dia_message(txt_get(TXT_NO_CTRLC), MSGTYPE_ERROR);
+      } else {
+	static dia_item_t items[] = {
+	  di_extras_info,
+	  di_extras_change,
+	  di_extras_command,
+	  di_extras_quit,
+	  di_none
+	};
+	switch (dia_menu2("Linuxrc extras", 30, 0, items, di_extras_info)) {
+	  case di_extras_info:     i = -71; break;
+	  case di_extras_change:   i = -73; break;
+	  case di_extras_command:  i = -69; break;
+	  case di_extras_quit:     i = -42; break;
+	  default:                 i = 0; break;
+	}
       }
-    }
-    else if(i == -70) {
-      /* force segfault */
-      *((unsigned char *) NULL) = 7;
-    }
-    else if(i == -71) {
-      util_status_info();
-    }
-    else if(i == -73) {
-      i = dia_input("Change Config", s, sizeof s - 1, 35, 0);
-      if(!i) {
-        f = file_parse_buffer(s);
-        file_do_info(f);
-        file_free_file(f);
+      if(i == -42) {
+	lxrc_end();
+	exit(0);
       }
-    }
+      else if(i == -69) {
+	i = dia_input("Run Command", s, sizeof s - 1, 35, 0);
+	if(!i) {
+	  if(strstr(s, "exec ") == s) {
+	    t = s + 5;
+	    while(isspace(*t)) t++;
+	    kbd_end();	/* restore terminal settings */
+	    j = execlp(t, t, NULL);
+	    kbd_init();
+	  }
+	  else {
+	    j = system(s);
+	  }
+	  if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
+	}
+      }
+      else if(i == -70) {
+	/* force segfault */
+	*((unsigned char *) NULL) = 7;
+      }
+      else if(i == -71) {
+	util_status_info();
+      }
+      else if(i == -73) {
+	i = dia_input("Change Config", s, sizeof s - 1, 35, 0);
+	if(!i) {
+	  f = file_parse_buffer(s);
+	  file_do_info(f);
+	  file_free_file(f);
+	}
+      } else {
+	break;
+      }
 
-    is_in_ctrlc_is = FALSE;
+      if (!config.linemode)
+	break;
     }
+    is_in_ctrlc_is = FALSE;
+}
 
 
 char *dia_get_text(dia_item_t di)

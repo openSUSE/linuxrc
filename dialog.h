@@ -6,8 +6,9 @@
  *
  */
 
-#define MSGTYPE_INFO     0
-#define MSGTYPE_ERROR    1
+#define MSGTYPE_INFO      0
+#define MSGTYPE_ERROR     1
+#define MSGTYPE_INFOENTER 2
 
 typedef enum {
   di_none,	/* must be 0 */
@@ -64,7 +65,12 @@ typedef enum {
   di_info_interrupts,
   di_info_devices,
   di_info_netdev,
-  di_info_dma
+  di_info_dma,
+
+  di_extras_info,
+  di_extras_change,
+  di_extras_command,
+  di_extras_quit
 
 } dia_item_t;
 
@@ -82,6 +88,7 @@ extern int  dia_menu         (char *head_tv,     item_t items_arv [],
                               int   nr_items_iv, int    default_iv);
 extern void dia_status_on    (window_t *win_prr, char *txt_tv);
 extern void dia_status       (window_t *win_prv, int percent_iv);
+extern void dia_status_off   (window_t *win_prr);
 extern int  dia_input        (char *txt_tv, char *input_tr,
                               int len_iv, int fieldlen_iv, int pw_mode);
 extern int  dia_show_file    (char *head_tv, char *file_tv, int eof_iv);

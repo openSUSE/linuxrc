@@ -414,7 +414,8 @@ void lxrc_end()
       fprintf(stderr, "memcheck pid = %d, wait = %d\n", config.memcheck_pid, i);
     }
 
-    printf ("\033[9;15]");	/* screen saver on */
+    if (!config.linemode)
+      printf ("\033[9;15]");		/* screen saver on */
 
 /*    reboot (RB_ENABLE_CAD); */
     mod_free_modules();
@@ -696,10 +697,14 @@ void lxrc_init()
   file_read_info_file("file:/linuxrc.config", NULL);
 
   if(!config.had_segv) {
+    if (config.linemode)
+      putchar('\n');
     printf(
       ">>> %s installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n",
       config.product
     );
+    if (config.linemode)
+      putchar('\n');
     fflush(stdout);
   }
 
@@ -877,7 +882,8 @@ void lxrc_init()
 
   // auto2_chk_expert();
 
-  printf("\033[9;0]");		/* screen saver off */
+  if (!config.linemode)
+    printf("\033[9;0]");		/* screen saver off */
   fflush(stdout);
 
   info_init();

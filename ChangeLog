@@ -1,3 +1,7 @@
+10/9/2002:	v1.4.27
+	- mls: added line oriented display mode
+	- don't set serial console twice
+
 10/9/2002:	v1.4.26
 	- ensure proper display init in vnc/usessh case (#19099)
 

@@ -168,6 +168,11 @@ void disp_end (void)
     FILE *fd_pri;
     char  tty_ti [20];
 
+    if (config.linemode)
+      {
+	printf("\n\n");
+	return;
+      }
 
     disp_set_color (COL_WHITE, COL_BLACK);
     printf ("\033[2J");
@@ -249,12 +254,16 @@ void disp_set_attr (char attr_cv)
 
 void disp_cursor_off (void)
     {
+    if (config.linemode)
+        return;
     printf ("\033[?25l");
     }
 
 
 void disp_cursor_on (void)
     {
+    if (config.linemode)
+      return;
     printf ("\033[?25h");
     }
 

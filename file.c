@@ -193,7 +193,8 @@ static struct {
   { key_brokenmodules,  "BrokenModules"    },
   { key_testpivotroot,  "_TestPivotRoot"   },
   { key_scsibeforeusb,  "SCSIBeforeUSB"    },
-  { key_hostip,         "HostIP"           }
+  { key_hostip,         "HostIP"           },
+  { key_linemode,       "Linemode"         }
 };
 
 static struct {
@@ -962,9 +963,11 @@ void file_do_info(file_t *f0)
         }
         break;
 
+#if 0
       case key_console:
         if(*f->value) util_set_serial_console(f->value);
         break;
+#endif
 
       case key_product:
         if(*f->value) str_copy(&config.product, f->value);
@@ -994,6 +997,10 @@ void file_do_info(file_t *f0)
 
       case key_scsibeforeusb:
         if(f->is.numeric) config.scsi_before_usb = f->nvalue;
+        break;
+
+      case key_linemode:
+        if(f->is.numeric) config.linemode = f->nvalue;
         break;
 
       default:

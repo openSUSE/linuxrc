@@ -164,7 +164,7 @@ int mod_copy_modules(char *src_dir, int doit)
 
   if(doit == 2) {
     if(cnt) usleep(200000);
-    win_close(&win);
+    dia_status_off(&win);
   }
 
   return cnt;
@@ -988,7 +988,7 @@ int mod_load_pcmcia()
       dia_status(&status, i++);
       usleep(100000);
     }
-    win_close(&status);
+    dia_status_off(&status);
   }
 
   ok = mod_pcmcia_ok();
@@ -1169,7 +1169,7 @@ int mod_auto (int type_iv)
             i_ii++;
         }
 
-    win_close (&win_ri);
+    dia_status_off (&win_ri);
     if (success_ii)
         return (0);
     else
@@ -1304,7 +1304,7 @@ void mod_autoload (void)
         rc_ii = mod_get_ram_modules (MOD_TYPE_OTHER);
         if (rc_ii)
             {
-            win_close (&win_ri);
+            dia_status_off (&win_ri);
             return;
             }
         for (i_ii = 0; i_ii < NR_CDROM_MODULES; i_ii++)
@@ -1325,7 +1325,7 @@ void mod_autoload (void)
         }
 #endif
 
-    win_close (&win_ri);
+    dia_status_off (&win_ri);
     if (!auto_ig)
         {
         (void) dia_show_file (txt_get (TXT_INFO_KERNEL), kernellog_tg, TRUE);

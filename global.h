@@ -199,6 +199,7 @@ typedef struct {
   unsigned textmode:1;		/* start yast2 in text mode */
   unsigned debugwait:1;		/* pop up dialogs at some critical points */
   unsigned manual:1;		/* manual mode */
+  unsigned linemode:1;		/* line mode */
   unsigned ask_language:1;	/* let use choose language  */
   unsigned ask_keytable:1;	/* let user choose keytable */
   unsigned activate_storage:1;	/* load all storage modules */

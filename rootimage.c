@@ -411,7 +411,7 @@ int load_image(char *file_name, instmode_t mode)
   net_close(fd_read);
   ramdisk_close(image.rd);
 
-  win_close(&root_status_win_rm);
+  dia_status_off(&root_status_win_rm);
 
   if(err) {
     fprintf(stderr, "error loading ramdisk\n");

@@ -70,6 +70,14 @@ void kbd_init (void)
 
     tcgetattr (kbd_tty_im, &kbd_norm_tio_rm);
     kbd_tio_rm = kbd_norm_tio_rm;
+    if (config.linemode)
+        {
+	kbd_tio_rm.c_lflag &= ~ISIG;
+	tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
+	max_x_ig = 80;
+	max_y_ig = 24;
+	return;
+	}
     kbd_tio_rm.c_cc [VMIN] = 1;
     kbd_tio_rm.c_cc [VTIME] = 0;
     kbd_tio_rm.c_lflag &= ~(ECHO | ICANON | ISIG);

@@ -169,13 +169,6 @@ void win_open (window_t *win_prr)
 
 void win_close (window_t *win_prr)
     {
-    if (!config.win)
-        {
-        printf ("\n");
-        fflush (stdout);
-        return;
-        }
-
     if (win_prr->save_bg)
         disp_restore_area (win_prr, DISP_RESTORE_IMPLODE);
     }
