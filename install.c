@@ -77,7 +77,7 @@ static int   inst_do_ftp              (void);
 static int   inst_do_http             (void);
 static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
-static void choose_dud(char **dev);
+static int choose_dud(char **dev);
 // static int dud_probe_cdrom(char **dev);
 // static int dud_probe_floppy(char **dev);
 static void  inst_swapoff             (void);
@@ -1561,9 +1561,9 @@ int inst_update_cd()
 
   config.update.shown = 1;
 
-  choose_dud(&dev);
+  if(choose_dud(&dev)) return 1;
 
-  if(!dev) return 1;
+  if(!dev) return 0;
 
   util_fstype(long_dev(dev), &module);
   if(module) mod_modprobe(module, NULL);
@@ -1620,11 +1620,15 @@ int inst_update_cd()
 /*
  * Let user enter a device for driver updates
  * (*dev = NULL if she changed her mind).
+ *
+ * return values:
+ *  0    : ok
+ *  1    : abort
  */
-void choose_dud(char **dev)
+int choose_dud(char **dev)
 {
   int i, j, item_cnt, last_item, dev_len, item_width;
-  int sort_cnt;
+  int sort_cnt, err = 0;
   char *s, *s1, *s2, *s3, *buf = NULL, **items, **values;
   hd_data_t *hd_data;
   hd_t *hd, *hd1;
@@ -1799,9 +1803,14 @@ void choose_dud(char **dev)
           dia_message(txt_get(TXT_DUD_INVALID_DEVICE), MSGTYPE_ERROR);
         }
       }
+      else {
+        err = 1;
+      }
     }
   }
-
+  else {
+    err = 1;
+  }
 
   for(i = 0; i < item_cnt; i++) { free(items[i]); free(values[i]); }
   free(items);
@@ -1814,68 +1823,9 @@ void choose_dud(char **dev)
   free(hd_data);
 
   // fprintf(stderr, "dud dev = %s\n", *dev);
+
+  return err;
 }
-
-
-#if 0
-/*
- * Look for cdrom drives. Returns number of devices found (0, 1, many).
- */
-int dud_probe_cdrom(char **dev)
-{
-  window_t win;
-  int cnt = 0;
-
-  if(dev) *dev = NULL;
-
-  dia_info(&win, txt_get(TXT_SEARCH_CDROM));
-
-  util_update_cdrom_list();
-
-  if(!config.cdroms) {
-    load_storage_mods();
-    util_update_cdrom_list();		/* probably not needed */
-  }
-
-  if(!config.cdroms) {
-    win_close(&win);
-    dia_message(txt_get(TXT_NO_CDROM), MSGTYPE_ERROR);
-  }
-  else {
-    win_close(&win);
-    if(dev)  *dev = config.cdroms->key;
-    cnt = config.cdroms->next ? 2 : 1;
-  }
- 
-  return cnt;
-}
-
-
-/*
- * Look for floppy disks. Returns number of disks found.
- */
-int dud_probe_floppy(char **dev)
-{
-  window_t win;
-  int cnt = 0;
-
-  if(dev) *dev = NULL;
-
-  dia_info(&win, txt_get(TXT_SEARCH_FLOPPY));
-
-  if(!auto2_find_floppy()) {
-    win_close(&win);
-    dia_message(txt_get(TXT_NO_FLOPPY), MSGTYPE_ERROR);
-  }
-  else {
-    win_close(&win);
-    if(dev) *dev = short_dev(config.floppy_dev[0]);
-    cnt = config.floppies;
-  }
-
-  return cnt;
-}
-#endif
 
 
 void inst_swapoff()

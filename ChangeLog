@@ -1,3 +1,5 @@
+29/9/2004:	v1.7.16
+	- minor driver update dialog fix
 	- s390: enhanced IUCV parameter description (bug #42789)
 
 28/9/2004:	v1.7.15
