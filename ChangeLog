@@ -1,3 +1,6 @@
+8/10/2002:	v1.4.35
+	- skip LS120 detection on ppc (#12514)
+
 7/10/2002:	v1.4.34
 	- get info.txt (#18504)
 	- don't ask for netdevices if one was explictly given (#20625)
