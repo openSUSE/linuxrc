@@ -208,6 +208,7 @@ typedef struct {
   unsigned vnc:1;		/* vnc mode */
   unsigned usessh:1;		/* ssh mode */
   unsigned pivotroot:1;		/* use pivotroot system call */
+  unsigned testpivotroot:1;	/* test pivotroot */
   unsigned addswap:1;		/* offer to add swap if yast needs it */
   unsigned fullnetsetup:1;	/* offer all network protocols */
   unsigned aborted:1;		/* yast did abort the installation */

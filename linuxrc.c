@@ -54,6 +54,10 @@
 #define SIGNAL_ARGS	int signum, struct sigcontext scp
 #endif
 
+#ifndef DIET
+#define pivot_root(a, b) syscall(SYS_pivot_root, a, b)
+#endif
+
 static void lxrc_main_menu     (void);
 static void lxrc_catch_signal_11(SIGNAL_ARGS);
 static void lxrc_catch_signal  (int signum);
@@ -64,6 +68,7 @@ static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int do_not_kill         (char *name);
 static void save_environment   (void);
+static void lxrc_change_root   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
@@ -349,55 +354,47 @@ static void save_environment (void)
 	memcpy (saved_environment, environ, i * sizeof (char *));
 }
 
-#ifdef USE_LXRC_CHANGE_ROOT
-void lxrc_change_root (void)
+
+void lxrc_change_root()
 {
+  int i;
   char *new_mp;
 
   if(config.test) return;
 
   new_mp = config.demo ? ".mnt" : "mnt";
 
-#ifdef SYS_pivot_root
-  umount ("/mnt");
+  umount("/mnt");
   util_mount_ro(config.new_root, "/mnt");
-  chdir ("/mnt");
-  if (
-#ifndef DIET
-      /* XXX Until glibc is fixed to provide pivot_root. */
-      syscall (SYS_pivot_root, ".", new_mp)
-#else
-      pivot_root (".", new_mp)
-#endif
-      == 0)
-    {
-#if 0
-      close (0); close (1); close (2);
-      chroot (".");
-      execve ("/sbin/init", config.argv, saved_environment ? : environ);
-#endif
-      int i;
+  chdir("/mnt");
 
-      for(i = 0; i < 20 ; i++) close(i);
-      chroot(".");
-      if(config.demo) {
-        execve("/sbin/init", config.argv, saved_environment ? : environ);
-      }
-      else {
-        execl("/bin/umount", "umount", "/mnt", NULL);
-      }
+  if(!pivot_root(".", new_mp)) {
+    fprintf(stderr, "pivot_root ok\n");
+    for(i = config.testpivotroot ? 3 : 0; i < 20 ; i++) close(i);
+    chroot(".");
+    if(config.testpivotroot) {
+      freopen(config.console, "r", stdin);
+      freopen(config.console, "a", stdout);
+      freopen(config.console, "a", stderr);
+      execl("/bin/sh", "sh", NULL);
     }
     else {
-      chdir ("/");
-      umount ("/mnt");
+      execl("/bin/umount", "umount", "/mnt", NULL);
     }
-#endif
+  }
+  else {
+    chdir("/");
+    umount("/mnt");
+    fprintf(stderr, "pivot_root failed\n");
+    deb_wait;
+  }
 }
-#endif
 
-void lxrc_end (void)
-    {
-    int i;
+
+void lxrc_end()
+{
+  int i;
+  FILE *f;
 
     if(config.netstop) {
       util_debugwait("shut down network");
@@ -432,19 +429,24 @@ void lxrc_end (void)
 
     util_debugwait("leaving now");
 
-    if(!config.test) {
-      (void) util_umount ("/proc/bus/usb");
-      (void) util_umount ("/proc");
-    }
-    disp_cursor_on ();
-    kbd_end ();
-    disp_end ();
-#ifdef USE_LXRC_CHANGE_ROOT
-    if (config.new_root)
-      lxrc_change_root();
-#endif
+  if(!config.test) {
+    if(config.new_root && config.pivotroot) {
+      // tell kernel root is /dev/ram0, prevents remount after initrd
+      if(!(f = fopen ("/proc/sys/kernel/real-root-dev", "w"))) return;
+      fprintf(f, "256\n");
+      fclose(f);
     }
 
+    util_umount("/proc/bus/usb");
+    util_umount("/proc");
+  }
+
+  disp_cursor_on ();
+  kbd_end ();
+  disp_end ();
+
+  if(config.new_root && config.pivotroot) lxrc_change_root();
+}
 
 /*
  * Check if pid is either portmap or rpciod.

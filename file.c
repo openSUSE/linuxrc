@@ -190,7 +190,8 @@ static struct {
   { key_linuxrcstderr,  "LinuxrcSTDERR"    },
   { key_comment,        "#"                },
   { key_kbdtimeout,     "KBDTimeout"       },
-  { key_brokenmodules,  "BrokenModules"    }
+  { key_brokenmodules,  "BrokenModules"    },
+  { key_testpivotroot,  "_TestPivotRoot"   }
 };
 
 static struct {
@@ -842,6 +843,10 @@ void file_do_info(file_t *f0)
 
       case key_usepivotroot:
         if(f->is.numeric) config.pivotroot = f->nvalue;
+        break;
+
+      case key_testpivotroot:
+        if(f->is.numeric) config.testpivotroot = f->nvalue;
         break;
 
       case key_fullnetsetup:

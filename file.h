@@ -35,7 +35,7 @@ typedef enum {
   key_setupnetif, key_netconfig, key_usessh, key_noshell, key_memcheck,
   key_hwdetect, key_floppydevice, key_cdromdevice, key_consoledevice,
   key_product, key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
-  key_brokenmodules
+  key_brokenmodules, key_testpivotroot
 } file_key_t;
 
 typedef struct file_s {
