@@ -935,7 +935,7 @@ char *auto2_xserver(char **version, char **busid)
 
   xf86_ver[0] = c;
   xf86_ver[1] = 0;
-  strcpy(display, c == '3' ? "VGA16" : "vga");
+  strcpy(display, c == '3' ? "FBDev" : "fbdev");
 
   return display;
 }
