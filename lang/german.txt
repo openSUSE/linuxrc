@@ -33,7 +33,7 @@ static text_t txt_german_atm [] =
 { TXT_NFS,            "Netzwerk (NFS)"                                        },
 { TXT_FTP,            "Netzwerk (FTP)"                                        },
 { TXT_HARDDISK,       "Festplatte"                                            },
-{ TXT_START_INSTALL,  "Installation starten"                                  },
+{ TXT_START_INSTALL,  "Installation/Update starten"                           },
 { TXT_START_RESCUE,   "Rettungssystem starten"                                },
 { TXT_LOAD_RS_NFS,    "Rettungssystem via NFS laden"                          },
 { TXT_BOOT_SYSTEM,    "Installiertes System booten"                           },
