@@ -293,6 +293,9 @@ void set_choose_keytable (int always_show)
         return;
         }
 
+    if ((auto2_ig || auto_ig) && !always_show)
+        return;
+
     util_create_items (items_ari, keymaps, width_ii);
     for (i_ii = 0; i_ii < keymaps; i_ii++)
         {
