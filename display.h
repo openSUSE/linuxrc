@@ -85,3 +85,4 @@ extern void disp_refresh_char   (int x_iv, int y_iv);
 extern void disp_set_display    (void);
 extern void disp_restore_screen (void);
 extern void disp_clear_screen   (void);
+
