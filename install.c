@@ -753,9 +753,8 @@ int inst_check_instsys()
 #endif
 
       if(
-        config.rescue ||
-        force_ri_ig ||
-        !(util_is_mountable(filename) || util_is_dir(filename))
+        (config.rescue || force_ri_ig || !util_is_mountable(filename)) &&
+        !util_is_dir(filename)
       ) {
         config.use_ramdisk = 1;
       }
