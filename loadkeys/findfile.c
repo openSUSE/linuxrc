@@ -24,7 +24,7 @@ FILE *findfile(char *fnam, char **dirpath, char **suffixes) {
 }
 
 char *
-xstrdup(char *p) {
+xxstrdup(char *p) {
         char *q = strdup(p);
         if (q == NULL) {
                 fprintf(stderr, "Out of Memory?\n");

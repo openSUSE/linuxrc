@@ -86,4 +86,6 @@ int             usb_ig = 0;
 char            *usb_mods_ig = NULL;
 int             found_suse_cd_ig = FALSE;
 int             do_disp_init_ig = TRUE;
+char            xkbrules_tg [20] = "";
 char            xkbmodel_tg [20] = "";
+char            xkblayout_tg [20] = "";

@@ -119,6 +119,7 @@ void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
   hd_t *hd;
+  driver_info_t *di;
   char *usb_mod;
   static char usb_mods[128];
   int i, j, ju, k, with_usb;
@@ -149,14 +150,17 @@ void auto2_scan_hardware(char *log_file)
   }
 
   if((usb_mod = auto2_usb_module())) {
-    if(
-      (i = mod_load_module("usbcore", NULL)) ||
-      (i = mod_load_module(usb_mod, NULL))   ||
-      (i = mod_load_module("input", NULL))   ||
-      (i = mod_load_module("hid", NULL))
-    );
-    mod_load_module("keybdev", NULL);
-    mod_load_module("mousedev", NULL);
+    i = 0;
+    if(*usb_mod) {
+      if(
+        (i = mod_load_module("usbcore", NULL)) ||
+        (i = mod_load_module(usb_mod, NULL))   ||
+        (i = mod_load_module("input", NULL))   ||
+        (i = mod_load_module("hid", NULL))
+      );
+      mod_load_module("keybdev", NULL);
+      mod_load_module("mousedev", NULL);
+    }
     k = mount (0, "/proc/bus/usb", "usbdevfs", 0, 0);
     if(!i) sleep(3);
     if(with_usb) {
@@ -175,20 +179,20 @@ void auto2_scan_hardware(char *log_file)
       has_kbd_ig = TRUE;
       j++;
       if(hd->bus == bus_usb) ju++;
-      switch(hd_cpu_arch(hd_data)) {
-        case arch_intel:
-        case arch_alpha:
-          strcpy(xkbmodel_tg, "pc104");
-          break;
-        case arch_ppc:
-          strcpy(xkbmodel_tg, hd->bus == bus_ps2 ? "pc104" : "macintosh");
-          break;
+      di = hd_driver_info(hd_data, hd);
+      if(di && di->any.type == di_kbd) {
+        if(di->kbd.XkbRules) strcpy(xkbrules_tg, di->kbd.XkbRules);
+        if(di->kbd.XkbModel) strcpy(xkbmodel_tg, di->kbd.XkbModel);
+        if(di->kbd.XkbLayout) strcpy(xkblayout_tg, di->kbd.XkbLayout);
+	/* UNTESTED !!! */
+        if(di->kbd.keymap) strcpy(keymap_tg, di->kbd.keymap);
       }
+      di = hd_free_driver_info(di);
     }
   }
 
   /* usb keyboard only ? */
-  if((j && j == ju) && usb_mod) {
+  if((j && j == ju) && usb_mod && *usb_mod) {
     sprintf(usb_mods, "usbcore %s input hid keybdev mousedev", usb_mod);
     usb_mods_ig = usb_mods;
   }
@@ -704,7 +708,14 @@ int auto2_full_libhd()
 
 char *auto2_usb_module()
 {
-  if(hd_data) usb_ig = hd_usb_support(hd_data);
+  int no_usb_mods = 0;
+
+  if(hd_data) {
+    usb_ig = hd_usb_support(hd_data);
+    if(hd_cpu_arch(hd_data) == arch_ppc) no_usb_mods = 1;
+  }
+
+  if(usb_ig && no_usb_mods) return "";
 
   return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
 }

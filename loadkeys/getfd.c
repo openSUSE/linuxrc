@@ -14,10 +14,11 @@
 
 static int
 is_a_console(int fd) {
-    long arg;
+    char arg;
 
     arg = 0;
-    return (ioctl(fd, KDGKBTYPE, &arg) == 0 && arg == KB_101);
+    return (ioctl(fd, KDGKBTYPE, &arg) == 0
+	    && ((arg == KB_101) || (arg == KB_84)));
 }
 
 static int
@@ -32,10 +33,14 @@ open_a_console(char *fnam) {
     return fd;
 }
 
-int getfd(void) {
+int getfd() {
     int fd;
 
     fd = open_a_console("/dev/tty");
+    if (fd >= 0)
+      return fd;
+
+    fd = open_a_console("/dev/tty0");
     if (fd >= 0)
       return fd;
 
@@ -47,7 +52,6 @@ int getfd(void) {
       if (is_a_console(fd))
 	return fd;
 
-    fprintf(stderr,
-	    "Couldnt get a file descriptor referring to the console\n");
+    fprintf(stderr, "Couldnt get a file descriptor referring to the console\n");
     exit(1);		/* total failure */
 }
