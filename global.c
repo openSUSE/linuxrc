@@ -50,7 +50,11 @@ int             force_ri_ig = FALSE;
 int             ramdisk_ig = FALSE;
 int             explode_win_ig = TRUE;
 int             auto_ig = FALSE;
+#if defined(__PPC__)
+int             auto2_ig = TRUE;
+#else
 int             auto2_ig = FALSE;
+#endif
 int             demo_ig = FALSE;
 int             color_ig = FALSE;
 int             nfsport_ig = 0;

@@ -312,6 +312,8 @@ static void lxrc_init (void)
 #ifdef USE_LIBHD
            if (strstr (s, ",auto2,"))
                auto2_ig = TRUE;
+           if (strstr (s, ",noauto2,"))
+               auto2_ig = FALSE;
 #endif
 
            if (strstr (s, ",demo,"))

@@ -53,7 +53,6 @@ static int   inst_loopmount_im = FALSE;
 static char *inst_tmpmount_tm = "/tmp/loopmount";
 static char  inst_rescuefile_tm [MAX_FILENAME];
 static char *inst_demo_sys_tm = "/suse/images/cd-demo";
-// static char *inst_demo_sys_tm = "/suse/images/root";
 
 static int   inst_mount_harddisk      (void);
 static int   inst_try_cdrom           (char *device_tv);
@@ -134,38 +133,41 @@ int inst_start_demo (void)
     char   filename_ti [MAX_FILENAME];
     FILE  *file_pri;
     char   line_ti [MAX_X];
-    int    test_ii;
+    int    test_ii = FALSE;
 
+    if (!auto2_ig)
+        {
+        if (demo_ig)
+            if (!info_eide_cd_exists ())
+                {
+                rc_ii = mod_auto (MOD_TYPE_SCSI);
+                if (rc_ii || !info_scsi_cd_exists ())
+                    (void) mod_auto (MOD_TYPE_OTHER);
+                }
 
-    if (demo_ig)
-        if (!info_eide_cd_exists ())
+        if (strcmp (rootimage_tg, "test"))
+            test_ii = FALSE;
+        else
+            test_ii = TRUE;
+
+        if (test_ii)
+            rc_ii = inst_mount_nfs ();
+        else
             {
-            rc_ii = mod_auto (MOD_TYPE_SCSI);
-            if (rc_ii || !info_scsi_cd_exists ())
-                (void) mod_auto (MOD_TYPE_OTHER);
+            if (!demo_ig)
+                (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
+
+            rc_ii = inst_mount_cdrom ();
             }
 
-    if (strcmp (rootimage_tg, "test"))
-        test_ii = FALSE;
-    else
-        test_ii = TRUE;
-
-    if (test_ii)
-        rc_ii = inst_mount_nfs ();
-    else
-        {
-        if (!demo_ig)
-            (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
-
-        rc_ii = inst_mount_cdrom ();
+        if (rc_ii)
+            return (rc_ii);
         }
-
-    if (rc_ii)
-        return (rc_ii);
 
     sprintf (filename_ti, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
     if (!util_check_exist (filename_ti))
         {
+        util_disp_init();
         dia_message (txt_get (TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
         inst_umount ();
         return (-1);
@@ -173,6 +175,7 @@ int inst_start_demo (void)
 
     rc_ii = root_load_rootimage (filename_ti);
     inst_umount ();
+
     if (rc_ii)
         return (rc_ii);
 
@@ -182,7 +185,7 @@ int inst_start_demo (void)
     sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
     file_pri = fopen (filename_ti, "a");
 
-    if (test_ii)
+    if (bootmode_ig == BOOTMODE_NET)
         sprintf (line_ti, "%s:%s /S.u.S.E. nfs ro 0 0\n",
                  inet_ntoa (nfs_server_rg), server_dir_tg);
     else
