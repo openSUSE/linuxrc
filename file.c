@@ -194,7 +194,8 @@ static struct {
   { key_testpivotroot,  "_TestPivotRoot"   },
   { key_scsibeforeusb,  "SCSIBeforeUSB"    },
   { key_hostip,         "HostIP"           },
-  { key_linemode,       "Linemode"         }
+  { key_linemode,       "Linemode"         },
+  { key_updatedir,      "UpdateDir"        }
 };
 
 static struct {
@@ -572,6 +573,10 @@ void file_do_info(file_t *f0)
         net_check_address2(&config.net.hostname, 0);
         break;
 
+      case key_hostname:
+        if(*f->value) str_copy(&config.net.realhostname, f->value);
+        break;
+
       case key_netmask:
         name2inet(&config.net.netmask, f->value);
         net_check_address2(&config.net.netmask, 0);
@@ -707,7 +712,10 @@ void file_do_info(file_t *f0)
         break;
 
       case key_memloadimage:
-        if(f->is.numeric) config.memory.load_image = f->nvalue;
+        if(f->is.numeric) {
+          config.memory.load_image = f->nvalue;
+          force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
+        }
         break;
 
       case key_tmpfs:
@@ -1003,6 +1011,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.linemode = f->nvalue;
         break;
 
+      case key_updatedir:
+        if(*f->value) str_copy(&config.updatedir, f->value);
+        break;
+
       default:
         break;
     }
@@ -1192,7 +1204,12 @@ void file_write_install_inf(char *dir)
     if(s) file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, netdevice_tg);
     file_write_inet(f, key_ip, &config.net.hostname);
-    file_write_str(f, key_hostname, config.net.hostname.name);
+    if(config.net.realhostname) {
+      file_write_str(f, key_hostname, config.net.realhostname);
+    }
+    else {
+      file_write_str(f, key_hostname, config.net.hostname.name);
+    }
     file_write_inet(f, key_broadcast, &config.net.broadcast);
     file_write_inet(f, key_network, &config.net.network);
     if(config.net.pliphost.ok) {
@@ -1203,10 +1220,8 @@ void file_write_install_inf(char *dir)
     }
     file_write_inet(f, key_gateway, &config.net.gateway);
     file_write_inet(f, key_nameserver, &config.net.nameserver);
-    if(!(config.vnc || config.usessh)) {
-      file_write_inet(f, key_server, &config.net.server);
-      file_write_str(f, key_serverdir, config.serverdir);
-    }
+    file_write_inet(f, key_server, &config.net.server);
+    file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
   }
 
@@ -1250,6 +1265,7 @@ void file_write_install_inf(char *dir)
   }
 
   file_write_num(f, key_keyboard, has_kbd_ig);
+  file_write_str(f, key_updatedir, config.updatedir);
   file_write_num(f, key_yast2update, yast2_update_ig || *driver_update_dir ? 1 : 0);
 
   file_write_num(f, key_yast2serial, yast2_serial_ig);
