@@ -19,7 +19,7 @@ dep:	$(SRC) $(INC)
 	$(CC) -M $(CFLAGS) $(SRC) > .depend
 
 clean:
-	rm -f $(TARGET) *.o analyze.c loadkeys.c
+	rm -f $(TARGET) *.o analyze.c loadkeys.c *~
 
 loadkeys.o:     loadkeys.c analyze.c paths.h ksyms.h
 	$(CC) -c $(CFLAGS) $(DEFS) $<
