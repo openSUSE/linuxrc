@@ -1156,9 +1156,9 @@ int inst_execute_yast()
     rc = system("/bin/bash 2>&1");
   }
   else {
-    sprintf(cmd, "%s%s", config.instsys, config.setupcmd);
-    fprintf(stderr, "starting %s\n", cmd);
-    rc = system(cmd);
+//    sprintf(cmd, "%s%s", config.instsys, config.setupcmd);
+    fprintf(stderr, "starting %s\n", config.setupcmd);
+    rc = system(config.setupcmd);
   }
 
   if(rc) {

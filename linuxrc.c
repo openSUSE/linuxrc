@@ -411,6 +411,7 @@ void lxrc_end()
       fclose(f);
     }
 
+    util_umount("/dev/pts");
     util_umount("/sys");
     util_umount("/proc/bus/usb");
     util_umount("/proc");
@@ -609,11 +610,13 @@ void lxrc_init()
 
   if(!config.test) {
     if(config.had_segv) {
+      umount("/dev/pts");
       umount("/sys");
       umount("/proc");
     }
     mount("proc", "/proc", "proc", 0, 0);
     mount("sysfs", "/sys", "sysfs", 0, 0);
+    mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
 
   /* add cmdline to info file */
