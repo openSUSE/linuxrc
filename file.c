@@ -67,6 +67,7 @@ static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_manual_tm         = "Manual:";
 static const char  *file_txt_demo_tm           = "Demo:";
+static const char  *file_txt_reboot            = "Reboot:";
 static const char  *file_txt_reboot_wait       = "WaitReboot:";
 static const char  *file_txt_bootp_timeout_tm  = "BOOTP_TIMEOUT:";
 static const char  *file_txt_force_ri_tm       = "ForceRootimage:";
@@ -362,15 +363,10 @@ void file_write_yast_info (char *file_name)
 
     mpar_write_modparms (file_pri);
 
-#if 0
-    if (detectSMP () > 0)
-        fprintf (file_pri, "SMP: 1\n");
-    else
-        fprintf (file_pri, "SMP: 0\n");
-#endif
-
     fprintf (file_pri, "%s %d\n", file_txt_manual_tm, auto_ig || auto2_ig ? 0 : 1);
     fprintf (file_pri, "%s %d\n", file_txt_demo_tm, demo_ig);
+    if(reboot_ig)
+        fprintf (file_pri, "%s 1\n", file_txt_reboot);
 
 #ifdef USE_LIBHD
     if (mouse_dev_ig)
@@ -379,13 +375,6 @@ void file_write_yast_info (char *file_name)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_xf86_tm, mouse_type_xf86_ig);
     if (mouse_type_gpm_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
-
-#if 0
-    if (braille_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_braille_tm, braille_ig);
-    if (braille_dev_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_braille_dev_tm, braille_dev_ig);
-#endif
 
     if (*floppy_tg)
         fprintf (file_pri, "%s %s\n", file_txt_has_floppy_tm, floppy_tg);
@@ -401,34 +390,9 @@ void file_write_yast_info (char *file_name)
 
     fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
 
-#if 0
-    if (frame_buffer_mode_ig)
-        fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);
-
-    {
-      char *s, *t, *v;
-      s = auto2_xserver(&t, &v);
-      if(s && *s) {
-        fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
-        if(*t) fprintf (file_pri, "%s %s\n", file_txt_xversion_tm, t);
-        if(*v) fprintf (file_pri, "%s %s\n", file_txt_xbusid_tm, v);
-        if(x11i_tg) fprintf (file_pri, "%s %s\n", file_txt_x11i_tm, x11i_tg);
-        auto2_print_x11_opts(file_pri);
-      }
-    }
-    if(*xkbrules_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbrules_tm, xkbrules_tg);
-    if(*xkbmodel_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbmodel_tm, xkbmodel_tg);
-    if(*xkblayout_tg) fprintf (file_pri, "%s %s\n", file_txt_xkblayout_tm, xkblayout_tg);
-#endif
     if(yast2_color_ig) {
       fprintf (file_pri, "%s %06x\n", file_txt_yast2_color_tm, yast2_color_ig);
     }
-#if 0
-    {
-      char *s = getenv("probe");
-      if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);
-    }
-#endif
 
     {
       char *s;
