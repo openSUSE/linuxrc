@@ -573,6 +573,10 @@ void file_do_info(file_t *f0)
         net_check_address2(&config.net.hostname, 0);
         break;
 
+      case key_hostname:
+        if(*f->value) str_copy(&config.net.realhostname, f->value);
+        break;
+
       case key_netmask:
         name2inet(&config.net.netmask, f->value);
         net_check_address2(&config.net.netmask, 0);
@@ -1200,7 +1204,12 @@ void file_write_install_inf(char *dir)
     if(s) file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, netdevice_tg);
     file_write_inet(f, key_ip, &config.net.hostname);
-    file_write_str(f, key_hostname, config.net.hostname.name);
+    if(config.net.realhostname) {
+      file_write_str(f, key_hostname, config.net.realhostname);
+    }
+    else {
+      file_write_str(f, key_hostname, config.net.hostname.name);
+    }
     file_write_inet(f, key_broadcast, &config.net.broadcast);
     file_write_inet(f, key_network, &config.net.network);
     if(config.net.pliphost.ok) {

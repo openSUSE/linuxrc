@@ -1,6 +1,10 @@
+4/11/2002:	v1.4.39
+	- allow to set hostname (#21099)
+
 28/10/2002:	v1.4.38
 	- mount of SAMBA-device as guest does not work (#20152)
 	- linuxrc should perfom a poweroff on s390 instead a reboot (#20894)
+
 18/10/2002:	v1.4.37
 	- info.txt file was not copied for cd/nfs installs (#21064)
 

@@ -358,6 +358,7 @@ typedef struct {
     inet_t hostname;
     inet_t server;
     inet_t pliphost;
+    char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *password;
