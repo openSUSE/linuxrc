@@ -1262,7 +1262,10 @@ int inst_commit_install()
 {
   int err = 0;
 
-  if(reboot_ig) {
+  if(reboot_ig == 2) {
+    reboot(RB_POWER_OFF);
+  }
+  else if(reboot_ig) {
 
     if(config.rebootmsg) {
       disp_clear_screen();

@@ -228,6 +228,7 @@ static struct {
   { "Color",     2                  },
   { "Alt"  ,     3                  },
   { "Reboot",    1                  },
+  { "Halt",      2                  },
   { "no scheme", inst_none          },
   { "file",      inst_file          },
   { "nfs",       inst_nfs           },

@@ -1,3 +1,6 @@
+21/4/2004:	v1.6.21
+	- add root=halt feature to yast.inf (tell linuxrc to halt the machine)
+
 20/4/2004:	v1.6.20
 	- linuxrc should not have a controlling terminal (#37177)
 
