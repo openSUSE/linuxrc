@@ -498,6 +498,7 @@ int net_activate()
 
   if(!error_ii) {
     config.net.is_configured = 1;
+    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
   }
 
   return error_ii;

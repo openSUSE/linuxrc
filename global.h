@@ -414,6 +414,7 @@ typedef struct {
     int dhcp_timeout;
     int tftp_timeout;
     int bootp_wait;		/* wait this time (in s) after network setup before starting bootp */
+    int ifup_wait;		/* wait this time (in s) after network setup */
     int nfs_rsize;		/* nfs rsize mount option */
     int nfs_wsize;		/* nfs wsize mount option */
     inet_t netmask;

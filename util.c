@@ -1394,6 +1394,11 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
+  if(config.net.ifup_wait) {
+    sprintf(buf, "net config wait = %ds", config.net.ifup_wait);
+    slist_append_str(&sl0, buf);
+  }
+
   lang = current_language();
 
   sprintf(buf, "language = %s, keymap = %s", lang->locale, config.keymap ?: "");

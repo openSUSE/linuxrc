@@ -225,6 +225,7 @@ static struct {
   { key_datachan,	"DataChannel",	  kf_cfg + kf_cmd		 },
   { key_ctcprotocol,	"CTCProtocol",	  kf_cfg + kf_cmd		 },
 #endif
+  { key_netwait,        "NetWait",        kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1254,6 +1255,10 @@ int file_read_yast_inf()
 
       case key_aborted:
         config.aborted = f->nvalue;
+        break;
+
+      case key_netwait:
+        if(f->is.numeric) config.net.ifup_wait = f->nvalue;
         break;
 
       default:
