@@ -27,3 +27,4 @@ void net_dhcp_stop(void);
 
 unsigned net_config_mask(void);
 int net_get_address(char *text, inet_t *inet, int do_dns);
+char *net_if2module(char *net_if);

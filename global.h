@@ -11,6 +11,8 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
+#include "tftp.h"
+
 #include "version.h"
 
 // should be architecture dependent!
@@ -232,10 +234,11 @@ typedef struct {
     char *more_file[MAX_MODULE_TYPES];	/* file name of module archive */
     int disk[MAX_MODULE_TYPES];		/* number of module disk */
     module2_t *list;			/* list of all modules */
-    int scsi_type;		/* for historical reasons... */
+    int scsi_type;		/* for some reasons... */
     int cdrom_type;		/* dto. */
     int network_type;		/* dto. */
     int pcmcia_type;		/* dto. */
+    int fs_type;		/* dto. */
     slist_t *input_params;	/* history for module loading dialog */
     slist_t *used_params;	/* parameters that were used for insmod */
     unsigned ramdisk:1;		/* ramdisk currently mounted to dir */
@@ -250,7 +253,9 @@ typedef struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned smb_available:1;	/* set if SMB functionality is available */
+    slist_t *devices;		/* list of active network devs */
     int ftp_sock;		/* used internally by ftp code */
+    struct tftp tftp;		/* used by tftp code */
     int file_length;		/* length of currently retrieved file */
     char *error;		/* ftp/http/tftp error message, if any */
     char *domain;		/* domain name */
@@ -287,8 +292,6 @@ extern char           *bootmsg_tg;
 extern char            installdir_tg [MAX_FILENAME];
 extern char            harddisk_tg [12];
 extern char           *fstype_tg;
-extern char            scsi_tg [20];
-extern char            net_tg [20];
 extern char            netdevice_tg [20];
 extern char            cdrom_tg [20];
 extern int             pcmcia_chip_ig;

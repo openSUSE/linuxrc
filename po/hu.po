@@ -76,14 +76,6 @@ msgstr "Monitor"
 msgid "Keymap"
 msgstr "Billentyûzet kiosztás"
 
-#. TXT_LOAD_SCSI
-msgid "Load SCSI modules"
-msgstr "SCSI modulok betöltése"
-
-#. TXT_LOAD_CDROM
-msgid "Load CD-ROM modules"
-msgstr "CD-ROM modulok betöltése"
-
 #. TXT_LOAD_NET
 msgid "Load network card modules"
 msgstr "Hálozati kártya modulok betöltése"
@@ -130,14 +122,6 @@ msgstr "CD-ROM"
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Hajlékonylemez"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Hálózat (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Hálózat (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -378,10 +362,6 @@ msgstr "Kérem válasszon hálózati eszközt."
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Kérem adja meg PLIP partner IP címét."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "PCMCIA modul betöltése"
-
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
 msgstr "A PCMCIA lapkakészlet automatikus felismerése nem sikerült! Kérem adja meg az szükséges adatokat."
@@ -575,18 +555,6 @@ msgstr "Kérem helyezze be a Live CD-t."
 msgid "Exit / Reboot"
 msgstr "Kilpés / Újraindítás"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Automatikus beállítás bootp illetve DHCP szerveren keresztül?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "Bootp kérés küldése..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "a bootp beállítása nem sikerült."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Infofile keresése..."
@@ -625,14 +593,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "A %s jelenleg megtalálható a rendszerén!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "SCSI-kártya"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Kíván további modulokat betölteni?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -643,10 +603,6 @@ msgstr ""
 "Hiba történt az FTP szerver elérése közben:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Próbál csatlakozni az FTP-szerverhez..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -680,10 +636,6 @@ msgid ""
 msgstr ""
 "Általában az FTP telepítés az anonymous felhasználó nevében történik meg. Meghatározhat azonban egy felhasználót\n"
 "és egy hozzátartozó jelszót az FTP-hez. Szeretné?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Kérem helyezze be a modulok lemezt"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -754,14 +706,6 @@ msgstr "IUCV kapcsolat"
 msgid "channel attached cisco router"
 msgstr "csatornához csatolt cisco router"
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr "Hálózat (Windows Share via SMB)"
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -791,12 +735,6 @@ msgstr ""
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -839,12 +777,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -858,5 +790,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

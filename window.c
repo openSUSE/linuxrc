@@ -169,7 +169,7 @@ void win_open (window_t *win_prr)
 
 void win_close (window_t *win_prr)
     {
-    if (auto2_ig)
+    if (!config.win)
         {
         printf ("\n");
         fflush (stdout);

@@ -69,7 +69,7 @@ extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
-extern int  util_urlcat_main       (int argc, char **argv);
+extern int  util_wget_main         (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
 extern char *util_process_name     (pid_t pid);
 extern char *util_process_cmdline  (pid_t pid);
@@ -95,3 +95,4 @@ char *get_instmode_name_up(instmode_t instmode);
 
 int net_open(char *filename);
 void net_close(int fd);
+int net_read(int fd, char *buf, int len);

@@ -337,6 +337,8 @@ int auto2_cdrom_dev(hd_t **hd0)
   cdrom_info_t *ci;
 
   for(hd = hd_list(hd_data, hw_cdrom, 1, *hd0); hd; hd = hd->next) {
+    fprintf(stderr, "Checking CD: %s\n", hd->unix_dev_name);
+    
     cdrom_drives++;
     add_hd_entry(hd0, hd);
     if(
@@ -351,7 +353,7 @@ int auto2_cdrom_dev(hd_t **hd0)
       }
       else {
         if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
-          fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
+          fprintf(stderr, "Found SuSE CD in %s\n", hd->unix_dev_name);
           found_suse_cd_ig = TRUE;
           /* CD found -> try to mount it */
           i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
@@ -473,9 +475,6 @@ int auto2_net_dev(hd_t **hd0)
         config.instmode = inst_nfs;	// #### FIX: this is likely the wrong place!
       }
 
-      if(auto2_loaded_module && strlen(auto2_loaded_module) < sizeof net_tg)
-        strcpy(net_tg, auto2_loaded_module);
-
       return inst_check_instsys();
 
       return 0;
@@ -500,7 +499,7 @@ int auto2_driver_is_active(driver_info_t *di)
  */
 int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 {
-  char mod_cmd[256];
+//  char mod_cmd[256];
   driver_info_t *di, *di0;
   str_list_t *sl1, *sl2;
   hd_t *hd;
@@ -528,12 +527,15 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
             sl1 && sl2;
             sl1 = sl1->next, sl2 = sl2->next
           ) {
+#if 0
             sprintf(
               mod_cmd, "insmod %s%s%s",
               sl1->str, sl2->str ? " " : "", sl2->str ? sl2->str : ""
             );
             // fprintf(stderr, "Going to load module \"%s\"...\n", sl1->str);
             system(mod_cmd);
+#endif
+            mod_load_module(sl1->str, sl2->str);
           }
 
           /* all modules should be loaded now */
@@ -619,17 +621,20 @@ int auto2_init()
 
   auto2_chk_frame_buffer();
 
-  fprintf(stderr, "Beginning hardware probing...");
+  fprintf(stderr, "Beginning hardware probing...\n");
+  fflush(stderr);
   printf("Starting hardware detection...\n");
+  fflush(stdout);
 
   auto2_scan_hardware(NULL);
 
   printf("\r%64s\r", "");
   fflush(stdout);
-  fprintf(stderr, "Hardware probing finished.");
+  fprintf(stderr, "Hardware probing finished.\n");
+  fflush(stderr);
 
   if(!auto2_find_floppy()) {
-    fprintf(stderr, "There seems to be no floppy disk.");
+    fprintf(stderr, "There seems to be no floppy disk.\n");
   }
 
   file_read_info();
@@ -644,11 +649,8 @@ int auto2_init()
 
     if(!util_check_exist("/modules/pcmcia_core.o")) {
       char buf[256], *t;
-      int mtype;
 
       util_disp_init();
-
-      mtype = mod_get_type("pcmcia");
 
       sprintf(buf, txt_get(TXT_FOUND_PCMCIA), "i82365");
       t = strchr(buf, '\n');
@@ -660,18 +662,11 @@ int auto2_init()
         *buf = 0;
       }
 
-      if(mtype) {
-        sprintf(buf + strlen(buf), txt_get(TXT_MODDISK1), config.module.disk[mtype]);
-      }
-      else {
-        strcat(buf, txt_get(TXT_MODDISK0));
-      }
-
-      strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
+      mod_disk_text(buf + strlen(buf), config.module.pcmcia_type);
 
       j = dia_okcancel(buf, YES) == YES ? 1 : 0;
 
-      if(j) mod_add_disk(0, mtype);
+      if(j) mod_add_disk(0, config.module.pcmcia_type);
 
       util_disp_done();
     }
@@ -753,7 +748,7 @@ int auto2_find_install_medium()
   if(config.instmode == inst_cdrom || !config.instmode) {
     *cdrom_tg = 0;
 
-    deb_msg("Looking for a SuSE CD...");
+    fprintf(stderr, "Looking for a SuSE CD...\n");
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
       if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
@@ -764,7 +759,7 @@ int auto2_find_install_medium()
     for(last_idx = 0;;) {
       /* i == 1 -> try to activate another storage device */
       if(i == 1) {
-        deb_msg("Ok, that didn't work; see if we can activate another storage device...");
+        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
       }
 
       if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
@@ -1248,14 +1243,19 @@ void auto2_print_x11_opts(FILE *f)
 int auto2_ask_for_modules(int prompt, char *type)
 {
   int do_something = 0;
+  char buf[256];
+  int mtype = mod_get_type(type);
 
   if(mod_check_modules(type)) return do_something;
 
   util_disp_init();
 
-  do_something = prompt ? dia_okcancel(txt_get(TXT_ENTER_MODDISK), YES) == YES ? 1 : 0 : 1;
+  *buf = 0;
+  mod_disk_text(buf, mtype);
 
-  if(do_something) mod_add_disk(0, mod_get_type(type));
+  do_something = prompt ? dia_okcancel(buf, YES) == YES ? 1 : 0 : 1;
+
+  if(do_something) mod_add_disk(0, mtype);
 
   util_disp_done();
 

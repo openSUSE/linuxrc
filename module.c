@@ -54,7 +54,6 @@ static int       mod_menu_cb          (int what_iv);
 static int       mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
                                        int *more_pir);
 static void      mod_sort_list        (module_t modlist_parr [], int nr_modules_iv);
-static int       mod_getmoddisk       (int mod_type);
 
 
 // #define DEBUG_MODULE
@@ -169,7 +168,7 @@ int mod_copy_modules(char *src_dir, int doit)
       if(!ok) {
         if(doit) {
           sprintf(buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
-          fprintf(stderr, "%s\n", buf);
+          // fprintf(stderr, "%s\n", buf);
           system(buf);
           if(doit == 2) dia_status(&win, (cnt++ * 100) / files);
         }
@@ -209,6 +208,10 @@ void mod_init()
 {
   char tmp[256];
   module2_t *ml;
+
+  if(!config.net.devices) {
+    mod_update_netdevice_list(NULL, 1);
+  }
 
   setenv("MODPATH", config.module.dir, 1);
 
@@ -351,22 +354,19 @@ char *mod_get_title(int type)
 
   /* we have translations for these... */
   if(type) {
-    if(type == config.module.scsi_type) {
-      s = txt_get(TXT_LOAD_SCSI);
-    }
-    if(type == config.module.cdrom_type) {
-      s = txt_get(TXT_LOAD_CDROM);
-    }
     if(type == config.module.network_type) {
       s = txt_get(TXT_LOAD_NET);
     }
-    if(type == config.module.pcmcia_type) {
-      s = txt_get(TXT_LOAD_PCMCIA);
+    if(type == config.module.fs_type) {
+      s = txt_get(TXT_LOAD_FS);
+    }
+    if(type == MAX_MODULE_TYPES - 1) {
+      s = txt_get(TXT_LOAD_OTHER);
     }
   }
 
   if(!s) {
-    sprintf(buf, "Load %s modules", config.module.type_name[type]);
+    sprintf(buf, txt_get(TXT_LOAD_MODULES), config.module.type_name[type]);
     s = buf;
   }
 
@@ -507,13 +507,9 @@ int mod_add_disk(int prompt, int type)
   if(type < 0) return 0;
 
   if(prompt) {
-    i = config.module.disk[type];
-    strcpy(buf, txt_get(TXT_MODDISK0));
-    if(i) {
-      sprintf(buf, txt_get(TXT_MODDISK1), i);
-    }
-    strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
-    if(dia_message(buf, MSGTYPE_INFO) == -1) return 0;
+    *buf = 0;
+    mod_disk_text(buf, type);
+    if(dia_okcancel(buf, YES) != YES) return 0;
   }
 
   mod_free_modules();
@@ -595,10 +591,13 @@ int mod_add_disk(int prompt, int type)
 void mod_unload_module(char *module)
 {
   char cmd[300];
+  int err;
 
   sprintf(cmd, "rmmod %s", module);
-  system(cmd);
+  err = system(cmd);
   util_update_kernellog();
+
+  if(!err) mod_update_netdevice_list(module, 0);
 }
 
 
@@ -751,7 +750,7 @@ void mod_load_module_manual(char *module, int show)
 
 int mod_load_module(char *module, char *param)
 {
-  char cmd[300];
+  char buf[512];
   int err;
   char *force = config.forceinsmod ? "-f " : "";
   slist_t *sl;
@@ -765,15 +764,20 @@ int mod_load_module(char *module, char *param)
 
   if(mod_is_loaded(module)) return 0;
 
-  sprintf(cmd, "insmod %s%s ", force, module);
+  if(!config.forceinsmod) {
+    sprintf(buf, "%s/%s.o", config.module.dir, module);
+    if(!util_check_exist(buf)) return -1;
+  }
 
-  if(param && *param) strcat(cmd, param);
+  sprintf(buf, "insmod %s%s ", force, module);
 
-  fprintf(stderr, "%s\n", cmd);
+  if(param && *param) strcat(buf, param);
+
+  fprintf(stderr, "%s\n", buf);
 
   if(mod_show_kernel_im) kbd_switch_tty(4);
 
-  err = system(cmd);
+  err = system(buf);
 
   if(!err && param) {
     while(isspace(*param)) param++;
@@ -793,6 +797,8 @@ int mod_load_module(char *module, char *param)
     printf(" %s\n", rc_ii ? "failed" : "ok");
   }
 #endif
+
+  if(!err) mod_update_netdevice_list(module, 1);
 
   return err;
 }
@@ -1067,7 +1073,7 @@ void mod_autoload (void)
     /* what if there are _no_ network mods on the modules disk??? */
     if (rc_ii || !nr_modules_ii)
     {
-        if (mod_getmoddisk (MOD_TYPE_SCSI)) return;
+//        if (mod_getmoddisk (MOD_TYPE_SCSI)) return;
     }
 
     dia_status_on (&win_ri, "");
@@ -1083,8 +1089,10 @@ void mod_autoload (void)
             dia_status (&win_ri, (nr_iv++ * 100) / (NR_SCSI_MODULES + NR_NET_MODULES));
             if (!mod_try_auto (&mod_scsi_mod_arm [i_ii], &win_ri))
                 {
+#if 0
                 if (!scsi_tg [0])
                     strcpy (scsi_tg, mod_scsi_mod_arm [i_ii].module_name);
+#endif
                 sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
                          mod_scsi_mod_arm [i_ii].module_name);
                 strcat (text_ti, "\n\n");
@@ -1109,8 +1117,10 @@ void mod_autoload (void)
             dia_status (&win_ri, (nr_iv++ * 100) / (NR_SCSI_MODULES + NR_NET_MODULES));
             if (!mod_try_auto (&mod_net_mod_arm [i_ii], &win_ri))
                 {
+#if 0
                 if (!net_tg [0])
                     strcpy (net_tg, mod_net_mod_arm [i_ii].module_name);
+#endif
                 sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
                          mod_net_mod_arm [i_ii].module_name);
                 strcat (text_ti, "\n\n");
@@ -1294,26 +1304,6 @@ static void mod_sort_list (module_t modlist_parr [], int nr_modules_iv)
     }
 
 
-static int mod_getmoddisk (int mod_type)
-    {
-           char  testfile_ti [MAX_FILENAME];
-    static int   gotit_is = FALSE;
-
-    sprintf (testfile_ti, "%s/NEEDMOD", config.module.dir);
-
-    if (!gotit_is && util_check_exist (testfile_ti))
-        {
-        if (dia_message (txt_get (mod_type == MOD_TYPE_NET ? TXT_ENTER_MODDISK2 : TXT_ENTER_MODDISK), MSGTYPE_INFO) == -1)
-            return (-1);
-        else
-            gotit_is = TRUE;
-        }
-
-    return (0);
-    }
-
-
-
 int mod_pcmcia_ok()
 {
   file_t *f;
@@ -1418,3 +1408,47 @@ int mod_pcmcia_chipset()
 
   return type;
 }
+
+
+void mod_disk_text(char *buf, int type)
+{
+  if(!buf) return;
+
+  if(config.module.disk[type]) {
+    sprintf(buf + strlen(buf), txt_get(TXT_MODDISK1), config.module.disk[type]);
+  }
+  else {
+    strcat(buf, txt_get(TXT_MODDISK0));
+  }
+
+  strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
+}
+
+
+void mod_update_netdevice_list(char *module, int add)
+{
+  file_t *f0, *f;
+  slist_t *sl;
+
+  f0 = file_read_file("/proc/net/dev");
+  if(!f0) return;
+
+  if((f = f0) && (f = f->next)) {	/* skip 2 lines */
+    for(f = f->next; f; f = f->next) {
+      if(!strcmp(f->key_str, "lo")) continue;
+      if(strstr(f->key_str, "sit") == f->key_str) continue;
+      sl = slist_getentry(config.net.devices, f->key_str);
+      if(!sl && add) {
+        sl = slist_append_str(&config.net.devices, f->key_str);
+        str_copy(&sl->value, module);
+      }
+      else if(sl && !add) {
+        str_copy(&sl->key, NULL);
+        str_copy(&sl->value, NULL);
+      }
+    }
+  }
+
+  file_free_file(f0);
+}
+

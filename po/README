@@ -11,7 +11,16 @@ o How do I add a new text?
 
       add_text REISERFS 'Reiserfs file system found.'
 
-    This will define TXT_REISERFS, so don't prefix the label with TXT_!
+    This will define TXT_REISERFS; the 'TXT_' prefix is optional.
+
+o How do I remove a text that's no longer needed?
+
+  - Use the linuxrc/po/bin/rm_text script; example:
+
+      rm_text REISERFS
+
+    This will remove TXT_REISERFS; the removed lines are stored in the 'old'
+    directory.
 
 o How do I add a new language?
 

@@ -76,14 +76,6 @@ msgstr "Écran"
 msgid "Keymap"
 msgstr "Disposition du clavier"
 
-#. TXT_LOAD_SCSI
-msgid "Load SCSI modules"
-msgstr "Chargement des modules SCSI"
-
-#. TXT_LOAD_CDROM
-msgid "Load CD-ROM modules"
-msgstr "Chargement des modules du CD-ROM"
-
 #. TXT_LOAD_NET
 msgid "Load network card modules"
 msgstr "Chargement des modules de la carte réseau"
@@ -128,14 +120,6 @@ msgstr "CD-ROM"
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Disquette"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Réseau (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Réseau (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -381,10 +365,6 @@ msgstr "Sélectionnez le type de réseau que vous voulez utiliser pour l'installat
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Entrez l'adresse IP de la machine PLIP distante."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "Chargement des modules PCMCIA"
-
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
 msgstr "Impossible de détecter automatiquement le chipset PCMCIA. Spécifiez-le manuellement."
@@ -579,18 +559,6 @@ msgstr "Insérez le CD live."
 msgid "Exit / Reboot"
 msgstr "Quitter / Réamorcer"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Configuration automatique via Bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "La demande Bootp est envoyée..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "La configuration Bootp a échoué."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Recherche du fichier info..."
@@ -629,14 +597,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "Dans votre système, il a déjà été détecté un %s!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "Adaptateur SCSI"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Voulez-vous charger un autre module?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -647,10 +607,6 @@ msgstr ""
 "Erreur lors de l'accès au serveur FTP:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Tentative de joindre le serveur FTP..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -684,10 +640,6 @@ msgid ""
 msgstr ""
 "Normalement, une installation FTP se déroule via FTP anonyme. Il est cependant possible de spécifier un nom d'utilisateur et un mot de passe pour l'accès au serveur FTP.\n"
 "Voulez-vous le faire?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Insérez la disquette modules"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -758,14 +710,6 @@ msgstr "Connexion IUV"
 msgid "channel attached cisco router"
 msgstr "Routeur cisco relié au canal "
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr "Réseau (partage Windows aka SMB)"
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -797,12 +741,6 @@ msgstr ""
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
 
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
-msgstr ""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -844,12 +782,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -863,5 +795,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

@@ -76,14 +76,6 @@ msgstr "Beeldscherm"
 msgid "Keymap"
 msgstr "Toetsenbord layout"
 
-#. TXT_LOAD_SCSI
-msgid "Load SCSI modules"
-msgstr "SCSI modules laden"
-
-#. TXT_LOAD_CDROM
-msgid "Load CD-ROM modules"
-msgstr "CD-ROM modules laden"
-
 #. TXT_LOAD_NET
 msgid "Load network card modules"
 msgstr "Netwerk kaart modules laden"
@@ -128,14 +120,6 @@ msgstr "CD-ROM"
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Diskette"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Netwerk (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Netwerk (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -375,10 +359,6 @@ msgstr "Kies het netwerk apparaat aub."
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Geef het IP-adres van de PLIP-partner op."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "Laad PCMCIA modules"
-
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
 msgstr "De PCMCIA chipset kon niet automatisch worden gedetecteerd. Doe een handmatige specificatie aub."
@@ -571,18 +551,6 @@ msgstr "Plaats de Live CD aub."
 msgid "Exit / Reboot"
 msgstr "Einde / reboot"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Automatische configuratie via Bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "Bootp aanvraag wordt verzonden..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "Bootp configuratie is mislukt."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Even zoeken naar het info-bestand..."
@@ -621,14 +589,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "Een %s is al op uw systeem gevonden!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "SCSI-adapter"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Wilt u een extra module laden?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -639,10 +599,6 @@ msgstr ""
 "Fout opgetreden bij het verbinding maken met de FTP server:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Probeer verbinding te maken met de FTP server..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -676,10 +632,6 @@ msgid ""
 msgstr ""
 "Normaal wordt een FTP-installatie via een anoniem FTP gedaan. U heeft echter de mogelijkheid om een gebruikersnaam en een wachtwoord te specificeren voor de toegang tot de FTP server.\n"
 "Wilt u dit gaan doen?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Plaats de module disk aub"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -750,14 +702,6 @@ msgstr "IUCV verbinding"
 msgid "channel attached cisco router"
 msgstr "kanaal verbonden cisco router"
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr "Netwerk (Windows share aka SMB)"
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -789,12 +733,6 @@ msgstr ""
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
 
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
-msgstr ""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -836,12 +774,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -855,5 +787,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

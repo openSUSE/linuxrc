@@ -36,8 +36,6 @@ char           *bootmsg_tg = "/var/log/boot.msg";
 char            installdir_tg [MAX_FILENAME] = "/suse/inst-sys";
 char            harddisk_tg [12] = "/dev/XdaX";
 char           *fstype_tg;
-char            scsi_tg [20];
-char            net_tg [20];
 char            netdevice_tg [20] = "eth0";
 char            cdrom_tg [20];
 int             pcmcia_chip_ig = 0;

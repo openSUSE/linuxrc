@@ -775,12 +775,12 @@ int net_choose_device()
   int i, item_cnt, choice;
   char buf[MAX_X];
   file_t *f0, *f;
+  slist_t *sl;
   static int last_item = 0;
   static struct {
     char *dev;
     int name;
   } net_dev[] = {
-//    { "sit",   TXT_NET_TR0   },
     { "eth",   TXT_NET_ETH0  },
     { "veth",  TXT_NET_ETH0  },
     { "plip",  TXT_NET_PLIP  },
@@ -795,6 +795,13 @@ int net_choose_device()
   };
     
   if(auto_ig) return 0;
+
+  /* re-read - just in case... */
+  mod_update_netdevice_list(NULL, 1);
+
+  for(item_cnt = 0, sl = config.net.devices; sl; sl = sl->next) {
+    if(sl->key) item_cnt++;
+  }
 
   f0 = file_read_file("/proc/net/dev");
   if(!f0) return -1;
@@ -1156,7 +1163,7 @@ int net_dhcp()
 
   if(config.net.dhcp_active) return 0;
 
-  if(!auto2_ig) {
+  if(config.win) {
     sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");
     dia_info(&win, cmd);
   }
@@ -1228,13 +1235,13 @@ int net_dhcp()
     }
   }
 
-  win_close(&win);
+  if(config.win) win_close(&win);
 
   if(f0) {
     config.net.dhcp_active = 1;
   }
   else {
-    if(!auto2_ig) {
+    if(config.win) {
       sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
       dia_message(cmd, MSGTYPE_ERROR);
     }
@@ -1268,6 +1275,17 @@ unsigned net_config_mask()
   if(config.serverdir) u |= 0x20;
 
   return u;
+}
+
+char *net_if2module(char *net_if)
+{
+  slist_t *sl;
+
+  for(sl = config.net.devices; sl; sl = sl->next ) {
+    if(sl->key && !strcmp(sl->key, net_if)) return sl->value;
+  }
+
+  return NULL;
 }
 
 

@@ -75,16 +75,6 @@ msgstr "Skramm"
 msgid "Keymap"
 msgstr "Renkadur stokelloù ar c'hlavier"
 
-#. TXT_LOAD_SCSI
-#, fuzzy
-msgid "Load SCSI modules"
-msgstr "Kargadur ar sturier SCSI"
-
-#. TXT_LOAD_CDROM
-#, fuzzy
-msgid "Load CD-ROM modules"
-msgstr "Kargadur sturier ar CD-ROM"
-
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load network card modules"
@@ -131,14 +121,6 @@ msgstr ""
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Pladennig"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Rouedad (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Rouedad (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -389,10 +371,6 @@ msgstr "Diuzit an doare rouedad a fell deoc'h arverañ evit ar staliañ."
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Roit chomlec'h IP an urzhiataer kevatal PLIP."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "Kargañ ar molladoù PCMCIA"
-
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
@@ -600,18 +578,6 @@ msgstr "Ensoc'hit ar CD mod bev."
 msgid "Exit / Reboot"
 msgstr "Darniñ / Advoulc'hañ"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Kefluniad emgefreek dre Bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "O Kas aters Bootp..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "C'hwitet eo kefluniad Bootp."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "O klask ar restr ditour..."
@@ -650,14 +616,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "Kavet ez eus bet dija en ho reizhiad ur %s!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "Azasaer SCSI"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "C'hoant ho peus da gargañ ur mollad all?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -668,10 +626,6 @@ msgstr ""
 "Kammad war ziraeziñ ar servijer FTP:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "O klask tizhout ar servijer FTP..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -707,10 +661,6 @@ msgid ""
 msgstr ""
 "Sevenet e vez peurvuiañ ur staliadur FTP dre FTP dizanv. Bez' e c'hellit ivez, ma karit, enankañ un anv arveriad hag ur ger-tremen.\n"
 "Fellout a ra deoc'h hen ober?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Ensoc'hit ar bladennig volladoù"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -781,14 +731,6 @@ msgstr ""
 msgid "channel attached cisco router"
 msgstr ""
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr ""
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -818,12 +760,6 @@ msgstr ""
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -866,12 +802,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -885,5 +815,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

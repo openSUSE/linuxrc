@@ -277,16 +277,13 @@ int root_load_rootimage (char *infile_tv)
     else
         {
         current_block_ii = 0;
-        bytes_read_ii = read (root_infile_im, buffer_ti, BLOCKSIZE);
-        while (bytes_read_ii > 0)
+        while ((bytes_read_ii = net_read (root_infile_im, buffer_ti, BLOCKSIZE)) > 0)
             {
             rc_ii = write (root_outfile_im, buffer_ti, bytes_read_ii);
             if (rc_ii != bytes_read_ii)
                 return (-1);
 
             root_update_status (++current_block_ii);
-
-            bytes_read_ii = read (root_infile_im, buffer_ti, BLOCKSIZE);
             }
         }
 
@@ -397,13 +394,15 @@ int root_boot_system (void)
           !root_reiserfs_loaded()
         ) {
           if(!util_check_exist("modules/reiserfs.o")) {
-            char s[200];
+            char buf[256];
+            int mtype = mod_get_type("file system");
 
-            sprintf(s, "%s\n\n%s", txt_get(TXT_REISERFS), txt_get(TXT_ENTER_MODDISK));
+            sprintf(buf, "%s\n\n", txt_get(TXT_REISERFS));
+            mod_disk_text(buf + strlen(buf), mtype);
 
-            rc_ii = dia_okcancel(s, YES) == YES ? 1 : 0;
+            rc_ii = dia_okcancel(buf, YES) == YES ? 1 : 0;
 
-            if(rc_ii) mod_add_disk(0, mod_get_type("file system"));
+            if(rc_ii) mod_add_disk(0, mtype);
           }
 
           mod_load_module("reiserfs", NULL);

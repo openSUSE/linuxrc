@@ -82,6 +82,7 @@ static int   inst_mount_smb           (void);
 static int   inst_do_ftp              (void);
 static int   inst_get_ftpsetup        (void);
 static int   inst_do_http             (void);
+static int   inst_do_tftp             (void);
 static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
@@ -336,14 +337,17 @@ int inst_choose_netsource()
     di_netsource_http,
     di_netsource_nfs,
     di_netsource_smb,
+    di_netsource_tftp,
     di_none
   };
 
   inst_umount();
 
+#if 0
   config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
 
   if(!config.net.smb_available) items[3] = di_skip;
+#endif
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
@@ -360,6 +364,7 @@ int inst_choose_netsource()
 int inst_choose_netsource_cb(dia_item_t di)
 {
   int error = FALSE;
+  char buf[256];
 
   di_inst_choose_netsource_last = di;
 
@@ -369,7 +374,13 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
 
     case di_netsource_smb:
-      error = inst_mount_smb();
+      config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
+      if(!config.net.smb_available) {
+        sprintf(buf, "%s\n\n%s", txt_get(TXT_SMBDISK), txt_get(TXT_MODDISK2));
+        dia_okcancel(buf, YES);
+      }
+      config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
+      error = config.net.smb_available ? inst_mount_smb() : 1;
       break;
 
     case di_netsource_ftp:
@@ -378,6 +389,10 @@ int inst_choose_netsource_cb(dia_item_t di)
 
     case di_netsource_http:
       error = inst_do_http();
+      break;
+
+    case di_netsource_tftp:
+      error = inst_do_tftp();
       break;
 
     default:
@@ -1385,6 +1400,41 @@ int inst_do_http()
     sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
     if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
 //    if((rc = inst_get_ftpsetup())) return rc;
+
+    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
+    dia_info(&win, buf);
+    rc = net_open(NULL);
+    win_close(&win);
+
+    if(rc < 0) {
+      util_print_net_error();
+    }
+    else {
+      rc = 0;
+    }
+  }
+  while(rc);
+
+  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
+  util_truncate_dir(config.serverdir);
+
+  return 0;
+}
+
+
+int inst_do_tftp()
+{
+  int rc;
+  window_t win;
+  char buf[256];
+
+  set_instmode(inst_tftp);
+
+  if((rc = net_config())) return rc;
+
+  do {
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
 
     sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
     dia_info(&win, buf);

@@ -116,7 +116,7 @@ static struct {
   { "freeramdisk", util_freeramdisk_main },
   { "raidautorun", util_raidautorun_main },
   { "free",        util_free_main        },
-  { "urlcat",      util_urlcat_main      },
+  { "wget",        util_wget_main        },
   { "nothing",     util_nothing_main     }
 };
 #endif

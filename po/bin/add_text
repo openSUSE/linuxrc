@@ -12,6 +12,8 @@ if($ARGV[0] eq '-c') {
 $id = shift;
 @texts = @ARGV;
 
+$id =~ s/^TXT_//;
+
 $_ = join '', @texts;
 
 push @l, "# $comment\n" if $comment;

@@ -75,16 +75,6 @@ msgstr "Schermo"
 msgid "Keymap"
 msgstr "Formattazione della tastiera"
 
-#. TXT_LOAD_SCSI
-#, fuzzy
-msgid "Load SCSI modules"
-msgstr "Caricare lo SCSI-driver"
-
-#. TXT_LOAD_CDROM
-#, fuzzy
-msgid "Load CD-ROM modules"
-msgstr "Caricare CD-ROM-driver"
-
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load network card modules"
@@ -131,14 +121,6 @@ msgstr ""
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Dischetto"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Rete (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Rete (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -387,10 +369,6 @@ msgstr "Scegliete il tipo di rete che volete usare per l'installazione."
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Indicate l'indirizzo IP del PLIP-partner."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "Carica moduli PCMCIA"
-
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
@@ -597,18 +575,6 @@ msgstr "Inserite il Live-CD."
 msgid "Exit / Reboot"
 msgstr "Interruzione / Reboot"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Configurazione automatica via Bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "Bootp-Domanda viene inviata..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "Bootp-Configurazione è fallita."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Cerca l' Info-File..."
@@ -647,14 +613,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "Nel Vostro sistema è giá stato trovato un %s!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "Adattatore SCSI"
-msgstr "Adattatore SCSI"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Volete caricare un altro modulo?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -665,10 +623,6 @@ msgstr ""
 "Errore durante l'accesso all server FTP:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Prova di collegamento con il server FTP..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -704,10 +658,6 @@ msgid ""
 msgstr ""
 "Normalement, une installation FTP est réalisée via FTP anonyme. Mais il est possible de spécifier un nom d'utilisateur et un mot de passe sur le serveur FTP.\n"
 "Souhaitez-vous le faire?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Inserire il dischetto dei moduli"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -781,14 +731,6 @@ msgstr ""
 msgid "channel attached cisco router"
 msgstr "router cisco connesso a canale"
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr "Rete (Windows Share aka SMB)"
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -818,12 +760,6 @@ msgstr ""
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -866,12 +802,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -885,5 +815,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

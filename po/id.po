@@ -75,16 +75,6 @@ msgstr ""
 msgid "Keymap"
 msgstr ""
 
-#. TXT_LOAD_SCSI
-#, fuzzy
-msgid "Load SCSI modules"
-msgstr "Muatkan (load) modul SCSI"
-
-#. TXT_LOAD_CDROM
-#, fuzzy
-msgid "Load CD-ROM modules"
-msgstr "Muatkan (load) modul CD-ROM"
-
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load network card modules"
@@ -131,14 +121,6 @@ msgstr ""
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Disket"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr ""
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr ""
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -383,10 +365,6 @@ msgstr "Harap pilih network device."
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Harap berikan alamat IP partner PLIP."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "Muatkan (load ) modul PCMCIA"
-
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
@@ -592,18 +570,6 @@ msgstr "Harap masukkan Live CD."
 msgid "Exit / Reboot"
 msgstr "Selesai / Reboot"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Konfigurasi otomatis melalui bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "Mengirim permohonan (request) bootp..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "Konfigurasi bootp gagal."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Mencari infofile..."
@@ -642,14 +608,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "Sebuah %s telah ditemukan dalam sistem anda!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr ""
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Apakah anda ingin memuatkan (laod) modul tambahan ?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -660,10 +618,6 @@ msgstr ""
 "Terjadi kesalahan ketika mengakses server FTP:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Mencoba melakukan koneksi ke server FTP..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -699,10 +653,6 @@ msgid ""
 msgstr ""
 "Biasanya instalasi dengan FTP dilakukan melalui FTP anonymous.  Tetapi ada juga kemungkinan untuk memberikan nama dan password user untuk FTP server.\n"
 "Apakah anda menginginkan ini ?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Harap masukkan disket modul"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -773,14 +723,6 @@ msgstr ""
 msgid "channel attached cisco router"
 msgstr ""
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr ""
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -810,12 +752,6 @@ msgstr ""
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -858,12 +794,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -877,5 +807,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

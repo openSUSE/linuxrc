@@ -76,14 +76,6 @@ msgstr "Bildschirm"
 msgid "Keymap"
 msgstr "Tastaturbelegung"
 
-#. TXT_LOAD_SCSI
-msgid "Load SCSI modules"
-msgstr "SCSI-Treiber laden"
-
-#. TXT_LOAD_CDROM
-msgid "Load CD-ROM modules"
-msgstr "CD-ROM-Treiber laden"
-
 #. TXT_LOAD_NET
 msgid "Load network card modules"
 msgstr "Netzwerktreiber laden"
@@ -130,14 +122,6 @@ msgstr "CD-ROM"
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Diskette"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Netzwerk (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Netzwerk (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -398,10 +382,6 @@ msgstr ""
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Geben Sie bitte die IP-Adresse des PLIP-Partners ein."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "PCMCIA-Module laden"
-
 #. TXT_NO_PCMCIA
 msgid ""
 "The PCMCIA chipset could not be detected"
@@ -620,18 +600,6 @@ msgstr "Bitte legen Sie die Live-CD ein."
 msgid "Exit / Reboot"
 msgstr "Abbruch / Reboot"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Automatische Konfiguration via Bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "Bootp-Anfrage wird gesendet..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "Bootp-Konfiguration ist gescheitert."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Suche nach Info-Datei..."
@@ -674,22 +642,10 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "In Ihrem System wurde bereits ein %s gefunden!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "SCSI-Adapter"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Möchten Sie ein weiteres Modul laden?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid "Error while accessing the FTP server:\n\n%s"
 msgstr "Fehler beim Zugriff auf den FTP-Server:\n\n%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Versuche, den FTP-Server zu erreichen..."
 
 #. TXT_ENTER_FTPUSER
 msgid ""
@@ -735,10 +691,6 @@ msgstr ""
 "anonymem FTP. Sie haben jedoch auch die Möglichkeit, "
 "einen Benutzernamen und ein Passwort anzugeben.\n"
 "Möchten Sie dies tun?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Bitte legen Sie die Modul-Diskette ein"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -826,14 +778,6 @@ msgstr "IUCV-Verbindung"
 msgid "channel attached cisco router"
 msgstr "cisco-Router mit Channel-Anschluss"
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr "Netzwerk (Windows Share aka SMB)"
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -864,15 +808,6 @@ msgstr ""
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
-msgstr ""
-"Bitte legen Sie die zweite Modul-Diskette ein.\n"
-"Sie finden eine Anleitung zum Erstellen dieser Diskette in disks/LIESMICH "
-"auf der CD1 oder DVD."
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -916,12 +851,6 @@ msgid "Please choose the network protocol"
 msgstr "Wählen Sie bitte das Netzwerkprotokol"
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -936,4 +865,22 @@ msgstr "Versuche, den %s-Server zu erreichen..."
 #. TXT_NET
 msgid "Network"
 msgstr "Netzwerk"
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr "%s-Treiber laden"
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr "Dateisystemtreiber laden"
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr "Unbekannte Treiber laden"
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
+msgstr "Bitte legen Sie die Samba-Diskette ein."
 

@@ -39,3 +39,5 @@ extern int   mod_get_mod_type    (char *name_tv);
 extern void  mod_autoload        (void);
 extern int   mod_force_moddisk_im;
 extern int   mod_load_modules    (char *modules, int show);
+void mod_disk_text(char *buf, int type);
+void mod_update_netdevice_list(char *module, int add);

@@ -536,10 +536,12 @@ void util_print_net_error()
   fprintf(stderr, "%s error: %s\n", get_instmode_name(config.instmode), config.net.error);
 
   if(config.win) {
-    sprintf(txt,
-      config.instmode == inst_ftp ? txt_get(TXT_ERROR_FTP) : "Network error:\n\n%s",
-      config.net.error
-    );
+    if(config.instmode == inst_ftp) {
+      sprintf(txt, txt_get(TXT_ERROR_FTP), config.net.error);
+    }
+    else {
+      sprintf(txt, "%s network error:\n\n%s", get_instmode_name_up(config.instmode), config.net.error);
+    }
     dia_message(txt, MSGTYPE_ERROR);
   }
 }
@@ -874,11 +876,11 @@ void util_umount_driver_update()
 
 void util_status_info()
 {
-  int i;
+  int i, j;
   char *s;
   hd_data_t *hd_data;
   char *lxrc;
-  slist_t *sl0 = NULL;
+  slist_t *sl, *sl0 = NULL;
   char buf[256];
 
   hd_data = calloc(1, sizeof *hd_data);
@@ -921,11 +923,22 @@ void util_status_info()
 
   strcpy(buf, "floppies = (");
   for(i = 0; i < config.floppies; i++) {
-    sprintf(buf + strlen(buf), "%s\"%s\"%s",
+    sprintf(buf + strlen(buf), "%s%s%s",
       i ? ", " : " ",
       config.floppy_dev[i],
       i == config.floppy && config.floppies != 1 ? "*" : ""
     );
+  }
+  strcat(buf, " )");
+  slist_append_str(&sl0, buf);
+
+  strcpy(buf, "net devices = (");
+  for(i = 0, sl = config.net.devices; sl; sl = sl->next) {
+    if(!sl->key) continue;
+    j = strcmp(sl->key, netdevice_tg) ? 0 : 1;
+    sprintf(buf + strlen(buf), "%s%s%s", i ? ", " : " ", sl->key, j ? "*" : "");
+    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+    i = 1;
   }
   strcat(buf, " )");
   slist_append_str(&sl0, buf);
@@ -2333,6 +2346,7 @@ int net_open(char *filename)
   char *user, *password;
   char buf[256];
   char *instmode_name = get_instmode_name(config.instmode);
+  struct sockaddr_in sa;
 
   user = config.net.user;
   password = config.net.password;
@@ -2344,6 +2358,7 @@ int net_open(char *filename)
 
   config.net.ftp_sock = -1;
   config.net.file_length = 0;
+  memset(&config.net.tftp, 0, sizeof config.net.tftp);
 
   if(net_check_address2(&config.net.server, 1)) {
     sprintf(buf, "invalid %s server address", instmode_name);
@@ -2407,13 +2422,31 @@ int net_open(char *filename)
     }
   }
 
+  if(config.instmode == inst_tftp) {
+
+    sa.sin_addr = config.net.server.ip;
+    sa.sin_family = AF_INET;
+    fd = tftp_open(&config.net.tftp, &sa, filename ?: "", 10);
+
+    if(fd < 0) {
+      str_copy(&config.net.error, config.net.tftp.buf);
+      return fd;
+    }
+
+    if(!filename) {
+      tftp_close(&config.net.tftp);
+      return 0;
+    }
+
+  }
+
   return fd;
 }
 
 
 void net_close(int fd)
 {
-  if(fd >= 0) close(fd);
+  if(fd > 0) close(fd);
 
   if(config.instmode == inst_ftp) {
     if(config.net.ftp_sock < 0) return;
@@ -2427,7 +2460,30 @@ void net_close(int fd)
 }
 
 
-int util_urlcat_main(int argc, char **argv)
+int net_read(int fd, char *buf, int len)
+{
+  unsigned char *p;
+  int l;
+
+  if(config.instmode != inst_tftp) {
+    return read(fd, buf, len);
+  }
+
+  l = tftp_read(&config.net.tftp, &p);
+
+  if(l < 0) {
+    str_copy(&config.net.error, config.net.tftp.buf);
+  }
+  else if(l > 0) {
+    if(l > len) return -1;
+    memcpy(buf, p, l);
+  }
+
+  return l;
+}
+
+
+int util_wget_main(int argc, char **argv)
 {
   url_t *url;
   int i, j, fd = -1;
@@ -2435,7 +2491,7 @@ int util_urlcat_main(int argc, char **argv)
 
   argv++; argc--;
 
-  if(argc != 1) return fprintf(stderr, "usage: urlcat url\n"), 1;
+  if(argc != 1) return fprintf(stderr, "usage: wget url\n"), 1;
 
   url = parse_url(*argv);
 
@@ -2458,7 +2514,7 @@ int util_urlcat_main(int argc, char **argv)
   }
 
   do {
-    i = read(fd, buf, sizeof buf);
+    i = net_read(fd, buf, sizeof buf);
     j = 0;
     if(i > 0) {
       j = write(1, buf, i);

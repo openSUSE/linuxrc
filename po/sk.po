@@ -75,16 +75,6 @@ msgstr "Obrazovka"
 msgid "Keymap"
 msgstr "Klávesová mapa"
 
-#. TXT_LOAD_SCSI
-#, fuzzy
-msgid "Load SCSI modules"
-msgstr "Nahra» modul pre SCSI"
-
-#. TXT_LOAD_CDROM
-#, fuzzy
-msgid "Load CD-ROM modules"
-msgstr "Nahra» modul pre CD-ROM"
-
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load network card modules"
@@ -131,14 +121,6 @@ msgstr ""
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Disketa"
-
-#. TXT_NFS
-msgid "Network (NFS)"
-msgstr "Sie» (NFS)"
-
-#. TXT_FTP
-msgid "Network (FTP)"
-msgstr "Sie» (FTP)"
 
 #. TXT_HARDDISK
 msgid "Harddisk"
@@ -383,10 +365,6 @@ msgstr "Vyberte si sie»ové zariadenie."
 msgid "Please enter the IP address of the PLIP partner."
 msgstr "Zadajte IP-adresu ako parameter pre PLIP."
 
-#. TXT_LOAD_PCMCIA
-msgid "Load PCMCIA modules"
-msgstr "Nahratie PCMCIA modulov"
-
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
@@ -592,18 +570,6 @@ msgstr "Vo¾te Live CD."
 msgid "Exit / Reboot"
 msgstr "Koniec / Re¹tart"
 
-#. TXT_ASK_BOOTP
-msgid "Automatic configuration via bootp/DHCP?"
-msgstr "Automatická konfigurácia cez bootp/DHCP?"
-
-#. TXT_SEND_BOOTP
-msgid "Sending bootp request..."
-msgstr "Posielam bootp ¾iados»..."
-
-#. TXT_ERROR_BOOTP
-msgid "Bootp configuration failed."
-msgstr "Bootp konfigurácia zlyhala."
-
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for infofile..."
 msgstr "Hµadám info súbor..."
@@ -642,14 +608,6 @@ msgstr ""
 msgid "A %s was already found in your system!\n"
 msgstr "%s u¾ bol vo va¹om systéme nájdený!\n"
 
-#. TXT_SCSI_ADAPTER
-msgid "SCSI-Adapter"
-msgstr "SCSI-Adaptér"
-
-#. TXT_ANOTHER_MOD
-msgid "Do you want to load an additional module?"
-msgstr "Chcete nahra» ïal¹ie moduly ?"
-
 #. TXT_ERROR_FTP
 #, c-format
 msgid ""
@@ -660,10 +618,6 @@ msgstr ""
 "Chyba pri prístupe na FTP server:\n"
 "\n"
 "%s"
-
-#. TXT_TRY_REACH_FTP
-msgid "Trying to connect to the FTP server..."
-msgstr "Pokú¹am sa pripoji» na FTP server..."
 
 #. TXT_ENTER_FTPUSER
 msgid "Please enter the user name under which you want to access the FTP server"
@@ -699,10 +653,6 @@ msgid ""
 msgstr ""
 "Normálne sa in¹talácia cez FTP vykonáva pomocu anonymous FTP. Je tu v¹ak mo¾nos» ¹pecifikova» u¾vateµa a jeho heslo na FTP serveri.\n"
 "Chcete to ?"
-
-#. TXT_ENTER_MODDISK
-msgid "Please insert the modules disk"
-msgstr "Vlo¾te disk s modulami"
 
 #. TXT_MORE_MODULES
 msgid "-- More modules --"
@@ -773,14 +723,6 @@ msgstr ""
 msgid "channel attached cisco router"
 msgstr ""
 
-#. TXT_SMB
-msgid "Network (Windows Share aka SMB)"
-msgstr ""
-
-#. TXT_SMB_ENTER_SERVER
-msgid "Please enter the IP-address of the SMB server"
-msgstr ""
-
 #. TXT_SMB_ENTER_SHARE
 msgid "Please enter the share name on the SMB server"
 msgstr ""
@@ -810,12 +752,6 @@ msgstr ""
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr ""
-
-#. TXT_ENTER_MODDISK2
-msgid ""
-"Please insert the second modules disk.\n"
-"You'll find instructions on how to create it in disks/README on CD1 or DVD."
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -858,12 +794,6 @@ msgid "Please choose the network protocol"
 msgstr ""
 
 # %s is NFS, FTP, HTTP or SMB
-#. TXT_TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
-
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Please enter the IP address of the %s server."
@@ -877,5 +807,23 @@ msgstr ""
 
 #. TXT_NET
 msgid "Network"
+msgstr ""
+
+# %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s modules"
+msgstr ""
+
+#. TXT_LOAD_FS
+msgid "Load file system modules"
+msgstr ""
+
+#. TXT_LOAD_OTHER
+msgid "Load unknown modules"
+msgstr ""
+
+#. TXT_SMBDISK
+msgid "Please insert the Samba disk."
 msgstr ""
 

@@ -687,7 +687,7 @@ void file_write_inet(FILE *f, file_key_t key, inet_t *inet)
 void file_write_install_inf(char *dir)
 {
   FILE *f;
-  char file_name[256];
+  char file_name[256], *s;
 
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
@@ -708,8 +708,12 @@ void file_write_install_inf(char *dir)
   }
 
   if(*cdrom_tg) file_write_str(f, key_cdrom, cdrom_tg);
-  if(*net_tg) {
-    fprintf(f, "%s: %s %s\n", file_key2str(key_alias), netdevice_tg, net_tg);
+  if(
+    config.insttype == inst_net &&
+    *netdevice_tg &&
+    (s = net_if2module(netdevice_tg))
+  ) {
+    fprintf(f, "%s: %s %s\n", file_key2str(key_alias), netdevice_tg, s);
   }
 
   if(*ppcd_tg) {
@@ -1006,8 +1010,7 @@ file_t *file_get_cmdline(file_key_t key)
 
 void file_module_load(char *insmod_arg)
 {
-  char module[64], params[256] /*, text[256] */;
-//  window_t win;
+  char module[64], params[256];
   int i;
 
   i = sscanf(insmod_arg, "%63s %255[^\n]", module, params);
@@ -1016,25 +1019,7 @@ void file_module_load(char *insmod_arg)
 
   if(i == 1) *params = 0;
 
-#if 0
-  sprintf(text, txt_get(TXT_TRY_TO_LOAD), module);
-  dia_info(&win, text);
-#endif
-
-  if(!mod_load_module(module, params)) {
-    switch(mod_get_mod_type(module)) {
-      case MOD_TYPE_SCSI:
-        strcpy(scsi_tg, module);
-        break;
-      case MOD_TYPE_NET:
-        strcpy(net_tg, module);
-        break;
-    }
-  }
-
-#if 0
-  win_close(&win);
-#endif
+  mod_load_module(module, params);
 }
 
 
@@ -1140,6 +1125,9 @@ module2_t *file_read_modinfo(char *name)
             }
             if(!config.module.pcmcia_type && !strcasecmp(s, "pcmcia")) {
               config.module.pcmcia_type = current_type;
+            }
+            if(!config.module.fs_type && !strcasecmp(s, "file system")) {
+              config.module.fs_type = current_type;
             }
           }
         }
