@@ -209,12 +209,14 @@ int root_load_rootimage (char *infile_tv)
     int   compressed_ii;
     int32_t filesize_li;
     int   error_ii = FALSE;
-    int   socket_ii = -1;
-
 
     fprintf (stderr, "Loading Image \"%s\"%s\n", infile_tv, auto2_ig ? "" : "...");
     mod_free_modules ();
-    if (config.instmode == inst_floppy || config.instmode == inst_ftp)
+    if (
+      config.instmode == inst_floppy ||
+      config.instmode == inst_ftp ||
+      config.instmode == inst_http
+    )
         {
         if (config.instmode == inst_floppy)
             root_nr_blocks_im = (int) ((4000L * 1024L) / BLOCKSIZE);
@@ -242,22 +244,13 @@ int root_load_rootimage (char *infile_tv)
 
     dia_status_on (&root_status_win_rm, buffer_ti);
 
-    if (config.instmode == inst_ftp)
+    if (config.instmode == inst_ftp || config.instmode == inst_http)
         {
-        socket_ii = util_open_ftp (inet_ntoa (config.net.server.ip));
-        if (socket_ii < 0)
+        root_infile_im = net_open (infile_tv);
+        if (root_infile_im < 0)
             {
-            util_print_ftp_error (socket_ii);
+            util_print_net_error ();
             error_ii = TRUE;
-            }
-        else
-            {
-            root_infile_im = ftpGetFileDesc (socket_ii, infile_tv);
-            if (root_infile_im < 0)
-                {
-                util_print_ftp_error (root_infile_im);
-                error_ii = TRUE;
-                }
             }
         }
     else
@@ -273,7 +266,7 @@ int root_load_rootimage (char *infile_tv)
 
     if (error_ii)
         {
-        close (root_infile_im);
+        net_close (root_infile_im);
         close (root_outfile_im);
         win_close (&root_status_win_rm);
         return (-1);
@@ -297,14 +290,8 @@ int root_load_rootimage (char *infile_tv)
             }
         }
 
-    (void) close (root_infile_im);
-    (void) close (root_outfile_im);
-
-    if (config.instmode == inst_ftp)
-        {
-        (void) ftpGetFileDone (socket_ii);
-        ftpClose (socket_ii);
-        }
+    net_close (root_infile_im);
+    close (root_outfile_im);
 
     win_close (&root_status_win_rm);
     root_set_root (RAMDISK_2);
@@ -508,7 +495,7 @@ fd_set emptySet, readSet;
 struct timeval timeout;
 int rc;
 
-        if (config.instmode == inst_ftp)
+        if (config.instmode == inst_ftp || config.instmode == inst_http)
             {
             FD_ZERO(&emptySet);
             FD_ZERO(&readSet);
@@ -522,7 +509,7 @@ int rc;
 
             if (rc <= 0)
                 {
-                util_print_ftp_error (rc);
+                util_print_net_error ();
                 exit_code = 1;
                 insize = INBUFSIZ;
                 inptr = 1;

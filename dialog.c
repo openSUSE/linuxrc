@@ -61,11 +61,19 @@ struct {
   { di_inst_update,  0, "Driver Update CD" },
 
   { di_source_cdrom,  TXT_CDROM,    },
+  { di_source_net,    0, "Network"  },
   { di_source_nfs,    TXT_NFS,      },
-  { di_source_ftp,    TXT_FTP,      },
   { di_source_smb,    TXT_SMB,      },
+  { di_source_ftp,    TXT_FTP,      },
+  { di_source_http,   0, "Network (HTTP)" },
   { di_source_hd,     TXT_HARDDISK, },
   { di_source_floppy, TXT_FLOPPY,   },
+
+  { di_netsource_nfs,  0, "NFS"                 },
+  { di_netsource_smb,  0, "SMB (Windows Share)" },
+  { di_netsource_ftp,  0, "FTP"                 },
+  { di_netsource_http, 0, "HTTP"                },
+  { di_netsource_tftp, 0, "TFTP"                },
 
   { di_info_kernel,     TXT_INFO_KERNEL  },
   { di_info_drives,     TXT_DRIVES       },

@@ -41,11 +41,19 @@ typedef enum {
   di_inst_update,
 
   di_source_cdrom,
+  di_source_net,
   di_source_nfs,
-  di_source_ftp,
   di_source_smb,
+  di_source_ftp,
+  di_source_http,
   di_source_hd,
   di_source_floppy,
+
+  di_netsource_nfs,
+  di_netsource_smb,
+  di_netsource_ftp,
+  di_netsource_http,
+  di_netsource_tftp,
 
   di_info_kernel,
   di_info_drives,

@@ -7,6 +7,7 @@
  */
 
 
+#include <stdio.h>
 #include <netinet/in.h>
 #include <inttypes.h>
 
@@ -60,16 +61,6 @@
 /* MAX_PARAM_LEN should not be less than 256 */
 #define MAX_PARAM_LEN    256
 #define STATUS_SIZE       50
-
-#if 0
-#define BOOTMODE_FLOPPY    0
-#define BOOTMODE_CD        1
-#define BOOTMODE_NET       2
-#define BOOTMODE_HARDDISK  3
-#define BOOTMODE_FTP       4
-#define BOOTMODE_CDWITHNET 5
-#define BOOTMODE_SMB       6
-#endif
 
 #define  LXRC_DEBUG
 
@@ -263,9 +254,13 @@ typedef struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned smb_available:1;	/* set if SMB functionality is available */
+    int ftp_sock;		/* used internally by ftp code */
+    int file_length;		/* length of currently retrieved file */
+    char *error;		/* ftp/http/tftp error message, if any */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
     unsigned proxyport;		/* proxy port */
+    unsigned port;		/* port */
     inet_t netmask;
     inet_t network;
     inet_t broadcast;

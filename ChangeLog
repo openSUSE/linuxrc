@@ -1,3 +1,7 @@
+30/1/2002:	v1.3.9
+	- http mostly works
+	- updated docs
+
 28/1/2002:	v1.3.8
 	- internal changes to networking code
 	- fixed bootpc to work with dietlibc

@@ -71,14 +71,17 @@ static int   inst_prepare             (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
+static int inst_choose_netsource(void);
+static int inst_choose_netsource_cb(dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
 static int   inst_init_cache          (void);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
-static int   inst_do_ftp                 (void);
+static int   inst_do_ftp              (void);
 static int   inst_get_ftpsetup        (void);
+static int   inst_do_http             (void);
 static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
@@ -90,6 +93,7 @@ static int yast_live_cd = 0;
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
+static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
 
 int inst_auto_install (void)
     {
@@ -324,16 +328,14 @@ int inst_menu_cb(dia_item_t di)
 }
 
 
-int inst_choose_source()
+int inst_choose_netsource()
 {
   dia_item_t di;
   dia_item_t items[] = {
-    di_source_cdrom,
-    di_source_nfs,
-    di_source_ftp,
-    di_source_smb,
-    di_source_hd,
-    di_source_floppy,
+    di_netsource_ftp,
+    di_netsource_http,
+    di_netsource_nfs,
+    di_netsource_smb,
     di_none
   };
 
@@ -341,8 +343,71 @@ int inst_choose_source()
 
   config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
 
-  if(!config.net.smb_available) items[3] = di_skip;
-  if(!inst_rescue_im) items[5] = di_skip;
+  if(!config.net.smb_available) items[1] = di_skip;
+
+  di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
+
+  return di == di_none ? -1 : 0;
+}
+
+
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int inst_choose_netsource_cb(dia_item_t di)
+{
+  int error = FALSE;
+
+  di_inst_choose_netsource_last = di;
+
+  switch(di) {
+    case di_netsource_nfs:
+      error = inst_mount_nfs();
+      break;
+
+    case di_netsource_smb:
+      error = inst_mount_smb();
+      break;
+
+    case di_netsource_ftp:
+      error = inst_do_ftp();
+      break;
+
+    case di_netsource_http:
+      error = inst_do_http();
+      break;
+
+    default:
+  }
+
+  if(!error) {
+    error = inst_check_instsys();
+    if(error) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+  }
+
+  if(error) inst_umount();
+
+  return error ? 1 : 0;
+}
+
+
+int inst_choose_source()
+{
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_source_cdrom,
+    di_source_net,
+    di_source_hd,
+    di_source_floppy,
+    di_none
+  };
+
+  inst_umount();
+
+  if(!inst_rescue_im) items[3] = di_skip;
 
   di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
 
@@ -373,16 +438,8 @@ int inst_choose_source_cb(dia_item_t di)
       }
       break;
 
-    case di_source_nfs:
-      error = inst_mount_nfs();
-      break;
-
-    case di_source_ftp:
-      error = inst_do_ftp();
-      break;
-
-    case di_source_smb:
-      error = inst_mount_smb();
+    case di_source_net:
+      error = inst_choose_netsource();
       break;
 
     case di_source_hd:
@@ -1228,6 +1285,8 @@ int inst_do_ftp()
     return -1;
   }
 
+  set_instmode(inst_ftp);
+
   if((rc = net_config())) return rc;
 
   do {
@@ -1235,14 +1294,13 @@ int inst_do_ftp()
     if((rc = inst_get_ftpsetup())) return rc;
 
     dia_info(&win, txt_get(TXT_TRY_REACH_FTP));
-    rc = util_open_ftp(inet_ntoa(config.net.server.ip));
+    rc = net_open(NULL);
     win_close(&win);
 
     if(rc < 0) {
-      util_print_ftp_error(rc);
+      util_print_net_error();
     }
     else {
-      ftpClose(rc);
       rc = 0;
     }
   }
@@ -1255,8 +1313,6 @@ int inst_do_ftp()
 
   if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
   util_truncate_dir(config.serverdir);
-
-  set_instmode(inst_ftp);
 
   return 0;
 }
@@ -1272,8 +1328,8 @@ int inst_get_ftpsetup()
   if(rc == ESCAPE) return -1;
 
   if(rc == NO) {
-    str_copy(&config.net.user, "anonymous");
-    str_copy(&config.net.password, "root@");
+    str_copy(&config.net.user, NULL);
+    str_copy(&config.net.password, NULL);
   }
   else {
     if((rc = dia_input2(txt_get(TXT_ENTER_FTPUSER), &config.net.user, 20, 0))) return rc;
@@ -1306,6 +1362,39 @@ int inst_get_ftpsetup()
     name2inet(&config.net.proxy, "");
     config.net.proxyport = 0;
   }
+
+  return 0;
+}
+
+
+int inst_do_http()
+{
+  int rc;
+  window_t win;
+
+  set_instmode(inst_http);
+
+  if((rc = net_config())) return rc;
+
+  do {
+    if((rc = net_get_address(txt_get(TXT_INPUT_FTPSERVER), &config.net.server, 1))) return rc;
+//    if((rc = inst_get_ftpsetup())) return rc;
+
+    dia_info(&win, txt_get(TXT_TRY_REACH_FTP));
+    rc = net_open(NULL);
+    win_close(&win);
+
+    if(rc < 0) {
+      util_print_net_error();
+    }
+    else {
+      rc = 0;
+    }
+  }
+  while(rc);
+
+  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
+  util_truncate_dir(config.serverdir);
 
   return 0;
 }

@@ -156,15 +156,6 @@ static struct {
   { "Color",     2                  },
   { "Alt"  ,     3                  },
   { "Reboot",    1                  },
-#if 0
-  { "Floppy",    BOOTMODE_FLOPPY    },
-  { "CD",        BOOTMODE_CD        },
-  { "Net",       BOOTMODE_NET       },
-  { "Harddisk",  BOOTMODE_HARDDISK  },
-  { "FTP",       BOOTMODE_FTP       },
-  { "CDwithNET", BOOTMODE_CDWITHNET },
-  { "SMB",       BOOTMODE_SMB       },
-#endif
   { "no scheme", inst_none          },
   { "file",      inst_file          },
   { "nfs",       inst_nfs           },
@@ -563,6 +554,7 @@ char *file_read_info_file(char *file, char *file2)
         if(url) {
           set_instmode(url->scheme);
 
+          if(url->port) config.net.port = url->port;
           str_copy(&config.serverdir, url->dir);
           str_copy(&config.net.user, url->user);
           str_copy(&config.net.password, url->password);

@@ -182,14 +182,13 @@ int ftpOpen(char * host, char * name, char * password, char * proxy,
     char * buf;
     int rc;
 
-    if (port < 0) port = IPPORT_FTP;
+    if (port <= 0) port = IPPORT_FTP;
 
     if (!name)
 	name = "anonymous";
 
     if (!password) {
-	if (getuid()) {
-	    pw = getpwuid(getuid());
+	if (getuid() && (pw = getpwuid(getuid()))) {
 	    password = alloca(strlen(pw->pw_name) + 2);
 	    strcpy(password, pw->pw_name);
 	    strcat(password, "@");

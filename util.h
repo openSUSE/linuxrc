@@ -34,9 +34,8 @@ extern int  util_check_exist       (char *filename_tv);
 extern int  util_check_break       (void);
 extern int  util_try_mount         (const char *device_pcv,      char *dir_pcv,
                                     unsigned long flags_lv, const void *data_prv);
-extern void util_print_ftp_error   (int error_iv);
+extern void util_print_net_error   (void);
 extern int  util_free_ramdisk      (char *ramdisk_dev_tv);
-extern int  util_open_ftp          (char *server_tv);
 extern int  util_cd1_boot          (void);
 
 extern void util_disp_init         (void);
@@ -70,6 +69,7 @@ extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
+extern int  util_urlcat_main       (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
 extern char *util_process_name     (pid_t pid);
 extern char *util_process_cmdline  (pid_t pid);
@@ -90,4 +90,7 @@ url_t *parse_url(char *str);
 void str_copy(char **dst, char *src);
 
 void set_instmode(instmode_t instmode);
+char *get_instmode_name(instmode_t instmode);
 
+int net_open(char *filename);
+void net_close(int fd);

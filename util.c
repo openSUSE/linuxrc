@@ -59,6 +59,7 @@
 #include "file.h"
 #include "lsh.h"
 #include "bootpc.h"
+#include "http.h"
 
 #define LED_TIME     50000
 
@@ -526,13 +527,22 @@ int util_try_mount (const char *device_pcv,             char *dir_pcv,
     }
 
 
-void util_print_ftp_error (int error_iv)
-    {
-    char  text_ti [200];
+void util_print_net_error()
+{
+  char txt[256];
 
-    sprintf (text_ti, txt_get (TXT_ERROR_FTP), ftpStrerror (error_iv));
-    dia_message (text_ti, MSGTYPE_ERROR);
-    }
+  if(!config.net.error) return;
+
+  fprintf(stderr, "%s error: %s\n", get_instmode_name(config.instmode), config.net.error);
+
+  if(config.win) {
+    sprintf(txt,
+      config.instmode == inst_ftp ? txt_get(TXT_ERROR_FTP) : "Network error:\n\n%s",
+      config.net.error
+    );
+    dia_message(txt, MSGTYPE_ERROR);
+  }
+}
 
 
 int util_free_ramdisk(char *ramdisk_dev)
@@ -557,16 +567,6 @@ int util_free_ramdisk(char *ramdisk_dev)
 
   return err;
 }
-
-
-int util_open_ftp (char *server_tv)
-    {
-    return (ftpOpen (server_tv,
-                     ftp_user_tg [0]     ? ftp_user_tg     : 0,
-                     ftp_password_tg,
-                     ftp_proxy_tg [0]    ? ftp_proxy_tg    : 0,
-                     ftp_proxyport_ig));
-    }
 
 
 int util_cd1_boot (void)
@@ -898,10 +898,10 @@ void util_status_info()
 
   sprintf(buf,
     "instmode = %s%s%s [%s], net_config_mask = 0x%x",
-    file_num2sym("no scheme", config.instmode),
+    get_instmode_name(config.instmode),
     config.instmode == config.instmode_extra ? "" : "/",
-    config.instmode == config.instmode_extra ? "" : file_num2sym("no scheme", config.instmode_extra),
-    file_num2sym("no scheme", config.insttype),
+    config.instmode == config.instmode_extra ? "" : get_instmode_name(config.instmode_extra),
+    get_instmode_name(config.insttype),
     net_config_mask()
   );
   slist_append_str(&sl0, buf);
@@ -2252,7 +2252,7 @@ url_t *parse_url(char *str)
   fprintf(stderr,
     "  scheme = %s, server = \"%s\", dir = \"%s\"\n"
     "  user = \"%s\", password = \"%s\", port = %u\n",
-    file_num2sym("no scheme", url.scheme), url.server, url.dir,
+    get_instmode_name(url.scheme), url.server, url.dir,
     url.user, url.password, url.port
   );
 #endif
@@ -2301,4 +2301,163 @@ void set_instmode(instmode_t instmode)
       config.insttype = inst_net;
   }
 }
+
+
+char *get_instmode_name(instmode_t instmode)
+{
+  return file_num2sym("no scheme", instmode);
+}
+
+/*
+ * return a file handle or, if 'filename' is NULL just check if
+ # we can connect to the ftp server
+ */
+int net_open(char *filename)
+{
+  int fd = -1, len = 0;
+  char *user, *password;
+  char buf[256];
+  char *instmode_name = get_instmode_name(config.instmode);
+
+  user = config.net.user;
+  password = config.net.password;
+
+  if(user && !*user) user = NULL;
+  if(password && !*password) password = NULL;
+
+  str_copy(&config.net.error, NULL);
+
+  config.net.ftp_sock = -1;
+  config.net.file_length = 0;
+
+  if(net_check_address2(&config.net.server, 1)) {
+    sprintf(buf, "invalid %s server address", instmode_name);
+    str_copy(&config.net.error, buf);
+    return -1;
+  }
+
+  if(config.net.proxyport && config.net.proxy.name && net_check_address2(&config.net.proxy, 1)) {
+    sprintf(buf, "invalid %s proxy address", instmode_name);
+    str_copy(&config.net.error, buf);
+    return -1;
+  }
+
+  if(config.instmode == inst_ftp) {
+
+    if(config.net.proxyport && config.net.proxy.ok) {
+      config.net.ftp_sock = ftpOpen(inet_ntoa(config.net.server.ip), user, password, inet_ntoa(config.net.proxy.ip), config.net.proxyport);
+    }
+    else {
+      config.net.ftp_sock = ftpOpen(inet_ntoa(config.net.server.ip), user, password, NULL, config.net.port);
+    }
+
+    if(config.net.ftp_sock < 0) {
+      str_copy(&config.net.error, (char *) ftpStrerror(config.net.ftp_sock));
+      return config.net.ftp_sock = -1;
+    }
+
+    if(!filename) {
+      ftpClose(config.net.ftp_sock);   
+      config.net.ftp_sock = -1;
+
+      return 0;
+    }
+
+    fd = ftpGetFileDesc(config.net.ftp_sock, filename);
+
+    if(fd < 0) {
+      str_copy(&config.net.error, (char *) ftpStrerror(fd));
+      ftpClose(config.net.ftp_sock);
+      return config.net.ftp_sock = -1;
+    }
+
+  }
+
+  if(config.instmode == inst_http) {
+    if(config.net.proxyport && config.net.proxy.ok) {
+      fd = http_connect(&config.net.server, filename, &config.net.proxy, config.net.proxyport, &len);
+    }
+    else {
+      fd = http_connect(&config.net.server, filename, NULL, config.net.port, &len);
+    }
+
+    if(fd < 0) {
+//      if(errno) str_copy(&config.net.error, strerror(errno));
+      return -1;
+    }
+
+    if(len) {
+      config.net.file_length = len;
+      if(filename) fprintf(stderr, "http: %s (%d bytes)\n", filename, config.net.file_length);
+    }
+  }
+
+  return fd;
+}
+
+
+void net_close(int fd)
+{
+  if(fd >= 0) close(fd);
+
+  if(config.instmode == inst_ftp) {
+    if(config.net.ftp_sock < 0) return;
+
+    ftpGetFileDone(config.net.ftp_sock);
+    ftpClose(config.net.ftp_sock);
+  }
+
+  config.net.ftp_sock = -1;
+  config.net.file_length = 0;
+}
+
+
+int util_urlcat_main(int argc, char **argv)
+{
+  url_t *url;
+  int i, j, fd = -1;
+  unsigned char buf[0x1000];
+
+  argv++; argc--;
+
+  if(argc != 1) return fprintf(stderr, "usage: urlcat url\n"), 1;
+
+  url = parse_url(*argv);
+
+  if(!url) return fprintf(stderr, "invalid url\n"), 2;
+
+  set_instmode(url->scheme);
+  
+  config.net.port = url->port;
+  str_copy(&config.serverdir, url->dir);
+  str_copy(&config.net.user, url->user);
+  str_copy(&config.net.password, url->password);
+  if(config.insttype == inst_net) {
+    name2inet(&config.net.server, url->server);
+    fd = net_open(config.serverdir);
+  }
+
+  if(fd < 0) {
+    util_print_net_error();
+    return 1;
+  }
+
+  do {
+    i = read(fd, buf, sizeof buf);
+    j = 0;
+    if(i > 0) {
+      j = write(1, buf, i);
+    }
+  }  
+  while(i > 0 && j > 0);
+
+  if(i < 0) {
+    perror(config.serverdir);
+  }
+
+  net_close(fd);
+
+  return 0;
+}
+
 

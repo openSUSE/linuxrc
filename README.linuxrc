@@ -33,11 +33,14 @@ They are ('|' stands for alternatives, other entries are examples):
     BOOTP_GATEWAYS_1,BOOTP_GATEWAYS,BOOTP_DNSSRVS_1,BOOTP_DNSSRVS,BOOTP_HOSTNAME,
     BOOTP_DOMAIN,BOOTP_BOOTFILE,BOOTP_SERVER
 
-Linuxrc looks for a file "info" in tree places:
+Linuxrc looks for a file "info" in places:
 
  - in the current root directory (that is, within the initrd),
  - in the root directory of the floppy (if any) and
- - in "/suse/setup/descr/" on the floppy.
+#  - in "/suse/setup/descr/" on the floppy.
+
+In addition, the kernel command line is parsed and entries of the form
+key=value are treated as belonging to the info file.
 
 It is line-oriented but otherwise more or less free-form and can have these
 entries:
@@ -47,10 +50,10 @@ entries:
   #
 
   # load module
-  insmod module ...
+  Insmod: module [module params]
 
-  # automatic module loading
-  autoprobe
+#  # automatic module loading
+#  autoprobe
 
   # load pcmcia modules & start card manager ("cardmgr -v -m /modules")
   start_pcmcia
@@ -59,13 +62,13 @@ entries:
   #
   # Note: case does't matter
 
-  Language: english|german|italian|french
+  Language: de_DE
 
   Display: Color|Mono
 
   Keytable: de-kat1-nd
 
-  Bootmode: CD|Net|Harddisk|CDwithNET
+  InstMode: nfs
 
   IP: 10.10.0.50
 
@@ -80,6 +83,9 @@ entries:
   Serverdir: /dist/6.3-i386
 
   Netdevice: eth0
+
+  # instead of the above, it is possible to say:
+  Install: nfs://servername/dir_to_install_stuff
 
   # sleep 5 seconds between network activation and starting the bootp stuff
   Bootpwait: 5
@@ -117,11 +123,20 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # Control code for switching console to correct charset and encoding
   Fontmagic: (K | (B
 
-  # color/mono display
-  Display: Color|Mono
+  # color/mono display (Alt: alternative color scheme)
+  Display: Mono|Color|Alt
 
-  # boot mode
-  Bootmode: Floppy|CD|Net|Harddisk|FTP|SMB|unknown
+  # if we have a PCMCIA controller
+  HasPCMCIA: 0|1
+
+  # PCMCIA controller type
+  PCMCIA: tcic|i82365
+
+  # set if we boot via serial line
+  Console: ttyS0,9600
+
+  # installation mode
+  InstMode: file|nfs|ftp|smb|http|tftp|cd|floppy|hd|dvd
 
   # inst-sys is: 0 -> in ramdisk, 1 -> mounted
   Sourcemounted: 0|1
@@ -138,11 +153,24 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # network device (bootmode Net)
   Netdevice: eth0
 
+  # A general note to the following network related entries: some of these
+  # entries might be missing, depending on the way the network was
+  # configured. In particular: Hostname, Gateway, Nameserver, Domain.
+
   # ip address
   IP: 10.10.0.50
 
+  # our hostname
+  Hostname: blub.suse.de
+
   # network mask
   Netmask: 255.255.0.0
+
+  # broadcast address
+  Broadcast: 10.10.255.255
+
+  # network address
+  Network: 10.10.0.0
 
   # gateway
   Gateway: 10.10.0.8
@@ -150,93 +178,87 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # name server
   Nameserver: 10.10.0.1
 
-  # NFS/FTP/SMB server
+  # dns domain name
+  Domain: suse.de
+
+  # plip host, if any
+  PLIP-Host: 10.10.1.1
+
+  # server we install from
   Server: 10.10.0.136
 
-  # SuSE directory on server (Samba share)
+  # SuSE directory on server
   Serverdir: /dist/6.3-i386
 
-  # Username, if authentication to server is required (i.e. SMB)
+  # Username, if authentication to server is required (FTP, SMB)
+  # Note: entry is missing if we used the guest account.
   Username: joeuser
 
-  # Password, if authentication to server is required (i.e. SMB)
+  # Password, if authentication to server is required (FTP, SMB)
+  # (entry is missing if password is empty)
   Password: password
 
+  # FIX: do we really need this???
   # AsWorkgroup: 1, if SMB authentication to Workgroup server
   #		 0, if SMB authentication to Domain server
   # (see WorkDomain below)
-  AsWorkgroup: 0
+  # AsWorkgroup: 0
 
   # WorkDomain, Workgroup or Domain for SMB authentication
   # (see AsWorkgroup above)
   WorkDomain: workgroup
 
-  # 
   # alias line for active network connection
-  alias eth0 de4x5
+  Alias: eth0 de4x5
 
-  # bootp: machine name
-  Machinename:
-
-  # bootp: domain
-  Domain:
-
-  # SMP board
-  SMP: 0|1
-
-  # mouse device, if any
-  Mousedevice: /dev/psaux
-
-  # xf86 mouse protocol
-  MouseXF86: ps/2
-
-  # gpm mouse protocol
-  MouseGPM: ps2
-
-  # initrd line for /etc/rc.config
-  INITRD_MODULES="de4x5"
+  # initrd line for /etc/sysconfig/kernel
+  InitrdModules: ips aic7xxx
 
   # module parameters
-  options ne io=0x300 irq=5
+  Options: ne io=0x300 irq=5
 
   # floppy device that has a floppy inserted (if any)
   Floppydisk: /dev/fd0
 
+  # has a keyboard
+  Keyboard: 0|1
+
   # YaST2 update disk?
   YaST2update: 0|1
+
+  # YaST2 over serial line
+  YaST2serial: 0|1
 
   # should YaST2 run in text mode?
   Textmode: 0|1
 
-  # is a frame buffer mode active (mode number)?
-  Framebuffer: 0x0301
+  # YaST2 should do autoinstall
+  # (entry is missing, if not)
+  YaST2AutoInstall: 1
 
-Note: the installation tree is always mounted to /var/adm/mount.
+  # 24bit hex number: the cmputer's color (available on some Macs only)
+  YaST2color: 202030
+
 
 Example (boot via CD):
 
   Sourcemounted: 0
   Display: Color
   Cdrom: hdc
-  Bootmode: CD
-  SMP: 0
-  Mousedevice: /dev/psaux
-  MouseXF86: ps/2
-  MouseGPM: ps2
-  Floppydisk: /dev/sda
+  InstMode: cd
+  Floppydisk: /dev/fd0
   YaST2update: 0
   Textmode: 0
-  Framebuffer: 0x0301
 
 Example (boot via NFS, language german):
 
   Language: german
   Locale: de_DE
-  Sourcemounted: 0
+  Sourcemounted: 1
   Display: Color
   Keytable: de-lat1-nd
-  alias eth0 de4x5
-  Bootmode: Net
+  Alias: eth0 de4x5
+  InstMode: nfs
   Netdevice: eth0
   IP: 10.10.0.50
   Netmask: 255.255.0.0
@@ -244,15 +266,10 @@ Example (boot via NFS, language german):
   Nameserver: 10.10.0.1
   Server: 10.10.0.136
   Serverdir: /dist/6.3-i386
-  INITRD_MODULES="de4x5"
-  SMP: 0
-  Mousedevice: /dev/psaux
-  MouseXF86: ps/2
-  MouseGPM: ps2
-  Floppydisk: 1
+  InitrdModules: tulip
+  Floppydisk: /dev/fd0
   YaST2update: 0
   Textmode: 0
-  Framebuffer: 0x0301
 
 
 After YaST finishes, Linuxrc reads a file "/etc/yast.inf"; it can have these

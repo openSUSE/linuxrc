@@ -45,7 +45,6 @@
 #include "linuxrc.h"
 #include "auto2.h"
 #include "lsh.h"
-#include "wget.h"
 #include "multiple_info.h"
 
 #define LINUXRC_DEFAULT_STDERR "/dev/tty3"
@@ -117,7 +116,7 @@ static struct {
   { "freeramdisk", util_freeramdisk_main },
   { "raidautorun", util_raidautorun_main },
   { "free",        util_free_main        },
-  { "wget",        wget_main             },
+  { "urlcat",      util_urlcat_main      },
   { "nothing",     util_nothing_main     }
 };
 #endif
