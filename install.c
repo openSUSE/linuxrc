@@ -1018,7 +1018,10 @@ int inst_execute_yast()
 
   if(!config.test) {
     if(mod_is_loaded("sbp2")) mod_unload_module("sbp2");
-    if(mod_is_loaded("usb-storage")) mod_unload_module("usb-storage");
+    if(mod_is_loaded("usb-storage")) {
+      mod_unload_module("usb-storage");
+      usbscsi_off();
+    }
   }
 
   if (!config.test && config.usessh && config.net.sshpassword) {

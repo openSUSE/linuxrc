@@ -630,7 +630,7 @@ int auto2_init()
 #ifdef __i386__
   int net_cfg;
 #endif
-  hd_t *hd;
+//  hd_t *hd;
 
   auto2_chk_frame_buffer();
 
@@ -656,11 +656,14 @@ int auto2_init()
 
   if(!config.test) {
     if(mod_is_loaded("usb-storage")) {
+      config.module.keep_usb_storage = 1;
+#if 0
       for(hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
         if(hd->hotplug == hp_usb) {
           config.module.keep_usb_storage = 1;
         }
       }
+#endif
     }
     if(!config.module.keep_usb_storage) {
       mod_unload_module("usb-storage");

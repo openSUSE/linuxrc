@@ -249,7 +249,7 @@ manfid:	  card MANFID NUMBER ',' NUMBER
 		    $1->ident_type = MANFID_IDENT;
 		    $1->id.manfid.manf = $3;
 		    $1->id.manfid.card = $5;
-		}
+		} ;
 
 pci:	  card PCI NUMBER ',' NUMBER
 		{
@@ -260,7 +260,7 @@ pci:	  card PCI NUMBER ',' NUMBER
 		    $1->ident_type = PCI_IDENT;
 		    $1->id.manfid.manf = $3;
 		    $1->id.manfid.card = $5;
-		}
+		} ;
 
 version:  card VERSION STRING
 		{

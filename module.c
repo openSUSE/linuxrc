@@ -774,9 +774,13 @@ int mod_insmod(char *module, char *param)
 
   if(mod_show_kernel_messages) kbd_switch_tty(4);
 
+  usbscsi_off();
+
   err = system(buf);
 
   if(config.module.delay > 0) sleep(config.module.delay);
+
+  usbscsi_on();
 
   if(!err && param) {
     while(isspace(*param)) param++;

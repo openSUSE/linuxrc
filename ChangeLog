@@ -1,3 +1,7 @@
+18/2/2003:	v1.4.42
+	- fix for current bison (end all rules with ";")
+	- added new usb storage device handling code
+
 6/11/2002:	v1.4.41
 	- check for inst-sys was still wrong (#19658)
 	- always load usb-storage, otherwise usb cdroms might
