@@ -5,6 +5,7 @@ int auto2_init_settings(void);
 void auto2_chk_expert(void);
 int auto2_pcmcia(void);
 int auto2_full_libhd(void);
+void auto2_find_braille(void);
 char *auto2_usb_module(void);
 char *auto2_xserver(char **version, char **busid);
 char *auto2_disk_list(int *boot_disk);

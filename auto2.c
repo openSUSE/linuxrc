@@ -51,7 +51,6 @@ static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
 static void auto2_find_mouse(void);
-static void auto2_find_braille(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 
@@ -506,8 +505,6 @@ int auto2_init()
 
   auto2_find_mouse();
 
-  auto2_find_braille();
-
   deb_int(valid_net_config_ig);
 
   if(bootmode_ig == BOOTMODE_CD) {
@@ -623,7 +620,7 @@ void auto2_chk_frame_buffer()
 {
   FILE *f;
   char buf[256], *s, *t;
-  int i = 0, j;
+  int j;
   int fb_mode = -1;
 
   if((f = fopen("/proc/cmdline", "r"))) {
@@ -682,9 +679,20 @@ void auto2_find_braille()
 
   if(!hd_data) return;
 
+  if(braille_ig || braille_dev_ig) return;
+
   braille_ig = braille_dev_ig = NULL;
 
-  for(hd = hd_data->hd; hd; hd = hd->next) {
+  hd_data->progress = auto2_progress;
+
+  printf("Looking for a braille display...\n");
+  hd = hd_list(hd_data, hw_braille, 1, NULL);
+  printf("\r%64s\r", "");
+  fflush(stdout);  
+
+  hd_data->progress = NULL;
+
+  for(; hd; hd = hd->next) {
     if(
       hd->base_class == bc_braille &&		/* is a braille display */
       hd->unix_dev_name	&&			/* and has a device name */

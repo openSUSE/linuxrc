@@ -386,9 +386,6 @@ void mod_init (void)
 				       "openprom",
 #endif
                                        "nvram",
-#ifdef __i386__
-                                       "serial",
-#endif
                                        "8390"
                                        };
            int   i_ii;

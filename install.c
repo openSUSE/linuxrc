@@ -42,6 +42,7 @@
 #include "ftp.h"
 #include "install.h"
 #include "settings.h"
+#include "auto2.h"
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
 #define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
@@ -717,7 +718,6 @@ static int inst_prepare (void)
     int    rc_ii = 0;
 
     mod_free_modules ();
-    file_write_yast_info (NULL);
     rename ("/bin", "/.bin");
 
     for (i_ii = 0; i_ii < sizeof (links_ati) / sizeof (links_ati [0]); i_ii++)
@@ -751,6 +751,12 @@ static int inst_prepare (void)
 
     setenv ("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
+#ifdef USE_LIBHD   
+    auto2_find_braille();
+#endif
+
+    file_write_yast_info (NULL);
+
     if (!ramdisk_ig)
         rc_ii = inst_init_cache ();
 
@@ -765,6 +771,7 @@ static int inst_execute_yast (void)
     window_t  status_ri;
     char      command_ti [50];
 
+    lxrc_set_modprobe ("/sbin/modprobe");
     rc_ii = inst_prepare ();
     if (rc_ii)
         return (rc_ii);
@@ -808,8 +815,6 @@ static int inst_execute_yast (void)
     if (auto2_ig)
         disp_clear_screen ();
     fflush (stdout);
-
-    lxrc_set_modprobe ("/sbin/modprobe");
 
     if (yast_version_ig == 2)
         sprintf (command_ti, "%s %s", YAST2_COMMAND,
