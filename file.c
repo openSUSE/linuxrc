@@ -214,31 +214,41 @@ void parse_value(file_t *ft)
 file_t *file_read_file(char *name)
 {
   FILE *f;
-  char buf1[256], buf2[256], *s;
-  int i, l;
+  char buf[1024];
+  char *s, *t, *t1;
   file_t *ft0 = NULL, **ft = &ft0;
 
   if(!(f = fopen(name, "r"))) return NULL;
 
-  while((i = fscanf(f, "%255s %255[^\n]", buf1, buf2)) != EOF) {
-    if(i) {
+  while(fgets(buf, sizeof buf, f)) {
+    for(s = buf; *s && isspace(*s); s++);
+    t = s;
+    strsep(&t, ":= \t\n");
+    if(t) {
+      while(*t && (*t == ':' || *t == '=' || isspace(*t))) t++;
+      for(t1 = t + strlen(t); t1 > t;) {
+        if(isspace(*--t1)) *t1 = 0; else break;
+      }
+    }
+    else {
+      t = "";
+    }
+
+    /* remove quotes */
+    if(*t == '"') {
+      t1 = t + strlen(t);
+      if(t1 > t && t1[-1] == '"') {
+        t++;
+        t1[-1] = 0;
+      }
+    }
+
+    if(*s) {
       *ft = calloc(1, sizeof **ft);
 
-      l = strlen(buf1);
-      if(l && buf1[l - 1] == ':') buf1[l - 1] = 0;
-
-      (*ft)->key_str = strdup(buf1);	/* Maybe we should include ':'? */
-
-      if(i == 2) {
-        l = strlen(buf2);
-        while(l && isspace(buf2[l - 1])) buf2[--l] = 0;
-      }
-      else {
-        *buf2 = 0;
-      }
-
-      (*ft)->key = file_str2key(buf1);
-      (*ft)->value = s = strdup(buf2);
+      (*ft)->key_str = strdup(s);
+      (*ft)->key = file_str2key(s);
+      (*ft)->value = strdup(t);
 
       parse_value(*ft);
 
