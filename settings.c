@@ -118,7 +118,7 @@ static language_t set_languages_arm [] =
 };
 #endif
 
-#if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__MIPSEB__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
 #define KEYMAP_DEFAULT	1
 static keymap_t set_keymaps_arm [] =
 {

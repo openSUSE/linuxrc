@@ -1338,7 +1338,7 @@ int inst_commit_install()
       fprintf(stderr, "*** reboot ***\n");
     }
     else {
-#if	defined(__s390__)
+#if	defined(__s390__) || defined(__s390x__)
       reboot(RB_POWER_OFF);
 #else
       reboot(RB_AUTOBOOT);

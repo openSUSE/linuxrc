@@ -1138,3 +1138,7 @@ msgstr ""
 msgid "Portname to use"
 msgstr ""
 
+#. TXT_HOSTNAME
+msgid "Fully qualified hostname"
+msgstr ""
+

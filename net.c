@@ -25,6 +25,7 @@
 #include <sys/ioctl.h>
 #include <sys/reboot.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/mount.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -113,6 +114,16 @@ void net_ask_password()
   if(config.win && !win_old) util_disp_done();
 }
 
+void net_ask_hostname()
+{
+  int win_old = config.win;
+  if(!config.net.realhostname)
+  {
+    if(!config.win) util_disp_init();
+    dia_input2(txt_get(TXT_HOSTNAME), &config.net.realhostname, 20, 1);
+    if(config.win && !win_old) util_disp_done();
+  }
+}
 
 /*
  * Configure network. Ask for network config data if necessary.
@@ -1669,8 +1680,6 @@ int net_activate_s390_devs(void)
   
   di = dia_menu2(txt_get(TXT_CHOOSE_390NET), 60, 0, items, config.hwp.type?:di_390net_iucv);
   
-  printf("type=%d\n",di);
-  
   /* hwcfg parms common to all devices */
   config.hwp.startmode="auto";
   config.hwp.module_options="";
@@ -1681,8 +1690,8 @@ int net_activate_s390_devs(void)
   case di_390net_iucv:
     if((rc=dia_input2(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
 
-    // does not work mod_modprobe("netiucv",NULL);	// FIXME: error handling
-    system("/sbin/modprobe netiucv");
+    mod_modprobe("netiucv",NULL);	// FIXME: error handling
+
     if((rc=util_set_sysfs_attr("/sys/bus/iucv/drivers/netiucv/connection",config.hwp.userid))) return rc;
 
     sprintf(hwcfg_name,"iucv-id-%s",config.hwp.userid);
@@ -1692,7 +1701,7 @@ int net_activate_s390_devs(void)
 
   case di_390net_ctc:
   case di_390net_escon:
-    system("/sbin/modprobe ctc");
+    mod_modprobe("ctc",NULL);	// FIXME: error handling
 
     net_list_s390_devs("cu3088",0);
 
@@ -1755,7 +1764,7 @@ int net_activate_s390_devs(void)
   case di_390net_osaexeth:
   case di_390net_hsi:
   case di_390net_osaextr:
-    system("/sbin/modprobe qeth");
+    mod_modprobe("qeth",NULL);	// FIXME: error handling
 
     net_list_s390_devs("qeth",di==di_390net_hsi?5:1);
 
@@ -1809,6 +1818,9 @@ int net_activate_s390_devs(void)
   
   /* write hwcfg file */
 
+  if (mkdir("/etc/sysconfig/hardware", (mode_t)0755) && errno != EEXIST)
+    return -1;
+  
   sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
@@ -1827,6 +1839,8 @@ int net_activate_s390_devs(void)
   if(config.hwp.portname) fprintf(fp,"CCW_CHAN_MODE=\"%s\"\n",config.hwp.portname);
   
   fclose(fp);
+  
+  net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
 
   return 0;
 }

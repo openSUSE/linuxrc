@@ -106,8 +106,8 @@ static struct {
 #if !defined(__s390__) && !defined(__s390x__)
   { "loadkeys",    loadkeys_main         },
   { "setfont",     setfont_main          },
-  { "portmap",     portmap_main          },
 #endif
+  { "portmap",     portmap_main          },
   { "dhcpcd",      dhcpcd_main           },
 #if WITH_PCMCIA
   { "cardmgr",     cardmgr_main          },
@@ -1151,6 +1151,7 @@ void lxrc_makelinks(char *name)
     sprintf(buf, "/lbin/%s", lxrc_internal[i].name);
     if(!util_check_exist(buf)) link(name, buf);
   }
+  if(!util_check_exist("/sbin/hotplug")) link(name, "/sbin/hotplug");
 }
 #endif
 

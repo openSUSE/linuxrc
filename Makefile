@@ -93,9 +93,6 @@ ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
     SUBDIRS		:= $(filter-out loadkeys, $(SUBDIRS))
     LIBS		:= $(filter-out loadkeys/loadkeys.a, $(LIBS))
     OBJ			:= $(filter-out loadkeys.o, $(OBJ))
-    SUBDIRS		:= $(filter-out portmap, $(SUBDIRS))
-    LIBS		:= $(filter-out portmap/portmap.a, $(LIBS))
-    OBJ			:= $(filter-out portmap.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"s390\"
 endif
 

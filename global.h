@@ -24,7 +24,7 @@
 #define WITH_PCMCIA	1
 #endif
 
-// on all architectures but s390, linuxrc includes a lot of other
+// linuxrc includes a lot of other
 // functionality like 'mount/umount', 'loadkeys', ...
 
 #define SWISS_ARMY_KNIFE 1
