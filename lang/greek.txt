@@ -193,6 +193,8 @@ static text_t txt_greek_atm [] =
                       "χρησιμοποιηθεί για την εγκατάσταση."                   },
 { TXT_INSERT_CD,      "Παρακαλώ βεβαιωθείτε ότι έχετε βάλει στο drive το CD "
                       "με αριθμό %d!"                                         },
+{ TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
+{ TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
                       "new installed system will now be started in order to "
                       "commit the installation. "

@@ -187,6 +187,8 @@ static text_t txt_indonesia_atm [] =
 { TXT_YAST2,          "YaST2 - mode grafis"                                   },
 { TXT_CHOOSE_YAST,    "Pilihlah versi YaST yang digunakan untuk instalasi."   },
 { TXT_INSERT_CD,      "Pastikanlah CD nomer %d ada pada drive anda!"          },
+{ TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
+{ TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
                       "new installed system will now be started in order to "
                       "commit the installation. "

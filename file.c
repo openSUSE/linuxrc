@@ -65,6 +65,7 @@ static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_manual_tm         = "Manual:";
 static const char  *file_txt_demo_tm           = "Demo:";
 static const char  *file_txt_reboot_wait       = "WaitReboot:";
+static const char  *file_txt_bootp_timeout_tm  = "BOOTP_TIMEOUT:";
 #if WITH_PCMCIA
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #endif
@@ -524,6 +525,10 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_bootp_wait_tm, buffer_ti,
                           strlen (file_txt_bootp_wait_tm)))
             bootp_wait_ig = atoi (value_ti);
+
+        if (!strncasecmp (file_txt_bootp_timeout_tm, buffer_ti,
+                          strlen (file_txt_bootp_timeout_tm)))
+            bootp_timeout_ig = atoi (value_ti);
 
         if (!strncasecmp (file_txt_reboot_wait, buffer_ti,
                           strlen (file_txt_reboot_wait)))

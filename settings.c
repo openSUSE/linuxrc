@@ -455,7 +455,7 @@ static int set_settings_cb (int what_iv)
 
 static void set_expert (void)
     {
-    item_t     items_ari [5];
+    item_t     items_ari [6];
     int        nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
     int        i_ii;
     int        width_ii = 32;
@@ -471,6 +471,7 @@ static void set_expert (void)
     strncpy (items_ari [2].text, txt_get (TXT_NEW_ROOTIMAGE), width_ii);
     strncpy (items_ari [3].text, txt_get (TXT_NEW_INST_SYS), width_ii);
     strncpy (items_ari [4].text, txt_get (TXT_NFSPORT), width_ii);
+    strncpy (items_ari [5].text, txt_get (TXT_BOOTP_TIMEOUT), width_ii);
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, width_ii);
@@ -533,6 +534,12 @@ static int set_expert_cb (int what_iv)
             rc_ii = dia_input (txt_get (TXT_ENTER_NFSPORT), tmp_ti, 6, 6);
             if (!rc_ii)
                 nfsport_ig = atoi (tmp_ti);
+            break;
+        case 6:
+            sprintf (tmp_ti, "%d", bootp_timeout_ig);
+            rc_ii = dia_input (txt_get (TXT_ENTER_BOOTP_TIMEOUT), tmp_ti, 4, 4);
+            if (!rc_ii)
+                bootp_timeout_ig = atoi (tmp_ti);
             break;
         default:
             dia_message (txt_get (TXT_NOT_IMPLEMENTED), MSGTYPE_ERROR);

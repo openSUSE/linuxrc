@@ -157,6 +157,8 @@ enum textid_t
     TXT_YAST2,
     TXT_CHOOSE_YAST,
     TXT_INSERT_CD,
+    TXT_BOOTP_TIMEOUT,
+    TXT_ENTER_BOOTP_TIMEOUT,
     TXT_DO_REBOOT
     };
 

@@ -745,8 +745,8 @@ int net_bootp (void)
     if (bootp_wait_ig)
         sleep (bootp_wait_ig);
 
-    rc_ii = performBootp (netdevice_tg, "255.255.255.255", "", 30, 0, NULL,
-                          0, 1, BP_PUT_ENV, 1);
+    rc_ii = performBootp (netdevice_tg, "255.255.255.255", "",
+                          bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV, 1);
     win_close (&win_ri);
 
     if (rc_ii || !getenv ("BOOTP_IPADDR"))

@@ -205,6 +205,8 @@ static text_t txt_french_atm [] =
                       "l'installation."                                       },
 { TXT_INSERT_CD,      "Assurez-vous que le CD %d se trouve dans votre "
                       "lecteur!"                                              },
+{ TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
+{ TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
                       "new installed system will now be started in order to "
                       "commit the installation. "

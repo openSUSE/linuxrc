@@ -185,6 +185,8 @@ static text_t txt_hungarian_atm [] =
 { TXT_CHOOSE_YAST,    "Kérem válasszon egy YAST változatot a telepitéshez."   },
 { TXT_INSERT_CD,      "Kérem gyõzõdjön meg arról, hogy a %d. CD van a "
                       "meghajtóban!"                                          },
+{ TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
+{ TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
                       "new installed system will now be started in order to "
                       "commit the installation. "
