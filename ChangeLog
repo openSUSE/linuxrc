@@ -1,3 +1,6 @@
+27/5/2002:	v1.4.2
+	- fixed Makefile for sparc
+
 24/5/2002:	v1.4.1
 	- removed mini-glibc code
 	- xf86_64 fixes

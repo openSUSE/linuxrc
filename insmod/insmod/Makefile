@@ -41,11 +41,6 @@ endif
 
 ifdef DEFS64
 INSMODOBJS	+= insmod_64.o
-ifeq (kallsyms,kallsyms)
-INSMODOBJS	+= kallsyms_64.o
-else
-KALLSYMSOBJS	+= kallsyms_64.o
-endif
 MODINFOOBJS	+= modinfo_64.o
 DEFSNOARCH	+= -DCOMMON_3264
 DEFS		+= -DONLY_32
