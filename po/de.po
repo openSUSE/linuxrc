@@ -4,12 +4,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2001-09-12 14:53+GMT\n"
+"Last-Translator: Antje Faber <afaber@suse.de>\n"
 "Language-Team: German <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.8\n"
 
 #. TXT_OK
 msgid "OK"
@@ -124,7 +125,7 @@ msgstr "Das Laden des Moduls \"%s\" ist fehlgeschlagen!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr ""
+msgstr "CD-ROM"
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -193,15 +194,15 @@ msgstr "Netzwerkkarten"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr ""
+msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr ""
+msgstr "Interrupts"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
-msgstr ""
+msgstr "Ein- Ausgabeport"
 
 #. TXT_INFO_MEM
 msgid "Memory"
@@ -213,7 +214,7 @@ msgstr "Module"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr ""
+msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
@@ -347,7 +348,7 @@ msgstr "Momentan sind keine Module geladen!"
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr ""
+msgstr "Automatische Überprüfung (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid ""
@@ -537,7 +538,7 @@ msgstr ""
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr ""
+msgstr "Animation"
 
 #. TXT_ASK_EXPLODE
 msgid "Do you like \"animated\" windows?\n\nOf course ;-)"
@@ -675,7 +676,7 @@ msgstr "In Ihrem System wurde bereits ein %s gefunden!\n"
 
 #. TXT_SCSI_ADAPTER
 msgid "SCSI-Adapter"
-msgstr ""
+msgstr "SCSI-Adapter"
 
 #. TXT_ANOTHER_MOD
 msgid "Do you want to load an additional module?"
@@ -811,23 +812,23 @@ msgstr "Reiserfs Dateisystem gefunden."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr ""
+msgstr "CTC-Verbindung"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr ""
+msgstr "ESCON-Verbindung"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr ""
+msgstr "IUCV-Verbindung"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr ""
+msgstr "cisco-Router mit Channel-Anschluss"
 
 #. TXT_SMB
 msgid "Network (Windows Share aka SMB)"
-msgstr ""
+msgstr "Netzwerk (Windows Share aka SMB)"
 
 #. TXT_SMB_ENTER_SERVER
 msgid "Please enter the IP-address of the SMB server"
