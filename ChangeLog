@@ -1,4 +1,4 @@
-7/7/2003:	v1.5.3
+11/7/2003:	v1.5.3
 	- better control over option parsing
 	- rewrote driver update handling (#27792)
 	- put cmdline args into /etc/install.inf (#25745)
