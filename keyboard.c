@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <string.h>
 #include <linux/vt.h>
+#include <errno.h>
 
 #include "global.h"
 #include "keyboard.h"
@@ -48,6 +49,9 @@ static void kbd_timeout     (int signal_iv);
 
 static int kbd_getch_raw    (int wait_iv);
 
+static void get_screen_size(int fd);
+
+
 /*
  *
  * exported functions
@@ -58,7 +62,6 @@ void kbd_init (int first)
     {
     struct winsize  winsize_ri;
     char           *start_msg_pci = "Startup...\n";
-
 
     if(!config.test) {
       kbd_tty_im = open ("/dev/tty4", O_RDWR);
@@ -93,10 +96,29 @@ void kbd_init (int first)
             max_y_ig = winsize_ri.ws_row;
             }
 
-        if(!config.had_segv) fprintf (stderr, "Window size: %d x %d\n", max_x_ig, max_y_ig);
         }
 
     tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
+
+    write(kbd_tty_im, "\033[?1l", sizeof "\033[?1l" - 1);
+    fsync(kbd_tty_im);
+
+    if(first) {
+      get_screen_size(kbd_tty_im);
+
+      if(max_x_ig > MAX_X) max_x_ig = MAX_X;
+      if(max_y_ig > MAX_Y) max_y_ig = MAX_Y;
+
+      if(!config.had_segv) fprintf(stderr, "Window size: %d x %d\n", max_x_ig, max_y_ig);
+
+      memset(&winsize_ri, 0, sizeof winsize_ri);
+
+      winsize_ri.ws_col = max_x_ig;
+      winsize_ri.ws_row = max_y_ig;
+
+      ioctl(kbd_tty_im, TIOCSWINSZ, &winsize_ri);
+    }
+
     }
 
 
@@ -269,3 +291,40 @@ static void kbd_timeout (int signal_iv)
     {
     kbd_timeout_im = TRUE;
     }
+
+
+void get_screen_size(int fd)
+{
+  static const char *term_init = "\0337\033[r\033[999;999H\033[6n\0338";
+  char buf[64];
+  int i, buf_len;
+  struct timeval to;
+  fd_set set;
+  unsigned u1, u2;
+
+  write(fd, term_init, strlen(term_init));
+  fsync(fd);
+
+  buf[buf_len = 0];
+
+  FD_ZERO(&set);
+  FD_SET(fd, &set);
+  to.tv_sec = 0; to.tv_usec = 500000;
+
+  while(select(fd + 1, &set, NULL, NULL, &to) > 0) {
+    if((i = read(fd, buf + buf_len, sizeof buf - 1 - buf_len)) < 0) break;
+    buf_len += i;
+    buf[buf_len] = 0;
+    to.tv_sec = 0; to.tv_usec = 500000;
+    if(strchr(buf, 'R')) break;
+  }
+
+  if(sscanf(buf, "\033[%u;%uR", &u1, &u2) == 2) {
+    max_x_ig = u2;
+    max_y_ig = u1;
+  }
+  else if(*buf) {
+    fprintf(stderr, "Unexpected response: >>%s<<\n", buf + 1);
+  }
+}
+

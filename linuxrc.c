@@ -574,7 +574,6 @@ void lxrc_catch_signal(int signum)
     sleep(10);
   }
 
-  signal(SIGHUP,  lxrc_catch_signal);
   signal(SIGBUS,  lxrc_catch_signal);
 
   if(!config.test) {
@@ -598,7 +597,7 @@ void lxrc_init()
   }
 
   siginterrupt(SIGALRM, 1);
-  siginterrupt(SIGHUP, 1);
+  signal(SIGHUP, SIG_IGN);
   siginterrupt(SIGBUS, 1);
   siginterrupt(SIGINT, 1);
   siginterrupt(SIGTERM, 1);
