@@ -7,8 +7,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.2 $
-  $Date: 2000/06/07 16:52:32 $
+  $Revision: 1.3 $
+  $Date: 2000/09/13 09:23:43 $
 */
 
 /* Standard headers */
@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
+#include <sys/uio.h>
 
 /* local headers */
 #include "bootpc.h"
@@ -72,6 +73,9 @@ int performBootp(char *device,
   int received_packet = 0 ;
 /* See RFC1497, RFC1542  09/02/94   JSP  */
   unsigned char mincookie[] = {99,130,83,99,255} ;
+  struct msghdr mh;
+  char cbuf[CMSG_SPACE(sizeof(struct in_pktinfo))];
+  struct iovec iov;
 
   returniffail=bp_rif ;
   printflag=bp_pr ;
@@ -124,6 +128,20 @@ int performBootp(char *device,
     memcpy(ifr.ifr_name, device, strlen(device)+1);
     if (ioctl(sockfd, SIOCGIFHWADDR, &ifr) < 0) {
       perror("bootpc: ioctl failed");
+      return BootpFatal();
+    }
+    /* Set the interface flags. */
+    ifr.ifr_flags = IFF_UP | IFF_BROADCAST | IFF_NOTRAILERS | IFF_RUNNING;
+    if (ioctl(sockfd, SIOCSIFFLAGS, &ifr)) {
+      perror("bootpc: ioctl SIOCSIFFLAGS");
+      return BootpFatal();
+    }
+    /* Set a non-zero internet address. */
+    memset((struct sockaddr_in *)&ifr.ifr_addr, 0, sizeof(struct sockaddr_in));
+    ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr = htonl(1);
+    ((struct sockaddr_in *)&ifr.ifr_addr)->sin_family = AF_INET;
+    if (ioctl(sockfd, SIOCSIFADDR, &ifr)) {
+      perror("bootpc: ioctl SIOCSIFADDR");
       return BootpFatal();
     }
   }
@@ -219,9 +237,31 @@ int performBootp(char *device,
 	logMessage("Size = %ld", (long)sizeof(struct bootp)) ;
       }
 
-      if(sendto(sockfd, bootp_xmit, sizeof(struct bootp), 0, 
-		(struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-	perror("bootpc: sendto");
+      /* Build a message that contains the interface number. */
+      memset(&mh, 0, sizeof(mh));
+      mh.msg_control = cbuf;
+      mh.msg_controllen = sizeof(cbuf);
+      mh.msg_name = (struct sockaddr *)&serv_addr;
+      mh.msg_namelen = sizeof(struct sockaddr_in);
+      mh.msg_iov = &iov;
+      mh.msg_iovlen = 1;
+      iov.iov_base = bootp_xmit;
+      iov.iov_len = sizeof(struct bootp);
+      {
+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&mh);
+	struct in_pktinfo *pki = (struct in_pktinfo *)CMSG_DATA(cmsg);
+	cmsg->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
+	cmsg->cmsg_level = SOL_IP;
+	cmsg->cmsg_type = IP_PKTINFO;
+	if (ioctl(sockfd, SIOCGIFINDEX, &ifr) < 0)
+	  perror("bootpc: SIOCGIFINDEX");
+	pki->ipi_ifindex = ifr.ifr_ifindex;
+	pki->ipi_spec_dst.s_addr = 0;
+	pki->ipi_addr.s_addr = 0xffffffff;
+      }
+
+      if(sendmsg(sockfd, &mh, 0) < 0) {
+	perror("bootpc: sendmsg");
 	return BootpFatal();
       }
     }
