@@ -840,6 +840,7 @@ void lxrc_init()
     str_copy(&config.floppy_dev[0], buf);
   }
 
+  get_ide_options();
   file_read_info_file("cmdline", kf_cmd_early);
 
   util_set_stderr(config.stderr_name);

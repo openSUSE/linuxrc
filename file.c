@@ -107,7 +107,7 @@ static struct {
   { key_password,       "Password",       kf_cfg + kf_cmd                },
   { key_workdomain,     "WorkDomain",     kf_cfg + kf_cmd                },
   { key_alias,          "Alias",          kf_none                        },
-  { key_options,        "Options",        kf_none                        },
+  { key_options,        "Options",        kf_cfg + kf_cmd + kf_cmd_early },
   { key_initrdmodules,  "InitrdModules",  kf_cfg + kf_cmd                },
   { key_locale,         "Locale",         kf_none                        },
   { key_font,           "Font",           kf_none                        },
@@ -424,9 +424,9 @@ file_t *file_read_file(char *name, file_key_flag_t flags)
     }
 
     /* remove quotes */
-    if(*t == '"') {
+    if(*t == '"' || *t == '\'') {
       t1 = t + strlen(t);
-      if(t1 > t && t1[-1] == '"') {
+      if(t1 > t && t1[-1] == *t) {
         t++;
         t1[-1] = 0;
       }
@@ -1248,6 +1248,18 @@ void file_do_info(file_t *f0)
         if(*f->value) str_copy(&config.rootimage2, f->value);
         break;
 
+      case key_options:
+        if(*f->value) {
+          if((s = strchr(f->value, '='))) {
+            *s++ = 0;
+            if(config.debug >= 2) fprintf(stderr, "options[%s] = \"%s\"\n", f->value, s);
+            sl = slist_add(&config.module.options, slist_new());
+            sl->key = strdup(f->value);
+            sl->value = strdup(s);
+          }
+        }
+        break;
+
       default:
         break;
     }
@@ -1587,10 +1599,10 @@ void file_write_modparms(FILE *f)
     ml = mod_get_entry(ft->key_str);
     if(ml) {
       sl = slist_add(&modules0, slist_new());
-      sl->key = strdup(ft->key_str);
-      if(ml->initrd || slist_getentry(config.module.initrd, ft->key_str)) {
+      sl->key = strdup(ml->name);
+      if(ml->initrd || slist_getentry(config.module.initrd, ml->name)) {
         sl = slist_add(&sl0, slist_new());
-        sl->key = strdup(ft->key_str);
+        sl->key = strdup(ml->name);
       }
     }
   }
@@ -1691,7 +1703,12 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
   do {
     while(isspace(*current)) current++;
     for(quote = 0, s = current; *s && (quote || !isspace(*s)); s++) {
-      if(*s == '"') quote ^= 1;
+      if(quote) {
+        if(*s == quote) quote = 0;
+      }
+      else {
+        if(*s == '"' || *s == '\'') quote = *s;
+      }
     }
     if(s > current) {
       t = malloc(s - current + 1);
@@ -1700,8 +1717,23 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
       memcpy(t1, current, s - current);
       t1[s - current] = 0;
 
-      for(s1 = t; s > current; current++) {
-        if(*current != '"') *s1++ = *current;
+      for(quote = 0, s1 = t; s > current; current++) {
+        if(quote) {
+          if(*current == quote) {
+            quote = 0;
+          }
+          else {
+            *s1++ = *current;
+          }
+        }
+        else {
+          if(*current == '"' || *current == '\'') {
+            quote = *current;
+          }
+          else {
+            *s1++ = *current;
+          }
+        }
       }
       *s1 = 0;
 
@@ -2051,5 +2083,33 @@ void add_driver(char *str)
   }
 
   slist_free(sl0);
+}
+
+
+void get_ide_options()
+{
+  file_t *f0, *f;
+  char *buf = NULL;
+  slist_t *sl;
+
+  f0 = file_read_cmdline(0);
+  for(f = f0; f; f = f->next) {
+    if(
+      !strcmp(f->key_str, "ide") ||
+      !strcmp(f->key_str, "idewait") ||
+      !strncmp(f->key_str, "hd", sizeof "hd" - 1)
+    ) {
+      strprintf(&buf, "%s%s ", buf ?: "options=\"", f->unparsed);
+    }
+  }
+
+  file_free_file(f0);
+
+  if(buf) {
+    buf[strlen(buf) - 1] = '"';
+    sl = slist_add(&config.module.options, slist_new());
+    sl->key = strdup("ide-core");
+    sl->value = buf;
+  }
 }
 

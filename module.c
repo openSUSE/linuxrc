@@ -750,6 +750,10 @@ int mod_insmod(char *module, char *param)
   slist_t *sl;
   driver_t *drv;
 
+  if((!param || !*param) && (sl = slist_getentry(config.module.options, module))) {
+    param = sl->value;
+  }
+
   if(config.debug) fprintf(stderr, "mod_insmod(\"%s\", \"%s\")\n", module, param);
 
   if(!module) return 0;
@@ -770,7 +774,7 @@ int mod_insmod(char *module, char *param)
 
   sprintf(buf, "insmod %s%s/%s" MODULE_SUFFIX, force, config.module.dir, module);
 
-  if(param && *param) strcat(strcat(buf, " "), param);
+  if(param && *param) sprintf(buf + strlen(buf), " '%s'", param);
 
   fprintf(stderr, "%s\n", buf);
 

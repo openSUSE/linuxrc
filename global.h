@@ -381,6 +381,7 @@ typedef struct {
     int delay;			/* wait this much after insmod */
     driver_t *drivers;		/* list of extra drive info */
     unsigned disks:1;		/* automatically ask for module disks */
+    slist_t *options;		/* potential module parameters */
   } module;
 
   struct {
