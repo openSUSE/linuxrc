@@ -1,3 +1,7 @@
+19/9/2002:	v1.4.31
+	- restructed VNC/SSH ask for password handling so we do not ask
+	  for netconfig and later do unconditional DHCP.
+
 18/9/2002:	v1.4.30
 	- enable samba support
 
