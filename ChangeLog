@@ -1,3 +1,4 @@
+27/8/2002:	v1.4.17
 	- do not imply vnc=1 if vncpassword is given, dito for ssh
 
 26/8/2002:	v1.4.16
