@@ -671,16 +671,8 @@ static module_list_t *module_list = NULL;
 
 static int try_insmod(char *mod, char *opts)
 {
-    char path[128], cmd[128];
-    if (strchr(mod, '/') != NULL)
-	sprintf(path, "%s/%s.o", modpath, mod);
-    else
-	sprintf(path, "%s/pcmcia/%s.o", modpath, mod);
-    if (access(path, R_OK) != 0) {
-	syslog(LOG_INFO, "module %s not available", path);
-	return -1;
-    }
-    sprintf(cmd, "insmod %s", path);
+    char cmd[128], *s = strrchr(mod, '/');
+    sprintf(cmd, "insmod %s", (s) ? s+1 : mod);
     if (opts) {
 	strcat(cmd, " ");
 	strcat(cmd, opts);

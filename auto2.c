@@ -497,7 +497,7 @@ int auto2_init()
 #endif
 
   if(!auto2_find_floppy()) {
-    deb_msg("There seems to be no floppy drive.");
+    deb_msg("There seems to be no floppy disk.");
   }
   else {
     file_read_info();

@@ -401,7 +401,8 @@ void mod_init (void)
             {
             mod_load_module (core_modules_ati [i_ii], 0);
             sprintf (tmp_ti, "%s/%s.o", mod_modpath_tm, core_modules_ati [i_ii]);
-            unlink (tmp_ti);
+            /* gives trouble while using pcmcia */
+            /* unlink (tmp_ti);  */
             }
 
         core_loaded_is = TRUE;
