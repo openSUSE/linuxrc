@@ -40,8 +40,11 @@ extern void util_disp_done         (void);
 extern int  util_umount            (char *mountpoint);
 extern int  util_eject_cdrom       (char *dev);
 extern void util_manual_mode       (void);
-extern int  util_chk_driver_update (char *dir);
-extern void util_umount_driver_update (void);
+extern int  util_chk_driver_update (char *dir, char *loc);
+extern void util_do_driver_updates (void);
+extern void util_write_update_pre  (void);
+// extern void util_umount_driver_update (void);
+extern int show_driver_updates(void);
 extern void util_status_info       (void);
 extern int  util_mount_main        (int argc, char **argv);
 extern int  util_umount_main       (int argc, char **argv);
@@ -82,6 +85,7 @@ slist_t *slist_append_str(slist_t **sl0, char *str);
 slist_t *slist_add(slist_t **sl0, slist_t *sl);
 slist_t *slist_getentry(slist_t *sl, char *key);
 slist_t *slist_reverse(slist_t *sl0);
+slist_t *slist_sort(slist_t *sl0, int (*cmp_func)(const void *, const void *));
 slist_t *slist_split(char del, char *text);
 
 void name2inet(inet_t *inet, char *name);
@@ -117,3 +121,11 @@ void util_hwcheck(void);
 void util_set_serial_console(char *str);
 void util_set_stderr(char *name);
 void util_set_product_dir(char *prod);
+
+int util_usbscsi_main(int argc, char **argv);
+int usbscsi_change(int action);
+void usbscsi_off(void);
+void usbscsi_on(void);
+
+char *short_dev(char *dev);
+char *long_dev(char *dev);

@@ -78,6 +78,8 @@ static int  net_input_data       (void);
 static void net_show_error       (enum nfs_stat status_rv);
 #endif
 
+static void if_down(char *dev);
+
 int net_ask_password() {
   int rc;
 
@@ -161,39 +163,38 @@ int net_config()
 }
 
 
-void net_stop (void)
-    {
-    int             socket_ii;
-    struct ifreq    interface_ri;
+void net_stop(void)
+{
+  file_t *f0, *f;
+  slist_t *sl0 = NULL, *sl;
 
-    if(config.test) {
-      net_is_configured_im = FALSE;
-      return;
-    }
-
-    if(config.net.dhcp_active) {
-      net_dhcp_stop();
-      net_is_configured_im = FALSE;
-      return;
-    }
-
-    if (!net_is_configured_im)
-        return;
-
-    socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
-    if (socket_ii == -1)
-        return;
-
-    memset (&interface_ri, 0, sizeof (struct ifreq));
-    strcpy (interface_ri.ifr_name, netdevice_tg);
-    interface_ri.ifr_addr.sa_family = AF_INET;
-
-    ioctl (socket_ii, SIOCGIFFLAGS, &interface_ri);
-    interface_ri.ifr_flags &= ~(IFF_UP | IFF_RUNNING);
-    ioctl (socket_ii, SIOCSIFFLAGS, &interface_ri);
-    close (socket_ii);
+  if(config.test) {
     net_is_configured_im = FALSE;
-    }
+    return;
+  }
+
+  if(config.net.dhcp_active) {
+    net_dhcp_stop();
+    net_is_configured_im = FALSE;
+  }
+
+  if(!net_is_configured_im) return;
+
+  /* build list of configured interfaces */
+  slist_append_str(&sl0, netdevice_tg);
+
+  f0 = file_read_file("/proc/net/route");
+  for((f = f0) && (f = f->next); f; f = f->next) {
+    if(f->key_str && !slist_getentry(sl0, f->key_str)) slist_append_str(&sl0, f->key_str);
+  }
+  file_free_file(f0);
+
+  for(sl = sl0; sl; sl = sl->next) if_down(sl->key);
+
+  slist_free(sl0);
+
+  net_is_configured_im = FALSE;
+}
 
 
 int net_setup_localhost (void)
@@ -551,8 +552,9 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
       strcat(options, ",workgroup=");
       strcat(options, workgroup);
     }
-  } else {
-    strcat(options, ",guest");
+  } else { /* smbmount needs a username, otherwise it takes LOGNAME from
+              environment. see bugzilla #20152 */
+    strcat(options, ",username=root,guest");
   }
 }
 
@@ -603,6 +605,7 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 
   mod_modprobe("smbfs", NULL);
 
+  fprintf(stderr, "%s\n", tmp);
   if(system(tmp)) {
     sprintf(tmp, "%s", "Error trying to mount SMB share.");
 
@@ -836,7 +839,7 @@ int net_choose_device()
     { "iucv",  TXT_NET_CLAW  }
   };
     
-  if(auto_ig) return 0;
+  if(auto_ig || config.net.device_given) return 0;
 
   /* re-read - just in case... */
   util_update_netdevice_list(NULL, 1);
@@ -1216,7 +1219,7 @@ int net_dhcp()
 
   strcpy(cmd, "dhcpcd -B");
   if(config.net.dhcp_timeout != 60) {
-    sprintf(cmd + strlen(cmd), "-t %d", config.net.dhcp_timeout);
+    sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
   }
   if(*machine_name_tg) {
     sprintf(cmd + strlen(cmd), " %s", machine_name_tg);
@@ -1286,6 +1289,7 @@ int net_dhcp()
         break;
 
       default:
+        break;
     }
   }
 
@@ -1331,6 +1335,7 @@ unsigned net_config_mask()
   return u;
 }
 
+
 char *net_if2module(char *net_if)
 {
   slist_t *sl;
@@ -1342,4 +1347,25 @@ char *net_if2module(char *net_if)
   return NULL;
 }
 
+
+void if_down(char *dev)
+{
+  int sock;
+  struct ifreq iface = {};
+
+  if(!dev || !*dev) return;
+
+  fprintf(stderr, "if %s down\n", dev);
+
+  sock = socket(AF_INET, SOCK_DGRAM, 0);
+  if(sock == -1) return;
+
+  strcpy(iface.ifr_name, dev);
+  iface.ifr_addr.sa_family = AF_INET;
+
+  ioctl(sock, SIOCGIFFLAGS, &iface);
+  iface.ifr_flags &= ~(IFF_UP | IFF_RUNNING);
+  ioctl(sock, SIOCSIFFLAGS, &iface);
+  close(sock);
+}
 
