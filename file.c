@@ -575,6 +575,7 @@ void file_do_info(file_t *f0)
       case key_netdevice:
         strncpy(netdevice_tg, f->value, sizeof netdevice_tg);
         netdevice_tg[sizeof netdevice_tg - 1] = 0;
+        config.net.device_given = 1;
         break;
 
       case key_livesrc:

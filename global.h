@@ -299,6 +299,7 @@ typedef struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned smb_available:1;	/* set if SMB functionality is available */
+    unsigned device_given:1;	/* netdevice explicity set in info file */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
     int ftp_sock;		/* used internally by ftp code */
