@@ -8,4 +8,3 @@
 
 extern void info_menu           (void);
 extern void info_init           (void);
-extern void info_show_hardware  (void);

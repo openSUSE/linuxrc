@@ -31,6 +31,7 @@
 static int info_show_cb(dia_item_t di);
 
 static dia_item_t di_info_menu_last = di_none;
+static void info_show_hardware(void);
 static char *pr_dev_num(hd_dev_num_t *d);
 
 void info_menu()
