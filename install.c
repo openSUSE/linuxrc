@@ -829,6 +829,10 @@ int inst_start_install()
     str_copy(&config.instsys, buf);
   }
 
+  /* workaround for broken SCO media */
+  if(config.instmode == inst_cdrom) {
+    get_file("/info.txt", "/info.txt");
+  }
   get_file("/content", "/content");
   get_file("/media.1/info.txt", "/info.txt");
 

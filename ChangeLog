@@ -1,3 +1,6 @@
+19/2/2003:	v1.4.43
+	- workaround for broken SCO media: look for /info.txt, too (#23767)
+
 17/2/2003:	v1.4.42
 	- copy content file from the first CD linuxrc sees to /tmp/content
 	- always enable update CD menu entry
