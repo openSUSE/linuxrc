@@ -98,15 +98,17 @@ static struct {
 //  { "insmod",      insmod_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
+#if !defined(__s390__) && !defined(__s390x__)
   { "loadkeys",    loadkeys_main         },
+  { "setfont",     setfont_main          },
+  { "portmap",     portmap_main          },
+#endif
   { "dhcpcd",      dhcpcd_main           },
 #if WITH_PCMCIA
   { "cardmgr",     cardmgr_main          },
   { "probe",       probe_main            },
 #endif
-  { "setfont",     setfont_main          },
   { "smbmnt",      smbmnt_main           },
-  { "portmap",     portmap_main          },
   { "mount",       util_mount_main       },
   { "umount",      util_umount_main      },
   { "cat",         util_cat_main         },

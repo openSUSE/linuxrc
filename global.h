@@ -27,13 +27,7 @@
 // on all architectures but s390, linuxrc includes a lot of other
 // functionality like 'mount/umount', 'loadkeys', ...
 
-// on s/390 need much more than this, so we include the original tools
-// instead of duplicating their functionality within linuxrc.
-#if defined (__s390__) || defined (__s390x__)
-#  define SWISS_ARMY_KNIFE 0
-#else
-#  define SWISS_ARMY_KNIFE 1
-#endif
+#define SWISS_ARMY_KNIFE 1
 
 #ifndef TRUE
 #define TRUE			1

@@ -26,12 +26,12 @@ CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
 
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 ifeq ($(CC),$(CC_DIET))
-LDFLAGS	+= -lrpc -lcompat -lhd_tiny_diet
+LDFLAGS	+= -lrpc -lcompat -lhd_tiny_diet -lsysfs
 else
 ifeq ($(CC),$(CC_UC))
-LDFLAGS	+= -lhd_tiny_uc
+LDFLAGS	+= -lhd_tiny_uc -lsysfs
 else
-LDFLAGS	+= -lhd_tiny -lresolv
+LDFLAGS	+= -lhd_tiny -lsysfs -lresolv
 endif
 endif
 
