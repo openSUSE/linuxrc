@@ -913,3 +913,8 @@ msgstr ""
 msgid "Show Driver Updates"
 msgstr ""
 
+#. TXT_INPUT_NAMED1
+#, c-format
+msgid "Please enter the IP of name server %u, or press ESC."
+msgstr ""
+

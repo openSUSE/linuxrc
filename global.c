@@ -29,8 +29,6 @@ char            netdevice_tg [20] = "eth0";
 int             pcmcia_chip_ig = 0;
 int             cpu_ig = 0;
 int             force_ri_ig = FALSE;
-char            machine_name_tg [100];
-int             old_kernel_ig = TRUE;
 char            ppcd_tg [10];
 int             yast2_serial_ig = FALSE;
 int             has_floppy_ig = TRUE;

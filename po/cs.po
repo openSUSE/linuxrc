@@ -918,3 +918,8 @@ msgstr "Pøidat aktualizaci ovladaèe"
 msgid "Show Driver Updates"
 msgstr "Zobrazit aktualizace ovladaèù"
 
+#. TXT_INPUT_NAMED1
+#, c-format
+msgid "Please enter the IP of name server %u, or press ESC."
+msgstr ""
+

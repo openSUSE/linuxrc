@@ -630,6 +630,8 @@ void lxrc_init()
   config.net.dhcp_timeout = 60;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
+  config.net.setup = NS_DEFAULT;
+  config.net.nameservers = 1;
 
   config.explode_win = 1;
   config.color = 2;
@@ -670,7 +672,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2004 SuSE Linux AG <<<\n",
+      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2004 SuSE Linux AG <<<\n",
       config.product
     );
     if (config.linemode)
@@ -724,7 +726,10 @@ void lxrc_init()
 
   util_splash_bar(10);
 
-  if(util_check_exist("/proc/iSeries")) config.is_iseries = 1;
+  if(util_check_exist("/proc/iSeries")) {
+    config.is_iseries = 1;
+    config.linemode = 1;
+  }
 
   kbd_init();
   util_redirect_kmsg();
@@ -851,6 +856,7 @@ void lxrc_main_menu()
     di_main_info,
     di_main_modules,
     di_main_start,
+    di_main_eject,
     di_main_hwcheck,
     di_main_reboot,
     di_main_halt,
@@ -862,10 +868,10 @@ void lxrc_main_menu()
   di_lxrc_main_menu_last = config.hwcheck ? di_main_hwcheck : di_main_start;
 
   if(config.hwcheck) {
-    items[0] = items[1] = items[2] = items[3] = di_skip;
+    items[0] = items[1] = items[2] = items[3] = items[4] = di_skip;
   }
   else {
-    items[4] = di_skip;
+    items[5] = di_skip;
   }
 
   for(;;) {
@@ -917,6 +923,11 @@ int lxrc_main_cb(dia_item_t di)
 
     case di_main_start:
       rc = inst_menu();
+      break;
+
+    case di_main_eject:
+      util_eject_cdrom(config.cdrom);
+      rc = 1;
       break;
 
 #if 0

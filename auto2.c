@@ -41,6 +41,7 @@ static char *pcmcia_params = NULL;
 static int is_vaio = 0;
 static int need_modules = 0;
 
+static void auto2_user_netconfig(void);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
@@ -49,7 +50,6 @@ static int driver_is_active(hd_t *hd);
 static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
-// static int load_usb_storage(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 #ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
@@ -505,8 +505,6 @@ int auto2_net_dev(hd_t **hd0)
         fprintf(stderr, "%s activated\n", hd->unix_dev_name);
       }
 
-      net_is_configured_im = TRUE;
-
       net_ask_password(); /* in case we have ssh or vnc in auto mode */
 
       switch(config.instmode) {
@@ -845,11 +843,15 @@ int auto2_init()
   return i;
 }
 
-static void auto2_ask_net_if_vnc()
+
+/*
+ * Let user enter network config data.
+ */
+void auto2_user_netconfig()
 {
   int win_old;
 
-  if(!config.vnc && !config.usessh) return;
+  if(!config.net.do_setup) return;
 
   auto2_activate_devices(bc_network, 0);
 
@@ -861,10 +863,14 @@ static void auto2_ask_net_if_vnc()
     }
   }
 
-  if(config.net.configured == nc_none) {
+  if(config.net.configured == nc_none || config.net.do_setup) {
     if(!(win_old = config.win)) util_disp_init();
-    if(net_config()) config.vnc = config.usessh = 0;
+    net_config();
     if(!win_old) util_disp_done();
+  }
+
+  if(config.net.configured == nc_none) {
+    config.vnc = config.usessh = 0;
   }
 }
 
@@ -892,7 +898,7 @@ int auto2_find_install_medium()
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
-      auto2_ask_net_if_vnc();
+      auto2_user_netconfig();
       return TRUE;
     }
 
@@ -911,13 +917,13 @@ int auto2_find_install_medium()
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
         if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        auto2_ask_net_if_vnc();
+        auto2_user_netconfig();
         return TRUE;
       }
     }
 
     if(config.cdrom) {
-      auto2_ask_net_if_vnc();
+      auto2_user_netconfig();
       return TRUE;
     }
   }
@@ -932,7 +938,7 @@ int auto2_find_install_medium()
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
       if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
-      auto2_ask_net_if_vnc();
+      auto2_user_netconfig();
       return TRUE;
     }
 
@@ -951,7 +957,7 @@ int auto2_find_install_medium()
       if(!(i = auto2_harddisk_dev(&hd_devs))) {
         if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        auto2_ask_net_if_vnc();
+        auto2_user_netconfig();
         return TRUE;
       }
     }
@@ -960,6 +966,8 @@ int auto2_find_install_medium()
   if(net_config_mask() || config.insttype == inst_net) {
 
     util_debugwait("Net?");
+
+    if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
 
     need_modules = 0;
 
@@ -973,7 +981,7 @@ int auto2_find_install_medium()
     fprintf(stderr, "broadcast:  %s\n", inet2print(&config.net.broadcast));
     fprintf(stderr, "gateway:    %s\n", inet2print(&config.net.gateway));
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
-    fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver));
+    fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
     fprintf(stderr, "Looking for a network server...\n");
     if(!auto2_net_dev(&hd_devs)) {

@@ -176,6 +176,24 @@ typedef enum {
 
 #define MAX_MODULE_TYPES 10
 
+/* config.net.do_setup bitmasks */
+
+#define DS_SETUP		(1 << 0)	/* NetSetup option has been used */
+#define DS_INSTALL		(1 << 1)
+#define DS_VNC			(1 << 2)
+#define DS_SSH			(1 << 3)
+
+/* config.net.setup bitmasks */
+
+/* reserved 			(1 << 0) */
+#define NS_DHCP			(1 << 1)
+#define NS_HOSTIP		(1 << 2)
+#define NS_NETMASK		(1 << 3)
+#define NS_GATEWAY		(1 << 4)
+#define NS_NAMESERVER		(1 << 5)
+
+#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER)
+
 typedef struct {
   unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
@@ -362,6 +380,9 @@ typedef struct {
     unsigned smb_available:1;	/* set if SMB functionality is available */
     unsigned device_given:1;	/* netdevice explicity set in info file */
     unsigned ifconfig:1;	/* setup network interface */
+    unsigned is_configured:1;	/* set if network is configured */
+    unsigned do_setup;		/* do network setup */
+    unsigned setup;		/* bitmask: do these network setup things */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
     int ftp_sock;		/* used internally by ftp code */
@@ -384,7 +405,8 @@ typedef struct {
     inet_t network;
     inet_t broadcast;
     inet_t gateway;
-    inet_t nameserver;
+    inet_t nameserver[4];	/* up to 4 nameservers */
+    unsigned nameservers;	/* actual number of nameservers */
     inet_t proxy;
     inet_t hostname;
     inet_t server;
@@ -414,8 +436,6 @@ extern char            netdevice_tg [20];
 extern int             pcmcia_chip_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
-extern char            machine_name_tg [100];
-extern int             old_kernel_ig;
 extern char            ppcd_tg [10];
 extern int             yast2_serial_ig;
 extern int             has_floppy_ig;

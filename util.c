@@ -1197,6 +1197,9 @@ void util_status_info()
   add_flag(&sl0, buf, config.use_usbscsi, "usbscsi");
   if(*buf) slist_append_str(&sl0, buf);
 
+  sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
+  slist_append_str(&sl0, buf);
+
   if(config.autoyast) {
     sprintf(buf, "autoyast = %s", config.autoyast);
     slist_append_str(&sl0, buf);
@@ -1259,8 +1262,10 @@ void util_status_info()
   sprintf(buf, "gateway = %s", inet2print(&config.net.gateway));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "nameserver = %s", inet2print(&config.net.nameserver));
-  slist_append_str(&sl0, buf);
+  for(i = 0; i < config.net.nameservers; i++) {
+    sprintf(buf, "nameserver%d = %s", i + 1, inet2print(&config.net.nameserver[i]));
+    slist_append_str(&sl0, buf);
+  }
 
   sprintf(buf, "proxy = %s", inet2print(&config.net.proxy));
   if(config.net.proxyport) {
@@ -3061,6 +3066,8 @@ void set_instmode(instmode_t instmode)
 
     default:
       config.insttype = inst_net;
+      config.net.do_setup |= DS_INSTALL;
+      if(!(config.net.do_setup & DS_SETUP)) config.net.setup = NS_DEFAULT;
   }
 
   if(

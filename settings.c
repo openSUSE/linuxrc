@@ -509,12 +509,22 @@ int set_expert_cb(dia_item_t di)
 
     case di_expert_vnc:
       rc = dia_yesno(txt_get(TXT_VNC_YES_NO), config.vnc ? YES : NO);
-      config.vnc = rc == YES ? 1 : 0;
+      if((config.vnc = rc == YES ? 1 : 0)) {
+        config.net.do_setup |= DS_VNC;
+      }
+      else {
+        config.net.do_setup &= ~DS_VNC;
+      }
       break;
 
     case di_expert_usessh:
       rc = dia_yesno(txt_get(TXT_SSH_YES_NO), config.usessh ? YES : NO);
-      config.usessh = rc == YES ? 1 : 0;
+      if((config.usessh = rc == YES ? 1 : 0)) {
+        config.net.do_setup |= DS_SSH;
+      }
+      else {
+        config.net.do_setup &= ~DS_SSH;
+      }
       break;
 
     default:

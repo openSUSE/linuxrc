@@ -921,3 +921,8 @@ msgstr "Prida» aktualizáciu ovládaèa"
 msgid "Show Driver Updates"
 msgstr "Zobrazi» aktualizácie ovládaèov"
 
+#. TXT_INPUT_NAMED1
+#, c-format
+msgid "Please enter the IP of name server %u, or press ESC."
+msgstr ""
+

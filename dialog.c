@@ -38,6 +38,7 @@ struct {
   { di_main_info,     TXT_MENU_INFO,      },
   { di_main_modules,  TXT_MENU_MODULES,   },
   { di_main_start,    TXT_MENU_START,     },
+  { di_main_eject,    TXT_EJECT_CD,       },
   { di_main_hwcheck,  0, "Hardware Check" },
   { di_main_reboot,   TXT_END_REBOOT,     },
   { di_main_halt,     0, "Power off"      },
@@ -61,7 +62,6 @@ struct {
   { di_inst_demo,        TXT_START_DEMO,          },
   { di_inst_system,      TXT_BOOT_SYSTEM,         },
   { di_inst_rescue,      TXT_START_RESCUE,        },
-  { di_inst_eject,       TXT_EJECT_CD,            },
   { di_inst_update_add,  TXT_ADD_DRIVER_UPDATE,   },
   { di_inst_update_show, TXT_SHOW_DRIVER_UPDATES, },
 

@@ -49,6 +49,8 @@ static void file_dump_mlist(module_t *ml);
 #endif
 
 static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
+static void file_write_inet_str(FILE *f, char *name, inet_t *inet);
+static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
 
 static struct {
   file_key_t key;
@@ -203,7 +205,8 @@ static struct {
   { key_ro,             "ro",             kf_boot                        },
   { key_rw,             "rw",             kf_boot                        },
   { key_netid,          "NetUniqueID",    kf_none                        },
-  { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early }
+  { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -521,7 +524,8 @@ void file_do_info(file_t *f0)
   url_t *url;
   int i, is_xml = 0;
   char buf[256], *s, *t;
-  slist_t *sl;
+  slist_t *sl, *sl0;
+  unsigned u;
 
   /* maybe it's an AutoYaST XML file */
   for(f = f0; f; f = f->next) {
@@ -592,8 +596,8 @@ void file_do_info(file_t *f0)
         break;
 
       case key_nameserver:
-        name2inet(&config.net.nameserver, f->value);
-        net_check_address2(&config.net.nameserver, 0);
+        name2inet(&config.net.nameserver[0], f->value);
+        net_check_address2(&config.net.nameserver[0], 0);
         break;
 
       case key_proxy:
@@ -803,12 +807,18 @@ void file_do_info(file_t *f0)
 
       case key_vnc:
         if(f->is.numeric) config.vnc = f->nvalue;
-        if(f->nvalue) config.activate_network = 1;
+        if(config.vnc) {
+          config.activate_network = 1;
+          config.net.do_setup |= DS_VNC;
+        }
         break;
 
       case key_usessh:
         if(f->is.numeric) config.usessh = f->nvalue;
-        if(f->nvalue) config.activate_network = 1;
+        if(config.usessh) {
+          config.activate_network = 1;
+          config.net.do_setup |= DS_SSH;
+        }
         break;
 
       case key_vncpassword:
@@ -1067,6 +1077,60 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.loglevel = f->nvalue;
         break;
 
+      case key_netsetup:
+        config.net.do_setup |= DS_SETUP;
+        if(f->is.numeric) {
+          config.net.setup = f->nvalue ? NS_DEFAULT : 0;
+        }
+        else {
+          sl0 = slist_split(',', f->value);
+
+          config.net.setup = 0;
+
+          for(sl = sl0; sl; sl = sl->next) {
+            if(*sl->key == '+' || *sl->key == '-') {
+              config.net.setup = NS_DEFAULT;
+              break;
+            }
+          }
+
+          for(sl = sl0; sl; sl = sl->next) {
+            s = sl->key;
+            if(*s == '+' || *s == '-') s++;
+            i = 0;
+            if(!strcmp(s, "dhcp")) i = NS_DHCP;
+            else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
+            else if(!strcmp(s, "netmask")) i = NS_NETMASK;
+            else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
+            else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
+              i = NS_NAMESERVER;
+              t = s + sizeof "nameserver" - 1;
+              if(!*t) {
+                u = 1;
+              }
+              else {
+                u = strtoul(t, &t, 0);
+                if(*t) u = 1;
+              }
+              config.net.nameservers =
+                u > sizeof config.net.nameserver / sizeof *config.net.nameserver ?
+                sizeof config.net.nameserver / sizeof *config.net.nameserver :
+                u;
+            }
+            if(i) {
+              if(*sl->key == '-') {
+                config.net.setup &= ~i;
+              }
+              else {
+                config.net.setup |= i;
+              }
+            }
+          }
+
+          slist_free(sl);
+        }
+        break;
+
       default:
         break;
     }
@@ -1155,19 +1219,41 @@ void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num)
 
 void file_write_inet(FILE *f, file_key_t key, inet_t *inet)
 {
+  file_write_inet_str(f, file_key2str(key), inet);
+}
+
+
+void file_write_inet_str(FILE *f, char *name, inet_t *inet)
+{
   char *s = NULL;
 
   if(inet->ok) s = inet_ntoa(inet->ip);
   if(!s) s = inet->name;
 
-  if(s) fprintf(f, "%s: %s\n", file_key2str(key), s);
+  if(s) fprintf(f, "%s: %s\n", name, s);
+}
+
+
+void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet)
+{
+  char *key_name = file_key2str(key);
+  char *ip = NULL;
+
+  if(inet->ok) {
+    ip = inet_ntoa(inet->ip);
+    fprintf(f, "%sIP: %s\n", key_name, ip);
+  }
+
+  if(inet->name && *inet->name && (!ip || strcmp(ip, inet->name))) {
+    fprintf(f, "%sName: %s\n", key_name, inet->name);
+  }
 }
 
 
 void file_write_install_inf(char *dir)
 {
   FILE *f;
-  char file_name[256], *s;
+  char file_name[256], buf[256], *s;
   slist_t *sl;
   file_t *ft0, *ft;
   int i;
@@ -1190,11 +1276,7 @@ void file_write_install_inf(char *dir)
   }
 
   file_write_str(f, key_cdrom, config.cdrom);
-  if(
-    (config.insttype == inst_net || (config.vnc || config.usessh)) &&
-    *netdevice_tg
-    /* && (s = net_if2module(netdevice_tg)) */
-  ) {
+  if(config.net.do_setup && *netdevice_tg) {
     for(sl = config.net.devices; sl; sl = sl->next) {
       if(sl->key && sl->value) {
       fprintf(f, "%s: %s %s\n", file_key2str(key_alias), sl->key, sl->value);
@@ -1228,11 +1310,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_serverdir, config.serverdir);
   }
 
-  if(
-    config.insttype == inst_net ||
-    config.instmode_extra == inst_cdwithnet ||
-    (config.vnc || config.usessh)
-  ) {
+  if(config.net.do_setup) {
     s = NULL;
     switch(config.net.configured) {
       case nc_none:
@@ -1267,8 +1345,13 @@ void file_write_install_inf(char *dir)
       file_write_inet(f, key_netmask, &config.net.netmask);
     }
     file_write_inet(f, key_gateway, &config.net.gateway);
-    file_write_inet(f, key_nameserver, &config.net.nameserver);
+    for(i = 0; i < config.net.nameservers; i++) {
+      s = file_key2str(key_nameserver);
+      if(i) { sprintf(buf, "%s%d", s, i + 1); s = buf; }
+      file_write_inet_str(f, s, &config.net.nameserver[i]);
+    }
     file_write_inet(f, key_server, &config.net.server);
+    file_write_inet_both(f, key_server, &config.net.server);
     file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
   }
@@ -1358,63 +1441,6 @@ void file_write_install_inf(char *dir)
   fclose(f);
 }
 
-
-#if 0
-void file_write_mtab()
-{
-  char smb_mount_options[256];
-  FILE *f;
-
-  if(!(f = fopen(MTAB_FILE, "w"))) return;
-
-  fprintf(f,
-    "/dev/initrd / minix rw 0 0\n"
-    "none /proc proc rw 0 0\n"
-  );
-
-  if(config.inst_ramdisk >= 0) {
-    fprintf(f, "%s %s ext2 ro 0 0\n",
-      config.ramdisk[config.inst_ramdisk].dev,
-      config.mountpoint.instsys
-    );
-  }
-  else {
-    switch(config.instmode) {
-      case inst_cdrom:
-        if(config.cdrom) {
-          fprintf(f, "/dev/%s %s iso9660 ro 0 0\n",
-            config.cdrom, config.mountpoint.instdata
-          );
-        }
-        break;
-
-      case inst_nfs:
-        fprintf(f,
-          "%s:%s %s nfs ro 0 0\n",
-          inet_ntoa(config.net.server.ip), config.serverdir ?: "", config.mountpoint.instdata
-        );
-        break;
-
-      case inst_smb:
-        net_smb_get_mount_options(
-          smb_mount_options,
-          &config.net.server, config.net.user,
-          config.net.password, config.net.workgroup
-        );
-        fprintf(f,
-          "//%s/%s %s smbfs ro,%s 0 0\n",
-          config.net.server.name, config.serverdir ?: "",
-          config.mountpoint.instdata, smb_mount_options
-        );
-        break;
-
-      default:
-    }
-  }
-
-  fclose(f);
-}
-#endif
 
 void file_write_modparms(FILE *f)
 {

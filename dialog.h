@@ -18,6 +18,7 @@ typedef enum {
   di_main_info,
   di_main_modules,
   di_main_start,
+  di_main_eject,
   di_main_hwcheck,
   di_main_reboot,
   di_main_halt,
@@ -41,7 +42,6 @@ typedef enum {
   di_inst_demo,
   di_inst_system,
   di_inst_rescue,
-  di_inst_eject,
   di_inst_update_add,
   di_inst_update_show,
 

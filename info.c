@@ -134,7 +134,6 @@ void info_init (void)
     char               line_ti [100];
     char               dummy_ti [20];
     char              *tmp_pci;
-    struct utsname     utsinfo_ri;
     struct hd_driveid  driveinfo_ri;
     char               devname_ti [30];
     int                fd_ii;
@@ -181,12 +180,8 @@ void info_init (void)
 
     fclose (fd_pri);
 
-    uname (&utsinfo_ri);
-    if (*(utsinfo_ri.release + 2) > '0')
-        old_kernel_ig = FALSE;
-
-    if(!config.had_segv) fprintf (stderr, "CPU: %d, Memory: %"PRId64", %skernel\n",
-             cpu_ig, memory_ig, old_kernel_ig ? "Old " : "New ");
+    if(!config.had_segv) fprintf (stderr, "CPU: %d, Memory: %"PRId64"\n",
+             cpu_ig, memory_ig);
 
 #ifndef __powerpc__
     /* Check for LS-120 */

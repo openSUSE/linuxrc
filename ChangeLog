@@ -1,3 +1,7 @@
+11/2/2004:	v1.6.4
+	- added netsetup option
+	- use linemode on iSeries (#12333)
+
 9/2/2004:	v1.6.3
 	- don't care about /oldroot when creating /lbin links
 

@@ -9,7 +9,7 @@
 extern int  net_config          (void);
 extern int  net_bootp           (void);
 
-extern int  net_ask_password    (void);
+extern void net_ask_password    (void);
 
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
 
@@ -22,7 +22,6 @@ int net_check_address2(inet_t *inet, int do_dns);
 extern int  net_setup_localhost (void);
 
 extern int  net_activate        (void);
-extern int  net_is_configured_im;
 
 int net_dhcp(void);
 void net_dhcp_stop(void);

@@ -232,7 +232,6 @@ int inst_menu()
     di_inst_demo,
     di_inst_system,
     di_inst_rescue,
-    di_inst_eject,
     di_none
   };
 
@@ -280,11 +279,6 @@ int inst_menu_cb(dia_item_t di)
     case di_inst_rescue:
       config.rescue = 1;
       error = inst_start_rescue();
-      break;
-
-    case di_inst_eject:
-      util_eject_cdrom(config.cdrom);
-      error = 1;
       break;
 
     default:
@@ -473,7 +467,7 @@ int inst_mount_cdrom(int show_err)
   else {
     set_instmode(inst_cdrom);
 
-    if((config.vnc || config.usessh) && (rc = net_config())) return rc;
+    if(config.net.do_setup && (rc = net_config())) return rc;
   }
 
   dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
@@ -586,7 +580,7 @@ int inst_mount_harddisk()
 
   set_instmode(inst_hd);
 
-  if((config.vnc || config.usessh) && (rc = net_config())) return rc;
+  if(config.net.do_setup && (rc = net_config())) return rc;
 
   do {
     rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));

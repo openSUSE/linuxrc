@@ -58,8 +58,6 @@
 
 #define MAX_NETDEVICE      64
 
-int net_is_configured_im = FALSE;
-
 static int  net_is_plip_im = FALSE;
 
 #if !defined(NETWORK_CONFIG)
@@ -71,50 +69,70 @@ static int  net_is_plip_im = FALSE;
 #endif
 
 #if NETWORK_CONFIG
-static int  net_choose_device    (void);
-static void net_setup_nameserver (void);
-static int  net_input_data       (void);
+static int net_choose_device(void);
+static void net_setup_nameserver(void);
+static int net_input_data(void);
 #endif
 #ifdef WITH_NFS
-static void net_show_error       (enum nfs_stat status_rv);
+static void net_show_error(enum nfs_stat status_rv);
 #endif
 
 #include "static_resolv.h"
 
 static void if_down(char *dev);
 
-int net_ask_password() {
-  int rc;
 
-  /* If we use VNC or ssh install, ask for the login password */
-  if (config.vnc && !config.net.vncpassword) {
-    int win_old;
+/*
+ * Ask for VNC & SSH password, unless they have already been set.
+ *
+ * Global vars changed:
+ *  config.net.vncpassword
+ *  config.net.sshpassword
+ */
+void net_ask_password()
+{
+  int win_old = config.win;
 
-    if(!(win_old = config.win)) util_disp_init();
-    rc = dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1);
-    if(!win_old) util_disp_done();
-    /* if(rc == ESCAPE) return -1; */
+  if(config.vnc && !config.net.vncpassword) {
+    if(!config.win) util_disp_init();
+    dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1);
   }
-  if (config.usessh && !config.net.sshpassword) {
-    int win_old;
 
-    if(!(win_old = config.win)) util_disp_init();
-    rc = dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
-    if(!win_old) util_disp_done();
+  if(config.usessh && !config.net.sshpassword) {
+    if(!config.win) util_disp_init();
+    dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
   }
-  return 0;
+
+  if(config.win && !win_old) util_disp_done();
 }
 
+
+/*
+ * Configure network. Ask for network config data if necessary.
+ * Does either DHCP, BOOTP or calls net_activate() to setup the interface.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error or abort
+ *
+ * Global vars changed:
+ *  config.net.is_configured
+ *
+ * Does nothing if DHCP is active.
+ *
+ * FIXME: needs window mode or not?
+ */
 int net_config()
 {
 #if NETWORK_CONFIG
   int rc;
   char buf[256];
 
-  if (net_ask_password()) return -1;
+  net_ask_password();
 
   if(
-    net_is_configured_im &&
+    config.win &&
+    config.net.is_configured &&
     dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES
   ) {
     return 0;
@@ -126,12 +144,17 @@ int net_config()
 
   config.net.configured = nc_none;
 
-  if(!config.win) {
-    rc = YES;
+  if(config.win) {
+    if((config.net.setup & NS_DHCP)) {
+      sprintf(buf, txt_get(TXT_ASK_DHCP), config.net.use_dhcp ? "DHCP" : "BOOTP");
+      rc = dia_yesno(buf, NO);
+    }
+    else {
+      rc = NO;
+    }
   }
   else {
-    sprintf(buf, txt_get(TXT_ASK_DHCP), config.net.use_dhcp ? "DHCP" : "BOOTP");
-    rc = dia_yesno(buf, NO);
+    rc = YES;
   }
 
   if(rc == ESCAPE) return -1;
@@ -150,38 +173,44 @@ int net_config()
   if(net_activate()) {
     dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
     config.net.configured = nc_none;
-    return -1;
+    if(!config.test) return rc = -1;
   }
 
   net_setup_nameserver();
 
-  net_is_configured_im = TRUE;
-
   net_check_address2(&config.net.server, 1);
-  // net_check_address2(&..., 1);
 
 #endif
 
-  return 0;
+  return rc;
 }
 
 
-void net_stop(void)
+/*
+ * Shut down all network interfaces.
+ *
+ * Global vars changed:
+ *  config.net.is_configured
+ *
+ * netdevice_tg:    interface
+ * /proc/net/route: configured interfaces
+ */
+void net_stop()
 {
   file_t *f0, *f;
   slist_t *sl0 = NULL, *sl;
 
   if(config.test) {
-    net_is_configured_im = FALSE;
+    config.net.is_configured = 0;
     return;
   }
 
   if(config.net.dhcp_active) {
     net_dhcp_stop();
-    net_is_configured_im = FALSE;
+    config.net.is_configured = 0;
   }
 
-  if(!net_is_configured_im) return;
+  if(!config.net.is_configured) return;
 
   /* build list of configured interfaces */
   slist_append_str(&sl0, netdevice_tg);
@@ -196,12 +225,15 @@ void net_stop(void)
 
   slist_free(sl0);
 
-  net_is_configured_im = FALSE;
+  config.net.is_configured = 0;
 }
 
 
-int net_setup_localhost (void)
-    {
+/*
+ * Configure loopback interface.
+ */
+int net_setup_localhost()
+{
     char                address_ti [20];
     struct in_addr      ipaddr_ri;
     int                 socket_ii;
@@ -240,7 +272,7 @@ int net_setup_localhost (void)
     sockaddr_ri.sin_addr = ipaddr_ri;
     memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
     if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
-        if (old_kernel_ig || config.net.netmask.ip.s_addr)
+        if (config.net.netmask.ip.s_addr)
             {
             HERE
             error_ii = TRUE;
@@ -252,7 +284,7 @@ int net_setup_localhost (void)
     sockaddr_ri.sin_addr = ipaddr_ri;
     memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
     if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
-        if (old_kernel_ig || config.net.broadcast.ip.s_addr != 0xffffffff)
+        if (config.net.broadcast.ip.s_addr != 0xffffffff)
             {
             HERE
             error_ii = TRUE;
@@ -273,13 +305,28 @@ int net_setup_localhost (void)
 
     close (socket_ii);
 
-    fprintf (stderr, "%s\n", error_ii ? "failure" : "done");
-    return (error_ii);
-    }
+  fprintf (stderr, "%s\n", error_ii ? "failure" : "done");
+
+  return error_ii;
+}
 
 
-int net_activate (void)
-    {
+/*
+ * Setup network interface.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error code
+ *
+ * Global vars changed:
+ *  config.net.is_configured
+ *
+ * Does nothing if DHCP is active.
+ *
+ * netdevice_tg: interface
+ */
+int net_activate()
+{
     int                 socket_ii;
     struct ifreq        interface_ri;
     struct rtentry      route_ri;
@@ -287,6 +334,8 @@ int net_activate (void)
     int                 error_ii = FALSE;
 
     if(config.test || !config.net.ifconfig || config.net.dhcp_active) return 0;
+
+    config.net.is_configured = 0;
 
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)
@@ -314,13 +363,13 @@ int net_activate (void)
         sockaddr_ri.sin_addr = config.net.netmask.ip;
         memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
-            if (old_kernel_ig || config.net.netmask.ip.s_addr)
+            if (config.net.netmask.ip.s_addr)
                 error_ii = TRUE;
 
         sockaddr_ri.sin_addr = config.net.broadcast.ip;
         memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
-            if (old_kernel_ig || config.net.broadcast.ip.s_addr != 0xffffffff)
+            if (config.net.broadcast.ip.s_addr != 0xffffffff)
                 error_ii = TRUE;
         }
 
@@ -358,9 +407,7 @@ int net_activate (void)
         sockaddr_ri.sin_addr = config.net.network.ip;
         memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
         route_ri.rt_flags = RTF_UP;
-        if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
-            if (old_kernel_ig)
-                error_ii = TRUE;
+        ioctl (socket_ii, SIOCADDRT, &route_ri);
 
         if (
           config.net.gateway.ip.s_addr &&
@@ -384,10 +431,14 @@ int net_activate (void)
             }
         }
 
-    close (socket_ii);
+  close(socket_ii);
 
-    return (error_ii);
-    }
+  if(!error_ii) {
+    config.net.is_configured = 1;
+  }
+
+  return error_ii;
+}
 
 
 int net_check_address (char *input_tv, struct in_addr *address_prr, int *net_bits)
@@ -557,6 +608,9 @@ int net_check_address2(inet_t *inet, int do_dns)
 }
 
 
+/*
+ * Build mount option suitable for smbmount.
+ */
 void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup)
 {
   if(!options) return;
@@ -574,38 +628,45 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
       strcat(options, ",workgroup=");
       strcat(options, workgroup);
     }
-  } else { /* smbmount needs a username, otherwise it takes LOGNAME from
-              environment. see bugzilla #20152 */
+  } else {
+     /*
+      * smbmount needs a username, otherwise it takes LOGNAME from
+      * environment. see bugzilla #20152
+      */
     strcat(options, ",username=root,guest");
   }
 }
 
 
 /*
- * mount windows share
+ * Mount windows share.
+ * (Run smbmount.)
  *
- * if user == NULL, use 'guest' login
+ * Return:
+ *      0: ok
+ *   != 0: error code
+ *
+ * mountpoint: mount point
+ * server: SMB server
+ * hostdir: share
+ * user: user (NULL: guest)
+ * password: password (NULL: no password)
+ * workgroup: workgroup (NULL: no workgroup)
+ *
+ */
+/*
+ * abhängig von Guest login 
+ *   options += "guest"
+ * bzw.
+ *   options += "username=" + USERNAME + ",password=" + PASSWORD
+ *
+ *   device = "//" + SERVER + "/" + SHARE
+ *   options += ",workgroup=" + WORKGROUP   falls WORKGROUP gesetzt ist
+ *   options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
+ * "  mount -t smbfs" + device + " " + mountpoint + " " + options
  */
 int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup)
 {
-    /*******************************************************************
-
-       abhängig von [X] Guest login 
-	 options += "guest"
-       bzw.
-	 options += "username=" + USERNAME + ",password=" + PASSWORD
-
-
-	 device = "//" + SERVER + "/" + SHARE
-
-	 options += ",workgroup=" + WORKGROUP   falls WORKGROUP gesetzt ist
-
-	 options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
-
-
-	 "mount -t smbfs" + device + " " + mountpoint + " " + options
-
-    *******************************************************************/
   char tmp[1024];
   char mount_options[256];
 
@@ -616,12 +677,8 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 
   net_smb_get_mount_options(mount_options, server, user, password, workgroup);
 
-#if !defined(SUDO)
-#  define SUDO
-#endif
-
   sprintf(tmp,
-    SUDO "smbmount //%s/%s %s -o ro,%s >&2",
+    "smbmount //%s/%s %s -o ro,%s >&2",
     server->name, hostdir, mountpoint, mount_options
   );
 
@@ -643,6 +700,7 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 
   return 0;
 }
+
 
 #ifdef WITH_NFS
 int xdr_dirpath (XDR *xdrs, dirpath *objp)
@@ -676,6 +734,21 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
     }
 
 
+/*
+ * Mount NFS volume.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error code
+ *
+ * mountpoint: mount point
+ * server: server address
+ * hostdir: directory on server
+ *
+ * config.net.nfs_rsize: read size
+ * config.net.nfs_wsize: write size
+ * config.net.nfs_port: NFS port
+ */
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
 {
     struct sockaddr_in     server_ri;
@@ -827,6 +900,10 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
 
 #else
 
+
+/*
+ * Dummy if we don't support NFS.
+ */
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
 {
   return -1;
@@ -836,6 +913,20 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
 
 
 #if NETWORK_CONFIG
+/*
+ * Let user select a network interface.
+ *
+ * Does nothing if network interface has been explicitly specified.
+ * No user interaction if there is exactly one interface.
+ * Shows error message if there is no interface.
+ *
+ * Note: expects window mode.
+ *
+ * Global vars changed:
+ *  netdevice_tg
+ *
+ * config.net.device_given: do nothing if != 0
+ */
 int net_choose_device()
 {
   char *items[MAX_NETDEVICE + 1], *s;
@@ -910,7 +1001,15 @@ int net_choose_device()
 }
 #endif
 
+
 #ifdef WITH_NFS
+/*
+ * Show NFS error messages.
+ *
+ * Helper for net_mount_nfs().
+ *
+ * nfs_stat: NFS status
+ */
 static void net_show_error(enum nfs_stat status_rv)
 {
   int i;
@@ -970,23 +1069,54 @@ static void net_show_error(enum nfs_stat status_rv)
 }
 #endif
 
+
 #if NETWORK_CONFIG
+/*
+ * Let user enter nameservers.
+ *
+ * Does nothing if dhcp is active.
+ * Does nothing unless window mode is active.
+ *
+ * Writes nameserver & domain to /etc/resolv.conf.
+ *
+ * Global vars changed:
+ *  config.net.nameserver
+ */
 void net_setup_nameserver()
 {
-  char *s;
+  char *s, buf[256];
   FILE *f;
+  unsigned u;
 
-  if(config.net.dhcp_active || !config.win || config.test) return;
+  if(config.net.dhcp_active || !config.win) return;
 
-  if(!config.net.nameserver.name && config.net.hostname.ok) {
+  if(!config.net.nameserver[0].name && config.net.hostname.ok) {
     s = inet_ntoa(config.net.hostname.ip);
-    config.net.nameserver.name = strdup(s ?: "");
+    config.net.nameserver[0].name = strdup(s ?: "");
   }
-  net_get_address(txt_get(TXT_INPUT_NAMED), &config.net.nameserver, 0);
 
-  if(config.net.nameserver.ok) {
+  if((config.net.setup & NS_NAMESERVER)) {
+    for(u = 0; u < config.net.nameservers; u++) {
+      if(config.net.nameservers == 1) {
+        s = txt_get(TXT_INPUT_NAMED);
+      }
+      else {
+         sprintf(buf, txt_get(TXT_INPUT_NAMED1), u + 1);
+         s = buf;
+      }
+      if(net_get_address(s, &config.net.nameserver[u], 0)) break;
+    }
+    for(; u < config.net.nameservers; u++) {
+      str_copy(&config.net.nameserver[u].name, NULL);
+      config.net.nameserver[u].ok = 0;
+    }
+  }
+
+  if(config.test) return;
+
+  if(config.net.nameserver[0].ok) {
     if((f = fopen("/etc/resolv.conf", "w"))) {
-      fprintf(f, "nameserver %s\n", config.net.nameserver.name);
+      fprintf(f, "nameserver %s\n", config.net.nameserver[0].name);
       if(config.net.domain) {
         fprintf(f, "search %s\n", config.net.domain);
       }
@@ -996,9 +1126,27 @@ void net_setup_nameserver()
 }
 
 
+/*
+ * Let user enter some network config data.
+ *
+ * Note: expects window mode.
+ *
+ * Global vars changed:
+ *  config.net.hostname
+ *  config.net.netmask
+ *  config.net.pliphost
+ *  config.net.gateway
+ *  config.net.server
+ *  config.net.broadcast
+ *  config.net.network
+ *  config.net.gateway
+ */
 int net_input_data()
 {
-  if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 1)) return -1;
+
+  if((config.net.setup & NS_HOSTIP)) {
+    if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 1)) return -1;
+  }
 
   if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
     s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
@@ -1038,7 +1186,9 @@ int net_input_data()
         strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0"
       );
     }
-    if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) return -1;
+    if((config.net.setup & NS_NETMASK)) {
+      if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) return -1;
+    }
 
     s_addr2inet(
       &config.net.broadcast,
@@ -1050,7 +1200,9 @@ int net_input_data()
       config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
     );
 
-    net_get_address(txt_get(TXT_INPUT_GATEWAY), &config.net.gateway, 1);
+    if((config.net.setup & NS_GATEWAY)) {
+      net_get_address(txt_get(TXT_INPUT_GATEWAY), &config.net.gateway, 1);
+    }
   }
 
   return 0;
@@ -1058,6 +1210,28 @@ int net_input_data()
 #endif
 
 
+/*
+ * Use bootp to get network config data.
+ *
+ * Does nothing if we already got a hostip address (in config.net.hostname).
+ *
+ * Note: shuts all interfaces down.
+ *
+ * Global vars changed:
+ *  config.net.hostname
+ *  config.net.netmask
+ *  config.net.network
+ *  config.net.broadcast
+ *  config.net.pliphost
+ *  config.net.gateway
+ *  config.net.nameserver
+ *  config.net.domain
+ *  config.net.server
+ *  config.serverdir
+ * 
+ * config.net.bootp_wait: delay between interface setup & bootp request
+ * netdevice_tg: interface
+ */
 int net_bootp()
 {
   window_t  win;
@@ -1076,7 +1250,7 @@ int net_bootp()
   name2inet(&config.net.hostname, "");
   netconf_error	= 0;
 
-  if(net_activate ()) {
+  if(net_activate()) {
     if(config.win) {
       dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
     }
@@ -1102,45 +1276,11 @@ int net_bootp()
   win_close(&win);
 
   if(rc || !getenv("BOOTP_IPADDR")) {
-    if(config.instmode_extra == inst_cdwithnet) {
-      dia_input("HOSTNAME", machine_name_tg, sizeof machine_name_tg - 1, 16, 0);
-
-      if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 0)) netconf_error++;
-
-      if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
-        s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
-      }
-
-      if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) netconf_error++;
-
-      s_addr2inet(
-        &config.net.broadcast,
-        config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-      );
-
-      s_addr2inet(
-        &config.net.network,
-        config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
-      );
-
-      if(net_get_address(txt_get(TXT_INPUT_GATEWAY), &config.net.gateway, 0)) netconf_error++;
-
-      if(netconf_error) {
-        dia_message("Configuration not valid: press any key to reboot, ... ", MSGTYPE_ERROR);
-        reboot(RB_AUTOBOOT);
-      }
-
-      net_stop();
-
-      return 0;
+    if(config.win) {
+      sprintf(tmp, txt_get(TXT_ERROR_DHCP), "BOOTP");
+      dia_message(tmp, MSGTYPE_ERROR);
     }
-    else {
-      if(config.win) {
-        sprintf(tmp, txt_get (TXT_ERROR_DHCP), "BOOTP");
-        dia_message(tmp, MSGTYPE_ERROR);
-      }
-      return -1;
-    }
+    return -1;
   }
 
   name2inet(&config.net.hostname, getenv("BOOTP_IPADDR"));
@@ -1159,9 +1299,9 @@ int net_bootp()
   name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS_1"));
   net_check_address2(&config.net.gateway, 0);
 
-  name2inet(&config.net.nameserver, getenv("BOOTP_DNSSRVS"));
-  name2inet(&config.net.nameserver, getenv("BOOTP_DNSSRVS_1"));
-  net_check_address2(&config.net.nameserver, 0);
+  name2inet(&config.net.nameserver[0], getenv("BOOTP_DNSSRVS"));
+  name2inet(&config.net.nameserver[0], getenv("BOOTP_DNSSRVS_1"));
+  net_check_address2(&config.net.nameserver[0], 0);
 
   s = getenv("BOOTP_HOSTNAME");
   if(s && !config.net.hostname.name) config.net.hostname.name = strdup(s);
@@ -1201,18 +1341,24 @@ int net_bootp()
     net_check_address2(&config.net.server, 0);
   }
 
-#ifdef CDWITHNET_DEBUG
-  if(config.instmode_extra == inst_cdwithnet) {
-    dia_message(machine_name_tg, MSGTYPE_ERROR);
-  }
-#endif
-
   net_stop();
 
   return 0;
 }
 
 
+/*
+ * Ask user for some network address.
+ * (Used for netmasks, too.)
+ *
+ * Either numeric or dns resolved.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error or abort
+ *
+ * Note: expects window mode.
+ */
 int net_get_address(char *text, inet_t *inet, int do_dns)
 {
   int rc;
@@ -1232,6 +1378,21 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
 }
 
 
+/*
+ * Start dhcp client and reads dhcp info.
+ *
+ * Global vars changed:
+ *  config.net.dhcp_active
+ *  config.net.hostname
+ *  config.net.netmask
+ *  config.net.network
+ *  config.net.broadcast
+ *  config.net.gateway
+ *  config.net.domain
+ *  config.net.nameserver
+ *  config.net.server
+ *  config.serverdir
+ */
 int net_dhcp()
 {
   char cmd[256], file[256], *s;
@@ -1251,9 +1412,7 @@ int net_dhcp()
   if(config.net.dhcp_timeout != 60) {
     sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
   }
-  if(*machine_name_tg) {
-    sprintf(cmd + strlen(cmd), " %s", machine_name_tg);
-  }
+
   sprintf(cmd + strlen(cmd), " %s", netdevice_tg);
 
   sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", netdevice_tg);
@@ -1314,8 +1473,8 @@ int net_dhcp()
 
       case key_dns:
         if((s = strchr(f->value, ','))) *s = 0;
-        name2inet(&config.net.nameserver, f->value);
-        net_check_address2(&config.net.nameserver, 0);
+        name2inet(&config.net.nameserver[0], f->value);
+        net_check_address2(&config.net.nameserver[0], 0);
         break;
 
       default:
@@ -1341,6 +1500,12 @@ int net_dhcp()
 }
 
 
+/*
+ * Stop dhcp client.
+ *
+ * Global vars changed:
+ *  config.net.dhcp_active
+ */
 void net_dhcp_stop()
 {
   if(!config.net.dhcp_active) return;
@@ -1351,6 +1516,9 @@ void net_dhcp_stop()
 }
 
 
+/*
+ * Return current network config state as bitmask.
+ */
 unsigned net_config_mask()
 {
   unsigned u = 0;
@@ -1359,13 +1527,20 @@ unsigned net_config_mask()
   if(config.net.netmask.ok) u |= 2;
   if(config.net.gateway.ok) u |= 4;
   if(config.net.server.name) u |= 8;
-  if(config.net.nameserver.ok) u |= 0x10;
+  if(config.net.nameserver[0].ok) u |= 0x10;
   if(config.serverdir) u |= 0x20;
 
   return u;
 }
 
 
+/*
+ * Return module that handles a network interface.
+ *
+ * Returns NULL if unknown.
+ *
+ * net_if: interface
+ */
 char *net_if2module(char *net_if)
 {
   slist_t *sl;
@@ -1378,6 +1553,11 @@ char *net_if2module(char *net_if)
 }
 
 
+/*
+ * Shut down single network interface.
+ *
+ * dev: interface
+ */
 void if_down(char *dev)
 {
   int sock;
