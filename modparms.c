@@ -135,6 +135,13 @@ void mpar_write_modparms (FILE *file_prv)
               fprintf (file_prv, "%s%s", mod_idx ? " " : "", "mptbase");
               mod_idx++;
             }
+            if(
+              !strcmp(mpar_modnames_atm[i_ii], "pdcraid") ||
+              !strcmp(mpar_modnames_atm[i_ii], "hptraid")
+            ) {
+              fprintf (file_prv, "%s%s", mod_idx ? " " : "", "ataraid");
+              mod_idx++;
+            }
             fprintf (file_prv, "%s%s", mod_idx ? " " : "", mpar_modnames_atm [i_ii]);
             mod_idx++;
           }

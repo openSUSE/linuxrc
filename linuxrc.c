@@ -769,8 +769,6 @@ static void lxrc_main_menu (void)
 
     util_create_items (items_ari, nr_items_ii, width_ii);
 
-    nr_items_ii = config.is_iseries ? 6 : 5;
-
     do
         {
         strcpy (items_ari [0].text, txt_get (TXT_SETTINGS));
