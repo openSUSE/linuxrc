@@ -1144,12 +1144,15 @@ int inst_execute_yast()
 
   if(config.splash && config.textmode) system("echo 0 >/proc/splash");
 
+  fprintf(stderr, "starting %s\n", config.setupcmd);
+
+  kbd_end();
+  util_notty();
+
   if(config.test) {
     rc = system("/bin/bash 2>&1");
   }
   else {
-//    sprintf(cmd, "%s%s", config.instsys, config.setupcmd);
-    fprintf(stderr, "starting %s\n", config.setupcmd);
     rc = system(config.setupcmd);
   }
 
@@ -1161,6 +1164,12 @@ int inst_execute_yast()
       rc = WEXITSTATUS(rc);
     }
   }
+
+  freopen(config.console, "r", stdin);
+  freopen(config.console, "a", stdout);
+  freopen(config.stderr_name, "a", stderr);
+  kbd_init(0);
+  util_notty();
 
   if(config.splash && config.textmode) system("echo 1 >/proc/splash");
 
@@ -1260,7 +1269,10 @@ int inst_commit_install()
 {
   int err = 0;
 
-  if(reboot_ig) {
+  if(reboot_ig == 2) {
+    reboot(RB_POWER_OFF);
+  }
+  else if(reboot_ig) {
 
     if(config.rebootmsg) {
       disp_clear_screen();
