@@ -3,7 +3,7 @@
 	- rewrote driver update handling (#27792)
 	- put cmdline args into /etc/install.inf (#25745)
 	- updated FAT fs detection (#27814)
-	- cleaned up manual mode
+	- cleaned up manual mode & option parsing
 
 14/5/2003:	v1.5.2
 	- make hd installs work properly (#26906)
