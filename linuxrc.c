@@ -359,6 +359,9 @@ static void lxrc_init (void)
            if (strstr (s, ",loaddisk,"))
                action_ig |= ACT_LOAD_DISK;
 
+           if (strstr (s, ",french,"))
+               language_ig = LANG_FRENCH;
+
            free (s);
            }
         }
