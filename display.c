@@ -583,5 +583,5 @@ void disp_restore_screen (void)
 
 void disp_clear_screen (void)
     {
-    printf ("[H[J");
+    printf ("\033[H\033[J");
     }

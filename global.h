@@ -22,8 +22,8 @@
 #define MEM_LIMIT_RAMDISK_FTP	 28*1024*1024
 #define MEM_LIMIT_YAST2		 28*1024*1024
 
-#define MEM_LIMIT_SWAP_MSG	6500000
-#define MEM_LIMIT_CACHE_LIBS	15000000
+#define MEM_LIMIT_SWAP_MSG	15000000
+#define MEM_LIMIT_CACHE_LIBS	63000000
 
 #if defined(__sparc__) || defined(__PPC__) || defined(__s390__) || defined(__s390x__)
 #define WITH_PCMCIA	0

@@ -783,7 +783,7 @@ int inst_prepare()
 
   setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
-  system("/sbin/syslogd");
+//  system("/sbin/syslogd");
 
   file_write_yast_info(NULL);
 
@@ -793,151 +793,147 @@ int inst_prepare()
 }
 
 
-static int inst_execute_yast (void)
-    {
-    int       rc_ii;
-    int       i_ii = 0;
-    window_t  status_ri;
-    char      command_ti [80];
+int inst_execute_yast()
+{
+  int rc_ii, i_ii = 0;
+  window_t status_ri;
+  char command_ti[80];
 
-    lxrc_set_modprobe ("/sbin/modprobe");
-    rc_ii = inst_prepare ();
-    if (rc_ii)
-        return (rc_ii);
+  rc_ii = inst_prepare();
+  if(rc_ii) return rc_ii;
 
-    if (inst_choose_yast_version ())
-        {
-        lxrc_killall (0);
-        waitpid (-1, NULL, WNOHANG);
-
-        lxrc_set_modprobe ("/etc/nothing");
-        inst_umount ();
-        if (ramdisk_ig)
-            util_free_ramdisk ("/dev/ram2");
-
-        unlink ("/bin");
-        rename ("/.bin", "/bin");
-
-        return -1;
-        }
-
-    if (!auto2_ig)
-        dia_status_on (&status_ri, txt_get (TXT_START_YAST));
-    system ("update");
-
-    if (!auto2_ig)
-        while (i_ii < 50)
-            {
-            dia_status (&status_ri, i_ii++);
-            usleep (10000);
-            }
-
-    inst_start_shell ("/dev/tty2");
-    if (memory_ig < MEM_LIMIT_SWAP_MSG)
-        {
-        if (!auto2_ig)
-            dia_message (txt_get (TXT_LITTLE_MEM), MSGTYPE_ERROR);
-        }
-    else
-        {
-        inst_start_shell ("/dev/tty5");
-        inst_start_shell ("/dev/tty6");
-        }
-
-    if (!auto2_ig)
-        while (i_ii <= 100)
-            {
-            dia_status (&status_ri, i_ii++);
-            usleep (10000);
-            }
-
-    if (!auto2_ig)
-        win_close (&status_ri);
-    disp_set_color (COL_WHITE, COL_BLACK);
-    if (auto2_ig)
-        disp_clear_screen ();
-    fflush (stdout);
-
-    if(util_check_exist(SETUP_COMMAND)) {
-      sprintf(command_ti, "%s yast%d%s",
-        SETUP_COMMAND,
-        yast_version_ig == 2 ? 2 : 1,
-        auto_ig ? " --autofloppy" : ""
-      );
-      fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
-    }
-    else {
-      sprintf(command_ti, "%s%s",
-        yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND,
-        auto_ig ? " --autofloppy" : ""
-      );
-      fprintf(stderr, "starting \"%s\"\n", command_ti);
-    }
-
-    rc_ii = system(command_ti);
-
-    fprintf(stderr,
-      "yast%d return code is %d (errno = %d)\n",
-      yast_version_ig == 2 ? 2 : 1,
-      rc_ii,
-      rc_ii ? errno : 0
-    );
-
-#ifdef LXRC_DEBUG
-    if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }
-#endif
-
-    lxrc_set_modprobe ("/etc/nothing");
-    do_disp_init_ig = TRUE;
-
-    fprintf (stderr, "sync...\n");
-    sync ();
-    fprintf (stderr, "sync ok\n");
-
-    rc_ii = inst_read_yast_file();
-
-//    if(!auto2_ig) disp_restore_screen();
-    disp_cursor_off();
-    kbd_reset();
-
-    yast_version_ig = 0;
-
-    if(rc_ii || !auto2_ig) {
-      util_manual_mode();
-      util_disp_init();
-    }
-
-    if(rc_ii) {
-      dia_message (txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
-    }
-
-    lxrc_killall (0);
-
+  if(inst_choose_yast_version()) {
+    lxrc_killall(0);
     waitpid (-1, NULL, WNOHANG);
 
-    (void) system ("rm -f /tmp/stp* > /dev/null 2>&1");
-    (void) system ("rm -f /var/lib/YaST/* > /dev/null 2>&1");
-    (void) system ("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
-    /* if the initrd has an ext2 fs, we've just made / read-only */
-    mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
-
     inst_umount ();
-    if (ramdisk_ig)
-        util_free_ramdisk ("/dev/ram2");
+    if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
     unlink("/bin");
     rename("/.bin", "/bin");
 
-    if(!rc_ii) {
-      rc_ii = inst_commit_install();
-      if(rc_ii) {
-        util_manual_mode();
-        util_disp_init();
-      }
-    }
+    return -1;
+  }
 
-    return (rc_ii);
+  if(!auto2_ig) dia_status_on(&status_ri, txt_get(TXT_START_YAST));
+
+  lxrc_set_modprobe("/sbin/modprobe");
+
+  system("update");
+
+  if(!auto2_ig) {
+    while(i_ii < 50) {
+      dia_status(&status_ri, i_ii++);
+      usleep(10000);
     }
+  }
+
+  inst_start_shell("/dev/tty2");
+
+  if(memory_ig < MEM_LIMIT_SWAP_MSG) {
+    if(!auto2_ig) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
+  }
+  else {
+    inst_start_shell("/dev/tty5");
+    inst_start_shell("/dev/tty6");
+  }
+
+  if(!auto2_ig) {
+    while(i_ii <= 100) {
+      dia_status (&status_ri, i_ii++);
+      usleep(10000);
+    }
+    win_close(&status_ri);
+  }
+
+  disp_set_color(COL_WHITE, COL_BLACK);
+  if(!auto2_ig) {
+    disp_clear_screen();
+    printf("\033c");
+  }
+  fflush (stdout);
+
+  if(util_check_exist(SETUP_COMMAND)) {
+    sprintf(command_ti, "%s yast%d%s",
+      SETUP_COMMAND,
+      yast_version_ig == 2 ? 2 : 1,
+      auto_ig ? " --autofloppy" : ""
+    );
+    fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
+  }
+  else {
+    sprintf(command_ti, "%s%s",
+      yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND,
+      auto_ig ? " --autofloppy" : ""
+    );
+    fprintf(stderr, "starting \"%s\"\n", command_ti);
+  }
+
+  rc_ii = system(command_ti);
+
+  fprintf(stderr,
+    "yast%d return code is %d (errno = %d)\n",
+    yast_version_ig == 2 ? 2 : 1,
+    rc_ii,
+    rc_ii ? errno : 0
+  );
+
+#ifdef LXRC_DEBUG
+  if((guru_ig & 1)) { printf("a shell for you...\n"); system("/bin/sh"); }
+#endif
+
+  lxrc_set_modprobe("/etc/nothing");
+  do_disp_init_ig = TRUE;
+
+  deb_msg("sync...\n");
+  sync();
+  deb_msg("sync ok\n");
+
+  rc_ii = inst_read_yast_file();
+
+  // if(!auto2_ig) disp_restore_screen();
+  disp_cursor_off();
+  kbd_reset();
+
+  yast_version_ig = 0;
+
+  if(rc_ii || !auto2_ig) {
+    util_manual_mode();
+    util_disp_init();
+  }
+
+  if(rc_ii) {
+    dia_message (txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
+  }
+
+  lxrc_killall (0);
+
+  waitpid (-1, NULL, WNOHANG);
+
+  system("rm -f /tmp/stp* > /dev/null 2>&1");
+  system("rm -f /var/lib/YaST/* > /dev/null 2>&1");
+
+  system ("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
+
+  /* if the initrd has an ext2 fs, we've just made / read-only */
+  mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
+
+  inst_umount();
+  if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
+
+  unlink("/bin");
+  rename("/.bin", "/bin");
+
+  if(!rc_ii) {
+    rc_ii = inst_commit_install();
+    if(rc_ii) {
+      util_manual_mode();
+      util_disp_init();
+    }
+  }
+
+  return rc_ii;
+}
 
 
 static int inst_check_floppy (void)
