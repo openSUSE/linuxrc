@@ -190,7 +190,7 @@ void auto2_scan_hardware(char *log_file)
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
       if(load_usb_storage(hd_data)) {
         mod_insmod("usb-storage", NULL);
-        if(config.usbwait > 0) sleep(3);
+        if(config.usbwait > 0) sleep(config.usbwait);
         hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
       }
     }
