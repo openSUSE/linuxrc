@@ -1,4 +1,5 @@
-linuxrc
 .depend
+linuxrc
+linuxrc-debug
 linuxrc.map
 todo
