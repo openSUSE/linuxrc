@@ -1214,7 +1214,7 @@ static int inst_get_ftpsetup (void)
 static void inst_choose_yast_version (void)
     {
     item_t   items_ari [2];
-    int      width_ii = 30;
+    int      i_ii, width_ii = 30;
     int      yast1_ii, yast2_ii;
 
     yast1_ii = util_check_exist (YAST1_COMMAND);
@@ -1239,6 +1239,14 @@ static void inst_choose_yast_version (void)
         {
         yast_version_ig = 2;
         return;
+        }
+
+    if (auto2_ig)
+        {
+        auto2_ig = 0;
+        for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
+        disp_cursor_off();
+        util_print_banner();
         }
 
     util_create_items (items_ari, 2, width_ii);
