@@ -208,3 +208,4 @@ extern char            *mouse_type_ig;
 extern char            *mouse_dev_ig;
 extern int             yast_version_ig;
 extern int             valid_net_config_ig;
+extern int             reboot_ig;

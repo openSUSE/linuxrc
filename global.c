@@ -79,4 +79,4 @@ char            *mouse_type_ig = NULL;
 char            *mouse_dev_ig = NULL;
 int             yast_version_ig = 1;
 int             valid_net_config_ig = 0;
-
+int             reboot_ig;

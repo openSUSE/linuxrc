@@ -139,7 +139,7 @@ int my_logmessage (char *buffer_pci, ...)
 
 void lxrc_reboot (void)
     {
-    if (auto2_ig || dia_yesno (txt_get (TXT_ASK_REBOOT), 1) == YES)
+    if (auto_ig || auto2_ig || dia_yesno (txt_get (TXT_ASK_REBOOT), 1) == YES)
         reboot (RB_AUTOBOOT);
     }
 
@@ -295,6 +295,9 @@ static void lxrc_init (void)
         
         if (strstr (linuxrc_pci, "demo"))
             demo_ig = TRUE;
+        
+        if (strstr (linuxrc_pci, "reboot"))
+            reboot_ig = TRUE;
         }
 
     freopen ("/dev/tty3", "a", stderr);
