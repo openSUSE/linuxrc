@@ -7,8 +7,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.6 $
-  $Date: 2001/08/13 14:23:55 $
+  $Revision: 1.7 $
+  $Date: 2001/10/31 09:45:23 $
 */
 
 #include "global.h"
@@ -129,7 +129,7 @@ int performBootp(char *device,
     ifr.ifr_hwaddr = their_ifr->ifr_hwaddr ;
   } else {
 /* Get the hardware address, and family information */
-    struct sockaddr hwaddr;
+
     memcpy(ifr.ifr_name, device, strlen(device)+1);
 
     /* Set the interface flags. */
@@ -138,7 +138,6 @@ int performBootp(char *device,
       perror("bootpc: ioctl SIOCSIFFLAGS");
       return BootpFatal();
     }
-    hwaddr = ifr.ifr_hwaddr;
 
     /* Set a non-zero internet address. */
     memset((struct sockaddr_in *)&ifr.ifr_addr, 0, sizeof(struct sockaddr_in));
@@ -153,7 +152,6 @@ int performBootp(char *device,
       perror("bootpc: ioctl failed");
       return BootpFatal();
     }
-    ifr.ifr_hwaddr = hwaddr;
   }
 
 /* Check the network family if in NET3 or later, before NET3 you couldn't
