@@ -39,10 +39,13 @@ ifneq ($(USE_MINI_GLIBC),no)
 endif
 
 .EXPORT_ALL_VARIABLES:
-.PHONY:	all clean install libs
+.PHONY:	all clean default install libs
 
 %.o:	%.c
 	$(CC) $(CFLAGS) $(WARN) -o $@ $<
+
+default:
+	libs linuxrc
 
 linuxrc: $(OBJ) $(LIBS)
 	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd -o $@
