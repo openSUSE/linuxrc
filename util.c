@@ -683,6 +683,8 @@ void util_disp_init()
 
   config.win = 1;
   disp_set_display();
+  printf("\033%%G");
+  fflush(stdout);
   if (config.linemode)
     return;
   for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");

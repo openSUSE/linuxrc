@@ -250,6 +250,7 @@ typedef struct {
   unsigned linebreak:1;		/* internal: print a newline first */
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
+  unsigned fb:1;		/* has frame buffer */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

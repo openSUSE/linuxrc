@@ -35,85 +35,85 @@ static language_t set_languages_arm [] =
 {
 #ifdef TRANS_ar
 // currently a fake
-{ lang_ar, "Arabic", "us", L1_FONT, "none", "lat1u.uni", 0, 0, "ar", "arabic" },
+{ lang_ar, "Arabic", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "ar", "arabic" },
 #endif
 
 #ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", L1_FONT, "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
+{ lang_br, "Brezhoneg", "fr-latin1", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "fr_FR", "breton" },
 #endif
 
 #ifdef TRANS_bs
-{ lang_bs, "Bosnia", "us", UNI_FONT, "none", "lat2u.uni", 1, 1, "bs_BA", "bosnia" },
+{ lang_bs, "Bosnia", "us", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "bs_BA", "bosnia" },
 #endif
 
 #ifdef TRANS_cs
-{ lang_cs, "Cestina", "cz-us-qwertz", L2_FONT, "none", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
+{ lang_cs, "Cestina", "cz-us-qwertz", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "cs_CZ", "czech" },
 #endif
 
 #ifdef TRANS_de
-{ lang_de, "Deutsch", "de-lat1-nd", L1_FONT, "none", "lat1u.uni", 0, 0, "de_DE", "german" },
+{ lang_de, "Deutsch", "de-lat1-nd", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "de_DE", "german" },
 #endif
 
 #ifdef TRANS_en
-{ lang_en, "English", "us", L1_FONT, "none", "lat1u.uni", 0, 0, "en_US", "english" },
+{ lang_en, "English", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "en_US", "english" },
 #endif
 
 #ifdef TRANS_es
-{ lang_es, "Español", "es", L1_FONT, "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
+{ lang_es, "Español", "es", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "es_ES", "spanish" },
 #endif
 
 #ifdef TRANS_fr
-{ lang_fr, "Français", "fr-latin1", L1_FONT, "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
+{ lang_fr, "Français", "fr-latin1", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "fr_FR", "french" },
 #endif
 
 #ifdef TRANS_el
-{ lang_el, "Hellenic", "gr", L7_FONT, "trivial", "lat7u.uni", 1, 1, "el_EL", "greek" },
+{ lang_el, "Hellenic", "gr", L7_FONT, L7_FONT, "lat7u.uni", 1, 1, "el_EL", "greek" },
 #endif
 
 #ifdef TRANS_id
-{ lang_id, "Indonesia", "us", L1_FONT, "none", "lat1u.uni", 0, 1, "de_DE", "indonesian" },
+{ lang_id, "Indonesia", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "de_DE", "indonesian" },
 #endif
 
 #ifdef TRANS_it
-{ lang_it, "Italiano", "it", L1_FONT, "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
+{ lang_it, "Italiano", "it", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "it_IT", "italian" },
 #endif
 
 #ifdef TRANS_ja
 // currently a fake
-{ lang_ja, "Japanese", "jp106", L1_FONT, "none", "lat1u.uni", 0, 0, "ja_JP", "japanese" },
+{ lang_ja, "Japanese", "jp106", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "ja_JP", "japanese" },
 #endif
 
 #ifdef TRANS_hu
-{ lang_hu, "Magyar", "hu", L2_FONT, "none", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
+{ lang_hu, "Magyar", "hu", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
 #endif
 
 #ifdef TRANS_nl
-{ lang_nl, "Nederlands", "us", L1_FONT, "none", "lat1u.uni", 0, 1, "nl_NL", "dutch" },
+{ lang_nl, "Nederlands", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "nl_NL", "dutch" },
 #endif
 
 #ifdef TRANS_pl
-{ lang_pl, "Polski", "Pl02", L2_FONT, "none", "lat2u.uni", 1, 1, "pl_PL", "polish" },
+{ lang_pl, "Polski", "Pl02", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "pl_PL", "polish" },
 #endif
 
 #ifdef TRANS_pt
-{ lang_pt, "Português", "pt-latin1", L1_FONT, "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
+{ lang_pt, "Português", "pt-latin1", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
 #endif
 
 #ifdef TRANS_pt_BR
-{ lang_pt_BR, "Português Brasileiro", "br-abnt2", L1_FONT, "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
+{ lang_pt_BR, "Português Brasileiro", "br-abnt2", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
 #endif
 
 #ifdef TRANS_ro
-{ lang_ro, "Romania", "us", L2_FONT, "none", "lat2u.uni", 1, 1, "en_US", "romanian" },
+{ lang_ro, "Romania", "us", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "en_US", "romanian" },
 #endif
 
 #ifdef TRANS_ru
 // { lang_ru, "Russian", "ru1", "LatArCyrHeb-16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU", "russian" },
-{ lang_ru, "Russian", "ru1", CYR_FONT, "none", "cyralt.uni",1, 1, "ru_RU", "russian" },
+{ lang_ru, "Russian", "ru1", CYR_FONT, UNI_FONT, "cyralt.uni",1, 1, "ru_RU", "russian" },
 #endif
 
 #ifdef TRANS_sk
-{ lang_sk, "Slovencina", "sk-qwerty", L2_FONT, "none", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
+{ lang_sk, "Slovencina", "sk-qwerty", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "sk_SK", "slovak" },
 #endif
 };
 #endif
@@ -218,10 +218,7 @@ static int  set_settings_cb          (dia_item_t di);
 static void set_expert               (void);
 static int  set_expert_cb            (dia_item_t di);
 static int  set_get_current_language (void);
-#if 0
-static void set_activate_font        (int usermap_iv);
-#endif
-static void set_font(char *font, char *map, char *unimap);
+static void set_font(language_t *lang);
 
 /*
  *
@@ -394,9 +391,7 @@ void set_activate_language(enum langid_t lang_id)
   if(i > 0) {
     lang = set_languages_arm + i - 1;
 
-    if(!config.serial && !config.linemode && lang->font) {
-      set_font(lang->font, lang->mapscreen, NULL);
-    }
+    if(!config.serial && !config.linemode) set_font(lang);
   }
 }
 
@@ -415,7 +410,7 @@ void set_activate_keymap(char *keymap)
 
   if((config.keymap = keymap)) {
     sprintf(cmd, "loadkeys %s.map", keymap);
-    system (cmd);
+    if(!config.test) system (cmd);
   }
 }
 
@@ -560,11 +555,10 @@ void set_write_info(FILE *f)
 
   lang = set_languages_arm + set_get_current_language() - 1;
 
-  file_write_str(f, key_language, lang->yastcode);
+//  file_write_str(f, key_language, lang->yastcode);
 
   if(lang->write_info) {
-    file_write_str(f, key_font, lang->font);
-    file_write_str(f, key_screenmap, lang->mapscreen);
+    file_write_str(f, key_font, lang->font1);
     magic[1] = lang->usermap ? 'K' : 'B';
     file_write_str(f, key_fontmagic, magic);
   }
@@ -586,34 +580,6 @@ int set_get_current_language()
 }
 
 
-#if 0
-static void set_activate_font (int usermap_iv)
-    {
-    char  text_ti [20];
-    char  tmp_ti [20];
-    FILE *tty_pri;
-    int   i_ii;
-
-    if (usermap_iv)
-        strcpy (text_ti, "\033(K");
-    else
-        strcpy (text_ti, "\033(B");
-
-    printf("%s", text_ti); fflush(stdout);
-
-    for (i_ii = 1; i_ii <= 6; i_ii++)
-        {
-        sprintf (tmp_ti, "/dev/tty%d", i_ii);
-        tty_pri = fopen (tmp_ti, "w");
-        if (tty_pri)
-            {
-            fprintf (tty_pri, text_ti);
-            fclose (tty_pri);
-            }
-        }
-    }
-#endif
-
 /*
  * New setfont code.
  * setfont apparently works with /dev/tty. This breaks things on frame buffer
@@ -621,53 +587,41 @@ static void set_activate_font (int usermap_iv)
  * for every console.
  * Hence the workaround.
  */
-static void set_font(char *font, char *map, char *unimap)
+void set_font(language_t *lang)
 {
-  char cmd[100], cmd_map[32], cmd_unimap[32];
-  char dev[32];
-  char usermap;
+  char cmd[128], *font, dev[32];
   int i, err = 0, max_cons;
-  int has_fb;
   FILE *f;
 
-  *cmd_map = *cmd_unimap = 0;
-  usermap = !map || strcmp(map, "none") ? 'K' : 'B';
+  if(!config.fb) {;
+    if((f = fopen("/dev/fb", "r"))) {
+      config.fb = 1;
+      fclose(f);
+    }
+  }
+
+  if(!lang) return;
+
+  font = config.fb ? lang->font2 : lang->font1;
+
   sprintf(cmd, "setfont %s", font);
-  if(map) sprintf(cmd_map, " -m %s", map);
-  if(unimap) sprintf(cmd_map, " -u %s", unimap);
-  strcat(strcat(cmd, cmd_map), cmd_unimap);
 
-  fprintf(stderr, "setfont %s (map %s)\n", font, map);
+  fprintf(stderr, "setfont %s\n", font);
 
-  has_fb = 0;
-  if((f = fopen("/dev/fb", "r"))) {
-    has_fb = 1;
-    fclose(f);
+  max_cons = config.fb ? 6 : 1;
+
+  if(!config.test) {
+    err |= rename("/dev/tty", "/dev/tty.bak");
+    for(i = 0; i < max_cons; i++) {
+      sprintf(dev, "/dev/tty%d", i);
+      err |= rename(dev, "/dev/tty");
+      system(cmd);
+      f = fopen("/dev/tty", "w");
+      if(f) { fprintf(f, "\033%%G"); fclose(f); }
+      err |= rename("/dev/tty", dev);
+    }
+    err |= rename("/dev/tty.bak", "/dev/tty");
   }
-
-//  deb_int(has_fb);
-
-  max_cons = has_fb ? 6 : 1;
-
-  err |= rename("/dev/tty", "/dev/tty.bak");
-  for(i = 0; i < max_cons; i++) {
-    sprintf(dev, "/dev/tty%d", i);
-    err |= rename(dev, "/dev/tty");
-    system(cmd);
-    f = fopen("/dev/tty", "w");
-//    if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
-    if(f) { fprintf(f, "\033%%G"); fclose(f); }
-    err |= rename("/dev/tty", dev);
-  }
-  err |= rename("/dev/tty.bak", "/dev/tty");
-
-#if 0
-  system(cmd);
-  f = fopen("/dev/tty", "w");
-  if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
-#endif
-
-  // if(err) deb_int(err);
 }
 
 

@@ -198,7 +198,7 @@ void auto2_scan_hardware(char *log_file)
     fflush(stdout);
 
     mod_modprobe("input", NULL);
-    mod_modprobe("hid", NULL);
+    mod_modprobe("usbhid", NULL);
     mod_modprobe("keybdev", NULL);
 
     config.module.delay -= 1;
@@ -281,7 +281,7 @@ void auto2_scan_hardware(char *log_file)
     slist_append(&config.module.initrd, usb_modules);
     usb_modules = NULL;
     slist_append_str(&config.module.initrd, "input");
-    slist_append_str(&config.module.initrd, "hid");
+    slist_append_str(&config.module.initrd, "usbhid");
     slist_append_str(&config.module.initrd, "keybdev");
   }
 

@@ -9,25 +9,23 @@
  *
  */
 
-typedef struct
-      {
-      enum langid_t  id;
-      char          *descr;
-      char          *keymap;
-      char          *font;
-      char          *mapscreen;
-      char          *unimap;
-      int            usermap;	// redundant, will drop it later -- snwint
-      int            write_info;
-      char          *locale;
-      char          *yastcode;
-      } language_t;
+typedef struct {
+  enum langid_t  id;
+  char *descr;
+  char *keymap;
+  char *font1;
+  char *font2;
+  char *unimap;
+  int usermap;	// redundant, will drop it later -- snwint
+  int write_info;
+  char *locale;
+  char *yastcode;
+} language_t;
 
-typedef struct
-      {
-      char *descr;
-      char *mapname;
-      } keymap_t;
+typedef struct {
+  char *descr;
+  char *mapname;
+} keymap_t;
 
 
 extern enum langid_t set_langidbyname(char *name);
