@@ -198,5 +198,11 @@ static text_t txt_dutch_atm [] =
 { TXT_YAST2,          "YaST2 - grafisch"                                      },
 { TXT_CHOOSE_YAST,    "Kies een versie van YaST om te gebruiken voor de "
                       "installatie."                                          },
-{ TXT_INSERT_CD,      "Plaats aub CD nummer %d in uw drive!"                  }
+{ TXT_INSERT_CD,      "Plaats aub CD nummer %d in uw drive!"                  },
+{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
+                      "new installed system will now be started in order to "
+                      "commit the installation. "
+                      "Please remove all installation media (CD-ROM, floppy).\n"
+                      "Do not remove the floppy disk if the Linux Loader (LILO) "
+                      "has been installed on it."                             }
 };

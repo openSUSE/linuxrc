@@ -203,5 +203,10 @@ static text_t txt_german_atm [] =
                       "textbasierten YaST1 oder dem neuen grafischen YaST2 "
                       "ausführen. Bitte wählen Sie die YaST-Version."         },
 { TXT_INSERT_CD,      "Bitte stellen Sie sicher, dass sich die CD Nummer %d "
-                      "in Ihrem Laufwerk befindet!"                           }
+                      "in Ihrem Laufwerk befindet!"                           },
+{ TXT_DO_REBOOT,      "Das Basissystem wurde erfolgreich installiert. Zum Abschluß "
+                      "der Installation muß neu gebootet werden. Entfernen Sie dazu "
+                      "bitte alle Installationsmedien (CD-ROM, Floppy).\n"
+                      "Entfernen Sie die Floppy nicht, wenn der Linux Loader (LILO) "
+                      "darauf installiert wurde."                             }
 };

@@ -10,15 +10,15 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
-#define LXRC_VERSION  "1.0.8"
+#define LXRC_VERSION  "1.0.9"
 
 #ifdef LINUXRC_AXP
 #define MEM_LIMIT1_RAMDISK    50000000
 #define MEM_LIMIT2_RAMDISK    50000000
 #else
 // was: 46000000; 64MB will currently not do...
-#define MEM_LIMIT1_RAMDISK    70000000
-#define MEM_LIMIT2_RAMDISK    70000000
+#define MEM_LIMIT1_RAMDISK    62*1024*1024
+#define MEM_LIMIT2_RAMDISK    98*1024*1024
 #endif
 #define MEM_LIMIT_SWAP_MSG     6500000
 #define MEM_LIMIT_CACHE_LIBS  15000000

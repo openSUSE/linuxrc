@@ -186,5 +186,11 @@ static text_t txt_indonesia_atm [] =
 { TXT_YAST1,          "YaST1 - mode teks"                                     },
 { TXT_YAST2,          "YaST2 - mode grafis"                                   },
 { TXT_CHOOSE_YAST,    "Pilihlah versi YaST yang digunakan untuk instalasi."   },
-{ TXT_INSERT_CD,      "Pastikanlah CD nomer %d ada pada drive anda!"          }
+{ TXT_INSERT_CD,      "Pastikanlah CD nomer %d ada pada drive anda!"          },
+{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
+                      "new installed system will now be started in order to "
+                      "commit the installation. "
+                      "Please remove all installation media (CD-ROM, floppy).\n"
+                      "Do not remove the floppy disk if the Linux Loader (LILO) "
+                      "has been installed on it."                             }
 };

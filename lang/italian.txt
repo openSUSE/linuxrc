@@ -198,5 +198,11 @@ static text_t txt_italian_atm [] =
 { TXT_YAST2,          "YaST2 - modo grafico"                                  },
 { TXT_CHOOSE_YAST,    "Scegliete la versione di YaST da utilizzare per "
                       "l'installazione."                                      },
-{ TXT_INSERT_CD,      "Assicuratevi che il CD numero %d si trovi nel lettore!"}
+{ TXT_INSERT_CD,      "Assicuratevi che il CD numero %d si trovi nel lettore!"},
+{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
+                      "new installed system will now be started in order to "
+                      "commit the installation. "
+                      "Please remove all installation media (CD-ROM, floppy).\n"
+                      "Do not remove the floppy disk if the Linux Loader (LILO) "
+                      "has been installed on it."                             }
 };

@@ -192,5 +192,11 @@ static text_t txt_greek_atm [] =
 { TXT_CHOOSE_YAST,    "Παρακαλούμε επιλέξτε την έκδοση του YaST που θα "
                       "χρησιμοποιηθεί για την εγκατάσταση."                   },
 { TXT_INSERT_CD,      "Παρακαλώ βεβαιωθείτε ότι έχετε βάλει στο drive το CD "
-                      "με αριθμό %d!"                                         }
+                      "με αριθμό %d!"                                         },
+{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
+                      "new installed system will now be started in order to "
+                      "commit the installation. "
+                      "Please remove all installation media (CD-ROM, floppy).\n"
+                      "Do not remove the floppy disk if the Linux Loader (LILO) "
+                      "has been installed on it."                             }
 };

@@ -182,5 +182,11 @@ static text_t txt_slovak_atm [] =
 { TXT_YAST2,          "YaST2 - Grafická"                                      },
 { TXT_CHOOSE_YAST,    "Vyberte si verziu YaST ktorú chcete pou¾i» ne "
                       "in¹talácie."                                           },
-{ TXT_INSERT_CD,      "Uistite sa, ¾e CD èíslo %d je v mechanike!"            }
+{ TXT_INSERT_CD,      "Uistite sa, ¾e CD èíslo %d je v mechanike!"            },
+{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
+                      "new installed system will now be started in order to "
+                      "commit the installation. "
+                      "Please remove all installation media (CD-ROM, floppy).\n"
+                      "Do not remove the floppy disk if the Linux Loader (LILO) "
+                      "has been installed on it."                             }
 };

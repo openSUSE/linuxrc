@@ -156,7 +156,8 @@ enum textid_t
     TXT_YAST1,
     TXT_YAST2,
     TXT_CHOOSE_YAST,
-    TXT_INSERT_CD
+    TXT_INSERT_CD,
+    TXT_DO_REBOOT
     };
 
 extern char *txt_get  (enum textid_t text_id);

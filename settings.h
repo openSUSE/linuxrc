@@ -6,6 +6,7 @@
  *
  */
 
+extern enum langid_t set_langidbyname(char *name);
 extern int  set_settings        (void);
 extern void set_choose_display  (void);
 extern void set_choose_keytable (void);

@@ -155,6 +155,19 @@ static void set_activate_font        (int usermap_iv);
  *
  */
 
+enum langid_t set_langidbyname(char *name)
+{
+  int i;
+
+  for(i = 0; i < NR_LANGUAGES; i++) {
+    if(!strcasecmp(set_languages_arm[i].yastcode, name))
+      return set_languages_arm[i].id;
+  }
+
+  return LANG_UNDEF;
+}
+
+
 int set_settings (void)
     {
     item_t items_ari [4];

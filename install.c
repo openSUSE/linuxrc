@@ -41,6 +41,7 @@
 #include "info.h"
 #include "ftp.h"
 #include "install.h"
+#include "settings.h"
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
 #define YAST2_COMMAND   "/lib/YaST2/bin/YaST2.start"
@@ -873,14 +874,18 @@ static int inst_commit_install (void)
     int       live_cd_ii = 0;
     int       rc_ii = 0;
     window_t  win_ri;
-
+    char      keymap[30], lang[30];
+    char      command_ti [MAX_FILENAME];
 
     fd_pri = fopen (YAST_INFO_FILE, "r");
     if (!fd_pri)
         return (-1);
 
-    swap_ti [0] = 0;
-    root_ti [0] = 0;
+    *swap_ti = 0;
+    *root_ti = 0;
+
+    *keymap = 0;
+    *lang = 0;
 
     while (fscanf (fd_pri, "%s %s", option_ti, value_ti) == 2)
         {
@@ -894,37 +899,68 @@ static int inst_commit_install (void)
 
         if (!strncasecmp (option_ti, "Live", 4))
             live_cd_ii = atoi (value_ti);
+
+        if (!strncasecmp (option_ti, "Keytable", 8))
+            strncpy (keymap, value_ti, sizeof keymap);
+
+        if (!strncasecmp (option_ti, "Language", 8))
+            strncpy (lang, value_ti, sizeof lang);
         }
+
+    keymap[sizeof keymap - 1] = lang[sizeof lang - 1] = 0;
 
     fclose (fd_pri);
 
-    if (swap_ti [0])
+    if(*lang) {
+      language_ig = set_langidbyname(lang);
+      do_disp_init_ig = TRUE;
+    }
+
+    if(*keymap) {
+      strcpy(keymap_tg, keymap);
+      sprintf(command_ti, "loadkeys %s.map", keymap_tg);
+      system(command_ti);
+      do_disp_init_ig = TRUE;
+    }
+
+    if (*swap_ti)
         swapoff (swap_ti);
 
-    if (root_ti [0])
+    if (*root_ti)
         {
         if ((!auto_ig && pcmcia_chip_ig)        ||
             !strncasecmp (root_ti, "reboot", 6) ||
             reboot_ig)
             {
-            lxrc_reboot ();
+            disp_clear_screen();
+            util_disp_init();
+            dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
+            reboot (RB_AUTOBOOT);
             rc_ii = -1;
             }
         else
             {
             root_set_root (root_ti);
             if (live_cd_ii)
+                {
+                util_disp_init();
                 (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
+                }
             else
                 {
                 if (auto_ig)
                     {
+                    util_disp_init();
                     dia_info (&win_ri, txt_get (TXT_INSTALL_SUCCESS));
                     sleep (2);
                     win_close (&win_ri);
                     }
                 else
-                    if(!auto2_ig) dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
+                    if(!auto2_ig)
+                        {
+                        util_disp_init();
+                        dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
+                        }
                 }
             }
         }
@@ -1071,6 +1107,8 @@ static int inst_ftp (void)
     window_t  win_ri;
     char msg[256];
 
+    /* currently YaST1 only */
+    yast_version_ig = 1;
     
     if (!inst_rescue_im && memory_ig <= (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
         {
