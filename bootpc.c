@@ -7,8 +7,8 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.1 $
-  $Date: 1999/12/14 12:38:12 $
+  $Revision: 1.2 $
+  $Date: 2000/06/07 16:52:32 $
 */
 
 /* Standard headers */
@@ -35,6 +35,7 @@
 #include "bootpc.h"
 
 #define logMessage my_logmessage
+#define perror logMessage
 
 extern int my_logmessage (char *buffer_pci, ...);
 
@@ -54,8 +55,8 @@ int performBootp(char *device,
 		 struct ifreq *their_ifr,
 		 int waitformore,
 		 int bp_rif,
-		 int bp_pr)
-
+		 int bp_pr,
+		 int broadcast)
 {
   struct ifreq ifr;
   struct sockaddr_in cli_addr, serv_addr;
@@ -109,10 +110,12 @@ int performBootp(char *device,
   bootp_recv = (struct bootp *) malloc(BUFSIZ) ;
   memset((char *) bootp_recv, 0, BUFSIZ) ;
 
+  /* Server needs to broadcast for me to see it */
+  if (broadcast || givenhwaddr)
+    bootp_xmit->bp_flags |= htons(BPFLAG_BROADCAST);
+
 /* Don't do this if we were given the MAC address to use.  27/09/94  JSP */
   if (givenhwaddr) {
-    /* If I'm spoofing my HW address then have the reply broadcast */
-    bootp_xmit->bp_flags |= BPFLAG_BROADCAST;
     /* Assuming ETHER if given HW */
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER ;
     ifr.ifr_hwaddr = their_ifr->ifr_hwaddr ;
@@ -208,7 +211,7 @@ int performBootp(char *device,
     
     if (!received_packet) {  /* Move this to a sendpacket function */
       /* set time of this timeout  09/02/94  JSP */
-      bootp_xmit->bp_secs = waited ;
+      bootp_xmit->bp_secs = htons(waited) ;
       if (bootp_verbose) {
 	logMessage("."); fflush(stderr);
       }
@@ -224,6 +227,9 @@ int performBootp(char *device,
     }
 
     /* Move rest of this loop to a receivepacket function */
+    FD_ZERO(&rfds);
+/* The above was missing, thanks to
+   Gilles Detillieux <grdetil@cliff.scrc.UManitoba.CA> for pointing it out */
     FD_SET(sockfd,&rfds);
     FD_ZERO(&wfds);
     FD_ZERO(&xfds);
@@ -253,35 +259,31 @@ int performBootp(char *device,
       }
       cookielength = 64 + plen - sizeof(struct bootp) ;
       
-/* Check xid is what we asked for  09/02/94  JSP */
-      if (bootp_recv->bp_xid != rancopy) {
-	logMessage("WARNING bp_xid mismatch got 0x%lx sent 0x%lx",
-		   (long)bootp_recv->bp_xid, (long)rancopy) ;
-	if (!bootp_debug) /* Unless bootp_debugging, ignore packet */
-/* WRONG, but we need to do something fatal, we actually
-   want to go back to the receive part again to listen
-   for more packets */
-	  return(1) ;
-      }
-
-      if (!received_packet) {
-	/* If we haven't already recieved a packet then set the time to wait
-	   further to be now + time user specified */
-	waitformore += waited ;
-	received_packet = 1 ;
+      if (bootp_recv->bp_xid == rancopy) {
+	if (!received_packet) {
+	  /* If we haven't already recieved a packet then set the time to wait
+	     further to be now + time user specified */
+	  waitformore += waited ;
+	  received_packet = 1 ;
+	} else {
+	  /* To make it look a bit prettier */
+	  if (printflag & BP_PRINT_OUT)
+	    printf("\n") ;
+	}
+	/* Pass the cookie info, the mincookie to look for and our address to
+	   the cookie parser.  It needs our address to get the network and
+	   broadcast bits right if the SUBNET is defined in the cookie.
+	   10/02/94  JSP */
+	ParsePacket(bootp_recv,
+		    cookielength,
+		    mincookie) ;
       } else {
-	/* To make it look a bit prettier */
-	if (printflag & BP_PRINT_OUT)
-	  printf ("\n") ;
+	/* xid mismatch so normally silently ignore */
+	if (bootp_verbose) {
+	  logMessage("WARNING bp_xid mismatch got 0x%lx sent 0x%lx",
+		     (long)bootp_recv->bp_xid, (long)rancopy) ;
+	}
       }
-
-/* Pass the cookie info, the mincookie to look for and our address to
-   the cookie parser.  It needs our address to get the network and
-   broadcast bits right if the SUBNET is defined in the cookie.
-   10/02/94  JSP */
-      ParsePacket(bootp_recv,
-		  cookielength,
-		  mincookie) ;
     }
   }
   if (!received_packet) {

@@ -6,14 +6,14 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.1 $
-  $Date: 1999/12/14 12:38:12 $
+  $Revision: 1.2 $
+  $Date: 2000/06/07 16:52:32 $
 */
 
-#define BPCVERSION "BOOTPclient V0.61"
+#define BPCVERSION "BOOTPclient V0.64"
 
 /* Tell the server to broadcast to reach me flag */
-#define BPFLAG_BROADCAST ( 1 << 16 )
+#define BPFLAG_BROADCAST ( 1 << 15 )
 
 /* Back in NET2 (and before?) the ifreq.ifr_hwaddr was a char array,
    but in NET3 it is now a "sockaddr", and we need the data part.
@@ -69,14 +69,15 @@ int in2host(char *address,
 	    int print) ;
 
 int performBootp(char *device,
-		char *server,
-		char *bootfile,
-		int timeout_wait,
-		int givenhwaddr,
-		struct ifreq *ifr,
-		int waitformore,
-		int returniffail,
-		int print) ;
+		 char *server,
+		 char *bootfile,
+		 int timeout_wait,
+		 int givenhwaddr,
+		 struct ifreq *ifr,
+		 int waitformore,
+		 int returniffail,
+		 int print,
+		 int broadcast) ;
 
 /* My global variables */
 extern int bootp_verbose ;   /* verbose mode or not 10/02/94 JSP */
