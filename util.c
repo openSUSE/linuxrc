@@ -70,7 +70,6 @@ static inline _syscall3 (int,syslog,int,type,char *,b,int,len);
 
 static char  *util_loopdev_tm = "/dev/loop0";
 
-static void do_file_cp(char *src_dir, char *dst_dir, char *name);
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
 
@@ -683,17 +682,6 @@ void util_manual_mode()
   auto2_ig = 0;
 }
 
-void do_file_cp(char *src_dir, char *dst_dir, char *name)
-{
-  char buf[256];
-
-  sprintf(buf, "cp %s/%s %s", src_dir, name, dst_dir);
-  system(buf);
-
-  sprintf(buf, "%s/%s", dst_dir, name);
-  chmod(buf, 0755);
-}
-
 /*
  * Check for a valid driver update directory below <dir>; copy the
  * necessary stuff into a ramdisk and mount it at /update. The global
@@ -734,22 +722,26 @@ int util_chk_driver_update(char *dir)
   for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
     sprintf(inst_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/%s", dir, config.product_dir, copy_dir[i]);
     sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
-
     if(
       !stat(inst_src, &st) &&
       S_ISDIR(st.st_mode) &&
       !mkdir(inst_dst, 0755)
     ) {
       fprintf(stderr, "copying %s dir\n", copy_dir[i]);
-      if((d = opendir(inst_src))) {
-        while((de = readdir(d))) {
-          if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
-            do_file_cp(inst_src, inst_dst, de->d_name);
-          }
-        }
-        closedir(d);
+      util_do_cp(inst_src, inst_dst);
+    }
+  }
+
+  // make sure scripts are executable
+  sprintf(inst_dst, "%s/install", driver_update_dir);
+  if((d = opendir(inst_dst))) {
+    while((de = readdir(d))) {
+      if(strstr(de->d_name, "update.") == de->d_name) {
+        sprintf(buf, "%ss/%s", inst_dst, de->d_name);
+        chmod(buf, 0755);
       }
     }
+    closedir(d);
   }
 
   if(
@@ -761,6 +753,11 @@ int util_chk_driver_update(char *dir)
       fprintf(stderr, "copying modules\n");
       mod_copy_modules(mods_src, 1);
       mod_init();
+      sprintf(buf, "%s/hd.ids", mods_src);
+      if(util_check_exist(buf)) {
+        sprintf(buf, "cp %s/hd.ids /var/lib/hardware", mods_src);
+        system(buf);
+      }
     }
     else {
       fprintf(stderr, "loading modules\n");
@@ -1329,7 +1326,7 @@ int do_cp(char *src, char *dst)
 {
   DIR *dir;
   struct dirent *de;
-  struct stat sbuf;
+  struct stat sbuf, sbuf2;
   char src2[0x100];
   char dst2[0x100];
   char *s;
@@ -1355,11 +1352,15 @@ int do_cp(char *src, char *dst)
         // avoid infinite recursion
         if(exclude && !rec_level && !strcmp(exclude, de->d_name)) continue;
 
-        i = mkdir(dst2, 0755);
-        if(i) {
-          err = 4;
-          perror(dst2);
-          break;
+        i = stat(dst2, &sbuf2);
+        if(i || !S_ISDIR(sbuf2.st_mode)) {
+          unlink(dst2);
+          i = mkdir(dst2, 0755);
+          if(i) {
+            err = 4;
+            perror(dst2);
+            break;
+          }
         }
 
         rec_level++;
@@ -1370,6 +1371,7 @@ int do_cp(char *src, char *dst)
       }
 
       else if(S_ISREG(sbuf.st_mode)) {
+        unlink(dst2);
         s = NULL;
         if(sbuf.st_nlink > 1) {
           s = walk_hlink_list(sbuf.st_ino, sbuf.st_dev, dst2);
@@ -1433,6 +1435,7 @@ int do_cp(char *src, char *dst)
         else {
           buf[i] = 0;
         }
+        unlink(dst2);
         i = symlink(buf, dst2);
         if(i) {
           err = 10;
@@ -1447,6 +1450,7 @@ int do_cp(char *src, char *dst)
         S_ISFIFO(sbuf.st_mode) ||
         S_ISSOCK(sbuf.st_mode)
       ) {
+        unlink(dst2);
         i = mknod(dst2, sbuf.st_mode, sbuf.st_rdev);
         if(i) {
           err = 11;
@@ -1800,14 +1804,19 @@ int util_cp_main(int argc, char **argv)
 
   argv++; argc--;
 
-  if(argc >= 1 && !strcmp(*argv, "-a")) {
-    argv++; argc--;
-    rec = 1;
-  }
+  while(argc) {
+    if(argc >= 1 && !strcmp(*argv, "-a")) {
+      argv++; argc--;
+      rec = 1;
+      continue;
+    }
 
-  if(argc >= 1 && !strcmp(*argv, "-p")) {
-    argv++; argc--;
-    preserve = 1;
+    if(argc >= 1 && !strcmp(*argv, "-p")) {
+      argv++; argc--;
+      preserve = 1;
+      continue;
+    }
+    break;
   }
 
   if(argc != 2) return 1;
@@ -1834,6 +1843,7 @@ int util_cp_main(int argc, char **argv)
       perror(src);
     }
     else {
+      unlink(dst);
       fd2 = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0644);
       if(fd2 < 0) {
         err = 2;

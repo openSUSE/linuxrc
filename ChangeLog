@@ -4,6 +4,9 @@
 	- ask for passwords not only on auto install with DHCP/BOOTP, but
 	  also with static config.
 	- VNC/SSH: ask for network config on CD/HD auto install mode too.
+	- improved driver update handling
+	- fixed bug in module disk section naming
+	- prepared for uclibc
 
 27/8/2002:	v1.4.17
 	- do not imply vnc=1 if vncpassword is given, dito for ssh

@@ -15,6 +15,9 @@ ifeq "$(ARCH)" "i686"
 ARCH	:= i386
 endif
 
+CC_DIET	= diet gcc
+CC_UC	= /opt/$(ARCH)-linux-uclibc/usr/bin/gcc
+
 CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
@@ -22,10 +25,14 @@ LEX	= flex -8
 CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
 
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
-ifeq ($(CC),diet gcc)
+ifeq ($(CC),$(CC_DIET))
 LDFLAGS	+= -lrpc -lcompat -lhd_tiny_diet
 else
+ifeq ($(CC),$(CC_UC))
+LDFLAGS	+= -lhd_tiny_uc
+else
 LDFLAGS	+= -lhd_tiny
+endif
 endif
 
 WARN	= -Wall
@@ -100,7 +107,7 @@ ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
 endif
 
 .EXPORT_ALL_VARIABLES:
-.PHONY:	all clean install libs tiny
+.PHONY:	all clean install libs tiny uc tinyuc diet tinydiet
 
 %.o:	%.c
 	$(CC) $(CFLAGS) $(LIBHDFL) $(WARN) -o $@ $<
@@ -110,11 +117,17 @@ all: libs linuxrc
 tiny:
 	$(MAKE) EXTRA_FLAGS+="-DLXRC_TINY=1"
 
+uc:
+	$(MAKE) CC="$(CC_UC)"
+
+tinyuc:
+	$(MAKE) CC="$(CC_UC)" EXTRA_FLAGS+="-DLXRC_TINY=1"
+
 diet:
-	$(MAKE) CC="diet gcc" EXTRA_FLAGS+="-DDIET"
+	$(MAKE) CC="$(CC_DIET)" EXTRA_FLAGS+="-DDIET"
 
 tinydiet:
-	$(MAKE) CC="diet gcc" EXTRA_FLAGS+="-DDIET" tiny
+	$(MAKE) CC="$(CC_DIET)" EXTRA_FLAGS+="-DDIET -DLXRC_TINY=1"
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@

@@ -1579,13 +1579,13 @@ module_t *file_read_modinfo(char *name)
           if(!config.module.type_name[current_type]) {
             config.module.type_name[current_type] = strdup(s);
 
-            if(!config.module.scsi_type && !strcasecmp(s, "scsi")) {
+            if(!config.module.scsi_type && !strcasecmp(s, "ide/raid/scsi")) {
               config.module.scsi_type = current_type;
             }
             if(!config.module.network_type && !strcasecmp(s, "network")) {
               config.module.network_type = current_type;
             }
-            if(!config.module.cdrom_type && !strcasecmp(s, "cdrom")) {
+            if(!config.module.cdrom_type && !strcasecmp(s, "cd-rom")) {
               config.module.cdrom_type = current_type;
             }
             if(!config.module.pcmcia_type && !strcasecmp(s, "pcmcia")) {

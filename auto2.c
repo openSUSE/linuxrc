@@ -740,7 +740,7 @@ int auto2_init()
       if(auto2_ask_for_modules(1, "network") == 0) return FALSE;
     }
     else {
-      if(auto2_ask_for_modules(1, "scsi") == 0) return FALSE;
+      if(auto2_ask_for_modules(1, "ide/raid/scsi") == 0) return FALSE;
     }
   }
 
