@@ -734,90 +734,52 @@ static void inst_start_shell (char *tty_tv)
 
 
 static int inst_prepare (void)
-    {
-    char  *links_ati [] = {
-                          "/etc/termcap",
-                          "/etc/services",
-                          "/etc/protocols",
-                          "/etc/nsswitch.conf",
-                          "/etc/passwd",
-                          "/etc/group",
-                          "/etc/shadow",
-                          "/etc/gshadow",
-                          "/etc/rpmrc",
-                          "/etc/inputrc",
-                          "/etc/ld.so.conf",
-                          "/etc/ld.so.cache",
-                          "/etc/host.conf",
-                          "/etc/modules.conf",
-                          "/etc/fb.modes",
-                          "/etc/X11/xserver",
-                          "/etc/X11/xkb",
-                          "/etc/joerc",
-                          "/etc/ssh",
-                          "/etc/pam.d",
-                          "/etc/suse-blinux.conf",
-                          "/etc/init.d",		/* for braille displays */
-                          "/bin",
-                          "/boot",
-                          "/root",
-                          "/lib",
-                          "/sbin",
-                          "/usr"
-                          };
-    char   link_source_ti [MAX_FILENAME];
-    int    i_ii;
-    int    rc_ii = 0;
+{
+  char *links[] = { "/lib", "/bin" };
+  char link_source[MAX_FILENAME];
+  int i, rc = 0;
 
-    mod_free_modules ();
-    rename ("/bin", "/.bin");
+  mod_free_modules();
+  rename("/bin", "/.bin");
 
-    for (i_ii = 0; i_ii < sizeof (links_ati) / sizeof (links_ati [0]); i_ii++)
-        {
-        if (inst_loopmount_im)
-            sprintf (link_source_ti, "%s%s", mountpoint_tg, links_ati [i_ii]);
-        else
-            {
-            if (ramdisk_ig)
-                sprintf (link_source_ti, "%s%s", inst_mountpoint_tg,
-                         links_ati [i_ii]);
-            else
-                sprintf (link_source_ti, "%s%s%s", mountpoint_tg, installdir_tg,
-                         links_ati [i_ii]);
-            }
-        unlink (links_ati [i_ii]);
-        symlink (link_source_ti, links_ati [i_ii]);
-        }
-
-    setenv ("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
-    if (serial_ig)
-        {
-        setenv ("TERM", "vt100", TRUE);
-        setenv ("ESCDELAY", "1100", TRUE);
-        }
-    else
-        {
-        setenv ("TERM", "linux", TRUE);
-        setenv ("ESCDELAY", "10", TRUE);
-        }
-
-    setenv ("YAST_DEBUG", "/debug/yast.debug", TRUE);
-
-    system ("/sbin/syslogd");
-
-#ifdef USE_LIBHD   
-#ifdef __i386__
-//    auto2_find_braille();
-#endif
-#endif
-
-    file_write_yast_info (NULL);
-
-    if (!ramdisk_ig)
-        rc_ii = inst_init_cache ();
-
-    return (rc_ii);
+  for(i = 0; i < sizeof links / sizeof *links; i++) {
+    if(inst_loopmount_im) {
+      sprintf(link_source, "%s%s", mountpoint_tg, links[i]);
     }
+    else {
+      if(ramdisk_ig)
+        sprintf(link_source, "%s%s", inst_mountpoint_tg, links[i]);
+      else
+        sprintf(link_source, "%s%s%s", mountpoint_tg, installdir_tg, links[i]);
+    }
+    if(!util_check_exist(links[i])) {
+      unlink(links[i]);
+      symlink(link_source, links[i]);
+    }
+  }
+
+  setenv("INSTSYS", link_source, TRUE);
+
+  setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
+
+  if(serial_ig) {
+    setenv("TERM", "vt100", TRUE);
+    setenv("ESCDELAY", "1100", TRUE);
+  } else {
+    setenv ("TERM", "linux", TRUE);
+    setenv ("ESCDELAY", "10", TRUE);
+  }
+
+  setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
+
+  system("/sbin/syslogd");
+
+  file_write_yast_info(NULL);
+
+  if(!ramdisk_ig) rc = inst_init_cache();
+
+  return rc;
+}
 
 
 static int inst_execute_yast (void)
