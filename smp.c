@@ -337,6 +337,8 @@ int detectSMP(void)
     return isSMP = sparcDetectSMP();
 #elif __alpha__
     return isSMP = alphaDetectSMP();
+#else
+    return isSMP;
 #endif
 }
 	
