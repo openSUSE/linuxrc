@@ -53,6 +53,7 @@ static int   inst_loopmount_im = FALSE;
 static char *inst_tmpmount_tm = "/tmp/loopmount";
 static char  inst_rescuefile_tm [MAX_FILENAME];
 static char *inst_demo_sys_tm = "/suse/images/cd-demo";
+// static char *inst_demo_sys_tm = "/suse/images/root";
 
 static int   inst_mount_harddisk      (void);
 static int   inst_try_cdrom           (char *device_tv);

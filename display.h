@@ -64,6 +64,7 @@ typedef struct
     } graphics_t;
 
 extern graphics_t graphics_sg;
+extern colorset_t  disp_vgacolors_rm;
 
 extern void disp_init           (void);
 extern void disp_end            (void);

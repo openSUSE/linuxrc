@@ -33,7 +33,7 @@ static int  disp_state_im = DISP_ON;
 
 static character_t **disp_screen_aprm;
 
-static colorset_t  disp_vgacolors_rm;
+colorset_t  disp_vgacolors_rm;
 static colorset_t  disp_mono_rm;
 static colorset_t  disp_alternate_rm;
 

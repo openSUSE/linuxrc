@@ -197,6 +197,12 @@ void auto2_scan_hardware(char *log_file)
     usb_mods_ig = usb_mods;
   }
 
+  switch(hd_mac_color(hd_data)) {
+    case 0x04:	disp_vgacolors_rm.bg = COL_GREEN; break;
+    case 0x05:	disp_vgacolors_rm.bg = COL_YELLOW; break;
+    case 0xff:	disp_vgacolors_rm.bg = COL_WHITE; break;
+  }
+
   if(log_file && (f = fopen(log_file, "w+"))) {
 
     if((hd_data->debug & HD_DEB_SHOW_LOG) && hd_data->log) {
