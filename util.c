@@ -1082,6 +1082,16 @@ void util_status_info()
   sprintf(buf, "setup command = \"%s\"", config.setupcmd);
   slist_append_str(&sl0, buf);
 
+  if(config.module.broken) {
+    strcpy(buf, "broken modules:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.module.broken; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.cdroms) {
     strcpy(buf, "cdroms:");
     slist_append_str(&sl0, buf);

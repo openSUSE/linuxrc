@@ -882,6 +882,12 @@ void lxrc_init()
 
   if(config.run_memcheck) lxrc_memcheck();
 
+  ft = file_get_cmdline(key_brokenmodules);
+  if(ft && *ft->value) {
+    slist_free(config.module.broken);
+    config.module.broken = slist_split(',', ft->value);
+  }
+
   mod_init();
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();

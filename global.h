@@ -287,6 +287,7 @@ typedef struct {
     slist_t *input_params;	/* history for module loading dialog */
     slist_t *used_params;	/* parameters that were used for insmod */
     int ramdisk;		/* ramdisk used for modules */
+    slist_t *broken;		/* list of modules that must not be loaded */
   } module;
 
   struct {

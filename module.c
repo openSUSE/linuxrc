@@ -755,6 +755,11 @@ int mod_insmod(char *module, char *param)
     }
   }
 
+  if(slist_getentry(config.module.broken, module)) {
+    fprintf(stderr, "%s tagged as broken, not loaded\n", module);
+    return -1;
+  }
+
   sprintf(buf, "insmod %s%s ", force, module);
 
   if(param && *param) strcat(buf, param);

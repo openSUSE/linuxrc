@@ -189,7 +189,8 @@ static struct {
   { key_productdir,     "ProductDir"       },
   { key_linuxrcstderr,  "LinuxrcSTDERR"    },
   { key_comment,        "#"                },
-  { key_kbdtimeout,     "KBDTimeout"       }
+  { key_kbdtimeout,     "KBDTimeout"       },
+  { key_brokenmodules,  "BrokenModules"    }
 };
 
 static struct {
@@ -973,6 +974,11 @@ void file_do_info(file_t *f0)
 
       case key_kbdtimeout:
         if(f->is.numeric) config.kbdtimeout = f->nvalue;
+        break;
+
+      case key_brokenmodules:
+        slist_free(config.module.broken);
+        config.module.broken = slist_split(',', f->value);
         break;
 
       default:
