@@ -50,6 +50,7 @@
 #include "ftp.h"
 #include "net.h"
 #include "auto2.h"
+#include "lsh.h"
 
 #define LED_TIME     50000
 
@@ -959,112 +960,6 @@ void util_status_info()
   free(hd_data);
 }
 
-int util_mount_main(int argc, char **argv)
-{
-  int i;
-  char *dir, *srv_dir;
-  char *mp_tmp = mountpoint_tg;
-  char *type = NULL, *dev;
-
-  argv++; argc--;
-
-  if(argc != 3 && argc != 4) return 1;
-
-  if(strstr(*argv, "-t") == *argv) {
-    type = *argv + 2;
-  }
-
-  if(type && !*type) {
-    type = *++argv;
-  }
-
-  dev = strcmp(argv[1], "none") ? argv[1] : NULL;
-
-  dir = argv[2];
-
-  if(!type) return 2;
-
-  if(strcmp(type, "nfs")) {
-    if(!mount(dev, dir, type, 0, 0)) return 0;
-    perror("mount");
-    return 3;
-  }
-
-  srv_dir = index(dev, ':');
-  if(!srv_dir) {
-    fprintf(stderr, "invalid mount src \"%s\"\n", dev);
-    return 7;
-  }
-
-  *srv_dir++ = 0;
-
-  mountpoint_tg = dir;
-
-  i = net_mount_nfs(dev, srv_dir);
-
-  mountpoint_tg = mp_tmp;
-
-  return i;
-}
-
-
-int util_umount_main(int argc, char **argv)
-{
-  argv++; argc--;
-
-  if(argc != 1) return 1;
-
-  if(!umount(*argv)) return 0;
-
-  perror(*argv);
-
-  return 1;
-}
-
-int util_cat_main(int argc, char **argv)
-{
-  FILE *f;
-  int i, c;
-
-  argv++; argc--;
-
-  if(!argc) {
-    while((c = fgetc(stdin)) != EOF) fputc(c, stdout);
-    fflush(stdout);
-    return 0;
-  }
-
-  for(i = 0; i < argc; i++) {
-    if((f = fopen(argv[i], "r"))) {
-      while((c = fgetc(f)) != EOF) fputc(c, stdout);
-      fclose(f);
-    }
-    else {
-      perror(argv[i]);
-      return 1;
-    }
-  }
-
-  fflush(stdout);
-
-  return 0;
-}
-
-int util_echo_main(int argc, char **argv)
-{
-  int i;
-
-  argv++; argc--;
-
-  for(i = 0; i < argc; i++) {
-    printf("%s%s", i ? " " : "", argv[i]);
-  }
-
-  printf("\n");
-
-  return 0;
-}
-
 void util_get_splash_status()
 {
   FILE *f;
@@ -1172,14 +1067,6 @@ void util_ps(FILE *f)
     closedir(proc);
   }
 }
-
-int util_ps_main(int argc, char **argv)
-{
-  util_ps(stderr);
-
-  return 0;
-}
-
 
 int util_do_cp(char *src, char *dst)
 {
@@ -1416,5 +1303,144 @@ void util_start_shell(char *tty, char *shell, int new_env)
     fprintf(stderr, "Couldn't start shell (errno = %d)\n", errno);
     exit(-1);
   }
+}
+
+
+int util_ps_main(int argc, char **argv)
+{
+  util_ps(stderr);
+
+  return 0;
+}
+
+
+int util_mount_main(int argc, char **argv)
+{
+  int i;
+  char *dir, *srv_dir;
+  char *mp_tmp = mountpoint_tg;
+  char *type = NULL, *dev;
+
+  argv++; argc--;
+
+  if(argc != 3 && argc != 4) return 1;
+
+  if(strstr(*argv, "-t") == *argv) {
+    type = *argv + 2;
+  }
+
+  if(type && !*type) {
+    type = *++argv;
+  }
+
+  dev = strcmp(argv[1], "none") ? argv[1] : NULL;
+
+  dir = argv[2];
+
+  if(!type) return 2;
+
+  if(strcmp(type, "nfs")) {
+    if(!mount(dev, dir, type, 0, 0)) return 0;
+    perror("mount");
+    return 3;
+  }
+
+  srv_dir = index(dev, ':');
+  if(!srv_dir) {
+    fprintf(stderr, "invalid mount src \"%s\"\n", dev);
+    return 7;
+  }
+
+  *srv_dir++ = 0;
+
+  mountpoint_tg = dir;
+
+  i = net_mount_nfs(dev, srv_dir);
+
+  mountpoint_tg = mp_tmp;
+
+  return i;
+}
+
+
+int util_umount_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(argc != 1) return 1;
+
+  if(!umount(*argv)) return 0;
+
+  perror(*argv);
+
+  return 1;
+}
+
+
+int util_cat_main(int argc, char **argv)
+{
+  FILE *f;
+  int i, c;
+
+  argv++; argc--;
+
+  if(!argc) {
+    while((c = fgetc(stdin)) != EOF) fputc(c, stdout);
+    fflush(stdout);
+    return 0;
+  }
+
+  for(i = 0; i < argc; i++) {
+    if((f = fopen(argv[i], "r"))) {
+      while((c = fgetc(f)) != EOF) fputc(c, stdout);
+      fclose(f);
+    }
+    else {
+      perror(argv[i]);
+      return 1;
+    }
+  }
+
+  fflush(stdout);
+
+  return 0;
+}
+
+
+int util_echo_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  for(i = 0; i < argc; i++) {
+    printf("%s%s", i ? " " : "", argv[i]);
+  }
+
+  printf("\n");
+
+  return 0;
+}
+
+
+int util_nothing_main(int argc, char **argv)
+{
+  return 0;
+}
+
+
+/*
+ * Redirect all output of system() to tty3.
+ */
+int util_sh_main(int argc, char **argv)
+{
+#if 0
+  freopen("/dev/tty3", "a", stdout);
+  freopen("/dev/tty3", "a", stderr);
+  printf("Executing: \"%s\"\n", argv[2]);
+#endif
+  dup2(2, 1);
+
+  return lsh_main(argc, argv);
 }
 

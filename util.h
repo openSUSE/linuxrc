@@ -50,6 +50,8 @@ extern int  util_mount_main        (int argc, char **argv);
 extern int  util_umount_main       (int argc, char **argv);
 extern int  util_cat_main          (int argc, char **argv);
 extern int  util_echo_main         (int argc, char **argv);
+extern int  util_nothing_main      (int argc, char **argv);
+extern int  util_sh_main           (int argc, char **argv);
 extern void util_get_splash_status (void);
 extern void util_ps                (FILE *f);
 extern int  util_ps_main           (int argc, char **argv);

@@ -42,19 +42,9 @@
 #include "linuxrc.h"
 #include "auto2.h"
 #include "lsh.h"
-
 #include "multiple_info.h"
 
-extern int  insmod_main        (int argc, char **argv);
-extern int  rmmod_main         (int argc, char **argv);
-extern void cardmgr_main       (int argc, char **argv);
-extern int  probe_main         (int argc, char **argv);
-extern int  loadkeys_main      (unsigned int argc, char *argv[]);
-extern int  setfont_main       (int argc, char **argv);
-extern int  portmap_main       (int argc, char **argv);
-
 static void lxrc_main_menu     (void);
-static void lxrc_do_shell      (int argc, char **argv, char **env);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (int what_iv);
 static void lxrc_memcheck      (void);
@@ -73,101 +63,100 @@ static char **saved_environment;
 extern char **environ;
 static void   lxrc_movetotmpfs(void);
 
-int main (int argc, char **argv, char **env)
-    {
-    int   rc_ii = 0;
-    char *progname_pci;
+#if SWISS_ARMY_KNIFE
+int cardmgr_main(int argc, char **argv);
+int insmod_main(int argc, char **argv);
+int loadkeys_main(int argc, char **argv);
+int portmap_main(int argc, char **argv);
+int probe_main(int argc, char **argv);
+int rmmod_main(int argc, char **argv);
+int setfont_main(int argc, char **argv);
 
-    progname_pci = strrchr (argv [0], '/');
-    if (progname_pci)
-        progname_pci++;
-    else
-        progname_pci = argv [0];
+static struct {
+  char *name;
+  int (*func)(int, char **);
+} lxrc_internal[] = {
+  { "sh",       util_sh_main      },
+  { "lsh",      lsh_main          },
+  { "insmod",   insmod_main       },
+  { "rmmod",    rmmod_main        },
+  { "loadkeys", loadkeys_main     },
+#if WITH_PCMCIA
+  { "cardmgr",  cardmgr_main      },
+  { "probe",    probe_main        },
+#endif
+  { "setfont",  setfont_main      },
+  { "portmap",  portmap_main      },
+  { "mount",    util_mount_main   },
+  { "umount",   util_umount_main  },
+  { "cat",      util_cat_main     },
+  { "echo",     util_echo_main    },
+  { "ps",       util_ps_main      },
+  { "nothing",  util_nothing_main }
+};
+#endif
+
+int main (int argc, char **argv, char **env)
+{
+  char *prog;
+  int i, err;
+
+  prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
 
 #if SWISS_ARMY_KNIFE
-    if (!strcmp (progname_pci, "sh"))
-        lxrc_do_shell (argc, argv, env);
-    if (!strcmp (progname_pci, "lsh"))
-        lsh_main (argc, argv);
-    else if (!strcmp (progname_pci, "insmod"))
-        rc_ii = insmod_main (argc, argv);
-    else if (!strcmp (progname_pci, "rmmod"))
-        rc_ii = rmmod_main (argc, argv);
-    else if (!strcmp (progname_pci, "loadkeys"))
-        rc_ii = loadkeys_main ((unsigned int) argc, argv);
-#if WITH_PCMCIA
-    else if (!strcmp (progname_pci, "cardmgr"))
-        cardmgr_main (argc, argv);
-    else if (!strcmp (progname_pci, "probe"))
-        rc_ii = probe_main (argc, argv);
-#endif
-    else if (!strcmp (progname_pci, "setfont"))
-        rc_ii = setfont_main (argc, argv);
-    else if (!strcmp (progname_pci, "portmap"))
-        rc_ii = portmap_main (argc, argv);
-    else if (!strcmp (progname_pci, "mount"))
-        rc_ii = util_mount_main (argc, argv);
-    else if (!strcmp (progname_pci, "umount"))
-        rc_ii = util_umount_main (argc, argv);
-    else if (!strcmp (progname_pci, "cat"))
-        rc_ii = util_cat_main (argc, argv);
-    else if (!strcmp (progname_pci, "echo"))
-        rc_ii = util_echo_main (argc, argv);
-    else if (!strcmp (progname_pci, "ps"))
-        rc_ii = util_ps_main (argc, argv);
-    else if (!strcmp (progname_pci, "nothing"))
-        rc_ii = 0;
-    else
-#endif
-        {
-	lxrc_argv = argv;
-
-        if(!getuid()) {
-          if(!util_check_exist("/oldroot")) {
-            lxrc_movetotmpfs();	// does (normally) not return
-          }
-          else {
-            // umount and release /oldroot
-            umount("/oldroot");
-            util_free_ramdisk("/dev/ram0");
-          }
-        }
-        
-	save_environment ();
-        lxrc_init ();
-        if (auto_ig)
-            rc_ii = inst_auto_install ();
-        else if (demo_ig)
-            rc_ii = inst_start_demo ();
-#ifdef USE_LIBHD
-        else if (auto2_ig) {
-            if ((action_ig & ACT_RESCUE))
-                {
-                util_manual_mode ();
-                util_disp_init ();
-                util_print_banner ();
-                set_choose_keytable (1);
-                }
-            rc_ii = inst_auto2_install ();
-            deb_msg ("done inst_auto2_install()");
-            deb_int (rc_ii);
-        }
-#endif
-        else
-             rc_ii = 99;
-
-        if (rc_ii)
-// was:       if (!(auto_ig || demo_ig || auto2_ig) || rc_ii)
-            {
-            util_disp_init();
-            lxrc_main_menu ();
-            }
-
-        lxrc_end ();
-        }
-
-    return (rc_ii);
+  for(i = 0; i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
+    if(!strcmp(prog, lxrc_internal[i].name)) {
+      return lxrc_internal[i].func(argc, argv);
     }
+  }
+#endif
+
+  lxrc_argv = argv;
+
+  if(!getuid()) {
+    if(!util_check_exist("/oldroot")) {
+      lxrc_movetotmpfs();	// does (normally) not return
+    }
+    else {
+      // umount and release /oldroot
+      umount("/oldroot");
+      util_free_ramdisk("/dev/ram0");
+    }
+  }
+
+  save_environment();
+  lxrc_init();
+
+  if(auto_ig) {
+    err = inst_auto_install();
+  }
+  else if(demo_ig) {
+    err = inst_start_demo();
+  }
+#ifdef USE_LIBHD
+  else if(auto2_ig) {
+    if((action_ig & ACT_RESCUE)) {
+      util_manual_mode();
+      util_disp_init();
+      util_print_banner();
+      set_choose_keytable(1);
+    }
+    err = inst_auto2_install();
+  }
+#endif
+  else {
+    err = 99;
+  }
+
+  if(err) {
+    util_disp_init();
+    lxrc_main_menu();
+  }
+
+  lxrc_end();
+
+  return err;
+}
 
 
 int my_syslog (int type_iv, char *buffer_pci, ...)
@@ -313,8 +302,14 @@ char *lxrc_prog_name(pid_t pid)
  */
 int is_rpc_prog(pid_t pid)
 {
-  if(!strcmp(lxrc_prog_name(pid), "portmap")) return 1;
-  if(!strcmp(lxrc_prog_name(pid), "rpciod")) return 1;
+  static char *progs[] = {
+    "portmap", "rpciod", "lsh"
+  };
+  int i;
+
+  for(i = 0; i < sizeof progs / sizeof *progs; i++) {
+    if(!strcmp(lxrc_prog_name(pid), progs[i])) return 1;
+  }
 
   return 0;
 }
@@ -823,65 +818,6 @@ static void lxrc_main_menu (void)
     util_free_items (items_ari, nr_items_ii);
     }
 
-
-#if SWISS_ARMY_KNIFE
-static void lxrc_do_shell (int argc, char **argv, char **env)
-    {
-#if 0
-    char  command_ati [10][100];
-    char  progname_ti [100];
-    int   i_ii = 0;
-    int   j_ii = 0;
-    int   k_ii = 0;
-    char *arguments_apci [10];
-#endif
-
-    freopen ("/dev/tty3", "a", stdout);
-    freopen ("/dev/tty3", "a", stderr);
-    printf ("Executing: \"%s\"\n", argv [2]);
-
-    lsh_main (argc, argv);
-
-#if 0
-    while (argv [2][i_ii] == ' ')
-        i_ii++;
-
-    do
-        {
-        if (argv [2][i_ii] == '\"')
-            {
-            i_ii++;
-            while (argv [2][i_ii] && argv [2][i_ii] != '\"')
-                command_ati [j_ii][k_ii++] = argv [2][i_ii++];
-
-            if (argv [2][i_ii])
-                i_ii++;
-            }
-        else
-            command_ati [j_ii][k_ii++] = argv [2][i_ii++];
-
-        if (argv [2][i_ii] == ' ' || argv [2][i_ii] == 0)
-            {
-            command_ati [j_ii][k_ii] = 0;
-            arguments_apci [j_ii] = command_ati [j_ii];
-            j_ii++;
-            k_ii = 0;
-
-            while (argv [2][i_ii] == ' ')
-                i_ii++;
-            }
-        }
-    while (argv [2][i_ii]);
-
-    arguments_apci [j_ii] = 0;
-
-    sprintf (progname_ti, "/bin/%s", arguments_apci [0]);
-    execve (progname_ti, arguments_apci, env);
-#endif
-
-    exit (0);
-    }
-#endif
 
 static void lxrc_memcheck (void)
     {

@@ -162,7 +162,7 @@ int do_internal(int argc, char **argv)
   int i;
 
   for(i = 0; i < sizeof internal_cmd / sizeof *internal_cmd; i++) {
-    if(!strcmp(argv[0], internal_cmd[i].name)) {
+    if(!strcmp(*argv, internal_cmd[i].name)) {
       last_exit = internal_cmd[i].func(argc, argv);
       return 1;
     }

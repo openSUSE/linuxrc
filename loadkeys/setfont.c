@@ -104,7 +104,9 @@ setfont_main(int argc, char *argv[])
 
 	set_progname(argv[0]);
 
+#if 0
 	setlocale(LC_ALL, "");
+#endif
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 
