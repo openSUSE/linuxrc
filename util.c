@@ -685,7 +685,7 @@ void do_cp(char *src_dir, char *dst_dir, char *name)
   int c;
   char src[200], dst[200];
 
-  deb_str(name);
+//  deb_str(name);
 
   sprintf(src, "%s/%s", src_dir, name);
   sprintf(dst, "%s/%s", dst_dir, name);
@@ -735,14 +735,14 @@ int util_chk_driver_update(char *dir)
   strcpy(driver_update_dir, "/update");
 
   deb_msg("driver update disk");
-  deb_str(dir);
+//  deb_str(dir);
 
   fd = open("/dev/ram3", O_RDWR);
   if(fd < 0) return 0;
   fssize = mkdosfs(fd, 8000);
   close(fd);
 
-  deb_int(fssize);
+//  deb_int(fssize);
 
   mkdir(driver_update_dir, 0755);
 
@@ -751,11 +751,11 @@ int util_chk_driver_update(char *dir)
 // Why does this not work???
 // i = util_try_mount("/dev/ram3", driver_update_dir, MS_MGC_VAL | MS_RDONLY, 0);
 
-  deb_int(i);
+//  deb_int(i);
 
   if(i) return 0;
 
-  deb_msg("mounted");
+//  deb_msg("mounted");
 
   sprintf(inst_dst, "%s/install", driver_update_dir);
 

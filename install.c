@@ -43,6 +43,7 @@
 #include "install.h"
 #include "settings.h"
 #include "auto2.h"
+#include "hd.h"
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
 #define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
@@ -424,6 +425,7 @@ static int inst_mount_cdrom (int show_err)
     rc_ii = inst_try_cdrom (device_pci);
     if (!rc_ii)
         {
+        cdrom_drives++;
         mount_success_ii = TRUE;
         rc_ii = inst_check_instsys ();
         if (rc_ii)
@@ -436,6 +438,7 @@ static int inst_mount_cdrom (int show_err)
         rc_ii = inst_try_cdrom (device_pci);
         if (!rc_ii)
             {
+            cdrom_drives++;
             mount_success_ii = TRUE;
             rc_ii = inst_check_instsys ();
             if (rc_ii)
@@ -1408,6 +1411,7 @@ int inst_auto2_install()
 #endif	/* USE_LIBHD */
 
 
+#if 0
 int inst_update_cd()
 {
   int  i;
@@ -1430,6 +1434,60 @@ int inst_update_cd()
   }
 
   if(!*driver_update_dir) dia_message("Driver Update failed", MSGTYPE_ERROR);
+
+  return 0;
+}
+
+#endif
+
+
+int inst_update_cd()
+{
+  int  i, cdroms = 0;
+  char *mp = "/tmp/drvupdate";
+  hd_data_t *hd_data;
+  hd_t *hd0, *hd;
+  window_t win;
+
+  *driver_update_dir = 0;
+
+  mkdir(mp, 0755);
+
+  dia_message("Please insert the Driver Update CD-ROM", MSGTYPE_INFO);
+  dia_info(&win, "Trying to mount the CD-ROM...");	// TXT_TRY_CD_MOUNT
+
+  hd_data = calloc(1, sizeof *hd_data);
+  hd0 = hd_list(hd_data, hw_cdrom, 1, NULL);
+
+  for(hd = hd0; hd; hd = hd->next) {
+    if(hd->unix_dev_name) {
+      cdrom_drives++;
+      i = util_try_mount(hd->unix_dev_name, mp, MS_MGC_VAL | MS_RDONLY, 0);
+      if(!i) {
+        cdroms++;
+        deb_msg("Update CD mounted");
+        util_chk_driver_update(mp);
+        umount(mp);
+      }
+      else {
+        deb_msg("Update CD mount failed");
+      }
+    }
+    if(*driver_update_dir) break;
+  }
+
+  hd_free_hd_list(hd0);
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  win_close(&win);
+
+  if(!*driver_update_dir) {
+    dia_message(cdroms ? "Driver Update failed" : "Could not mount the CD-ROM", MSGTYPE_ERROR);
+  }
+  else {
+    dia_message("Driver Update ok", MSGTYPE_INFO);
+  }
 
   return 0;
 }

@@ -237,3 +237,4 @@ extern char            *braille_dev_ig;
 extern char            *x11i_tg;
 extern char            livesrc_tg[16];
 extern char            driver_update_dir[16];
+extern int             cdrom_drives;

@@ -64,6 +64,7 @@ static int auto2_has_i2o(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
 #endif
 static void auto2_progress(char *pos, char *msg);
+static int auto2_ask_for_modules(int prompt, int mod_type);
 
 char *auto2_device_name(hd_t *hd)
 {
@@ -193,7 +194,7 @@ void auto2_scan_hardware(char *log_file)
       mod_load_module("mousedev", NULL);
     }
     k = mount (0, "/proc/bus/usb", "usbdevfs", 0, 0);
-    if(!i) sleep(3);
+    if(!i) sleep(4);
     if(with_usb) {
       hd_clear_probe_feature(hd_data, pr_all);
       hd_set_probe_feature(hd_data, pr_usb);
@@ -337,6 +338,7 @@ int auto2_cdrom_dev(hd_t **hd0)
   cdrom_info_t *ci;
 
   for(hd = hd_list(hd_data, hw_cdrom, 1, *hd0); hd; hd = hd->next) {
+    cdrom_drives++;
     add_hd_entry(hd0, hd);
     if(
       hd->unix_dev_name &&
@@ -619,7 +621,31 @@ int auto2_init()
 
   deb_int(valid_net_config_ig);
 
-  return auto2_find_install_medium();
+  i = auto2_find_install_medium();
+
+#ifdef __i386__
+  {
+    int net_cfg = (valid_net_config_ig & 0x2b) == 0x2b;
+
+    /* ok, found something */
+    if(i) return i;
+
+    /* no CD, but CD drive and no network config */
+    if(cdrom_drives && !net_cfg) return i;
+
+    if(auto2_ask_for_modules(1, net_cfg ? MOD_TYPE_NET : MOD_TYPE_SCSI) == 0) return FALSE;
+
+    i = auto2_find_install_medium();
+
+    if(i || !net_cfg) return i;
+
+    if(auto2_ask_for_modules(0, net_cfg ? MOD_TYPE_SCSI : MOD_TYPE_NET) == 0) return FALSE;
+
+    i = auto2_find_install_medium();
+  }
+#endif
+
+  return i;
 }
 
 
@@ -1178,6 +1204,40 @@ void auto2_print_x11_opts(FILE *f)
   }
 }
 #endif
+
+
+int auto2_ask_for_modules(int prompt, int mod_type)
+{
+  int do_something = 0;
+
+  if(!util_check_exist("/etc/need_modules_disk")) return do_something;
+
+  util_manual_mode();
+  disp_cursor_off();
+  disp_set_display(1);
+  util_print_banner();
+
+  if(prompt) {
+    prompt = dia_okcancel(txt_get(TXT_ENTER_MODDISK), YES) == YES ? 1 : 0;
+  }
+  else {
+    prompt = 1;
+  }
+
+  if(prompt) {
+    mod_force_moddisk_im = TRUE;
+    mod_free_modules();
+    mod_get_ram_modules(mod_type);
+    do_something = 1;
+  }
+
+  printf("\033c"); fflush(stdout);
+  disp_clear_screen();
+
+  auto2_ig = TRUE;
+
+  return do_something;
+}
 
 
 #endif	/* USE_LIBHD */

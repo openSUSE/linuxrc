@@ -484,18 +484,23 @@ static void lxrc_init (void)
         char s[200];
 
         deb_msg("Automatic setup not possible.");
+
         util_manual_mode();
         disp_cursor_off();
         disp_set_display(1);
-        util_print_banner();
 
-        sprintf(s, txt_get(TXT_INSERT_CD), 1);
-        j = dia_okcancel(s, YES) == YES ? 1 : 0;
+#ifdef __i386__
+        util_print_banner();
         i = 0;
-        if(j) {
-          printf("\033c"); fflush(stdout);
-          disp_clear_screen();
-          i = auto2_find_install_medium();
+        j = 1;
+        if(cdrom_drives) {
+          sprintf(s, txt_get(TXT_INSERT_CD), 1);
+          j = dia_okcancel(s, YES) == YES ? 1 : 0;
+          if(j) {
+            printf("\033c"); fflush(stdout);
+            disp_clear_screen();
+            i = auto2_find_install_medium();
+          }
         }
         if(i) {
           auto2_ig = TRUE;
@@ -504,21 +509,16 @@ static void lxrc_init (void)
         else {
           yast_version_ig = 0;
           disp_cursor_off();
-          util_print_banner ();
-//          dia_message(s, MSGTYPE_INFO);
+          util_print_banner();
           if(j) dia_message("Could not find the SuSE Linux Installation CD.\n\nActivating manual setup program.\n", MSGTYPE_ERROR);
         }
-#if 0 /* defined(__i386__) */
-        else {
-          dia_message("Could not find the SuSE Linux installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
-        }
 #endif
+
       }
     }
 #endif
 
     util_print_banner ();
-
 
     /* note: for auto2, file_read_info() is called inside auto2_init() */
     if (auto_ig) 

@@ -101,3 +101,4 @@ char            *braille_dev_ig = NULL;
 char            *x11i_tg = NULL;
 char            livesrc_tg[16] = "";
 char            driver_update_dir[16] = "";
+int             cdrom_drives = 0;
