@@ -99,7 +99,6 @@ static struct {
   { key_yast2update,    "YaST2update"      },
   { key_yast2serial,    "YaST2serial"      },
   { key_textmode,       "Textmode"         },
-  { key_usb,            "USB"              },
   { key_yast2color,     "YaST2color"       },
   { key_bootdisk,       "BootDisk"         },
   { key_disks,          "Disks"            },
@@ -139,8 +138,9 @@ static struct {
   { key_cached,         "Cached"           },
   { key_swaptotal,      "SwapTotal"        },
   { key_swapfree,       "SwapFree"         },
-  { key_minmemfree,     "MinMemFree"       },
-  { key_minmemmodules,  "MinMemModules"    },
+  { key_memlimit,       "MemLimit"         },
+  { key_memyast,        "MemYaST"          },
+  { key_memmodules,     "MemModules"       },
   { key_info,           "Info"             },
   { key_proxy,          "Proxy"            },
   { key_proxyport,      "ProxyPort"        },
@@ -152,7 +152,15 @@ static struct {
   { key_tmpfs,          "_TmpFS"           },
   { key_testmode,       "_TestMode"        },
   { key_debugwait,      "_DebugWait"       },
-  { key_expert,         "Expert"           }
+  { key_auto,           "_Auto"            },
+  { key_expert,         "Expert"           },
+  { key_rescue,         "Rescue"           },
+  { key_rootimage,      "RootImage"        },
+  { key_rescueimage,    "RescueImage"      },
+  { key_installdir,     "InstallDir"       },
+  { key_nopcmcia,       "NoPCMCIA"         },
+  { key_vnc,            "VNC"              },
+  { key_vncpassword,    "VNCPassword"      }
 };
 
 static struct {
@@ -590,11 +598,11 @@ void file_do_info(file_t *f0)
 
       case key_username:
       case key_ftpuser:
-        str_copy(&config.net.user, f->value);
+        str_copy(&config.net.user, *f->value ? f->value : NULL);
         break;
 
       case key_password:
-        str_copy(&config.net.password, f->value);
+        str_copy(&config.net.password, *f->value ? f->value : NULL);
         break;
 
       case key_workdomain:
@@ -623,11 +631,15 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.net.nfs_port = f->nvalue;
         break;
 
-      case key_minmemfree:
+      case key_memlimit:
         if(f->is.numeric) config.memory.min_free = f->nvalue;
         break;
 
-      case key_minmemmodules:
+      case key_memyast:
+        if(f->is.numeric) config.memory.min_yast = f->nvalue;
+        break;
+
+      case key_memmodules:
         if(f->is.numeric) config.memory.min_modules = f->nvalue;
         break;
 
@@ -643,6 +655,37 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.debugwait = f->nvalue;
         break;
 
+      case key_manual:
+        if(f->is.numeric) {
+          config.manual = f->nvalue;
+          auto_ig = 0;
+          auto2_ig = config.manual ^ 1;
+        }
+        break;
+
+      case key_auto:
+        if(f->is.numeric) {
+          switch(f->nvalue) {
+            case 0:
+              config.manual = 1;
+              auto_ig = auto2_ig = 0;
+              break;
+
+            case 1:
+              config.manual = 0;
+              auto_ig = 1;
+              auto2_ig = 0;
+              break;
+
+            case 2:
+              config.manual = 0;
+              auto_ig = 0;
+              auto2_ig = 1;
+              break;
+          }
+        }
+        break;
+
       case key_expert:
         if(f->is.numeric) {
           if((f->nvalue & 1)) config.textmode = 1;
@@ -651,12 +694,36 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_domain:
-        if(config.net.domain) free(config.net.domain);
-        config.net.domain = strdup(f->value);
+      case key_demo:
+        if(f->is.numeric) {
+          config.demo = f->nvalue;
+          config.activate_storage = 1;
+        }
         break;
 
+      case key_nopcmcia:
+        if(f->is.numeric) config.nopcmcia = f->nvalue;
+        break;
+
+      case key_domain:
+        str_copy(&config.net.domain, f->value);
+        break;
+
+      case key_rootimage:
+        str_copy(&config.rootimage, f->value);
+        break;
+
+      case key_rescueimage:
+        str_copy(&config.rescueimage, f->value);
+        break;
+
+      case key_installdir:
+        str_copy(&config.installdir, f->value);
+        break;
+
+      case key_rescue:
       case key_install:
+        config.rescue = f->key == key_rescue ? 1 : 0;
         url = parse_url(f->value);
         if(url && url->scheme) {
           set_instmode(url->scheme);
@@ -675,11 +742,18 @@ void file_do_info(file_t *f0)
         str_copy(&config.autoyast, f->value);
         auto2_ig = TRUE;
         yast_version_ig = 2;
-        action_ig |= ACT_YAST2_AUTO_INSTALL;
         if(!config.instmode) {
           url = parse_url(config.autoyast);
           if(url && url->scheme) set_instmode(url->scheme);
         }
+        break;
+
+      case key_vnc:
+        if(f->is.numeric) config.vnc = f->nvalue;
+        break;
+
+      case key_vncpassword:
+        str_copy(&config.net.vncpassword, *f->value ? f->value : NULL);
         break;
 
       default:
@@ -881,8 +955,8 @@ void file_write_install_inf(char *dir)
 
   file_write_modparms(f);
 
-  file_write_num(f, key_manual, auto_ig || auto2_ig ? 0 : 1);
-  file_write_num(f, key_demo, demo_ig);
+  file_write_num(f, key_manual, config.manual);
+  file_write_num(f, key_demo, config.demo);
 
   if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
 
@@ -899,10 +973,11 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_autoyast, config.autoyast);
 
-  file_write_num(f, key_usb, usb_ig);
-
   util_update_meminfo();
   file_write_num(f, key_memfree, config.memory.current);
+
+  file_write_num(f, key_vnc, config.vnc);
+  file_write_str(f, key_vncpassword, config.net.vncpassword);
 
   if(yast2_color_ig) {
     fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
@@ -925,6 +1000,7 @@ void file_write_install_inf(char *dir)
 }
 
 
+#if 0
 void file_write_mtab()
 {
   char smb_mount_options[256];
@@ -937,7 +1013,13 @@ void file_write_mtab()
     "none /proc proc rw 0 0\n"
   );
 
-  if(!ramdisk_ig) {
+  if(config.inst_ramdisk >= 0) {
+    fprintf(f, "%s %s ext2 ro 0 0\n",
+      config.ramdisk[config.inst_ramdisk].dev,
+      config.mountpoint.instsys
+    );
+  }
+  else {
     switch(config.instmode) {
       case inst_cdrom:
         if(config.cdrom) {
@@ -970,18 +1052,10 @@ void file_write_mtab()
       default:
     }
   }
-  else {
-    if(config.inst_ramdisk >= 0) {
-      fprintf(f, "%s %s ext2 ro 0 0\n",
-        config.ramdisk[config.inst_ramdisk].dev,
-        config.mountpoint.instsys
-      );
-    }
-  }
 
   fclose(f);
 }
-
+#endif
 
 void file_write_modparms(FILE *f)
 {

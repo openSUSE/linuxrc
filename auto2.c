@@ -375,6 +375,7 @@ int auto2_cdrom_dev(hd_t **hd0)
 int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
+  int i;
 
   // TODO: +=SMB
       
@@ -400,68 +401,86 @@ int auto2_net_dev(hd_t **hd0)
         (net_config_mask() || config.insttype == inst_net) &&
         (net_config_mask() & 0x2b) != 0x2b
       ) {
-        printf("Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+        printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
         fflush(stdout);
+        fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
         config.net.use_dhcp ? net_dhcp() : net_bootp();
         if(
           !config.serverdir || !*config.serverdir ||
           !config.net.hostname.ok ||
           !config.net.netmask.ok ||
           !config.net.broadcast.ok ||
-          !config.net.gateway.ok ||
-          !config.net.server.ok
+          !config.net.gateway.ok
         ) {
-          printf("no/incomplete answer.\n");
+          if(!config.net.server.ok) {
+          }
+          fprintf(stderr, "no/incomplete answer.\n");
           return 1;
         }
-        printf("ok.\n");
+        fprintf(stderr, "ok.\n");
+
+        if(net_check_address2(&config.net.server, 1)) {
+          fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
+          return 1;
+        }
       }
 
       if(net_activate()) {
         deb_msg("net_activate() failed");
         return 1;
       }
-      else
+      else {
         fprintf(stderr, "%s activated\n", hd->unix_dev_name);
+      }
 
       net_is_configured_im = TRUE;
 
-      if(config.instmode == inst_smb) {
-        fprintf(stderr,
-          "OK, going to mount //%s/%s ...\n",
-          config.net.server.name,
-          config.serverdir
-        );
-        
-        if(
-          net_mount_smb(mountpoint_tg,
+      switch(config.instmode) {
+        case inst_smb:
+          fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.serverdir);
+
+          i = net_mount_smb(mountpoint_tg,
             &config.net.server, config.serverdir,
             config.net.user, config.net.password, config.net.workgroup
-          )
-        ) {
-          deb_msg("SMB mount failed.");
+          );
+          
+          if(i) {
+            deb_msg("SMB mount failed.");
+            return 1;
+          }
+
+          deb_msg("SMB mount ok.");
+          break;
+
+        case inst_nfs:
+          fprintf(stderr, "Starting portmap.\n");
+          system("portmap");
+
+          fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
+
+          if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
+            deb_msg("NFS mount failed.");
+            return 1;
+          }
+
+          deb_msg("NFS mount ok.");
+
+          config.instmode = inst_nfs;	// #### FIX: this is likely the wrong place!
+          break;
+
+        case inst_ftp:
+        case inst_tftp:
+        case inst_http:
+          i = net_open(NULL);
+          if(i < 0) {
+            util_print_net_error();
+            return 1;
+          }
+          break;
+
+        default:
+          fprintf(stderr, "insupported inst mode: %s\n", get_instmode_name(config.instmode));
           return 1;
-        }
-
-        deb_msg("SMB mount ok.");
-      }
-      else {
-        fprintf(stderr, "Starting portmap.\n");
-        system("portmap");
-
-        fprintf(stderr, "OK, going to mount %s:%s ...\n",
-          inet_ntoa(config.net.server.ip),
-          config.serverdir ?: ""
-        );
-
-        if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
-          deb_msg("NFS mount failed.");
-          return 1;
-        }
-
-        deb_msg("NFS mount ok.");
-
-        config.instmode = inst_nfs;	// #### FIX: this is likely the wrong place!
       }
 
       return inst_check_instsys();
@@ -533,14 +552,8 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
           }
 
           if(i) {
-            if(auto2_loaded_module) {
-              free(auto2_loaded_module);
-              auto2_loaded_module = NULL;
-            }
-            if(auto2_loaded_module_args) {
-              free(auto2_loaded_module_args);
-              auto2_loaded_module_args = NULL;
-            }
+            str_copy(&auto2_loaded_module, NULL);
+            str_copy(&auto2_loaded_module_args, NULL);
 
             // use the last module
             for(
@@ -548,8 +561,8 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
               sl1->next && sl2->next;
               sl1 = sl1->next, sl2 = sl2->next
             );
-            auto2_loaded_module = strdup(sl1->str);
-            if(sl2->str) auto2_loaded_module_args = strdup(sl2->str);
+            str_copy(&auto2_loaded_module, sl1->str);
+            if(sl2->str) str_copy(&auto2_loaded_module_args, sl2->str);
 
             if(base_class == bc_storage) {
               fprintf(stderr, "added");
@@ -576,8 +589,8 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
       /* some module was loaded...; in demo mode activate all disks */
       if(
         !(
-          ((action_ig & ACT_LOAD_DISK) && base_class == bc_storage) ||
-          ((action_ig & ACT_LOAD_NET) && base_class == bc_network)
+          (config.activate_storage && base_class == bc_storage) ||
+          (config.activate_network && base_class == bc_network)
         ) &&
         di
       ) break;
@@ -628,9 +641,11 @@ int auto2_init()
 
   file_read_info();
 
+  util_debugwait("got info file");
+
 #if WITH_PCMCIA
   if(
-    !(action_ig & ACT_NO_PCMCIA) &&
+    !config.nopcmcia &&
     hd_has_pcmcia(hd_data) &&
     !mod_pcmcia_ok()
   ) {
@@ -691,6 +706,8 @@ int auto2_init()
 
 //  deb_int(net_config_mask());
 
+  util_debugwait("starting search for inst-sys");
+
   i = auto2_find_install_medium();
 
 #ifdef __i386__
@@ -722,7 +739,7 @@ int auto2_init()
 /*
  * mmj@suse.de - first check if we're running automated harddisk install 
  * 
- * Look for a SuSE CD ot NFS source.
+ * Look for a SuSE CD or NFS source.
  */
 int auto2_find_install_medium()
 {
@@ -740,10 +757,12 @@ int auto2_find_install_medium()
   if(config.instmode == inst_cdrom || !config.instmode) {
     str_copy(&config.cdrom, NULL);
 
+    util_debugwait("CD?");
+
     fprintf(stderr, "Looking for a SuSE CD...\n");
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
-      if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
-      if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+      if(config.activate_network) auto2_activate_devices(bc_network, 0);
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }
@@ -761,8 +780,8 @@ int auto2_find_install_medium()
 
       fprintf(stderr, "Looking for a SuSE CD again...\n");
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        if((action_ig & ACT_LOAD_DISK)) auto2_activate_devices(bc_storage, 0);
-        if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+        if(config.activate_network) auto2_activate_devices(bc_network, 0);
         if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
         return TRUE;
       }
@@ -774,18 +793,16 @@ int auto2_find_install_medium()
     }
   }
 
-  if(auto2_loaded_module) {
-    free(auto2_loaded_module); auto2_loaded_module = NULL;
-  }
-  if(auto2_loaded_module_args) {
-    free(auto2_loaded_module_args); auto2_loaded_module_args = NULL;
-  }
+  str_copy(&auto2_loaded_module, NULL);
+  str_copy(&auto2_loaded_module_args, NULL);
 
 #if 0
   // TODO: +=SMB
 #endif
 
   deb_msg("Well, maybe there is a NFS/FTP/SMB server...");
+
+  util_debugwait("Net?");
 
   if(net_config_mask() || config.insttype == inst_net) {
     // ???
@@ -803,7 +820,7 @@ int auto2_find_install_medium()
   }
 
   if(!auto2_net_dev(&hd_devs)) {
-    if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+    if(config.activate_network) auto2_activate_devices(bc_network, 0);
     if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
     return TRUE;
   }
@@ -818,72 +835,19 @@ int auto2_find_install_medium()
 
     fprintf(stderr, "Looking for a NFS/FTP/SMB server again...\n");
     if(!auto2_net_dev(&hd_devs)) {
-      if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
+      if(config.activate_network) auto2_activate_devices(bc_network, 0);
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
       return TRUE;
     }
   }
+
+  util_debugwait("Nothing found");
 
   set_instmode(inst_cdrom);
 
   return FALSE;
 }
 
-
-#if 0
-/*
- * Read *all* "expert=" entries from the kernel command line.
- *
- * Note: can't use getenv() as there might be multiple "expert=" entries.
- */
-void auto2_chk_expert()
-{
-  FILE *f;
-  char buf[256], *s, *t;
-  int i = 0, j;
-
-  if((f = fopen("/proc/cmdline", "r"))) {
-    if(fgets(buf, sizeof buf, f)) {
-      t = buf;
-      while((s = strsep(&t, " "))) {
-        if(sscanf(s, "expert=%i", &j) == 1) i |= j;
-      }
-    }
-    fclose(f);
-  }
-
-  if((i & 0x01)) config.textmode = 1;
-  if((i & 0x02)) yast2_update_ig = 1;
-  if((i & 0x04)) yast2_serial_ig = 1;
-  if((i & 0x08)) auto2_ig = 1;
-}
-#endif
-
-#if 0
-/*
- * Read "vga=" entry from the kernel command line.
- */
-void auto2_chk_frame_buffer()
-{
-  FILE *f;
-  char buf[256], *s, *t;
-  int j;
-  int fb_mode = -1;
-
-  if((f = fopen("/proc/cmdline", "r"))) {
-    if(fgets(buf, sizeof buf, f)) {
-      t = buf;
-      while((s = strsep(&t, " "))) {
-        if(sscanf(s, "vga=%i", &j) == 1) fb_mode = j;
-        if(strstr(s, "vga=normal") == s) fb_mode = 0;
-      }
-    }
-    fclose(f);
-  }
-
-  if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
-}
-#endif
 
 /*
  * Read "vga=" entry from the kernel command line.
@@ -909,67 +873,6 @@ void auto2_chk_frame_buffer()
   if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
 }
 
-
-#if 0
-/*
- * Read "x11i=" entry from the kernel command line.
- */
-void auto2_chk_x11i()
-{
-  FILE *f;
-  char buf[256], *s, *t;
-  char x11i[64];
-
-  *x11i = 0;
-
-  if((f = fopen("/proc/cmdline", "r"))) {
-    if(fgets(buf, sizeof buf, f)) {
-      t = buf;
-      while((s = strsep(&t, " "))) {
-        if(sscanf(s, "x11i=%60s", x11i) == 1) {
-          x11i_tg = strdup(x11i);
-          break;
-        }
-      }
-    }
-    fclose(f);
-  }
-}
-#endif
-
-
-#if 0
-/*
- * Scans the hardware list for a mouse.
- */
-void auto2_find_mouse()
-{
-  driver_info_t *di;
-  hd_t *hd;
-
-  if(!hd_data) return;
-
-  mouse_type_xf86_ig = mouse_type_gpm_ig = mouse_dev_ig = NULL;
-
-  for(di = NULL, hd = hd_data->hd; hd; hd = hd->next) {
-    if(
-      hd->base_class == bc_mouse &&             /* is a mouse */
-      hd->unix_dev_name &&                      /* and has a device name */
-      (di = hd_driver_info(hd_data, hd)) &&     /* and has driver info... */
-      di->any.type == di_mouse &&               /* which is actually *mouse* info... */
-      (di->mouse.xf86 || di->mouse.gpm)         /* it's supported */
-    ) {
-      mouse_type_xf86_ig = strdup(di->mouse.xf86);
-      mouse_type_gpm_ig = strdup(di->mouse.gpm);
-      mouse_dev_ig = strdup(hd->unix_dev_name);
-    }
-
-    di = hd_free_driver_info(di);
-
-    if(mouse_dev_ig) break;
-  }
-}
-#endif
 
 /*
  * Scans the hardware list for a floppy and puts the result into

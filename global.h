@@ -18,15 +18,11 @@
 
 #include "version.h"
 
-// should be architecture dependent!
-#define MEM_LIMIT_RAMDISK_YAST1	 93*1024*1024
 #ifdef __alpha__
 #define MEM_LIMIT_RAMDISK_YAST2	500*1024*1024
 #else
-#define MEM_LIMIT_RAMDISK_YAST2	252*1024*1024	// the Y2 partitioner needs that much...
+#define MEM_LIMIT_RAMDISK_YAST2	256*1024*1024
 #endif
-#define MEM_LIMIT_RAMDISK_FTP	 28*1024*1024
-#define MEM_LIMIT_YAST2		 28*1024*1024
 
 #define MEM_LIMIT_SWAP_MSG	15000000
 #define MEM_LIMIT_CACHE_LIBS	63000000
@@ -49,24 +45,22 @@
 #endif
 
 #ifndef TRUE
-#define TRUE               1
+#define TRUE			1
 #endif
 #ifndef FALSE
-#define FALSE              0
+#define FALSE			0
 #endif
 
-#define YES                1
-#define NO                 0
-#define ESCAPE          (-1)
+#define YES			1
+#define NO			0
+#define ESCAPE			-1
 
-#define MAX_X            250
-#define MAX_Y            150
+#define MAX_X			250
+#define MAX_Y			150
 
-#define BUTTON_SIZE_NORMAL	 9
+#define BUTTON_SIZE_NORMAL	9
 #define BUTTON_SIZE_LARGE	11
-/* MAX_PARAM_LEN should not be less than 256 */
-#define MAX_PARAM_LEN    256
-#define STATUS_SIZE       50
+#define STATUS_SIZE		50
 
 #define  LXRC_DEBUG
 
@@ -81,15 +75,6 @@
 # define deb_str(a)
 # define deb_int(a)
 #endif
-
-#define ACT_DEMO		(1 << 0)
-#define ACT_DEMO_LANG_SEL	(1 << 1)
-#define ACT_LOAD_NET		(1 << 2)
-#define ACT_LOAD_DISK		(1 << 3)
-#define ACT_YAST2_AUTO_INSTALL	(1 << 4)
-#define ACT_RESCUE		(1 << 5)
-#define ACT_NO_PCMCIA		(1 << 6)
-#define ACT_DEBUG		(1 << 7)
 
 #define RAMDISK_2  "/dev/ram2"
 
@@ -211,12 +196,20 @@ typedef struct {
   unsigned run_as_linuxrc:1;	/* set if we really are linuxrc */
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
-  unsigned live:1;		/* start live cd */
+  unsigned demo:1;		/* start live cd */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   unsigned extramount:1;	/* mountpoints.extra is in use */
   unsigned instdata_mounted:1;	/* install data are mounted */
   unsigned textmode:1;		/* start yast2 in text mode */
   unsigned debugwait:1;		/* pop up dialogs at some critical points */
+  unsigned manual:1;		/* manual mode */
+  unsigned ask_language:1;	/* let use choose language  */
+  unsigned ask_keytable:1;	/* let user choose keytable */
+  unsigned activate_storage:1;	/* load all storage modules */
+  unsigned activate_network:1;	/* load all network modules */
+  unsigned nopcmcia:1;		/* don't start pcmcia automatically */
+  unsigned use_ramdisk:1;	/* used internally */
+  unsigned vnc:1;		/* vnc mode */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -275,9 +268,11 @@ typedef struct {
   struct {
     int total;			/* memory size (in kB) */
     int free;			/* free memory (in kB) when linuxrc starts */
+    int free_swap;		/* free swap */
+    int current;		/* currently free memory */
     int min_free;		/* don't let it drop below this */
     int min_modules;		/* remove modules before starting yast, if it drops below this */
-    int current;		/* currently free memory */
+    int min_yast;		/* minimum for yast */
   } memory;
 
   struct {
@@ -328,6 +323,7 @@ typedef struct {
     char *workgroup;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *password;
+    char *vncpassword;
   } net;
 
 } config_t;
@@ -337,9 +333,7 @@ config_t config;
 extern int             max_x_ig;
 extern int             max_y_ig;
 extern colorset_t     *colors_prg;
-extern char            rootimage_tg [MAX_FILENAME];
 extern char           *mountpoint_tg;
-extern char           *inst_mountpoint_tg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
@@ -348,10 +342,8 @@ extern int             pcmcia_chip_ig;
 extern uint64_t        memory_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
-extern int             ramdisk_ig;
 extern int             explode_win_ig;
 extern int             auto_ig;
-extern int             demo_ig;
 extern int             auto2_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
@@ -372,9 +364,7 @@ extern int             reboot_ig;
 extern int             found_suse_cd_ig;
 extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
-extern unsigned        action_ig;
 extern int             reboot_wait_ig;
-extern char            *x11i_tg;
 extern char            livesrc_tg[16];
 extern char            driver_update_dir[16];
 extern int             cdrom_drives;

@@ -651,8 +651,7 @@ int mod_load_modules(char *modules, int show)
 
 char *mod_get_params(module2_t *mod)
 {
-  char buf[MAX_PARAM_LEN + 100];
-  char buf2[MAX_PARAM_LEN];
+  char buf[256], buf2[256];
   slist_t *sl;
 
   if(mod_param_text) {

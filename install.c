@@ -55,7 +55,6 @@
 #define SETUP_COMMAND   "/sbin/inst_setup"
 
 static char  inst_rootimage_tm [MAX_FILENAME];
-static int   inst_rescue_im = FALSE;
 static char *inst_demo_sys_tm = "/suse/images/cd-demo";
 
 static int   inst_mount_harddisk      (void);
@@ -93,59 +92,58 @@ static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
 
-int inst_auto_install (void)
-    {
-    int       rc_ii;
+int inst_auto_install()
+{
+  int rc;
 
+  if(config.manual) return -1;
 
-    if (!auto_ig)
-        return (-1);
+  switch(config.instmode) {
+    case inst_cdrom:
+//  case BOOTMODE_CDWITHNET:
+      rc = inst_mount_cdrom(1);
+      break;
 
-    inst_rescue_im = FALSE;
+    case inst_smb:
+      rc = inst_mount_smb();
+      break;
 
-    switch (config.instmode)
-        {
-        case inst_cdrom:
-//        case BOOTMODE_CDWITHNET:
-            rc_ii = inst_mount_cdrom (1);
-            break;
-        case inst_smb:
-            rc_ii = inst_mount_smb ();
-            break;
-        case inst_nfs:
-            rc_ii = inst_mount_nfs ();
-            break;
-        case inst_hd:
-            rc_ii = inst_mount_harddisk();
-            break;
-        default:
-            rc_ii = -1;
-            break;
-        }
+    case inst_nfs:
+      rc = inst_mount_nfs();
+      break;
 
-    if (!rc_ii)
-        rc_ii = inst_check_instsys ();
+    case inst_hd:
+      rc = inst_mount_harddisk();
+      break;
 
-    if (rc_ii)
-        {
-        inst_umount ();
-        return (-1);
-        }
+    case inst_ftp:
+      rc = inst_do_ftp();
+      break;
 
-    if (ramdisk_ig)
-        {
-        rc_ii = root_load_rootimage (inst_rootimage_tm);
-        inst_umount ();
-        if (rc_ii)
-            return (rc_ii);
+    case inst_http:
+      rc = inst_do_http();
+      break;
 
-        rc_ii = util_mount_ro (RAMDISK_2, config.mountpoint.instsys);
-        if (rc_ii)
-            return (rc_ii);
-        }
+    case inst_tftp:
+      rc = inst_do_tftp();
+      break;
 
-    return (inst_execute_yast ());
-    }
+    default:
+      rc = -1;
+      break;
+  }
+
+  if(!rc) rc = inst_check_instsys();
+
+  if(rc) {
+    inst_umount();
+    return -1;
+  }
+
+  config.rescue = 0;
+
+  return inst_start_install();
+}
 
 
 int inst_start_demo (void)
@@ -158,7 +156,7 @@ int inst_start_demo (void)
 
     if (!auto2_ig)
         {
-        if (demo_ig)
+        if (config.demo)
             if (!info_eide_cd_exists ())
                 {
 #if 0
@@ -168,16 +166,13 @@ int inst_start_demo (void)
 #endif
                 }
 
-        if (strcmp (rootimage_tg, "test"))
-            test_ii = FALSE;
-        else
-            test_ii = TRUE;
+        test_ii = FALSE;
 
         if (test_ii)
             rc_ii = inst_mount_nfs ();
         else
             {
-            if (!demo_ig)
+            if (!config.demo)
                 (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
 
             rc_ii = inst_mount_cdrom (1);
@@ -188,14 +183,14 @@ int inst_start_demo (void)
         }
     else
         {
-        if ((action_ig & ACT_DEMO_LANG_SEL))
-            {
-            util_manual_mode();
-            util_disp_init ();
-            set_choose_language ();
-            util_print_banner ();
-            set_choose_keytable (1);
-            }
+        if(config.ask_language || config.ask_keytable) {
+          int win_old;
+          if(!(win_old = config.win)) util_disp_init();
+          if(config.ask_language) set_choose_language();
+          util_print_banner();
+          if(config.ask_keytable) set_choose_keytable(1);
+          if(!win_old) util_disp_done();
+        }
         }
 
     sprintf (filename_ti, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
@@ -257,7 +252,7 @@ int inst_menu()
     di_none
   };
 
-  items[(action_ig & ACT_DEMO) ? 0 : 1] = di_skip;
+  items[config.demo ? 0 : 1] = di_skip;
   if(!yast2_update_ig) items[5] = di_skip;
 
   di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
@@ -281,6 +276,7 @@ int inst_menu_cb(dia_item_t di)
 
   switch(di) {
     case di_inst_install:
+      config.rescue = 0;
       error = inst_start_install();
      /*
       * Fall through to the main menu if we return from a failed installation
@@ -299,6 +295,7 @@ int inst_menu_cb(dia_item_t di)
       break;
 
     case di_inst_rescue:
+      config.rescue = 1;
       error = inst_start_rescue();
       break;
 
@@ -416,7 +413,7 @@ int inst_choose_source()
 
   inst_umount();
 
-  if(!inst_rescue_im) items[3] = di_skip;
+  if(!config.rescue) items[3] = di_skip;
 
   di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
 
@@ -731,14 +728,9 @@ int inst_check_instsys()
 {
   char filename[MAX_FILENAME];
 
-  if((action_ig & ACT_RESCUE)) {
-    action_ig &= ~ACT_RESCUE;
-    inst_rescue_im = TRUE;
-  }
-
   switch(config.instmode) {
     case inst_floppy:
-      ramdisk_ig = 1;
+      config.use_ramdisk = 1;
       config.instdata_mounted = 0;
 
       strcpy(inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
@@ -748,48 +740,48 @@ int inst_check_instsys()
     case inst_cdrom:
     case inst_nfs:
     case inst_smb:
-      ramdisk_ig = 0;
+      config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
       sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
-      if(inst_rescue_im || force_ri_ig || !util_is_dir(filename)) {
+      if(config.rescue || force_ri_ig || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
           config.mountpoint.instdata,
-          inst_rescue_im ? config.rescueimage : config.rootimage
+          config.rescue ? config.rescueimage : config.rootimage
         );
       }
 
 #if 0
-      deb_int(inst_rescue_im);
+      deb_int(config.rescue);
       deb_int(force_ri_ig);
       deb_int(util_is_mountable(filename));
       deb_int(util_is_dir(filename));
 #endif
 
       if(
-        inst_rescue_im ||
+        config.rescue ||
         force_ri_ig ||
         !(util_is_mountable(filename) || util_is_dir(filename))
       ) {
-        ramdisk_ig = 1;
+        config.use_ramdisk = 1;
       }
       strcpy(inst_rootimage_tm, filename);
       
       // TODO: handle demo image!
 
-      deb_int(ramdisk_ig);
+      // deb_int(config.use_ramdisk);
 
       break;
 
     case inst_ftp:
     case inst_http:
     case inst_tftp:
-      ramdisk_ig = 1;
+      config.use_ramdisk = 1;
       config.instdata_mounted = 0;
 
       sprintf(inst_rootimage_tm, "%s%s",
         config.serverdir ?: "",
-        inst_rescue_im ? config.rescueimage : config.rootimage
+        config.rescue ? config.rescueimage : config.rootimage
       );
       break;
 
@@ -801,7 +793,7 @@ int inst_check_instsys()
     config.instmode != inst_ftp &&
     config.instmode != inst_http &&
     config.instmode != inst_tftp &&
-    ramdisk_ig &&
+    config.use_ramdisk &&
     !util_check_exist(inst_rootimage_tm)
   ) {
     return -1;
@@ -816,22 +808,27 @@ int inst_start_install()
   int rc;
   char buf[256];
 
-  if(auto2_ig) {
-    fprintf(stderr, "going for automatic install\n");
+  if(config.manual) {
+    if((rc = inst_choose_source())) return rc;
   }
   else {
-    inst_rescue_im = FALSE;
-    if((rc = inst_choose_source())) return rc;
+    fprintf(stderr, "going for automatic install\n");
   }
 
   // deb_str(inst_rootimage_tm);
 
   str_copy(&config.instsys, NULL);
 
-  if(ramdisk_ig) {
+  if(config.use_ramdisk) {
     config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode);
     // maybe: inst_umount(); ???
     if(config.inst_ramdisk < 0) return -1;
+
+    if(config.rescue) {
+      root_set_root(config.ramdisk[config.inst_ramdisk].dev);
+
+      return 0;
+    }
 
     rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.instsys);
     if(rc) return rc;
@@ -851,16 +848,16 @@ int inst_start_install()
 }
 
 
+/* we might as well just use inst_start_install() instead... */
 int inst_start_rescue()
 {
   int rc;
 
-  inst_rescue_im = 1;
   if((rc = inst_choose_source())) return rc;
 
   config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode);
 
-  inst_umount();
+  inst_umount();	// what for???
 
   if(config.inst_ramdisk >= 0) {
     root_set_root(config.ramdisk[config.inst_ramdisk].dev);
@@ -922,9 +919,12 @@ int inst_prepare()
   setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
   file_write_install_inf("");
-  if(!config.test) file_write_mtab();
+  if(!config.test) {
+    // file_write_mtab();
+    system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
+  }
 
-  if(!ramdisk_ig) rc = inst_init_cache();
+  if(!config.use_ramdisk) rc = inst_init_cache();
 
   return rc;
 }
@@ -1039,7 +1039,6 @@ int inst_execute_yast()
   i = file_read_yast_inf();
   if(!rc_ii) rc_ii = i;
 
-  // if(!auto2_ig) disp_restore_screen();
   disp_cursor_off();
   kbd_reset();
 
@@ -1051,6 +1050,7 @@ int inst_execute_yast()
   }
 
   if(rc_ii) {
+    config.rescue = 0;
     dia_message(txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
   }
 
@@ -1093,6 +1093,7 @@ int inst_execute_yast()
   if(!rc_ii) {
     rc_ii = inst_commit_install();
     if(rc_ii) {
+      config.rescue = 0;
       util_manual_mode();
       util_disp_init();
     }
@@ -1295,11 +1296,6 @@ int inst_do_ftp()
     }
   }
   while(rc);
-
-  if(inst_rescue_im) {
-    if(config.serverdir) free(config.serverdir);
-    config.serverdir = strdup("/pub/SuSE-Linux/current");
-  }
 
   if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
   util_truncate_dir(config.serverdir);

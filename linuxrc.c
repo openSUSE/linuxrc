@@ -123,8 +123,8 @@ static struct {
 
 typedef enum {
   lx_auto, lx_auto2, lx_noauto2, lx_y2autoinst, lx_demo, lx_eval, lx_reboot,
-  lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, /* lx_french, */ /* lx_color, */
-  lx_rescue, lx_nopcmcia, lx_debug, lx_nocmdline
+  lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, lx_rescue, lx_nopcmcia,
+  lx_nocmdline
 } lx_param_t;
 
 static struct {
@@ -142,11 +142,8 @@ static struct {
   { "yast2",      lx_yast2      },
   { "loadnet",    lx_loadnet    },
   { "loaddisk",   lx_loaddisk   },
-//  { "french",     lx_french     },
-//  { "color",      lx_color      },
   { "rescue",     lx_rescue     },
   { "nopcmcia",   lx_nopcmcia   },
-  { "debug",      lx_debug      },
   { "nocmdline",  lx_nocmdline  }
 };
 
@@ -203,16 +200,17 @@ int main(int argc, char **argv, char **env)
   if(auto_ig) {
     err = inst_auto_install();
   }
-  else if(demo_ig) {
+  else if(config.demo) {
     err = inst_start_demo();
   }
 #ifdef USE_LIBHD
   else if(auto2_ig) {
-    printf("***** rescue 0x%x *****\n", action_ig); fflush(stdout);
-    if((action_ig & ACT_RESCUE)) {
-      util_manual_mode();
-      util_disp_init();
-      set_choose_keytable(1);
+    if(config.rescue) {
+      int win_old;
+      if(!(win_old = config.win)) util_disp_init();
+      set_choose_keytable(0);
+      if(!win_old) util_disp_done();
+      
     }
     err = inst_start_install();
   }
@@ -301,7 +299,7 @@ void lxrc_change_root (void)
 
   if(config.test) return;
 
-  new_mp = (action_ig & ACT_DEMO) ? ".mnt" : "mnt";
+  new_mp = config.demo ? ".mnt" : "mnt";
 
 #ifdef SYS_pivot_root
   umount ("/mnt");
@@ -325,7 +323,7 @@ void lxrc_change_root (void)
 
       for(i = 0; i < 20 ; i++) close(i);
       chroot(".");
-      if((action_ig & ACT_DEMO)) {
+      if(config.demo) {
         execve("/sbin/init", lxrc_argv, saved_environment ? : environ);
       }
       else {
@@ -576,6 +574,13 @@ void lxrc_init()
   config.color = 2;
   config.net.use_dhcp = 1;
 
+#if defined(__PPC__) || defined(__sparc__)
+  auto2_ig = 1;
+#else
+  config.manual = 1;
+#endif
+
+
 #if defined(__s390__) || defined(__s390x__)
   config.initrd_has_ldso = 1;
 #endif
@@ -604,9 +609,10 @@ void lxrc_init()
   str_copy(&config.autoyast, s);
 
   if(config.autoyast) {
-    auto2_ig = TRUE;
+    auto_ig = 0;
+    auto2_ig = 1;
+    config.manual = 0;
     yast_version_ig = 2;
-    action_ig |= ACT_YAST2_AUTO_INSTALL;
     url = parse_url(config.autoyast);
     if(url && url->scheme) set_instmode(url->scheme);
   }
@@ -622,31 +628,37 @@ void lxrc_init()
         if(!strcasecmp(lxrc_params[i].name, t)) {
           switch(lxrc_params[i].key) {
             case lx_auto:
-              auto_ig = TRUE;
+              auto_ig = 1;
+              config.manual = 0;
               break;
 
             case lx_auto2:
-              auto2_ig = TRUE;
+              auto2_ig = 1;
+              config.manual = 0;
               break;
 
             case lx_noauto2:
-              auto2_ig = FALSE;
+              auto_ig = auto2_ig = 0;
+              config.manual = 1;
               break;
 
             case lx_y2autoinst:
-              auto2_ig = TRUE;
+              auto_ig = 0;
+              auto2_ig = 1;
+              config.manual = 0;
               yast_version_ig = 2;
-              action_ig |= ACT_YAST2_AUTO_INSTALL;
               break;
 
             case lx_demo:
-              demo_ig = TRUE;
-              action_ig |= ACT_DEMO | ACT_DEMO_LANG_SEL | ACT_LOAD_DISK;
+              config.demo = 1;
+              config.ask_language = 1;
+              config.ask_keytable = 1;
+              config.activate_storage = 1;
               break;
 
             case lx_eval:
-              demo_ig = TRUE;
-              action_ig |= ACT_DEMO | ACT_LOAD_DISK;
+              config.demo = 1;
+              config.activate_storage = 1;
               break;
 
             case lx_reboot:
@@ -662,11 +674,11 @@ void lxrc_init()
               break;
 
             case lx_loadnet:
-              action_ig |= ACT_LOAD_NET;
+              config.activate_network = 1;
               break;
 
             case lx_loaddisk:
-              action_ig |= ACT_LOAD_DISK;
+              config.activate_storage = 1;
               break;
 
 #if 0	/* obsolete */
@@ -682,15 +694,11 @@ void lxrc_init()
 #endif
 
             case lx_rescue:
-              action_ig |= ACT_RESCUE;
+              config.rescue = 1;
               break;
 
             case lx_nopcmcia:
-              action_ig |= ACT_NO_PCMCIA;
-              break;
-
-            case lx_debug:
-              action_ig |= ACT_DEBUG;
+              config.nopcmcia = 1;
               break;
 
             case lx_nocmdline:
@@ -733,6 +741,7 @@ void lxrc_init()
   util_free_mem();
 
   config.memory.min_free = 10 * 1024;		// at least 10MB
+  config.memory.min_yast = 48 * 1024;		// at least 48MB
   config.memory.min_modules = 64 * 1024;	// at least 64MB
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;
@@ -761,12 +770,7 @@ void lxrc_init()
 
   info_init();
 
-  // ???
-  if(memory_ig < MEM_LIMIT_YAST2) yast_version_ig = 1;
-
-  if(memory_ig > (yast_version_ig == 1 ? MEM_LIMIT_RAMDISK_YAST1 : MEM_LIMIT_RAMDISK_YAST2)) {
-    force_ri_ig = TRUE;
-  }
+  if(memory_ig > MEM_LIMIT_RAMDISK_YAST2) force_ri_ig = TRUE;
 
   lxrc_memcheck();
 
@@ -782,18 +786,18 @@ void lxrc_init()
 #ifdef USE_LIBHD
   if(auto2_ig) {
     if(auto2_init()) {
-      auto2_ig = TRUE;
+      auto_ig = 0;
+      auto2_ig = 1;
+      config.manual = 0;
     } else {
       deb_msg("Automatic setup not possible.");
 
-      util_manual_mode();
-      disp_set_display();
       util_disp_init();
 
 #ifdef __i386__
       i = 0;
       j = 1;
-      if(cdrom_drives && !(action_ig & ACT_DEMO)) {
+      if(cdrom_drives && !config.demo) {
         sprintf(buf, txt_get(TXT_INSERT_CD), 1);
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
@@ -801,16 +805,16 @@ void lxrc_init()
           i = auto2_find_install_medium();
         }
       }
-      if(i) {
-        auto2_ig = TRUE;
-      }
-      else {
+
+      if(!i) {
+        config.rescue = 0;
+        util_manual_mode();
         yast_version_ig = 0;
         util_disp_init();
         if(j) {
           sprintf(buf,
             "Could not find the SuSE Linux %s CD.\n\nActivating manual setup program.\n",
-            (action_ig & ACT_DEMO) ? "LiveEval" : "Installation"
+            config.demo ? "LiveEval" : "Installation"
           );
           dia_message(buf, MSGTYPE_ERROR);
         }

@@ -91,6 +91,8 @@ static struct hlink_s {
 static char *exclude = NULL;
 static int rec_level = 0;
 
+static void add_flag(slist_t **sl, char *buf, int value, char *name);
+
 static int do_cp(char *src, char *dst);
 static char *walk_hlink_list(ino_t ino, dev_t dev, char *dst);
 static void free_hlink_list(void);
@@ -681,6 +683,7 @@ int util_eject_cdrom(char *dev)
 
 void util_manual_mode()
 {
+  config.manual = 1;
   auto_ig = 0;
   auto2_ig = 0;
 }
@@ -879,6 +882,24 @@ void util_umount_driver_update()
 }
 
 
+void add_flag(slist_t **sl, char *buf, int value, char *name)
+{
+  int l;
+
+  if(!value) return;
+
+  if(!*buf) strcpy(buf, "  ");
+  l = strlen(buf);
+
+  sprintf(buf + strlen(buf), "%s%s", buf[l - 1] == ' ' ? "" : ", ", name);
+
+  if(strlen(buf) > 40) {
+    slist_append_str(sl, buf);
+    *buf = 0;
+  }
+}
+
+
 void util_status_info()
 {
   int i, j;
@@ -901,9 +922,16 @@ void util_status_info()
   }
 
   sprintf(buf,
-    "memory (kB): total %d, free %d (%d), min %d/%d",
+    "memory (kB): total %d, free %d (%d), ramdisk %d",
     config.memory.total, config.memory.current,
-    config.memory.free, config.memory.min_free, config.memory.min_modules
+    config.memory.current - config.memory.free_swap,
+    config.memory.free - config.memory.current
+  );
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf,
+    "memory limits: min %d, yast %d, modules %d",
+    config.memory.min_free, config.memory.min_yast, config.memory.min_modules
   );
   slist_append_str(&sl0, buf);
 
@@ -921,10 +949,23 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "flags = ");
-  s = "";
-  if(config.test) { sprintf(buf + strlen(buf), "%stest", s); s = ", "; }
-  if(config.tmpfs) { sprintf(buf + strlen(buf), "%stmpfs", s); s = ", "; }
-  slist_append_str(&sl0, buf);
+  add_flag(&sl0, buf, config.test, "test");
+  add_flag(&sl0, buf, config.tmpfs, "tmpfs");
+  add_flag(&sl0, buf, config.manual, "manual");
+  add_flag(&sl0, buf, config.rescue, "rescue");
+  add_flag(&sl0, buf, config.demo, "demo");
+  add_flag(&sl0, buf, config.vnc, "vnc");
+  add_flag(&sl0, buf, config.textmode, "textmode");
+  add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
+  add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
+  add_flag(&sl0, buf, config.net.use_dhcp, "dhcp");
+  add_flag(&sl0, buf, config.net.dhcp_active, "dhcp_active");
+  add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
+  add_flag(&sl0, buf, config.ask_language, "ask_lang");
+  add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
+  add_flag(&sl0, buf, config.activate_storage, "act_storage");
+  add_flag(&sl0, buf, config.activate_network, "act_net");
+  if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {
     sprintf(buf, "autoyast = %s", config.autoyast);
@@ -941,10 +982,9 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "yast = %d, auto = %d, action = 0x%x, splash = %s",
+    "yast = %d, auto = %d, splash = %s",
     yast_version_ig,
     auto2_ig ? 2 : auto_ig ? 1 : 0,
-    action_ig,
     splash_active ? "on" : "off"
   );
   slist_append_str(&sl0, buf);
@@ -1013,8 +1053,27 @@ void util_status_info()
   sprintf(buf, "plip host = %s", inet2print(&config.net.pliphost));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "server dir = \"%s\"", config.serverdir ?: "");
-  slist_append_str(&sl0, buf);
+  if(config.serverdir) {
+    sprintf(buf, "server dir = %s", config.serverdir);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.net.workgroup) {
+    sprintf(buf, "workgroup = %s", config.net.workgroup);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.net.user || config.net.password) {
+    *buf = 0;
+    if(config.net.user) sprintf(buf, "user = %s", config.net.user);
+    sprintf(buf + strlen(buf), "%spassword = %s", *buf ? ", " : "", config.net.password);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.net.vncpassword) {
+    sprintf(buf, "vncpassword = %s", config.net.vncpassword);
+    slist_append_str(&sl0, buf);
+  }
 
   if(config.net.use_dhcp) {
     s = "", t = "*";
@@ -1046,7 +1105,7 @@ void util_status_info()
   sprintf(buf, "language = %s (%s), keymap = %s", lang->yastcode, lang->locale, config.keymap ?: "");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "textmode = %d, yast2update = %d, yast2serial = %d", config.textmode, yast2_update_ig, yast2_serial_ig);
+  sprintf(buf, "yast2update = %d, yast2serial = %d", yast2_update_ig, yast2_serial_ig);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "vga = 0x%04x", frame_buffer_mode_ig);
@@ -1060,6 +1119,20 @@ void util_status_info()
     auto2_pcmcia(),
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
+  slist_append_str(&sl0, buf);
+
+  if(config.instsys) {
+    sprintf(buf, "instsys = \"%s\"", config.instsys);
+    slist_append_str(&sl0, buf);
+  }
+
+  sprintf(buf, "rootimage = \"%s\"", config.rootimage);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "installdir = \"%s\"", config.installdir);
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "cdroms:");
@@ -1090,6 +1163,9 @@ void util_status_info()
     if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
     slist_append_str(&sl0, buf);
   }
+
+  sprintf(buf, "inst_ramdisk = %d", config.inst_ramdisk);
+  slist_append_str(&sl0, buf);
 
   for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
     if(config.ramdisk[i].inuse) {
@@ -2046,8 +2122,7 @@ int util_raidautorun_main(int argc, char **argv)
 void util_free_mem()
 {
   file_t *f0, *f;
-  unsigned mem_total = 0, mem_free = 0;
-  unsigned u;
+  int i, mem_total = 0, mem_free = 0, mem_free_swap = 0;
   char *s;
 
   f0 = file_read_file("/proc/meminfo");
@@ -2056,16 +2131,21 @@ void util_free_mem()
     switch(f->key) {
       case key_memtotal:
       case key_swaptotal:
-        u = strtoul(f->value, &s, 10);
-        if(!*s || *s == ' ') mem_total += u;
+        i = strtoul(f->value, &s, 10);
+        if(!*s || *s == ' ') mem_total += i;
         break;
 
       case key_memfree:
       case key_buffers:
       case key_cached:
       case key_swapfree:
-        u = strtoul(f->value, &s, 10);
-        if(!*s || *s == ' ') mem_free += u;
+        i = strtol(f->value, &s, 10);
+        if(!*s || *s == ' ') {
+          mem_free += i;
+          if(f->key == key_swapfree) {
+            mem_free_swap += i;
+          }
+        }
         break;
 
       default:
@@ -2076,6 +2156,7 @@ void util_free_mem()
 
   config.memory.total = mem_total;
   config.memory.free = mem_free;
+  config.memory.free_swap = mem_free_swap;
 
   util_update_meminfo();
 }

@@ -1,3 +1,8 @@
+23/2/2002:	v1.3.18
+	- more config options
+	- 'install' parameter works now
+	- starting rescue system works again
+
 20/2/2002:	v1.3.17
 	- show list of partitions in 'boot installed system'
 	- set root image name properly for systems > 256MB

@@ -18,9 +18,7 @@ int             max_y_ig = Y_DEFAULT;
 config_t config;
 
 colorset_t     *colors_prg;
-char            rootimage_tg [MAX_FILENAME] = "/suse/images/root";
 char           *mountpoint_tg = "/var/adm/mount";
-char           *inst_mountpoint_tg = "/inst-img";
 char           *kernellog_tg = "/etc/kernellog";
 char           *lastlog_tg = "/etc/lastlog";
 char           *bootmsg_tg = "/var/log/boot.msg";
@@ -29,15 +27,9 @@ int             pcmcia_chip_ig = 0;
 uint64_t        memory_ig = 8192000;
 int             cpu_ig = 0;
 int             force_ri_ig = FALSE;
-int             ramdisk_ig = FALSE;
 int             explode_win_ig = TRUE;
 int             auto_ig = FALSE;
-#if defined(__PPC__) || defined(__sparc__)
-int             auto2_ig = TRUE;
-#else
 int             auto2_ig = FALSE;
-#endif
-int             demo_ig = FALSE;
 char            machine_name_tg [100];
 int             old_kernel_ig = TRUE;
 char            ppcd_tg [10];
@@ -56,9 +48,7 @@ char            *usb_mods_ig = NULL;
 int             found_suse_cd_ig = FALSE;
 char            xkbmodel_tg [20] = "";
 unsigned        yast2_color_ig = 0;
-unsigned        action_ig = 0;
 int             reboot_wait_ig = FALSE;
-char            *x11i_tg = NULL;
 char            livesrc_tg[16] = "";
 char            driver_update_dir[16] = "";
 int             cdrom_drives = 0;
