@@ -205,13 +205,14 @@ static text_t txt_french_atm [] =
                       "l'installation."                                       },
 { TXT_INSERT_CD,      "Assurez-vous que le CD %d se trouve dans votre "
                       "lecteur!"                                              },
-{ TXT_EJECT_CD,       "Eject CD"                                              },
-{ TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
-{ TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
-{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
-                      "new installed system will now be started in order to "
-                      "commit the installation. "
-                      "Please remove all installation media (CD-ROM, floppy).\n"
-                      "Do not remove the floppy disk if the Linux Loader (LILO) "
-                      "has been installed on it."                             }
+{ TXT_EJECT_CD,       "Éjecter le CD"                                         },
+{ TXT_BOOTP_TIMEOUT,  "Temporisation Bootp"                                   },
+{ TXT_ENTER_BOOTP_TIMEOUT, "Spécifiez la valeur de temporisation pour bootp." },
+{ TXT_DO_REBOOT,      "L'installation du système de base a réussi. Ce "
+                      "système nouvellement installé va maintenant être "
+                      "démarré pour que le processus d'installation "
+                      "soit exécuté. Éjectez tous les supports "
+                      "d'installation (CD-ROM, disquette.\nNe retirez pas "
+                      "la disquette si le Linux Loader (LILO) a été "
+                      "installé sur celle-ci."                                }
 };
