@@ -1112,6 +1112,8 @@ int inst_execute_yast()
     return -1;
   }
 
+// ###### FIXME: we need a solution for this
+#if 0
   if(!config.test) {
     if(mod_is_loaded("sbp2")) mod_unload_module("sbp2");
     if(mod_is_loaded("usb-storage")) {
@@ -1119,6 +1121,7 @@ int inst_execute_yast()
       usbscsi_off();
     }
   }
+#endif
 
   if (!config.test && config.usessh && config.net.sshpassword) {
     FILE *passwd;
