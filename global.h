@@ -18,7 +18,7 @@
 
 #include "version.h"
 
-#if defined(__sparc__) || defined(__PPC__) || defined(__s390__) || defined(__s390x__)
+#if defined(__sparc__) || defined(__PPC__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
 #define WITH_PCMCIA	0
 #else
 #define WITH_PCMCIA	1

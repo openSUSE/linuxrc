@@ -78,6 +78,14 @@ ifeq ($(ARCH),ia64)
     CFLAGS		+= -DLX_ARCH=\"ia64\"
 endif
 
+ifeq ($(ARCH),mips)
+    USE_MINI_GLIBC	= no
+    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
+    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
+    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
+    CFLAGS		+= -DLX_ARCH=\"mips\"
+endif
+
 ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
     USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
