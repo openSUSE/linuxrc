@@ -1,3 +1,6 @@
+18/9/2002:	v1.4.29
+	- serial console fix (superfluous '/dev', #19635)
+
 11/9/2002:	v1.4.28
 	- do write server info for VNC/ssh install again
 	  needed for network installation (#18882)
