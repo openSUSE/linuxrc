@@ -737,28 +737,24 @@ static int inst_prepare (void)
 {
   char *links[] = { "/lib", "/bin" };
   char link_source[MAX_FILENAME];
+  char instsys[MAX_FILENAME];
   int i, rc = 0;
 
   mod_free_modules();
   rename("/bin", "/.bin");
 
+  strcpy(instsys, mountpoint_tg);
+  if(!(inst_loopmount_im || ramdisk_ig)) strcat(instsys, installdir_tg);
+
+  setenv("INSTSYS", instsys, TRUE);
+
   for(i = 0; i < sizeof links / sizeof *links; i++) {
-    if(inst_loopmount_im) {
-      sprintf(link_source, "%s%s", mountpoint_tg, links[i]);
-    }
-    else {
-      if(ramdisk_ig)
-        sprintf(link_source, "%s%s", inst_mountpoint_tg, links[i]);
-      else
-        sprintf(link_source, "%s%s%s", mountpoint_tg, installdir_tg, links[i]);
-    }
     if(!util_check_exist(links[i])) {
       unlink(links[i]);
+      sprintf(link_source, "%s%s", instsys, links[i]);
       symlink(link_source, links[i]);
     }
   }
-
-  setenv("INSTSYS", link_source, TRUE);
 
   setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin", TRUE);
 
