@@ -320,13 +320,13 @@ int auto2_cdrom_dev(hd_t **hd0)
     ) {
       ci = hd->detail->cdrom.data;
 #if 1
-      if(ci->volume && strstr(ci->volume, "SU") == ci->volume) {
+      if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
         fprintf(stderr, "Found SuSE CD in %s.\n", hd->unix_dev_name);
         found_suse_cd_ig = TRUE;
         break;
       }
 #else
-      if(ci->volume) {
+      if(ci->iso9660.ok && ci->iso9660.volume) {
         fprintf(stderr, "Found a CD in %s.\n", hd->unix_dev_name);
         found_suse_cd_ig = TRUE;
         break;
@@ -745,6 +745,7 @@ void auto2_find_mouse()
 }
 
 
+#if 0
 /*
  * Scans the hardware list for a braille display.
  */
@@ -784,6 +785,7 @@ void auto2_find_braille()
     }
   }
 }
+#endif
 
 
 /*

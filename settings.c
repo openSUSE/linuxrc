@@ -159,7 +159,7 @@ static keymap_t set_keymaps_arm [] =
 { "English/US (PS/2)",           "us"              },
 { "English/US (Sun)",            "sunkeymap"       },
 { "English/UK (PS/2)",           "uk"              },
-{ "English/UK (Sun)",            "sunkeymap"       },
+{ "English/UK (Sun)",            "sunt5-uk"        },
 { "Español (PS/2)",              "es"              },
 { "Español (Sun Type4)",         "sunt4-es"        },
 { "Español (Sun Type5)",         "sunt5-es"        },
@@ -679,4 +679,3 @@ static void set_font(char *font, char *map, char *unimap)
 
   deb_int(err);
 }
-

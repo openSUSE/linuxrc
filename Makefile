@@ -31,7 +31,7 @@ ifeq ($(ARCH),ppc)
 endif
 
 ifeq ($(ARCH),sparc)
-    USE_MINI_GLIBC	= no
+    USE_MINI_GLIBC	= yes
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))

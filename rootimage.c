@@ -294,6 +294,7 @@ void root_set_root (char *root_string_tv)
 
 
     lxrc_new_root = strdup (root_string_tv);
+    lxrc_new_root = NULL;	// ############
     if (!strncmp ("/dev/", root_string_tv, 5))
         tmp_string_pci = root_string_tv + 5;
     else

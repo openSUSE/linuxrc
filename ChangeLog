@@ -1,3 +1,12 @@
+11/12/2000:	v1.1.16.006
+	- disabled andreas' pivot_root changes
+	- kukuk: use small libc on SPARC, too
+	- kukuk: add type5 keyboard for UK
+
+9/12/2000:	v1.1.16.005
+	- schwab: when lxrc_new_root is set, try pivot_root to change root
+	- libhd interface changes
+
 1/12/2000:	v1.1.16.004
 	- there are problems with autoinstall & gateway setup on kernel 2.2.17;
 	  for now, no "Gateway:" entry should be used in "info"

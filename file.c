@@ -93,8 +93,10 @@ static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
 static const char  *file_txt_yast2_color_tm    = "YaST2color:";
 static const char  *file_txt_boot_disk_tm      = "BootDisk:";
 static const char  *file_txt_disks_tm          = "Disks:";
+#if 0
 static const char  *file_txt_braille_tm        = "Braille:";
 static const char  *file_txt_braille_dev_tm    = "Brailledevice:";
+#endif
 #endif
 static const char  *file_txt_livesrc_tm        = "LiveSRC:";
 
@@ -257,10 +259,12 @@ void file_write_yast_info (char *file_name)
     if (mouse_type_gpm_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
 
+#if 0
     if (braille_ig)
         fprintf (file_pri, "%s %s\n", file_txt_braille_tm, braille_ig);
     if (braille_dev_ig)
         fprintf (file_pri, "%s %s\n", file_txt_braille_dev_tm, braille_dev_ig);
+#endif
 
     fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
     fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
