@@ -7,11 +7,8 @@ CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
 CFLAGS	= -O2 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
-LDFLAGS	= -static -Wl,-Map=linuxrc.map -lhd_tiny
+LDFLAGS	= -static -Wl,-Map=linuxrc.map
 WARN	= -Wstrict-prototypes -Wall
-
-# use this to get a linuxrc that uses the libhd *
-EXTRA_FLAGS	= -DUSE_LIBHD
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
@@ -47,15 +44,25 @@ endif
 %.o:	%.c
 	$(CC) $(CFLAGS) $(WARN) -o $@ $<
 
+linuxrc: $(OBJ) $(LIBS)
+	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd -o $@
+	@strip -R .note -R .comment $@
+ifdef EXTRA_FLAGS
+	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd_tiny -o $@_mini
+	@strip -R .note -R .comment $@_mini
+	@ls -l linuxrc{,_mini}
+else
+	@ls -l linuxrc
+endif
+
 all: libs linuxrc
+	@rm $(OBJ)
+	@mv linuxrc linuxrc_tiny
+	@make EXTRA_FLAGS=-DUSE_LIBHD linuxrc
+	@ls -l linuxrc{,_mini,_tiny}
 
 install: linuxrc
 	@install linuxrc /usr/sbin
-
-linuxrc: $(OBJ) $(LIBS)
-	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -o $@
-	strip -R .note -R .comment $@
-	@ls -l $@
 
 libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done
