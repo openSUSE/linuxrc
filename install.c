@@ -743,8 +743,15 @@ static int inst_prepare (void)
   mod_free_modules();
   rename("/bin", "/.bin");
 
-  strcpy(instsys, mountpoint_tg);
-  if(!(inst_loopmount_im || ramdisk_ig)) strcat(instsys, installdir_tg);
+  if(inst_loopmount_im) {
+    strcpy(instsys, mountpoint_tg);
+  }
+  else {
+    if(ramdisk_ig)
+      strcpy(instsys, inst_mountpoint_tg);
+    else
+      sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
+  }
 
   setenv("INSTSYS", instsys, TRUE);
 
@@ -761,7 +768,8 @@ static int inst_prepare (void)
   if(serial_ig) {
     setenv("TERM", "vt100", TRUE);
     setenv("ESCDELAY", "1100", TRUE);
-  } else {
+  }
+  else {
     setenv ("TERM", "linux", TRUE);
     setenv ("ESCDELAY", "10", TRUE);
   }
