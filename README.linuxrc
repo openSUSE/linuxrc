@@ -108,20 +108,20 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # font ?
   Font: Cyr_a8x16
 
-  # unicode map ?
+  # unicode map, use by setfont for unicode encodings
   Unicodemap: cyralt.uni
 
-  # ??
+  # used by setfont for console charset and encoding selection
   Screenmap: koi2alt
 
-  # ???
+  # Control code for switching console to correct charset and encoding
   Fontmagic: (K | (B
 
   # color/mono display
   Display: Color|Mono
 
   # boot mode
-  Bootmode: Floppy|CD|Net|Harddisk|FTP|unknown
+  Bootmode: Floppy|CD|Net|Harddisk|FTP|SMB|unknown
 
   # inst-sys is: 0 -> in ramdisk, 1 -> mounted
   Sourcemounted: 0|1
@@ -150,12 +150,28 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # name server
   Nameserver: 10.10.0.1
 
-  # NFS/FTP server
+  # NFS/FTP/SMB server
   Server: 10.10.0.136
 
-  # SuSE directory on server
+  # SuSE directory on server (Samba share)
   Serverdir: /dist/6.3-i386
 
+  # Username, if authentication to server is required (i.e. SMB)
+  Username: joeuser
+
+  # Password, if authentication to server is required (i.e. SMB)
+  Password: password
+
+  # AsWorkgroup: 1, if SMB authentication to Workgroup server
+  #		 0, if SMB authentication to Domain server
+  # (see WorkDomain below)
+  AsWorkgroup: 0
+
+  # WorkDomain, Workgroup or Domain for SMB authentication
+  # (see AsWorkgroup above)
+  WorkDomain: workgroup
+
+  # 
   # alias line for active network connection
   alias eth0 de4x5
 
