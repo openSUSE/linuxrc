@@ -27,6 +27,14 @@
 #define LANG_DEFAULT	1
 static language_t set_languages_arm [] =
 {
+#ifdef TRANS_br
+{ lang_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
+#endif
+
+#ifdef TRANS_cs
+{ lang_cs, "Cestina", "cz-us-qwertz", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
+#endif
+
 #ifdef TRANS_de
 { lang_de, "Deutsch", "de-lat1-nd", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "de_DE", "german" },
 #endif
@@ -41,10 +49,6 @@ static language_t set_languages_arm [] =
 
 #ifdef TRANS_fr
 { lang_fr, "Français", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
-#endif
-
-#ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
 #endif
 
 #ifdef TRANS_el
@@ -87,10 +91,6 @@ static language_t set_languages_arm [] =
 { lang_ru, "Russian", "ru1", "Cyr_a8x16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU.KOI8-R", "russian" },
 #endif
 
-#ifdef TRANS_cs
-{ lang_cs, "Cestina", "cz-us-qwertz", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
-#endif
-
 #ifdef TRANS_sk
 { lang_sk, "Slovencina", "sk-qwerty", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
 #endif
@@ -101,9 +101,11 @@ static language_t set_languages_arm [] =
 #define KEYMAP_DEFAULT	1
 static keymap_t set_keymaps_arm [] =
 {
+{ "Ceske",                "cz-us-qwertz" },
+{ "Dansk",                "dk"           },
 { "Deutsch",              "de-lat1-nd"   },
-{ "English (US)",         "us"           },
 { "English (UK)",         "uk"           },
+{ "English (US)",         "us"           },
 { "Español",              "es"           },
 { "Français",             "fr-latin1"    },
 { "Hellenic",             "gr"           },
@@ -112,13 +114,11 @@ static keymap_t set_keymaps_arm [] =
 { "Nederlands",           "nl"           },
 { "Norsk",                "no-latin1"    },
 { "Polski",               "Pl02"         },
-{ "Português",            "pt-latin1"    },
 { "Português Brasileiro", "br-abnt2"     },
+{ "Português",            "pt-latin1"    },
 { "Russian",              "ru1"          },
-{ "Ceske",                "cz-us-qwertz" },
-{ "Dansk",                "dk"           },
-{ "Suomi/Svensk",         "fi"           },
 { "Slovak",               "sk-qwerty"    }
+{ "Suomi/Svensk",         "fi"           },
 };
 #endif
 
@@ -126,12 +126,14 @@ static keymap_t set_keymaps_arm [] =
 #define KEYMAP_DEFAULT 3
 static keymap_t set_keymaps_arm [] =
 {
+{ "Ceske (PS/2)",                "cz-us-qwertz"    },
+{ "Dansk (PS/2)",                "dk"              },
 { "Deutsch (PS/2)",              "de-lat1-nd"      },
 { "Deutsch (Sun Type5)",         "sunt5-de-latin1" },
-{ "English/US (PS/2)",           "us"              },
-{ "English/US (Sun)",            "sunkeymap"       },
 { "English/UK (PS/2)",           "uk"              },
 { "English/UK (Sun)",            "sunt5-uk"        },
+{ "English/US (PS/2)",           "us"              },
+{ "English/US (Sun)",            "sunkeymap"       },
 { "Español (PS/2)",              "es"              },
 { "Español (Sun Type4)",         "sunt4-es"        },
 { "Español (Sun Type5)",         "sunt5-es"        },
@@ -148,12 +150,10 @@ static keymap_t set_keymaps_arm [] =
 { "Português Brasileiro (PS/2)", "br-abnt2"        },
 { "Russian (PS/2)",              "ru1"             },
 { "Russian (Sun Type5)",         "sunt5-ru"        },
-{ "Ceske (PS/2)",                "cz-us-qwertz"    },
-{ "Dansk (PS/2)",                "dk"              },
+{ "Slovak",                      "sk-qwerty"       }
 { "Suomi/Svensk (PS/2)",         "fi"              },
 { "Suomi/Svensk (Sun Type4)",    "sunt4-fi-latin1" },
 { "Suomi/Svensk (Sun Type5)",    "sunt5-fi-latin1" },
-{ "Slovak",                      "sk-qwerty"       }
 };
 #endif
 
@@ -164,19 +164,19 @@ static keymap_t set_keymaps_arm [] =
 #define KEYMAP_DEFAULT	1
 static keymap_t set_keymaps_arm_mac [] =
 {
-{ "Deutsch",              "mac-de-latin1-nodeadkeys" },
-{ "English (US)",         "mac-us"                   },
-{ "English (UK)",         "mac-uk"                   },
-{ "Français",             "mac-fr-latin1"            },
-{ "Deutsch (CH)",         "mac-de_CH"                },
-{ "Français (CH)",        "mac-fr_CH"                },
 { "Dansk",                "mac-dk-latin1"            },
-{ "Suomi/Svensk",         "mac-fi"                   },
-{ "Italiano",             "mac-it"                   },
-{ "Flamish",              "mac-be"                   },
+{ "Deutsch (CH)",         "mac-de_CH"                },
+{ "Deutsch",              "mac-de-latin1-nodeadkeys" },
+{ "English (UK)",         "mac-uk"                   },
+{ "English (US)",         "mac-us"                   },
 { "Español",              "mac-es"                   },
-{ "Svenska",              "mac-se"                   },
+{ "Flamish",              "mac-be"                   },
+{ "Français (CH)",        "mac-fr_CH"                },
+{ "Français",             "mac-fr-latin1"            },
+{ "Italiano",             "mac-it"                   },
 { "Português",            "mac-pt"                   }
+{ "Suomi/Svensk",         "mac-fi"                   },
+{ "Svenska",              "mac-se"                   },
 };
 /* !!! ***MUST NOT*** be bigger than NR_KEYMAPS !!! */
 #define NR_KEYMAPS_MAC (sizeof set_keymaps_arm_mac / sizeof *set_keymaps_arm_mac)
