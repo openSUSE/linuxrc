@@ -188,9 +188,9 @@ void auto2_scan_hardware(char *log_file)
 
     fflush(stdout);
 
-    mod_insmod("input", NULL);
-    mod_insmod("hid", NULL);
-    mod_insmod("keybdev", NULL);
+    mod_modprobe("input", NULL);
+    mod_modprobe("hid", NULL);
+    mod_modprobe("keybdev", NULL);
 
     config.module.delay -= 1;
 
@@ -198,7 +198,7 @@ void auto2_scan_hardware(char *log_file)
     if(config.usbwait > 0) sleep(config.usbwait);
 
     if(with_usb) {
-      mod_insmod("usb-storage", NULL);
+      mod_modprobe("usb-storage", NULL);
       if(config.usbwait > 0) sleep(config.usbwait);
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
     }
@@ -219,7 +219,7 @@ void auto2_scan_hardware(char *log_file)
     for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd, NULL);
     hd_usb = hd_free_hd_list(hd_fw);
 
-    mod_insmod("sbp2", NULL);
+    mod_modprobe("sbp2", NULL);
 
     config.module.delay -= 3;
 
@@ -700,13 +700,16 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
  */
 int auto2_init()
 {
-  int i, j, win_old;
+  int i, win_old;
 #if 0	/* def __i386__ */
   int net_cfg;
 #endif
   hd_t *hd;
   char buf[256];
+#if WITH_PCMCIA
+  int j;
   hd_hw_item_t hw_items[] = { hw_cdrom, hw_network, 0 };
+#endif
 
   auto2_chk_frame_buffer();
 
@@ -736,8 +739,8 @@ int auto2_init()
 
     if(i) {
       mod_unload_module("ide-cd");
-      mod_insmod("ide-cd", buf);
-      mod_insmod("ide-scsi", NULL);
+      mod_modprobe("ide-cd", buf);
+      mod_modprobe("ide-scsi", NULL);
       hd_list(hd_data, hw_cdrom, 1, NULL);
     }
   }
