@@ -1,3 +1,6 @@
+30/6/2004:	v1.6.36
+	- SLP fix (wrong entry was used sometimes)
+
 23/6/2004:	v1.6.35
 	- use kbyte in ask_for_swap() to avoid 4GB trouble (#42182)
 	- set escdelay to 250ms (#42317)

@@ -389,7 +389,7 @@ slp_get_install()
       i = dia_list("Choose an installation source", 60, NULL, ambg, 0, align_center);
       if (i <= 0 || i > acnt)
 	break;
-      d = descs[i - 1];
+      d = ambg[i - 1];
       for (i = acnt = 0; i < urlcnt; i++)
         if (!strcmp(descs[i], d))
 	  ambg[acnt++] = urls[i];
