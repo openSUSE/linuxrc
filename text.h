@@ -34,7 +34,7 @@ extern int   txt_init (void);
 
 /* all we have */
 // #define TRANS_br
-#define TRANS_ar
+// #define TRANS_ar
 #define TRANS_bg
 #define TRANS_bn
 #define TRANS_bs
@@ -44,6 +44,7 @@ extern int   txt_init (void);
 #define TRANS_en
 #define TRANS_es
 #define TRANS_fr
+#define TRANS_he
 #define TRANS_hu
 // #define TRANS_id
 #define TRANS_it

@@ -98,6 +98,10 @@ static language_t set_languages_arm [] =
 { lang_de, "Deutsch", "de-lat1-nd", L1_FONT, UNI_FONT, 0, 0, "de_DE" },
 #endif
 
+#ifdef TRANS_el
+{ lang_el, "Ελληνικά", "gr", L7_FONT, L7_FONT, 1, 1, "el_GR" },
+#endif
+
 #ifdef TRANS_en
 { lang_en, "English", "us", L1_FONT, UNI_FONT, 0, 0, "en_US" },
 #endif
@@ -110,16 +114,17 @@ static language_t set_languages_arm [] =
 { lang_fr, "Français", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR" },
 #endif
 
-#ifdef TRANS_el
-{ lang_el, "Ελληνικά", "gr", L7_FONT, L7_FONT, 1, 1, "el_GR" },
-#endif
-
 #ifdef TRANS_id
 { lang_id, "Indonesia", "us", L1_FONT, UNI_FONT, 0, 1, "de_DE" },
 #endif
 
 #ifdef TRANS_it
 { lang_it, "Italiano", "it", L1_FONT, UNI_FONT, 0, 0, "it_IT" },
+#endif
+
+#ifdef TRANS_he
+// currently a fake
+{ lang_he, "Ivrit", "us", L1_FONT, UNI_FONT, 0, 0, "he_IL" },
 #endif
 
 #ifdef TRANS_ja
