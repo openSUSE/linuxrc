@@ -188,6 +188,7 @@ void info_init (void)
     if(!config.had_segv) fprintf (stderr, "CPU: %d, Memory: %"PRId64", %skernel\n",
              cpu_ig, memory_ig, old_kernel_ig ? "Old " : "New ");
 
+#ifndef __powerpc__
     /* Check for LS-120 */
     /* ---------------- */
 
@@ -210,6 +211,7 @@ void info_init (void)
 
         close (fd_ii);
         }
+#endif
     }
 
 

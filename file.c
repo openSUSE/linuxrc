@@ -707,7 +707,10 @@ void file_do_info(file_t *f0)
         break;
 
       case key_memloadimage:
-        if(f->is.numeric) config.memory.load_image = f->nvalue;
+        if(f->is.numeric) {
+          config.memory.load_image = f->nvalue;
+          force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
+        }
         break;
 
       case key_tmpfs:
@@ -1203,10 +1206,8 @@ void file_write_install_inf(char *dir)
     }
     file_write_inet(f, key_gateway, &config.net.gateway);
     file_write_inet(f, key_nameserver, &config.net.nameserver);
-    if(!(config.vnc || config.usessh)) {
-      file_write_inet(f, key_server, &config.net.server);
-      file_write_str(f, key_serverdir, config.serverdir);
-    }
+    file_write_inet(f, key_server, &config.net.server);
+    file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
   }
 
