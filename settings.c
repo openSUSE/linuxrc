@@ -53,12 +53,16 @@ static language_t set_languages_arm [] =
   "none",            "lat1u.uni", 0, 1,      "es_ES",        "spanish"       },
 { LANG_FRENCH,       "Français",             "fr-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "fr_FR",        "french"        },
+#if LXRC_TINY < 1
 { LANG_BRETON,       "Brezhoneg",            "fr-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "fr_FR",        "breton"        },
+#endif
 { LANG_GREEK,        "Hellenic",             "gr",           "lat7-16.psfu",
   "trivial",         "lat7u.uni", 1, 1,      "el_EL",        "greek"         },
+#if LXRC_TINY < 1
 { LANG_INDONESIA,    "Indonesia",            "us",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "de_DE",        "indonesian"    },
+#endif
 { LANG_ITALIAN,      "Italiano",             "it",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "it_IT",        "italian"       },
 { LANG_HUNGARIA,     "Magyar",               "hu",           "lat2-16.psfu",
@@ -390,7 +394,7 @@ void set_choose_language (void)
         util_fill_string (items_ari [i_ii].text, width_ii);
         }
 
-    if (auto_ig)
+    if (auto_ig || auto2_ig)
         rc_ii = current_ii;
     else
         rc_ii = dia_menu (txt_get (TXT_CHOOSE_LANGUAGE), items_ari,

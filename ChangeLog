@@ -1,3 +1,10 @@
+19/7/2001:	v1.2.3
+	- added linuxrc_tiny: smaller linuxrc with some things dropped
+	  (to be used for bootdisks)
+
+11/7/2001:	v1.2.2
+	- LiveEval: set language even in auto2 mode
+
 18/6/2001:	v1.2.1
 	- load isa-pnp.o and add it to INITRD_MODULES if necessary
 	- fixed to build on s390

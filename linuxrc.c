@@ -599,8 +599,9 @@ static void lxrc_init (void)
         file_read_info ();
         }
 	
-    if (!auto2_ig && language_ig == LANG_UNDEF)
-        set_choose_language ();
+    if((!auto2_ig && language_ig == LANG_UNDEF) || (auto2_ig && demo_ig)) {
+      set_choose_language ();
+    }
 
     util_print_banner ();
 

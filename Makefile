@@ -84,12 +84,15 @@ ifneq ($(USE_MINI_GLIBC),no)
 endif
 
 .EXPORT_ALL_VARIABLES:
-.PHONY:	all clean install libs
+.PHONY:	all clean install libs tiny
 
 %.o:	%.c
 	$(CC) $(CFLAGS) $(LIBHDFL) $(WARN) -o $@ $<
 
 all: libs linuxrc
+
+tiny:
+	$(MAKE) EXTRA_FLAGS="-DLXRC_TINY=1"
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
