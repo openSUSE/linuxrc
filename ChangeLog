@@ -1,3 +1,6 @@
+13/5/2003:	v1.4.47
+	- make hd installs work properly (#26906)
+
 10/4/2003:	v1.4.46
 	- copy 'part.info' file from install medium
 

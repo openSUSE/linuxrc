@@ -68,7 +68,6 @@ static int   inst_choose_netsource_cb (dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
-static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
 static int   inst_do_ftp              (void);
 static int   inst_do_http             (void);
