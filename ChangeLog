@@ -7,6 +7,7 @@
 	- close tftp connection
 	- some zenworks stuff
 	- zen: urls specfify relative paths
+	- support ukrainian
 
 7/2/2005:	v1.7.20
 	- pcmcia fixes
