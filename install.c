@@ -859,7 +859,7 @@ static int inst_commit_install (void)
 #else
     if (root_ti [0])
         {
-        if (pcmcia_chip_ig || !strncasecmp (root_ti, "reboot", 6))
+        if ((!auto_ig && pcmcia_chip_ig) || !strncasecmp (root_ti, "reboot", 6))
             {
             lxrc_reboot ();
             rc_ii = -1;
