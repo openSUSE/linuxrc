@@ -184,7 +184,6 @@ extern char            cdrom_tg [20];
 extern char            keymap_tg [30];
 extern int             bootmode_ig;
 extern int             pcmcia_chip_ig;
-extern int             bogomips_ig;
 extern uint64_t        memory_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;

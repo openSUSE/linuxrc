@@ -43,7 +43,6 @@ char            cdrom_tg [20];
 char            keymap_tg [30];
 int             bootmode_ig = BOOTMODE_CD;
 int             pcmcia_chip_ig = 0;
-int             bogomips_ig = 0;
 uint64_t        memory_ig = 8192000;
 int             cpu_ig = 0;
 int             force_ri_ig = FALSE;

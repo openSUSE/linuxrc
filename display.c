@@ -490,7 +490,7 @@ void disp_restore_area (window_t *win_prr, int mode_iv)
 
                 fflush (stdout);
 
-                if (bogomips_ig > 30 && x_start_ii % 2)
+                if (x_start_ii % 2)
                     usleep (1000);
                 }
             while (!ready_ii);

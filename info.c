@@ -118,13 +118,6 @@ void info_init (void)
 
         if (strstr (line_ti, "Alpha"))
             cpu_ig = 5;
-
-        if (!strncmp (line_ti, "bogomips", 8))
-            {
-            tmp_pci = strchr (line_ti, ':');
-            if (tmp_pci)
-                bogomips_ig = atoi (tmp_pci + 2);
-            }
         }
 
     fclose (fd_pri);
@@ -152,8 +145,8 @@ void info_init (void)
     if (*(utsinfo_ri.release + 2) > '0')
         old_kernel_ig = FALSE;
 
-    fprintf (stderr, "CPU: %d, BogoMips: %d, Memory: %"PRId64", %skernel\n",
-             cpu_ig, bogomips_ig, memory_ig, old_kernel_ig ? "Old " : "New ");
+    fprintf (stderr, "CPU: %d, Memory: %"PRId64", %skernel\n",
+             cpu_ig, memory_ig, old_kernel_ig ? "Old " : "New ");
 
     /* Check for LS-120 */
     /* ---------------- */
