@@ -106,20 +106,36 @@ static keymap_t set_keymaps_arm [] =
 #endif
 
 #if defined(__sparc__)
-#define KEYMAP_DEFAULT	0
+#define KEYMAP_DEFAULT 3
 static keymap_t set_keymaps_arm [] =
 {
-{ "sunkeymap",       "sunkeymap"       },
-{ "sundvorak",       "sundvorak"       },
-{ "sun-pl-altgraph", "sun-pl-altgraph" },
-{ "sun-pl",          "sun-pl"          },
-{ "sunt4-es",        "sunt4-es"        },
-{ "sunt4-no-lotin1", "sunt4-no-lotin1" },
-{ "sunt5-de-latin1", "sunt5-de-latin1" },
-{ "sunt5-es",        "sunt5-es"        },
-{ "sunt5-fi-latin1", "sunt5-fi-latin1" },
-{ "sunt5-fr-latin1", "sunt5-fr-latin1" },
-{ "sunt5-ru",        "sunt5-ru"        }
+{ "Deutsch (PS/2)",              "de-lat1-nd"      },
+{ "Deutsch (Sun Type5)",         "sunt5-de-latin1" },
+{ "English/US (PS/2)",           "us"              },
+{ "English/US (Sun)",            "sunkeymap"       },
+{ "English/UK (PS/2)",           "uk"              },
+{ "English/UK (Sun)",            "sunkeymap"       },
+{ "Español (PS/2)",              "es"              },
+{ "Español (Sun Type4)",         "sunt4-es"        },
+{ "Español (Sun Type5)",         "sunt5-es"        },
+{ "Français (PS/2)",             "fr-latin1"       },
+{ "Français (Sun Type5)",        "sunt5-fr-latin1" },
+{ "Hellenic (PS/2)",             "gr"              },
+{ "Italiano (PS/2)",             "it"              },
+{ "Magyar (PS/2)",               "hu"              },
+{ "Nederlands (PS/2)",           "nl"              },
+{ "Norway (PS/2)",               "no-latin1"       },
+{ "Norway (Sun Type5)",          "sunt4-no-lotin1" },
+{ "Polski (PS/2)",               "Pl02"            },
+{ "Português (PS/2)",            "pt-latin1"       },
+{ "Português Brasileiro (PS/2)", "br-abnt2"        },
+{ "Russian (PS/2)",              "ru1"             },
+{ "Russian (Sun Type5)",         "sunt5-ru"        },
+{ "Czech (PS/2)",                "cz-us-qwertz"    },
+{ "Dansk (PS/2)",                "dk"              },
+{ "Suomi/Svensk (PS/2)",         "fi"              },
+{ "Suomi/Svensk (Sun Type5)",    "sunt5-fi-latin1" },
+{ "Slovak",                      "sk-qwerty"       }
 };
 #endif
 
@@ -270,11 +286,8 @@ void set_choose_keytable (int always_show)
       }
     }
 
-    if ((auto_ig || auto2_ig || *keymap_tg) && !always_show)
+    if (*keymap_tg && !always_show)
         {
-        if (!*keymap_tg)
-            strcpy (keymap_tg, keymap [def_keymap_idx].mapname);
-
         sprintf (command_ti, "loadkeys %s.map", keymap_tg);
         system (command_ti);
         return;
