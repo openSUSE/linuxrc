@@ -1,3 +1,6 @@
+20/9/2002:	v1.4.32
+	- copy 'content' file from install medium (#19904)
+
 19/9/2002:	v1.4.31
 	- restructed VNC/SSH ask for password handling so we do not ask
 	  for netconfig and later do unconditional DHCP (#19721)

@@ -76,6 +76,7 @@ static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
+static void get_content_file(void);
 
 #ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
@@ -729,6 +730,17 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
+      /* copy content file */
+      sprintf(filename, "%s/content", config.mountpoint.instdata);
+      if(util_check_exist(filename)) {
+        char *argv[3];
+
+        unlink("/content");
+        argv[1] = filename;
+        argv[2] = "/";
+        util_cp_main(3, argv);
+      }
+
       sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
       if(config.rescue || force_ri_ig || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
@@ -818,6 +830,8 @@ int inst_start_install()
     rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.instsys);
     if(rc) return rc;
     str_copy(&config.instsys, config.mountpoint.instsys);
+
+    get_content_file();
   }
   else if(!util_is_dir(inst_rootimage_tm)) {
     rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
@@ -1532,6 +1546,40 @@ void inst_swapoff()
     sprintf(buf, "/dev/%s", sl->key);
     fprintf(stderr, "swapoff %s\n", buf);
     swapoff(buf);
+  }
+}
+
+
+void get_content_file()
+{
+  char buf[0x1000];
+  char fname[256];
+  int i, j, fd_in, fd_out;
+
+  if(
+    config.instmode == inst_ftp ||
+    config.instmode == inst_http ||
+    config.instmode == inst_tftp
+  ) {
+    sprintf(fname, "%s/content", config.serverdir ?: "");
+    fd_in = net_open(fname);
+    if(fd_in >= 0) {
+      fd_out = open("/content.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+      if(fd_out >= 0) {
+        do {
+          i = net_read(fd_in, buf, sizeof buf);
+          j = 0;
+          if(i > 0) j = write(fd_out, buf, i);
+        }  
+        while(i > 0 && j > 0);
+        close(fd_out);
+        if(!(i < 0 || j < 0)) {
+          unlink("/content");
+          rename("/content.tmp", "/content");
+        }
+      }
+      net_close(fd_in);
+    }
   }
 }
 
