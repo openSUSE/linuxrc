@@ -176,6 +176,7 @@ enum modid_t
 
     ID_MACE,
     ID_BMAC,
-    ID_GMAC
+    ID_GMAC,
+    ID_IBMSIS
 
     };

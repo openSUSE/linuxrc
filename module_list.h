@@ -6,6 +6,7 @@ static module_t mod_scsi_mod_arm [] =
 { ID_SYM_53C8XX, "Symbios 53c8xx",                     "sym53c8xx",  0, __LINE__ },
 { ID_BUSLOGIC,   "BusLogic",                           "BusLogic",   0, __LINE__ },
 { ID_ADVANSYS,   "AdvanSys",                           "advansys",   "asc_iopflag=1 asc_ioport=0x110", __LINE__ },
+{ ID_IBMSIS,     "IBM iSeries ibmsis SCSI",            "ibmsis",     0, __LINE__ },
 { ID_GDTH,       "ICP Vortex GDTH Disk Array",         "gdth",       0, __LINE__ },
 { ID_DAC960,     "Mylex DAC-960/DAC1100",              "DAC960",     0, __LINE__ },
 { ID_SMART2,     "Compaq SMART2 RAID",                 "cpqarray",   0, __LINE__ },
