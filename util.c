@@ -634,7 +634,7 @@ int util_umount(char *dir)
 
   // fprintf(stderr, "umount: >%s<\n", dir);
 
-  f0 = file_read_file("/proc/mounts");
+  f0 = file_read_file("/proc/mounts", kf_none);
 
   if((i = umount(dir))) {
     // fprintf(stderr, "umount: %s: %s\n", dir, strerror(errno));
@@ -804,7 +804,7 @@ int util_chk_driver_update(char *dir)
   }
 
   sprintf(buf, "file:/%s/linuxrc.config", inst_src);
-  file_read_info_file(buf, NULL);
+  file_read_info_file(buf, NULL, kf_cfg);
 
   return 0;
 }
@@ -912,7 +912,6 @@ void util_status_info()
   add_flag(&sl0, buf, config.addswap, "addswap");
   add_flag(&sl0, buf, config.splash, "splash");
   add_flag(&sl0, buf, config.noshell, "noshell");
-  add_flag(&sl0, buf, config.run_memcheck, "memcheck");
   add_flag(&sl0, buf, config.hwdetect, "hwdetect");
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
@@ -1269,7 +1268,7 @@ void show_lsof_info(FILE *f, unsigned pid)
   }
 
   sprintf(pe, "/proc/%u/maps", pid);
-  f0 = file_read_file(pe);
+  f0 = file_read_file(pe, kf_none);
 
   for(f1 = f0; f1; f1 = f1->next) {
     *buf3 = 0;
@@ -2205,7 +2204,7 @@ void util_free_mem()
   int i, mem_total = 0, mem_free = 0, mem_free_swap = 0;
   char *s;
 
-  f0 = file_read_file("/proc/meminfo");
+  f0 = file_read_file("/proc/meminfo", kf_mem);
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {
@@ -2756,12 +2755,6 @@ void set_instmode(instmode_t instmode)
   ) {
     config.net.proxyproto = inst_http;
   }
-
-#if 0
-  if(instmode == inst_tftp) {
-    config.fullnetsetup = 1;
-  }
-#endif
 }
 
 
@@ -3068,7 +3061,7 @@ char *util_fstype(char *dev, char **module)
   if(!type) return NULL;
 
   if(module) {
-    f0 = file_read_file("/proc/filesystems");
+    f0 = file_read_file("/proc/filesystems", kf_none);
     for(f = f0; f; f = f->next) {
       s = strcmp(f->key_str, "nodev") ? f->key_str : f->value;
       if(!strcmp(s, type)) {
@@ -3226,7 +3219,7 @@ void util_update_netdevice_list(char *module, int add)
   file_t *f0, *f1, *f;
   slist_t *sl;
 
-  f0 = file_read_file("/proc/net/dev");
+  f0 = file_read_file("/proc/net/dev", kf_none);
   if(!f0) return;
 
   /* skip 2 lines */
@@ -3315,7 +3308,7 @@ void util_update_cdrom_list()
 
   config.cdroms = slist_free(config.cdroms);
 
-  f0 = file_read_file("/proc/sys/dev/cdrom/info");
+  f0 = file_read_file("/proc/sys/dev/cdrom/info", kf_none);
 
   for(f = f0; f; f = f->next) {
     if(!strcmp(f->key_str, "drive") && strstr(f->value, "name:") == f->value) {
@@ -3339,7 +3332,7 @@ void util_update_swap_list()
 
   config.swaps = slist_free(config.swaps);
 
-  f0 = file_read_file("/proc/swaps");
+  f0 = file_read_file("/proc/swaps", kf_none);
 
   for(f = f0; f; f = f->next) {
     if(f->key == key_none && strstr(f->key_str, "/dev/") == f->key_str) {

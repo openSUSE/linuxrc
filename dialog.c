@@ -1369,7 +1369,7 @@ void dia_handle_ctrlc (void)
       else if(i == -73) {
 	i = dia_input("Change Config", s, sizeof s - 1, 35, 0);
 	if(!i) {
-	  f = file_parse_buffer(s);
+	  f = file_parse_buffer(s, kf_cfg + kf_cmd);
 	  file_do_info(f);
 	  file_free_file(f);
 	}

@@ -507,7 +507,7 @@ int net_check_address2(inet_t *inet, int do_dns)
   }
 
   if(!he) {
-    f0 = file_read_file("/etc/resolv.conf");
+    f0 = file_read_file("/etc/resolv.conf", kf_none);
     for(f = f0; f; f = f->next) {
       if(!strcmp(f->key_str, "search")) {
         s = malloc(strlen(inet->name) + strlen(f->value) + 2);
@@ -867,7 +867,7 @@ int net_choose_device()
     if(sl->key) item_cnt++;
   }
 
-  f0 = file_read_file("/proc/net/dev");
+  f0 = file_read_file("/proc/net/dev", kf_none);
   if(!f0) return -1;
 
   for(item_cnt = 0, f = f0; f && (unsigned) item_cnt < sizeof items / sizeof *items - 1; f = f->next) {
@@ -1259,7 +1259,7 @@ int net_dhcp()
 
   system(cmd);
 
-  f0 = file_read_file(file);
+  f0 = file_read_file(file, kf_dhcp);
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {

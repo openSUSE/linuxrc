@@ -317,13 +317,6 @@ int inst_choose_netsource()
 
   if(!config.net.smb_available) items[3] = di_skip;
 
-#if 0
-  if(!config.fullnetsetup) {
-    // yast doesn't support it :-((
-    items[4] = di_skip;
-  }
-#endif
-
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
   return di == di_none ? -1 : 0;

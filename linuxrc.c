@@ -63,7 +63,6 @@ static void lxrc_catch_signal_11(SIGNAL_ARGS);
 static void lxrc_catch_signal  (int signum);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (dia_item_t di);
-static void lxrc_memcheck      (void);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int do_not_kill         (char *name);
@@ -138,8 +137,7 @@ static struct {
 #endif
 
 typedef enum {
-  lx_auto, lx_auto2, lx_noauto2, lx_y2autoinst, lx_demo, lx_eval, lx_reboot,
-  lx_loadnet, lx_loaddisk, lx_rescue, lx_nopcmcia, lx_nocmdline
+  lx_auto, lx_auto2, lx_reboot, lx_loadnet, lx_loaddisk, lx_nocmdline
 } lx_param_t;
 
 static struct {
@@ -148,15 +146,9 @@ static struct {
 } lxrc_params[] = {
   { "auto",       lx_auto       },
   { "auto2",      lx_auto2      },
-  { "noauto2",    lx_noauto2    },
-  { "y2autoinst", lx_y2autoinst },
-  { "demo",       lx_demo       },
-  { "eval",       lx_eval       },
   { "reboot",     lx_reboot     },
   { "loadnet",    lx_loadnet    },
   { "loaddisk",   lx_loaddisk   },
-  { "rescue",     lx_rescue     },
-  { "nopcmcia",   lx_nopcmcia   },
   { "nocmdline",  lx_nocmdline  }
 };
 
@@ -395,7 +387,6 @@ void lxrc_change_root()
 
 void lxrc_end()
 {
-  int i;
   FILE *f;
 
     if(config.netstop) {
@@ -405,16 +396,9 @@ void lxrc_end()
 
     util_debugwait("kill remaining procs");
 
-    if(config.memcheck_pid) kill(config.memcheck_pid, 9);
-
     lxrc_killall(1);
 
     while(waitpid(-1, NULL, WNOHANG) == 0);
-
-    if(config.memcheck_pid) {
-      i = waitpid(config.memcheck_pid, NULL, 0);
-      fprintf(stderr, "memcheck pid = %d, wait = %d\n", config.memcheck_pid, i);
-    }
 
     if (!config.linemode)
       printf ("\033[9;15]");		/* screen saver on */
@@ -508,7 +492,6 @@ void lxrc_killall(int really_all_iv)
       pid = strtoul(sl->key, NULL, 10);
       if(
         pid > mypid &&
-        pid != config.memcheck_pid &&
         (really_all_iv || !do_not_kill(sl->value))
       ) {
         if(sig == 15) fprintf(stderr, "killing %s (%d)\n", sl->value, pid);
@@ -585,7 +568,6 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
     addr[16] = 0;
     state[0] = config.win ? '1' : '0';
     state[1] = 0;
-    if(config.memcheck_pid) kill(config.memcheck_pid, 9);
     kbd_end();		/* restore terminal settings */
     execl(*config.argv, "linuxrc", "segv", addr, state, NULL);
   }
@@ -705,7 +687,7 @@ void lxrc_init()
   config.inst_ramdisk = -1;
   config.module.ramdisk = -1;
 
-  file_read_info_file("file:/linuxrc.config", NULL);
+  file_read_info_file("file:/linuxrc.config", NULL, kf_cfg);
 
   if(!config.had_segv) {
     if (config.linemode)
@@ -800,29 +782,6 @@ void lxrc_init()
               config.manual = 0;
               break;
 
-            case lx_noauto2:
-              auto_ig = auto2_ig = 0;
-              config.manual = 1;
-              break;
-
-            case lx_y2autoinst:
-              auto_ig = 0;
-              auto2_ig = 1;
-              config.manual = 0;
-              break;
-
-            case lx_demo:
-              config.demo = 1;
-              config.ask_language = 1;
-              config.ask_keytable = 1;
-              config.activate_storage = 1;
-              break;
-
-            case lx_eval:
-              config.demo = 1;
-              config.activate_storage = 1;
-              break;
-
             case lx_reboot:
               reboot_ig = TRUE;
               break;
@@ -833,26 +792,6 @@ void lxrc_init()
 
             case lx_loaddisk:
               config.activate_storage = 1;
-              break;
-
-#if 0	/* obsolete */
-            case lx_french:
-              config.language = lang_fr;
-              break;
-#endif
-
-#if 0	/* obsolete */
-            case lx_color:
-              config.color = 2;
-              break;
-#endif
-
-            case lx_rescue:
-              config.rescue = 1;
-              break;
-
-            case lx_nopcmcia:
-              config.nopcmcia = 1;
               break;
 
             case lx_nocmdline:
@@ -912,8 +851,6 @@ void lxrc_init()
   fflush(stdout);
 
   info_init();
-
-  if(config.run_memcheck) lxrc_memcheck();
 
   ft = file_get_cmdline(key_brokenmodules);
   if(ft && *ft->value) {
@@ -1133,31 +1070,6 @@ int lxrc_main_cb(dia_item_t di)
   }
 
   return rc;
-}
-
-
-void lxrc_memcheck()
-{
-  int nr_pages, max_pages, i;
-  char *buf;
-
-  if((config.memcheck_pid = fork())) return;
-
-  lxrc_catch_signal(0);
-
-  max_pages = config.memory.free < 8000 ? 40 : 100;
-
-  while(1) {
-    nr_pages = ((rand() & 0xfff) % max_pages) + 3;
-    if((buf = malloc(nr_pages * 4096))) {
-      for(i = 0; i < nr_pages; i++) {
-        buf[i * 4096] = 42;
-        usleep(10000);
-      }
-      free(buf);
-    }
-    sleep(1);
-  }
 }
 
 

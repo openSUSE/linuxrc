@@ -37,7 +37,7 @@
 // #define DEBUG_FILE
 
 static char *file_key2str(file_key_t key);
-static file_key_t file_str2key(char *value);
+static file_key_t file_str2key(char *value, file_key_flag_t flags);
 static int sym2index(char *sym);
 static void parse_value(file_t *ft);
 
@@ -53,157 +53,140 @@ static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
 static struct {
   file_key_t key;
   char *value;
+  file_key_flag_t flags;
 } keywords[] = {
-  { key_none,           ""                 },
-  { key_swap,           "Swap"             },
-  { key_root,           "Root"             },
-  { key_live,           "live"             },
-  { key_keytable,       "Keytable"         },
-  { key_language,       "Language"         },
-  { key_rebootmsg,      "RebootMsg"        },
-  { key_insmod,         "Insmod"           },
-  { key_autoprobe,      "Autoprobe"        },
-  { key_start_pcmcia,   "StartPCMCIA"      },
-  { key_display,        "Display"          },
-  { key_bootmode,       "Bootmode"         },
-  { key_ip,             "IP"               },
-  { key_netmask,        "Netmask"          },
-  { key_gateway,        "Gateway"          },
-  { key_server,         "Server"           },
-  { key_nameserver,     "Nameserver"       },
-  { key_broadcast,      "Broadcast"        },
-  { key_network,        "Network"          },
-  { key_partition,      "Partition"        },
-  { key_serverdir,      "Serverdir"        },
-  { key_fstype,         "Fstyp"            },
-  { key_netdevice,      "Netdevice"        },
-  { key_livesrc,        "LiveSRC"          },
-  { key_bootpwait,      "Bootpwait"        },
-  { key_bootptimeout,   "BOOTPTimeout"     },
-  { key_forcerootimage, "ForceRootimage"   },
-  { key_rebootwait,     "WaitReboot"       },
-  { key_sourcemounted,  "Sourcemounted"    },
-  { key_cdrom,          "Cdrom"            },
-  { key_pcmcia,         "PCMCIA"           },
-  { key_haspcmcia,      "HasPCMCIA"        },
-  { key_console,        "Console"          },
-  { key_pliphost,       "PLIPHost"         },
-  { key_domain,         "Domain"           },
-  { key_ftpuser,        "FTPUser"          },
-  { key_ftpproxy,       "FTPProxy"         },
-  { key_ftpproxyport,   "FTPProxyport"     },
-  { key_manual,         "Manual"           },
-  { key_demo,           "Demo"             },
-  { key_reboot,         "Reboot"           },
-  { key_floppydisk,     "Floppydisk"       },
-  { key_keyboard,       "Keyboard"         },
-  { key_yast2update,    "YaST2update"      },
-  { key_yast2serial,    "YaST2serial"      },
-  { key_textmode,       "Textmode"         },
-  { key_yast2color,     "YaST2color"       },
-  { key_bootdisk,       "BootDisk"         },
-  { key_disks,          "Disks"            },
-  { key_username,       "Username"         },
-  { key_password,       "Password"         },
-  { key_workdomain,     "WorkDomain"       },
-  { key_alias,          "Alias"            },
-  { key_options,        "Options"          },
-  { key_initrdmodules,  "InitrdModules"    },
-  { key_locale,         "Locale"           },
-  { key_font,           "Font"             },
-  { key_screenmap,      "Screenmap"        },
-  { key_fontmagic,      "Fontmagic"        },
-  { key_autoyast,       "AutoYaST"         },
-  { key_linuxrc,        "linuxrc"          },
-  { key_forceinsmod,    "ForceInsmod"      },
-  { key_dhcp,           "DHCP"             },
-  { key_ipaddr,         "IPAddr"           },
-  { key_hostname,       "Hostname"         },
-  { key_nisdomain,      "NISDomain"        },
-  { key_nisservers,     "NISServers"       },
-  { key_dns,            "DNS"              },
-  { key_nptservers,     "NTPServers"       },
-  { key_dhcpsid,        "DHCPSID"          },
-  { key_dhcpgiaddr,     "DHCPGIAddr"       },
-  { key_dhcpsiaddr,     "DHCPSIAddr"       },
-  { key_dhcpchaddr,     "DHCPCHAddr"       },
-  { key_dhcpshaddr,     "DHCPSHAddr"       },
-  { key_dhcpsname,      "DHCPSName"        },
-  { key_rootpath,       "RootPath"         },
-  { key_bootfile,       "BootFile"         },
-  { key_install,        "Install"          },
-  { key_instmode,       "InstMode"         },
-  { key_memtotal,       "MemTotal"         },
-  { key_memfree,        "MemFree"          },
-  { key_buffers,        "Buffers"          },
-  { key_cached,         "Cached"           },
-  { key_swaptotal,      "SwapTotal"        },
-  { key_swapfree,       "SwapFree"         },
-  { key_memlimit,       "MemLimit"         },
-  { key_memyast,        "MemYaST"          },
-  { key_memyasttext,    "MemYaSTText"      },
-  { key_memmodules,     "MemModules"       },
-  { key_memloadimage,   "MemLoadImage"     },
-  { key_info,           "Info"             },
-  { key_proxy,          "Proxy"            },
-  { key_proxyport,      "ProxyPort"        },
-  { key_proxyproto,     "ProxyProto"       },
-  { key_usedhcp,        "UseDHCP"          },
-  { key_nfsport,        "NFSPort"          },
-  { key_dhcptimeout,    "DHCPTimeout"      },
-  { key_tftptimeout,    "TFTPTimeout"      },
-  { key_tmpfs,          "_TmpFS"           },
-  { key_netstop,        "_NetStop"         },
-  { key_testmode,       "_TestMode"        },
-  { key_debugwait,      "_DebugWait"       },
-  { key_auto,           "_Auto"            },
-  { key_expert,         "Expert"           },
-  { key_rescue,         "Rescue"           },
-  { key_rootimage,      "RootImage"        },
-  { key_rescueimage,    "RescueImage"      },
-  { key_installdir,     "InstallDir"       },
-  { key_nopcmcia,       "NoPCMCIA"         },
-  { key_vnc,            "VNC"              },
-  { key_usessh,         "UseSSH"           },
-  { key_vncpassword,    "VNCPassword"      },
-  { key_sshpassword,    "SSHPassword"      },
-  { key_usepivotroot,   "UsePivotRoot"     },
-  { key_term,           "TERM"             },
-  { key_addswap,        "AddSwap"          },
-  { key_fullnetsetup,   "FullNetSetup"     },
-  { key_aborted,        "Aborted"          },
-  { key_exec,           "Exec"             },
-  { key_usbwait,        "USBWait"          },
-  { key_nfsrsize,       "NFS.RSize"        },
-  { key_nfswsize,       "NFS.WSize"        },
-  { key_hwcheck,        "HWCheck"          },
-  { key_setupcmd,       "SetupCmd"         },
-  { key_setupnetif,     "SetupNetIF"       },
-  { key_netconfig,      "NetConfig"        },
-  { key_noshell,        "NoShell"          },
-  { key_memcheck,       "_MemCheck"        },
-  { key_hwdetect,       "HWDetect"         },
-  { key_floppydevice,   "FloppyDevice"     },
-  { key_cdromdevice,    "CDROMDevice"      },
-  { key_consoledevice,  "ConsoleDevice"    },
-  { key_product,        "Product"          },
-  { key_productdir,     "ProductDir"       },
-  { key_linuxrcstderr,  "LinuxrcSTDERR"    },
-  { key_comment,        "#"                },
-  { key_kbdtimeout,     "KBDTimeout"       },
-  { key_brokenmodules,  "BrokenModules"    },
-  { key_testpivotroot,  "_TestPivotRoot"   },
-  { key_scsibeforeusb,  "SCSIBeforeUSB"    },
-  { key_hostip,         "HostIP"           },
-  { key_linemode,       "Linemode"         },
-  { key_moduledelay,    "ModuleDelay"      },
-  { key_updatedir,      "UpdateDir"        },
-  { key_usbscsi,        "USBSCSI"          },
-  { key_useusbscsi,     "UseUSBSCSI"       },
-  { key_lxrcdebug,      "LXRCDebug"        },
-  { key_kernel_pcmcia,  "KernelPCMCIA"     },
-  { key_liveconfig,     "LiveConfig"       },
-  { key_useidescsi,     "UseIDESCSI"       }
+  { key_none,           "",               kf_none                        },
+  { key_root,           "Root",           kf_yast                        },
+  { key_live,           "live",           kf_cfg + kf_cmd                },
+  { key_keytable,       "Keytable",       kf_cfg + kf_cmd + kf_yast      },
+  { key_language,       "Language",       kf_cfg + kf_cmd + kf_yast      },
+  { key_rebootmsg,      "RebootMsg",      kf_yast                        },
+  { key_insmod,         "Insmod",         kf_cfg + kf_cmd                },
+  { key_display,        "Display",        kf_cfg + kf_cmd                },
+  { key_ip,             "IP",             kf_none                        },
+  { key_netmask,        "Netmask",        kf_cfg + kf_cmd + kf_dhcp      },
+  { key_gateway,        "Gateway",        kf_cfg + kf_cmd + kf_dhcp      },
+  { key_server,         "Server",         kf_cfg + kf_cmd                },
+  { key_nameserver,     "Nameserver",     kf_cfg + kf_cmd                },
+  { key_broadcast,      "Broadcast",      kf_cfg + kf_cmd + kf_dhcp      },
+  { key_network,        "Network",        kf_cfg + kf_cmd + kf_dhcp      },
+  { key_partition,      "Partition",      kf_cfg + kf_cmd                },
+  { key_serverdir,      "Serverdir",      kf_cfg + kf_cmd                },
+  { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
+  { key_livesrc,        "LiveSRC",        kf_cfg + kf_cmd                },
+  { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
+  { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
+  { key_forcerootimage, "ForceRootimage", kf_cfg + kf_cmd                },
+  { key_rebootwait,     "WaitReboot",     kf_cfg + kf_cmd                },	/* drop it? */
+  { key_sourcemounted,  "Sourcemounted",  kf_none                        },
+  { key_cdrom,          "Cdrom",          kf_none                        },
+  { key_pcmcia,         "PCMCIA",         kf_none                        },
+  { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
+  { key_console,        "Console",        kf_none                        },	/* tricky */
+  { key_pliphost,       "PLIPHost",       kf_none                        },	/* drop it? */
+  { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
+  { key_manual,         "Manual",         kf_none                        },	/* tricky */
+  { key_demo,           "Demo",           kf_none                        },	/* obsolete */
+  { key_reboot,         "Reboot",         kf_none                        },	/* drop it? */
+  { key_floppydisk,     "Floppydisk",     kf_none                        },	/* ??? */
+  { key_keyboard,       "Keyboard",       kf_none                        },
+  { key_yast2update,    "YaST2update",    kf_none                        },
+  { key_yast2serial,    "YaST2serial",    kf_none                        },
+  { key_textmode,       "Textmode",       kf_cfg + kf_cmd                },
+  { key_yast2color,     "YaST2color",     kf_none                        },
+  { key_bootdisk,       "BootDisk",       kf_none                        },	/* obsolete */
+  { key_disks,          "Disks",          kf_none                        },	/* obsolete */
+  { key_username,       "Username",       kf_cfg + kf_cmd                },
+  { key_password,       "Password",       kf_cfg + kf_cmd                },
+  { key_workdomain,     "WorkDomain",     kf_cfg + kf_cmd                },
+  { key_alias,          "Alias",          kf_none                        },
+  { key_options,        "Options",        kf_none                        },
+  { key_initrdmodules,  "InitrdModules",  kf_cfg + kf_cmd                },
+  { key_locale,         "Locale",         kf_none                        },
+  { key_font,           "Font",           kf_none                        },
+  { key_screenmap,      "Screenmap",      kf_none                        },
+  { key_fontmagic,      "Fontmagic",      kf_none                        },
+  { key_autoyast,       "AutoYaST",       kf_cfg + kf_cmd                },	/* tricky */
+  { key_linuxrc,        "linuxrc",        kf_none                        },	/* tricky */
+  { key_forceinsmod,    "ForceInsmod",    kf_cfg + kf_cmd                },
+  { key_dhcp,           "DHCP",           kf_cmd                         },	/* not really useful */
+  { key_ipaddr,         "IPAddr",         kf_dhcp                        },
+  { key_hostname,       "Hostname",       kf_cfg + kf_cmd                },
+  { key_dns,            "DNS",            kf_dhcp                        },
+  { key_dhcpsiaddr,     "DHCPSIAddr",     kf_dhcp                        },
+  { key_rootpath,       "RootPath",       kf_dhcp                        },
+  { key_bootfile,       "BootFile",       kf_dhcp                        },
+  { key_install,        "Install",        kf_cfg + kf_cmd                },
+  { key_instmode,       "InstMode",       kf_cfg + kf_cmd                },
+  { key_memtotal,       "MemTotal",       kf_mem                         },
+  { key_memfree,        "MemFree",        kf_mem                         },
+  { key_buffers,        "Buffers",        kf_mem                         },
+  { key_cached,         "Cached",         kf_mem                         },
+  { key_swaptotal,      "SwapTotal",      kf_mem                         },
+  { key_swapfree,       "SwapFree",       kf_mem                         },
+  { key_memlimit,       "MemLimit",       kf_cfg + kf_cmd                },
+  { key_memyast,        "MemYaST",        kf_cfg + kf_cmd                },
+  { key_memyasttext,    "MemYaSTText",    kf_cfg + kf_cmd                },
+  { key_memmodules,     "MemModules",     kf_cfg + kf_cmd                },
+  { key_memloadimage,   "MemLoadImage",   kf_cfg + kf_cmd                },
+  { key_info,           "Info",           kf_none                        },	/* tricky */
+  { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
+  { key_proxyport,      "ProxyPort",      kf_cfg + kf_cmd                },
+  { key_proxyproto,     "ProxyProto",     kf_cfg + kf_cmd                },
+  { key_usedhcp,        "UseDHCP",        kf_cfg + kf_cmd                },
+  { key_nfsport,        "NFSPort",        kf_cfg + kf_cmd                },
+  { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
+  { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
+  { key_tmpfs,          "_TmpFS",         kf_none                        },	/* tricky */
+  { key_netstop,        "_NetStop",       kf_cfg + kf_cmd                },
+  { key_testmode,       "_TestMode",      kf_cfg                         },
+  { key_debugwait,      "_DebugWait",     kf_cfg + kf_cmd                },	/* tricky */
+  { key_auto,           "_Auto",          kf_cfg + kf_cmd                },	/* drop old auto mode? */
+  { key_expert,         "Expert",         kf_cfg + kf_cmd                },	/* drop it? */
+  { key_rescue,         "Rescue",         kf_cfg + kf_cmd                },
+  { key_rootimage,      "RootImage",      kf_cfg + kf_cmd                },
+  { key_rescueimage,    "RescueImage",    kf_cfg + kf_cmd                },
+  { key_installdir,     "InstallDir",     kf_cfg + kf_cmd                },
+  { key_nopcmcia,       "NoPCMCIA",       kf_cfg + kf_cmd                },	/* kf_cmd_early? */
+  { key_vnc,            "VNC",            kf_cfg + kf_cmd                },
+  { key_usessh,         "UseSSH",         kf_cfg + kf_cmd                },
+  { key_vncpassword,    "VNCPassword",    kf_cfg + kf_cmd                },
+  { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },
+  { key_usepivotroot,   "UsePivotRoot",   kf_cfg + kf_cmd                },
+  { key_term,           "TERM",           kf_cfg + kf_cmd                },
+  { key_addswap,        "AddSwap",        kf_cfg + kf_cmd                },
+  { key_aborted,        "Aborted",        kf_yast                        },
+  { key_exec,           "Exec",           kf_cfg + kf_cmd                },
+  { key_usbwait,        "USBWait",        kf_cfg + kf_cmd + kf_cmd_early },
+  { key_nfsrsize,       "NFS.RSize",      kf_cfg + kf_cmd                },
+  { key_nfswsize,       "NFS.WSize",      kf_cfg + kf_cmd                },
+  { key_hwcheck,        "HWCheck",        kf_cfg + kf_cmd                },
+  { key_setupcmd,       "SetupCmd",       kf_cfg + kf_cmd                },
+  { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
+  { key_netconfig,      "NetConfig",      kf_none                        },
+  { key_noshell,        "NoShell",        kf_cfg + kf_cmd                },
+  { key_hwdetect,       "HWDetect",       kf_cfg + kf_cmd                },
+  { key_floppydevice,   "FloppyDevice",   kf_cfg + kf_cmd                },
+  { key_cdromdevice,    "CDROMDevice",    kf_cfg + kf_cmd                },
+  { key_consoledevice,  "ConsoleDevice",  kf_cfg + kf_cmd                },
+  { key_product,        "Product",        kf_cfg + kf_cmd                },
+  { key_productdir,     "ProductDir",     kf_cfg + kf_cmd                },
+  { key_linuxrcstderr,  "LinuxrcSTDERR",  kf_cfg + kf_cmd                },	/* hm */
+  { key_comment,        "#",              kf_cfg                         },
+  { key_kbdtimeout,     "KBDTimeout",     kf_cfg + kf_cmd                },
+  { key_brokenmodules,  "BrokenModules",  kf_cfg + kf_cmd + kf_cmd_early },
+  { key_testpivotroot,  "_TestPivotRoot", kf_cfg + kf_cmd                },
+  { key_scsibeforeusb,  "SCSIBeforeUSB",  kf_cfg + kf_cmd + kf_cmd_early },
+  { key_hostip,         "HostIP",         kf_cfg + kf_cmd                },
+  { key_linemode,       "Linemode",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_moduledelay,    "ModuleDelay",    kf_cfg + kf_cmd + kf_cmd_early },
+  { key_updatedir,      "UpdateDir",      kf_cfg + kf_cmd                },
+  { key_usbscsi,        "USBSCSI",        kf_cfg + kf_cmd                },
+  { key_useusbscsi,     "UseUSBSCSI",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
+  { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
+  { key_liveconfig,     "LiveConfig",     kf_cfg + kf_cmd                },
+  { key_useidescsi,     "UseIDESCSI",     kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -266,12 +249,12 @@ char *file_key2str(file_key_t key)
 
 
 /* !!! str is overwritten !!! */
-file_key_t file_str2key(char *str)
+file_key_t file_str2key(char *str, file_key_flag_t flags)
 {
   int i;
   char *s;
 
-  if(!str || !*str) return key_none;
+  if(!str || !*str || flags == kf_none) return key_none;
 
   /* remove all '-' and '_' */
   if(*str != '_') {
@@ -286,7 +269,7 @@ file_key_t file_str2key(char *str)
   if(!*str) return key_none;
 
   for(i = 0; (unsigned) i < sizeof keywords / sizeof *keywords; i++) {
-    if(!strcasecmp(keywords[i].value, str)) {
+    if((keywords[i].flags & flags) && !strcasecmp(keywords[i].value, str)) {
       return keywords[i].key;
     }
   }
@@ -352,7 +335,7 @@ void parse_value(file_t *ft)
 }
 
 
-file_t *file_read_file(char *name)
+file_t *file_read_file(char *name, file_key_flag_t flags)
 {
   FILE *f;
   char buf[1024];
@@ -388,7 +371,7 @@ file_t *file_read_file(char *name)
       *ft = calloc(1, sizeof **ft);
 
       (*ft)->key_str = strdup(s);
-      (*ft)->key = file_str2key(s);	/* destroys s!!! */
+      (*ft)->key = file_str2key(s, flags);	/* destroys s!!! */
       (*ft)->value = strdup(t);
 
       parse_value(*ft);
@@ -435,18 +418,18 @@ int file_read_info()
   if(!config.info.file || !strcmp(config.info.file, "default")) {
     if(config.info.file || auto2_ig || auto_ig) {
       strprintf(&info_file_old, "floppy:/%s/setup/descr/info", config.product_dir);
-      file = file_read_info_file(info_file_old, "floppy:/info");
+      file = file_read_info_file(info_file_old, "floppy:/info", kf_cfg);
       free(info_file_old);
       info_file_old = NULL;
     }
-    if(!file) file = file_read_info_file("file:/info", NULL);
+    if(!file) file = file_read_info_file("file:/info", NULL, kf_cfg);
   }
   else {
-    file = file_read_info_file(config.info.file, NULL);
+    file = file_read_info_file(config.info.file, NULL, kf_cfg);
   }
 
   if(config.info.add_cmdline) {
-    s = file_read_info_file("cmdline", NULL);
+    s = file_read_info_file("cmdline", NULL, kf_cmd);
     if(!file) file = s;
   }
 
@@ -467,7 +450,7 @@ int file_read_info()
 }
 
 
-char *file_read_info_file(char *file, char *file2)
+char *file_read_info_file(char *file, char *file2, file_key_flag_t flags)
 {
   char filename[MAX_FILENAME];
   int i, mounted = 0;
@@ -478,10 +461,10 @@ char *file_read_info_file(char *file, char *file2)
 #endif
 
   if(!strcmp(file, "cmdline")) {
-    f0 = file_read_cmdline();
+    f0 = file_read_cmdline(flags);
   }
   else if(!strncmp(file, "file:", 5)) {
-    f0 = file_read_file(file + 5);
+    f0 = file_read_file(file + 5, flags);
   }
   else if(!strncmp(file, "floppy:", 7)) {
     for(i = 0; i < config.floppies; i++) {
@@ -492,11 +475,11 @@ char *file_read_info_file(char *file, char *file2)
       mounted = 1;
       util_chk_driver_update(mountpoint_tg);
       sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
-      f0 = file_read_file(filename);
+      f0 = file_read_file(filename, flags);
       if(!f0 && file2) {
         file = file2;
         sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
-        f0 = file_read_file(filename);
+        f0 = file_read_file(filename, flags);
       }
     }
   }
@@ -517,12 +500,6 @@ char *file_read_info_file(char *file, char *file2)
 
   if(mounted) umount(mountpoint_tg);
 
-//  if(config.info.mod_autoload) mod_autoload();
-
-#if WITH_PCMCIA
-//  if(config.info.start_pcmcia) pcmcia_load_core();
-#endif
-
   return file;
 }
 
@@ -534,9 +511,6 @@ void file_do_info(file_t *f0)
   int i, is_xml = 0;
   char buf[256], *s, *t;
   slist_t *sl;
-
-  config.info.mod_autoload = 0;
-  config.info.start_pcmcia = 0;
 
   /* maybe it's an AutoYaST XML file */
   for(f = f0; f; f = f->next) {
@@ -561,14 +535,6 @@ void file_do_info(file_t *f0)
         file_module_load(f->value);
         break;
 
-      case key_autoprobe:
-        config.info.mod_autoload = 1;
-        break;
-
-      case key_start_pcmcia:
-        config.info.start_pcmcia = 1;
-        break;
-
       case key_language:
         i = set_langidbyname(f->value);
         if(i) config.language = i;
@@ -583,12 +549,10 @@ void file_do_info(file_t *f0)
         str_copy(&config.keymap, *f->value ? f->value : NULL);
         break;
 
-      case key_bootmode:
       case key_instmode:
         if(f->is.numeric) set_instmode(f->nvalue);
         break;
 
-      case key_ip:
       case key_hostip:
         name2inet(&config.net.hostname, f->value);
         net_check_address2(&config.net.hostname, 0);
@@ -622,13 +586,11 @@ void file_do_info(file_t *f0)
         break;
 
       case key_proxy:
-      case key_ftpproxy:
         name2inet(&config.net.proxy, f->value);
         net_check_address2(&config.net.proxy, 0);
         break;
 
       case key_proxyport:
-      case key_ftpproxyport:
         if(f->is.numeric) config.net.proxyport = f->nvalue;
         break;
 
@@ -685,7 +647,6 @@ void file_do_info(file_t *f0)
         break;
 
       case key_username:
-      case key_ftpuser:
         str_copy(&config.net.user, *f->value ? f->value : NULL);
         break;
 
@@ -884,10 +845,6 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.testpivotroot = f->nvalue;
         break;
 
-      case key_fullnetsetup:
-        if(f->is.numeric) config.fullnetsetup = f->nvalue;
-        break;
-
       case key_term:
         str_copy(&config.term, *f->value ? f->value : NULL);
         break;
@@ -970,10 +927,6 @@ void file_do_info(file_t *f0)
 
       case key_noshell:
         if(f->is.numeric) config.noshell = f->nvalue;
-        break;
-
-      case key_memcheck:
-        if(f->is.numeric) config.run_memcheck = f->nvalue;
         break;
 
       case key_hwdetect:
@@ -1122,7 +1075,7 @@ int file_read_yast_inf()
   int root = 0;
   file_t *f0, *f;
 
-  f0 = file_read_file(YAST_INF_FILE);
+  f0 = file_read_file(YAST_INF_FILE, kf_yast);
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {
@@ -1255,7 +1208,6 @@ void file_write_install_inf(char *dir)
 
   if(config.insttype == inst_hd) {
     file_write_str(f, key_partition, config.partition);
-//    file_write_str(f, key_fstype, fstype_tg);
     file_write_str(f, key_serverdir, config.serverdir);
   }
 
@@ -1301,13 +1253,6 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
   }
-
-#if 0
-  file_write_inet(f, key_ftpproxy, &config.net.proxy);
-  if(config.net.proxyport) {
-    file_write_num(f, key_ftpproxyport, config.net.proxyport);
-  }
-#endif
 
   if(
     config.net.proxyport &&
@@ -1445,7 +1390,7 @@ void file_write_modparms(FILE *f)
   slist_t *initrd0 = NULL, *initrd;
   slist_t *modules0 = NULL;
 
-  ft0 = file_read_file("/proc/modules");
+  ft0 = file_read_file("/proc/modules", kf_none);
 
   /* build list of modules & initrd modules, reverse /proc/modules order! */
   for(ft = ft0; ft; ft = ft->next) {
@@ -1515,7 +1460,7 @@ void file_write_modparms(FILE *f)
 }
 
 
-file_t *file_read_cmdline()
+file_t *file_read_cmdline(file_key_flag_t flags)
 {
   FILE *f;
   char cmdline[1024];
@@ -1524,11 +1469,11 @@ file_t *file_read_cmdline()
   if(!fgets(cmdline, sizeof cmdline, f)) *cmdline = 0;
   fclose(f);
 
-  return file_parse_buffer(cmdline);
+  return file_parse_buffer(cmdline, flags);
 }
 
 
-file_t *file_parse_buffer(char *buf)
+file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
 {
   file_t *ft0 = NULL, **ft = &ft0;
   char *current, *s, *s1, *t;
@@ -1557,7 +1502,7 @@ file_t *file_parse_buffer(char *buf)
       if(i && t[i - 1] == ':') t[i - 1] = 0;
 
       (*ft)->key_str = strdup(t);
-      (*ft)->key = file_str2key(t);	/* destroys t!!! */
+      (*ft)->key = file_str2key(t, flags);	/* destroys t!!! */
       (*ft)->value = strdup(s1 ?: "");
 
       parse_value(*ft);
@@ -1577,7 +1522,7 @@ file_t *file_get_cmdline(file_key_t key)
 {
   static file_t *cmdline = NULL, *ft;
 
-  if(!cmdline) cmdline = file_read_cmdline();
+  if(!cmdline) cmdline = file_read_cmdline(kf_cmd + kf_cmd_early);
 
   for(ft = cmdline; ft; ft = ft->next) {
     if(ft->key == key) break;

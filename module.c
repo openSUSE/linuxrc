@@ -599,7 +599,7 @@ int mod_is_loaded(char *module)
 {
   file_t *f0, *f;
 
-  f0 = file_read_file("/proc/modules");
+  f0 = file_read_file("/proc/modules", kf_none);
 
   for(f = f0; f; f = f->next) {
     if(!strcmp(f->key_str, module)) break;
@@ -849,7 +849,7 @@ int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t alig
     free(mods);
   }
 
-  f0 = file_read_file("/proc/modules");
+  f0 = file_read_file("/proc/modules", kf_none);
 
   for(max_mods = 2, f = f0; f && f->next; f = f->next) max_mods++;
 
@@ -945,7 +945,7 @@ int mod_pcmcia_ok()
   int i, ok = 0;
 
   if(util_check_exist(CARDMGR_PIDFILE)) {
-    f = file_read_file(CARDMGR_PIDFILE);
+    f = file_read_file(CARDMGR_PIDFILE, kf_none);
 
     if(f && (i = atoi(f->key_str))) {
       if(!strcmp(util_process_name(i), "cardmgr")) ok = 1;

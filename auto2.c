@@ -1010,7 +1010,7 @@ void auto2_chk_frame_buffer()
   file_t *f0, *f;
   int fb_mode = -1;
 
-  f0 = file_read_cmdline();
+  f0 = file_read_cmdline(kf_cmd);
   for(f = f0; f; f = f->next) {
     if(strcmp(f->key_str, "vga")) {
       if(strcmp(f->value, "normal")) {

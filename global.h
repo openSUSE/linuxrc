@@ -212,14 +212,12 @@ typedef struct {
   unsigned pivotroot:1;		/* use pivotroot system call */
   unsigned testpivotroot:1;	/* test pivotroot */
   unsigned addswap:1;		/* offer to add swap if yast needs it */
-  unsigned fullnetsetup:1;	/* offer all network protocols */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
   unsigned netstop:1;		/* shut down network iface at end */
   unsigned noshell:1;		/* don't start any shells */
   volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
   unsigned had_segv:1;		/* last linuxrc run ended with segv */
-  unsigned run_memcheck:1;	/* run memcheck thread */
   unsigned hwdetect:1;		/* do automatic hardware detection */
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
@@ -227,7 +225,6 @@ typedef struct {
   unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
   unsigned idescsi;		/* use ide-scsi module */
-  pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -244,8 +241,6 @@ typedef struct {
     char *file;			/* 'info' file name */
     char *loaded;		/* actual 'info' file that was loaded */
     unsigned add_cmdline:1;	/* parse cmdline, too */
-    unsigned mod_autoload:1;	/* used internally */
-    unsigned start_pcmcia:1;	/* dto  */
   } info;
   char *autoyast;		/* yast autoinstall parameter */
   char *linuxrc;		/* 'linuxrc' parameter */
