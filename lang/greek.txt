@@ -201,5 +201,6 @@ static text_t txt_greek_atm [] =
                       "commit the installation. "
                       "Please remove all installation media (CD-ROM, floppy).\n"
                       "Do not remove the floppy disk if the Linux Loader (LILO) "
-                      "has been installed on it."                             }
+                      "has been installed on it."                             },
+{ TXT_REISERFS,       "Reiserfs file system found."                           }
 };

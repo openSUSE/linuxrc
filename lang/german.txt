@@ -211,5 +211,6 @@ static text_t txt_german_atm [] =
                       "der Installation muﬂ neu gebootet werden. Entfernen Sie dazu "
                       "bitte alle Installationsmedien (CD-ROM, Floppy).\n"
                       "Entfernen Sie die Floppy nicht, wenn der Linux Loader (LILO) "
-                      "darauf installiert wurde."                             }
+                      "darauf installiert wurde."                             },
+{ TXT_REISERFS,       "Reiserfs Dateisystem gefunden."                        }
 };

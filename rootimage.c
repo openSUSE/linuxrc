@@ -133,6 +133,67 @@ static int  root_check_root      (char *root_string_tv);
 static void root_update_status   (int  blocks_iv);
 static void root_load_compressed (void);
 
+static int root_is_reiserfs(char *dev);
+static int root_reiserfs_loaded(void);
+
+#define REISERFS_SUPER_MAGIC_STRING "ReIsErFs"
+#define REISER2FS_SUPER_MAGIC_STRING "ReIsEr2Fs"
+
+int root_is_reiserfs(char *dev)
+{
+  int fd;
+  char magic0[11], magic1[11];
+
+  fd = open(dev, O_RDONLY);
+
+  if(fd < 0) return 0;
+
+  if(
+    lseek(fd, 0x2034, SEEK_SET) != 0x2034 ||
+    read(fd, magic0, sizeof magic0) != sizeof magic0
+  ) *magic0 = 0;
+
+  if(
+    lseek(fd, 0x10034, SEEK_SET) != 0x10034 ||
+    read(fd, magic0, sizeof magic1) != sizeof magic1
+  ) *magic1 = 0;
+
+  magic0[sizeof magic0 -1] = magic1[sizeof magic1 -1] = 0;
+
+  close(fd);
+
+  if(
+    !strcmp(magic0, REISERFS_SUPER_MAGIC_STRING) ||
+    !strcmp(magic0, REISER2FS_SUPER_MAGIC_STRING) ||
+    !strcmp(magic1, REISERFS_SUPER_MAGIC_STRING) ||
+    !strcmp(magic1, REISER2FS_SUPER_MAGIC_STRING)
+  ) {
+    return 1;
+  }
+
+  return 0;
+}
+
+int root_reiserfs_loaded()
+{
+  FILE *f;
+  char s[100];
+  int ok = 0;
+
+  if((f = fopen("/proc/filesystems", "r"))) {
+    while(fgets(s, sizeof s, f)) {
+      if(strstr(s, "reiserfs")) {
+        ok = 1;
+        break;
+      }
+    }
+    fclose(f);
+  }
+
+  return ok;
+}
+
+
 
 int root_load_rootimage (char *infile_tv)
     {
@@ -337,12 +398,35 @@ int root_boot_system (void)
         rc_ii = dia_input (txt_get (TXT_ENTER_ROOT_FS), root_ti, sizeof root_ti - 1, 25);
         if (rc_ii)
             return (rc_ii);
+
+        if(
+          root_is_reiserfs(root_ti) &&
+          !root_reiserfs_loaded()
+        ) {
+          if(!util_check_exist("modules/resierfs.o")) {
+            char s[200];
+
+            sprintf(s, "%s\n\n%s", txt_get(TXT_REISERFS), txt_get(TXT_ENTER_MODDISK));
+
+            rc_ii = dia_okcancel(s, YES) == YES ? 1 : 0;
+
+            if(rc_ii) {
+              mod_force_moddisk_im = TRUE;
+              mod_free_modules();
+              mod_get_ram_modules(MOD_TYPE_OTHER);
+            }
+
+            ask_for_moddisk = FALSE;
+          }
+
+          mod_load_module("reiserfs", NULL);
+        }
+
         rc_ii = root_check_root (root_ti);
         if (rc_ii)
             dia_message (txt_get (TXT_INVALID_ROOT_FS), MSGTYPE_ERROR);
         }
     while (rc_ii);
-
     root_set_root (root_ti);
     return (0);
     }

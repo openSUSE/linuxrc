@@ -177,6 +177,7 @@ void disp_end (void)
     printf ("[2J");
     disp_gotoxy (1, 1);
     disp_graph_off ();
+    printf ("\033c");
     fflush (stdout);
 
     for (i_ii = 0; i_ii < max_y_ig; i_ii++)

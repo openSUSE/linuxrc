@@ -74,6 +74,7 @@
 #define ACT_LOAD_NET		(1 << 2)
 #define ACT_LOAD_DISK		(1 << 3)
 #define ACT_YAST2_AUTO_INSTALL	(1 << 4)
+#define ACT_RESCUE		(1 << 5)
 
 enum langid_t
     {
@@ -244,3 +245,4 @@ extern char            livesrc_tg[16];
 extern char            driver_update_dir[16];
 extern int             cdrom_drives;
 extern int             ask_for_moddisk;
+extern int             splash_active;

@@ -160,7 +160,8 @@ enum textid_t
     TXT_EJECT_CD,
     TXT_BOOTP_TIMEOUT,
     TXT_ENTER_BOOTP_TIMEOUT,
-    TXT_DO_REBOOT
+    TXT_DO_REBOOT,
+    TXT_REISERFS
     };
 
 extern char *txt_get  (enum textid_t text_id);

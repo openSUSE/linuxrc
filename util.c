@@ -61,7 +61,6 @@ static void put_short(int fd, unsigned short data);
 static void put_int(int fd, unsigned data);
 static unsigned mkdosfs(int fd, unsigned size);
 static void do_cp(char *src_dir, char *dst_dir, char *name);
-static void util_disable_splash(void);
 
 void util_redirect_kmsg (void)
     {
@@ -314,8 +313,6 @@ void util_print_banner (void)
 
     if(auto2_ig) return;
 
-    util_disable_splash();
-
     memset (&win_ri, 0, sizeof (window_t));
     win_ri.x_left = 1;
     win_ri.y_left = 1;
@@ -479,7 +476,7 @@ int util_check_break (void)
     }
 
 
-int util_try_mount (char *device_pcv,             char *dir_pcv,
+int util_try_mount (const char *device_pcv,             char *dir_pcv,
                     unsigned long flags_lv, const void *data_prv)
     {
     static  char *fs_types_ats [] = { "minix",   "ext2",  "reiserfs", "vfat",
@@ -792,7 +789,9 @@ int util_chk_driver_update(char *dir)
             sprintf(imod, "%s/%s", mods_src, de->d_name);
             strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
             mod_unload_module(rmod);
-            mod_load_module(imod, NULL);
+            if(!mod_load_module(imod, NULL)) {
+              mpar_save_modparams(imod, NULL);
+            }
           }
         }
       }
@@ -847,7 +846,13 @@ void util_status_info()
   );
   lxrc = getenv("linuxrc");
   sprintf(l[lc++], "linuxrc = \"%s\"", lxrc ? lxrc : "");
-  sprintf(l[lc++], "yast = %d, auto = %d, action = 0x%x", yast_version_ig, auto2_ig ? 2 : auto_ig ? 1 : 0, action_ig);
+  sprintf(l[lc++],
+    "yast = %d, auto = %d, action = 0x%x, splash = %s",
+    yast_version_ig,
+    auto2_ig ? 2 : auto_ig ? 1 : 0,
+    action_ig,
+    splash_active ? "on" : "off"
+  );
   sprintf(l[lc++], "floppy = \"%s\", cdrom = \"%s\", suse_cd = %d", floppy_tg, cdrom_tg, found_suse_cd_ig);
   sprintf(l[lc++], "driver_update_dir = \"%s\"", driver_update_dir);
 
@@ -984,32 +989,25 @@ int util_cat_main(int argc, char **argv)
   return 0;
 }
 
-/* disable kernel graphics screen */
-void util_disable_splash()
+void util_get_splash_status()
 {
   FILE *f;
-  int fd;
-  struct winsize winsize;
+  char s[80];
 
+  splash_active = FALSE;
+
+#if 0
   if((f = fopen("/proc/splash", "w"))) {
-    fprintf(f, "0\n");
+    fprintf(f, "0x0f01\n");
     fclose(f);
-
-    fd = open(console_tg, O_RDWR);
-    if(fd >= 0) {
-      if(!ioctl(fd, TIOCGWINSZ, &winsize)) {
-        if(winsize.ws_col && winsize.ws_row) {
-          if(winsize.ws_col != max_x_ig || winsize.ws_row != max_y_ig) {
-            disp_end();
-            max_x_ig = winsize.ws_col;
-            max_y_ig = winsize.ws_row;
-            disp_init();
-            disp_set_display(color_ig ? 1 : 2);
-          }
-        }
-      }
-    }
   }
+#endif
 
+  if((f = fopen("/proc/splash", "r"))) {
+    if(fgets(s, sizeof s, f)) {
+      if(strstr(s, ": on")) splash_active = TRUE;
+    }
+    fclose(f);
+  }
 }
 

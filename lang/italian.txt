@@ -207,5 +207,6 @@ static text_t txt_italian_atm [] =
                       "eseguire l'installazione. Togliete tutti i mezzi "
                       "d'installazione (CD-ROM, dischetto).\nSe il Linux "
                       "Loader (LILO) è stato installato sul dischetto, non "
-                      "toglietelo."                                           }
+                      "toglietelo."                                           },
+{ TXT_REISERFS,       "Reiserfs file system found."                           }
 };

@@ -189,5 +189,6 @@ static text_t txt_czech_atm [] =
 { TXT_DO_REBOOT,      "Základní systém byl úspì¹nì nainstalován. "
                       "Nyní bude spu¹tìn, aby se instalace projevila. "
                       "Prosím odstraòte instalaèní média (CD-ROM, disketu).\n"
-                      "(Nevyjímejte ov¹em disketu, pokud na ní je LILO.)"     }
+                      "(Nevyjímejte ov¹em disketu, pokud na ní je LILO.)"     },
+{ TXT_REISERFS,       "Reiserfs file system found."                           }
 };

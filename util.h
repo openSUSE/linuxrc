@@ -32,7 +32,7 @@ extern void util_umount_loop       (char *mountpoint_tv);
 extern void util_truncate_dir      (char *dir_tr);
 extern int  util_check_exist       (char *filename_tv);
 extern int  util_check_break       (void);
-extern int  util_try_mount         (char *device_pcv,      char *dir_pcv,
+extern int  util_try_mount         (const char *device_pcv,      char *dir_pcv,
                                     unsigned long flags_lv, const void *data_prv);
 extern void util_print_ftp_error   (int error_iv);
 extern void util_free_ramdisk      (char *ramdisk_dev_tv);
@@ -49,3 +49,4 @@ extern void util_status_info       (void);
 extern int  util_mount_main        (int argc, char **argv);
 extern int  util_umount_main       (int argc, char **argv);
 extern int  util_cat_main          (int argc, char **argv);
+extern void util_get_splash_status (void);

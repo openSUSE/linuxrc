@@ -194,5 +194,6 @@ static text_t txt_spanish_atm [] =
                       "para llevar a cabo la instalación. Por favor, quite "
                       "todos los medios de instalación (CD-ROM, floppy).\n"
                       "No quite el floppy en caso que LILO (el cargador de "
-                      "Linux) se encuentre en el mismo."                      }
+                      "Linux) se encuentre en el mismo."                      },
+{ TXT_REISERFS,       "Reiserfs file system found."                           }
 };

@@ -214,5 +214,6 @@ static text_t txt_french_atm [] =
                       "soit exécuté. Éjectez tous les supports "
                       "d'installation (CD-ROM, disquette.\nNe retirez pas "
                       "la disquette si le Linux Loader (LILO) a été "
-                      "installé sur celle-ci."                                }
+                      "installé sur celle-ci."                                },
+{ TXT_REISERFS,       "Reiserfs file system found."                           }
 };

@@ -194,5 +194,6 @@ static text_t txt_romanian_atm [] =
                       "suportul media de pe care s-a facut instalarea "
                       "(CD-ROM, Floppy).\n Nu scoateti discheta din computer "
                       "in cazul in care ati optat pentru bootare de "
-                      "pe discheta cu ajutorul sistemului LILO (LInux LOader)."}
+                      "pe discheta cu ajutorul sistemului LILO (LInux LOader)."},
+{ TXT_REISERFS,       "Reiserfs file system found."                           }
 };

@@ -1,3 +1,9 @@
+5/5/2001:	v1.1.19.008
+	- keep boot splash
+	- can now automatically start rescue system
+	- ask for module disk/load reiserfs module if necessary
+	- add modules loaded via 'driver update' to INITRD_MODULES
+
 3/5/2001:	v1.1.19.007
 	- mmj: autoinstall via hard disk
 

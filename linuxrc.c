@@ -424,6 +424,9 @@ static void lxrc_init (void)
            if (strstr (s, ",color,"))
                color_ig = TRUE;
 
+           if (strstr (s, ",rescue,"))
+               action_ig |= ACT_RESCUE;
+
            free (s);
            }
         }
@@ -449,9 +452,12 @@ static void lxrc_init (void)
     freopen (console_tg, "r", stdin);
     freopen (console_tg, "a", stdout);
 
+    util_get_splash_status();
+
     kbd_init ();
     util_redirect_kmsg ();
     disp_init ();
+    if(splash_active) color_ig = TRUE;
     if(color_ig) disp_set_display(color_ig);
 
     auto2_chk_expert ();
