@@ -1,3 +1,16 @@
+21/4/2004:	v1.6.21
+	- add root=halt feature to yast.inf (tell linuxrc to halt the machine)
+	- always report keyboard to yast (#38922, #39235)
+	- rewrote serial console handling (#23322)
+	- reopen & init console when we return from yast (#39316)
+	- query & set terminal size
+
+20/4/2004:	v1.6.20
+	- linuxrc should not have a controlling terminal (#37177)
+
+7/4/2004:	v1.6.19
+	- use HWAddr (not NetHWAddr) in install.inf
+
 7/4/2004:	v1.6.18
 	- slp fix
 
