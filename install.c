@@ -84,7 +84,6 @@ static void get_file(char *src, char *dst);
 static void eval_find_config(void);
 static int eval_configure(void);
 static void live_show_state(void);
-static void save_1st_content_file(char *dir, char *loc);
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
@@ -720,7 +719,7 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
-      save_1st_content_file(config.mountpoint.instdata, get_instmode_name(config.instmode));
+      if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
       util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
       util_do_driver_updates();
 
@@ -827,6 +826,8 @@ int inst_start_install()
   get_file("/media.1/info.txt", "/info.txt");
   get_file("/part.info", "/part.info");
   get_file("/control.xml", "/control.xml");
+  /* only if we need it for ftp/http installs, too */
+  /* if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE); */
 
   /* look for driver update image; load and apply it */
   i = 1;
@@ -855,9 +856,6 @@ int inst_start_install()
       if(!i) util_do_driver_updates();
     }
   }
-
-  /* write update.pre script for compatibility, if necessary */
-  util_write_update_pre();
 
   free(buf);
 
@@ -1091,7 +1089,7 @@ int inst_execute_yast()
   util_free_mem();
   if(config.addswap) {
     i = ask_for_swap(
-      (config.memory.min_yast_text - config.memory.min_free) << 10,
+      config.memory.min_yast_text - config.memory.min_free,
       txt_get(TXT_LOW_MEMORY2)
     );
   }
@@ -1144,12 +1142,15 @@ int inst_execute_yast()
 
   if(config.splash && config.textmode) system("echo 0 >/proc/splash");
 
+  fprintf(stderr, "starting %s\n", config.setupcmd);
+
+  kbd_end();
+  util_notty();
+
   if(config.test) {
     rc = system("/bin/bash 2>&1");
   }
   else {
-//    sprintf(cmd, "%s%s", config.instsys, config.setupcmd);
-    fprintf(stderr, "starting %s\n", config.setupcmd);
     rc = system(config.setupcmd);
   }
 
@@ -1161,6 +1162,12 @@ int inst_execute_yast()
       rc = WEXITSTATUS(rc);
     }
   }
+
+  freopen(config.console, "r", stdin);
+  freopen(config.console, "a", stdout);
+  freopen(config.stderr_name, "a", stderr);
+  kbd_init(0);
+  util_notty();
 
   if(config.splash && config.textmode) system("echo 1 >/proc/splash");
 
@@ -1260,7 +1267,10 @@ int inst_commit_install()
 {
   int err = 0;
 
-  if(reboot_ig) {
+  if(reboot_ig == 2) {
+    reboot(RB_POWER_OFF);
+  }
+  else if(reboot_ig) {
 
     if(config.rebootmsg) {
       disp_clear_screen();
@@ -1489,7 +1499,7 @@ int inst_do_tftp()
 int inst_update_cd()
 {
   int  i;
-  char *dev;
+  char *dev, *buf = NULL, *argv[3];
   unsigned old_count;
   slist_t **names;
   window_t win;
@@ -1515,6 +1525,14 @@ int inst_update_cd()
 
   dia_info(&win, "Reading Driver Update...");
 
+  strprintf(&buf, "%s/%s", config.mountpoint.update, SP_FILE);
+
+  if(util_check_exist(buf) == 'r' && !util_check_exist("/" SP_FILE)) {
+    argv[1] = buf;
+    argv[2] = "/";
+    util_cp_main(3, argv);
+  }
+
   util_chk_driver_update(config.mountpoint.update, dev);
 
   util_umount(config.mountpoint.update);
@@ -1534,6 +1552,8 @@ int inst_update_cd()
       dia_message("Driver Update ok", MSGTYPE_INFO);
     }
   }
+
+  free(buf);
 
   return 0;
 }
@@ -2028,26 +2048,6 @@ void live_show_state()
   }
 
   getchar();
-}
-
-
-/*
- * get content file from first medium we see
- */
-void save_1st_content_file(char *dir, char *loc)
-{
-  char *buf = NULL, *argv[3];
-
-  if(dir && loc && !util_check_exist("/tmp/content")) {
-    strprintf(&buf, "%s/content", dir);
-    if(util_check_exist(buf) == 'r') {
-      fprintf(stderr, "1st content file: %s:%s\n", loc, dir);
-      argv[1] = buf;
-      argv[2] = "/tmp";
-      util_cp_main(3, argv);
-    }
-    free(buf);
-  }
 }
 
 
