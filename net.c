@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
+#include <sys/reboot.h>
 #include <sys/socket.h>
 #include <sys/mount.h>
 #include <netdb.h>
@@ -735,7 +736,7 @@ int net_bootp (void)
     char     *data_pci;
     char      tmp_ti [30];
     int       i_ii;
-
+    int	      netconf_error;
 
     if (auto_ig && ipaddr_rg.s_addr)
         return (0);
@@ -745,6 +746,7 @@ int net_bootp (void)
     netmask_rg.s_addr = 0;
     network_rg.s_addr = 0;
     broadcast_rg.s_addr = 0xffffffff;
+    netconf_error	= 0;
 
     if (net_activate ())
         {
@@ -766,12 +768,33 @@ int net_bootp (void)
                           bootp_timeout_ig, 0, NULL, 0, 1, BP_PUT_ENV, 1);
     win_close (&win_ri);
 
-    if (rc_ii || !getenv ("BOOTP_IPADDR"))
-        {
-	if (!auto2_ig)
-	    (void) dia_message (txt_get (TXT_ERROR_BOOTP), MSGTYPE_ERROR);
-        return (-1);
+    if ( rc_ii || !getenv ("BOOTP_IPADDR") ) {
+        if ( bootmode_ig == BOOTMODE_CDWITHNET ) {
+	    dia_input ("HOSTNAME", machine_name_tg, 32, 16);
+	    if( net_get_address (txt_get (TXT_INPUT_IPADDR), &ipaddr_rg) ) {
+	        netconf_error++;
+            }
+	    if( net_get_address (txt_get (TXT_INPUT_NETMASK), &netmask_rg) ) {
+	        netconf_error++;
+	    }
+            broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+            network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+	    if( net_get_address (txt_get (TXT_INPUT_GATEWAY), &gateway_rg) ) {
+   	        netconf_error++;
+            }
+	    if( netconf_error ) {
+	        dia_message( "Configuration not valid: press any key to reboot, ... ", 
+                             MSGTYPE_ERROR);
+	        reboot (RB_AUTOBOOT);
+            }
+	    net_stop ();
+	    return(0);
+        } else {
+            if (!auto2_ig) 
+                (void) dia_message (txt_get (TXT_ERROR_BOOTP), MSGTYPE_ERROR);
+            return (-1);
         }
+    }
 
     data_pci = getenv ("BOOTP_IPADDR");
     if (data_pci)
@@ -814,6 +837,7 @@ int net_bootp (void)
         strncpy (domain_name_tg, data_pci, sizeof (domain_name_tg) - 1);
 
     data_pci = getenv ("BOOTP_BOOTFILE");
+
     if (data_pci && strlen (data_pci))
         {
         fprintf (stderr, "\"%s\"\n", data_pci);
@@ -841,10 +865,15 @@ int net_bootp (void)
             }
         }
 
-
     data_pci = getenv ("BOOTP_SERVER");
     if (data_pci && !nfs_server_rg.s_addr)
         inet_aton (data_pci, &nfs_server_rg);
+
+#ifdef CDWITHNET_DEBUG
+    if( bootmode_ig == BOOTMODE_CDWITHNET ) {
+       dia_message(machine_name_tg, MSGTYPE_ERROR);
+    }
+#endif
 
     net_stop ();
     return (0);

@@ -65,7 +65,7 @@ entries:
 
   Keytable: de-kat1-nd
 
-  Bootmode: CD|Net|Harddisk
+  Bootmode: CD|Net|Harddisk|CDwithNET
 
   IP: 10.10.0.50
 

@@ -7,9 +7,11 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.5 $
-  $Date: 2001/07/09 09:29:40 $
+  $Revision: 1.6 $
+  $Date: 2001/08/13 14:23:55 $
 */
+
+#include "global.h"
 
 /* Standard headers */
 #include <stdio.h>
@@ -76,6 +78,8 @@ int performBootp(char *device,
   struct msghdr mh;
   char cbuf[CMSG_SPACE(sizeof(struct in_pktinfo))];
   struct iovec iov;
+
+  bootp_debug = bootmode_ig == BOOTMODE_CDWITHNET;
 
   returniffail=bp_rif ;
   printflag=bp_pr ;
@@ -417,7 +421,7 @@ void ParsePacket(struct bootp * bootp_recv,
     tag = cookie[i] ;
 
     if (bootp_verbose)
-      logMessage("cookie position %d is %d", i, tag) ;
+      logMessage("cookie position: %d - tag: %d", i, tag) ;
 
 /* If we arn't at the end of the cookie and we will need it extract len */
     if ((i < cookielength - 1) && (tag != TAG_PAD) && (tag != TAG_END))

@@ -43,6 +43,7 @@ static const char  *file_txt_bootfloppy_tm     = "Floppy";
 static const char  *file_txt_bootcd_tm         = "CD";
 static const char  *file_txt_bootnet_tm        = "Net";
 static const char  *file_txt_bootharddisk_tm   = "Harddisk";
+static const char  *file_txt_bootcdwithnet_tm  = "CDwithNET";
 static const char  *file_txt_bootftp_tm        = "FTP";
 static const char  *file_txt_partition_tm      = "Partition:";
 static const char  *file_txt_fstyp_tm          = "Fstyp:";
@@ -55,6 +56,8 @@ static const char  *file_txt_server_tm         = "Server:";
 static const char  *file_txt_dnsserver_tm      = "Nameserver:";
 static const char  *file_txt_netdevice_tm      = "Netdevice:";
 static const char  *file_txt_machine_name_tm   = "Machinename:";
+static const char  *file_txt_broadcast_tm      = "Broadcast:";
+static const char  *file_txt_network_tm        = "Network:";
 static const char  *file_txt_domain_name_tm    = "Domain:";
 static const char  *file_txt_bootp_wait_tm     = "Bootpwait:";
 static const char  *file_txt_ftp_user_tm       = "FTP-User:";
@@ -181,6 +184,7 @@ void file_write_yast_info (char *file_name)
             strcat (line_ti, file_txt_bootfloppy_tm);
             break;
         case BOOTMODE_CD:
+        case BOOTMODE_CDWITHNET:
             strcat (line_ti, file_txt_bootcd_tm);
             break;
         case BOOTMODE_NET:
@@ -206,11 +210,19 @@ void file_write_yast_info (char *file_name)
         fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir_tg);
         }
 
-    if (bootmode_ig == BOOTMODE_NET || bootmode_ig == BOOTMODE_FTP)
+    if ( bootmode_ig == BOOTMODE_NET || 
+	 bootmode_ig == BOOTMODE_FTP || 
+	 bootmode_ig == BOOTMODE_CDWITHNET )
         {
         fprintf (file_pri, "%s %s\n", file_txt_netdevice_tm, netdevice_tg);
-
         fprintf (file_pri, "%s %s\n", file_txt_ip_tm, inet_ntoa (ipaddr_rg));
+
+	if ( bootmode_ig == BOOTMODE_CDWITHNET ) {
+            broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
+            network_rg.s_addr = ipaddr_rg.s_addr & netmask_rg.s_addr;
+            fprintf (file_pri, "%s %s\n", file_txt_broadcast_tm, inet_ntoa ( broadcast_rg ) );
+            fprintf (file_pri, "%s %s\n", file_txt_network_tm,   inet_ntoa ( network_rg ) );
+  	}
 
         if (plip_host_rg.s_addr)
             fprintf (file_pri, "%s %s\n", file_txt_pliphost_tm,
@@ -225,6 +237,7 @@ void file_write_yast_info (char *file_name)
         if (nameserver_rg.s_addr)
             fprintf (file_pri, "%s %s\n", file_txt_dnsserver_tm,
                                           inet_ntoa (nameserver_rg));
+
         fprintf (file_pri, "%s %s\n", file_txt_server_tm,
                  inet_ntoa (bootmode_ig == BOOTMODE_NET ? nfs_server_rg : ftp_server_rg));
         fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir_tg);
@@ -347,6 +360,7 @@ void file_write_yast_info (char *file_name)
         switch (bootmode_ig)
             {
             case BOOTMODE_CD:
+            case BOOTMODE_CDWITHNET:
                 sprintf (line_ti, "/dev/%s %s iso9660 ro 0 0\n", cdrom_tg, mountpoint_tg);
                 break;
             case BOOTMODE_NET:
@@ -469,7 +483,10 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_bootmode_tm, buffer_ti,
                           strlen (file_txt_bootmode_tm)))
             {
-            if (!strncasecmp (value_ti, file_txt_bootcd_tm,
+            if (!strncasecmp (value_ti, file_txt_bootcdwithnet_tm,
+                              strlen (file_txt_bootcdwithnet_tm)))
+                bootmode_ig = BOOTMODE_CDWITHNET;
+            else if (!strncasecmp (value_ti, file_txt_bootcd_tm,
                               strlen (file_txt_bootcd_tm)))
                 bootmode_ig = BOOTMODE_CD;
             else if (!strncasecmp (value_ti, file_txt_bootharddisk_tm,

@@ -54,6 +54,7 @@
 #define BOOTMODE_NET       2
 #define BOOTMODE_HARDDISK  3
 #define BOOTMODE_FTP       4
+#define BOOTMODE_CDWITHNET 5
 
 #define  LXRC_DEBUG
 

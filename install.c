@@ -95,6 +95,7 @@ int inst_auto_install (void)
     switch (bootmode_ig)
         {
         case BOOTMODE_CD:
+        case BOOTMODE_CDWITHNET:
             rc_ii = inst_mount_cdrom (1);
             break;
         case BOOTMODE_NET:
@@ -423,8 +424,10 @@ static int inst_mount_cdrom (int show_err)
     window_t      win_ri;
     int           mount_success_ii = FALSE;
 
+    if( bootmode_ig == BOOTMODE_CDWITHNET ) {
+        rc_ii = net_config ();
+    }
 
-    bootmode_ig = BOOTMODE_CD;
     dia_info (&win_ri, txt_get (TXT_TRY_CD_MOUNT));
 
     if (cdrom_tg [0])
@@ -610,6 +613,7 @@ int inst_check_instsys (void)
                          inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
                 }
             break;
+        case BOOTMODE_CDWITHNET:
         case BOOTMODE_CD:
         case BOOTMODE_NET:
             ramdisk_ig = FALSE;
