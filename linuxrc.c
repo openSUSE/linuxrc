@@ -385,6 +385,7 @@ static void lxrc_init (void)
       } else {
         deb_msg("Automatic setup not possible.");
         auto2_ig = FALSE;
+        yast_version_ig = 0;
         printf("\033[9;0]");
         disp_cursor_off();
         disp_set_display(1);
