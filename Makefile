@@ -23,7 +23,7 @@ CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
 
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 ifeq ($(CC),diet gcc)
-LDFLAGS	+= -lrpc -lhd_tiny_diet
+LDFLAGS	+= -lrpc -lcompat -lhd_tiny_diet
 else
 LDFLAGS	+= -lhd_tiny
 endif

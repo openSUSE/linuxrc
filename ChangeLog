@@ -1,5 +1,6 @@
 23/5/2002:	v1.4.0
 	- let 'NetDevice' option cooperate with auto install
+	- fixed for dietlibc 0.17
 
 15/5/2002:	v1.3.33
 	- mips changes
