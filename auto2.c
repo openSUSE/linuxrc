@@ -892,10 +892,11 @@ int auto2_find_install_medium()
     util_debugwait("CD?");
 
     need_modules = 0;
-  
+
+    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
-      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       auto2_user_netconfig();
       return TRUE;
@@ -914,7 +915,6 @@ int auto2_find_install_medium()
 
       fprintf(stderr, "Looking for a %s CD again...\n", config.product);
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
         auto2_user_netconfig();
         return TRUE;
@@ -933,9 +933,10 @@ int auto2_find_install_medium()
 
     need_modules = 0;
   
+    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
-      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       auto2_user_netconfig();
       return TRUE;
@@ -954,7 +955,6 @@ int auto2_find_install_medium()
 
       fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
       if(!(i = auto2_harddisk_dev(&hd_devs))) {
-        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
         auto2_user_netconfig();
         return TRUE;
@@ -1185,66 +1185,49 @@ char *auto2_disk_list(int *boot_disk)
 }
 
 
-#if defined(__sparc__) || defined(__PPC__)
-
-/* We can only probe on SPARC for serial console */
-
-extern void hd_scan_kbd(hd_data_t *hd_data);
-char *auto2_serial_console (void)
+char *auto2_serial_console()
 {
-  char console[32];
-  char buf[256];
-  hd_data_t *hd_data2;
+  static char *console = NULL;
+  hd_data_t *hd_data;
   hd_t *hd;
 
-  if(hd_data == NULL)
-    {
-// FIXME: use hd_list( ,hw_keyboard, ) instead!!!
-      hd_data2 = calloc(1, sizeof (hd_data_t));
-      hd_set_probe_feature(hd_data2, pr_kbd);
-#ifdef __PPC__
-      hd_set_probe_feature(hd_data2, pr_serial);
-#endif
-      hd_scan_kbd(hd_data2);
-    }
-  else
-    hd_data2 = hd_data;
+  hd_data = calloc(1, sizeof *hd_data);
 
-  if (hd_data2 == NULL)
-    return NULL;
+  hd = hd_list(hd_data, hw_keyboard, 1, NULL);
 
-  *console = 0;
+  for(; hd; hd = hd->next) {
+    if(
+      hd->base_class.id == bc_keyboard &&
+      hd->sub_class.id == sc_keyboard_console
+    ) {
+      if(hd->unix_dev_name) {
+        strprintf(&console, "%s", short_dev(hd->unix_dev_name));
 
-  for(hd = hd_data2->hd; hd; hd = hd->next)
-    if(hd->base_class.id == bc_keyboard && hd->bus.id == bus_serial &&
-       hd->sub_class.id == sc_keyboard_console &&
-       hd->res->baud.type && hd->res->baud.type == res_baud)
-      {
-	strcpy (console, hd->unix_dev_name);
-	/* Create a string like: ttyS0,38400n8 */
-#if defined(__sparc__)
-	sprintf (buf, "%s,%d%c%d", &console[5],
-		 hd->res->baud.speed,
-		 hd->res->baud.parity,
-		 hd->res->baud.bits);
-#else
-	sprintf (buf, "%s,%d", &console[5], hd->res->baud.speed);
-#endif
-	str_copy(&config.serial, buf);
+        if(
+          hd->res &&
+          hd->res->baud.type == res_baud &&
+          hd->res->baud.speed
+        ) {
+          strprintf(&console, "%s,%u", console, hd->res->baud.speed);
+          if(hd->res->baud.parity && hd->res->baud.bits) {
+            strprintf(&console, "%s%c%u", console, hd->res->baud.parity, hd->res->baud.bits);
+          }
+        }
+      }
+      else {
+        strprintf(&console, "console");
       }
 
-  if (hd_data == NULL)
-    {
-      hd_free_hd_data (hd_data2);
-      free (hd_data2);
+      break;
     }
+  }
 
-  if (*console)
-    return config.serial;
-  else
-    return NULL;
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  return console;
 }
-#endif
+
 
 void auto2_progress(char *pos, char *msg)
 {
@@ -1252,27 +1235,6 @@ void auto2_progress(char *pos, char *msg)
   printf("> %s: %s", pos, msg);
   fflush(stdout);
 }
-
-#if 0
-void auto2_print_x11_opts(FILE *f)
-{
-  str_list_t *sl;
-
-  if(!x11_driver) return;
-
-  for(sl = x11_driver->x11.extensions; sl; sl = sl->next) {
-    if(*sl->str) fprintf(f, "XF86Ext:   Load\t\t\"%s\"\n", sl->str);
-  }
-
-  for(sl = x11_driver->x11.options; sl; sl = sl->next) {
-    if(*sl->str) fprintf(f, "XF86Raw:   Option\t\"%s\"\n", sl->str);
-  }
-
-  for(sl = x11_driver->x11.raw; sl; sl = sl->next) {
-    if(*sl->str) fprintf(f, "XF86Raw:   %s\n", sl->str);
-  }
-}
-#endif
 
 
 #ifdef __i386__

@@ -574,7 +574,6 @@ void lxrc_catch_signal(int signum)
     sleep(10);
   }
 
-  signal(SIGHUP,  lxrc_catch_signal);
   signal(SIGBUS,  lxrc_catch_signal);
 
   if(!config.test) {
@@ -598,7 +597,7 @@ void lxrc_init()
   }
 
   siginterrupt(SIGALRM, 1);
-  siginterrupt(SIGHUP, 1);
+  signal(SIGHUP, SIG_IGN);
   siginterrupt(SIGBUS, 1);
   siginterrupt(SIGINT, 1);
   siginterrupt(SIGTERM, 1);
@@ -652,14 +651,12 @@ void lxrc_init()
   config.addswap = 1;
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */
+  config.escdelay = 25;		/* 25 ms */
 
   config.hwdetect = 1;
 
-#if 0
-  /* disabled, see #38222 */
   config.scsi_rename = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
-#endif
 
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
@@ -750,7 +747,7 @@ void lxrc_init()
     config.linemode = 1;
   }
 
-  kbd_init();
+  kbd_init(1);
   util_redirect_kmsg();
   disp_init();
 
@@ -991,7 +988,11 @@ void lxrc_set_modprobe(char *prog)
    commandline. On SPARC, we use the result from hardwareprobing. */
 void lxrc_check_console()
 {
-#if !defined(__sparc__) && !defined(__PPC__)
+#ifdef USE_LIBHD
+
+  util_set_serial_console(auto2_serial_console());
+
+#else
 
   file_t *ft;
 
@@ -999,12 +1000,6 @@ void lxrc_check_console()
 
   util_set_serial_console(ft->value);
 
-#else
-#ifdef USE_LIBHD
-
-  util_set_serial_console(auto2_serial_console());
-
-#endif
 #endif
 
   if(config.serial) {
