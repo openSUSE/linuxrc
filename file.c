@@ -278,6 +278,7 @@ void file_write_yast_info (char *file_name)
         if(*t) fprintf (file_pri, "%s %s\n", file_txt_xversion_tm, t);
         if(*v) fprintf (file_pri, "%s %s\n", file_txt_xbusid_tm, v);
         if((v = getenv("X11i"))) fprintf (file_pri, "%s %s\n", file_txt_x11i_tm, v);
+        auto2_print_x11_opts(file_pri);
       }
     }
     if(*xkbrules_tg) fprintf (file_pri, "%s %s\n", file_txt_xkbrules_tm, xkbrules_tg);

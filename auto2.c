@@ -40,6 +40,7 @@
 static hd_data_t *hd_data = NULL;
 static char *auto2_loaded_module = NULL;
 static char *auto2_loaded_module_args = NULL;
+static driver_info_t *x11_driver = NULL;
 
 static char *auto2_device_name(hd_t *hd);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
@@ -620,12 +621,22 @@ void auto2_chk_expert()
  */
 void auto2_chk_frame_buffer()
 {
-  char *env = getenv("vga");
-  int i;
+  FILE *f;
+  char buf[256], *s, *t;
+  int i = 0, j;
+  int fb_mode = -1;
 
-  if(!env) return;
+  if((f = fopen("/proc/cmdline", "r"))) {
+    if(fread(buf, 1, sizeof buf, f)) {
+      t = buf;
+      while((s = strsep(&t, " "))) {
+        if(sscanf(s, "vga=%i", &j) == 1) fb_mode = j;
+      }
+    }
+    fclose(f);
+  }
 
-  if(sscanf(env, "%i", &i) == 1) frame_buffer_mode_ig = i;
+  if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
 }
 
 
@@ -822,8 +833,12 @@ char *auto2_xserver(char **version, char **busid)
   static char xf86_ver[2];
   static char id[32];
   char c, *x11i = getenv("x11i");
-  driver_info_t *di, *di0;
+  static driver_info_t *di0 = NULL;
+  driver_info_t *di;
   hd_t *hd;
+
+  di0 = hd_free_driver_info(di0);
+  x11_driver = NULL;
 
   *display = *xf86_ver = *id = c = 0;
   *version = xf86_ver;
@@ -865,12 +880,12 @@ char *auto2_xserver(char **version, char **busid)
         xf86_ver[1] = 0;
         strncpy(display, di->x11.server, sizeof display - 1);
         display[sizeof display - 1] = 0;
+        x11_driver = di;
         break;
       }
     }
   }
 
-  hd_free_driver_info(di0);
 
   if(*display) return display;
 
@@ -975,6 +990,25 @@ void auto2_progress(char *pos, char *msg)
   printf("\r%64s\r", "");
   printf("> %s: %s", pos, msg);
   fflush(stdout);
+}
+
+void auto2_print_x11_opts(FILE *f)
+{
+  str_list_t *sl;
+
+  if(!x11_driver) return;
+
+  for(sl = x11_driver->x11.extensions; sl; sl = sl->next) {
+    fprintf(f, "XF86Ext:   Load\t\t\"%s\"\n", sl->str);
+  }
+
+  for(sl = x11_driver->x11.options; sl; sl = sl->next) {
+    fprintf(f, "XF86Raw:   Option\t\"%s\"\n", sl->str);
+  }
+
+  for(sl = x11_driver->x11.raw; sl; sl = sl->next) {
+    fprintf(f, "XF86Raw:   %s\n", sl->str);
+  }
 }
 
 #endif	/* USE_LIBHD */

@@ -9,3 +9,4 @@ char *auto2_usb_module(void);
 char *auto2_xserver(char **version, char **busid);
 char *auto2_disk_list(int *boot_disk);
 char *auto2_serial_console(void);
+void auto2_print_x11_opts(FILE *);
