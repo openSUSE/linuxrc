@@ -385,13 +385,15 @@ int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
 
+#if 0
   // TODO: +=SMB
   if (bootmode_ig == BOOTMODE_SMB) {
     dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
     return (1);
   }
+#endif
       
-  if(!(valid_net_config_ig || bootmode_ig == BOOTMODE_NET)) return 1;
+  if(!(valid_net_config_ig || bootmode_ig == BOOTMODE_NET || bootmode_ig == BOOTMODE_SMB)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
@@ -436,19 +438,32 @@ int auto2_net_dev(hd_t **hd0)
 
       net_is_configured_im = TRUE;
 
-      fprintf(stderr, "Starting portmap.\n");
-      system("portmap");
+      if(bootmode_ig == BOOTMODE_SMB) {
+        fprintf(stderr, "OK, going to mount //%s/%s ...\n", inet_ntoa(config.smb.server), config.smb.share);
+        
+        if(net_mount_smb()) {
+          deb_msg("SMB mount failed.");
+          return 1;
+        }
 
-      fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(nfs_server_rg), server_dir_tg);
+        deb_msg("SMB mount ok.");
+      }
+      else {
+        fprintf(stderr, "Starting portmap.\n");
+        system("portmap");
 
-      if(net_mount_nfs(inet_ntoa(nfs_server_rg), server_dir_tg)) {
-        deb_msg("NFS mount failed.");
-        return 1;
+        fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(nfs_server_rg), server_dir_tg);
+
+        if(net_mount_nfs(inet_ntoa(nfs_server_rg), server_dir_tg)) {
+          deb_msg("NFS mount failed.");
+          return 1;
+        }
+
+        deb_msg("NFS mount ok.");
+
+        bootmode_ig = BOOTMODE_NET;
       }
 
-      deb_msg("NFS mount ok.");
-
-      bootmode_ig = BOOTMODE_NET;
       if(auto2_loaded_module && strlen(auto2_loaded_module) < sizeof net_tg)
         strcpy(net_tg, auto2_loaded_module);
 
@@ -773,13 +788,15 @@ int auto2_find_install_medium()
     free(auto2_loaded_module_args); auto2_loaded_module_args = NULL;
   }
 
+#if 0
   // TODO: +=SMB
   if (bootmode_ig == BOOTMODE_SMB) {
     dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
     return FALSE;
   }
+#endif
 
-  deb_msg("Well, maybe there is a NFS/FTP server...");
+  deb_msg("Well, maybe there is a NFS/FTP/SMB server...");
 
   if(valid_net_config_ig || bootmode_ig == BOOTMODE_NET) {
     broadcast_rg.s_addr = ipaddr_rg.s_addr | ~netmask_rg.s_addr;
@@ -807,7 +824,7 @@ int auto2_find_install_medium()
       break;
     }
 
-    fprintf(stderr, "Looking for a NFS/FTP server again...\n");
+    fprintf(stderr, "Looking for a NFS/FTP/SMB server again...\n");
     if(!auto2_net_dev(&hd_devs)) {
       if((action_ig & ACT_LOAD_NET)) auto2_activate_devices(bc_network, 0);
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
