@@ -22,6 +22,7 @@
 #include <sys/kd.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#include <sys/klog.h>
 #include <fcntl.h>
 #include <time.h>
 #include <syscall.h>
@@ -66,8 +67,6 @@
 #include "mkdevs.h"
 
 #define LED_TIME     50000
-
-static inline _syscall3 (int,syslog,int,type,char *,b,int,len);
 
 static char  *util_loopdev_tm = "/dev/loop0";
 
@@ -122,7 +121,7 @@ void util_redirect_kmsg (void)
 
 
     if (config.serial)
-        syslog (8, 0, 1);
+        klogctl (8, 0, 1);
     else
         {
         fd_ii = open (config.console, O_RDONLY);
@@ -325,7 +324,7 @@ void util_update_kernellog (void)
 
     bootmsg_pri = fopen (bootmsg_tg, "a");
 
-    size_ii = syslog (3, buffer_ti, sizeof (buffer_ti));
+    size_ii = klogctl (3, buffer_ti, sizeof (buffer_ti));
 
     if (size_ii > 0 && bootmsg_pri)
         fwrite (buffer_ti, 1, size_ii, bootmsg_pri);
@@ -354,7 +353,7 @@ void util_update_kernellog (void)
         ++i_ii;
         }
 
-    (void) syslog (5, 0, 0);
+    klogctl (5, 0, 0);
 
     fclose (outfile_pri);
     fclose (lastfile_pri);

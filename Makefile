@@ -31,7 +31,7 @@ else
 ifeq ($(CC),$(CC_UC))
 LDFLAGS	+= -lhd_tiny_uc
 else
-LDFLAGS	+= -lhd_tiny
+LDFLAGS	+= -lhd_tiny -lresolv
 endif
 endif
 
@@ -118,10 +118,10 @@ tiny:
 	$(MAKE) EXTRA_FLAGS+="-DLXRC_TINY=1"
 
 uc:
-	$(MAKE) CC="$(CC_UC)"
+	$(MAKE) CC="$(CC_UC)" EXTRA_FLAGS+="-DUC"
 
 tinyuc:
-	$(MAKE) CC="$(CC_UC)" EXTRA_FLAGS+="-DLXRC_TINY=1"
+	$(MAKE) CC="$(CC_UC)" EXTRA_FLAGS+="-DUC -DLXRC_TINY=1"
 
 diet:
 	$(MAKE) CC="$(CC_DIET)" EXTRA_FLAGS+="-DDIET"

@@ -79,6 +79,8 @@ static int  net_input_data       (void);
 static void net_show_error       (enum nfs_stat status_rv);
 #endif
 
+#include "static_resolv.h"
+
 int net_ask_password() {
   int rc;
 

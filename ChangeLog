@@ -1,3 +1,6 @@
+16/7/2003:	v1.5.5
+	- use static resolv lib
+
 15/7/2003:	v1.5.4
 	- create /dev tree
 

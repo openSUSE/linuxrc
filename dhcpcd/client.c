@@ -66,6 +66,8 @@
 #define OLD_LINUX_VERSION 1
 #endif
 
+#include "static_resolv.h"
+
 extern	char		*ProgramName,**ProgramEnviron,*Cfilename;
 extern	char		*IfName;
 extern	int		IfName_len;
