@@ -62,6 +62,7 @@ static const char  *file_txt_ftp_user_tm       = "FTP-User:";
 static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
+static const char  *file_txt_manual_tm         = "Manual:";
 #if WITH_PCMCIA
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #endif
@@ -230,6 +231,8 @@ void file_write_yast_info (void)
     else
         fprintf (file_pri, "SMP: 0\n");
 
+    fprintf (file_pri, "%s %d\n", file_txt_manual_tm, auto_ig || auto2_ig ? 0 : 1);
+
 #ifdef USE_LIBHD
     if (mouse_dev_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_dev_tm, mouse_dev_ig);
@@ -248,7 +251,10 @@ void file_write_yast_info (void)
         fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);
 
     fprintf (file_pri, "%s %d\n", file_txt_usb_tm, usb_ig);
-    fprintf (file_pri, "%s %s\n", file_txt_xserver_tm, auto2_xserver());
+    {
+      char *s = auto2_xserver();
+      if(s) printf (file_pri, "%s %s\n", file_txt_xserver_tm, s);
+    }
     {
       char *s = getenv("probe");
       if(s) fprintf (file_pri, "%s %s\n", file_probe_tm, s);
