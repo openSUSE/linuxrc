@@ -426,7 +426,6 @@ int auto2_net_dev(hd_t **hd0)
         }
         fprintf(stderr, "ok.\n");
 
-        net_ask_password();
 
         config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
 
@@ -447,6 +446,8 @@ int auto2_net_dev(hd_t **hd0)
       }
 
       net_is_configured_im = TRUE;
+
+      net_ask_password(); /* in case we have ssh or vnc in auto mode */
 
       switch(config.instmode) {
         case inst_smb:
