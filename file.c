@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 
 #include "global.h"
+#include "file.h"
 #include "text.h"
 #include "util.h"
 #include "module.h"
@@ -112,9 +113,103 @@ static const char  *file_txt_braille_dev_tm    = "Brailledevice:";
 #endif
 static const char  *file_txt_livesrc_tm        = "LiveSRC:";
 
+static file_key_t file_str2key(char *value);
+
 static void file_get_value   (char *input_tv, char *value_tr);
 static void file_trim_buffer (char *buffer_tr);
 static void file_module_load (char *command_tv);
+
+static struct {
+  file_key_t key;
+  char *value;
+} keywords[] = {
+  { key_none,     ""         },
+  { key_swap,     "Swap"     },
+  { key_root,     "Root"     },
+  { key_live,     "Live"     },
+  { key_keytable, "Keytable" },
+  { key_language, "Language" }
+};
+
+
+char *file_key2str(file_key_t key)
+{
+  int i;
+
+  for(i = 0; i < sizeof keywords / sizeof *keywords; i++) {
+    if(keywords[i].key == key) {
+      return keywords[i].value;
+    }
+  }
+
+  return "";
+}
+
+
+file_key_t file_str2key(char *str)
+{
+  int i;
+
+  if(!str || !*str) return key_none;
+
+  for(i = 0; i < sizeof keywords / sizeof *keywords; i++) {
+    if(!strcasecmp(keywords[i].value, str)) {
+      return keywords[i].key;
+    }
+  }
+
+  return key_none;
+}
+
+
+file_t *file_read_file(char *name)
+{
+  FILE *f;
+  char buf1[256], buf2[256];
+  int i, l;
+  file_key_t fk;
+  file_t *ft0 = NULL, **ft = &ft0;
+
+  if(!(f = fopen(name, "r"))) return NULL;
+
+  while((i = fscanf(f, "%255s %255[^\n]", buf1, buf2)) != EOF) {
+    if(i) {
+      l = strlen(buf1);
+      if(l && buf1[l - 1] == ':') buf1[l - 1] = 0;
+      if(i == 2) {
+        l = strlen(buf2);
+        while(l && isspace(buf2[l - 1])) buf2[--l] = 0;
+      }
+      else {
+        *buf2 = 0;
+      }
+      if((fk = file_str2key(buf1)) != key_none) {
+        *ft = calloc(1, sizeof *ft);
+        (*ft)->key = fk;
+        (*ft)->value = strdup(buf2);
+        ft = &(*ft)->next;
+      }
+      printf("+%s+ +%s+\n", buf1, buf2);
+    }
+  }
+
+  fclose(f);
+
+  return ft0;
+}
+
+
+void file_free_file(file_t *file)
+{
+  file_t *next;
+
+  for(; file; file = next) {
+    next = file->next;
+    if(file->value) free(file->value);
+    free(file);
+  }
+}
+
 
 void file_write_yast_info (char *file_name)
     {

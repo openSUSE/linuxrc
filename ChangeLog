@@ -1,3 +1,5 @@
+	- disable modprobe only if we don't have it
+
 13/8/2001:	v1.2.12
 	- mge: added new boot mode 'CDwithNET'
 

@@ -69,6 +69,7 @@ static void  inst_start_shell         (char *tty_tv);
 static int   inst_prepare             (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
+static int   inst_read_yast_file      (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (int what_iv);
@@ -82,6 +83,9 @@ static int   inst_ftp                 (void);
 static int   inst_get_ftpsetup        (void);
 static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
+
+/* 'Live' entry in yast.inf */
+static int yast_live_cd = 0;
 
 int inst_auto_install (void)
     {
@@ -917,22 +921,22 @@ static int inst_execute_yast (void)
     sync ();
     fprintf (stderr, "sync ok\n");
 
-    if (!auto2_ig)
-        disp_restore_screen ();
-    disp_cursor_off ();
-    kbd_reset ();
+    rc_ii = inst_read_yast_file();
+
+//    if(!auto2_ig) disp_restore_screen();
+    disp_cursor_off();
+    kbd_reset();
 
     yast_version_ig = 0;
-    if (rc_ii)
-        {
-        if (auto2_ig)
-            {
-            util_manual_mode();
-            util_disp_init();
-            }
 
-        dia_message (txt_get (TXT_ERROR_INSTALL), MSGTYPE_ERROR);
-        }
+    if(rc_ii || !auto2_ig) {
+      util_manual_mode();
+      util_disp_init();
+    }
+
+    if(rc_ii) {
+      dia_message (txt_get (TXT_ERROR_INSTALL), MSGTYPE_ERROR);
+    }
 
     lxrc_killall (0);
 
@@ -948,13 +952,16 @@ static int inst_execute_yast (void)
     if (ramdisk_ig)
         util_free_ramdisk ("/dev/ram2");
 
-    if (!rc_ii)
-        rc_ii = inst_commit_install ();
+    unlink("/bin");
+    rename("/.bin", "/bin");
 
-    unlink ("/bin");
-    rename ("/.bin", "/bin");
-
-    if(rc_ii) util_manual_mode();
+    if(!rc_ii) {
+      rc_ii = inst_commit_install();
+      if(rc_ii) {
+        util_manual_mode();
+        util_disp_init();
+      }
+    }
 
     return (rc_ii);
     }
@@ -983,117 +990,99 @@ static int inst_check_floppy (void)
     }
 
 
-static int inst_commit_install (void)
-    {
-    FILE     *fd_pri;
-    char      option_ti [30];
-    char      value_ti [30];
-    char      swap_ti [30];
-    char      root_ti [30];
-    int       live_cd_ii = 0;
-    int       rc_ii = 0;
-    window_t  win_ri;
-    char      keymap[30], lang[30];
-    char      command_ti [MAX_FILENAME];
+int inst_read_yast_file()
+{
+  int root = 0;
+  char cmd[MAX_FILENAME];
+  file_t *f0, *f;
 
-    fd_pri = fopen (YAST_INFO_FILE, "r");
-    if (!fd_pri)
-        return (-1);
+  f0 = file_read_file(YAST_INFO_FILE);
 
-    *swap_ti = 0;
-    *root_ti = 0;
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+      case key_swap:
+        swapoff(f->value);
+        break;
 
-    *keymap = 0;
-    *lang = 0;
-
-    while (fscanf (fd_pri, "%s %s", option_ti, value_ti) == 2)
-        {
-        fprintf (stderr, "%s %s\n", option_ti, value_ti);
-
-        if (!strncasecmp (option_ti, "Swap", 4))
-            strcpy (swap_ti, value_ti);
-
-        if (!strncasecmp (option_ti, "Root", 4))
-            strcpy (root_ti, value_ti);
-
-        if (!strncasecmp (option_ti, "Live", 4))
-            live_cd_ii = atoi (value_ti);
-
-        if (!strncasecmp (option_ti, "Keytable", 8))
-            strncpy (keymap, value_ti, sizeof keymap);
-
-        if (!strncasecmp (option_ti, "Language", 8))
-            strncpy (lang, value_ti, sizeof lang);
-        }
-
-    keymap[sizeof keymap - 1] = lang[sizeof lang - 1] = 0;
-
-    fclose (fd_pri);
-
-    if(*lang) {
-      language_ig = set_langidbyname(lang);
-      do_disp_init_ig = TRUE;
-    }
-
-    if(*keymap) {
-      strcpy(keymap_tg, keymap);
-      sprintf(command_ti, "loadkeys %s.map", keymap_tg);
-      system(command_ti);
-      do_disp_init_ig = TRUE;
-    }
-
-    if (*swap_ti)
-        swapoff (swap_ti);
-
-    if (*root_ti)
-        {
-        if (/* (!auto_ig && pcmcia_chip_ig)        || */
-            !strncasecmp (root_ti, "reboot", 6) ||
-            reboot_ig)
-            {
-#if ! ( defined(__PPC__) || defined(__sparc__) )
-            if(!auto_ig || reboot_wait_ig) {
-              disp_clear_screen();
-              util_disp_init();
-              dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
-            }
-#endif
-            reboot (RB_AUTOBOOT);
-            rc_ii = -1;
-            }
+      case key_root:
+        root = 1;
+        if(!strcasecmp(f->value, "reboot"))
+          reboot_ig = TRUE;
         else
-            {
-            root_set_root (root_ti);
-            if (live_cd_ii)
-                {
-                util_disp_init();
-                (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
-                }
-            else
-                {
-                if (auto_ig)
-                    {
-                    util_disp_init();
-                    dia_info (&win_ri, txt_get (TXT_INSTALL_SUCCESS));
-                    sleep (2);
-                    win_close (&win_ri);
-                    }
-                else
-                    if(!auto2_ig)
-                        {
-#if 0 /* ifndef __PPC__ */
-                        util_disp_init();
-                        dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
-#endif
-                        }
-                }
-            }
-        }
-    else
-        rc_ii = -1;
+          root_set_root(f->value);
+        break;
 
-    return (rc_ii);
+      case key_live:		/* really obsolete */
+        yast_live_cd = atoi(f->value);
+        break;
+
+      case key_keytable:
+        strcpy(keymap_tg, f->value);
+        sprintf(cmd, "loadkeys %s.map", keymap_tg);
+        system(cmd);
+        do_disp_init_ig = TRUE;
+        break;
+
+      case key_language:
+        language_ig = set_langidbyname(f->value);
+        do_disp_init_ig = TRUE;
+        break;
+
+      default:
     }
+  }
+
+  file_free_file(f0);
+
+  return root ? 0 : -1;
+}
+
+
+int inst_commit_install()
+{
+  int err = 0;
+  window_t win;
+
+  if(reboot_ig) {
+
+#if !defined(__PPC__) && !defined(__sparc__)
+    if(!auto_ig || reboot_wait_ig) {
+      disp_clear_screen();
+      util_disp_init();
+      dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
+    }
+#endif
+
+    reboot(RB_AUTOBOOT);
+    err = -1;
+  }
+  else {
+    if(yast_live_cd) {
+      util_disp_init();
+      dia_message(txt_get(TXT_INSERT_LIVECD), MSGTYPE_INFO);
+    }
+    else {
+      if(auto_ig) {
+        util_disp_init();
+        dia_info(&win, txt_get(TXT_INSTALL_SUCCESS));
+        sleep(2);
+        win_close(&win);
+      }
+      else {
+
+#if 0 /* ifndef __PPC__ */
+        if(!auto2_ig) {
+          util_disp_init();
+          dia_message(txt_get(TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
+        }
+#endif
+
+      }
+    }
+  }
+
+  return err;
+}
 
 
 static int inst_init_cache (void)
