@@ -178,9 +178,9 @@ static text_t txt_slovak_atm [] =
 { TXT_MORE_MODULES,   "-- Viac modulov --"                                    },
 { TXT_INIT_PARPORT,   "Inicializujem paralelný port..."                       },
 { TXT_ENTER_NFSPORT,  "Zadajte èíslo portu na ktorom be¾í NFS server "        },
-{ TXT_YAST1,          "YaST1 - text based"                                    },
-{ TXT_YAST2,          "YaST2 - grafical"                                      },
-{ TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
-                      "installation."                                         },
+{ TXT_YAST1,          "YaST1 - Textová"                                       },
+{ TXT_YAST2,          "YaST2 - Grafická"                                      },
+{ TXT_CHOOSE_YAST,    "Vyberte si verziu YaST ktorú chcete pou¾i» ne "
+                      "in¹talácie."                                           },
 { TXT_INSERT_CD,      "Uistite sa, ¾e CD èíslo %d je v mechanike!"            }
 };
