@@ -838,6 +838,12 @@ void file_do_info(file_t *f0)
           if(config.insttype == inst_net) {
             name2inet(&config.net.server, url->server);
           }
+          else if(config.insttype == inst_cdrom && url->server) {
+            str_copy(&config.cdromdev, url->server);
+          }
+          else if(config.insttype == inst_hd && url->server) {
+            str_copy(&config.partition, url->server);
+          }
         }
         break;
 
