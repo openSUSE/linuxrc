@@ -117,7 +117,7 @@ static keymap_t set_keymaps_arm [] =
 };
 #endif
 
-#if defined(__ppc__)
+#if defined(__PPC__)
 static keymap_t set_keymaps_arm [] =
 {
 { "mac-de-latin1-nodeadkeys", "mac-de-latin1-nodeadkeys" },

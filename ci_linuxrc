@@ -1,0 +1,39 @@
+#! /bin/sh
+
+# check in linuxrc to /work/src/done/STABLE
+# call from the linuxrc directory
+
+ver=`perl -ne 'print $1 if /^#define\s+LXRC_VERSION\s+\"(.+)\"/' global.h`
+linuxrc=/tmp/linuxrc-$ver
+
+if [ "$ver" = "" ] ; then
+  echo "no version info?"
+  exit 1
+fi
+
+echo "going to check in linuxrc version $ver..."
+
+make clean
+rm -rf $linuxrc
+mkdir $linuxrc
+tar -cf - * | tar -C $linuxrc -xf -
+cd $linuxrc
+find . -depth -name CVS -exec rm -r {} \;
+rm -f ci_linuxrc Makefile.new
+cd /tmp
+
+tar -zcf $linuxrc.tar.gz linuxrc-$ver
+
+if mkdir /work/src/done/STABLE/linuxrc ; then
+  cd /work/src/done/STABLE/linuxrc
+  cp $linuxrc.tar.gz /work/SRC/all/linuxrc/linuxrc.{changes,spec} .
+  perl -pi -e 's/^(Version:\s+)\S+/${1}'$ver'/' /work/src/done/STABLE/linuxrc/linuxrc.spec
+  perl -pi -e 's/^(Source.+?-)\S+?(\.tar\.gz)/${1}'$ver'${2}/' /work/src/done/STABLE/linuxrc/linuxrc.spec
+  . /work/src/bin/.profile
+  vc linuxrc
+  rm /work/src/done/STABLE/linuxrc/*~
+  echo "ok"
+else
+  echo oops
+  exit 1
+fi
