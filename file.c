@@ -644,7 +644,7 @@ void file_write_install_inf(char *dir)
 
   if(serial_ig) file_write_str(f, key_console, console_parms_tg);
 
-  i = bootmode_ig != BOOTMODE_CDWITHNET ?: BOOTMODE_CD;
+  i = bootmode_ig != BOOTMODE_CDWITHNET ? bootmode_ig : BOOTMODE_CD;
   file_write_sym(f, key_bootmode, "Floppy", i);
 
   if(bootmode_ig == BOOTMODE_HARDDISK) {
