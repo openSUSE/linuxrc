@@ -43,9 +43,6 @@ struct {
   { di_set_keymap,  TXT_MENU_KEYMAP,  },
   { di_set_expert,  TXT_MENU_EXPERT,  },
 
-  { di_display_color, TXT_COLOR_DISPLAY, },
-  { di_display_mono,  TXT_MONO_DISPLAY,  },
-
   { di_expert_animate,      TXT_ASK_ANIMATE,     },
   { di_expert_forceroot,    TXT_FORCE_ROOTIMAGE, },
   { di_expert_rootimage,    TXT_NEW_ROOTIMAGE,   },
@@ -60,9 +57,6 @@ struct {
   { di_inst_eject,   TXT_EJECT_CD,         },
   { di_inst_update,  0, "Driver Update CD" },
 
-  { di_yast_1, TXT_YAST1, },
-  { di_yast_2, TXT_YAST2, },
-
   { di_source_cdrom,  TXT_CDROM,    },
   { di_source_nfs,    TXT_NFS,      },
   { di_source_ftp,    TXT_FTP,      },
@@ -70,8 +64,17 @@ struct {
   { di_source_hd,     TXT_HARDDISK, },
   { di_source_floppy, TXT_FLOPPY,   },
 
-  { di_pcmcia_1, 0, "tcic"   },
-  { di_pcmcia_2, 0, "i82365" }
+  { di_info_kernel,     TXT_INFO_KERNEL  },
+  { di_info_drives,     TXT_DRIVES       },
+  { di_info_modules,    TXT_INFO_MODULES },
+  { di_info_pci,        TXT_INFO_PCI     },
+  { di_info_cpu,        TXT_INFO_CPU     },
+  { di_info_mem,        TXT_INFO_MEM     },
+  { di_info_ioports,    TXT_INFO_IOPORTS },
+  { di_info_interrupts, TXT_INFO_IRQS    },
+  { di_info_devices,    TXT_INFO_DEVICES },
+  { di_info_netdev,     TXT_INFO_NETDEV  },
+  { di_info_dma,        TXT_INFO_DMA     }
 };
 
 
@@ -82,7 +85,6 @@ struct {
  */
 
 static int  dia_win_open (window_t *win_prr, char *txt_tv);
-static char *dia_get_text(dia_item_t di);
 
 /*
  *
@@ -1103,8 +1105,7 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
 
   item_list = calloc(item_cnt, sizeof *item_list);
 
-  /* not sure about the '+ 1'... */
-  util_create_items(item_list, item_cnt, width + 1);
+  util_create_items(item_list, item_cnt, width);
 
   default_idx = 1;
   for(i = 0, it = items; *it != di_none; it++) {
@@ -1131,6 +1132,44 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
   util_free_items(item_list, item_cnt);
 
   return di;
+}
+
+
+/*
+ * returns selected item (1 based), or 0 (ESC pressed)
+ */
+int dia_list(char *title, int width, char **items, int default_item, dia_align_t align)
+{
+  int item_cnt, i;
+  char **it;
+  item_t *item_list;
+
+  for(item_cnt = 0, it = items; *it; it++) item_cnt++;
+
+  if(!item_cnt) return 0;
+
+  item_list = calloc(item_cnt, sizeof *item_list);
+
+  util_create_items(item_list, item_cnt, width);
+
+  if(default_item < 1 || default_item > item_cnt) default_item = 1;
+
+  for(i = 0, it = items; *it; it++, i++) {
+    strncpy(item_list[i].text, *it, width);
+    item_list[i].text[width] = 0;
+    if(align == align_center) {
+      util_center_text(item_list[i].text, width);
+    }
+    else {
+      util_fill_string(item_list[i].text, width);
+    }
+  }
+
+  i = dia_menu(title, item_list, item_cnt, default_item);
+
+  util_free_items(item_list, item_cnt);
+
+  return i;
 }
 
 

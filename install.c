@@ -1518,12 +1518,11 @@ int inst_choose_yast_version()
 {
   int yast1, yast2;
   char yast1_file[MAX_FILENAME], yast2_file[MAX_FILENAME];
-
-  static dia_item_t di = di_yast_2;
-  dia_item_t items[] = {
-    di_yast_1,
-    di_yast_2,
-    di_none
+  static int last_item = 0;
+  char *items[] = {
+    txt_get(TXT_YAST1),
+    txt_get(TXT_YAST2),
+    NULL
   };
 
   *yast1_file = *yast2_file = 0;
@@ -1558,18 +1557,8 @@ int inst_choose_yast_version()
     util_disp_init();
   }
 
-  di = dia_menu2(txt_get(TXT_CHOOSE_YAST), 30, NULL, items, di);
-
-  switch(di) {
-    case di_yast_1:
-      yast_version_ig = 1;
-      break;
-    case di_yast_2:
-      yast_version_ig = 2;
-      break;
-    default:
-      yast_version_ig = 0;
-  }
+  yast_version_ig = dia_list(txt_get(TXT_CHOOSE_YAST), 30, items, last_item, align_center);
+  if(yast_version_ig) last_item = 0;
 
   return yast_version_ig ? 0 : -1;
 }

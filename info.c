@@ -28,65 +28,103 @@
 #include "auto2.h"
 
 static char *info_hwfile_tm = "/tmp/hwinfo";
-#ifdef USE_LIBHD
-static char *info_hwfile2_tm = "/tmp/hw.log";
-#endif
-typedef struct {
-               int  text;
-               char *file;
-               } ifile_t;
-static ifile_t info_file_arm [] = { { TXT_INFO_MODULES, "modules"    },
-                                    { TXT_INFO_PCI,     "pci"        },
-                                    { TXT_INFO_CPU,     "cpuinfo"    },
-                                    { TXT_INFO_MEM,     "meminfo"    },
-                                    { TXT_INFO_IOPORTS, "ioports"    },
-                                    { TXT_INFO_IRQS,    "interrupts" },
-                                    { TXT_INFO_DEVICES, "devices"    },
-                                    { TXT_INFO_NETDEV,  "net/dev"    },
-                                    { TXT_INFO_DMA,     "dma"        } };
 
-static void info_hw_header (FILE *outfile_prv, char *text_tv);
-static int  info_show_cb   (int what_iv);
+static void info_hw_header(FILE *outfile_prv, char *text_tv);
+static int info_show_cb(dia_item_t di);
+
+static dia_item_t di_info_menu_last = di_none;
+
+void info_menu()
+{
+  dia_item_t items[] = {
+    di_info_kernel,
+    di_info_drives,
+    di_info_modules,
+    di_info_pci,
+    di_info_cpu,
+    di_info_mem,
+    di_info_ioports,
+    di_info_interrupts,
+    di_info_devices,
+    di_info_netdev,
+    di_info_dma,
+    di_none
+  };
+
+  dia_menu2(txt_get(TXT_MENU_INFO), 26, info_show_cb, items, di_info_menu_last);
+}
 
 
-void info_menu (void)
-    {
-#ifdef USE_LIBHD
-    item_t  items_ari [12];
-    int     full_libhd = auto2_full_libhd ();
-#else
-    item_t  items_ari [11];
-#define     full_libhd  0
-#endif
-    int     i_ii;
-    int     width_ii = 26;
-    int     nr_items_ii = 0;
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int info_show_cb(dia_item_t di)
+{
+  char buf[30] = "/proc/", *s;
+  int i;
 
-    util_create_items (items_ari, 11 + full_libhd, width_ii);
+  di_info_menu_last = di;
 
-#ifdef USE_LIBHD
-    if (full_libhd)
-        strncpy (items_ari [nr_items_ii++].text, "Hardware Info", width_ii);
-#endif
-    strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_INFO_KERNEL), width_ii);
-    strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_DRIVES), width_ii);
-    for (i_ii = 0;
-         i_ii < sizeof (info_file_arm) / sizeof (info_file_arm [0]);
-         i_ii++)
-        strncpy (items_ari [nr_items_ii++].text,
-                 txt_get (info_file_arm [i_ii].text), width_ii);
+  s = NULL;
+  switch(di) {
+    case di_info_kernel:
+      dia_show_file(txt_get(TXT_INFO_KERNEL), kernellog_tg, FALSE);
+      break;
 
-    for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-        {
-        util_center_text (items_ari [i_ii].text, width_ii);
-        items_ari [i_ii].func = info_show_cb;
-        }
+    case di_info_drives:
+      info_show_hardware();
+      break;
 
-    (void) dia_menu (txt_get (TXT_MENU_INFO), items_ari,
-                     nr_items_ii, 1);
+    case di_info_modules:
+      s = "modules";
+      break;
 
-    util_free_items (items_ari, 11 + full_libhd);
-    }
+    case di_info_pci:
+      s = "pci";
+      break;
+
+    case di_info_cpu:
+      s = "cpuinfo";
+      break;
+
+    case di_info_mem:
+      s = "meminfo";
+      break;
+
+    case di_info_ioports:
+      s = "ioports";
+      break;
+
+    case di_info_interrupts:
+      s = "interrupts";
+      break;
+
+    case di_info_devices:
+      s = "devices";
+      break;
+
+    case di_info_netdev:
+      s = "net/dev";
+      break;
+
+    case di_info_dma:
+      s = "dma";
+      break;
+
+    default:
+  }
+
+  if(s) {
+    strcat(buf, s);
+    i = dia_show_file(dia_get_text(di), buf, FALSE);
+    if(i) dia_message(txt_get(TXT_NO_INFO_AVAIL), MSGTYPE_INFO);
+  }
+
+  return 1;
+}
 
 
 void info_init (void)
@@ -394,38 +432,3 @@ static void info_hw_header (FILE *outfile_prv, char *text_tv)
     fprintf (outfile_prv, outline_ti);
     }
 
-
-static int info_show_cb (int what_iv)
-    {
-    char  tmp_ti [30];
-    int   rc_ii;
-
-#ifndef USE_LIBHD
-    what_iv++;
-#else
-    if(!auto2_full_libhd ()) what_iv++;
-#endif
-
-    if (what_iv == 1)
-        {
-#ifdef USE_LIBHD
-        auto2_scan_hardware(info_hwfile2_tm);
-        dia_show_file("Hardware Info", info_hwfile2_tm, TRUE);
-#endif
-        }
-    else if (what_iv == 2)
-        (void) dia_show_file (txt_get (TXT_INFO_KERNEL), kernellog_tg, FALSE);
-    else if (what_iv == 3)
-        info_show_hardware ();
-    else if (what_iv > 3 &&
-             what_iv <= sizeof (info_file_arm) / sizeof (info_file_arm [0]) + 3)
-        {
-        sprintf (tmp_ti, "/proc/%s", info_file_arm [what_iv - 4].file);
-        rc_ii = dia_show_file (txt_get (info_file_arm [what_iv - 4].text),
-                               tmp_ti, FALSE);
-        if (rc_ii)
-            (void) dia_message (txt_get (TXT_NO_INFO_AVAIL), MSGTYPE_INFO);
-        }
-
-    return (what_iv);
-    }

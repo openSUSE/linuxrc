@@ -358,81 +358,62 @@ int set_settings_cb (dia_item_t di)
 
 void set_choose_display()
 {
-  static dia_item_t di = di_none;
-  dia_item_t items[] = {
-    di_display_color,
-    di_display_mono,
-    di_none
+  static int last_item = 0;
+  char *items[] = {
+    txt_get(TXT_COLOR_DISPLAY),
+    txt_get(TXT_MONO_DISPLAY),
+    NULL
   };
 
-  di = dia_menu2(txt_get(TXT_CHOOSE_DISPLAY), 30, NULL, items, di);
+  last_item = dia_list(txt_get(TXT_CHOOSE_DISPLAY), 30, items, last_item, align_center);
 
-  switch(di) {
-    case di_display_color:
-      config.color = 2;
-      break;
-
-    case di_display_mono:
-      config.color = 1;
-      break;
-
-    default:
-      config.color = 3;
-  }
+  config.color = 3 - last_item;
 
   disp_set_display();
 }
 
 
-void set_choose_keytable (int always_show)
-    {
-    item_t  items_ari [NR_KEYMAPS];
-    int     i_ii;
-    int     width_ii = 24;
-    int     keymaps = NR_KEYMAPS;
-    keymap_t *keymap = set_keymaps_arm;
-    int i, cur_lang, def_keymap_idx;
-    char *def_keymap;
+void set_choose_keytable(int always_show)
+{
+  char *items[NR_KEYMAPS + 1];
+  int keymaps = NR_KEYMAPS;
+  keymap_t *keymap = set_keymaps_arm;
+  int i, cur_lang, def_keymap_idx;
+  char *def_keymap;
 
 #ifdef __PPC__
-    if(!strcmp(xkbmodel_tg, "macintosh")) {
-      keymaps = NR_KEYMAPS_MAC;
-      keymap = set_keymaps_arm_mac;
-    }
+  if(!strcmp(xkbmodel_tg, "macintosh")) {
+    keymaps = NR_KEYMAPS_MAC;
+    keymap = set_keymaps_arm_mac;
+  }
 #endif
 
-    /* note that this works only for iaxx, axp and non-mac ppc */
-    cur_lang = set_get_current_language();
-    def_keymap = config.keymap ?: set_languages_arm[cur_lang - 1].keymap;
+  /* note that this works only for iaxx, axp and non-mac ppc */
+  cur_lang = set_get_current_language();
+  def_keymap = config.keymap ?: set_languages_arm[cur_lang - 1].keymap;
 
-    def_keymap_idx = KEYMAP_DEFAULT;
-    for(i = 0; i < keymaps; i++) {
-      if(!strcmp(keymap[i].mapname, def_keymap)) {
-        def_keymap_idx = i;
-        break;
-      }
+  def_keymap_idx = KEYMAP_DEFAULT;
+  for(i = 0; i < keymaps; i++) {
+    if(!strcmp(keymap[i].mapname, def_keymap)) {
+      def_keymap_idx = i;
+      break;
     }
+  }
 
-    if (config.keymap && !always_show)
-        {
-        set_activate_keymap(config.keymap);
-        return;
-        }
+  if(config.keymap && !always_show) {
+    set_activate_keymap(config.keymap);
+    return;
+  }
 
-    if (!config.win && !always_show) return;
+  if(!config.win && !always_show) return;
 
-    util_create_items (items_ari, keymaps, width_ii);
-    for (i_ii = 0; i_ii < keymaps; i_ii++)
-        {
-        strcpy (items_ari [i_ii].text, keymap [i_ii].descr);
-        util_fill_string (items_ari [i_ii].text, width_ii);
-        }
+  for(i = 0; i < keymaps; i++) items[i] = keymap[i].descr;
+  items[i] = NULL;
 
-    i_ii = dia_menu (txt_get (TXT_CHOOSE_KEYMAP), items_ari, keymaps, 1 + def_keymap_idx);
-    util_free_items (items_ari, keymaps);
+  i = dia_list(txt_get(TXT_CHOOSE_KEYMAP), 24, items, def_keymap_idx + 1, align_left);
 
-    if (i_ii) set_activate_keymap(keymap[i_ii - 1].mapname);
-    }
+  if(i) set_activate_keymap(keymap[i - 1].mapname);
+}
 
 
 /*
@@ -488,23 +469,19 @@ void set_activate_keymap(char *keymap)
  */
 void set_choose_language()
 {
-  item_t items[NR_LANGUAGES];
-  int i, current, width = 24;
+  char *items[NR_LANGUAGES + 1];
+  int i;
 
-  current = set_get_current_language();
-
-  util_create_items(items, NR_LANGUAGES, width);
   for(i = 0; i < NR_LANGUAGES; i++) {
-     strcpy(items[i].text, set_languages_arm[i].descr);
-     util_fill_string(items[i].text, width);
+    items[i] = set_languages_arm[i].descr;
   }
+  items[i] = NULL;
 
-  current = dia_menu(txt_get(TXT_CHOOSE_LANGUAGE), items, NR_LANGUAGES, current);
+  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 24, items, set_get_current_language(), align_left);
 
-  if(current > 0) set_activate_language(set_languages_arm[current - 1].id);
-
-  util_free_items(items, NR_LANGUAGES);
+  if(i > 0) set_activate_language(set_languages_arm[i - 1].id);
 }
+
 
 void set_expert()
 {

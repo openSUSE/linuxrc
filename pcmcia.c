@@ -127,32 +127,20 @@ int pcmcia_load_core (void)
 
 int pcmcia_find_chipset()
 {
-  static dia_item_t di = di_none;
-  dia_item_t items[] = {
-    di_pcmcia_1,
-    di_pcmcia_2,
-    di_none
+  char *items[] = {
+    "tcic",
+    "i82365",
+    NULL
   };
+  static int last_item = 0;
   int type;
 
   type = system("probe");
   type >>= 8;
 
   if(type != 1 && type != 2) {
-    di = dia_menu2(txt_get(TXT_NO_PCMCIA), 10, NULL, items, di);
-
-    switch(di) {
-      case di_pcmcia_1:
-        type = 1;
-        break;
-
-      case di_pcmcia_2:
-        type = 2;
-        break;
-
-      default:
-        type = 0;
-    }
+    type = dia_list(txt_get(TXT_NO_PCMCIA), 10, items, last_item, align_center);
+    if(type) last_item = type;
   }
 
   return type;

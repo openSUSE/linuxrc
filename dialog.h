@@ -25,9 +25,6 @@ typedef enum {
   di_set_keymap,
   di_set_expert,
 
-  di_display_color,
-  di_display_mono,
-
   di_expert_animate,
   di_expert_forceroot,
   di_expert_rootimage,
@@ -42,9 +39,6 @@ typedef enum {
   di_inst_eject,
   di_inst_update,
 
-  di_yast_1,
-  di_yast_2,
-
   di_source_cdrom,
   di_source_nfs,
   di_source_ftp,
@@ -52,9 +46,24 @@ typedef enum {
   di_source_hd,
   di_source_floppy,
 
-  di_pcmcia_1,
-  di_pcmcia_2
+  di_info_kernel,
+  di_info_drives,
+  di_info_modules,
+  di_info_pci,
+  di_info_cpu,
+  di_info_mem,
+  di_info_ioports,
+  di_info_interrupts,
+  di_info_devices,
+  di_info_netdev,
+  di_info_dma
+
 } dia_item_t;
+
+typedef enum {
+  align_center,
+  align_left
+} dia_align_t;
 
 extern int  dia_yesno        (char *txt_tv, int default_iv);
 extern int  dia_okcancel     (char *txt_tv, int default_iv);
@@ -71,5 +80,7 @@ extern int  dia_show_lines   (char *head_tv,   char *lines_atv [],
                               int nr_lines_iv, int   width_iv, int eof_iv);
 extern void dia_handle_ctrlc (void);
 
+char *dia_get_text(dia_item_t di);
 dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t *items, dia_item_t default_item);
+int dia_list(char *title, int width, char **items, int default_item, dia_align_t align);
 

@@ -45,6 +45,7 @@
 #include "util.h"
 #include "net.h"
 #include "bootpc.h"
+#include "file.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -608,101 +609,71 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
 
 
 #if NETWORK_CONFIG
-static int net_choose_device (void)
-    {
-    item_t  items_ari [MAX_NETDEVICE];
-    int     nr_items_ii = 0;
-    int     choice_ii;
-    int     width_ii = 32;
-    int     i_ii;
-    FILE   *fd_pri;
-    char    buffer_ti [MAX_X];
-
+int net_choose_device()
+{
+  char *items[MAX_NETDEVICE + 1], *s;
+  int i, item_cnt, choice;
+  char buf[MAX_X];
+  file_t *f0, *f;
+  static int last_item = 0;
+  static struct {
+    char *dev;
+    int name;
+  } net_dev[] = {
+    { "sit",   TXT_NET_TR0   },
+    { "eth",   TXT_NET_ETH0  },
+    { "veth",  TXT_NET_ETH0  },
+    { "plip",  TXT_NET_PLIP  },
+    { "tr",    TXT_NET_TR0   },
+    { "arc",   TXT_NET_ARC0  },
+    { "fddi",  TXT_NET_FDDI  },
+    { "hip",   TXT_NET_HIPPI },
+    { "ctc",   TXT_NET_CTC   },
+    { "escon", TXT_NET_ESCON },
+    { "ci",    TXT_NET_CLAW  },
+    { "iucv",  TXT_NET_CLAW  }
+  };
     
-    if (auto_ig)
-        return (0);
+  if(auto_ig) return 0;
 
-    util_create_items (items_ari, MAX_NETDEVICE, width_ii);
+  f0 = file_read_file("/proc/net/dev");
+  if(!f0) return -1;
 
-    fd_pri = fopen ("/proc/net/dev", "r");
-    if (!fd_pri)
-        return (-1);
-
-    while (fgets (buffer_ti, MAX_X - 1, fd_pri) && nr_items_ii < MAX_NETDEVICE)
-        {
-        buffer_ti [6] = 0;
-        i_ii = 0;
-        while (buffer_ti [i_ii] == ' ')
-            i_ii++;
-
-        if (!strncmp (&buffer_ti [i_ii], "eth", 3) || !strncmp (&buffer_ti [i_ii], "veth", 4))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_ETH0));
-        else if (!strncmp (&buffer_ti [i_ii], "plip", 4))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_PLIP));
-        else if (!strncmp (&buffer_ti [i_ii], "tr", 2))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_TR0));
-        else if (!strncmp (&buffer_ti [i_ii], "arc", 3))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_ARC0));
-        else if (!strncmp (&buffer_ti [i_ii], "fddi", 4))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_FDDI));
-        else if (!strncmp (&buffer_ti [i_ii], "hip", 3))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_HIPPI));
-        else if (!strncmp (&buffer_ti [i_ii], "ctc", 3))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_CTC));
-        else if (!strncmp (&buffer_ti [i_ii], "escon", 3))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_ESCON));
-        else if (!strncmp (&buffer_ti [i_ii], "ci", 3))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_CLAW));
-        else if (!strncmp (&buffer_ti [i_ii], "iucv", 3))
-            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
-                     &buffer_ti [i_ii], txt_get (TXT_NET_CLAW));
-        }
-
-    fclose (fd_pri);
-
-    for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
-        util_fill_string (items_ari [i_ii].text, width_ii);
-
-    if (!nr_items_ii)
-        {
-        dia_message (txt_get (TXT_NO_NETDEVICE), MSGTYPE_ERROR);
-        util_free_items (items_ari, MAX_NETDEVICE);
-        return (-1);
-        }
-
-    if (nr_items_ii > 1)
-        choice_ii = dia_menu (txt_get (TXT_CHOOSE_NET), items_ari, nr_items_ii, 1);
-    else
-        choice_ii = 1;
-
-    if (choice_ii)
-        {
-        i_ii = 0;
-        while (items_ari [choice_ii - 1].text [i_ii] != ' ')
-            i_ii++;
-        items_ari [choice_ii - 1].text [i_ii] = 0;
-        strcpy (netdevice_tg, items_ari [choice_ii - 1].text);
-        if (!strncmp (netdevice_tg, "plip", 4))
-            net_is_plip_im = TRUE;
-        else
-            net_is_plip_im = FALSE;
-        }
-
-    util_free_items (items_ari, MAX_NETDEVICE);
-    if (!choice_ii)
-        return (-1);
-    else
-        return (0);
+  for(item_cnt = 0, f = f0; f && item_cnt < sizeof items / sizeof *items - 1; f = f->next) {
+    for(i = 0; i < sizeof net_dev / sizeof *net_dev; i++) {
+      if(strstr(f->key_str, net_dev[i].dev) == f->key_str) {
+        sprintf(buf, "%-6s : %s", f->key_str, txt_get(net_dev[i].name));
+        items[item_cnt++] = strdup(buf);
+        break;
+      }
     }
+  }
+  items[item_cnt] = NULL;
+
+  file_free_file(f0);
+
+  if(item_cnt == 0) {
+    dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
+    choice = -1;
+  } else if(item_cnt == 1) {
+    choice = 1;
+  }
+  else {
+    choice = dia_list(txt_get(TXT_CHOOSE_NET), 32, items, last_item, align_left);
+    if(choice) last_item = choice;
+  }
+
+  if(choice > 0) {
+    s = strchr(items[choice - 1], ' ');
+    if(s) *s = 0;
+    strcpy(netdevice_tg, items[choice - 1]);
+    net_is_plip_im = strstr(netdevice_tg, "plip") == netdevice_tg ? TRUE : FALSE;
+  }
+
+  for(i = 0; i < item_cnt; i++) free(items[i]);
+
+  return choice > 0 ? 0 : -1;
+}
 #endif
 
 static void net_show_error (enum nfs_stat status_rv)
