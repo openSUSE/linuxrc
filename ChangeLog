@@ -1,3 +1,6 @@
+28/4/2004:	v1.6.22
+	- improved slp support
+
 21/4/2004:	v1.6.21
 	- add root=halt feature to yast.inf (tell linuxrc to halt the machine)
 	- always report keyboard to yast (#38922, #39235)

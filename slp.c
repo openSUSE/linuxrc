@@ -158,7 +158,7 @@ slp_get_install()
   unsigned char sendbuf[8000];
   unsigned char recvbuf[8000];
   unsigned char *bp, *end;
-  int xid, l, s, l2, l3, ec, comma, ulen, i;
+  int xid, l, s, l2, l3, ec, comma, ulen, i, acnt;
   struct sockaddr_in mysa;
   struct sockaddr_in mcsa;
   struct sockaddr_in pesa;
@@ -167,6 +167,7 @@ slp_get_install()
   char *iaddr, *d;
   char **urls = 0;
   char **descs = 0;
+  char **ambg = 0;
   int urlcnt = 0;
   int win_old;
   file_t *f;
@@ -349,7 +350,7 @@ slp_get_install()
 		  if (!d)
 		    d = strdup(urlbuf);
 		  for (i = 0; i < urlcnt; i++)
-		    if (strcmp(d, descs[i]) < 0)
+		    if (strcmp(d, descs[i]) < 0 || (strcmp(d, descs[i]) == 0 && strcmp(urlbuf, urls[i]) < 0))
 		      break;
 		  if (i < urlcnt)
 		    {
@@ -371,19 +372,41 @@ slp_get_install()
       fprintf(stderr, "SLP: no installation source found\n");
       return 1;
     }
-  if ((urlcnt & 15) == 0)
-    descs = realloc(descs, sizeof(char **) * (urlcnt + 16));
-  if (!descs)
+  ambg = malloc((urlcnt + 1) * sizeof(char **));
+  if (!ambg)
     return 1;
-  descs[urlcnt] = 0;
   win_old = config.win;
   if(config.language) set_activate_language(config.language);
   if(!config.win) util_disp_init();
-  i = dia_list("Choose an installation source", 60, NULL, descs, 0, align_center);
-  if(config.win && !win_old) util_disp_done();
   *urlbuf = 0;
-  if (i > 0 && i - 1 < urlcnt)
-    sprintf(urlbuf, "install=%s", urls[i - 1]);
+  for (;;)
+    {
+      for (i = acnt = 0; i < urlcnt; i++)
+	if (acnt == 0 || strcmp(descs[i], ambg[acnt - 1]))
+	  ambg[acnt++] = descs[i];
+      ambg[acnt] = 0;
+
+      i = dia_list("Choose an installation source", 60, NULL, ambg, 0, align_center);
+      if (i <= 0 || i > acnt)
+	break;
+      d = descs[i - 1];
+      for (i = acnt = 0; i < urlcnt; i++)
+        if (!strcmp(descs[i], d))
+	  ambg[acnt++] = urls[i];
+      ambg[acnt] = 0;
+      if (acnt == 0)
+	break;
+      if (acnt > 1)
+        i = dia_list("Choose an installation source", 60, NULL, ambg, 0, align_center);
+      else
+	i = 1;
+      if (i > 0 && i - 1 < acnt)
+	{
+	  sprintf(urlbuf, "install=%s", ambg[i - 1]);
+	  break;
+	}
+    }
+  if(config.win && !win_old) util_disp_done();
   for (i = 0; i < urlcnt; i++)
     {
       free(descs[i]);
@@ -391,6 +414,7 @@ slp_get_install()
     }
   free(descs);
   free(urls);
+  free(ambg);
   if (!*urlbuf)
     return 1;
   f = file_parse_buffer(urlbuf, kf_cfg + kf_cmd);
