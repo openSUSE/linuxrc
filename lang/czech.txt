@@ -16,22 +16,22 @@ static text_t txt_czech_atm [] =
 { TXT_SETTINGS,       "Nastavení"                                             },
 { TXT_MENU_DISPLAY,   "Monitor"                                               },
 { TXT_MENU_KEYMAP,    "Rozlo¾ení klávesnice"                                  },
-{ TXT_LOAD_SCSI,      "Nahrát SCSI modul"                                     },
-{ TXT_LOAD_CDROM,     "Nahrát CD-ROM modul"                                   },
-{ TXT_LOAD_NET,       "Nahrát modul sí»ové karty"                             },
-{ TXT_SHOW_MODULES,   "Zobraz nahrané moduly"                                 },
-{ TXT_AUTO_LOAD,      "Automatické nahrání modulù"                            },
+{ TXT_LOAD_SCSI,      "Zavést SCSI modul"                                     },
+{ TXT_LOAD_CDROM,     "Zavést CD-ROM modul"                                   },
+{ TXT_LOAD_NET,       "Zavést modul sí»ové karty"                             },
+{ TXT_SHOW_MODULES,   "Zobrazit nahrané moduly"                               },
+{ TXT_AUTO_LOAD,      "Automatické zavedení modulù"                           },
 { TXT_DEL_MODULES,    "Odstranìní modulù"                                     },
-{ TXT_TRY_TO_LOAD,    "Zkou¹ím nahrát modul \"%s\"...\n\n"
-                      "Bìhem nahrávání mù¾ete sledovat hlá¹ení jádra "
-                      "na virtuální konsole 4 (ALT-F4)."                      },
-{ TXT_LOAD_SUCCESSFUL,"Modul \"%s\" byl úspì¹nì nahrán!"                      },
-{ TXT_LOAD_FAILED,    "Chyba pøi nahráváaní modulu \"%s\"!"                   },
+{ TXT_TRY_TO_LOAD,    "Zkou¹ím zavést modul \"%s\"...\n\n"              
+                      "Bìhem zavádìní mù¾ete sledovat hlá¹ení jádra "
+                      "na virtuální konsoli 4 (Alt-F4)."                      },
+{ TXT_LOAD_SUCCESSFUL,"Modul \"%s\" byl úspì¹nì zaveden!"                     },
+{ TXT_LOAD_FAILED,    "Chyba pøi zavádìní modulu \"%s\"!"                     },
 { TXT_CDROM,          "CD-ROM"                                                },
 { TXT_FLOPPY,         "Disketa"                                               },
 { TXT_NFS,            "Sí» (NFS)"                                             },
 { TXT_FTP,            "Sí» (FTP)"                                             },
-{ TXT_HARDDISK,       "Harddisk"                                              },
+{ TXT_HARDDISK,       "Disk"                                                  },
 { TXT_START_INSTALL,  "Spu¹tìní instalace"                                    },
 { TXT_START_RESCUE,   "Spu¹tìní záchranného systému"                          },
 { TXT_LOAD_RS_NFS,    "Nahrání záchranného systému pøes NFS"                  },
@@ -50,15 +50,15 @@ static text_t txt_czech_atm [] =
 { TXT_INFO_MEM,       "Pamì»"                                                 },
 { TXT_INFO_MODULES,   "Moduly"                                                },
 { TXT_INFO_PCI,       "PCI"                                                   },
-{ TXT_INSERT_DISK,    "Vlo¾te prosím disk a stisknìte ENTER"                  },
-{ TXT_ERROR_READ_DISK,"Chyba pøi ètení disku!"                                },
-{ TXT_ENTER_ROOT_FS,  "Zadejte prosím va¹i root partition (napø.. /dev/sda3)" },
-{ TXT_INVALID_ROOT_FS,"Neplatné root zaøízení!"                               },
+{ TXT_INSERT_DISK,    "Vlo¾te prosím disketu a stisknìte ENTER"               },
+{ TXT_ERROR_READ_DISK,"Chyba pøi ètení diskety!"                              },
+{ TXT_ENTER_ROOT_FS,  "Zadejte prosím vá¹ koøenový oddíl  (napø. /dev/sda3)"  },
+{ TXT_INVALID_ROOT_FS,"Neplatné zaøízení pro koøenový oddíl!"                 },
 { TXT_INVALID_INPUT,  "Neplatný vstup!"                                       },
 { TXT_INPUT_IPADDR,   "Zadejte prosím va¹i IP addresu"                        },
-{ TXT_INPUT_NETMASK,  "Zadejte prosím va¹i sí»ovou masku. Pro bì¾nou class C "
-                      "sí», je to obvykle 255.255.255.0"                      },
-{ TXT_INPUT_GATEWAY,  "Pokud potøebujete bránu pro pøístup k serveru, vlo¾te "
+{ TXT_INPUT_NETMASK,  "Zadejte prosím va¹i sí»ovou masku. Pro bì¾nou (class C) "
+                      "sí» je to obvykle 255.255.255.0"                      },
+{ TXT_INPUT_GATEWAY,  "Pokud potøebujete bránu pro pøístup k serveru, zadejte "
                       "prosím IP addresu této brány. Pokud nepotøebujete "
                       "bránu, zadejte va¹i vlastní IP addresu."               },
 { TXT_INPUT_NAMED,    "Zadejte prosím IP addresu va¹eho name serveru. Pokud "
@@ -67,9 +67,8 @@ static text_t txt_czech_atm [] =
                       "IP addresa: %s\n"
                       "Jméno: %s\n"
                       "Doména: %s"                                            },
-{ TXT_ERROR_CONF_NET, "Bìhem konfigurace sítì do¹lo k chybì. "
-                      "Pravdìpodobnì nebyla va¹e sí»ová karta rozpoznána "
-                      "jádrem systému!"                                       },
+{ TXT_ERROR_CONF_NET, "Bìhem konfigurace sítì do¹lo k chybì. Jádro systému "
+		      "nejspí¹e nerozpoznalo va¹i sí»ovou kartu!"             },
 { TXT_INPUT_SERVER,   "Zadejte prosím IP addresu NFS serveru."                },
 { TXT_INPUT_FTPSERVER,"Zadejte prosím IP addresu FTP serveru."                },
 { TXT_INPUT_DIR,      "Zadejte prosím adresáø na serveru."                    },
@@ -80,34 +79,34 @@ static text_t txt_czech_atm [] =
 { TXT_CHOOSE_KEYMAP,  "Zadejte prosím klávesovou mapu.\nYaST vám umo¾ní "    
                       "doplnìní dal¹í klávesové tabulky pozdìji."             },
 { TXT_DELETE_MODULE,  "Vyberte modul, který má být odstranìn."                },
-{ TXT_NO_MODULES,     "Nyní nejsou ¾ádné moduly nahrány!"                     },
+{ TXT_NO_MODULES,     "Nyní nejsou ¾ádné moduly zavedeny!"                    },
 { TXT_AUTO_RUNNING,   "Autodetekce (%s)...      "                             },
 { TXT_WANT_MORE_SCSI, "Chcete vyhledat dal¹í SCSI øadièe?"                    },
 { TXT_WANT_MORE_NET,  "Chcete vyhledat dal¹í sí»ové karty?"                   },
 { TXT_WANT_MORE_CDROM,"Chcete vyhledat dal¹í CD-ROM mechaniky?"               },
-{ TXT_NET_ETH0,       "ethernet sí»ová karta"                                 },
+{ TXT_NET_ETH0,       "sí»ová karta typu Ethernet"                            },
 { TXT_NET_PLIP,       "paralelní port"                                        },
-{ TXT_NET_TR0,        "token ring sí»ová karta"                               },
-{ TXT_NET_ARC0,       "arcnet sí»ová karta"                                   },
+{ TXT_NET_TR0,        "sí»ová karta typu Token ring"                          },
+{ TXT_NET_ARC0,       "sí»ová karta typu Arcnet"                              },
 { TXT_NET_FDDI,       "FDDI sí»ová karta"                                     },
 { TXT_NET_HIPPI,      "HIPPI sí»ová karta"                                    },
 { TXT_CHOOSE_NET,     "Vyberte prosím sí»ové zaøízení."                       },
 { TXT_INPUT_PLIP_IP,  "Zadejte prosím IP-adresu va¹eho PLIP partnera."        },
 { TXT_LOAD_PCMCIA,    "Nahrát PCMCIA moduly"                                  },
-{ TXT_NO_PCMCIA,      "PCMCIA chipset nelze detekovat automaticky! "
+{ TXT_NO_PCMCIA,      "PCMCIA èipset nelze detekovat automaticky! "
                       "Zadejte jej prosím ruènì."                             },
 { TXT_FOUND_PCMCIA,   "Nalezen PCMCIA èipset \"%s\"!\n\nZadejte prosím "            
-                      "parametry pro PCMCIA core modul"                       },
+                      "parametry pro modul jádra pro PCMCIA"                  },
 { TXT_PCMCIA_PARAMS,  "Zadejte prosím specifické parametery pro \"%s\""       },
 { TXT_START_CARDMGR,  "Startuji cardmanager..."                               },
 { TXT_PCMCIA_SUCCESS, "PCMCIA card services byly úspì¹nì spu¹tìny."           },
 { TXT_PCMCIA_FAIL,    "PCMCIA card services se nepodaøilo spustit!"           },
 { TXT_PCMCIA_ALREADY, "PCMCIA card services jsou ji¾ spu¹tìny!"               },
 { TXT_NO_LXRC_END,    "Linuxrc mù¾ete opustit pouze pøes polo¾ku menu\n\n"                      
-                      "» Start installation / system «\n\n"
+                      "Start installation / system\n\n"
                       "Pravdìpodobnì budete potøebovat nahrát nìkteré "
-                      "ovladaèe (moduly) podle va¹eho hardware."              },
-{ TXT_NO_CTRLC,       "Nemù¾ete opustit Linuxrc klávesou <ctrl-c>!"           },
+                      "ovladaèe (moduly) podle va¹eho hardwaru."              },
+{ TXT_NO_CTRLC,       "Linuxrc nemù¾ete opustit klávesou <Ctrl-C>!"           },
 { TXT_REMOVE_DISK,    "Prosím, vyndejte nyní disketu z mechaniky!"            },
 { TXT_EXAMPLE_PAR,    "\n\nPøíklad: "                                         },
 { TXT_CHOOSE_SOURCE,  "Vyberte prosím zdrojové médium"                        },
@@ -116,31 +115,30 @@ static text_t txt_czech_atm [] =
 { TXT_START_YAST,     "Startuje se YaST..."                                   },
 { TXT_ASK_REBOOT,     "Chcete vá¹ systém nyní restartovat?"                   },
 { TXT_INSTALL_SUCCESS,"Základní systém byl úspì¹nì nainstalován. Tento "
-                      "novì nainstalovaný systém bude spu¹tìn aby bylo "
+                      "novì nainstalovaný systém bude spu¹tìn, aby bylo "
                       "mo¾né dokonèit instalaci."                             },
-{ TXT_ENTER_PARTITION,"Zadejte prosím diskovou oblast (napø. /dev/sda1)"      },
-{ TXT_ERROR_HD_MOUNT, "Nemohu pøipojit zadanou diskovou oblast!"              },
+{ TXT_ENTER_PARTITION,"Zadejte prosím diskový oddíl (napø. /dev/sda1)"        },
+{ TXT_ERROR_HD_MOUNT, "Nemohu pøipojit zadaný diskový oddíl!"                 },
 { TXT_ENTER_HD_DIR,   "Zadejte prosím zdrojový adresáø"                       },
 { TXT_ERROR_INSTALL,  "Objevila se chyba bìhem instalace!"                    },
-{ TXT_DRIVES,         "Harddisky / CD-ROM mechaniky"                          },
+{ TXT_DRIVES,         "Disky / mechaniky CD"                                  },
 { TXT_LITTLE_MEM,     "Vá¹ poèítaè má extrémnì málo operaèní pamìti!\n\n"
                       "Ne¾ potvrdíte toto hlá¹ení, musíte se pøepnout na "
-                      "virtuální konzolu 2 (stiskem ALT-F2) a vytvoøit "
+                      "virtuální konsoli 2 (stiskem ALT-F2) a vytvoøit "
                       "a aktivovat dodateènou odkládací (swap) pamì»!"        },
 { TXT_ASK_ANIMATE,    "Animace"                                               },
 { TXT_ASK_EXPLODE,    "Chcete mít \"explodující\" okna?\n\nAle jistì ;-)"     },
-{ TXT_NO_DRIVES,      "Nebyly detekovány ¾ádné harddisky nebo CD-ROM "
-                      "mechaniky."                                            },
+{ TXT_NO_DRIVES,      "Nebyly detekovány ¾ádné disky ani mechaniky CD."       },
 { TXT_MENU_EXPERT,    "Debug (expert)"                                        },
-{ TXT_FORCE_ROOTIMAGE,"Vynutit rootimage"                                     },
-{ TXT_NEW_ROOTIMAGE,  "Zadat rootimage"                                       },
-{ TXT_ASK_RI_FORCE,   "Chcete, aby se rootimage nahrál do RAM disku "       
+{ TXT_FORCE_ROOTIMAGE,"Vynutit root image"                                    },
+{ TXT_NEW_ROOTIMAGE,  "Zadat root image"                                      },
+{ TXT_ASK_RI_FORCE,   "Chcete, aby se root image nahrál na RAM disk, "       
                       "jakmile bude nalezen platný instalaèní systém?"        },
-{ TXT_ENTER_ROOTIMAGE,"Zadejte prosím cestu a jméno souboru který chcete "
-                      "aby se nahrál do RAM disku jako root file system"      },
+{ TXT_ENTER_ROOTIMAGE,"Zadejte prosím cestu a jméno souboru, který chcete "
+                      "nahrát na RAM disk jako koøenový souborový systém"     },
 { TXT_NOT_IMPLEMENTED,"Zatím není implementováno!"                            },
 { TXT_NEW_INST_SYS,   "Instalaèní systém"                                     },
-{ TXT_ENTER_INST_SYS, "Zadejte prosím adresáø který obsahuje instalaèní "
+{ TXT_ENTER_INST_SYS, "Zadejte prosím adresáø, který obsahuje instalaèní "
                       "systém."                                               },
 { TXT_NO_INFO_AVAIL,  "Nejsou dostupné ¾ádné informace."                      },
 { TXT_PREPARE_INST,   "Pøipravuji instalaci..."                               },
@@ -148,47 +146,45 @@ static text_t txt_czech_atm [] =
 { TXT_INSERT_LIVECD,  "Vlo¾te prosím Live CD."                                },
 { TXT_END_REBOOT,     "Konec / Reboot"                                        },
 { TXT_ASK_BOOTP,      "Automatická konfigurace pøes bootp?"                   },
-{ TXT_SEND_BOOTP,     "Zasílán bootp po¾adavek..."                            },
-{ TXT_ERROR_BOOTP,    "Bootp configurace selhala."                            },
+{ TXT_SEND_BOOTP,     "Zasílán po¾adavek bootp..."                            },
+{ TXT_ERROR_BOOTP,    "Bootp konfigurace selhala."                            },
 { TXT_SEARCH_INFOFILE,"Hledám informaèní soubor..."                           },
-{ TXT_NFSPORT,        "Specifikuj NFS port"                                   },
+{ TXT_NFSPORT,        "Specifikujte NFS port"                                 },
 { TXT_ASKING_NAMED,   "Kontaktuji nameserver..."                              },
 { TXT_HOST_NOT_FOUND, "Poèítaè %s je neznámý!"                                },
 { TXT_NET_CONFIGURED, "Va¹e sí» je ji¾ nakonfigurována. Chcete ponechat "
                       "tuto konfiguraci?"                                     },
 { TXT_ASK_BREAK,      "Chcete skonèit?"                                       },
-{ TXT_NO_NETDEVICE,   "Nebylo nalezeno ¾ádné sí»ové zaøízení!\nNahrejte"
-                      "prosím nejprve ovladaè sí»ové karty."                  },
+{ TXT_NO_NETDEVICE,   "Nebylo nalezeno ¾ádné sí»ové zaøízení!\n"
+                      "Zaveïte prosím nejprve ovladaè sí»ové karty."          },
 { TXT_ALREADY_FOUND,  "%s je ji¾ ve va¹em poèítaèi nainstalován!\n"           },
 { TXT_SCSI_ADAPTER,   "SCSI øadiè"                                            },
 { TXT_ANOTHER_MOD,    "Chcete nahrát dal¹í modul?"                            },
 { TXT_ERROR_FTP,      "Chyba pøi pøipojování na FTP server:\n\n%s"            },
 { TXT_TRY_REACH_FTP,  "Zkou¹ím se pøipojit na FTP server..."                  },
-{ TXT_ENTER_FTPUSER,  "Zadejte prosím u¾ivatelské jméno pod kterým se " 
+{ TXT_ENTER_FTPUSER,  "Zadejte prosím u¾ivatelské jméno, pod kterým se " 
                       "chcete pøipojit na FTP server"                         },
 { TXT_ENTER_FTPPASSWD,"Zadejte prosím u¾ivatelské heslo pro FTP pøístup"      },
 { TXT_ENTER_FTPPROXY, "Zadejte prosím adresu FTP proxy"                       },
 { TXT_ENTER_FTPPORT,  "Zadejte prosím port FTP proxy"                         },
 { TXT_WANT_FTPPROXY,  "Chcete pou¾ít FTP proxy?"                              },
-{ TXT_NOMEM_FTP,      "Vá¹ poèítaè nemá dostatek RAM pamìti pro instalaci "
-                      "pøes FTP! (min. %d MB RAM je vy¾adováno)"              },
-{ TXT_ANONYM_FTP,     "Normalnì je FTP instalace provádìna pøes "
-                      "anonymní FTP. Ale je zde mo¾nost specifikovat "
+{ TXT_NOMEM_FTP,      "Vá¹ poèítaè nemá dostatek pamìti pro instalaci "
+                      "pøes FTP! (je vy¾adováno min. %d MB RAM)"              },
+{ TXT_ANONYM_FTP,     "Normálnì je FTP instalace provádìna pøes "
+                      "anonymní FTP. Máte v¹ak mo¾nost specifikovat "
                       "u¾ivatelské jmého a heslo na FTP serveru.\n" 
                       "Pøejete si tuto mo¾nost?"                              },
 { TXT_ENTER_MODDISK,  "Vlo¾te prosím disketu s moduly"                        },
 { TXT_MORE_MODULES,   "-- Dal¹í moduly --"                                    },
 { TXT_INIT_PARPORT,   "Inicializuji paralelní port..."                        },
-{ TXT_ENTER_NFSPORT,  "Zadejte prosím èíslo portu na kterém be¾í nfs server"  },
+{ TXT_ENTER_NFSPORT,  "Zadejte prosím èíslo portu, na kterém be¾í NFS server" },
 { TXT_YAST1,          "YaST1 - v textové podobì"                              },
 { TXT_YAST2,          "YaST2 - v grafické podobì"                             },
 { TXT_CHOOSE_YAST,    "Vyberte prosím, která verze YaSTu bude pou¾ita pro "
                       "instalaci."                                            },
-{ TXT_INSERT_CD,      "Ujistìte se prosím, ¾e v mechanice máte CD èíslo %d!"  },
-{ TXT_DO_REBOOT,      "The base system has been successfully installed.  This "
-                      "new installed system will now be started in order to "
-                      "commit the installation. "
-                      "Please remove all installation media (CD-ROM, floppy).\n"
-                      "Do not remove the floppy disk if the Linux Loader (LILO) "
-                      "has been installed on it."                             }
+{ TXT_INSERT_CD,      "Ujistìte se prosím, ¾e máte v mechanice CD èíslo %d!"  },
+{ TXT_DO_REBOOT,      "Základní systém byl úspì¹nì nainstalován. "
+                      "Nyní bude spu¹tìn, aby se instalace projevila. "
+                      "Prosím odstraòte instalaèní média (CD-ROM, disketu).\n"
+                      "(Nevyjímejte ov¹em disketu, pokud na ní je LILO.)"     }
 };

@@ -704,6 +704,7 @@ static int inst_prepare (void)
                           "/etc/host.conf",
                           "/etc/modules.conf",
                           "/etc/fb.modes",
+                          "/etc/X11/xserver",
                           "/bin",
                           "/boot",
                           "/root",
