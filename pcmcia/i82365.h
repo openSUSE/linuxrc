@@ -1,5 +1,5 @@
 /*
- * i82365.h 1.15 1999/10/25 20:03:34
+ * i82365.h 1.19 2000/06/12 21:29:37
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -12,7 +12,7 @@
  * limitations under the License. 
  *
  * The initial developer of the original code is David A. Hinds
- * <dhinds@pcmcia.sourceforge.org>.  Portions created by David A. Hinds
+ * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
@@ -130,6 +130,24 @@
 #define I365_MEM_WRPROT	0x8000	/* In offset high byte */
 #define I365_MEM_REG	0x4000
 
-#define I365_REG(slot, reg)	(((slot) << 6) + reg)
+#define I365_REG(slot, reg)	(((slot) << 6) | (reg))
+
+/* Default ISA interrupt mask */
+#define I365_ISA_IRQ_MASK	0xdeb8	/* irq's 3-5,7,9-12,14,15 */
+
+/* Device ID's for PCI-to-PCMCIA bridges */
+
+#ifndef PCI_VENDOR_ID_INTEL
+#define PCI_VENDOR_ID_INTEL		0x8086
+#endif
+#ifndef PCI_DEVICE_ID_INTEL_82092AA_0
+#define PCI_DEVICE_ID_INTEL_82092AA_0	0x1221
+#endif
+#ifndef PCI_VENDOR_ID_OMEGA
+#define PCI_VENDOR_ID_OMEGA		0x119b
+#endif
+#ifndef PCI_DEVICE_ID_OMEGA_82C092G
+#define PCI_DEVICE_ID_OMEGA_82C092G	0x1221
+#endif
 
 #endif /* _LINUX_I82365_H */

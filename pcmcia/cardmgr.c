@@ -2,7 +2,7 @@
 
     PCMCIA Card Manager daemon
 
-    cardmgr.c 1.133 2000/01/12 20:50:33
+    cardmgr.c 1.139 2000/06/12 21:33:02
 
     The contents of this file are subject to the Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
@@ -15,7 +15,7 @@
     rights and limitations under the License.
 
     The initial developer of the original code is David A. Hinds
-    <dhinds@pcmcia.sourceforge.org>.  Portions created by David A. Hinds
+    <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
     are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
 
     Alternatively, the contents of this file may be used under the
@@ -289,7 +289,7 @@ static void write_pid(void)
     FILE *f;
     f = fopen(pidfile, "w");
     if (f == NULL)
-	syslog(LOG_INFO, "could not open %s: %m", pidfile);
+	syslog(LOG_WARNING, "could not open %s: %m", pidfile);
     else {
 	fprintf(f, "%d\n", getpid());
 	fclose(f);
@@ -305,12 +305,12 @@ static void write_stab(void)
 
     f = fopen(stabfile, "w");
     if (f == NULL) {
-	syslog(LOG_INFO, "fopen(stabfile) failed: %m");
+	syslog(LOG_WARNING, "fopen(stabfile) failed: %m");
 	return;
     }
 #ifndef __BEOS__
     if (flock(fileno(f), LOCK_EX) != 0) {
-	syslog(LOG_INFO, "flock(stabfile) failed: %m");
+	syslog(LOG_ERR, "flock(stabfile) failed: %m");
 	return;
     }
 #endif
@@ -415,9 +415,13 @@ static card_info_t *lookup_card(int ns)
     
     /* Try to read VERS_1, MANFID tuples */
     if (has_cis) {
+	/* rule of thumb: cards with no FUNCID, but with common memory
+	   device geometry information, are probably memory cards */
 	if (get_tuple(ns, CISTPL_FUNCID, &arg) == 0)
 	    memcpy(&funcid, &arg.tuple_parse.parse.funcid,
 		   sizeof(funcid));
+	else if (get_tuple(ns, CISTPL_DEVICE_GEO, &arg) == 0)
+	    funcid.func = CISTPL_FUNCID_MEMORY;
 	if (get_tuple(ns, CISTPL_MANFID, &arg) == 0)
 	    memcpy(&manfid, &arg.tuple_parse.parse.manfid,
 		   sizeof(manfid));
@@ -514,14 +518,16 @@ static card_info_t *lookup_card(int ns)
 
 static void load_config(void)
 {
-    if (chdir(configpath) != 0)
-	syslog(LOG_INFO, "chdir to %s failed: %m", configpath);
+    if (chdir(configpath) != 0) {
+	syslog(LOG_ERR, "chdir to %s failed: %m", configpath);
+	exit(EXIT_FAILURE);
+    }
     if (parse_configfile("config") != 0)
 	exit(EXIT_FAILURE);
     if (root_device == NULL)
-	syslog(LOG_INFO, "no device drivers defined");
+	syslog(LOG_WARNING, "no device drivers defined");
     if ((root_card == NULL) && (root_func == NULL))
-	syslog(LOG_INFO, "no cards defined");
+	syslog(LOG_WARNING, "no cards defined");
 }
 
 /*====================================================================*/
@@ -663,11 +669,39 @@ typedef struct module_list_t {
 
 static module_list_t *module_list = NULL;
 
-static int install_module(char *mod, char *opts)
+static int try_insmod(char *mod, char *opts)
 {
     char path[128], cmd[128];
+    if (strchr(mod, '/') != NULL)
+	sprintf(path, "%s/%s.o", modpath, mod);
+    else
+	sprintf(path, "%s/pcmcia/%s.o", modpath, mod);
+    if (access(path, R_OK) != 0) {
+	syslog(LOG_INFO, "module %s not available", path);
+	return -1;
+    }
+    sprintf(cmd, "insmod %s", path);
+    if (opts) {
+	strcat(cmd, " ");
+	strcat(cmd, opts);
+    }
+    return execute("insmod", cmd);
+}
+
+static int try_modprobe(char *mod, char *opts)
+{
+    char cmd[128], *s = strrchr(mod, '/');
+    sprintf(cmd, "modprobe %s", (s) ? s+1 : mod);
+    if (opts) {
+	strcat(cmd, " ");
+	strcat(cmd, opts);
+    }
+    return execute("modprobe", cmd);
+}
+
+static void install_module(char *mod, char *opts)
+{
     module_list_t *ml;
-    int ret;
 
     for (ml = module_list; ml != NULL; ml = ml->next)
 	if (strcmp(mod, ml->mod) == 0) break;
@@ -680,7 +714,7 @@ static int install_module(char *mod, char *opts)
     }
     ml->usage++;
     if (ml->usage != 1)
-	return 0;
+	return;
 
 #ifdef __linux__
     if (access("/proc/bus/pccard/drivers", R_OK) == 0) {
@@ -688,41 +722,26 @@ static int install_module(char *mod, char *opts)
 	if (f) {
 	    char a[61], s[33];
 	    while (fgets(a, 60, f)) {
-		sscanf(a, "%s %d", s, &ret);
+		int is_kernel;
+		sscanf(a, "%s %d", s, &is_kernel);
 		if (strcmp(s, mod) != 0) continue;
 		/* If it isn't a module, we won't try to rmmod */
-		ml->usage += ret;
+		ml->usage += is_kernel;
 		fclose(f);
-		return 0;
+		return;
 	    }
 	    fclose(f);
 	}
     }
 #endif
 
-    if (!do_modprobe) {
-	if (strchr(mod, '/') != NULL)
-	    sprintf(path, "%s/%s.o", modpath, mod);
-	else
-	    sprintf(path, "%s/%s.o", modpath, mod);
-	if (access(path, R_OK) != 0) {
-	    syslog(LOG_INFO, "module %s not available", path);
-	    return -1;
-	}
-	sprintf(cmd, "insmod %s", path);
-	if (opts) {
-	    strcat(cmd, " ");
-	    strcat(cmd, opts);
-	}
-	ret = execute("insmod", cmd);
-	if (ret == 0) return 0;
+    if (do_modprobe) {
+	if (try_modprobe(mod, opts) != 0)
+	    try_insmod(mod, opts);
+    } else {
+	if (try_insmod(mod, opts) != 0)
+	    try_modprobe(mod, opts);
     }
-    sprintf(cmd, "modprobe %s", mod);
-    if (opts) {
-	strcat(cmd, " ");
-	strcat(cmd, opts);
-    }
-    return execute("modprobe", cmd);
 }
 
 static void remove_module(char *mod)
@@ -737,10 +756,7 @@ static void remove_module(char *mod)
 	if (ml->usage == 0) {
 	    /* Strip off leading path names */
 	    s = strrchr(mod, '/');
-	    if (s == NULL)
-		s = mod;
-	    else
-		s++;
+	    s = (s) ? s+1 : mod;
 	    sprintf(cmd, do_modprobe ? "modprobe -r %s" : "rmmod %s", s);
 	    execute(do_modprobe ? "modprobe" : "rmmod", cmd);
 	}
@@ -854,12 +870,12 @@ static void update_cis(socket_info_t *s)
     cisdump_t cis;
     FILE *f = fopen(s->card->cis_file, "r");
     if (f == NULL)
-	syslog(LOG_INFO, "could not open '%s': %m", s->card->cis_file);
+	syslog(LOG_ERR, "could not open '%s': %m", s->card->cis_file);
     else {
 	cis.Length = fread(cis.Data, 1, CISTPL_MAX_CIS_SIZE, f);
 	fclose(f);
 	if (ioctl(s->fd, DS_REPLACE_CIS, &cis) != 0)
-	    syslog(LOG_INFO, "could not replace CIS: %m");
+	    syslog(LOG_ERR, "could not replace CIS: %m");
     }
 }
 
@@ -929,7 +945,7 @@ static void do_insert(int sn)
 	republish_driver(dev[i]->module[0]);
 #endif
 
-	for (j = 0; j < 10; j++) {
+	for (ret = j = 0; j < 10; j++) {
 	    ret = ioctl(s->fd, DS_GET_DEVICE_INFO, bind);
 	    if ((ret == 0) || (errno != EAGAIN))
 		break;
@@ -1188,9 +1204,9 @@ static void fork_now(void)
 	exit(0);
     }
     if (ret == -1)
-	syslog(LOG_INFO, "forking: %m");
+	syslog(LOG_ERR, "forking: %m");
     if (setsid() < 0)
-	syslog(LOG_INFO, "detaching from tty: %m");
+	syslog(LOG_ERR, "detaching from tty: %m");
 }    
 
 static void done(void)
@@ -1251,32 +1267,32 @@ static int init_sockets(void)
     major = lookup_dev("pcmcia");
     if (major < 0) {
 	if (major == -ENODEV)
-	    syslog(LOG_INFO, "no pcmcia driver in /proc/devices");
+	    syslog(LOG_ERR, "no pcmcia driver in /proc/devices");
 	else
-	    syslog(LOG_INFO, "could not open /proc/devices: %m");
+	    syslog(LOG_ERR, "could not open /proc/devices: %m");
 	exit(EXIT_FAILURE);
     }
 #endif
-    for (i = 0; i < MAX_SOCKS; i++) {
+    for (fd = -1, i = 0; i < MAX_SOCKS; i++) {
 	fd = open_sock(i, S_IFCHR|S_IREAD|S_IWRITE);
 	if (fd < 0) break;
 	socket[i].fd = fd;
 	socket[i].state = 0;
     }
     if ((fd < 0) && (errno != ENODEV) && (errno != ENOENT))
-	syslog(LOG_INFO, "open_sock(socket %d) failed: %m", i);
+	syslog(LOG_ERR, "open_sock(socket %d) failed: %m", i);
     sockets = i;
     if (sockets == 0) {
-	syslog(LOG_INFO, "no sockets found!");
+	syslog(LOG_ERR, "no sockets found!");
 	return -1;
     } else
 	syslog(LOG_INFO, "watching %d sockets", sockets);
 
     if (ioctl(socket[0].fd, DS_GET_CARD_SERVICES_INFO, &serv) == 0) {
 	if (serv.Revision != CS_RELEASE_CODE)
-	    syslog(LOG_INFO, "Card Services release does not match!");
+	    syslog(LOG_INFO, "Card Services release does not match");
     } else {
-	syslog(LOG_INFO, "could not get CS revision info!");
+	syslog(LOG_ERR, "could not get CS revision info!");
 	return -1;
     }
     adjust_resources();
@@ -1293,9 +1309,7 @@ int cardmgr_main(int argc, char *argv[])
     struct timeval tv;
     fd_set fds;
 
-    if (access("/var/state/pcmcia", R_OK) == 0) {
-	stabfile = "/var/state/pcmcia/stab";
-    } else if (access("/var/lib/pcmcia", R_OK) == 0) {
+    if (access("/var/lib/pcmcia", R_OK) == 0) {
 	stabfile = "/var/lib/pcmcia/stab";
     } else {
 	stabfile = "/var/run/stab";
@@ -1310,8 +1324,6 @@ int cardmgr_main(int argc, char *argv[])
 	    break;
 	case 'q':
 	    be_quiet = 1; break;
-	case 'd':
-	    do_modprobe = 1; break;
 	case 'v':
 	    verbose = 1; break;
 	case 'o':
@@ -1321,6 +1333,8 @@ int cardmgr_main(int argc, char *argv[])
 	case 'c':
 	    configpath = strdup(optarg); break;
 #ifdef __linux__
+	case 'd':
+	    do_modprobe = 1; break;
 	case 'm':
 	    modpath = strdup(optarg); break;
 #endif
@@ -1344,9 +1358,6 @@ int cardmgr_main(int argc, char *argv[])
 #else
     openlog("cardmgr", LOG_PID|LOG_CONS, LOG_DAEMON);
     close(0); close(1); close(2);
-#endif
-
-#ifndef DEBUG
     if (!delay_fork && !one_pass)
 	fork_now();
 #endif
@@ -1362,17 +1373,17 @@ int cardmgr_main(int argc, char *argv[])
 	else {
 	    struct utsname utsname;
 	    if (uname(&utsname) != 0) {
-		syslog(LOG_INFO, "uname(): %m");
+		syslog(LOG_ERR, "uname(): %m");
 		exit(EXIT_FAILURE);
 	    }
 	    modpath = (char *)malloc(strlen(utsname.release)+14);
 	    sprintf(modpath, "/lib/modules/%s", utsname.release);
 	}
     }
-    if (access(modpath, X_OK) != 0) {
+    if (access(modpath, X_OK) != 0)
 	syslog(LOG_INFO, "cannot access %s: %m", modpath);
-	exit(EXIT_FAILURE);
-    }
+    /* We default to using modprobe if it is available */
+    do_modprobe |= (access("/sbin/modprobe", X_OK) == 0);
 #endif /* __linux__ */
     
     load_config();
@@ -1386,14 +1397,14 @@ int cardmgr_main(int argc, char *argv[])
     cleanup_files = 1;
     
     if (signal(SIGHUP, catch_signal) == SIG_ERR)
-	syslog(LOG_INFO, "signal(SIGHUP): %m");
+	syslog(LOG_ERR, "signal(SIGHUP): %m");
     if (signal(SIGTERM, catch_signal) == SIG_ERR)
-	syslog(LOG_INFO, "signal(SIGTERM): %m");
+	syslog(LOG_ERR, "signal(SIGTERM): %m");
     if (signal(SIGINT, catch_signal) == SIG_ERR)
-	syslog(LOG_INFO, "signal(SIGINT): %m");
+	syslog(LOG_ERR, "signal(SIGINT): %m");
 #ifdef SIGPWR
     if (signal(SIGPWR, catch_signal) == SIG_ERR)
-	syslog(LOG_INFO, "signal(SIGPWR): %m");
+	syslog(LOG_ERR, "signal(SIGPWR): %m");
 #endif
     
     for (i = max_fd = 0; i < sockets; i++)
@@ -1416,7 +1427,7 @@ int cardmgr_main(int argc, char *argv[])
 	    if (errno == EINTR) {
 		handle_signal();
 	    } else {
-		syslog(LOG_INFO, "select(): %m");
+		syslog(LOG_ERR, "select(): %m");
 		exit(EXIT_FAILURE);
 	    }
 	}

@@ -2,7 +2,7 @@
 
     PCMCIA controller probe
 
-    probe.c 1.49 2000/02/07 19:29:52
+    probe.c 1.52 2000/06/12 21:33:02
 
     The contents of this file are subject to the Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
@@ -15,7 +15,7 @@
     rights and limitations under the License.
 
     The initial developer of the original code is David A. Hinds
-    <dhinds@pcmcia.sourceforge.org>.  Portions created by David A. Hinds
+    <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
     are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
 
     Alternatively, the contents of this file may be used under the
@@ -39,21 +39,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#ifdef __GLIBC__
-#include <sys/io.h>
-#else
-#include <asm/io.h>
-#endif
-
 #include <pcmcia/config.h>
-#include "i82365.h"
-#include "cirrus.h"
-#include "vg468.h"
-#include "tcic.h"
-
-static int i365_base = 0x03e0;
-
-typedef u_short ioaddr_t;
 
 /*====================================================================*/
 
@@ -86,6 +72,7 @@ pci_id_t pci_id[] = {
     { 0x104c, 0xac1b, "Texas Instruments PCI1450", "TI 1450" },
     { 0x104c, 0xac1c, "Texas Instruments PCI1225", "TI 1225" },
     { 0x104c, 0xac1e, "Texas Instruments PCI1211", "TI 1211" },
+    { 0x104c, 0xac50, "Texas Instruments PCI1410", "TI 1410" },
     { 0x104c, 0xac51, "Texas Instruments PCI1420", "TI 1420" },
     { 0x1217, 0x6729, "O2 Micro 6729", "O2Micro OZ6729" },
     { 0x1217, 0x673a, "O2 Micro 6730", "O2Micro OZ6730" },
@@ -166,6 +153,22 @@ static int pci_probe(int verbose, int module)
 
 /*====================================================================*/
 
+#ifdef CONFIG_ISA
+
+#if defined __GLIBC__ && !defined(__powerpc__)
+#include <sys/io.h>
+#else
+#include <asm/io.h>
+#endif
+typedef u_short ioaddr_t;
+
+#include "i82365.h"
+#include "cirrus.h"
+#include "vg468.h"
+
+static ioaddr_t i365_base = 0x03e0;
+
+#ifndef __powerpc__
 static u_char i365_get(u_short sock, u_short reg)
 {
     u_char val = I365_REG(sock, reg);
@@ -192,11 +195,13 @@ static void i365_bclr(u_short sock, u_short reg, u_char mask)
     d &= ~mask;
     i365_set(sock, reg, d);
 }
-
-/*====================================================================*/
+#endif /* __powerpc__ */
 
 int i365_probe(int verbose, int module)
 {
+#ifdef __powerpc__
+        return -ENODEV;
+#else
     int val, sock, done;
     char *name = "i82365sl";
 
@@ -278,11 +283,20 @@ int i365_probe(int verbose, int module)
     else
 	printf("%s found, %d sockets.\n", name, sock);
     return 0;
-    
+#endif /* __powerpc__ */
 } /* i365_probe */
-  
+
+#endif /* CONFIG_ISA */
+
 /*====================================================================*/
 
+#ifdef CONFIG_ISA
+
+#include "tcic.h"
+
+static ioaddr_t tcic_base = TCIC_BASE;
+
+#ifndef __powerpc__
 static u_char tcic_getb(ioaddr_t base, u_char reg)
 {
     u_char val = inb(base+reg);
@@ -360,9 +374,13 @@ int tcic_probe_at(ioaddr_t base, int module)
 
     return 2;
 }
+#endif /* __powerpc__ */
 
 int tcic_probe(int verbose, int module, ioaddr_t base)
 {
+#ifdef __powerpc__
+    return -ENODEV;
+#else
     int sock, id;
 
     if (!module)
@@ -403,8 +421,10 @@ int tcic_probe(int verbose, int module, ioaddr_t base)
 	printf(" found at %#6x, %d sockets.\n", base, sock);
     }
     return 0;
-    
+#endif    
 } /* tcic_probe */
+
+#endif /* CONFIG_ISA */
 
 /*====================================================================*/
 
@@ -413,13 +433,14 @@ int probe_main(int argc, char *argv[])
     int optch, errflg;
     extern char *optarg;
     int verbose = 0, module = 0;
-    ioaddr_t tcic_base = TCIC_BASE;
     
     errflg = 0;
     while ((optch = getopt(argc, argv, "t:vxm")) != -1) {
 	switch (optch) {
+#ifdef CONFIG_ISA
 	case 't':
 	    tcic_base = strtoul(optarg, NULL, 0); break;
+#endif
 	case 'v':
 	    verbose = 1; break;
 	case 'm':
@@ -430,18 +451,19 @@ int probe_main(int argc, char *argv[])
     }
     if (errflg || (optind < argc)) {
 	fprintf(stderr, "usage: %s [-t tcic_base] [-v] [-m]\n", argv[0]);
-	exit(-1);
+	return(-1);
     }
 
 #ifdef CONFIG_PCI
     if (pci_probe(verbose, module) == 0)
 	return(2);
-    else
 #endif
+#ifdef CONFIG_ISA
     if (i365_probe(verbose, module) == 0)
 	return(2);
     else if (tcic_probe(verbose, module, tcic_base) == 0)
 	return(1);
-    else
-	return(-1);
+#endif
+    return(-1);
+    return 0;
 }

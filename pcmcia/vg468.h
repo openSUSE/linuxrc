@@ -1,5 +1,5 @@
 /*
- * vg468.h 1.11 1999/10/25 20:03:34
+ * vg468.h 1.13 2000/06/12 21:29:37
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -12,7 +12,7 @@
  * limitations under the License. 
  *
  * The initial developer of the original code is David A. Hinds
- * <dhinds@pcmcia.sourceforge.org>.  Portions created by David A. Hinds
+ * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
@@ -102,5 +102,11 @@
 
 /* Flags for VG469_EXT_MODE_B */
 #define VG469_MODE_B_3V		0x01	/* 3.3v for socket B */
+
+/* Data structure for tracking vendor-specific state */
+typedef struct vg46x_state_t {
+    u_char		ctl;		/* VG468_CTL */
+    u_char		ema;		/* VG468_EXT_MODE_A */
+} vg46x_state_t;
 
 #endif /* _LINUX_VG468_H */

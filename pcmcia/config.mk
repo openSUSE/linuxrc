@@ -1,24 +1,26 @@
 LINUX=/usr/src/linux
-PREFIX=
-MODDIR=/lib/modules/2.2.14
+CC=cc
+LD=ld
 KFLAGS=
 UFLAGS=
 PCDEBUG=
-USE_APM=y
+USE_PM=y
 # UNSAFE_TOOLS is not defined
 CONFIG_CARDBUS=y
-CONFIG_PNP_BIOS=y
+# CONFIG_PNP_BIOS is not defined
+MODDIR=/lib/modules/2.2.16
 
 # CONFIG_SMP is not defined
 CONFIG_PCI=y
 CONFIG_PCI_QUIRKS=y
-# CONFIG_APM is not defined
+# CONFIG_PM is not defined
 CONFIG_SCSI=y
 CONFIG_INET=y
-CONFIG_NET_RADIO=y
+# CONFIG_NET_PCMCIA_RADIO is not defined
 CONFIG_TR=y
 # CONFIG_NET_FASTROUTE is not defined
 # CONFIG_MODVERSIONS is not defined
+CONFIG_X86_L1_CACHE_BYTES=32
 CONFIG_PROC_FS=y
 CONFIG_1GB=y
 # CONFIG_2GB is not defined
@@ -26,34 +28,34 @@ CONFIG_1GB=y
 # CONFIG_SMP is not defined
 CONFIG_PCI=y
 CONFIG_PCI_QUIRKS=y
-# CONFIG_APM is not defined
+# CONFIG_PM is not defined
 CONFIG_SCSI=y
 CONFIG_INET=y
-CONFIG_NET_RADIO=y
+# CONFIG_NET_PCMCIA_RADIO is not defined
 CONFIG_TR=y
 # CONFIG_NET_FASTROUTE is not defined
 # CONFIG_MODVERSIONS is not defined
+CONFIG_X86_L1_CACHE_BYTES=32
 CONFIG_PROC_FS=y
 CONFIG_1GB=y
 # CONFIG_2GB is not defined
 # CONFIG_3GB is not defined
 ARCH=i386
+HOST_ARCH=i386
 AFLAGS=
 CONFIG_ISA=y
 
-MFLAG=-DMODVERSIONS -include ../include/linux/modversions.h
+MFLAG=
 CPPFLAGS=-I../include -I$(LINUX)/include
-UTS_RELEASE=2.2.14
-UTS_VERSION=#1 Fri Feb 4 10:58:11 CET 2000
-LINUX_VERSION_CODE=131598
+UTS_RELEASE=2.2.16
+UTS_VERSION=#1 Sat Jun 24 00:23:24 GMT 2000
+LINUX_VERSION_CODE=131600
 
 HAS_PROC_BUS=y
 DO_IDE=y
 DO_PARPORT=y
 DO_APA1480=y
 # FIX_AIC7XXX is not defined
-DO_EPIC_CB=y
-RC_DIR=/sbin/init.d
 SYSV_INIT=y
-# INSTALL_DEPMOD is not defined
-# HAS_FORMS is not defined
+RC_DIR=/sbin/init.d
+HAS_FORMS=y

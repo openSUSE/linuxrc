@@ -5,28 +5,31 @@
 #define _PCMCIA_CONFIG_H
 
 #define AUTOCONF_INCLUDED
+#define __IN_PCMCIA_PACKAGE__
 
 #define LINUX "/usr/src/linux"
-#define PREFIX ""
-#define MODDIR "/lib/modules/2.2.14"
+#define CC "cc"
+#define LD "ld"
 #define KFLAGS ""
 #define UFLAGS ""
 #define PCDEBUG ""
-#define USE_APM 1
+#define USE_PM 1
 #undef  UNSAFE_TOOLS
 #define CONFIG_CARDBUS 1
-#define CONFIG_PNP_BIOS 1
+#undef  CONFIG_PNP_BIOS
+#define MODDIR "/lib/modules/2.2.16"
 
 #undef  CONFIG_SMP
 #define CONFIG_PCI 1
 #define CONFIG_PCI_QUIRKS 1
-#undef  CONFIG_APM
+#undef  CONFIG_PM
 #define CONFIG_SCSI 1
 #define CONFIG_INET 1
-#define CONFIG_NET_RADIO 1
+#undef  CONFIG_NET_PCMCIA_RADIO
 #define CONFIG_TR 1
 #undef  CONFIG_NET_FASTROUTE
 #undef  CONFIG_MODVERSIONS
+#define CONFIG_X86_L1_CACHE_BYTES 32
 #define CONFIG_PROC_FS 1
 #define CONFIG_1GB 1
 #undef  CONFIG_2GB
@@ -34,27 +37,31 @@
 #undef  CONFIG_SMP
 #define CONFIG_PCI 1
 #define CONFIG_PCI_QUIRKS 1
-#undef  CONFIG_APM
+#undef  CONFIG_PM
 #define CONFIG_SCSI 1
 #define CONFIG_INET 1
-#define CONFIG_NET_RADIO 1
+#undef  CONFIG_NET_PCMCIA_RADIO
 #define CONFIG_TR 1
 #undef  CONFIG_NET_FASTROUTE
 #undef  CONFIG_MODVERSIONS
+#define CONFIG_X86_L1_CACHE_BYTES 32
 #define CONFIG_PROC_FS 1
 #define CONFIG_1GB 1
 #undef  CONFIG_2GB
 #undef  CONFIG_3GB
+#define ARCH "i386"
+#define HOST_ARCH "i386"
+#define AFLAGS ""
 #define CONFIG_ISA 1
 
-#define UTS_RELEASE "2.2.14"
-#define UTS_VERSION "#1 Fri Feb 4 10:58:11 CET 2000"
-#define LINUX_VERSION_CODE 131598
+#define UTS_RELEASE "2.2.16"
+#define UTS_VERSION "#1 Sat Jun 24 00:23:24 GMT 2000"
+#define LINUX_VERSION_CODE 131600
+#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
 #define HAS_PROC_BUS 1
-#define HAS_WIRELESS_EXTENSIONS 1
 #define SYSV_INIT 1
-#undef  INSTALL_DEPMOD
-#undef  HAS_FORMS
+#define RC_DIR "/sbin/init.d"
+#define HAS_FORMS 1
 
 #endif /* _PCMCIA_CONFIG_H */
