@@ -578,7 +578,7 @@ int inst_check_instsys (void)
         {
         case BOOTMODE_FLOPPY:
             ramdisk_ig = TRUE;
-            strcpy (inst_rootimage_tm, "/dev/fd0");
+            strcpy (inst_rootimage_tm, *floppy_tg ? floppy_tg : "/dev/fd0");
             break;
         case BOOTMODE_HARDDISK:
             if (inst_loopmount_im)
@@ -929,7 +929,7 @@ static int inst_check_floppy (void)
     if (fd_ii)
         return (fd_ii);
 
-    fd_ii = open ("/dev/fd0", O_RDONLY);
+    fd_ii = open (*floppy_tg ? floppy_tg : "/dev/fd0", O_RDONLY);
     if (fd_ii < 0)
         dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
     else

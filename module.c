@@ -325,13 +325,12 @@ int mod_get_ram_modules (int type_iv)
 
     if (!util_check_exist (testfile_ti) || mod_force_moddisk_im)
         {
-        if (util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-            if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-                {
-                dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-                mod_force_moddisk_im = FALSE;
-                return (-1);
-                }
+        if (util_try_mount (*floppy_tg ? floppy_tg : "/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+            {
+            dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+            mod_force_moddisk_im = FALSE;
+            return (-1);
+            }
 
         sprintf (testfile_ti, "%s/%s", mountpoint_tg, modfile_pci);
         rc_ii = root_load_rootimage (testfile_ti);

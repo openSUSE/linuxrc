@@ -357,6 +357,8 @@ static void lxrc_init (void)
     lxrc_catch_signal (0);
 /*    reboot (RB_DISABLE_CAD); */
 
+    umask(022);
+
     language_pci = getenv ("lang");
     if(language_pci) {
       int i = set_langidbyname(language_pci);

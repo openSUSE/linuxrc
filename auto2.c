@@ -192,12 +192,15 @@ void auto2_scan_hardware(char *log_file)
       );
       mod_load_module("keybdev", NULL);
       mod_load_module("mousedev", NULL);
+      mod_load_module("usb-storage", NULL);
     }
     k = mount ("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
     if(!i) sleep(4);
     if(with_usb) {
       hd_clear_probe_feature(hd_data, pr_all);
       hd_set_probe_feature(hd_data, pr_usb);
+      hd_set_probe_feature(hd_data, pr_scsi);
+      hd_set_probe_feature(hd_data, pr_int);
       hd_scan(hd_data);
     }
   }
@@ -571,6 +574,13 @@ int auto2_init()
   fflush(stdout);
   deb_msg("Hardware probing finished.");
 
+  if(!auto2_find_floppy()) {
+    deb_msg("There seems to be no floppy disk.");
+  }
+  else {
+    file_read_info();
+  }
+
 #if WITH_PCMCIA
   if(hd_has_pcmcia(hd_data)) {
     deb_msg("Going to load PCMCIA support...");
@@ -640,13 +650,6 @@ int auto2_init()
     }
   }
 #endif
-
-  if(!auto2_find_floppy()) {
-    deb_msg("There seems to be no floppy disk.");
-  }
-  else {
-    file_read_info();
-  }
 
   auto2_find_mouse();
 
@@ -896,6 +899,9 @@ void auto2_find_mouse()
 int auto2_find_floppy()
 {
   hd_t *hd;
+  char *floppy_0 = NULL;
+  char *floppy_1 = NULL;
+  hd_res_t *res;
 
   if(!hd_data) return has_floppy_ig;
 
@@ -904,35 +910,31 @@ int auto2_find_floppy()
       hd->base_class == bc_storage_device &&	/* is a storage device... */
       hd->sub_class == sc_sdev_floppy &&	/* a floppy actually... */
       hd->unix_dev_name &&			/* and has a device name */
-      !strcmp(hd->unix_dev_name, "/dev/fd0") &&	/* it's the 1st floppy */
-      hd->detail &&
-      hd->detail->type == hd_detail_floppy	/* floppy can be read */
+      !hd->is.notready				/* medium inserted */
     ) {
-      return has_floppy_ig = hd->detail->floppy.data ? TRUE : FALSE;
+      for(res = hd->res; res; res = res->next) {
+        if(!floppy_1) floppy_1 = hd->unix_dev_name;
+        if(
+          res->any.type == res_size &&
+          res->size.unit == size_unit_sectors &&
+          res->size.val1 >= 0 && res->size.val1 <= 2880 * 2
+        ) {
+          if(!floppy_0) floppy_0 = hd->unix_dev_name;
+        }
+      }
     }
   }
 
-  return has_floppy_ig = FALSE;
-}
+  if(!floppy_0) floppy_0 = floppy_1;		/* prefer <= 2.88MB floppies */
 
-#if 0
-/*
- * Scans the hardware list for a keybord and puts the result in
- * has_kbd_ig.
- */
-int auto2_find_kbd()
-{
-  hd_t *hd;
+  *floppy_tg = 0;
 
-  for(hd = hd_data->hd; hd; hd = hd->next) {
-    if(hd->base_class == bc_keyboard) {
-      return has_kbd_ig = TRUE;
-    }
+  if(floppy_0 && strlen(floppy_0) < sizeof floppy_tg) {
+    strcpy(floppy_tg, floppy_0);
   }
 
-  return has_kbd_ig = FALSE;
+  return has_floppy_ig = floppy_tg ? TRUE : FALSE;
 }
-#endif
 
 int auto2_has_i2o()
 {
@@ -948,49 +950,6 @@ int auto2_has_i2o()
 
   return FALSE;
 }
-
-#if 0
-int auto2_get_probe_env(hd_data_t *hd_data)
-{
-  char *s, *t, *env = getenv("probe");
-  int j, k;
-
-  if(env) s = env = strdup(env);
-  if(!env) return 0;
-
-  while((t = strsep(&s, ","))) {
-    if(*t == '+') {
-      k = 1;
-    }
-    else if(*t == '-') {
-      k = 0;
-    }
-    else {
-      deb_msg("unknown flag");
-      free(env);
-      return -1;
-    }
-
-    t++;
-
-    if((j = hd_probe_feature_by_name(t))) {
-      if(k)
-        hd_set_probe_feature(hd_data, j);
-      else
-        hd_clear_probe_feature(hd_data, j);
-    }
-    else {
-      fprintf(stderr, "unknown flag");
-      free(env);
-      return -2;
-    }
-  }
-
-  free(env);
-
-  return 0;
-}
-#endif
 
 int auto2_pcmcia()
 {
@@ -1030,87 +989,6 @@ char *auto2_usb_module()
 
   return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
 }
-
-#if 0
-/*
- * Assumes xf86_ver to be either "3" or "4" (or empty).
- */
-char *auto2_xserver(char **version, char **busid)
-{
-  static char display[16];
-  static char xf86_ver[2];
-  static char id[32];
-  char c, *x11i = x11i_tg;
-  static driver_info_t *di0 = NULL;
-  driver_info_t *di;
-  hd_t *hd;
-
-  di0 = hd_free_driver_info(di0);
-  x11_driver = NULL;
-
-  *display = *xf86_ver = *id = c = 0;
-  *version = xf86_ver;
-  *busid = id;
-
-  if(x11i) {
-    if(*x11i == '3' || *x11i == '4') {
-      c = *x11i;
-    }
-    else {
-      if(*x11i >= 'A' && *x11i <= 'Z') {
-        c = '3';
-      }
-      if(*x11i >= 'a' && *x11i <= 'z') {
-        c = '4';
-      }
-      if(c) {
-        strncpy(display, x11i, sizeof display - 1);
-        display[sizeof display - 1] = 0;
-      }
-    }
-  }
-
-#ifdef __PPC__
-  /* temporary hack due to XF4 problems */
-  if(!c) c = '3';
-#endif
-
-  if(c) { xf86_ver[0] = c; xf86_ver[1] = 0; }
-
-  if(!hd_data) return NULL;
-
-  hd = hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data));
-  if(hd && hd->bus == bus_pci)
-    sprintf(id, "%d:%d:%d", hd->slot >> 8, hd->slot & 0xff, hd->func);
-
-  if(*display) return display;
-
-  di0 = hd_driver_info(hd_data, hd);
-  for(di = di0; di; di = di->next) {
-    if(di->any.type == di_x11 && di->x11.server && di->x11.xf86_ver && !di->x11.x3d) {
-      if(c == 0 || c == di->x11.xf86_ver[0]) {
-        xf86_ver[0] = di->x11.xf86_ver[0];
-        xf86_ver[1] = 0;
-        strncpy(display, di->x11.server, sizeof display - 1);
-        display[sizeof display - 1] = 0;
-        x11_driver = di;
-        break;
-      }
-    }
-  }
-
-
-  if(*display) return display;
-
-  if(c == 0) c = '3';	/* default to XF 3, if nothing else is known  */
-
-  xf86_ver[0] = c;
-  xf86_ver[1] = 0;
-  strcpy(display, c == '3' ? "FBDev" : "fbdev");
-
-  return display;
-}
-#endif
 
 char *auto2_disk_list(int *boot_disk)
 {

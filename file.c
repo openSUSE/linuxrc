@@ -275,7 +275,8 @@ void file_write_yast_info (char *file_name)
         fprintf (file_pri, "%s %s\n", file_txt_braille_dev_tm, braille_dev_ig);
 #endif
 
-    fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
+    if (*floppy_tg)
+        fprintf (file_pri, "%s %s\n", file_txt_has_floppy_tm, floppy_tg);
     fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
     fprintf(file_pri, "%s %d\n",
       file_txt_yast2_update_tm,
@@ -392,12 +393,14 @@ int file_read_info (void)
     fd_pri = fopen (filename_ti, "r");
     if (!fd_pri)
         {
-        if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-            if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
-                {
-                if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-                return (-1);
-                }
+// What's this for??? -- snwint
+//        if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+
+        if (!*floppy_tg || util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+            {
+            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
+            return (-1);
+            }
 
         util_chk_driver_update (mountpoint_tg);
 

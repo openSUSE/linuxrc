@@ -1,3 +1,13 @@
+24/4/2001:	v1.1.19.004
+	- explicitly set umask to 022
+	- look for floppy disk and read info file _before_ asking for modules disk
+
+24/4/2001:	v1.1.19.003
+	- mantel: do not autoload aic7xxx_old
+	- mantel: new translations added
+	- automatically recognize various floppy drive types (legacy, usb, zip, ls-120)
+	- 'Floppydisk' entry in /etc/install.inf now holds floppy device name
+
 6/4/2001:	v1.1.19.002
 	- made 'Eject CD' lang dependent
 

@@ -68,7 +68,7 @@ char            ftp_user_tg [20];
 char            ftp_password_tg [20];
 char            ftp_proxy_tg [50];
 int             ftp_proxyport_ig = -1;
-char            floppy_tg [10];
+char            floppy_tg [20] = "/dev/fd0";
 char            ppcd_tg [10];
 int             serial_ig = FALSE;
 char            console_tg [30] = "/dev/console";

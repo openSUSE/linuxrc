@@ -845,7 +845,7 @@ void util_status_info()
   lxrc = getenv("linuxrc");
   sprintf(l[lc++], "linuxrc = \"%s\"", lxrc ? lxrc : "");
   sprintf(l[lc++], "yast = %d, auto = %d, action = 0x%x", yast_version_ig, auto2_ig ? 2 : auto_ig ? 1 : 0, action_ig);
-  sprintf(l[lc++], "cdrom = \"%s\", suse_cd = %d", cdrom_tg, found_suse_cd_ig);
+  sprintf(l[lc++], "floppy = \"%s\", cdrom = \"%s\", suse_cd = %d", floppy_tg, cdrom_tg, found_suse_cd_ig);
   sprintf(l[lc++], "driver_update_dir = \"%s\"", driver_update_dir);
 
   strcpy(t, inet_ntoa(ipaddr_rg));

@@ -183,8 +183,8 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # module parameters
   options ne io=0x300 irq=5
 
-  # is a floppy disk is present (in /dev/fd0)?
-  Floppydisk: 0|1
+  # floppy device that has a floppy inserted (if any)
+  Floppydisk: /dev/fd0
 
   # YaST2 update disk?
   YaST2update: 0|1
@@ -207,7 +207,7 @@ Example (boot via CD):
   Mousedevice: /dev/psaux
   MouseXF86: ps/2
   MouseGPM: ps2
-  Floppydisk: 1
+  Floppydisk: /dev/sda
   YaST2update: 0
   Textmode: 0
   Framebuffer: 0x0301
