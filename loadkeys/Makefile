@@ -5,11 +5,11 @@ all: $(TARGET)
 DEFS=-DDATADIR=\"/kbd\"
 
 SRC=loadkeys.c findfile.c analyze.c ksyms.c getfd.c setfont.c \
-    mapscrn.c loadunimap.c xmalloc.c \
-    kdfontop.c psffontop.c
+    mapscrn.c loadunimap.c xmalloc.c kdmapop.c dumpkeys.c \
+    kdfontop.c psffontop.c utf8.c
 OBJ=loadkeys.o ksyms.o findfile.o getfd.o setfont.o mapscrn.o \
     loadunimap.o xmalloc.o \
-    kdfontop.o psffontop.o
+    kdfontop.o psffontop.o utf8.o kdmapop.o dumpkeys.o
 INC=
 
 $(TARGET): $(SRC) $(OBJ) $(INC)

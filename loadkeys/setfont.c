@@ -1,7 +1,7 @@
 /*
  * setfont.c - Eugene Crosser & Andries Brouwer
  *
- * Version 1.00
+ * Version 1.05
  *
  * Loads the console font, and possibly the corresponding screen map(s).
  * We accept two kind of screen maps, one [-m] giving the correspondence
@@ -9,8 +9,6 @@
  * font positions, and the second [-u] giving the correspondence between
  * font positions and Unicode values.
  */
-
-#include "dietlibc.h"
 
 #include <stdio.h>
 #include <memory.h>
@@ -21,7 +19,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <sys/kd.h>
+#include <linux/kd.h>
 #include <endian.h>
 #include <sysexits.h>
 #include "paths.h"
@@ -31,6 +29,7 @@
 #include "psf.h"
 #include "psffontop.h"
 #include "kdfontop.h"
+#include "kdmapop.h"
 #include "xmalloc.h"
 #include "nls.h"
 #include "version.h"
@@ -42,13 +41,12 @@ static void loadnewfont(int fd, char *ifil,
 			int iunit, int hwunit, int no_m, int no_u);
 static void loadnewfonts(int fd, char **ifiles, int ifilct,
 			int iunit, int hwunit, int no_m, int no_u);
-static void restorefont(int fd);
 extern void saveoldmap(int fd, char *omfil);
 extern void loadnewmap(int fd, char *mfil);
-extern void activatemap(void);
-extern void disactivatemap(void);
+extern void activatemap(int fd);
+extern void disactivatemap(int fd);
 
-extern int lk_verbose;
+int lk_verbose = 0;
 int force = 0;
 int debug = 0;
 
@@ -75,21 +73,26 @@ usage(void)
         fprintf(stderr, _(
 "Usage: setfont [write-options] [-<N>] [newfont..] [-m consolemap] [-u unicodemap]\n"
 "  write-options (take place before file loading):\n"
-"    -o  <filename>	Write current font to <filename>\n"
-"    -om <filename>	Write current consolemap to <filename>\n"
-"    -ou <filename>	Write current unicodemap to <filename>\n"
-"If no newfont and no -[o|om|ou|m|u] option is given, a default font is loaded:\n"
-"    setfont             Load font \"default[.gz]\"\n"
-"    setfont -<N>        Load font \"default8x<N>[.gz]\"\n"
+"    -o  <filename>  Write current font to <filename>\n"
+"    -O  <filename>  Write current font and unicode map to <filename>\n"
+"    -om <filename>  Write current consolemap to <filename>\n"
+"    -ou <filename>  Write current unicodemap to <filename>\n"
+"If no newfont and no -[o|O|om|ou|m|u] option is given,\n"
+"a default font is loaded:\n"
+"    setfont         Load font \"default[.gz]\"\n"
+"    setfont -<N>    Load font \"default8x<N>[.gz]\"\n"
 "The -<N> option selects a font from a codepage that contains three fonts:\n"
 "    setfont -{8|14|16} codepage.cp[.gz]   Load 8x<N> font from codepage.cp\n"
-"Explicitly (with -m or -u) or implicitly (in the fontfile) given mappings will\n"
-"be loaded and, in the case of consolemaps, activated.\n"
-"    -h<N>       (no space) Override font height.\n"
-"    -m none	Suppress loading and activation of a mapping table.\n"
-"    -u none	Suppress loading of a unicode map.\n"
-"    -v		Be verbose.\n"
-"    -V		Print version and exit.\n"
+"Explicitly (with -m or -u) or implicitly (in the fontfile) given mappings\n"
+"will be loaded and, in the case of consolemaps, activated.\n"
+"    -h<N>      (no space) Override font height.\n"
+"    -m <fn>    Load console screen map.\n"
+"    -u <fn>    Load font unicode map.\n"
+"    -m none    Suppress loading and activation of a screen map.\n"
+"    -u none    Suppress loading of a unicode map.\n"
+"    -v         Be verbose.\n"
+"    -C <cons>  Indicate console device to be used.\n"
+"    -V         Print version and exit.\n"
 "Files are loaded from the current directory or /usr/lib/kbd/*/.\n"
 ));
 	exit(EX_USAGE);
@@ -98,9 +101,9 @@ usage(void)
 #define MAXIFILES 256
 
 int
-setfont_main(int argc, char *argv[])
-{
-	char *ifiles[MAXIFILES], *mfil, *ufil, *Ofil, *ofil, *omfil, *oufil;
+setfont_main(int argc, char *argv[]) {
+	char *ifiles[MAXIFILES];
+	char *mfil, *ufil, *Ofil, *ofil, *omfil, *oufil, *console;
 	int ifilct = 0, fd, i, iunit, hwunit, no_m, no_u;
 	int restore = 0;
 
@@ -112,21 +115,25 @@ setfont_main(int argc, char *argv[])
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 
-	fd = getfd();
-
-	ifiles[0] = mfil = ufil = Ofil = ofil = omfil = oufil = 0;
+	ifiles[0] = mfil = ufil = Ofil = ofil = omfil = oufil = NULL;
 	iunit = hwunit = 0;
 	no_m = no_u = 0;
+	console = NULL;
 
+	/*
+	 * No getopt() here because of the -om etc options.
+	 */
 	for (i = 1; i < argc; i++) {
 	    if (!strcmp(argv[i], "-V")) {
 		print_version_and_exit();
 	    } else if (!strcmp(argv[i], "-v")) {
-	        lk_verbose = 1;
-	    } else if (!strcmp(argv[i], "-d")) {
-		debug = 1;
+	        lk_verbose++;
 	    } else if (!strcmp(argv[i], "-R")) {
 		restore = 1;
+	    } else if (!strcmp(argv[i], "-C")) {
+		if (++i == argc || console)
+		  usage();
+		console = argv[i];
 	    } else if (!strcmp(argv[i], "-O")) {
 		if (++i == argc || Ofil)
 		  usage();
@@ -182,6 +189,8 @@ setfont_main(int argc, char *argv[])
 	    exit(EX_USAGE);
 	}
 
+	fd = getfd(console);
+
 	if (!ifilct && !mfil && !ufil &&
 	    !Ofil && !ofil && !omfil && !oufil && !restore)
 	  /* reset to some default */
@@ -201,7 +210,7 @@ setfont_main(int argc, char *argv[])
 
 	if (mfil) {
 	    loadnewmap(fd, mfil);
-	    activatemap();
+	    activatemap(fd);
 	    no_m = 1;
 	}
 
@@ -220,37 +229,23 @@ setfont_main(int argc, char *argv[])
 	return 0;
 }
 
-static void
-restorefont(int fd) {
-	/* On most kernels this won't work since it is not supported
-	   when BROKEN_GRAPHICS_PROGRAMS is defined, and that is defined
-	   by default.  Moreover, this is not defined for vgacon. */
-	if (ioctl(fd, PIO_FONTRESET, 0)) {
-		perror("PIO_FONTRESET");
-	}
-}
-
 /*
  * 0 - do not test, 1 - test and warn, 2 - test and wipe, 3 - refuse
  */
 static int erase_mode = 1;
 
 static void
-do_loadfont(int fd, char *inbuf, int width, int unit, int hwunit, int fontsize,
-	    char *pathname) {
+do_loadfont(int fd, char *inbuf, int width, int height, int hwunit,
+	    int fontsize, char *pathname) {
 	char *buf;
 	int i, buflen;
+	int bytewidth = (width+7)/8;
+	int charsize = height * bytewidth;
+	int kcharsize = 32 * bytewidth;
 	int bad_video_erase_char = 0;
-	int bpl = (width + 7) / 8;
 
-	buflen = 32*fontsize*bpl;
-	if (buflen < 32*128*bpl)		/* below we access position 32 */
-		buflen = 32*128*bpl;		/* so need at least 32*33 */
-	buf = xmalloc(buflen);
-	memset(buf,0,buflen);
-
-	if (unit < 1 || unit > 32) {
-		fprintf(stderr, _("Bad character height %d\n"), unit);
+	if (height < 1 || height > 32) {
+		fprintf(stderr, _("Bad character height %d\n"), height);
 		exit(EX_DATAERR);
 	}
 	if (width < 1 || width > 32) {
@@ -259,22 +254,23 @@ do_loadfont(int fd, char *inbuf, int width, int unit, int hwunit, int fontsize,
 	}
 
 	if (!hwunit)
-		hwunit = unit;
-		//hwunit = (unit > 32? 64: (unit > 16? 32: (unit > 8? 16: 8)));
+		hwunit = height;
 
+	buflen = kcharsize * ((fontsize < 128) ? 128 : fontsize);
+	buf = xmalloc(buflen);
+	memset(buf,0,buflen);
 
 	for (i = 0; i < fontsize; i++)
-		memcpy(buf+(32*i*bpl), inbuf+(unit*i*bpl), unit*bpl);
+		memcpy(buf+(i*kcharsize), inbuf+(i*charsize), charsize);
 
-	
 	/*
 	 * Due to a kernel bug, font position 32 is used
 	 * to erase the screen, regardless of maps loaded.
 	 * So, usually this font position should be blank.
 	 */
 	if (erase_mode) {
-		for (i = 0; i < 32*bpl; i++)
-			if (buf[32*32*bpl+i])
+		for (i = 0; i < kcharsize; i++)
+			if (buf[32*kcharsize+i])
 				bad_video_erase_char = 1;
 		if (bad_video_erase_char) {
 			fprintf(stderr,
@@ -284,8 +280,8 @@ do_loadfont(int fd, char *inbuf, int width, int unit, int hwunit, int fontsize,
 			case 3:
 				exit(EX_DATAERR);
 			case 2:
-				for (i = 0; i < 32*bpl; i++)
-					buf[32*32*bpl+i] = 0;
+				for (i = 0; i < kcharsize; i++)
+					buf[32*kcharsize+i] = 0;
 				fprintf(stderr, _("%s: wiped it\n"), progname);
 				break;
 			case 1:
@@ -299,21 +295,26 @@ do_loadfont(int fd, char *inbuf, int width, int unit, int hwunit, int fontsize,
 	}
 
 	if (lk_verbose) {
-		if (pathname)
+		if (height == hwunit && pathname)
+			printf(_("Loading %d-char %dx%d font from file %s\n"),
+			       fontsize, width, height, pathname);
+		else if (height == hwunit)
+			printf(_("Loading %d-char %dx%d font\n"),
+			       fontsize, width, height);
+		else if (pathname)
 			printf(_("Loading %d-char %dx%d (%d) font from file %s\n"),
-			       fontsize, width, unit, hwunit, pathname);
+			       fontsize, width, height, hwunit, pathname);
 		else
 			printf(_("Loading %d-char %dx%d (%d) font\n"),
-			       fontsize, width, unit, hwunit);
+			       fontsize, width, height, hwunit);
 	}
 
-	if (putfont(fd, buf, fontsize, width, unit, hwunit))
+	if (putfont(fd, buf, fontsize, width, hwunit))
 		exit(EX_OSERR);
 }
 
 static void
 do_loadtable(int fd, struct unicode_list *uclistheads, int fontsize) {
-	struct unimapinit advice;
 	struct unimapdesc ud;
 	struct unipair *up;
 	int i, ct = 0, maxct;
@@ -362,36 +363,13 @@ do_loadtable(int fd, struct unicode_list *uclistheads, int fontsize) {
 		exit(EX_SOFTWARE);
 	}
 
-	/* Note: after PIO_UNIMAPCLR and before PIO_UNIMAP
-	   this printf did not work on many kernels */
 	if (lk_verbose)
 	  printf(_("Loading Unicode mapping table...\n"));
 
-	advice.advised_hashsize = 0;
-	advice.advised_hashstep = 0;
-	advice.advised_hashlevel = 0;
-	if(ioctl(fd, PIO_UNIMAPCLR, &advice)) {
-#ifdef ENOIOCTLCMD
-	    if (errno == ENOIOCTLCMD) {
-		fprintf(stderr,
-			_("It seems this kernel is older than 1.1.92\n"
-			  "No Unicode mapping table loaded.\n"));
-	    } else
-#endif
-	      perror("PIO_UNIMAPCLR");
-	    exit(EX_OSERR);
-	}
 	ud.entry_ct = ct;
 	ud.entries = up;
-	if(ioctl(fd, PIO_UNIMAP, &ud)) {
-#if 0
-	    if (errno == ENOMEM) {
-		/* change advice parameters */
-	    }
-#endif
-	    perror("PIO_UNIMAP");
-	    exit(EX_OSERR);
-	}
+	if (loadunimap(fd, NULL, &ud))
+		exit(EX_OSERR);
 }
 
 static void
@@ -399,8 +377,8 @@ loadnewfonts(int fd, char **ifiles, int ifilct,
 	     int iunit, int hwunit, int no_m, int no_u) {
 	FILE *fpi;
 	char *ifil, *inbuf, *fontbuf, *bigfontbuf;
-	int inputlth, fontbuflth, fontsize, unit, width, bpl;
-	int bigfontbuflth, bigfontsize, bigunit, bigwidth;
+	int inputlth, fontbuflth, fontsize, height, width, bytewidth;
+	int bigfontbuflth, bigfontsize, bigheight, bigwidth;
 	struct unicode_list *uclistheads;
 	int i;
 
@@ -415,7 +393,7 @@ loadnewfonts(int fd, char **ifiles, int ifilct,
 	bigfontbuflth = 0;
 	bigfontsize = 0;
 	uclistheads = NULL;
-	bigunit = 0;
+	bigheight = 0;
 	bigwidth = 0;
 
 	for (i=0; i<ifilct; i++) {
@@ -431,21 +409,22 @@ loadnewfonts(int fd, char **ifiles, int ifilct,
 		fontsize = 0;
 
 		if(readpsffont(fpi, &inbuf, &inputlth, &fontbuf, &fontbuflth,
-			       &fontsize, &width, bigfontsize,
+			       &width, &fontsize, bigfontsize,
 			       no_u ? NULL : &uclistheads)) {
 			fprintf(stderr, _("When loading several fonts, all "
 					  "must be psf fonts - %s isn't\n"),
 				pathname);
 			exit(EX_DATAERR);
 		}
-		bpl = (width + 7) / 8;
-		unit = fontbuflth / (bpl * fontsize);
+		bytewidth = (width+7) / 8;
+		height = fontbuflth / (bytewidth * fontsize);
 		if (lk_verbose)
 			printf(_("Read %d-char %dx%d font from file %s\n"),
-			       fontsize, width, unit, pathname);
-		if (bigunit == 0)
-			bigunit = unit;
-		else if (bigunit != unit) {
+			       fontsize, width, height, pathname);
+
+		if (bigheight == 0)
+			bigheight = height;
+		else if (bigheight != height) {
 			fprintf(stderr, _("When loading several fonts, all "
 					  "must have the same height\n"));
 			exit(EX_DATAERR);
@@ -457,14 +436,15 @@ loadnewfonts(int fd, char **ifiles, int ifilct,
 					  "must have the same width\n"));
 			exit(EX_DATAERR);
 		}
-			
+
 		bigfontsize += fontsize;
 		bigfontbuflth += fontbuflth;
 		bigfontbuf = xrealloc(bigfontbuf, bigfontbuflth);
 		memcpy(bigfontbuf+bigfontbuflth-fontbuflth,
 		       fontbuf, fontbuflth);
 	}
-	do_loadfont(fd, bigfontbuf, bigwidth, bigunit, hwunit, bigfontsize, NULL);
+	do_loadfont(fd, bigfontbuf, bigwidth, bigheight, hwunit,
+		    bigfontsize, NULL);
 
 	if (uclistheads && !no_u)
 		do_loadtable(fd, uclistheads, bigfontsize);
@@ -474,7 +454,7 @@ static void
 loadnewfont(int fd, char *ifil, int iunit, int hwunit, int no_m, int no_u) {
 	FILE *fpi;
 	char defname[20];
-	int unit, width, bpl, def = 0;
+	int height, width, bytewidth, def = 0;
 	char *inbuf, *fontbuf;
 	int inputlth, fontbuflth, fontsize, offset;
 	struct unicode_list *uclistheads;
@@ -509,16 +489,22 @@ loadnewfont(int fd, char *ifil, int iunit, int hwunit, int no_m, int no_u) {
 		}
 	}
 
+	if (lk_verbose > 1)
+		printf(_("Reading font file %s\n"), ifil);
+
 	inbuf = fontbuf = NULL;
 	inputlth = fontbuflth = fontsize = 0;
+	width = 8;
 	uclistheads = NULL;
 	if(readpsffont(fpi, &inbuf, &inputlth, &fontbuf, &fontbuflth,
-		       &fontsize, &width, 0, no_u ? NULL : &uclistheads) == 0) {
+		       &width, &fontsize, 0,
+		       no_u ? NULL : &uclistheads) == 0) {
 		/* we've got a psf font */
-		bpl = (width + 7) / 8;
-		unit = fontbuflth / (bpl * fontsize);
+		bytewidth = (width+7) / 8;
+		height = fontbuflth / (bytewidth * fontsize);
 
-		do_loadfont(fd, fontbuf, width, unit, hwunit, fontsize, pathname);
+		do_loadfont(fd, fontbuf, width, height, hwunit,
+			    fontsize, pathname);
 		if (uclistheads && !no_u)
 			do_loadtable(fd, uclistheads, fontsize);
 #if 1
@@ -562,7 +548,7 @@ loadnewfont(int fd, char *ifil, int iunit, int hwunit, int no_m, int no_u) {
 	/* file with three code pages? */
 	if (inputlth == 9780) {
 		offset = position_codepage(iunit);
-		unit = iunit;
+		height = iunit;
 		fontsize = 256;
 		width = 8;
 	} else if (inputlth == 32768) {
@@ -577,8 +563,8 @@ loadnewfont(int fd, char *ifil, int iunit, int hwunit, int no_m, int no_u) {
 		inputlth = 16384; 	/* ignore rest */
 		fontsize = 512;
 		offset = 0;
-		unit = 32;
 		width = 8;
+		height = 32;
 		if (!hwunit)
 			hwunit = 16;
 	} else {
@@ -593,10 +579,11 @@ loadnewfont(int fd, char *ifil, int iunit, int hwunit, int no_m, int no_u) {
 			exit(EX_DATAERR);
 		}
 		fontsize = 256;
-		unit = inputlth/256;
 		width = 8;
+		height = inputlth/256;
 	}
-	do_loadfont(fd, inbuf+offset, width, unit, hwunit, fontsize, pathname);
+	do_loadfont(fd, inbuf+offset, width, height, hwunit, fontsize,
+		    pathname);
 }
 
 static int
@@ -632,86 +619,69 @@ position_codepage(int iunit) {
 }
 
 static void
-do_saveoldfont(int fd, char *ofil, FILE *fpo, int unimap_follows, int *count, int *utf8) 
-{
-    int i, unit, width, height, bpl, ct;
-    char buf[MAXFONTSIZE];
+do_saveoldfont(int fd, char *ofil, FILE *fpo, int unimap_follows,
+	       int *count, int *utf8) {
 
-    ct = sizeof(buf)/(32*32/8);			/* max size 32x32, 8 bits/byte */
-    if (getfont(fd, buf, &ct, &width, &height))
-	exit(EX_OSERR);
+/* this is the max font size the kernel is willing to handle */
+#define MAXFONTSIZE	65536
+	char buf[MAXFONTSIZE];
 
-    bpl = (width + 7) / 8;
-    /* save as efficiently as possible */
-    unit = font_charheight(buf, ct, bpl);
+	int i, ct, width, height, bytewidth, charsize, kcharsize;
 
-    /* Do we need a psf header? */
-    /* Yes if ct=512 - otherwise we cannot distinguish
-       a 512-char 8x8 and a 256-char 8x16 font. */
+	ct = sizeof(buf)/(32*32/8);	/* max size 32x32, 8 bits/byte */
+	if (getfont(fd, buf, &ct, &width, &height))
+		exit(EX_OSERR);
+
+	/* save as efficiently as possible */
+	bytewidth = (width + 7) / 8;
+	height = font_charheight(buf, ct, width);
+	charsize = height * bytewidth;
+	kcharsize = 32 * bytewidth;
+
+	/* Do we need a psf header? */
+	/* Yes if ct==512 - otherwise we cannot distinguish
+	   a 512-char 8x8 and a 256-char 8x16 font. */
 #define ALWAYS_PSF_HEADER	1
 
-    if (ct != 256 || unimap_follows || width != 8 || ALWAYS_PSF_HEADER) {
-	    /* We need to reorganise the font in memory ... */
-	    if (height != 32) {
-		    int c;
-		    if (debug) printf ("Remap %i chars: 32 -> %i (%i)\n", ct, height, unit);
-		    for (c = 0; c < ct; c++)
-			    memmove (buf+height*bpl*c, buf+32*bpl*c, height*bpl);
-	    }
-	    if (unimap_follows)
-		    *utf8 = writepsffont(fpo, buf, width, height*bpl, ct, 0, (struct unicode_list*)-1, fd);
-	    else
-		    writepsffont(fpo, buf, width, height*bpl, ct, 0, 0, fd);
-	    if (lk_verbose)
-		    printf(_("Saved %d-char %dx%d font file on %s\n"), ct, width, unit, ofil);
-	    if (count)
-		    *count = ct;
-	    return;
-#if 0
-	/* old font save routine */
-        struct psf1_header psfhdr;
+	if (ct != 256 || width != 8 || unimap_follows || ALWAYS_PSF_HEADER) {
+		int psftype = 1;
+		int flags = 0;
 
-	psfhdr.magic[0] = PSF1_MAGIC0;
-	psfhdr.magic[1] = PSF1_MAGIC1;
-	psfhdr.mode = 0;
-	if (ct != 256)
-	    psfhdr.mode |= PSF1_MODE512;
-	if (unimap_follows)
-	    psfhdr.mode |= PSF1_MODEHASTAB;
-	psfhdr.charsize = unit;
-	if (fwrite(&psfhdr, sizeof(struct psf1_header), 1, fpo) != 1) {
-	    fprintf(stderr, _("Cannot write font file header"));
-	    exit(EX_IOERR);
+		if (unimap_follows)
+			flags |= WPSFH_HASTAB;
+		writepsffontheader (fpo, width, height, ct, &psftype, flags);
+		if (utf8)
+			*utf8 = (psftype == 2);
 	}
-#endif
-    }
 
-    if (unit == 0)
-      fprintf(stderr, _("Found nothing to save\n"));
-    else {
-      for (i = 0; i < ct; i++)
-	if (fwrite(buf+(32*i), unit, 1, fpo) != 1) {
-	   fprintf(stderr, _("Cannot write font file"));
-	   exit(EX_IOERR);
+	if (height == 0) {
+		fprintf(stderr, _("Found nothing to save\n"));
+	} else {
+		for (i = 0; i < ct; i++) {
+			if (fwrite(buf+(i*kcharsize), charsize, 1, fpo) != 1) {
+				fprintf(stderr, _("Cannot write font file"));
+				exit(EX_IOERR);
+			}
+		}
+		if (lk_verbose) {
+			printf(_("Saved %d-char %dx%d font file on %s\n"),
+			       ct, width, height, ofil);
+		}
 	}
-      if (lk_verbose)
-	printf(_("Saved %d-char 8x%d font file on %s\n"), ct, unit, ofil);
-    }
 
-    if (count)
-      *count = ct;
+	if (count)
+		*count = ct;
 }
 
 static void
 saveoldfont(int fd, char *ofil) {
     FILE *fpo;
-    int utf8;
 
     if((fpo = fopen(ofil, "w")) == NULL) {
 	perror(ofil);
 	exit(EX_CANTCREAT);
     }
-    do_saveoldfont(fd, ofil, fpo, 0, NULL, &utf8);
+    do_saveoldfont(fd, ofil, fpo, 0, NULL, NULL);
     fclose(fpo);
 }
 
@@ -736,12 +706,19 @@ saveoldfontplusunicodemap(int fd, char *Ofil) {
    probably it should copy the default from the current console?
    But what if we want a new one because the current one is messed up? */
 /* For the moment: only the current console, only the G0 set */
-void
-activatemap(void) {
-    printf("\033(K");
+
+static void
+send_escseq(int fd, char *seq, int n) {
+	if (write(fd, seq, n) != n)  /* maybe fd is read-only */
+		printf(seq);
 }
 
 void
-disactivatemap(void) {
-    printf("\033(B");
+activatemap(int fd) {
+	send_escseq(fd, "\033(K", 3);
+}
+
+void
+disactivatemap(int fd) {
+	send_escseq(fd, "\033(B", 3);
 }

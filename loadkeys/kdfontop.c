@@ -1,16 +1,17 @@
 /*
- * kdfontop.c - export getfont() and putfont()
+ * kdfontop.c - export getfont(), getfontsize() and putfont()
  *
  * Font handling differs between various kernel versions.
  * Hide the differences in this file.
  */
 #include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>		/* free() */
 #include <sys/ioctl.h>
 #include <linux/kd.h>
 #include "kdfontop.h"
 #include "nls.h"
+#include "version.h"
 
 /*
  * Linux pre-0.96 introduced, and 1.1.63 removed the defines
@@ -24,7 +25,7 @@
  */
 
 /*
- * Linux 0.99.15 introduces the GIO_FONT and PIO_FONT ioctls.
+ * Linux 0.99.14y introduces the GIO_FONT and PIO_FONT ioctls.
  * Usage:
 	char buf[8192];
 	ioctl(fd, GIO_FONT, buf);
@@ -90,6 +91,15 @@ struct consolefontdesc {
 #define PIO_FONTRESET   0x4B6D  /* reset to default font */
 #endif
 
+int
+restorefont(int fd) {
+	if (ioctl(fd, PIO_FONTRESET, 0)) {
+		perror("PIO_FONTRESET");
+		return -1;
+	}
+	return 0;
+}
+
 /*
  * Linux 2.1.111 introduces the KDFONTOP ioctl.
  * Details of use have changed a bit in 2.1.111-115,124.
@@ -119,20 +129,21 @@ struct console_font_op {
 #endif /* KDFONTOP */
 
 int
-font_charheight(char *buf, int count, int bpl) {
+font_charheight(char *buf, int count, int width) {
 	int h, i, x;
+	int bytewidth = (width+7)/8;
 
 	for (h = 32; h > 0; h--)
 		for (i = 0; i < count; i++)
-			for (x = 0; x < bpl; x++)
-				if (buf[(32*i+h-1)*bpl+x])
+			for (x = 0; x < bytewidth; x++)
+				if (buf[(32*i+h-1)*bytewidth+x])
 					goto nonzero;
-
  nonzero:
 	return h;
 }
 
-
+/* may be called with buf==NULL if we only want info */
+/* must not exit - we may have cleanup to do */
 int
 getfont(int fd, char *buf, int *count, int *width, int *height) {
 	struct consolefontdesc cfd;
@@ -152,14 +163,6 @@ getfont(int fd, char *buf, int *count, int *width, int *height) {
 			*height = cfo.height;
 		if (width)
 			*width = cfo.width;
-#if 0		
-		/* We do support width != 8. */
-		if (cfo.width != 8) {
-			fprintf(stderr,
-				_("kdfontop.c: only width 8 supported\n"));
-			exit(1);
-		}
-#endif		
 		return 0;
 	}
 	if (errno != ENOSYS && errno != EINVAL) {
@@ -188,7 +191,7 @@ getfont(int fd, char *buf, int *count, int *width, int *height) {
 	/* Third attempt: GIO_FONT */
 	if (*count < 256) {
 		fprintf(stderr, _("bug: getfont called with count<256\n"));
-		exit(1);
+		return -1;
 	}
 	i = ioctl(fd, GIO_FONT, buf);
 	if (i) {
@@ -196,18 +199,31 @@ getfont(int fd, char *buf, int *count, int *width, int *height) {
 		return -1;
 	}
 	*count = 256;
+	if (height)
+		*height = 0;	/* undefined, at most 32 */
 	return 0;
 }
 
 int
-putfont(int fd, char *buf, int count, int width, int height, int hwunit) {
+getfontsize(int fd) {
+	int count, width, height;
+	int i;
+
+	count = width = height = 0;
+	i = getfont(fd, NULL, &count, &width, &height);
+	return (i == 0) ? count : 256;
+}
+
+int
+putfont(int fd, char *buf, int count, int width, int height) {
 	struct consolefontdesc cfd;
 	struct console_font_op cfo;
 	int i;
 
-	if (!width) width = 8;
-	if (!hwunit)
-		hwunit = font_charheight(buf, count, width);
+	if (!width)
+		width = 8;
+	if (!height)
+		height = font_charheight(buf, count, width);
 
 	/* First attempt: KDFONTOP */
 	cfo.op = KD_FONT_OP_SET;
@@ -219,9 +235,29 @@ putfont(int fd, char *buf, int count, int width, int height, int hwunit) {
 	i = ioctl(fd, KDFONTOP, &cfo);
 	if (i == 0)
 		return 0;
-	if (errno != ENOSYS && errno != EINVAL) {
+	if (width != 8 || (errno != ENOSYS && errno != EINVAL)) {
 		perror("putfont: KDFONTOP");
 		return -1;
+	}
+
+	/* Variation on first attempt: in case count is not 256 or 512
+	   round up and try again. */
+	if (errno == EINVAL && width == 8 && count != 256 && count < 512) {
+		int ct = ((count > 256) ? 512 : 256);
+		char *mybuf = malloc(32 * ct);
+
+		if (!mybuf) {
+			fprintf(stderr, _("%s: out of memory\n"), progname);
+			return -1;
+		}
+		memset(mybuf, 0, 32 * ct);
+		memcpy(mybuf, buf, 32 * count);
+		cfo.data = mybuf;
+		cfo.charcount = ct;
+		i = ioctl(fd, KDFONTOP, &cfo);
+		free(mybuf);
+		if (i == 0)
+			return 0;
 	}
 
 	/* Second attempt: PIO_FONTX */

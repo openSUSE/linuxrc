@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <string.h>
 #include <linux/vt.h>
+#include <linux/kd.h>
 #include <errno.h>
 
 #include "global.h"
@@ -34,7 +35,6 @@
 
 static struct termios   kbd_norm_tio_rm;
 static struct termios   kbd_tio_rm;
-static int              kbd_tty_im;
 static int              kbd_timeout_im;
 
 typedef struct {
@@ -95,23 +95,24 @@ static void get_screen_size(int fd);
 
 void kbd_init (int first)
     {
-    struct winsize  winsize_ri;
-    char           *start_msg_pci = "Startup...\n";
+    struct winsize winsize_ri;
+    int fd;
 
     if(!config.test) {
-      kbd_tty_im = open ("/dev/tty4", O_RDWR);
-      write (kbd_tty_im, start_msg_pci, strlen (start_msg_pci));
-      close (kbd_tty_im);
+      fd = open("/dev/tty4", O_RDWR);
+      write(fd, "Startup...\n", sizeof "Startup...\n" - 1);
+      close(fd);
     }
 
-    kbd_tty_im = open (config.console, O_RDWR);
+    kbd_unimode();
 
-    tcgetattr (kbd_tty_im, &kbd_norm_tio_rm);
+    if(config.kbd_fd == -1) config.kbd_fd = open(config.console, O_RDWR);
+    tcgetattr (config.kbd_fd, &kbd_norm_tio_rm);
     kbd_tio_rm = kbd_norm_tio_rm;
     if (config.linemode)
         {
 	kbd_tio_rm.c_lflag &= ~ISIG;
-	tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
+	tcsetattr (config.kbd_fd, TCSAFLUSH, &kbd_tio_rm);
 	if (first)
 	    {
 	    max_x_ig = 80;
@@ -123,7 +124,7 @@ void kbd_init (int first)
     kbd_tio_rm.c_cc [VTIME] = 0;
     kbd_tio_rm.c_lflag &= ~(ECHO | ICANON | ISIG);
     kbd_tio_rm.c_iflag &= ~(INLCR | IGNCR | ICRNL);
-    if (first && !ioctl (kbd_tty_im, TIOCGWINSZ, &winsize_ri))
+    if (first && !ioctl (config.kbd_fd, TIOCGWINSZ, &winsize_ri))
         {
         if (winsize_ri.ws_col && winsize_ri.ws_row)
             {
@@ -133,16 +134,16 @@ void kbd_init (int first)
 
         }
 
-    tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
+    tcsetattr (config.kbd_fd, TCSAFLUSH, &kbd_tio_rm);
 
-    write(kbd_tty_im, "\033[?1l", sizeof "\033[?1l" - 1);
-    fsync(kbd_tty_im);
+    write(config.kbd_fd, "\033[?1l", sizeof "\033[?1l" - 1);
+    fsync(config.kbd_fd);
 
-    write(kbd_tty_im, "\033%G", sizeof "\033%G" - 1);
-    fsync(kbd_tty_im);
+    write(config.kbd_fd, "\033%G", sizeof "\033%G" - 1);
+    fsync(config.kbd_fd);
 
     if(first && config.serial) {
-      get_screen_size(kbd_tty_im);
+      get_screen_size(config.kbd_fd);
 
       if(max_x_ig > MAX_X) max_x_ig = MAX_X;
       if(max_y_ig > MAX_Y) max_y_ig = MAX_Y;
@@ -154,29 +155,33 @@ void kbd_init (int first)
       winsize_ri.ws_col = max_x_ig;
       winsize_ri.ws_row = max_y_ig;
 
-      ioctl(kbd_tty_im, TIOCSWINSZ, &winsize_ri);
+      ioctl(config.kbd_fd, TIOCSWINSZ, &winsize_ri);
     }
 
     }
 
 
-void kbd_reset (void)
-    {
-    tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
-    }
-
-void kbd_end (int close_fd)
-    {
-    tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_norm_tio_rm);
-    if(close_fd) close (kbd_tty_im);
-    }
+void kbd_reset()
+{
+  tcsetattr(config.kbd_fd, TCSAFLUSH, &kbd_tio_rm);
+}
 
 
-void kbd_switch_tty (int  tty_iv)
-    {
-    ioctl (kbd_tty_im, VT_ACTIVATE, tty_iv);
-    ioctl (kbd_tty_im, VT_WAITACTIVE, tty_iv);
-    }
+void kbd_end(int close_fd)
+{
+  tcsetattr (config.kbd_fd, TCSAFLUSH, &kbd_norm_tio_rm);
+  if(close_fd) {
+    close(config.kbd_fd);
+    config.kbd_fd = -1;
+  }
+}
+
+
+void kbd_switch_tty(int tty)
+{
+  ioctl(config.kbd_fd, VT_ACTIVATE, tty);
+  ioctl(config.kbd_fd, VT_WAITACTIVE, tty);
+}
 
 
 /*
@@ -189,6 +194,7 @@ int kbd_getch(int wait_iv)
 
   do {
     key = kbd_getch_raw(wait_iv);
+
 //    fprintf(stderr, "rawkey(%d): %d\n", wait_iv, key);
 
     if(key == KEY_ENTER || key == KEY_CTRL_M) {
@@ -319,7 +325,7 @@ int kbd_getch_raw(do_wait)
 
     kbd_set_timeout(delay);
     key = 0;
-    read(kbd_tty_im, &key, 1);
+    read(config.kbd_fd, &key, 1);
     kbd_del_timeout();
     if(do_wait && config.kbdtimeout && (time_to_wait -= delay) <= 0) {
       /* fake 'Enter' */
@@ -358,7 +364,7 @@ void kbd_echo_off (void)
 	struct termios tios;
 	tios = kbd_tio_rm;
 	tios.c_lflag &= ~ECHO;
-	tcsetattr (kbd_tty_im, TCSAFLUSH, &tios);
+	tcsetattr (config.kbd_fd, TCSAFLUSH, &tios);
     }
 
 
@@ -433,4 +439,19 @@ void get_screen_size(int fd)
   }
 }
 
+
+void kbd_unimode()
+{
+  int fd, kbd_mode = K_UNICODE;
+
+  if(config.test) return;
+
+  fd = open(config.console, O_RDWR);
+
+  if(fd < 0 || ioctl(fd, KDSKBMODE, kbd_mode) == -1) {
+    perror("error setting kbd mode");
+  }
+
+  if(fd >= 0) close(fd);
+}
 

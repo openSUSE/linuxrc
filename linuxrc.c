@@ -86,6 +86,7 @@ static void lxrc_makelinks(char *name);
 int cardmgr_main(int argc, char **argv);
 // int insmod_main(int argc, char **argv);
 int loadkeys_main(int argc, char **argv);
+int dumpkeys_main(int argc, char **argv);
 int dhcpcd_main(int argc, char **argv);
 int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
@@ -105,6 +106,7 @@ static struct {
   { "lsmod",       util_lsmod_main       },
 #if !defined(__s390__) && !defined(__s390x__)
   { "loadkeys",    loadkeys_main         },
+  { "dumpkeys",    dumpkeys_main         },
   { "setfont",     setfont_main          },
 #endif
   { "portmap",     portmap_main          },
@@ -661,6 +663,7 @@ void lxrc_init()
   config.usbwait = 4;		/* 4 seconds */
   config.escdelay = 100;	/* 100 ms */
   config.utf8 = 1;
+  config.kbd_fd = -1;
 
   config.hwdetect = 1;
 

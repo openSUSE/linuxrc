@@ -298,6 +298,7 @@ typedef struct {
   int loglevel;			/* set kernel log level */
   char *loghost;		/* syslog host */
   char *rootpassword;
+  int kbd_fd;			/* fd for console */
   struct {
     char *dir;			/* driver update source dir */
     char *dst;			/* driver update destination dir */

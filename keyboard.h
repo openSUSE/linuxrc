@@ -63,3 +63,4 @@ extern int   kbd_getch        (int wait_iv);
 extern void  kbd_clear_buffer (void);
 extern void  kbd_switch_tty   (int tty_iv);
 extern void  kbd_echo_off     (void);
+void kbd_unimode(void);

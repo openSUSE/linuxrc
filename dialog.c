@@ -1414,9 +1414,12 @@ void dia_handle_ctrlc (void)
         }
         if(!config.linemode) {
           printf("\033c");
+          if(config.utf8) printf("\033%%G");
           fflush(stdout);
         }
-        system(util_check_exist("/lbin/lsh") ? "/lbin/lsh 2>&1" : "/bin/sh");
+
+        system(util_check_exist("/lbin/lsh") ? "/lbin/lsh >/dev/console 2>/dev/console" : "/bin/sh");
+
         kbd_init(0);
         if(config.win) {
           disp_cursor_off();

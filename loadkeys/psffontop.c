@@ -9,6 +9,7 @@
 #include "nls.h"
 #include "psf.h"
 #include "psffontop.h"
+#include "utf8.h"
 #include "paths.h"
 
 extern char *progname;
@@ -47,6 +48,19 @@ addseq(struct unicode_list *up, unsigned int uc) {
 }
 
 static unsigned int
+assemble_int(unsigned char *ip) {
+	return (ip[0] + (ip[1]<<8) + (ip[2]<<16) + (ip[3]<<24));
+}
+
+static void
+store_int_le(unsigned char *ip, int num) {
+	ip[0] = (num & 0xff);
+	ip[1] = ((num >> 8) & 0xff);
+	ip[2] = ((num >> 16) & 0xff);
+	ip[3] = ((num >> 24) & 0xff);
+}
+
+static unsigned int
 assemble_ucs2(char **inptr, int cnt) {
 	unsigned char **in = (unsigned char **) inptr;
 	unsigned int u1, u2;
@@ -65,41 +79,25 @@ assemble_ucs2(char **inptr, int cnt) {
 /* called with cnt > 0 and **inptr not 0xff or 0xfe */
 static unsigned int
 assemble_utf8(char **inptr, int cnt) {
-	unsigned char *in;
-	unsigned int uc, uc1, uc2 = 0;
-	int need, need1, bit, bad = 0;
+	int err;
+	unsigned long uc;
+	char *u;
 
-	in = (unsigned char *)(* inptr);
-	uc = *in++; 
-	need = 0;
-	bit = 0x80; uc1 = uc;
-	while(uc & bit) {
-		need++;
-		bit >>= 1;
-	}
-	uc &= (bit-1);
-	if (cnt < need) {
-		char *u = _("%s: short utf8 unicode table\n");
+	uc = from_utf8(inptr, cnt, &err);
+	if (err) {
+		switch (err) {
+		case UTF8_SHORT:
+			u = _("%s: short utf8 unicode table\n");
+			break;
+		case UTF8_BAD:
+			u = _("%s: bad utf8\n");
+			break;
+		default:
+			u = _("%s: unknown utf8 error\n");
+		}
 		fprintf(stderr, u, progname);
 		exit(EX_DATAERR);
 	}
-	need1 = need;
-	if (need == 1)
-		bad = 1;
-	else if (need) while(--need) {
-		uc2 = *in++;
-		if ((uc2 & 0xc0) != 0x80) {
-			bad = 1;
-			break;
-		}
-		uc = ((uc << 6) | (uc2 & 0x3f));
-	}
-	if (bad) {
-		char *u = _("%s: bad utf8 %02x %02x (need %i, cnt %i)\n");
-		fprintf(stderr, u, progname, uc1, uc2, need1, cnt);
-		exit(EX_DATAERR);
-	}
-	*inptr = in;
 	return uc;
 }
 
@@ -149,16 +147,12 @@ get_uni_entry(char **inptr, char **endptr, struct unicode_list *up, int utf8) {
 				continue;
 			}
 		}
-		if (inseq == 0)
+		if (inseq < 2)
 			addpair(up, unichar);
 		else
-		{
-			if (inseq == 1)
-				addpair(up, unichar);
-			else
-				addseq(up, unichar);
+			addseq(up, unichar);
+		if (inseq)
 			inseq++;
-		}
 	}
 }
 
@@ -175,6 +169,7 @@ get_uni_entry(char **inptr, char **endptr, struct unicode_list *up, int utf8) {
  * buffer was allocated using malloc().
  * In FONTBUFP, FONTSZP the subinterval of ALLBUFP containing
  * the font data is given.
+ * The font width is stored in FONTWIDTHP.
  * The number of glyphs is stored in FONTLENP.
  * The unicodetable is stored in UCLISTHEADSP (when non-NULL), with
  * fontpositions counted from FONTPOS0 (so that calling this several
@@ -185,12 +180,12 @@ extern char *progname;
 int
 readpsffont(FILE *fontf, char **allbufp, int *allszp,
 	    char **fontbufp, int *fontszp,
-	    int *fontlenp, int *fontwidthp, int fontpos0,
+	    int *fontwidthp, int *fontlenp, int fontpos0,
 	    struct unicode_list **uclistheadsp) {
 	char *inputbuf = NULL;
 	int inputbuflth = 0;
 	int inputlth, fontlen, fontwidth, charsize, hastable, ftoffset, utf8;
-	int i, k, n, bpl;
+	int i, k, n;
 
 	/*
 	 * We used to look at the length of the input file
@@ -246,11 +241,12 @@ readpsffont(FILE *fontf, char **allbufp, int *allszp,
 		charsize = psfhdr->charsize;
 		hastable = (psfhdr->mode & (PSF1_MODEHASTAB|PSF1_MODEHASSEQ));
 		ftoffset = sizeof(struct psf1_header);
-		utf8 = 0;
 		fontwidth = 8;
+		utf8 = 0;
 	} else if (inputlth >= sizeof(struct psf2_header) &&
 		   PSF2_MAGIC_OK((unsigned char *)inputbuf)) {
 		struct psf2_header *psfhdr;
+		int flags;
 
 		psfhdr = (struct psf2_header *) &inputbuf[0];
 
@@ -259,11 +255,12 @@ readpsffont(FILE *fontf, char **allbufp, int *allszp,
 			fprintf(stderr, u, progname, psfhdr->version);
 			exit(EX_DATAERR);
 		}
-		fontlen = psfhdr->length;
-		charsize = psfhdr->charsize;
-		hastable = (psfhdr->flags & PSF2_HAS_UNICODE_TABLE);
-		ftoffset = psfhdr->headersize;
-		fontwidth = psfhdr->width;
+		fontlen = assemble_int((unsigned char *) &psfhdr->length);
+		charsize = assemble_int((unsigned char *) &psfhdr->charsize);
+		flags = assemble_int((unsigned char *) &psfhdr->flags);
+		hastable = (flags & PSF2_HAS_UNICODE_TABLE);
+		ftoffset = assemble_int((unsigned char *) &psfhdr->headersize);
+		fontwidth = assemble_int((unsigned char *) &psfhdr->width);
 		utf8 = 1;
 	} else
 		return -1;	/* not psf */
@@ -292,7 +289,7 @@ readpsffont(FILE *fontf, char **allbufp, int *allszp,
 		*fontszp = fontlen * charsize;
 	if (fontlenp)
 		*fontlenp = fontlen;
-	if (fontwidth)
+	if (fontwidthp)
 		*fontwidthp = fontwidth;
 
 	if (!uclistheadsp)
@@ -398,37 +395,35 @@ appendseparator(FILE *fp, int seq, int utf8) {
 	}
 }
 
-int
-writepsffont(FILE *ofil, char *fontbuf, int width, int charsize, int fontlen,
-	     int psftype, struct unicode_list *uclistheads, int fd) {
-	int i;
-	int utf8;
-	int seqs = 0;
-	int bpl = (width + 7) / 8;
-	int height = charsize / bpl;
+void
+writepsffontheader(FILE *ofil, int width, int height, int fontlen,
+		   int *psftype, int flags) {
+	int bytewidth, charsize, ret;
 
-	if (uclistheads && uclistheads != (struct unicode_list*)-1)
-		seqs = has_sequences(uclistheads, fontlen);
+	bytewidth = (width+7)/8;
+	charsize = bytewidth * height;
 
-	/* Output new font file */
-	if ((fontlen != 256 && fontlen != 512) || psftype == 2 || width != 8) {
+	if ((fontlen != 256 && fontlen != 512) || width != 8)
+		*psftype = 2;
+
+	if (*psftype == 2) {
 		struct psf2_header h;
+		int flags2 = 0;
 
+		if (flags & WPSFH_HASTAB)
+			flags2 |= PSF2_HAS_UNICODE_TABLE;
 		h.magic[0] = PSF2_MAGIC0;
 		h.magic[1] = PSF2_MAGIC1;
 		h.magic[2] = PSF2_MAGIC2;
 		h.magic[3] = PSF2_MAGIC3;
-		h.version = 0;
-		h.headersize = sizeof(h);
-		h.flags = 0;
-		if (uclistheads != NULL)
-			h.flags |= PSF2_HAS_UNICODE_TABLE;
-		h.length = fontlen;
-		h.charsize = charsize;
-		h.width = width;
-		h.height = height;
-		fwrite(&h, sizeof(h), 1, ofil);
-		utf8 = 1;
+		store_int_le((unsigned char *) &h.version, 0);
+		store_int_le((unsigned char *) &h.headersize, sizeof(h));
+		store_int_le((unsigned char *) &h.flags, flags2);
+		store_int_le((unsigned char *) &h.length, fontlen);
+		store_int_le((unsigned char *) &h.charsize, charsize);
+		store_int_le((unsigned char *) &h.width, width);
+		store_int_le((unsigned char *) &h.height, height);
+		ret = fwrite(&h, sizeof(h), 1, ofil);
 	} else {
 		struct psf1_header h;
 
@@ -437,12 +432,39 @@ writepsffont(FILE *ofil, char *fontbuf, int width, int charsize, int fontlen,
 		h.mode = 0;
 		if (fontlen == 512)
 			h.mode |= PSF1_MODE512;
-		if (uclistheads != NULL)
-			h.mode |= (seqs ? PSF1_MODEHASSEQ : PSF1_MODEHASTAB);
+		if (flags & WPSFH_HASSEQ)
+			h.mode |= PSF1_MODEHASSEQ;
+		else if (flags & WPSFH_HASTAB)
+			h.mode |= PSF1_MODEHASTAB;
 		h.charsize = charsize;
-		fwrite(&h, sizeof(h), 1, ofil);
-		utf8 = 0;
+		ret = fwrite(&h, sizeof(h), 1, ofil);
 	}
+
+	if (ret != 1) {
+		fprintf(stderr, _("Cannot write font file header"));
+		exit(EX_IOERR);
+	}
+}
+
+
+int
+writepsffont(FILE *ofil, char *fontbuf, int width, int height, int fontlen,
+	     int psftype, struct unicode_list *uclistheads) {
+	int bytewidth, charsize, flags, utf8, i;
+
+	bytewidth = (width+7)/8;
+	charsize = bytewidth * height;
+	flags = 0;
+
+	if (uclistheads) {
+		flags |= WPSFH_HASTAB;
+		if (has_sequences(uclistheads, fontlen))
+			flags |= WPSFH_HASSEQ;
+	}
+
+	writepsffontheader(ofil, width, height, fontlen, &psftype, flags);
+	utf8 = (psftype == 2);
+
 	fwrite(fontbuf, charsize, fontlen, ofil);
 	/* unimaps: -1 => do nothing: caller will append map */
 	if (uclistheads != NULL && uclistheads != (struct unicode_list*)-1) {

@@ -409,8 +409,9 @@ void set_activate_keymap(char *keymap)
   if(config.keymap) free(config.keymap);
 
   if((config.keymap = keymap)) {
-    sprintf(cmd, "loadkeys %s.map", keymap);
-    if(!config.test) system (cmd);
+    kbd_unimode();
+    sprintf(cmd, "loadkeys %s.map ; dumpkeys >/tmp/dk ; loadkeys --unicode </tmp/dk", keymap);
+    if(!config.test) system(cmd);
   }
 }
 
