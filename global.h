@@ -285,6 +285,7 @@ typedef struct {
   char *product;		/* product name */
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
+  int escdelay;			/* timeout to differ esc from function keys */
   int loglevel;			/* set kernel log level */
   char *loghost;		/* syslog host */
   char *rootpassword;

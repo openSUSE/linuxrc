@@ -802,8 +802,8 @@ void add_driver_update(char *dir, char *loc)
       if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
         while((de = readdir(d))) {
           if(
-            (len = strlen(de->d_name)) > 2 &&
-            !strcmp(de->d_name + len - 2, ".o")
+            (len = strlen(de->d_name)) > sizeof MODULE_SUFFIX - 1 &&
+            !strcmp(de->d_name + len - (sizeof MODULE_SUFFIX - 1), MODULE_SUFFIX)
           ) {
             fprintf(f, "%s\n", de->d_name);
           }
@@ -1350,6 +1350,9 @@ void util_status_info()
   sprintf(buf, "console = \"%s\"", config.console);
   if(config.serial) sprintf(buf + strlen(buf), ", serial line params = \"%s\"", config.serial);
   slist_append_str(&sl0, buf);
+  sprintf(buf, "esc delay: %dms", config.escdelay);
+  slist_append_str(&sl0, buf);
+
 
   sprintf(buf, "stderr = \"%s\"", config.stderr_name);
   slist_append_str(&sl0, buf);
@@ -2628,6 +2631,27 @@ int util_kill_main(int argc, char **argv)
 }
 
 
+int util_killall_main(int argc, char **argv)
+{
+  int sig = SIGTERM;
+  char *s;
+
+  argv++; argc--;
+
+  if(**argv == '-') {
+    sig = strtol(*argv + 1, &s, 0);
+    if(*s) return fprintf(stderr, "kill: bad signal spec \"%s\"\n", *argv + 1), 1;
+
+    argv++;
+    argc--;
+  }
+
+  while(argc--) util_killall(*argv++, sig);
+
+  return 0;
+}
+
+
 int util_bootpc_main(int argc, char **argv)
 {
   int i;
@@ -3777,7 +3801,6 @@ void util_hwcheck()
 void util_set_serial_console(char *str)
 {
   slist_t *sl;
-  char *s;
 
   if(!str || !*str) return;
 
@@ -3792,12 +3815,15 @@ void util_set_serial_console(char *str)
   sl = slist_split(',', config.serial);
 
   if(sl) {
+    str_copy(&config.console, long_dev(sl->key));
+#if 0
     s = long_dev(sl->key);
     if(!config.console || strcmp(s, config.console)) {
       str_copy(&config.console, s);
       freopen(config.console, "r", stdin);
       freopen(config.console, "a", stdout);
     }
+#endif
     config.textmode = 1;
   }
      
@@ -4150,5 +4176,61 @@ int make_links(char *src, char *dst)
   }
 
   return err;
+}
+
+
+void util_notty()
+{
+  int fd;
+
+  fd = open("/dev/tty", O_RDWR);
+
+  if(fd != -1) {
+    ioctl(fd, TIOCNOTTY);
+    close(fd);
+  }
+}
+
+
+void util_killall(char *name, int sig)
+{
+  pid_t mypid, pid;
+  struct dirent *de;
+  DIR *d;
+  char *s;
+  slist_t *sl0 = NULL, *sl;
+
+  if(!name) return;
+
+  mypid = getpid();
+
+  if(!(d = opendir("/proc"))) return;
+
+  /* make a (reversed) list of all process ids */
+  while((de = readdir(d))) {
+    pid = strtoul(de->d_name, &s, 10);
+    if(!*s && *util_process_cmdline(pid)) {
+      sl = slist_add(&sl0, slist_new());
+      sl->key = strdup(de->d_name);
+      sl->value = strdup(util_process_name(pid));
+    }
+  }
+
+  closedir(d);
+
+  for(sl = sl0; sl; sl = sl->next) {
+    pid = strtoul(sl->key, NULL, 10);
+    if(pid == mypid) continue;
+    if(!strcmp(sl->value, name)) {
+      if(config.debug) fprintf(stderr, "kill -%d %d\n", sig, pid);
+      kill(pid, sig);
+      usleep(20000);
+    }
+  }
+
+
+  slist_free(sl0);
+
+  while(waitpid(-1, NULL, WNOHANG) > 0);
 }
 
