@@ -1,4 +1,4 @@
-13/9/2003:	v1.5.12
+14/9/2003:	v1.5.12
 	- write 'Console' entry to install.inf again (#29569, #30451)
 	- make line drawing chars work on serial console
 	- use *last* console arg for linuxrc (#18592)
