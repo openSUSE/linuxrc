@@ -75,7 +75,6 @@ static int   inst_menu_cb             (dia_item_t di);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
 static int   inst_do_ftp              (void);
-static int   inst_get_ftpsetup        (void);
 static int   inst_do_http             (void);
 static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
@@ -325,12 +324,10 @@ int inst_choose_netsource()
 
   if(!config.net.smb_available) items[3] = di_skip;
 
-#if 0
   if(!config.fullnetsetup) {
     // yast doesn't support it :-((
-    items[1] = items[4] = di_skip;
+    items[4] = di_skip;
   }
-#endif
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 

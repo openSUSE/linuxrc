@@ -2549,7 +2549,7 @@ void set_instmode(instmode_t instmode)
     config.net.proxyproto = inst_http;
   }
 
-  if(instmode == inst_ftp || instmode == inst_tftp || instmode == inst_http) {
+  if(instmode == inst_tftp) {
     config.fullnetsetup = 1;
   }
 }
