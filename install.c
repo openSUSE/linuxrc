@@ -589,6 +589,7 @@ int inst_mount_harddisk()
 {
   int rc = 0;
   char buf[256];
+  char *module;
 
   set_instmode(inst_hd);
 
@@ -600,6 +601,8 @@ int inst_mount_harddisk()
 
     if(config.partition) {
       sprintf(buf, "/dev/%s", config.partition);
+      util_fstype(buf, &module);
+      if(module) mod_modprobe(module, NULL);
       rc = util_mount_ro(buf, config.mountpoint.extra);
     }
     else {
@@ -869,6 +872,8 @@ int inst_start_install()
   util_write_update_pre();
 
   free(buf);
+
+  util_splash_bar(60);
 
   return inst_execute_yast();
 }

@@ -727,6 +727,8 @@ void lxrc_init()
 
   util_get_splash_status();
 
+  util_splash_bar(10);
+
   if(util_check_exist("/proc/iSeries")) config.is_iseries = 1;
 
   kbd_init();

@@ -1476,6 +1476,24 @@ void util_get_splash_status()
 }
 
 
+/*
+ * Set splash progress bar to num percent.
+ */
+void util_splash_bar(unsigned num)
+{
+  FILE *f;
+
+  if(num > 100) num = 100;
+
+  num = (num*65534)/100;
+
+  if((f = fopen("/proc/splash", "w"))) {
+    fprintf(f, "show %u\n", num);
+    fclose(f);
+  }
+}
+
+
 char *read_symlink(char *file)
 {
   static char buf[256];

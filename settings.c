@@ -24,11 +24,15 @@
 #if 1	/* I think the line below would catch all anyway... */
 // #if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__sparc__) || defined(__alpha__)
 
-#define LANG_DEFAULT	2
+#define LANG_DEFAULT	3
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_br
 { lang_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
+#endif
+
+#ifdef TRANS_bs
+{ lang_bs, "Bosnia", "us", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "bs_BA", "bosnia" },
 #endif
 
 #ifdef TRANS_cs

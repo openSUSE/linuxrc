@@ -1,3 +1,8 @@
+6/9/2003:	v1.5.10
+	- advance splash progress bar
+	- added bosnian translation
+	- load fs module for hard disk installation (#29996)
+
 5/9/2003:	v1.5.9
 	- back to en as default (#29594)
 	- load cardbus drivers (#29543)

@@ -169,6 +169,8 @@ void auto2_scan_hardware(char *log_file)
     fflush(stdout);
   }
 
+  util_splash_bar(20);
+
   hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL);
 
   if(hd_usb) {
@@ -225,6 +227,8 @@ void auto2_scan_hardware(char *log_file)
     printf(" done\n");
     fflush(stdout);
   }
+
+  util_splash_bar(30);
 
   /* look for keyboards & mice */
   has_kbd_ig = FALSE;
@@ -805,9 +809,13 @@ int auto2_init()
   }
 #endif
 
+  util_splash_bar(40);
+
   util_debugwait("starting search for inst-sys");
 
   i = auto2_find_install_medium();
+
+  util_splash_bar(50);
 
   if(!i && config.hwcheck) i = 1;
 
