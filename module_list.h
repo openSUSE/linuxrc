@@ -175,9 +175,7 @@ static enum modid_t mod_noauto_arm [] =
   ID_ON26,
   ID_ATP,
   ID_EEPRO,
-#ifdef LINUXRC_AXP
   ID_EATA_DMA,
-#endif
   ID_ADVANSYS
 };
 
