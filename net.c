@@ -55,14 +55,23 @@ int net_is_configured_im = FALSE;
 
 static int  net_is_plip_im = FALSE;
 
+#if defined (__s390__) || defined (__s390x__)
+#  define NETWORK_CONFIG 0
+#else
+#  define NETWORK_CONFIG 1
+#endif
+
+#if NETWORK_CONFIG
 static int  net_choose_device    (void);
-static void net_show_error       (enum nfs_stat status_rv);
 static void net_setup_nameserver (void);
 static int  net_input_data       (void);
+#endif
+static void net_show_error       (enum nfs_stat status_rv);
 static int  net_get_address      (char *text_tv, struct in_addr *address_prr);
 
 int net_config (void)
     {
+#if NETWORK_CONFIG
     int   rc_ii;
 
 
@@ -100,6 +109,7 @@ int net_config (void)
     net_setup_nameserver ();
 
     net_is_configured_im = TRUE;
+#endif
     return (0);
     }
 
@@ -542,6 +552,7 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
     }
 
 
+#if NETWORK_CONFIG
 static int net_choose_device (void)
     {
     item_t  items_ari [MAX_NETDEVICE];
@@ -587,6 +598,18 @@ static int net_choose_device (void)
         else if (!strncmp (&buffer_ti [i_ii], "hip", 3))
             sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
                      &buffer_ti [i_ii], txt_get (TXT_NET_HIPPI));
+        else if (!strncmp (&buffer_ti [i_ii], "ctc", 3))
+            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
+                     &buffer_ti [i_ii], txt_get (TXT_NET_CTC));
+        else if (!strncmp (&buffer_ti [i_ii], "escon", 3))
+            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
+                     &buffer_ti [i_ii], txt_get (TXT_NET_ESCON));
+        else if (!strncmp (&buffer_ti [i_ii], "ci", 3))
+            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
+                     &buffer_ti [i_ii], txt_get (TXT_NET_CLAW));
+        else if (!strncmp (&buffer_ti [i_ii], "iucv", 3))
+            sprintf (items_ari [nr_items_ii++].text, "%-6s : %s",
+                     &buffer_ti [i_ii], txt_get (TXT_NET_CLAW));
         }
 
     fclose (fd_pri);
@@ -625,7 +648,7 @@ static int net_choose_device (void)
     else
         return (0);
     }
-
+#endif
 
 static void net_show_error (enum nfs_stat status_rv)
     {
@@ -668,7 +691,7 @@ static void net_show_error (enum nfs_stat status_rv)
     dia_message (tmp_ti, MSGTYPE_ERROR);
     }
 
-
+#if NETWORK_CONFIG
 static void net_setup_nameserver (void)
     {
     if (!nameserver_rg.s_addr)
@@ -677,7 +700,7 @@ static void net_setup_nameserver (void)
     if (!auto_ig && net_get_address (txt_get (TXT_INPUT_NAMED), &nameserver_rg))
         return;
     }
-
+#endif
 
 static int net_input_data (void)
     {

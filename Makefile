@@ -68,11 +68,20 @@ ifeq ($(ARCH),ia64)
     CFLAGS		+= -DLX_ARCH=\"ia64\"
 endif
 
-ifeq ($(ARCH),s390)
+ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
     USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
+    SUBDIRS		:= $(filter-out insmod, $(SUBDIRS))
+    LIBS		:= $(filter-out insmod/insmod.a, $(LIBS))
+    OBJ			:= $(filter-out insmod.o, $(OBJ))
+    SUBDIRS		:= $(filter-out loadkeys, $(SUBDIRS))
+    LIBS		:= $(filter-out loadkeys/loadkeys.a, $(LIBS))
+    OBJ			:= $(filter-out loadkeys.o, $(OBJ))
+    SUBDIRS		:= $(filter-out portmap, $(SUBDIRS))
+    LIBS		:= $(filter-out portmap/portmap.a, $(LIBS))
+    OBJ			:= $(filter-out portmap.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"s390\"
 endif
 

@@ -81,6 +81,7 @@ int main (int argc, char **argv, char **env)
     else
         progname_pci = argv [0];
 
+#if SWISS_ARMY_KNIFE
     if (!strcmp (progname_pci, "sh"))
         lxrc_do_shell (argc, argv, env);
     else if (!strcmp (progname_pci, "insmod"))
@@ -108,6 +109,7 @@ int main (int argc, char **argv, char **env)
     else if (!strcmp (progname_pci, "nothing"))
         rc_ii = 0;
     else
+#endif
         {
 	lxrc_argv = argv;
 	save_environment ();
@@ -746,6 +748,7 @@ static void lxrc_main_menu (void)
     }
 
 
+#if SWISS_ARMY_KNIFE
 static void lxrc_do_shell (int argc, char **argv, char **env)
     {
     char  command_ati [10][100];
@@ -795,7 +798,7 @@ static void lxrc_do_shell (int argc, char **argv, char **env)
     execve (progname_ti, arguments_apci, env);
     exit (0);
     }
-
+#endif
 
 static void lxrc_memcheck (void)
     {

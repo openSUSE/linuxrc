@@ -762,3 +762,23 @@ msgstr ""
 
 #~ msgid "Machine %s is unknown!"
 #~ msgstr "Машина %s неизвестна!"
+#. TXT_NET_CTC
+msgid "channel to channel connection"
+msgstr ""
+
+#. TXT_NET_ESCON
+msgid "ESCON connection"
+msgstr ""
+
+#. TXT_NET_IUCV
+msgid "IUCV connection"
+msgstr ""
+
+#. TXT_NET_CLAW
+msgid "channel attached cisco router"
+msgstr ""
+
+#. TXT_SMB
+msgid "Network (Windows Share aka SMB)"
+msgstr ""
+

@@ -75,6 +75,7 @@ static int   inst_choose_source_cb    (int what_iv);
 static int   inst_menu_cb             (int what_iv);
 static int   inst_init_cache          (void);
 static void  inst_umount              (void);
+static int   inst_mount_smb           (void);
 static int   inst_get_nfsserver       (void);
 static int   inst_get_ftpserver       (void);
 static int   inst_ftp                 (void);
@@ -333,6 +334,9 @@ static int inst_choose_source_cb (int what_iv)
             error_ii = inst_mount_harddisk ();
             break;
         case 5:
+            error_ii = inst_mount_smb ();
+            break;
+        case 6:
             error_ii = inst_check_floppy ();
             break;
         default:
@@ -358,8 +362,8 @@ static int inst_choose_source_cb (int what_iv)
 
 static int inst_choose_source (void)
     {
-    int     width_ii = 20;
-    item_t  items_ari [5];
+    int     width_ii = 30;
+    item_t  items_ari [6];
     int     choice_ii;
     int     i_ii;
     int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
@@ -372,7 +376,10 @@ static int inst_choose_source (void)
     strncpy (items_ari [1].text, txt_get (TXT_NFS), width_ii);
     strncpy (items_ari [2].text, txt_get (TXT_FTP), width_ii);
     strncpy (items_ari [3].text, txt_get (TXT_HARDDISK), width_ii);
-    strncpy (items_ari [4].text, txt_get (TXT_FLOPPY), width_ii);
+    strncpy (items_ari [4].text, txt_get (TXT_SMB), width_ii);
+    // this one has to stay last, since it won't be displayed if
+    // 'inst_rescue_im' = 0
+    strncpy (items_ari [5].text, txt_get (TXT_FLOPPY), width_ii);
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, width_ii);
@@ -1370,6 +1377,96 @@ static int inst_get_ftpsetup (void)
 
     return (0);
     }
+
+
+static int inst_mount_smb (void)
+    {
+    int       rc_ii;
+    window_t  win_ri;
+    char msg[256];
+
+    rc_ii = net_config ();
+    if (rc_ii)
+        return (rc_ii);
+
+    /*******************************************************************
+  
+    CD location
+  
+  	 server              :  SERVER
+  	 server IP (optional):  SERVER_IP
+  	 share               :  SHARE
+  
+    authentification for this CD-ROM share
+  
+  	 [X] Guest login  or
+  
+  	 username            :  USERNAME
+  	 password            :  PASSWORD
+  	 workgroup (optional):  WORKGROUP
+  
+    *******************************************************************/
+    /*******************************************************************
+
+
+      das wird so zum mount umgesetzt:
+
+       abhängig von [X] Guest login 
+	 options += "guest"
+       bzw.
+	 options += "username=" + USERNAME + ",password=" + PASSWORD
+
+
+	 device = "//" + SERVER + "/" + SHARE
+
+	 options += ",workgroup=" + WORKGROUP   falls WORKGROUP gesetzt ist
+
+	 options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
+
+
+	 "mount -t smbfs" + device + " " + mountpoint + " " + options
+
+    *******************************************************************/
+    
+    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
+    return 0;
+    do
+	{
+        rc_ii = inst_get_ftpserver ();
+        if (rc_ii)
+            return (rc_ii);
+
+        rc_ii = inst_get_ftpsetup ();
+        if (rc_ii)
+            return (rc_ii);
+
+	//        dia_info (&win_ri, txt_get (TXT_TRY_SMB_MOUNT));
+        rc_ii = util_open_ftp (inet_ntoa (ftp_server_rg));
+        win_close (&win_ri);
+
+        if (rc_ii < 0)
+            util_print_ftp_error (rc_ii);
+        else
+            {
+            ftpClose (rc_ii);
+            rc_ii = 0;
+            }
+        }
+    while (rc_ii);
+
+    if (inst_rescue_im)
+        strcpy (server_dir_tg, "/pub/SuSE-Linux/current");
+
+    if (dia_input (txt_get (TXT_INPUT_DIR), server_dir_tg,
+                            sizeof (server_dir_tg) - 1, 30))
+        return (-1);
+
+    util_truncate_dir (server_dir_tg);
+
+    bootmode_ig = BOOTMODE_FTP;
+    return (0);
+    }
+
 
 
 static int inst_choose_yast_version (void)
