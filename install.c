@@ -590,7 +590,11 @@ int inst_check_instsys (void)
                 sprintf (filename_ti, "%s%s%s", inst_tmpmount_tm,
                          server_dir_tg, instsys_loop_ti);
                 if (util_mount_loop (filename_ti, mountpoint_tg))
-                    return (-1);
+                    {
+                    ramdisk_ig = TRUE;
+                    sprintf (inst_rootimage_tm, "%s%s%s", mountpoint_tg, server_dir_tg,
+                             inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
+                    }
                 }
             else
                 {
