@@ -719,7 +719,7 @@ void add_driver_update(char *dir, char *loc)
   /* module version may not match kernel exactly */
   config.forceinsmod = 1;
 
-  prio = config.update.count++;
+  prio = config.update.count;
 
   /* preliminary config file read for update id & priority */
   strprintf(&buf1, "%s/dud.config", dir);
@@ -745,12 +745,13 @@ void add_driver_update(char *dir, char *loc)
     return;
   }
 
-  config.update.map[prio] = 1;
-
   if((sl = slist_getentry(config.update.id_list, config.update.id))) {
     fprintf(stderr, "dud: %s (duplicate of %s, skipped)\n", loc, sl->value);
     return;
   }
+
+  config.update.map[prio] = 1;
+  config.update.count++;
 
   strprintf(&dst, "%s/%03u", config.update.dst, prio);
   if(mkdir(dst, 0755)) return;
