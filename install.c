@@ -1144,6 +1144,8 @@ int inst_execute_yast()
 
   if(config.splash && config.textmode) system("echo 0 >/proc/splash");
 
+  util_notty();
+
   if(config.test) {
     rc = system("/bin/bash 2>&1");
   }

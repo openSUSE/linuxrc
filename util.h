@@ -133,3 +133,5 @@ void util_mkdevs(void);
 void get_net_unique_id(void);
 
 int util_lndir_main(int argc, char **argv);
+
+void util_notty(void);

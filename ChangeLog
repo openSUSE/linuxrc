@@ -1,3 +1,6 @@
+20/4/2004:	v1.6.20
+	- linuxrc should not have a controlling terminal (#37177)
+
 7/4/2004:	v1.6.19
 	- use HWAddr (not NetHWAddr) in install.inf
 

@@ -4152,3 +4152,16 @@ int make_links(char *src, char *dst)
   return err;
 }
 
+
+void util_notty()
+{
+  int fd;
+
+  fd = open("/dev/tty", O_RDWR);
+
+  if(fd != -1) {
+    ioctl(fd, TIOCNOTTY);
+    close(fd);
+  }
+}
+
