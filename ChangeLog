@@ -3,6 +3,8 @@
 	- can now automatically start rescue system
 	- ask for module disk/load reiserfs module if necessary
 	- add modules loaded via 'driver update' to INITRD_MODULES
+	- remove Unicodemap entry from install.inf (#7767)
+	- no longer remove trailing /suse from installation dir (#6716)
 
 3/5/2001:	v1.1.19.007
 	- mmj: autoinstall via hard disk

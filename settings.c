@@ -572,8 +572,10 @@ void set_write_info (FILE *file_prv)
                           set_languages_arm [lang_idx_ii].font);
         fprintf (file_prv, line_ti);
 
+#if 0
         sprintf (line_ti, "%s %s\n", set_txt_unicode_tm,
                           set_languages_arm [lang_idx_ii].unimap);
+#endif
         fprintf (file_prv, line_ti);
 
         sprintf (line_ti, "%s %s\n", set_txt_screenmap_tm,

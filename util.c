@@ -442,8 +442,10 @@ void util_truncate_dir (char *dir_tr)
     if (dir_tr [strlen (dir_tr) - 1] == '/')
         dir_tr [strlen (dir_tr) - 1] = 0;
 
+#if 0
     if (strlen (dir_tr) > 4 && !strcmp (&dir_tr [strlen (dir_tr) - 5], "/suse"))
         dir_tr [strlen (dir_tr) - 5] = 0;
+#endif
 
     if (dir_tr [0] == 0)
         strcpy (dir_tr, "/");
