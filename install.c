@@ -252,8 +252,12 @@ int inst_menu_cb(dia_item_t di)
   switch(di) {
     case di_inst_vnc:
       dia_input2("Please enter your VNC password", &config.net.vncpassword, 20, 1);
-      if(config.insttype != inst_net) net_config();
-      error = 1;
+      error = inst_start_install();
+      if(config.redraw_menu)  { /* install source not found */
+          rc = -1;
+	  break;
+      }
+      // if(config.insttype != inst_net) net_config();
       break;
 
     case di_inst_install:
@@ -490,6 +494,8 @@ int inst_mount_cdrom(int show_err)
   }
   else {
     set_instmode(inst_cdrom);
+
+    if(config.vnc && (rc = net_config())) return rc;
   }
 
   dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
@@ -597,6 +603,8 @@ int inst_mount_harddisk()
   char buf[256];
 
   set_instmode(inst_hd);
+
+  if(config.vnc && (rc = net_config())) return rc;
 
   do {
     if(!auto_ig) {
