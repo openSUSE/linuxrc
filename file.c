@@ -124,12 +124,13 @@ static struct {
   file_key_t key;
   char *value;
 } keywords[] = {
-  { key_none,     ""         },
-  { key_swap,     "Swap"     },
-  { key_root,     "Root"     },
-  { key_live,     "Live"     },
-  { key_keytable, "Keytable" },
-  { key_language, "Language" }
+  { key_none,      ""          },
+  { key_swap,      "Swap"      },
+  { key_root,      "Root"      },
+  { key_live,      "Live"      },
+  { key_keytable,  "Keytable"  },
+  { key_language,  "Language"  },
+  { key_rebootmsg, "RebootMsg" }
 };
 
 
