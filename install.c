@@ -635,7 +635,7 @@ static void inst_start_shell (char *tty_tv)
     char  *env_pci [] =   { "TERM=linux",
                             "PS1=`pwd -P` # ",
                             "HOME=/",
-                            "PATH=/lbin:/bin:/sbin:/usr/bin:/usr/sbin", 0 };
+                            "PATH=/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/lib/YaST2/bin", 0 };
     int    fd_ii;
 
 
@@ -706,7 +706,7 @@ static int inst_prepare (void)
         symlink (link_source_ti, links_ati [i_ii]);
         }
 
-    setenv ("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin", TRUE);
+    setenv ("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/lib/YaST2/bin", TRUE);
     if (serial_ig)
         {
         setenv ("TERM", "vt100", TRUE);

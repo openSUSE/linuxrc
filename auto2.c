@@ -585,6 +585,11 @@ int auto2_get_probe_env(hd_data_t *hd_data)
   return 0;
 }
 
+int auto2_pcmcia()
+{
+  return hd_has_pcmcia(hd_data);
+}
+
 
 void auto2_progress(char *pos, char *msg)
 {
