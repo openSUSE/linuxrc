@@ -780,7 +780,20 @@ static int inst_execute_yast (void)
         return (rc_ii);
 
     if (inst_choose_yast_version ())
-        return (-1);
+        {
+        lxrc_killall (0);
+        waitpid (-1, NULL, WNOHANG);
+
+        lxrc_set_modprobe ("/etc/nothing");
+        inst_umount ();
+        if (ramdisk_ig)
+            util_free_ramdisk ("/dev/ram2");
+
+        unlink ("/bin");
+        rename ("/.bin", "/bin");
+
+        return -1;
+        }
 
     if (!auto2_ig)
         dia_status_on (&status_ri, txt_get (TXT_START_YAST));
