@@ -1,3 +1,6 @@
+16/1/2001:	v1.1.18.006
+	- save PCMCIA module params
+
 16/1/2001:	v1.1.18.005
 	- added vfat to inst_mount_harddisk()
 	- load pci-scan.o before starfire.o

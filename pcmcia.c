@@ -19,6 +19,7 @@
 #include "dialog.h"
 #include "text.h"
 #include "util.h"
+#include "modparms.h"
 
 int pcmcia_core_loaded_im = FALSE;
 
@@ -62,6 +63,7 @@ int pcmcia_load_core (void)
 
     if (!error_ii)
         {
+        if(*params_ti) mpar_save_modparams("pcmcia_core", params_ti);
         sprintf (text_ti, txt_get (TXT_PCMCIA_PARAMS), type_ii == 1 ? "tcic" : "i82365");
         params_ti [0] = 0;
         if (!auto_ig && dia_input (text_ti, params_ti, MAX_PARAM_LEN, 30))
@@ -81,6 +83,7 @@ int pcmcia_load_core (void)
 
     if (!error_ii)
         {
+        if(*params_ti) mpar_save_modparams(type_ii == 2 ? "i82365" : "tcic", params_ti);
         dia_status_on (&status_ri, txt_get (TXT_START_CARDMGR));
         (void) system ("cardmgr -v -m /modules");
         for (i_ii = 0; i_ii <= 100; i_ii++)

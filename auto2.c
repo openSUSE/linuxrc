@@ -593,6 +593,9 @@ int auto2_init()
 
     if(!i) {
       deb_msg("PCMCIA modules loaded - starting card manager.");
+      if(pcmcia_params) {
+        mpar_save_modparams("i82365", pcmcia_params);
+      }
       pcmcia_chip_ig = 2;	/* i82365 */
       i = system("cardmgr -v -m /modules");
       if(i)
