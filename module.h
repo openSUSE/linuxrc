@@ -14,6 +14,7 @@ module_t  *mod_get_entry(char *name);
 void       mod_menu(void);
 int        mod_add_disk(int prompt, int type);
 void       mod_unload_module(char *module);
+int        mod_is_loaded(char *module);
 int        mod_load_modules(char *modules, int show);
 int        mod_insmod(char *module, char *param);
 int        mod_modprobe(char *module, char *param);

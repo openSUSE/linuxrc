@@ -653,7 +653,7 @@ void lxrc_init()
   config.mountpoint.instsys = strdup("/mounts/instsys");
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.setupcmd = strdup("/sbin/inst_setup yast2");
+  config.setupcmd = strdup("/sbin/inst_setup yast");
 
   util_set_product_dir("suse");
 

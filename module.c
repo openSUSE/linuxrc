@@ -50,7 +50,6 @@ static int mod_build_list(int type, char ***list, module_t ***mod_list);
 static char *mod_get_title(int type);
 static int mod_menu_cb(int item);
 static int mod_load_manually(int type);
-static int mod_is_loaded(char *module);
 static int mod_unload_modules(char *modules);
 static char *mod_get_params(module_t *mod);
 static void mod_load_module_manual(char *module, int show);
@@ -582,6 +581,7 @@ void mod_unload_module(char *module)
   int err;
 
   sprintf(cmd, "rmmod %s", module);
+  fprintf(stderr, "%s\n", cmd);
   err = system(cmd);
   util_update_kernellog();
 

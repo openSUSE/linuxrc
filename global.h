@@ -288,6 +288,8 @@ typedef struct {
     slist_t *used_params;	/* parameters that were used for insmod */
     int ramdisk;		/* ramdisk used for modules */
     slist_t *broken;		/* list of modules that must not be loaded */
+    slist_t *initrd;		/* extra modules for initrd */
+    unsigned keep_usb_storage:1;	/* don't unload usb-storage */
   } module;
 
   struct {

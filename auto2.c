@@ -45,11 +45,12 @@ static void auto2_check_cdrom_update(char *dev);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
-static int auto2_driver_is_active(driver_info_t *di);
+static int driver_is_active(hd_t *hd);
+static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
-static int auto2_load_usb_storage(void);
+static int load_usb_storage(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 #ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
@@ -132,12 +133,11 @@ void auto2_check_cdrom_update(char *dev)
 void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
-  hd_t *hd, *hd_sys;
+  hd_t *hd, *hd_sys, *hd_usb, *hd_fw;
   driver_info_t *di;
-  char *usb_mod;
-  static char usb_mods[128];
-  int i, j, ju, k, with_usb;
+  int j, ju, k, with_usb;
   sys_info_t *st;
+  slist_t *usb_modules = NULL;
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -159,40 +159,51 @@ void auto2_scan_hardware(char *log_file)
     fflush(stdout);
   }
 
-  if((usb_mod = auto2_usb_module())) {
+  hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL);
+
+  if(hd_usb) {
     printf("Activating usb devices...");
     hd_data->progress = NULL;
+
+    for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, &usb_modules);
+    hd_usb = hd_free_hd_list(hd_usb);
+
     fflush(stdout);
-    i = 0;
-    if(*usb_mod) {
-      if(
-        (i = mod_insmod("usbcore", NULL)) ||
-        (i = mod_insmod(usb_mod, NULL))   ||
-        (i = mod_insmod("input", NULL))   ||
-        (i = mod_insmod("hid", NULL))
-      );
-      mod_insmod("keybdev", NULL);
-    }
+
+    mod_insmod("input", NULL);
+    mod_insmod("hid", NULL);
+    mod_insmod("keybdev", NULL);
+
     k = mount("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
-    if(!i && config.usbwait > 0) sleep(config.usbwait);
+    if(config.usbwait > 0) sleep(config.usbwait);
+
     if(with_usb) {
-      hd_clear_probe_feature(hd_data, pr_all);
-      hd_set_probe_feature(hd_data, pr_usb);
-      hd_set_probe_feature(hd_data, pr_scsi);
-      hd_set_probe_feature(hd_data, pr_int);
-      hd_scan(hd_data);
-      if(auto2_load_usb_storage()) {
+      hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
+      if(load_usb_storage(hd_data)) {
         mod_insmod("usb-storage", NULL);
         if(config.usbwait > 0) sleep(1);
-        hd_clear_probe_feature(hd_data, pr_all);
-        hd_set_probe_feature(hd_data, pr_usb);
-        hd_set_probe_feature(hd_data, pr_scsi);
-        hd_set_probe_feature(hd_data, pr_int);
-        hd_scan(hd_data);
+        hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
       }
     }
     printf(" done\n"); fflush(stdout);
     if(!log_file) hd_data->progress = auto2_progress;
+  }
+
+  hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL);
+
+  if(hd_fw) {
+    printf("Activating ieee1394 devices...");
+    fflush(stdout);
+
+    for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd, NULL);
+    hd_usb = hd_free_hd_list(hd_fw);
+
+    mod_insmod("sbp2", NULL);
+
+    if(config.usbwait > 0) sleep(config.usbwait);
+
+    printf(" done\n");
+    fflush(stdout);
   }
 
   /* look for keyboards & mice */
@@ -206,10 +217,7 @@ void auto2_scan_hardware(char *log_file)
       if(hd->bus.id == bus_usb) ju++;
       di = hd->driver_info;
       if(di && di->any.type == di_kbd) {
-//        if(di->kbd.XkbRules) strcpy(xkbrules_tg, di->kbd.XkbRules);
         if(di->kbd.XkbModel) strcpy(xkbmodel_tg, di->kbd.XkbModel);
-//        if(di->kbd.XkbLayout) strcpy(xkblayout_tg, di->kbd.XkbLayout);
-	/* UNTESTED !!! */
         if(di->kbd.keymap) {
           str_copy(&config.keymap, di->kbd.keymap);
         }
@@ -229,17 +237,18 @@ void auto2_scan_hardware(char *log_file)
       fprintf(stderr, "is a Vaio\n");
       is_vaio = 1;
       pcmcia_params = "irq_list=9,10,11,15";
-      if(usb_mod && *usb_mod) {
-        sprintf(usb_mods, "usbcore %s", usb_mod);
-        usb_mods_ig = usb_mods;
-      }
+      slist_append(&config.module.initrd, usb_modules);
+      usb_modules = NULL;
     }
   }
 
-  /* usb keyboard or mouse ? */
-  if((j || ju) && usb_mod && *usb_mod) {
-    sprintf(usb_mods, "usbcore %s input hid keybdev mousedev", usb_mod);
-    usb_mods_ig = usb_mods;
+  /* usb keyboard ? */
+  if(ju) {
+    slist_append(&config.module.initrd, usb_modules);
+    usb_modules = NULL;
+    slist_append_str(&config.module.initrd, "input");
+    slist_append_str(&config.module.initrd, "hid");
+    slist_append_str(&config.module.initrd, "keybdev");
   }
 
 #ifdef __PPC__
@@ -492,12 +501,62 @@ int auto2_net_dev(hd_t **hd0)
   return 1;
 }
 
-int auto2_driver_is_active(driver_info_t *di)
+int driver_is_active(hd_t *hd)
 {
+  driver_info_t *di;
+
+  if(!hd || !(di = hd->driver_info)) return 1;
+
   for(; di; di = di->next) {
     if(di->any.type == di_module && di->module.active) return 1;
   }
+
   return 0;
+}
+
+
+/*
+ * Activate device driver.
+ * Returns 1 if it worked, else 0.
+ */
+int activate_driver(hd_t *hd, slist_t **mod_list)
+{
+  driver_info_t *di;
+  str_list_t *sl1, *sl2;
+  slist_t *slm;
+  int i, ok = 0;
+
+  if(!hd || driver_is_active(hd)) return 1;
+
+  if(hd->is.notready) return 1;
+
+  for(di = hd->driver_info; di; di = di->next) {
+    if(di->module.type == di_module && !di->module.modprobe) {
+      for(
+        sl1 = di->module.names, sl2 = di->module.mod_args;
+        sl1 && sl2;
+        sl1 = sl1->next, sl2 = sl2->next
+      ) {
+        mod_insmod(sl1->str, sl2->str);
+        if(mod_list) {
+          slm = slist_add(mod_list, slist_new());
+          str_copy(&slm->key, sl1->str);
+        }
+      }
+
+      /* all modules should be loaded now */
+      for(i = 1, sl1 = di->module.names; sl1; sl1 = sl1->next) {
+        i &= hd_module_is_active(hd_data, sl1->str);
+      }
+
+      if(i) {
+        ok = 1;
+        break;
+      }
+    }
+  }
+
+  return ok;
 }
 
 
@@ -507,10 +566,8 @@ int auto2_driver_is_active(driver_info_t *di)
  */
 int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 {
-  driver_info_t *di;
-  str_list_t *sl1, *sl2;
   hd_t *hd;
-  int i;
+  int ok;
 
   for(hd = hd_data->hd; hd; hd = hd->next) {
     if(hd->idx > last_idx) break;
@@ -521,37 +578,14 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
   if(!hd) return 0;	/* no further entries */
 
   for(; hd; hd = hd->next) {
-    if(
-      hd->base_class.id == base_class &&
-      hd->driver_info &&
-      !auto2_driver_is_active(hd->driver_info)
-    ) {
-      for(di = hd->driver_info; di; di = di->next) {
-        if(di->module.type == di_module && !di->module.modprobe) {
-          // fprintf(stderr, "Found a \"%s\"\n", auto2_device_name(hd));
-          for(
-            sl1 = di->module.names, sl2 = di->module.mod_args;
-            sl1 && sl2;
-            sl1 = sl1->next, sl2 = sl2->next
-          ) {
-            mod_insmod(sl1->str, sl2->str);
-          }
-
-          /* all modules should be loaded now */
-          for(i = 1, sl1 = di->module.names; sl1; sl1 = sl1->next) {
-            i &= hd_module_is_active(hd_data, sl1->str);
-          }
-
-          if(i) {
-            last_idx = hd->idx;
-            fprintf(stderr, "Ok, that seems to have worked. :-)\n");
-            break;
-          }
-          else {
-            need_modules = 1;
-            fprintf(stderr, "Oops, that didn't work.\n");
-          }
-        }
+    if(hd->base_class.id == base_class && !driver_is_active(hd)) {
+      if((ok = activate_driver(hd, NULL))) {
+        last_idx = hd->idx;
+        fprintf(stderr, "Ok, that seems to have worked. :-)\n");
+      }
+      else {
+        need_modules = 1;
+        fprintf(stderr, "Oops, that didn't work.\n");
       }
 
       /* some module was loaded...; in demo mode activate all disks */
@@ -560,7 +594,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
           (config.activate_storage && base_class == bc_storage) ||
           (config.activate_network && base_class == bc_network)
         ) &&
-        di
+        ok
       ) break;
     }
   }
@@ -583,6 +617,7 @@ int auto2_init()
 #ifdef __i386__
   int net_cfg;
 #endif
+  hd_t *hd;
 
   auto2_chk_frame_buffer();
 
@@ -605,6 +640,19 @@ int auto2_init()
   if(!config.hwcheck) file_read_info();
 
   util_debugwait("got info file");
+
+  if(!config.test) {
+    if(mod_is_loaded("usb-storage")) {
+      for(hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+        if(hd->hotplug == hp_usb) {
+          config.module.keep_usb_storage = 1;
+        }
+      }
+    }
+    if(!config.module.keep_usb_storage) {
+      mod_unload_module("usb-storage");
+    }
+  }
 
 #if WITH_PCMCIA
   if(
@@ -658,6 +706,7 @@ int auto2_init()
       /* wait for cards to be activated... */
       sleep(is_vaio ? 10 : 2);
       /* check for cdrom & net devs */
+      // What's this???????
       hd_list(hd_data, hw_cdrom, 0, NULL);
       hd_list(hd_data, hw_network, 0, NULL);
     }
@@ -905,95 +954,32 @@ int auto2_find_floppy()
 /*
  * Return != 0 if we should load the usb-storage module.
  */
-int auto2_load_usb_storage()
+int load_usb_storage(hd_data_t *hd_data)
 {
-  hd_t *hd;
-  int nonusb_floppy_drives = 0;
-  int usb_floppy_drives = 0;
+  hd_t *hd, *hd_floppy, *hd_cdrom;
+  int usb_floppies = 0, usb_cdroms = 0;
 
-  if(!hd_data) return 0;
-
-  for(hd = hd_data->hd; hd; hd = hd->next) {
-    if(
-      hd->base_class.id == bc_storage_device &&
-      hd->sub_class.id == sc_sdev_floppy
-    ) {
-      if(hd->bus.id == bus_usb) {
-        if(
-          !(
-            (
-              (hd->vendor.name && !strcasecmp(hd->vendor.name, "iomega")) ||
-              (hd->sub_vendor.name && !strcasecmp(hd->sub_vendor.name, "iomega"))
-            ) &&
-            (
-              (hd->device.name && strstr(hd->device.name, "ZIP")) ||
-              (hd->sub_device.name && strstr(hd->sub_device.name, "Zip"))
-            )
-          )
-        ) {
-          usb_floppy_drives++;
-        }
-      }
-      else {
-        nonusb_floppy_drives++;
-      }
-    }
+  hd_floppy = hd_list(hd_data, hw_floppy, 0, NULL);
+  for(hd = hd_floppy; hd; hd = hd->next) {
+    if(hd->bus.id == bus_usb /* && !hd->is.zip */) usb_floppies++;
   }
+  hd_free_hd_list(hd_floppy);
 
-  return usb_floppy_drives != 0;
+  hd_cdrom = hd_list(hd_data, hw_cdrom, 0, NULL);
+  for(hd = hd_floppy; hd; hd = hd->next) {
+    if(hd->bus.id == bus_usb /* && !hd->is.zip */) usb_cdroms++;
+  }
+  hd_free_hd_list(hd_cdrom);
+
+  return usb_floppies || usb_cdroms;
 }
 
-
-#if 0
-int auto2_has_i2o()
-{
-  hd_t *hd;
-  driver_info_t *di = NULL;
-  int i2o_needed = -1;
-
-  if(hd_data) {
-    for(hd = hd_data->hd; hd; hd = hd->next) {
-      if(hd->base_class == bc_i2o) {
-        di = hd->driver_info;
-
-        /* don't use i2o if we have an alternative driver */
-        if(di && di->any.type == di_module) {
-          i2o_needed = 0;
-        } else {
-          if(i2o_needed == -1) i2o_needed = 1;
-        }
-      }
-    }
-  }
-
-  return i2o_needed > 0 ? TRUE : FALSE;
-}
-#endif
 
 int auto2_pcmcia()
 {
   if(!hd_data) return 0;
 
   return hd_has_pcmcia(hd_data);
-}
-
-int auto2_full_libhd()
-{
-  return 0;
-}
-
-char *auto2_usb_module()
-{
-  int no_usb_mods = 0;
-
-  if(hd_data) {
-    usb_ig = hd_usb_support(hd_data);
-    if(hd_cpu_arch(hd_data) == arch_ppc) no_usb_mods = 1;
-  }
-
-  if(usb_ig && no_usb_mods) return "";
-
-  return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
 }
 
 char *auto2_disk_list(int *boot_disk)

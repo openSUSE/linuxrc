@@ -1092,6 +1092,16 @@ void util_status_info()
     }
   }
 
+  if(config.module.initrd) {
+    strcpy(buf, "extra initrd modules:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.module.initrd; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.cdroms) {
     strcpy(buf, "cdroms:");
     slist_append_str(&sl0, buf);
@@ -3360,9 +3370,9 @@ void util_set_product_dir(char *prod)
 
   str_copy(&config.product_dir, prod);
 
-  strprintf(&config.installdir, "/%s/inst-sys", prod);
-  strprintf(&config.rootimage, "/%s/images/root", prod);
-  strprintf(&config.rescueimage, "/%s/images/rescue", prod);
-  strprintf(&config.demoimage, "/%s/images/cd-demo", prod);
+  str_copy(&config.installdir, "/boot/inst-sys");
+  str_copy(&config.rootimage, "/boot/root");
+  str_copy(&config.rescueimage, "/boot/rescue");
+  str_copy(&config.demoimage, "/boot/cd-demo");
 }
 

@@ -1,4 +1,7 @@
+26/8/2002:	v1.4.16
 	- also ask for ssh/vnc password in auto install.
+	- new cd layout
+	- improved usb & firewire handling
 	
 21/8/2002:	v1.4.15
 	- accept AutoYaST XML files for config data

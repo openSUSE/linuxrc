@@ -1,5 +1,5 @@
 # SuSE release number, needed for driver update feature
-LX_REL	?= -DLX_REL=\"8.0\"
+LX_REL	?= -DLX_REL=\"8.1\"
 
 include pcmcia/config.mk
 

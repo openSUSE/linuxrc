@@ -1021,6 +1021,10 @@ int inst_execute_yast()
     return -1;
   }
 
+  if(!config.test) {
+    if(mod_is_loaded("usb-storage")) mod_unload_module("usb-storage");
+  }
+
   if (!config.test && config.usessh && config.net.sshpassword) {
     FILE *passwd;
 

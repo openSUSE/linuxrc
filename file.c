@@ -981,6 +981,11 @@ void file_do_info(file_t *f0)
         config.module.broken = slist_split(',', f->value);
         break;
 
+      case key_initrdmodules:
+        slist_free(config.module.initrd);
+        config.module.initrd = slist_split(',', f->value);
+        break;
+
       default:
         break;
     }
@@ -1336,7 +1341,7 @@ void file_write_modparms(FILE *f)
     if(ml) {
       sl = slist_add(&modules0, slist_new());
       sl->key = strdup(ft->key_str);
-      if(ml->initrd) {
+      if(ml->initrd || slist_getentry(config.module.initrd, ft->key_str)) {
         sl = slist_add(&sl0, slist_new());
         sl->key = strdup(ft->key_str);
       }
