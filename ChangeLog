@@ -1,3 +1,6 @@
+20/12/2000:	v1.1.17.000
+	- started driver update stuff; should work with floppies now
+
 20/12/2000:	v1.1.16.007
 	- no longer generate X11 info entries in install.inf
 	- pivot_root stuff fixed

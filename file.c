@@ -276,7 +276,10 @@ void file_write_yast_info (char *file_name)
 
     fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
     fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
-    fprintf (file_pri, "%s %d\n", file_txt_yast2_update_tm, yast2_update_ig);
+    fprintf(file_pri, "%s %d\n",
+      file_txt_yast2_update_tm,
+      (yast2_update_ig || *driver_update_dir) ? 1 : 0
+    );
     fprintf (file_pri, "%s %d\n", file_txt_yast2_serial_tm, yast2_serial_ig);
     fprintf (file_pri, "%s %d\n", file_txt_text_mode_tm, text_mode_ig);
     if ((action_ig & ACT_YAST2_AUTO_INSTALL))
@@ -394,6 +397,8 @@ int file_read_info (void)
                 if(auto2_ig) printf ("\n"); else win_close (&win_ri);
                 return (-1);
                 }
+
+        util_chk_driver_update (mountpoint_tg);
 
         sprintf (filename_ti, "%s/suse/setup/descr/info", mountpoint_tg);
         fd_pri = fopen (filename_ti, "r");

@@ -192,6 +192,7 @@ void lxrc_end (void)
     printf ("\033[9;15]");	/* screen saver on */
 /*    reboot (RB_ENABLE_CAD); */
     mod_free_modules ();
+    util_umount_driver_update ();
     (void) util_umount (mountpoint_tg);
     lxrc_set_modprobe ("/sbin/modprobe");
     lxrc_set_bdflush (40);
@@ -432,9 +433,9 @@ static void lxrc_init (void)
     util_redirect_kmsg ();
     disp_init ();
 
-#ifdef USE_LIBHD
     auto2_chk_expert ();
 
+#ifdef USE_LIBHD
     deb_int(text_mode_ig);
     deb_int(yast2_update_ig);
     deb_int(auto2_ig);

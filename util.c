@@ -21,6 +21,7 @@
 #include <sys/utsname.h>
 #include <fcntl.h>
 #include <syscall.h>
+#include <dirent.h>
 #include <errno.h>
 
 // #include <linux/cdrom.h>
@@ -49,6 +50,12 @@
 static inline _syscall3 (int,syslog,int,type,char *,b,int,len);
 
 static char  *util_loopdev_tm = "/dev/loop0";
+
+static void put_byte(int fd, unsigned char data);
+static void put_short(int fd, unsigned short data);
+static void put_int(int fd, unsigned data);
+static unsigned mkdosfs(int fd, unsigned size);
+static void do_cp(char *src_dir, char *dst_dir, char *name);
 
 void util_redirect_kmsg (void)
     {
@@ -612,5 +619,190 @@ void util_manual_mode()
 {
   auto_ig = 0;
   auto2_ig = 0;
+}
+
+
+void put_byte(int fd, unsigned char data)
+{
+  write(fd, &data, 1);
+}
+
+void put_short(int fd, unsigned short data)
+{
+  write(fd, &data, 2);
+}
+
+void put_int(int fd, unsigned data)
+{
+  write(fd, &data, 4);
+}
+
+/*
+ * Create a FAT file system on fd; size in kbyte.
+ * Return the actual free space in kbyte.
+ *
+ * size must be less than 32MB.
+ */
+unsigned mkdosfs(int fd, unsigned size)
+{
+  static unsigned char part1[] = {
+    0xeb, 0xfe, 0x90, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 0, 2, 2, 1, 0,
+    1, 0x20, 0
+  };
+  static unsigned char part2[] = {
+    16, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0, 0x29, 1, 2, 3, 4,
+    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ',
+    'F', 'A', 'T', '1', '6', ' ', ' ', ' '
+  };
+  int i;
+  unsigned clusters;
+  unsigned fat_sectors;
+
+  fat_sectors = ((16 * (size + 2) + 7) / 8 + 0x200 - 1) / 0x200;
+  clusters = (size * 2 - fat_sectors - 2) / 2;
+
+  for(i = 0; i < sizeof part1; i++) put_byte(fd, part1[i]);
+  put_short(fd, size * 2);
+  put_byte(fd, 0xf8);
+  put_short(fd, fat_sectors);
+  for(i = 0; i < sizeof part2; i++) put_byte(fd, part2[i]);
+
+  lseek(fd, 0x1fe, SEEK_SET);
+  put_short(fd, 0xaa55);
+  put_int(fd, 0xfffffff8);
+  for(i = 1; i < ((fat_sectors + 1) * 0x200) / 4; i++) put_int(fd, 0);
+
+  return clusters;
+}
+
+void do_cp(char *src_dir, char *dst_dir, char *name)
+{
+  FILE *f, *g;
+  int c;
+  char src[200], dst[200];
+
+  deb_str(name);
+
+  sprintf(src, "%s/%s", src_dir, name);
+  sprintf(dst, "%s/%s", dst_dir, name);
+
+  if(!(f = fopen(src, "r"))) return;
+  if(!(g = fopen(dst, "w"))) {
+    fclose(f);
+    return;
+  }
+
+  while((c = fgetc(f)) != EOF) fputc(c, g);
+
+  fclose(g);
+  fclose(f);
+}
+
+/*
+ * Check for a valid driver update directory below <dir>; copy the
+ * necessary stuff into a ramdisk and mount it at /update. The global
+ * variable driver_update_dir[] then holds the mount point (and is ""
+ * otherwise).
+ *
+ * Do nothing if *driver_update_dir != 0 (stay with the first driver
+ * update medium).
+ */
+int util_chk_driver_update(char *dir)
+{
+  char drv_src[100], mods_src[100], inst_src[100];
+  char inst_dst[100], imod[200], rmod[100], *s;
+  struct stat st;
+  int fd, i;
+  unsigned fssize;
+  struct dirent *de;
+  DIR *d;
+
+  if(!dir) return 0;
+  if(*driver_update_dir) return 0;
+
+  sprintf(drv_src, "%s/suse.drv", dir);
+  sprintf(mods_src, "%s/suse.drv/modules", dir);
+  sprintf(inst_src, "%s/suse.drv/install", dir);
+
+  if(stat(drv_src, &st) == -1) return 0;
+  if(!S_ISDIR(st.st_mode)) return 0;
+
+  /* Driver update disk, even if the update dir is empty! */
+  strcpy(driver_update_dir, "/update");
+
+  deb_msg("driver update disk");
+  deb_str(dir);
+
+  fd = open("/dev/ram3", O_RDWR);
+  if(fd < 0) return 0;
+  fssize = mkdosfs(fd, 8000);
+  close(fd);
+
+  deb_int(fssize);
+
+  mkdir(driver_update_dir, 0755);
+
+  i = mount("/dev/ram3", driver_update_dir, "vfat", 0, 0);
+
+// Why does this not work???
+// i = util_try_mount("/dev/ram3", driver_update_dir, MS_MGC_VAL | MS_RDONLY, 0);
+
+  deb_int(i);
+
+  if(i) return 0;
+
+  deb_msg("mounted");
+
+  sprintf(inst_dst, "%s/install", driver_update_dir);
+
+  if(
+    !stat(inst_src, &st) &&
+    S_ISDIR(st.st_mode) &&
+    !mkdir(inst_dst, 0755)
+  ) {
+    deb_msg("install");
+    d = opendir(inst_src);
+    if(d) {
+      while((de = readdir(d))) {
+        if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
+          do_cp(inst_src, inst_dst, de->d_name);
+        }
+      }
+      closedir(d);
+    }
+  }
+
+  if(
+    !stat(mods_src, &st) &&
+    S_ISDIR(st.st_mode)
+  ) {
+    deb_msg("modules");
+    d = opendir(mods_src);
+    if(d) {
+      while((de = readdir(d))) {
+        if(strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
+          if((s = strstr(de->d_name, ".o")) && !s[2]) {
+            sprintf(imod, "%s/%s", mods_src, de->d_name);
+            strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
+            mod_unload_module(rmod);
+            mod_load_module(imod, NULL);
+          }
+        }
+      }
+      closedir(d);
+    }
+  }
+
+  return 0;
+}
+
+void util_umount_driver_update()
+{
+  if(!*driver_update_dir) return;
+
+  util_umount(driver_update_dir);
+  *driver_update_dir = 0;
+
+  util_free_ramdisk("/dev/ram3");
 }
 

@@ -240,3 +240,4 @@ extern char            *braille_ig;
 extern char            *braille_dev_ig;
 extern char            *x11i_tg;
 extern char            livesrc_tg[16];
+extern char            driver_update_dir[16];
