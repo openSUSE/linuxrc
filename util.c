@@ -3332,7 +3332,10 @@ void util_set_serial_console(char *str)
   sl = slist_split(',', config.serial);
 
   if(sl) {
-    sprintf(buf, "/dev/%s", sl->key);
+    if (strncmp("/dev/", sl->key, 5) == 0)
+      sprintf(buf, "%s", sl->key);
+    else
+      sprintf(buf, "/dev/%s", sl->key);
     if(!config.console || strcmp(buf, config.console)) {
       str_copy(&config.console, buf);
       freopen(config.console, "r", stdin);

@@ -1025,7 +1025,8 @@ char *auto2_disk_list(int *boot_disk)
 extern void hd_scan_kbd(hd_data_t *hd_data);
 char *auto2_serial_console (void)
 {
-  char console[32], buf[256];
+  static char console[32];
+  char buf[256];
   hd_data_t *hd_data2;
   hd_t *hd;
 
