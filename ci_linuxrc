@@ -28,6 +28,7 @@ tar -Icf $linuxrc.tar.bz2 linuxrc-$ver
 if mkdir /work/src/done/STABLE/linuxrc ; then
   cd /work/src/done/STABLE/linuxrc
   cp $linuxrc.tar.bz2 /work/SRC/all/linuxrc/linuxrc.{changes,spec} .
+  [ -f /work/SRC/all/linuxrc/config-dist.sh ] && cp /work/SRC/all/linuxrc/config-dist.sh .
   perl -pi -e 's/^(Version:\s+)\S+/${1}'$ver'/' /work/src/done/STABLE/linuxrc/linuxrc.spec
   perl -pi -e 's/^(Source.+?-)\S+?(\.tar\.bz2)/${1}'$ver'${2}/' /work/src/done/STABLE/linuxrc/linuxrc.spec
   . /work/src/bin/.profile
