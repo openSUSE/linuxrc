@@ -496,7 +496,7 @@ int auto2_net_dev(hd_t **hd0)
         }
       }
 
-      if(net_activate()) {
+      if(net_activate_ns()) {
         fprintf(stderr, "net activation failed\n");
         config.net.configured = nc_none;
         return 1;
@@ -856,7 +856,7 @@ void auto2_user_netconfig()
 
   if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
     config.net.configured = nc_static;
-    if(net_activate()) {
+    if(net_activate_ns()) {
       fprintf(stderr, "net activation failed\n");
       config.net.configured = nc_none;
     }

@@ -68,6 +68,8 @@ static int  net_is_plip_im = FALSE;
 #  endif
 #endif
 
+static int net_activate(void);
+
 #if NETWORK_CONFIG
 static int net_choose_device(void);
 static void net_setup_nameserver(void);
@@ -109,7 +111,7 @@ void net_ask_password()
 
 /*
  * Configure network. Ask for network config data if necessary.
- * Does either DHCP, BOOTP or calls net_activate() to setup the interface.
+ * Does either DHCP, BOOTP or calls net_activate_ns() to setup the interface.
  *
  * Return:
  *      0: ok
@@ -170,13 +172,11 @@ int net_config()
 
   if(rc) return -1;
 
-  if(net_activate()) {
+  if(net_activate_ns()) {
     dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
     config.net.configured = nc_none;
     if(!config.test) return rc = -1;
   }
-
-  net_setup_nameserver();
 
   net_check_address2(&config.net.server, 1);
 
@@ -308,6 +308,34 @@ int net_setup_localhost()
   fprintf (stderr, "%s\n", error_ii ? "failure" : "done");
 
   return error_ii;
+}
+
+
+/*
+ * Setup network interface and write name server config.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error code
+ *
+ * Global vars changed:
+ *  config.net.is_configured
+ *  config.net.nameserver
+ *
+ * Does nothing if DHCP is active.
+ * Writes nameserver & domain to /etc/resolv.conf.
+ *
+ * netdevice_tg: interface
+ */
+int net_activate_ns()
+{
+  int rc;
+
+  rc = net_activate();
+
+  if(!rc) net_setup_nameserver();
+
+  return rc;
 }
 
 
@@ -543,10 +571,13 @@ int net_check_address2(inet_t *inet, int do_dns)
     }
   }
 
-  /* ####### should be something like nameserver_active */
   if(
     !do_dns ||
-    (!config.net.dhcp_active && !config.test && config.run_as_linuxrc)
+    (
+      !config.net.dhcp_active &&
+      !config.net.nameserver[0].ok &&
+      !config.test &&
+      config.run_as_linuxrc)
   ) {
     return -1;
   }
@@ -1075,7 +1106,7 @@ static void net_show_error(enum nfs_stat status_rv)
  * Let user enter nameservers.
  *
  * Does nothing if dhcp is active.
- * Does nothing unless window mode is active.
+ * Asks for name servers if window mode is active.
  *
  * Writes nameserver & domain to /etc/resolv.conf.
  *
@@ -1088,40 +1119,46 @@ void net_setup_nameserver()
   FILE *f;
   unsigned u;
 
-  if(config.net.dhcp_active || !config.win) return;
+  if(config.net.dhcp_active) return;
 
-  if(!config.net.nameserver[0].name && config.net.hostname.ok) {
-    s = inet_ntoa(config.net.hostname.ip);
-    config.net.nameserver[0].name = strdup(s ?: "");
-  }
+  if(config.win) {
 
-  if((config.net.setup & NS_NAMESERVER)) {
-    for(u = 0; u < config.net.nameservers; u++) {
-      if(config.net.nameservers == 1) {
-        s = txt_get(TXT_INPUT_NAMED);
-      }
-      else {
-         sprintf(buf, txt_get(TXT_INPUT_NAMED1), u + 1);
-         s = buf;
-      }
-      if(net_get_address(s, &config.net.nameserver[u], 0)) break;
+    if(!config.net.nameserver[0].name && config.net.hostname.ok) {
+      s = inet_ntoa(config.net.hostname.ip);
+      config.net.nameserver[0].name = strdup(s ?: "");
     }
-    for(; u < config.net.nameservers; u++) {
-      str_copy(&config.net.nameserver[u].name, NULL);
-      config.net.nameserver[u].ok = 0;
+
+    if((config.net.setup & NS_NAMESERVER)) {
+      for(u = 0; u < config.net.nameservers; u++) {
+        if(config.net.nameservers == 1) {
+          s = txt_get(TXT_INPUT_NAMED);
+        }
+        else {
+           sprintf(buf, txt_get(TXT_INPUT_NAMED1), u + 1);
+           s = buf;
+        }
+        if(net_get_address(s, &config.net.nameserver[u], 0)) break;
+      }
+      for(; u < config.net.nameservers; u++) {
+        str_copy(&config.net.nameserver[u].name, NULL);
+        config.net.nameserver[u].ok = 0;
+      }
     }
+
   }
 
   if(config.test) return;
 
-  if(config.net.nameserver[0].ok) {
-    if((f = fopen("/etc/resolv.conf", "w"))) {
-      fprintf(f, "nameserver %s\n", config.net.nameserver[0].name);
-      if(config.net.domain) {
-        fprintf(f, "search %s\n", config.net.domain);
+  if((f = fopen("/etc/resolv.conf", "w"))) {
+    for(u = 0; u < config.net.nameservers; u++) {
+      if(config.net.nameserver[u].ok) {
+        fprintf(f, "nameserver %s\n", config.net.nameserver[u].name);
       }
-      fclose(f);
     }
+    if(config.net.domain) {
+      fprintf(f, "search %s\n", config.net.domain);
+    }
+    fclose(f);
   }
 }
 
@@ -1250,7 +1287,7 @@ int net_bootp()
   name2inet(&config.net.hostname, "");
   netconf_error	= 0;
 
-  if(net_activate()) {
+  if(net_activate_ns()) {
     if(config.win) {
       dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
     }
