@@ -1,3 +1,6 @@
+22/9/2004:	v1.7.13
+	- enhanced driver update dialog
+
 15/9/2004:	v1.7.12
 	- added 'netwait=N' option: wait N seconds after network setup (#44218)
 	- s390: several minor netdev setup fixes
