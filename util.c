@@ -365,7 +365,7 @@ void util_print_banner (void)
 
     uname (&utsinfo_ri);
     if (config.linemode) {
-      printf (">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2002 SuSE Linux AG <<<\n", utsinfo_ri.release);
+      printf (">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2003 SuSE Linux AG <<<\n", utsinfo_ri.release);
         return;
     }
     memset (&win_ri, 0, sizeof (window_t));
@@ -396,7 +396,7 @@ void util_print_banner (void)
     win_ri.style = STYLE_SUNKEN;
     win_open (&win_ri);
 
-    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2002 SuSE Linux AG <<<",
+    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2003 SuSE Linux AG <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
