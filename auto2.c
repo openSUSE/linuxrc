@@ -510,6 +510,7 @@ int auto2_init()
         pcmcia_core_loaded_im = TRUE;
         deb_msg("card manager ok.");
       }
+      sleep(2);		/* wait for cards to be activated... */
       /* check for cdrom & net devs */
       hd_list(hd_data, hw_cdrom, 0, NULL);
       hd_list(hd_data, hw_network, 0, NULL);
