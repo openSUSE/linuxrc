@@ -2095,9 +2095,11 @@ void get_ide_options()
   f0 = file_read_cmdline(0);
   for(f = f0; f; f = f->next) {
     if(
-      !strcmp(f->key_str, "ide") ||
-      !strcmp(f->key_str, "idewait") ||
-      !strncmp(f->key_str, "hd", sizeof "hd" - 1)
+      !strncmp(f->key_str, "ide", sizeof "ide" - 1) ||
+      (
+        !strncmp(f->key_str, "hd", sizeof "hd" - 1) &&
+        strlen(f->key_str) == 3
+      )
     ) {
       strprintf(&buf, "%s%s ", buf ?: "options=\"", f->unparsed);
     }
