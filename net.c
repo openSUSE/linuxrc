@@ -551,8 +551,9 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
       strcat(options, ",workgroup=");
       strcat(options, workgroup);
     }
-  } else {
-    strcat(options, ",guest");
+  } else { /* smbmount needs a username, otherwise it takes LOGNAME from
+              environment. see bugzilla #20152 */
+    strcat(options, ",username=root,guest");
   }
 }
 
@@ -603,6 +604,7 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 
   mod_modprobe("smbfs", NULL);
 
+  fprintf(stderr, "%s\n", tmp);
   if(system(tmp)) {
     sprintf(tmp, "%s", "Error trying to mount SMB share.");
 
@@ -836,7 +838,7 @@ int net_choose_device()
     { "iucv",  TXT_NET_CLAW  }
   };
     
-  if(auto_ig) return 0;
+  if(auto_ig || config.net.device_given) return 0;
 
   /* re-read - just in case... */
   util_update_netdevice_list(NULL, 1);
