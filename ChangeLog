@@ -5,6 +5,7 @@
 	- tty and tty%d are known not to be serial lines (#18592)
 	- 'loglevel' parameter can be used to change kernel log level (#18592)
 	- add translations for driver update menu entry (#30395)
+	- write unique id of network card, not interface (#25739)
 
 8/9/2003:	v1.5.11
 	- use time() *and* CLientHwAddr for xid calculation in dhcpcd (#29334)

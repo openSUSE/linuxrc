@@ -4137,3 +4137,46 @@ void util_mkdevs()
   }
 }
 
+
+/*
+ * Get unique id for network device.
+ *
+ */
+void get_net_unique_id()
+{
+  hd_data_t *hd_data;
+  hd_t *hd;
+  driver_info_t *di;
+  str_list_t *sl1;
+  slist_t *sl;
+  char *id = NULL;
+
+  if(!*netdevice_tg) return;
+
+  for(sl = config.net.devices; sl; sl = sl->next) {
+    if(sl->key && sl->value && !strcmp(sl->key, netdevice_tg)) break;
+  }
+
+  if(!sl) return;
+
+  /* sl->value: network module */
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  for(hd = hd_list(hd_data, hw_network_ctrl, 1, NULL); hd && !id; hd = hd->next) {
+    for(di = hd->driver_info; di && !id; di = di->next) {
+      if(di->module.type == di_module) {
+        for(sl1 = di->module.names; sl1; sl1 = sl1->next) {
+          if(sl1->str && !strcmp(sl1->str, sl->value)) {
+            str_copy(&config.net.unique_id, id = hd->unique_id);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  hd_free_hd_data(hd_data);
+}
+
+

@@ -171,8 +171,6 @@ void net_stop(void)
   file_t *f0, *f;
   slist_t *sl0 = NULL, *sl;
 
-  str_copy(&config.net.unique_id, NULL);
-
   if(config.test) {
     net_is_configured_im = FALSE;
     return;

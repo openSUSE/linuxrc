@@ -503,7 +503,6 @@ int auto2_net_dev(hd_t **hd0)
       }
       else {
         fprintf(stderr, "%s activated\n", hd->unix_dev_name);
-        str_copy(&config.net.unique_id, hd->unique_id);
       }
 
       net_is_configured_im = TRUE;

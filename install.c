@@ -1127,7 +1127,7 @@ int inst_execute_yast()
 
   if(rc || config.aborted) {
     config.rescue = 0;
-    config.manual = 1;
+    config.manual |= 1;
   }
 
   if(config.manual) util_disp_init();
@@ -1155,7 +1155,7 @@ int inst_execute_yast()
     rc = inst_commit_install();
     if(rc) {
       config.rescue = 0;
-      config.manual = 1;
+      config.manual |= 1;
       util_disp_init();
     }
   }

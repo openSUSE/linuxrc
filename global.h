@@ -200,7 +200,6 @@ typedef struct {
   unsigned instdata_mounted:1;	/* install data are mounted */
   unsigned textmode:1;		/* start yast2 in text mode */
   unsigned debugwait:1;		/* pop up dialogs at some critical points */
-  unsigned manual:1;		/* manual mode */
   unsigned linemode:1;		/* line mode */
   unsigned ask_language:1;	/* let use choose language  */
   unsigned ask_keytable:1;	/* let user choose keytable */
@@ -228,6 +227,7 @@ typedef struct {
   unsigned idescsi;		/* use ide-scsi module */
   unsigned floppy_probed:1;	/* tried to detect floppy device */
   unsigned linebreak:1;		/* internal: print a newline first */
+  unsigned manual;		/* manual mode */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

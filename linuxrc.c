@@ -776,7 +776,7 @@ void lxrc_init()
 
       if(!i) {
         config.rescue = 0;
-        config.manual = 1;
+        config.manual |= 1;
         util_disp_init();
         if(j) {
           sprintf(buf, "Could not find the %s ", config.product);
@@ -862,7 +862,7 @@ void lxrc_main_menu()
     di_none
   };
 
-  config.manual = 1;
+  config.manual |= 1;
 
   di_lxrc_main_menu_last = config.hwcheck ? di_main_hwcheck : di_main_start;
 
