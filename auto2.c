@@ -950,7 +950,7 @@ char *auto2_xserver(char **version, char **busid)
 
   if(*display) return display;
 
-  if(c == 0) c = '4';
+  if(c == 0) c = '3';	/* default to XF 3, if nothing else is known  */
 
   xf86_ver[0] = c;
   xf86_ver[1] = 0;
