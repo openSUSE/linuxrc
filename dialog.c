@@ -293,7 +293,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
     if (config.linemode)
       {
 	putchar('\n');
-	if (msgtype_iv == MSGTYPE_ERROR)
+	if (msgtype_iv == MSGTYPE_ERROR || msgtype_iv == MSGTYPE_REBOOT)
 	  printf("*** ");
         dia_printformatted(txt_tv, 0, max_x_ig - 5, 1);
 	if (msgtype_iv == MSGTYPE_INFOENTER)
@@ -308,7 +308,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
     memset (&win_ri, 0, sizeof (window_t));
-    if (msgtype_iv == MSGTYPE_ERROR)
+    if (msgtype_iv == MSGTYPE_ERROR || msgtype_iv == MSGTYPE_REBOOT)
         {
         win_ri.bg_color = colors_prg->error_win;
         win_ri.fg_color = colors_prg->error_fg;
@@ -319,7 +319,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
         win_ri.fg_color = colors_prg->msg_fg;
         }
     width_ii = dia_win_open (&win_ri, txt_tv);
-    s = txt_get(TXT_OK);
+    s = txt_get(msgtype_iv == MSGTYPE_REBOOT ? TXT_REBOOT : TXT_OK);
     util_generate_button (&button_ri, s, strlen(s));
     win_add_button (&win_ri, &button_ri,
                     width_ii / 2 - strlen (button_ri.text) / 2 - 1,
@@ -856,11 +856,13 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	    putchar('\n');
 	    c = 0;
 	  }
-	if (*input_tr)
+	if (*input_tr && !pw_mode)
 	  printf(" [%s]> " + (c == 0), input_tr);
         else
 	  printf("> ");
 	fflush(stdout);
+	if (pw_mode)
+	  kbd_echo_off();
 	for (i = 0; ; i++)
 	  {
 	    c = getchar();
@@ -875,7 +877,11 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	      {
 		c = getchar();
 		if (c == '\n' || c == '\r' || c == EOF)
-		  return -1;
+		  {
+		    if (pw_mode)
+		      kbd_reset();
+		    return -1;
+		  }
 	      }
 	    if ((unsigned char)c < ' ')
 	      {
@@ -885,6 +891,8 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	    if (i < len_iv - 1)
 	      input_tr[i] = c;
 	  }
+	if (pw_mode)
+	  kbd_reset();
 	return 0;
       }
     disp_toggle_output (DISP_OFF);
@@ -1352,7 +1360,7 @@ void dia_handle_ctrlc (void)
 	    while(isspace(*t)) t++;
 	    kbd_end();	/* restore terminal settings */
 	    j = execlp(t, t, NULL);
-	    kbd_init();
+	    kbd_init(0);
 	  }
 	  else {
 	    j = system(s);

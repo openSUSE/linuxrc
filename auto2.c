@@ -46,14 +46,12 @@ static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
 static int auto2_net_dev(hd_t **);
+static int auto2_net_dev1(char *device);
 static int driver_is_active(hd_t *hd);
-static int activate_driver(hd_t *hd, slist_t **mod_list);
-static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
+static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
-#ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
-#endif
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -182,14 +180,26 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay += 1;
 
-    for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, &usb_modules);
+    /* ehci needs to be loaded first */
+    for(hd = hd_usb; hd; hd = hd->next) {
+      if(
+        hd->base_class.id == bc_serial &&
+        hd->sub_class.id == sc_ser_usb &&
+        hd->prog_if.id == pif_usb_ehci
+      ) {
+        mod_modprobe("ehci-hcd", NULL);
+        break;
+      }
+    }
+
+    for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, &usb_modules);
     hd_usb = hd_free_hd_list(hd_usb);
 
     fflush(stdout);
 
-    mod_insmod("input", NULL);
-    mod_insmod("hid", NULL);
-    mod_insmod("keybdev", NULL);
+    mod_modprobe("input", NULL);
+    mod_modprobe("hid", NULL);
+    mod_modprobe("keybdev", NULL);
 
     config.module.delay -= 1;
 
@@ -197,7 +207,7 @@ void auto2_scan_hardware(char *log_file)
     if(config.usbwait > 0) sleep(config.usbwait);
 
     if(with_usb) {
-      mod_insmod("usb-storage", NULL);
+      mod_modprobe("usb-storage", NULL);
       if(config.usbwait > 0) sleep(config.usbwait);
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
     }
@@ -215,10 +225,10 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay += 3;
 
-    for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd, NULL);
+    for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
     hd_usb = hd_free_hd_list(hd_fw);
 
-    mod_insmod("sbp2", NULL);
+    mod_modprobe("sbp2", NULL);
 
     config.module.delay -= 3;
 
@@ -442,131 +452,147 @@ int auto2_cdrom_dev(hd_t **hd0)
 int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
-  int i;
 
   if(!(net_config_mask() || config.insttype == inst_net)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
-    if(hd->unix_dev_name && strcmp(hd->unix_dev_name, "lo")) {
 
-      if(config.net.device_given && strcmp(netdevice_tg, hd->unix_dev_name)) continue;
-
-      /* net_stop() - just in case */
-      net_stop();
-
-      fprintf(stderr, "Trying to activate %s\n", hd->unix_dev_name);
-
-      strcpy(netdevice_tg, hd->unix_dev_name);
-
-      net_setup_localhost();
-
-      config.net.configured = nc_static;
-
-      /* do bootp if there's some indication that a net install is intended
-       * but some data are still missing
-       */
-      if(
-        (net_config_mask() || config.insttype == inst_net) &&
-        (net_config_mask() & 0x2b) != 0x2b
-      ) {
-        printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
-        fflush(stdout);
-        fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
-        config.net.use_dhcp ? net_dhcp() : net_bootp();
-        if(
-          !config.serverdir || !*config.serverdir ||
-          !config.net.hostname.ok ||
-          !config.net.netmask.ok ||
-          !config.net.broadcast.ok
-        ) {
-          fprintf(stderr, "no/incomplete answer.\n");
-          config.net.configured = nc_none;
-          return 1;
-        }
-        fprintf(stderr, "ok.\n");
-
-
-        config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
-
-        if(net_check_address2(&config.net.server, 1)) {
-          fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
-          config.net.configured = nc_none;
-          return 1;
-        }
-      }
-
-      if(net_activate()) {
-        fprintf(stderr, "net activation failed\n");
-        config.net.configured = nc_none;
-        return 1;
-      }
-      else {
-        fprintf(stderr, "%s activated\n", hd->unix_dev_name);
-      }
-
-      while (config.instmode == inst_slp) {
-	extern int slp_get_install(void);
-	if (slp_get_install()) {
-            fprintf(stderr, "SLP failed\n");
-            return 1;
-        }
-      }
-
-      net_ask_password(); /* in case we have ssh or vnc in auto mode */
-
-      switch(config.instmode) {
-        case inst_smb:
-          fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.serverdir);
-
-          i = net_mount_smb(mountpoint_tg,
-            &config.net.server, config.serverdir,
-            config.net.user, config.net.password, config.net.workgroup
-          );
-          
-          if(i) {
-            fprintf(stderr, "SMB mount failed\n");
-            return 1;
-          }
-
-          fprintf(stderr, "SMB mount ok\n");
-          break;
-
-        case inst_nfs:
-          fprintf(stderr, "Starting portmap.\n");
-          system("portmap");
-
-          fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
-
-          if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
-            fprintf(stderr, "NFS mount failed\n");
-            return 1;
-          }
-
-          fprintf(stderr, "NFS mount ok\n");
-          break;
-
-        case inst_ftp:
-        case inst_tftp:
-        case inst_http:
-          i = net_open(NULL);
-          if(i < 0) {
-            util_print_net_error();
-            return 1;
-          }
-          break;
-
-        default:
-          fprintf(stderr, "unsupported inst mode: %s\n", get_instmode_name(config.instmode));
-          return 1;
-      }
-
-      return inst_check_instsys();
-    }
+    if(!auto2_net_dev1(hd->unix_dev_name)) return 0;
   }
 
   return 1;
 }
+
+
+/*
+ * Try to get inst-sys from network device.
+ *
+ * Return:
+ *   0: ok
+ *   1: failed
+ */
+int auto2_net_dev1(char *device)
+{
+  int i;
+
+  if(!device) return 1;
+
+  if(!strncmp(device, "lo", sizeof "lo" - 1)) return 1;
+
+  if(config.net.device_given && strcmp(device, netdevice_tg)) return 1;
+
+  /* net_stop() - just in case */
+  net_stop();
+
+  fprintf(stderr, "Trying to activate %s\n", device);
+
+  strcpy(netdevice_tg, device);
+
+  net_setup_localhost();
+
+  config.net.configured = nc_static;
+
+  /* do bootp if there's some indication that a net install is intended
+   * but some data are still missing
+   */
+  if(
+    (net_config_mask() || config.insttype == inst_net) &&
+    (net_config_mask() & 0x2b) != 0x2b
+  ) {
+    printf("Sending %s request to %s...\n", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+    fflush(stdout);
+    fprintf(stderr, "Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
+    config.net.use_dhcp ? net_dhcp() : net_bootp();
+    if(
+      !config.serverdir || !*config.serverdir ||
+      !config.net.hostname.ok ||
+      !config.net.netmask.ok ||
+      !config.net.broadcast.ok
+    ) {
+      fprintf(stderr, "no/incomplete answer.\n");
+      config.net.configured = nc_none;
+      return 1;
+    }
+    fprintf(stderr, "ok.\n");
+
+    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+
+    if(net_check_address2(&config.net.server, 1)) {
+      fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
+      config.net.configured = nc_none;
+      return 1;
+    }
+  }
+
+  if(net_activate_ns()) {
+    fprintf(stderr, "net activation failed\n");
+    config.net.configured = nc_none;
+    return 1;
+  }
+  else {
+    fprintf(stderr, "%s activated\n", device);
+  }
+
+  while(config.instmode == inst_slp) {
+    extern int slp_get_install(void);
+    if(slp_get_install()) {
+      fprintf(stderr, "SLP failed\n");
+      return 1;
+    }
+  }
+
+  net_ask_password(); /* in case we have ssh or vnc in auto mode */
+
+  switch(config.instmode) {
+    case inst_smb:
+      fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.serverdir);
+
+      i = net_mount_smb(mountpoint_tg,
+        &config.net.server, config.serverdir,
+        config.net.user, config.net.password, config.net.workgroup
+      );
+      
+      if(i) {
+        fprintf(stderr, "SMB mount failed\n");
+        return 1;
+      }
+
+      fprintf(stderr, "SMB mount ok\n");
+      break;
+
+    case inst_nfs:
+      fprintf(stderr, "Starting portmap.\n");
+      system("portmap");
+
+      fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
+
+      if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
+        fprintf(stderr, "NFS mount failed\n");
+        return 1;
+      }
+
+      fprintf(stderr, "NFS mount ok\n");
+      break;
+
+    case inst_ftp:
+    case inst_tftp:
+    case inst_http:
+      i = net_open(NULL);
+      if(i < 0) {
+        util_print_net_error();
+        return 1;
+      }
+      break;
+
+    default:
+      fprintf(stderr, "unsupported inst mode: %s\n", get_instmode_name(config.instmode));
+      return 1;
+  }
+
+  return inst_check_instsys();
+}
+
 
 int driver_is_active(hd_t *hd)
 {
@@ -586,7 +612,7 @@ int driver_is_active(hd_t *hd)
  * Activate device driver.
  * Returns 1 if it worked, else 0.
  */
-int activate_driver(hd_t *hd, slist_t **mod_list)
+int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list)
 {
   driver_info_t *di;
   str_list_t *sl1, *sl2;
@@ -634,7 +660,7 @@ int activate_driver(hd_t *hd, slist_t **mod_list)
  * Activate storage/network devices.
  * Returns 0 or the index of the last controller we activated.
  */
-int auto2_activate_devices(unsigned base_class, unsigned last_idx)
+int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
 {
   hd_t *hd;
   int ok;
@@ -648,21 +674,23 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
   if(!hd) return 0;	/* no further entries */
 
   for(; hd; hd = hd->next) {
-    if(hd->base_class.id == base_class && !driver_is_active(hd)) {
-      if((ok = activate_driver(hd, NULL))) {
+    if(hd_is_hw_class(hd, hw_class) && !driver_is_active(hd)) {
+      if((ok = activate_driver(hd_data, hd, NULL))) {
         last_idx = hd->idx;
         fprintf(stderr, "Ok, that seems to have worked. :-)\n");
       }
       else {
+#ifdef __i386__
         need_modules = 1;
+#endif
         fprintf(stderr, "Oops, that didn't work.\n");
       }
 
       /* some module was loaded...; in demo mode activate all disks */
       if(
         !(
-          (config.activate_storage && base_class == bc_storage) ||
-          (config.activate_network && base_class == bc_network)
+          (config.activate_storage && hw_class == hw_storage_ctrl) ||
+          (config.activate_network && hw_class == hw_network_ctrl)
         ) &&
         ok
       ) break;
@@ -683,13 +711,16 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
  */
 int auto2_init()
 {
-  int i, j, win_old;
-#ifdef __i386__
+  int i, win_old;
+#if 0	/* def __i386__ */
   int net_cfg;
 #endif
   hd_t *hd;
   char buf[256];
+#if WITH_PCMCIA
+  int j;
   hd_hw_item_t hw_items[] = { hw_cdrom, hw_network, 0 };
+#endif
 
   auto2_chk_frame_buffer();
 
@@ -719,8 +750,8 @@ int auto2_init()
 
     if(i) {
       mod_unload_module("ide-cd");
-      mod_insmod("ide-cd", buf);
-      mod_insmod("ide-scsi", NULL);
+      mod_modprobe("ide-cd", buf);
+      mod_modprobe("ide-scsi", NULL);
       hd_list(hd_data, hw_cdrom, 1, NULL);
     }
   }
@@ -818,27 +849,6 @@ int auto2_init()
 
   if(!i && config.hwcheck) i = 1;
 
-#ifdef __i386__
-  /* ok, found something */
-  if(i) return i;
-
-  net_cfg = net_config_mask() || config.insttype == inst_net;
-
-  /* no CD, but CD drive and no network install */
-  if(cdrom_drives && config.insttype != inst_net) return i;
-
-  if(need_modules) {
-    if(config.insttype == inst_net) {
-      if(auto2_ask_for_modules(1, "network") == 0) return FALSE;
-    }
-    else {
-      if(auto2_ask_for_modules(1, "ide/raid/scsi") == 0) return FALSE;
-    }
-  }
-
-  i = auto2_find_install_medium();
-#endif
-
   return i;
 }
 
@@ -852,11 +862,11 @@ void auto2_user_netconfig()
 
   if(!config.net.do_setup) return;
 
-  auto2_activate_devices(bc_network, 0);
+  auto2_activate_devices(hw_network_ctrl, 0);
 
   if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
     config.net.configured = nc_static;
-    if(net_activate()) {
+    if(net_activate_ns()) {
       fprintf(stderr, "net activation failed\n");
       config.net.configured = nc_none;
     }
@@ -891,35 +901,48 @@ int auto2_find_install_medium()
 
     util_debugwait("CD?");
 
-    need_modules = 0;
+    do {
+      need_modules = 0;
 
-    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+      if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+
+    do {
+      need_modules = 0;
+
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
 
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
-      if(config.activate_network) auto2_activate_devices(bc_network, 0);
       auto2_user_netconfig();
       return TRUE;
     }
 
-    for(need_modules = 0, last_idx = 0;;) {
-      /* i == 1 -> try to activate another storage device */
-      if(i == 1) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-      }
+    do {
+      need_modules = 0;
 
-      if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
-        fprintf(stderr, "No further storage devices found; giving up.\n");
-        break;
-      }
+      for(last_idx = 0;;) {
+        /* i == 1 -> try to activate another storage device */
+        if(i == 1) {
+          fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+        }
 
-      fprintf(stderr, "Looking for a %s CD again...\n", config.product);
-      if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        auto2_user_netconfig();
-        return TRUE;
+        if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
+          fprintf(stderr, "No further storage devices found; giving up.\n");
+          break;
+        }
+
+        fprintf(stderr, "Looking for a %s CD again...\n", config.product);
+        if(!(i = auto2_cdrom_dev(&hd_devs))) {
+          auto2_user_netconfig();
+          return TRUE;
+        }
       }
     }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
 
     if(config.cdrom) {
       auto2_user_netconfig();
@@ -931,35 +954,49 @@ int auto2_find_install_medium()
 
     util_debugwait("HD?");
 
-    need_modules = 0;
+    do {
+      need_modules = 0;
   
-    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+      if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+
+    do {
+      need_modules = 0;
+
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
 
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
-      if(config.activate_network) auto2_activate_devices(bc_network, 0);
       auto2_user_netconfig();
       return TRUE;
     }
 
-    for(need_modules = 0, last_idx = 0;;) {
-      /* i == 1 -> try to activate another storage device */
-      if(i == 1) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-      }
+    do {
+      need_modules = 0;
 
-      if(!(last_idx = auto2_activate_devices(bc_storage, last_idx))) {
-        fprintf(stderr, "No further storage devices found; giving up.\n");
-        break;
-      }
+      for(last_idx = 0;;) {
+        /* i == 1 -> try to activate another storage device */
+        if(i == 1) {
+          fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+        }
 
-      fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
-      if(!(i = auto2_harddisk_dev(&hd_devs))) {
-        if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        auto2_user_netconfig();
-        return TRUE;
+        if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
+          fprintf(stderr, "No further storage devices found; giving up.\n");
+          break;
+        }
+
+        fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
+        if(!(i = auto2_harddisk_dev(&hd_devs))) {
+          auto2_user_netconfig();
+          return TRUE;
+        }
       }
     }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+
   }
 
   if(net_config_mask() || config.insttype == inst_net) {
@@ -967,8 +1004,6 @@ int auto2_find_install_medium()
     util_debugwait("Net?");
 
     if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
-
-    need_modules = 0;
 
     s_addr2inet(
       &config.net.broadcast,
@@ -982,28 +1017,35 @@ int auto2_find_install_medium()
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
+    do {
+      need_modules = 0;
+
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
+
+    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+
     fprintf(stderr, "Looking for a network server...\n");
-    if(!auto2_net_dev(&hd_devs)) {
-      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
-      if(config.activate_network) auto2_activate_devices(bc_network, 0);
-      return TRUE;
-    }
+    if(!auto2_net_dev(&hd_devs)) return TRUE;
 
-    for(need_modules = 0, last_idx = 0;;) {
-      fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
+    do {
+      need_modules = 0;
 
-      if(!(last_idx = auto2_activate_devices(bc_network, last_idx))) {
-        fprintf(stderr, "No further network cards found; giving up.\n");
-        break;
-      }
+      for(last_idx = 0;;) {
+        fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
 
-      fprintf(stderr, "Looking for a network server again...\n");
-      if(!auto2_net_dev(&hd_devs)) {
-        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
-        if(config.activate_network) auto2_activate_devices(bc_network, 0);
-        return TRUE;
+        if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
+          fprintf(stderr, "No further network cards found; giving up.\n");
+          break;
+        }
+
+        fprintf(stderr, "Looking for a network server again...\n");
+        if(!auto2_net_dev(&hd_devs)) return TRUE;
       }
     }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
+
   }
 
   util_debugwait("Nothing found");
@@ -1110,38 +1152,6 @@ int auto2_find_floppy()
 }
 
 
-#if 0
-/*
- * Return != 0 if we should load the usb-storage module.
- */
-int load_usb_storage(hd_data_t *hd_data)
-{
-  hd_t *hd, *hd_floppy, *hd_cdrom, *hd_usb;
-  int usb_floppies = 0, usb_cdroms = 0, usb_other = 0;
-
-  hd_floppy = hd_list(hd_data, hw_floppy, 0, NULL);
-  for(hd = hd_floppy; hd; hd = hd->next) {
-    if(hd->bus.id == bus_usb && !hd->is.zip) usb_floppies++;
-  }
-  hd_free_hd_list(hd_floppy);
-
-  hd_cdrom = hd_list(hd_data, hw_cdrom, 0, NULL);
-  for(hd = hd_cdrom; hd; hd = hd->next) {
-    if(hd->bus.id == bus_usb) usb_cdroms++;
-  }
-  hd_free_hd_list(hd_cdrom);
-
-  hd_usb = hd_list(hd_data, hw_usb, 0, NULL);
-  for(hd = hd_usb; hd; hd = hd->next) {
-    if(hd->hw_class == hw_unknown) usb_other++;
-  }
-  hd_free_hd_list(hd_usb);
-
-  return usb_floppies || usb_cdroms || usb_other;
-}
-#endif
-
-
 int auto2_pcmcia()
 {
   if(!hd_data) return 0;
@@ -1185,66 +1195,49 @@ char *auto2_disk_list(int *boot_disk)
 }
 
 
-#if defined(__sparc__) || defined(__PPC__)
-
-/* We can only probe on SPARC for serial console */
-
-extern void hd_scan_kbd(hd_data_t *hd_data);
-char *auto2_serial_console (void)
+char *auto2_serial_console()
 {
-  char console[32];
-  char buf[256];
-  hd_data_t *hd_data2;
+  static char *console = NULL;
+  hd_data_t *hd_data;
   hd_t *hd;
 
-  if(hd_data == NULL)
-    {
-// FIXME: use hd_list( ,hw_keyboard, ) instead!!!
-      hd_data2 = calloc(1, sizeof (hd_data_t));
-      hd_set_probe_feature(hd_data2, pr_kbd);
-#ifdef __PPC__
-      hd_set_probe_feature(hd_data2, pr_serial);
-#endif
-      hd_scan_kbd(hd_data2);
-    }
-  else
-    hd_data2 = hd_data;
+  hd_data = calloc(1, sizeof *hd_data);
 
-  if (hd_data2 == NULL)
-    return NULL;
+  hd = hd_list(hd_data, hw_keyboard, 1, NULL);
 
-  *console = 0;
+  for(; hd; hd = hd->next) {
+    if(
+      hd->base_class.id == bc_keyboard &&
+      hd->sub_class.id == sc_keyboard_console
+    ) {
+      if(hd->unix_dev_name) {
+        strprintf(&console, "%s", short_dev(hd->unix_dev_name));
 
-  for(hd = hd_data2->hd; hd; hd = hd->next)
-    if(hd->base_class.id == bc_keyboard && hd->bus.id == bus_serial &&
-       hd->sub_class.id == sc_keyboard_console &&
-       hd->res->baud.type && hd->res->baud.type == res_baud)
-      {
-	strcpy (console, hd->unix_dev_name);
-	/* Create a string like: ttyS0,38400n8 */
-#if defined(__sparc__)
-	sprintf (buf, "%s,%d%c%d", &console[5],
-		 hd->res->baud.speed,
-		 hd->res->baud.parity,
-		 hd->res->baud.bits);
-#else
-	sprintf (buf, "%s,%d", &console[5], hd->res->baud.speed);
-#endif
-	str_copy(&config.serial, buf);
+        if(
+          hd->res &&
+          hd->res->baud.type == res_baud &&
+          hd->res->baud.speed
+        ) {
+          strprintf(&console, "%s,%u", console, hd->res->baud.speed);
+          if(hd->res->baud.parity && hd->res->baud.bits) {
+            strprintf(&console, "%s%c%u", console, hd->res->baud.parity, hd->res->baud.bits);
+          }
+        }
+      }
+      else {
+        strprintf(&console, "console");
       }
 
-  if (hd_data == NULL)
-    {
-      hd_free_hd_data (hd_data2);
-      free (hd_data2);
+      break;
     }
+  }
 
-  if (*console)
-    return config.serial;
-  else
-    return NULL;
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  return console;
 }
-#endif
+
 
 void auto2_progress(char *pos, char *msg)
 {
@@ -1253,32 +1246,16 @@ void auto2_progress(char *pos, char *msg)
   fflush(stdout);
 }
 
-#if 0
-void auto2_print_x11_opts(FILE *f)
-{
-  str_list_t *sl;
 
-  if(!x11_driver) return;
-
-  for(sl = x11_driver->x11.extensions; sl; sl = sl->next) {
-    if(*sl->str) fprintf(f, "XF86Ext:   Load\t\t\"%s\"\n", sl->str);
-  }
-
-  for(sl = x11_driver->x11.options; sl; sl = sl->next) {
-    if(*sl->str) fprintf(f, "XF86Raw:   Option\t\"%s\"\n", sl->str);
-  }
-
-  for(sl = x11_driver->x11.raw; sl; sl = sl->next) {
-    if(*sl->str) fprintf(f, "XF86Raw:   %s\n", sl->str);
-  }
-}
-#endif
-
-
-#ifdef __i386__
+/*
+ * Prompt for module floppy; does some real things only on i386 (other
+ * archs don't have module floppies).
+ */
 int auto2_ask_for_modules(int prompt, char *type)
 {
   int do_something = 0;
+
+#ifdef __i386__
   char buf[256];
   int mtype = mod_get_type(type);
 
@@ -1294,10 +1271,10 @@ int auto2_ask_for_modules(int prompt, char *type)
   if(do_something) mod_add_disk(0, mtype);
 
   util_disp_done();
+#endif
 
   return do_something;
 }
-#endif
 
 
 void load_storage_mods()
@@ -1310,7 +1287,7 @@ void load_storage_mods()
   }
 
   config.activate_storage = 1;
-  auto2_activate_devices(bc_storage, 0);
+  auto2_activate_devices(hw_storage_ctrl, 0);
 }
 
 #endif	/* USE_LIBHD */
