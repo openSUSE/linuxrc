@@ -964,6 +964,11 @@ char *auto2_xserver(char **version, char **busid)
     }
   }
 
+#ifdef __PPC__
+  /* temporary hack due to XF4 problems */
+  if(!c) c = '3';
+#endif
+
   if(c) { xf86_ver[0] = c; xf86_ver[1] = 0; }
 
   if(!hd_data) return NULL;

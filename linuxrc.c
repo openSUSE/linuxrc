@@ -233,6 +233,8 @@ void lxrc_killall (int really_all_iv)
             {
             fprintf (stderr, "Killing %s (%d)\n", lxrc_prog_name (pid_ri),
                                                   pid_ri);
+            kill (pid_ri, 15);
+            usleep (10000);
             kill (pid_ri, 9);
             }
 
