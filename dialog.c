@@ -736,7 +736,11 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     window_t  tmp_win_ri;
     char      tmp_txt_ti [STATUS_SIZE + 1];
 
-    if(!config.win || config.linemode) { printf("%s", txt_tv); return; }
+    if(!config.win || config.linemode) {
+      printf("%s", txt_tv);
+      fflush(stdout);
+      return;
+    }
 
     disp_toggle_output (DISP_OFF);
     strncpy (tmp_txt_ti, txt_tv, STATUS_SIZE);
