@@ -1036,7 +1036,7 @@ char *auto2_disk_list(int *boot_disk)
 }
 
 
-#if defined(__sparc__)
+#if defined(__sparc__) || defined(__PPC__)
 
 /* We can only probe on SPARC for serial console */
 
@@ -1049,8 +1049,12 @@ char *auto2_serial_console (void)
 
   if(hd_data == NULL)
     {
+// FIXME: use hd_list( ,hw_keyboard, ) instead!!!
       hd_data2 = calloc(1, sizeof (hd_data_t));
       hd_set_probe_feature(hd_data2, pr_kbd);
+#ifdef __PPC__
+      hd_set_probe_feature(hd_data2, pr_serial);
+#endif
       hd_scan_kbd(hd_data2);
     }
   else
@@ -1068,10 +1072,14 @@ char *auto2_serial_console (void)
       {
 	strcpy (console, hd->unix_dev_name);
 	/* Create a string like: ttyS0,38400n8 */
+#if defined(__sparc__)
 	sprintf (console_parms_tg, "%s,%d%s%d", &console[5],
 		 hd->res->baud.speed,
 		 hd->res->baud.parity ? "p" : "n",
 		 hd->res->baud.bits);
+#else
+	sprintf (console_parms_tg, "%s,%d", &console[5], hd->res->baud.speed);
+#endif
       }
 
   if (hd_data == NULL)

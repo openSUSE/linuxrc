@@ -668,7 +668,7 @@ void lxrc_set_modprobe (char *program_tv)
    commandline. On SPARC, we use the result from hardwareprobing. */
 static void lxrc_check_console (void)
     {
-#if !defined(__sparc__)
+#if !defined(__sparc__) && !defined(__PPC__)
     FILE  *fd_pri;
     char   buffer_ti [300];
     char  *tmp_pci = (char *) 0;
