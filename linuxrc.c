@@ -206,7 +206,8 @@ void lxrc_killall(int really_all)
   pid_t i_ri;
   pid_t mypid_ri;
 
-  if(testing_ig) return;
+  if (testing_ig)
+      return;
 
   mypid_ri = getpid ();
   for(i_ri = 32767; i_ri > mypid_ri; i_ri--)

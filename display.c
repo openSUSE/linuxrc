@@ -37,6 +37,8 @@ static colorset_t  disp_vgacolors_rm;
 static colorset_t  disp_mono_rm;
 static colorset_t  disp_alternate_rm;
 
+graphics_t graphics_sg;
+
 /*
  *
  * local function prototypes
@@ -118,6 +120,39 @@ void disp_init (void)
         disp_mono_rm.input_fg   = COL_WHITE;
         disp_mono_rm.error_win  = COL_WHITE;
         disp_mono_rm.error_fg   = COL_BLACK;
+        }
+
+    if (testing_ig || serial_ig)
+        {
+        fprintf (stderr, "ACS activated\n");
+
+        graphics_sg.lrcorner = 106;
+        graphics_sg.urcorner = 107;
+        graphics_sg.ulcorner = 108;
+        graphics_sg.llcorner = 109;
+        graphics_sg.ltee     = 116;
+        graphics_sg.rtee     = 117;
+        graphics_sg.dtee     = 118;
+        graphics_sg.utee     = 119;
+        graphics_sg.vline    = 120;
+        graphics_sg.hline    = 113;
+        graphics_sg.cross    = 110;
+        graphics_sg.block    =  97;
+        }
+    else
+        {
+        graphics_sg.lrcorner = 217;
+        graphics_sg.urcorner = 191;
+        graphics_sg.ulcorner = 218;
+        graphics_sg.llcorner = 192;
+        graphics_sg.ltee     = 195;
+        graphics_sg.rtee     = 180;
+        graphics_sg.dtee     = 194;
+        graphics_sg.utee     = 193;
+        graphics_sg.vline    = 179;
+        graphics_sg.hline    = 196;
+        graphics_sg.cross    = 197;
+        graphics_sg.block    = 177;
         }
 
     if (auto_ig)
@@ -228,7 +263,7 @@ void disp_graph_on (void)
     {
     if (!IS_ALTERNATE (disp_attr_cm))
         {
-        if (testing_ig)
+        if (serial_ig || testing_ig)
             printf ("%c", 14);
         else
             printf ("[11m");
@@ -241,7 +276,7 @@ void disp_graph_off (void)
     {
     if (IS_ALTERNATE (disp_attr_cm))
         {
-        if (testing_ig)
+        if (serial_ig || testing_ig)
             printf ("%c", 15);
         else
             printf ("[10m");

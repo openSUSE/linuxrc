@@ -58,6 +58,7 @@ static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
+static const char  *file_txt_console_tm        = "Console:";
 #ifdef USE_LIBHD
 static const char  *file_txt_mouse_dev_tm      = "Mouse-Device:";
 static const char  *file_txt_mouse_type_tm     = "Mouse-Type:";
@@ -84,7 +85,8 @@ void file_write_yast_info (void)
         return;
         }
 
-    if(!auto2_ig) set_write_info (file_pri);
+    if (!auto2_ig)
+        set_write_info (file_pri);
 
     strcpy (line_ti, file_txt_sourcemount_tm);
     if (!ramdisk_ig)
@@ -121,6 +123,9 @@ void file_write_yast_info (void)
             strcat (line_ti, " i82365\n");
         fprintf (file_pri, line_ti);
         }
+
+    if (serial_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_console_tm, console_tg);
 
     strcpy (line_ti, file_txt_bootmode_tm);
     strcat (line_ti, " ");

@@ -249,7 +249,7 @@ void set_choose_language (void)
     if (rc_ii > 0)
         {
         language_ig = set_languages_arm [rc_ii - 1].id;
-        if (set_languages_arm [rc_ii - 1].font)
+        if (!serial_ig && set_languages_arm [rc_ii - 1].font)
             {
             sprintf (command_ti, "setfont %s -m %s -u %s",
                      set_languages_arm [rc_ii - 1].font,

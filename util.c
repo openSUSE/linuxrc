@@ -44,17 +44,22 @@ static char  *util_loopdev_tm = "/dev/loop0";
 
 void util_redirect_kmsg (void)
     {
-    int  fd_ii;
-    int  newvt_ii;
+    int   fd_ii;
+    char  newvt_aci [2];
 
 
-/*    fd_ii = open ("/dev/tty1", O_RDONLY); */
-    fd_ii = open (console_tg, O_RDONLY);
-    if (fd_ii)
+    if (serial_ig)
+        syslog (8, 0, 1);
+    else
         {
-        newvt_ii = (4 << 8) | 11;
-        ioctl (fd_ii, TIOCLINUX, &newvt_ii);
-        close (fd_ii);
+        fd_ii = open (console_tg, O_RDONLY);
+        if (fd_ii)
+            {
+            newvt_aci [0] = 11;
+            newvt_aci [1] = 4;
+            ioctl (fd_ii, TIOCLINUX, &newvt_aci);
+            close (fd_ii);
+            }
         }
     }
 

@@ -708,10 +708,16 @@ static int inst_prepare (void)
 
     setenv ("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin", TRUE);
     if (serial_ig)
+        {
         setenv ("TERM", "vt100", TRUE);
+        setenv ("ESCDELAY", "1100", TRUE);
+        }
     else
+        {
         setenv ("TERM", "linux", TRUE);
-    setenv ("ESCDELAY", "10", TRUE);
+        setenv ("ESCDELAY", "10", TRUE);
+        }
+
     setenv ("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
     if (!ramdisk_ig)

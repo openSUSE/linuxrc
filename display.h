@@ -27,36 +27,18 @@
 #define ATTR_NORMAL        0
 #define ATTR_BRIGHT        1
 
-/* #define LXRC_TEST */
-#undef LXRC_TEST
-
-#ifdef LXRC_TEST
-#define GRAPH_LRCORNER   106
-#define GRAPH_URCORNER   107
-#define GRAPH_ULCORNER   108
-#define GRAPH_LLCORNER   109
-#define GRAPH_LTEE       116
-#define GRAPH_RTEE       117
-#define GRAPH_DTEE       118
-#define GRAPH_UTEE       119
-#define GRAPH_VLINE      120
-#define GRAPH_HLINE      113
-#define GRAPH_CROSS      110
-#define GRAPH_BLOCK       97
-#else
-#define GRAPH_LRCORNER   217
-#define GRAPH_URCORNER   191
-#define GRAPH_ULCORNER   218
-#define GRAPH_LLCORNER   192
-#define GRAPH_LTEE       195
-#define GRAPH_RTEE       180
-#define GRAPH_DTEE       194
-#define GRAPH_UTEE       193
-#define GRAPH_VLINE      179
-#define GRAPH_HLINE      196
-#define GRAPH_CROSS      197
-#define GRAPH_BLOCK      177
-#endif
+#define GRAPH_LRCORNER   graphics_sg.lrcorner
+#define GRAPH_URCORNER   graphics_sg.urcorner
+#define GRAPH_ULCORNER   graphics_sg.ulcorner
+#define GRAPH_LLCORNER   graphics_sg.llcorner
+#define GRAPH_LTEE       graphics_sg.ltee
+#define GRAPH_RTEE       graphics_sg.rtee
+#define GRAPH_DTEE       graphics_sg.dtee
+#define GRAPH_UTEE       graphics_sg.utee
+#define GRAPH_VLINE      graphics_sg.vline
+#define GRAPH_HLINE      graphics_sg.hline
+#define GRAPH_CROSS      graphics_sg.cross
+#define GRAPH_BLOCK      graphics_sg.block
 
 #define DISP_OFF           0
 #define DISP_ON            1
@@ -64,6 +46,24 @@
 #define DISP_RESTORE_NORMAL     0
 #define DISP_RESTORE_EXPLODE    1
 #define DISP_RESTORE_IMPLODE    2
+
+typedef struct
+    {
+    char  lrcorner;
+    char  urcorner;
+    char  ulcorner;
+    char  llcorner;
+    char  ltee;
+    char  rtee;
+    char  dtee;
+    char  utee;
+    char  vline;
+    char  hline;
+    char  cross;
+    char  block;
+    } graphics_t;
+
+extern graphics_t graphics_sg;
 
 extern void disp_init           (void);
 extern void disp_end            (void);
