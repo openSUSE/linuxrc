@@ -16,3 +16,4 @@ void ramdisk_free(int rd);
 int ramdisk_write(int rd, void *buf, int count);
 int ramdisk_umount(int rd);
 int ramdisk_mount(int rd, char *dir);
+int ask_for_swap(int size, char *msg);

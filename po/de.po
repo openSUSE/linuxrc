@@ -906,3 +906,11 @@ msgstr "Bitte wählen Sie die Festplatten-Partition."
 msgid "Please choose the root partition."
 msgstr "Bitte wählen Sie die Root-Partition."
 
+#. TXT_CHOOSE_SWAP
+msgid "Please choose the swap partition."
+msgstr "Bitte wählen Sie die Swap-Partition."
+
+#. TXT_LOW_MEMORY1
+msgid "There is not enough memory to load all data."
+msgstr "Der Hauptspeicher reicht nicht aus, um alle Daten zu laden."
+

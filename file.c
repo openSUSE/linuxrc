@@ -754,6 +754,7 @@ void file_do_info(file_t *f0)
 
       case key_vncpassword:
         str_copy(&config.net.vncpassword, *f->value ? f->value : NULL);
+        config.vnc = 1;
         break;
 
       default:

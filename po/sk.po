@@ -849,3 +849,11 @@ msgstr ""
 msgid "Please choose the root partition."
 msgstr ""
 
+#. TXT_CHOOSE_SWAP
+msgid "Please choose the swap partition."
+msgstr ""
+
+#. TXT_LOW_MEMORY1
+msgid "There is not enough memory to load all data."
+msgstr ""
+

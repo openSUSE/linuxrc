@@ -51,7 +51,6 @@ static struct {
 
 #define fd_read		root_infile_im
 
-static int ask_for_swap(int size);
 static int  root_check_root      (char *root_string_tv);
 static void root_update_status(int block);
 static int fill_inbuf(void);
@@ -236,7 +235,7 @@ int ramdisk_write(int rd, void *buf, int count)
 
   util_update_meminfo();
 
-  if(ask_for_swap(count)) return -1;
+  if(ask_for_swap(count, txt_get(TXT_LOW_MEMORY1))) return -1;
 
   i = write(config.ramdisk[rd].fd, buf, count);
 
@@ -287,26 +286,64 @@ int ramdisk_mount(int rd, char *dir)
 
 
 /*
- * Check if have still have enough free memory for 'size'.If not, ask user
+ * Check if we still have enough free memory for 'size'. If not, ask user
  * for more swap.
+ *
+ * size: in bytes!
  *
  * return: 0 ok, -1 error
  */
-int ask_for_swap(int size)
+int ask_for_swap(int size, char *msg)
 {
-  int i, win_old;
+  int i, did_init = 0;
   char tmp[256];
+  char *txt2 = "To continue, activate some swap space.";
+  char *txt3 = "Please enter a partition to use for swap.\n\n"
+               "All existing data on this partition will be lost!"
+               "\n\n-- does not work yet --";
+  char *txt4 = "Error activating swap space.";
+  char *partition = NULL;
 
-  if(config.memory.current - (size >> 10) < config.memory.min_free) {
-    if(!(win_old = config.win)) util_disp_init();
-    strcpy(tmp, "There is not enough memory to load all data.\n\nTo continue, activate some swap space.");
-    i = dia_contabort(tmp, NO);
-    util_free_mem();
-    if(!win_old) util_disp_done();
-    if(i != YES) return -1;
+  size >>= 10;
+
+  if(config.memory.current >= config.memory.min_free + size) return 0;
+
+  if(!config.win) {
+    util_disp_init();
+    did_init = 1;
+  }
+  sprintf(tmp, "%s\n\n%s", msg, txt2);
+  i = dia_contabort(tmp, YES);
+  util_free_mem();
+  if(i != YES) {
+    if(did_init) util_disp_done();
+    return -1;
   }
 
-  return 0;
+  if(config.memory.current >= config.memory.min_free + size) {
+    if(did_init) util_disp_done();
+    return 0;
+  }
+
+  do {
+    if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt3)) break;
+
+    if(partition) {
+      sprintf(tmp, "swapon /dev/%s", partition);
+      i = system(tmp);
+      if(i) {
+        dia_message(txt4, MSGTYPE_ERROR);
+      }
+    }
+    util_free_mem();
+  }
+  while(i);
+
+  str_copy(&partition, NULL);
+
+  if(did_init) util_disp_done();
+
+  return i;
 }
 
 
@@ -441,7 +478,7 @@ int load_image(char *file_name, instmode_t mode)
   }
 
   if(got_size) {
-    if(ask_for_swap(root_nr_blocks_im * BLOCKSIZE)) {
+    if(ask_for_swap(root_nr_blocks_im * BLOCKSIZE, txt_get(TXT_LOW_MEMORY1))) {
       net_close(fd_read);
       ramdisk_free(image.rd);
       return image.rd = -1;
@@ -548,7 +585,7 @@ int root_boot_system()
   char buf[256], root[64];
 
   do {
-    rc = inst_choose_hd(txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
+    rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
     if(rc || !config.partition) return -1;
     sprintf(root, "/dev/%s", config.partition);
 

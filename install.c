@@ -529,7 +529,7 @@ int inst_mount_cdrom(int show_err)
 }
 
 
-int inst_choose_hd(char *txt_menu, char *txt_input)
+int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_input)
 {
   int i, item_cnt, rc;
   char **items, **values;
@@ -541,18 +541,23 @@ int inst_choose_hd(char *txt_menu, char *txt_input)
   char *s, *tmp = NULL;
 
   util_update_disk_list(NULL, 1);
+  util_update_swap_list();
 
   for(i = 0, sl = config.partitions; sl; sl = sl->next) i++;
 
+  /* just max values, actual lists might be shorter */
   items = calloc(i + 2, sizeof *items);
   values = calloc(i + 2, sizeof *values);
 
   for(item_cnt = 0, sl = config.partitions; sl; sl = sl->next) {
-    if(sl->key) {
+    if(
+      sl->key &&
+      !slist_getentry(config.swaps, sl->key)		/* don't show active swaps */
+    ) {
       sprintf(buf, "/dev/%s", sl->key);
       type = fstype(buf);
-      if(type && strcmp(type, "swap")) {
-        if(config.partition && !strcmp(sl->key, config.partition)) found = 1;
+      if(type && (!strcmp(type, "swap") ^ !swap)) {
+        if(*partition && !strcmp(sl->key, *partition)) found = 1;
         sprintf(buf, "%-12s : %s", sl->key, type);
         values[item_cnt] = strdup(sl->key);
         items[item_cnt++] = strdup(buf);
@@ -560,11 +565,11 @@ int inst_choose_hd(char *txt_menu, char *txt_input)
     }
   }
 
-  if(config.partition && !found) {
-    sprintf(buf, "/dev/%s", config.partition);
+  if(*partition && !found && item_cnt) {
+    sprintf(buf, "/dev/%s", *partition);
     type = fstype(buf);
-    sprintf(buf, "%-12s : %s", config.partition, type ?: "");
-    values[item_cnt] = strdup(config.partition);
+    sprintf(buf, "%-12s : %s", *partition, type ?: "");
+    values[item_cnt] = strdup(*partition);
     items[item_cnt++] = strdup(buf);
   }
 
@@ -573,17 +578,17 @@ int inst_choose_hd(char *txt_menu, char *txt_input)
     i = dia_list(txt_menu, 32, NULL, items, last_item, align_left);
     if(i > 0) {
       last_item = i;
-      str_copy(&config.partition, values[i - 1]);
+      str_copy(partition, values[i - 1]);
       rc = 0;
     }
   }
   else {
-    str_copy(&tmp, config.partition);
+    str_copy(&tmp, *partition);
     rc = dia_input2(txt_input, &tmp, 30, 0);
     if(!rc) {
       s = tmp;
       if(tmp && strstr(tmp, "/dev/") == tmp) s = tmp  + sizeof "/dev/" - 1;
-      str_copy(&config.partition, s);
+      str_copy(partition, s);
       str_copy(&tmp, NULL);
     }
   }
@@ -605,7 +610,7 @@ int inst_mount_harddisk()
 
   do {
     if(!auto_ig) {
-      rc = inst_choose_hd(txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));
+      rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));
       if(rc) return -1;
     }
 
@@ -954,43 +959,49 @@ int inst_execute_yast()
     return -1;
   }
 
-#if 0
-  if(!auto2_ig) dia_status_on(&status_ri, txt_get(TXT_START_YAST));
-#endif
-
   if(!config.test) {
     lxrc_set_modprobe("/sbin/modprobe");
 
     if(util_check_exist("/sbin/update")) system("/sbin/update");
 
-#if 0
-  if(!auto2_ig) {
-    while(i_ii < 50) {
-      dia_status(&status_ri, i_ii++);
-      usleep(10000);
-    }
-  }
-#endif
-
     util_start_shell("/dev/tty2", "/bin/bash", 1);
+    util_start_shell("/dev/tty5", "/bin/bash", 1);
+    util_start_shell("/dev/tty6", "/bin/bash", 1);
+  }
 
-    if(memory_ig < MEM_LIMIT_SWAP_MSG) {
-      if(config.win) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
+  ask_for_swap(
+    (config.memory.min_yast - config.memory.min_free) << 10,
+    "Not enough memory for YaST, bla bla..."
+  );
+
+  i = 0;
+
+  util_free_mem();
+  if(config.memory.current < config.memory.min_yast) {
+    if(!config.textmode) {
+      if(dia_yesno("Do you want to try the installation in text mode?", NO) != YES) i = 1;
+      if(!i) {
+        config.textmode = 1;
+        file_write_install_inf("");
+      }
     }
     else {
-      util_start_shell("/dev/tty5", "/bin/bash", 1);
-      util_start_shell("/dev/tty6", "/bin/bash", 1);
+      if(dia_yesno("Do you want to start the installation anyway?", NO) != YES) i = 1;
     }
   }
-#if 0
-  if(!auto2_ig) {
-    while(i_ii <= 100) {
-      dia_status (&status_ri, i_ii++);
-      usleep(10000);
+
+  if(i) {
+    lxrc_killall(0);
+    inst_umount ();
+    ramdisk_free(config.inst_ramdisk);
+    config.inst_ramdisk = -1;
+
+    if(!config.initrd_has_ldso && !config.test) {
+      unlink("/bin");
+      rename("/.bin", "/bin");
     }
-    win_close(&status_ri);
+    return -1;
   }
-#endif
 
   disp_set_color(COL_WHITE, COL_BLACK);
   if(config.win) util_disp_done();
@@ -1528,19 +1539,17 @@ int inst_update_cd()
 
 void inst_swapoff()
 {
-  file_t *f0, *f;
+  slist_t *sl;
+  char buf[64];
+
+  util_update_swap_list();
 
   if(config.test) return;
 
-  f0 = file_read_file("/proc/swaps");
-
-  for(f = f0; f; f = f->next) {
-    if(f->key == key_none && *f->key_str == '/') {
-      fprintf(stderr, "swapoff %s\n", f->key_str);
-      swapoff(f->key_str);
-    }
+  for(sl = config.swaps; sl; sl = sl->next) {
+    sprintf(buf, "/dev/%s", sl->key);
+    fprintf(stderr, "swapoff %s\n", buf);
+    swapoff(buf);
   }
-
-  file_free_file(f0);
 }
 

@@ -213,11 +213,12 @@ typedef struct {
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
-  slist_t *disks;		/* list of harddisk */
-  slist_t *partitions;		/* list of partitions */
-  char *partition;		/* currently used partition (hd install) */
-  slist_t *cdroms;		/* list of cdroms */
-  char *cdrom;			/* currently used cdrom */
+  slist_t *disks;		/* list of harddisk, without '/dev/' */
+  slist_t *partitions;		/* list of partitions, without '/dev/' */
+  char *partition;		/* currently used partition (hd install), without '/dev/' */
+  slist_t *cdroms;		/* list of cdroms, without '/dev/' */
+  char *cdrom;			/* currently used cdrom, without '/dev/' */
+  slist_t *swaps;		/* swap partitions, without '/dev/' */
   char *instsys;		/* installation system mount point */
   struct {
     char *file;			/* 'info' file name */

@@ -1135,33 +1135,39 @@ void util_status_info()
   sprintf(buf, "installdir = \"%s\"", config.installdir);
   slist_append_str(&sl0, buf);
 
-  strcpy(buf, "cdroms:");
-  slist_append_str(&sl0, buf);
-  for(sl = config.cdroms; sl; sl = sl->next) {
-    if(!sl->key) continue;
-    i = config.cdrom && !strcmp(sl->key, config.cdrom) ? 1 : 0;
-    sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
-    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+  if(config.cdroms) {
+    strcpy(buf, "cdroms:");
     slist_append_str(&sl0, buf);
+    for(sl = config.cdroms; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      i = config.cdrom && !strcmp(sl->key, config.cdrom) ? 1 : 0;
+      sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
+      if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+      slist_append_str(&sl0, buf);
+    }
   }
 
-  strcpy(buf, "disks:");
-  slist_append_str(&sl0, buf);
-  for(sl = config.disks; sl; sl = sl->next) {
-    if(!sl->key) continue;
-    sprintf(buf, "  %s", sl->key);
-    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+  if(config.disks) {
+    strcpy(buf, "disks:");
     slist_append_str(&sl0, buf);
+    for(sl = config.disks; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+      slist_append_str(&sl0, buf);
+    }
   }
 
-  strcpy(buf, "partitions:");
-  slist_append_str(&sl0, buf);
-  for(sl = config.partitions; sl; sl = sl->next) {
-    if(!sl->key) continue;
-    i = config.partition && !strcmp(sl->key, config.partition) ? 1 : 0;
-    sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
-    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+  if(config.partitions) {
+    strcpy(buf, "partitions:");
     slist_append_str(&sl0, buf);
+    for(sl = config.partitions; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      i = config.partition && !strcmp(sl->key, config.partition) ? 1 : 0;
+      sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
+      if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+      slist_append_str(&sl0, buf);
+    }
   }
 
   sprintf(buf, "inst_ramdisk = %d", config.inst_ramdisk);
@@ -3032,6 +3038,24 @@ void util_update_cdrom_list()
         str_copy(&sl->key, t);
       }
       break;
+    }
+  }
+
+  file_free_file(f0);
+}
+
+
+void util_update_swap_list()
+{
+  file_t *f0, *f;
+
+  config.swaps = slist_free(config.swaps);
+
+  f0 = file_read_file("/proc/swaps");
+
+  for(f = f0; f; f = f->next) {
+    if(f->key == key_none && strstr(f->key_str, "/dev/") == f->key_str) {
+      slist_append_str(&config.swaps, f->key_str + sizeof "/dev/" - 1);
     }
   }
 
