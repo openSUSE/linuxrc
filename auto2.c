@@ -847,16 +847,25 @@ int auto2_init()
 
 static void auto2_ask_net_if_vnc()
 {
-    if (config.vnc || config.usessh) {
-      int win_old;
+  int win_old;
 
-      auto2_activate_devices(bc_network, 0);
-      if(!(win_old = config.win)) util_disp_init();
-      if (net_config())
-	config.vnc = config.usessh = 0;
-      if(!win_old) util_disp_done();
+  if(!config.vnc && !config.usessh) return;
+
+  auto2_activate_devices(bc_network, 0);
+
+  if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
+    config.net.configured = nc_static;
+    if(net_activate()) {
+      fprintf(stderr, "net activation failed\n");
+      config.net.configured = nc_none;
     }
+  }
 
+  if(config.net.configured == nc_none) {
+    if(!(win_old = config.win)) util_disp_init();
+    if(net_config()) config.vnc = config.usessh = 0;
+    if(!win_old) util_disp_done();
+  }
 }
 
 /*
