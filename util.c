@@ -802,8 +802,8 @@ void add_driver_update(char *dir, char *loc)
       if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
         while((de = readdir(d))) {
           if(
-            (len = strlen(de->d_name)) > 2 &&
-            !strcmp(de->d_name + len - 2, ".o")
+            (len = strlen(de->d_name)) > sizeof MODULE_SUFFIX - 1 &&
+            !strcmp(de->d_name + len - (sizeof MODULE_SUFFIX - 1), MODULE_SUFFIX)
           ) {
             fprintf(f, "%s\n", de->d_name);
           }
@@ -1145,6 +1145,14 @@ void util_status_info()
   );
   slist_append_str(&sl0, buf);
 
+  util_get_ram_size();
+
+  sprintf(buf,
+    "RAM size (MB): total %u, min %u",
+    config.memory.ram, config.memory.ram_min
+  );
+  slist_append_str(&sl0, buf);
+
   sprintf(buf,
     "instmode = %s%s%s [%s], net_config_mask = 0x%x",
     get_instmode_name(config.instmode),
@@ -1350,6 +1358,9 @@ void util_status_info()
   sprintf(buf, "console = \"%s\"", config.console);
   if(config.serial) sprintf(buf + strlen(buf), ", serial line params = \"%s\"", config.serial);
   slist_append_str(&sl0, buf);
+  sprintf(buf, "esc delay: %dms", config.escdelay);
+  slist_append_str(&sl0, buf);
+
 
   sprintf(buf, "stderr = \"%s\"", config.stderr_name);
   slist_append_str(&sl0, buf);
@@ -2628,6 +2639,27 @@ int util_kill_main(int argc, char **argv)
 }
 
 
+int util_killall_main(int argc, char **argv)
+{
+  int sig = SIGTERM;
+  char *s;
+
+  argv++; argc--;
+
+  if(**argv == '-') {
+    sig = strtol(*argv + 1, &s, 0);
+    if(*s) return fprintf(stderr, "kill: bad signal spec \"%s\"\n", *argv + 1), 1;
+
+    argv++;
+    argc--;
+  }
+
+  while(argc--) util_killall(*argv++, sig);
+
+  return 0;
+}
+
+
 int util_bootpc_main(int argc, char **argv)
 {
   int i;
@@ -2988,6 +3020,8 @@ url_t *parse_url(char *str)
     free(s);
   }
 
+  /* implicitly add a directory so people can use just 'install=slp' */
+  if(url.scheme == inst_slp && !url.dir) str_copy(&url.dir, "/");
 
 #if 0
   fprintf(stderr,
@@ -3777,7 +3811,6 @@ void util_hwcheck()
 void util_set_serial_console(char *str)
 {
   slist_t *sl;
-  char *s;
 
   if(!str || !*str) return;
 
@@ -3792,12 +3825,15 @@ void util_set_serial_console(char *str)
   sl = slist_split(',', config.serial);
 
   if(sl) {
+    str_copy(&config.console, long_dev(sl->key));
+#if 0
     s = long_dev(sl->key);
     if(!config.console || strcmp(s, config.console)) {
       str_copy(&config.console, s);
       freopen(config.console, "r", stdin);
       freopen(config.console, "a", stdout);
     }
+#endif
     config.textmode = 1;
   }
      
@@ -3955,56 +3991,39 @@ void util_mkdevs()
 }
 
 
+extern str_list_t *add_str_list(str_list_t **sl, char *str);
 /*
- * Get unique id for network device.
+ * Get unique id & hw address for network device.
  *
  */
 void get_net_unique_id()
 {
   hd_data_t *hd_data;
-  hd_t *hd;
+  hd_t *hd, *hd_card;
   hd_res_t *res;
-  driver_info_t *di;
-  str_list_t *sl1;
-  slist_t *sl;
-  char *id = NULL;
-  char *hwaddr;
 
   if(!*netdevice_tg) return;
 
-  for(sl = config.net.devices; sl; sl = sl->next) {
-    if(sl->key && sl->value && !strcmp(sl->key, netdevice_tg)) break;
-  }
-
-  if(!sl) return;
-
-  /* sl->value: network module */
-
   hd_data = calloc(1, sizeof *hd_data);
 
-  for(hd = hd_list(hd_data, hw_network_ctrl, 1, NULL); hd && !id; hd = hd->next) {
-    for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+  add_str_list(&hd_data->only, netdevice_tg);
+
+  hd = hd_list(hd_data, hw_network, 1, NULL);
+
+  if(hd) {
+    for(res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
-        hwaddr = res->hwaddr.addr;
+        str_copy(&config.net.hwaddr, res->hwaddr.addr);
+        break;
       }
     }
-    for(di = hd->driver_info; di && !id; di = di->next) {
-      if(di->module.type == di_module) {
-        for(sl1 = di->module.names; sl1; sl1 = sl1->next) {
-          if(sl1->str && !strcmp(sl1->str, sl->value)) {
-            str_copy(&config.net.unique_id, id = hd->unique_id);
-            str_copy(&config.net.hwaddr, hwaddr);
-            break;
-          }
-        }
-      }
+    if((hd_card = hd_get_device_by_idx(hd_data, hd->attached_to))) {
+      str_copy(&config.net.unique_id, hd_card->unique_id);
     }
   }
 
   hd_free_hd_data(hd_data);
 }
-
-
 
 
 static int is_there(char *name);
@@ -4150,5 +4169,87 @@ int make_links(char *src, char *dst)
   }
 
   return err;
+}
+
+
+void util_notty()
+{
+  int fd;
+
+  fd = open("/dev/tty", O_RDWR);
+
+  if(fd != -1) {
+    ioctl(fd, TIOCNOTTY);
+    close(fd);
+  }
+}
+
+
+void util_killall(char *name, int sig)
+{
+  pid_t mypid, pid;
+  struct dirent *de;
+  DIR *d;
+  char *s;
+  slist_t *sl0 = NULL, *sl;
+
+  if(!name) return;
+
+  mypid = getpid();
+
+  if(!(d = opendir("/proc"))) return;
+
+  /* make a (reversed) list of all process ids */
+  while((de = readdir(d))) {
+    pid = strtoul(de->d_name, &s, 10);
+    if(!*s && *util_process_cmdline(pid)) {
+      sl = slist_add(&sl0, slist_new());
+      sl->key = strdup(de->d_name);
+      sl->value = strdup(util_process_name(pid));
+    }
+  }
+
+  closedir(d);
+
+  for(sl = sl0; sl; sl = sl->next) {
+    pid = strtoul(sl->key, NULL, 10);
+    if(pid == mypid) continue;
+    if(!strcmp(sl->value, name)) {
+      if(config.debug) fprintf(stderr, "kill -%d %d\n", sig, pid);
+      kill(pid, sig);
+      usleep(20000);
+    }
+  }
+
+
+  slist_free(sl0);
+
+  while(waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+
+void util_get_ram_size()
+{
+  hd_data_t *hd_data;
+  hd_t *hd;
+  hd_res_t *res;
+
+  if(config.memory.ram) return;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  hd = hd_list(hd_data, hw_memory, 1, NULL);
+
+  if(hd && hd->base_class.id == bc_internal && hd->sub_class.id == sc_int_main_mem) {
+    for(res = hd->res; res; res = res->next) {
+      if(res->any.type == res_phys_mem) {
+        config.memory.ram = res->phys_mem.range >> 20;
+        fprintf(stderr, "RAM size: %u MB\n", config.memory.ram);
+        break;
+      }
+    }
+  }
+
+  hd_free_hd_data(hd_data);
 }
 

@@ -125,6 +125,7 @@ static struct {
   { "mkdir",       util_mkdir_main       },
   { "chroot",      util_chroot_main      },
   { "kill",        util_kill_main        },
+  { "killall",     util_killall_main     },
   { "bootpc",      util_bootpc_main      },
   { "swapon",      util_swapon_main      },
   { "swapoff",     util_swapoff_main     },
@@ -574,7 +575,6 @@ void lxrc_catch_signal(int signum)
     sleep(10);
   }
 
-  signal(SIGHUP,  lxrc_catch_signal);
   signal(SIGBUS,  lxrc_catch_signal);
 
   if(!config.test) {
@@ -598,7 +598,7 @@ void lxrc_init()
   }
 
   siginterrupt(SIGALRM, 1);
-  siginterrupt(SIGHUP, 1);
+  signal(SIGHUP, SIG_IGN);
   siginterrupt(SIGBUS, 1);
   siginterrupt(SIGINT, 1);
   siginterrupt(SIGTERM, 1);
@@ -652,14 +652,12 @@ void lxrc_init()
   config.addswap = 1;
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */
+  config.escdelay = 25;		/* 25 ms */
 
   config.hwdetect = 1;
 
-#if 0
-  /* disabled, see #38222 */
   config.scsi_rename = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
-#endif
 
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
@@ -750,7 +748,7 @@ void lxrc_init()
     config.linemode = 1;
   }
 
-  kbd_init();
+  kbd_init(1);
   util_redirect_kmsg();
   disp_init();
 
@@ -772,6 +770,32 @@ void lxrc_init()
   }
 
   if(config.had_segv) config.manual = 1;
+
+  fprintf(stderr, "min = %d\n", config.memory.ram_min);
+
+  if(config.memory.ram_min && !config.had_segv) {
+    int window = config.win, ram;
+    char *msg = NULL;
+
+    util_get_ram_size();
+
+    ram = config.memory.ram_min - config.memory.ram_min / 8;
+
+    if(config.memory.ram < ram) {
+      if(!window) util_disp_init();
+      strprintf(&msg, txt_get(TXT_NO_RAM), config.product, config.memory.ram_min);
+      dia_message(msg, MSGTYPE_REBOOT);
+      free(msg);
+      if(!window) util_disp_done();
+      config.manual = 1;
+      if(config.test) {
+        fprintf(stderr, "*** reboot ***\n");
+      }
+      else {
+        reboot(RB_AUTOBOOT);
+      }
+    }
+  }
 
 #ifdef USE_LIBHD
   if(!config.manual) {
@@ -991,7 +1015,11 @@ void lxrc_set_modprobe(char *prog)
    commandline. On SPARC, we use the result from hardwareprobing. */
 void lxrc_check_console()
 {
-#if !defined(__sparc__) && !defined(__PPC__)
+#ifdef USE_LIBHD
+
+  util_set_serial_console(auto2_serial_console());
+
+#else
 
   file_t *ft;
 
@@ -999,12 +1027,6 @@ void lxrc_check_console()
 
   util_set_serial_console(ft->value);
 
-#else
-#ifdef USE_LIBHD
-
-  util_set_serial_console(auto2_serial_console());
-
-#endif
 #endif
 
   if(config.serial) {

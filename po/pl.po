@@ -28,7 +28,8 @@ msgid "No"
 msgstr "Nie"
 
 #. TXT_CHOOSE_LANGUAGE
-msgid "Please choose the language"
+#, fuzzy
+msgid "Select the language."
 msgstr "Wybierz jêzyk"
 
 #. TXT_COLOR_DISPLAY
@@ -40,27 +41,31 @@ msgid "Monochrome display"
 msgstr "Ekran monochromatyczny"
 
 #. TXT_CHOOSE_DISPLAY
-msgid "What kind of display do you use?"
-msgstr "Jakiego ekranu u¿ywasz?"
+msgid "Select the display type."
+msgstr ""
 
 #. TXT_MENU_LANG
 msgid "Language"
 msgstr "Jêzyk"
 
 #. TXT_MENU_MODULES
-msgid "Kernel modules (hardware drivers)"
+#, fuzzy
+msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Modu³y j±dra (sterowniki sprzêtu)"
 
 #. TXT_MENU_START
-msgid "Start installation / system"
+#, fuzzy
+msgid "Start Installation or System"
 msgstr "Start instalacji lub uruchomienie systemu"
 
 #. TXT_MENU_INFO
-msgid "System information"
+#, fuzzy
+msgid "System Information"
 msgstr "Informacje o systemie"
 
 #. TXT_HDR_MAIN
-msgid "Main menu"
+#, fuzzy
+msgid "Main Menu"
 msgstr "Menu g³ówne"
 
 #. TXT_SETTINGS
@@ -77,41 +82,45 @@ msgstr "Uk³ad klawiatury"
 
 #. TXT_LOAD_NET
 #, fuzzy
-msgid "Load network card modules"
+msgid "Load Network Card Modules"
 msgstr "Za³aduj sterownik karty sieciowej"
 
 #. TXT_SHOW_MODULES
-msgid "Show loaded modules"
+#, fuzzy
+msgid "Show Loaded Modules"
 msgstr "Lista za³adowanych modu³ów"
 
 #. TXT_AUTO_LOAD
 #, fuzzy
-msgid "Load modules automatically"
+msgid "Load Modules Automatically"
 msgstr "Automatyczne za³adowanie modu³ów"
 
 #. TXT_DEL_MODULES
-msgid "Unload modules"
+#, fuzzy
+msgid "Unload Modules"
 msgstr "Usuñ za³adowany modu³"
 
 #. TXT_TRY_TO_LOAD
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console "
+"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Próbujê za³adowaæ modu³ \"%s\" ...\n"
 "\n"
-"W trakcie ³adowania na konsoli 4 (Alt-F4) mo¿na prze¶ledziæ raport j±dra systemu."
+"W trakcie ³adowania na konsoli 4 (Alt-F4) mo¿na prze¶ledziæ raport j±dra "
+"systemu."
 
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
-msgid "Module \"%s\" loaded successfully!"
+msgid "Module \"%s\" loaded successfully."
 msgstr "Modu³ \"%s\" za³adowany pomy¶lnie!"
 
 #. TXT_LOAD_FAILED
-#, c-format
-msgid "Failed to load module \"%s\"!"
+#, fuzzy, c-format
+msgid "Failed to load module \"%s\"."
 msgstr "Nie powiod³o siê za³adowanie modu³u \"%s\" !"
 
 #. TXT_CDROM
@@ -123,23 +132,28 @@ msgid "Floppy"
 msgstr "Dyskietka"
 
 #. TXT_HARDDISK
-msgid "Harddisk"
+#, fuzzy
+msgid "Hard Disk"
 msgstr "Dysk sztywny"
 
 #. TXT_START_INSTALL
-msgid "Start installation/update"
+#, fuzzy
+msgid "Start Installation or Update"
 msgstr "Start instalacji"
 
 #. TXT_START_RESCUE
-msgid "Start rescue system"
+#, fuzzy
+msgid "Start Rescue System"
 msgstr "Uruchomienie systemu awaryjnego"
 
 #. TXT_LOAD_RS_NFS
-msgid "Load rescue system via NFS"
+#, fuzzy
+msgid "Load Rescue System via NFS"
 msgstr "Uruchomienie systemu awaryjnego poprzez NFS"
 
 #. TXT_BOOT_SYSTEM
-msgid "Boot installed system"
+#, fuzzy
+msgid "Boot Installed System"
 msgstr "Uruchomienie zainstalowanego systemu"
 
 #. TXT_SEARCH_FOR_RI
@@ -148,21 +162,24 @@ msgid "Searching for image \"%s\"..."
 msgstr "Szukam obrazu j±dra: \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
+#, fuzzy
 msgid ""
-"Cannot find the image!\n"
+"Cannot find the image.\n"
 "\n"
-"Check the directory specification!"
+"Check the directory specification."
 msgstr ""
 "Nie znaleziono obrazu j±dra!\n"
 "\n"
 "Proszê sprawdziæ nazwy podanych podkatalogów."
 
 #. TXT_LOADING
-msgid "Loading data into ramdisk"
+#, fuzzy
+msgid "Loading data into RAM disk..."
 msgstr "Wczytywanie danych do RAM-dysku"
 
 #. TXT_INFO_KERNEL
-msgid "Kernel messages"
+#, fuzzy
+msgid "Kernel Messages"
 msgstr "Raporty j±dra"
 
 #. TXT_INFO_CPU
@@ -174,7 +191,8 @@ msgid "Devices"
 msgstr "Urz±dzenia"
 
 #. TXT_INFO_NETDEV
-msgid "Network cards"
+#, fuzzy
+msgid "Network Cards"
 msgstr "Karty sieciowe"
 
 #. TXT_INFO_DMA
@@ -202,52 +220,69 @@ msgid "PCI"
 msgstr ""
 
 #. TXT_INSERT_DISK
-msgid "Please insert the disk and press ENTER"
+#, fuzzy
+msgid "Insert the disk and press ENTER."
 msgstr ""
 "Proszê w³o¿yæ dyskietkê\n"
 "i nacisn±æ ENTER"
 
 #. TXT_ERROR_READ_DISK
 #, fuzzy
-msgid "Error reading from floppy disk!"
+msgid "Error reading from floppy disk."
 msgstr "B³±d przy odczycie danych z dyskietki!"
 
 #. TXT_ENTER_ROOT_FS
-msgid "Please enter your root partition (eg. /dev/sda3)"
+#, fuzzy
+msgid "Enter your root partition (e.g., /dev/sda3)"
 msgstr ""
 "Wska¿ lokalizacjê partycji root\n"
 "(np. /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
-msgid "Invalid root device!"
+#, fuzzy
+msgid "Invalid root device."
 msgstr "Nieprawid³owa partycja root!"
 
 #. TXT_INVALID_INPUT
-msgid "Invalid input!"
+#, fuzzy
+msgid "Invalid input."
 msgstr "B³êdnie podane dane!"
 
 #. TXT_INPUT_IPADDR
-msgid "Please enter your IP address"
+#, fuzzy
+msgid "Enter your IP address."
 msgstr "Podaj adres IP."
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
-msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
-msgstr "Podaj maskê sieci. Dla 'zwyczajnej' sieci klasy C to bêdzie: 255.255.255.0"
+msgid ""
+"Enter your netmask. For a normal class C network, this is usually "
+"255.255.255.0."
+msgstr ""
+"Podaj maskê sieci. Dla 'zwyczajnej' sieci klasy C to bêdzie: 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
-msgstr "Podaj adres bramy (gatewaya), je¶li takowy jest niezbêdny do nawi±zania komunikacji z serwerem. Je¶li nie - podaj po prostu swój adres IP."
+#, fuzzy
+msgid ""
+"If you need a gateway to reach the server, enter the IP address of the "
+"gateway. If you do not need a gateway, enter your own IP address."
+msgstr ""
+"Podaj adres bramy (gatewaya), je¶li takowy jest niezbêdny do nawi±zania "
+"komunikacji z serwerem. Je¶li nie - podaj po prostu swój adres IP."
 
 #. TXT_INPUT_NAMED
 #, fuzzy
-msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Podaj adres IP serwera nazw (DNS). Je¶li nie chcesz z takowego korzystaæ, naci¶nij ESC."
+msgid ""
+"Enter the IP address of your name server. If you do not use a name server, "
+"press ESC."
+msgstr ""
+"Podaj adres IP serwera nazw (DNS). Je¶li nie chcesz z takowego korzystaæ, "
+"naci¶nij ESC."
 
 #. TXT_FOUND_HOST
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"The following data have been retrieved:\n"
+"The following data has been retrieved:\n"
 "\n"
 "IP address: %s\n"
 "Name: %s\n"
@@ -261,24 +296,32 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 #, fuzzy
-msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
-msgstr "B³±d w trakcie konfiguracji sieci. Albo nie wczytano ¿adnego z pasuj±cych modu³ów sterowników kart sieciowych, albo Twoja karta sieciowa nie zosta³a prawid³owo rozpoznana przez j±dro systemu!"
+msgid ""
+"An error occurred during the network configuration. Your network card "
+"probably was not recognized by the kernel."
+msgstr ""
+"B³±d w trakcie konfiguracji sieci. Albo nie wczytano ¿adnego z pasuj±cych "
+"modu³ów sterowników kart sieciowych, albo Twoja karta sieciowa nie zosta³a "
+"prawid³owo rozpoznana przez j±dro systemu!"
 
 #. TXT_INPUT_SERVER
-msgid "Please enter the IP address of the NFS server."
+#, fuzzy
+msgid "Enter the IP address of the NFS server."
 msgstr "Podaj adres IP serwera NFS."
 
 #. TXT_INPUT_FTPSERVER
-msgid "Please enter the IP address of the FTP server."
+#, fuzzy
+msgid "Enter the IP address of the FTP server."
 msgstr "Podaj adres IP serwera FTP."
 
 #. TXT_INPUT_DIR
-msgid "Please enter the directory on the server."
+#, fuzzy
+msgid "Enter the directory on the server."
 msgstr "Wska¿ (pod)katalog na serwerze."
 
 #. TXT_ENTER_PARAMS
-#, c-format
-msgid "Please enter parameters for \"%s\"."
+#, fuzzy, c-format
+msgid "Enter parameters for \"%s\"."
 msgstr "Podaj ewentualne dodatkowe parametry dla \"%s\" "
 
 #. TXT_TRY_NFS_MOUNT
@@ -295,31 +338,34 @@ msgstr ""
 " "
 
 #. TXT_ERROR_NFSMOUNT
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"An error occurred while trying to mount the nfs directory.\n"
+"An error occurred while trying to mount the NFS directory.\n"
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Przy próbie zamontowania podkatalogu serwera NFS zdarzy³ siê nastêpuj±cy b³±d:\n"
+"Przy próbie zamontowania podkatalogu serwera NFS zdarzy³ siê nastêpuj±cy "
+"b³±d:\n"
 "\n"
 "Serwer NFS wskazuje b³±d: %s"
 
 #. TXT_CHOOSE_KEYMAP
+#, fuzzy
 msgid ""
-"Please choose a keyboard map.\n"
-"YaST will offer you additional keyboard tables later on."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
 "Wybierz teraz swój uk³ad klawiatury.\n"
 "YaST da Ci pó¼niej mo¿liwo¶æ ponownej jego zmiany na inny."
 
 #. TXT_DELETE_MODULE
-msgid "Choose the module to be unloaded."
+#, fuzzy
+msgid "Choose the module to unload."
 msgstr "Wska¿ modu³ (sterownik) przeznaczony do usuniêcia."
 
 #. TXT_NO_MODULES
-msgid "Currently there are no modules loaded!"
-msgstr "Nie zainstalowano dotychczas ¿adnych modu³ów!"
+msgid "No modules currently loaded."
+msgstr ""
 
 #. TXT_AUTO_RUNNING
 #, c-format
@@ -327,15 +373,18 @@ msgid "Autoprobing (%s)...      "
 msgstr ""
 
 #. TXT_WANT_MORE_SCSI
-msgid "Do you want to search for additional SCSI host adaptors?"
+#, fuzzy
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Szukaæ kolejnych kontrolerów SCSI?"
 
 #. TXT_WANT_MORE_NET
-msgid "Do you want to search for additional network cards?"
+#, fuzzy
+msgid "Search for additional network cards?"
 msgstr "Szukaæ kolejnych kart sieciowych?"
 
 #. TXT_WANT_MORE_CDROM
-msgid "Do you want to search for additional CD-ROM drives?"
+#, fuzzy
+msgid "Search for additional CD-ROM drives?"
 msgstr "Szukaæ kolejnych napêdów CD-ROM?"
 
 #. TXT_NET_ETH0
@@ -363,34 +412,39 @@ msgid "HIPPI network card"
 msgstr "Karta sieciowa (HIPPI)"
 
 #. TXT_CHOOSE_NET
-msgid "Please choose the network device."
+#, fuzzy
+msgid "Choose the network device."
 msgstr "Wska¿ typ sieci, z której chcesz korzystaæ w trakcie instalacji."
 
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
-msgid "Please enter the IP address of the PLIP partner."
+msgid "Enter the IP address of the PLIP partner."
 msgstr "Podaj adres IP korespondenta PLIP."
 
 #. TXT_NO_PCMCIA
 #, fuzzy
-msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
-msgstr "Automatyczne rozpoznanie chipsetu PCMCIA nie powiod³o siê. Dokonaj wpisu rêcznie."
+msgid ""
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr ""
+"Automatyczne rozpoznanie chipsetu PCMCIA nie powiod³o siê. Dokonaj wpisu "
+"rêcznie."
 
 #. TXT_FOUND_PCMCIA
-#, c-format
+#, fuzzy, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\"!\n"
+"Found PCMCIA chipset \"%s\".\n"
 "\n"
-"Please enter parameters for PCMCIA core modules"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
 "Wykryto chipset PCMCIA  \"%s\" !\n"
 "\n"
 "Podaj ew. dod. parametry dla modu³u PCMCIA Core-Module"
 
 #. TXT_PCMCIA_PARAMS
-#, c-format
-msgid "Please enter specific parameters for chipset \"%s\""
-msgstr "Podaj ew. parametry specyficzne dla u¿ywanego przez sprzêt chipsetu \"%s\" "
+#, fuzzy, c-format
+msgid "Enter specific parameters for chipset \"%s\"."
+msgstr ""
+"Podaj ew. parametry specyficzne dla u¿ywanego przez sprzêt chipsetu \"%s\" "
 
 #. TXT_START_CARDMGR
 #, fuzzy
@@ -402,35 +456,39 @@ msgid "Successfully started PCMCIA card services."
 msgstr "PCMCIA Card Services uruchomione pomy¶lnie."
 
 #. TXT_PCMCIA_FAIL
-msgid "Start of PCMCIA card services failed!"
+#, fuzzy
+msgid "Start of PCMCIA card services failed."
 msgstr "Uruchomienie serwisów karty PCMCIA nie powiod³o siê!"
 
 #. TXT_PCMCIA_ALREADY
-msgid "PCMCIA card services already running!"
+#, fuzzy
+msgid "PCMCIA card services already running."
 msgstr "Serwisy karty PCMCIA s± uruchomione!"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
 msgid ""
-"You can exit Linuxrc only via the menu item\n"
+"You can leave Linuxrc only via \n"
 "\n"
-"\"Start installation / system\"\n"
+"\"Start Installation or System\"\n"
 "\n"
-"In order to allow this, you might need to load some drivers (modules) to support your hardware."
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
 "Linuxrc mo¿na opu¶ciæ jedynie poprzez opcjê\n"
 "\n"
 "» menu Instalacja / uruchomienie systemu «\n"
 "\n"
-"Mo¿e siê zdarzyæ, ¿e konieczne bêdzie uprzednie do³adowanie modu³u (sterownika sprzêtu)."
+"Mo¿e siê zdarzyæ, ¿e konieczne bêdzie uprzednie do³adowanie modu³u "
+"(sterownika sprzêtu)."
 
 #. TXT_NO_CTRLC
 #, fuzzy
-msgid "You cannot exit Linuxrc with <ctrl-c>!"
+msgid "You cannot exit Linuxrc with <Ctrl-C>."
 msgstr "Nie da siê przerwaæ Linuxrc poprzez <ctrl-c> !"
 
 #. TXT_REMOVE_DISK
-msgid "Please remove the disk from the drive now!"
+#, fuzzy
+msgid "Remove the disk from the drive now."
 msgstr "Proszê teraz zabraæ dyskietkê z napêdu!"
 
 #. TXT_EXAMPLE_PAR
@@ -445,7 +503,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 #, fuzzy
-msgid "Please choose the source medium"
+msgid "Choose the source medium."
 msgstr "Wybierz no¶nik ¼ród³owy"
 
 #. TXT_TRY_CD_MOUNT
@@ -454,7 +512,7 @@ msgstr "Próba zamontowania CD-ROM-u..."
 
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
-msgid "Unable to mount the CD-ROM!"
+msgid "Unable to mount the CD-ROM."
 msgstr "Zamontowanie CD-ROM-u nie powiod³o siê!"
 
 #. TXT_START_YAST
@@ -462,63 +520,69 @@ msgid "Starting YaST..."
 msgstr "Uruchamiam YaST-a..."
 
 #. TXT_ASK_REBOOT
-msgid "Do you want to reboot the system now?"
+#, fuzzy
+msgid "Reboot the system now?"
 msgstr "Czy chcesz teraz zrestartowaæ system?"
 
 #. TXT_INSTALL_SUCCESS
-msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
-msgstr "Podstawowy system zainicjalizowany pomy¶lnie. Teraz zostanie uruchomiony w celu ostatecznego zakoñczenia instalacji."
+#, fuzzy
+msgid ""
+"The base system has been successfully installed. This newly installed system "
+"will now be started to commit the installation."
+msgstr ""
+"Podstawowy system zainicjalizowany pomy¶lnie. Teraz zostanie uruchomiony w "
+"celu ostatecznego zakoñczenia instalacji."
 
 #. TXT_ENTER_PARTITION
-msgid "Please enter the harddisk partition (eg. /dev/sda1)"
+#, fuzzy
+msgid "Enter the hard disk partition (e.g., /dev/sda1)"
 msgstr "Proszê podaæ partycjê (np. /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
-msgid "Could not mount the specified partition!"
+#, fuzzy
+msgid "Could not mount the specified partition."
 msgstr "Nie uda³o siê zamontowaæ wskazanej partycji!"
 
 #. TXT_ENTER_HD_DIR
-msgid "Please enter the source directory"
+#, fuzzy
+msgid "Enter the source directory."
 msgstr "Proszê podaæ katalog ¼ród³owy"
 
 #. TXT_ERROR_INSTALL
 #, fuzzy
-msgid "An error occurred during the installation!"
+msgid "An error occurred during the installation."
 msgstr "Instalacja nie zosta³a prawid³owo zakoñczona!"
 
 #. TXT_DRIVES
-msgid "Harddisks / CD-ROMs"
+#, fuzzy
+msgid "Hard Disks or CD-ROMs"
 msgstr "Dyski sztywne / CD-ROM-y"
 
 #. TXT_LITTLE_MEM
 #, fuzzy
 msgid ""
-"Your computer has extremely little memory!\n"
+"Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space!"
+"Before you acknowledge this message, you must switch to virtual console 2 "
+"(press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Twój komputer posiada niewiele pamiêci operacyjnej!\n"
 "\n"
-"Zanim potwierdzisz tê wiadomo¶æ i tym samym uruchomisz YaST-a, musisz przej¶æ na konsolê 2 (naci¶nij Alt-F2) i 'rêcznie' ustawiæ i uaktywniæ pamiêæ wymiany!"
+"Zanim potwierdzisz tê wiadomo¶æ i tym samym uruchomisz YaST-a, musisz "
+"przej¶æ na konsolê 2 (naci¶nij Alt-F2) i 'rêcznie' ustawiæ i uaktywniæ "
+"pamiêæ wymiany!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
 msgstr "Animacja"
 
 #. TXT_ASK_EXPLODE
-#, fuzzy
-msgid ""
-"Do you like \"animated\" windows?\n"
-"\n"
-"Of course ;-)"
+msgid "Use animated windows?"
 msgstr ""
-"Czy lubisz \"eksploduj±ce\" okienka?\n"
-"\n"
-"Pewnie, ¿e lubisz... ;-)"
 
 #. TXT_NO_DRIVES
 #, fuzzy
-msgid "No harddisks or CD-ROM drives have been detected so far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Dot±d nie wykryto harddysków ani CD-ROM-ów."
 
 #. TXT_MENU_EXPERT
@@ -527,32 +591,40 @@ msgstr "Debug (tylko dla ekspertów)"
 
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
-msgid "Load rootimage into ramdisk"
+msgid "Load Root Image into RAM Disk"
 msgstr "Wymu¶ Rootimage"
 
 #. TXT_NEW_ROOTIMAGE
-msgid "Enter rootimage"
+#, fuzzy
+msgid "Enter Root Image"
 msgstr "Podaj nazwê Rootimage-u"
 
 #. TXT_ASK_RI_FORCE
-#, fuzzy
-msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
-msgstr "Czy ³adowaæ Rootimage do RAM-dysku nawet wtedy, gdy na dysku zostanie wykryty prawid³owy system instalacyjny?"
+msgid "Should the root image be loaded into the RAM disk?"
+msgstr ""
 
 #. TXT_ENTER_ROOTIMAGE
-msgid "Please enter the path and name of the file you want to be loaded into the RAM disk as the root file system"
-msgstr "Proszê podaæ nazwê pliku (i ¶cie¿kê), który chcesz za³adowaæ do RAM-dysku jako Root Filesystem."
+#, fuzzy
+msgid ""
+"Enter the path and name of the file to load into the RAM disk as the root "
+"file system."
+msgstr ""
+"Proszê podaæ nazwê pliku (i ¶cie¿kê), który chcesz za³adowaæ do RAM-dysku "
+"jako Root Filesystem."
 
 #. TXT_NOT_IMPLEMENTED
-msgid "Not yet implemented!"
+#, fuzzy
+msgid "Not yet implemented."
 msgstr "Funkcja nie zaimplementowana!"
 
 #. TXT_NEW_INST_SYS
-msgid "Installation system"
+#, fuzzy
+msgid "Installation System"
 msgstr "System instalacyjny"
 
 #. TXT_ENTER_INST_SYS
-msgid "Please enter the directory that contains the installation system."
+#, fuzzy
+msgid "Enter the directory that contains the installation system."
 msgstr "Podaj katalog zawieraj±cy system instalacyjny. "
 
 #. TXT_NO_INFO_AVAIL
@@ -568,50 +640,56 @@ msgid "Start Live CD"
 msgstr "Uruchomienie Live-CD"
 
 #. TXT_INSERT_LIVECD
-msgid "Please insert the Live CD."
+#, fuzzy
+msgid "Insert the Live CD."
 msgstr "Proszê umie¶ciæ w napêdzie dysk Live-CD."
 
 #. TXT_END_REBOOT
 #, fuzzy
-msgid "Exit / Reboot"
+msgid "Exit or Reboot"
 msgstr "Przerwij / Reboot"
 
 #. TXT_SEARCH_INFOFILE
-msgid "Searching for infofile..."
+#, fuzzy
+msgid "Searching for info file..."
 msgstr "Szukam pliku Info..."
 
 #. TXT_NFSPORT
-msgid "Specify NFS port"
+#, fuzzy
+msgid "Specify the NFS port."
 msgstr "Udostêpnienie portu NFS"
 
 #. TXT_ASKING_NAMED
-msgid "Asking nameserver..."
+#, fuzzy
+msgid "Asking name server..."
 msgstr "Sprawdzam w serwerze nazw (DNS)..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format,fuzzy
-msgid "Host %s was not found!"
+#, fuzzy, c-format
+msgid "Host %s was not found."
 msgstr "Komputer %s nieznany!"
 
 #. TXT_NET_CONFIGURED
-msgid "Your network is already configured. Do you want to keep this configuration?"
+#, fuzzy
+msgid "Your network is already configured. Keep this configuration?"
 msgstr "Sieæ skonfigurowana. Czy chcesz zachowaæ aktualn± konfiguracjê?"
 
 #. TXT_ASK_BREAK
-msgid "Do want to abort?"
-msgstr "Przerwaæ pracê?"
+msgid "Abort?"
+msgstr ""
 
 #. TXT_NO_NETDEVICE
+#, fuzzy
 msgid ""
-"No network device found!\n"
-"Please load a network module first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
 "Nie wykryto karty sieciowej!\n"
 "Nale¿y do³adowaæ odpowiedni modu³ (sterownik)."
 
 #. TXT_ALREADY_FOUND
-#, c-format
-msgid "A %s was already found in your system!\n"
+#, fuzzy, c-format
+msgid "A %s was already found in your system.\n"
 msgstr "W systemie ju¿ wykryto %s !\n"
 
 #. TXT_ERROR_FTP
@@ -626,42 +704,55 @@ msgstr ""
 "%s"
 
 #. TXT_ENTER_FTPUSER
-msgid "Please enter the user name under which you want to access the FTP server"
-msgstr "Podaj nazwê u¿ytkownika (konta), pod jak± chcesz uzyskaæ dostêp do serwera FTP"
+#, fuzzy
+msgid "Enter the user name with which to access the FTP server."
+msgstr ""
+"Podaj nazwê u¿ytkownika (konta), pod jak± chcesz uzyskaæ dostêp do serwera "
+"FTP"
 
 #. TXT_ENTER_FTPPASSWD
-msgid "Please enter the password for the FTP user account"
+#, fuzzy
+msgid "Enter the password for the FTP user account."
 msgstr "Podaj has³o dla serwera FTP"
 
 #. TXT_ENTER_FTPPROXY
-msgid "Please enter the address of the FTP proxy"
+#, fuzzy
+msgid "Enter the address of the FTP proxy."
 msgstr "Podaj Adres FTP-Proxy"
 
 #. TXT_ENTER_FTPPORT
-msgid "Please enter the port of the FTP proxy"
+#, fuzzy
+msgid "Enter the port of the FTP proxy."
 msgstr "Podaj port FTP-Proxy"
 
 #. TXT_WANT_FTPPROXY
 #, fuzzy
-msgid "Do you want to use an FTP proxy?"
+msgid "Use an FTP proxy?"
 msgstr "Czy chcesz korzystaæ z FTP-Proxy?"
 
 #. TXT_NOMEM_FTP
 #, fuzzy, c-format
-msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
-msgstr "Zbyt ma³o pamiêci operacyjnej do przeprowadzenia instalacji poprzez FTP! (potrzeba min. %d MB)"
+msgid ""
+"Your computer does not have enough RAM to install via FTP (%d MB RAM "
+"required)."
+msgstr ""
+"Zbyt ma³o pamiêci operacyjnej do przeprowadzenia instalacji poprzez FTP! "
+"(potrzeba min. %d MB)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
-"Do you want this?"
+"Usually an FTP installation is performed via anonymous FTP. It is possible "
+"to specify a user name and password for the FTP server access.\n"
+"Use a user name and password?"
 msgstr ""
-"Przewa¿nie instalacjê poprzez FTP przeprowadza siê na tzw. anonimowym FTP. Jednakowo¿ jest mo¿liwo¶æ podania nazwy konta i has³a.\n"
+"Przewa¿nie instalacjê poprzez FTP przeprowadza siê na tzw. anonimowym FTP. "
+"Jednakowo¿ jest mo¿liwo¶æ podania nazwy konta i has³a.\n"
 "Czy chcesz to zrobiæ?"
 
 #. TXT_MORE_MODULES
-msgid "-- More modules --"
+#, fuzzy
+msgid "-- More Modules --"
 msgstr "-- Inne modu³y --"
 
 #. TXT_INIT_PARPORT
@@ -670,24 +761,25 @@ msgstr "Inicjalizacja portu równoleg³ego..."
 
 #. TXT_ENTER_NFSPORT
 #, fuzzy
-msgid "Please enter the port number on which the nfs server is running"
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Podaj numer portu serwera NFS"
 
 #. TXT_YAST1
-msgid "YaST1 - text based"
+msgid "YaST1 -- Text-Based"
 msgstr ""
 
 #. TXT_YAST2
-msgid "YaST2 - graphical"
+#, fuzzy
+msgid "YaST2 -- Graphical"
 msgstr "YaST2 - grafical"
 
 #. TXT_CHOOSE_YAST
-msgid "Please choose the version of YaST you want to use for the installation."
+msgid "Choose the version of YaST to use for the installation."
 msgstr ""
 
 #. TXT_INSERT_CD
-#, c-format
-msgid "Please make sure that CD number %d is in your drive!"
+#, fuzzy, c-format
+msgid "Make sure that CD number %d is in your drive."
 msgstr "Upewnij siê, ¿e w napêdzie CD-ROM jest kompakt nr %d!"
 
 #. TXT_EJECT_CD
@@ -695,11 +787,11 @@ msgid "Eject CD"
 msgstr ""
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp timeout"
+msgid "Bootp Time-Out"
 msgstr ""
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Please enter the timeout value for bootp."
+msgid "Enter the time-out value for bootp."
 msgstr ""
 
 #. TXT_NET_CTC
@@ -719,34 +811,37 @@ msgid "channel attached cisco router"
 msgstr ""
 
 #. TXT_SMB_ENTER_SHARE
-msgid "Please enter the share name on the SMB server"
-msgstr ""
+#, fuzzy
+msgid "Enter the share name on the SMB server."
+msgstr "Podaj adres IP serwera NFS."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you don't need do specify username, password and workgroup.\n"
-"Do you want to access the share as quest?"
+"If you want to access the share as guest,you do not need to specify user "
+"name, password, and workgroup.\n"
+"Access the share as guest?"
 msgstr ""
 
 #. TXT_SMB_ENTER_USER
-msgid "Please enter your user name on the SMB server"
+msgid "Enter your user name on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_PASSWORD
-msgid "Please enter your password on the SMB server"
+msgid "Enter your password on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Please enter your workgroup."
-"If you don't need to specify a workgroup,"
-"just leave the field empty."
+"Enter your workgroup.If you do not need to specify a workgroup,leave the "
+"field empty."
 msgstr ""
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -772,27 +867,27 @@ msgid "Use DHCP instead of BOOTP?"
 msgstr ""
 
 #. TXT_MODDISK0
-msgid "Please insert a modules disk."
+msgid "Insert a modules disk."
 msgstr ""
 
 #. TXT_MODDISK1
 #, c-format
-msgid "Please insert modules disk %d."
+msgid "Insert modules disk %d."
 msgstr ""
 
 #. TXT_MODDISK2
-msgid "You'll find instructions on how to create it in boot/README on CD1 or DVD1."
+msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
 
 #. TXT_CHOOSE_NETSOURCE
-msgid "Please choose the network protocol"
-msgstr ""
+#, fuzzy
+msgid "Choose the network protocol."
+msgstr "Wska¿ typ sieci, z której chcesz korzystaæ w trakcie instalacji."
 
-# %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
-#, c-format
-msgid "Please enter the IP address of the %s server."
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the IP address of the %s server."
+msgstr "Podaj adres IP serwera NFS."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -804,19 +899,19 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
-# %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
-#, c-format
-msgid "Load %s modules"
-msgstr ""
+#, fuzzy, c-format
+msgid "Load %s Modules"
+msgstr "Usuñ za³adowany modu³"
 
 #. TXT_LOAD_FS
-msgid "Load file system modules"
+msgid "Load File System Modules"
 msgstr ""
 
 #. TXT_LOAD_OTHER
-msgid "Load unknown modules"
-msgstr ""
+#, fuzzy
+msgid "Load Unknown Modules"
+msgstr "Za³aduj sterownik karty sieciowej"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
@@ -837,24 +932,29 @@ msgid "No new modules found."
 msgstr ""
 
 #. TXT_CHOOSE_PARTITION
-msgid "Please choose the harddisk partition."
-msgstr ""
+#, fuzzy
+msgid "Choose the hard disk partition."
+msgstr "Proszê podaæ partycjê (np. /dev/sda1)"
 
 #. TXT_CHOOSE_ROOT_FS
-msgid "Please choose the root partition."
+msgid "Choose the root partition."
 msgstr ""
 
 #. TXT_CHOOSE_SWAP
-msgid "Please choose the swap partition."
-msgstr ""
+#, fuzzy
+msgid "Choose the swap partition."
+msgstr "Nie uda³o siê zamontowaæ wskazanej partycji!"
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
 msgstr ""
 
 #. TXT_LOW_MEMORY2
-msgid "Your computer doesn't have enough memory to run YaST."
+#, fuzzy
+msgid "Your computer does not have enough memory to run YaST."
 msgstr ""
+"Zbyt ma³o pamiêci operacyjnej do przeprowadzenia instalacji poprzez FTP! "
+"(potrzeba min. %d MB)"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -865,36 +965,39 @@ msgid "Error activating swap space."
 msgstr ""
 
 #. TXT_ENTER_SWAP
-msgid "Please enter the swap partition (eg. /dev/sda2)"
-msgstr ""
+#, fuzzy
+msgid "Enter the swap partition (e.g., /dev/sda2)"
+msgstr "Proszê podaæ partycjê (np. /dev/sda1)"
 
 #. TXT_ENTER_USER
-#, c-format
-msgid "Please enter the user name under which you want to access the %s server"
+#, fuzzy, c-format
+msgid "Enter the user name with which to access the %s server."
 msgstr ""
+"Podaj nazwê u¿ytkownika (konta), pod jak± chcesz uzyskaæ dostêp do serwera "
+"FTP"
 
 #. TXT_ENTER_PASSWORD
-#, c-format
-msgid "Please enter the password for the %s server"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the password for the %s server."
+msgstr "Podaj has³o dla serwera FTP"
 
 #. TXT_WANT_PROXY
 #, c-format
-msgid "Do you want to use a %s proxy?"
+msgid "Use a %s proxy?"
 msgstr ""
 
 #. TXT_ENTER_PROXY
-#, c-format
-msgid "Please enter the address of the %s proxy"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the address of the %s proxy."
+msgstr "Podaj Adres FTP-Proxy"
 
 #. TXT_ENTER_PROXYPORT
-#, c-format
-msgid "Please enter the port of the %s proxy"
-msgstr ""
+#, fuzzy, c-format
+msgid "Enter the port of the %s proxy."
+msgstr "Podaj port FTP-Proxy"
 
 #. TXT_VNC_SWITCH
-msgid "VNC Enable/Disable"
+msgid "VNC Enable or Disable"
 msgstr ""
 
 #. TXT_VNC_YES_NO
@@ -902,7 +1005,7 @@ msgid "Use VNC for install?"
 msgstr ""
 
 #. TXT_SSH_SWITCH
-msgid "Enable/Disable SSH Mode"
+msgid "Enable or Disable SSH Mode"
 msgstr ""
 
 #. TXT_SSH_YES_NO
@@ -910,20 +1013,18 @@ msgid "Start SSH for Text Install?"
 msgstr ""
 
 #. TXT_VNC_PASSWORD
-msgid "Please enter your VNC password"
+msgid "Enter your VNC password."
 msgstr ""
 
 #. TXT_SSH_PASSWORD
-msgid "Please enter your temporary SSH password"
+msgid "Enter your temporary SSH password."
 msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Please remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be "
+"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -935,14 +1036,30 @@ msgid "Show Driver Updates"
 msgstr ""
 
 #. TXT_INPUT_NAMED1
-#, c-format
-msgid "Please enter the IP of name server %u, or press ESC."
+#, fuzzy, c-format
+msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
+"Podaj adres IP serwera nazw (DNS). Je¶li nie chcesz z takowego korzystaæ, "
+"naci¶nij ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
-"Enter temporary Root Password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"Enter temporary root password.\n"
+"You will be required to change this password on initial root user login."
+msgstr ""
+
+#. TXT_REBOOT
+msgid "Reboot"
+msgstr ""
+
+#. TXT_NO_RAM
+#, c-format
+msgid ""
+"Your computer does not have enough RAM for the installation of %s. "
+"You need at least %d MB."
+msgstr ""
+
+#. TXT_VNC_PASSWORD_TOO_SHORT
+msgid "Password is too short (must have at least 5 characters)."
 msgstr ""
 

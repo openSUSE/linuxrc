@@ -285,6 +285,7 @@ typedef struct {
   char *product;		/* product name */
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
+  int escdelay;			/* timeout to differ esc from function keys */
   int loglevel;			/* set kernel log level */
   char *loghost;		/* syslog host */
   char *rootpassword;
@@ -356,6 +357,8 @@ typedef struct {
     int min_yast;		/* minimum for yast */
     int min_yast_text;		/* minimum for yast in text mode */
     int load_image;		/* _load_ rootimage, if we have at least that much */
+    int ram;			/* ram size in MB */
+    int ram_min;		/* min required memory (ram size) needed for install in MB */
   } memory;
 
   struct {
