@@ -7,3 +7,4 @@ void auto2_find_mouse(void);
 int auto2_pcmcia(void);
 int auto2_full_libhd(void);
 char *auto2_usb_module(void);
+char *auto2_xserver(void);

@@ -826,7 +826,7 @@ static int inst_execute_yast (void)
 
     (void) system ("rm -f /tmp/stp* > /dev/null 2>&1");
     (void) system ("rm -f /var/lib/YaST/* > /dev/null 2>&1");
-    (void) system ("umount -a -tnoproc,nominix > /dev/null 2>&1");
+    (void) system ("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
     inst_umount ();
     if (ramdisk_ig)
         util_free_ramdisk ("/dev/ram2");
@@ -837,7 +837,7 @@ static int inst_execute_yast (void)
     unlink ("/bin");
     rename ("/.bin", "/bin");
 
-    auto2_ig = FALSE;
+    if(rc_ii) auto2_ig = FALSE;
 
     return (rc_ii);
     }

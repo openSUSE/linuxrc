@@ -219,3 +219,4 @@ extern int             yast_version_ig;
 extern int             valid_net_config_ig;
 extern int             reboot_ig;
 extern int             usb_ig;
+extern char            *usb_mods_ig;

@@ -83,3 +83,4 @@ int             yast_version_ig = 0;
 int             valid_net_config_ig = 0;
 int             reboot_ig;
 int             usb_ig = 0;
+char            *usb_mods_ig = NULL;

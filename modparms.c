@@ -110,9 +110,12 @@ void mpar_write_modparms (FILE *file_prv)
     int  i_ii;
 
 
-    if (mpar_modnames_atm [0])
+    if (mpar_modnames_atm [0] || usb_mods_ig)
         {
-        fprintf (file_prv, "INITRD_MODULES=\"%s", mpar_modnames_atm [0]);
+        fprintf (file_prv, "INITRD_MODULES=\"%s%s%s",
+            usb_mods_ig ? usb_mods_ig : "",
+            *mpar_modnames_atm [0] || usb_mods_ig ? " " : "",
+            mpar_modnames_atm [0] ? mpar_modnames_atm [0] : "");
 
         for (i_ii = 1; i_ii < NR_MODPARAMS; i_ii++)
             if (mpar_modnames_atm [i_ii] &&

@@ -47,7 +47,6 @@ static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, int last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
-static int auto2_find_kbd(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 
@@ -119,37 +118,68 @@ void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
   hd_t *hd;
-  int i;
-  int no_feature[] = {
-    pr_modem, pr_serial, pr_mouse, pr_isa, pr_isdn, pr_parallel
-  };
+  char *usb_mod;
+  static char usb_mods[128];
+  int i, j, ju, k, ku, with_usb;
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
     free(hd_data);
   }
   hd_data = calloc(1, sizeof *hd_data);
-  hd_set_probe_feature(hd_data, pr_default);
-  if(!log_file) {
-    hd_data->progress = auto2_progress;
-    for(i = 0; i < sizeof no_feature / sizeof *no_feature; i++) {
-      hd_clear_probe_feature(hd_data, no_feature[i]);
-    }
-  }
+  hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
+  if(!log_file) hd_data->progress = auto2_progress;
 
   if(auto2_get_probe_env(hd_data)) {
     /* reset flags on error */
-    hd_set_probe_feature(hd_data, pr_default);
-    if(!log_file) {
-      for(i = 0; i < sizeof no_feature / sizeof *no_feature; i++) {
-        hd_clear_probe_feature(hd_data, no_feature[i]);
-      }
-    }
+    hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
   }
 
   if((guru_ig & 4)) hd_data->debug=-1 & ~HD_DEB_DRIVER_INFO;
 
+  with_usb = hd_probe_feature(hd_data, pr_usb);
+  hd_clear_probe_feature(hd_data, pr_usb);
   hd_scan(hd_data);
+
+  if((usb_mod = auto2_usb_module())) {
+    if(
+      (i = mod_load_module("usbcore", NULL)) ||
+      (i = mod_load_module(usb_mod, NULL))   ||
+      (i = mod_load_module("input", NULL))   ||
+      (i = mod_load_module("hid", NULL))
+    );
+    mod_load_module("keybdev", NULL);
+    mod_load_module("mousedev", NULL);
+    k = mount (0, "/proc/bus/usb", "usbdevfs", 0, 0);
+    if(!i) sleep(3);
+    if(with_usb) {
+      hd_clear_probe_feature(hd_data, pr_all);
+      hd_set_probe_feature(hd_data, pr_usb);
+      hd_scan(hd_data);
+    }
+  }
+
+  /* look for keyboards & mice */
+  has_kbd_ig = FALSE;
+
+  j = ju = k = ku = 0;
+  for(hd = hd_data->hd; hd; hd = hd->next) {
+    if(hd->base_class == bc_keyboard) {
+      has_kbd_ig = TRUE;
+      j++;
+      if(hd->bus == bus_usb) ju++;
+    }
+    if(hd->base_class == bc_mouse) {
+      k++;
+      if(hd->bus == bus_usb) ku++;
+    }
+  }
+
+  /* usb mouse only || usb keyboard only ? */
+  if(((j && j == ju) || (k && k == ku)) && usb_mod) {
+    sprintf(usb_mods, "usbcore %s input hid keybdev mousedev", usb_mod);
+    usb_mods_ig = usb_mods;
+  }
 
   if(log_file && (f = fopen(log_file, "w+"))) {
 
@@ -533,6 +563,7 @@ int auto2_find_floppy()
   return has_floppy_ig = FALSE;
 }
 
+#if 0
 /*
  * Scans the hardware list for a keybord and puts the result in
  * has_kbd_ig.
@@ -549,6 +580,7 @@ int auto2_find_kbd()
 
   return has_kbd_ig = FALSE;
 }
+#endif
 
 int auto2_get_probe_env(hd_data_t *hd_data)
 {
@@ -606,6 +638,22 @@ char *auto2_usb_module()
   if(hd_data) usb_ig = hd_usb_support(hd_data);
 
   return usb_ig == 2 ? "usb-ohci" : usb_ig == 1 ? "usb-uhci" : NULL;
+}
+
+char *auto2_xserver()
+{
+  static char display[16];
+  driver_info_t *di;
+
+  *display = 0;
+  di = hd_driver_info(hd_data, hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data)));
+  if(di && di->any.type == di_x11 && di->x11.server) {
+    strncpy(display, di->x11.server, sizeof display - 1);
+    display[sizeof display - 1] = 0;
+  }
+  hd_free_driver_info(di);
+
+  return display;
 }
 
 

@@ -158,6 +158,7 @@ void lxrc_end (void)
     (void) util_umount (mountpoint_tg);
     lxrc_set_modprobe ("/sbin/modprobe");
     lxrc_set_bdflush (40);
+    (void) util_umount ("/proc/bus/usb");
     (void) util_umount ("/proc");
     deb_wait;
     disp_cursor_on ();
@@ -385,20 +386,6 @@ static void lxrc_init (void)
         disp_cursor_off();
         disp_set_display(1);
         dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
-      }
-    }
-
-    {
-      char *usb_mod = auto2_usb_module();
-
-      if(usb_mod) {
-        mod_load_module("usbcore", NULL);
-        mod_load_module(usb_mod, NULL);
-        mod_load_module("input", NULL);
-        mod_load_module("hid", NULL);
-        mod_load_module("keybdev", NULL);
-        mod_load_module("mousedev", NULL);
-        mount (0, "/dev/usb", "usbdevfs", 0, 0);
       }
     }
 #endif

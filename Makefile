@@ -75,6 +75,8 @@ all: libs linuxrc
 
 install: linuxrc
 	@install linuxrc /usr/sbin
+	-@install linuxrc_mini /usr/sbin
+	-@install linuxrc_tiny /usr/sbin
 
 libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done
