@@ -2,7 +2,7 @@
 	- new czech translations
 	- fixed AddSwap config option
 	- finalized swap dialog
-	- diable splash for yast2 ncurses interface
+	- disable splash for yast2 ncurses interface
 
 3/3/2002:	v1.3.22
 	- detect more fstypes
