@@ -64,6 +64,14 @@
 #define pivot_root(a, b) syscall(SYS_pivot_root, a, b)
 #endif
 
+#ifndef MS_MOVE
+#define MS_MOVE		(1 << 13)
+#endif
+
+#ifndef MNT_DETACH
+#define MNT_DETACH	(1 << 1)
+#endif
+
 static void lxrc_main_menu     (void);
 static void lxrc_catch_signal_11(SIGNAL_ARGS);
 static void lxrc_catch_signal  (int signum);
@@ -79,6 +87,7 @@ static void lxrc_halt          (void);
 
 extern char **environ;
 static void lxrc_movetotmpfs(void);
+static void lxrc_movetotmpfs2(void);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
@@ -234,6 +243,12 @@ int main(int argc, char **argv, char **env)
         }
         config.tmpfs = 0;
       }
+      else {
+        if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
+          lxrc_movetotmpfs2();	/* does not return if successful */
+        }
+        config.tmpfs = 0;
+      }
 
       if(!config.serial && config.debugwait) {
         util_start_shell("/dev/tty9", "/lbin/lsh", 0);
@@ -386,14 +401,6 @@ void lxrc_change_root()
 }
 
 
-#ifndef MS_MOVE
-#define MS_MOVE		(1 << 13)
-#endif
-
-#ifndef MNT_DETACH
-#define MNT_DETACH	(1 << 1)
-#endif
-
 void lxrc_change_root2()
 {
   if(config.test) return;
@@ -423,6 +430,58 @@ void lxrc_change_root2()
   fprintf(stderr, "system start failed\n");
 
   deb_wait;
+}
+
+
+/*
+ * Copy root tree into a tmpfs tree, pivot_root() there and
+ * exec() the new linuxrc.
+ */
+void lxrc_movetotmpfs2()
+{
+  int i;
+  char *newroot = "/newroot";
+
+  fprintf(stderr, "Moving into tmpfs...");
+  i = mkdir(newroot, 0755);
+  if(i) {
+    perror(newroot);
+    return;
+  }
+
+  i = mount("tmpfs", newroot, "tmpfs", 0, "nr_inodes=30720");
+  if(i) {
+    perror(newroot);
+    return;
+  }
+
+  i = util_do_cp("/", newroot);
+  if(i) {
+    fprintf(stderr, "copy failed: %d\n", i);
+    return;
+  }
+
+  fprintf(stderr, " done.\n");
+
+  if(chdir(newroot)) perror(newroot);
+
+  if(mkdir("oldroot", 0755)) perror("oldroot");
+
+  umount2("/", MNT_DETACH);
+  mount(".", "/", NULL, MS_MOVE, NULL);
+  chroot(".");
+
+  /* put / entry back into /proc/mounts */
+  mount("/", "/", "none", MS_BIND, 0);
+
+  for(i = 0; i < 20; i++) close(i);
+
+  open("/dev/console", O_RDWR);
+  dup(0);
+  dup(0);
+  execve("/init", config.argv, environ);
+
+  perror("/init");
 }
 
 

@@ -155,7 +155,9 @@ static struct {
   { key_installdir,     "InstallDir",     kf_cfg + kf_cmd                },
   { key_nopcmcia,       "NoPCMCIA",       kf_cfg + kf_cmd                },	/* kf_cmd_early? */
   { key_vnc,            "VNC",            kf_cfg + kf_cmd                },
+  { key_vnc,            "UseVNC",         kf_cfg + kf_cmd                },
   { key_usessh,         "UseSSH",         kf_cfg + kf_cmd                },
+  { key_usessh,         "SSH",            kf_cfg + kf_cmd                },
   { key_vncpassword,    "VNCPassword",    kf_cfg + kf_cmd                },
   { key_displayip,	"Display_IP",     kf_cfg + kf_cmd		 },
   { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },

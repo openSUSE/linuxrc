@@ -1,3 +1,7 @@
+	- allow ssh=1 as an alias for usessh=1 (#66793)
+	- pass unknown languages to yast
+	- copy into new tmpfs even if we use initramfs
+
 22/2/2005:	v1.8.1
 	- accept "domain;" in smb url
 

@@ -658,6 +658,11 @@ int util_free_ramdisk(char *ramdisk_dev)
     perror(ramdisk_dev);
   }
 
+  if(strncmp(ramdisk_dev, "/dev/", sizeof "/dev/" - 1)) {
+    unlink(ramdisk_dev);
+    fprintf(stderr, "%s removed\n", ramdisk_dev);
+  }
+
   return err;
 }
 

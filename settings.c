@@ -172,6 +172,8 @@ static language_t set_languages_arm [] =
 { lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW" },
 #endif
 
+// dummy for unknown language, must be last entry
+{lang_dummy, "", "us", SMALL_FONT, UNI_FONT, 0, 0, NULL },
 };
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
@@ -273,7 +275,7 @@ static dia_item_t di_set_expert_last = di_none;
 static int  set_settings_cb          (dia_item_t di);
 static void set_expert               (void);
 static int  set_expert_cb            (dia_item_t di);
-static int  set_get_current_language (void);
+static int  set_get_current_language (enum langid_t lang);
 static void set_font(language_t *lang);
 static char *keymap_encoding(char *map);
 
@@ -288,7 +290,7 @@ enum langid_t set_langidbyname(char *name)
   int i, l;
 
   for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
-    if(!strcasecmp(set_languages_arm[i].locale, name)) {
+    if(set_languages_arm[i].locale && !strcasecmp(set_languages_arm[i].locale, name)) {
       return set_languages_arm[i].id;
     }
   }
@@ -297,11 +299,19 @@ enum langid_t set_langidbyname(char *name)
   if(l) {
     for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
       if(
+        set_languages_arm[i].locale &&
         !strncasecmp(set_languages_arm[i].locale, name, l) &&
         set_languages_arm[i].locale[l] == '_'
       ) {
         return set_languages_arm[i].id;
       }
+    }
+  }
+
+  for(i = 0; i < NR_LANGUAGES; i++) {
+    if(set_languages_arm[i].id == lang_dummy) {
+      str_copy(&set_languages_arm[i].locale, name);
+      return lang_dummy;
     }
   }
 
@@ -395,7 +405,7 @@ void set_choose_keytable(int always_show)
 #endif
 
   /* note that this works only for iaxx, axp and non-mac ppc */
-  cur_lang = set_get_current_language();
+  cur_lang = set_get_current_language(lang_undef);
   def_keymap = config.keymap ?: set_languages_arm[cur_lang - 1].keymap;
 
   def_keymap_idx = 0;
@@ -447,7 +457,7 @@ void set_activate_language(enum langid_t lang_id)
   language_t *lang;
 
   config.language = lang_id;
-  i = set_get_current_language();
+  i = set_get_current_language(lang_undef);
 
   if(i > 0) {
     lang = set_languages_arm + i - 1;
@@ -497,11 +507,15 @@ void set_choose_language()
   int i;
 
   for(i = 0; (unsigned) i < NR_LANGUAGES; i++) {
+    if(set_languages_arm[i].id == lang_dummy) break;
     items[i] = set_languages_arm[i].descr;
   }
   items[i] = NULL;
 
-  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 24, NULL, items, set_get_current_language(), align_left);
+  i = set_get_current_language(lang_undef);
+  if(set_languages_arm[i - 1].id == lang_dummy) i = set_get_current_language(LANG_DEFAULT);
+
+  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 24, NULL, items, i, align_left);
 
   if(i > 0) set_activate_language(set_languages_arm[i - 1].id);
 }
@@ -626,7 +640,7 @@ void set_write_info(FILE *f)
   language_t *lang;
   char magic[3] = "( ";
 
-  lang = set_languages_arm + set_get_current_language() - 1;
+  lang = set_languages_arm + set_get_current_language(lang_undef) - 1;
 
   if(lang->write_info) {
     file_write_str(f, key_font, lang->font1);
@@ -639,12 +653,14 @@ void set_write_info(FILE *f)
 
 
 /* Note: this *must* return a value in the range [1, NR_LANGUAGES]! */
-int set_get_current_language()
+int set_get_current_language(enum langid_t lang)
 {
   unsigned u;
 
+  if(lang == lang_undef) lang = config.language;
+
   for(u = 0; u < NR_LANGUAGES; u++) {
-    if(set_languages_arm[u].id == config.language) return u + 1;
+    if(set_languages_arm[u].id == lang) return u + 1;
   }
 
   for(u = 0; u < NR_LANGUAGES; u++) {
@@ -702,7 +718,7 @@ void set_font(language_t *lang)
 
 language_t *current_language()
 {
-  return set_languages_arm + set_get_current_language() - 1;
+  return set_languages_arm + set_get_current_language(lang_undef) - 1;
 }
 
 

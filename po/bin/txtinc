@@ -29,7 +29,7 @@ print W "/*\n * This file is generated automatically. Editing it is pointless.\n
 print W "/* lang_undef _must_ be 0 */\n\n";
 print W "enum langid_t {\n";
 
-@list = ( "undef", @ARGV );
+@list = ( "undef", @ARGV, "dummy" );
 for ($i = 0 ; $i < @list; $i++) {
   print W "  lang_$list[$i]";
   print W $i + 1 == @list ? "\n" : ",\n";
