@@ -30,6 +30,7 @@
 #include "rootimage.h"
 #include "module.h"
 #include "ftp.h"
+#include "linuxrc.h"
 
 #define BLOCKSIZE        10240
 
@@ -292,6 +293,7 @@ void root_set_root (char *root_string_tv)
     int    i_ii = 0;
 
 
+    lxrc_new_root = strdup (root_string_tv);
     if (!strncmp ("/dev/", root_string_tv, 5))
         tmp_string_pci = root_string_tv + 5;
     else
