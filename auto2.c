@@ -362,6 +362,8 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
     if(hd->idx > last_idx) break;
   }
 
+  last_idx = 0;		/* re-use */
+
   if(!hd) return 0;	/* no further entries */
 
   for(di0 = NULL; hd; hd = hd->next) {
@@ -396,6 +398,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
               mpar_save_modparams(auto2_loaded_module, auto2_loaded_module_args);
             }
 
+            last_idx = hd->idx;
             fprintf(stderr, "Ok, that seems to have worked. :-)\n");
             break;
           }
@@ -414,7 +417,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 
   di0 = hd_free_driver_info(di0);
 
-  return hd ? hd->idx : 0;
+  return last_idx;
 }
 
 
@@ -786,7 +789,7 @@ char *auto2_disk_list(int *boot_disk)
     }
   }
   
-  for(hd = hd_disk_list(hd_data, 0); hd; hd = hd->next) {
+  for(hd = hd_disk_list(hd_data, 1); hd; hd = hd->next) {
     if(hd->idx != boot_idx && hd->unix_dev_name) {
       if(*buf) strcat(buf, " ");
       strcat(buf, hd->unix_dev_name);
