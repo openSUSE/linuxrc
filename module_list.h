@@ -11,6 +11,7 @@ static module_t mod_scsi_mod_arm [] =
 { ID_DPT_I2O,    "DPT I2O SmartRAID V",                "dpt_i2o",    0, __LINE__ },
 { ID_AACRAID,    "Adaptec RAID",                       "aacraid",    0, __LINE__ },
 { ID_IPS,        "IBM ServeRAID",                      "ips",        0, __LINE__ },
+{ ID_CPQFC,      "Compaq Fibre Channel 64-bit/66Mhz",  "cpqfc",      0, __LINE__ },
 { ID_EATA_DMA,   "EATA-DMA (DPT, NEC, AT&T, SNI etc)", "eata_dma",   0, __LINE__ },
 { ID_DC390T,     "Tekram DC390(T) (AM53C974 chip)",    "tmscsim",    0, __LINE__ },
 { ID_DC395,      "Tekram Tekram DC395U/UW/F, DC315/U", "dc395x_trm", 0, __LINE__ },
