@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <sys/utsname.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -171,6 +172,7 @@ slp_get_install()
   file_t *f;
   unsigned char *origurl;
   int origurllen;
+  struct utsname utsname;
 
   mysa.sin_family = AF_INET;
   mysa.sin_port = 0;
@@ -201,8 +203,24 @@ slp_get_install()
   bp += 20 + 2;
   memcpy(bp, "\000\007default", 7 + 2);
   bp += 7 + 2;
-  *bp++ = 0;
-  *bp++ = 0;
+
+  if (uname(&utsname))
+    {
+      *bp++ = 0;
+      *bp++ = 0;
+    }
+  else
+    {
+      int rell = strlen(utsname.release);
+      int machl = strlen(utsname.machine);
+      if (bp + rell + machl + 57 + 4 < sendbuf + sizeof(sendbuf))
+	{
+	  *bp++ = (57 + rell + machl) >> 8;
+	  *bp++ = (57 + rell + machl) & 255;
+	  sprintf(bp, "(&(|(!(machine=*))(machine=%s))(|(!(release=*))(release=%s)))", utsname.machine, utsname.release);
+	  bp += 57 + rell + machl;
+	}
+    }
   *bp++ = 0;
   *bp++ = 0;
   l = bp - sendbuf;

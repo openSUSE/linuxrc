@@ -1,3 +1,6 @@
+19/3/2004:	v1.6.10
+	- provide machine and release filter in slp request
+
 15/3/2004:	v1.6.9
 	- write 'NoPCMCIA' & 'NetHWAddr' entries
 
