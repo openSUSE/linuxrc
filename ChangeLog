@@ -1,5 +1,7 @@
 15/3/2005:	v1.8.4
 	- load acpi modules if necessary (#72146)
+	- no error if asian fonts are missing (#72992)
+	- translations updated
 
 11/3/2005:	v1.8.3
 	- s390: fix segfault in net_list_s390_devs()

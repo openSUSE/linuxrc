@@ -3,12 +3,12 @@
 # Czech translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
 # Petr Kania <petr.kania@suse.cz>, 2003.
-# Klara Cihlarova <koty@seznam.cz>, 2003, 2004.
+# Klara Cihlarova <koty@seznam.cz>, 2003, 2004, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
-"PO-Revision-Date: 2004-09-03 08:59+0200\n"
+"PO-Revision-Date: 2005-03-03 14:57+0100\n"
 "Last-Translator: Klara Cihlarova <koty@seznam.cz>\n"
 "Language-Team: cs_CZ <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1150,18 +1150,18 @@ msgstr "Zvolte instalační zdroj"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr ""
+msgstr "Toto není plně kvalifikované jméno."
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
-msgstr ""
+msgstr "Toto není platná CCW adresa."
 
 #. TXT_NET_HSI
 msgid "Hipersocket"
-msgstr ""
+msgstr "Hipersocket"
 
 # power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr ""
+msgstr "Chcete systém nyní vypnout?"
 

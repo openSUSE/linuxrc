@@ -1,18 +1,21 @@
+# translation of hu.po to Hungarian
 # Hungarian translation of linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
 # Copyright (C) 2004 Novell, Inc.
 # Gabor Szentivanyi <szenti@suselinux.hu>, 2001.
 # Laszlo Dvornik <dvornik@gnome.hu>, 2004.
+# Szabolcs Varga <shirokuma@shirokuma.hu>, 2005.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2004-10-17 13:35+0200\n"
-"Last-Translator: Laszlo Dvornik <dvornik@gnome.hu>\n"
-"Language-Team: Hungarian <gnome@gnome.hu>\n"
+"Project-Id-Version: hu\n"
+"PO-Revision-Date: 2005-03-09 14:56+0100\n"
+"Last-Translator: Szabolcs Varga <shirokuma@shirokuma.hu>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
@@ -52,7 +55,7 @@ msgstr "Nyelv"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Rendszermag modulok (hardver meghajtók)"
+msgstr "Rendszermagmodulok (hardvermeghajtók)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
@@ -80,7 +83,7 @@ msgstr "Billentyűzetkiosztás"
 
 #. TXT_LOAD_NET
 msgid "Load Network Card Modules"
-msgstr "Hálózati kártya modulok betöltése"
+msgstr "Hálózatikártya-modulok betöltése"
 
 #. TXT_SHOW_MODULES
 msgid "Show Loaded Modules"
@@ -104,8 +107,7 @@ msgid ""
 msgstr ""
 "Megpróbálom betölteni a(z) \"%s\" modult...\n"
 "\n"
-"A betöltés alatt megtekinthetők a rendszermag üzenetei a 4-es virtuális "
-"konzolon (ALT-F4). Ehhez a menühöz az ALT-F1 billentyűkombinációval lehet "
+"A betöltés alatt a rendszermag üzenetei a 4-es virtuális konzolon (ALT-F4) tekinthetők meg. Ehhez a menühöz az ALT-F1 billentyűkombinációval lehet "
 "visszajutni."
 
 #. TXT_LOAD_SUCCESSFUL
@@ -157,7 +159,7 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"Képmás nem található.\n"
+"A képmás nem található.\n"
 "\n"
 "Ellenőrizze az elérési utat."
 
@@ -167,7 +169,7 @@ msgstr "Adatok betöltése a RAM-diszkbe..."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
-msgstr "Rendszermag üzenetek"
+msgstr "Rendszermagüzenetek"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -278,11 +280,11 @@ msgstr ""
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
-msgstr "Adja meg az NFS szerver IP-címét."
+msgstr "Adja meg az NFS-szerver IP-címét."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Enter the IP address of the FTP server."
-msgstr "Adja meg az FTP szerver IP-címét."
+msgstr "Adja meg az FTP-szerver IP-címét."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
@@ -358,11 +360,11 @@ msgstr "párhuzamos port"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "token ring hálózati kártya"
+msgstr "Token Ring hálózati kártya"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "arcnet hálózati kártya"
+msgstr "Arcnet hálózati kártya"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
@@ -381,8 +383,7 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Adja meg a PLIP partner IP-címét."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
 "A PCMCIA lapkakészlet automatikus felismerése nem sikerült. Adja meg "
 "manuálisan a szükséges adatokat."
@@ -450,11 +451,11 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Például: "
+"Példa: "
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr "Válasszon forrásmédiumot."
+msgstr "Válassza ki a forrás adathordozót."
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -478,7 +479,7 @@ msgstr ""
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Adja meg a merevlemez partíciót (pl. /dev/sda1)"
+msgstr "Adja meg a merevlemez-partíciót (pl. /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
@@ -627,8 +628,7 @@ msgstr ""
 
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr ""
-"Adja meg azt a felhasználónevet, amellyel el kívánja érni az FTP-szervert."
+msgstr "Adja meg azt a felhasználónevet, amellyel el kívánja érni az FTP-szervert."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -712,7 +712,7 @@ msgstr "csatornához csatolt Cisco útválasztó"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
-msgstr "Adja meg az SMB szerver által kiajánlott nevet."
+msgstr "Adja meg az SMB kiszolgáló által kiajánlott nevet."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
@@ -726,11 +726,11 @@ msgstr ""
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
-msgstr "Adja meg a felhasználói nevét az SMB szerveren."
+msgstr "Adja meg a felhasználói nevét az SMB kiszolgálón."
 
 #. TXT_SMB_ENTER_PASSWORD
 msgid "Enter your password on the SMB server."
-msgstr "Adja meg a jelszavát az SMB szerveren."
+msgstr "Adja meg a jelszavát az SMB kiszolgálón."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
@@ -816,7 +816,7 @@ msgstr "A(z) %s modulok betöltése"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
-msgstr "A fájlrendszer modulok betöltése"
+msgstr "A fájlrendszermodulok betöltése"
 
 #. TXT_LOAD_OTHER
 msgid "Load Unknown Modules"
@@ -875,8 +875,7 @@ msgstr "Adja meg a merevlemez partíciót (pl. /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
-"Adja meg azt a felhasználó nevet, amellyel el kívánja érni a(z) %s szervert."
+msgstr "Adja meg azt a felhasználó nevet, amellyel el kívánja érni a(z) %s szervert."
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_ENTER_PASSWORD
@@ -935,17 +934,16 @@ msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Meghajtófrissítés hozzáadása"
+msgstr "Illesztőprogram-frissítés hozzáadása"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Meghajtófrissítések megjelenítése"
+msgstr "Illesztőprogram-frissítések megjelenítése"
 
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr ""
-"Adja meg a(z) %u névszerver IP-címét vagy nyomja meg az ESC billentyűt."
+msgstr "Adja meg a(z) %u névszerver IP-címét vagy nyomja meg az ESC billentyűt."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -1011,11 +1009,11 @@ msgstr "Inter-User Communication Vehicle (IUCV)"
 
 #. TXT_390NET_HSI
 msgid "Hipersockets"
-msgstr "Hiperfoglalatok"
+msgstr "Hipersockets"
 
 #. TXT_390NET_OSAEXTR
 msgid "OSA High Speed Token Ring"
-msgstr "OSA nagy sebességű token ring"
+msgstr "OSA nagy sebességű Token Ring"
 
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
@@ -1035,7 +1033,7 @@ msgstr "Válasszon protokollt ehhez a CTC-eszközhöz."
 
 #. TXT_CTC_PROT_COMPAT
 msgid "Compatibility mode (default)"
-msgstr "Kompatibilitás mód (alapértelmezett)"
+msgstr "Kompatibilitási mód (alapértelmezett)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
@@ -1043,7 +1041,7 @@ msgstr "Kiterjesztett mód"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Kompatibilitás mód OS/390 és z/OS partnerekhez"
+msgstr "Kompatibilitási mód OS/390 és z/OS partnerekhez"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
@@ -1068,32 +1066,32 @@ msgstr "Kikapcsolás"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Nem sikerült hozzáférni a meghajtófrissítés adathordozóhoz."
+msgstr "Nem sikerült hozzáférni az illesztőprogram-frissítés adathordozóhoz."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "Meghajtófrissítés olvasása..."
+msgstr "Illesztőprogram-frissítés olvasása..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Új meghajtófrissítés nem található"
+msgstr "Új Illesztőprogram-frissítés nem található"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Meghajtófrissítések hozzáadva"
+msgstr "Illesztőprogram-frissítések hozzáadva"
 
 # shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr "Meghajtófrissítés OK"
+msgstr "Illesztőprogram-frissítés OK"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Válassza ki a meghajtófrissítés adathordozót."
+msgstr "Válassza ki az illesztőfrissítés adathordozóját."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Adja meg a meghajtófrissítés eszközt."
+msgstr "Adja meg az illesztőprogram-frissítési eszközt."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -1118,11 +1116,11 @@ msgstr "Floppy lemez nem található."
 # heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr "Meghajtófrissítés lista"
+msgstr "Illesztőprogram-frissítési lista"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Nincs meghajtófrissítés."
+msgstr "Nincs illesztőprogram-frissítés."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1167,19 +1165,19 @@ msgstr "Telepítési forrás kiválasztása"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr ""
+msgstr "Ez nem egy teljes képzésű minősített gépnév."
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
-msgstr ""
+msgstr "Ez nem egy érvényes CCW-cím."
 
 #. TXT_NET_HSI
-#, fuzzy
 msgid "Hipersocket"
-msgstr "Hiperfoglalatok"
+msgstr "Hipersocket"
+
 # power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr ""
+msgstr "Kívánja most leállítani a rendszert?"
 

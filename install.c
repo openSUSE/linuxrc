@@ -885,7 +885,9 @@ int inst_start_install()
 
     if(config.rootimage2) {
       strprintf(&buf, "%s%s", inst_rootimage_tm, config.rootimage2);
+      config.noerrors = 1;
       config.inst2_ramdisk = load_image(buf, config.instmode);
+      config.noerrors = 0;
       if(config.inst2_ramdisk >= 0) {
         if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
           str_copy(&config.instsys2, config.mountpoint.instsys2);
@@ -904,7 +906,9 @@ int inst_start_install()
         str_copy(&config.instsys2, config.mountpoint.instsys2);
       }
       else {
+        config.noerrors = 1;
         config.inst2_ramdisk = load_image(buf, config.instmode);
+        config.noerrors = 0;
         if(config.inst2_ramdisk >= 0) {
           if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
             str_copy(&config.instsys2, config.mountpoint.instsys2);
