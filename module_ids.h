@@ -131,6 +131,8 @@ enum modid_t
     ID_SK55XX,
     ID_EEPRO100,
     ID_EEPRO100_OLD,
+    ID_I_E100,
+    ID_I_E1000,
     ID_MTOK,
     ID_SKTR,
     ID_RL100ATX,
