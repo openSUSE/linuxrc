@@ -27,27 +27,33 @@ typedef struct
     } alltexts_t;
 
 #ifndef __alpha__
+#if LXRC_TINY < 1
 #include "lang/brasil.txt"
+#endif
 #include "lang/dutch.txt"
 #endif
 #include "lang/english.txt"
 #include "lang/french.txt"
 #include "lang/german.txt"
 #ifndef __alpha__
+#if LXRC_TINY < 1
 #include "lang/greek.txt"
 #include "lang/hungarian.txt"
-#if LXRC_TINY < 1
 #include "lang/indonesia.txt"
 #endif
 #include "lang/italian.txt"
+#if LXRC_TINY < 1
 #include "lang/polish.txt"
+#endif
 #include "lang/portuguese.txt"
+#if LXRC_TINY < 1
 #include "lang/russian.txt"
 #include "lang/slovak.txt"
+#endif
 #include "lang/spanish.txt"
+#if LXRC_TINY < 1
 #include "lang/romanian.txt"
 #include "lang/czech.txt"
-#if LXRC_TINY < 1
 #include "lang/breton.txt"
 #endif
 #endif
@@ -66,19 +72,23 @@ static alltexts_t alltexts_arm [] =
     { LANG_BRETON,     LANG_ENTRY (txt_breton_atm)     },
 #endif
     { LANG_SPANISH,    LANG_ENTRY (txt_spanish_atm)    },
+#if LXRC_TINY < 1
     { LANG_BRAZIL,     LANG_ENTRY (txt_brasil_atm)     },
     { LANG_GREEK,      LANG_ENTRY (txt_greek_atm)      },
+#endif
     { LANG_DUTCH,      LANG_ENTRY (txt_dutch_atm)      },
+#if LXRC_TINY < 1
     { LANG_RUSSIA,     LANG_ENTRY (txt_russian_atm)    },
     { LANG_SLOVAK,     LANG_ENTRY (txt_slovak_atm)     },
     { LANG_POLISH,     LANG_ENTRY (txt_polish_atm)     },
-#if LXRC_TINY < 1
     { LANG_INDONESIA,  LANG_ENTRY (txt_indonesia_atm)  },
 #endif
     { LANG_PORTUGUESE, LANG_ENTRY (txt_portuguese_atm) },
+#if LXRC_TINY < 1
     { LANG_ROMANIAN,   LANG_ENTRY (txt_romanian_atm)   },
     { LANG_CZECH,      LANG_ENTRY (txt_czech_atm)   },
     { LANG_HUNGARIA,   LANG_ENTRY (txt_hungarian_atm)  }
+#endif
 #endif
     };
 

@@ -56,23 +56,26 @@ static language_t set_languages_arm [] =
 #if LXRC_TINY < 1
 { LANG_BRETON,       "Brezhoneg",            "fr-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "fr_FR",        "breton"        },
-#endif
 { LANG_GREEK,        "Hellenic",             "gr",           "lat7-16.psfu",
   "trivial",         "lat7u.uni", 1, 1,      "el_EL",        "greek"         },
-#if LXRC_TINY < 1
 { LANG_INDONESIA,    "Indonesia",            "us",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "de_DE",        "indonesian"    },
 #endif
 { LANG_ITALIAN,      "Italiano",             "it",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 0,      "it_IT",        "italian"       },
+#if LXRC_TINY < 1
 { LANG_HUNGARIA,     "Magyar",               "hu",           "lat2-16.psfu",
   "trivial",         "lat2u.uni", 1, 1,      "hu_HU",        "hungarian"     },
+#endif
 { LANG_DUTCH,        "Nederlands",           "us",           "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "nl_NL",        "dutch"         },
+#if LXRC_TINY < 1
 { LANG_POLISH,       "Polski",               "Pl02",         "lat2-16.psfu",
   "trivial",         "lat2u.uni", 1, 1,      "pl_PL",        "polish"        },
+#endif
 { LANG_PORTUGUESE,   "Português",            "pt-latin1",    "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "pt_PT",        "portuguese"    },
+#if LXRC_TINY < 1
 { LANG_BRAZIL,       "Português Brasileiro", "br-abnt2",     "lat1-16.psfu",
   "none",            "lat1u.uni", 0, 1,      "pt_BR",        "brazilian"     },
 { LANG_ROMANIAN,     "Romania",              "us",           "lat2-16.psfu",
@@ -83,6 +86,7 @@ static language_t set_languages_arm [] =
   "trivial",         "lat2u.uni", 1, 1,      "cs_CZ",        "czech"         },
 { LANG_SLOVAK,       "Slovencina",           "sk-qwerty",    "lat2-16.psfu",
   "trivial",         "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
+#endif
 };
 #endif
 
@@ -217,7 +221,9 @@ static keymap_t set_keymaps_arm_mac [] =
 static const char  *set_txt_language_tm       = "Language:";
 static const char  *set_txt_font_tm           = "Font:";
 static const char  *set_txt_screenmap_tm      = "Screenmap:";
+#if 0
 static const char  *set_txt_unicode_tm        = "Unicodemap:";
+#endif
 static const char  *set_txt_fontmagic_tm      = "Fontmagic:";
 static const char  *set_txt_locale_tm         = "Locale:";
 

@@ -1,3 +1,7 @@
+31/7/2001:	v1.2.5
+	- removed even more languages from linuxrc_tiny
+	- mantel: changed text from "bootp" to "bootp/DHCP"
+
 23/7/2001:	v1.2.4
 	- adapted for libhd 3.0
 
