@@ -1,3 +1,6 @@
+10/9/2002:	v1.4.26
+	- ensure proper display init in vnc/usessh case (#19099)
+
 9/9/2002:	v1.4.25
 	- don't write server info for VNC/ssh install (#18882)
 	- disks/README --> boot/README 

@@ -781,9 +781,13 @@ int auto2_find_install_medium()
     if(!config.partition) return FALSE;
 
     if (config.vnc || config.usessh) {
+      int win_old;
+
       auto2_activate_devices(bc_network, 0);
+      if(!(win_old = config.win)) util_disp_init();
       if (net_config())
 	config.vnc = config.usessh = 0;
+      if(!win_old) util_disp_done();
     }
 
     sprintf(buf, "/dev/%s", config.partition);
@@ -800,9 +804,12 @@ int auto2_find_install_medium()
     need_modules = 0;
   
     if (config.vnc || config.usessh) {
+      int win_old;
       auto2_activate_devices(bc_network, 0);
+      if(!(win_old = config.win)) util_disp_init();
       if(net_config())
 	config.vnc = config.usessh = 0;
+      if(!win_old) util_disp_done();
     }
 
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
