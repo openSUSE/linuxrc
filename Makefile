@@ -17,6 +17,8 @@ OBJ	= $(SRC:.c=.o)
 SUBDIRS	= insmod loadkeys pcmcia portmap
 LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a
 
+# USE_MINI_GLIBC      = no
+
 ifeq ($(ARCH),alpha)
     USE_MINI_GLIBC	= no
     CFLAGS		+= -DLINUXRC_AXP

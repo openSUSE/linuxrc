@@ -1,5 +1,5 @@
 /*
- * mapscrn.c - version 0.92
+ * mapscrn.c - version 0.98
  */
 
 #include <stdio.h>
@@ -11,8 +11,11 @@
 #include <sys/ioctl.h>
 #include <sys/kd.h>
 #include "paths.h"
+#include "findfile.h"
+#include "nls.h"
 
 /* the two exported functions */
+void saveoldmap(int fd, char *omfil);
 void loadnewmap(int fd, char *mfil);
 
 static int parsemap (FILE *, char*);
@@ -22,6 +25,46 @@ static int ctoi (unsigned char *);
 static char *mapdirpath[] = { "", DATADIR "/" TRANSDIR "/", 0 };
 static char *mapsuffixes[] = { "", 0 };
 
+#ifdef MAIN
+#include "getfd.h"
+#include "version.h"
+
+int verbose = 0;
+int debug = 0;
+
+int
+main(int argc, char *argv[]) {
+	int fd;
+
+	set_progname(argv[0]);
+
+	setlocale(LC_ALL, "");
+	bindtextdomain(PACKAGE, LOCALEDIR);
+	textdomain(PACKAGE);
+
+	if (argc == 2 && !strcmp(argv[1], "-V"))
+	    print_version_and_exit();
+
+	fd = getfd();
+
+	if (argc >= 3 && !strcmp(argv[1], "-o")) {
+	    saveoldmap(fd, argv[2]);
+	    argc -= 2;
+	    argv += 2;
+	    if (argc == 1)
+	      exit(0);
+	}
+		
+	if (argc != 2) {
+		fprintf(stderr, _("usage: %s [-o map.orig] map-file\n"),
+			progname);
+		exit(1);
+	}
+	loadnewmap(fd, argv[1]);
+	exit(0);
+}
+#endif
+
 void
 loadnewmap(int fd, char *mfil) {
 	FILE *fp;
@@ -30,28 +73,29 @@ loadnewmap(int fd, char *mfil) {
 	int i;
 
 	if ((fp = findfile(mfil, mapdirpath, mapsuffixes)) == NULL) {
-	        fprintf(stderr, "mapscrn: cannot open map file _%s_\n", mfil);
+	        fprintf(stderr, _("mapscrn: cannot open map file _%s_\n"), mfil);
 		exit(1);
 	}
 	if (stat(pathname, &stbuf)) {
-		perror("Cannot stat map file");
+		perror(pathname);
+		fprintf(stderr, _("Cannot stat map file"));
 		exit(1);
 	}
 	if (stbuf.st_size != E_TABSZ) {
 		fprintf(stderr,
-			"Loading symbolic screen map from file %s\n",
+			_("Loading symbolic screen map from file %s\n"),
 			pathname);
 
 		if (parsemap(fp,buf)) {
-			fprintf(stderr, "Error parsing symbolic map\n");
+			fprintf(stderr, _("Error parsing symbolic map\n"));
 			exit(1);
 		}
 	} else 	{
-		fprintf(stderr, "Loading binary screen map from file %s\n",
+		fprintf(stderr, _("Loading binary screen map from file %s\n"),
 			pathname);
 
 		if (fread(buf,E_TABSZ,1,fp) != 1) {
-			perror("Cannot read map from file");
+			fprintf(stderr, _("Cannot read map from file"));
 			exit(1);
 		}
 	}
@@ -59,12 +103,12 @@ loadnewmap(int fd, char *mfil) {
 
 	i = ioctl(fd,PIO_SCRNMAP,buf);
 	if (i) {
-	    perror("PIO_SCRNMAP ioctl error");
+	    perror("PIO_SCRNMAP");
 	    exit(1);
 	}
 
 	if (verbose)
-	  printf("Loaded screen map from `%s'\n", mfil);
+	  printf(_("Loaded screen map from `%s'\n"), mfil);
 }
 
 static int
@@ -110,7 +154,7 @@ ctoi(unsigned char *s) {
   else return(-1);
 
   if (i < 0 || i > 255) {
-      fprintf(stderr, "mapscrn: format error detected in _%s_\n", s);
+      fprintf(stderr, _("mapscrn: format error detected in _%s_\n"), s);
       exit(1);
   }
 
@@ -129,15 +173,15 @@ saveoldmap(int fd, char *omfil) {
     }
     i = ioctl(fd,GIO_SCRNMAP,buf);
     if (i) {
-	perror("GIO_SCRNMAP ioctl error");
+	perror("GIO_SCRNMAP");
 	exit(1);
     }
     if (fwrite(buf,E_TABSZ,1,fp) != 1) {
-	perror("Error writing map to file");
+	fprintf(stderr, _("Error writing map to file"));
 	exit(1);
     }
     fclose(fp);
 
     if (verbose)
-      printf("Saved screen map in `%s'\n", omfil);
+      printf(_("Saved screen map in `%s'\n"), omfil);
 }

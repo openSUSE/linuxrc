@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
+#include "nls.h"
+#include "getfd.h"
 
 /*
  * getfd.c
@@ -28,8 +31,12 @@ open_a_console(char *fnam) {
     fd = open(fnam, O_RDONLY);
     if (fd < 0 && errno == EACCES)
       fd = open(fnam, O_WRONLY);
-    if (fd < 0 || ! is_a_console(fd))
+    if (fd < 0)
       return -1;
+    if (!is_a_console(fd)) {
+      close(fd);
+      return -1;
+    }
     return fd;
 }
 
@@ -52,6 +59,7 @@ int getfd() {
       if (is_a_console(fd))
 	return fd;
 
-    fprintf(stderr, "Couldnt get a file descriptor referring to the console\n");
+    fprintf(stderr,
+	    _("Couldnt get a file descriptor referring to the console\n"));
     exit(1);		/* total failure */
 }
