@@ -81,11 +81,16 @@ static int mod_menu_last = 0;
 
 static module2_t *mod_get_entry(char *name);
 static void mod_update_list(void);
+static char *mod_get_title(int type);
 static int mod_show_type(int type);
+static int mod_build_list(int type, char ***list, module2_t ***mod_list);
 static void mod_load_manually(int type);
 static int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align);
 static int mod_is_loaded(char *module);
 static int mod_unload_modules(char *modules);
+static int mod_load_modules(char *modules, int show);
+static char *mod_get_params(module2_t *mod);
+static void mod_load_module_manual(char *module, int show);
 
 
 /*
@@ -125,11 +130,51 @@ module2_t *mod_get_entry(char *name)
 
 void mod_update_list()
 {
-  module2_t *ml;
+  module2_t *ml, **ml1;
+  struct dirent *de;
+  DIR *d;
+  char buf[32];
+  int i;
 
-  for(ml = config.module.list; ml; ml = ml->next) {
-    ml->exists = 1;
+  for(ml1 = &config.module.list; *ml1; ml1 = &(*ml1)->next) (*ml1)->exists = 0;
+
+  if(!(d = opendir(config.module.dir))) return;
+
+  deb_msg("hi");
+
+  while((de = readdir(d))) {
+    i = strlen(de->d_name);
+    if(
+      i >= 3 &&
+      i < sizeof buf &&
+      de->d_name[i - 2] == '.' &&
+      de->d_name[i - 1] == 'o'
+    ) {
+      strcpy(buf, de->d_name);
+      buf[i - 2] = 0;
+
+      for(ml = config.module.list; ml; ml = ml->next) {
+        if(!strcmp(ml->name, buf)) {
+          ml->exists = 1;
+          break;
+        }
+      }
+
+      /* unknown module */
+      if(!ml) {
+        ml = *ml1 = calloc(1, sizeof **ml1);
+        ml->exists = 1;
+        ml->type = MAX_MODULE_TYPES - 1;	/* reserved for 'other' */
+        ml->name = strdup(buf);
+        ml->descr = strdup("");
+
+        ml1 = &ml->next;
+      }
+    }
   }
+
+  closedir(d);
+
 }
 
 
@@ -141,17 +186,88 @@ int mod_show_type(int type)
   if(config.module.more_file[type]) return 1;
 
   for(ml = config.module.list; ml; ml = ml->next) {
-    if(ml->type == type && ml->exists) return 1;
+    if(ml->type == type && ml->exists && ml->descr) return 1;
   }
 
   return 0;
 }
 
 
+int mod_build_list(int type, char ***list, module2_t ***mod_list)
+{
+  module2_t *ml;
+  static char **items = NULL;
+  static module2_t **mod_items = NULL;
+  static int mods = 0;
+  int i;
+  char buf[256];
+
+  if(items) {
+    for(i = 0; i < mods; i++) if(items[i]) free(items[i]);
+    free(items);
+    free(mod_items);
+  }
+
+  mods = config.module.more_file[type] ? 1 : 0;
+
+  for(ml = config.module.list; ml; ml = ml->next) {
+    if(ml->type == type && ml->exists && ml->descr) mods++;
+  }
+
+  items = calloc(mods + 1, sizeof *items);
+  mod_items = calloc(mods + 1, sizeof *mod_items);
+
+  for(i = 0, ml = config.module.list; ml; ml = ml->next) {
+    if(ml->type == type && ml->exists && ml->descr) {
+      sprintf(buf, "%14s%s%s", ml->name, *ml->descr ? " : " : "", ml->descr);
+      items[i] = strdup(buf);
+      mod_items[i++] = ml;
+    }
+  }
+
+  if(config.module.more_file[type]) {
+    items[i++] = strdup(txt_get(TXT_MORE_MODULES));
+  }
+
+  if(list) *list = items;
+  if(mod_list) *mod_list = mod_items;
+
+  return mods;
+}
+
+
+char *mod_get_title(int type)
+{
+  char buf[256], *s = NULL;
+
+  /* we have translations for these... */
+  if(type) {
+    if(type == config.module.scsi_type) {
+      s = txt_get(TXT_LOAD_SCSI);
+    }
+    if(type == config.module.cdrom_type) {
+      s = txt_get(TXT_LOAD_CDROM);
+    }
+    if(type == config.module.network_type) {
+      s = txt_get(TXT_LOAD_NET);
+    }
+    if(type == config.module.pcmcia_type) {
+      s = txt_get(TXT_LOAD_PCMCIA);
+    }
+  }
+
+  if(!s) {
+    sprintf(buf, "Load %s modules", config.module.type_name[type]);
+    s = buf;
+  }
+
+  return strdup(s);
+}
+
+
 void mod_menu(void)
 {
   char *items[MAX_MODULE_TYPES + 3];
-  char buf[256], *s;
   int i;
 
   net_stop();
@@ -160,23 +276,8 @@ void mod_menu(void)
 
   for(mod_types = 0, i = 1; i < MAX_MODULE_TYPES; i++) {
     if(mod_show_type(i)) {
-      if(!strcasecmp(config.module.type_name[i], "scsi"))
-        s = txt_get(TXT_LOAD_SCSI);
-      else if(!strcasecmp(config.module.type_name[i], "cdrom")) {
-        s = txt_get(TXT_LOAD_CDROM);
-      }
-      else if(!strcasecmp(config.module.type_name[i], "network")) {
-        s = txt_get(TXT_LOAD_NET);
-      }
-      else if(!strcasecmp(config.module.type_name[i], "pcmcia")) {
-        s = txt_get(TXT_LOAD_PCMCIA);
-      }
-      else {
-        sprintf(buf, "Load %s modules", config.module.type_name[i]);
-        s = buf;
-      }
       mod_type[mod_types] = i;
-      items[mod_types++] = strdup(s);
+      items[mod_types++] = mod_get_title(i);
     }
   }
 
@@ -288,8 +389,37 @@ int mod_menu_cb (int item)
 
 void mod_load_manually(int type)
 {
+  int i, ok;
+  char *s;
+  char **items;
+  module2_t **mod_items;
+
+  i = mod_build_list(type, &items, &mod_items);
+
+  if(i) {
+    s = mod_get_title(type);
+    i = dia_list(s, MENU_WIDTH, NULL, items, 1, align_left);
+
+    if(i--) {
+      if(mod_items[i]) {
+        ok = 1;
+        if(mod_items[i]->pre_inst) {
+          ok = mod_load_modules(mod_items[i]->pre_inst, 1);
+        }
+        if(ok) ok = mod_load_modules(mod_items[i]->name, 2);
+        if(ok && mod_items[i]->post_inst) {
+          ok = mod_load_modules(mod_items[i]->post_inst, 1);
+        }
+      }
+      else {
+        // more modules...
 
 
+      }
+    }
+
+    free(s);
+  }
 }
 
 
@@ -390,7 +520,7 @@ int mod_load_by_user (int mod_type_iv)
 #endif
 
 
-void mod_unload_module (char *module)
+void mod_unload_module(char *module)
 {
   char cmd[300];
 
@@ -428,7 +558,7 @@ int mod_unload_modules(char *modules)
   for(i = 0; i < len; i++) if(isspace(modules[i])) modules[i] = 0;
 
   for(s = modules + len - 1; s >= modules; s--) {
-    if(s == modules || !s[-1]) {
+    if(*s && (s == modules || !s[-1])) {
       if(mod_is_loaded(s)) {
         mod_unload_module(s);
         if(mod_is_loaded(s)) ok = 0;
@@ -442,25 +572,176 @@ int mod_unload_modules(char *modules)
 }
 
 
+int mod_load_modules(char *modules, int show)
+{
+  char *s, buf[256];
+  int i, len, ok = 1;
+
+  modules = strdup(modules);
+
+  len = strlen(modules);
+
+  for(i = 0; i < len; i++) if(isspace(modules[i])) modules[i] = 0;
+
+  for(s = modules; s < modules + len && ok; s++) {
+    if(*s &&(s == modules || !s[-1])) {
+      if(mod_is_loaded(s)) {
+        if(show == 2) {
+          sprintf(buf, "Module \"%s\" has already been loaded.", s);
+          dia_message(buf, MSGTYPE_INFO);
+        }
+      }
+      else {
+        mod_load_module_manual(s, show);
+        if(!mod_is_loaded(s)) ok = 0;
+      }
+    }
+  }
+
+  free(modules);
+
+  return ok;
+}
+
+
+char *mod_get_params(module2_t *mod)
+{
+  char buf[MAX_PARAM_LEN + 100];
+  char buf2[MAX_PARAM_LEN];
+
+  sprintf(buf, txt_get(TXT_ENTER_PARAMS), mod->name);
+
+  *buf2 = 0;
+
+  if(mod->param) {
+    strcat(buf, txt_get(TXT_EXAMPLE_PAR));
+    strcat(buf, mod->param);
+    if(mod->autoload) strcpy(buf2, mod->param);
+  }
+
+  if(mod->user_param) strcpy(buf2, mod->user_param);
+
+  if(dia_input(buf, buf2, sizeof buf2 - 1, 30)) return NULL;
+
+  if(mod->user_param) free(mod->user_param);
+  mod->user_param = strdup(buf2);
+
+  return mod->user_param;
+}
+
+
+void mod_load_module_manual(char *module, int show)
+{
+  module2_t *ml;
+  char *s, buf[256];
+  window_t win;
+  int i;
+
+  if(!(ml = mod_get_entry(module))) return;
+
+  if(!config.win) show = 0;
+
+  if(show) {
+    s = mod_get_params(ml);
+  }
+  else {
+    s = ml->param && ml->autoload ? ml->param : "";
+  }
+
+  if(show) {
+    if(s) {
+      sprintf(buf, txt_get(TXT_TRY_TO_LOAD), ml->name);
+      dia_info(&win, buf);
+      mod_load_module(ml->name, s);
+      win_close(&win);
+      i = mod_is_loaded(ml->name);
+      if(i) {
+        sprintf(buf, txt_get (TXT_LOAD_SUCCESSFUL), ml->name);
+        dia_message(buf, MSGTYPE_INFO);
+  //      mpar_save_modparams(ml->name, s);
+      }
+      else {
+        util_beep(FALSE);
+        sprintf(buf, txt_get(TXT_LOAD_FAILED), ml->name);
+        dia_message(buf, MSGTYPE_ERROR);
+      }
+    }
+  }
+  else {
+    mod_load_module(ml->name, s);
+    win_close(&win);
+    i = mod_is_loaded(ml->name);
+    if(i) {
+//      mpar_save_modparams(ml->name, s);
+    }
+    else {
+      util_beep(FALSE);
+    }
+  }
+}
+
+
+int mod_load_module(char *module, char *param)
+{
+  char cmd[300];
+  int rc;
+  char *force = config.forceinsmod ? "-f " : "";
+
+#if 0
+  if(!config.win) {
+    printf("loading module %s...", module);
+    fflush(stdout);
+  }
+#endif
+
+  sprintf(cmd, "insmod %s%s ", force, module);
+
+  if(param && *param) strcat(cmd, param);
+
+  fprintf(stderr, "%s\n", cmd);
+
+  if(mod_show_kernel_im) kbd_switch_tty(4);
+
+  rc = system(cmd);
+
+  if(mod_show_kernel_im) kbd_switch_tty(1);
+
+  util_update_kernellog();
+
+#if 0
+  if(!config.win) {
+    printf(" %s\n", rc_ii ? "failed" : "ok");
+  }
+#endif
+
+  return rc;
+}
+
+
 int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align)
 {
-  static char *item[64] = {};
-  static module2_t *mods[64] = {};
+  static char **item = NULL;
+  static module2_t **mods = NULL;
+  static int max_mods = 0;
   char *s;
   int i, items = 0;
   module2_t *mod;
   file_t *f0, *f;
 
-  for(i = 0; i < sizeof item / sizeof *item; i++) {
-    if(item[i]) {
-      free(item[i]);
-      item[i] = NULL;
-    }
+  if(item) {
+    for(i = 0; i < max_mods; i++) if(item[i]) free(item[i]);
+    free(item);
+    free(mods);
   }
 
   f0 = file_read_file("/proc/modules");
 
-  for(f = f0; f; f = f->next) {
+  for(max_mods = 2, f = f0; f && f->next; f = f->next) max_mods++;
+
+  item = calloc(max_mods, sizeof *item);
+  mods = calloc(max_mods, sizeof *mods);
+
+  for(; f; f = f->prev) {
     mod = mod_get_entry(f->key_str);
     if(mod && mod->descr) {
       if(align == align_left) {
@@ -474,7 +755,7 @@ int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t ali
       }
       mods[items] = mod;
       item[items++] = s;
-      if(items >= sizeof item / sizeof *item - 1) break;
+      if(items >= max_mods - 1) break;
     }
   }
 
@@ -540,77 +821,6 @@ void mod_delete_module()
 
 
 
-
-
-
-
-
-
-int mod_load_module (char *module_tv, char *params_tv)
-    {
-    char  command_ti [300];
-    char  command1_ti [300];
-    int   rc_ii;
-    int i;
-    static struct {
-      char *mod;
-      char *dep;
-    } deps[] = {
-      { "3c509",     "isa-pnp isapnp_reset=0" },
-      { "aha152x",   "isa-pnp isapnp_reset=0" },
-      { "aha1542",   "isa-pnp isapnp_reset=0" },
-      { "g_NCR5380", "isa-pnp isapnp_reset=0" },
-      { "ne",        "isa-pnp isapnp_reset=0" },
-      { "sb1000",    "isa-pnp isapnp_reset=0" },
-      { "smc-ultra", "isa-pnp isapnp_reset=0" },
-      { "sym53c416", "isa-pnp isapnp_reset=0" },
-      { "tmsisa",    "tms380tr" },
-      { "tmspci",    "tms380tr" },
-      { "mptscsih",  "mptbase"  },
-      { "hptraid",   "ataraid"  },
-      { "pdcraid",   "ataraid"  }
-    };
-    char *force = config.forceinsmod ? "-f " : "";
-
-#if 0
-    if(!config.win) {
-      printf("loading module %s...", module_tv);
-      fflush(stdout);
-    }
-#endif
-
-    sprintf (command_ti, "insmod %s%s ", force, module_tv);
-
-    *command1_ti = 0;
-    for(i = 0; i < sizeof deps / sizeof *deps; i++ ) {
-      if(!strcmp(module_tv, deps[i].mod)) {
-        sprintf(command1_ti, "insmod %s%s ", force, deps[i].dep);
-        break;
-      }
-    }
-
-    if (params_tv && params_tv [0])
-        strcat (command_ti, params_tv);
-
-    if (mod_show_kernel_im)
-        kbd_switch_tty (4);
-
-    if (*command1_ti) system (command1_ti);
-    rc_ii = system (command_ti);
-
-    if (mod_show_kernel_im)
-        kbd_switch_tty (1);
-
-    util_update_kernellog ();
-
-#if 0
-    if(!config.win) {
-      printf(" %s\n", rc_ii ? "failed" : "ok");
-    }
-#endif
-
-    return (rc_ii);
-    }
 
 
 void mod_free_modules (void)

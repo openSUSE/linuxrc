@@ -19,7 +19,7 @@ CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
 # _No_ -fomit-frame-pointer! It makes linuxrc larger (after compression).
-CFLAGS	= -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
+CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
 WARN	= -Wstrict-prototypes -Wall
 LIBHDFL	= -DUSE_LIBHD
@@ -110,7 +110,7 @@ version.h: VERSION
 
 linuxrc: $(OBJ) $(LIBS)
 	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd_tiny -o $@
-	@strip -R .note -R .comment $@
+#	@strip -R .note -R .comment $@
 	@ls -l linuxrc
 
 install: linuxrc

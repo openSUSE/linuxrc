@@ -23,7 +23,7 @@ typedef enum {
 } file_key_t;
 
 typedef struct file_s {
-  struct file_s *next;
+  struct file_s *next, *prev;
   file_key_t key;
   char *key_str;
   char *value;

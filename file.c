@@ -221,7 +221,7 @@ file_t *file_read_file(char *name)
   FILE *f;
   char buf[1024];
   char *s, *t, *t1;
-  file_t *ft0 = NULL, **ft = &ft0;
+  file_t *ft0 = NULL, **ft = &ft0, *prev = NULL;
 
   if(!(f = fopen(name, "r"))) return NULL;
 
@@ -257,6 +257,8 @@ file_t *file_read_file(char *name)
 
       parse_value(*ft);
 
+      (*ft)->prev = prev;
+      prev = *ft;
       ft = &(*ft)->next;
     }
   }
@@ -1006,6 +1008,19 @@ module2_t *file_read_modinfo(char *name)
           current_type = j >= 0 ? j : MAX_MODULE_TYPES - 1;
           if(!config.module.type_name[current_type]) {
             config.module.type_name[current_type] = strdup(s);
+
+            if(!config.module.scsi_type && !strcasecmp(s, "scsi")) {
+              config.module.scsi_type = current_type;
+            }
+            if(!config.module.network_type && !strcasecmp(s, "network")) {
+              config.module.network_type = current_type;
+            }
+            if(!config.module.cdrom_type && !strcasecmp(s, "cdrom")) {
+              config.module.cdrom_type = current_type;
+            }
+            if(!config.module.pcmcia_type && !strcasecmp(s, "pcmcia")) {
+              config.module.pcmcia_type = current_type;
+            }
           }
         }
         free(field[--fields]);

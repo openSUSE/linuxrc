@@ -173,6 +173,7 @@ typedef struct module2_s {
   unsigned initrd:1;	/* add it to initrd */
   unsigned autoload:1;	/* can be autoloaded */
   unsigned exists:1;	/* module really exists */
+  char *user_param;	/* user provided parameters */
 } module2_t;
 
 
@@ -202,6 +203,10 @@ typedef struct {
     char *type_name[MAX_MODULE_TYPES];	/* module type names */
     char *more_file[MAX_MODULE_TYPES];	/* file name of module archive */
     module2_t *list;			/* list of all modules */
+    int scsi_type;		/* for historical reasons... */
+    int cdrom_type;		/* dto. */
+    int network_type;		/* dto. */
+    int pcmcia_type;		/* dto. */
   } module;
 } config_t;
 
