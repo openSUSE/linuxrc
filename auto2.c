@@ -205,8 +205,9 @@ void auto2_scan_hardware(char *log_file)
     hd_sys->detail && hd_sys->detail->type == hd_detail_sys &&
     (st = hd_sys->detail->sys.data)
   ) {
-    if((st->model && strstr(st->model, "PCG-") == st->model)) {
+    if(st->model && strstr(st->model, "PCG-") == st->model) {
       /* is a Sony Vaio */
+      deg_msg("Vaio");
       is_vaio = 1;
       pcmcia_params = "irq_list=9,10,11,15";
       if(usb_mod && *usb_mod) {
