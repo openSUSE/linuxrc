@@ -374,7 +374,6 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
 
 void net_smb_get_mount_options (char* options)
 {
-    
     sprintf(options,"ip=%s", inet_ntoa(config.smb.server));
     if (config.smb.user) {
 	strcat(options, ",username=");
@@ -415,7 +414,7 @@ int net_mount_smb ()
 #if !defined(SUDO)
 #  define SUDO
 #endif
-    sprintf(mount_command, SUDO "mount -t smbfs //%s/%s %s -o %s",
+    sprintf(mount_command, SUDO "smbmount //%s/%s %s -o %s",
 	    inet_ntoa(config.smb.server),
 	    config.smb.share,
 	    mountpoint_tg,
