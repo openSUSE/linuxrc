@@ -124,7 +124,7 @@ static language_t set_languages_arm [] =
 
 #ifdef TRANS_he
 // currently a fake
-{ lang_he, "Ivrit", "us", L1_FONT, UNI_FONT, 0, 0, "he_IL" },
+{ lang_he, "תירבע", "us", L1_FONT, UNI_FONT, 0, 0, "he_IL" },
 #endif
 
 #ifdef TRANS_ja
@@ -170,6 +170,16 @@ static language_t set_languages_arm [] =
 
 #ifdef TRANS_sv
 { lang_sv, "Svenska", "sv-latin1", L1_FONT, UNI_FONT, 0, 1, "sv_SE" },
+#endif
+
+#ifdef TRANS_zh_CN
+// currently a fake
+{ lang_zh_CN, "Simplified Chinese", "us", L1_FONT, UNI_FONT, 0, 0, "zh_CN" },
+#endif
+
+#ifdef TRANS_zh_TW
+// currently a fake
+{ lang_zh_TW, "Traditional Chinese", "us", L1_FONT, UNI_FONT, 0, 0, "zh_TW" },
 #endif
 
 };

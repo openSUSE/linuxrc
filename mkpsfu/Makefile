@@ -25,6 +25,7 @@ font1: linuxrc.txt
 	  --fsize 0,1 -f lat9u-16 \
 	  --fsize 0,1 -f iso07u-16 \
 	  --fsize 0,1 -f koi8u_8x16 \
+	  --fsize 0,0 -f LatArCyrHeb-16 \
 	  -v linuxrc-16.psfu >linuxrc-16.psfu.log
 
 font2: linuxrc.txt
@@ -40,6 +41,7 @@ font2: linuxrc.txt
 	  --fsize 0,1 -f lat9u-16 \
 	  --fsize 0,1 -f iso07u-16 \
 	  --fsize 0,1 -f koi8u_8x16 \
+	  --fsize 0,0 -f LatArCyrHeb-16 \
 	  -v linuxrc2-16.psfu >linuxrc2-16.psfu.log
 
 clean:
