@@ -64,7 +64,7 @@ static language_t set_languages_arm [] =
   "none",            "lat1u.uni", 0, 1,      "nl_NL",        "dutch"         },
 { LANG_POLISH,       "Polski",               "Pl02",         "lat2u-16.psf",
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "pl_PL",        "polish"        },
-{ LANG_PORTUGUESE,   "Português",            "pt2",          "lat1u-16.psf",
+{ LANG_PORTUGUESE,   "Português",            "pt-latin1",    "lat1u-16.psf",
   "none",            "lat1u.uni", 0, 1,      "pt_PT",        "portuguese"    },
 { LANG_BRAZIL,       "Português Brasileiro", "br-abnt2",     "lat1u-16.psf",
   "none",            "lat1u.uni", 0, 1,      "pt_BR",        "brazilian"     },
