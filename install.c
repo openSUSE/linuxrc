@@ -797,8 +797,8 @@ int inst_check_instsys()
 
 int inst_start_install()
 {
-  int rc;
-  char buf[256];
+  int i, rc, update_rd;
+  char *buf = NULL;
 
   if(config.manual) {
     if((rc = inst_choose_source())) return rc;
@@ -806,8 +806,6 @@ int inst_start_install()
   else {
     fprintf(stderr, "going for automatic install\n");
   }
-
-  // deb_str(inst_rootimage_tm);
 
   str_copy(&config.instsys, NULL);
 
@@ -832,16 +830,47 @@ int inst_start_install()
     str_copy(&config.instsys, config.mountpoint.instsys);
   }
   else {
-    sprintf(buf, "%s%s", config.mountpoint.instdata, config.installdir);
+    strprintf(&buf, "%s%s", config.mountpoint.instdata, config.installdir);
     str_copy(&config.instsys, buf);
   }
 
+  /* load some extra files, if they exist */
   get_file("/content", "/content");
   get_file("/media.1/info.txt", "/info.txt");
   get_file("/part.info", "/part.info");
 
+  /* look for driver update image; load and apply it */
+  i = 1;
+  if(
+    config.instmode == inst_ftp ||
+    config.instmode == inst_http ||
+    config.instmode == inst_tftp
+  ) {
+    strprintf(&buf, "%s/driverupdate", config.serverdir ?: "");
+  }
+  else {
+    strprintf(&buf, "%s/driverupdate", config.mountpoint.instdata);
+    /* look for it in advance */
+    i = util_check_exist(buf);
+  }
+
+  if(i) {
+    config.noerrors = 1;
+    update_rd = load_image(buf, config.instmode);
+    config.noerrors = 0;
+
+    if(update_rd >= 0) {
+      i = ramdisk_mount(update_rd, config.mountpoint.update);
+      if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(config.instmode));
+      ramdisk_free(update_rd);
+      if(!i) util_do_driver_updates();
+    }
+  }
+
   /* write update.pre script for compatibility, if necessary */
   util_write_update_pre();
+
+  free(buf);
 
   return inst_execute_yast();
 }

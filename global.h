@@ -185,6 +185,7 @@ typedef struct {
   unsigned redraw_menu:1;	/* we need a better solution for this */
   unsigned initrd_has_ldso:1;	/* instsys contains a dynamic linker */
   unsigned suppress_warnings:1;	/* show less warning dialogs */
+  unsigned noerrors:1;		/* no error messages */
   unsigned is_iseries:1;	/* set if we run on an iSeries machine */
   unsigned win:1;		/* set if we are drawing windows */
   unsigned forceinsmod:1;	/* use 'insmod -f' if set */
