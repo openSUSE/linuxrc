@@ -20,7 +20,7 @@
 #include "text.h"
 #include "util.h"
 
-static int pcmcia_core_loaded_im = FALSE;
+int pcmcia_core_loaded_im = FALSE;
 
 static int pcmcia_find_chipset (void);
 

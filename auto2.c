@@ -33,6 +33,7 @@
 #include "auto2.h"
 #include "settings.h"
 #include "modparms.h"
+#include "pcmcia.h"
 
 #ifdef USE_LIBHD
 
@@ -405,8 +406,10 @@ int auto2_init()
       i = system("cardmgr -v -m /modules");
       if(i)
         deb_msg("Oops: card manager didn't start.");
-      else
+      else {
+        pcmcia_core_loaded_im = TRUE;
         deb_msg("card manager ok.");
+      }
     }
     else {
       deb_msg("Error loading PCMCIA modules.");

@@ -7,3 +7,4 @@
  */
 
 extern int  pcmcia_load_core    (void);
+extern int  pcmcia_core_loaded_im;
