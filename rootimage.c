@@ -403,7 +403,7 @@ int root_boot_system (void)
           root_is_reiserfs(root_ti) &&
           !root_reiserfs_loaded()
         ) {
-          if(!util_check_exist("modules/resierfs.o")) {
+          if(!util_check_exist("modules/reiserfs.o")) {
             char s[200];
 
             sprintf(s, "%s\n\n%s", txt_get(TXT_REISERFS), txt_get(TXT_ENTER_MODDISK));
