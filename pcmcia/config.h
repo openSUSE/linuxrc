@@ -6,18 +6,17 @@
 
 #define AUTOCONF_INCLUDED
 
-#define LINUX "/kernel/src/linux"
+#define LINUX "/usr/src/linux"
 #define PREFIX ""
-#define MODDIR "/lib/modules/2.2.13"
-#define PCDEBUG ""
+#define MODDIR "/lib/modules/2.2.14"
 #define KFLAGS ""
 #define UFLAGS ""
+#define PCDEBUG ""
+#define USE_APM 1
 #undef  UNSAFE_TOOLS
 #define CONFIG_CARDBUS 1
-#undef  CONFIG_PNP_BIOS
+#define CONFIG_PNP_BIOS 1
 
-/* Options from /kernel/src/linux/.config */
-#undef  CONFIG_PCMCIA
 #undef  CONFIG_SMP
 #define CONFIG_PCI 1
 #define CONFIG_PCI_QUIRKS 1
@@ -26,6 +25,21 @@
 #define CONFIG_INET 1
 #define CONFIG_NET_RADIO 1
 #define CONFIG_TR 1
+#undef  CONFIG_NET_FASTROUTE
+#undef  CONFIG_MODVERSIONS
+#define CONFIG_PROC_FS 1
+#define CONFIG_1GB 1
+#undef  CONFIG_2GB
+#undef  CONFIG_3GB
+#undef  CONFIG_SMP
+#define CONFIG_PCI 1
+#define CONFIG_PCI_QUIRKS 1
+#undef  CONFIG_APM
+#define CONFIG_SCSI 1
+#define CONFIG_INET 1
+#define CONFIG_NET_RADIO 1
+#define CONFIG_TR 1
+#undef  CONFIG_NET_FASTROUTE
 #undef  CONFIG_MODVERSIONS
 #define CONFIG_PROC_FS 1
 #define CONFIG_1GB 1
@@ -33,11 +47,10 @@
 #undef  CONFIG_3GB
 #define CONFIG_ISA 1
 
-#define UTS_RELEASE "2.2.13"
-#define UTS_VERSION "#5 Sun Oct 31 14:35:11 CET 1999"
-#define LINUX_VERSION_CODE 131597
+#define UTS_RELEASE "2.2.14"
+#define UTS_VERSION "#1 Fri Feb 4 10:58:11 CET 2000"
+#define LINUX_VERSION_CODE 131598
 
-#define NEW_QLOGIC 1
 #define HAS_PROC_BUS 1
 #define HAS_WIRELESS_EXTENSIONS 1
 #define SYSV_INIT 1

@@ -1,6 +1,6 @@
 %{
 /*
- * yacc_config.y 1.48 1999/10/25 20:00:14
+ * yacc_config.y 1.49 1999/12/29 00:57:33
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -56,7 +56,7 @@ static int add_module(device_info_t *card, char *name);
 
 %}
 
-%token DEVICE CARD ANONYMOUS TUPLE MANFID VERSION FUNCTION
+%token DEVICE CARD ANONYMOUS TUPLE MANFID VERSION FUNCTION PCI
 %token BIND CIS TO NEEDS_MTD MODULE OPTS CLASS
 %token REGION JEDEC DTYPE DEFAULT MTD
 %token INCLUDE EXCLUDE RESERVE IRQ_NO PORT MEMORY
@@ -75,7 +75,7 @@ static int add_module(device_info_t *card, char *name);
 %type <num> NUMBER
 %type <adjust> adjust resource
 %type <device> device needs_mtd module class
-%type <card> card anonymous tuple manfid version function bind cis
+%type <card> card anonymous tuple manfid pci version function bind cis
 %type <mtd> region jedec dtype default mtd
 %%
 
@@ -203,6 +203,7 @@ card:	  CARD STRING
 	| anonymous
 	| tuple
 	| manfid
+	| pci
 	| version
 	| function
 	| bind
@@ -244,6 +245,17 @@ manfid:	  card MANFID NUMBER ',' NUMBER
 			YYERROR;
 		    }
 		    $1->ident_type = MANFID_IDENT;
+		    $1->id.manfid.manf = $3;
+		    $1->id.manfid.card = $5;
+		}
+
+pci:	  card PCI NUMBER ',' NUMBER
+		{
+		    if ($1->ident_type != 0) {
+			yyerror("ID method already defined");
+			YYERROR;
+		    }
+		    $1->ident_type = PCI_IDENT;
 		    $1->id.manfid.manf = $3;
 		    $1->id.manfid.card = $5;
 		}

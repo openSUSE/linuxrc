@@ -1,5 +1,5 @@
 /*
- * cardmgr.h 1.33 1999/10/25 20:00:14
+ * cardmgr.h 1.34 1999/12/29 00:57:15
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -71,7 +71,7 @@ typedef struct card_info_t {
     char		*name;
     enum {
 	VERS_1_IDENT=1, MANFID_IDENT, TUPLE_IDENT, FUNC_IDENT,
-	BLANK_IDENT, CARDBUS_IDENT
+	BLANK_IDENT, PCI_IDENT
     } ident_type;
     union {
 	vers_ident_t	vers;

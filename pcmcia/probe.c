@@ -2,7 +2,7 @@
 
     PCMCIA controller probe
 
-    probe.c 1.46 1999/10/25 20:00:14
+    probe.c 1.47 1999/12/06 23:44:14
 
     The contents of this file are subject to the Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
@@ -31,14 +31,6 @@
     
 ======================================================================*/
 
-/*
- * Note on PPC & SPARC:
- *
- * removed the ISA board (io based) probing stuff
- *
- * -- wfeldt@suse.de
- */
-
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,13 +39,11 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#if !defined(__PPC__) && !defined(__sparc__)
-#ifdef __GLIBC__
+#if defined __GLIBC__ && !defined(__powerpc__)
 #include <sys/io.h>
 #else
 #include <asm/io.h>
 #endif
-#endif		/* __PPC__ */
 
 #include <pcmcia/config.h>
 #include "i82365.h"
@@ -61,9 +51,7 @@
 #include "vg468.h"
 #include "tcic.h"
 
-#if !defined(__PPC__) && !defined(__sparc__)
 static int i365_base = 0x03e0;
-#endif
 
 typedef u_short ioaddr_t;
 
@@ -107,6 +95,7 @@ pci_id_t pci_id[] = {
     { 0x1179, 0x0603, "Toshiba ToPIC95-A", "Toshiba ToPIC95-A" },
     { 0x1179, 0x060a, "Toshiba ToPIC95-B", "Toshiba ToPIC95-B" },
     { 0x1179, 0x060f, "Toshiba ToPIC97", "Toshiba ToPIC97" },
+    { 0x1179, 0x0617, "Toshiba ToPIC100", "Toshiba ToPIC100" },
     { 0x119b, 0x1221, "Omega Micro 82C092G", "Omega Micro 82C092G" },
     { 0x8086, 0x1221, "Intel 82092AA", "Intel 82092AA" }
 };
@@ -177,8 +166,7 @@ static int pci_probe(int verbose, int module)
 
 /*====================================================================*/
 
-#if !defined(__PPC__) && !defined(__sparc__)
-
+#ifndef __powerpc__
 static u_char i365_get(u_short sock, u_short reg)
 {
     u_char val = I365_REG(sock, reg);
@@ -205,14 +193,15 @@ static void i365_bclr(u_short sock, u_short reg, u_char mask)
     d &= ~mask;
     i365_set(sock, reg, d);
 }
-
-#endif	/* __PPC__, __sparc__ */
+#endif /* __powerpc__ */
 
 /*====================================================================*/
 
 int i365_probe(int verbose, int module)
 {
-#if !defined(__PPC__) && !defined(__sparc__)
+#ifdef __powerpc__
+	return -ENODEV;
+#else
     int val, sock, done;
     char *name = "i82365sl";
 
@@ -294,16 +283,12 @@ int i365_probe(int verbose, int module)
     else
 	printf("%s found, %d sockets.\n", name, sock);
     return 0;
-#else
-    return 1;
-#endif		/* __PPC__, __sparc__ */
-    
+#endif /* __powerpc__ */    
 } /* i365_probe */
   
 /*====================================================================*/
 
-#if !defined(__PPC__) && !defined(__sparc__)
-
+#ifndef __powerpc__
 static u_char tcic_getb(ioaddr_t base, u_char reg)
 {
     u_char val = inb(base+reg);
@@ -381,12 +366,13 @@ int tcic_probe_at(ioaddr_t base, int module)
 
     return 2;
 }
-
-#endif	/* __PPC__, __sparc__ */
+#endif /* __powerpc__ */
 
 int tcic_probe(int verbose, int module, ioaddr_t base)
 {
-#if !defined(__PPC__) && !defined(__sparc__)
+#ifdef __powerpc__
+    return -ENODEV;
+#else
     int sock, id;
 
     if (!module)
@@ -427,9 +413,7 @@ int tcic_probe(int verbose, int module, ioaddr_t base)
 	printf(" found at %#6x, %d sockets.\n", base, sock);
     }
     return 0;
-#else
-    return 1;
-#endif    /* __PPC__, __sparc__ */
+#endif    
 } /* tcic_probe */
 
 /*====================================================================*/

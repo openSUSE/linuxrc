@@ -2,7 +2,7 @@
 
     PCMCIA Card Manager daemon
 
-    cardmgr.c 1.131 1999/10/25 20:00:14
+    cardmgr.c 1.133 2000/01/12 20:50:33
 
     The contents of this file are subject to the Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
@@ -668,7 +668,7 @@ static int install_module(char *mod, char *opts)
     char path[128], cmd[128];
     module_list_t *ml;
     int ret;
-    
+
     for (ml = module_list; ml != NULL; ml = ml->next)
 	if (strcmp(mod, ml->mod) == 0) break;
     if (ml == NULL) {
@@ -681,6 +681,25 @@ static int install_module(char *mod, char *opts)
     ml->usage++;
     if (ml->usage != 1)
 	return 0;
+
+#ifdef __linux__
+    if (access("/proc/bus/pccard/drivers", R_OK) == 0) {
+	FILE *f = fopen("/proc/bus/pccard/drivers", "r");
+	if (f) {
+	    char a[61], s[33];
+	    while (fgets(a, 60, f)) {
+		sscanf(a, "%s %d", s, &ret);
+		if (strcmp(s, mod) != 0) continue;
+		/* If it isn't a module, we won't try to rmmod */
+		ml->usage += ret;
+		fclose(f);
+		return 0;
+	    }
+	    fclose(f);
+	}
+    }
+#endif
+
     if (!do_modprobe) {
 	if (strchr(mod, '/') != NULL)
 	    sprintf(path, "%s/%s.o", modpath, mod);
@@ -879,6 +898,7 @@ static void do_insert(int sn)
 #ifdef __linux__
     /* Install kernel modules */
     for (i = 0; i < card->bindings; i++) {
+	dev[i]->refs++;
 	for (j = 0; j < dev[i]->modules; j++)
 	    install_module(dev[i]->module[j], dev[i]->opts[j]);
     }
@@ -886,7 +906,6 @@ static void do_insert(int sn)
     
     /* Bind drivers by their dev_info identifiers */
     for (i = 0; i < card->bindings; i++) {
-	dev[i]->refs++;
 	bind = calloc(1, sizeof(bind_info_t));
 	strcpy((char *)bind->dev_info, (char *)dev[i]->dev_info);
 	if (strcmp(bind->dev_info, "cb_enabler") == 0)

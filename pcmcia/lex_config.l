@@ -3,7 +3,7 @@
 
 %{
 /*
- * lex_config.l 1.35 1999/10/25 20:00:14
+ * lex_config.l 1.38 1999/12/29 00:57:33
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <syslog.h>
+#include <glob.h>
 #define src 1
 
 #include <pcmcia/cs_types.h>
@@ -89,6 +90,7 @@ module		return MODULE;
 mtd		return MTD;
 needs_mtd	return NEEDS_MTD;
 opts		return OPTS;
+pci		return PCI;
 port		return PORT;
 region		return REGION;
 reserve		return RESERVE;
@@ -147,61 +149,79 @@ static int lex_string(char *s)
 ======================================================================*/
 
 #define MAX_SOURCE_DEPTH 4
-struct {
+struct source_stack {
     YY_BUFFER_STATE	buffer;
     char		*filename;
-    int			lineno;
+    int			lineno, fileno;
     FILE		*file;
+    glob_t		glob;
 } source_stack[MAX_SOURCE_DEPTH];
 static int source_stack_ptr = 0;
 static int parse_env = 0;
 
+static int get_glob(void)
+{
+    struct source_stack *s = &source_stack[source_stack_ptr];
+    while (s->fileno < s->glob.gl_pathc) {
+	char *fn = s->glob.gl_pathv[s->fileno];
+	s->file = fopen(fn, "r");
+	if (s->file == NULL) {
+	    if (strpbrk(fn, "?*[") == NULL)
+		syslog(LOG_INFO, "could not open '%s': %m", fn);
+	    s->fileno++;
+	} else {
+	    current_lineno = 1;
+	    current_file = strdup(fn);
+	    yy_switch_to_buffer(yy_create_buffer(s->file, YY_BUF_SIZE));
+	    source_stack_ptr++;
+	    s->fileno++;
+	    return 0;
+	}
+    }
+    return -1;
+}
+
 static void do_source(char *fn)
 {
-    FILE *f;
+    struct source_stack *s = &source_stack[source_stack_ptr];
 
     if (source_stack_ptr >= MAX_SOURCE_DEPTH) {
 	syslog(LOG_INFO, "source depth limit exceeded");
 	return;
     }
-    f = fopen(fn, "r");
-    if (f == NULL) {
-	syslog(LOG_INFO, "could not open '%s': %m", fn);
-	return;
-    }
-    source_stack[source_stack_ptr].buffer = YY_CURRENT_BUFFER;
-    source_stack[source_stack_ptr].lineno = current_lineno;
-    source_stack[source_stack_ptr].filename = current_file;
-    source_stack[source_stack_ptr].file = f;
-    source_stack_ptr++;
-    current_lineno = 1;
-    current_file = strdup(fn);
-    yy_switch_to_buffer(yy_create_buffer(f, YY_BUF_SIZE));
+    glob(fn, GLOB_NOCHECK, NULL, &s->glob);
+    s->fileno = 0;
+    s->buffer = YY_CURRENT_BUFFER;
+    s->lineno = current_lineno;
+    s->filename = current_file;
+    get_glob();
 }
 
 static int do_eof(void)
 {
-    if (--source_stack_ptr < 0) {
+    struct source_stack *s = &source_stack[--source_stack_ptr];
+    if (source_stack_ptr < 0) {
 	if (parse_env == 0) {
-	    char *s = getenv("PCMCIA_OPTS");
-	    if (s == NULL) return -1;
+	    char *t = getenv("PCMCIA_OPTS");
+	    if (t == NULL) return -1;
 	    parse_env = 1;
 	    source_stack_ptr = 0;
 	    current_file = "PCMCIA_OPTS";
 	    current_lineno = 1;
-	    yy_scan_string(s);
+	    yy_scan_string(t);
 	    return 0;
 	} else
 	    return -1;
-    } else {
-	yy_delete_buffer(YY_CURRENT_BUFFER);
-	fclose(source_stack[source_stack_ptr].file);
-	yy_switch_to_buffer(source_stack[source_stack_ptr].buffer);
-	current_lineno = source_stack[source_stack_ptr].lineno;
-	free(current_file);
-	current_file = source_stack[source_stack_ptr].filename;
-	return 0;
     }
+    fclose(s->file);
+    free(current_file);
+    yy_delete_buffer(YY_CURRENT_BUFFER);
+    if (get_glob() != 0) {
+	yy_switch_to_buffer(s->buffer);
+	current_lineno = s->lineno;
+	current_file = s->filename;
+    }
+    return 0;
 }
 
 /*======================================================================
