@@ -1,3 +1,69 @@
+24/3/2003:	v1.4.45
+	- module unloading used to clear internal network/disk lists (#24606)
+	- keep proxy scheme (#23611)
+	- fixed bison warning about missing ';'
+
+4/3/2003:	v1.4.44
+	- don't check for gateway config (#22430)
+
+19/2/2003:	v1.4.43
+	- workaround for broken SCO media: look for /info.txt, too (#23767)
+
+17/2/2003:	v1.4.42
+	- copy content file from the first CD linuxrc sees to /tmp/content
+	- always enable update CD menu entry
+
+15/1/2003:	v1.4.41
+	- fixed 'usbwait' option handling (had no effect when given
+	  on command line)
+	- 'floppydevice' option now really sets floppy device
+	- added new usb storage handling code; must be explicitly
+	  activated  using the 'useusbscsi' option (#20103, #21017)
+
+4/11/2002:	v1.4.40
+	- sparc64 needs different inst-sys
+
+4/11/2002:	v1.4.39
+	- allow to set hostname (#21099)
+
+28/10/2002:	v1.4.38
+	- mount of SAMBA-device as guest does not work (#20152)
+	- linuxrc should perfom a poweroff on s390 instead a reboot (#20894)
+
+18/10/2002:	v1.4.37
+	- info.txt file was not copied for cd/nfs installs (#21064)
+
+14/10/2002:	v1.4.36
+	- specify driver update dir explicitly (#19442)
+
+8/10/2002:	v1.4.35
+	- skip LS120 detection on ppc (#12514)
+
+7/10/2002:	v1.4.34
+	- get info.txt (#18504)
+	- don't ask for netdevices if one was explictly given (#20625)
+
+20/9/2002:	v1.4.33
+	- set memory limit defaults _before_ reading them
+	  from config files (#19960)
+
+20/9/2002:	v1.4.32
+	- copy 'content' file from install medium (#19904)
+
+19/9/2002:	v1.4.31
+	- restructed VNC/SSH ask for password handling so we do not ask
+	  for netconfig and later do unconditional DHCP (#19721)
+
+18/9/2002:	v1.4.30
+	- enable samba support
+
+18/9/2002:	v1.4.29
+	- serial console fix (superfluous '/dev', #19635)
+
+11/9/2002:	v1.4.28
+	- do write server info for VNC/ssh install again
+	  needed for network installation (#18882)
+
 10/9/2002:	v1.4.27
 	- mls: added line oriented display mode
 	- don't set serial console twice
