@@ -3,6 +3,7 @@
 	- fixed AddSwap config option
 	- finalized swap dialog
 	- disable splash for yast2 ncurses interface
+	- no error message if user left yast via 'abort' button
 
 3/3/2002:	v1.3.22
 	- detect more fstypes
