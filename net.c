@@ -1965,7 +1965,7 @@ int net_activate_s390_devs(void)
   /* write hwcfg file */
   if (mkdir("/etc/sysconfig/hardware", (mode_t)0755) && errno != EEXIST)
     return -1;
-  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
+  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-static-%s",hwcfg_name);
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
 # define HWE(var,string) if(config.hwp.var) fprintf(fp, #string "=\"%s\"\n",config.hwp.var);
