@@ -184,6 +184,7 @@ typedef struct {
   unsigned redraw_menu:1;	/* we need a better solution for this */
   unsigned initrd_has_ldso:1;	/* instsys contains a dynamic linker */
   unsigned suppress_warnings:1;	/* show less warning dialogs */
+  unsigned noerrors:1;		/* no error messages */
   unsigned is_iseries:1;	/* set if we run on an iSeries machine */
   unsigned win:1;		/* set if we are drawing windows */
   unsigned forceinsmod:1;	/* use 'insmod -f' if set */
@@ -222,6 +223,10 @@ typedef struct {
   unsigned hwdetect:1;		/* do automatic hardware detection */
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
+  unsigned use_usbscsi:1;	/* use new usb storage handling code */
+  unsigned debug;		/* debug */
+  unsigned floppy_probed:1;	/* tried to detect floppy device */
+  unsigned linebreak:1;		/* internal: print a newline first */
   pid_t memcheck_pid;		/* pid of memcheck thread */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
@@ -269,6 +274,24 @@ typedef struct {
   char *product;		/* product name */
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
+  int loglevel;			/* set kernel log level */
+  struct {
+    char *dir;			/* driver update source dir */
+    char *dst;			/* driver update destination dir */
+    char *dev;			/* device recently used for updates (if any) */
+    unsigned count;		/* driver update count */
+    unsigned next;		/* next driver update to do */
+    unsigned compat_last;	/* where last compat link pointed to (old style) */
+    unsigned compat;		/* where compat link points to (old style) */
+    unsigned style:1;		/* 0: new style, 1: old style */
+    unsigned ask:1;		/* 1: ask for update disk */
+    unsigned shown:1;		/* 1: update dialog has been shown at least once */
+    unsigned name_added:1;	/* set if driver update has a name */
+    char *id;			/* current id, if any */
+    slist_t *id_list;		/* list of updates */
+    slist_t *name_list;		/* list of update names */
+    slist_t **next_name;	/* points into name_list */
+  } update;
 
   struct {
     char *buf;
@@ -322,6 +345,7 @@ typedef struct {
     char *extra;
     char *instdata;
     char *instsys;
+    char *update;
   } mountpoint;
 
   struct {
@@ -357,6 +381,7 @@ typedef struct {
     inet_t hostname;
     inet_t server;
     inet_t pliphost;
+    char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *password;
@@ -385,7 +410,6 @@ extern int             auto2_ig;
 extern char            machine_name_tg [100];
 extern int             old_kernel_ig;
 extern char            ppcd_tg [10];
-extern int             yast2_update_ig;
 extern int             yast2_serial_ig;
 extern int             has_floppy_ig;
 extern int             has_kbd_ig;
@@ -398,6 +422,5 @@ extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;
 extern char            livesrc_tg[16];
-extern char            driver_update_dir[16];
 extern int             cdrom_drives;
 extern int             has_modprobe;

@@ -35,7 +35,7 @@ LDFLAGS	+= -lhd_tiny
 endif
 endif
 
-WARN	= -Wall
+WARN	= -Wall -Wno-sign-compare
 LIBHDFL	= -DUSE_LIBHD
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
