@@ -171,6 +171,9 @@ typedef struct {
   char *floppy_dev[4];		/* list of floppy devices */
   char *instsys;		/* installation system mount point */
   smb_t smb;			/* SMB installation info */
+  char *infofile;		/* 'info' file name */
+  char *infoloaded;		/* actual 'info' file that was loaded */
+  char *stderr_name;		/* stderr device name */
 } config_t;
 
 config_t config;

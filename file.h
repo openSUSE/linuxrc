@@ -19,7 +19,7 @@ typedef enum {
   key_yast2serial, key_textmode, key_yast2autoinst, key_usb, key_yast2color,
   key_bootdisk, key_disks, key_username, key_password, key_workdomain,
   key_alias, key_options, key_initrdmodules, key_locale, key_font,
-  key_screenmap, key_fontmagic
+  key_screenmap, key_fontmagic, key_autoyast, key_linuxrc
 } file_key_t;
 
 typedef struct file_s {
@@ -47,5 +47,5 @@ void file_write_install_inf(char *dir);
 void file_write_mtab(void);
 int file_read_info(void);
 int file_read_yast_inf(void);
-file_t *file_read_cmdline(void);
+file_t *file_get_cmdline(file_key_t key);
 

@@ -31,18 +31,19 @@
 #include "rootimage.h"
 
 #define YAST_INF_FILE		"/etc/yast.inf"
-#define INFO_FILE		"/info"
 #define INSTALL_INF_FILE	"/etc/install.inf"
 #define MTAB_FILE		"/etc/mtab"
 #define CMDLINE_FILE		"/proc/cmdline"
 
-// #define DEBUG_FILE
+#define DEBUG_FILE
 
 static char *file_key2str(file_key_t key);
 static file_key_t file_str2key(char *value);
 static int sym2index(char *sym);
 static void parse_value(file_t *ft);
 
+static char *file_read_info_file(char *file, char *file2);
+static file_t *file_read_cmdline(void);
 static void file_module_load (char *insmod_arg);
 #ifdef DEBUG_FILE
 static void file_dump_flist(file_t *ft);
@@ -113,7 +114,9 @@ static struct {
   { key_locale,         "Locale"           },
   { key_font,           "Font"             },
   { key_screenmap,      "Screenmap"        },
-  { key_fontmagic,      "Fontmagic"        }
+  { key_fontmagic,      "Fontmagic"        },
+  { key_autoyast,       "autoyast"         },
+  { key_linuxrc,        "linuxrc"          }
 };
 
 static struct {
@@ -125,6 +128,7 @@ static struct {
   { "y",         1                  },
   { "yes",       1                  },
   { "j",         1                  },	// keep for compatibility?
+  { "default",   1                  },
   { "Mono",      0                  },
   { "Color",     1                  },
   { "Reboot",    1                  },
@@ -262,57 +266,88 @@ void file_free_file(file_t *file)
 
 int file_read_info()
 {
-  char filename_ti[MAX_FILENAME] = INFO_FILE;
   window_t win_ri;
-  int do_autoprobe = FALSE;
-#if WITH_PCMCIA
-  int start_pcmcia = FALSE;
-#endif
-  int i, mounted = FALSE;
-  file_t *f0, *f;
+  char *file = NULL;
 
   if(auto2_ig) {
     printf("%s...", txt_get(TXT_SEARCH_INFOFILE));
     fflush(stdout);
   }
-  else {
+  else if(auto_ig) {
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
   }
 
-  f0 = file_read_file(filename_ti);
+  if(!config.infofile || !strcmp(config.infofile, "default")) {
+    if(config.infofile || auto2_ig) {
+      file = file_read_info_file("floppy:/suse/setup/descr/info", "floppy:/info");
+    }
+    if(!file) file = file_read_info_file("file:/info", NULL);
+    if(!file) file = file_read_info_file("cmdline", NULL);
+  }
+  else {
+    file = file_read_info_file(config.infofile, NULL);
+  }
 
-  if(!f0) {
+  if(auto2_ig) {
+    printf("\n");
+  }
+  else if(auto_ig) {
+    win_close(&win_ri);
+  }
+
+  if(file) {
+    fprintf(stderr, "got info from: %s\n", file);
+  }
+
+  config.infoloaded = strdup(file ?: "");
+
+  return file ? 0 : 1;
+}
+
+
+char *file_read_info_file(char *file, char *file2)
+{
+  char filename[MAX_FILENAME];
+  int do_autoprobe = 0;
+#if WITH_PCMCIA
+  int start_pcmcia = 0;
+#endif
+  int i, mounted = 0;
+  file_t *f0 = NULL, *f;
+
+  fprintf(stderr, "looking for info file: %s\n", file);
+
+  if(!strcmp(file, "cmdline")) {
+    f0 = file_read_cmdline();
+  }
+  else if(!strncmp(file, "file:", 5)) {
+    f0 = file_read_file(file + 5);
+  }
+  else if(!strncmp(file, "floppy:", 7)) {
     for(i = 0; i < config.floppies; i++) {
       if(!util_try_mount(config.floppy_dev[i], mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0)) break;
     }
     if(i < config.floppies) {
       config.floppy = i;	// remember currently used floppy
-
-      mounted = TRUE;
-
+      mounted = 1;
       util_chk_driver_update(mountpoint_tg);
-
-      sprintf(filename_ti, "%s/suse/setup/descr" INFO_FILE, mountpoint_tg);
-      f0 = file_read_file(filename_ti);
-      if(!f0) {
-        sprintf(filename_ti, "%s" INFO_FILE, mountpoint_tg);
-        f0 = file_read_file(filename_ti);
+      sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
+      f0 = file_read_file(filename);
+      if(!f0 && file2) {
+        file = file2;
+        sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
+        f0 = file_read_file(filename);
       }
     }
   }
 
   if(!f0) {
     if(mounted) umount(mountpoint_tg);
-    if(auto2_ig) printf ("\n"); else win_close (&win_ri);
-    f0 = file_read_cmdline();
-#ifdef DEBUG_FILE
-    strcpy(filename_ti, CMDLINE_FILE);
-#endif
-    if(!f0) return -1;
+    return NULL;
   }
 
 #ifdef DEBUG_FILE
-  fprintf(stderr, "info file read from \"%s\":\n", filename_ti);
+  fprintf(stderr, "info file read from \"%s\":\n", file);
   file_dump_flist(f0);
 #endif
 
@@ -325,12 +360,12 @@ int file_read_info()
         break;
 
       case key_autoprobe:
-        do_autoprobe = TRUE;
+        do_autoprobe = 1;
         break;
 
 #if WITH_PCMCIA
       case key_start_pcmcia:
-        start_pcmcia = TRUE;
+        start_pcmcia = 1;
         break;
 #endif
 
@@ -450,15 +485,13 @@ int file_read_info()
 
   if(mounted) umount(mountpoint_tg);
 
-  if(auto2_ig) printf("\n"); else win_close(&win_ri);
-
   if(do_autoprobe) mod_autoload();
 
 #if WITH_PCMCIA
   if(start_pcmcia) pcmcia_load_core();
 #endif
 
-  return 0;
+  return file;
 }
 
 
@@ -771,6 +804,70 @@ void file_write_mtab()
 }
 
 
+file_t *file_read_cmdline()
+{
+  FILE *f;
+  file_t *ft0 = NULL, **ft = &ft0;
+  char cmdline[1024], *current, *s, *s1, *t;
+  int i, quote;
+
+  if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
+  if(!fgets(cmdline, sizeof cmdline, f)) *cmdline = 0;
+  fclose(f);
+
+  current = cmdline;
+
+  do {
+    while(isspace(*current)) current++;
+    for(quote = 0, s = current; *s && (quote || !isspace(*s)); s++) {
+      if(*s == '"') quote ^= 1;
+    }
+    if(s > current) {
+      t = malloc(s - current + 1);
+
+      for(s1 = t; s > current; current++) {
+        if(*current != '"') *s1++ = *current;
+      }
+      *s1 = 0;
+
+      if((s1 = strchr(t, '='))) *s1++ = 0;
+
+      *ft = calloc(1, sizeof **ft);
+
+      i = strlen(t);
+      if(i && t[i - 1] == ':') t[i - 1] = 0;
+
+      (*ft)->key_str = strdup(t);
+      (*ft)->key = file_str2key(t);
+      (*ft)->value = strdup(s1 ?: "");
+
+      parse_value(*ft);
+
+      free(t);
+
+      ft = &(*ft)->next;
+    }
+  }
+  while(*current);
+
+  return ft0;
+}
+
+
+file_t *file_get_cmdline(file_key_t key)
+{
+  static file_t *cmdline = NULL, *ft;
+
+  if(!cmdline) cmdline = file_read_cmdline();
+
+  for(ft = cmdline; ft; ft = ft->next) {
+    if(ft->key == key) break;
+  }
+
+  return ft;
+}
+
+
 void file_module_load(char *insmod_arg)
 {
   char module[64], params[256], text[256];
@@ -802,53 +899,6 @@ void file_module_load(char *insmod_arg)
 }
 
 
-file_t *file_read_cmdline()
-{
-  FILE *f;
-  file_t *ft0 = NULL, **ft = &ft0;
-  char cmdline[1024], *current, *s, *s1, *t;
-  int quote;
-
-  if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
-  if(!fgets(cmdline, sizeof cmdline, f)) *cmdline = 0;
-  fclose(f);
-
-  current = cmdline;
-
-  do {
-    while(isspace(*current)) current++;
-    for(quote = 0, s = current; *s && (quote || !isspace(*s)); s++) {
-      if(*s == '"') quote ^= 1;
-    }
-    if(s > current) {
-      t = malloc(s - current + 1);
-
-      for(s1 = t; s > current; current++) {
-        if(*current != '"') *s1++ = *current;
-      }
-      *s1 = 0;
-
-      if((s1 = strchr(t, '='))) *s1++ = 0;
-
-      *ft = calloc(1, sizeof **ft);
-
-      (*ft)->key_str = strdup(t);
-      (*ft)->key = file_str2key(t);
-      (*ft)->value = strdup(s1 ?: "");
-
-      parse_value(*ft);
-
-      free(t);
-
-      ft = &(*ft)->next;
-    }
-  }
-  while(*current);
-
-  return ft0;
-}
-
-
 #ifdef DEBUG_FILE
 
 void file_dump_flist(file_t *ft)
@@ -861,3 +911,4 @@ void file_dump_flist(file_t *ft)
 }
 
 #endif
+

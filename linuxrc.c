@@ -44,6 +44,8 @@
 #include "lsh.h"
 #include "multiple_info.h"
 
+#define LINUXRC_DEFAULT_STDERR "/dev/tty3"
+
 static void lxrc_main_menu     (void);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (int what_iv);
@@ -96,7 +98,36 @@ static struct {
 };
 #endif
 
-int main (int argc, char **argv, char **env)
+typedef enum {
+  lx_auto, lx_auto2, lx_noauto2, lx_y2autoinst, lx_demo, lx_eval, lx_reboot,
+  lx_yast1, lx_yast2, lx_loadnet, lx_loaddisk, lx_french, lx_color,
+  lx_rescue, lx_nopcmcia, lx_debug
+} lx_param_t;
+
+static struct {
+  char *name;
+  lx_param_t key;
+} lxrc_params[] = {
+  { "auto",       lx_auto       },
+  { "auto2",      lx_auto2      },
+  { "noauto2",    lx_noauto2    },
+  { "y2autoinst", lx_y2autoinst },
+  { "demo",       lx_demo       },
+  { "eval",       lx_eval       },
+  { "reboot",     lx_reboot     },
+  { "yast1",      lx_yast1      },
+  { "yast2",      lx_yast2      },
+  { "loadnet",    lx_loadnet    },
+  { "loaddisk",   lx_loaddisk   },
+  { "french",     lx_french     },
+  { "color",      lx_color      },
+  { "rescue",     lx_rescue     },
+  { "nopcmcia",   lx_nopcmcia   },
+  { "debug",      lx_debug      }
+};
+
+
+int main(int argc, char **argv, char **env)
 {
   char *prog;
   int i, err;
@@ -429,313 +460,300 @@ static void lxrc_catch_signal (int sig_iv)
     }
 
 
-static void lxrc_init (void)
-    {
-    int    i_ii;
-    char  *language_pci;
-    char  *autoyast_pci;
-    char  *linuxrc_pci;
-    char  *stderr_where_to;
-#define LINUXRC_DEFAULT_STDERR "/dev/tty3"
-    int    rc_ii;
+void lxrc_init()
+{
+  int i, j;
+  file_t *ft;
+  char *s, *t0, *t, buf[256];
 
-    printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2001 SuSE GmbH <<<\n");
-    fflush(stdout);
+  printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2001 SuSE GmbH <<<\n");
+  fflush(stdout);
 
-    if (!testing_ig && getpid () > 19)
-        {
-        printf ("Seems we are on a running system; activating testmode...\n");
-        testing_ig = TRUE;
-        strcpy (console_tg, "/dev/tty");
-        }
+  if(!testing_ig && getpid() > 19) {
+    printf ("Seems we are on a running system; activating testmode...\n");
+    testing_ig = TRUE;
+    strcpy(console_tg, "/dev/tty");
+  }
 
-    if (txt_init ())
-        {
-        printf ("Corrupted texts!\n");
-        exit (-1);
-        }
+  if(txt_init()) {
+    printf("Corrupted texts!\n");
+    exit(-1);
+  }
 
-    siginterrupt (SIGALRM, 1);
-    siginterrupt (SIGHUP,  1);
-    siginterrupt (SIGBUS,  1);
-    siginterrupt (SIGINT,  1);
-    siginterrupt (SIGTERM, 1);
-    siginterrupt (SIGSEGV, 1);
-    siginterrupt (SIGPIPE, 1);
-    lxrc_catch_signal (0);
-/*    reboot (RB_DISABLE_CAD); */
+  siginterrupt(SIGALRM, 1);
+  siginterrupt(SIGHUP, 1);
+  siginterrupt(SIGBUS, 1);
+  siginterrupt(SIGINT, 1);
+  siginterrupt(SIGTERM, 1);
+  siginterrupt(SIGSEGV, 1);
+  siginterrupt(SIGPIPE, 1);
+  lxrc_catch_signal(0);
+/*  reboot (RB_DISABLE_CAD); */
 
-    umask(022);
+  umask(022);
 
-    /* just a default for manual mode */
-    config.floppies = 1;
-    config.floppy_dev[0] = strdup("/dev/fd0");
+  /* just a default for manual mode */
+  config.floppies = 1;
+  config.floppy_dev[0] = strdup("/dev/fd0");
 
-    language_pci = getenv ("lang");
-    if(language_pci) {
-      int i = set_langidbyname(language_pci);
+  if((s = getenv("lang"))) {
+    i = set_langidbyname(s);
+    if(i != LANG_UNDEF) language_ig = i;
+  }
 
-      if(i != LANG_UNDEF) language_ig = i;
+  ft = file_get_cmdline(key_autoyast);
+  config.infofile = ft ? ft->value : getenv("autoyast");
+  if(config.infofile) {
+    config.infofile = strdup(*config.infofile ? config.infofile : "default");
+  }
+
+  if(config.infofile) {
+    auto2_ig = TRUE;
+    yast_version_ig = 2;
+    action_ig |= ACT_YAST2_AUTO_INSTALL;
+    // ???
+    if(
+      !strncasecmp(config.infofile, "nfs:", 4) ||
+      !strncasecmp(config.infofile, "tftp:", 5) ||
+      !strncasecmp(config.infofile, "dhcp", 4)
+    ) {
+      bootmode_ig = BOOTMODE_NET;
     }
+  }
 
-#ifdef USE_LIBHD
-    autoyast_pci = getenv ("autoyast");
-    if (autoyast_pci)
-        {
-          auto2_ig = TRUE;
-          yast_version_ig = 2;
-	  action_ig |= ACT_YAST2_AUTO_INSTALL;
-          if (!strncasecmp(autoyast_pci, "nfs:", 4)) {
-            bootmode_ig = BOOTMODE_NET;
-          } else if (!strncasecmp(autoyast_pci, "tftp:", 5)) {
-            bootmode_ig = BOOTMODE_NET;
-          } 
-	}
-#endif
-    linuxrc_pci = getenv ("linuxrc");
-    if (linuxrc_pci)
-        {
-        char *s = malloc (strlen (linuxrc_pci) + 3);
-        if (s)
-           {
-           *s = 0;
-           strcat (strcat (strcat (s, ","), linuxrc_pci), ",");
+  ft = file_get_cmdline(key_linuxrc);
+  s = ft ? ft->value : getenv("linuxrc");
 
-           if (strstr (s, ",auto,"))
-               auto_ig = TRUE;
+  if(s) {
+    s = strdup(s);
 
-#ifdef USE_LIBHD
-           if (strstr (s, ",auto2,"))
-               auto2_ig = TRUE;
-           if (strstr (s, ",noauto2,"))
-               auto2_ig = FALSE;
-           if (strstr (s, ",y2autoinst,"))
-               {
-               auto2_ig = TRUE;
-               yast_version_ig = 2;
-               action_ig |= ACT_YAST2_AUTO_INSTALL;
-               }
-#endif
+    for(t0 = s; (t = strsep(&t0, ",")); ) {
+      for(i = 0; i < sizeof lxrc_params / sizeof *lxrc_params; i++) {
+        if(!strcasecmp(lxrc_params[i].name, t)) {
+          switch(lxrc_params[i].key) {
+            case lx_auto:
+              auto_ig = TRUE;
+              break;
 
-           if (strstr (s, ",demo,"))
-               {
-               demo_ig = TRUE;
-               action_ig |= ACT_DEMO | ACT_DEMO_LANG_SEL | ACT_LOAD_DISK;
-               }
+            case lx_auto2:
+              auto2_ig = TRUE;
+              break;
 
-           if (strstr (s, ",eval,"))
-               {
-               demo_ig = TRUE;
-               action_ig |= ACT_DEMO | ACT_LOAD_DISK;
-               }
+            case lx_noauto2:
+              auto2_ig = FALSE;
+              break;
 
-           if (strstr (s, ",reboot,"))
-               reboot_ig = TRUE;
+            case lx_y2autoinst:
+              auto2_ig = TRUE;
+              yast_version_ig = 2;
+              action_ig |= ACT_YAST2_AUTO_INSTALL;
+              break;
 
-           if (strstr (s, ",yast1,"))
-               yast_version_ig = 1;
+            case lx_demo:
+              demo_ig = TRUE;
+              action_ig |= ACT_DEMO | ACT_DEMO_LANG_SEL | ACT_LOAD_DISK;
+              break;
 
-           if (strstr (s, ",yast2,"))
-               yast_version_ig = 2;
+            case lx_eval:
+              demo_ig = TRUE;
+              action_ig |= ACT_DEMO | ACT_LOAD_DISK;
+              break;
 
-           if (strstr (s, ",loadnet,"))
-               action_ig |= ACT_LOAD_NET;
+            case lx_reboot:
+              reboot_ig = TRUE;
+              break;
 
-           if (strstr (s, ",loaddisk,"))
-               action_ig |= ACT_LOAD_DISK;
+            case lx_yast1:
+              yast_version_ig = 1;
+              break;
 
-           if (strstr (s, ",french,"))
-               language_ig = LANG_fr;
+            case lx_yast2:
+              yast_version_ig = 2;
+              break;
 
-           if (strstr (s, ",color,"))
-               color_ig = TRUE;
+            case lx_loadnet:
+              action_ig |= ACT_LOAD_NET;
+              break;
 
-           if (strstr (s, ",rescue,"))
-               action_ig |= ACT_RESCUE;
+            case lx_loaddisk:
+              action_ig |= ACT_LOAD_DISK;
+              break;
 
-           if (strstr (s, ",nopcmcia,"))
-               action_ig |= ACT_NO_PCMCIA;
+            case lx_french:
+              language_ig = LANG_fr;
+              break;
 
-           if (strstr (s, ",debug,"))
-               action_ig |= ACT_DEBUG;
+            case lx_color:
+              color_ig = TRUE;
+              break;
 
-           free (s);
-           }
+            case lx_rescue:
+              action_ig |= ACT_RESCUE;
+              break;
+
+            case lx_nopcmcia:
+              action_ig |= ACT_NO_PCMCIA;
+              break;
+
+            case lx_debug:
+              action_ig |= ACT_DEBUG;
+              break;
+          }
+          break;
         }
-
-    if (!(stderr_where_to = getenv("LINUXRC_STDERR")))
-      stderr_where_to = LINUXRC_DEFAULT_STDERR;
-
-    freopen (stderr_where_to, "a", stderr);
-    (void) mount ("proc", "/proc", "proc", 0, 0);
-    fprintf (stderr, "Remount of / ");
-    rc_ii = mount (0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
-    fprintf (stderr, rc_ii ? "failure\n" : "success\n");
-
-    /* Check for special case with aborted installation */
-
-    if (util_check_exist ("/.bin"))
-        {
-        unlink ("/bin");
-        rename ("/.bin", "/bin");
-        }
-
-    if (util_check_exist("/sbin/modprobe")) has_modprobe = 1;
-    lxrc_set_modprobe ("/etc/nothing");
-    lxrc_set_bdflush (5);
-
-    lxrc_check_console ();
-    freopen (console_tg, "r", stdin);
-    freopen (console_tg, "a", stdout);
-
-    util_get_splash_status();
-
-    if(util_check_exist("/proc/iSeries")) config.is_iseries = 1;
-
-    kbd_init ();
-    util_redirect_kmsg ();
-    disp_init ();
-    if(splash_active) color_ig = TRUE;
-    if(color_ig) disp_set_display(color_ig);
-
-    auto2_chk_expert ();
-
-#ifdef USE_LIBHD
-    deb_int(text_mode_ig);
-    deb_int(yast2_update_ig);
-    deb_int(auto2_ig);
-    deb_int(yast_version_ig);
-    deb_int(guru_ig);
-
-    printf ("\033[9;0]");	/* screen saver off */
-
-    if (!auto2_ig)
-#endif
-        {
-        for (i_ii = 1; i_ii < max_y_ig; i_ii++) printf ("\n");
-        disp_cursor_off ();
-        }
-
-    info_init ();
-
-    if (memory_ig < MEM_LIMIT_YAST2)
-        yast_version_ig = 1;
-
-    if (memory_ig > (yast_version_ig == 1 ? MEM_LIMIT_RAMDISK_YAST1 : MEM_LIMIT_RAMDISK_YAST2))
-        force_ri_ig = TRUE;
-
-    if ((guru_ig & 8)) force_ri_ig = FALSE;
-
-#if 0
-    if((action_ig & ACT_DEBUG)) {
-      FILE *f = fopen("/dev/tty1", "w");
-      if(f) {
-        util_ps(f);
-        fclose(f);
       }
-      getchar();
     }
-#endif
+    free(s);
+  }
 
-    lxrc_memcheck ();
+  config.stderr_name = getenv("LINUXRC_STDERR");
+  config.stderr_name = strdup(config.stderr_name ?: LINUXRC_DEFAULT_STDERR);
+  freopen(config.stderr_name, "a", stderr);
 
-    // #### drop this later!!!
-    // if (yast_version_ig == 2) strcpy(rootimage_tg, "/suse/images/yast2");
-    // deb_str(rootimage_tg);
-    mod_init ();
+  mount("proc", "/proc", "proc", 0, 0);
 
-    if(!(testing_ig || serial_ig))
-      util_start_shell("/dev/tty9", "/bin/lsh", 0);
+  fprintf(stderr, "Remount of / ");
+  i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
+  fprintf(stderr, i ? "failed\n" : "ok\n");
+
+  /* Check for special case with aborted installation */
+  if(util_check_exist ("/.bin")) {
+    unlink("/bin");
+    rename("/.bin", "/bin");
+  }
+
+  if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
+  lxrc_set_modprobe("/etc/nothing");
+  lxrc_set_bdflush(5);
+
+  lxrc_check_console();
+  freopen(console_tg, "r", stdin);
+  freopen(console_tg, "a", stdout);
+
+  util_get_splash_status();
+
+  if(util_check_exist("/proc/iSeries")) config.is_iseries = 1;
+
+  kbd_init();
+  util_redirect_kmsg();
+  disp_init ();
+  if(splash_active) color_ig = TRUE;
+  if(color_ig) disp_set_display(color_ig);
+
+  auto2_chk_expert();
 
 #ifdef USE_LIBHD
-    if(auto2_ig) {
-      if(auto2_init()) {
-        auto2_ig = TRUE;
-        auto2_init_settings();
-      } else {
-        int i, j;
-        char s[200];
+  printf("\033[9;0]");		/* screen saver off */
+  fflush(stdout);
+#endif
 
-        deb_msg("Automatic setup not possible.");
+  if(!auto2_ig) {
+    for(i = 1; i < max_y_ig; i++) printf("\n");
+    disp_cursor_off();
+  }
 
-        util_manual_mode();
-        disp_cursor_off();
-        disp_set_display(1);
+  info_init ();
+
+  // ???
+  if(memory_ig < MEM_LIMIT_YAST2) yast_version_ig = 1;
+
+  if(memory_ig > (yast_version_ig == 1 ? MEM_LIMIT_RAMDISK_YAST1 : MEM_LIMIT_RAMDISK_YAST2)) {
+    force_ri_ig = TRUE;
+  }
+
+  if((guru_ig & 8)) force_ri_ig = FALSE;
+
+  lxrc_memcheck();
+
+  mod_init();
+
+  if(!(testing_ig || serial_ig)) {
+    util_start_shell("/dev/tty9", "/bin/lsh", 0);
+  }
+
+#ifdef USE_LIBHD
+  if(auto2_ig) {
+    if(auto2_init()) {
+      auto2_ig = TRUE;
+      auto2_init_settings();
+    } else {
+      deb_msg("Automatic setup not possible.");
+
+      util_manual_mode();
+      disp_cursor_off();
+      disp_set_display(1);
 
 #ifdef __i386__
-        util_print_banner();
-        i = 0;
-        j = 1;
-        if(cdrom_drives && !(action_ig & ACT_DEMO)) {
-          sprintf(s, txt_get(TXT_INSERT_CD), 1);
-          j = dia_okcancel(s, YES) == YES ? 1 : 0;
-          if(j) {
-            printf("\033c"); fflush(stdout);
-            disp_clear_screen();
-            i = auto2_find_install_medium();
-          }
+      util_print_banner();
+      i = 0;
+      j = 1;
+      if(cdrom_drives && !(action_ig & ACT_DEMO)) {
+        sprintf(buf, txt_get(TXT_INSERT_CD), 1);
+        j = dia_okcancel(buf, YES) == YES ? 1 : 0;
+        if(j) {
+          printf("\033c"); fflush(stdout);
+          disp_clear_screen();
+          i = auto2_find_install_medium();
         }
-        if(i) {
-          auto2_ig = TRUE;
-          auto2_init_settings();
-        }
-        else {
-          yast_version_ig = 0;
-          disp_cursor_off();
-          util_print_banner();
-          if(j) {
-            char s[200];
-
-            sprintf(s,
-              "Could not find the SuSE Linux %s CD.\n\nActivating manual setup program.\n",
-              (action_ig & ACT_DEMO) ? "LiveEval" : "Installation"
-            );
-            dia_message(s, MSGTYPE_ERROR);
-          }
-        }
-#endif
-
       }
-    }
+      if(i) {
+        auto2_ig = TRUE;
+        auto2_init_settings();
+      }
+      else {
+        yast_version_ig = 0;
+        disp_cursor_off();
+        util_print_banner();
+        if(j) {
+          sprintf(buf,
+            "Could not find the SuSE Linux %s CD.\n\nActivating manual setup program.\n",
+            (action_ig & ACT_DEMO) ? "LiveEval" : "Installation"
+          );
+          dia_message(buf, MSGTYPE_ERROR);
+        }
+      }
 #endif
 
-    util_print_banner ();
+    }
+  }
+#endif
 
-    /* note: for auto2, file_read_info() is called inside auto2_init() */
-    if (auto_ig) 
-        {
-	rename_info_file ();
-        file_read_info ();
-        }
+  util_print_banner();
+
+  /* note: for auto2, file_read_info() is called inside auto2_init() */
+  if(auto_ig) {
+    rename_info_file();
+    file_read_info();
+  }
+
+  /* For 'manual'. Is that useful anyway? */
+  if(!config.infoloaded) file_read_info();
 	
-    if((!auto2_ig && language_ig == LANG_UNDEF) || (auto2_ig && demo_ig)) {
-      set_choose_language ();
-    }
+  if((!auto2_ig && language_ig == LANG_UNDEF) || (auto2_ig && demo_ig)) {
+    set_choose_language ();
+  }
 
-    util_print_banner ();
+  util_print_banner();
 
-    deb_int(color_ig);
+  if(!color_ig)	{	/* if it hasn't already been set */
+    set_choose_display();
+    util_print_banner();
+  }
 
-    if (!color_ig)	/* if it hasn't already been set */
-        {
-        set_choose_display ();
-        util_print_banner ();
-        }
+  if(!(serial_ig || config.is_iseries)) {
+    set_choose_keytable (0);
+  }
 
-    if (!(serial_ig || config.is_iseries))
-        set_choose_keytable (0);
+  util_update_kernellog();
 
-    util_update_kernellog ();
+  net_setup_localhost();
 
-    (void) net_setup_localhost ();
-
-#if !defined(__PPC__) && !defined(__sparc__)
-    if(!auto_ig || reboot_wait_ig) {
-      config.rebootmsg = 1;
-    }
+#if !(defined(__PPC__) || defined(__sparc__))
+  if(!auto_ig || reboot_wait_ig) {
+    config.rebootmsg = 1;
+  }
 #endif
-
-    }
+}
 
 
 static int lxrc_main_cb (int what_iv)
