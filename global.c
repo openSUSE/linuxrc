@@ -107,3 +107,4 @@ int             ask_for_moddisk = TRUE;
 int             splash_active = FALSE;
 char           *fs_types_atg [] = { "minix", "ext2",    "reiserfs", "xfs",
                                     "vfat",  "iso9660", "msdos", "hpfs",  0 };
+int             has_modprobe = 0;

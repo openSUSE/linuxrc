@@ -527,6 +527,7 @@ static void lxrc_init (void)
         rename ("/.bin", "/bin");
         }
 
+    if (util_check_exist("/sbin/modprobe")) has_modprobe = 1;
     lxrc_set_modprobe ("/etc/nothing");
     lxrc_set_bdflush (5);
 
@@ -841,6 +842,9 @@ static void lxrc_memcheck (void)
 void lxrc_set_modprobe (char *program_tv)
     {
     FILE  *proc_file_pri;
+
+    /* do nothing if we have a modprobe */
+    if (has_modprobe) return;
 
     proc_file_pri = fopen ("/proc/sys/kernel/modprobe", "w");
     if (proc_file_pri)
