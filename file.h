@@ -24,8 +24,9 @@ typedef enum {
   key_nptservers, key_dhcpsid, key_dhcpgiaddr, key_dhcpsiaddr,
   key_dhcpchaddr, key_dhcpshaddr, key_dhcpsname, key_rootpath, key_bootfile,
   key_install, key_instmode, key_memtotal, key_memfree, key_buffers,
-  key_cached, key_info, key_proxy, key_proxyport, key_proxyproto,
-  key_usedhcp, key_nfsport, key_dhcptimeout, key_tftptimeout
+  key_cached, key_swaptotal, key_swapfree, key_minmemfree, key_info,
+  key_proxy, key_proxyport, key_proxyproto, key_usedhcp, key_nfsport,
+  key_dhcptimeout, key_tftptimeout
 } file_key_t;
 
 typedef struct file_s {

@@ -138,6 +138,9 @@ static struct {
   { key_memfree,        "MemFree"          },
   { key_buffers,        "Buffers"          },
   { key_cached,         "Cached"           },
+  { key_swaptotal,      "SwapTotal"        },
+  { key_swapfree,       "SwapFree"         },
+  { key_minmemfree,     "MinMemFree"       },
   { key_info,           "Info"             },
   { key_proxy,          "Proxy"            },
   { key_proxyport,      "ProxyPort"        },
@@ -614,6 +617,10 @@ void file_do_info(file_t *f0)
 
       case key_nfsport:
         if(f->is.numeric) config.net.nfs_port = f->nvalue;
+        break;
+
+      case key_minmemfree:
+        if(f->is.numeric) config.memory.min_free = f->nvalue;
         break;
 
       case key_domain:

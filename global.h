@@ -232,6 +232,13 @@ typedef struct {
   instmode_t insttype;		/* install type (cdrom, network, etc. )*/
   instmode_t instmode;		/* ftp, nfs, smb, etc. */
   instmode_t instmode_extra;	/* for the stranger things... */
+  int inst_ramdisk;		/* ramdisk with instsys */
+
+  struct {
+    char *buf;
+    unsigned size;
+    unsigned cnt;
+  } cache;			/* used internally to buffer reads in some cases */
 
   struct {
     char *dir;				/* modules directory */
@@ -248,6 +255,21 @@ typedef struct {
     slist_t *used_params;	/* parameters that were used for insmod */
     unsigned ramdisk:1;		/* ramdisk currently mounted to dir */
   } module;
+
+  struct {
+    int total;			/* memory size (in kB) */
+    int free;			/* free memory (in kB) when linuxrc starts */
+    int min_free;		/* don't let it drop below this */
+    int current;		/* currently free memory */
+  } memory;
+
+  struct {
+    char *dev;			/* device name */
+    char *mountpoint;		/* mountpoint, if any */
+    int inuse:1;		/* currently in use */
+    int fd;			/* file descriptor while it is open */
+    int size;			/* current size in kB */
+  } ramdisk[6];			/* /dev/ram2 .. /dev/ram7 */
 
   struct {			/* mountpoints */
     char *floppy;

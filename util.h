@@ -22,8 +22,7 @@ extern int  util_format_txt        (char *txt_tv, char *lines_atr [],
 extern void util_fill_string       (char *txt_tr, int size_iv);
 extern void util_create_items      (item_t items_arr [], int nr_iv, int size_iv);
 extern void util_free_items        (item_t items_arr [], int nr_iv);
-extern int  util_fileinfo          (char *file_tv, int32_t *size_plr,
-                                    int *compressed_pir);
+extern int  util_fileinfo          (char *file_name, int *size, int *compressed);
 extern void util_update_kernellog  (void);
 extern void util_print_banner      (void);
 extern void util_beep              (int  success_iv);
@@ -95,6 +94,9 @@ char *get_instmode_name_up(instmode_t instmode);
 int net_open(char *filename);
 void net_close(int fd);
 int net_read(int fd, char *buf, int len);
+
+void util_free_mem(void);
+void util_update_meminfo(void);
 
 char *util_fstype(char *dev, char **module);
 int util_mount(char *dev, char *dir, unsigned long flags);

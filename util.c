@@ -78,6 +78,8 @@ static void do_file_cp(char *src_dir, char *dst_dir, char *name);
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
 
+static void net_read_cleanup();
+
 static struct hlink_s {
   struct hlink_s *next;
   dev_t dev;
@@ -229,49 +231,49 @@ void util_free_items (item_t items_arr [], int nr_iv)
     }
 
 
-/* This function can only handle images <= 2GB. I think this is enough
-   for the root image in the next month (kukuk@suse.de) */
-int
-util_fileinfo (char *file_tv, int32_t *size_plr, int *compressed_pir)
+int util_fileinfo(char *file_name, int *size, int *compressed)
 {
-  unsigned char  buf_ti [2];
-  int            handle_ii;
+  unsigned char buf[4];
+  int fd, err = 0;
+  off_t ofs;
 
+  if(size) *size = 0;
+  if(compressed) *compressed = 0;
 
-  *size_plr = 0;
-  handle_ii = open (file_tv, O_RDONLY);
-  if (!handle_ii)
-    return (-1);
+  if(!(fd = open(file_name, O_RDONLY))) return -1;
 
-  if (read (handle_ii, buf_ti, 2) != 2)
-    {
-      close (handle_ii);
-      return (-1);
+  if(read(fd, buf, 2) != 2) {
+    close(fd);
+    return -1;
+  }
+
+  if(buf[0] == 0x1f && (buf[1] == 0x8b || buf[1] == 0x9e)) {
+    if(
+      lseek(fd, (off_t) -4, SEEK_END) == (off_t) -1 ||
+      read(fd, buf, 4) != 4
+    ) {
+      err = -1;
     }
-
-  if (buf_ti [0] == 037 && (buf_ti [1] == 0213 || buf_ti [1] == 0236))
-    {
-      unsigned char buf_size[4];
-
-      if (lseek (handle_ii, (off_t) -4, SEEK_END) == (off_t)-1)
-	{
-	  close (handle_ii);
-	  return (-1);
-	}
-
-      read (handle_ii, buf_size, sizeof (buf_size));
-      *size_plr = (buf_size[3] << 24) + (buf_size[2] << 16) +
-	(buf_size[1] << 8) + buf_size[0];
-      *compressed_pir = TRUE;
+    else {
+      *size = (buf[3] << 24) + (buf[2] << 16) + (buf[1] << 8) + buf[0];
+      if(compressed) *compressed = 1;
     }
-  else
-    {
-      *size_plr = (int32_t) lseek (handle_ii, (off_t) 0, SEEK_END);
-      *compressed_pir = FALSE;
+  }
+  else {
+    if(size) {
+      ofs = lseek(fd, 0, SEEK_END);
+      if(ofs != -1) {
+        *size = ofs;
+      }
+      else {
+        err = -1;
+      }
     }
+  }
 
-  close (handle_ii);
-  return (0);
+  close(fd);
+
+  return err;
 }
 
 
@@ -875,7 +877,11 @@ void util_status_info()
     }
   }
 
-  sprintf(buf, "memory = %" PRIu64, memory_ig);
+  sprintf(buf,
+    "memory (kB): total %d, free %d (%d), min %d",
+    config.memory.total, config.memory.current,
+    config.memory.free, config.memory.min_free
+  );
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
@@ -1026,6 +1032,18 @@ void util_status_info()
     pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
   );
   slist_append_str(&sl0, buf);
+
+  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+    if(config.ramdisk[i].inuse) {
+      sprintf(buf, "ramdisk %s: %d kB",
+        config.ramdisk[i].dev, (config.ramdisk[i].size + 1023) >> 10
+      );
+      if(config.ramdisk[i].mountpoint) {
+        sprintf(buf + strlen(buf), " mounted at \"%s\"", config.ramdisk[i].mountpoint);
+      }
+      slist_append_str(&sl0, buf);
+    }
+  }
 
   dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION "/" LX_ARCH "-" LX_REL " (" __DATE__ ", " __TIME__ ")", sl0, 76);
 
@@ -1960,23 +1978,19 @@ int util_raidautorun_main(int argc, char **argv)
 }
 
 
-int util_free_main(int argc, char **argv)
+void util_free_mem()
 {
   file_t *f0, *f;
-  unsigned mem_total = 0, mem_free = 0, mem_rd = 0;
+  unsigned mem_total = 0, mem_free = 0;
   unsigned u;
   char *s;
-#if 0
-  char buf[32];
-  int i, fd;
-  unsigned long kbytes;
-#endif
 
   f0 = file_read_file("/proc/meminfo");
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_memtotal:
+      case key_swaptotal:
         u = strtoul(f->value, &s, 10);
         if(!*s || *s == ' ') mem_total += u;
         break;
@@ -1984,6 +1998,7 @@ int util_free_main(int argc, char **argv)
       case key_memfree:
       case key_buffers:
       case key_cached:
+      case key_swapfree:
         u = strtoul(f->value, &s, 10);
         if(!*s || *s == ' ') mem_free += u;
         break;
@@ -1994,25 +2009,31 @@ int util_free_main(int argc, char **argv)
 
   file_free_file(f0);
 
-#if 0
-  for(i = -1; i < 8; i++) {
-    if(i >= 0) {
-      sprintf(buf, "/dev/ram%d", i);
-    }
-    else {
-      strcpy(buf, "/dev/initrd");
-    }
-    if((fd = open(buf, O_RDONLY | O_NONBLOCK)) >= 0) {
-      if(!ioctl(fd, BLKGETSIZE, &kbytes)) {
-        mem_rd += kbytes;
-        printf("%s: %6lu kB\n", buf, kbytes);
-      }
-      close(fd);
-    }
-  }
-#endif
+  config.memory.total = mem_total;
+  config.memory.free = mem_free;
 
-  printf("MemTotal: %9u kB\nMemFree: %10u kB\n", mem_total, mem_free - mem_rd);
+  util_update_meminfo();
+}
+
+
+void util_update_meminfo()
+{
+  int i;
+  int rd_mem = 0;
+
+  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+    if(config.ramdisk[i].inuse) rd_mem += config.ramdisk[i].size;
+  }
+
+  config.memory.current = config.memory.free - (rd_mem >> 10);
+}
+
+
+int util_free_main(int argc, char **argv)
+{
+  util_free_mem();
+
+  printf("MemTotal: %9d kB\nMemFree: %10d kB\n", config.memory.total, config.memory.free);
 
   return 0;
 }
@@ -2219,7 +2240,7 @@ void s_addr2inet(inet_t *inet, unsigned long s_addr)
   if(inet->name) free(inet->name);
 
   inet_new.ip.s_addr = s_addr;
-  inet_new.name = inet_ntoa(inet_new.ip);
+  inet_new.name = strdup(inet_ntoa(inet_new.ip));
 
   if(inet_new.name) inet_new.ok = 1;
 
@@ -2406,6 +2427,18 @@ char *get_instmode_name_up(instmode_t instmode)
 
 
 /*
+ * reset some values
+ */
+void net_read_cleanup()
+{
+  config.net.ftp_sock = -1;
+  config.net.file_length = 0;
+  memset(&config.net.tftp, 0, sizeof config.net.tftp);
+  str_copy(&config.cache.buf, NULL);
+  config.cache.size = config.cache.cnt = 0;
+}
+
+/*
  * return a file handle or, if 'filename' is NULL just check if
  # we can connect to the ftp server
  */
@@ -2425,9 +2458,7 @@ int net_open(char *filename)
 
   str_copy(&config.net.error, NULL);
 
-  config.net.ftp_sock = -1;
-  config.net.file_length = 0;
-  memset(&config.net.tftp, 0, sizeof config.net.tftp);
+  net_read_cleanup();
 
   if(net_check_address2(&config.net.server, 1)) {
     sprintf(buf, "invalid %s server address", instmode_name);
@@ -2498,7 +2529,7 @@ int net_open(char *filename)
     fd = tftp_open(&config.net.tftp, &sa, filename ?: "", config.net.tftp_timeout);
 
     if(fd < 0) {
-      str_copy(&config.net.error, config.net.tftp.buf);
+      str_copy(&config.net.error, tftp_error(&config.net.tftp));
       return fd;
     }
 
@@ -2524,28 +2555,32 @@ void net_close(int fd)
     ftpClose(config.net.ftp_sock);
   }
 
-  config.net.ftp_sock = -1;
-  config.net.file_length = 0;
+  net_read_cleanup();
 }
 
 
 int net_read(int fd, char *buf, int len)
 {
-  unsigned char *p;
   int l;
+
+  if(config.cache.buf) {
+    if(config.cache.cnt < config.cache.size) {
+      l = config.cache.size - config.cache.cnt;
+      if(len > l) len = l;
+      memcpy(buf, config.cache.buf + config.cache.cnt, len);
+      config.cache.cnt += len;
+      return len;
+    }
+  }
 
   if(config.instmode != inst_tftp) {
     return read(fd, buf, len);
   }
 
-  l = tftp_read(&config.net.tftp, &p);
+  l = tftp_read(&config.net.tftp, buf, len);
 
   if(l < 0) {
-    str_copy(&config.net.error, config.net.tftp.buf);
-  }
-  else if(l > 0) {
-    if(l > len) return -1;
-    memcpy(buf, p, l);
+    str_copy(&config.net.error, tftp_error(&config.net.tftp));
   }
 
   return l;

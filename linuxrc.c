@@ -176,7 +176,14 @@ int main(int argc, char **argv, char **env)
 
   lxrc_argv = argv;
 
-  if(!getuid()) {
+  if(getpid() > 19 || util_check_exist("/opt")) {
+    printf("Seems we are on a running system; activating testmode...\n");
+    config.test = 1;
+    config.tmpfs = 1;
+    strcpy(console_tg, "/dev/tty");
+  }
+
+  if(!config.test && !getuid()) {
     if(!util_check_exist("/oldroot")) {
 #if SWISS_ARMY_KNIFE 
       lxrc_makelinks();
@@ -252,17 +259,29 @@ int my_logmessage (char *buffer_pci, ...)
     }
 
 
-void lxrc_reboot (void)
-    {
-    if (auto_ig || auto2_ig || dia_yesno (txt_get (TXT_ASK_REBOOT), 1) == YES)
-        reboot (RB_AUTOBOOT);
-    }
+void lxrc_reboot()
+{
+  if(config.test) {
+    fprintf(stderr, "*** reboot ***\n");
+    return;
+  }
 
-void lxrc_halt (void)
-    {
-    if (auto_ig || auto2_ig || dia_yesno ("Do you want to halt the system now?", 1) == YES)
-        reboot (RB_POWER_OFF);
-    }
+  if(auto_ig || auto2_ig || dia_yesno(txt_get(TXT_ASK_REBOOT), 1) == YES) {
+    reboot(RB_AUTOBOOT);
+  }
+}
+
+void lxrc_halt()
+{
+  if(config.test) {
+    fprintf(stderr, "*** power off ***\n");
+    return;
+  }
+
+  if(auto_ig || auto2_ig || dia_yesno("Do you want to halt the system now?", 1) == YES) {
+    reboot(RB_POWER_OFF);
+  }
+}
 
 static void save_environment (void)
 {
@@ -280,6 +299,8 @@ static void save_environment (void)
 void lxrc_change_root (void)
 {
   char *new_mp;
+
+  if(config.test) return;
 
   new_mp = (action_ig & ACT_DEMO) ? ".mnt" : "mnt";
 
@@ -337,8 +358,10 @@ void lxrc_end (void)
     (void) util_umount (mountpoint_tg);
     lxrc_set_modprobe ("/sbin/modprobe");
     lxrc_set_bdflush (40);
-    (void) util_umount ("/proc/bus/usb");
-    (void) util_umount ("/proc");
+    if(!config.test) {
+      (void) util_umount ("/proc/bus/usb");
+      (void) util_umount ("/proc");
+    }
     disp_cursor_on ();
     kbd_end ();
     disp_end ();
@@ -504,12 +527,6 @@ void lxrc_init()
   printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n");
   fflush(stdout);
 
-  if(!config.test && getpid() > 19) {
-    printf ("Seems we are on a running system; activating testmode...\n");
-    config.test = 1;
-    strcpy(console_tg, "/dev/tty");
-  }
-
   if(txt_init()) {
     printf("Corrupted texts!\n");
     exit(-1);
@@ -549,6 +566,17 @@ void lxrc_init()
 #if defined(__s390__) || defined(__s390x__)
   config.initrd_has_ldso = 1;
 #endif
+
+  for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+    sprintf(buf, "/dev/ram%d", i + 2);
+    str_copy(&config.ramdisk[i].dev, buf);
+  }
+
+  config.inst_ramdisk = -1;
+
+  util_free_mem();
+  config.memory.min_free = 10240;	// at least 10MB
+  if(config.memory.free < config.memory.min_free) config.memory.min_free = config.memory.free;
 
   if((s = getenv("lang"))) {
     i = set_langidbyname(s);
@@ -678,16 +706,18 @@ void lxrc_init()
   }
 #endif
 
-  mount("proc", "/proc", "proc", 0, 0);
+  if(!config.test) {
+    mount("proc", "/proc", "proc", 0, 0);
 
-  fprintf(stderr, "Remount of / ");
-  i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
-  fprintf(stderr, i ? "failed\n" : "ok\n");
+    fprintf(stderr, "Remount of / ");
+    i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
+    fprintf(stderr, i ? "failed\n" : "ok\n");
 
-  /* Check for special case with aborted installation */
-  if(util_check_exist ("/.bin")) {
-    unlink("/bin");
-    rename("/.bin", "/bin");
+    /* Check for special case with aborted installation */
+    if(util_check_exist ("/.bin")) {
+      unlink("/bin");
+      rename("/.bin", "/bin");
+    }
   }
 
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
@@ -942,7 +972,7 @@ void lxrc_set_modprobe (char *program_tv)
     FILE  *proc_file_pri;
 
     /* do nothing if we have a modprobe */
-    if (has_modprobe) return;
+    if (has_modprobe || config.test) return;
 
     proc_file_pri = fopen ("/proc/sys/kernel/modprobe", "w");
     if (proc_file_pri)
@@ -1031,6 +1061,7 @@ static void lxrc_set_bdflush (int percent_iv)
     {
     FILE  *fd_pri;
 
+    if(config.test) return;
 
     fd_pri = fopen ("/proc/sys/vm/bdflush", "w");
     if (!fd_pri)

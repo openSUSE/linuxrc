@@ -56,7 +56,7 @@ int len;
 	continue;
       if (r < 4)
 	continue;
-      tftp->len = r;
+      tftp->len = r - 4;
       r = tftp->buf[0] * 256 + tftp->buf[1];
       if (r == 3)
 	{
@@ -68,6 +68,8 @@ int len;
 	tftp->sa.sin_port = osa.sin_port;
       else if (tftp->sa.sin_port != osa.sin_port)
 	continue;
+      if (r == 3)
+        tftp->nr++;
       return r;
     }
   strcpy(tftp->buf, "timeout");
@@ -117,6 +119,7 @@ int timo;
     return 0;
   tftp->nr = -1;
   tftp->s = -1;
+  tftp->len = 0;
   close(s);
   if (r == 5)
     {
@@ -130,7 +133,8 @@ int timo;
       free(s);
       return -2;
     }
-  if(r > 0) sprintf(tftp->buf, "#%d", r);
+  if (r >= 0)
+    sprintf(tftp->buf, "#%d", r);
   return -1;
 }
 
@@ -143,32 +147,46 @@ struct tftp *tftp;
   close(tftp->s);
   tftp->s = -1;
   tftp->nr = -1;
+  tftp->len = 0;
 }
 
 int
-tftp_read(tftp, bpp)
+tftp_read(tftp, bp, len)
 struct tftp *tftp;
-unsigned char **bpp;
+unsigned char *bp;
+int len;
 {
   int r;
 
-  if (tftp->nr == -1)
-    return 0;
-  if (tftp->nr)
+  if (tftp->len == 0)
     {
+      if (tftp->nr == -1)
+        return 0;
       tftp->buf[2] = tftp->nr >> 8;
       tftp->buf[3] = tftp->nr;
       r = sendget(tftp, 4, 4);
       if (r != 3)
-	{
-	  fprintf(stderr, "tftp error #%d\n", r);
-	  return -1;
-	}
+        {
+          sprintf(tftp->buf, "#%d", r);
+          return -1;
+        }
+      if (tftp->len != 512)
+        tftp->nr = -1;
     }
-  tftp->nr++;
-  *bpp = tftp->buf + 4;
-  if (tftp->len != 512 + 4)
-    tftp->nr = -1;
-  return tftp->len - 4;
+  if (len > tftp->len)
+    len = tftp->len;  
+  if (len <= 0)
+    return 0;  
+  memcpy(bp, tftp->buf + 4, len);
+  tftp->len -= len;
+  if (tftp->len)   
+    memmove(tftp->buf + 4, tftp->buf + 4 + len, tftp->len);
+  return len;
 }
-
+ 
+char *
+tftp_error(tftp)
+struct tftp *tftp;
+{
+  return tftp->buf;
+}

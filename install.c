@@ -832,7 +832,9 @@ static int inst_start_rescue (void)
     if (rc_ii)
         return (rc_ii);
 
-    rc_ii = root_load_rootimage (inst_rootimage_tm);
+    config.inst_ramdisk = load_image (inst_rootimage_tm, config.instmode);
+    if(config.inst_ramdisk < 0) rc_ii = -1;
+    rc_ii = -1;
     inst_umount ();
     return (rc_ii);
     }
@@ -884,8 +886,9 @@ int inst_prepare()
   int rc = 0;
 
   mod_free_modules();
-  if(!config.initrd_has_ldso)
+  if(!config.initrd_has_ldso && !config.test) {
     rename("/bin", "/.bin");
+  }
 
   if(inst_loopmount_im) {
     sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
@@ -897,12 +900,11 @@ int inst_prepare()
       sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
   }
 
-  if(config.instsys) free(config.instsys);
-  config.instsys = strdup(instsys);
+  str_copy(&config.instsys, instsys);
 
   setenv("INSTSYS", instsys, TRUE);
 
-  if(!config.initrd_has_ldso)
+  if(!config.initrd_has_ldso && !config.test)
     for(i = 0; i < sizeof links / sizeof *links; i++) {
       if(!util_check_exist(links[i])) {
 	unlink(links[i]);
@@ -925,7 +927,7 @@ int inst_prepare()
   setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
   file_write_install_inf("");
-  file_write_mtab();
+  if(!config.test) file_write_mtab();
 
   if(!ramdisk_ig) rc = inst_init_cache();
 
@@ -949,7 +951,7 @@ int inst_execute_yast()
     inst_umount ();
     if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
-    if(!config.initrd_has_ldso) {
+    if(!config.initrd_has_ldso && !config.test) {
       unlink("/bin");
       rename("/.bin", "/bin");
     }
@@ -960,9 +962,10 @@ int inst_execute_yast()
   if(!auto2_ig) dia_status_on(&status_ri, txt_get(TXT_START_YAST));
 #endif
 
-  lxrc_set_modprobe("/sbin/modprobe");
+  if(!config.test) {
+    lxrc_set_modprobe("/sbin/modprobe");
 
-  if(util_check_exist("/sbin/update")) system("/sbin/update");
+    if(util_check_exist("/sbin/update")) system("/sbin/update");
 
 #if 0
   if(!auto2_ig) {
@@ -973,16 +976,16 @@ int inst_execute_yast()
   }
 #endif
 
-  util_start_shell("/dev/tty2", "/bin/bash", 1);
+    util_start_shell("/dev/tty2", "/bin/bash", 1);
 
-  if(memory_ig < MEM_LIMIT_SWAP_MSG) {
-    if(config.win) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
+    if(memory_ig < MEM_LIMIT_SWAP_MSG) {
+      if(config.win) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
+    }
+    else {
+      util_start_shell("/dev/tty5", "/bin/bash", 1);
+      util_start_shell("/dev/tty6", "/bin/bash", 1);
+    }
   }
-  else {
-    util_start_shell("/dev/tty5", "/bin/bash", 1);
-    util_start_shell("/dev/tty6", "/bin/bash", 1);
-  }
-
 #if 0
   if(!auto2_ig) {
     while(i_ii <= 100) {
@@ -1069,13 +1072,15 @@ int inst_execute_yast()
   system("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
 #endif
 
-  /* if the initrd has an ext2 fs, we've just made / read-only */
-  mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
+  if(!config.test) {
+    /* if the initrd has an ext2 fs, we've just made / read-only */
+    mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
+  }
 
 //  inst_umount();
   if(ramdisk_ig) util_free_ramdisk("/dev/ram2");
 
-  if(!config.initrd_has_ldso) {
+  if(!config.initrd_has_ldso && !config.test) {
     unlink("/bin");
     rename("/.bin", "/bin");
   }
@@ -1163,7 +1168,12 @@ int inst_commit_install()
       dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
     }
 
-    reboot(RB_AUTOBOOT);
+    if(config.test) {
+      fprintf(stderr, "*** reboot ***\n");
+    }
+    else {
+      reboot(RB_AUTOBOOT);
+    }
     err = -1;
   }
   else {
@@ -1583,6 +1593,8 @@ int inst_update_cd()
 void inst_swapoff()
 {
   file_t *f0, *f;
+
+  if(config.test) return;
 
   f0 = file_read_file("/proc/swaps");
 

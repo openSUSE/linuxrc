@@ -137,6 +137,11 @@ void net_stop (void)
     int             socket_ii;
     struct ifreq    interface_ri;
 
+    if(config.test) {
+      net_is_configured_im = FALSE;
+      return;
+    }
+
     if(config.net.dhcp_active) {
       net_dhcp_stop();
       net_is_configured_im = FALSE;
@@ -403,9 +408,9 @@ int net_check_address2(inet_t *inet, int do_dns)
 {
   struct hostent *he = NULL;
   struct in_addr iaddr;
-  char *s;
   slist_t *sl;
 #ifdef DIET
+  char *s;
   file_t *f0, *f;
   char *has_dots;
 #endif
@@ -1004,6 +1009,8 @@ int net_bootp()
 
   if(auto_ig && config.net.hostname.ok) return 0;
 
+  if(config.test) return 0;
+
   name2inet(&config.net.netmask, "");
   name2inet(&config.net.network, "");
   s_addr2inet(&config.net.broadcast, 0xffffffff);
@@ -1170,6 +1177,8 @@ int net_dhcp()
   window_t win;
 
   if(config.net.dhcp_active) return 0;
+
+  if(config.test) return 0;
 
   if(config.win) {
     sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");
