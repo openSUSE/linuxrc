@@ -57,9 +57,10 @@
 #define KEY_F3        (51 | KEY_SPECIAL | KEY_FUNC)
 #define KEY_F4        (52 | KEY_SPECIAL | KEY_FUNC)
 
-extern void  kbd_init         (void);
+extern void  kbd_init         (int first);
 extern void  kbd_reset        (void);
 extern void  kbd_end          (void);
 extern int   kbd_getch        (int wait_iv);
 extern void  kbd_clear_buffer (void);
 extern void  kbd_switch_tty   (int tty_iv);
+extern void  kbd_echo_off     (void);

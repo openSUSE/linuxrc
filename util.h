@@ -41,8 +41,6 @@ extern int  util_umount            (char *mountpoint);
 extern int  util_eject_cdrom       (char *dev);
 extern int  util_chk_driver_update (char *dir, char *loc);
 extern void util_do_driver_updates (void);
-extern void util_write_update_pre  (void);
-// extern void util_umount_driver_update (void);
 extern int show_driver_updates(void);
 extern void util_status_info       (void);
 extern int  util_mount_main        (int argc, char **argv);
@@ -71,6 +69,7 @@ extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_chroot_main       (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
+extern int  util_killall_main      (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
 extern int  util_wget_main         (int argc, char **argv);
 extern int  util_fstype_main       (int argc, char **argv);
@@ -133,3 +132,10 @@ void util_mkdevs(void);
 void get_net_unique_id(void);
 
 int util_lndir_main(int argc, char **argv);
+
+void util_notty(void);
+void util_killall(char *name, int sig);
+
+void util_get_ram_size(void);
+void util_load_usb(void);
+
