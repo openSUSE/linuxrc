@@ -1,3 +1,6 @@
+8/1/2004:	v1.5.20
+	- hardlinks on driver update medium could cause segfault
+
 13/10/2003:	v1.5.19
 	- LiveEval changes
 	- fixed bug causing linuxrc to do some unexpected things
