@@ -418,8 +418,6 @@ int auto2_net_dev(hd_t **hd0)
           !config.net.broadcast.ok ||
           !config.net.gateway.ok
         ) {
-          if(!config.net.server.ok) {
-          }
           fprintf(stderr, "no/incomplete answer.\n");
           return 1;
         }
@@ -532,7 +530,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
       !auto2_driver_is_active(di0)
     ) {
       for(di = di0; di; di = di->next) {
-        if(!di->module.modprobe) {
+        if(di->module.type == di_module && !di->module.modprobe) {
           // fprintf(stderr, "Found a \"%s\"\n", auto2_device_name(hd));
           for(
             sl1 = di->module.names, sl2 = di->module.mod_args;

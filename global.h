@@ -204,6 +204,8 @@ typedef struct {
   unsigned pivotroot:1;		/* use pivotroot system call */
   unsigned addswap:1;		/* offer to add swap if yast needs it */
   unsigned fullnetsetup:1;	/* offer all network protocols */
+  unsigned aborted:1;		/* yast did abort the installation */
+  unsigned splash:1;		/* splash active */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -364,5 +366,4 @@ extern int             reboot_wait_ig;
 extern char            livesrc_tg[16];
 extern char            driver_update_dir[16];
 extern int             cdrom_drives;
-extern int             splash_active;
 extern int             has_modprobe;

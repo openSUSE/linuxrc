@@ -53,5 +53,4 @@ int             reboot_wait_ig = FALSE;
 char            livesrc_tg[16] = "";
 char            driver_update_dir[16] = "";
 int             cdrom_drives = 0;
-int             splash_active = FALSE;
 int             has_modprobe = 0;

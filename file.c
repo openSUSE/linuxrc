@@ -165,7 +165,8 @@ static struct {
   { key_usepivotroot,   "UsePivotRoot"     },
   { key_term,           "TERM"             },
   { key_addswap,        "AddSwap"          },
-  { key_fullnetsetup,   "FullNetSetup"     }
+  { key_fullnetsetup,   "FullNetSetup"     },
+  { key_aborted,        "Aborted"          }
 };
 
 static struct {
@@ -478,6 +479,7 @@ void file_do_info(file_t *f0)
   url_t *url;
   int i;
   char buf[256], *s, *t;
+  slist_t *sl;
 
   config.info.mod_autoload = 0;
   config.info.start_pcmcia = 0;
@@ -781,18 +783,41 @@ void file_do_info(file_t *f0)
 
       case key_addswap:
         if(f->is.numeric) {
-          config.addswap = f->nvalue;
+          if(f->is.numeric <= 0) {
+            config.addswap = f->nvalue;
+          }
+          else {
+            util_update_disk_list(NULL, 1);
+            i = f->nvalue;
+            for(sl = config.partitions; sl; sl = sl->next) {
+              if(sl->key) {
+                sprintf(buf, "/dev/%s", sl->key);
+                t = fstype(buf);
+                if(t && !strcmp(t, "swap")) {
+                  if(!--i) {
+                    char *argv[2] = { };
+
+                    argv[1] = buf;
+                    fprintf(stderr, "swapon %s\n", buf);
+                    util_swapon_main(2, argv);
+                    break;
+                  }
+                }
+              }
+            }
+          }
         }
         else {
-          char *argv[] = { };
+          char *argv[2] = { };
 
           s = f->value;
           if(strstr(s, "/dev/") != s) {
             sprintf(s = buf, "/dev/%s", f->value);
           }
           t = fstype(s);
-          if(t && strcmp(t, "swap")) {
+          if(t && !strcmp(t, "swap")) {
             argv[1] = s;
+            fprintf(stderr, "swapon %s\n", s);
             util_swapon_main(2, argv);
           }
         }
@@ -852,6 +877,10 @@ int file_read_yast_inf()
 
       case key_rebootmsg:
         config.rebootmsg = f->nvalue;
+        break;
+
+      case key_aborted:
+        config.aborted = f->nvalue;
         break;
 
       default:

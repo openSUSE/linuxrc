@@ -62,8 +62,8 @@ static int   inst_try_cdrom           (char *device_tv);
 static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
 static int   inst_start_rescue        (void);
-//static void  inst_start_shell         (char *tty_tv);
 static int   inst_prepare             (void);
+static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
@@ -72,7 +72,6 @@ static int inst_choose_netsource_cb(dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
-// static int   inst_init_cache          (void);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
 static int   inst_do_ftp              (void);
@@ -942,27 +941,42 @@ int inst_prepare()
 }
 
 
+void inst_yast_done()
+{
+  int count;
+
+  lxrc_set_modprobe("/etc/nothing");
+
+  lxrc_killall(0);
+  inst_umount();
+
+  util_debugwait("going to umount inst-sys");
+
+  /* wait a bit */
+  for(count = 5; inst_umount() == EBUSY && count--;) sleep(1);
+
+  util_debugwait("inst-sys umount done");
+
+  ramdisk_free(config.inst_ramdisk);
+  config.inst_ramdisk = -1;
+
+  if(!config.initrd_has_ldso && !config.test) {
+    unlink("/bin");
+    rename("/.bin", "/bin");
+  }
+}
+
+
 int inst_execute_yast()
 {
-  int rc_ii;
-//  int i_ii = 0;
-  int i, count;
-//  window_t status_ri;
-  char command_ti[256];
+  int i, rc;
+  char cmd[256];
 
-  rc_ii = inst_prepare();
-  if(rc_ii) return rc_ii;
+  rc = inst_prepare();
+  if(rc) return rc;
 
   if(inst_choose_yast_version()) {
-    lxrc_killall(0);
-    inst_umount ();
-    ramdisk_free(config.inst_ramdisk);
-    config.inst_ramdisk = -1;
-
-    if(!config.initrd_has_ldso && !config.test) {
-      unlink("/bin");
-      rename("/.bin", "/bin");
-    }
+    inst_yast_done();
     return -1;
   }
 
@@ -972,10 +986,9 @@ int inst_execute_yast()
   }
 
   util_free_mem();
-  if(config.addswap )ask_for_swap(
+  if(config.addswap) ask_for_swap(
     (config.memory.min_yast - config.memory.min_free) << 10,
-    "Not enough memory for YaST.\n"
-    "(We're still checking memory limits, so don't panic if you have a 64MB system!)"
+    "Not enough memory for YaST."
   );
 
   i = 0;
@@ -985,77 +998,69 @@ int inst_execute_yast()
     if(!config.textmode) {
       int win_old;
       if(!(win_old = config.win)) util_disp_init();
-      if(dia_yesno("Do you want to try the installation in text mode?", NO) != YES) i = 1;
+      if(dia_okcancel(
+        "You don't have enough free memory for a graphical installation.\n\n"
+        "The text mode frontend of YaST2 will be used instead.",
+        YES
+      ) != YES) i = 1;
       if(!win_old) util_disp_done();
+
       if(!i) {
         config.textmode = 1;
         file_write_install_inf("");
       }
     }
-    else {
-      int win_old;
-      if(!(win_old = config.win)) util_disp_init();
-      if(dia_yesno("Do you want to start the installation anyway?", NO) != YES) i = 1;
-      if(!win_old) util_disp_done();
-    }
   }
 
   if(i) {
-    lxrc_killall(0);
-    inst_umount ();
-    ramdisk_free(config.inst_ramdisk);
-    config.inst_ramdisk = -1;
-
-    if(!config.initrd_has_ldso && !config.test) {
-      unlink("/bin");
-      rename("/.bin", "/bin");
-    }
+    inst_yast_done();
     return -1;
   }
 
   /* start shells only _after_ the swap dialog */
   if(!config.test) {
     util_start_shell("/dev/tty2", "/bin/bash", 1);
-    util_start_shell("/dev/tty5", "/bin/bash", 1);
-    util_start_shell("/dev/tty6", "/bin/bash", 1);
+    if(config.memory.current >= config.memory.min_yast) {
+      util_start_shell("/dev/tty5", "/bin/bash", 1);
+      util_start_shell("/dev/tty6", "/bin/bash", 1);
+    }
   }
 
   disp_set_color(COL_WHITE, COL_BLACK);
   if(config.win) util_disp_done();
 
+  if(config.splash && config.textmode) system("echo 0 >/proc/splash");
+
   if(config.test) {
-    system("/bin/bash 2>&1");
+    rc = system("/bin/bash 2>&1");
   }
   else {
-    sprintf(command_ti, "%s%s", config.instsys, SETUP_COMMAND);
+    sprintf(cmd, "%s%s", config.instsys, SETUP_COMMAND);
 
-    if(util_check_exist(command_ti)) {
-      sprintf(command_ti, "%s%s yast%d",
-        config.instsys,
-        SETUP_COMMAND,
-        yast_version_ig == 2 ? 2 : 1
-      );
+    if(util_check_exist(cmd)) {
+      sprintf(cmd + strlen(cmd), " yast%d", yast_version_ig == 2 ? 2 : 1);
       fprintf(stderr, "starting yast%d\n", yast_version_ig == 2 ? 2 : 1);
     }
     else {
-      sprintf(command_ti, "%s",
-        yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND
-      );
-      fprintf(stderr, "starting \"%s\"\n", command_ti);
+      sprintf(cmd, "%s", yast_version_ig == 2 ? YAST2_COMMAND : YAST1_COMMAND);
+      fprintf(stderr, "starting \"%s\"\n", cmd);
     }
 
-    deb_str(command_ti);
-    rc_ii = system(command_ti);
+    rc = system(cmd);
   }
 
-  fprintf(stderr,
-    "yast%d return code is %d (errno = %d)\n",
-    yast_version_ig == 2 ? 2 : 1,
-    rc_ii,
-    rc_ii ? errno : 0
-  );
+  if(rc) {
+    if(rc == -1) {
+      rc = errno;
+    }
+    else if(WIFEXITED(rc)) {
+      rc = WEXITSTATUS(rc);
+    }
+  }
 
-  lxrc_set_modprobe("/etc/nothing");
+  if(config.splash && config.textmode) system("echo 1 >/proc/splash");
+
+  fprintf(stderr, "yast exit code is %d\n", rc);
 
   /* Redraw erverything and go back to the main menu. */
   config.redraw_menu = 1;
@@ -1064,70 +1069,52 @@ int inst_execute_yast()
   sync();
   fprintf(stderr, " ok\n");
 
+  util_debugwait("going to read yast.inf");
+
   i = file_read_yast_inf();
-  if(!rc_ii) rc_ii = i;
+  if(!rc) rc = i;
 
   disp_cursor_off();
   kbd_reset();
 
   yast_version_ig = 0;
 
-  if(rc_ii || !auto2_ig) {
+  if(rc || config.aborted) {
+    config.rescue = 0;
     util_manual_mode();
-    util_disp_init();
   }
 
-  if(rc_ii) {
-    config.rescue = 0;
+  if(config.manual) util_disp_init();
+
+  if(rc && config.win) {
     dia_message(txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
   }
 
-  lxrc_killall(0);
-
-#if 0
-  system("rm -f /tmp/stp* > /dev/null 2>&1");
-  system("rm -f /var/lib/YaST/* > /dev/null 2>&1");
-#endif
-
-#if 0
-  system("umount -a -tnoproc,nousbdevfs,nominix > /dev/null 2>&1");
-#endif
-
   if(!config.test) {
-    /* if the initrd has an ext2 fs, we've just made / read-only */
+    /* never trust yast */
     mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
   }
 
-  inst_umount();
-
-  if(!config.initrd_has_ldso && !config.test) {
-    unlink("/bin");
-    rename("/.bin", "/bin");
-  }
   /* turn off swap */
   inst_swapoff();
 
-  util_debugwait("about to umount inst-sys");
+  inst_yast_done();
 
-  /* wait a bit */
-  count = 5;
-  while((i = inst_umount()) == EBUSY && count--) sleep(1);
+  if(config.aborted) {
+    config.aborted = 0;
+    rc = -1;
+  }
 
-  ramdisk_free(config.inst_ramdisk);
-  config.inst_ramdisk = -1;
-
-  util_debugwait("inst-sys umount done");
-
-  if(!rc_ii) {
-    rc_ii = inst_commit_install();
-    if(rc_ii) {
+  if(!rc) {
+    rc = inst_commit_install();
+    if(rc) {
       config.rescue = 0;
       util_manual_mode();
       util_disp_init();
     }
   }
 
-  return rc_ii;
+  return rc;
 }
 
 

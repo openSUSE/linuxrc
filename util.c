@@ -968,6 +968,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.activate_network, "act_net");
   add_flag(&sl0, buf, config.pivotroot, "pivotroot");
   add_flag(&sl0, buf, config.addswap, "addswap");
+  add_flag(&sl0, buf, config.splash, "splash");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {
@@ -984,12 +985,7 @@ void util_status_info()
   if(*t) sprintf(buf + strlen(buf), ", %s", t);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf,
-    "yast = %d, auto = %d, splash = %s",
-    yast_version_ig,
-    auto2_ig ? 2 : auto_ig ? 1 : 0,
-    splash_active ? "on" : "off"
-  );
+  sprintf(buf, "yast = %d, auto = %d", yast_version_ig, auto2_ig ? 2 : auto_ig ? 1 : 0);
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "floppies = (");
@@ -1210,18 +1206,11 @@ void util_get_splash_status()
   FILE *f;
   char s[80];
 
-  splash_active = FALSE;
-
-#if 0
-  if((f = fopen("/proc/splash", "w"))) {
-    fprintf(f, "0x0f01\n");
-    fclose(f);
-  }
-#endif
+  config.splash = 0;
 
   if((f = fopen("/proc/splash", "r"))) {
     if(fgets(s, sizeof s, f)) {
-      if(strstr(s, ": on")) splash_active = TRUE;
+      if(strstr(s, ": on")) config.splash = 1;
     }
     fclose(f);
   }

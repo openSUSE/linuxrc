@@ -29,7 +29,8 @@ typedef enum {
   key_usedhcp, key_nfsport, key_dhcptimeout, key_tftptimeout, key_tmpfs,
   key_testmode, key_debugwait, key_auto, key_expert, key_rescue,
   key_rootimage, key_rescueimage, key_installdir, key_nopcmcia, key_vnc,
-  key_vncpassword, key_usepivotroot, key_term, key_addswap, key_fullnetsetup
+  key_vncpassword, key_usepivotroot, key_term, key_addswap,
+  key_fullnetsetup, key_aborted
 } file_key_t;
 
 typedef struct file_s {
