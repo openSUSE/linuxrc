@@ -2,7 +2,7 @@
  *
  * settings.c    Settings for linuxrc
  *
- * Copyright (c) 1996-1999  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
+ * Copyright (c) 1996-2000  Hubert Mantel, SuSE GmbH  (mantel@suse.de)
  *
  */
 
