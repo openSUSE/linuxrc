@@ -488,7 +488,7 @@ void lxrc_killall(int really_all_iv)
  */
 
 
-#if defined(__i386__) || defined(__PPC__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__)
+#if defined(__i386__) || defined(__PPC__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
 static void lxrc_catch_signal_11(int signum, struct sigcontext scp)
 #endif
 #if defined(__alpha__) || defined(__ia64__)
@@ -524,6 +524,10 @@ static void lxrc_catch_signal_11(int signum, int x, struct sigcontext *scp)
 
 #ifdef __s390x__
   ip = (scp.sregs)->regs.psw.addr;
+#endif
+
+#ifdef __MIPSEB__
+  ip = scp.sc_fpc_eir;
 #endif
 
   if(!cnt++) fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
