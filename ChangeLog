@@ -1,3 +1,8 @@
+14/2/2002:	v1.3.15
+	- removed old module code
+	- new ramdisk handling
+	- lots of bugfixes
+
 11/2/2002:	v1.3.14
 	- added fstype detection
 	- fixed tftp

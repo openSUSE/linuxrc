@@ -60,9 +60,11 @@ void kbd_init (void)
     char           *start_msg_pci = "Startup...\n";
 
 
-    kbd_tty_im = open ("/dev/tty4", O_RDWR);
-    write (kbd_tty_im, start_msg_pci, strlen (start_msg_pci));
-    close (kbd_tty_im);
+    if(!config.test) {
+      kbd_tty_im = open ("/dev/tty4", O_RDWR);
+      write (kbd_tty_im, start_msg_pci, strlen (start_msg_pci));
+      close (kbd_tty_im);
+    }
 
     kbd_tty_im = open (console_tg, O_RDWR);
 

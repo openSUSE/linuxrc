@@ -32,40 +32,20 @@
 #include "auto2.h"
 #include "file.h"
 
-#include "module_list.h"
-
-#define NR_SCSI_MODULES     (sizeof(mod_scsi_mod_arm)/sizeof(mod_scsi_mod_arm[0]))
-#define NR_CDROM_MODULES    (sizeof(mod_cdrom_mod_arm)/sizeof(mod_cdrom_mod_arm[0]))
-#define NR_NET_MODULES      (sizeof(mod_net_mod_arm)/sizeof(mod_net_mod_arm[0]))
-#define NR_MODULES          (NR_SCSI_MODULES+NR_CDROM_MODULES+NR_NET_MODULES+50)
-#define NR_NO_AUTOPROBE     (sizeof(mod_noauto_arm)/sizeof(mod_noauto_arm[0]))
-#define MENU_WIDTH          55
-
-static module_t  mod_current_arm [NR_MODULES];
-static int       mod_show_kernel_im = FALSE;
-int       mod_force_moddisk_im = FALSE;
-
-
-static int       mod_try_auto         (module_t *module_prv,
-                                       window_t *status_prv);
-static int       mod_auto_allowed     (enum modid_t id_iv);
-static void      mod_delete_module    (void);
-static int       mod_menu_cb          (int what_iv);
-static int       mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
-                                       int *more_pir);
-static void      mod_sort_list        (module_t modlist_parr [], int nr_modules_iv);
-
-
 // #define DEBUG_MODULE
 
-#define MODULE_CONFIG "module.config"
-#define CARDMGR_PIDFILE "/var/run/cardmgr.pid"
+#define MENU_WIDTH		55
+#define MODULE_CONFIG		"module.config"
+#define CARDMGR_PIDFILE		"/var/run/cardmgr.pid"
 
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};
 static int mod_menu_last = 0;
 static char *mod_param_text = NULL;
+static int mod_show_kernel_messages = 0;
 
+static void mod_delete_module(void);
+static int mod_menu_cb(int item);
 static int mod_copy_modules(char *src_dir, int doit);
 static void mod_update_list(void);
 static char *mod_get_title(int type);
@@ -193,10 +173,9 @@ int mod_copy_modules(char *src_dir, int doit)
 
 void mod_free_modules()
 {
-  if(config.module.ramdisk) {
-    umount(config.module.dir);
-    util_free_ramdisk(RAMDISK_2);
-    config.module.ramdisk = 0;
+  if(config.module.ramdisk >= 0) {
+    ramdisk_free(config.module.ramdisk);
+    config.module.ramdisk = -1;
   }
 }
 
@@ -433,9 +412,11 @@ int mod_menu_cb(int item)
       mod_delete_module();
       break;
 
+#if 0
     case 2:
       mod_autoload();
       break;
+#endif
   }
 
   return 1;
@@ -537,13 +518,21 @@ int mod_add_disk(int prompt, int type)
   if(config.module.more_file[type] && *config.module.more_file[type]) {
     sprintf(buf, "%s/%s", config.mountpoint.floppy, config.module.more_file[type]);
     if(util_check_exist(buf)) {
-      err = root_load_rootimage(buf);
-      if(!err) got_image = 1;
+      config.module.ramdisk = load_image(buf, inst_file);
+      if(config.module.ramdisk >= 0) {
+        got_image = 1;
+      }
+      else {
+        err = -1;
+      }
     }
   }
 
   if(*buf && !err && got_image) {
-    err = util_mount_ro(RAMDISK_2, config.tmpfs ? config.mountpoint.ramdisk2 : config.module.dir);
+    err = ramdisk_mount(
+      config.module.ramdisk,
+      config.tmpfs ? config.mountpoint.ramdisk2 : config.module.dir
+    );
 
     if(err) {
       dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
@@ -551,11 +540,8 @@ int mod_add_disk(int prompt, int type)
     else {
       if(config.tmpfs) {
         added = mod_copy_modules(config.mountpoint.ramdisk2, 1);
-        umount(config.mountpoint.ramdisk2);
-        util_free_ramdisk(RAMDISK_2);
-      }
-      else {
-        config.module.ramdisk = 1;
+        ramdisk_free(config.module.ramdisk);
+        config.module.ramdisk = -1;
       }
       mod_init();
     }
@@ -571,7 +557,7 @@ int mod_add_disk(int prompt, int type)
 
   if(!err) {
     if(!got_image && !added) {
-      dia_message("No new modules found.", MSGTYPE_INFO);
+      dia_message(txt_get(TXT_NO_NEW_MODULES), MSGTYPE_INFO);
     }
   }
 
@@ -770,7 +756,9 @@ int mod_load_module(char *module, char *param)
 
   fprintf(stderr, "%s\n", buf);
 
-  if(mod_show_kernel_im) kbd_switch_tty(4);
+  strcat(buf, " >&2");
+
+  if(mod_show_kernel_messages) kbd_switch_tty(4);
 
   err = system(buf);
 
@@ -783,7 +771,7 @@ int mod_load_module(char *module, char *param)
     }
   }
 
-  if(mod_show_kernel_im) kbd_switch_tty(1);
+  if(mod_show_kernel_messages) kbd_switch_tty(1);
 
   util_update_kernellog();
 
@@ -903,400 +891,6 @@ void mod_delete_module()
     dia_message(txt_get(TXT_NO_MODULES), MSGTYPE_INFO);
   }
 }
-
-
-int mod_get_ram_modules (int type_iv)
-    {
-    char      testfile_ti [MAX_FILENAME];
-    char     *modfile_pci;
-    int       rc_ii = 0;
-    int i;
-
-
-    strcpy (testfile_ti, config.module.dir);
-    if (type_iv == MOD_TYPE_SCSI)
-        {
-        strcat (testfile_ti, "/SCSI");
-        modfile_pci = "scsi-mod.gz";
-        }
-    else if (type_iv == MOD_TYPE_NET)
-        {
-        strcat (testfile_ti, "/NET");
-        modfile_pci = "net-mod.gz";
-        }
-    else
-        {
-        strcat (testfile_ti, "/OTHER");
-        modfile_pci = "other-mod.gz";
-        }
-
-    if (!util_check_exist (testfile_ti))
-        mod_free_modules ();
-
-    if (!util_check_exist (testfile_ti) || mod_force_moddisk_im)
-        {
-        for(i = 0; i < config.floppies; i++) {
-          if(!util_mount_ro(config.floppy_dev[i], mountpoint_tg)) break;
-        }
-        if(i < config.floppies) {
-          config.floppy = i;	// remember currently used floppy
-        }
-        else {
-          rc_ii = -1;
-          /* Try /dev/fd0 anyway, in case the user has inserted a floppy _now_. */
-          if(!config.floppies) {
-            rc_ii = util_mount_ro("/dev/fd0", mountpoint_tg);
-          }
-          if(rc_ii) {
-            dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-            mod_force_moddisk_im = FALSE;
-            return rc_ii;
-          }
-        }
-
-        sprintf (testfile_ti, "%s/%s", mountpoint_tg, modfile_pci);
-        rc_ii = root_load_rootimage (testfile_ti);
-        umount (mountpoint_tg);
-        if (!rc_ii)
-            {
-            rc_ii = util_mount_ro (RAMDISK_2, config.module.dir);
-
-            if (rc_ii)
-                dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-
-//            mod_ram_modules_im = TRUE;
-            mod_force_moddisk_im = FALSE;
-            }
-        }
-
-    return (rc_ii);
-    }
-
-
-int mod_auto (int type_iv)
-    {
-    int       nr_modules_ii;
-    int       i_ii;
-    window_t  win_ri;
-    int       rc_ii;
-    int       success_ii;
-    int       dummy_ii;
-
-
-    rc_ii = mod_get_ram_modules (type_iv);
-    if (rc_ii)
-        return (1);
-
-    rc_ii = mod_get_current_list (type_iv, &nr_modules_ii, &dummy_ii);
-    if (rc_ii)
-        return (1);
-
-    dia_status_on (&win_ri, "");
-    success_ii = FALSE;
-    i_ii = 0;
-
-    while (i_ii < nr_modules_ii && !success_ii)
-        {
-        dia_status (&win_ri, ((i_ii + 1) * 100) / nr_modules_ii);
-        if (!mod_try_auto (&mod_current_arm [i_ii], &win_ri))
-            success_ii = TRUE;
-        else
-            i_ii++;
-        }
-
-    win_close (&win_ri);
-    if (success_ii)
-        return (0);
-    else
-        return (-1);
-    }
-
-
-int mod_get_mod_type (char *name_tv)
-    {
-    int  i_ii;
-    int  found_ii = FALSE;
-
-    /* This really needs fixing! -- snwint */
-    if(strstr(name_tv, "i2o_") == name_tv) return MOD_TYPE_SCSI;
-
-    i_ii = 0;
-    while (i_ii < NR_SCSI_MODULES && !found_ii)
-        if (!strcmp (name_tv, mod_scsi_mod_arm [i_ii].module_name))
-            found_ii = TRUE;
-        else
-            i_ii++;
-
-    if (found_ii)
-        return (MOD_TYPE_SCSI);
-
-    i_ii = 0;
-    while (i_ii < NR_CDROM_MODULES && !found_ii)
-        if (!strcmp (name_tv, mod_cdrom_mod_arm [i_ii].module_name))
-            found_ii = TRUE;
-        else
-            i_ii++;
-
-    if (found_ii)
-        return (MOD_TYPE_OTHER);
-
-    i_ii = 0;
-    while (i_ii < NR_NET_MODULES && !found_ii)
-        if (!strcmp (name_tv, mod_net_mod_arm [i_ii].module_name))
-            found_ii = TRUE;
-        else
-            i_ii++;
-
-    if (found_ii)
-        return (MOD_TYPE_NET);
-    else
-        return (-1);
-    }
-
-
-void mod_autoload (void)
-    {
-    int       i_ii;
-    int       nr_iv = 0;
-    window_t  win_ri;
-    char      text_ti [200];
-    int       rc_ii;
-    int       nr_modules_ii, more_ii;
-
-    rc_ii = mod_get_current_list (MOD_TYPE_SCSI, &nr_modules_ii, &more_ii);
-
-    /* what if there are _no_ network mods on the modules disk??? */
-    if (rc_ii || !nr_modules_ii)
-    {
-//        if (mod_getmoddisk (MOD_TYPE_SCSI)) return;
-    }
-
-    dia_status_on (&win_ri, "");
-
-    config.suppress_warnings = 1;
-    rc_ii = mod_get_ram_modules (MOD_TYPE_SCSI);
-    config.suppress_warnings = 0;
-
-    if (!rc_ii)
-        {
-        for (i_ii = 0; i_ii < NR_SCSI_MODULES; i_ii++)
-            {
-            dia_status (&win_ri, (nr_iv++ * 100) / (NR_SCSI_MODULES + NR_NET_MODULES));
-            if (!mod_try_auto (&mod_scsi_mod_arm [i_ii], &win_ri))
-                {
-#if 0
-                if (!scsi_tg [0])
-                    strcpy (scsi_tg, mod_scsi_mod_arm [i_ii].module_name);
-#endif
-                sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
-                         mod_scsi_mod_arm [i_ii].module_name);
-                strcat (text_ti, "\n\n");
-                strcat (text_ti, txt_get (TXT_WANT_MORE_SCSI));
-                if (!auto_ig && dia_yesno (text_ti, NO) != YES)
-                    {
-                    i_ii = NR_SCSI_MODULES;
-                    nr_iv = NR_SCSI_MODULES;
-                    }
-                }
-            }
-        }
-
-    config.suppress_warnings = 1;
-    rc_ii = mod_get_ram_modules (MOD_TYPE_NET);
-    config.suppress_warnings = 0;
-
-    if (!rc_ii)
-        {
-        for (i_ii = 0; i_ii < NR_NET_MODULES; i_ii++)
-            {
-            dia_status (&win_ri, (nr_iv++ * 100) / (NR_SCSI_MODULES + NR_NET_MODULES));
-            if (!mod_try_auto (&mod_net_mod_arm [i_ii], &win_ri))
-                {
-#if 0
-                if (!net_tg [0])
-                    strcpy (net_tg, mod_net_mod_arm [i_ii].module_name);
-#endif
-                sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
-                         mod_net_mod_arm [i_ii].module_name);
-                strcat (text_ti, "\n\n");
-                strcat (text_ti, txt_get (TXT_WANT_MORE_NET));
-                if (!auto_ig && dia_yesno (text_ti, NO) != YES)
-                    {
-                    i_ii = NR_NET_MODULES;
-                    nr_iv = NR_SCSI_MODULES + NR_NET_MODULES;
-                    }
-                }
-            }
-        }
-
-#if 0
-    if (!mod_getmoddisk ())
-        {
-        rc_ii = mod_get_ram_modules (MOD_TYPE_OTHER);
-        if (rc_ii)
-            {
-            win_close (&win_ri);
-            return;
-            }
-        for (i_ii = 0; i_ii < NR_CDROM_MODULES; i_ii++)
-            {
-            dia_status (&win_ri, (nr_iv++ * 100) / NR_MODULES);
-            if (!mod_try_auto (&mod_cdrom_mod_arm [i_ii], &win_ri))
-                {
-                if (!cdrom_tg [0])
-                    strcpy (cdrom_tg, mod_cdrom_mod_arm [i_ii].module_name);
-                sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
-                         mod_cdrom_mod_arm [i_ii].module_name);
-                strcat (text_ti, "\n\n");
-                strcat (text_ti, txt_get (TXT_WANT_MORE_CDROM));
-                if (dia_yesno (text_ti, NO) != YES)
-                    i_ii = NR_CDROM_MODULES;
-                }
-            }
-        }
-#endif
-
-    win_close (&win_ri);
-    if (!auto_ig)
-        {
-        (void) dia_show_file (txt_get (TXT_INFO_KERNEL), kernellog_tg, TRUE);
-        mod_show_modules ();
-        }
-    }
-
-
-static int mod_try_auto (module_t *module_prv, window_t *status_prv)
-    {
-    char   text_ti [STATUS_SIZE];
-    int    rc_ii = -1;
-    char   tmp_ti [12];
-
-
-    memset (text_ti, ' ', STATUS_SIZE);
-    strncpy (tmp_ti, module_prv->module_name, sizeof (tmp_ti) - 1);
-    tmp_ti [sizeof (tmp_ti) - 1] = 0;
-/*
- * Don't use translated text here for now. We should get around the
- * fixed buffer size at some point, though...
- */
-//    sprintf (text_ti + 13, txt_get (TXT_AUTO_RUNNING), tmp_ti);
-    sprintf (text_ti + 13, "Autoprobing (%s)...      ", tmp_ti);
-    disp_set_color (status_prv->fg_color, status_prv->bg_color);
-    win_print (status_prv, 2, 2, text_ti);
-    fflush (stdout);
-
-    if (mod_auto_allowed (module_prv->id) ||
-        (/* demo_ig && */ mod_current_arm == mod_cdrom_mod_arm))
-        rc_ii = mod_load_module (module_prv->module_name, module_prv->example);
-
-    return (rc_ii);
-    }
-
-
-static int mod_auto_allowed (enum modid_t id_iv)
-    {
-    int  i_ii = 0;
-    int  found_ii = FALSE;
-
-    while (i_ii < NR_NO_AUTOPROBE && !found_ii)
-        if (id_iv == mod_noauto_arm [i_ii])
-            found_ii = TRUE;
-        else
-            i_ii++;
-
-    return (!found_ii);
-    }
-
-
-static int mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
-                                 int *more_pir)
-    {
-    module_t      *test_modules_pri;
-    struct dirent *module_pri;
-    DIR           *directory_ri;
-    int            i_ii;
-    int            max_ii = 0;
-    int            found_ii;
-    char           tmp_ti [30];
-
-
-    switch (mod_type_iv)
-        {
-        case MOD_TYPE_SCSI:
-            test_modules_pri = mod_scsi_mod_arm;
-            max_ii = NR_SCSI_MODULES;
-            break;
-        case MOD_TYPE_OTHER:
-            test_modules_pri = mod_cdrom_mod_arm;
-            max_ii = NR_CDROM_MODULES;
-            break;
-        case MOD_TYPE_NET:
-            test_modules_pri = mod_net_mod_arm;
-            max_ii = NR_NET_MODULES;
-            break;
-        default:
-            return (-1);
-            break;
-        }
-
-    directory_ri = opendir (config.module.dir);
-    if (!directory_ri)
-        return (-1);
-
-    *nr_modules_pir = 0;
-    *more_pir = FALSE;
-    module_pri = readdir (directory_ri);
-    while (module_pri)
-        {
-        i_ii = 0;
-        found_ii = FALSE;
-
-        while (i_ii < max_ii && !found_ii)
-            {
-            sprintf (tmp_ti, "%s.o", test_modules_pri [i_ii].module_name);
-            if (!strcmp (tmp_ti, module_pri->d_name))
-                found_ii = TRUE;
-            else
-                i_ii++;
-            }
-
-        if (found_ii)
-            memcpy (&mod_current_arm [(*nr_modules_pir)++], &test_modules_pri [i_ii],
-                    sizeof (module_t));
-        else if (!strcmp ("MORE", module_pri->d_name))
-            *more_pir = TRUE;
-
-        module_pri = readdir (directory_ri);
-        }
-
-    (void) closedir (directory_ri);
-
-    mod_sort_list (mod_current_arm, *nr_modules_pir);
-
-    return (0);
-    }
-
-
-static void mod_sort_list (module_t modlist_parr [], int nr_modules_iv)
-    {
-    int       index_ii = 0;
-    int       i_ii;
-    module_t  tmp_mod_ri;
-
-
-    while (index_ii < nr_modules_iv)
-        {
-        for (i_ii = index_ii; i_ii < nr_modules_iv; i_ii++)
-            if (modlist_parr [i_ii].order < modlist_parr [index_ii].order)
-                {
-                memcpy (&tmp_mod_ri, &modlist_parr [i_ii], sizeof (module_t));
-                memcpy (&modlist_parr [i_ii], &modlist_parr [index_ii], sizeof (module_t));
-                memcpy (&modlist_parr [index_ii], &tmp_mod_ri, sizeof (module_t));
-                }
-
-        index_ii++;
-        }
-    }
 
 
 int mod_pcmcia_ok()
@@ -1446,4 +1040,424 @@ void mod_update_netdevice_list(char *module, int add)
 
   file_free_file(f0);
 }
+
+
+
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//
+//             ********* below is historical code *********
+//
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+#if 0
+int mod_get_ram_modules (int type_iv)
+    {
+    char      testfile_ti [MAX_FILENAME];
+    char     *modfile_pci;
+    int       rc_ii = 0;
+    int i;
+
+
+    strcpy (testfile_ti, config.module.dir);
+    if (type_iv == MOD_TYPE_SCSI)
+        {
+        strcat (testfile_ti, "/SCSI");
+        modfile_pci = "scsi-mod.gz";
+        }
+    else if (type_iv == MOD_TYPE_NET)
+        {
+        strcat (testfile_ti, "/NET");
+        modfile_pci = "net-mod.gz";
+        }
+    else
+        {
+        strcat (testfile_ti, "/OTHER");
+        modfile_pci = "other-mod.gz";
+        }
+
+    if (!util_check_exist (testfile_ti))
+        mod_free_modules ();
+
+    if (!util_check_exist (testfile_ti) || mod_force_moddisk_im)
+        {
+        for(i = 0; i < config.floppies; i++) {
+          if(!util_mount_ro(config.floppy_dev[i], mountpoint_tg)) break;
+        }
+        if(i < config.floppies) {
+          config.floppy = i;	// remember currently used floppy
+        }
+        else {
+          rc_ii = -1;
+          /* Try /dev/fd0 anyway, in case the user has inserted a floppy _now_. */
+          if(!config.floppies) {
+            rc_ii = util_mount_ro("/dev/fd0", mountpoint_tg);
+          }
+          if(rc_ii) {
+            dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+            mod_force_moddisk_im = FALSE;
+            return rc_ii;
+          }
+        }
+
+        sprintf (testfile_ti, "%s/%s", mountpoint_tg, modfile_pci);
+        rc_ii = root_load_rootimage (testfile_ti);
+        umount (mountpoint_tg);
+        if (!rc_ii)
+            {
+            rc_ii = util_mount_ro (RAMDISK_2, config.module.dir);
+
+            if (rc_ii)
+                dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+
+//            mod_ram_modules_im = TRUE;
+            mod_force_moddisk_im = FALSE;
+            }
+        }
+
+    return (rc_ii);
+    }
+#endif
+
+
+#if 0
+int mod_auto (int type_iv)
+    {
+    int       nr_modules_ii;
+    int       i_ii;
+    window_t  win_ri;
+    int       rc_ii;
+    int       success_ii;
+    int       dummy_ii;
+
+
+    rc_ii = mod_get_ram_modules (type_iv);
+    if (rc_ii)
+        return (1);
+
+    rc_ii = mod_get_current_list (type_iv, &nr_modules_ii, &dummy_ii);
+    if (rc_ii)
+        return (1);
+
+    dia_status_on (&win_ri, "");
+    success_ii = FALSE;
+    i_ii = 0;
+
+    while (i_ii < nr_modules_ii && !success_ii)
+        {
+        dia_status (&win_ri, ((i_ii + 1) * 100) / nr_modules_ii);
+        if (!mod_try_auto (&mod_current_arm [i_ii], &win_ri))
+            success_ii = TRUE;
+        else
+            i_ii++;
+        }
+
+    win_close (&win_ri);
+    if (success_ii)
+        return (0);
+    else
+        return (-1);
+    }
+
+#endif
+
+
+#if 0
+int mod_get_mod_type (char *name_tv)
+    {
+    int  i_ii;
+    int  found_ii = FALSE;
+
+    /* This really needs fixing! -- snwint */
+    if(strstr(name_tv, "i2o_") == name_tv) return MOD_TYPE_SCSI;
+
+    i_ii = 0;
+    while (i_ii < NR_SCSI_MODULES && !found_ii)
+        if (!strcmp (name_tv, mod_scsi_mod_arm [i_ii].module_name))
+            found_ii = TRUE;
+        else
+            i_ii++;
+
+    if (found_ii)
+        return (MOD_TYPE_SCSI);
+
+    i_ii = 0;
+    while (i_ii < NR_CDROM_MODULES && !found_ii)
+        if (!strcmp (name_tv, mod_cdrom_mod_arm [i_ii].module_name))
+            found_ii = TRUE;
+        else
+            i_ii++;
+
+    if (found_ii)
+        return (MOD_TYPE_OTHER);
+
+    i_ii = 0;
+    while (i_ii < NR_NET_MODULES && !found_ii)
+        if (!strcmp (name_tv, mod_net_mod_arm [i_ii].module_name))
+            found_ii = TRUE;
+        else
+            i_ii++;
+
+    if (found_ii)
+        return (MOD_TYPE_NET);
+    else
+        return (-1);
+    }
+#endif
+
+#if 0
+void mod_autoload (void)
+    {
+    int       i_ii;
+    int       nr_iv = 0;
+    window_t  win_ri;
+    char      text_ti [200];
+    int       rc_ii;
+    int       nr_modules_ii, more_ii;
+
+    rc_ii = mod_get_current_list (MOD_TYPE_SCSI, &nr_modules_ii, &more_ii);
+
+    /* what if there are _no_ network mods on the modules disk??? */
+    if (rc_ii || !nr_modules_ii)
+    {
+//        if (mod_getmoddisk (MOD_TYPE_SCSI)) return;
+    }
+
+    dia_status_on (&win_ri, "");
+
+    config.suppress_warnings = 1;
+    rc_ii = mod_get_ram_modules (MOD_TYPE_SCSI);
+    config.suppress_warnings = 0;
+
+    if (!rc_ii)
+        {
+        for (i_ii = 0; i_ii < NR_SCSI_MODULES; i_ii++)
+            {
+            dia_status (&win_ri, (nr_iv++ * 100) / (NR_SCSI_MODULES + NR_NET_MODULES));
+            if (!mod_try_auto (&mod_scsi_mod_arm [i_ii], &win_ri))
+                {
+#if 0
+                if (!scsi_tg [0])
+                    strcpy (scsi_tg, mod_scsi_mod_arm [i_ii].module_name);
+#endif
+                sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
+                         mod_scsi_mod_arm [i_ii].module_name);
+                strcat (text_ti, "\n\n");
+                strcat (text_ti, txt_get (TXT_WANT_MORE_SCSI));
+                if (!auto_ig && dia_yesno (text_ti, NO) != YES)
+                    {
+                    i_ii = NR_SCSI_MODULES;
+                    nr_iv = NR_SCSI_MODULES;
+                    }
+                }
+            }
+        }
+
+    config.suppress_warnings = 1;
+    rc_ii = mod_get_ram_modules (MOD_TYPE_NET);
+    config.suppress_warnings = 0;
+
+    if (!rc_ii)
+        {
+        for (i_ii = 0; i_ii < NR_NET_MODULES; i_ii++)
+            {
+            dia_status (&win_ri, (nr_iv++ * 100) / (NR_SCSI_MODULES + NR_NET_MODULES));
+            if (!mod_try_auto (&mod_net_mod_arm [i_ii], &win_ri))
+                {
+#if 0
+                if (!net_tg [0])
+                    strcpy (net_tg, mod_net_mod_arm [i_ii].module_name);
+#endif
+                sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
+                         mod_net_mod_arm [i_ii].module_name);
+                strcat (text_ti, "\n\n");
+                strcat (text_ti, txt_get (TXT_WANT_MORE_NET));
+                if (!auto_ig && dia_yesno (text_ti, NO) != YES)
+                    {
+                    i_ii = NR_NET_MODULES;
+                    nr_iv = NR_SCSI_MODULES + NR_NET_MODULES;
+                    }
+                }
+            }
+        }
+
+#if 0
+    if (!mod_getmoddisk ())
+        {
+        rc_ii = mod_get_ram_modules (MOD_TYPE_OTHER);
+        if (rc_ii)
+            {
+            win_close (&win_ri);
+            return;
+            }
+        for (i_ii = 0; i_ii < NR_CDROM_MODULES; i_ii++)
+            {
+            dia_status (&win_ri, (nr_iv++ * 100) / NR_MODULES);
+            if (!mod_try_auto (&mod_cdrom_mod_arm [i_ii], &win_ri))
+                {
+                if (!cdrom_tg [0])
+                    strcpy (cdrom_tg, mod_cdrom_mod_arm [i_ii].module_name);
+                sprintf (text_ti, txt_get (TXT_LOAD_SUCCESSFUL),
+                         mod_cdrom_mod_arm [i_ii].module_name);
+                strcat (text_ti, "\n\n");
+                strcat (text_ti, txt_get (TXT_WANT_MORE_CDROM));
+                if (dia_yesno (text_ti, NO) != YES)
+                    i_ii = NR_CDROM_MODULES;
+                }
+            }
+        }
+#endif
+
+    win_close (&win_ri);
+    if (!auto_ig)
+        {
+        (void) dia_show_file (txt_get (TXT_INFO_KERNEL), kernellog_tg, TRUE);
+        mod_show_modules ();
+        }
+    }
+#endif
+
+
+#if 0
+static int mod_try_auto (module_t *module_prv, window_t *status_prv)
+    {
+    char   text_ti [STATUS_SIZE];
+    int    rc_ii = -1;
+    char   tmp_ti [12];
+
+
+    memset (text_ti, ' ', STATUS_SIZE);
+    strncpy (tmp_ti, module_prv->module_name, sizeof (tmp_ti) - 1);
+    tmp_ti [sizeof (tmp_ti) - 1] = 0;
+/*
+ * Don't use translated text here for now. We should get around the
+ * fixed buffer size at some point, though...
+ */
+//    sprintf (text_ti + 13, txt_get (TXT_AUTO_RUNNING), tmp_ti);
+    sprintf (text_ti + 13, "Autoprobing (%s)...      ", tmp_ti);
+    disp_set_color (status_prv->fg_color, status_prv->bg_color);
+    win_print (status_prv, 2, 2, text_ti);
+    fflush (stdout);
+
+    if (mod_auto_allowed (module_prv->id) ||
+        (/* demo_ig && */ mod_current_arm == mod_cdrom_mod_arm))
+        rc_ii = mod_load_module (module_prv->module_name, module_prv->example);
+
+    return (rc_ii);
+    }
+#endif
+
+#if 0
+static int mod_auto_allowed (enum modid_t id_iv)
+    {
+    int  i_ii = 0;
+    int  found_ii = FALSE;
+
+    while (i_ii < NR_NO_AUTOPROBE && !found_ii)
+        if (id_iv == mod_noauto_arm [i_ii])
+            found_ii = TRUE;
+        else
+            i_ii++;
+
+    return (!found_ii);
+    }
+#endif
+
+#if 0
+static int mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
+                                 int *more_pir)
+    {
+    module_t      *test_modules_pri;
+    struct dirent *module_pri;
+    DIR           *directory_ri;
+    int            i_ii;
+    int            max_ii = 0;
+    int            found_ii;
+    char           tmp_ti [30];
+
+
+    switch (mod_type_iv)
+        {
+        case MOD_TYPE_SCSI:
+            test_modules_pri = mod_scsi_mod_arm;
+            max_ii = NR_SCSI_MODULES;
+            break;
+        case MOD_TYPE_OTHER:
+            test_modules_pri = mod_cdrom_mod_arm;
+            max_ii = NR_CDROM_MODULES;
+            break;
+        case MOD_TYPE_NET:
+            test_modules_pri = mod_net_mod_arm;
+            max_ii = NR_NET_MODULES;
+            break;
+        default:
+            return (-1);
+            break;
+        }
+
+    directory_ri = opendir (config.module.dir);
+    if (!directory_ri)
+        return (-1);
+
+    *nr_modules_pir = 0;
+    *more_pir = FALSE;
+    module_pri = readdir (directory_ri);
+    while (module_pri)
+        {
+        i_ii = 0;
+        found_ii = FALSE;
+
+        while (i_ii < max_ii && !found_ii)
+            {
+            sprintf (tmp_ti, "%s.o", test_modules_pri [i_ii].module_name);
+            if (!strcmp (tmp_ti, module_pri->d_name))
+                found_ii = TRUE;
+            else
+                i_ii++;
+            }
+
+        if (found_ii)
+            memcpy (&mod_current_arm [(*nr_modules_pir)++], &test_modules_pri [i_ii],
+                    sizeof (module_t));
+        else if (!strcmp ("MORE", module_pri->d_name))
+            *more_pir = TRUE;
+
+        module_pri = readdir (directory_ri);
+        }
+
+    (void) closedir (directory_ri);
+
+    mod_sort_list (mod_current_arm, *nr_modules_pir);
+
+    return (0);
+    }
+#endif
+
+
+#if 0
+static void mod_sort_list (module_t modlist_parr [], int nr_modules_iv)
+    {
+    int       index_ii = 0;
+    int       i_ii;
+    module_t  tmp_mod_ri;
+
+
+    while (index_ii < nr_modules_iv)
+        {
+        for (i_ii = index_ii; i_ii < nr_modules_iv; i_ii++)
+            if (modlist_parr [i_ii].order < modlist_parr [index_ii].order)
+                {
+                memcpy (&tmp_mod_ri, &modlist_parr [i_ii], sizeof (module_t));
+                memcpy (&modlist_parr [i_ii], &modlist_parr [index_ii], sizeof (module_t));
+                memcpy (&modlist_parr [index_ii], &tmp_mod_ri, sizeof (module_t));
+                }
+
+        index_ii++;
+        }
+    }
+#endif
+
 

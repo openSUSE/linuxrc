@@ -92,7 +92,9 @@ struct {
  *
  */
 
-static int  dia_win_open (window_t *win_prr, char *txt_tv);
+static int dia_binary(char *txt, char *button0, char *button1, int def);
+static int dia_win_open (window_t *win_prr, char *txt_tv);
+static int strwidth(char *str);
 
 /*
  *
@@ -100,82 +102,90 @@ static int  dia_win_open (window_t *win_prr, char *txt_tv);
  *
  */
 
-int dia_yesno (char *txt_tv, int default_iv)
-    {
-    window_t  win_ri;
-    button_t  yes_button_ri;
-    button_t  no_button_ri;
-    button_t *buttons_ari [2] = { &yes_button_ri, &no_button_ri };
-    int       width_ii;
-    int       answer_ii;
+int dia_contabort(char *txt, int def)
+{
+  int i;
 
+  i = dia_binary(txt, txt_get(TXT_CONTINUE), txt_get(TXT_ABORT), def == NO ? 1 : 0);
 
-    disp_toggle_output (DISP_OFF);
-    memset (&win_ri, 0, sizeof (window_t));
-    win_ri.bg_color = colors_prg->choice_win;
-    win_ri.fg_color = colors_prg->choice_fg;
-    width_ii = dia_win_open (&win_ri, txt_tv);
+  switch(i) {
+    case 0:
+      return YES;
+    case 1:
+      return NO;
+    default:
+      return ESCAPE;
+  }
+}
 
-    util_generate_button (&yes_button_ri, txt_get (TXT_YES));
-    util_generate_button (&no_button_ri, txt_get (TXT_NO));
+int dia_yesno(char *txt, int def)
+{
+  int i;
 
-    win_add_button (&win_ri, &yes_button_ri,
-                    width_ii / 3 - strlen (yes_button_ri.text) / 2 - 3,
-                    strlen (yes_button_ri.text));
-    win_add_button (&win_ri, &no_button_ri, width_ii - width_ii / 3 -
-                    strlen (yes_button_ri.text) / 2 + 2,
-                    strlen (no_button_ri.text));
+  i = dia_binary(txt, txt_get(TXT_YES), txt_get(TXT_NO), def == NO ? 1 : 0);
 
-    disp_flush_area (&win_ri);
-    answer_ii = win_choose_button (buttons_ari, 2, default_iv == NO ? 2 : 1);
-    win_close (&win_ri);
+  switch(i) {
+    case 0:
+      return YES;
+    case 1:
+      return NO;
+    default:
+      return ESCAPE;
+  }
+}
 
-    if (answer_ii == 1)
-        return (YES);
-    else if (answer_ii == 2)
-        return (NO);
-    else
-        return (ESCAPE);
-    }
+int dia_okcancel(char *txt, int def)
+{
+  int i;
 
+  i = dia_binary(txt, txt_get(TXT_OK), txt_get(TXT_CANCEL), def == NO ? 1 : 0);
 
-int dia_okcancel (char *txt_tv, int default_iv)
-    {
-    window_t  win_ri;
-    button_t  yes_button_ri;
-    button_t  no_button_ri;
-    button_t *buttons_ari [2] = { &yes_button_ri, &no_button_ri };
-    int       width_ii;
-    int       answer_ii;
+  switch(i) {
+    case 0:
+      return YES;
+    case 1:
+      return NO;
+    default:
+      return ESCAPE;
+  }
+}
 
+/*
+ * Show dialog with two buttons; returns the botton that was selected.
+ */
+int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
+{
+  window_t win;
+  button_t button0, button1;
+  button_t *buttons[2] = { &button0, &button1 };
+  int width, answer;
+  int len0, len1, len_max;
 
-    disp_toggle_output (DISP_OFF);
-    memset (&win_ri, 0, sizeof (window_t));
-    win_ri.bg_color = colors_prg->choice_win;
-    win_ri.fg_color = colors_prg->choice_fg;
-    width_ii = dia_win_open (&win_ri, txt_tv);
+  disp_toggle_output(DISP_OFF);
+  memset(&win, 0, sizeof win);
+  win.bg_color = colors_prg->choice_win;
+  win.fg_color = colors_prg->choice_fg;
+  width = dia_win_open(&win, txt);
 
-    util_generate_button (&yes_button_ri, "Ok");
-    util_generate_button (&no_button_ri, "Cancel");
+  len0 = strlen(button0_txt);
+  len1 = strlen(button1_txt);
+  len_max = len0 > len1 ? len0 : len1;
 
-    win_add_button (&win_ri, &yes_button_ri,
-                    width_ii / 3 - strlen (yes_button_ri.text) / 2 - 3,
-                    strlen (yes_button_ri.text));
-    win_add_button (&win_ri, &no_button_ri, width_ii - width_ii / 3 -
-                    strlen (yes_button_ri.text) / 2 + 2,
-                    strlen (no_button_ri.text));
+  util_generate_button(buttons[0], button0_txt, len_max);
+  util_generate_button(buttons[1], button1_txt, len_max);
 
-    disp_flush_area (&win_ri);
-    answer_ii = win_choose_button (buttons_ari, 2, default_iv == NO ? 2 : 1);
-    win_close (&win_ri);
+  len0 = strlen(button0.text);
+  len1 = strlen(button1.text);
 
-    if (answer_ii == 1)
-        return (YES);
-    else if (answer_ii == 2)
-        return (NO);
-    else
-        return (ESCAPE);
-    }
+  win_add_button(&win, buttons[0], width / 3 - len0 / 2 - 3, len0);
+  win_add_button(&win, buttons[1], width - width / 3 - len1 / 2 + 2, len1);
+
+  disp_flush_area(&win);
+  answer = win_choose_button(buttons, 2, def + 1) - 1;
+  win_close(&win);
+
+  return answer;
+}
 
 
 int dia_message (char *txt_tv, int msgtype_iv)
@@ -184,7 +194,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
     int       width_ii;
     button_t  button_ri;
     int       key_ii;
-
+    char *s;
 
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
@@ -200,7 +210,8 @@ int dia_message (char *txt_tv, int msgtype_iv)
         win_ri.fg_color = colors_prg->msg_fg;
         }
     width_ii = dia_win_open (&win_ri, txt_tv);
-    util_generate_button (&button_ri, txt_get (TXT_OK));
+    s = txt_get(TXT_OK);
+    util_generate_button (&button_ri, s, strlen(s));
     win_add_button (&win_ri, &button_ri,
                     width_ii / 2 - strlen (button_ri.text) / 2 - 1,
                     strlen (button_ri.text));
@@ -261,6 +272,8 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     int       need_redraw_ii;
     int       scrollbar_ii;
     int       rc_ii;
+    int len0, len1, len_max;
+    char *s0, *s1;
 
 
     disp_toggle_output (DISP_OFF);
@@ -318,9 +331,15 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
         free (lines_ati [i_ii - 1]);
         }
     
+    s0 = txt_get (TXT_OK);
+    s1 = txt_get (TXT_CANCEL);
 
-    util_generate_button (&yes_button_ri, txt_get (TXT_OK));
-    util_generate_button (&no_button_ri, txt_get (TXT_CANCEL));
+    len0 = strlen(s0);
+    len1 = strlen(s1);
+    len_max = len0 > len1 ? len0 : len1;
+
+    util_generate_button (&yes_button_ri, s0, len_max);
+    util_generate_button (&no_button_ri, s1, len_max);
 
     win_add_button (&menu_win_ri, &yes_button_ri,
                     width_ii / 3 - strlen (yes_button_ri.text) / 2 - 3,
@@ -704,6 +723,7 @@ int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
     int       sb_len_ii;
     int       sb_start_ii;
     int       needflush_ii;
+    char *s;
 
 
     if (!nr_lines_iv || width_iv < 8)
@@ -751,7 +771,8 @@ int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
         free (lines_ati [i_ii - 1]);
         }
     
-    util_generate_button (&button_ri, txt_get (TXT_OK));
+    s = txt_get (TXT_OK);
+    util_generate_button (&button_ri, s, strlen(s));
 
     win_add_button (&file_win_ri, &button_ri,
                     width_iv / 2 - strlen (button_ri.text) / 2 - 1,
@@ -1016,7 +1037,7 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
     int        i_ii;
 
 
-    width_ii = strlen (txt_tv) + 6;
+    width_ii = strwidth (txt_tv) + 6;
     if (width_ii < MIN_WIN_SIZE)
         width_ii = MIN_WIN_SIZE;
 
@@ -1258,5 +1279,24 @@ int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
   if(*buf) *input = strdup(buf);
 
   return i;
+}
+
+/*
+ * return string width, taking line breaks into account
+ */
+int strwidth(char *str)
+{
+  int i, width = 0;
+
+  for(i = 0; *str; str++) {
+    if(*str == '\n') {
+      i = 0;
+    }
+    else {
+      if(++i > width) width = i;
+    }
+  }
+
+  return width;
 }
 

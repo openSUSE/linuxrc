@@ -148,7 +148,8 @@ static struct {
   { key_usedhcp,        "UseDHCP"          },
   { key_nfsport,        "NFSPort"          },
   { key_dhcptimeout,    "DHCPTimeout"      },
-  { key_tftptimeout,    "TFTPTimeout"      }
+  { key_tftptimeout,    "TFTPTimeout"      },
+  { key_tmpfs,          "TmpFS"            }
 };
 
 static struct {
@@ -443,7 +444,7 @@ char *file_read_info_file(char *file, char *file2)
 
   if(mounted) umount(mountpoint_tg);
 
-  if(config.info.mod_autoload) mod_autoload();
+//  if(config.info.mod_autoload) mod_autoload();
 
 #if WITH_PCMCIA
 //  if(config.info.start_pcmcia) pcmcia_load_core();
@@ -621,6 +622,10 @@ void file_do_info(file_t *f0)
 
       case key_minmemfree:
         if(f->is.numeric) config.memory.min_free = f->nvalue;
+        break;
+
+      case key_tmpfs:
+        if(f->is.numeric) config.tmpfs = f->nvalue;
         break;
 
       case key_domain:

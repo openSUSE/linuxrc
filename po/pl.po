@@ -834,3 +834,15 @@ msgstr ""
 msgid "%s file system found."
 msgstr ""
 
+#. TXT_CONTINUE
+msgid "Continue"
+msgstr ""
+
+#. TXT_ABORT
+msgid "Abort"
+msgstr ""
+
+#. TXT_NO_NEW_MODULES
+msgid "No new modules found."
+msgstr ""
+

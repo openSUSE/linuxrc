@@ -886,3 +886,15 @@ msgstr "Bitte legen Sie die Samba-Diskette ein."
 msgid "%s Dateisystem gefunden."
 msgstr ""
 
+#. TXT_CONTINUE
+msgid "Continue"
+msgstr "Weiter"
+
+#. TXT_ABORT
+msgid "Abort"
+msgstr "Abbrechen"
+
+#. TXT_NO_NEW_MODULES
+msgid "No new modules found."
+msgstr "Es wurden keine neuen Module gefunden."
+

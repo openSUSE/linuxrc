@@ -909,6 +909,8 @@ int *e;                 /* last block flag */
   register ulg b;       /* bit buffer */
   register unsigned k;  /* number of bits in bit buffer */
 
+  if(exit_code) return exit_code;
+
   DEBG("<blk");
 
   /* make local bit buffer */

@@ -573,6 +573,7 @@ void lxrc_init()
   }
 
   config.inst_ramdisk = -1;
+  config.module.ramdisk = -1;
 
   util_free_mem();
   config.memory.min_free = 10240;	// at least 10MB
@@ -756,6 +757,7 @@ void lxrc_init()
 
   if(!(config.test || serial_ig)) {
     util_start_shell("/dev/tty9", "/bin/lsh", 0);
+    config.shell_started = 1;
   }
 
 #ifdef USE_LIBHD

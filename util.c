@@ -134,12 +134,14 @@ void util_center_text (char *txt_tr, int size_iv)
     }
 
 
-void util_generate_button (button_t *button_prr, char *txt_tv)
-    {
-    memset (button_prr, 0, sizeof (button_t));
-    strncpy (button_prr->text, txt_tv, BUTTON_SIZE);
-    util_center_text (button_prr->text, BUTTON_SIZE);
-    }
+void util_generate_button(button_t *button, char *txt, int size)
+{
+  size = size > 8 ? BUTTON_SIZE_LARGE : BUTTON_SIZE_NORMAL;
+
+  memset(button, 0, sizeof *button);
+  strncpy(button->text, txt, size - 1);
+  util_center_text(button->text, size);
+}
 
 
 int util_format_txt (char *txt_tv, char *lines_atr [], int width_iv)
@@ -895,6 +897,12 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "linuxrc = %s", config.linuxrc ?: "");
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "flags = ");
+  s = "";
+  if(config.test) { sprintf(buf + strlen(buf), "%stest", s); s = ", "; }
+  if(config.tmpfs) { sprintf(buf + strlen(buf), "%stmpfs", s); s = ", "; }
   slist_append_str(&sl0, buf);
 
   if(config.autoyast) {

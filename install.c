@@ -165,9 +165,11 @@ int inst_start_demo (void)
         if (demo_ig)
             if (!info_eide_cd_exists ())
                 {
+#if 0
                 rc_ii = mod_auto (MOD_TYPE_SCSI);
                 if (rc_ii || !info_scsi_cd_exists ())
                     (void) mod_auto (MOD_TYPE_OTHER);
+#endif
                 }
 
         if (strcmp (rootimage_tg, "test"))

@@ -62,7 +62,8 @@
 #define MAX_X            250
 #define MAX_Y            150
 
-#define BUTTON_SIZE        9
+#define BUTTON_SIZE_NORMAL	 9
+#define BUTTON_SIZE_LARGE	11
 /* MAX_PARAM_LEN should not be less than 256 */
 #define MAX_PARAM_LEN    256
 #define STATUS_SIZE       50
@@ -118,7 +119,7 @@ typedef struct {
 
 typedef struct {
                window_t  win;
-               char      text [BUTTON_SIZE];
+               char      text [BUTTON_SIZE_LARGE];
                }
         button_t;
 
@@ -211,6 +212,7 @@ typedef struct {
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
   unsigned live:1;		/* start live cd */
+  unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -253,7 +255,7 @@ typedef struct {
     int fs_type;		/* dto. */
     slist_t *input_params;	/* history for module loading dialog */
     slist_t *used_params;	/* parameters that were used for insmod */
-    unsigned ramdisk:1;		/* ramdisk currently mounted to dir */
+    int ramdisk;		/* ramdisk used for modules */
   } module;
 
   struct {

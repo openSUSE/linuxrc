@@ -16,7 +16,7 @@
 
 extern void util_redirect_kmsg     (void);
 extern void util_center_text       (char *txt_tr, int size_iv);
-extern void util_generate_button   (button_t *button_prr, char *txt_tv);
+extern void util_generate_button   (button_t *button, char *txt, int size);
 extern int  util_format_txt        (char *txt_tv, char *lines_atr [],
                                     int width_iv);
 extern void util_fill_string       (char *txt_tr, int size_iv);

@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <endian.h>
+#include <errno.h>
 
 #include "global.h"
 #include "text.h"
@@ -142,9 +143,13 @@ static struct {
 
 #define fd_read		root_infile_im
 
+static int ask_for_swap(int size);
 static int  root_check_root      (char *root_string_tv);
-static void root_update_status   (int  blocks_iv);
-static void root_load_compressed (void);
+static void root_update_status(int block);
+static int fill_inbuf(void);
+static void flush_window(void);
+static void error(char *msg);
+static int root_load_compressed(void);
 
 
 int root_load_rootimage(char *infile_tv)
@@ -295,6 +300,8 @@ void ramdisk_free(int rd)
 
   ramdisk_close(rd);
 
+  if(ramdisk_umount(rd)) return;
+
   i = util_free_ramdisk(config.ramdisk[rd].dev);
 
   if(!i) {
@@ -319,18 +326,7 @@ int ramdisk_write(int rd, void *buf, int count)
 
   util_update_meminfo();
 
-  if(config.memory.current - (count >> 10) < config.memory.min_free) {
-    if(config.win) {
-      i = dia_yesno("Activate some swap!", NO);
-      if(i != YES) return -1;
-    }
-    else {
-      util_disp_init();
-      i = dia_yesno("Activate some swap!", NO);
-      if(i != YES) return -1;
-      util_disp_done();
-    }
-  }
+  if(ask_for_swap(count)) return -1;
 
   i = write(config.ramdisk[rd].fd, buf, count);
 
@@ -340,16 +336,80 @@ int ramdisk_write(int rd, void *buf, int count)
 }
 
 
+int ramdisk_umount(int rd)
+{
+  int i;
+
+  if(rd < 0 || rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return -1;
+
+  if(!config.ramdisk[rd].inuse) return -1;
+
+  if(!config.ramdisk[rd].mountpoint) return 0;
+
+  if(!(i = umount(config.ramdisk[rd].mountpoint))) {
+    str_copy(&config.ramdisk[rd].mountpoint, NULL);
+  }
+  else {
+    fprintf(stderr, "umount: %s: %s\n", config.ramdisk[rd].dev, strerror(errno));
+  }
+
+  return i;
+}
+
+
+int ramdisk_mount(int rd, char *dir)
+{
+  int i;
+
+  if(rd < 0 || rd >= sizeof config.ramdisk / sizeof *config.ramdisk) return -1;
+
+  if(!config.ramdisk[rd].inuse) return -1;
+
+  if(config.ramdisk[rd].mountpoint) return -1;
+
+  if(!(i = util_mount_ro(config.ramdisk[rd].dev, dir))) {
+    str_copy(&config.ramdisk[rd].mountpoint, dir);
+  }
+  else {
+    fprintf(stderr, "mount: %s: %s\n", config.ramdisk[rd].dev, strerror(errno));
+  }
+
+  return i;
+}
+
+
+/*
+ * Check if have still have enough free memory for 'size'.If not, ask user
+ * for more swap.
+ *
+ * return: 0 ok, -1 error
+ */
+int ask_for_swap(int size)
+{
+  int i, win_old;
+  char tmp[256];
+
+  if(config.memory.current - (size >> 10) < config.memory.min_free) {
+    if(!(win_old = config.win)) util_disp_init();
+    strcpy(tmp, "There is not enough memory to load all data.\n\nTo continue, activate some swap space.");
+    i = dia_contabort(tmp, NO);
+    if(!win_old) util_disp_done();
+    if(i != YES) return -1;
+  }
+
+  return 0;
+}
+
+
 /*
  * returns ramdisk index if successful
  */
 int load_image(char *file_name, instmode_t mode)
 {
-  char buffer[BLOCKSIZE];
-  int bytes_read;
-  int rc, current_block, compressed, filesize;
-  int error = 0, got_size = 0;
-  int i;
+  char buffer[BLOCKSIZE], cramfs_name[17];
+  int bytes_read, current_pos;
+  int i, rc, compressed;
+  int err = 0, got_size = 0;
   char *real_name = NULL;
   char *buf2;
   struct cramfs_super_block *cramfssb;
@@ -367,7 +427,7 @@ int load_image(char *file_name, instmode_t mode)
   image.rd = -1;
 
   if(mode != inst_floppy && mode != inst_net) {
-    rc = util_fileinfo(file_name, &filesize, &compressed);
+    rc = util_fileinfo(file_name, &i, &compressed);
     if(rc) {
       if(!config.suppress_warnings) {
         dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
@@ -376,26 +436,27 @@ int load_image(char *file_name, instmode_t mode)
     }
 
     got_size = 1;
-    root_nr_blocks_im = filesize / BLOCKSIZE;
+    root_nr_blocks_im = i / BLOCKSIZE;
   }
 
   if(mode == inst_net) {
     fd_read = net_open(file_name);
     if(fd_read < 0) {
       util_print_net_error();
-      error = 1;
+      err = 1;
     }
   }
   else {
     fd_read = open(file_name, O_RDONLY);
-    if(fd_read < 0) error = 1;
+    if(fd_read < 0) err = 1;
   }
 
   if((image.rd = ramdisk_open()) < 0) {
-    error = 1;
+    dia_message("No usable ramdisk found.", MSGTYPE_ERROR);
+    err = 1;
   }
 
-  if(error) {
+  if(err) {
     net_close(fd_read);
     ramdisk_close(image.rd);
     return -1;
@@ -433,21 +494,19 @@ int load_image(char *file_name, instmode_t mode)
 
         if((buf2[3] & 0x08)) {
           real_name = buf2 + 10;
-          for(i = 0; i < config.cache.size - 10 && i < 100; i++) {
+          for(i = 0; i < config.cache.size - 10 && i < 128; i++) {
             if(!real_name[i]) break;
           }
-          if(i > 100) real_name = NULL;
+          if(i > 128) real_name = NULL;
         }
       }
       else {
         cramfssb = (struct cramfs_super_block *) config.cache.buf;
         if(cramfsmagic((*cramfssb)) == CRAMFS_SUPER_MAGIC) {
           /* cramfs */
-          real_name = config.cache.buf + 0x30;
-          for(i = 0; i < config.cache.size - 0x30 && i < 100; i++) {
-            if(!real_name[i]) break;
-          }
-          if(i > 100) real_name = NULL;
+          memcpy(cramfs_name, config.cache.buf + 0x30, sizeof cramfs_name - 1);
+          cramfs_name[sizeof cramfs_name - 1] = 0;
+          real_name = cramfs_name;
           fprintf(stderr, "cramfs: \"%s\"\n", real_name);
         }
       }
@@ -459,10 +518,9 @@ int load_image(char *file_name, instmode_t mode)
       i = 0;
       if(sscanf(real_name, "%*s %d", &i) >= 1) {
         if(i > 0) {
-          filesize = i;
-          root_nr_blocks_im = filesize / BLOCKSIZE;
+          root_nr_blocks_im = i / BLOCKSIZE_KB;
           got_size = 1;
-          fprintf(stderr, "image size: %d\n", filesize);
+          fprintf(stderr, "image size: %d kB\n", i);
         }
       }
     }
@@ -474,6 +532,12 @@ int load_image(char *file_name, instmode_t mode)
   }
 
   if(got_size) {
+    if(ask_for_swap(root_nr_blocks_im * BLOCKSIZE)) {
+      net_close(fd_read);
+      ramdisk_free(image.rd);
+      return image.rd = -1;
+    }
+
     sprintf(buffer, "%s (%d kB)%s",
       txt_get(TXT_LOADING),
       root_nr_blocks_im * BLOCKSIZE_KB,
@@ -487,14 +551,17 @@ int load_image(char *file_name, instmode_t mode)
   dia_status_on(&root_status_win_rm, buffer);
 
   if(compressed) {
-    root_load_compressed();
+    err = root_load_compressed();
   }
   else {
-    current_block = 0;
+    current_pos = 0;
     while((bytes_read = net_read(fd_read, buffer, BLOCKSIZE)) > 0) {
       rc = ramdisk_write(image.rd, buffer, bytes_read);
-      if(rc != bytes_read) return -1;
-      root_update_status(++current_block);
+      if(rc != bytes_read) {
+        err = 1;
+        break;
+      }
+      root_update_status((current_pos += bytes_read) / BLOCKSIZE);
     }
   }
 
@@ -503,7 +570,12 @@ int load_image(char *file_name, instmode_t mode)
 
   win_close(&root_status_win_rm);
 
-  if(config.instmode == inst_floppy) {
+  if(err) {
+    fprintf(stderr, "error loading ramdisk\n");
+    ramdisk_free(image.rd);
+    image.rd = -1;
+  }
+  else if(config.instmode == inst_floppy) {
     dia_message(txt_get(TXT_REMOVE_DISK), MSGTYPE_INFO);
   }
 
@@ -621,18 +693,16 @@ int root_boot_system()
 }
 
 
-static void root_update_status (int  blocks_iv)
-    {
-    static int  old_percent_is;
-    int         percent_ii;
+void root_update_status(int block)
+{
+  static int old_percent_is;
+  int percent;
 
-    percent_ii = (blocks_iv * 100) / root_nr_blocks_im;
-    if (percent_ii != old_percent_is)
-        {
-        dia_status (&root_status_win_rm, percent_ii);
-        old_percent_is = percent_ii;
-        }
-    }
+  percent = (block * 100) / root_nr_blocks_im;
+  if(percent != old_percent_is) {
+    dia_status(&root_status_win_rm, old_percent_is = percent);
+  }
+}
 
 
 /* --------------------------------- GZIP -------------------------------- */
@@ -676,11 +746,14 @@ static void error(char *m);
 static void gzip_mark(void **);
 static void gzip_release(void **);
 
+
 #include "inflate.c"
+
 
 static void gzip_mark(void **ptr)
 {
 }
+
 
 static void gzip_release(void **ptr)
 {
@@ -691,7 +764,7 @@ static void gzip_release(void **ptr)
  * Fill the input buffer. This is called only when the buffer is empty
  * and at least one byte is really needed.
  */
-static int fill_inbuf()
+int fill_inbuf()
 {
   fd_set emptySet, readSet;
   struct timeval timeout;
@@ -722,71 +795,83 @@ static int fill_inbuf()
 
   insize = net_read(root_infile_im, inbuf, INBUFSIZ);
 
-  if(!insize) return -1;
+  if(insize <= 0) {
+    exit_code = 1;
+    return -1;
+  }
 
   inptr = 1;
 
   return inbuf[0];
 }
 
+
 /* ===========================================================================
  * Write the output window window[0..outcnt-1] and update crc and bytes_out.
  * (Used for the decompressed data only.)
  */
-static void flush_window()
+void flush_window()
 {
-    ulg c = crc;         /* temporary variable */
-    unsigned n;
-    uch *in, ch;
-    int i;
+  ulg c = crc;		/* temporary variable */
+  unsigned n;
+  uch *in, ch;
+  int i;
 
-    if (exit_code)
-        {
-        fprintf (stderr, ".");
-        fflush (stderr);
-        bytes_out += (ulg)outcnt;
-        outcnt = 0;
-        return;
-        }
+  if(exit_code) {
+    fprintf(stderr, ".");
+    fflush(stderr);
+    bytes_out += (ulg) outcnt;
+    outcnt = 0;
+    return;
+  }
     
-    if(image.rd >= 0) {
-      i = ramdisk_write(image.rd, window, outcnt);
-      if(i < 0) exit_code = 1;
-    }
-    else {
-      write(root_outfile_im, window, outcnt);
-    }
-    in = window;
-    for (n = 0; n < outcnt; n++) {
-            ch = *in++;
-            c = crc_32_tab[((int)c ^ ch) & 0xff] ^ (c >> 8);
-    }
-    crc = c;
-    bytes_out += (ulg)outcnt;
-    root_update_status ((int) (bytes_out / BLOCKSIZE));
-    outcnt = 0;
+  if(image.rd >= 0) {
+    i = ramdisk_write(image.rd, window, outcnt);
+    if(i < 0) exit_code = 1;
+  }
+  else {
+    write(root_outfile_im, window, outcnt);
+  }
+
+  in = window;
+  for(n = 0; n < outcnt; n++) {
+    ch = *in++;
+    c = crc_32_tab[((int)c ^ ch) & 0xff] ^ (c >> 8);
+  }
+  crc = c;
+
+  bytes_out += (ulg) outcnt;
+  root_update_status(bytes_out / BLOCKSIZE);
+  outcnt = 0;
 }
 
-static void error(char *x)
+
+void error(char *msg)
 {
-        fprintf(stderr, x);
-        exit_code = 1;
+  fprintf(stderr, "%s\n", msg);
+  exit_code = 1;
 }
 
-static void root_load_compressed (void)
-    {
-    inbuf = (uch *) malloc (INBUFSIZ);
-    window = (uch *) malloc (WSIZE);
-    insize = 0;
-    inptr = 0;
-    outcnt = 0;
-    exit_code = 0;
-    bytes_out = 0;
-    crc = 0xffffffffL;
 
-    makecrc ();
-    gunzip ();
+int root_load_compressed()
+{
+  int err;
 
-    free (inbuf);
-    free (window);
-    }
+  inbuf = malloc(INBUFSIZ);
+  window = malloc(WSIZE);
+  insize = 0;
+  inptr = 0;
+  outcnt = 0;
+  exit_code = 0;
+  bytes_out = 0;
+  crc = 0xffffffffL;
+
+  makecrc();
+  err = gunzip();
+
+  free(inbuf);
+  free(window);
+
+  return err;
+}
+

@@ -181,15 +181,18 @@ void disp_end (void)
 
     free (disp_screen_aprm);
 
-    for (i_ii = 2; i_ii <= 6; i_ii++)
+    if(!config.test)
         {
-        sprintf (tty_ti, "/dev/tty%d", i_ii);
-        fd_pri = fopen (tty_ti, "a");
-        if (fd_pri)
+        for (i_ii = 2; i_ii <= 6; i_ii++)
             {
-            fprintf (fd_pri, "\033[2J\033[1;1f");
-            fflush (fd_pri);
-            fclose (fd_pri);
+            sprintf (tty_ti, "/dev/tty%d", i_ii);
+            fd_pri = fopen (tty_ti, "a");
+            if (fd_pri)
+                {
+                fprintf (fd_pri, "\033[2J\033[1;1f");
+                fflush (fd_pri);
+                fclose (fd_pri);
+                }
             }
         }
     }

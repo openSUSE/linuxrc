@@ -26,7 +26,7 @@ typedef enum {
   key_install, key_instmode, key_memtotal, key_memfree, key_buffers,
   key_cached, key_swaptotal, key_swapfree, key_minmemfree, key_info,
   key_proxy, key_proxyport, key_proxyproto, key_usedhcp, key_nfsport,
-  key_dhcptimeout, key_tftptimeout
+  key_dhcptimeout, key_tftptimeout, key_tmpfs
 } file_key_t;
 
 typedef struct file_s {
