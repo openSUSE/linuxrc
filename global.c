@@ -72,6 +72,7 @@ char            floppy_tg [10];
 char            ppcd_tg [10];
 int             serial_ig = FALSE;
 char            console_tg [30] = "/dev/console";
+char		console_parms_tg [30] = "";
 int             smp_ig = FALSE;
 int             guru_ig = FALSE;
 int             text_mode_ig = FALSE;

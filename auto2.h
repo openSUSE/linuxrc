@@ -9,3 +9,4 @@ int auto2_full_libhd(void);
 char *auto2_usb_module(void);
 char *auto2_xserver(void);
 char *auto2_disk_list(int *boot_disk);
+char *auto2_serial_console(void);

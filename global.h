@@ -207,6 +207,7 @@ extern char            floppy_tg [10];
 extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];
+extern char	       console_parms_tg [30];
 extern int             smp_ig;
 extern int             guru_ig;
 extern int             text_mode_ig;

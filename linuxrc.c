@@ -226,7 +226,7 @@ void lxrc_killall(int really_all)
     }
   }
 }
-                          
+
 
 /*
  *
@@ -345,7 +345,7 @@ static void lxrc_init (void)
         }
 
     freopen ("/dev/tty3", "a", stderr);
-    (void) mount (0, "/proc", "proc", 0, 0);  
+    (void) mount (0, "/proc", "proc", 0, 0);
     fprintf (stderr, "Remount of / ");
     rc_ii = mount (0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
     fprintf (stderr, rc_ii ? "failure\n" : "success\n");
@@ -635,13 +635,16 @@ void lxrc_set_modprobe (char *program_tv)
     }
 
 
+/* Check if we start linuxrc on a serial console. On Intel and
+   Alpha, we look if the "console" parameter was used on the
+   commandline. On SPARC, we use the result from hardwareprobing. */
 static void lxrc_check_console (void)
     {
+#if !defined(__sparc__)
     FILE  *fd_pri;
     char   buffer_ti [300];
     char  *tmp_pci = (char *) 0;
     char  *found_pci = (char *) 0;
-
 
     fd_pri = fopen ("/proc/cmdline", "r");
     if (!fd_pri)
@@ -664,7 +667,18 @@ static void lxrc_check_console (void)
 
         found_pci++;
 
+	/* Find the whole console= entry for the install.inf file */
         tmp_pci = found_pci;
+        while (*tmp_pci && *tmp_pci != '\t' && *tmp_pci != ' ' &&
+	                   *tmp_pci != '\n')
+            tmp_pci++;
+
+        *tmp_pci = 0;
+	strncpy (console_parms_tg, tmp_pci, sizeof (console_parms_tg));
+	console_parms_tg[sizeof(console_parms) - 1] = '\0';
+
+	/* Now search only for the device name */
+	tmp_pci = found_pci;
         while (*tmp_pci && *tmp_pci != ',' && *tmp_pci != '\t' &&
                            *tmp_pci != ' ' && *tmp_pci != '\n')
             tmp_pci++;
@@ -678,6 +692,21 @@ static void lxrc_check_console (void)
         }
 
     fclose (fd_pri);
+#else
+#ifdef USE_LIBHD
+    char *cp;
+
+    cp = auto2_serial_console ();
+    if (cp && strlen (cp) > 0)
+      {
+	serial_ig = TRUE;
+
+	strcpy (console_tg, cp);
+
+        fprintf (stderr, "Console: %s, serial=%d\n", console_tg, serial_ig);
+      }
+#endif
+#endif
     }
 
 

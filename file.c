@@ -152,7 +152,7 @@ void file_write_yast_info (char *file_name)
 #endif
 
     if (serial_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_console_tm, console_tg);
+        fprintf (file_pri, "%s %s\n", file_txt_console_tm, console_parms_tg);
 
     strcpy (line_ti, file_txt_bootmode_tm);
     strcat (line_ti, " ");

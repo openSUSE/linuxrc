@@ -234,7 +234,7 @@ void auto2_scan_hardware(char *log_file)
   }
 
   hd_data->progress = NULL;
-}	
+}
 
 
 /*
@@ -512,7 +512,7 @@ int auto2_init()
   }
 
   if((valid_net_config_ig & 0x2f) != 0x2f) return FALSE;
-  
+
   if(auto2_loaded_module) {
     free(auto2_loaded_module); auto2_loaded_module = NULL;
   }
@@ -791,7 +791,7 @@ char *auto2_disk_list(int *boot_disk)
       strcpy(bdev, hd->unix_dev_name);
     }
   }
-  
+
   for(hd = hd_disk_list(hd_data, 1); hd; hd = hd->next) {
     if(hd->unix_dev_name && strcmp(bdev, hd->unix_dev_name)) {
       if(*buf) strcat(buf, " ");
@@ -804,6 +804,57 @@ char *auto2_disk_list(int *boot_disk)
   return buf;
 }
 
+
+#if defined(__sparc__)
+
+/* We can only probe on SPARC for serial console */
+
+extern void hd_scan_kbd(hd_data_t *hd_data);
+char *auto2_serial_console (void)
+{
+  static char console[32];
+  hd_data_t *hd_data2;
+  hd_t *hd;
+
+  if(hd_data == NULL)
+    {
+      hd_data2 = calloc(1, sizeof (hd_data_t));
+      hd_set_probe_feature(hd_data2, pr_kbd);
+      hd_scan_kbd(hd_data2);
+    }
+  else
+    hd_data2 = hd_data;
+
+  if (hd_data2 == NULL)
+    return NULL;
+
+  console[0] = 0;
+
+  for(hd = hd_data2->hd; hd; hd = hd->next)
+    if(hd->base_class == bc_keyboard && hd->bus == bus_serial &&
+       hd->sub_class == sc_keyboard_console &&
+       hd->res->baud.type && hd->res->baud.type == res_baud)
+      {
+	strcpy (console, hd->unix_dev_name);
+	/* Create a string like: ttyS0,38400n8 */
+	sprintf (console_parms_tg, "%s,%d%s%d", &console[5],
+		 hd->res->baud.speed,
+		 hd->res->baud.parity ? "p" : "n",
+		 hd->res->baud.bits);
+      }
+
+  if (hd_data == NULL)
+    {
+      hd_free_hd_data (hd_data2);
+      free (hd_data2);
+    }
+
+  if (strlen (console) > 0)
+    return console;
+  else
+    return NULL;
+}
+#endif
 
 void auto2_progress(char *pos, char *msg)
 {

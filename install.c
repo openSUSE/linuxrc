@@ -44,7 +44,7 @@
 #include "settings.h"
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
-#define YAST2_COMMAND   "/lib/YaST2/bin/YaST2.start"
+#define YAST2_COMMAND   "/usr/lib/YaST2/bin/YaST2.start"
 #define YAST1_COMMAND   "/sbin/YaST"
 
 static char  inst_rootimage_tm [MAX_FILENAME];
@@ -357,10 +357,10 @@ static int inst_choose_source (void)
         util_center_text (items_ari [i_ii].text, width_ii);
         items_ari [i_ii].func = inst_choose_source_cb;
         }
-    
+
     choice_ii = dia_menu (txt_get (TXT_CHOOSE_SOURCE), items_ari,
                           inst_rescue_im ? nr_items_ii : nr_items_ii - 1, 1);
-        
+
     util_free_items (items_ari, nr_items_ii);
 
     if (choice_ii)
@@ -477,7 +477,7 @@ static int inst_mount_nfs (void)
         if (rc_ii)
             return (rc_ii);
         }
-        
+
     util_truncate_dir (server_dir_tg);
     strcpy (server_ti, inet_ntoa (nfs_server_rg));
     sprintf (text_ti, txt_get (TXT_TRY_NFS_MOUNT), server_ti, server_dir_tg);
@@ -843,7 +843,7 @@ static int inst_execute_yast (void)
             auto2_ig = 0;
             util_disp_init();
             }
-        
+
         dia_message (txt_get (TXT_ERROR_INSTALL), MSGTYPE_ERROR);
         }
 
@@ -1147,7 +1147,7 @@ static int inst_ftp (void)
 
     /* currently YaST1 only */
     yast_version_ig = 1;
-    
+
     if (!inst_rescue_im && memory_ig <= (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
         {
         sprintf(msg, txt_get (TXT_NOMEM_FTP), (MEM_LIMIT1_RAMDISK >> 20) + 2);
@@ -1352,8 +1352,8 @@ int inst_auto2_install()
   deb_msg("going for automatic install");
 
   if(ramdisk_ig) {
-    deb_msg("using RAM disk");   
-   
+    deb_msg("using RAM disk");
+
     i = root_load_rootimage(inst_rootimage_tm);
     fprintf(stderr, "Loading of rootimage returns %d\n", i);
 //    umount(mountpoint_tg);
