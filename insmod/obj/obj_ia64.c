@@ -911,14 +911,8 @@ arch_apply_relocation(struct obj_file *f,
 
     case R_IA64_SEGREL32LSB :   /* @segrel(sym + add), data4 LSB */
     case R_IA64_SEGREL64LSB :   /* @segrel(sym + add), data8 LSB */
-	if (targsec->header.sh_type & SHT_NOBITS)
-	    v = ifile->bss - v;
-	else if (targsec->header.sh_flags & SHF_EXECINSTR)
-	    v = ifile->text - v;
-	else if (targsec->header.sh_type == SHT_IA_64_UNWIND)
-	    v = v - ifile->text;
-	else
-	    v = ifile->data - v;
+	/* Only one segment for modules, see segment_base in arch_archdata */
+	v -= f->sections[1]->header.sh_addr;
 	if (r_info == R_IA64_SEGREL32LSB)
 	    COPY_32LSB(loc, v);
 	else
