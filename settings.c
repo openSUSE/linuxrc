@@ -78,6 +78,7 @@ static language_t set_languages_arm [] =
   "latin2u.scrnmap", "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
 };
 
+#if defined(__i386__) || defined(__alpha__)
 static keymap_t set_keymaps_arm [] =
 {
 { "Deutsch",              "de-lat1-nd"   },
@@ -91,7 +92,7 @@ static keymap_t set_keymaps_arm [] =
 { "Nederlands",           "nl"           },
 { "Norway",               "no-latin1"    },
 { "Polski",               "Pl02"         },
-{ "Português",            "pt2"          },
+{ "Português",            "pt-latin1"    },
 { "Português Brasileiro", "br-abnt2"     },
 { "Russian",              "ru1"          },
 { "Czech",                "cz-us-qwertz" },
@@ -99,6 +100,32 @@ static keymap_t set_keymaps_arm [] =
 { "Suomi/Svensk",         "fi",          },
 { "Slovak",               "sk-qwerty"    }
 };
+#endif
+
+#if defined(__sparc__)
+static keymap_t set_keymaps_arm [] =
+{
+{ "sunkeymap",       "sunkeymap"       },
+{ "sun-pl-altgraph", "sun-pl-altgraph" },
+{ "sun-pl",          "sun-pl"          },
+{ "sunt4-es",        "sunt4-es"        },
+{ "sunt5-de-latin1", "sunt5-de-latin1" },
+{ "sunt5-es",        "sunt5-es"        },
+{ "sunt5-fi-latin1", "sunt5-fi-latin1" },
+{ "sunt5-fr-latin1", "sunt5-fr-latin1" },
+{ "sunt5-ru.map",    "sunt5-ru.map"    }
+};
+#endif
+
+#if defined(__ppc__)
+static keymap_t set_keymaps_arm [] =
+{
+{ "mac-de-latin1-nodeadkeys", "mac-de-latin1-nodeadkeys" },
+{ "mac-fr2-ext.map",          "mac-fr2-ext.map"          },
+{ "mac-us-ext.map",           "mac-us-ext.map"           },
+{ "mac-us-std.map",           "mac-us-std.map"           }
+};
+#endif
 
 #define NR_LANGUAGES (sizeof(set_languages_arm)/sizeof(set_languages_arm[0]))
 #define NR_KEYMAPS (sizeof(set_keymaps_arm)/sizeof(set_keymaps_arm[0]))
