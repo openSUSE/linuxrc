@@ -413,7 +413,6 @@ typedef struct {
   struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
-    unsigned smb_available:1;	/* set if SMB functionality is available */
     unsigned device_given:1;	/* netdevice explicity set in info file */
     unsigned ifconfig:1;	/* setup network interface */
     unsigned is_configured:1;	/* set if network is configured */
@@ -459,6 +458,10 @@ typedef struct {
     net_config_t configured;	/* how we configured the network device */
     char *unique_id;		/* unique id of network card */
     char *hwaddr;		/* hardware addr of network card */
+    struct {
+      char *binary;		/* cifs/smb mount binary */
+      char *module;		/* cifs/smb kernel module */
+    } cifs;
   } net;
 
 #if defined(__s390__) || defined(__s390x__)

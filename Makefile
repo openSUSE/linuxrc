@@ -21,14 +21,15 @@ LEX	= flex -8
 # _No_ -fomit-frame-pointer! It makes linuxrc larger (after compression).
 CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS)
 
-LDFLAGS	= -static -Wl,-Map=linuxrc.map
+#LDFLAGS	= -static -Wl,-Map=linuxrc.map
 ifeq ($(CC),$(CC_DIET))
 LDFLAGS	+= -lrpc -lcompat -lhd_tiny_diet -lsysfs
 else
 ifeq ($(CC),$(CC_UC))
 LDFLAGS	+= -lhd_tiny_uc -lsysfs
 else
-LDFLAGS	+= -lhd_tiny -lsysfs -lresolv
+# LDFLAGS	+= -lhd_tiny -lsysfs -lresolv
+LDFLAGS	+= -lhd_tiny
 endif
 endif
 

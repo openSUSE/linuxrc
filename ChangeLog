@@ -1,3 +1,7 @@
+17/2/2005:	v1.7.24
+	- use cifs instead of smb (#38423)
+	- build dynamically linked linuxrc
+
 17/2/2005:	v1.7.23
 	- smb mount accepts share + directory (#26059)
 

@@ -308,9 +308,7 @@ int inst_choose_netsource()
 
   inst_umount();
 
-  config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
-
-  if(!config.net.smb_available) items[3] = di_skip;
+  if(!(config.test || config.net.cifs.binary)) items[3] = di_skip;
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 

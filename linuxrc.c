@@ -440,7 +440,7 @@ void lxrc_end()
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "smbmount", "cardmgr"
+    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs", "cardmgr"
   };
   int i;
 
@@ -680,6 +680,16 @@ void lxrc_init()
   config.memory.min_yast =       40 * 1024;
   config.memory.min_modules =    64 * 1024;
   config.memory.load_image =    200 * 1024;
+
+  if(util_check_exist("/sbin/mount.smbfs")) {
+    str_copy(&config.net.cifs.binary, "/sbin/mount.smbfs");
+    str_copy(&config.net.cifs.module, "smbfs");
+  }
+
+  if(util_check_exist("/sbin/mount.cifs")) {
+    str_copy(&config.net.cifs.binary, "/sbin/mount.cifs");
+    str_copy(&config.net.cifs.module, "cifs");
+  }
 
   /* make auto mode default */
   if(config.test || config.had_segv) {

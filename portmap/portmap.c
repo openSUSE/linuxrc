@@ -100,6 +100,7 @@ static char sccsid[] = "@(#)portmap.c 1.32 87/08/06 Copyr 1984 Sun Micro";
 
 extern char *strerror();
 #include <stdlib.h>
+#include <errno.h>
 
 #ifndef LOG_PERROR
 #define LOG_PERROR 0
@@ -127,7 +128,6 @@ void reap();
 static void callit();
 struct pmaplist *pmaplist;
 int debugging = 0;
-extern int errno;
 
 #include "pmap_check.h"
 

@@ -676,7 +676,7 @@ int net_check_address2(inet_t *inet, int do_dns)
 
 
 /*
- * Build mount option suitable for smbmount.
+ * Build mount option suitable for muont.cifs.
  */
 void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup)
 {
@@ -697,7 +697,7 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
     }
   } else {
      /*
-      * smbmount needs a username, otherwise it takes LOGNAME from
+      * mount.cifs needs a username, otherwise it takes LOGNAME from
       * environment. see bugzilla #20152
       */
     strcat(options, ",username=root,guest");
@@ -707,7 +707,7 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
 
 /*
  * Mount windows share.
- * (Run smbmount.)
+ * (Run mount.cifs.)
  *
  * Return:
  *      0: ok
@@ -738,6 +738,8 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
   char tmp[1024];
   char mount_options[256];
 
+  if(!config.net.cifs.binary) return -1;
+
   if(net_check_address2(server, 1)) return -1;
 
   if(!share) share = "";
@@ -746,11 +748,11 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
   net_smb_get_mount_options(mount_options, server, user, password, workgroup);
 
   sprintf(tmp,
-    "smbmount //%s/%s %s -o ro,%s >&2",
-    server->name, share, mountpoint, mount_options
+    "%s //%s/%s %s -o ro,%s >&2",
+    config.net.cifs.binary, server->name, share, mountpoint, mount_options
   );
 
-  mod_modprobe("smbfs", NULL);
+  mod_modprobe(config.net.cifs.module, NULL);
 
   fprintf(stderr, "%s\n", tmp);
   if(system(tmp)) {

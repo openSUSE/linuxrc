@@ -72,11 +72,11 @@ struct {
   { di_source_hd,     TXT_HARDDISK, },
   { di_source_floppy, TXT_FLOPPY,   },
 
-  { di_netsource_nfs,  0, "NFS"                 },
-  { di_netsource_smb,  0, "SMB (Windows Share)" },
-  { di_netsource_ftp,  0, "FTP"                 },
-  { di_netsource_http, 0, "HTTP"                },
-  { di_netsource_tftp, 0, "TFTP"                },
+  { di_netsource_nfs,  0, "NFS"        },
+  { di_netsource_smb,  0, "SMB / CIFS (Windows Share)" },
+  { di_netsource_ftp,  0, "FTP"        },
+  { di_netsource_http, 0, "HTTP"       },
+  { di_netsource_tftp, 0, "TFTP"       },
 
   { di_info_kernel,     TXT_INFO_KERNEL  },
   { di_info_drives,     TXT_DRIVES       },

@@ -270,6 +270,7 @@ static struct {
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
   { "cdrom",     inst_cdrom         },
+  { "cifs",      inst_smb           },
 #if defined(__s390__) || defined(__s390x__)
   { "osatr",	 di_390net_osatr    },
   { "osaeth",	 di_390net_osaeth   },
