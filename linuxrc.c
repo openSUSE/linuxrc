@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <sys/reboot.h>
+#include <sys/syscall.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
@@ -59,6 +60,8 @@ static int is_rpc_prog         (pid_t pid);
 
 static pid_t  lxrc_mempid_rm;
 static int    lxrc_sig11_im = FALSE;
+static char **lxrc_argv;
+const char *lxrc_new_root;
 
 
 int main (int argc, char **argv, char **env)
@@ -95,6 +98,7 @@ int main (int argc, char **argv, char **env)
         rc_ii = 0;
     else
         {
+	lxrc_argv = argv;
         lxrc_init ();
         if (auto_ig)
             rc_ii = inst_auto_install ();
@@ -154,6 +158,27 @@ void lxrc_reboot (void)
         reboot (RB_AUTOBOOT);
     }
 
+void lxrc_change_root (void)
+{
+#ifdef SYS_pivot_root
+  umount ("/mnt");
+  util_try_mount (lxrc_new_root, "/mnt", MS_MGC_VAL | MS_RDONLY, 0);
+  chdir ("/mnt");
+  if (
+#if 1
+      /* XXX Until glibc is fixed to provide pivot_root. */
+      syscall (SYS_pivot_root, ".", "mnt")
+#else
+      pivot_root (".", "mnt")
+#endif
+      == 0)
+    {
+      close (0); close (1); close (2);
+      chroot (".");
+      execv ("/sbin/init", lxrc_argv);
+    }
+#endif
+}
 
 void lxrc_end (void)
     {
@@ -171,6 +196,8 @@ void lxrc_end (void)
     disp_cursor_on ();
     kbd_end ();
     disp_end ();
+    if (lxrc_new_root)
+      lxrc_change_root();
     }
 
 
