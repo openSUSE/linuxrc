@@ -34,7 +34,7 @@ char           *kernellog_tg = "/etc/kernellog";
 char           *lastlog_tg = "/etc/lastlog";
 char           *bootmsg_tg = "/var/log/boot.msg";
 char            installdir_tg [MAX_FILENAME] = "/suse/inst-sys";
-char            harddisk_tg [12] = "/dev/hda1";
+char            harddisk_tg [12] = "/dev/XdaX";
 char           *fstype_tg;
 char            scsi_tg [20];
 char            net_tg [20];

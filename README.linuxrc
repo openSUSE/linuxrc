@@ -132,8 +132,8 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   # harddisk partition (bootmode Harddisk)
   Partition: /dev/hda1
 
-  # FS type (bootmode Harddisk)
-  Fstyp:
+  # FS type (bootmode Harddisk)  * Deprecated since we try and mount all
+  # Fstyp:                       * possible filesystems
 
   # network device (bootmode Net)
   Netdevice: eth0

@@ -498,6 +498,9 @@ int file_read_info (void)
                           strlen (file_txt_dnsserver_tm)))
             if (!net_check_address (value_ti, &nameserver_rg)) valid_net_config_ig |= 0x10;
 
+        if (!strncasecmp (file_txt_partition_tm, buffer_ti, strlen (file_txt_partition_tm)))
+            strncpy (harddisk_tg, value_ti, sizeof (harddisk_tg));
+        
         if (!strncasecmp (file_txt_serverdir_tm, buffer_ti,
                           strlen (file_txt_serverdir_tm)))
             {

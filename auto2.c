@@ -127,6 +127,36 @@ int auto2_mount_cdrom(char *device)
   return rc;
 }
 
+/* 
+ * mmj@suse.de - mount a harddisk partition at mountpoint_tg and run 
+ * inst_check_instsys(), by trying all known partition types.
+ * 
+ * return 0 on success
+ */
+
+int auto2_mount_harddisk(char *device)
+{
+    int rc;
+    static char *fs_types_ati [] = { "vfat", "msdos", "reiserfs", "hpfs", "ext2", 0 };
+    int i_ii = 0;
+    
+    bootmode_ig = BOOTMODE_HARDDISK;
+
+    do
+        rc = mount(device, mountpoint_tg, fs_types_ati[i_ii++],
+                   MS_MGC_VAL | MS_RDONLY, 0);
+    while( rc && fs_types_ati[i_ii] );
+    
+    if(!rc) {
+        if( (rc = inst_check_instsys()) ) {
+            fprintf(stderr, "%s is not a SuSE installation media.\n", device);
+            umount(mountpoint_tg);
+        }
+    } else
+        fprintf(stderr, "%s does not have a mountable file system.\n", device);
+
+    return rc;
+}
 
 void auto2_check_cdrom_update(char *dev)
 {
@@ -683,8 +713,9 @@ int auto2_init()
   return i;
 }
 
-
 /*
+ * mmj@suse.de - first check if we're running automated harddisk install 
+ * 
  * Look for a SuSE CD ot NFS source.
  */
 int auto2_find_install_medium()
@@ -693,6 +724,10 @@ int auto2_find_install_medium()
   unsigned last_idx;
   hd_t *hd_devs = NULL;
 
+  if(bootmode_ig == BOOTMODE_HARDDISK) 
+    if(!(i = auto2_mount_harddisk(harddisk_tg)))
+      return TRUE;
+    
   if(bootmode_ig == BOOTMODE_CD) {
     *cdrom_tg = 0;
 

@@ -1,3 +1,6 @@
+3/5/2001:	v1.1.19.007
+	- mmj: autoinstall via hard disk
+
 3/5/2001:	v1.1.19.006
 	- removed TXT_INSTALL_SUCCESS message except in (old) auto mode
 	- removed TXT_DO_REBOOT message (unless explictly requested via info file)

@@ -99,6 +99,9 @@ int inst_auto_install (void)
         case BOOTMODE_NET:
             rc_ii = inst_mount_nfs ();
             break;
+        case BOOTMODE_HARDDISK:
+            rc_ii = inst_mount_harddisk();
+            break;
         default:
             rc_ii = -1;
             break;
