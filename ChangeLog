@@ -1,3 +1,6 @@
+5/4/2005:	v1.8.8
+	- s390: only IUCV hwcfg files must be named hwcfg-static-
+
 1/4/2005:	v1.8.7
 	- s390: hwcfg- files renamed to hwcfg-static-
 

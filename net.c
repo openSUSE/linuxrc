@@ -1823,7 +1823,7 @@ int net_activate_s390_devs(void)
 
     if((rc=util_set_sysfs_attr("/sys/bus/iucv/drivers/netiucv/connection",config.hwp.userid))) return rc;
 
-    sprintf(hwcfg_name,"iucv-id-%s",config.hwp.userid);
+    sprintf(hwcfg_name,"static-iucv-id-%s",config.hwp.userid);
     config.hwp.module="netiucv";
     config.hwp.scriptup="hwup-iucv";
     break;
@@ -1965,7 +1965,7 @@ int net_activate_s390_devs(void)
   /* write hwcfg file */
   if (mkdir("/etc/sysconfig/hardware", (mode_t)0755) && errno != EEXIST)
     return -1;
-  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-static-%s",hwcfg_name);
+  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
 # define HWE(var,string) if(config.hwp.var) fprintf(fp, #string "=\"%s\"\n",config.hwp.var);
