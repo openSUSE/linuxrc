@@ -401,7 +401,7 @@ void disp_restore_area (window_t *win_prr, int mode_iv)
     if (save_y_ii + win_prr->y_left > max_y_ig)
         save_y_ii = max_y_ig - win_prr->y_left + 1;
 
-    if (cpu_ig < 4 || explode_win_ig == FALSE || serial_ig == TRUE)
+    if (explode_win_ig == FALSE || serial_ig == TRUE)
         mode_iv = DISP_RESTORE_NORMAL;
 
     switch (mode_iv)
