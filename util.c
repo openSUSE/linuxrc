@@ -25,6 +25,10 @@
 
 // #include <linux/cdrom.h>
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
+/* Glibc 2.2 defines __dev_t_defined instead. */
+#ifndef dev_t
+#define dev_t dev_t
+#endif
 #include <linux/loop.h>
 
 #include <hd.h>
