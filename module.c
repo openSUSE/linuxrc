@@ -112,7 +112,7 @@ static module_t mod_net_mod_arm [] =
 {
 { ID_DE_45,      "DE425, DE434, DE435, DE450, DE500",  "de4x5",      0, __LINE__ },
 { ID_TULIP,      "DEC Tulip (DC21x4x) PCI",            "tulip",      "options=0", __LINE__ },
-{ ID_TULIP_OLD,  "DEC Tulip (DC21x4x) (old driver)",   "tulip-old",  "options=0", __LINE__ },
+{ ID_TULIP_OLD,  "DEC Tulip (DC21x4x) (old driver)",   "old_tulip",  "options=0", __LINE__ },
 { ID_EEPRO100,   "Intel EtherExpress Pro 100",         "eepro100",   0         , __LINE__ },
 { ID_EEPRO100_OLD,"Intel EtherExpress Pro 100 (old)",  "eepro100-old",0         , __LINE__ },
 { ID_3C590,      "3Com 3c59x/3c90x (592/595/597)",     "3c59x",      0, __LINE__ },
@@ -152,7 +152,6 @@ static module_t mod_net_mod_arm [] =
 { ID_NI5210,     "NI5210",                             "ni52",       "io=0x360 irq=9 memstart=0xd0000 memend=0xd4000", __LINE__ },
 { ID_NI6510,     "ni6510 (am7990 \"lance\" chip)",     "ni65",       "io=0x360 irq=9 dma=0", __LINE__ },
 { ID_WD_9194,    "SMC 9194",                           "smc9194",    "io=0x200", __LINE__ },
-{ ID_SK55XX,     "SysKonnect FDDI (SK-55xx/SK-58xx)",  "skfp",       0, __LINE__ },
 { ID_SKTR,       "SysKonnect Token Ring",              "sktr",       0, __LINE__ },
 { ID_SK98X,      "SysKonnect Gigabit Ethernet 984x",   "sk98lin",    0, __LINE__ },
 { ID_YELLOWFIN,  "Packet Engines Yellowfin Gigabit",   "yellowfin",  0, __LINE__ },
