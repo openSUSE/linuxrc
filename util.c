@@ -467,8 +467,8 @@ int util_check_break (void)
 int util_try_mount (char *device_pcv,             char *dir_pcv,
                     unsigned long flags_lv, const void *data_prv)
     {
-    static  char *fs_types_ats [] = { "minix",   "ext2",  "reiserfs", "msdos",
-                                      "iso9660", "hpfs",  0 };
+    static  char *fs_types_ats [] = { "minix",   "ext2",  "reiserfs", "vfat",
+                                      "iso9660", "msdos", "hpfs",  0 };
             int   i_ii;
             int   rc_ii;
 
