@@ -45,7 +45,7 @@ static module_t mod_scsi_mod_arm [] =
 { ID_ULTRASTOR,  "UltraStor (alternate driver)",       "ultrastor",  0, __LINE__ },
 { ID_ACARD,      "ACARD AEC-671X",                     "atp870u",    0, __LINE__ },
 { ID_PCI2000,    "PCI-2000",                           "pci2000",    0, __LINE__ },
-{ ID_PCI2220I,   "PCI-2220I",                          "pci2220i",   0, __LINE__ },
+{ ID_PCI2220I,   "PCI-2220I/2240I",                    "pci2220i",   0, __LINE__ },
 { ID_PSI240I,    "PSI-240i",                           "psi240i",    0, __LINE__ },
 { ID_SYM53C416,  "Symbios 53C416",                     "sym53c416",  0, __LINE__ },
 { ID_SIM710,     "Simple 53c710 (Compaq, NCR)",        "sim710",     0, __LINE__ },

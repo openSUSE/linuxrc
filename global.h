@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
-#define LXRC_VERSION  "1.1.14"
+#define LXRC_VERSION  "1.1.15"
 
 #ifdef LINUXRC_AXP
 // was: 50000000

@@ -708,6 +708,7 @@ static int inst_prepare (void)
                           "/etc/modules.conf",
                           "/etc/fb.modes",
                           "/etc/X11/xserver",
+                          "/etc/X11/xkb",
                           "/etc/suse-blinux.conf",
                           "/etc/rc.d",		/* for braille displays */
                           "/bin",
