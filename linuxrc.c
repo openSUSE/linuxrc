@@ -162,6 +162,8 @@ int main(int argc, char **argv, char **env)
 #if SWISS_ARMY_KNIFE
   int i;
 #endif
+  file_t *ft;
+  int tmpfs_opt = 0;
 
   prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
 
@@ -173,26 +175,47 @@ int main(int argc, char **argv, char **env)
   }
 #endif
 
-  config.run_as_linuxrc = 1;
-
   lxrc_argv = argv;
 
-  if(getpid() > 19 || util_check_exist("/opt")) {
+  config.run_as_linuxrc = 1;
+  config.tmpfs = 1;
+
+  if(util_check_exist("/opt") || getuid()) {
     printf("Seems we are on a running system; activating testmode...\n");
     config.test = 1;
-    config.tmpfs = 1;
     strcpy(console_tg, "/dev/tty");
   }
 
-  if(!config.test && !getuid()) {
+  if(!config.test) {
     if(!util_check_exist("/oldroot")) {
 #if SWISS_ARMY_KNIFE 
       lxrc_makelinks(*argv);
 #endif
-      lxrc_movetotmpfs();	// does (normally) not return
+      mount("proc", "/proc", "proc", 0, 0);
+      ft = file_get_cmdline(key_tmpfs);
+      if(ft && ft->is.numeric) {
+        config.tmpfs = ft->nvalue;
+        tmpfs_opt = 1;
+      }
+      ft = file_get_cmdline(key_debugwait);
+      if(ft && ft->is.numeric) config.debugwait = ft->nvalue;
+      util_free_mem();
+      umount("/proc");
+
+//      fprintf(stderr, "free: %d, %d, %d\n", config.memory.free, config.tmpfs, tmpfs_opt);
+
+      if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
+        lxrc_movetotmpfs();	/* does not return if successful */
+      }
+      config.tmpfs = 0;
+
+      if(!serial_ig && config.debugwait) {
+        util_start_shell("/dev/tty9", "/bin/lsh", 0);
+        config.shell_started = 1;
+      }
+      deb_wait;
     }
     else {
-      config.tmpfs = 1;
       // umount and release /oldroot
       umount("/oldroot");
       util_free_ramdisk("/dev/ram0");
@@ -759,10 +782,12 @@ void lxrc_init()
 
   util_free_mem();
 
-  config.memory.min_free = 10 * 1024;		// at least 10MB
-  config.memory.min_yast = 48 * 1024;		// at least 48MB
-  config.memory.min_modules = 64 * 1024;	// at least 64MB
-  config.memory.load_image = 256 * 1024;	// at least 256MB
+  // default memory limits for i386 version
+  config.memory.min_free =      8 * 1024;
+  config.memory.min_yast =     44 * 1024;
+  config.memory.min_modules =  64 * 1024;
+  config.memory.load_image =  256 * 1024;
+
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;
   }
@@ -798,7 +823,7 @@ void lxrc_init()
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
-  if(!(config.test || serial_ig)) {
+  if(!(config.test || serial_ig || config.shell_started)) {
     util_start_shell("/dev/tty9", "/bin/lsh", 0);
     config.shell_started = 1;
   }
@@ -1141,7 +1166,7 @@ void lxrc_movetotmpfs()
     return;
   }
 
-  i = mount("shmfs", newroot, "shm", 0, 0);
+  i = mount("shmfs", newroot, "shm", 0, "nr_inodes=10240");
   if(i) {
     perror(newroot);
     return;

@@ -1,3 +1,8 @@
+17/3/2002:	v1.3.24
+	- don't use tmpfs on systems < 32 MB
+	- explicitly set nr_inodes for tmpfs (we need quite a few)
+	- adjusted memory limits (no swap on 64MB systems)
+
 9/3/2002:	v1.3.23
 	- new czech translations
 	- fixed AddSwap config option

@@ -889,7 +889,7 @@ int file_read_yast_inf()
 
   file_free_file(f0);
 
-  return root ? 0 : -1;
+  return root || config.aborted ? 0 : -1;
 }
 
 
