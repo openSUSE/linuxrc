@@ -836,7 +836,7 @@ int net_choose_device()
     { "iucv",  TXT_NET_CLAW  }
   };
     
-  if(auto_ig) return 0;
+  if(auto_ig || config.net.device_given) return 0;
 
   /* re-read - just in case... */
   util_update_netdevice_list(NULL, 1);
