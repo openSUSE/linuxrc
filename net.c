@@ -29,6 +29,14 @@
 #include <nfs/nfs.h>
 #include "nfs_mount4.h"
 
+/* this is probably the wrong solution... */
+#ifndef NFS_FHSIZE
+#define NFS_FHSIZE 32
+#endif
+#ifndef NFS_PORT
+#define NFS_PORT 2049
+#endif
+
 #include "global.h"
 #include "text.h"
 #include "dialog.h"
