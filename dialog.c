@@ -62,7 +62,7 @@ struct {
   { di_inst_system,  TXT_BOOT_SYSTEM,      },
   { di_inst_rescue,  TXT_START_RESCUE,     },
   { di_inst_eject,   TXT_EJECT_CD,         },
-  { di_inst_update,  0, "Driver Update CD" },
+  { di_inst_update,  0, "Add Driver Update" },
 
   { di_source_cdrom,  TXT_CDROM,    },
   { di_source_net,    TXT_NET,      },
@@ -427,7 +427,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
       }
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
-    width_ii = strlen (head_tv) + 6;
+    width_ii = strwidth (head_tv) + 6;
     if (width_ii < strlen (items_arv [0].text) + 6)
         width_ii = strlen (items_arv [0].text) + 6;
 
@@ -736,7 +736,11 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     window_t  tmp_win_ri;
     char      tmp_txt_ti [STATUS_SIZE + 1];
 
-    if(!config.win || config.linemode) { printf("%s", txt_tv); return; }
+    if(!config.win || config.linemode) {
+      printf("%s", txt_tv);
+      fflush(stdout);
+      return;
+    }
 
     disp_toggle_output (DISP_OFF);
     strncpy (tmp_txt_ti, txt_tv, STATUS_SIZE);
