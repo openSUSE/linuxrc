@@ -206,7 +206,7 @@ static struct {
   { key_ro,             "ro",             kf_boot                        },
   { key_rw,             "rw",             kf_boot                        },
   { key_netid,          "NetUniqueID",    kf_none                        },
-  { key_nethwaddr,      "NetHWAddr",      kf_none                        },
+  { key_nethwaddr,      "HWAddr",         kf_none                        },
   { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
   { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },

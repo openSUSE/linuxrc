@@ -1,3 +1,6 @@
+7/4/2004:	v1.6.19
+	- use HWAddr (not NetHWAddr) in install.inf
+
 7/4/2004:	v1.6.18
 	- slp fix
 
