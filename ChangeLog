@@ -1,3 +1,7 @@
+3/9/2001:	1.2.19
+	- inst_prep: all directories (/bin, /sbin, /lib, ...) are moved to a
+	  save place during install and moved back afterwards, not just /bin
+
 31/8/2001:	1.2.18
 	- added 'RebootMsg'
 	- give installation CD some time before we umount it
