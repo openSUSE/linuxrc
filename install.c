@@ -802,6 +802,7 @@ static int inst_execute_yast (void)
 
     if (rc_ii)
         {
+        yast_version_ig = 0;
         if (auto2_ig)
             {
             auto2_ig = 0;
@@ -1067,7 +1068,7 @@ static int inst_ftp (void)
     window_t  win_ri;
 
     
-    if (!inst_rescue_im && memory_ig <= (yast_version_ig == 2 ? MEM_LIMIT2_RAMDISK : MEM_LIMIT1_RAMDISK))
+    if (!inst_rescue_im && memory_ig <= (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
         {
         (void) dia_message (txt_get (TXT_NOMEM_FTP), MSGTYPE_ERROR);
         return (-1);
@@ -1214,25 +1215,41 @@ static void inst_choose_yast_version (void)
     {
     item_t   items_ari [2];
     int      width_ii = 30;
+    int      yast1_ii, yast2_ii;
 
+    yast1_ii = util_check_exist (YAST1_COMMAND);
+    yast2_ii = util_check_exist (YAST2_COMMAND);
 
-    if (auto_ig)
+    if (!yast_version_ig && auto_ig)
         yast_version_ig = 1;
-    else if (auto2_ig)
-        yast_version_ig = 2;
-    else if (util_check_exist (YAST2_COMMAND))
+
+    if (yast_version_ig == 1 && yast1_ii)
+        return;
+
+    if (yast_version_ig == 2 && yast2_ii)
+        return;
+
+    if (yast1_ii && !yast2_ii)
         {
-        util_create_items (items_ari, 2, width_ii);
-        strcpy (items_ari [0].text, txt_get (TXT_YAST1));
-        strcpy (items_ari [1].text, txt_get (TXT_YAST2));
-        util_center_text (items_ari [0].text, width_ii);
-        util_center_text (items_ari [1].text, width_ii);
-        yast_version_ig = dia_menu (txt_get (TXT_CHOOSE_YAST),
-                                    items_ari, 2, 2);
-        util_free_items (items_ari, 2);
-        }
-    else
         yast_version_ig = 1;
+        return;
+        }
+
+    if (!yast1_ii && yast2_ii)
+        {
+        yast_version_ig = 2;
+        return;
+        }
+
+    util_create_items (items_ari, 2, width_ii);
+    strcpy (items_ari [0].text, txt_get (TXT_YAST1));
+    strcpy (items_ari [1].text, txt_get (TXT_YAST2));
+    util_center_text (items_ari [0].text, width_ii);
+    util_center_text (items_ari [1].text, width_ii);
+    yast_version_ig = dia_menu (txt_get (TXT_CHOOSE_YAST),
+                                items_ari, 2, 2);
+    util_free_items (items_ari, 2);
+
     }
 
 #ifdef USE_LIBHD

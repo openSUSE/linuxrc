@@ -75,6 +75,6 @@ int             has_floppy_ig = TRUE;
 unsigned        frame_buffer_mode_ig = 0;
 char            *mouse_type_ig = NULL;
 char            *mouse_dev_ig = NULL;
-int             yast_version_ig = 1;
+int             yast_version_ig = 0;
 int             valid_net_config_ig = 0;
 int             reboot_ig;

@@ -453,7 +453,6 @@ void auto2_chk_expert()
   if((i & 0x01)) text_mode_ig = 1;
   if((i & 0x02)) yast2_update_ig = 1;
   if((i & 0x04)) auto2_ig = 1;
-  if((i & 0x08)) yast_version_ig = 2;	/* default is 1! */
   guru_ig = i >> 4;
 }
 

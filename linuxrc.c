@@ -358,11 +358,12 @@ static void lxrc_init (void)
     if (memory_ig < MEM_LIMIT_YAST2)
         yast_version_ig = 1;
 
-    if (memory_ig > (yast_version_ig == 2 ? MEM_LIMIT2_RAMDISK : MEM_LIMIT1_RAMDISK))
+    if (memory_ig > (yast_version_ig == 1 ? MEM_LIMIT1_RAMDISK : MEM_LIMIT2_RAMDISK))
         force_ri_ig = TRUE;
 
     lxrc_memcheck ();
 
+    // #### drop this later!!!
     if (yast_version_ig == 2) strcpy(rootimage_tg, "/suse/images/yast2");
 
     deb_str(rootimage_tg);
