@@ -350,6 +350,14 @@ static void lxrc_init (void)
     rc_ii = mount (0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
     fprintf (stderr, rc_ii ? "failure\n" : "success\n");
 
+    /* Check for special case with aborted installation */
+
+    if (util_check_exist ("/.bin"))
+        {
+        unlink ("/bin");
+        rename ("/.bin", "/bin");
+        }
+
     lxrc_set_modprobe ("/etc/nothing");
     lxrc_set_bdflush (5);
 
