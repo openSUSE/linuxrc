@@ -47,6 +47,7 @@ static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, int last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
+static int auto2_find_kbd(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 
@@ -452,7 +453,8 @@ void auto2_chk_expert()
 
   if((i & 0x01)) text_mode_ig = 1;
   if((i & 0x02)) yast2_update_ig = 1;
-  if((i & 0x04)) auto2_ig = 1;
+  if((i & 0x04)) yast2_serial_ig = 1;
+  if((i & 0x08)) auto2_ig = 1;
   guru_ig = i >> 4;
 }
 
@@ -523,6 +525,23 @@ int auto2_find_floppy()
   }
 
   return has_floppy_ig = FALSE;
+}
+
+/*
+ * Scans the hardware list for a keybord and puts the result in
+ * has_kbd_ig.
+ */
+int auto2_find_kbd()
+{
+  hd_t *hd;
+
+  for(hd = hd_data->hd; hd; hd = hd->next) {
+    if(hd->base_class == bc_keyboard) {
+      return has_kbd_ig = TRUE;
+    }
+  }
+
+  return has_kbd_ig = FALSE;
 }
 
 int auto2_get_probe_env(hd_data_t *hd_data)

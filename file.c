@@ -70,7 +70,9 @@ static const char  *file_txt_mouse_dev_tm      = "Mousedevice:";
 static const char  *file_txt_mouse_xf86_tm     = "MouseXF86:";
 static const char  *file_txt_mouse_gpm_tm      = "MouseGPM:";
 static const char  *file_txt_has_floppy_tm     = "Floppydisk:";
+static const char  *file_txt_has_kbd_tm        = "Keyboard:";
 static const char  *file_txt_yast2_update_tm   = "YaST2update:";
+static const char  *file_txt_yast2_serial_tm   = "YaST2serial:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
 static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 #endif
@@ -229,7 +231,9 @@ void file_write_yast_info (void)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
 
     fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
+    fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
     fprintf (file_pri, "%s %d\n", file_txt_yast2_update_tm, yast2_update_ig);
+    fprintf (file_pri, "%s %d\n", file_txt_yast2_serial_tm, yast2_serial_ig);
     fprintf (file_pri, "%s %d\n", file_txt_text_mode_tm, text_mode_ig);
 
     if (frame_buffer_mode_ig)
