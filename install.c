@@ -76,6 +76,7 @@ static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
+static void get_file(char *src, char *dst);
 
 #ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
@@ -342,17 +343,9 @@ int inst_choose_netsource_cb(dia_item_t di)
       error = inst_mount_nfs();
       break;
 
-#if 0
     case di_netsource_smb:
-      config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
-      if(!config.net.smb_available) {
-        sprintf(buf, "%s\n\n%s", txt_get(TXT_SMBDISK), txt_get(TXT_MODDISK2));
-        dia_okcancel(buf, YES);
-      }
-      config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
-      error = config.net.smb_available ? inst_mount_smb() : 1;
+      error = inst_mount_smb();
       break;
-#endif
 
     case di_netsource_ftp:
       error = inst_do_ftp();
@@ -837,6 +830,9 @@ int inst_start_install()
     str_copy(&config.instsys, buf);
   }
 
+  get_file("/content", "/content");
+  get_file("/media.1/info.txt", "/info.txt");
+
   return inst_execute_yast();
 }
 
@@ -1022,7 +1018,10 @@ int inst_execute_yast()
 
   if(!config.test) {
     if(mod_is_loaded("sbp2")) mod_unload_module("sbp2");
-    if(mod_is_loaded("usb-storage")) mod_unload_module("usb-storage");
+    if(mod_is_loaded("usb-storage")) {
+      mod_unload_module("usb-storage");
+      usbscsi_off();
+    }
   }
 
   if (!config.test && config.usessh && config.net.sshpassword) {
@@ -1186,7 +1185,11 @@ int inst_commit_install()
       fprintf(stderr, "*** reboot ***\n");
     }
     else {
+#if	defined(__s390__)
+      reboot(RB_POWER_OFF);
+#else
       reboot(RB_AUTOBOOT);
+#endif
     }
     err = -1;
   }
@@ -1540,6 +1543,57 @@ void inst_swapoff()
     sprintf(buf, "/dev/%s", sl->key);
     fprintf(stderr, "swapoff %s\n", buf);
     swapoff(buf);
+  }
+}
+
+
+void get_file(char *src, char *dst)
+{
+  char buf[0x1000];
+  char fname[256];
+  int i, j, fd_in, fd_out;
+
+  if(
+    config.instmode == inst_ftp ||
+    config.instmode == inst_http ||
+    config.instmode == inst_tftp
+  ) {
+    sprintf(fname, "%s%s", config.serverdir ?: "", src);
+    fd_in = net_open(fname);
+    if(fd_in >= 0) {
+      fd_out = open("/xxx.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+      if(fd_out >= 0) {
+        do {
+          i = net_read(fd_in, buf, sizeof buf);
+          j = 0;
+          if(i > 0) j = write(fd_out, buf, i);
+        }  
+        while(i > 0 && j > 0);
+        close(fd_out);
+        if(!(i < 0 || j < 0)) {
+          unlink(dst);
+          rename("/xxx.tmp", dst);
+        }
+      }
+      net_close(fd_in);
+    }
+  }
+  else if(
+    config.instmode == inst_hd ||
+    config.instmode == inst_cdrom ||
+    config.instmode == inst_nfs ||
+    config.instmode == inst_smb
+  ) {
+    /* copy content file */
+    sprintf(fname, "%s%s", config.mountpoint.instdata, src);
+    if(util_check_exist(fname)) {
+      char *argv[3];
+
+      unlink(dst);
+      argv[1] = fname;
+      argv[2] = "/";
+      util_cp_main(3, argv);
+    }
   }
 }
 

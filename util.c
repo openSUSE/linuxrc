@@ -94,6 +94,20 @@ static void free_hlink_list(void);
 static char *util_attach_loop(char *file, int ro);
 static int util_detach_loop(char *dev);
 
+typedef struct {
+  unsigned usb:1;
+  unsigned active:1;
+  unsigned disk:1;
+  char name[5];
+  char last_name[5];
+} scsidev_t;
+
+static scsidev_t scsidev[16 /* arbitrary, just large enough */] = {};
+
+static void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action);
+static void usbscsi_rename(void);
+static void usbscsi_rename_single(char *old_name, char *new_name);
+
 
 void util_redirect_kmsg (void)
     {
@@ -715,8 +729,8 @@ int util_chk_driver_update(char *dir)
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
-  sprintf(drv_src, "%s/linux/%s/" LX_ARCH "-" LX_REL, dir, config.product_dir);
-  sprintf(mods_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/modules", dir, config.product_dir);
+  sprintf(drv_src, "%s%s", dir, config.updatedir);
+  sprintf(mods_src, "%s%s/modules", dir, config.updatedir);
 
   if(stat(drv_src, &st) == -1) return 0;
   if(!S_ISDIR(st.st_mode)) return 0;
@@ -731,7 +745,7 @@ int util_chk_driver_update(char *dir)
   if(mount("shmfs", driver_update_dir, "shm", 0, 0)) return 0;
 
   for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
-    sprintf(inst_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/%s", dir, config.product_dir, copy_dir[i]);
+    sprintf(inst_src, "%s%s/%s", dir, config.updatedir, copy_dir[i]);
     sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
     if(
       !stat(inst_src, &st) &&
@@ -875,6 +889,7 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "flags = ");
+  add_flag(&sl0, buf, config.debug, "debug");
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
   add_flag(&sl0, buf, config.manual, "manual");
@@ -900,6 +915,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.run_memcheck, "memcheck");
   add_flag(&sl0, buf, config.hwdetect, "hwdetect");
   add_flag(&sl0, buf, config.had_segv, "segv");
+  add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
+  add_flag(&sl0, buf, config.use_usbscsi, "usbscsi");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {
@@ -928,6 +945,9 @@ void util_status_info()
     );
   }
   strcat(buf, " )");
+  if(config.floppydev) {
+    sprintf(buf + strlen(buf), " [%s]", config.floppydev);
+  }
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "net devices = (");
@@ -3396,8 +3416,252 @@ void util_set_product_dir(char *prod)
   str_copy(&config.product_dir, prod);
 
   str_copy(&config.installdir, "/boot/inst-sys");
+#if defined(__sparc__)
+  {
+     struct utsname buf;
+
+     uname (&buf);
+     if (strcmp (buf.machine, "sparc64") == 0)
+	str_copy(&config.rootimage, "/boot/root64");
+     else
+	str_copy(&config.rootimage, "/boot/root");
+  }
+#else
   str_copy(&config.rootimage, "/boot/root");
+#endif
   str_copy(&config.rescueimage, "/boot/rescue");
   str_copy(&config.demoimage, "/boot/cd-demo");
+}
+
+
+int util_usbscsi_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(!argc) {
+    return fprintf(stderr, "usage: usbscsi 0|1|2\n"), 1;
+  }
+
+  while(argc--) usbscsi_change(atoi(*argv++));
+
+  return 0;
+}
+
+
+/*
+ * action
+ *   0: detach
+ *   1: attach
+ *   2: detach disks only
+ *
+ * returns number of devices attached/detached
+ */
+int usbscsi_change(int action)
+{
+  int i, cnt = 0;
+  FILE *f;
+  int scsidevs = sizeof scsidev / sizeof *scsidev;
+  static int proc_scsi_ext = 0;
+
+  if(!proc_scsi_ext) {
+    proc_scsi_ext = 1;
+    if((f = fopen("/proc/scsi/scsi", "w"))) {
+      fprintf(f, "scsi report-devs 1\n");
+      fclose(f);
+    }
+  }
+
+  usbscsi_read(scsidevs, scsidev, action);
+
+  if(config.debug) {
+    for(i = 0; i < scsidevs; i++) {
+      if(scsidev[i].usb) {
+        fprintf(stderr, "%d: %u (%s) (%s)\n", i, scsidev[i].active, scsidev[i].name, scsidev[i].last_name);
+      }
+    }
+  }
+
+  /* attach or detach them */
+  for(i = 0; i < scsidevs; i++) {
+    if(
+      scsidev[i].usb &&
+      (scsidev[i].disk || action == 0 || action == 1) &&
+      (
+        ((action == 0 || action == 2) && scsidev[i].active) ||
+        (action == 1 && !scsidev[i].active)
+      )
+    ) {
+      cnt++;
+      if(config.debug) {
+        fprintf(stderr, "%sing %d\n", action == 1 ? "attach" : "detach", i);
+      }
+      if((f = fopen("/proc/scsi/scsi", "w"))) {
+        fprintf(f, "scsi %s-single-device %d 0 0 0\n", action == 1 ? "add" : "remove", i);
+        fclose(f);
+      }
+    }
+  }
+
+  usbscsi_read(scsidevs, scsidev, action);
+
+  if(config.debug) {
+    for(i = 0; i < scsidevs; i++) {
+      if(scsidev[i].usb) {
+        fprintf(stderr, "%d: %u (%s) (%s)\n", i, scsidev[i].active, scsidev[i].name, scsidev[i].last_name);
+      }
+    }
+  }
+
+  return cnt;
+}
+
+
+/*
+ * reads info from /proc/scsi/scsi
+ */
+void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action)
+{
+  struct dirent *de1, *de2;
+  DIR *d1, *d2;
+  unsigned u0, u1, u2, u3;
+  char buf[256], *s;
+  FILE *f;
+  int i, attached, ha;
+
+  /* find usb storage host adapters */
+  if((d1 = opendir("/proc/scsi"))) {
+    while((de1 = readdir(d1))) {
+      if(sscanf(de1->d_name, "usb-storage-%u", &u1) == 1) {
+        sprintf(buf, "/proc/scsi/%s", de1->d_name);
+        if((d2 = opendir(buf))) {
+          while((de2 = readdir(d2))) {
+            if(sscanf(de2->d_name, "%u", &u2) == 1) {
+              sprintf(buf + strlen(buf), "/%s", de2->d_name);
+              attached = 1;
+              if((f = fopen(buf, "r"))) {
+                while(fgets(buf, sizeof buf, f)) {
+                  if(strstr(buf, " Attached: No")) {
+                    attached = 0;
+                    break;
+                  }
+                }
+                fclose(f);
+              }
+              if(attached && u2 < scsidevs) {
+                scsidev[u2].usb = 1;
+              }
+            }
+          }
+          closedir(d2);
+        }
+      }
+    }
+    closedir(d1);
+  }
+
+  for(i = 0; i < scsidevs; i++) {
+    if(action == 0 || action == 2) {
+      memcpy(scsidev[i].last_name, scsidev[i].name, sizeof scsidev[i].last_name);
+      memset(scsidev[i].name, 0, sizeof scsidev[i].name);
+    }
+    scsidev[i].active = 0;
+  }
+
+  /* look for disk devices */
+  if((f = fopen("/proc/scsi/scsi", "r"))) {
+    ha = -1;
+    while(fgets(buf, sizeof buf, f)) {
+      if(
+        sscanf(buf, "Host: scsi%u Channel: %u Id: %u Lun: %u", &u0, &u1, &u2, &u3) == 4 &&
+        u1 == 0 && u2 == 0 && u3 == 0
+      ) {
+        ha = u0;
+        if(ha >= 0 && ha < scsidevs && scsidev[ha].usb) {
+          scsidev[ha].active = 1;
+        }
+      }
+      else if(strstr(buf, "Host:") == buf) {
+        ha = -1;
+      }
+      else if(
+        strstr(buf, "  Attached drivers:") == buf &&
+        (s = strstr(buf, " sd"))
+      ) {
+        if(ha >= 0 && ha < scsidevs && scsidev[ha].usb) {
+          scsidev[ha].disk = 1;
+          s++;
+          if(s[3] == '(') {
+            s[3] = 0;
+          }
+          else if(s[4] == '(') {
+            s[4] = 0;
+          }
+          else {
+            *s = 0;
+          }
+          if(*s) {
+            strcpy(scsidev[ha].name, s);
+          }
+        }
+      }
+    }
+    fclose(f);
+  }
+}
+
+
+void usbscsi_off()
+{
+  if(!config.use_usbscsi) return;
+
+  if(!mod_is_loaded("usb-storage")) return;
+
+  usbscsi_change(2);
+}
+
+
+void usbscsi_on()
+{
+  if(!config.use_usbscsi) return;
+
+  if(!mod_is_loaded("usb-storage")) return;
+
+  if(usbscsi_change(1)) usbscsi_rename();
+}
+
+
+void usbscsi_rename()
+{
+  int i;
+  int scsidevs = sizeof scsidev / sizeof *scsidev;
+
+  for(i = 0; i < scsidevs; i++) {
+    if(
+      scsidev[i].usb &&
+      *scsidev[i].name &&
+      *scsidev[i].last_name &&
+      strcmp(scsidev[i].name, scsidev[i].last_name)
+    ) {
+      fprintf(stderr, "%s --> %s\n", scsidev[i].last_name, scsidev[i].name);
+      usbscsi_rename_single(scsidev[i].last_name, scsidev[i].name);
+    }
+  }
+}
+
+
+void usbscsi_rename_single(char *old_name, char *new_name)
+{
+  int i;
+  char buf[16];
+
+  for(i = 0; i < sizeof config.floppy_dev / sizeof *config.floppy_dev; i++) {
+    if(config.floppy_dev[i] && !strcmp(config.floppy_dev[i] + 5, old_name)) {
+      sprintf(buf, "/dev/%s", new_name);
+      str_copy(&config.floppy_dev[i], buf);
+    }
+  }
+  if(config.floppydev && !strcmp(config.floppydev, old_name)) {
+    str_copy(&config.floppydev, new_name);
+  }
 }
 
