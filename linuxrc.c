@@ -98,6 +98,8 @@ int main (int argc, char **argv, char **env)
         rc_ii = util_mount_main (argc, argv);
     else if (!strcmp (progname_pci, "umount"))
         rc_ii = util_umount_main (argc, argv);
+    else if (!strcmp (progname_pci, "cat"))
+        rc_ii = util_cat_main (argc, argv);
     else if (!strcmp (progname_pci, "nothing"))
         rc_ii = 0;
     else
@@ -478,17 +480,35 @@ static void lxrc_init (void)
         auto2_ig = TRUE;
         auto2_init_settings();
       } else {
+        int i, j;
+        char s[200];
+
         deb_msg("Automatic setup not possible.");
         util_manual_mode();
-        yast_version_ig = 0;
         disp_cursor_off();
         disp_set_display(1);
-        if(found_suse_cd_ig) {
-          char s[200];
-          sprintf(s, txt_get(TXT_INSERT_CD), 1);
-          dia_message(s, MSGTYPE_INFO);
+        util_print_banner();
+
+        sprintf(s, txt_get(TXT_INSERT_CD), 1);
+        j = dia_okcancel(s, YES) == YES ? 1 : 0;
+        i = 0;
+        if(j) {
+          printf("\033c"); fflush(stdout);
+          disp_clear_screen();
+          i = auto2_find_install_medium();
         }
-#if defined(__i386__)
+        if(i) {
+          auto2_ig = TRUE;
+          auto2_init_settings();
+        }
+        else {
+          yast_version_ig = 0;
+          disp_cursor_off();
+          util_print_banner ();
+//          dia_message(s, MSGTYPE_INFO);
+          if(j) dia_message("Could not find the SuSE Linux Installation CD.\n\nActivating manual setup program.\n", MSGTYPE_ERROR);
+        }
+#if 0 /* defined(__i386__) */
         else {
           dia_message("Could not find the SuSE Linux installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
         }

@@ -77,6 +77,45 @@ int dia_yesno (char *txt_tv, int default_iv)
     }
 
 
+int dia_okcancel (char *txt_tv, int default_iv)
+    {
+    window_t  win_ri;
+    button_t  yes_button_ri;
+    button_t  no_button_ri;
+    button_t *buttons_ari [2] = { &yes_button_ri, &no_button_ri };
+    int       width_ii;
+    int       answer_ii;
+
+
+    disp_toggle_output (DISP_OFF);
+    memset (&win_ri, 0, sizeof (window_t));
+    win_ri.bg_color = colors_prg->choice_win;
+    win_ri.fg_color = colors_prg->choice_fg;
+    width_ii = dia_win_open (&win_ri, txt_tv);
+
+    util_generate_button (&yes_button_ri, "Ok");
+    util_generate_button (&no_button_ri, "Cancel");
+
+    win_add_button (&win_ri, &yes_button_ri,
+                    width_ii / 3 - strlen (yes_button_ri.text) / 2 - 3,
+                    strlen (yes_button_ri.text));
+    win_add_button (&win_ri, &no_button_ri, width_ii - width_ii / 3 -
+                    strlen (yes_button_ri.text) / 2 + 2,
+                    strlen (no_button_ri.text));
+
+    disp_flush_area (&win_ri);
+    answer_ii = win_choose_button (buttons_ari, 2, default_iv == NO ? 2 : 1);
+    win_close (&win_ri);
+
+    if (answer_ii == 1)
+        return (YES);
+    else if (answer_ii == 2)
+        return (NO);
+    else
+        return (ESCAPE);
+    }
+
+
 int dia_message (char *txt_tv, int msgtype_iv)
     {
     window_t  win_ri;

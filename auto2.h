@@ -17,3 +17,4 @@ char *auto2_serial_console(void);
 #if 0
 void auto2_print_x11_opts(FILE *);
 #endif
+int auto2_find_install_medium(void);

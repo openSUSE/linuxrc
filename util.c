@@ -48,6 +48,7 @@
 #include "dialog.h"
 #include "ftp.h"
 #include "net.h"
+#include "auto2.h"
 
 #define LED_TIME     50000
 
@@ -812,12 +813,12 @@ void util_umount_driver_update()
 
 void util_status_info()
 {
-  char *l[10];
+  char *l[13];
   int i;
   char *s, t[100];
 
   for(i = 0; i < sizeof l / sizeof *l; i++) {
-    l[i] = calloc(100, 1);
+    l[i] = calloc(256, 1);
   }
 
   sprintf(l[0],
@@ -845,6 +846,20 @@ void util_status_info()
 
   s = inet_ntoa(plip_host_rg);
   sprintf(l[7], "plip host = %s", s);
+
+  sprintf(l[8], "language = %d, keymap = \"%s\"", language_ig, keymap_tg);
+
+  sprintf(l[9], "textmode = %d, yast2update = %d, yast2serial = %d", text_mode_ig, yast2_update_ig, yast2_serial_ig);
+
+  sprintf(l[10], "vga = 0x%04x", frame_buffer_mode_ig);
+
+  sprintf(l[11], "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
+
+  sprintf(l[12],
+    "pcmcia = %d, pcmcia_chip = %s",
+    auto2_pcmcia(),
+    pcmcia_chip_ig == 2 ? "\"i82365\"" : pcmcia_chip_ig == 1 ? "\"tcic\"" : "0"
+  );
 
   dia_show_lines("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", l, sizeof l / sizeof *l, 76, FALSE);
 
@@ -911,5 +926,31 @@ int util_umount_main(int argc, char **argv)
   perror(*argv);
 
   return 1;
+}
+
+int util_cat_main(int argc, char **argv)
+{
+  FILE *f;
+  int i, c;
+
+  argv++; argc--;
+
+  if(!argc) {
+    while((c = fgetc(stdin)) != EOF) fputc(c, stdout);
+    return 0;
+  }
+
+  for(i = 0; i < argc; i++) {
+    if((f = fopen(argv[i], "r"))) {
+      while((c = fgetc(f)) != EOF) fputc(c, stdout);
+      fclose(f);
+    }
+    else {
+      perror(argv[i]);
+      return 1;
+    }
+  }
+
+  return 0;
 }
 

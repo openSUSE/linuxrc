@@ -76,6 +76,7 @@ static int   inst_get_ftpserver       (void);
 static int   inst_ftp                 (void);
 static int   inst_get_ftpsetup        (void);
 static int   inst_choose_yast_version (void);
+static int   inst_update_cd           (void);
 
 int inst_auto_install (void)
     {
@@ -218,7 +219,7 @@ int inst_start_demo (void)
 int inst_menu (void)
     {
     int     width_ii = 40;
-    item_t  items_ari [5];
+    item_t  items_ari [6];
     int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
     int     choice_ii;
     int     i_ii;
@@ -230,6 +231,7 @@ int inst_menu (void)
     strcpy (items_ari [2].text, txt_get (TXT_START_RESCUE));
     strcpy (items_ari [3].text, txt_get (TXT_START_DEMO));
     strcpy (items_ari [4].text, "Eject CD");
+    strcpy (items_ari [5].text, "Driver Update CD");
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, width_ii);
@@ -237,7 +239,7 @@ int inst_menu (void)
         }
 
     choice_ii = dia_menu (txt_get (TXT_MENU_START), items_ari,
-                          nr_items_ii, 1);
+                          yast2_update_ig ? nr_items_ii : nr_items_ii - 1, 1);
 
     util_free_items (items_ari, nr_items_ii);
 
@@ -270,6 +272,10 @@ static int inst_menu_cb (int what_iv)
         case 5:
             sprintf(s, "/dev/%s", cdrom_tg);
             util_eject_cdrom(*cdrom_tg ? s : NULL);
+            error_ii = -1;
+            break;
+        case 6:
+            inst_update_cd ();
             error_ii = -1;
             break;
         default:
@@ -756,7 +762,7 @@ static int inst_prepare (void)
 
     setenv ("YAST_DEBUG", "/debug/yast.debug", TRUE);
 
-    system ("/usr/sbin/syslogd");
+    system ("/sbin/syslogd");
 
 #ifdef USE_LIBHD   
 #ifdef __i386__
@@ -1400,4 +1406,31 @@ int inst_auto2_install()
 }
 
 #endif	/* USE_LIBHD */
+
+
+int inst_update_cd()
+{
+  int  i;
+  char dev[20];
+  char *mp = "/tmp/drvupdate";
+
+  *driver_update_dir = 0;
+  strcpy(dev, "/dev/");
+  i = dia_input(txt_get(TXT_CHOOSE_SOURCE), dev, 17, 17);
+  if(i) return i;
+  mkdir(mp, 0755);
+  i = util_try_mount(dev, mp, MS_MGC_VAL | MS_RDONLY, 0);
+  if(!i) {
+    deb_msg("Update CD mounted");
+    util_chk_driver_update(mp);
+    umount(mp);
+  }
+  else {
+    deb_msg("Update CD mount failed");
+  }
+
+  if(!*driver_update_dir) dia_message("Driver Update failed", MSGTYPE_ERROR);
+
+  return 0;
+}
 

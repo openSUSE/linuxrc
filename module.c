@@ -48,7 +48,7 @@ static int       mod_ram_modules_im = FALSE;
 static char     *mod_modpath_tm = "/modules";
 static module_t  mod_current_arm [NR_MODULES];
 static int       mod_show_kernel_im = FALSE;
-static int       mod_force_moddisk_im = FALSE;
+int       mod_force_moddisk_im = FALSE;
 static int       plip_core_loaded_im = FALSE;
 
 

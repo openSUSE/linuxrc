@@ -48,3 +48,4 @@ extern void util_umount_driver_update (void);
 extern void util_status_info       (void);
 extern int  util_mount_main        (int argc, char **argv);
 extern int  util_umount_main       (int argc, char **argv);
+extern int  util_cat_main          (int argc, char **argv);

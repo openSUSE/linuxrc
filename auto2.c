@@ -527,9 +527,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
  */
 int auto2_init()
 {
-  int i;
-  unsigned last_idx;
-  hd_t *hd_devs = NULL;
+  int i, j;
 
 #if 0
   auto2_chk_x11i();
@@ -548,6 +546,39 @@ int auto2_init()
 #if WITH_PCMCIA
   if(hd_has_pcmcia(hd_data)) {
     deb_msg("Going to load PCMCIA support...");
+
+    if(!util_check_exist("modules/pcmcia_core.o")) {
+      char s[200], *t;
+
+      util_manual_mode();
+      disp_cursor_off();
+      disp_set_display(1);
+      util_print_banner();
+
+      sprintf(s, txt_get(TXT_FOUND_PCMCIA), "i82365");
+      t = index(s, '\n');
+      if(t) {
+        *t = 0;
+        strcat(t, "\n\n");
+      }
+      else {
+        *s = 0;
+      }
+      strcat(s, txt_get(TXT_ENTER_MODDISK));
+
+      j = dia_okcancel(s, YES) == YES ? 1 : 0;
+
+      if(j) {
+        mod_force_moddisk_im = TRUE;
+        mod_free_modules();
+        mod_get_ram_modules(MOD_TYPE_OTHER);
+      }
+
+      printf("\033c"); fflush(stdout);
+      disp_clear_screen();
+
+      auto2_ig = TRUE;
+    }
 
     if(
       (i = mod_load_module("pcmcia_core", NULL)) ||
@@ -587,6 +618,19 @@ int auto2_init()
   auto2_find_mouse();
 
   deb_int(valid_net_config_ig);
+
+  return auto2_find_install_medium();
+}
+
+
+/*
+ * Look for a SuSE CD ot NFS source.
+ */
+int auto2_find_install_medium()
+{
+  int i;
+  unsigned last_idx;
+  hd_t *hd_devs = NULL;
 
   if(bootmode_ig == BOOTMODE_CD) {
     *cdrom_tg = 0;
@@ -672,6 +716,7 @@ int auto2_init()
 
   return FALSE;
 }
+
 
 /*
  * Read *all* "expert=" entries from the kernel command line.

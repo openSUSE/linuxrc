@@ -10,6 +10,7 @@
 #define MSGTYPE_ERROR    1
 
 extern int  dia_yesno        (char *txt_tv, int default_iv);
+extern int  dia_okcancel     (char *txt_tv, int default_iv);
 extern int  dia_message      (char *txt_tv, int msgtype_iv);
 extern int  dia_menu         (char *head_tv,     item_t items_arv [],
                               int   nr_items_iv, int    default_iv);
