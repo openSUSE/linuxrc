@@ -246,7 +246,7 @@ typedef struct {
     unsigned add_cmdline:1;	/* parse cmdline, too */
   } info;
   char *autoyast;		/* yast autoinstall parameter */
-  char *linuxrc;		/* 'linuxrc' parameter */
+  slist_t *linuxrc;		/* 'linuxrc' parameters */
   char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */

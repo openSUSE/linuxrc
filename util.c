@@ -921,7 +921,7 @@ void util_do_driver_update(unsigned idx)
   /* read config file */
   config.update.name_added = 0;
   strprintf(&buf1, "file:/%s/dud.config", dst);
-  file_read_info_file(buf1, NULL, kf_cfg);
+  file_read_info_file(buf1, kf_cfg);
 
   if(!config.update.name_added) create_update_name(idx);
 
@@ -1164,9 +1164,6 @@ void util_status_info()
     get_instmode_name(config.insttype),
     net_config_mask()
   );
-  slist_append_str(&sl0, buf);
-
-  sprintf(buf, "linuxrc = %s", config.linuxrc ?: "");
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "flags = ");

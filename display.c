@@ -232,8 +232,8 @@ void disp_set_color (char fg_cv, char bg_cv)
         else
             attr_ci = ATTR_NORMAL;
 
-        printf ("\033[%d;%d;%dm",
-                (int) attr_ci, (int) (fg_cv & 0x07) + 30, (int) bg_cv + 40);
+        if(!config.linemode)
+        	printf ("\033[%d;%d;%dm", (int) attr_ci, (int) (fg_cv & 0x07) + 30, (int) bg_cv + 40);
         }
     }
 

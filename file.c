@@ -85,8 +85,7 @@ static struct {
   { key_console,        "Console",        kf_none                        },	/* tricky */
   { key_pliphost,       "PLIPHost",       kf_none                        },	/* drop it? */
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
-//  { key_manual,         "Manual",         kf_none                        },	/* tricky */
-  { key_manual,         "Manual",         kf_cfg + kf_cmd                },	/* tricky */
+  { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_demo,           "Demo",           kf_none                        },	/* obsolete */
   { key_reboot,         "Reboot",         kf_none                        },	/* drop it? */
   { key_floppydisk,     "Floppydisk",     kf_none                        },	/* ??? */
@@ -107,8 +106,8 @@ static struct {
   { key_font,           "Font",           kf_none                        },
   { key_screenmap,      "Screenmap",      kf_none                        },
   { key_fontmagic,      "Fontmagic",      kf_none                        },
-  { key_autoyast,       "AutoYaST",       kf_cfg + kf_cmd                },	/* tricky */
-  { key_linuxrc,        "linuxrc",        kf_none                        },	/* tricky */
+  { key_autoyast,       "AutoYaST",       kf_cfg + kf_cmd_early          },
+  { key_linuxrc,        "linuxrc",        kf_cfg + kf_cmd_early          },
   { key_forceinsmod,    "ForceInsmod",    kf_cfg + kf_cmd                },
   { key_dhcp,           "DHCP",           kf_cmd                         },	/* not really useful */
   { key_ipaddr,         "IPAddr",         kf_dhcp                        },
@@ -130,7 +129,7 @@ static struct {
   { key_memyasttext,    "MemYaSTText",    kf_cfg + kf_cmd                },
   { key_memmodules,     "MemModules",     kf_cfg + kf_cmd                },
   { key_memloadimage,   "MemLoadImage",   kf_cfg + kf_cmd                },
-  { key_info,           "Info",           kf_none                        },	/* tricky */
+  { key_info,           "Info",           kf_cmd_early                   },
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
   { key_proxyport,      "ProxyPort",      kf_cfg + kf_cmd                },
   { key_proxyproto,     "ProxyProto",     kf_cfg + kf_cmd                },
@@ -138,10 +137,10 @@ static struct {
   { key_nfsport,        "NFSPort",        kf_cfg + kf_cmd                },
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
   { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
-  { key_tmpfs,          "_TmpFS",         kf_none                        },	/* tricky */
+  { key_tmpfs,          "_TmpFS",         kf_cmd                         },
   { key_netstop,        "_NetStop",       kf_cfg + kf_cmd                },
   { key_testmode,       "_TestMode",      kf_cfg                         },
-  { key_debugwait,      "_DebugWait",     kf_cfg + kf_cmd                },	/* tricky */
+  { key_debugwait,      "_DebugWait",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_expert,         "Expert",         kf_cfg + kf_cmd                },	/* drop it? */
   { key_rescue,         "Rescue",         kf_cfg + kf_cmd                },
   { key_rootimage,      "RootImage",      kf_cfg + kf_cmd                },
@@ -171,7 +170,7 @@ static struct {
   { key_consoledevice,  "ConsoleDevice",  kf_cfg + kf_cmd                },
   { key_product,        "Product",        kf_cfg + kf_cmd                },
   { key_productdir,     "ProductDir",     kf_cfg + kf_cmd                },
-  { key_linuxrcstderr,  "LinuxrcSTDERR",  kf_cfg + kf_cmd                },	/* hm */
+  { key_linuxrcstderr,  "LinuxrcSTDERR",  kf_cfg + kf_cmd + kf_cmd_early },
   { key_comment,        "#",              kf_cfg                         },
   { key_kbdtimeout,     "KBDTimeout",     kf_cfg + kf_cmd                },
   { key_brokenmodules,  "BrokenModules",  kf_cfg + kf_cmd + kf_cmd_early },
@@ -431,17 +430,14 @@ int file_read_info()
   }
 
   if(!config.info.file || !strcmp(config.info.file, "default")) {
-    if(config.info.file || !config.manual) {
-      file = file_read_info_file("floppy:/info", NULL, kf_cfg);
-    }
-    if(!file) file = file_read_info_file("file:/info", NULL, kf_cfg);
+    file = file_read_info_file("file:/info", kf_cfg);
   }
   else {
-    file = file_read_info_file(config.info.file, NULL, kf_cfg);
+    file = file_read_info_file(config.info.file, kf_cfg);
   }
 
   if(config.info.add_cmdline) {
-    s = file_read_info_file("cmdline", NULL, kf_cmd);
+    s = file_read_info_file("cmdline", kf_cmd);
     if(!file) file = s;
   }
 
@@ -465,7 +461,7 @@ int file_read_info()
 }
 
 
-char *file_read_info_file(char *file, char *file2, file_key_flag_t flags)
+char *file_read_info_file(char *file, file_key_flag_t flags)
 {
   char filename[MAX_FILENAME];
   int i, mounted = 0, dud = 0;
@@ -492,11 +488,6 @@ char *file_read_info_file(char *file, char *file2, file_key_flag_t flags)
       dud = 1;
       sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
       f0 = file_read_file(filename, flags);
-      if(!f0 && file2) {
-        file = file2;
-        sprintf(filename, "%s/%s", mountpoint_tg, file + 7);
-        f0 = file_read_file(filename, flags);
-      }
     }
   }
 
@@ -718,10 +709,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_tmpfs:
-        if(f->is.numeric) config.tmpfs = f->nvalue;
-        break;
-
       case key_netstop:
         if(f->is.numeric) config.netstop = f->nvalue;
         break;
@@ -797,12 +784,16 @@ void file_do_info(file_t *f0)
         break;
 
       case key_autoyast:
-        str_copy(&config.autoyast, f->value);
+        str_copy(&config.autoyast, *f->value ? f->value : "default");
         config.manual = 0;
         if(!config.instmode) {
           url = parse_url(config.autoyast);
           if(url && url->scheme) set_instmode(url->scheme);
         }
+        break;
+
+      case key_info:
+        str_copy(&config.info.file, *f->value ? f->value : "default");
         break;
 
       case key_vnc:
@@ -1008,6 +999,14 @@ void file_do_info(file_t *f0)
 
       case key_lxrcdebug:
         if(f->is.numeric) config.debug = f->nvalue;
+        break;
+
+      case key_linuxrc:
+        slist_free(config.linuxrc);
+        config.linuxrc = slist_split(',', f->value);
+        if(slist_getentry(config.linuxrc, "nocmdline")) config.info.add_cmdline = 0;
+        /* ###### still needed? */
+        if(slist_getentry(config.linuxrc, "reboot")) reboot_ig = 1;
         break;
 
       case key_live:
@@ -1481,13 +1480,28 @@ void file_write_modparms(FILE *f)
 file_t *file_read_cmdline(file_key_flag_t flags)
 {
   FILE *f;
-  char cmdline[1024];
+  file_t *ft;
+  char **argv, *cmdline = NULL;
 
-  if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
-  if(!fgets(cmdline, sizeof cmdline, f)) *cmdline = 0;
-  fclose(f);
+  if(config.test) {
+    if(!config.had_segv) {
+      for((argv = config.argv) && argv++; *argv; argv++) {
+        strprintf(&cmdline, "%s \"%s\"", cmdline ?: "", *argv);
+      }
+    }
+  }
+  else {
+    if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
+    cmdline = calloc(1024, 1);
+    if(!fgets(cmdline, 1024, f)) *cmdline = 0;
+    fclose(f);
+  }
 
-  return file_parse_buffer(cmdline, flags);
+  ft = file_parse_buffer(cmdline, flags);
+
+  free(cmdline);
+
+  return ft;
 }
 
 
@@ -1496,6 +1510,8 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
   file_t *ft0 = NULL, **ft = &ft0;
   char *current, *s, *s1, *t, *t1;
   int i, quote;
+
+  if(!buf) return NULL;
 
   current = buf;
 

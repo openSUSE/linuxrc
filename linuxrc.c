@@ -136,20 +136,6 @@ static struct {
 };
 #endif
 
-typedef enum {
-  lx_reboot, lx_loadnet, lx_loaddisk, lx_nocmdline
-} lx_param_t;
-
-static struct {
-  char *name;
-  lx_param_t key;
-} lxrc_params[] = {
-  { "reboot",     lx_reboot     },
-  { "loadnet",    lx_loadnet    },
-  { "loaddisk",   lx_loaddisk   },
-  { "nocmdline",  lx_nocmdline  }
-};
-
 static dia_item_t di_lxrc_main_menu_last;
 
 
@@ -597,9 +583,7 @@ void lxrc_catch_signal(int signum)
 void lxrc_init()
 {
   int i, j;
-  file_t *ft;
-  char *s, *t0, *t, buf[256];
-  url_t *url;
+  char buf[256];
 
   if(txt_init()) {
     printf("Linuxrc error: Corrupted texts!\n");
@@ -680,7 +664,7 @@ void lxrc_init()
   config.inst_ramdisk = -1;
   config.module.ramdisk = -1;
 
-  file_read_info_file("file:/linuxrc.config", NULL, kf_cfg);
+  file_read_info_file("file:/linuxrc.config", kf_cfg);
 
   if(!config.had_segv) {
     if (config.linemode)
@@ -702,88 +686,9 @@ void lxrc_init()
     str_copy(&config.floppy_dev[0], buf);
   }
 
-  if((s = getenv("lang"))) {
-    i = set_langidbyname(s);
-    if(i) config.language = i;
-  }
+  file_read_info_file("cmdline", kf_cmd_early);
 
-  if(!config.had_segv) {
-    ft = file_get_cmdline(key_manual);
-    if(ft && ft->is.numeric) config.manual = ft->nvalue;
-  }
-
-  ft = file_get_cmdline(key_info);
-  s = ft ? ft->value : getenv("info");
-  if(s && !*s) s = "default";
-  str_copy(&config.info.file, s);
-
-  ft = file_get_cmdline(key_autoyast);
-  s = ft ? ft->value : getenv("autoyast");
-  if(s && !*s) s = "default";
-  str_copy(&config.autoyast, s);
-
-  if(config.autoyast) {
-    config.manual = 0;
-    url = parse_url(config.autoyast);
-    if(url && url->scheme) set_instmode(url->scheme);
-  }
-
-  ft = file_get_cmdline(key_linemode);
-  if(ft && ft->is.numeric) config.linemode = ft->nvalue;
-
-  ft = file_get_cmdline(key_usbwait);
-  if(ft && ft->is.numeric) config.usbwait = ft->nvalue;
-
-  ft = file_get_cmdline(key_moduledelay);
-  if(ft && ft->is.numeric) config.module.delay = ft->nvalue;
-
-  ft = file_get_cmdline(key_scsibeforeusb);
-  if(ft && ft->is.numeric) config.scsi_before_usb = ft->nvalue;
-
-  ft = file_get_cmdline(key_useusbscsi);
-  if(ft && ft->is.numeric) config.use_usbscsi = ft->nvalue;
-
-  ft = file_get_cmdline(key_useidescsi);
-  if(ft && ft->is.numeric) config.idescsi = ft->nvalue;
-
-  ft = file_get_cmdline(key_lxrcdebug);
-  if(ft && ft->is.numeric) config.debug = ft->nvalue;
-
-  ft = file_get_cmdline(key_linuxrc);
-  str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));
-
-  if(config.linuxrc) {
-    s = strdup(config.linuxrc);
-
-    for(t0 = s; (t = strsep(&t0, ",")); ) {
-      for(i = 0; (unsigned) i < sizeof lxrc_params / sizeof *lxrc_params; i++) {
-        if(!strcasecmp(lxrc_params[i].name, t)) {
-          switch(lxrc_params[i].key) {
-            case lx_reboot:
-              reboot_ig = TRUE;
-              break;
-
-            case lx_loadnet:
-              config.activate_network = 1;
-              break;
-
-            case lx_loaddisk:
-              config.activate_storage = 1;
-              break;
-
-            case lx_nocmdline:
-              config.info.add_cmdline = 0;
-              break;
-          }
-          break;
-        }
-      }
-    }
-    free(s);
-  }
-
-  if((s = getenv("LINUXRC_STDERR"))) str_copy(&config.stderr_name, s);
-  util_set_stderr(config.stderr_name);
+  if(config.had_segv) config.manual = 1;
 
   if(!config.test && !config.had_segv) {
     fprintf(stderr, "Remount of / ");
@@ -828,12 +733,6 @@ void lxrc_init()
   fflush(stdout);
 
   info_init();
-
-  ft = file_get_cmdline(key_brokenmodules);
-  if(ft && *ft->value) {
-    slist_free(config.module.broken);
-    config.module.broken = slist_split(',', ft->value);
-  }
 
   mod_init(1);
   util_update_disk_list(NULL, 1);
