@@ -203,7 +203,8 @@ static struct {
   { key_updatestyle,    "UpdateStyle"      },
   { key_updateid,       "UpdateID"         },
   { key_updateask,      "DriverUpdate"     },
-  { key_updateask,      "DUD"              }
+  { key_updateask,      "DUD"              },
+  { key_loglevel,       "LogLevel"         }
 };
 
 static struct {
@@ -1078,6 +1079,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.update.ask = f->nvalue;
         break;
 
+      case key_loglevel:
+        if(f->is.numeric) config.loglevel = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1559,17 +1564,20 @@ file_t *file_parse_buffer(char *buf)
 }
 
 
+/*
+ * Returns last matching entry.
+ */
 file_t *file_get_cmdline(file_key_t key)
 {
-  static file_t *cmdline = NULL, *ft;
+  static file_t *cmdline = NULL, *ft, *ft_ok = NULL;
 
   if(!cmdline) cmdline = file_read_cmdline();
 
   for(ft = cmdline; ft; ft = ft->next) {
-    if(ft->key == key) break;
+    if(ft->key == key) ft_ok = ft;
   }
 
-  return ft;
+  return ft_ok;
 }
 
 
