@@ -2499,6 +2499,11 @@ url_t *parse_url(char *str)
     }
   }
 
+  if(scheme == inst_smb && url.dir && *url.dir == '/') {
+    str_copy(&url.dir, url.dir + 1);
+  }
+
+
   free(str);
   if(scheme >= 0) url.scheme = scheme;
 

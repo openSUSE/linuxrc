@@ -1,5 +1,10 @@
 #ifdef DIET
 
+// #include <asm/posix_types.h>
+typedef unsigned short  __kernel_uid_t;
+typedef unsigned short  __kernel_gid_t;
+typedef unsigned short  __kernel_mode_t;
+
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
 typedef unsigned u_int32_t;

@@ -1174,8 +1174,6 @@ DhcpIface.client_id[6],DhcpIface.client_id[7],DhcpIface.client_id[8]);
       dhcpStop();
       return 0;
     }
-  if ( DebugFlag ) syslog(LOG_DEBUG,"broadcasting second DHCP_DISCOVER\n");
-  dhcpSendAndRecv(DhcpMsgRecv->xid,DHCP_OFFER,&buildDhcpDiscover);
   prev_ip_addr = DhcpIface.ciaddr;
   DhcpIface.ciaddr = DhcpMsgRecv->yiaddr;
   memcpy(&DhcpIface.siaddr,DhcpOptions.val[dhcpServerIdentifier],4);

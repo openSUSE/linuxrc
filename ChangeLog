@@ -1,3 +1,10 @@
+27/2/2002:	v1.3.21
+	- dhcpcd: don't depend on a second DHCPOFFER -- breaks with
+	  Lucent Technologies server
+	- added smbmnt
+	- fixed swap dialog
+	- remember nameserver info from dhcp
+
 25/2/2002:	v1.3.20
 	- make vnc usable
 	- fixed some bugs in swap dialog

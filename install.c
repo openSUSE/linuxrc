@@ -969,6 +969,7 @@ int inst_execute_yast()
     util_start_shell("/dev/tty6", "/bin/bash", 1);
   }
 
+  util_free_mem();
   ask_for_swap(
     (config.memory.min_yast - config.memory.min_free) << 10,
     "Not enough memory for YaST.\n"

@@ -67,7 +67,7 @@ static char **saved_environment;
 extern char **environ;
 static void lxrc_movetotmpfs(void);
 #if SWISS_ARMY_KNIFE 
-static void lxrc_makelinks(void);
+static void lxrc_makelinks(char *name);
 #endif
 
 #if SWISS_ARMY_KNIFE
@@ -79,6 +79,7 @@ int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
 int rmmod_main(int argc, char **argv);
 int setfont_main(int argc, char **argv);
+int smbmnt_main(int argc, char **argv);
 
 static struct {
   char *name;
@@ -96,6 +97,7 @@ static struct {
   { "probe",       probe_main            },
 #endif
   { "setfont",     setfont_main          },
+  { "smbmnt",      smbmnt_main           },
   { "portmap",     portmap_main          },
   { "mount",       util_mount_main       },
   { "umount",      util_umount_main      },
@@ -182,7 +184,7 @@ int main(int argc, char **argv, char **env)
   if(!config.test && !getuid()) {
     if(!util_check_exist("/oldroot")) {
 #if SWISS_ARMY_KNIFE 
-      lxrc_makelinks();
+      lxrc_makelinks(*argv);
 #endif
       lxrc_movetotmpfs();	// does (normally) not return
     }
@@ -382,7 +384,7 @@ void lxrc_end (void)
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "lsh"
+    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "smbmount"
   };
   int i;
 
@@ -1169,16 +1171,18 @@ void lxrc_movetotmpfs()
 
 
 #if SWISS_ARMY_KNIFE
-void lxrc_makelinks()
+void lxrc_makelinks(char *name)
 {
   int i;
   char buf[64];
 
   if(!util_check_exist("/bin")) mkdir("/bin", 0755);
 
+  if(!util_check_exist("/etc/nothing")) link(name, "/etc/nothing");
+
   for(i = 0; i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
     sprintf(buf, "/bin/%s", lxrc_internal[i].name);
-    if(!util_check_exist(buf)) link("/linuxrc", buf);
+    if(!util_check_exist(buf)) link(name, buf);
   }
 }
 #endif

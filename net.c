@@ -1172,7 +1172,7 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
 
 int net_dhcp()
 {
-  char cmd[256], file[256];
+  char cmd[256], file[256], *s;
   file_t *f0, *f;
   window_t win;
 
@@ -1248,6 +1248,12 @@ int net_dhcp()
         if(*f->value && !config.serverdir) {
           str_copy(&config.serverdir, f->value);
         }
+        break;
+
+      case key_dns:
+        if((s = strchr(f->value, ','))) *s = 0;
+        name2inet(&config.net.nameserver, f->value);
+        net_check_address2(&config.net.nameserver, 0);
         break;
 
       default:
