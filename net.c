@@ -745,7 +745,7 @@ int net_bootp (void)
     if (bootp_wait_ig)
         sleep (bootp_wait_ig);
 
-    rc_ii = performBootp (netdevice_tg, "255.255.255.255", "", 10, 0, NULL,
+    rc_ii = performBootp (netdevice_tg, "255.255.255.255", "", 30, 0, NULL,
                           0, 1, BP_PUT_ENV, 1);
     win_close (&win_ri);
 
