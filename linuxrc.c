@@ -567,6 +567,8 @@ static void lxrc_init (void)
 
     util_get_splash_status();
 
+    if(util_check_exist("/proc/iSeries")) config.is_iseries = 1;
+
     kbd_init ();
     util_redirect_kmsg ();
     disp_init ();
@@ -694,7 +696,7 @@ static void lxrc_init (void)
         util_print_banner ();
         }
 
-    if (!serial_ig)
+    if (!(serial_ig || config.is_iseries))
         set_choose_keytable (0);
 
     util_update_kernellog ();
