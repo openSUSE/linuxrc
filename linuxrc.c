@@ -729,6 +729,10 @@ static void lxrc_check_console (void)
       {
 	serial_ig = TRUE;
 
+#ifdef __PPC__
+        yast_version_ig = 1;
+#endif
+
 	strcpy (console_tg, cp);
 
         fprintf (stderr, "Console: %s, serial=%d\n", console_tg, serial_ig);
