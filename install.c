@@ -719,6 +719,7 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
+      if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
       util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
       util_do_driver_updates();
 
@@ -825,7 +826,8 @@ int inst_start_install()
   get_file("/media.1/info.txt", "/info.txt");
   get_file("/part.info", "/part.info");
   get_file("/control.xml", "/control.xml");
-  if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
+  /* only if we need it for ftp/http installs, too */
+  /* if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE); */
 
   /* look for driver update image; load and apply it */
   i = 1;

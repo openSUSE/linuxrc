@@ -1,5 +1,5 @@
-1/7/2004:	v1.6.37
-	- get servicepack.tar.gz from install source
+27/7/2004:	v1.6.37
+	- get servicepack.tar.gz from install source (#42611)
 	- removed /tmp/content hack
 
 30/6/2004:	v1.6.36
