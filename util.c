@@ -258,7 +258,7 @@ int util_fileinfo(char *file_name, int *size, int *compressed)
       err = -1;
     }
     else {
-      *size = (buf[3] << 24) + (buf[2] << 16) + (buf[1] << 8) + buf[0];
+      if(size) *size = (buf[3] << 24) + (buf[2] << 16) + (buf[1] << 8) + buf[0];
       if(compressed) *compressed = 1;
     }
   }

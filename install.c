@@ -55,7 +55,6 @@
 #define SETUP_COMMAND   "/sbin/inst_setup"
 
 static char  inst_rootimage_tm [MAX_FILENAME];
-static char *inst_demo_sys_tm = "/suse/images/cd-demo";
 
 static int   inst_mount_harddisk      (void);
 static int   inst_try_cdrom           (char *device_tv);
@@ -145,97 +144,76 @@ int inst_auto_install()
 }
 
 
-int inst_start_demo (void)
-    {
-    int    rc_ii;
-    char   filename_ti [MAX_FILENAME];
-    FILE  *file_pri;
-    char   line_ti [MAX_X];
-    int    test_ii = FALSE;
+int inst_start_demo()
+{
+  int rc, win_old;
+  char buf[256];
+  FILE *f;
 
-    if (!auto2_ig)
-        {
-        if (config.demo)
-            if (!info_eide_cd_exists ())
-                {
-#if 0
-                rc_ii = mod_auto (MOD_TYPE_SCSI);
-                if (rc_ii || !info_scsi_cd_exists ())
-                    (void) mod_auto (MOD_TYPE_OTHER);
-#endif
-                }
-
-        test_ii = FALSE;
-
-        if (test_ii)
-            rc_ii = inst_mount_nfs ();
-        else
-            {
-            if (!config.demo)
-                (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
-
-            rc_ii = inst_mount_cdrom (1);
-            }
-
-        if (rc_ii)
-            return (rc_ii);
-        }
-    else
-        {
-        if(config.ask_language || config.ask_keytable) {
-          int win_old;
-          if(!(win_old = config.win)) util_disp_init();
-          if(config.ask_language) set_choose_language();
-          util_print_banner();
-          if(config.ask_keytable) set_choose_keytable(1);
-          if(!win_old) util_disp_done();
-        }
-        }
-
-    sprintf (filename_ti, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
-    if (!util_check_exist (filename_ti))
-        {
-        util_disp_init();
-        dia_message (txt_get (TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-        inst_umount ();
-        return (-1);
-        }
-
-    rc_ii = root_load_rootimage (filename_ti);
-    inst_umount ();
-
-    if (rc_ii)
-        return (rc_ii);
-
-    if (util_mount_rw(RAMDISK_2, mountpoint_tg)) return (-1);
-
-    file_write_install_inf (mountpoint_tg);
-
-    sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
-    file_pri = fopen (filename_ti, "a");
-    // TODO:SMB???
-    if (config.instmode == inst_nfs && !*livesrc_tg)
-        {
-        sprintf(line_ti,
-          "%s:%s /S.u.S.E. nfs ro,nolock 0 0\n",
-          inet_ntoa(config.net.server.ip),
-          config.serverdir ?: ""
-        );
-        }
-    else
-        {
-        sprintf(line_ti,
-          "/dev/%s /S.u.S.E. %s ro 0 0\n",
-          *livesrc_tg ? livesrc_tg : config.cdrom,
-          *livesrc_tg ? "auto" : "iso9660"
-        );
-        }
-
-    fprintf (file_pri, line_ti);
-    fclose (file_pri);
-    inst_umount ();
-    return (0);
+  if(config.manual) {
+    if(config.instmode == inst_nfs) {
+      rc = inst_mount_nfs();
     }
+    else {
+      dia_message(txt_get(TXT_INSERT_LIVECD), MSGTYPE_INFO);
+      rc = inst_mount_cdrom(1);
+    }
+
+    if(rc) return rc;
+  }
+  else {
+    if(config.ask_language || config.ask_keytable) {
+      if(!(win_old = config.win)) util_disp_init();
+      if(config.ask_language) set_choose_language();
+      util_print_banner();
+      if(config.ask_keytable) set_choose_keytable(1);
+      if(!win_old) util_disp_done();
+    }
+  }
+
+  sprintf(buf, "%s/%s", mountpoint_tg, config.demoimage);
+
+  if(!util_check_exist(buf)) {
+    util_disp_init();
+    dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+    inst_umount();
+    return -1;
+  }
+
+  config.inst_ramdisk = load_image(buf, config.instmode);
+
+  inst_umount();	// what for???, cf. inst_start_rescue()
+
+  if(config.inst_ramdisk < 0) return -1;
+
+  root_set_root(config.ramdisk[config.inst_ramdisk].dev);
+
+  rc = ramdisk_mount(config.inst_ramdisk, mountpoint_tg);
+  if(!rc) mount(0, mountpoint_tg, 0, MS_MGC_VAL | MS_REMOUNT, 0);
+
+  file_write_install_inf(mountpoint_tg);
+
+  sprintf(buf, "%s/%s", mountpoint_tg, "etc/fstab");
+  f = fopen(buf, "a");
+
+  if(config.instmode == inst_nfs && !*livesrc_tg) {
+    sprintf(buf, "%s:%s /S.u.S.E. nfs ro,nolock 0 0\n",
+      inet_ntoa(config.net.server.ip),
+      config.serverdir ?: ""
+    );
+  }
+  else {
+    sprintf(buf, "/dev/%s /S.u.S.E. %s ro 0 0\n",
+      *livesrc_tg ? livesrc_tg : config.cdrom,
+      *livesrc_tg ? "auto" : "iso9660"
+    );
+  }
+
+  fprintf(f, buf);
+  fclose(f);
+
+  return 0;
+}
 
 
 int inst_menu()
@@ -347,7 +325,7 @@ int inst_choose_netsource()
 
   if(!config.fullnetsetup) {
     // yast doesn't support it :-((
-    items[0] = items[1] = items[4] = di_skip;
+    items[1] = items[4] = di_skip;
   }
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
@@ -763,7 +741,7 @@ int inst_check_instsys()
       if(config.rescue || force_ri_ig || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
           config.mountpoint.instdata,
-          config.rescue ? config.rescueimage : config.rootimage
+          config.demo ? config.demoimage : config.rescue ? config.rescueimage : config.rootimage
         );
       }
 

@@ -431,7 +431,7 @@ int auto2_net_dev(hd_t **hd0)
       }
 
       if(net_activate()) {
-        deb_msg("net_activate() failed");
+        fprintf(stderr, "net activation failed\n");
         return 1;
       }
       else {
@@ -450,11 +450,11 @@ int auto2_net_dev(hd_t **hd0)
           );
           
           if(i) {
-            deb_msg("SMB mount failed.");
+            fprintf(stderr, "SMB mount failed\n");
             return 1;
           }
 
-          deb_msg("SMB mount ok.");
+          fprintf(stderr, "SMB mount ok\n");
           break;
 
         case inst_nfs:
@@ -464,11 +464,11 @@ int auto2_net_dev(hd_t **hd0)
           fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
 
           if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
-            deb_msg("NFS mount failed.");
+            fprintf(stderr, "NFS mount failed\n");
             return 1;
           }
 
-          deb_msg("NFS mount ok.");
+          fprintf(stderr, "NFS mount ok\n");
           break;
 
         case inst_ftp:
