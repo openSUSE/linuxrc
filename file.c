@@ -183,8 +183,8 @@ static struct {
   { key_linemode,       "Linemode",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_moduledelay,    "ModuleDelay",    kf_cfg + kf_cmd + kf_cmd_early },
   { key_updatedir,      "UpdateDir",      kf_cfg + kf_cmd                },
-  { key_usbscsi,        "USBSCSI",        kf_cfg + kf_cmd                },
-  { key_useusbscsi,     "UseUSBSCSI",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_scsirename,     "SCSIRename",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_doscsirename,   "DoSCSIRename",   kf_cfg + kf_cmd                },
   { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
   { key_liveconfig,     "LiveConfig",     kf_cfg + kf_cmd                },
@@ -1009,12 +1009,18 @@ void file_do_info(file_t *f0)
         if(*f->value) str_copy(&config.update.dir, f->value);
         break;
 
-      case key_usbscsi:
-        if(f->is.numeric) f->nvalue ? usbscsi_on() : usbscsi_off();
+      case key_scsirename:
+        if(f->is.numeric) config.scsi_rename = f->nvalue;
+        if(config.scsi_rename) {
+          config.activate_storage = 1;
+        }
         break;
 
-      case key_useusbscsi:
-        if(f->is.numeric) config.use_usbscsi = f->nvalue;
+      case key_doscsirename:
+        if(f->is.numeric && f->nvalue) {
+          config.scsi_rename = 1;
+          scsi_rename();
+        }
         break;
 
       case key_lxrcdebug:

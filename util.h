@@ -123,10 +123,7 @@ void util_set_serial_console(char *str);
 void util_set_stderr(char *name);
 void util_set_product_dir(char *prod);
 
-int util_usbscsi_main(int argc, char **argv);
-int usbscsi_change(int action);
-void usbscsi_off(void);
-void usbscsi_on(void);
+void scsi_rename(void);
 char *pcmcia_driver(int pcmcia_type);
 
 char *short_dev(char *dev);

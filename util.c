@@ -65,6 +65,7 @@
 #include "http.h"
 #include "fstype.h"
 #include "mkdevs.h"
+#include "scsi_rename.h"
 
 #define LED_TIME     50000
 
@@ -100,20 +101,7 @@ static int cmp_dir_entry_s(const void *p0, const void *p1);
 static void create_update_name(unsigned idx);
 
 static char *read_symlink(char *name);
-
-typedef struct {
-  unsigned usb:1;
-  unsigned active:1;
-  unsigned disk:1;
-  char name[5];
-  char last_name[5];
-} scsidev_t;
-
-static scsidev_t scsidev[16 /* arbitrary, just large enough */] = {};
-
-static void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action);
-static void usbscsi_rename(void);
-static void usbscsi_rename_single(char *old_name, char *new_name);
+static void scsi_rename_single(char *old_name, char *new_name);
 
 void util_redirect_kmsg()
 {
@@ -1194,7 +1182,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.hwdetect, "hwdetect");
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
-  add_flag(&sl0, buf, config.use_usbscsi, "usbscsi");
+  add_flag(&sl0, buf, config.scsi_rename, "scsirename");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
@@ -3861,213 +3849,29 @@ void util_set_product_dir(char *prod)
 }
 
 
-int util_usbscsi_main(int argc, char **argv)
-{
-  argv++; argc--;
-
-  if(!argc) {
-    return fprintf(stderr, "usage: usbscsi 0|1|2\n"), 1;
-  }
-
-  while(argc--) usbscsi_change(atoi(*argv++));
-
-  return 0;
-}
-
-
 /*
- * action
- *   0: detach
- *   1: attach
- *   2: detach disks only
- *
- * returns number of devices attached/detached
+ * Rename SCSI devices so that usb and firewire devices are last.
  */
-int usbscsi_change(int action)
+void scsi_rename()
 {
-  int i, cnt = 0;
-  FILE *f;
-  int scsidevs = sizeof scsidev / sizeof *scsidev;
+  unsigned u;
 
-  usbscsi_read(scsidevs, scsidev, action);
+  if(!config.scsi_rename) return;
 
-  if(config.debug) {
-    for(i = 0; i < scsidevs; i++) {
-      if(scsidev[i].usb) {
-        fprintf(stderr, "%d: %u (%s) (%s)\n", i, scsidev[i].active, scsidev[i].name, scsidev[i].last_name);
-      }
+  get_scsi_list();
+  rename_scsi_devs();
+
+  for(u = 0; u < scsi_list_len; u++) {
+    if(scsi_list[u]->new_name) {
+      scsi_rename_single(scsi_list[u]->name, scsi_list[u]->new_name);
     }
   }
 
-  /* attach or detach them */
-  for(i = 0; i < scsidevs; i++) {
-    if(
-      scsidev[i].usb &&
-      (scsidev[i].disk || action == 0 || action == 1) &&
-      (
-        ((action == 0 || action == 2) && scsidev[i].active) ||
-        (action == 1 && !scsidev[i].active)
-      )
-    ) {
-      cnt++;
-      if(config.debug) {
-        fprintf(stderr, "%sing %d\n", action == 1 ? "attach" : "detach", i);
-      }
-      if((f = fopen("/proc/scsi/scsi", "w"))) {
-        fprintf(f, "scsi %s-single-device %d 0 0 0\n", action == 1 ? "add" : "remove", i);
-        fclose(f);
-      }
-    }
-  }
-
-  usbscsi_read(scsidevs, scsidev, action);
-
-  if(config.debug) {
-    for(i = 0; i < scsidevs; i++) {
-      if(scsidev[i].usb) {
-        fprintf(stderr, "%d: %u (%s) (%s)\n", i, scsidev[i].active, scsidev[i].name, scsidev[i].last_name);
-      }
-    }
-  }
-
-  return cnt;
+  free_scsi_list();
 }
 
 
-/*
- * reads info from /proc/scsi/scsi
- */
-void usbscsi_read(int scsidevs, scsidev_t *scsidev, int action)
-{
-  struct dirent *de1, *de2;
-  DIR *d1, *d2;
-  unsigned u0, u1, u2, u3;
-  char buf[256], *s;
-  FILE *f;
-  int i, attached, ha;
-
-  /* find usb storage host adapters */
-  if((d1 = opendir("/proc/scsi"))) {
-    while((de1 = readdir(d1))) {
-      if(sscanf(de1->d_name, "usb-storage-%u", &u1) == 1) {
-        sprintf(buf, "/proc/scsi/%s", de1->d_name);
-        if((d2 = opendir(buf))) {
-          while((de2 = readdir(d2))) {
-            if(sscanf(de2->d_name, "%u", &u2) == 1) {
-              sprintf(buf + strlen(buf), "/%s", de2->d_name);
-              attached = 1;
-              if((f = fopen(buf, "r"))) {
-                while(fgets(buf, sizeof buf, f)) {
-                  if(strstr(buf, " Attached: No")) {
-                    attached = 0;
-                    break;
-                  }
-                }
-                fclose(f);
-              }
-              if(attached && u2 < (unsigned) scsidevs) {
-                scsidev[u2].usb = 1;
-              }
-            }
-          }
-          closedir(d2);
-        }
-      }
-    }
-    closedir(d1);
-  }
-
-  for(i = 0; i < scsidevs; i++) {
-    if(action == 0 || action == 2) {
-      memcpy(scsidev[i].last_name, scsidev[i].name, sizeof scsidev[i].last_name);
-      memset(scsidev[i].name, 0, sizeof scsidev[i].name);
-    }
-    scsidev[i].active = 0;
-  }
-
-  /* look for disk devices */
-  if((f = fopen("/proc/scsi/scsi", "r"))) {
-    ha = -1;
-    while(fgets(buf, sizeof buf, f)) {
-      if(
-        sscanf(buf, "Host: scsi%u Channel: %u Id: %u Lun: %u", &u0, &u1, &u2, &u3) == 4 &&
-        u1 == 0 && u2 == 0 && u3 == 0
-      ) {
-        ha = u0;
-        if(ha >= 0 && ha < scsidevs && scsidev[ha].usb) {
-          scsidev[ha].active = 1;
-        }
-      }
-      else if(strstr(buf, "Host:") == buf) {
-        ha = -1;
-      }
-      else if(
-        strstr(buf, "  Attached drivers:") == buf &&
-        (s = strstr(buf, " sd"))
-      ) {
-        if(ha >= 0 && ha < scsidevs && scsidev[ha].usb) {
-          scsidev[ha].disk = 1;
-          s++;
-          if(s[3] == '(') {
-            s[3] = 0;
-          }
-          else if(s[4] == '(') {
-            s[4] = 0;
-          }
-          else {
-            *s = 0;
-          }
-          if(*s) {
-            strcpy(scsidev[ha].name, s);
-          }
-        }
-      }
-    }
-    fclose(f);
-  }
-}
-
-
-void usbscsi_off()
-{
-  if(!config.use_usbscsi) return;
-
-  if(!mod_is_loaded("usb-storage")) return;
-
-  usbscsi_change(2);
-}
-
-
-void usbscsi_on()
-{
-  if(!config.use_usbscsi) return;
-
-  if(!mod_is_loaded("usb-storage")) return;
-
-  if(usbscsi_change(1)) usbscsi_rename();
-}
-
-
-void usbscsi_rename()
-{
-  int i;
-  int scsidevs = sizeof scsidev / sizeof *scsidev;
-
-  for(i = 0; i < scsidevs; i++) {
-    if(
-      scsidev[i].usb &&
-      *scsidev[i].name &&
-      *scsidev[i].last_name &&
-      strcmp(scsidev[i].name, scsidev[i].last_name)
-    ) {
-      fprintf(stderr, "%s --> %s\n", scsidev[i].last_name, scsidev[i].name);
-      usbscsi_rename_single(scsidev[i].last_name, scsidev[i].name);
-    }
-  }
-}
-
-
-void usbscsi_rename_single(char *old_name, char *new_name)
+void scsi_rename_single(char *old_name, char *new_name)
 {
   size_t i;
   char **rs[] = { &config.floppydev, &config.update.dev };
@@ -4083,7 +3887,12 @@ void usbscsi_rename_single(char *old_name, char *new_name)
       str_copy(rs[i], new_name);
     }
   }
+
+  if(config.cdrom) {
+    if(!strcmp(config.cdrom, old_name)) str_copy(&config.cdrom, new_name);
+  }
 }
+
 
 char *pcmcia_driver(int pcmcia_type)
 {

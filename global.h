@@ -235,7 +235,7 @@ typedef struct {
   unsigned hwdetect:1;		/* do automatic hardware detection */
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
-  unsigned use_usbscsi:1;	/* use new usb storage handling code */
+  unsigned scsi_rename:1;	/* ensure hotplug scsi devs are last */
   unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
   unsigned idescsi;		/* use ide-scsi module */

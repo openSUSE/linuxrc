@@ -745,18 +745,6 @@ int auto2_init()
     }
   }
 
-// ###### FIXME: we need a solution for this
-#if 0
-  if(!config.test) {
-    if(mod_is_loaded("usb-storage")) {
-      config.module.keep_usb_storage = 1;
-    }
-    if(!config.module.keep_usb_storage) {
-      mod_unload_module("usb-storage");
-    }
-  }
-#endif
-
 #if WITH_PCMCIA
   if(
     !config.nopcmcia &&

@@ -776,8 +776,6 @@ int mod_insmod(char *module, char *param)
     util_update_cdrom_list();
 
     if(mod_show_kernel_messages) kbd_switch_tty(4);
-
-    usbscsi_off();
   }
 
   err = system(buf);
@@ -785,7 +783,7 @@ int mod_insmod(char *module, char *param)
   if(config.module.delay > 0) sleep(config.module.delay);
 
   if(config.run_as_linuxrc) {
-    usbscsi_on();
+    scsi_rename();
 
     if(!err && param) {
       while(isspace(*param)) param++;

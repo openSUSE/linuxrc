@@ -48,6 +48,7 @@
 #include "lsh.h"
 #include "multiple_info.h"
 #include "mkdevs.h"
+#include "scsi_rename.h"
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -133,7 +134,7 @@ static struct {
   { "wget",        util_wget_main        },
   { "fstype",      util_fstype_main      },
   { "modprobe",    util_modprobe_main    },
-  { "usbscsi",     util_usbscsi_main     },
+  { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
   { "nothing",     util_nothing_main     }
 };
@@ -653,6 +654,12 @@ void lxrc_init()
   config.usbwait = 4;		/* 4 seconds */
 
   config.hwdetect = 1;
+
+#if 0
+  /* disabled, see #38222 */
+  config.scsi_rename = 1;
+  config.activate_storage = 1;		/* together with scsi_rename */
+#endif
 
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
