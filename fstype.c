@@ -230,6 +230,7 @@ fstype(const char *device) {
 		   !strncmp(xsb.fatsb.s_os, "mkdosfs", 7) ||
 		   !strncmp(xsb.fatsb.s_os, "kmkdosfs", 8) ||
 		   !strncmp(xsb.fatsb.s_os, "FreeDOS", 7) ||
+		   !strncmp(xsb.fatsb.s_os, "FDOS", 4) ||
 		   /* Michal Svec: created by fdformat, old msdos utility for
 		      formatting large (1.7) floppy disks. */
 		   !strncmp(xsb.fatsb.s_os, "CH-FOR18", 8))

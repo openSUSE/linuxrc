@@ -1,5 +1,6 @@
 9/6/2004:	v1.6.33
 	- fixed division by zero bug (#41819)
+	- FreeDOS vfat detection again (#40462)
 
 1/6/2004:	v1.6.32
 	- always load font; the kernel default font is unusable
