@@ -1,3 +1,8 @@
+9/11/2001:	v1.3.0
+	- nashif: added autoinstall patches
+	- implemented small interactive shell, runs on /dev/tty9
+	- russian translations updated
+
 9/11/2001:	v1.2.34
 	- handle ide raid module dependencies
 

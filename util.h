@@ -53,3 +53,4 @@ extern void util_get_splash_status (void);
 extern void util_ps                (FILE *f);
 extern int  util_ps_main           (int argc, char **argv);
 extern int  util_do_cp             (char *src, char *dst);
+extern void util_start_shell       (char *tty, char *shell, int new_env);

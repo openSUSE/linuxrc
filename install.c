@@ -65,7 +65,7 @@ static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
 static int   inst_start_install       (void);
 static int   inst_start_rescue        (void);
-static void  inst_start_shell         (char *tty_tv);
+//static void  inst_start_shell         (char *tty_tv);
 static int   inst_prepare             (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
@@ -742,6 +742,7 @@ static int inst_start_rescue (void)
     }
 
 
+#if 0
 static void inst_start_shell (char *tty_tv)
     {
     char  *args_apci [] = { "bash", 0 };
@@ -768,6 +769,7 @@ static void inst_start_shell (char *tty_tv)
         exit (-1);
         }
     }
+#endif
 
 
 /*
@@ -871,14 +873,14 @@ int inst_execute_yast()
     }
   }
 
-  inst_start_shell("/dev/tty2");
+  util_start_shell("/dev/tty2", "/bin/bash", 1);
 
   if(memory_ig < MEM_LIMIT_SWAP_MSG) {
     if(!auto2_ig) dia_message(txt_get(TXT_LITTLE_MEM), MSGTYPE_ERROR);
   }
   else {
-    inst_start_shell("/dev/tty5");
-    inst_start_shell("/dev/tty6");
+    util_start_shell("/dev/tty5", "/bin/bash", 1);
+    util_start_shell("/dev/tty6", "/bin/bash", 1);
   }
 
   if(!auto2_ig) {

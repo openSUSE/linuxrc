@@ -1,5 +1,5 @@
 # SuSE release number, needed for driver update feature
-LX_REL	?= -DLX_REL=\"7.3\"
+LX_REL	?= -DLX_REL=\"8.0\"
 
 include pcmcia/config.mk
 
@@ -40,7 +40,7 @@ ifeq ($(ARCH),alpha)
     CFLAGS		+= -DLINUXRC_AXP -DLX_ARCH=\"axp\"
 endif
 
-ifeq ($(ARCH),ppc)
+ifneq ($(findstring $(ARCH),ppc ppc64),)
     USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))

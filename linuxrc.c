@@ -41,6 +41,7 @@
 #include "file.h"
 #include "linuxrc.h"
 #include "auto2.h"
+#include "lsh.h"
 
 #include "multiple_info.h"
 
@@ -86,6 +87,8 @@ int main (int argc, char **argv, char **env)
 #if SWISS_ARMY_KNIFE
     if (!strcmp (progname_pci, "sh"))
         lxrc_do_shell (argc, argv, env);
+    if (!strcmp (progname_pci, "lsh"))
+        lsh_main (argc, argv);
     else if (!strcmp (progname_pci, "insmod"))
         rc_ii = insmod_main (argc, argv);
     else if (!strcmp (progname_pci, "rmmod"))
@@ -644,6 +647,9 @@ static void lxrc_init (void)
     // deb_str(rootimage_tg);
     mod_init ();
 
+    if(!(testing_ig || serial_ig))
+      util_start_shell("/dev/tty9", "/bin/lsh", 0);
+
 #ifdef USE_LIBHD
     if(auto2_ig) {
       if(auto2_init()) {
@@ -819,17 +825,22 @@ static void lxrc_main_menu (void)
 #if SWISS_ARMY_KNIFE
 static void lxrc_do_shell (int argc, char **argv, char **env)
     {
+#if 0
     char  command_ati [10][100];
     char  progname_ti [100];
     int   i_ii = 0;
     int   j_ii = 0;
     int   k_ii = 0;
     char *arguments_apci [10];
+#endif
 
     freopen ("/dev/tty3", "a", stdout);
     freopen ("/dev/tty3", "a", stderr);
     printf ("Executing: \"%s\"\n", argv [2]);
 
+    lsh_main (argc, argv);
+
+#if 0
     while (argv [2][i_ii] == ' ')
         i_ii++;
 
@@ -864,6 +875,8 @@ static void lxrc_do_shell (int argc, char **argv, char **env)
 
     sprintf (progname_ti, "/bin/%s", arguments_apci [0]);
     execve (progname_ti, arguments_apci, env);
+#endif
+
     exit (0);
     }
 #endif

@@ -1368,3 +1368,35 @@ void free_hlink_list()
   }
 }
 
+
+void util_start_shell(char *tty, char *shell, int new_env)
+{
+  int fd;
+  char *s, *args[] = { NULL, NULL };
+  char *env[] = {
+    "TERM=linux",
+    "PS1=\\w # ",
+    "HOME=/",
+    "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin:/usr/X11R6/bin",
+    NULL
+  };
+  extern char **environ;
+
+  *args = (s = strrchr(shell, '/')) ? s + 1 : shell;
+
+  if(!fork()) {
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
+    setsid();
+    fd = open(tty, O_RDWR);
+    ioctl(fd, TIOCSCTTY, (void *) 1);
+    dup(fd);
+    dup(fd);
+
+    execve(shell, args, new_env ? env : environ);
+    fprintf(stderr, "Couldn't start shell (errno = %d)\n", errno);
+    exit(-1);
+  }
+}
+
