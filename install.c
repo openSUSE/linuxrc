@@ -1527,6 +1527,7 @@ int inst_update_cd()
 
   dia_info(&win, "Reading Driver Update...");
 
+  save_1st_content_file(config.mountpoint.update, "dud");
   util_chk_driver_update(config.mountpoint.update, dev);
 
   util_umount(config.mountpoint.update);
