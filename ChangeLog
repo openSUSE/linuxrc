@@ -1,4 +1,8 @@
+16/8/2001:	v1.2.13
 	- disable modprobe only if we don't have it
+	- always read yast.inf
+	- linuxrc can no longer start yast directly, instead
+          /sbin/inst_setup is started
 
 13/8/2001:	v1.2.12
 	- mge: added new boot mode 'CDwithNET'

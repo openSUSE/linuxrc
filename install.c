@@ -733,9 +733,16 @@ static void inst_start_shell (char *tty_tv)
     }
 
 
-static int inst_prepare (void)
+/*
+ * Do some basic preparations before we can run programs from the
+ * installation system. More is done later in SETUP_COMMAND.
+ *
+ * Note: the instsys must already be mounted at this point.
+ *
+ */
+int inst_prepare()
 {
-  char *links[] = { "/lib", "/bin" };
+  char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
   char link_source[MAX_FILENAME];
   char instsys[MAX_FILENAME];
   int i, rc = 0;
@@ -770,8 +777,8 @@ static int inst_prepare (void)
     setenv("ESCDELAY", "1100", TRUE);
   }
   else {
-    setenv ("TERM", "linux", TRUE);
-    setenv ("ESCDELAY", "10", TRUE);
+    setenv("TERM", "linux", TRUE);
+    setenv("ESCDELAY", "10", TRUE);
   }
 
   setenv("YAST_DEBUG", "/debug/yast.debug", TRUE);
