@@ -216,6 +216,15 @@ void file_free_file(file_t *file)
 
 
 void file_write_yast_info (char *file_name)
+     /*
+Bootmode: SMB
+Server: <samba server>
+Serverdir: <samba share>
+Username: <samba user>  // falls nicht gesetzt, Anmeldung als 'guest'
+Password: <samba password>
+AsWorkgroup: <1 == workgroup, 0 == domain>
+WorkDomain: <Workgroup name falls AsWorkgroup == 1, sonst Domainname>
+     */
     {
     FILE  *file_pri;
     char   line_ti [200];
@@ -286,6 +295,7 @@ void file_write_yast_info (char *file_name)
         case BOOTMODE_CDWITHNET:
             strcat (line_ti, file_txt_bootcd_tm);
             break;
+	    // TODO: +=SMB
         case BOOTMODE_NET:
             strcat (line_ti, file_txt_bootnet_tm);
             break;
@@ -336,7 +346,7 @@ void file_write_yast_info (char *file_name)
         if (nameserver_rg.s_addr)
             fprintf (file_pri, "%s %s\n", file_txt_dnsserver_tm,
                                           inet_ntoa (nameserver_rg));
-
+	//TODO: +=SMB
         fprintf (file_pri, "%s %s\n", file_txt_server_tm,
                  inet_ntoa (bootmode_ig == BOOTMODE_NET ? nfs_server_rg : ftp_server_rg));
         fprintf (file_pri, "%s %s\n", file_txt_serverdir_tm, server_dir_tg);
@@ -425,6 +435,7 @@ void file_write_yast_info (char *file_name)
             case BOOTMODE_CDWITHNET:
                 sprintf (line_ti, "/dev/%s %s iso9660 ro 0 0\n", cdrom_tg, mountpoint_tg);
                 break;
+		// TODO: +=SMB
             case BOOTMODE_NET:
                 sprintf (line_ti, "%s:%s %s nfs ro 0 0\n",
                                   inet_ntoa (nfs_server_rg),
@@ -557,6 +568,7 @@ int file_read_info (void)
             else if (!strncasecmp (value_ti, file_txt_bootnet_tm,
                                    strlen (file_txt_bootnet_tm)))
                 bootmode_ig = BOOTMODE_NET;
+	    // TODO: += SMB
             }
 
         if (!strncasecmp (file_txt_ip_tm, buffer_ti,
@@ -601,6 +613,7 @@ int file_read_info (void)
         if (!strncasecmp (file_txt_livesrc_tm, buffer_ti, strlen (file_txt_livesrc_tm)))
             {
             strncpy (livesrc_tg, value_ti, sizeof (livesrc_tg));
+	    // TODO: SMB
             if((valid_net_config_ig & 0x20)) bootmode_ig = BOOTMODE_NET;
             }
 

@@ -106,6 +106,7 @@ int inst_auto_install (void)
         case BOOTMODE_CDWITHNET:
             rc_ii = inst_mount_cdrom (1);
             break;
+	    // TODO: SMB
         case BOOTMODE_NET:
             rc_ii = inst_mount_nfs ();
             break;
@@ -215,7 +216,7 @@ int inst_start_demo (void)
 
     sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
     file_pri = fopen (filename_ti, "a");
-
+    // TODO:SMB???
     if (bootmode_ig == BOOTMODE_NET && !*livesrc_tg)
         {
         sprintf (line_ti, "%s:%s /S.u.S.E. nfs ro,nolock 0 0\n", inet_ntoa (nfs_server_rg), server_dir_tg);
@@ -635,6 +636,7 @@ int inst_check_instsys (void)
         case BOOTMODE_CDWITHNET:
         case BOOTMODE_CD:
         case BOOTMODE_NET:
+	case BOOTMODE_SMB:
             ramdisk_ig = FALSE;
             sprintf (filename_ti, "%s%s", mountpoint_tg, installdir_tg);
             if (inst_rescue_im || force_ri_ig || !util_check_exist (filename_ti))
@@ -1254,6 +1256,103 @@ static int inst_get_ftpserver (void)
     return (0);
     }
 
+static int inst_get_smbserver (void)
+    {
+    char            input_ti [100];
+    int             rc_ii;
+
+
+    if (config.smb.server.s_addr)
+        strcpy (input_ti, inet_ntoa (config.smb.server));
+    //    else if (inst_rescue_im)
+    //    strcpy (input_ti, "209.81.41.5");
+    else
+        input_ti [0] = '\0';
+
+    do
+        {
+        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_SERVER), input_ti,
+                           sizeof (input_ti) - 1, 20);
+        if (rc_ii)
+            return (rc_ii);
+
+        rc_ii = net_check_address (input_ti, &config.smb.server);
+        if (rc_ii)
+            (void) dia_message (txt_get (TXT_INVALID_INPUT), MSGTYPE_ERROR);
+
+	if (config.smb.share)
+	  strcpy (input_ti, config.smb.share);
+	else
+	  input_ti[0] = '\0';
+        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_SHARE), input_ti,
+                           50, 20);
+        if (rc_ii)
+            return (rc_ii);
+	free(config.smb.share);
+	if (!(config.smb.share = strdup(input_ti))) return -1;
+        }
+    while (rc_ii);
+
+    return (0);
+    }
+
+
+static int inst_get_smbsetup (void)
+    {
+    int             rc_ii;
+    char            tmp_ti [MAX_FILENAME];
+
+
+    rc_ii = dia_yesno (txt_get (TXT_SMB_GUEST_LOGIN), YES);
+    if (rc_ii == ESCAPE)
+        return (-1);
+
+    if (rc_ii == YES)
+        {
+	  free(config.smb.user);
+	  config.smb.user=0;
+        }
+    else
+        {
+	if(config.smb.user)
+	  strcpy (tmp_ti, config.smb.user);
+	else
+	  tmp_ti[0] = '\0';
+        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_USER), tmp_ti,
+                           50, 20);
+        if (rc_ii)
+            return (rc_ii);
+	free(config.smb.user);
+	if (!(config.smb.user = strdup(tmp_ti))) return -1;
+
+	if(config.smb.password)
+	  strcpy (tmp_ti, config.smb.password);
+	else
+	  tmp_ti[0] = '\0';
+        passwd_mode_ig = TRUE;
+        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_PASSWORD), tmp_ti,
+                           50, 20);
+        passwd_mode_ig = FALSE;
+        if (rc_ii)
+            return (rc_ii);
+	free(config.smb.password);
+	if (!(config.smb.password = strdup(tmp_ti))) return -1;
+
+        if(config.smb.workgroup)
+	  strcpy (tmp_ti, config.smb.workgroup);
+	else
+	  tmp_ti[0] = '\0';
+        rc_ii = dia_input (txt_get (TXT_SMB_ENTER_WORKGROUP), tmp_ti,
+                           50, 20);
+        if (rc_ii)
+            return (rc_ii);
+	free(config.smb.workgroup);
+	if (strlen(tmp_ti) > 0)
+	    if (!(config.smb.workgroup = strdup(tmp_ti))) return -1;
+        }
+
+    return (0);
+    }
 
 static int inst_ftp (void)
     {
@@ -1412,11 +1511,11 @@ static int inst_mount_smb (void)
     {
     int       rc_ii;
     window_t  win_ri;
-//    char msg[256];
+    char msg[256];
 
     rc_ii = net_config ();
     if (rc_ii)
-        return (rc_ii);
+      return (rc_ii);
 
     /*******************************************************************
   
@@ -1435,64 +1534,34 @@ static int inst_mount_smb (void)
   	 workgroup (optional):  WORKGROUP
   
     *******************************************************************/
-    /*******************************************************************
-
-
-      das wird so zum mount umgesetzt:
-
-       abhängig von [X] Guest login 
-	 options += "guest"
-       bzw.
-	 options += "username=" + USERNAME + ",password=" + PASSWORD
-
-
-	 device = "//" + SERVER + "/" + SHARE
-
-	 options += ",workgroup=" + WORKGROUP   falls WORKGROUP gesetzt ist
-
-	 options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
-
-
-	 "mount -t smbfs" + device + " " + mountpoint + " " + options
-
-    *******************************************************************/
     
-    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
-    return 0;
     do
 	{
-        rc_ii = inst_get_ftpserver ();
+        rc_ii = inst_get_smbserver ();
         if (rc_ii)
             return (rc_ii);
 
-        rc_ii = inst_get_ftpsetup ();
+        rc_ii = inst_get_smbsetup ();
         if (rc_ii)
             return (rc_ii);
 
-	//        dia_info (&win_ri, txt_get (TXT_TRY_SMB_MOUNT));
-        rc_ii = util_open_ftp (inet_ntoa (ftp_server_rg));
+	sprintf(msg, txt_get(TEXT_SMB_TRYING_MOUNT),
+		inet_ntoa(config.smb.server),
+		config.smb.share);
+
+	dia_info (&win_ri, msg);
+
+        rc_ii = net_mount_smb ();
         win_close (&win_ri);
 
         if (rc_ii < 0)
-            util_print_ftp_error (rc_ii);
-        else
-            {
-            ftpClose (rc_ii);
-            rc_ii = 0;
-            }
+	  return(-1);
         }
     while (rc_ii);
 
-    if (inst_rescue_im)
-        strcpy (server_dir_tg, "/pub/SuSE-Linux/current");
-
-    if (dia_input (txt_get (TXT_INPUT_DIR), server_dir_tg,
-                            sizeof (server_dir_tg) - 1, 30))
-        return (-1);
-
-    util_truncate_dir (server_dir_tg);
-
-    bootmode_ig = BOOTMODE_FTP;
+    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
+    return (-1);
+    bootmode_ig = BOOTMODE_SMB;
     return (0);
     }
 

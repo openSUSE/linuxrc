@@ -55,10 +55,12 @@ int net_is_configured_im = FALSE;
 
 static int  net_is_plip_im = FALSE;
 
-#if defined (__s390__) || defined (__s390x__)
-#  define NETWORK_CONFIG 0
-#else
-#  define NETWORK_CONFIG 1
+#if !defined(NETWORK_CONFIG)
+#  if defined (__s390__) || defined (__s390x__)
+#    define NETWORK_CONFIG 0
+#  else
+#    define NETWORK_CONFIG 1
+#  endif
 #endif
 
 #if NETWORK_CONFIG
@@ -370,6 +372,52 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
     return (0);
     }
 
+int net_mount_smb ()
+{
+    /*******************************************************************
+
+       abhängig von [X] Guest login 
+	 options += "guest"
+       bzw.
+	 options += "username=" + USERNAME + ",password=" + PASSWORD
+
+
+	 device = "//" + SERVER + "/" + SHARE
+
+	 options += ",workgroup=" + WORKGROUP   falls WORKGROUP gesetzt ist
+
+	 options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
+
+
+	 "mount -t smbfs" + device + " " + mountpoint + " " + options
+
+    *******************************************************************/
+    char mount_command[1000];
+    char server_ascii[100];
+    strcpy(server_ascii, inet_ntoa(config.smb.server));
+    sprintf(mount_command, "sudo mount -t smbfs //%s/%s %s -o ip=%s",
+	    server_ascii,
+	    config.smb.share,
+	    mountpoint_tg,
+	    server_ascii
+	);
+    if (config.smb.user) {
+	strcat(mount_command, ",username=");
+	strcat(mount_command, config.smb.user);
+	strcat(mount_command, ",password=");
+	strcat(mount_command, config.smb.password);
+	if (config.smb.workgroup) {
+	    strcat(mount_command,",workgroup=");
+	    strcat(mount_command,config.smb.workgroup);
+	}
+    } else {
+	strcat(mount_command,",guest");
+    }
+    deb_str(mount_command);
+    if (system(mount_command))
+	return(-1);
+    return(0);
+}
 
 int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     {
@@ -700,7 +748,6 @@ static void net_setup_nameserver (void)
     if (!auto_ig && net_get_address (txt_get (TXT_INPUT_NAMED), &nameserver_rg))
         return;
     }
-#endif
 
 static int net_input_data (void)
     {
@@ -750,6 +797,7 @@ static int net_input_data (void)
 
     return (0);
     }
+#endif
 
 
 int net_bootp (void)

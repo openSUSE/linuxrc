@@ -20,10 +20,16 @@ config_t config = {
   rebootmsg: 0,
   redraw_menu: 0,
 #if defined(__s390__) || defined(__s390x__)
-  initrd_has_ldso: 1
+  initrd_has_ldso: 1,
 #else
-  initrd_has_ldso: 0
+  initrd_has_ldso: 0,
 #endif
+  smb: {
+    share: 0,
+    user: 0,
+    password: 0,
+    workgroup: 0
+  }
 };
 
 colorset_t     *colors_prg;

@@ -66,6 +66,7 @@
 #define BOOTMODE_HARDDISK  3
 #define BOOTMODE_FTP       4
 #define BOOTMODE_CDWITHNET 5
+#define BOOTMODE_SMB       6
 
 #define  LXRC_DEBUG
 
@@ -150,6 +151,14 @@ typedef struct {
         item_t;
 
 typedef struct {
+  struct in_addr server;	/* SMB server to install from */
+  char           *share;
+  char           *workgroup;
+  char           *user;		/* if this is 0, perform guest login */
+  char           *password;
+} smb_t;
+
+typedef struct {
   unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
   unsigned initrd_has_ldso:1;	/* instsys contains a dynamic linker */
@@ -157,6 +166,7 @@ typedef struct {
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
   char *instsys;		/* installation system mount point */
+  smb_t smb;			/* SMB installation info */
 } config_t;
 
 config_t config;

@@ -788,3 +788,38 @@ msgstr ""
 msgid "Network (Windows Share aka SMB)"
 msgstr ""
 
+#. TXT_SMB_ENTER_SERVER
+msgid "Please enter the IP-address of the SMB server"
+msgstr ""
+
+#. TXT_SMB_ENTER_SHARE
+msgid "Please enter the share name on the SMB server"
+msgstr ""
+
+#. TXT_SMB_GUEST_LOGIN
+msgid ""
+"If you want to access the share as guest,"
+"you don't need do specify username, password and workgroup.\n"
+"Do you want to access the share as quest?"
+msgstr ""
+
+#. TXT_SMB_ENTER_USER
+msgid "Please enter yor user name on the SMB server"
+msgstr ""
+
+#. TXT_SMB_ENTER_PASSWORD
+msgid "Please enter yor password on the SMB server"
+msgstr ""
+
+#. TXT_SMB_ENTER_WORKGROUP
+msgid ""
+"Please enter yor workgroup."
+"If you don't need to specify a workgroup,"
+"just leave the field empty."
+msgstr ""
+
+#. TXT_SMB_TRYING_MOUNT
+#, c-format
+msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgstr ""
+
