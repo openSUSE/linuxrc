@@ -11,9 +11,10 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <sys/mount.h>
 #include <sys/reboot.h>
+#include <fcntl.h>
+#include <dirent.h>
 #include <string.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -205,27 +206,39 @@ int is_rpc_prog(pid_t pid)
  * really_all = 1: kill really everything
  *
  */
-void lxrc_killall(int really_all)
-{
-  pid_t i;
-  pid_t mypid;
-#ifdef LXRC_DEBUG
-  char *s;
-#endif
+void lxrc_killall (int really_all_iv)
+    {
+    pid_t          mypid_ri;
+    struct dirent *process_pri;
+    DIR           *directory_ri;
+    pid_t          pid_ri;
 
-  if(testing_ig) return;
 
-  mypid = getpid();
-  for(i = 32767; i > mypid; i--) {
-    if(i != lxrc_mempid_rm && (really_all || !is_rpc_prog(i))) {
-#ifdef LXRC_DEBUG
-      s = lxrc_prog_name(i);
-      if(*s) fprintf(stderr, "kill %s (%d)\n", s, (int) i);
-#endif
-      kill(i, 9);
+    if (testing_ig)
+        return;
+
+    mypid_ri = getpid ();
+    directory_ri = opendir ("/proc");
+    if (!directory_ri)
+        return;
+
+    process_pri = readdir (directory_ri);
+    while (process_pri)
+        {
+        pid_ri = (pid_t) atoi (process_pri->d_name);
+        if (pid_ri > mypid_ri && pid_ri != lxrc_mempid_rm &&
+            (really_all_iv || !is_rpc_prog (pid_ri)))
+            {
+            fprintf (stderr, "Killing %s (%d)\n", lxrc_prog_name (pid_ri),
+                                                  pid_ri);
+            kill (pid_ri, 9);
+            }
+
+        process_pri = readdir (directory_ri);
+        }
+
+    (void) closedir (directory_ri);
     }
-  }
-}
 
 
 /*
