@@ -740,11 +740,11 @@ static void inst_start_shell (char *tty_tv)
         }
     }
 
-static void inst_setup_dirs(char* instsys)
+static void inst_setup_dirs(char *instsys)
 {
   char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
   char link_source[MAX_FILENAME];
-  const char *backup_dir = "/.saved_files";
+  char *backup_dir = "/.saved_files";
   char backup_name[MAX_FILENAME];
   int i;
 
@@ -782,7 +782,7 @@ static void inst_setup_dirs(char* instsys)
 int inst_prepare()
 {
   char instsys[MAX_FILENAME];
-  int i, rc = 0;
+  int rc = 0;
 
   mod_free_modules();
 
