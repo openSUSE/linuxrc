@@ -189,6 +189,7 @@ static text_t txt_english_atm [] =
 { TXT_CHOOSE_YAST,    "Please choose the version of YaST to use for the "
                       "installation."                                         },
 { TXT_INSERT_CD,      "Please make sure that CD number %d is in your drive!"  },
+{ TXT_EJECT_CD,       "Eject CD"                                              },
 { TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
 { TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "

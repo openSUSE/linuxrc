@@ -182,6 +182,7 @@ static text_t txt_russian_atm [] =
 { TXT_YAST2,          "YaST2 - графический"                                   },
 { TXT_CHOOSE_YAST,    "Выберите версию YaST для использования при установке." },
 { TXT_INSERT_CD,      "Убедитесь, что CD номер %d есть в дисководе!"          },
+{ TXT_EJECT_CD,       "Eject CD"                                              },
 { TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
 { TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "

@@ -235,7 +235,7 @@ int inst_menu (void)
 #if 0
     strcpy (items_ari [3].text, txt_get (TXT_START_DEMO));
 #endif
-    strcpy (items_ari [3].text, "Eject CD");
+    strcpy (items_ari [3].text, txt_get (TXT_EJECT_CD));
     strcpy (items_ari [4].text, "Driver Update CD");
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {

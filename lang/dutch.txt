@@ -199,6 +199,7 @@ static text_t txt_dutch_atm [] =
 { TXT_CHOOSE_YAST,    "Kies een versie van YaST om te gebruiken voor de "
                       "installatie."                                          },
 { TXT_INSERT_CD,      "Plaats aub CD nummer %d in uw drive!"                  },
+{ TXT_EJECT_CD,       "Eject CD"                                              },
 { TXT_BOOTP_TIMEOUT,  "Bootp timeout"                                         },
 { TXT_ENTER_BOOTP_TIMEOUT, "Please enter the timeout value for bootp."        },
 { TXT_DO_REBOOT,      "The base system has been successfully installed.  This "

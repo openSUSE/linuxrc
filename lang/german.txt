@@ -204,6 +204,7 @@ static text_t txt_german_atm [] =
                       "ausführen. Bitte wählen Sie die YaST-Version."         },
 { TXT_INSERT_CD,      "Bitte stellen Sie sicher, dass sich die CD Nummer %d "
                       "in Ihrem Laufwerk befindet!"                           },
+{ TXT_EJECT_CD,       "Eject CD"                                              },
 { TXT_BOOTP_TIMEOUT,  "Timeout für Bootp"                                     },
 { TXT_ENTER_BOOTP_TIMEOUT, "Bitte geben Sie den Timeout für Bootp ein."       },
 { TXT_DO_REBOOT,      "Das Basissystem wurde erfolgreich installiert. Zum Abschluß "
