@@ -290,14 +290,32 @@ static void lxrc_init (void)
     linuxrc_pci = getenv ("linuxrc");
     if (linuxrc_pci)
         {
-        if (strstr (linuxrc_pci, "auto"))
-            auto_ig = TRUE;
-        
-        if (strstr (linuxrc_pci, "demo"))
-            demo_ig = TRUE;
-        
-        if (strstr (linuxrc_pci, "reboot"))
-            reboot_ig = TRUE;
+        char *s = malloc (strlen (linuxrc_pci) + 3);
+        if (s)
+           {
+           *s = 0;
+           strcat (strcat (strcat (s, ","), linuxrc_pci), ",");
+
+           if (strstr (linuxrc_pci, ",auto,"))
+               auto_ig = TRUE;
+           
+           if (strstr (linuxrc_pci, ",auto2,"))
+               auto2_ig = TRUE;
+           
+           if (strstr (linuxrc_pci, ",demo,"))
+               demo_ig = TRUE;
+           
+           if (strstr (linuxrc_pci, ",reboot,"))
+               reboot_ig = TRUE;
+
+           if (strstr (linuxrc_pci, ",yast1,"))
+               yast_version_ig = 1;
+
+           if (strstr (linuxrc_pci, ",yast2,"))
+               yast_version_ig = 2;
+
+           free (s);
+           }
         }
 
     freopen ("/dev/tty3", "a", stderr);

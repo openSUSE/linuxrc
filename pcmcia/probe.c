@@ -32,7 +32,7 @@
 ======================================================================*/
 
 /*
- * Note on PPC:
+ * Note on PPC & SPARC:
  *
  * removed the ISA board (io based) probing stuff
  *
@@ -47,7 +47,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#if !defined(__PPC__)
+#if !defined(__PPC__) && !defined(__sparc__)
 #ifdef __GLIBC__
 #include <sys/io.h>
 #else
@@ -61,7 +61,7 @@
 #include "vg468.h"
 #include "tcic.h"
 
-#if !defined(__PPC__)
+#if !defined(__PPC__) && !defined(__sparc__)
 static int i365_base = 0x03e0;
 #endif
 
@@ -177,7 +177,7 @@ static int pci_probe(int verbose, int module)
 
 /*====================================================================*/
 
-#if !defined(__PPC__)
+#if !defined(__PPC__) && !defined(__sparc__)
 
 static u_char i365_get(u_short sock, u_short reg)
 {
@@ -206,13 +206,13 @@ static void i365_bclr(u_short sock, u_short reg, u_char mask)
     i365_set(sock, reg, d);
 }
 
-#endif	/* __PPC__ */
+#endif	/* __PPC__, __sparc__ */
 
 /*====================================================================*/
 
 int i365_probe(int verbose, int module)
 {
-#if !defined(__PPC__)
+#if !defined(__PPC__) && !defined(__sparc__)
     int val, sock, done;
     char *name = "i82365sl";
 
@@ -296,13 +296,13 @@ int i365_probe(int verbose, int module)
     return 0;
 #else
     return 1;
-#endif		/* __PPC__ */
+#endif		/* __PPC__, __sparc__ */
     
 } /* i365_probe */
   
 /*====================================================================*/
 
-#if !defined(__PPC__)
+#if !defined(__PPC__) && !defined(__sparc__)
 
 static u_char tcic_getb(ioaddr_t base, u_char reg)
 {
@@ -382,11 +382,11 @@ int tcic_probe_at(ioaddr_t base, int module)
     return 2;
 }
 
-#endif	/* __PPC__ */
+#endif	/* __PPC__, __sparc__ */
 
 int tcic_probe(int verbose, int module, ioaddr_t base)
 {
-#if !defined(__PPC__)
+#if !defined(__PPC__) && !defined(__sparc__)
     int sock, id;
 
     if (!module)
@@ -429,7 +429,7 @@ int tcic_probe(int verbose, int module, ioaddr_t base)
     return 0;
 #else
     return 1;
-#endif    /* __PPC__ */
+#endif    /* __PPC__, __sparc__ */
 } /* tcic_probe */
 
 /*====================================================================*/
