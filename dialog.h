@@ -72,6 +72,7 @@ typedef enum {
 
   di_extras_info,
   di_extras_change,
+  di_extras_shell,
   di_extras_command,
   di_extras_quit,
   

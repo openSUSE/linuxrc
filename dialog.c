@@ -92,6 +92,7 @@ struct {
 
   { di_extras_info,     0, "Show config"    },
   { di_extras_change,   0, "Change config"  },
+  { di_extras_shell,    0, "Start shell"    },
   { di_extras_command,  0, "Run command"    },
   { di_extras_quit,     0, "Quit linuxrc"   },
   
@@ -361,6 +362,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
       key_ii != 'r' &&
       key_ii != 's' &&
       key_ii != 'i' &&
+      key_ii != 'f' &&
       key_ii != 'c'
     );
 
@@ -372,12 +374,14 @@ int dia_message (char *txt_tv, int msgtype_iv)
         return (-1);
     else if (key_ii == 'r')
         return (-69);
-    else if (key_ii == 's')
+    else if (key_ii == 'f')
         return (-70);
     else if (key_ii == 'i')
         return (-71);
     else if (key_ii == 'c')
         return (-73);
+    else if (key_ii == 's')
+        return (-74);
     else
         return (-42);
     }
@@ -1354,6 +1358,7 @@ void dia_handle_ctrlc (void)
 	static dia_item_t items[] = {
 	  di_extras_info,
 	  di_extras_change,
+	  di_extras_shell,
 	  di_extras_command,
 	  di_extras_quit,
 	  di_none
@@ -1361,6 +1366,7 @@ void dia_handle_ctrlc (void)
 	switch (dia_menu2("Linuxrc extras", 30, 0, items, di_extras_info)) {
 	  case di_extras_info:     i = -71; break;
 	  case di_extras_change:   i = -73; break;
+	  case di_extras_shell:    i = -74; break;
 	  case di_extras_command:  i = -69; break;
 	  case di_extras_quit:     i = -42; break;
 	  default:                 i = 0; break;
@@ -1376,7 +1382,7 @@ void dia_handle_ctrlc (void)
 	  if(strstr(s, "exec ") == s) {
 	    t = s + 5;
 	    while(isspace(*t)) t++;
-	    kbd_end();	/* restore terminal settings */
+	    kbd_end(0);	/* restore terminal settings */
 	    j = execlp(t, t, NULL);
 	    kbd_init(0);
 	  }
@@ -1400,6 +1406,23 @@ void dia_handle_ctrlc (void)
 	  file_do_info(f);
 	  file_free_file(f);
 	}
+      }
+      else if(i == -74) {
+        kbd_end(0);
+        if(config.win) {
+          disp_cursor_on();
+        }
+        if(!config.linemode) {
+          printf("\033c");
+          fflush(stdout);
+        }
+        system(util_check_exist("/lbin/lsh") ? "/lbin/lsh 2>&1" : "/bin/sh");
+        kbd_init(0);
+        if(config.win) {
+          disp_cursor_off();
+          if(!config.linemode) disp_restore_screen();
+        }
+
       } else {
 	break;
       }

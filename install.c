@@ -1200,7 +1200,7 @@ int inst_execute_yast()
 
   fprintf(stderr, "starting %s\n", config.setupcmd);
 
-  kbd_end();
+  kbd_end(1);
   util_notty();
 
   if(config.test) {

@@ -165,10 +165,10 @@ void kbd_reset (void)
     tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_tio_rm);
     }
 
-void kbd_end (void)
+void kbd_end (int close_fd)
     {
     tcsetattr (kbd_tty_im, TCSAFLUSH, &kbd_norm_tio_rm);
-    close (kbd_tty_im);
+    if(close_fd) close (kbd_tty_im);
     }
 
 

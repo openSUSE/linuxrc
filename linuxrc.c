@@ -425,7 +425,7 @@ void lxrc_end()
   }
 
   disp_cursor_on ();
-  kbd_end ();
+  kbd_end (1);
   disp_end ();
 
   if(config.new_root && config.pivotroot) lxrc_change_root();
@@ -564,7 +564,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
     addr[16] = 0;
     state[0] = config.win ? '1' : '0';
     state[1] = 0;
-    kbd_end();		/* restore terminal settings */
+    kbd_end(1);		/* restore terminal settings */
     execl(*config.argv, "linuxrc", "segv", addr, state, NULL);
   }
 

@@ -2398,6 +2398,8 @@ int util_sh_main(int argc, char **argv)
 {
   dup2(2, 1);
 
+  close(3);
+
   return lsh_main(argc, argv);
 }
 

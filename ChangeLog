@@ -1,3 +1,5 @@
+	- added 'start shell' menu entry
+
 23/8/2004:	v1.7.4
 	- added installation display selection (X11/VNC/SSH)
 	- initial support for S/390 network device setup (IUCV, CTC, QDIO)
