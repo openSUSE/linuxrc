@@ -183,6 +183,18 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay += 1;
 
+    /* ehci needs to be loaded first */
+    for(hd = hd_usb; hd; hd = hd->next) {
+      if(
+        hd->base_class.id == bc_serial &&
+        hd->sub_class.id == sc_ser_usb &&
+        hd->prog_if.id == pif_usb_ehci
+      ) {
+        mod_modprobe("ehci-hcd", NULL);
+        break;
+      }
+    }
+
     for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd, &usb_modules);
     hd_usb = hd_free_hd_list(hd_usb);
 
