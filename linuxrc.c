@@ -674,6 +674,13 @@ void lxrc_init()
 
   config.hwdetect = 1;
 
+  // default memory limits for i386 version
+  config.memory.min_free =       12 * 1024;
+  config.memory.min_yast_text =  32 * 1024;
+  config.memory.min_yast =       40 * 1024;
+  config.memory.min_modules =    64 * 1024;
+  config.memory.load_image =    200 * 1024;
+
   /* make auto mode default */
   if(config.test || config.had_segv) {
     config.manual = 1;
@@ -854,18 +861,11 @@ void lxrc_init()
 
   util_free_mem();
 
-  // default memory limits for i386 version
-  config.memory.min_free =       12 * 1024;
-  config.memory.min_yast_text =  32 * 1024;
-  config.memory.min_yast =       40 * 1024;
-  config.memory.min_modules =    64 * 1024;
-  config.memory.load_image =    200 * 1024;
-
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;
   }
 
-  if(config.memory.free > config.memory.load_image) force_ri_ig = 1;
+  force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
 
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");
