@@ -2,6 +2,7 @@
 	- 8.2 live eval changes
 	- added 'idescsi' parameter: use ide-scsi module for cdr/cdrw drives
 	  (needed for live eval)
+	- fix sorting of languages and keyboards
 
 11/3/2003:	v1.4.45
 	- module unloading used to clear internal network/disk lists (#24606)
