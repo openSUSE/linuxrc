@@ -67,7 +67,8 @@ static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 static const char  *file_txt_console_tm        = "Console:";
 #ifdef USE_LIBHD
 static const char  *file_txt_mouse_dev_tm      = "Mousedevice:";
-static const char  *file_txt_mouse_type_tm     = "Mousetype:";
+static const char  *file_txt_mouse_xf86_tm     = "MouseXF86:";
+static const char  *file_txt_mouse_gpm_tm      = "MouseGPM:";
 static const char  *file_txt_has_floppy_tm     = "Floppydisk:";
 static const char  *file_txt_yast2_update_tm   = "YaST2update:";
 static const char  *file_txt_text_mode_tm      = "Textmode:";
@@ -222,9 +223,10 @@ void file_write_yast_info (void)
 #ifdef USE_LIBHD
     if (mouse_dev_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_dev_tm, mouse_dev_ig);
-
-    if (mouse_type_ig)
-        fprintf (file_pri, "%s %s\n", file_txt_mouse_type_tm, mouse_type_ig);
+    if (mouse_type_xf86_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_mouse_xf86_tm, mouse_type_xf86_ig);
+    if (mouse_type_gpm_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
 
     fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
     fprintf (file_pri, "%s %d\n", file_txt_yast2_update_tm, yast2_update_ig);

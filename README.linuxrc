@@ -165,7 +165,10 @@ Linuxrc writes a file "/etc/install.inf" that can have these entries:
   Mousedevice: /dev/psaux
 
   # xf86 mouse protocol
-  Mousetype: ps/2
+  MouseXF86: ps/2
+
+  # gpm mouse protocol
+  MouseGPM: ps2
 
   # initrd line for /etc/rc.config
   INITRD_MODULES="de4x5"
@@ -194,10 +197,11 @@ Example (boot via CD):
   Cdrom: hdc
   Bootmode: CD
   SMP: 0
-  Mouse-Device: /dev/psaux
-  Mouse-Type: ps/2
-  Floppy-Disk: 1
-  YaST2-Update: 0
+  Mousedevice: /dev/psaux
+  MouseXF86: ps/2
+  MouseGPM: ps2
+  Floppydisk: 1
+  YaST2update: 0
   Textmode: 0
   Framebuffer: 0x0301
 
@@ -219,10 +223,11 @@ Example (boot via NFS, language german):
   Serverdir: /dist/6.3-i386
   INITRD_MODULES="de4x5"
   SMP: 0
-  Mouse-Device: /dev/psaux
-  Mouse-Type: ps/2
-  Floppy-Disk: 1
-  YaST2-Update: 0
+  Mousedevice: /dev/psaux
+  MouseXF86: ps/2
+  MouseGPM: ps2
+  Floppydisk: 1
+  YaST2update: 0
   Textmode: 0
   Framebuffer: 0x0301
 

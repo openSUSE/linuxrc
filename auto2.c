@@ -479,7 +479,7 @@ void auto2_find_mouse()
   driver_info_t *di;
   hd_t *hd;
 
-  mouse_type_ig = mouse_dev_ig = NULL;
+  mouse_type_xf86_ig = mouse_type_gpm_ig = mouse_dev_ig = NULL;
 
   for(di = NULL, hd = hd_data->hd; hd; hd = hd->next) {
     if(
@@ -487,9 +487,10 @@ void auto2_find_mouse()
       hd->unix_dev_name	&&			/* and has a device name */
       (di = hd_driver_info(hd_data, hd)) &&	/* and has driver info... */
       di->any.type == di_mouse &&		/* which is actually *mouse* info... */
-      di->mouse.xf86				/* it's supported by XFree... */
+      (di->mouse.xf86 || di->mouse.gpm)		/* it's supported */
     ) {
-      mouse_type_ig = strdup(di->mouse.xf86);
+      mouse_type_xf86_ig = strdup(di->mouse.xf86);
+      mouse_type_gpm_ig = strdup(di->mouse.gpm);
       mouse_dev_ig = strdup(hd->unix_dev_name);
     }
 
