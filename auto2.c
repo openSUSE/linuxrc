@@ -571,7 +571,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
               fprintf(stderr, "added");
               for(
                 sl1 = di->module.names, sl2 = di->module.mod_args;
-                sl1->next && sl2->next;
+                sl1 && sl2;
                 sl1 = sl1->next, sl2 = sl2->next
               ) {
                 fprintf(stderr, " %s", sl1->str);

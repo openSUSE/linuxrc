@@ -1,2 +1,2 @@
 #define LXRC_VERSION "1.2"
-#define LXRC_FULL_VERSION "1.2.15"
+#define LXRC_FULL_VERSION "1.2.16"
