@@ -503,9 +503,11 @@ int auto2_driver_is_active(driver_info_t *di)
  */
 int auto2_activate_devices(unsigned base_class, unsigned last_idx)
 {
-  char mod_cmd[100];
+  char mod_cmd[256];
   driver_info_t *di, *di0;
+  str_list_t *sl1, *sl2;
   hd_t *hd;
+  int i;
 
   for(hd = hd_data->hd; hd; hd = hd->next) {
     if(hd->idx > last_idx) break;
@@ -523,28 +525,55 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
     ) {
       for(di = di0; di; di = di->next) {
         if(!di->module.modprobe) {
-          sprintf(mod_cmd, "insmod %s%s%s",
-            di->module.name,
-            di->module.mod_args ? " " : "",
-            di->module.mod_args ? di->module.mod_args : ""
-          );
-          fprintf(stderr, "Found a \"%s\"\n", auto2_device_name(hd));
-          fprintf(stderr, "Going to load module \"%s\" to activate it...\n", di->module.name);
-          system(mod_cmd);
-          if(hd_module_is_active(hd_data, di->module.name)) {
+          // fprintf(stderr, "Found a \"%s\"\n", auto2_device_name(hd));
+          for(
+            sl1 = di->module.names, sl2 = di->module.mod_args;
+            sl1 && sl2;
+            sl1 = sl1->next, sl2 = sl2->next
+          ) {
+            sprintf(
+              mod_cmd, "insmod %s%s%s",
+              sl1->str, sl2->str ? " " : "", sl2->str ? sl2->str : ""
+            );
+            // fprintf(stderr, "Going to load module \"%s\"...\n", sl1->str);
+            system(mod_cmd);
+          }
+
+          /* all modules should be loaded now */
+          for(i = 1, sl1 = di->module.names; sl1; sl1 = sl1->next) {
+            i &= hd_module_is_active(hd_data, sl1->str);
+          }
+
+          if(i) {
             if(auto2_loaded_module) {
-              free(auto2_loaded_module); auto2_loaded_module = NULL;
+              free(auto2_loaded_module);
+              auto2_loaded_module = NULL;
             }
             if(auto2_loaded_module_args) {
-              free(auto2_loaded_module_args); auto2_loaded_module_args = NULL;
+              free(auto2_loaded_module_args);
+              auto2_loaded_module_args = NULL;
             }
-            auto2_loaded_module = strdup(di->module.name);
-            if(di->module.mod_args)
-              auto2_loaded_module_args = strdup(di->module.mod_args);
+
+            // use the last module
+            for(
+              sl1 = di->module.names, sl2 = di->module.mod_args;
+              sl1->next && sl2->next;
+              sl1 = sl1->next, sl2 = sl2->next
+            );
+            auto2_loaded_module = strdup(sl1->str);
+            if(sl2->str) auto2_loaded_module_args = strdup(sl2->str);
 
             if(base_class == bc_storage) {
-              fprintf(stderr, "added %s to initrd\n", di->module.name);
-              mpar_save_modparams(auto2_loaded_module, auto2_loaded_module_args);
+              fprintf(stderr, "added");
+              for(
+                sl1 = di->module.names, sl2 = di->module.mod_args;
+                sl1->next && sl2->next;
+                sl1 = sl1->next, sl2 = sl2->next
+              ) {
+                fprintf(stderr, " %s", sl1->str);
+                mpar_save_modparams(sl1->str, sl2->str);
+              }
+              fprintf(stderr, " to initrd\n");
             }
 
             last_idx = hd->idx;
