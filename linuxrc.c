@@ -339,7 +339,7 @@ void lxrc_halt()
     return;
   }
 
-  if(dia_yesno("Do you want to halt the system now?", 1) == YES) {
+  if(dia_yesno(txt_get(TXT_HALT), 1) == YES) {
     reboot(RB_POWER_OFF);
   }
 }

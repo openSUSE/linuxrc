@@ -1,5 +1,7 @@
+14/2/2005:	v1.7.23
 	- really always write Locale (#37679)
 	- fix url handling (#35907, #50618)
+	- write port number to install.inf
 
 8/2/2005:	v1.7.21
 	- don't show unnecessary network config popup during autoinstall (#47690)

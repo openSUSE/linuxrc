@@ -1092,3 +1092,8 @@ msgstr ""
 msgid "Hipersocket"
 msgstr ""
 
+# power-off message
+#. TXT_HALT
+msgid "Do you want to halt the system now?"
+msgstr ""
+

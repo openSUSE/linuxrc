@@ -1178,3 +1178,8 @@ msgstr ""
 #, fuzzy
 msgid "Hipersocket"
 msgstr "Hiperfoglalatok"
+# power-off message
+#. TXT_HALT
+msgid "Do you want to halt the system now?"
+msgstr ""
+

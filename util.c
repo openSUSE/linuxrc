@@ -4541,7 +4541,7 @@ void store_driverid(driver_t *drv)
  */
 char *url_decode(char *str)
 {
-  static char *s0, *s = NULL;
+  static char *s0 = NULL, *s;
   char t[3];
   unsigned u;
 
@@ -4549,7 +4549,7 @@ char *url_decode(char *str)
 
   if(!str) return s0;
 
-  s = s0 = malloc(strlen(str));
+  s = s0 = malloc(strlen(str) + 1);
 
   while(*str) {
     if(*str == '%' && isxdigit(str[1]) && isxdigit(str[2])) {

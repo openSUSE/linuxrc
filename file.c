@@ -232,7 +232,8 @@ static struct {
   { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
   { key_moduledisks,    "ModuleDisks",    kf_cfg + kf_cmd                },
   { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
-  { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early }
+  { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early },
+  { key_port,           "Port",           kf_none                        }
 };
 
 static struct {
@@ -1462,6 +1463,10 @@ void file_write_install_inf(char *dir)
     file_write_inet_both(f, key_server, &config.net.server);
     file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
+  }
+
+  if(config.net.port) {
+    file_write_num(f, key_port, config.net.port);
   }
 
   if(
