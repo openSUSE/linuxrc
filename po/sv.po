@@ -1197,3 +1197,11 @@ msgstr "s är."
 msgid "Choose an installation source"
 msgstr "Välj källa"
 
+#. TXT_INVALID_FQHOSTNAME
+msgid "This is not a valid fully qualified hostname."
+msgstr ""
+
+#. TXT_INVALID_CCW_ADDRESS
+msgid "This is not a valid CCW address."
+msgstr ""
+
