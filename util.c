@@ -729,6 +729,19 @@ int util_chk_driver_update(char *dir)
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
+  /* get content file from first medium we see */
+  if(!util_check_exist("/tmp/content")) {
+    sprintf(buf, "%s/content", dir);
+    if(util_check_exist(buf)) {
+      char *argv[3];
+
+      fprintf(stderr, "copying content file\n");
+      argv[1] = buf;
+      argv[2] = "/tmp";
+      util_cp_main(3, argv);
+    }
+  }
+
   sprintf(drv_src, "%s%s", dir, config.updatedir);
   sprintf(mods_src, "%s%s/modules", dir, config.updatedir);
 
