@@ -36,6 +36,8 @@
 static char sccsid[] = "@(#) pmap_check.c 1.8 96/07/07 10:49:10";
 #endif
 
+#include "dietlibc.h"
+
 #include <rpc/rpc.h>
 #include <rpc/pmap_prot.h>
 #include <syslog.h>

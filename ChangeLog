@@ -1,7 +1,11 @@
+14/12/2001:	v1.3.3
 	- make 'info' file parser more flexible
 	- rewrote color scheme, language and keytable handling
 	- lots of menus rewritten
 	- new dialog function
+	- module loading rewritten
+	- added some more simple commands: cp, ls, rm, mv, swapon, swapoff
+	- builds against dietlibc
 
 26/11/2001:	v1.3.2
 	- work around broken terminals that send CR + LF

@@ -643,7 +643,7 @@ int auto2_init()
       util_print_banner();
 
       sprintf(s, txt_get(TXT_FOUND_PCMCIA), "i82365");
-      t = index(s, '\n');
+      t = strchr(s, '\n');
       if(t) {
         *t = 0;
         strcat(t, "\n\n");

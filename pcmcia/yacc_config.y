@@ -27,6 +27,8 @@
  * provisions above, a recipient may use your version of this file
  * under either the MPL or the GPL.
  */
+
+#include "dietlibc.h"
     
 #include <stdlib.h>
 #include <stdarg.h>

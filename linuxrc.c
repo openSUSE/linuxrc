@@ -6,6 +6,8 @@
  *
  */
 
+#include "dietlibc.h"
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +24,8 @@
 #include <stdarg.h>
 #include <inttypes.h>
 #include <ctype.h>
+
+#include <asm/sigcontext.h>
 
 #include "global.h"
 #include "text.h"
@@ -96,6 +100,10 @@ static struct {
   { "ps",       util_ps_main      },
   { "cp",       util_cp_main      },
   { "ls",       util_ls_main      },
+  { "rm",       util_rm_main      },
+  { "mv",       util_mv_main      },
+  { "swapon",   util_swapon_main  },
+  { "swapoff",  util_swapoff_main },
   { "nothing",  util_nothing_main }
 };
 #endif
@@ -134,7 +142,10 @@ static dia_item_t di_lxrc_main_menu_last = di_main_start;
 int main(int argc, char **argv, char **env)
 {
   char *prog;
-  int i, err;
+  int err;
+#if SWISS_ARMY_KNIFE
+  int i;
+#endif
 
   prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
 
@@ -257,7 +268,7 @@ void lxrc_change_root (void)
   util_try_mount (lxrc_new_root, "/mnt", MS_MGC_VAL | MS_RDONLY, 0);
   chdir ("/mnt");
   if (
-#if 1
+#ifndef DIET
       /* XXX Until glibc is fixed to provide pivot_root. */
       syscall (SYS_pivot_root, ".", new_mp)
 #else
@@ -424,7 +435,7 @@ static void lxrc_catch_signal_11(int signum, int x, struct sigcontext *scp)
   ip = (scp.sregs)->regs.psw.addr;
 #endif
 
-  if(++cnt < 3) fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
+  if(!cnt++) fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
   sleep(10);
 
   lxrc_sig11_im = TRUE;
@@ -609,7 +620,14 @@ void lxrc_init()
   config.stderr_name = getenv("LINUXRC_STDERR");
   config.stderr_name = strdup(config.stderr_name ?: LINUXRC_DEFAULT_STDERR);
   freopen(config.stderr_name, "a", stderr);
+#ifndef DIET
   setlinebuf(stderr);
+#else
+  {
+    static char buf[128];
+    setvbuf(stderr, buf, _IOLBF, sizeof buf);
+  }
+#endif
 
   mount("proc", "/proc", "proc", 0, 0);
 
@@ -849,7 +867,11 @@ static void lxrc_memcheck (void)
 
     while (1)
         {
+#if 0
+  /* dietlibc's (v0.12) rand() gives values above RAND_MAX */
         nr_pages_ii = 1 + (int) ((double) max_pages_ii * rand () / (RAND_MAX + 1.0));
+#endif
+        nr_pages_ii = ((rand() & 0xfff) % max_pages_ii) + 3;
         data_pci = malloc (nr_pages_ii * 4096);
         if (data_pci)
             {
@@ -1013,7 +1035,7 @@ void lxrc_movetotmpfs()
   }
 
   if(
-#if 1
+#ifndef DIET
     !syscall(SYS_pivot_root, ".", "oldroot")
 #else
     !pivot_root(".", "oldroot")

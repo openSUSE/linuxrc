@@ -35,9 +35,6 @@
 
 #include "module_list.h"
 
-/* defined in pcmcia/cardmgr.c */
-extern char *pidfile;
-
 #define NR_SCSI_MODULES     (sizeof(mod_scsi_mod_arm)/sizeof(mod_scsi_mod_arm[0]))
 #define NR_CDROM_MODULES    (sizeof(mod_cdrom_mod_arm)/sizeof(mod_cdrom_mod_arm[0]))
 #define NR_NET_MODULES      (sizeof(mod_net_mod_arm)/sizeof(mod_net_mod_arm[0]))
@@ -64,6 +61,7 @@ static int       mod_getmoddisk       (int mod_type);
 #define DEBUG_MODULE
 
 #define MODULE_CONFIG "module.config"
+#define CARDMGR_PIDFILE "/var/run/cardmgr.pid"
 
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};
@@ -1416,8 +1414,8 @@ int mod_pcmcia_ok()
   file_t *f;
   int i, ok = 0;
 
-  if(util_check_exist(pidfile)) {
-    f = file_read_file(pidfile);
+  if(util_check_exist(CARDMGR_PIDFILE)) {
+    f = file_read_file(CARDMGR_PIDFILE);
 
     if(f && (i = atoi(f->key_str))) {
       if(!strcmp(util_process_name(i), "cardmgr")) ok = 1;

@@ -59,6 +59,10 @@ extern int  util_ps_main           (int argc, char **argv);
 extern int  util_cp_main           (int argc, char **argv);
 extern int  util_do_cp             (char *src, char *dst);
 extern int  util_ls_main           (int argc, char **argv);
+extern int  util_rm_main           (int argc, char **argv);
+extern int  util_mv_main           (int argc, char **argv);
+extern int  util_swapon_main       (int argc, char **argv);
+extern int  util_swapoff_main      (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
 extern char *util_process_name     (pid_t pid);
 

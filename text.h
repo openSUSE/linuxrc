@@ -22,6 +22,14 @@ extern int   txt_init (void);
 
 #else
 
+#if LXRC_TINY >= 1
+
+#define TRANS_de
+#define TRANS_en
+#define TRANS_fr
+
+#else
+
 /* all we have */
 #define TRANS_br
 #define TRANS_cs
@@ -41,11 +49,6 @@ extern int   txt_init (void);
 #define TRANS_ru
 #define TRANS_sk
 
-#endif
+#endif	/* LXRC_TINY */
 
-#if LXRC_TINY >= 1
-#define TRANS_de
-#define TRANS_en
-#define TRANS_fr
-#endif
-
+#endif	/* __alpha__ */

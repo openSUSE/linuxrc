@@ -10,6 +10,8 @@
  * font positions and Unicode values.
  */
 
+#include "dietlibc.h"
+
 #include <stdio.h>
 #include <memory.h>
 #include <fcntl.h>

@@ -19,8 +19,15 @@ CC	= gcc
 YACC	= bison -y
 LEX	= flex -8
 # _No_ -fomit-frame-pointer! It makes linuxrc larger (after compression).
-CFLAGS	= -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
+CFLAGS	= -g -O1 -c -I$(TOPDIR) $(EXTRA_FLAGS) $(LX_REL)
+
 LDFLAGS	= -static -Wl,-Map=linuxrc.map
+ifeq ($(CC),diet gcc)
+LDFLAGS	+= -lrpc -lhd_tiny_diet
+else
+LDFLAGS	+= -lhd_tiny
+endif
+
 WARN	= -Wstrict-prototypes -Wall
 LIBHDFL	= -DUSE_LIBHD
 
@@ -32,6 +39,7 @@ SUBDIRS	= po insmod loadkeys pcmcia portmap
 LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a
 
 ifeq ($(ARCH),i386)
+    USE_MINI_GLIBC	= no
     CFLAGS		+= -DLX_ARCH=\"i386\"
 endif
 
@@ -49,7 +57,7 @@ ifneq ($(findstring $(ARCH),ppc ppc64),)
 endif
 
 ifeq ($(ARCH),sparc)
-    USE_MINI_GLIBC	= yes
+    USE_MINI_GLIBC	= no
     SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
@@ -104,12 +112,18 @@ all: libs linuxrc
 tiny:
 	$(MAKE) EXTRA_FLAGS+="-DLXRC_TINY=1"
 
+diet:
+	$(MAKE) CC="diet gcc" EXTRA_FLAGS+="-DDIET"
+
+tinydiet:
+	$(MAKE) CC="diet gcc" EXTRA_FLAGS+="-DDIET" tiny
+
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
 	@echo "#define LXRC_FULL_VERSION \"`cat VERSION`\"" >>$@
 
 linuxrc: $(OBJ) $(LIBS)
-	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -lhd_tiny -o $@
+	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -o $@
 	@strip -R .note -R .comment $@
 	@ls -l linuxrc
 

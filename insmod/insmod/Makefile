@@ -5,7 +5,6 @@ endif
 ifeq ($(ARCH),i586)
     ARCH	:= i386
 endif
-CC		= gcc
 CFLAGS		= -O2 -Wall
 AR		= ar
 RANLIB		= ranlib

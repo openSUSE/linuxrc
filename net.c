@@ -6,6 +6,10 @@
  *
  */
 
+#include "dietlibc.h"
+
+#define WITH_NFS
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -69,7 +73,9 @@ static int  net_choose_device    (void);
 static void net_setup_nameserver (void);
 static int  net_input_data       (void);
 #endif
+#ifdef WITH_NFS
 static void net_show_error       (enum nfs_stat status_rv);
+#endif
 static int  net_get_address      (char *text_tv, struct in_addr *address_prr);
 
 int net_config (void)
@@ -427,6 +433,7 @@ int net_mount_smb ()
     return(0);
 }
 
+#ifdef WITH_NFS
 int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     {
     struct sockaddr_in     server_ri;
@@ -606,6 +613,14 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
 
     return (TRUE);
     }
+#else
+
+int net_mount_nfs(char *server_addr_tv, char *hostdir_tv)
+{
+  return -1;
+}
+
+#endif	/* WITH_NFS */
 
 
 #if NETWORK_CONFIG
@@ -676,6 +691,7 @@ int net_choose_device()
 }
 #endif
 
+#ifdef WITH_NFS
 static void net_show_error (enum nfs_stat status_rv)
     {
     struct { enum nfs_stat stat;
@@ -716,6 +732,7 @@ static void net_show_error (enum nfs_stat status_rv)
 
     dia_message (tmp_ti, MSGTYPE_ERROR);
     }
+#endif
 
 #if NETWORK_CONFIG
 static void net_setup_nameserver (void)

@@ -24,6 +24,7 @@
 #include <syscall.h>
 #include <dirent.h>
 #include <errno.h>
+#include <sys/swap.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -880,7 +881,7 @@ void util_status_info()
   lc = 0;
 
   if(hd_data->log) {
-    s = index(hd_data->log, '\n');
+    s = strchr(hd_data->log, '\n');
     if(s) {
       i = s - hd_data->log;
       if(i > 255) i = 255;
@@ -1009,6 +1010,9 @@ void show_proc(FILE *f, unsigned pid)
   unsigned u, v;
   char *s;
 
+#ifdef DIET
+  memset(buf1, 0, sizeof buf1);
+#endif
   sprintf(pe, "/proc/%u/status", pid);
   if((p = fopen(pe, "r"))) {
     if(fscanf(p, "Name: %63[^\n]", buf1) == 1) status |= 1;
@@ -1353,7 +1357,7 @@ int util_mount_main(int argc, char **argv)
     return errno;
   }
 
-  srv_dir = index(dev, ':');
+  srv_dir = strchr(dev, ':');
   if(!srv_dir) {
     fprintf(stderr, "invalid mount src \"%s\"\n", dev);
     return 77;
@@ -1694,6 +1698,81 @@ slist_t *slist_getentry(slist_t *sl, char *key)
   }
 
   return NULL;
+}
+
+
+int util_rm_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  while(argc--) {
+    i = unlink(*argv);
+    if(i) {
+      perror(*argv);
+      return errno;
+    }
+    argv++;
+  }
+
+  return 0;
+}
+
+
+int util_mv_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  if(argc != 2) return -1;
+
+  i = rename(argv[0], argv[1]);
+  if(i) {
+    i = errno;
+    fprintf(stderr, "mv %s %s failed\n", argv[0], argv[1]);
+  }
+
+  return i;
+}
+
+
+int util_swapon_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  if(argc != 1) return -1;
+
+  i = swapon(*argv, 0);
+
+  if(i) {
+    i = errno;
+    perror(*argv);
+  }
+
+  return i;
+}
+
+
+int util_swapoff_main(int argc, char **argv)
+{
+  int i;
+
+  argv++; argc--;
+
+  if(argc != 1) return -1;
+
+  i = swapoff(*argv);
+
+  if(i) {
+    i = errno;
+    perror(*argv);
+  }
+
+  return i;
 }
 
 

@@ -31,6 +31,8 @@
     
 ======================================================================*/
 
+#include "dietlibc.h"
+
 #ifndef __linux__
 #include <pcmcia/u_compat.h>
 #endif

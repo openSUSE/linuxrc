@@ -7,9 +7,11 @@
   Copyright (c) University of Cambridge, 1993-1996
   See the file NOTICE for conditions of use and distribution.
 
-  $Revision: 1.8 $
-  $Date: 2001/12/13 18:27:16 $
+  $Revision: 1.9 $
+  $Date: 2001/12/14 18:10:57 $
 */
+
+#include "dietlibc.h"
 
 /* Standard headers */
 #include <stdio.h>

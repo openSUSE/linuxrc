@@ -80,6 +80,8 @@ static char sccsid[] = "@(#)portmap.c 1.32 87/08/06 Copyr 1984 Sun Micro";
  * Mountain View, California  94043
  */
 
+#include "dietlibc.h"
+
 #include <rpc/rpc.h>
 #include <rpc/pmap_prot.h>
 #include <stdio.h>

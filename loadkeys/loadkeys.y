@@ -63,6 +63,8 @@
 %token UNUMBER ALT_IS_META STRINGS AS USUAL ON FOR
 
 %{
+#include "dietlibc.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <getopt.h>
