@@ -286,6 +286,7 @@ typedef struct {
   char *product_dir;		/* product specific dir component (e.g. 'suse') */
   int kbdtimeout;		/* keyboard timeout (in s) */
   int loglevel;			/* set kernel log level */
+  char *loghost;		/* syslog host */
   char *rootpassword;
   struct {
     char *dir;			/* driver update source dir */

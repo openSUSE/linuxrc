@@ -207,7 +207,8 @@ static struct {
   { key_netid,          "NetUniqueID",    kf_none                        },
   { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
-  { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                }
+  { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                },
+  { key_loghost,        "Loghost",        kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1136,6 +1137,10 @@ void file_do_info(file_t *f0)
         if(*f->value) str_copy(&config.rootpassword, f->value);
         break;
 
+      case key_loghost:
+        str_copy(&config.loghost, f->value);
+        break;
+
       default:
         break;
     }
@@ -1377,6 +1382,7 @@ void file_write_install_inf(char *dir)
     );
   }
 
+  file_write_str(f, key_loghost, config.loghost);
   file_write_str(f, key_username, config.net.user);
   file_write_str(f, key_password, config.net.password);
   file_write_str(f, key_workdomain, config.net.workgroup);
