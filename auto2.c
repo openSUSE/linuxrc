@@ -51,9 +51,7 @@ static int driver_is_active(hd_t *hd);
 static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
-#if 0	/* __i386__ */
 static int auto2_ask_for_modules(int prompt, char *type);
-#endif
 
 /*
  * mount a detected suse-cdrom at mountpoint_tg and run inst_check_instsys()
@@ -682,7 +680,9 @@ int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
         fprintf(stderr, "Ok, that seems to have worked. :-)\n");
       }
       else {
+#ifdef __i386__
         need_modules = 1;
+#endif
         fprintf(stderr, "Oops, that didn't work.\n");
       }
 
@@ -849,27 +849,6 @@ int auto2_init()
 
   if(!i && config.hwcheck) i = 1;
 
-#if 0	/* def __i386__ */
-  /* ok, found something */
-  if(i) return i;
-
-  net_cfg = net_config_mask() || config.insttype == inst_net;
-
-  /* no CD, but CD drive and no network install */
-  if(cdrom_drives && config.insttype != inst_net) return i;
-
-  if(need_modules) {
-    if(config.insttype == inst_net) {
-      if(auto2_ask_for_modules(1, "network") == 0) return FALSE;
-    }
-    else {
-      if(auto2_ask_for_modules(1, "ide/raid/scsi") == 0) return FALSE;
-    }
-  }
-
-  i = auto2_find_install_medium();
-#endif
-
   return i;
 }
 
@@ -922,35 +901,48 @@ int auto2_find_install_medium()
 
     util_debugwait("CD?");
 
-    need_modules = 0;
+    do {
+      need_modules = 0;
 
-    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+      if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+
+    do {
+      need_modules = 0;
+
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
 
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
-      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
       auto2_user_netconfig();
       return TRUE;
     }
 
-    for(need_modules = 0, last_idx = 0;;) {
-      /* i == 1 -> try to activate another storage device */
-      if(i == 1) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-      }
+    do {
+      need_modules = 0;
 
-      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
-        fprintf(stderr, "No further storage devices found; giving up.\n");
-        break;
-      }
+      for(last_idx = 0;;) {
+        /* i == 1 -> try to activate another storage device */
+        if(i == 1) {
+          fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+        }
 
-      fprintf(stderr, "Looking for a %s CD again...\n", config.product);
-      if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-        auto2_user_netconfig();
-        return TRUE;
+        if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
+          fprintf(stderr, "No further storage devices found; giving up.\n");
+          break;
+        }
+
+        fprintf(stderr, "Looking for a %s CD again...\n", config.product);
+        if(!(i = auto2_cdrom_dev(&hd_devs))) {
+          auto2_user_netconfig();
+          return TRUE;
+        }
       }
     }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
 
     if(config.cdrom) {
       auto2_user_netconfig();
@@ -962,35 +954,49 @@ int auto2_find_install_medium()
 
     util_debugwait("HD?");
 
-    need_modules = 0;
+    do {
+      need_modules = 0;
   
-    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+      if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+
+    do {
+      need_modules = 0;
+
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
 
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
-      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
       auto2_user_netconfig();
       return TRUE;
     }
 
-    for(need_modules = 0, last_idx = 0;;) {
-      /* i == 1 -> try to activate another storage device */
-      if(i == 1) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-      }
+    do {
+      need_modules = 0;
 
-      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
-        fprintf(stderr, "No further storage devices found; giving up.\n");
-        break;
-      }
+      for(last_idx = 0;;) {
+        /* i == 1 -> try to activate another storage device */
+        if(i == 1) {
+          fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+        }
 
-      fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
-      if(!(i = auto2_harddisk_dev(&hd_devs))) {
-        if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-        auto2_user_netconfig();
-        return TRUE;
+        if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
+          fprintf(stderr, "No further storage devices found; giving up.\n");
+          break;
+        }
+
+        fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
+        if(!(i = auto2_harddisk_dev(&hd_devs))) {
+          auto2_user_netconfig();
+          return TRUE;
+        }
       }
     }
+    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+
   }
 
   if(net_config_mask() || config.insttype == inst_net) {
@@ -998,8 +1004,6 @@ int auto2_find_install_medium()
     util_debugwait("Net?");
 
     if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
-
-    need_modules = 0;
 
     s_addr2inet(
       &config.net.broadcast,
@@ -1013,23 +1017,35 @@ int auto2_find_install_medium()
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
-    if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    do {
+      need_modules = 0;
+
+      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
+    }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
+
     if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
     fprintf(stderr, "Looking for a network server...\n");
     if(!auto2_net_dev(&hd_devs)) return TRUE;
 
-    for(need_modules = 0, last_idx = 0;;) {
-      fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
+    do {
+      need_modules = 0;
 
-      if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
-        fprintf(stderr, "No further network cards found; giving up.\n");
-        break;
+      for(last_idx = 0;;) {
+        fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
+
+        if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
+          fprintf(stderr, "No further network cards found; giving up.\n");
+          break;
+        }
+
+        fprintf(stderr, "Looking for a network server again...\n");
+        if(!auto2_net_dev(&hd_devs)) return TRUE;
       }
-
-      fprintf(stderr, "Looking for a network server again...\n");
-      if(!auto2_net_dev(&hd_devs)) return TRUE;
     }
+    while(need_modules && auto2_ask_for_modules(1, "network"));
+
   }
 
   util_debugwait("Nothing found");
@@ -1231,10 +1247,15 @@ void auto2_progress(char *pos, char *msg)
 }
 
 
-#if 0	/* __i386__ */
+/*
+ * Prompt for module floppy; does some real things only on i386 (other
+ * archs don't have module floppies).
+ */
 int auto2_ask_for_modules(int prompt, char *type)
 {
   int do_something = 0;
+
+#ifdef __i386__
   char buf[256];
   int mtype = mod_get_type(type);
 
@@ -1250,10 +1271,10 @@ int auto2_ask_for_modules(int prompt, char *type)
   if(do_something) mod_add_disk(0, mtype);
 
   util_disp_done();
+#endif
 
   return do_something;
 }
-#endif
 
 
 void load_storage_mods()

@@ -1,3 +1,6 @@
+26/5/2004:	v1.6.31
+	- code that asks for module floppies reactivated (#40904)
+
 24/5/2004:	v1.6.30
 	- removed some old texts
 	- no echo for passwords in linemode (#41072)

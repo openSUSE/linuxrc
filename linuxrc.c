@@ -790,12 +790,14 @@ void lxrc_init()
       dia_message(msg, MSGTYPE_REBOOT);
       free(msg);
       if(!window) util_disp_done();
-      config.manual = 1;
-      if(config.test) {
-        fprintf(stderr, "*** reboot ***\n");
-      }
-      else {
-        reboot(RB_AUTOBOOT);
+      if(config.memory.ram_min) {
+        config.manual = 1;
+        if(config.test) {
+          fprintf(stderr, "*** reboot ***\n");
+        }
+        else {
+          reboot(RB_AUTOBOOT);
+        }
       }
     }
   }
