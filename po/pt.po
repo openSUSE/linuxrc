@@ -1118,3 +1118,107 @@ msgstr ""
 msgid "Enter the relative port number"
 msgstr ""
 
+#. TXT_CHECK_CD
+msgid "Verify Installation CD-ROM/DVD"
+msgstr ""
+
+# turn the computer off
+#. TXT_POWER_OFF
+msgid "Power off"
+msgstr ""
+
+#. TXT_DUD_FAIL
+msgid "Failed to access Driver Update medium."
+msgstr ""
+
+#. TXT_DUD_READ
+msgid "Reading Driver Update..."
+msgstr ""
+
+#. TXT_DUD_NOTFOUND
+msgid "No new Driver Updates found"
+msgstr ""
+
+#. TXT_DUD_ADDED
+msgid "Driver Updates added"
+msgstr ""
+
+# shown if driver update succeeded
+#. TXT_DUD_OK
+msgid "Driver Update ok"
+msgstr ""
+
+#. TXT_DUD_SELECT
+msgid "Please choose the Driver Update medium."
+msgstr ""
+
+#. TXT_DUD_DEVICE
+msgid "Please enter the Driver Update device."
+msgstr ""
+
+#. TXT_DUD_INVALID_DEVICE
+msgid "Invalid device name."
+msgstr ""
+
+#. TXT_SEARCH_CDROM
+msgid "Looking for CD-ROM drives..."
+msgstr ""
+
+#. TXT_NO_CDROM
+msgid "No CD-ROM drives found."
+msgstr ""
+
+#. TXT_SEARCH_FLOPPY
+msgid "Looking for floppy disks..."
+msgstr ""
+
+#. TXT_NO_FLOPPY
+msgid "No floppy disk found."
+msgstr ""
+
+# heading for a listing of updates
+#. TXT_DUD_LIST
+msgid "Driver Update list"
+msgstr ""
+
+#. TXT_DUD_NOT_YET
+msgid "No Driver Updates so far."
+msgstr ""
+
+#. TXT_INSERT_CD_DVD
+msgid "Insert Installation CD-ROM or DVD."
+msgstr ""
+
+#. TXT_NO_CD_DVD
+msgid "No CD-ROM or DVD found."
+msgstr ""
+
+# e.g 'not a SUSE LINUX CD-ROM'
+#. TXT_WRONG_CD
+#, c-format
+msgid "This is not a %s CD-ROM."
+msgstr ""
+
+#. TXT_CD_CHECK_OK
+msgid "No errors found."
+msgstr ""
+
+#. TXT_CD_MD5_FAILED
+msgid "Checksum wrong."
+msgstr ""
+
+#. TXT_CD_READ_FAILED
+#, c-format
+msgid "Error reading sector %u."
+msgstr ""
+
+# %s is CD-ROM or DVD
+#. TXT_CD_BROKEN
+#, c-format
+msgid "\nThis %s is broken."
+msgstr ""
+
+#. TXT_SLP_SOURCE
+msgid "Choose an installation source"
+msgstr ""
+

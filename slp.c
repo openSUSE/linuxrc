@@ -386,7 +386,7 @@ slp_get_install()
 	  ambg[acnt++] = descs[i];
       ambg[acnt] = 0;
 
-      i = dia_list("Choose an installation source", 60, NULL, ambg, 0, align_center);
+      i = dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
       if (i <= 0 || i > acnt)
 	break;
       d = ambg[i - 1];
@@ -397,7 +397,7 @@ slp_get_install()
       if (acnt == 0)
 	break;
       if (acnt > 1)
-        i = dia_list("Choose an installation source", 60, NULL, ambg, 0, align_center);
+        i = dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
       else
 	i = 1;
       if (i > 0 && i - 1 < acnt)

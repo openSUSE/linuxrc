@@ -1570,7 +1570,7 @@ int inst_update_cd()
   i = util_mount_ro(long_dev(dev), config.mountpoint.update);
 
   if(i) {
-    dia_message("Failed to access Driver Update medium.", MSGTYPE_ERROR);
+    dia_message(txt_get(TXT_DUD_FAIL), MSGTYPE_ERROR);
     return 0;
   }
 
@@ -1579,7 +1579,7 @@ int inst_update_cd()
   /* point at list end */
   for(names = &config.update.name_list; *names; names = &(*names)->next);
 
-  dia_info(&win, "Reading Driver Update...");
+  dia_info(&win, txt_get(TXT_DUD_READ));
 
   strprintf(&buf, "%s/%s", config.mountpoint.update, SP_FILE);
 
@@ -1598,14 +1598,14 @@ int inst_update_cd()
   win_close(&win);
 
   if(old_count == config.update.count) {
-    dia_message("No new Driver Updates found", MSGTYPE_INFO);
+    dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
   }
   else {
     if(*names) {
-      dia_show_lines2("Driver Updates added", *names, 64);
+      dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
     }
     else {
-      dia_message("Driver Update ok", MSGTYPE_INFO);
+      dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
     }
   }
 
@@ -1686,7 +1686,7 @@ int choose_dud(char **dev)
   values[item_cnt] = NULL;
   items[item_cnt++] = strdup("other");
 
-  i = dia_list("Please choose the Driver Update medium.", 30, NULL, items, last_item, align_left);
+  i = dia_list(txt_get(TXT_DUD_SELECT), 30, NULL, items, last_item, align_left);
   if(i > 0) {
     s = values[i - 1];
     if(s) {
@@ -1713,14 +1713,14 @@ int choose_dud(char **dev)
     }
     else {
       str_copy(&buf, NULL);
-      i = dia_input2("Please enter the Driver Update device.", &buf, 30, 0);
+      i = dia_input2(txt_get(TXT_DUD_DEVICE), &buf, 30, 0);
       if(!i) {
         if(util_check_exist(long_dev(buf)) == 'b') {
           str_copy(&config.update.dev, short_dev(buf));
           *dev = config.update.dev;
         }
         else {
-          dia_message("Invalid device name.", MSGTYPE_ERROR);
+          dia_message(txt_get(TXT_DUD_INVALID_DEVICE), MSGTYPE_ERROR);
         }
       }
     }
@@ -1748,7 +1748,7 @@ int dud_probe_cdrom(char **dev)
 
   if(dev) *dev = NULL;
 
-  dia_info(&win, "Looking for cdrom drives...");
+  dia_info(&win, txt_get(TXT_SEARCH_CDROM));
 
   util_update_cdrom_list();
 
@@ -1759,7 +1759,7 @@ int dud_probe_cdrom(char **dev)
 
   if(!config.cdroms) {
     win_close(&win);
-    dia_message("No cdrom drives found.", MSGTYPE_ERROR);
+    dia_message(txt_get(TXT_NO_CDROM), MSGTYPE_ERROR);
   }
   else {
     win_close(&win);
@@ -1781,11 +1781,11 @@ int dud_probe_floppy(char **dev)
 
   if(dev) *dev = NULL;
 
-  dia_info(&win, "Looking for floppy disks...");
+  dia_info(&win, txt_get(TXT_SEARCH_FLOPPY));
 
   if(!auto2_find_floppy()) {
     win_close(&win);
-    dia_message("No floppy disk found.", MSGTYPE_ERROR);
+    dia_message(txt_get(TXT_NO_FLOPPY), MSGTYPE_ERROR);
   }
   else {
     win_close(&win);

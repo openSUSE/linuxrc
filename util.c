@@ -1136,10 +1136,10 @@ int show_driver_updates()
 {
 
   if(config.update.name_list) {
-    dia_show_lines2("Driver Update list", config.update.name_list, 64);
+    dia_show_lines2(txt_get(TXT_DUD_LIST), config.update.name_list, 64);
   }
   else {
-    dia_message("No Driver Updates so far.", MSGTYPE_INFO);
+    dia_message(txt_get(TXT_DUD_NOT_YET), MSGTYPE_INFO);
   }
 
   return 0;

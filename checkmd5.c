@@ -39,7 +39,7 @@ void md5_verify()
   slist_t *sl;
   char buf[256];
 
-  if(dia_message("Insert Installation CD-ROM or DVD.", MSGTYPE_INFO)) return;
+  if(dia_message(txt_get(TXT_INSERT_CD_DVD), MSGTYPE_INFO)) return;
 
   get_info(long_dev(config.cdrom));
 
@@ -62,7 +62,7 @@ void md5_verify()
   }
 
   if(iso.err) {
-    dia_message("No CD-ROM or DVD found.", MSGTYPE_ERROR);
+    dia_message(txt_get(TXT_NO_CD_DVD), MSGTYPE_ERROR);
     return;
   }
 
@@ -79,7 +79,7 @@ void md5_verify()
   fprintf(stderr, "\n");
 
   if(!*iso.app_id || !iso.got_old_md5) {
-    sprintf(buf, "This is not a %s CD-ROM.", config.product);
+    sprintf(buf, txt_get(TXT_WRONG_CD), config.product);
     dia_message(buf, MSGTYPE_ERROR);
     return;
   }
@@ -112,16 +112,16 @@ void md5_verify()
   fprintf(stderr, "\n");
 
   if(iso.md5_ok) {
-    dia_message("No errors found.", MSGTYPE_INFO);
+    dia_message(txt_get(TXT_CD_CHECK_OK), MSGTYPE_INFO);
   }
   else {
     if(iso.err_ofs) {
-      sprintf(buf, "Error reading sector %u.", iso.err_ofs >> 1);
+      sprintf(buf, txt_get(TXT_CD_READ_FAILED), iso.err_ofs >> 1);
     }
     else {
-      sprintf(buf, "Checksum wrong.");
+      sprintf(buf, txt_get(TXT_CD_MD5_FAILED));
     }
-    sprintf(buf + strlen(buf), "\nThis %s is broken.", *iso.media_type == 'C' ? "CD-ROM" : iso.media_type);
+    sprintf(buf + strlen(buf), txt_get(TXT_CD_BROKEN), *iso.media_type == 'C' ? "CD-ROM" : iso.media_type);
     dia_message(buf, MSGTYPE_ERROR);
   }
 
