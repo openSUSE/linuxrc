@@ -61,6 +61,8 @@ static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int is_rpc_prog         (pid_t pid);
 static void save_environment   (void);
+static void lxrc_reboot        (void);
+static void lxrc_halt          (void);
 
 static pid_t  lxrc_mempid_rm;
 static int    lxrc_sig11_im = FALSE;
@@ -191,6 +193,12 @@ void lxrc_reboot (void)
     {
     if (auto_ig || auto2_ig || dia_yesno (txt_get (TXT_ASK_REBOOT), 1) == YES)
         reboot (RB_AUTOBOOT);
+    }
+
+void lxrc_halt (void)
+    {
+    if (auto_ig || auto2_ig || dia_yesno ("Do you want to halt the system now?", 1) == YES)
+        reboot (RB_POWER_OFF);
     }
 
 static void save_environment (void)
@@ -737,6 +745,10 @@ static int lxrc_main_cb (int what_iv)
             break;
         case 5:
             lxrc_reboot ();
+            break;
+        case 6:
+            lxrc_halt ();
+            break;
         default:
             break;
         }
@@ -748,7 +760,7 @@ static int lxrc_main_cb (int what_iv)
 static void lxrc_main_menu (void)
     {
     int    width_ii = 40;
-    item_t items_ari [5];
+    item_t items_ari [6];
     int    i_ii;
     int    choice_ii;
     int    nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
@@ -757,6 +769,8 @@ static void lxrc_main_menu (void)
 
     util_create_items (items_ari, nr_items_ii, width_ii);
 
+    nr_items_ii = config.is_iseries ? 6 : 5;
+
     do
         {
         strcpy (items_ari [0].text, txt_get (TXT_SETTINGS));
@@ -764,6 +778,7 @@ static void lxrc_main_menu (void)
         strcpy (items_ari [2].text, txt_get (TXT_MENU_MODULES));
         strcpy (items_ari [3].text, txt_get (TXT_MENU_START));
         strcpy (items_ari [4].text, txt_get (TXT_END_REBOOT));
+        strcpy (items_ari [5].text, "Power off");
         for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
             {
             util_center_text (items_ari [i_ii].text, width_ii);

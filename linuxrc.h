@@ -6,7 +6,6 @@
  *
  */
 
-extern void lxrc_reboot  (void);
 extern void lxrc_killall (int);
 extern void lxrc_end     (void);
 extern void lxrc_set_modprobe  (char *program_tv);
