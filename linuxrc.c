@@ -33,6 +33,7 @@
 #include "settings.h"
 #include "file.h"
 #include "linuxrc.h"
+#include "auto2.h"
 
 extern int  insmod_main        (int argc, char **argv);
 extern int  rmmod_main         (int argc, char **argv);
@@ -50,6 +51,7 @@ static void lxrc_memcheck      (void);
 static void lxrc_set_modprobe  (char *program_tv);
 static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
+static int is_rpc_prog         (pid_t pid);
 
 static pid_t  lxrc_mempid_rm;
 static int    lxrc_sig11_im = FALSE;
@@ -92,11 +94,19 @@ int main (int argc, char **argv, char **env)
             rc_ii = inst_auto_install ();
         else if (demo_ig)
             rc_ii = inst_start_demo ();
+#ifdef USE_LIBHD
+        else if (auto2_ig) {
+            rc_ii = inst_auto2_install ();
+            deb_msg ("done inst_auto2_install()");
+            deb_int (rc_ii);
+        }
+#endif
 
-        if ((!auto_ig && !demo_ig) || rc_ii)
+        if (!(auto_ig || demo_ig || auto2_ig) || rc_ii)
             lxrc_main_menu ();
 
         lxrc_end ();
+        deb_wait;
         }
 
     return (rc_ii);
@@ -129,40 +139,81 @@ int my_logmessage (char *buffer_pci, ...)
 
 void lxrc_reboot (void)
     {
-    if (dia_yesno (txt_get (TXT_ASK_REBOOT), 1) == YES)
+    if (auto2_ig || dia_yesno (txt_get (TXT_ASK_REBOOT), 1) == YES)
         reboot (RB_AUTOBOOT);
     }
 
 
 void lxrc_end (void)
     {
+    deb_msg("lxrc_end()");
     kill (lxrc_mempid_rm, 9);
-    lxrc_killall ();
-    printf ("[9;15]");
+    lxrc_killall (1);
+    if(!auto2_ig) printf ("\033[9;15]");
 /*    reboot (RB_ENABLE_CAD); */
     mod_free_modules ();
-    (void) umount (mountpoint_tg);
+    (void) util_umount (mountpoint_tg);
     lxrc_set_modprobe ("/sbin/modprobe");
     lxrc_set_bdflush (40);
-    (void) umount ("/proc");
+    (void) util_umount ("/proc");
+    deb_wait;
     disp_cursor_on ();
     kbd_end ();
     disp_end ();
     }
 
 
-void lxrc_killall (void)
-    {
-    pid_t  i_ri;
-    pid_t  mypid_ri;;
+/*
+ * Check if pid is either portmap or rpciod.
+ *
+ */
+int is_rpc_prog(pid_t pid)
+{
+  char proc_status[64], buf[64];
+  FILE *f;
 
-    mypid_ri = getpid ();
-    if (!testing_ig)
-        for (i_ri = 32767; i_ri > mypid_ri; i_ri--)
-            if (i_ri != lxrc_mempid_rm)
-                kill (i_ri, 9);
+  sprintf(proc_status, "/proc/%u/status", pid);
+
+  if((f = fopen(proc_status, "r"))) {
+    if(fscanf(f, "Name: %30s", buf) == 1) {
+      if(!strcmp(buf, "portmap")) {
+        deb_int(pid);
+        deb_msg("-> is portmap");
+        fclose(f);
+        return 1;
+      }
+      if(!strcmp(buf, "rpciod")) {
+        deb_int(pid);
+        deb_msg("-> is rpciod");
+        fclose(f);
+        return 1;
+      }
     }
+    fclose(f);
+  }
+  
+  return 0;
+}
 
+
+/*
+ * really_all = 0: kill everything except rpc progs
+ * really_all = 1: kill really everything
+ *
+ */
+void lxrc_killall(int really_all)
+{
+  pid_t i_ri;
+  pid_t mypid_ri;
+
+  if(testing_ig) return;
+
+  mypid_ri = getpid ();
+  for(i_ri = 32767; i_ri > mypid_ri; i_ri--)
+    if(i_ri != lxrc_mempid_rm && (really_all || !is_rpc_prog(i_ri)))
+      kill(i_ri, 9);
+}
+                          
 
 /*
  *
@@ -197,6 +248,8 @@ static void lxrc_init (void)
     char  *linuxrc_pci;
     int    rc_ii;
 
+    printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2000 SuSE GmbH <<<\n");
+    fflush(stdout);
 
     if (!testing_ig && getpid () > 19)
         {
@@ -261,39 +314,80 @@ static void lxrc_init (void)
     util_redirect_kmsg ();
     disp_init ();
 
-    for (i_ii = 1; i_ii < max_y_ig; i_ii++)
-        printf ("\n");
-    printf ("[9;0]");
+#ifdef USE_LIBHD
+    auto2_chk_expert ();
 
-    disp_cursor_off ();
+    deb_int(text_mode_ig);
+    deb_int(yast2_update_ig);
+    deb_int(auto2_ig);
+    deb_int(yast_version_ig);
+    deb_int(guru_ig);
+
+    if (!auto2_ig)
+#endif
+        {
+        for (i_ii = 1; i_ii < max_y_ig; i_ii++) printf ("\n");
+        printf ("\033[9;0]");
+        disp_cursor_off ();
+        }
+
     info_init ();
 
-#ifdef LINUXRC_AXP
-    if (memory_ig > 50000000)
+    if (memory_ig < MEM_LIMIT_YAST2)
+        yast_version_ig = 1;
+
+    if (memory_ig > (yast_version_ig == 2 ? MEM_LIMIT2_RAMDISK : MEM_LIMIT1_RAMDISK))
         force_ri_ig = TRUE;
-#else
-    if (memory_ig > 30000000)
-        force_ri_ig = TRUE;
-#endif
 
     lxrc_memcheck ();
 
-    util_print_banner ();
+    if (yast_version_ig == 2) strcpy(rootimage_tg, "/suse/images/yast2");
+
+    deb_str(rootimage_tg);
+
     mod_init ();
 
+#ifdef USE_LIBHD
+    if(auto2_ig)
+      if(auto2_init()) {
+        auto2_ig = TRUE;
+        auto2_init_settings();
+      } else {
+        deb_msg("Automatic setup not possible.");
+        auto2_ig = FALSE;
+        printf("\033[9;0]");
+        disp_cursor_off();
+        if(1 /*(guru_ig & 1) || testing_ig */) {
+          disp_set_display(1);
+          dia_message("Could not find the SuSE Linux 6.4 installation CD.\n\nActivating manual setup program.\n", MSGTYPE_INFO);
+        }
+      }
+#endif
+
+    util_print_banner ();
+
+    /* note: for auto2, file_read_info() is called inside auto2_init() */
     if (auto_ig)
         file_read_info ();
 
-    if (language_ig == LANG_UNDEF)
+    if (!auto2_ig && language_ig == LANG_UNDEF)
         set_choose_language ();
 
     util_print_banner ();
-    set_choose_display ();
-    util_print_banner ();
+
+    deb_int(color_ig);
+
+    if (!color_ig)	/* if it hasn't already been set */
+        {
+        set_choose_display ();
+        util_print_banner ();
+        }
+
     if (!serial_ig)
         set_choose_keytable ();
 
     util_update_kernellog ();
+
     (void) net_setup_localhost ();
     }
 

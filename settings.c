@@ -164,7 +164,7 @@ void set_choose_display (void)
     int      width_ii = 30;
 
 
-    if (auto_ig)
+    if (auto_ig || auto2_ig)
         {
         disp_set_display (color_ig ? 1 : 2);
         return;
@@ -191,7 +191,7 @@ void set_choose_keytable (void)
     char    command_ti [MAX_FILENAME];
 
 
-    if (auto_ig)
+    if (auto_ig || auto2_ig)
         {
         if (!keymap_tg [0])
             strcpy (keymap_tg, set_keymaps_arm [0].mapname);

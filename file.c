@@ -58,6 +58,10 @@ static const char  *file_txt_ftp_proxy_tm      = "FTP-Proxy:";
 static const char  *file_txt_ftp_proxy_port_tm = "FTP-Proxyport:";
 static const char  *file_txt_autoprobe_tm      = "autoprobe";
 static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
+#ifdef USE_LIBHD
+static const char  *file_txt_mouse_dev_tm      = "Mouse-Device:";
+static const char  *file_txt_mouse_type_tm     = "Mouse-Type:";
+#endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
 static void file_trim_buffer (char *buffer_tr);
@@ -76,7 +80,7 @@ void file_write_yast_info (void)
         return;
         }
 
-    set_write_info (file_pri);
+    if(!auto2_ig) set_write_info (file_pri);
 
     strcpy (line_ti, file_txt_sourcemount_tm);
     if (!ramdisk_ig)
@@ -92,7 +96,7 @@ void file_write_yast_info (void)
         strcat (line_ti, " Mono\n");
     fprintf (file_pri, line_ti);
 
-    if (keymap_tg [0])
+    if (keymap_tg [0] && !auto2_ig)
         fprintf (file_pri, "%s %s\n", file_txt_keymap_tm, keymap_tg);
     if (cdrom_tg [0])
         fprintf (file_pri, "%s %s\n", file_txt_cdrom_tm, cdrom_tg);
@@ -198,6 +202,14 @@ void file_write_yast_info (void)
     else
         fprintf (file_pri, "SMP: 0\n");
 
+#ifdef USE_LIBHD
+    if (mouse_dev_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_mouse_dev_tm, mouse_dev_ig);
+
+    if (mouse_type_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_mouse_type_tm, mouse_type_ig);
+#endif
+
     fclose (file_pri);
 
     file_pri = fopen ("/etc/mtab", "w");
@@ -244,11 +256,20 @@ int file_read_info (void)
     int       start_pcmcia_ii = FALSE;
 
 
-    dia_info (&win_ri, txt_get (TXT_SEARCH_INFOFILE));
-    if (util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
+    if(auto2_ig)
+        {
+        printf("%s...", txt_get (TXT_SEARCH_INFOFILE));
+        fflush(stdout);
+        }
+    else
+        {
+        dia_info (&win_ri, txt_get (TXT_SEARCH_INFOFILE));
+        }
+
+    if (!has_floppy_ig || util_try_mount ("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
         if (util_try_mount (floppy_tg, mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0))
             {
-            win_close (&win_ri);
+            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
             return (-1);
             }
 
@@ -261,14 +282,16 @@ int file_read_info (void)
         if (!fd_pri)
             {
             umount (mountpoint_tg);
-            win_close (&win_ri);
+            if(auto2_ig) printf ("\n"); else win_close (&win_ri);
             return (-1);
             }
         }
 
+    valid_net_config_ig = 0;
+
     while (fgets (buffer_ti, sizeof (buffer_ti) - 1, fd_pri))
         {
-        fprintf (stderr, buffer_ti);
+        fprintf (stderr, "%s", buffer_ti);
         file_trim_buffer (buffer_ti);
 
         if (!strncasecmp (buffer_ti, "insmod", 6))
@@ -326,27 +349,30 @@ int file_read_info (void)
 
         if (!strncasecmp (file_txt_ip_tm, buffer_ti,
                           strlen (file_txt_ip_tm)))
-            (void) net_check_address (value_ti, &ipaddr_rg);
+            if (!net_check_address (value_ti, &ipaddr_rg)) valid_net_config_ig |= 1;
 
         if (!strncasecmp (file_txt_netmask_tm, buffer_ti,
                           strlen (file_txt_netmask_tm)))
-            (void) net_check_address (value_ti, &netmask_rg);
+            if (!net_check_address (value_ti, &netmask_rg)) valid_net_config_ig |= 2;
 
         if (!strncasecmp (file_txt_gateway_tm, buffer_ti,
                           strlen (file_txt_gateway_tm)))
-            (void) net_check_address (value_ti, &gateway_rg);
+            if (!net_check_address (value_ti, &gateway_rg)) valid_net_config_ig |= 4;
 
         if (!strncasecmp (file_txt_server_tm, buffer_ti,
                           strlen (file_txt_server_tm)))
-            (void) net_check_address (value_ti, &nfs_server_rg);
+            if (!net_check_address (value_ti, &nfs_server_rg)) valid_net_config_ig |= 8;
 
         if (!strncasecmp (file_txt_dnsserver_tm, buffer_ti,
                           strlen (file_txt_dnsserver_tm)))
-            (void) net_check_address (value_ti, &nameserver_rg);
+            if (!net_check_address (value_ti, &nameserver_rg)) valid_net_config_ig |= 0x10;
 
         if (!strncasecmp (file_txt_serverdir_tm, buffer_ti,
                           strlen (file_txt_serverdir_tm)))
+            {
             strncpy (server_dir_tg, value_ti, sizeof (server_dir_tg));
+            valid_net_config_ig |= 0x20;
+            }
 
         if (!strncasecmp (file_txt_netdevice_tm, buffer_ti,
                           strlen (file_txt_netdevice_tm)))
@@ -359,7 +385,7 @@ int file_read_info (void)
 
     fclose (fd_pri);
     umount (mountpoint_tg);
-    win_close (&win_ri);
+    if(auto2_ig) printf ("\n"); else win_close (&win_ri);
 
     if (do_autoprobe_ii)
         mod_autoload ();

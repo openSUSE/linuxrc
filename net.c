@@ -42,10 +42,10 @@
 
 #define MAX_NETDEVICE      10
 
-static int  net_is_plip_im = FALSE;
-static int  net_is_configured_im = FALSE;
+int net_is_configured_im = FALSE;
 
-static int  net_activate         (void);
+static int  net_is_plip_im = FALSE;
+
 static int  net_choose_device    (void);
 static void net_show_error       (enum nfs_stat status_rv);
 static void net_setup_nameserver (void);
@@ -198,7 +198,7 @@ int net_setup_localhost (void)
     }
 
 
-static int net_activate (void)
+int net_activate (void)
     {
     int                 socket_ii;
     struct ifreq        interface_ri;

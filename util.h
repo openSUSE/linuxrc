@@ -38,3 +38,5 @@ extern void util_print_ftp_error  (int error_iv);
 extern void util_free_ramdisk     (char *ramdisk_dev_tv);
 extern int  util_open_ftp         (char *server_tv);
 extern int  util_cd1_boot         (void);
+
+extern int  util_umount           (char *mountpoint);

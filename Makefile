@@ -10,6 +10,9 @@ CFLAGS	= -O2 -fomit-frame-pointer -c -I$(TOPDIR) $(EXTRA_FLAGS)
 LDFLAGS	= -static -Wl,-Map=linuxrc.map -lhd
 WARN	= -Wstrict-prototypes -Wall
 
+# use this to get a linuxrc that uses the libhd *
+EXTRA_FLAGS	= -DUSE_LIBHD
+
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)

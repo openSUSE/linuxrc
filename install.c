@@ -40,6 +40,7 @@
 #include "file.h"
 #include "info.h"
 #include "ftp.h"
+#include "install.h"
 
 #define YAST_INFO_FILE  "/etc/yast.inf"
 
@@ -62,7 +63,6 @@ static int   inst_execute_yast     (void);
 static int   inst_check_floppy     (void);
 static int   inst_commit_install   (void);
 static int   inst_choose_source    (void);
-static int   inst_check_instsys    (void);
 static int   inst_choose_source_cb (int what_iv);
 static int   inst_menu_cb          (int what_iv);
 static int   inst_init_cache       (void);
@@ -515,7 +515,7 @@ static int inst_mount_harddisk (void)
     }
 
 
-static int inst_check_instsys (void)
+int inst_check_instsys (void)
     {
     char  filename_ti [MAX_FILENAME];
     char *instsys_loop_ti = "/suse/setup/inst-img";
@@ -669,6 +669,7 @@ static int inst_prepare (void)
                           "/etc/gshadow",
                           "/etc/rpmrc",
                           "/etc/inputrc",
+                          "/etc/ld.so.conf",
                           "/etc/ld.so.cache",
                           "/etc/host.conf",
                           "/bin",
@@ -731,47 +732,66 @@ static int inst_execute_yast (void)
     if (rc_ii)
         return (rc_ii);
 
-    dia_status_on (&status_ri, txt_get (TXT_START_YAST));
+    if(!auto2_ig) dia_status_on (&status_ri, txt_get (TXT_START_YAST));
     system ("update");
 
-    while (i_ii < 50)
+    if(!auto2_ig) while (i_ii < 50)
         {
         dia_status (&status_ri, i_ii++);
         usleep (10000);
         }
 
     inst_start_shell ("/dev/tty2");
-    if (memory_ig < 6500000)
-        dia_message (txt_get (TXT_LITTLE_MEM), MSGTYPE_ERROR);
+    if (memory_ig < MEM_LIMIT_SWAP_MSG)
+        if(!auto2_ig) dia_message (txt_get (TXT_LITTLE_MEM), MSGTYPE_ERROR);
     else
         {
         inst_start_shell ("/dev/tty5");
         inst_start_shell ("/dev/tty6");
         }
 
-    while (i_ii <= 100)
+    if(!auto2_ig) while (i_ii <= 100)
         {
         dia_status (&status_ri, i_ii++);
         usleep (10000);
         }
 
-    win_close (&status_ri);
+    if(!auto2_ig) win_close (&status_ri);
     disp_set_color (COL_WHITE, COL_BLACK);
+    if(auto2_ig) printf("\033[H\033[J");	/* clear screen */
     fflush (stdout);
 
-    sprintf (command_ti, "/sbin/YaST %s", auto_ig ? "--autofloppy" : " ");
+    if(yast_version_ig == 2)
+        sprintf (command_ti, "/lib/YaST2/bin/YaST2.start %s", auto_ig ? "--autofloppy" : "");
+    else
+        sprintf (command_ti, "/sbin/YaST%s", auto_ig ? " --autofloppy" : "");
+    fprintf (stderr, "starting \"%s\"\n", command_ti);
     rc_ii = system (command_ti);
-    fprintf (stderr, "YaST return code is %d (errno = %d)\n", rc_ii, errno);
+    fprintf (stderr, "%s return code is %d (errno = %d)\n", command_ti, rc_ii, rc_ii ? errno : 0);
+
+#ifdef LXRC_DEBUG
+    if((guru_ig & 2)) { printf("a shell for you...\n"); system("/bin/sh"); }
+#endif
 
     sync ();
-    disp_restore_screen ();
+    if(!auto2_ig) disp_restore_screen ();
     disp_cursor_off ();
     kbd_reset ();
 
     if (rc_ii)
+        {
+        if (auto2_ig)
+            {
+            auto2_ig = 0;
+            for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
+            disp_cursor_off();
+            util_print_banner();
+            }
+        
         dia_message (txt_get (TXT_ERROR_INSTALL), MSGTYPE_ERROR);
+        }
 
-    lxrc_killall ();
+    lxrc_killall (0);
 
     waitpid (-1, NULL, WNOHANG);
 
@@ -787,6 +807,8 @@ static int inst_execute_yast (void)
 
     unlink ("/bin");
     rename ("/.bin", "/bin");
+
+    auto2_ig = FALSE;
 
     return (rc_ii);
     }
@@ -878,7 +900,7 @@ static int inst_commit_install (void)
                     win_close (&win_ri);
                     }
                 else
-                    dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
+                    if(!auto2_ig) dia_message (txt_get (TXT_INSTALL_SUCCESS), MSGTYPE_INFO);
                 }
             }
         }
@@ -911,7 +933,7 @@ static int inst_init_cache (void)
     int       read_ii;
 
 
-    if (memory_ig < 15000000)
+    if (memory_ig < MEM_LIMIT_CACHE_LIBS)
         return (0);
 
     dia_status_on (&status_ri, txt_get (TXT_PREPARE_INST));
@@ -1026,7 +1048,7 @@ static int inst_ftp (void)
     window_t  win_ri;
 
     
-    if (!inst_rescue_im && memory_ig < 30000000)
+    if (!inst_rescue_im && memory_ig <= (yast_version_ig == 2 ? MEM_LIMIT2_RAMDISK : MEM_LIMIT1_RAMDISK))
         {
         (void) dia_message (txt_get (TXT_NOMEM_FTP), MSGTYPE_ERROR);
         return (-1);
@@ -1167,3 +1189,34 @@ static int inst_get_ftpsetup (void)
 
     return (0);
     }
+
+
+
+#ifdef USE_LIBHD
+
+int inst_auto2_install()
+{
+  int i;
+
+  deb_msg("going for automatic install");
+
+  if(ramdisk_ig) {
+    deb_msg("using RAM disk");   
+   
+    i = root_load_rootimage(inst_rootimage_tm);
+    fprintf(stderr, "Loading of rootimage returns %d\n", i);
+//    umount(mountpoint_tg);
+    umount(inst_mountpoint_tg);
+
+    if(i || inst_rescue_im) return i;
+
+    mkdir(inst_mountpoint_tg, 0777);
+    i = util_try_mount(RAMDISK_2, inst_mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0);
+    fprintf(stderr, "Mounting of %s returns %d\n", inst_mountpoint_tg, i);
+    if(i) return i;
+  }
+
+  return inst_execute_yast();
+}
+
+#endif	/* USE_LIBHD */

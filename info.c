@@ -25,8 +25,12 @@
 #include "module.h"
 #include "display.h"
 #include "info.h"
+#include "auto2.h"
 
 static char *info_hwfile_tm = "/tmp/hwinfo";
+#ifdef USE_LIBHD
+static char *info_hwfile2_tm = "/tmp/hw.log";
+#endif
 typedef struct {
                int  text;
                char *file;
@@ -47,13 +51,24 @@ static int  info_show_cb   (int what_iv);
 
 void info_menu (void)
     {
+#ifdef USE_LIBHD
+    item_t  items_ari [12];
+#else
     item_t  items_ari [11];
+#endif
     int     i_ii;
     int     width_ii = 26;
     int     nr_items_ii = 0;
 
+#ifdef USE_LIBHD
+    util_create_items (items_ari, 12, width_ii);
+#else
     util_create_items (items_ari, 11, width_ii);
+#endif
 
+#ifdef USE_LIBHD
+    strncpy (items_ari [nr_items_ii++].text, "Hardware Autoprobing", width_ii);
+#endif
     strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_INFO_KERNEL), width_ii);
     strncpy (items_ari [nr_items_ii++].text, txt_get (TXT_DRIVES), width_ii);
     for (i_ii = 0;
@@ -71,7 +86,11 @@ void info_menu (void)
     (void) dia_menu (txt_get (TXT_MENU_INFO), items_ari,
                      nr_items_ii, 1);
 
+#ifdef USE_LIBHD
+    util_free_items (items_ari, 12);
+#else
     util_free_items (items_ari, 11);
+#endif
     }
 
 
@@ -130,7 +149,7 @@ void info_init (void)
         return;
         }
 
-    sscanf (line_ti, "%s %d", dummy_ti, &memory_ig);
+    sscanf (line_ti, "%s %"PRId64, dummy_ti, &memory_ig);
 
     fclose (fd_pri);
 
@@ -138,7 +157,7 @@ void info_init (void)
     if (*(utsinfo_ri.release + 2) > '0')
         old_kernel_ig = FALSE;
 
-    fprintf (stderr, "CPU: %d, BogoMips: %d, Memory: %d, %skernel\n",
+    fprintf (stderr, "CPU: %d, BogoMips: %d, Memory: %"PRId64", %skernel\n",
              cpu_ig, bogomips_ig, memory_ig, old_kernel_ig ? "Old " : "New ");
 
     /* Check for LS-120 */
@@ -393,15 +412,26 @@ static int info_show_cb (int what_iv)
     int   rc_ii;
 
 
+#ifndef USE_LIBHD
+    what_iv++;
+#endif
+
     if (what_iv == 1)
-        (void) dia_show_file (txt_get (TXT_INFO_KERNEL), kernellog_tg, FALSE);
-    else if (what_iv == 2)
-        info_show_hardware ();
-    else if (what_iv > 2 &&
-             what_iv <= sizeof (info_file_arm) / sizeof (info_file_arm [0]) + 2)
         {
-        sprintf (tmp_ti, "/proc/%s", info_file_arm [what_iv - 3].file);
-        rc_ii = dia_show_file (txt_get (info_file_arm [what_iv - 3].text),
+#ifdef USE_LIBHD
+        auto2_scan_hardware(info_hwfile2_tm);
+        dia_show_file("Hardware Autoprobing Results", info_hwfile2_tm, TRUE);
+#endif
+        }
+    else if (what_iv == 2)
+        (void) dia_show_file (txt_get (TXT_INFO_KERNEL), kernellog_tg, FALSE);
+    else if (what_iv == 3)
+        info_show_hardware ();
+    else if (what_iv > 3 &&
+             what_iv <= sizeof (info_file_arm) / sizeof (info_file_arm [0]) + 3)
+        {
+        sprintf (tmp_ti, "/proc/%s", info_file_arm [what_iv - 4].file);
+        rc_ii = dia_show_file (txt_get (info_file_arm [what_iv - 4].text),
                                tmp_ti, FALSE);
         if (rc_ii)
             (void) dia_message (txt_get (TXT_NO_INFO_AVAIL), MSGTYPE_INFO);

@@ -302,7 +302,7 @@ int mod_load_module (char *module_tv, char *params_tv)
     int   rc_ii;
 
 
-    sprintf (command_ti, "insmod %s/%s.o ", mod_modpath_tm, module_tv);
+    sprintf (command_ti, "insmod %s ", module_tv);
     if (params_tv && params_tv [0])
         strcat (command_ti, params_tv);
 
@@ -570,6 +570,8 @@ void mod_init (void)
     {
     static int   core_loaded_is = FALSE;
            char *core_modules_ati [] = {
+                                       "nvram",
+                                       "serial",
                                        "8390"
                                        };
            int   i_ii;
@@ -578,6 +580,7 @@ void mod_init (void)
 
     if (!core_loaded_is)
         {
+        setenv("MODPATH", mod_modpath_tm, 1);
         for (i_ii = 0;
              i_ii < sizeof (core_modules_ati) / sizeof (core_modules_ati [0]);
              i_ii++)

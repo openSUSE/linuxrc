@@ -454,6 +454,7 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     window_t  tmp_win_ri;
     char      tmp_txt_ti [STATUS_SIZE + 1];
 
+    if(auto2_ig) { printf("%s", txt_tv); return; }
 
     disp_toggle_output (DISP_OFF);
     strncpy (tmp_txt_ti, txt_tv, STATUS_SIZE);
@@ -509,6 +510,19 @@ void dia_status (window_t *win_prv, int percent_iv)
     {
     char line_ti [STATUS_SIZE + 1];
     int  i_ii;
+    static unsigned count = 0;
+
+    if(auto2_ig) {
+      if(percent_iv >= 100) {
+        printf(".");
+      }
+      else {
+        if(!(count & 3)) printf(".");
+      }
+      count++;
+      fflush(stdout);
+      return;
+    }
 
     if (percent_iv > 100)
         percent_iv = 100;

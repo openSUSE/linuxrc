@@ -267,6 +267,7 @@ void util_print_banner (void)
     char           text_ti [MAX_X];
     struct utsname utsinfo_ri;
 
+    if(auto2_ig) return;
 
     memset (&win_ri, 0, sizeof (window_t));
     win_ri.x_left = 1;
@@ -297,7 +298,7 @@ void util_print_banner (void)
     win_open (&win_ri);
 
     uname (&utsinfo_ri);
-    sprintf (text_ti, ">>> Linuxrc v1.0b (Kernel %s) (c) 1996-2000 SuSE GmbH <<<",
+    sprintf (text_ti, ">>> Linuxrc v" LXRC_VERSION " (Kernel %s) (c) 1996-2000 SuSE GmbH <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
@@ -500,3 +501,24 @@ int util_cd1_boot (void)
     else
         return (FALSE);
     }
+
+
+/*
+ * umount() with error message
+ */
+int util_umount(char *mp)
+{
+#ifdef LXRC_DEBUG
+  int i;
+
+  if((i = umount(mp)))
+    fprintf(stderr, "umount(%s) failed: %d\n", mp, errno);
+  else
+    fprintf(stderr, "umount(%s) ok\n", mp);
+
+  return i;
+#else
+  return umount(mp);
+#endif
+}
+

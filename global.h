@@ -8,6 +8,20 @@
 
 
 #include <netinet/in.h>
+#include <inttypes.h>
+
+#ifdef LINUXRC_AXP
+#define MEM_LIMIT1_RAMDISK	50000000
+#define MEM_LIMIT2_RAMDISK	50000000
+#else
+#define MEM_LIMIT1_RAMDISK	30000000
+#define MEM_LIMIT2_RAMDISK	47000000
+#endif
+#define MEM_LIMIT_SWAP_MSG	 6500000
+#define MEM_LIMIT_CACHE_LIBS	15000000
+#define MEM_LIMIT_YAST2		12000000
+
+#define LXRC_VERSION	"1.0.1b"
 
 #ifndef TRUE
 #define TRUE               1
@@ -32,6 +46,20 @@
 #define BOOTMODE_NET       2
 #define BOOTMODE_HARDDISK  3
 #define BOOTMODE_FTP       4
+
+#define	LXRC_DEBUG
+
+#ifdef LXRC_DEBUG
+# define deb_wait if((guru_ig & 4)) printf(__FUNCTION__ ":%d: Press a key...\n", __LINE__), getchar()
+# define deb_msg(a) fprintf(stderr, __FUNCTION__ ":%u %s\n", __LINE__, a)
+# define deb_str(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = \"%s\"\n", __LINE__, a)
+# define deb_int(a) fprintf(stderr, __FUNCTION__ ":%u " #a " = %d\n", __LINE__, a)
+#else
+# define deb_wait
+# define deb_msg(a)
+# define deb_str(a)
+# define deb_int(a)
+#endif
 
 enum langid_t
     {
@@ -144,13 +172,14 @@ extern char            keymap_tg [30];
 extern int             bootmode_ig;
 extern int             pcmcia_chip_ig;
 extern int             bogomips_ig;
-extern int             memory_ig;
+extern uint64_t        memory_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
 extern int             ramdisk_ig;
 extern int             explode_win_ig;
 extern int             auto_ig;
 extern int             demo_ig;
+extern int             auto2_ig;
 extern int             color_ig;
 extern int             nfsport_ig;
 extern char            machine_name_tg [100];
@@ -168,3 +197,12 @@ extern char            ppcd_tg [10];
 extern int             serial_ig;
 extern char            console_tg [30];
 extern int             smp_ig;
+extern int             guru_ig;
+extern int             text_mode_ig;
+extern int             yast2_update_ig;
+extern int             has_floppy_ig;
+extern unsigned        frame_buffer_mode_ig;
+extern char            *mouse_type_ig;
+extern char            *mouse_dev_ig;
+extern int             yast_version_ig;
+extern int             valid_net_config_ig;

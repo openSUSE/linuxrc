@@ -129,7 +129,7 @@ int root_load_rootimage (char *infile_tv)
     int   socket_ii = -1;
 
 
-    fprintf (stderr, "Loading Image »%s«...\n", infile_tv);
+    fprintf (stderr, "Loading Image »%s«%s\n", infile_tv, auto2_ig ? "" : "...");
     mod_free_modules ();
     if (bootmode_ig == BOOTMODE_FLOPPY || bootmode_ig == BOOTMODE_FTP)
         {
@@ -138,7 +138,7 @@ int root_load_rootimage (char *infile_tv)
         else
             root_nr_blocks_im = (int) ((11151L * 1024L) / BLOCKSIZE);
         compressed_ii = TRUE;
-        sprintf (buffer_ti, "%s...", txt_get (TXT_LOADING));
+        sprintf (buffer_ti, "%s%s", txt_get (TXT_LOADING), auto2_ig ? "" : "...");
         }
     else
         {
@@ -151,8 +151,9 @@ int root_load_rootimage (char *infile_tv)
 
         root_nr_blocks_im = (int) (filesize_li / BLOCKSIZE);
 
-        sprintf (buffer_ti, "%s (%d kB)...", txt_get (TXT_LOADING),
-                 (int) ((long) root_nr_blocks_im * BLOCKSIZE / 1024L));
+        sprintf (buffer_ti, "%s (%d kB)%s", txt_get (TXT_LOADING),
+                 (int) ((long) root_nr_blocks_im * BLOCKSIZE / 1024L),
+                 auto2_ig ? "" : "...");
         }
 
     dia_status_on (&root_status_win_rm, buffer_ti);

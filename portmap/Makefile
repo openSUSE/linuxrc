@@ -13,7 +13,7 @@ dep:    $(SRC) $(INC)
 	$(CC) -M $(CFLAGS) $(SRC) > .depend
 
 clean:
-	rm $(TARGET) *.o
+	rm -f $(TARGET) *.o
 
 %.o:    %.c
 	$(CC) $(CFLAGS) -o $@ $<
