@@ -170,7 +170,7 @@ static keymap_t set_keymaps_arm [] =
 { "Magyar (PS/2)",               "hu"              },
 { "Nederlands (PS/2)",           "nl"              },
 { "Norway (PS/2)",               "no-latin1"       },
-{ "Norway (Sun Type5)",          "sunt4-no-lotin1" },
+{ "Norway (Sun Type5)",          "sunt4-no-latin1" },
 { "Polski (PS/2)",               "Pl02"            },
 { "Português (PS/2)",            "pt-latin1"       },
 { "Português Brasileiro (PS/2)", "br-abnt2"        },
@@ -179,6 +179,7 @@ static keymap_t set_keymaps_arm [] =
 { "Ceske (PS/2)",                "cz-us-qwertz"    },
 { "Dansk (PS/2)",                "dk"              },
 { "Suomi/Svensk (PS/2)",         "fi"              },
+{ "Suomi/Svensk (Sun Type4)",    "sunt4-fi-latin1" },
 { "Suomi/Svensk (Sun Type5)",    "sunt5-fi-latin1" },
 { "Slovak",                      "sk-qwerty"       }
 };
