@@ -150,6 +150,7 @@ enum modid_t
     ID_OLYMPIC,
     ID_RRUNNER,
     ID_SIS900,
+    ID_STARFIRE,
 
     /* Yea, another comment ;) */
     /* SPARC - network */
