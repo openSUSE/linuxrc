@@ -2,7 +2,7 @@
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
+ * Copyright (c) 1996-2003  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
  *
  */
 
@@ -131,6 +131,7 @@ static struct {
   { "wget",        util_wget_main        },
   { "fstype",      util_fstype_main      },
   { "modprobe",    util_modprobe_main    },
+  { "usbscsi",     util_usbscsi_main     },
   { "nothing",     util_nothing_main     }
 };
 #endif
@@ -616,9 +617,7 @@ void lxrc_catch_signal(int signum)
 void lxrc_init()
 {
   int i;
-#ifdef __i386__
   int j;
-#endif
   file_t *ft;
   char *s, *t0, *t, buf[256];
   url_t *url;
@@ -657,11 +656,12 @@ void lxrc_init()
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("/sbin/inst_setup yast");
+  config.updatedir = strdup("/linux/suse/" LX_ARCH "-" LX_REL);
 
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;
-  config.net.dhcp_timeout = 60;
+  config.net.dhcp_timeout = 90;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
 
@@ -673,6 +673,13 @@ void lxrc_init()
   config.usbwait = 4;		/* 4 seconds */
 
   config.hwdetect = 1;
+
+  // default memory limits for i386 version
+  config.memory.min_free =       12 * 1024;
+  config.memory.min_yast_text =  32 * 1024;
+  config.memory.min_yast =       40 * 1024;
+  config.memory.min_modules =    64 * 1024;
+  config.memory.load_image =    200 * 1024;
 
   /* make auto mode default */
   if(config.test || config.had_segv) {
@@ -700,7 +707,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2002 SuSE Linux AG <<<\n",
+      ">>> %s installation program v" LXRC_VERSION " (c) 1996-2003 SuSE Linux AG <<<\n",
       config.product
     );
     if (config.linemode)
@@ -750,6 +757,18 @@ void lxrc_init()
 
   ft = file_get_cmdline(key_linemode);
   if(ft && ft->is.numeric) config.linemode = ft->nvalue;
+
+  ft = file_get_cmdline(key_usbwait);
+  if(ft && ft->is.numeric) config.usbwait = ft->nvalue;
+
+  ft = file_get_cmdline(key_scsibeforeusb);
+  if(ft && ft->is.numeric) config.scsi_before_usb = ft->nvalue;
+
+  ft = file_get_cmdline(key_useusbscsi);
+  if(ft && ft->is.numeric) config.use_usbscsi = ft->nvalue;
+
+  ft = file_get_cmdline(key_lxrcdebug);
+  if(ft && ft->is.numeric) config.debug = ft->nvalue;
 
   ft = file_get_cmdline(key_linuxrc);
   str_copy(&config.linuxrc, ft ? ft->value : getenv("linuxrc"));
@@ -854,18 +873,11 @@ void lxrc_init()
 
   util_free_mem();
 
-  // default memory limits for i386 version
-  config.memory.min_free =       12 * 1024;
-  config.memory.min_yast_text =  32 * 1024;
-  config.memory.min_yast =       40 * 1024;
-  config.memory.min_modules =    64 * 1024;
-  config.memory.load_image =    200 * 1024;
-
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;
   }
 
-  if(config.memory.free > config.memory.load_image) force_ri_ig = 1;
+  force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
 
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");
@@ -921,7 +933,6 @@ void lxrc_init()
 
       util_disp_init();
 
-#ifdef __i386__
       i = 0;
       j = 1;
       if(config.insttype == inst_cdrom && cdrom_drives && !config.demo) {
@@ -951,8 +962,6 @@ void lxrc_init()
           dia_message(buf, MSGTYPE_ERROR);
         }
       }
-#endif
-
     }
   }
 #endif
