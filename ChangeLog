@@ -1,3 +1,8 @@
+27/5/2002:	v1.3.35
+	- added 'ProxyProto' entry to install.inf
+	- ask for http proxy
+	- ftp proxy is proxy via http per default
+
 23/5/2002:	v1.3.34
 	- let 'NetDevice' option cooperate with auto install
 
