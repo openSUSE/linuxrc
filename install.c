@@ -494,7 +494,7 @@ static int inst_mount_nfs (void)
 static int inst_mount_harddisk (void)
     {
             int   rc_ii;
-    static  char *fs_types_ati [] = { "msdos", "hpfs", "ext2", 0 };
+    static  char *fs_types_ati [] = { "msdos", "reiserfs", "hpfs", "ext2", 0 };
             int   i_ii;
             char *mountpoint_pci;
 
@@ -502,7 +502,7 @@ static int inst_mount_harddisk (void)
     bootmode_ig = BOOTMODE_HARDDISK;
     do
         {
-        rc_ii = dia_input (txt_get (TXT_ENTER_PARTITION), harddisk_tg, 11, 11);
+        rc_ii = dia_input (txt_get (TXT_ENTER_PARTITION), harddisk_tg, 17, 17);
         if (rc_ii)
             return (rc_ii);
 
