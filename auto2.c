@@ -49,6 +49,8 @@ static int auto2_driver_is_active(driver_info_t *di);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
+static void auto2_find_mouse(void);
+static void auto2_find_braille(void);
 static int auto2_get_probe_env(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 
@@ -176,9 +178,9 @@ void auto2_scan_hardware(char *log_file)
 
   j = ju = 0;
   for(hd = hd_data->hd; hd; hd = hd->next) {
+    if(hd->base_class == bc_mouse && hd->bus == bus_usb) j++;
     if(hd->base_class == bc_keyboard) {
       has_kbd_ig = TRUE;
-      j++;
       if(hd->bus == bus_usb) ju++;
       di = hd_driver_info(hd_data, hd);
       if(di && di->any.type == di_kbd) {
@@ -192,8 +194,8 @@ void auto2_scan_hardware(char *log_file)
     }
   }
 
-  /* usb keyboard only ? */
-  if((j && j == ju) && usb_mod && *usb_mod) {
+  /* usb keyboard or mouse ? */
+  if((j || ju) && usb_mod && *usb_mod) {
     sprintf(usb_mods, "usbcore %s input hid keybdev mousedev", usb_mod);
     usb_mods_ig = usb_mods;
   }
@@ -503,6 +505,8 @@ int auto2_init()
 
   auto2_find_mouse();
 
+  auto2_find_braille();
+
   deb_int(valid_net_config_ig);
 
   if(bootmode_ig == BOOTMODE_CD) {
@@ -639,11 +643,11 @@ void auto2_find_mouse()
 
   for(di = NULL, hd = hd_data->hd; hd; hd = hd->next) {
     if(
-      hd->base_class == bc_mouse &&		/* is a mouse */
-      hd->unix_dev_name	&&			/* and has a device name */
-      (di = hd_driver_info(hd_data, hd)) &&	/* and has driver info... */
-      di->any.type == di_mouse &&		/* which is actually *mouse* info... */
-      (di->mouse.xf86 || di->mouse.gpm)		/* it's supported */
+      hd->base_class == bc_mouse &&             /* is a mouse */
+      hd->unix_dev_name &&                      /* and has a device name */
+      (di = hd_driver_info(hd_data, hd)) &&     /* and has driver info... */
+      di->any.type == di_mouse &&               /* which is actually *mouse* info... */
+      (di->mouse.xf86 || di->mouse.gpm)         /* it's supported */
     ) {
       mouse_type_xf86_ig = strdup(di->mouse.xf86);
       mouse_type_gpm_ig = strdup(di->mouse.gpm);
@@ -653,6 +657,33 @@ void auto2_find_mouse()
     di = hd_free_driver_info(di);
 
     if(mouse_dev_ig) break;
+  }
+}
+
+
+/*
+ * Scans the hardware list for a braille display.
+ */
+void auto2_find_braille()
+{
+  hd_t *hd;
+  char *s;
+
+  if(!hd_data) return;
+
+  braille_ig = braille_dev_ig = NULL;
+
+  for(hd = hd_data->hd; hd; hd = hd->next) {
+    if(
+      hd->base_class == bc_braille &&		/* is a braille display */
+      hd->unix_dev_name	&&			/* and has a device name */
+      (s = hd_device_name(hd_data, hd->vend, hd->dev))
+    ) {
+      braille_ig = strdup(s);
+      braille_dev_ig = strdup(hd->unix_dev_name);
+
+      break;
+    }
   }
 }
 
@@ -821,7 +852,8 @@ char *auto2_xserver(char **version, char **busid)
   if(!hd_data) return NULL;
 
   hd = hd_get_device_by_idx(hd_data, hd_display_adapter(hd_data));
-  if(hd) sprintf(id, "%d:%d:%d", hd->slot >> 8, hd->slot & 0xff, hd->func);
+  if(hd && hd->bus == bus_pci)
+    sprintf(id, "%d:%d:%d", hd->slot >> 8, hd->slot & 0xff, hd->func);
 
   if(*display) return display;
 

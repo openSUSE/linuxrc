@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
-#define LXRC_VERSION  "1.1.11"
+#define LXRC_VERSION  "1.1.12"
 
 #ifdef LINUXRC_AXP
 #define MEM_LIMIT1_RAMDISK    50000000
@@ -235,3 +235,5 @@ extern char            xkblayout_tg [20];
 extern unsigned        yast2_color_ig;
 extern unsigned        action_ig;
 extern int             reboot_wait_ig;
+extern char            *braille_ig;
+extern char            *braille_dev_ig;

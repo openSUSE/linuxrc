@@ -92,6 +92,8 @@ static const char  *file_txt_xkblayout_tm      = "XkbLayout:";
 static const char  *file_txt_yast2_color_tm    = "YaST2color:";
 static const char  *file_txt_boot_disk_tm      = "BootDisk:";
 static const char  *file_txt_disks_tm          = "Disks:";
+static const char  *file_txt_braille_tm        = "Braille:";
+static const char  *file_txt_braille_dev_tm    = "Brailledevice:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
@@ -252,6 +254,11 @@ void file_write_yast_info (char *file_name)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_xf86_tm, mouse_type_xf86_ig);
     if (mouse_type_gpm_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_gpm_tm, mouse_type_gpm_ig);
+
+    if (braille_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_braille_tm, braille_ig);
+    if (braille_dev_ig)
+        fprintf (file_pri, "%s %s\n", file_txt_braille_dev_tm, braille_dev_ig);
 
     fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
     fprintf (file_pri, "%s %d\n", file_txt_has_kbd_tm, has_kbd_ig);
