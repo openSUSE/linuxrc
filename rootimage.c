@@ -133,7 +133,7 @@ int ramdisk_write(int rd, void *buf, int count)
 
   util_update_meminfo();
 
-  if(ask_for_swap(count, txt_get(TXT_LOW_MEMORY1))) return -1;
+  if(ask_for_swap((count + 0x3ff) >> 10, txt_get(TXT_LOW_MEMORY1))) return -1;
 
   i = write(config.ramdisk[rd].fd, buf, count);
 
@@ -187,7 +187,7 @@ int ramdisk_mount(int rd, char *dir)
  * Check if we still have enough free memory for 'size'. If not, ask user
  * for more swap.
  *
- * size: in bytes!
+ * size: in kbytes!
  *
  * return: 0 ok, -1 error
  */
@@ -197,8 +197,6 @@ int ask_for_swap(int size, char *msg)
   char tmp[256];
   char *partition = NULL;
   char *argv[] = { NULL, tmp };
-
-  size >>= 10;
 
   if(config.memory.current >= config.memory.min_free + size) return 0;
 
@@ -375,7 +373,7 @@ int load_image(char *file_name, instmode_t mode)
   }
 
   if(got_size) {
-    if(ask_for_swap(root_nr_blocks_im * BLOCKSIZE, txt_get(TXT_LOW_MEMORY1))) {
+    if(ask_for_swap(root_nr_blocks_im * (BLOCKSIZE >> 10), txt_get(TXT_LOW_MEMORY1))) {
       net_close(fd_read);
       ramdisk_free(image.rd);
       return image.rd = -1;

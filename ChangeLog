@@ -1,3 +1,7 @@
+23/6/2004:	v1.6.35
+	- use kbyte in ask_for_swap() to avoid 4GB trouble (#42182)
+	- set escdelay to 250ms (#42317)
+
 17/6/2004:	v1.6.34
 	- netsetup=0 turns off *all* net setup dialogs (#41664)
 	- url scheme 'file' was treated as network install (#41664)

@@ -656,7 +656,7 @@ void lxrc_init()
   config.addswap = 1;
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */
-  config.escdelay = 25;		/* 25 ms */
+  config.escdelay = 250;	/* 250 ms */
 
   config.hwdetect = 1;
 
