@@ -971,7 +971,8 @@ int inst_execute_yast()
 
   ask_for_swap(
     (config.memory.min_yast - config.memory.min_free) << 10,
-    "Not enough memory for YaST, bla bla..."
+    "Not enough memory for YaST.\n"
+    "(We're still checking memory limits, so don't panic if you have a 64MB system!)"
   );
 
   i = 0;
@@ -979,14 +980,20 @@ int inst_execute_yast()
   util_free_mem();
   if(config.memory.current < config.memory.min_yast) {
     if(!config.textmode) {
+      int win_old;
+      if(!(win_old = config.win)) util_disp_init();
       if(dia_yesno("Do you want to try the installation in text mode?", NO) != YES) i = 1;
+      if(!win_old) util_disp_done();
       if(!i) {
         config.textmode = 1;
         file_write_install_inf("");
       }
     }
     else {
+      int win_old;
+      if(!(win_old = config.win)) util_disp_init();
       if(dia_yesno("Do you want to start the installation anyway?", NO) != YES) i = 1;
+      if(!win_old) util_disp_done();
     }
   }
 

@@ -303,6 +303,7 @@ int ask_for_swap(int size, char *msg)
                "\n\n-- does not work yet --";
   char *txt4 = "Error activating swap space.";
   char *partition = NULL;
+  char *argv[] = { NULL, tmp };
 
   size >>= 10;
 
@@ -329,8 +330,8 @@ int ask_for_swap(int size, char *msg)
     if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt3)) break;
 
     if(partition) {
-      sprintf(tmp, "swapon /dev/%s", partition);
-      i = system(tmp);
+      sprintf(tmp, "/dev/%s", partition);
+      i = util_swapon_main(2, argv);
       if(i) {
         dia_message(txt4, MSGTYPE_ERROR);
       }
