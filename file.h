@@ -30,7 +30,7 @@ typedef enum {
   key_testmode, key_debugwait, key_auto, key_expert, key_rescue,
   key_rootimage, key_rescueimage, key_installdir, key_nopcmcia, key_vnc,
   key_vncpassword, key_usepivotroot, key_term, key_addswap,
-  key_fullnetsetup, key_aborted, key_memyasttext
+  key_fullnetsetup, key_aborted, key_memyasttext, key_netstop
 } file_key_t;
 
 typedef struct file_s {

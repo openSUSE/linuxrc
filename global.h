@@ -206,6 +206,7 @@ typedef struct {
   unsigned fullnetsetup:1;	/* offer all network protocols */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
+  unsigned netstop:1;		/* shut down network iface at end */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

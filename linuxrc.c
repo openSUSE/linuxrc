@@ -370,6 +370,11 @@ void lxrc_end (void)
     {
     int i;
 
+    if(config.netstop) {
+      util_debugwait("shut down network");
+      net_stop();
+    }
+
     util_debugwait("kill remaining procs");
 
     kill (lxrc_mempid_rm, 9);
@@ -606,6 +611,7 @@ void lxrc_init()
   config.color = 2;
   config.net.use_dhcp = 1;
   config.addswap = 1;
+  config.netstop = 1;
   yast_version_ig = 2;
 
   /* make auto mode default */

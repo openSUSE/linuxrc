@@ -4,6 +4,7 @@
 	- don't request module disk unless it would be really useful
 	- don't ask for swap unless we won't be able to run yast in text mode
 	- made search for installation system do less unexpected things
+	- shut down network interface before leaving linuxrc
 
 17/3/2002:	v1.3.24
 	- don't use tmpfs on systems < 32 MB

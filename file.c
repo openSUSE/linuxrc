@@ -152,6 +152,7 @@ static struct {
   { key_dhcptimeout,    "DHCPTimeout"      },
   { key_tftptimeout,    "TFTPTimeout"      },
   { key_tmpfs,          "_TmpFS"           },
+  { key_netstop,        "_NetStop"         },
   { key_testmode,       "_TestMode"        },
   { key_debugwait,      "_DebugWait"       },
   { key_auto,           "_Auto"            },
@@ -662,6 +663,10 @@ void file_do_info(file_t *f0)
 
       case key_tmpfs:
         if(f->is.numeric) config.tmpfs = f->nvalue;
+        break;
+
+      case key_netstop:
+        if(f->is.numeric) config.netstop = f->nvalue;
         break;
 
       case key_testmode:
