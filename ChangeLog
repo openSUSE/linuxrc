@@ -1,3 +1,7 @@
+1/12/2000:	v1.1.16.004
+	- there are problems with autoinstall & gateway setup on kernel 2.2.17;
+	  for now, no "Gateway:" entry should be used in "info"
+
 30/11/2000:	v1.1.16.003
 	- finally got font settings right
 	- cleaned up Makefile: create only one linuxrc now

@@ -588,7 +588,7 @@ int auto2_init()
     }
   }
 
-  if((valid_net_config_ig & 0x2f) != 0x2f) return FALSE;
+  if((valid_net_config_ig & 0x2b) != 0x2b) return FALSE;
 
   if(auto2_loaded_module) {
     free(auto2_loaded_module); auto2_loaded_module = NULL;
