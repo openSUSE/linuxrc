@@ -1,8 +1,8 @@
-static module_t mod_scsi_mod_arm [] = 
+static module_t mod_scsi_mod_arm [] =
 {
 { ID_AHA_2940,   "Adaptec 274x/284x/294x",             "aic7xxx",    0, __LINE__ },
 { ID_NCR_53C8XX, "NCR 53c8xx",                         "ncr53c8xx",  0, __LINE__ },
-{ ID_SYM_53C8XX, "Symbios 53c896",                     "sym53c8xx",  0, __LINE__ },
+{ ID_SYM_53C8XX, "Symbios 53c8xx",                     "sym53c8xx",  0, __LINE__ },
 { ID_BUSLOGIC,   "BusLogic",                           "BusLogic",   0, __LINE__ },
 { ID_ADVANSYS,   "AdvanSys",                           "advansys",   "asc_iopflag=1 asc_ioport=0x110", __LINE__ },
 { ID_GDTH,       "ICP Vortex GDTH Disk Array",         "gdth",       0, __LINE__ },
@@ -45,9 +45,10 @@ static module_t mod_scsi_mod_arm [] =
 { ID_PSI240I,    "PSI-240i",                           "psi240i",    0, __LINE__ },
 { ID_SYM53C416,  "Symbios 53C416",                     "sym53c416",  0, __LINE__ },
 { ID_SIM710,     "Simple 53c710 (Compaq, NCR)",        "sim710",     0, __LINE__ },
+{ ID_QLOGICPTI,  "PTI Qlogic ISP Driver",              "qlogicpti",  0, __LINE__ },
 };
 
-static module_t mod_cdrom_mod_arm [] = 
+static module_t mod_cdrom_mod_arm [] =
 {
 { ID_SBPCD,      "SBPCD (Matsushita/Panasonic etc.)",  "sbpcd",      "sbpcd=0x230,1", __LINE__ },
 { ID_MCD,        "Mitsumi (standard)",                 "mcd",        "mcd=0x300,10", __LINE__ },
@@ -140,6 +141,10 @@ static module_t mod_net_mod_arm [] =
 { ID_OLYMPIC,    "IBM Olympic chipset PCI Token Ring", "olympic",    0, __LINE__ },
 { ID_RRUNNER,    "Essential RoadRunner HIPPI",         "rrunner",    0, __LINE__ },
 { ID_SIS900,     "SiS 900 PCI Fast Ethernet",          "sis900",     0, __LINE__ },
+{ ID_MYRI_SBUS,  "MyriCOM Gigabit Ethernet",           "myri_sbus",  0, __LINE__ },
+{ ID_SUNBIGMAC,  "Sun BigMAC 10/100baseT",             "sunbmac",    0, __LINE__ },
+{ ID_SUNHAPPYMEAL, "Sun Happy Meal 10/100baseT",       "sunhme",     0, __LINE__ },
+{ ID_SUNQUADE,   "Sun QuadEthernet",                   "sunqe",      0, __LINE__ },
 };
 
 static enum modid_t mod_noauto_arm [] =
@@ -196,4 +201,3 @@ static enum modid_t mod_is_ppcd_arm [] =
   ID_ON20,
   ID_ON26
 };
-

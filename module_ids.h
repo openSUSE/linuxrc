@@ -140,6 +140,15 @@ enum modid_t
     ID_NI5010,
     ID_OLYMPIC,
     ID_RRUNNER,
-    ID_SIS900
-    };
+    ID_SIS900,
 
+    /* Yea, another comment ;) */
+    /* SPARC - network */
+    ID_MYRI_SBUS,
+    ID_SUNBIGMAC,
+    ID_SUNHAPPYMEAL,
+    ID_SUNQUADE,
+
+    /* SPARC - SCSI */
+    ID_QLOGICPTI
+    };
