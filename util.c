@@ -726,6 +726,9 @@ void add_driver_update(char *dir, char *loc)
 
   str_copy(&config.update.id, NULL);
 
+  /* module version may not match kernel exactly */
+  config.forceinsmod = 1;
+
   /* preliminary config file read just for the update id */
   strprintf(&buf1, "%s/dud.config", dir);
   ft0 = file_read_file(buf1, kf_cfg);

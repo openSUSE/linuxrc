@@ -1,3 +1,7 @@
+19/9/2003:	v1.5.18
+	- 'insmod -f' for driver updates
+	- keep 'console' boot option for grub config
+
 18/9/2003:	v1.5.17
 	- use hostip & netmask if they are already known
 	  in vnc & ssh setup (#30927)

@@ -1340,7 +1340,10 @@ void file_write_install_inf(char *dir)
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
   for(i = 0, ft = ft0; ft; ft = ft->next) {
-    if(ft->key == key_none) {
+    if(
+      ft->key == key_none ||
+      ft->key == key_console	/* keep serial console setting */
+    ) {
       fprintf(f, "%s%s", i ? " " : "Cmdline: ", ft->unparsed);
       i = 1;
     }
