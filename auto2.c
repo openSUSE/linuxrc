@@ -392,6 +392,8 @@ int auto2_net_dev(hd_t **hd0)
     add_hd_entry(hd0, hd);
     if(hd->unix_dev_name && strcmp(hd->unix_dev_name, "lo")) {
 
+      if(config.net.device_given && strcmp(netdevice_tg, hd->unix_dev_name)) continue;
+
       /* net_stop() - just in case */
       net_stop();
 
