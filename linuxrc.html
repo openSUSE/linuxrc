@@ -4,53 +4,49 @@
 </head>
 
 <body>
-<h1>Linuxc</h1>
+<h1>Linuxrc</h1>
 
 Linuxrc is a program used for setting up the kernel for installation
-purposes. It allows the user to load modules, start an installed system, a
-rescue system or an installation via YaST.
+purposes. It allows the user to load modules and start an installed system, a
+rescue system, or an installation via YaST.
 <p>
-Linuxrc is designed to be as small as possible. Therefore, all needed
-programs are linked directly into one binary. So there is no need for shared
+Linuxrc is designed to be as small as possible. All needed
+programs are linked directly into one binary, so there is no need for shared
 libraries in the initdisk.
 <p>
 NOTE: If you run Linuxrc on an installed system, it will work slightly
-different as it tries not to destroy your installation. :-) As a consequence you
+differently as it tries not to destroy your installation. As a consequence, you
 cannot test all features this way.
 
-<h2>Passing parameters to Linuxrc</h2>
+<h2>Passing Parameters to Linuxrc</h2>
 
-Unless Linuxrc is in manual mode it will look for an 'info' file in these
-locations: first <code>/info</code> on the floppy disk and if that does not
-exsist for <code>/info</code> in the initrd. After that it parses the kernel
-command line for parameters. You may change the 'info' file Linuxrc reads
-using the <code>info</code> command line parameter. If you don't want
-Linuxrc to read the kernel command line (say, because you need to give a
-kernel parameter that accidentally is recognized by Linuxrc, too), use
+Unless Linuxrc is in manual mode, it will look for an 'info' file in these
+locations: <code>/info</code> on the floppy disk then, if that does not
+exist, <code>/info</code> in the initrd. After that, it parses the kernel
+command line for parameters. Change the 'info' file Linuxrc reads
+using the <code>info</code> command line parameter. If you do not want
+Linuxrc to read the kernel command line (for example, because you need to give a
+kernel parameter that is also recognized by Linuxrc), use
 <code>linuxrc=nocmdline</code>.
 <p>
-Independend if the above, Linuxrc will always look for and parse a file
-<code>/linuxrc.config</code>. You can use this file to change default
-values, if you need to. But in general, use the <code>info</code> file
-instead. Note that <code>/linuxrc.config</code> is read before any 'info'
+Independently from the above, Linuxrc always looks for and parses a file
+<code>/linuxrc.config</code>. Use this file to change default
+values, if needed. Generally, use the <code>info</code> file
+instead. <code>/linuxrc.config</code> is read before any 'info'
 file and even in manual mode.
 
-<h2>'info' file format</h2>
+<h2>'info' File Format</h2>
 
-Lines starting with '<code>#</code>' are comments, valid entries are of the form
-<pre>
-  key: value
-</pre>
-Note that <code>value</code> extends to the end of the line and so may contain spaces.
-<code>key</code> is matched case insensitive.
+Lines starting with '<code>#</code>' are comments. Valid entries are in the
+format <code>key: value</code>.
+<code>value</code> extends to the end of the line and may contain spaces.
+<code>key</code> is case-insensitive.
 <p>
-You can use the same key - value pairs on the kernel command line using the syntax
-<pre>
-  key=value
-</pre>
-Lines that don't have the form described above are ignored.
+You can use the same key and value pairs on the kernel command line using the
+syntax <code>key=value</code>
+Lines that do not have the format described above are ignored.
 <p>
-Valid keys are (values given are just examples)
+Valid keys are (values given are just examples):
 <ul>
   <li><code>Language: de_DE</code><br>
   set the language<br>
@@ -70,13 +66,13 @@ Valid keys are (values given are just examples)
     <li><code>hd:/suse/i386</code><br>
     install from hard disk<br>
     <li><code>hd:/sda3/suse/i386</code><br>
-    like the last example, but don't search for a partition, just use sda3<br>
+    like the last example, but do not search for a partition, just use sda3<br>
   </ul>
-  note: valid URL schemes are cd, hd, nfs, smb, ftp, http, tftp<br>
+  Note: valid URL protocols are cd, hd, nfs, smb, ftp, http, tftp<br>
   <li><code>InstMode: cd|hd|nfs|smb|ftp|http|tftp</code><br>
   set installation mode<br>
   <li><code>HostIP: 10.10.0.2</code><br>
-  the client ip address<br>
+  the client IP address<br>
   <li><code>Netmask: 255.255.0.0</code><br>
   network mask<br>
   <li><code>Gateway: 10.10.0.1</code><br>
@@ -84,7 +80,7 @@ Valid keys are (values given are just examples)
   <li><code>Server: 10.10.0.1</code><br>
   installation server address<br>
   <li><code>Nameserver: 10.10.0.1</code><br>
-  nameserver<br>
+  name server<br>
   <li><code>Proxy: 10.10.0.1</code><br>
   proxy (either ftp or http)<br>
   <li><code>ProxyPort: 10.10.0.1</code><br>
@@ -98,19 +94,19 @@ Valid keys are (values given are just examples)
   <li><code>BOOTPWait: 5</code><br>
   sleep 5 seconds between network activation and starting bootp<br>
   <li><code>BOOTPTimeout: 10</code><br>
-  10 seconds timeout for BOOTP requests<br>
+  10-second time-out for BOOTP requests<br>
   <li><code>DHCPTimeout: 60</code><br>
-  60 seconds timeout for DHCP requests<br>
+  60-second time-out for DHCP requests<br>
   <li><code>TFTPTimeout: 10</code><br>
-  10 seconds timeout for TFTP connection<br>
+  10-second time-out for TFTP connection<br>
   <li><code>ForceRootimage: 0|1</code><br>
-  load the installation system into ramdisk<br>
+  load the installation system into RAM disk<br>
   <li><code>Textmode: 0|1</code><br>
   start YaST in text mode<br>
   <li><code>Username: name</code><br>
-  set user name (e.g. for FTP install)<br>
+  set user name (e.g., for FTP install)<br>
   <li><code>Password: password</code><br>
-  set password (e.g. for FTP install)<br>
+  set password (e.g., for FTP install)<br>
   <li><code>WorkDomain: domain</code><br>
   set work domain for SMB install<br>
   <li><code>ForceInsmod: 0|1</code><br>
@@ -128,11 +124,11 @@ Valid keys are (values given are just examples)
   <li><code>MemModules: 20000</code><br>
   delete all modules before starting YaST if free memory is below 20000 kB<br>
   <li><code>MemLoadImage: 50000</code><br>
-  load installation system into ramdisk if free memory is above 50000 kB<br>
+  load installation system into RAM disk if free memory is above 50000 kB<br>
   <li><code>Manual: 0|1</code><br>
   start Linuxrc in manual mode<br>
   <li><code>NoPCMCIA: 0|1</code><br>
-  don't start card manager<br>
+  do not start card manager<br>
   <li><code>Domain: zap.de</code><br>
   set domain name (used for name server lookups)<br>
   <li><code>RootImage: /suse/images/root</code><br>
@@ -146,16 +142,16 @@ Valid keys are (values given are just examples)
   <li><code>AutoYaST: ftp://autoyastfile</code><br>
   location of autoinstall file; activates autoinstall mode<br>
   <li><code>VNC: 0|1</code><br>
-  setup VNC server<br>
+  set up VNC server<br>
   <li><code>VNCPassword: password</code><br>
   sets VNC server password<br>
   <li><code>UseSSH: 0|1</code><br>
-  setup SSH server<br>
+  set up SSH server<br>
   <li><code>SSHPassword: password</code><br>
-  sets SSH server password (this will not be the final root password!)<br>
+  sets SSH server password (this will not be the final root password)<br>
   <li><code>AddSwap: 0|3|/dev/hda5</code><br>
-  if 0, do never ask for swap; if the argument is a positive number <code>n</code>,
-  activate the <code>n</code>'th swap partition; is the argument is a partition name,
+  if 0, never ask for swap; if the argument is a positive number <code>n</code>,
+  activate the <code>n</code>th swap partition; if the argument is a partition name,
   activate this swap partition<br>
   <li><code>Exec: command</code><br>
   run <code>command</code><br>
