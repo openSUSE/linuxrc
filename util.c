@@ -26,6 +26,8 @@
 #include <linux/cdrom.h>
 #include <linux/loop.h>
 
+#include <hd.h>
+
 #include "global.h"
 #include "display.h"
 #include "util.h"
@@ -553,16 +555,42 @@ int util_umount(char *mp)
 #endif
 }
 
-int util_eject_cdrom(char *dev)
+int _util_eject_cdrom(char *dev)
 {
   int fd;
 
-  if(!*dev) return 0;
+  if(!dev || !*dev) return 0;
+
+  fprintf(stderr, "eject %s\n", dev);
 
   if((fd = open(dev, O_RDONLY | O_NONBLOCK)) < 0) return 1;
   umount(dev);
   if(ioctl(fd, CDROMEJECT, NULL) < 0) { close(fd); return 2; }
   close(fd);
+
+  return 0;
+}
+
+int util_eject_cdrom(char *dev)
+{
+#ifdef USE_LIBHD
+  hd_data_t *hd_data;
+  hd_t *hd;
+#endif
+
+  if(dev && *dev) return _util_eject_cdrom(dev);
+
+#ifdef USE_LIBHD
+  hd_data = calloc(1, sizeof *hd_data);
+  hd_set_probe_feature(hd_data, pr_cdrom);
+  hd_scan(hd_data);
+  for(hd = hd_cd_list(hd_data, 0); hd; hd = hd->next) {
+    _util_eject_cdrom(hd->unix_dev_name);
+  }
+  hd_free_hd_list(hd);
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+#endif
 
   return 0;
 }

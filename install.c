@@ -56,7 +56,7 @@ static char *inst_demo_sys_tm = "/suse/images/cd-demo";
 
 static int   inst_mount_harddisk      (void);
 static int   inst_try_cdrom           (char *device_tv);
-static int   inst_mount_cdrom         (void);
+static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
 static int   inst_start_install       (void);
 static int   inst_start_rescue        (void);
@@ -90,7 +90,7 @@ int inst_auto_install (void)
     switch (bootmode_ig)
         {
         case BOOTMODE_CD:
-            rc_ii = inst_mount_cdrom ();
+            rc_ii = inst_mount_cdrom (1);
             break;
         case BOOTMODE_NET:
             rc_ii = inst_mount_nfs ();
@@ -157,7 +157,7 @@ int inst_start_demo (void)
             if (!demo_ig)
                 (void) dia_message (txt_get (TXT_INSERT_LIVECD), MSGTYPE_INFO);
 
-            rc_ii = inst_mount_cdrom ();
+            rc_ii = inst_mount_cdrom (1);
             }
 
         if (rc_ii)
@@ -255,7 +255,7 @@ static int inst_menu_cb (int what_iv)
             break;
         case 5:
             sprintf(s, "/dev/%s", cdrom_tg);
-            util_eject_cdrom(s);
+            util_eject_cdrom(*cdrom_tg ? s : NULL);
             error_ii = -1;
             break;
         default:
@@ -281,14 +281,15 @@ static int inst_choose_source_cb (int what_iv)
     switch (what_iv)
         {
         case 1:
-            if (!told_is && !util_cd1_boot ())
+            error_ii = inst_mount_cdrom (0);
+//            if (!told_is && !util_cd1_boot ())
+            if (error_ii)
                 {
                 sprintf (tmp_ti, txt_get (TXT_INSERT_CD), 1);
                 (void) dia_message (tmp_ti, MSGTYPE_INFO);
                 told_is = TRUE;
+                error_ii = inst_mount_cdrom (1);
                 }
-
-            error_ii = inst_mount_cdrom ();
             break;
         case 2:
             error_ii = inst_mount_nfs ();
@@ -370,7 +371,7 @@ static int inst_try_cdrom (char *device_tv)
     }
 
 
-static int inst_mount_cdrom (void)
+static int inst_mount_cdrom (int show_err)
     {
     static char  *device_tab_ats [] =
                           {
@@ -425,9 +426,12 @@ static int inst_mount_cdrom (void)
     win_close (&win_ri);
 
     if (rc_ii < 0)
-        dia_message (txt_get (mount_success_ii ? TXT_RI_NOT_FOUND :
-                                                 TXT_ERROR_CD_MOUNT),
-                     MSGTYPE_ERROR);
+        {
+        if (show_err)
+             dia_message (txt_get (mount_success_ii ? TXT_RI_NOT_FOUND :
+                                                     TXT_ERROR_CD_MOUNT),
+                         MSGTYPE_ERROR);
+        }
     else
         strcpy (cdrom_tg, device_pci);
 

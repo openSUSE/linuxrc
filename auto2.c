@@ -773,7 +773,7 @@ char *auto2_disk_list(int *boot_disk)
   int matches;
   unsigned boot_idx;
 
-  boot_disk = 0;
+  *boot_disk = 0;
   *buf = 0;
   if(!hd_data) return buf;
 
@@ -781,7 +781,7 @@ char *auto2_disk_list(int *boot_disk)
   if(boot_idx && matches == 1) {
     hd = hd_get_device_by_idx(hd_data, boot_idx);
     if(hd && hd->unix_dev_name) {
-      boot_disk = boot_idx;
+      *boot_disk = boot_idx;
       strcpy(buf, hd->unix_dev_name);
     }
   }
