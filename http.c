@@ -110,11 +110,11 @@ int read_line(int fd, char *buf, int len)
 }
 
 
-int http_connect(inet_t *server, char *name, inet_t *proxy, int port, int *file_len)
+int http_connect(inet_t *server, char *name, char *proto, inet_t *proxy, int server_port, int proxy_port, int *file_len)
 {
   struct sigaction act, old;
   struct addrinfo ask;
-  int i, sock;
+  int i, sock, port;
   char buf[0x1000];
   int timeout = 60;
   inet_t *host;
@@ -122,8 +122,20 @@ int http_connect(inet_t *server, char *name, inet_t *proxy, int port, int *file_
   memset(&ask, 0, sizeof ask);
   ask.ai_family = PF_INET;		/* PF_INET6 */
   ask.ai_socktype = SOCK_STREAM;
-  port = port > 0 ? port : 80;
-  host = proxy ? proxy : server;
+
+//  fprintf(stderr, "proto = %s, server = %s:%d, proxy = %s:%d\n", proto, server ? server->name : "", server_port, proxy ? proxy->name : "", proxy_port);
+
+  proto = proto ?: "http";
+
+  if(proxy && proxy_port) {
+    host = proxy;
+    port = proxy_port;
+  }
+  else {
+    host = server;
+    server_port = server_port > 0 ? server_port : 80;
+    port = server_port;
+  }
 
   /* signal handler for timeout via SIGALRM */
   memset(&act, 0, sizeof act);
@@ -145,12 +157,18 @@ int http_connect(inet_t *server, char *name, inet_t *proxy, int port, int *file_
 
   /* send request */
   if(proxy) {
-    sprintf(buf,
-      "GET %s://%s:%d%s HTTP/1.0\r\n"
-      "Connection: close\r\n"
-      "\r\n",
-      "http", host->name, port, name
-    );
+    if(server_port) {
+      sprintf(buf,
+        "GET %s://%s:%d%s HTTP/1.0\r\n" "Connection: close\r\n" "\r\n",
+        proto, server->name, server_port, name
+      );
+    }
+    else {
+      sprintf(buf,
+        "GET %s://%s%s HTTP/1.0\r\n" "Connection: close\r\n" "\r\n",
+        proto, server->name, name
+      );
+    }
   }
   else {
     sprintf(buf,

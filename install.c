@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <netdb.h>
 #include <errno.h>
+#include <dirent.h>
 #include <sys/mount.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -66,16 +67,16 @@ static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
 static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
-static int inst_choose_netsource(void);
-static int inst_choose_netsource_cb(dia_item_t di);
+static int   inst_choose_netsource    (void);
+static int   inst_choose_netsource_cb (dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
 static int   inst_do_ftp              (void);
-static int   inst_get_ftpsetup        (void);
 static int   inst_do_http             (void);
+static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
 static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
@@ -325,7 +326,7 @@ int inst_choose_netsource()
 
   if(!config.fullnetsetup) {
     // yast doesn't support it :-((
-    items[1] = items[4] = di_skip;
+    items[4] = di_skip;
   }
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
@@ -875,6 +876,8 @@ int inst_prepare()
   char *links[] = { "/bin", "/lib", "/sbin", "/usr" };
   char link_source[MAX_FILENAME], buf[256];
   int i = 0, rc = 0;
+  struct dirent *de;
+  DIR *d;
 
   mod_free_modules();
   if(!config.initrd_has_ldso && !config.test) {
@@ -921,19 +924,30 @@ int inst_prepare()
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
 
     /*
-     * In these cases, part of the "/suse" tree is in the installation system.
-     * We add a symlink to make it available below config.mountpoint.instdata.
+     * In these cases, part of the "/suse" tree is in the installation
+     * system. We add some symlinks needed by YaST2 to make it available
+     * below config.mountpoint.instdata.
      */
     if(
       config.instmode == inst_ftp ||
       config.instmode == inst_tftp ||
       config.instmode == inst_http
     ) {
-      sprintf(buf, "%s/suse", config.mountpoint.instdata);
-      unlink(buf);
-      if(!util_check_exist(buf)) {
-        sprintf(link_source, "%s/suse", config.mountpoint.instsys);
-        symlink(link_source, buf);
+      if((d = opendir(config.mountpoint.instsys))) {
+        while((de = readdir(d))) {
+          if(
+            strstr(de->d_name, ".S.u.S.E") == de->d_name ||
+            !strcmp(de->d_name, "suse")
+          ) {
+            sprintf(buf, "%s/%s", config.mountpoint.instdata, de->d_name);
+            unlink(buf);
+            if(!util_check_exist(buf)) {
+              sprintf(link_source, "%s/%s", config.mountpoint.instsys, de->d_name);
+              symlink(link_source, buf);
+            }
+          }
+        }
+        closedir(d);
       }
     }
   }
@@ -1294,7 +1308,7 @@ int inst_do_ftp()
   do {
     sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
     if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-    if((rc = inst_get_ftpsetup())) return rc;
+    if((rc = inst_get_proxysetup())) return rc;
 
     sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
     dia_info(&win, buf);
@@ -1312,55 +1326,6 @@ int inst_do_ftp()
 
   if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
   util_truncate_dir(config.serverdir);
-
-  return 0;
-}
-
-
-int inst_get_ftpsetup()
-{
-  int rc;
-  char *s, tmp[256];
-  unsigned u;
-
-  rc = dia_yesno(txt_get(TXT_ANONYM_FTP), NO);
-  if(rc == ESCAPE) return -1;
-
-  if(rc == NO) {
-    str_copy(&config.net.user, NULL);
-    str_copy(&config.net.password, NULL);
-  }
-  else {
-    if((rc = dia_input2(txt_get(TXT_ENTER_FTPUSER), &config.net.user, 20, 0))) return rc;
-    if((rc = dia_input2(txt_get(TXT_ENTER_FTPPASSWD), &config.net.password, 20, 1))) return rc;
-  }
-
-  rc = dia_yesno(txt_get(TXT_WANT_FTPPROXY), NO);
-  if(rc == ESCAPE) return -1;
-
-  if(rc == YES) {
-    if((rc = net_get_address(txt_get(TXT_ENTER_FTPPROXY), &config.net.proxy, 1))) return rc;
-
-    *tmp = 0;
-    if(config.net.proxyport) sprintf(tmp, "%u", config.net.proxyport);
-
-    do {
-      rc = dia_input(txt_get(TXT_ENTER_FTPPORT), tmp, 6, 6, 0);
-      if(rc) return rc;
-      u = strtoul(tmp, &s, 0);
-      if(*s) {
-        rc = -1;
-        dia_message (txt_get (TXT_INVALID_INPUT), MSGTYPE_ERROR);
-      }
-    }
-    while(rc);
-
-    config.net.proxyport = u;
-  }
-  else {
-    name2inet(&config.net.proxy, "");
-    config.net.proxyport = 0;
-  }
 
   return 0;
 }
@@ -1379,7 +1344,7 @@ int inst_do_http()
   do {
     sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
     if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-//    if((rc = inst_get_ftpsetup())) return rc;
+    if((rc = inst_get_proxysetup())) return rc;
 
     sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
     dia_info(&win, buf);
@@ -1402,6 +1367,72 @@ int inst_do_http()
 }
 
 
+int inst_get_proxysetup()
+{
+  int rc;
+  char *s, tmp[256], buf[256];
+  unsigned u;
+
+  if(config.instmode == inst_ftp) {
+    if(config.instmode == inst_ftp) {
+      strcpy(buf, txt_get(TXT_ANONYM_FTP));
+    }
+    else {
+      sprintf(buf,
+        "Do you need a username and password to access the %s server?",
+        get_instmode_name_up(config.instmode)
+      );
+    }
+    rc = dia_yesno(buf, NO);
+    if(rc == ESCAPE) return -1;
+
+    if(rc == NO) {
+      str_copy(&config.net.user, NULL);
+      str_copy(&config.net.password, NULL);
+    }
+    else {
+      sprintf(buf, txt_get(TXT_ENTER_USER), get_instmode_name_up(config.instmode));
+      if((rc = dia_input2(buf, &config.net.user, 20, 0))) return rc;
+      sprintf(buf, txt_get(TXT_ENTER_PASSWORD), get_instmode_name_up(config.instmode));
+      if((rc = dia_input2(buf, &config.net.password, 20, 1))) return rc;
+    }
+  }
+
+  sprintf(buf, txt_get(TXT_WANT_PROXY), get_instmode_name_up(config.net.proxyproto));
+  rc = dia_yesno(buf, NO);
+  if(rc == ESCAPE) return -1;
+
+  if(rc == YES) {
+    sprintf(buf, txt_get(TXT_ENTER_PROXY), get_instmode_name_up(config.net.proxyproto));
+    if((rc = net_get_address(buf, &config.net.proxy, 1))) return rc;
+
+    *tmp = 0;
+    if(config.net.proxyport) sprintf(tmp, "%u", config.net.proxyport);
+
+    do {
+      sprintf(buf, txt_get(TXT_ENTER_PROXYPORT), get_instmode_name_up(config.net.proxyproto));
+      rc = dia_input(buf, tmp, 6, 6, 0);
+      if(rc) return rc;
+      u = strtoul(tmp, &s, 0);
+      if(*s) {
+        rc = -1;
+        dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+      }
+    }
+    while(rc);
+
+    config.net.proxyport = u;
+  }
+  else {
+    name2inet(&config.net.proxy, "");
+    config.net.proxyport = 0;
+    config.net.proxyproto = 0;
+  }
+
+  return 0;
+}
+
+
 int inst_do_tftp()
 {
   int rc;
@@ -1409,6 +1440,8 @@ int inst_do_tftp()
   char buf[256];
 
   set_instmode(inst_tftp);
+
+  config.net.proxyport = 0;
 
   if((rc = net_config())) return rc;
 
