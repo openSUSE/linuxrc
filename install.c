@@ -227,7 +227,6 @@ int inst_menu()
   };
 
   items[config.demo ? 0 : 1] = di_skip;
-  if(!yast2_update_ig) items[5] = di_skip;
 
   di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
 
