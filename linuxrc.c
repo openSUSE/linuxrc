@@ -134,6 +134,13 @@ int main (int argc, char **argv, char **env)
             rc_ii = inst_start_demo ();
 #ifdef USE_LIBHD
         else if (auto2_ig) {
+            if ((action_ig & ACT_RESCUE))
+                {
+                util_manual_mode ();
+                util_disp_init ();
+                util_print_banner ();
+                set_choose_keytable (1);
+                }
             rc_ii = inst_auto2_install ();
             deb_msg ("done inst_auto2_install()");
             deb_int (rc_ii);

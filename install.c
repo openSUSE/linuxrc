@@ -616,7 +616,11 @@ int inst_check_instsys (void)
     char  filename_ti [MAX_FILENAME];
     char *instsys_loop_ti = "/suse/setup/inst-img";
 
-    if((action_ig & ACT_RESCUE) && auto2_ig) inst_rescue_im = TRUE;
+    if ((action_ig & ACT_RESCUE)) 
+        {
+        action_ig &= ~ACT_RESCUE;
+        inst_rescue_im = TRUE;
+        }
 
     if (memory_ig > 8000000)
         strcpy (inst_rescuefile_tm, "/suse/images/rescue");
