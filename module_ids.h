@@ -132,6 +132,8 @@ enum modid_t
     ID_PCNET32,
     ID_ULTRA32,
     ID_YELLOWFIN,
+    ID_BCM5700,
+    ID_NS83820,
     ID_SK55XX,
     ID_EEPRO100,
     ID_EEPRO100_OLD,
