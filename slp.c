@@ -376,7 +376,7 @@ slp_get_install()
   if (!ambg)
     return 1;
   win_old = config.win;
-  if(config.language) set_activate_language(config.language);
+  set_activate_language(config.language);
   if(!config.win) util_disp_init();
   *urlbuf = 0;
   for (;;)

@@ -1,3 +1,6 @@
+11/8/2004:	v1.7.2
+	- set font earlier
+
 6/8/2004:	v1.7.1
 	- deal with multi gateway dhcp response (#25413)
 	- utf8 support

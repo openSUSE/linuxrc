@@ -757,6 +757,8 @@ void lxrc_init()
   util_redirect_kmsg();
   disp_init();
 
+  set_activate_language(config.language);
+
   // auto2_chk_expert();
 
   if (!config.linemode)

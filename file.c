@@ -1196,7 +1196,7 @@ int file_read_yast_inf()
         break;
 
       case key_language:
-        set_activate_language(set_langidbyname(f->value));
+        config.language = set_langidbyname(f->value);
         break;
 
       case key_rebootmsg:
@@ -1211,6 +1211,8 @@ int file_read_yast_inf()
         break;
     }
   }
+
+  set_activate_language(config.language);
 
   file_free_file(f0);
 
