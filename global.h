@@ -146,11 +146,16 @@ typedef struct {
         colorset_t;
 
 typedef struct {
-               char  *text;
-               int  (*func) (int);
-               int di;
-               }
-        item_t;
+  char *text;
+  int (*func) (int);
+  int di;
+} item_t;
+
+typedef struct slist_s {
+  struct slist_s *next;
+  char *key, *value;
+} slist_t;
+
 
 typedef struct {
   unsigned       available:1;	/* set if SMB functionality is available */
@@ -173,7 +178,6 @@ typedef struct module2_s {
   unsigned initrd:1;	/* add it to initrd */
   unsigned autoload:1;	/* can be autoloaded */
   unsigned exists:1;	/* module really exists */
-  char *user_param;	/* user provided parameters */
 } module2_t;
 
 
@@ -187,6 +191,7 @@ typedef struct {
   unsigned is_iseries:1;	/* set if we run on an iSeries machine */
   unsigned win:1;		/* set if we are drawing windows */
   unsigned forceinsmod:1;	/* use 'insmod -f' if set */
+  unsigned tmpfs:1;		/* we're using tmpfs for / */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -207,6 +212,8 @@ typedef struct {
     int cdrom_type;		/* dto. */
     int network_type;		/* dto. */
     int pcmcia_type;		/* dto. */
+    slist_t *input_params;	/* history for module loading dialog */
+    slist_t *used_params;	/* parameters that were used for insmod */
   } module;
 } config_t;
 

@@ -24,6 +24,7 @@ static char *mpar_modnames_atm [NR_MODPARAMS] = { 0, };
 static void  mpar_save_modname   (char *module_tv);
 static void  mpar_delete_modname (char *module_tv);
 
+#if 0
 int mpar_get_params (module_t *module_prv, char *params_pcr)
     {
     char  txt_ti [MAX_PARAM_LEN + 100];
@@ -47,7 +48,7 @@ int mpar_get_params (module_t *module_prv, char *params_pcr)
 
     return (0);
     }
-
+#endif
 
 void mpar_save_modparams (char *module_tv, char *params_tv)
     {

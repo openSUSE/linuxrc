@@ -73,6 +73,9 @@ static struct hlink_s {
   char *dst;
 } *hlink_list = NULL;
 
+static char *exclude = NULL;
+static int rec_level = 0;
+
 static int do_cp(char *src, char *dst);
 static char *walk_hlink_list(ino_t ino, dev_t dev, char *dst);
 static void free_hlink_list(void);
@@ -728,27 +731,13 @@ unsigned mkdosfs(int fd, unsigned size)
 
 void do_file_cp(char *src_dir, char *dst_dir, char *name)
 {
-  FILE *f, *g;
-  int c;
-  char src[200], dst[200];
+  char buf[256];
 
-//  deb_str(name);
+  sprintf(buf, "cp %s/%s %s", src_dir, name, dst_dir);
+  system(buf);
 
-  sprintf(src, "%s/%s", src_dir, name);
-  sprintf(dst, "%s/%s", dst_dir, name);
-
-  if(!(f = fopen(src, "r"))) return;
-  if(!(g = fopen(dst, "w"))) {
-    fclose(f);
-    return;
-  }
-
-  while((c = fgetc(f)) != EOF) fputc(c, g);
-
-  fclose(g);
-  fclose(f);
-
-  chmod(dst, 0755);
+  sprintf(buf, "%s/%s", dst_dir, name);
+  chmod(buf, 0755);
 }
 
 /*
@@ -1083,6 +1072,10 @@ int util_do_cp(char *src, char *dst)
 {
   int i;
 
+  exclude = strrchr(dst, '/');
+  if(exclude) exclude++; else exclude = dst;
+  rec_level = 0;
+
   i = do_cp(src, dst);
   free_hlink_list();
 
@@ -1120,17 +1113,20 @@ int do_cp(char *src, char *dst)
       }
 
       if(S_ISDIR(sbuf.st_mode)) {
+        // avoid infinite recursion
+        if(exclude && !rec_level && !strcmp(exclude, de->d_name)) continue;
+
         i = mkdir(dst2, 0755);
         if(i) {
           err = 4;
           perror(dst2);
           break;
         }
-        // avoid infinite recursion
-//        if(!(*src2 == '/' && !strcmp(src2 + 1, dst))) {
-        if(strcmp(src2, "//newroot")) {
-          err = do_cp(src2, dst2);
-        }
+
+        rec_level++;
+        err = do_cp(src2, dst2);
+        rec_level--;
+
         if(err) break;
       }
 
@@ -1440,6 +1436,87 @@ int util_nothing_main(int argc, char **argv)
 }
 
 
+int util_cp_main(int argc, char **argv)
+{
+  int err = 0, rec = 0;
+  char *src, *dst, *s;
+  char dst2[0x100];
+  int i, j, fd1, fd2;
+  unsigned char buf[0x1000];
+  struct stat sbuf;
+
+  argv++; argc--;
+
+  if(argc >= 1 && !strcmp(*argv, "-a")) {
+    argv++; argc--;
+    rec = 1;
+  }
+
+  if(argc != 2) return 1;
+
+  src = argv[0];
+  dst = argv[1];
+
+  if(rec) {
+    if(!util_check_exist(dst)) mkdir(dst, 0755);
+    err = util_do_cp(src, dst);
+  }
+  else {
+    i = stat(dst, &sbuf);
+    if(!i && S_ISDIR(sbuf.st_mode)) {
+      s = strrchr(src, '/');
+      s = s ? s + 1 : src;
+      sprintf(dst2, "%s/%s", dst, s);
+      dst = dst2;
+    }
+    
+    fd1 = open(src, O_RDONLY);
+    if(fd1 < 0) {
+      err = 1;
+      perror(src);
+    }
+    else {
+      fd2 = open(dst, O_WRONLY | O_CREAT | O_TRUNC);
+      if(fd2 < 0) {
+        err = 2;
+        perror(dst);
+        close(fd1);
+      }
+      else {
+        do {
+          i = read(fd1, buf, sizeof buf);
+          j = 0;
+          if(i > 0) {
+            j = write(fd2, buf, i);
+          }
+        }
+        while(i > 0 && j > 0);
+        if(i < 0) {
+          perror(src);
+          err = 3;
+        }
+        if(j < 0) {
+          perror(dst);
+          err = 4;
+        }
+        close(fd1);
+        close(fd2);
+      }
+    }
+
+    if(!err) {
+      i = stat(src, &sbuf);
+      if(!i) {
+        chown(dst, sbuf.st_uid, sbuf.st_gid);
+        chmod(dst, sbuf.st_mode);
+      }
+    }
+  }
+
+  return err;
+}
+
+
 /*
  * Redirect all output of system() to tty3.
  */
@@ -1454,4 +1531,37 @@ int util_sh_main(int argc, char **argv)
 
   return lsh_main(argc, argv);
 }
+
+
+slist_t *slist_new()
+{
+  return calloc(1, sizeof (slist_t));
+}
+
+
+slist_t *slist_append(slist_t **sl0, slist_t *sl)
+{
+  for(; *sl0; sl0 = &(*sl0)->next);
+  return *sl0 = sl;
+}
+
+
+slist_t *slist_add(slist_t **sl0, slist_t *sl)
+{
+  sl->next = *sl0;
+  return *sl0 = sl;
+}
+
+
+slist_t *slist_getentry(slist_t *sl, char *key)
+{
+  if(key) {
+    for(; sl; sl = sl->next) {
+      if(sl->key && !strcmp(key, sl->key)) return sl;
+    }
+  }
+
+  return NULL;
+}
+
 

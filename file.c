@@ -905,7 +905,6 @@ void file_module_load(char *insmod_arg)
 #endif
 
   if(!mod_load_module(module, params)) {
-    mpar_save_modparams(module, params);
     switch(mod_get_mod_type(module)) {
       case MOD_TYPE_SCSI:
         strcpy(scsi_tg, module);

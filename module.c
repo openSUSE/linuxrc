@@ -42,7 +42,7 @@
 #define NR_NET_MODULES      (sizeof(mod_net_mod_arm)/sizeof(mod_net_mod_arm[0]))
 #define NR_MODULES          (NR_SCSI_MODULES+NR_CDROM_MODULES+NR_NET_MODULES+50)
 #define NR_NO_AUTOPROBE     (sizeof(mod_noauto_arm)/sizeof(mod_noauto_arm[0]))
-#define NR_PPCD             (sizeof(mod_is_ppcd_arm)/sizeof(mod_is_ppcd_arm[0]))
+// #define NR_PPCD             (sizeof(mod_is_ppcd_arm)/sizeof(mod_is_ppcd_arm[0]))
 #define MENU_WIDTH          55
 
 
@@ -50,28 +50,23 @@ static int       mod_ram_modules_im = FALSE;
 static module_t  mod_current_arm [NR_MODULES];
 static int       mod_show_kernel_im = FALSE;
 int       mod_force_moddisk_im = FALSE;
-static int       plip_core_loaded_im = FALSE;
 
 
 static int       mod_try_auto         (module_t *module_prv,
                                        window_t *status_prv);
 static int       mod_auto_allowed     (enum modid_t id_iv);
-static module_t *mod_get_description  (char *name_tv);
+// static module_t *mod_get_description  (char *name_tv);
 static void      mod_delete_module    (void);
 static int       mod_menu_cb          (int what_iv);
-static int       mod_choose_cb        (int what_iv);
+// static int       mod_choose_cb        (int what_iv);
 static int       mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
                                        int *more_pir);
 static void      mod_sort_list        (module_t modlist_parr [], int nr_modules_iv);
-static int       mod_is_ppcd          (char *name_tv);
-static int       mod_load_ppcd_core   (void);
-static int       mod_load_i2o_core    (void);
-static int       mod_load_parport_core(void);
-static int       mod_load_pcinet_core (void);
-static int       mod_load_plip_core   (void);
-static void      mod_unload_plip_core (void);
+// static int       mod_is_ppcd          (char *name_tv);
 static int       mod_getmoddisk       (int mod_type);
 
+
+#define DEBUG_MODULE
 
 
 static int mod_types = 0;
@@ -139,8 +134,6 @@ void mod_update_list()
   for(ml1 = &config.module.list; *ml1; ml1 = &(*ml1)->next) (*ml1)->exists = 0;
 
   if(!(d = opendir(config.module.dir))) return;
-
-  deb_msg("hi");
 
   while((de = readdir(d))) {
     i = strlen(de->d_name);
@@ -608,6 +601,7 @@ char *mod_get_params(module2_t *mod)
 {
   char buf[MAX_PARAM_LEN + 100];
   char buf2[MAX_PARAM_LEN];
+  slist_t *sl;
 
   sprintf(buf, txt_get(TXT_ENTER_PARAMS), mod->name);
 
@@ -619,14 +613,20 @@ char *mod_get_params(module2_t *mod)
     if(mod->autoload) strcpy(buf2, mod->param);
   }
 
-  if(mod->user_param) strcpy(buf2, mod->user_param);
+  sl = slist_getentry(config.module.input_params, mod->name);
+
+  if(sl && sl->value) strcpy(buf2, sl->value);
 
   if(dia_input(buf, buf2, sizeof buf2 - 1, 30)) return NULL;
 
-  if(mod->user_param) free(mod->user_param);
-  mod->user_param = strdup(buf2);
+  if(!sl) {
+    sl = slist_add(&config.module.input_params, slist_new());
+    sl->key = strdup(mod->name);
+  }
+  if(sl->value) free(sl->value);
+  sl->value = strdup(buf2);
 
-  return mod->user_param;
+  return sl->value;
 }
 
 
@@ -658,7 +658,6 @@ void mod_load_module_manual(char *module, int show)
       if(i) {
         sprintf(buf, txt_get (TXT_LOAD_SUCCESSFUL), ml->name);
         dia_message(buf, MSGTYPE_INFO);
-  //      mpar_save_modparams(ml->name, s);
       }
       else {
         util_beep(FALSE);
@@ -671,10 +670,7 @@ void mod_load_module_manual(char *module, int show)
     mod_load_module(ml->name, s);
     win_close(&win);
     i = mod_is_loaded(ml->name);
-    if(i) {
-//      mpar_save_modparams(ml->name, s);
-    }
-    else {
+    if(!i) {
       util_beep(FALSE);
     }
   }
@@ -686,6 +682,7 @@ int mod_load_module(char *module, char *param)
   char cmd[300];
   int rc;
   char *force = config.forceinsmod ? "-f " : "";
+  slist_t *sl;
 
 #if 0
   if(!config.win) {
@@ -703,6 +700,12 @@ int mod_load_module(char *module, char *param)
   if(mod_show_kernel_im) kbd_switch_tty(4);
 
   rc = system(cmd);
+
+  if(!rc && param) {
+    sl = slist_add(&config.module.used_params, slist_new());
+    sl->key = strdup(module);
+    sl->value = strdup(param);
+  }
 
   if(mod_show_kernel_im) kbd_switch_tty(1);
 
@@ -723,7 +726,7 @@ int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t ali
   static char **item = NULL;
   static module2_t **mods = NULL;
   static int max_mods = 0;
-  char *s;
+  char *s, *t;
   int i, items = 0;
   module2_t *mod;
   file_t *f0, *f;
@@ -744,14 +747,15 @@ int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t ali
   for(; f; f = f->prev) {
     mod = mod_get_entry(f->key_str);
     if(mod && mod->descr) {
+      t = *mod->descr ? mod->descr : mod->name;
       if(align == align_left) {
         s = malloc(MENU_WIDTH);
-        strncpy(s, mod->descr, MENU_WIDTH);
+        strncpy(s, t, MENU_WIDTH);
         s[MENU_WIDTH - 1] = 0;
         util_fill_string(s, MENU_WIDTH - 4);
       }
       else {
-        s = strdup(mod->descr);
+        s = strdup(t);
       }
       mods[items] = mod;
       item[items++] = s;
@@ -775,8 +779,17 @@ void mod_show_modules()
 {
   char **list;
   int items;
+#ifdef DEBUG_MODULE
+  slist_t *sl;
+#endif
 
   items = mod_list_loaded_modules(&list, NULL, align_left);
+
+#ifdef DEBUG_MODULE
+  for(sl = config.module.used_params; sl; sl = sl->next) {
+    fprintf(stderr, "  %s: %s\n", sl->key, sl->value);
+  }
+#endif
 
   if(items) {
     dia_show_lines(txt_get(TXT_SHOW_MODULES), list, items, MENU_WIDTH, FALSE);
@@ -801,10 +814,8 @@ void mod_delete_module()
       mod = mod_list[choice - 1];
       if(mod->post_inst) {
         mod_unload_modules(mod->post_inst);
-        mpar_delete_modparams(mod->post_inst);
       }
       mod_unload_modules(mod->name);
-      mpar_delete_modparams(mod->name);
     }
   }
   else {
@@ -834,6 +845,7 @@ void mod_free_modules (void)
     }
 
 
+#if 0
 int mod_load_by_user (int mod_type_iv)
     {
     int     nr_modules_ii;
@@ -927,6 +939,7 @@ int mod_load_by_user (int mod_type_iv)
 
     return (choice_ii);
     }
+#endif
 
 
 int mod_get_ram_modules (int type_iv)
@@ -1185,6 +1198,7 @@ void mod_autoload (void)
     }
 
 
+#if 0
 /*
  *
  * Local functions
@@ -1200,49 +1214,6 @@ static int mod_choose_cb (int what_iv)
     window_t  win_ri;
     module_t  pcd_ri = { ID_PPCD, "", "pcd", "drive0=0x378" };
 
-
-    if (mod_is_ppcd (mod_current_arm [what_iv - 1].module_name))
-        {
-        rc_ii = mod_load_ppcd_core ();
-        if (rc_ii)
-            return (rc_ii);
-        }
-
-    if (!strcmp (mod_current_arm [what_iv - 1].module_name, "plip"))
-        {
-        rc_ii = mod_load_plip_core ();
-        if (rc_ii)
-            return (rc_ii);
-        }
-
-    if (
-        !strcmp (mod_current_arm [what_iv - 1].module_name, "i2o_block") ||
-        !strcmp (mod_current_arm [what_iv - 1].module_name, "i2o_scsi")
-       )
-        {
-        rc_ii = mod_load_i2o_core ();
-        if (rc_ii)
-            return (rc_ii);
-        }
-
-    if (
-        !strcmp (mod_current_arm [what_iv - 1].module_name, "imm") ||
-        !strcmp (mod_current_arm [what_iv - 1].module_name, "ppa")
-       )
-        {
-        rc_ii = mod_load_parport_core ();
-        if (rc_ii)
-            return (rc_ii);
-        }
-
-    if (
-        !strcmp (mod_current_arm [what_iv - 1].module_name, "starfire")
-       )
-        {
-        rc_ii = mod_load_pcinet_core ();
-        if (rc_ii)
-            return (rc_ii);
-        }
 
     if (mod_current_arm [what_iv - 1].example)
         strcpy (params_ti, mod_current_arm [what_iv - 1].example);
@@ -1288,9 +1259,6 @@ static int mod_choose_cb (int what_iv)
             if (mod_is_ppcd (mod_current_arm [what_iv - 1].module_name))
                 mod_unload_module (mod_current_arm [what_iv - 1].module_name);
 
-            if (!strcmp (mod_current_arm [what_iv - 1].module_name, "plip"))
-                mod_unload_plip_core ();
-
             util_beep (FALSE);
             sprintf (text_ti, txt_get (TXT_LOAD_FAILED),
                      mod_current_arm [what_iv - 1].module_name);
@@ -1305,6 +1273,7 @@ static int mod_choose_cb (int what_iv)
     else
         return (0);
     }
+#endif
 
 
 static int mod_try_auto (module_t *module_prv, window_t *status_prv)
@@ -1353,6 +1322,7 @@ static int mod_auto_allowed (enum modid_t id_iv)
     }
 
 
+#if 0
 static int mod_is_ppcd (char *name_tv)
     {
     int        i_ii = 0;
@@ -1372,8 +1342,9 @@ static int mod_is_ppcd (char *name_tv)
 
     return (found_ii);
     }
+#endif
 
-
+#if 0
 static module_t *mod_get_description (char *name_tv)
     {
     int  i_ii;
@@ -1412,6 +1383,7 @@ static module_t *mod_get_description (char *name_tv)
     else
         return (0);
     }
+#endif
 
 
 static int mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
@@ -1502,138 +1474,6 @@ static void mod_sort_list (module_t modlist_parr [], int nr_modules_iv)
 
         index_ii++;
         }
-    }
-
-
-static int mod_load_ppcd_core (void)
-    {
-    static int       ppcd_core_loaded_is = FALSE;
-           char     *ppcd_modules_ati [] = {
-                                           "parport",
-                                           "paride",
-                                           "parport_pc",
-                                           "parport_probe"
-                                           };
-           int       rc_ii = 0;
-           window_t  win_ri;
-           int       i_ii = 0;
-
-    if (!ppcd_core_loaded_is)
-        {
-        dia_info (&win_ri, txt_get (TXT_INIT_PARPORT));
-        for (i_ii = 0;
-             i_ii < sizeof (ppcd_modules_ati) /
-                    sizeof (ppcd_modules_ati [0]) && !rc_ii;
-             i_ii++)
-            rc_ii = mod_load_module (ppcd_modules_ati [i_ii], 0);
-
-        win_close (&win_ri);
-        if (rc_ii)
-            return (-1);
-
-        ppcd_core_loaded_is = TRUE;
-        }
-
-    return (0);
-    }
-
-
-static int mod_load_i2o_core()
-{
-  static int i2o_core_loaded = FALSE;
-  char *i2o_modules[] = { "i2o_pci", "i2o_core", "i2o_config" };
-  int i, err;
-
-  if(!i2o_core_loaded) {
-    for(i = 0; i < sizeof i2o_modules / sizeof *i2o_modules; i++) {
-      err = mod_load_module(i2o_modules[i], 0);
-      if(err && i < 2) return -1;	/* ignore i2o_config loading errors */
-    }
-    i2o_core_loaded = TRUE;
-    for(i = 0; i < sizeof i2o_modules / sizeof *i2o_modules; i++) {
-      mpar_save_modparams(i2o_modules[i], 0);
-    }
-  }
-
-  return 0;
-}
-
-
-static int mod_load_parport_core()
-{
-  static int parport_core_loaded = FALSE;
-  char *parport_modules[] = { "parport", "parport_pc", "parport_probe" };
-  int i, err;
-
-  if(!parport_core_loaded) {
-    for(i = 0; i < sizeof parport_modules / sizeof *parport_modules; i++) {
-      err = mod_load_module(parport_modules[i], 0);
-      if(err) return -1;
-    }
-    parport_core_loaded = TRUE;
-    for(i = 0; i < sizeof parport_modules / sizeof *parport_modules; i++) {
-      mpar_save_modparams(parport_modules[i], 0);
-    }
-  }
-
-  return 0;
-}
-
-
-static int mod_load_pcinet_core()
-{
-  static int pcinet_core_loaded = FALSE;
-  char *pcinet_modules[] = { "pci-scan" };
-  int i, err;
-
-  if(!pcinet_core_loaded) {
-    for(i = 0; i < sizeof pcinet_modules / sizeof *pcinet_modules; i++) {
-      err = mod_load_module(pcinet_modules[i], 0);
-      if(err) return -1;
-    }
-    pcinet_core_loaded = TRUE;
-    for(i = 0; i < sizeof pcinet_modules / sizeof *pcinet_modules; i++) {
-      mpar_save_modparams(pcinet_modules[i], 0);
-    }
-  }
-
-  return 0;
-}
-
-
-static int mod_load_plip_core (void)
-    {
-    int       rc_ii = 0;
-    char      params_ti [MAX_PARAM_LEN] = "io=0x378 irq=7";
-    module_t  parport_ri = { ID_PARPORT, "", "parport_pc", "" };
-
-    if (!plip_core_loaded_im)
-        {
-        if (mod_load_module ("parport", 0))
-            return (-1);
-
-        if (!mpar_get_params (&parport_ri, params_ti))
-            rc_ii = mod_load_module ("parport_pc", params_ti);
-        else
-            rc_ii = -1;
-
-        if (rc_ii)
-            return (-1);
-        else
-            mpar_save_modparams ("parport_pc", params_ti);
-
-        plip_core_loaded_im = TRUE;
-        }
-
-    return (0);
-    }
-
-
-static void mod_unload_plip_core (void)
-    {
-    mod_unload_module ("parport_pc");
-    mod_unload_module ("parport");
-    plip_core_loaded_im = FALSE;
     }
 
 

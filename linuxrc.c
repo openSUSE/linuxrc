@@ -57,13 +57,16 @@ static void save_environment   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
-static pid_t  lxrc_mempid_rm;
-static int    lxrc_sig11_im = FALSE;
+static pid_t lxrc_mempid_rm;
+static int lxrc_sig11_im = FALSE;
 static char **lxrc_argv;
 const char *lxrc_new_root;
 static char **saved_environment;
 extern char **environ;
-static void   lxrc_movetotmpfs(void);
+static void lxrc_movetotmpfs(void);
+#if SWISS_ARMY_KNIFE 
+static void lxrc_makelinks(void);
+#endif
 
 #if SWISS_ARMY_KNIFE
 int cardmgr_main(int argc, char **argv);
@@ -94,6 +97,7 @@ static struct {
   { "cat",      util_cat_main     },
   { "echo",     util_echo_main    },
   { "ps",       util_ps_main      },
+  { "cp",       util_cp_main      },
   { "nothing",  util_nothing_main }
 };
 #endif
@@ -148,9 +152,13 @@ int main(int argc, char **argv, char **env)
 
   if(!getuid()) {
     if(!util_check_exist("/oldroot")) {
+#if SWISS_ARMY_KNIFE 
+      lxrc_makelinks();
+#endif
       lxrc_movetotmpfs();	// does (normally) not return
     }
     else {
+      config.tmpfs = 1;
       // umount and release /oldroot
       umount("/oldroot");
       util_free_ramdisk("/dev/ram0");
@@ -1040,3 +1048,18 @@ void lxrc_movetotmpfs()
   }
 }
 
+
+#if SWISS_ARMY_KNIFE
+void lxrc_makelinks()
+{
+  int i;
+  char buf[64];
+
+  if(!util_check_exist("/bin")) mkdir("/bin", 0755);
+
+  for(i = 0; i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
+    sprintf(buf, "/bin/%s", lxrc_internal[i].name);
+    if(!util_check_exist(buf)) link("/linuxrc", buf);
+  }
+}
+#endif

@@ -236,6 +236,7 @@ static enum modid_t mod_noauto_arm [] =
   ID_MPTSCSIH
 };
 
+#if 0
 static enum modid_t mod_is_ppcd_arm [] =
 {
   ID_ATEN,
@@ -253,3 +254,4 @@ static enum modid_t mod_is_ppcd_arm [] =
   ID_ON20,
   ID_ON26
 };
+#endif
