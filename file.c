@@ -48,6 +48,7 @@ static file_t *file_read_cmdline(void);
 static void file_module_load (char *insmod_arg);
 #ifdef DEBUG_FILE
 static void file_dump_flist(file_t *ft);
+static void file_dump_mlist(module2_t *ml);
 #endif
 
 static struct {
@@ -931,4 +932,160 @@ void file_dump_flist(file_t *ft)
 }
 
 #endif
+
+
+module2_t *file_read_modinfo(char *name)
+{
+  FILE *f;
+  char buf[1024];
+  char *s, *s1, *t, *current;
+  module2_t *ml0 = NULL, **ml = &ml0, *ml1;
+  int i, j, quote, fields, esc;
+  char *field[9];
+  int current_type = 0;
+
+  if(!config.module.type_name[0]) {
+    config.module.type_name[0] = strdup("");
+    config.module.type_name[MAX_MODULE_TYPES - 1] = strdup("other");
+  }
+
+  if(!(f = fopen(name, "r"))) return NULL;
+
+  while(fgets(buf, sizeof buf, f)) {
+    current = buf;
+    fields = 0;
+
+    do {
+      while(isspace(*current)) current++;
+      if(*current == 0 || *current == ';' || *current == '#') break;
+      
+      for(quote = 0, s = current; *s && (quote || *s != ','); s++) {
+        if(*s == '"') quote ^= 1;
+      }
+
+      if(s > current) {
+        t = malloc(s - current + 1);
+
+        for(esc = 0, s1 = t; s > current; current++) {
+          if(*current == '\\' && !esc) {
+            esc = 1;
+            continue;
+          }
+          if(*current != '"' || esc) *s1++ = *current;
+          esc = 0;
+        }
+        *s1 = 0;
+
+        while(s1 > t && isspace(s1[-1])) *--s1 = 0;
+      }
+      else {
+        t = strdup("");
+      }
+      field[fields++] = t;
+
+      if(*current == ',') current++;
+    }
+    while(*current && fields < sizeof field / sizeof *field);
+
+    if(fields == 1) {
+      if(*(s = *field ) == '[' && (i = strlen(s)) && s[i - 1] == ']') {
+        s[i - 1] = 0;
+        s++;
+        for(j = -1, i = 0; i < MAX_MODULE_TYPES; i++) {
+          if(config.module.type_name[i]) {
+            if(!strcasecmp(config.module.type_name[i], s)) {
+              current_type = i;
+              break;
+            }
+          }
+          else {
+            if(j < 0) j = i;
+          }
+        }
+        if(i == MAX_MODULE_TYPES) {
+          current_type = j >= 0 ? j : MAX_MODULE_TYPES - 1;
+          if(!config.module.type_name[current_type]) {
+            config.module.type_name[current_type] = strdup(s);
+          }
+        }
+        free(field[--fields]);
+      }
+      else {
+        if(!strncasecmp(field[0], "MoreModules", sizeof "MoreModules" - 1)) {
+          s = field[0] + sizeof "MoreModules" - 1;
+          while(*s == '=' || isspace(*s)) s++;
+          if(!config.module.more_file[current_type]) free(config.module.more_file[current_type]);
+          config.module.more_file[current_type] = strdup(s);
+          free(field[--fields]);
+        }
+      }
+    }
+
+#if 0
+    if(fields) {
+      fprintf(stderr, "type = %d (%s)\n", current_type, config.module.type_name[current_type]);
+
+      for(i = 0; i < fields; i++) {
+        fprintf(stderr, ">%s< ", field[i]);
+      }
+      fprintf(stderr, "\n");
+    }
+#endif
+
+    if(fields && **field) {
+      ml1 = *ml = calloc(1, sizeof **ml);
+
+      ml1->type = current_type;
+      ml1->name = strdup(field[0]);
+      if(fields > 1 && *field[1]) ml1->descr = strdup(field[1]);
+      if(fields > 2 && *field[2]) ml1->param = strdup(field[2]);
+      if(fields > 3 && *field[3]) ml1->pre_inst = strdup(field[3]);
+      if(fields > 4 && *field[4]) ml1->post_inst = strdup(field[4]);
+      if(fields > 5 && *field[5]) ml1->initrd = atoi(field[5]);
+      ml1->show = fields > 6 && *field[6] ? atoi(field[6]) : current_type ? 1 : 0;
+      ml1->autoload = fields > 7 && *field[7] ? atoi(field[7]) : current_type ? 1 : 0;
+
+      ml = &(*ml)->next;
+    }
+
+    while(fields--) free(field[fields]);
+  }
+
+  fclose(f);
+
+  *ml = config.module.list;
+  config.module.list = ml0;
+
+#ifdef DEBUG_FILE
+  file_dump_mlist(config.module.list);
+#endif
+
+  return ml0;
+}
+
+
+#ifdef DEBUG_FILE
+
+void file_dump_mlist(module2_t *ml)
+{
+  for(; ml; ml = ml->next) {
+    fprintf(stderr, "%s (%s:%s): \"%s\"\n",
+      ml->name,
+      config.module.type_name[ml->type],
+      config.module.more_file[ml->type] ?: "-",
+      ml->descr ?: ""
+    );
+    fprintf(stderr, "  initrd = %s, show = %s, auto = %s\n",
+      ml->initrd ? "yes" : "no",
+      ml->show ? "yes" : "no",
+      ml->autoload ? "yes" : "no"
+    );
+    if(ml->param) fprintf(stderr, "  param: \"%s\"\n", ml->param);
+    if(ml->pre_inst) fprintf(stderr, "  pre_inst: \"%s\"\n", ml->pre_inst);
+    if(ml->post_inst) fprintf(stderr, "  post_inst: \"%s\"\n", ml->post_inst);
+  }
+}
+
+#endif
+
 

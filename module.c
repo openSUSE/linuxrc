@@ -32,6 +32,7 @@
 #include "info.h"
 #include "keyboard.h"
 #include "auto2.h"
+#include "file.h"
 
 #include "module_list.h"
 
@@ -45,7 +46,6 @@
 
 
 static int       mod_ram_modules_im = FALSE;
-static char     *mod_modpath_tm = "/modules";
 static module_t  mod_current_arm [NR_MODULES];
 static int       mod_show_kernel_im = FALSE;
 int       mod_force_moddisk_im = FALSE;
@@ -238,7 +238,7 @@ void mod_free_modules (void)
     {
     if (mod_ram_modules_im)
         {
-        umount (mod_modpath_tm);
+        umount (config.module.dir);
         util_free_ramdisk ("/dev/ram2");
         mod_ram_modules_im = FALSE;
         }
@@ -348,7 +348,7 @@ int mod_get_ram_modules (int type_iv)
     int i;
 
 
-    strcpy (testfile_ti, mod_modpath_tm);
+    strcpy (testfile_ti, config.module.dir);
     if (type_iv == MOD_TYPE_SCSI)
         {
         strcat (testfile_ti, "/SCSI");
@@ -394,7 +394,7 @@ int mod_get_ram_modules (int type_iv)
         umount (mountpoint_tg);
         if (!rc_ii)
             {
-            rc_ii = util_try_mount (RAMDISK_2, mod_modpath_tm, MS_MGC_VAL | MS_RDONLY, 0);
+            rc_ii = util_try_mount (RAMDISK_2, config.module.dir, MS_MGC_VAL | MS_RDONLY, 0);
 
             if (rc_ii)
                 dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
@@ -447,40 +447,25 @@ int mod_auto (int type_iv)
     }
 
 
-void mod_init (void)
-    {
-    static int   core_loaded_is = FALSE;
-           char *core_modules_ati [] = {
-#ifdef __sparc__
-				       "openprom",
-#endif
-                                       "nvram",
-                                       "8390"
-                                       };
-           int   i_ii;
-           char  tmp_ti [100];
+/*
+ * openprom, nvram
+ */
+void mod_init()
+{
+  char tmp[256];
+  module2_t *ml;
 
+  setenv("MODPATH", config.module.dir, 1);
 
-    if (!core_loaded_is)
-        {
-        setenv("MODPATH", mod_modpath_tm, 1);
-        for (i_ii = 0;
-             i_ii < sizeof (core_modules_ati) / sizeof (core_modules_ati [0]);
-             i_ii++)
-            {
-            mod_load_module (core_modules_ati [i_ii], 0);
-            sprintf (tmp_ti, "%s/%s.o", mod_modpath_tm, core_modules_ati [i_ii]);
-            /* gives trouble while using pcmcia */
-            /* unlink (tmp_ti);  */
-            }
+  sprintf(tmp, "%s/module.config", config.module.dir);
+  file_read_modinfo(tmp);
 
-#ifdef __i386__
-        mod_load_module ("isa-pnp", "isapnp_reset=0");
-#endif
-
-        core_loaded_is = TRUE;
-        }
+  for(ml = config.module.list; ml; ml = ml->next) {
+    if(ml->type == 0 && ml->autoload) {
+      mod_load_module(ml->name, ml->param);
     }
+  }
+}
 
 
 int mod_get_mod_type (char *name_tv)
@@ -1040,7 +1025,7 @@ static int mod_get_current_list (int mod_type_iv, int *nr_modules_pir,
             break;
         }
 
-    directory_ri = opendir (mod_modpath_tm);
+    directory_ri = opendir (config.module.dir);
     if (!directory_ri)
         return (-1);
 
@@ -1237,7 +1222,7 @@ static int mod_getmoddisk (int mod_type)
            char  testfile_ti [MAX_FILENAME];
     static int   gotit_is = FALSE;
 
-    sprintf (testfile_ti, "%s/NEEDMOD", mod_modpath_tm);
+    sprintf (testfile_ti, "%s/NEEDMOD", config.module.dir);
 
     if (!gotit_is && util_check_exist (testfile_ti))
         {

@@ -44,18 +44,8 @@ extern int   txt_init (void);
 #endif
 
 #if LXRC_TINY >= 1
-#undef TRANS_br
-#undef TRANS_cs
-#undef TRANS_el
-#undef TRANS_es
-#undef TRANS_hu
-#undef TRANS_id
-#undef TRANS_it
-#undef TRANS_nl
-#undef TRANS_pl
-#undef TRANS_pt_BR
-#undef TRANS_ro
-#undef TRANS_ru
-#undef TRANS_sk
+#define TRANS_de
+#define TRANS_en
+#define TRANS_fr
 #endif
 

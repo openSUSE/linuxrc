@@ -614,6 +614,7 @@ void lxrc_init()
   config.stderr_name = getenv("LINUXRC_STDERR");
   config.stderr_name = strdup(config.stderr_name ?: LINUXRC_DEFAULT_STDERR);
   freopen(config.stderr_name, "a", stderr);
+  setlinebuf(stderr);
 
   mount("proc", "/proc", "proc", 0, 0);
 
@@ -658,6 +659,9 @@ void lxrc_init()
   }
 
   lxrc_memcheck();
+
+  /* make it configurable? */
+  config.module.dir = strdup("/modules");
 
   mod_init();
 

@@ -161,6 +161,23 @@ typedef struct {
   char           *password;
 } smb_t;
 
+
+typedef struct module2_s {
+  struct module2_s *next;
+  char *name;		/* module name */
+  char *descr;		/* a description */
+  char *param;		/* sample module params */
+  char *pre_inst;	/* load these before */
+  char *post_inst;	/* load these after */
+  int type;		/* category, e.g. scsi, cdrom, network... */
+  unsigned initrd:1;	/* add it to initrd */
+  unsigned show:1;	/* show it in module list */
+  unsigned autoload:1;	/* can be autoloaded */
+} module2_t;
+
+
+#define MAX_MODULE_TYPES 10
+
 typedef struct {
   unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
@@ -180,6 +197,12 @@ typedef struct {
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
+  struct {
+    char *dir;				/* modules directory */
+    char *type_name[MAX_MODULE_TYPES];	/* module type names */
+    char *more_file[MAX_MODULE_TYPES];	/* file name of module archive */
+    module2_t *list;			/* list of all modules */
+  } module;
 } config_t;
 
 config_t config;

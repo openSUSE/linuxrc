@@ -48,4 +48,4 @@ void file_write_mtab(void);
 int file_read_info(void);
 int file_read_yast_inf(void);
 file_t *file_get_cmdline(file_key_t key);
-
+module2_t *file_read_modinfo(char *name);
