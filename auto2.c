@@ -50,7 +50,7 @@ static int activate_driver(hd_t *hd, slist_t **mod_list);
 static int auto2_activate_devices(unsigned base_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
-static int load_usb_storage(hd_data_t *hd_data);
+// static int load_usb_storage(hd_data_t *hd_data);
 static void auto2_progress(char *pos, char *msg);
 #ifdef __i386__
 static int auto2_ask_for_modules(int prompt, char *type);
@@ -984,6 +984,7 @@ int auto2_find_floppy()
 }
 
 
+#if 0
 /*
  * Return != 0 if we should load the usb-storage module.
  */
@@ -1012,6 +1013,7 @@ int load_usb_storage(hd_data_t *hd_data)
 
   return usb_floppies || usb_cdroms || usb_other;
 }
+#endif
 
 
 int auto2_pcmcia()
@@ -1064,7 +1066,7 @@ char *auto2_disk_list(int *boot_disk)
 extern void hd_scan_kbd(hd_data_t *hd_data);
 char *auto2_serial_console (void)
 {
-  static char console[32];
+  char console[32];
   char buf[256];
   hd_data_t *hd_data2;
   hd_t *hd;
@@ -1111,8 +1113,8 @@ char *auto2_serial_console (void)
       free (hd_data2);
     }
 
-  if (strlen (console) > 0)
-    return console;
+  if (*console)
+    return config.serial;
   else
     return NULL;
 }

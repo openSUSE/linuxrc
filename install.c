@@ -738,7 +738,7 @@ int inst_check_instsys()
       config.instdata_mounted = 1;
 
       sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
-      if(config.rescue || force_ri_ig || !util_is_dir(filename)) {
+      if(config.rescue || !util_is_dir(filename)) {
         sprintf(filename, "%s%s",
           config.mountpoint.instdata,
           config.demo ? config.demoimage : config.rescue ? config.rescueimage : config.rootimage
