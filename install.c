@@ -220,7 +220,7 @@ int inst_start_demo (void)
 int inst_menu (void)
     {
     int     width_ii = 40;
-    item_t  items_ari [6];
+    item_t  items_ari [5];
     int     nr_items_ii = sizeof (items_ari) / sizeof (items_ari [0]);
     int     choice_ii;
     int     i_ii;
@@ -230,9 +230,11 @@ int inst_menu (void)
     strcpy (items_ari [0].text, txt_get (TXT_START_INSTALL));
     strcpy (items_ari [1].text, txt_get (TXT_BOOT_SYSTEM));
     strcpy (items_ari [2].text, txt_get (TXT_START_RESCUE));
+#if 0
     strcpy (items_ari [3].text, txt_get (TXT_START_DEMO));
-    strcpy (items_ari [4].text, "Eject CD");
-    strcpy (items_ari [5].text, "Driver Update CD");
+#endif
+    strcpy (items_ari [3].text, "Eject CD");
+    strcpy (items_ari [4].text, "Driver Update CD");
     for (i_ii = 0; i_ii < nr_items_ii; i_ii++)
         {
         util_center_text (items_ari [i_ii].text, width_ii);
@@ -267,15 +269,17 @@ static int inst_menu_cb (int what_iv)
         case 3:
             error_ii = inst_start_rescue ();
             break;
+#if 0
         case 4:
             error_ii = inst_start_demo ();
             break;
-        case 5:
+#endif
+        case 4:
             sprintf(s, "/dev/%s", cdrom_tg);
             util_eject_cdrom(*cdrom_tg ? s : NULL);
             error_ii = -1;
             break;
-        case 6:
+        case 5:
             inst_update_cd ();
             error_ii = -1;
             break;

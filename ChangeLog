@@ -1,6 +1,7 @@
 16/1/2001:	v1.1.18.006
 	- save PCMCIA module params
 	- ask for mod disk before "Autoload of modules"
+	- removed Live CD from start menu
 
 16/1/2001:	v1.1.18.005
 	- added vfat to inst_mount_harddisk()
