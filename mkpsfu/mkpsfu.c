@@ -856,6 +856,7 @@ int assign_char_pos()
     }
 
     if(i <= GFX_END) {
+      if(used[i]) used[i]->new_index = -1;
       used[cd->new_index = i] = cd;
     }
   }
@@ -883,6 +884,7 @@ int assign_char_pos()
     }
 
     if(i < max_chars) {
+      if(used[i]) used[i]->new_index = -1;
       used[cd->new_index = i] = cd;
     }
   }

@@ -1,3 +1,6 @@
+13/9/2004:	v1.7.11
+	- fixed font creation
+
 10/9/2004:	v1.7.10
 	- wrote small console font (*.psfu) manipulation program (mkpsfu)
 	- added special linuxrc console fonts
