@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <endian.h>
 
 #include "global.h"
 #include "text.h"
@@ -293,11 +294,15 @@ void root_set_root (char *root_string_tv)
               root_devices_arm [i_ii].minor +
               atoi (tmp_string_pci + strlen (root_devices_arm [i_ii].dev_name));
 
+#if BYTE_ORDER == LITTLE_ENDIAN
+    root_ii <<= 16;
+#endif
+
     proc_root_pri = fopen ("/proc/sys/kernel/real-root-dev", "w");
     if (!proc_root_pri)
         return;
 
-    fprintf (proc_root_pri, "%d\n", root_ii);
+    fprintf (proc_root_pri, "%hd\n", root_ii);
     fclose (proc_root_pri);
     }
 

@@ -44,15 +44,16 @@ static char  *util_loopdev_tm = "/dev/loop0";
 void util_redirect_kmsg (void)
     {
     int  fd_ii;
-    int  newvt_ii;
+    char arg_aci [2];
 
 
-/*    fd_ii = open ("/dev/tty1", O_RDONLY); */
     fd_ii = open (console_tg, O_RDONLY);
     if (fd_ii)
         {
-        newvt_ii = (4 << 8) | 11;
-        ioctl (fd_ii, TIOCLINUX, &newvt_ii);
+        arg_aci [0] = 11;
+        arg_aci [1] = 4;
+
+        ioctl (fd_ii, TIOCLINUX, &arg_aci);
         close (fd_ii);
         }
     }
@@ -296,7 +297,7 @@ void util_print_banner (void)
     win_open (&win_ri);
 
     uname (&utsinfo_ri);
-    sprintf (text_ti, ">>> Linuxrc v1.0 (Kernel %s) (c) 1996-99 SuSE GmbH <<<",
+    sprintf (text_ti, ">>> Linuxrc v1.0b (Kernel %s) (c) 1996-99 SuSE GmbH <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
