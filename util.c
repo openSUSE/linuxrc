@@ -104,7 +104,9 @@ static int cmp_dir_entry_s(const void *p0, const void *p1);
 static void create_update_name(unsigned idx);
 
 static char *read_symlink(char *name);
-static void scsi_rename_single(char *old_name, char *new_name);
+static void scsi_rename_devices(void);
+static void scsi_rename_onedevice(char **dev);
+
 
 static int skip_spaces(unsigned char **str);
 static int word_size(unsigned char *str, int *width, int *enc_len);
@@ -3959,42 +3961,55 @@ void util_set_product_dir(char *prod)
  */
 void scsi_rename()
 {
-  unsigned u;
-
   if(!config.scsi_rename) return;
 
   get_scsi_list();
   rename_scsi_devs();
 
-  for(u = 0; u < scsi_list_len; u++) {
-    if(scsi_list[u]->new_name) {
-      scsi_rename_single(scsi_list[u]->name, scsi_list[u]->new_name);
-    }
-  }
+  scsi_rename_devices();
 
   free_scsi_list();
 }
 
 
-void scsi_rename_single(char *old_name, char *new_name)
+void scsi_rename_devices()
 {
   size_t i;
-  char **rs[] = { &config.floppydev, &config.update.dev };
+  slist_t *sl;
+  char **rs[] = { &config.floppydev, &config.update.dev, &config.cdrom };
 
   for(i = 0; i < sizeof config.floppy_dev / sizeof *config.floppy_dev; i++) {
-    if(config.floppy_dev[i] && !strcmp(short_dev(config.floppy_dev[i]), old_name)) {
-      str_copy(&config.floppy_dev[i], long_dev(new_name));
-    }
+    scsi_rename_onedevice(config.floppy_dev + i);
   }
 
   for(i = 0; i < sizeof rs / sizeof *rs; i++) {
-    if(*rs[i] && !strcmp(*rs[i], old_name)) {
-      str_copy(rs[i], new_name);
-    }
+    scsi_rename_onedevice(rs[i]);
   }
 
-  if(config.cdrom) {
-    if(!strcmp(config.cdrom, old_name)) str_copy(&config.cdrom, new_name);
+  for(sl = config.disks; sl; sl = sl->next) {
+    scsi_rename_onedevice(&sl->key);
+  }
+}
+
+
+void scsi_rename_onedevice(char **dev)
+{
+  unsigned u, is_long = 0;
+  char *s_dev;
+
+  if(!dev || !*dev) return;
+
+  s_dev = *dev;
+
+  if(!strncmp(s_dev, "/dev/", sizeof "/dev/" - 1)) {
+    s_dev += sizeof "/dev/" - 1;
+    is_long = 1;
+  }
+
+  for(u = 0; u < scsi_list_len; u++) {
+    if(scsi_list[u]->new_name && !strcmp(scsi_list[u]->name, s_dev)) {
+      str_copy(dev, is_long ? long_dev(scsi_list[u]->new_name) : scsi_list[u]->new_name);
+    }
   }
 }
 

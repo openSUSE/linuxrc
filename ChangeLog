@@ -1,4 +1,5 @@
 	- new hungarian texts
+	- fix bug in scsi device renaming code (#49391)
 
 12/10/2004:	v1.7.18
 	- linuxrc should *not* ask for dhcp after netsetup=dhcp
