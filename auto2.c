@@ -591,6 +591,9 @@ int activate_driver(hd_t *hd, slist_t **mod_list)
 
   if(hd->is.notready) return 1;
 
+  /* skip pcmcia devices; card manager handles those */
+  if(ID_TAG(hd->vendor.id) == TAG_PCMCIA) return 0;
+
   for(di = hd->driver_info; di; di = di->next) {
     if(di->module.type == di_module) {
       for(
