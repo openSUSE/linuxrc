@@ -26,6 +26,7 @@
 #include "auto2.h"
 #include "rootimage.h"
 #include "display.h"
+#include "fstype.h"
 
 #define YAST_INF_FILE		"/etc/yast.inf"
 #define INSTALL_INF_FILE	"/etc/install.inf"
@@ -39,7 +40,6 @@ static file_key_t file_str2key(char *value);
 static int sym2index(char *sym);
 static void parse_value(file_t *ft);
 
-static char *file_read_info_file(char *file, char *file2);
 void file_write_modparms(FILE *f);
 static void file_module_load (char *insmod_arg);
 #ifdef DEBUG_FILE
@@ -141,6 +141,7 @@ static struct {
   { key_memlimit,       "MemLimit"         },
   { key_memyast,        "MemYaST"          },
   { key_memmodules,     "MemModules"       },
+  { key_memloadimage,   "MemLoadImage"     },
   { key_info,           "Info"             },
   { key_proxy,          "Proxy"            },
   { key_proxyport,      "ProxyPort"        },
@@ -160,7 +161,11 @@ static struct {
   { key_installdir,     "InstallDir"       },
   { key_nopcmcia,       "NoPCMCIA"         },
   { key_vnc,            "VNC"              },
-  { key_vncpassword,    "VNCPassword"      }
+  { key_vncpassword,    "VNCPassword"      },
+  { key_usepivotroot,   "UsePivotRoot"     },
+  { key_term,           "TERM"             },
+  { key_addswap,        "AddSwap"          },
+  { key_fullnetsetup,   "FullNetSetup"     }
 };
 
 static struct {
@@ -472,6 +477,7 @@ void file_do_info(file_t *f0)
   file_t *f;
   url_t *url;
   int i;
+  char buf[256], *s, *t;
 
   config.info.mod_autoload = 0;
   config.info.start_pcmcia = 0;
@@ -643,6 +649,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.memory.min_modules = f->nvalue;
         break;
 
+      case key_memloadimage:
+        if(f->is.numeric) config.memory.load_image = f->nvalue;
+        break;
+
       case key_tmpfs:
         if(f->is.numeric) config.tmpfs = f->nvalue;
         break;
@@ -755,6 +765,37 @@ void file_do_info(file_t *f0)
       case key_vncpassword:
         str_copy(&config.net.vncpassword, *f->value ? f->value : NULL);
         config.vnc = 1;
+        break;
+
+      case key_usepivotroot:
+        if(f->is.numeric) config.pivotroot = f->nvalue;
+        break;
+
+      case key_fullnetsetup:
+        if(f->is.numeric) config.fullnetsetup = f->nvalue;
+        break;
+
+      case key_term:
+        str_copy(&config.term, *f->value ? f->value : NULL);
+        break;
+
+      case key_addswap:
+        if(f->is.numeric) {
+          config.addswap = f->nvalue;
+        }
+        else {
+          char *argv[] = { };
+
+          s = f->value;
+          if(strstr(s, "/dev/") != s) {
+            sprintf(s = buf, "/dev/%s", f->value);
+          }
+          t = fstype(s);
+          if(t && strcmp(t, "swap")) {
+            argv[1] = s;
+            util_swapon_main(2, argv);
+          }
+        }
         break;
 
       default:
@@ -908,7 +949,9 @@ void file_write_install_inf(char *dir)
 
   if(serial_ig) file_write_str(f, key_console, console_parms_tg);
 
-  file_write_str(f, key_instmode, get_instmode_name(config.instmode));
+  file_write_str(f, key_instmode,
+    get_instmode_name(config.instmode_extra == inst_dvd ? config.instmode_extra : config.instmode)
+  );
 
   if(config.insttype == inst_hd) {
     file_write_str(f, key_partition, config.partition);

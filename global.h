@@ -18,15 +18,6 @@
 
 #include "version.h"
 
-#ifdef __alpha__
-#define MEM_LIMIT_RAMDISK_YAST2	500*1024*1024
-#else
-#define MEM_LIMIT_RAMDISK_YAST2	256*1024*1024
-#endif
-
-#define MEM_LIMIT_SWAP_MSG	15000000
-#define MEM_LIMIT_CACHE_LIBS	63000000
-
 #if defined(__sparc__) || defined(__PPC__) || defined(__s390__) || defined(__s390x__)
 #define WITH_PCMCIA	0
 #else
@@ -210,6 +201,9 @@ typedef struct {
   unsigned nopcmcia:1;		/* don't start pcmcia automatically */
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
+  unsigned pivotroot:1;		/* use pivotroot system call */
+  unsigned addswap:1;		/* offer to add swap if yast needs it */
+  unsigned fullnetsetup:1;	/* offer all network protocols */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */
@@ -243,6 +237,8 @@ typedef struct {
   char *rootimage;		/* "/suse/images/root" */
   char *rescueimage;		/* "/suse/images/rescue" */
   char *demoimage;		/* "/suse/images/cd-demo" */
+  char *term;			/* TERM var */
+  char *susecd;			/* set if we found a SuSE cd */
 
   struct {
     char *buf;
@@ -274,6 +270,7 @@ typedef struct {
     int min_free;		/* don't let it drop below this */
     int min_modules;		/* remove modules before starting yast, if it drops below this */
     int min_yast;		/* minimum for yast */
+    int load_image;		/* _load_ rootimage, if we have at least that much */
   } memory;
 
   struct {
@@ -340,7 +337,6 @@ extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
 extern char            netdevice_tg [20];
 extern int             pcmcia_chip_ig;
-extern uint64_t        memory_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
 extern int             explode_win_ig;
@@ -362,7 +358,6 @@ extern int             reboot_ig;
 extern int             usb_ig;
 extern char            *usb_mods_ig;
 extern int             reboot_ig;
-extern int             found_suse_cd_ig;
 extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;

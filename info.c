@@ -138,6 +138,7 @@ void info_init (void)
     char               devname_ti [30];
     int                fd_ii;
     int                i_ii;
+    uint64_t           memory_ig;
 
 
     line_ti [sizeof (line_ti) - 1] = 0;

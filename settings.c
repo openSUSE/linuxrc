@@ -97,52 +97,6 @@ static language_t set_languages_arm [] =
 };
 #endif
 
-
-/* Is this really still needed ??????? */
-// #if defined(__alpha__)
-#if 0
-
-#define LANG_DEFAULT    1
-static language_t set_languages_arm [] =
-{
-{ LANG_GERMAN,       "Deutsch",              "de-lat1-nd",   "default8x16.psfu",
-  "none",            "def.uni", 0, 0,      "de_DE",        "german"        },
-{ LANG_ENGLISH,      "English",              "us",           "default8x16.psfu",
-  "none",            "def.uni", 0, 0,      "en_US",        "english"       },
-{ LANG_SPANISH,      "Español",              "es",           "default8x16.psfu",
-  "none",            "def.uni", 0, 1,      "es_ES",        "spanish"       },
-{ LANG_FRENCH,       "Français",             "fr-latin1",    "default8x16.psfu",
-  "none",            "def.uni", 0, 0,      "fr_FR",        "french"        },
-{ LANG_BRETON,       "Brezhoneg",            "fr-latin1",    "default8x16.psfu",
-  "none",            "def.uni", 0, 0,      "fr_FR",        "breton"        },
-{ LANG_GREEK,        "Hellenic",             "gr",           "lat7-16.psfu",
-  "trivial",         "lat7u.uni", 1, 1,      "el_EL",        "greek"         },
-{ LANG_INDONESIA,    "Indonesia",            "us",           "default8x16.psfu",
-  "none",            "def.uni", 0, 1,      "de_DE",        "indonesian"    },
-{ LANG_ITALIAN,      "Italiano",             "it",           "default8x16.psfu",
-  "none",            "def.uni", 0, 0,      "it_IT",        "italian"       },
-{ LANG_HUNGARIA,     "Magyar",               "hu",           "lat2u-16.psf",
-  "latin2u.scrnmap", "lat2u.uni", 1, 1,      "hu_HU",        "hungarian"     },
-{ LANG_DUTCH,        "Nederlands",           "us",           "default8x16.psfu",
-  "none",            "def.uni", 0, 1,      "nl_NL",        "dutch"         },
-{ LANG_POLISH,       "Polski",               "Pl02",         "lat2u-16.psf",
-  "latin2u.scrnmap", "lat2u.uni", 1, 1,      "pl_PL",        "polish"        },
-{ LANG_PORTUGUESE,   "Português",            "pt-latin1",    "default8x16.psfu",
-  "none",            "def.uni", 0, 1,      "pt_PT",        "portuguese"    },
-{ LANG_BRAZIL,       "Português Brasileiro", "br-abnt2",     "default8x16.psfu",
-  "none",            "def.uni", 0, 1,      "pt_BR",        "brazilian"     },
-{ LANG_ROMANIAN,     "Romania",              "us",           "lat2u-16.psf",
-  "latin2u.scrnmap", "lat2u.uni", 1, 1,      "en_US",        "romanian"      },
-{ LANG_RUSSIA,       "Russian",              "ru1",          "Cyr_a8x16",
-  "koi2alt",         "cyralt.uni",1, 1,      "ru_RU.KOI8-R", "russian"       },
-{ LANG_CZECH,        "Cestina",              "cz-us-qwertz", "lat2u-16.psf",
-  "latin2u.scrnmap", "lat2u.uni", 1, 1,      "cs_CZ",        "czech"         },
-{ LANG_SLOVAK,       "Slovencina",           "sk-qwerty",    "lat2u-16.psf",
-  "latin2u.scrnmap", "lat2u.uni", 1, 1,      "sk_SK",        "slovak"        },
-};
-#endif
-
-
 #if defined(__i386__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__)
 #define KEYMAP_DEFAULT	1
 static keymap_t set_keymaps_arm [] =
@@ -358,8 +312,9 @@ void set_choose_keytable(int always_show)
   char *items[NR_KEYMAPS + 1];
   int keymaps = NR_KEYMAPS;
   keymap_t *keymap = set_keymaps_arm;
-  int i, cur_lang, def_keymap_idx;
+  int i, cur_lang, def_keymap_idx, cnt, default_idx;
   char *def_keymap;
+  char buf[256];
 
 #ifdef __PPC__
   if(!strcmp(xkbmodel_tg, "macintosh")) {
@@ -387,10 +342,16 @@ void set_choose_keytable(int always_show)
 
   if(!config.win && !always_show) return;
 
-  for(i = 0; i < keymaps; i++) items[i] = keymap[i].descr;
-  items[i] = NULL;
+  for(i = cnt = default_idx = 0; i < keymaps; i++) {
+    sprintf(buf, "/kbd/keymaps/%s.map", keymap[i].mapname);
+    if(config.test || util_check_exist(buf)) {
+      if(i == def_keymap_idx) default_idx = cnt;
+      items[cnt++] = keymap[i].descr;
+    }
+  }
+  items[cnt] = NULL;
 
-  i = dia_list(txt_get(TXT_CHOOSE_KEYMAP), 24, NULL, items, def_keymap_idx + 1, align_left);
+  i = dia_list(txt_get(TXT_CHOOSE_KEYMAP), 24, NULL, items, default_idx + 1, align_left);
 
   if(i) set_activate_keymap(keymap[i - 1].mapname);
 }

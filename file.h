@@ -25,10 +25,11 @@ typedef enum {
   key_dhcpshaddr, key_dhcpsname, key_rootpath, key_bootfile, key_install,
   key_instmode, key_memtotal, key_memfree, key_buffers, key_cached,
   key_swaptotal, key_swapfree, key_memlimit, key_memyast, key_memmodules,
-  key_info, key_proxy, key_proxyport, key_proxyproto, key_usedhcp,
-  key_nfsport, key_dhcptimeout, key_tftptimeout, key_tmpfs, key_testmode,
-  key_debugwait, key_auto, key_expert, key_rescue, key_rootimage,
-  key_rescueimage, key_installdir, key_nopcmcia, key_vnc, key_vncpassword
+  key_memloadimage, key_info, key_proxy, key_proxyport, key_proxyproto,
+  key_usedhcp, key_nfsport, key_dhcptimeout, key_tftptimeout, key_tmpfs,
+  key_testmode, key_debugwait, key_auto, key_expert, key_rescue,
+  key_rootimage, key_rescueimage, key_installdir, key_nopcmcia, key_vnc,
+  key_vncpassword, key_usepivotroot, key_term, key_addswap, key_fullnetsetup
 } file_key_t;
 
 typedef struct file_s {
@@ -52,6 +53,7 @@ void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num);
 void file_write_install_inf(char *dir);
 // void file_write_mtab(void);
 int file_read_info(void);
+char *file_read_info_file(char *file, char *file2);
 int file_read_yast_inf(void);
 file_t *file_get_cmdline(file_key_t key);
 file_t *file_read_cmdline(void);

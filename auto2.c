@@ -68,6 +68,8 @@ int auto2_mount_cdrom(char *device)
 
   set_instmode(inst_cdrom);
 
+  if(config.susecd && strstr(config.susecd, "-DVD-")) set_instmode(inst_dvd);
+
   rc = mount(device, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
   if(!rc) {
     if((rc = inst_check_instsys())) {
@@ -81,6 +83,8 @@ int auto2_mount_cdrom(char *device)
   else {
     fprintf(stderr, "%s does'nt have an ISO9660 file syetem.\n", device);
   }
+
+  if(rc) set_instmode(inst_cdrom);
 
   return rc;
 }
@@ -344,7 +348,8 @@ int auto2_cdrom_dev(hd_t **hd0)
       else {
         if(ci->iso9660.ok && ci->iso9660.volume && strstr(ci->iso9660.volume, "SU") == ci->iso9660.volume) {
           fprintf(stderr, "Found SuSE CD in %s\n", hd->unix_dev_name);
-          found_suse_cd_ig = TRUE;
+          str_copy(&config.susecd, ci->iso9660.volume);
+          if(ci->iso9660.application) str_copy(&config.susecd, ci->iso9660.application);
           /* CD found -> try to mount it */
           i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
         }
@@ -465,8 +470,6 @@ int auto2_net_dev(hd_t **hd0)
           }
 
           deb_msg("NFS mount ok.");
-
-          config.instmode = inst_nfs;	// #### FIX: this is likely the wrong place!
           break;
 
         case inst_ftp:
@@ -801,7 +804,7 @@ int auto2_find_install_medium()
   // TODO: +=SMB
 #endif
 
-  deb_msg("Well, maybe there is a NFS/FTP/SMB server...");
+  deb_msg("Well, maybe there is a network server...");
 
   util_debugwait("Net?");
 
@@ -834,7 +837,7 @@ int auto2_find_install_medium()
       break;
     }
 
-    fprintf(stderr, "Looking for a NFS/FTP/SMB server again...\n");
+    fprintf(stderr, "Looking for a network server again...\n");
     if(!auto2_net_dev(&hd_devs)) {
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);

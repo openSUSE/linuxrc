@@ -14,7 +14,10 @@
 int             max_x_ig = X_DEFAULT;
 int             max_y_ig = Y_DEFAULT;
 
-/* for default config, look at linuxrc.c::lxrc_init() */
+/*
+ * for default config, look at linuxrc.c::lxrc_init()
+ * Do NOT set it here!
+ */
 config_t config;
 
 colorset_t     *colors_prg;
@@ -24,7 +27,6 @@ char           *lastlog_tg = "/etc/lastlog";
 char           *bootmsg_tg = "/var/log/boot.msg";
 char            netdevice_tg [20] = "eth0";
 int             pcmcia_chip_ig = 0;
-uint64_t        memory_ig = 8192000;
 int             cpu_ig = 0;
 int             force_ri_ig = FALSE;
 int             explode_win_ig = TRUE;
@@ -45,7 +47,6 @@ int             yast_version_ig = 0;
 int             reboot_ig;
 int             usb_ig = 0;
 char            *usb_mods_ig = NULL;
-int             found_suse_cd_ig = FALSE;
 char            xkbmodel_tg [20] = "";
 unsigned        yast2_color_ig = 0;
 int             reboot_wait_ig = FALSE;

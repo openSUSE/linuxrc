@@ -23,7 +23,7 @@ find . -depth -name .cvsignore -exec rm -r {} \;
 rm -f ci_linuxrc Makefile.new
 cd /tmp
 
-tar -jcf $linuxrc.tar.bz2 linuxrc-$ver
+tar -Icf $linuxrc.tar.bz2 linuxrc-$ver
 
 if mkdir /work/src/done/STABLE/linuxrc ; then
   cd /work/src/done/STABLE/linuxrc

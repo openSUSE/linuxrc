@@ -72,7 +72,7 @@ static int inst_choose_netsource_cb(dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
-static int   inst_init_cache          (void);
+// static int   inst_init_cache          (void);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
 static int   inst_do_ftp              (void);
@@ -334,11 +334,14 @@ int inst_choose_netsource()
 
   inst_umount();
 
-#if 0
   config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
 
   if(!config.net.smb_available) items[3] = di_skip;
-#endif
+
+  if(!config.fullnetsetup) {
+    // yast doesn't support it :-((
+    items[0] = items[1] = items[4] = di_skip;
+  }
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
@@ -355,7 +358,6 @@ int inst_choose_netsource()
 int inst_choose_netsource_cb(dia_item_t di)
 {
   int error = FALSE;
-  char buf[256];
 
   di_inst_choose_netsource_last = di;
 
@@ -364,6 +366,7 @@ int inst_choose_netsource_cb(dia_item_t di)
       error = inst_mount_nfs();
       break;
 
+#if 0
     case di_netsource_smb:
       config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
       if(!config.net.smb_available) {
@@ -373,6 +376,7 @@ int inst_choose_netsource_cb(dia_item_t di)
       config.net.smb_available = config.test || util_check_exist("/bin/smbmount");
       error = config.net.smb_available ? inst_mount_smb() : 1;
       break;
+#endif
 
     case di_netsource_ftp:
       error = inst_do_ftp();
@@ -894,7 +898,10 @@ int inst_prepare()
 
   setenv("INSTSYS", config.instsys, TRUE);
 
-  if(config.memory.current < config.memory.min_modules) {
+  if(config.term) setenv("TERM", config.term, TRUE);
+
+  util_free_mem();
+  if(config.memory.current - config.memory.free_swap < config.memory.min_modules) {
     putenv("REMOVE_MODULES=1");
   }
   else {
@@ -929,7 +936,7 @@ int inst_prepare()
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
   }
 
-  if(!config.use_ramdisk) rc = inst_init_cache();
+//  if(!config.use_ramdisk) rc = inst_init_cache();
 
   return rc;
 }
@@ -961,16 +968,11 @@ int inst_execute_yast()
 
   if(!config.test) {
     lxrc_set_modprobe("/sbin/modprobe");
-
     if(util_check_exist("/sbin/update")) system("/sbin/update");
-
-    util_start_shell("/dev/tty2", "/bin/bash", 1);
-    util_start_shell("/dev/tty5", "/bin/bash", 1);
-    util_start_shell("/dev/tty6", "/bin/bash", 1);
   }
 
   util_free_mem();
-  ask_for_swap(
+  if(config.addswap )ask_for_swap(
     (config.memory.min_yast - config.memory.min_free) << 10,
     "Not enough memory for YaST.\n"
     "(We're still checking memory limits, so don't panic if you have a 64MB system!)"
@@ -979,7 +981,7 @@ int inst_execute_yast()
   i = 0;
 
   util_free_mem();
-  if(config.memory.current < config.memory.min_yast) {
+  if(config.addswap && config.memory.current < config.memory.min_yast) {
     if(!config.textmode) {
       int win_old;
       if(!(win_old = config.win)) util_disp_init();
@@ -1009,6 +1011,13 @@ int inst_execute_yast()
       rename("/.bin", "/bin");
     }
     return -1;
+  }
+
+  /* start shells only _after_ the swap dialog */
+  if(!config.test) {
+    util_start_shell("/dev/tty2", "/bin/bash", 1);
+    util_start_shell("/dev/tty5", "/bin/bash", 1);
+    util_start_shell("/dev/tty6", "/bin/bash", 1);
   }
 
   disp_set_color(COL_WHITE, COL_BLACK);
@@ -1211,6 +1220,7 @@ int inst_commit_install()
 }
 
 
+#if 0
 static int inst_init_cache (void)
     {
     char     *files_ati [] = {
@@ -1265,6 +1275,7 @@ static int inst_init_cache (void)
     win_close (&status_ri);
     return (0);
     }
+#endif
 
 
 int inst_umount()

@@ -539,6 +539,8 @@ int mod_add_disk(int prompt, int type)
     else {
       if(config.tmpfs) {
         added = mod_copy_modules(config.mountpoint.ramdisk2, 1);
+        sprintf(buf, "%s/modules", config.mountpoint.ramdisk2);
+        added += mod_copy_modules(buf, 1);
         ramdisk_free(config.module.ramdisk);
         config.module.ramdisk = -1;
       }

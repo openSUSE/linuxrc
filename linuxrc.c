@@ -387,7 +387,7 @@ void lxrc_end (void)
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "smbmount"
+    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "smbmount", "cardmgr"
   };
   int i;
 
@@ -552,6 +552,10 @@ void lxrc_init()
 
   umask(022);
 
+  if(!config.test) {
+    mount("proc", "/proc", "proc", 0, 0);
+  }
+
   /* add cmdline to info file */
   config.info.add_cmdline = 1;
 
@@ -578,13 +582,16 @@ void lxrc_init()
 
   config.color = 2;
   config.net.use_dhcp = 1;
+  config.addswap = 1;
+  yast_version_ig = 2;
 
-#if defined(__PPC__) || defined(__sparc__)
-  auto2_ig = 1;
-#else
-  config.manual = 1;
-#endif
-
+  /* make auto mode default */
+  if(config.test) {
+    config.manual = 1;
+  }
+  else {
+    auto2_ig = 1;
+  }
 
 #if defined(__s390__) || defined(__s390x__)
   config.initrd_has_ldso = 1;
@@ -598,9 +605,18 @@ void lxrc_init()
   config.inst_ramdisk = -1;
   config.module.ramdisk = -1;
 
+  file_read_info_file("file:/linuxrc.config", NULL);
+
   if((s = getenv("lang"))) {
     i = set_langidbyname(s);
     if(i) config.language = i;
+  }
+
+  ft = file_get_cmdline(key_manual);
+  if(ft && ft->is.numeric) {
+    config.manual = ft->nvalue;
+    auto_ig = 0;
+    auto2_ig = config.manual ^ 1;
   }
 
   ft = file_get_cmdline(key_info);
@@ -730,8 +746,6 @@ void lxrc_init()
 #endif
 
   if(!config.test) {
-    mount("proc", "/proc", "proc", 0, 0);
-
     fprintf(stderr, "Remount of / ");
     i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
     fprintf(stderr, i ? "failed\n" : "ok\n");
@@ -748,9 +762,12 @@ void lxrc_init()
   config.memory.min_free = 10 * 1024;		// at least 10MB
   config.memory.min_yast = 48 * 1024;		// at least 48MB
   config.memory.min_modules = 64 * 1024;	// at least 64MB
+  config.memory.load_image = 256 * 1024;	// at least 256MB
   if(config.memory.free < config.memory.min_free) {
     config.memory.min_free = config.memory.free;
   }
+
+  if(config.memory.free > config.memory.load_image) force_ri_ig = 1;
 
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");
@@ -774,8 +791,6 @@ void lxrc_init()
   fflush(stdout);
 
   info_init();
-
-  if(memory_ig > MEM_LIMIT_RAMDISK_YAST2) force_ri_ig = TRUE;
 
   lxrc_memcheck();
 
@@ -977,7 +992,7 @@ static void lxrc_memcheck (void)
 
     lxrc_catch_signal (0);
 
-    if (memory_ig < 8000000)
+    if (config.memory.free < 8000)
         max_pages_ii = 40;
     else
         max_pages_ii = 100;

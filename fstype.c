@@ -40,8 +40,7 @@
 #include "linux_fs.h"
 #include "fstype.h"
 
-/* we really don't need to check for all... */
-// #define ALL_TYPES
+#define ALL_TYPES
 
 #define SIZE(a) (sizeof(a)/sizeof(a[0]))
 

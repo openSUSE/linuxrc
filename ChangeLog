@@ -1,3 +1,16 @@
+3/3/2002:	v1.3.22
+	- detect more fstypes
+	- 'TERM' var settable via info file
+	- swap space can be activated via info file
+	- drop ftp/tftp/http net install offer (not implemented in yast)
+	- show only keytables that really exist
+	- new czech translations
+	- don't ask for samba disk, smb is always supported
+	- remove ancient memory limits
+	- report to yast whether we found a dvd
+	- look at 'modules' subdir on module disk images, too
+	- make 'auto' mode default
+
 27/2/2002:	v1.3.21
 	- dhcpcd: don't depend on a second DHCPOFFER -- breaks with
 	  Lucent Technologies server

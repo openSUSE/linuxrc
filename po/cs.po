@@ -823,10 +823,6 @@ msgstr ""
 msgid "Load unknown modules"
 msgstr ""
 
-#. TXT_SMBDISK
-msgid "Please insert the Samba disk."
-msgstr ""
-
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format

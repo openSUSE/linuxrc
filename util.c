@@ -930,8 +930,9 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory limits: min %d, yast %d, modules %d",
-    config.memory.min_free, config.memory.min_yast, config.memory.min_modules
+    "memory limits: min %d, yast %d, modules %d, image %d",
+    config.memory.min_free, config.memory.min_yast,
+    config.memory.min_modules, config.memory.load_image
   );
   slist_append_str(&sl0, buf);
 
@@ -965,6 +966,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
   add_flag(&sl0, buf, config.activate_storage, "act_storage");
   add_flag(&sl0, buf, config.activate_network, "act_net");
+  add_flag(&sl0, buf, config.pivotroot, "pivotroot");
+  add_flag(&sl0, buf, config.addswap, "addswap");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.autoyast) {
@@ -1011,11 +1014,15 @@ void util_status_info()
   strcat(buf, " )");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "suse_cd = %d", found_suse_cd_ig);
-  slist_append_str(&sl0, buf);
+  if(config.susecd) {
+    sprintf(buf, "cdrom id = %s", config.susecd);
+    slist_append_str(&sl0, buf);
+  }
 
-  sprintf(buf, "driver_update = \"%s\"", driver_update_dir);
-  slist_append_str(&sl0, buf);
+  if(*driver_update_dir) {
+    sprintf(buf, "driver_update = %s", driver_update_dir);
+    slist_append_str(&sl0, buf);
+  }
 
   sprintf(buf, "hostname = %s", inet2print(&config.net.hostname));
   slist_append_str(&sl0, buf);
@@ -1110,6 +1117,11 @@ void util_status_info()
 
   sprintf(buf, "vga = 0x%04x", frame_buffer_mode_ig);
   slist_append_str(&sl0, buf);
+
+  if(config.term) {
+    sprintf(buf, "term = \"%s\"", config.term);
+    slist_append_str(&sl0, buf);
+  }
 
   sprintf(buf, "serial = %d, console = \"%s\", consoleparams = \"%s\"", serial_ig, console_tg, console_parms_tg);
   slist_append_str(&sl0, buf);
@@ -2625,6 +2637,10 @@ void set_instmode(instmode_t instmode)
 
     default:
       config.insttype = inst_net;
+  }
+
+  if(instmode == inst_ftp || instmode == inst_tftp || instmode == inst_http) {
+    config.fullnetsetup = 1;
   }
 }
 
