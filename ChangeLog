@@ -1,3 +1,6 @@
+5/4/2004:	v1.6.16
+	- scsi rename code enabled
+
 3/4/2004:	v1.6.15
 	- updated code that ensures usb/firewire devices are always
 	  the last scsi devices (#36187)

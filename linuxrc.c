@@ -655,11 +655,8 @@ void lxrc_init()
 
   config.hwdetect = 1;
 
-#if 0
-  /* disabled, see #38222 */
   config.scsi_rename = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
-#endif
 
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;

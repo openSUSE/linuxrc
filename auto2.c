@@ -892,10 +892,11 @@ int auto2_find_install_medium()
     util_debugwait("CD?");
 
     need_modules = 0;
-  
+
+    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
-      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       auto2_user_netconfig();
       return TRUE;
@@ -914,7 +915,6 @@ int auto2_find_install_medium()
 
       fprintf(stderr, "Looking for a %s CD again...\n", config.product);
       if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
         auto2_user_netconfig();
         return TRUE;
@@ -933,9 +933,10 @@ int auto2_find_install_medium()
 
     need_modules = 0;
   
+    if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
+
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
-      if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       auto2_user_netconfig();
       return TRUE;
@@ -954,7 +955,6 @@ int auto2_find_install_medium()
 
       fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
       if(!(i = auto2_harddisk_dev(&hd_devs))) {
-        if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
         auto2_user_netconfig();
         return TRUE;
