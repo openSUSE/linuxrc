@@ -675,7 +675,7 @@ static void lxrc_check_console (void)
 
         *tmp_pci = 0;
 	strncpy (console_parms_tg, tmp_pci, sizeof (console_parms_tg));
-	console_parms_tg[sizeof(console_parms) - 1] = '\0';
+	console_parms_tg[sizeof(console_parms_tg) - 1] = '\0';
 
 	/* Now search only for the device name */
 	tmp_pci = found_pci;
