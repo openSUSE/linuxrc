@@ -1033,6 +1033,8 @@ int inst_execute_yast()
     unlink("/etc/shadow");
     sprintf(cmd, "cp %s/etc/shadow /etc", config.instsys);system(cmd);
     sprintf(cmd, "cp %s/etc/passwd /etc", config.instsys);system(cmd);
+    sprintf(cmd, "%s/etc/pam.d", config.instsys);symlink(cmd,"/etc/pam.d");
+
  
     passwd = popen("/usr/sbin/chpasswd","w");
     if (passwd) {

@@ -1,3 +1,4 @@
+	- symlink /etc/pam.d from instsys so we can run chpasswd for ssh mode.
 	- ask for passwords not only on auto install with DHCP/BOOTP, but
 	  also with static config.
 
