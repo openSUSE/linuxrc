@@ -932,9 +932,11 @@ static int inst_commit_install (void)
             !strncasecmp (root_ti, "reboot", 6) ||
             reboot_ig)
             {
-            disp_clear_screen();
-            util_disp_init();
-            dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
+            if(!auto_ig) {
+              disp_clear_screen();
+              util_disp_init();
+              dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
+            }
             reboot (RB_AUTOBOOT);
             rc_ii = -1;
             }

@@ -100,7 +100,7 @@ void file_write_yast_info (void)
         return;
         }
 
-    if (!auto2_ig)
+    if (language_ig != LANG_UNDEF)
         set_write_info (file_pri);
 
     strcpy (line_ti, file_txt_sourcemount_tm);
