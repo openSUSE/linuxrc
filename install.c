@@ -1281,7 +1281,8 @@ int inst_auto2_install()
     i = root_load_rootimage(inst_rootimage_tm);
     fprintf(stderr, "Loading of rootimage returns %d\n", i);
 //    umount(mountpoint_tg);
-    umount(inst_mountpoint_tg);
+//    umount(inst_mountpoint_tg);
+    inst_umount();
 
     if(i || inst_rescue_im) return i;
 
