@@ -1022,7 +1022,7 @@ int net_bootp()
   win_close(&win);
 
   if(rc || !getenv("BOOTP_IPADDR")) {
-    if(bootmode_ig == BOOTMODE_CDWITHNET) {
+    if(config.instmode_extra == inst_cdwithnet) {
       dia_input("HOSTNAME", machine_name_tg, sizeof machine_name_tg - 1, 16);
 
       if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 0)) netconf_error++;
@@ -1118,7 +1118,7 @@ int net_bootp()
   }
 
 #ifdef CDWITHNET_DEBUG
-  if(bootmode_ig == BOOTMODE_CDWITHNET) {
+  if(config.instmode_extra == inst_cdwithnet) {
     dia_message(machine_name_tg, MSGTYPE_ERROR);
   }
 #endif

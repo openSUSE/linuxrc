@@ -897,8 +897,11 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "instmode = %s [%d], net_config_mask = 0x%x",
-    file_num2sym("no scheme", config.instmode), config.insttype,
+    "instmode = %s%s%s [%s], net_config_mask = 0x%x",
+    file_num2sym("no scheme", config.instmode),
+    config.instmode == config.instmode_extra ? "" : "/",
+    config.instmode == config.instmode_extra ? "" : file_num2sym("no scheme", config.instmode_extra),
+    file_num2sym("no scheme", config.insttype),
     net_config_mask()
   );
   slist_append_str(&sl0, buf);
@@ -2276,22 +2279,26 @@ void str_copy(char **dst, char *src)
 
 void set_instmode(instmode_t instmode)
 {
-  config.instmode = instmode;
+  config.instmode_extra = config.instmode = instmode;
+
   switch(instmode) {
     case inst_cdrom:
-      config.insttype = insttype_cdrom;
+    case inst_cdwithnet:
+    case inst_dvd:
+      config.insttype = inst_cdrom;
+      config.instmode = inst_cdrom;
       break;
 
     case inst_hd:
-      config.insttype = insttype_hd;
+      config.insttype = inst_hd;
       break;
 
     case inst_floppy:
-      config.insttype = insttype_floppy;
+      config.insttype = inst_floppy;
       break;
 
     default:
-      config.insttype = insttype_net;
+      config.insttype = inst_net;
   }
 }
 

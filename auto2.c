@@ -66,7 +66,7 @@ int auto2_mount_cdrom(char *device)
 {
   int rc;
 
-  bootmode_ig = BOOTMODE_CD;
+  set_instmode(inst_cdrom);
 
   rc = mount(device, mountpoint_tg, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
   if(!rc) {
@@ -99,11 +99,13 @@ int auto2_mount_harddisk(char *device)
     int rc;
     int i_ii = 0;
     
-    bootmode_ig = BOOTMODE_HARDDISK;
 
-    do
+    set_instmode(inst_hd);
+
+    do {
         rc = mount(device, mountpoint_tg, fs_types_atg[i_ii++],
                    MS_MGC_VAL | MS_RDONLY, 0);
+    }
     while( rc && fs_types_atg[i_ii] );
     
     if(!rc) {
@@ -383,15 +385,9 @@ int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
 
-#if 0
   // TODO: +=SMB
-  if (bootmode_ig == BOOTMODE_SMB) {
-    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
-    return (1);
-  }
-#endif
       
-  if(!(net_config_mask() || bootmode_ig == BOOTMODE_NET || bootmode_ig == BOOTMODE_SMB)) return 1;
+  if(!(net_config_mask() || config.insttype == inst_net)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
@@ -410,7 +406,7 @@ int auto2_net_dev(hd_t **hd0)
        * but some data are still missing
        */
       if(
-        (net_config_mask() || bootmode_ig == BOOTMODE_NET) &&
+        (net_config_mask() || config.insttype == inst_net) &&
         (net_config_mask() & 0x2b) != 0x2b
       ) {
         printf("Sending %s request to %s... ", config.net.use_dhcp ? "DHCP" : "BOOTP", netdevice_tg);
@@ -439,7 +435,7 @@ int auto2_net_dev(hd_t **hd0)
 
       net_is_configured_im = TRUE;
 
-      if(bootmode_ig == BOOTMODE_SMB) {
+      if(config.instmode == inst_smb) {
         fprintf(stderr,
           "OK, going to mount //%s/%s ...\n",
           config.net.server.name,
@@ -474,7 +470,7 @@ int auto2_net_dev(hd_t **hd0)
 
         deb_msg("NFS mount ok.");
 
-        bootmode_ig = BOOTMODE_NET;
+        config.instmode = inst_nfs;	// #### FIX: this is likely the wrong place!
       }
 
       if(auto2_loaded_module && strlen(auto2_loaded_module) < sizeof net_tg)
@@ -701,7 +697,7 @@ int auto2_init()
 #ifdef __i386__
   {
     /* int net_cfg = (net_config_mask() & 0x2b) == 0x2b; */
-    int net_cfg = net_config_mask() || bootmode_ig == BOOTMODE_NET;
+    int net_cfg = net_config_mask() || config.insttype == inst_net;
 
     /* ok, found something */
     if(i) return i;
@@ -735,11 +731,11 @@ int auto2_find_install_medium()
   unsigned last_idx;
   hd_t *hd_devs = NULL;
 
-  if(bootmode_ig == BOOTMODE_HARDDISK) 
+  if(config.instmode == inst_hd) 
     if(!(i = auto2_mount_harddisk(harddisk_tg)))
       return TRUE;
     
-  if(bootmode_ig == BOOTMODE_CD) {
+  if(config.instmode == inst_cdrom) {
     *cdrom_tg = 0;
 
     deb_msg("Looking for a SuSE CD...");
@@ -785,15 +781,11 @@ int auto2_find_install_medium()
 
 #if 0
   // TODO: +=SMB
-  if (bootmode_ig == BOOTMODE_SMB) {
-    dia_message("SMB is not implemented yet", MSGTYPE_ERROR);
-    return FALSE;
-  }
 #endif
 
   deb_msg("Well, maybe there is a NFS/FTP/SMB server...");
 
-  if(net_config_mask() || bootmode_ig == BOOTMODE_NET) {
+  if(net_config_mask() || config.insttype == inst_net) {
     // ???
     s_addr2inet(
       &config.net.broadcast,
@@ -830,7 +822,7 @@ int auto2_find_install_medium()
     }
   }
 
-  bootmode_ig = BOOTMODE_CD;		/* reset value */
+  set_instmode(inst_cdrom);
 
   return FALSE;
 }

@@ -496,6 +496,7 @@ void lxrc_init()
   int i, j;
   file_t *ft;
   char *s, *t0, *t, buf[256];
+  url_t *url;
 
   printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE GmbH <<<\n");
   fflush(stdout);
@@ -550,14 +551,8 @@ void lxrc_init()
     auto2_ig = TRUE;
     yast_version_ig = 2;
     action_ig |= ACT_YAST2_AUTO_INSTALL;
-    // ???
-    if(
-      !strncasecmp(config.info.file, "nfs:", 4) ||
-      !strncasecmp(config.info.file, "tftp:", 5) ||
-      !strncasecmp(config.info.file, "dhcp", 4)
-    ) {
-      bootmode_ig = BOOTMODE_NET;
-    }
+    url = parse_url(config.info.file);
+    if(url && url->scheme) set_instmode(url->scheme);
   }
 
   ft = file_get_cmdline(key_linuxrc);

@@ -177,6 +177,7 @@ static struct {
   { "hd",        inst_hd            },
   { "dvd",       inst_dvd           },
   { "cdwithnet", inst_cdwithnet     },
+  { "net",       inst_net           },
   { "harddisk",  inst_hd            },
   { "cdrom",     inst_cdrom         }
 };
@@ -460,12 +461,6 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_bootmode:
-        if(f->is.numeric) {
-          bootmode_ig = f->nvalue;
-          set_instmode(f->nvalue);
-        }
-        break;
-
       case key_instmode:
         if(f->is.numeric) set_instmode(f->nvalue);
         break;
@@ -566,14 +561,13 @@ char *file_read_info_file(char *file, char *file2)
       case key_install:
         url = parse_url(f->value);
         if(url) {
-          bootmode_ig = url->scheme;
           set_instmode(url->scheme);
 
           str_copy(&config.serverdir, url->dir);
           str_copy(&config.net.user, url->user);
           str_copy(&config.net.password, url->password);
 
-          if(config.insttype == insttype_net) {
+          if(config.insttype == inst_net) {
             name2inet(&config.net.server, url->server);
           }
         }
@@ -739,51 +733,33 @@ void file_write_install_inf(char *dir)
 
   if(serial_ig) file_write_str(f, key_console, console_parms_tg);
 
-//  i = bootmode_ig != BOOTMODE_CDWITHNET ? bootmode_ig : BOOTMODE_CD;
   file_write_sym(f, key_instmode, "no scheme", config.instmode);
 
-  if(config.insttype == insttype_hd) {
+  if(config.insttype == inst_hd) {
     file_write_str(f, key_partition, harddisk_tg);
     file_write_str(f, key_fstype, fstype_tg);
     file_write_str(f, key_serverdir, config.serverdir);
   }
 
-// what about 'bootmode_ig == BOOTMODE_CDWITHNET' ???
-  if(config.insttype == insttype_net) {
+  if(
+    config.insttype == inst_net ||
+    config.instmode_extra == inst_cdwithnet
+  ) {
     file_write_str(f, key_netdevice, netdevice_tg);
     file_write_inet(f, key_ip, &config.net.hostname);
     file_write_str(f, key_hostname, config.net.hostname.name);
-
-#if 0
-    if(bootmode_ig == BOOTMODE_CDWITHNET) {
-      s_addr2inet(
-        &config.net.broadcast,
-        config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-      );
-      s_addr2inet(
-        &config.net.network,
-        config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
-      );
-    }
-#endif
-
     file_write_inet(f, key_broadcast, &config.net.broadcast);
     file_write_inet(f, key_network, &config.net.network);
-
     if(config.net.pliphost.ok) {
       file_write_inet(f, key_pliphost, &config.net.pliphost);
     }
     else {
       file_write_inet(f, key_netmask, &config.net.netmask);
     }
-            
     file_write_inet(f, key_gateway, &config.net.gateway);
-
     file_write_inet(f, key_nameserver, &config.net.nameserver);
-
     file_write_inet(f, key_server, &config.net.server);
     file_write_str(f, key_serverdir, config.serverdir);
-
     file_write_str(f, key_domain, config.net.domain);
   }
 

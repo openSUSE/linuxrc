@@ -153,7 +153,7 @@ typedef struct {
 typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
-  inst_dvd, inst_cdwithnet
+  inst_dvd, inst_cdwithnet, inst_net
 } instmode_t;
 
 #define BOOTMODE_FLOPPY    inst_floppy
@@ -163,10 +163,6 @@ typedef enum {
 #define BOOTMODE_FTP       inst_ftp
 #define BOOTMODE_CDWITHNET inst_cdwithnet
 #define BOOTMODE_SMB       inst_smb
-
-typedef enum {
-  insttype_cdrom, insttype_hd, insttype_floppy, insttype_net
-} insttype_t;
 
 
 typedef struct {
@@ -240,8 +236,9 @@ typedef struct {
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
   char *serverdir;		/* install base directory on server */
+  instmode_t insttype;		/* install type (cdrom, network, etc. )*/
   instmode_t instmode;		/* ftp, nfs, smb, etc. */
-  insttype_t insttype;		/* install type (cdrom, network, etc. )*/
+  instmode_t instmode_extra;	/* for the stranger things... */
 
   struct {
     char *dir;				/* modules directory */
@@ -303,7 +300,6 @@ extern char            scsi_tg [20];
 extern char            net_tg [20];
 extern char            netdevice_tg [20];
 extern char            cdrom_tg [20];
-extern int             bootmode_ig;
 extern int             pcmcia_chip_ig;
 extern uint64_t        memory_ig;
 extern int             cpu_ig;

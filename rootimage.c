@@ -214,9 +214,9 @@ int root_load_rootimage (char *infile_tv)
 
     fprintf (stderr, "Loading Image \"%s\"%s\n", infile_tv, auto2_ig ? "" : "...");
     mod_free_modules ();
-    if (bootmode_ig == BOOTMODE_FLOPPY || bootmode_ig == BOOTMODE_FTP)
+    if (config.instmode == inst_floppy || config.instmode == inst_ftp)
         {
-        if (bootmode_ig == BOOTMODE_FLOPPY)
+        if (config.instmode == inst_floppy)
             root_nr_blocks_im = (int) ((4000L * 1024L) / BLOCKSIZE);
         else
             root_nr_blocks_im = (int) ((11151L * 1024L) / BLOCKSIZE);
@@ -242,7 +242,7 @@ int root_load_rootimage (char *infile_tv)
 
     dia_status_on (&root_status_win_rm, buffer_ti);
 
-    if (bootmode_ig == BOOTMODE_FTP)
+    if (config.instmode == inst_ftp)
         {
         socket_ii = util_open_ftp (inet_ntoa (config.net.server.ip));
         if (socket_ii < 0)
@@ -300,7 +300,7 @@ int root_load_rootimage (char *infile_tv)
     (void) close (root_infile_im);
     (void) close (root_outfile_im);
 
-    if (bootmode_ig == BOOTMODE_FTP)
+    if (config.instmode == inst_ftp)
         {
         (void) ftpGetFileDone (socket_ii);
         ftpClose (socket_ii);
@@ -309,7 +309,7 @@ int root_load_rootimage (char *infile_tv)
     win_close (&root_status_win_rm);
     root_set_root (RAMDISK_2);
 
-    if (bootmode_ig == BOOTMODE_FLOPPY)
+    if (config.instmode == inst_floppy)
         dia_message (txt_get (TXT_REMOVE_DISK), MSGTYPE_INFO);
 
     return (0);
@@ -508,7 +508,7 @@ fd_set emptySet, readSet;
 struct timeval timeout;
 int rc;
 
-        if (bootmode_ig == BOOTMODE_FTP)
+        if (config.instmode == inst_ftp)
             {
             FD_ZERO(&emptySet);
             FD_ZERO(&readSet);

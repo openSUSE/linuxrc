@@ -40,7 +40,6 @@ char            scsi_tg [20];
 char            net_tg [20];
 char            netdevice_tg [20] = "eth0";
 char            cdrom_tg [20];
-int             bootmode_ig = BOOTMODE_CD;
 int             pcmcia_chip_ig = 0;
 uint64_t        memory_ig = 8192000;
 int             cpu_ig = 0;

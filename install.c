@@ -219,7 +219,7 @@ int inst_start_demo (void)
     sprintf (filename_ti, "%s/%s", mountpoint_tg, "etc/fstab");
     file_pri = fopen (filename_ti, "a");
     // TODO:SMB???
-    if (bootmode_ig == BOOTMODE_NET && !*livesrc_tg)
+    if (config.instmode == inst_nfs && !*livesrc_tg)
         {
         sprintf(line_ti,
           "%s:%s /S.u.S.E. nfs ro,nolock 0 0\n",
@@ -440,11 +440,12 @@ static int inst_mount_cdrom (int show_err)
     window_t      win_ri;
     int           mount_success_ii = FALSE;
 
-    if( bootmode_ig == BOOTMODE_CDWITHNET ) {
+
+    if(config.instmode_extra == inst_cdwithnet) {
         rc_ii = net_config ();
     }
     else {
-      bootmode_ig = BOOTMODE_CD;
+      set_instmode(inst_cdrom);
     }
 
     dia_info (&win_ri, txt_get (TXT_TRY_CD_MOUNT));
@@ -501,7 +502,8 @@ static int inst_mount_harddisk (void)
     char *mountpoint_pci;
 
 
-    bootmode_ig = BOOTMODE_HARDDISK;
+    set_instmode(inst_hd);
+
     do
         {
         if (!auto_ig)
@@ -559,8 +561,6 @@ int inst_mount_nfs()
   window_t win;
   char text[256];
 
-  bootmode_ig = BOOTMODE_NET;
-
   set_instmode(inst_nfs);
 
   if((rc = net_config())) return rc;
@@ -590,8 +590,6 @@ int inst_mount_smb()
   int rc;
   window_t win;
   char msg[256];
-
-  bootmode_ig = BOOTMODE_SMB;
 
   set_instmode(inst_smb);
 
@@ -656,13 +654,13 @@ int inst_check_instsys (void)
     else
         strcpy (inst_rescuefile_tm, "/disks/rescue");
 
-    switch (bootmode_ig)
+    switch (config.instmode)
         {
-        case BOOTMODE_FLOPPY:
+        case inst_floppy:
             ramdisk_ig = TRUE;
             strcpy (inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
             break;
-        case BOOTMODE_HARDDISK:
+        case inst_hd:
           if(inst_loopmount_im) {
             ramdisk_ig = FALSE;
             sprintf(filename_ti, "%s%s", inst_tmpmount_tm, config.serverdir ?: "");
@@ -687,10 +685,9 @@ int inst_check_instsys (void)
             );
           }
           break;
-        case BOOTMODE_CDWITHNET:
-        case BOOTMODE_CD:
-        case BOOTMODE_NET:
-	case BOOTMODE_SMB:
+        case inst_cdrom:
+        case inst_nfs:
+	case inst_smb:
             ramdisk_ig = FALSE;
             sprintf (filename_ti, "%s%s", mountpoint_tg, installdir_tg);
             if (inst_rescue_im || force_ri_ig || !util_check_exist (filename_ti))
@@ -705,7 +702,9 @@ int inst_check_instsys (void)
                     sprintf (inst_rootimage_tm, "%s/%s", mountpoint_tg, inst_demo_sys_tm);
                 }
             break;
-        case BOOTMODE_FTP:
+        case inst_ftp:
+        case inst_http:
+        case inst_tftp:
             ramdisk_ig = TRUE;
             sprintf (inst_rootimage_tm, "%s%s", config.serverdir ?: "",
                      inst_rescue_im == TRUE ? inst_rescuefile_tm : rootimage_tg);
@@ -714,12 +713,18 @@ int inst_check_instsys (void)
             break;
         }
 
-    if (bootmode_ig != BOOTMODE_FTP && ramdisk_ig &&
-        !util_check_exist (inst_rootimage_tm))
-        return (-1);
-    else
-        return (0);
-    }
+  if(
+    config.instmode != inst_ftp &&
+    config.instmode != inst_http &&
+    config.instmode != inst_tftp &&
+    ramdisk_ig &&
+    !util_check_exist(inst_rootimage_tm)
+  ) {
+    return -1;
+  }
+
+  return 0;
+}
 
 
 static int inst_start_install (void)
@@ -1056,7 +1061,8 @@ int inst_check_floppy()
   int i, fd = -1;
   char *s;
 
-  bootmode_ig = BOOTMODE_FLOPPY;
+  set_instmode(inst_floppy);
+
   i = dia_message(txt_get(TXT_INSERT_DISK), MSGTYPE_INFO);
   if(i) return i;
 
@@ -1250,7 +1256,7 @@ int inst_do_ftp()
   if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
   util_truncate_dir(config.serverdir);
 
-  bootmode_ig = BOOTMODE_FTP;
+  set_instmode(inst_ftp);
 
   return 0;
 }
