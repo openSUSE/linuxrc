@@ -39,7 +39,7 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po loadkeys pcmcia portmap dhcpcd
+SUBDIRS	= po loadkeys pcmcia portmap dhcpcd mkpsfu
 LIBS	= loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
@@ -131,7 +131,11 @@ linuxrc: $(OBJ) $(LIBS)
 	@mv $(@)-debug $@
 
 install: linuxrc
-	@install linuxrc /usr/sbin
+	install -m 755 linuxrc $(DESTDIR)/usr/sbin
+	install -m 755 mkpsfu/mkpsfu $(DESTDIR)/usr/bin
+	install -d -m 755 $(DESTDIR)/usr/share/linuxrc
+	gzip -c9 mkpsfu/linuxrc-16.psfu >$(DESTDIR)/usr/share/linuxrc/linuxrc-16.psfu.gz
+	gzip -c9 mkpsfu/linuxrc2-16.psfu >$(DESTDIR)/usr/share/linuxrc/linuxrc2-16.psfu.gz
 
 libs:
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $(MAKECMDGOALS); done

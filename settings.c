@@ -24,11 +24,19 @@
 #if 1	/* I think the line below would catch all anyway... */
 // #if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__sparc__) || defined(__alpha__)
 
+#if 0
 #define UNI_FONT "LatArCyrHeb-16.psfu"
 #define L1_FONT "lat1-16.psfu"
 #define L2_FONT "lat2-16.psfu"
 #define L7_FONT "lat7-16.psfu"
 #define CYR_FONT "Cyr_a8x16.psfu"
+#else
+#define UNI_FONT "linuxrc2-16.psfu"
+#define L1_FONT "linuxrc-16.psfu"
+#define L2_FONT "linuxrc-16.psfu"
+#define L7_FONT "linuxrc-16.psfu"
+#define CYR_FONT "linuxrc-16.psfu"
+#endif
 
 #define KM_L1 "iso-8859-15"
 #define KM_L2 "iso-8859-2"
@@ -41,6 +49,7 @@ struct {
   char *map;
   char *enc;
 } km_enc[] = {
+  { "Pl02",         KM_L2  },
   { "br-abnt2",     KM_L1  },
   { "cz-us-qwertz", KM_L2  },
   { "de-lat1-nd",   KM_L1  },
@@ -49,7 +58,7 @@ struct {
   { "gr",           KM_L7  },
   { "hu",           KM_L2  },
   { "it",           KM_L1  },
-  { "Pl02",         KM_L2  },
+  { "no-latin1",    KM_L1  },
   { "pt-latin1",    KM_L1  },
   { "ru1",          KM_KOI },
   { "sk-qwerty",    KM_L2  }
@@ -124,6 +133,10 @@ static language_t set_languages_arm [] =
 
 #ifdef TRANS_nl
 { lang_nl, "Nederlands", "us", L1_FONT, UNI_FONT, 0, 1, "nl_NL" },
+#endif
+
+#ifdef TRANS_nb
+{ lang_nb, "Norsk", "no-latin1", L1_FONT, UNI_FONT, 0, 1, "nb_NO" },
 #endif
 
 #ifdef TRANS_pl
