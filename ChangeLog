@@ -1,3 +1,18 @@
+9/5/2003:	v1.4.48
+	- copy 'part.info' file from install medium
+
+24/4/2003:	v1.4.47
+	- live eval changes
+	- added 'idescsi' parameter: use ide-scsi module for cdr/cdrw drives
+	  (needed for live eval)
+
+4/4/2003:	v1.4.46
+	- copy content file from the first CD linuxrc sees to /tmp/content
+
+11/3/2003:	v1.4.45
+	- module unloading used to clear internal network/disk lists (#24606)
+	- keep proxy scheme (#23611)
+
 7/3/2003:	v1.4.44
 	- don't log to console (#24753)
 

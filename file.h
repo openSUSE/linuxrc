@@ -37,7 +37,7 @@ typedef enum {
   key_product, key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
   key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
   key_linemode, key_moduledelay, key_updatedir, key_usbscsi, key_useusbscsi,
-  key_lxrcdebug, key_kernel_pcmcia
+  key_lxrcdebug, key_kernel_pcmcia, key_liveconfig, key_useidescsi
 } file_key_t;
 
 typedef struct file_s {
@@ -51,6 +51,7 @@ typedef struct file_s {
   } is; 
 } file_t;
 
+file_t *file_getentry(file_t *f, char *key);
 file_t *file_read_file(char *name);
 void file_free_file(file_t *file);
 
@@ -70,4 +71,4 @@ int file_sym2num(char *sym);
 char *file_num2sym(char *base_sym, int num);
 file_t *file_parse_buffer(char *buf);
 void file_do_info(file_t *f0);
-
+void file_write_live_config(char *dir);

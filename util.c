@@ -729,6 +729,19 @@ int util_chk_driver_update(char *dir)
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
+  /* get content file from first medium we see */
+  if(!util_check_exist("/tmp/content")) {
+    sprintf(buf, "%s/content", dir);
+    if(util_check_exist(buf)) {
+      char *argv[3];
+
+      fprintf(stderr, "copying content file\n");
+      argv[1] = buf;
+      argv[2] = "/tmp";
+      util_cp_main(3, argv);
+    }
+  }
+
   sprintf(drv_src, "%s%s", dir, config.updatedir);
   sprintf(mods_src, "%s%s/modules", dir, config.updatedir);
 
@@ -1101,7 +1114,7 @@ void util_status_info()
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "evalimage = \"%s\"", config.demoimage);
+  sprintf(buf, "evalimage = \"%s\"", config.live.image);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "installdir = \"%s\"", config.installdir);
@@ -3170,22 +3183,28 @@ int util_mount_rw(char *dev, char *dir)
 
 void util_update_netdevice_list(char *module, int add)
 {
-  file_t *f0, *f;
+  file_t *f0, *f1, *f;
   slist_t *sl;
 
   f0 = file_read_file("/proc/net/dev");
   if(!f0) return;
 
-  if((f = f0) && (f = f->next)) {	/* skip 2 lines */
-    for(f = f->next; f; f = f->next) {
+  /* skip 2 lines */
+  if((f1 = f0->next)) f1 = f1->next;
+
+  if(add) {
+    for(f = f1; f; f = f->next) {
       if(!strcmp(f->key_str, "lo")) continue;
       if(strstr(f->key_str, "sit") == f->key_str) continue;
-      sl = slist_getentry(config.net.devices, f->key_str);
-      if(!sl && add) {
+      if(!slist_getentry(config.net.devices, f->key_str)) {
         sl = slist_append_str(&config.net.devices, f->key_str);
         str_copy(&sl->value, module);
       }
-      else if(sl && !add) {
+    }
+  }
+  else {
+    for(sl = config.net.devices; sl; sl = sl->next) {
+      if(!file_getentry(f1, sl->key)) {
         str_copy(&sl->key, NULL);
         str_copy(&sl->value, NULL);
       }
@@ -3195,6 +3214,8 @@ void util_update_netdevice_list(char *module, int add)
   file_free_file(f0);
 }
 
+
+extern str_list_t *search_str_list(str_list_t *sl, char *str);
 
 int util_update_disk_list(char *module, int add)
 {
@@ -3208,29 +3229,34 @@ int util_update_disk_list(char *module, int add)
   hd_data->flags.list_md = 1;
   hd_scan(hd_data);
 
-  for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
-    sl = slist_getentry(config.disks, hsl->str);
-    if(!sl && add) {
-      sl = slist_append_str(&config.disks, hsl->str);
-      str_copy(&sl->value, module);
-      added++;
+  if(add) {
+    for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
+      if(!slist_getentry(config.disks, hsl->str)) {
+        sl = slist_append_str(&config.disks, hsl->str);
+        str_copy(&sl->value, module);
+        added++;
+      }
     }
-    else if(sl && !add) {
-      str_copy(&sl->key, NULL);
-      str_copy(&sl->value, NULL);
+    for(hsl = hd_data->partitions; hsl; hsl = hsl->next) {
+      if(!slist_getentry(config.partitions, hsl->str)) {
+        sl = slist_append_str(&config.partitions, hsl->str);
+        str_copy(&sl->value, module);
+        added++;
+      }
     }
   }
-
-  for(hsl = hd_data->partitions; hsl; hsl = hsl->next) {
-    sl = slist_getentry(config.partitions, hsl->str);
-    if(!sl && add) {
-      sl = slist_append_str(&config.partitions, hsl->str);
-      str_copy(&sl->value, module);
-      added++;
+  else {
+    for(sl = config.disks; sl; sl = sl->next) {
+      if(!search_str_list(hd_data->disks, sl->key)) {
+        str_copy(&sl->key, NULL);
+        str_copy(&sl->value, NULL);
+      }
     }
-    else if(sl && !add) {
-      str_copy(&sl->key, NULL);
-      str_copy(&sl->value, NULL);
+    for(sl = config.partitions; sl; sl = sl->next) {
+      if(!search_str_list(hd_data->partitions, sl->key)) {
+        str_copy(&sl->key, NULL);
+        str_copy(&sl->value, NULL);
+      }
     }
   }
 
@@ -3470,7 +3496,7 @@ void util_set_product_dir(char *prod)
   str_copy(&config.rootimage, "/boot/root");
 #endif
   str_copy(&config.rescueimage, "/boot/rescue");
-  str_copy(&config.demoimage, "/boot/cd-demo");
+  str_copy(&config.live.image, "/boot/liveeval");
 }
 
 
