@@ -408,7 +408,7 @@ char *file_read_info_file(char *file, char *file2)
   }
   else if(!strncmp(file, "floppy:", 7)) {
     for(i = 0; i < config.floppies; i++) {
-      if(!util_try_mount(config.floppy_dev[i], mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0)) break;
+      if(!util_mount_ro(config.floppy_dev[i], mountpoint_tg)) break;
     }
     if(i < config.floppies) {
       config.floppy = i;	// remember currently used floppy
@@ -801,7 +801,7 @@ void file_write_install_inf(char *dir)
 
   if(config.insttype == inst_hd) {
     file_write_str(f, key_partition, harddisk_tg);
-    file_write_str(f, key_fstype, fstype_tg);
+//    file_write_str(f, key_fstype, fstype_tg);
     file_write_str(f, key_serverdir, config.serverdir);
   }
 

@@ -143,8 +143,7 @@ int inst_auto_install (void)
             return (rc_ii);
 
         mkdir (inst_mountpoint_tg, 0777);
-        rc_ii = util_try_mount (RAMDISK_2, inst_mountpoint_tg,
-                                MS_MGC_VAL | MS_RDONLY, 0);
+        rc_ii = util_mount_ro (RAMDISK_2, inst_mountpoint_tg);
         if (rc_ii)
             return (rc_ii);
         }
@@ -216,8 +215,7 @@ int inst_start_demo (void)
     if (rc_ii)
         return (rc_ii);
 
-    if (util_try_mount (RAMDISK_2, mountpoint_tg, 0, 0))
-        return (-1);
+    if (util_mount_rw(RAMDISK_2, mountpoint_tg)) return (-1);
 
     file_write_install_inf (mountpoint_tg);
 
@@ -570,9 +568,7 @@ static int inst_mount_cdrom (int show_err)
 static int inst_mount_harddisk (void)
     {
     int   rc_ii = 0;
-    int   i_ii;
     char *mountpoint_pci;
-
 
     set_instmode(inst_hd);
 
@@ -597,17 +593,12 @@ static int inst_mount_harddisk (void)
             mountpoint_pci = mountpoint_tg;
             }
 
-        i_ii = 0;
-        do
-            rc_ii = mount (harddisk_tg, mountpoint_pci, fs_types_atg [i_ii++],
-                           MS_MGC_VAL | MS_RDONLY, 0);
-        while (rc_ii && fs_types_atg [i_ii]);
+        rc_ii = util_mount_ro(harddisk_tg, mountpoint_pci);
 
         if (rc_ii)
             dia_message (txt_get (TXT_ERROR_HD_MOUNT), MSGTYPE_ERROR);
         else
             {
-            fstype_tg = fs_types_atg [i_ii - 1];
             if (!auto_ig)
                 {
                 rc_ii = dia_input2 (txt_get (TXT_ENTER_HD_DIR), &config.serverdir, 30, 0);
@@ -819,8 +810,7 @@ static int inst_start_install (void)
             return (rc_ii);
 
         mkdir (inst_mountpoint_tg, 0777);
-        rc_ii = util_try_mount (RAMDISK_2, inst_mountpoint_tg,
-                                MS_MGC_VAL | MS_RDONLY, 0);
+        rc_ii = util_mount_ro (RAMDISK_2, inst_mountpoint_tg);
         fprintf (stderr, "Mounting of inst-sys returns %d\n", rc_ii);
         if (rc_ii)
             return (rc_ii);
@@ -1527,7 +1517,7 @@ int inst_auto2_install()
     if(i || inst_rescue_im) return i;
 
     mkdir(inst_mountpoint_tg, 0777);
-    i = util_try_mount(RAMDISK_2, inst_mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0);
+    i = util_mount_ro(RAMDISK_2, inst_mountpoint_tg);
     fprintf(stderr, "Mounting of %s returns %d\n", inst_mountpoint_tg, i);
     if(i) return i;
   }
@@ -1559,7 +1549,7 @@ int inst_update_cd()
   for(hd = hd0; hd; hd = hd->next) {
     if(hd->unix_dev_name) {
       cdrom_drives++;
-      i = util_try_mount(hd->unix_dev_name, mp, MS_MGC_VAL | MS_RDONLY, 0);
+      i = util_mount_ro(hd->unix_dev_name, mp);
       if(!i) {
         cdroms++;
         deb_msg("Update CD mounted");

@@ -96,27 +96,21 @@ int auto2_mount_cdrom(char *device)
 
 int auto2_mount_harddisk(char *device)
 {
-    int rc;
-    int i_ii = 0;
-    
+  int rc;
 
-    set_instmode(inst_hd);
+  set_instmode(inst_hd);
 
-    do {
-        rc = mount(device, mountpoint_tg, fs_types_atg[i_ii++],
-                   MS_MGC_VAL | MS_RDONLY, 0);
+  if(!(rc = util_mount_ro(device, mountpoint_tg))) {
+    if((rc = inst_check_instsys())) {
+      fprintf(stderr, "%s is not a SuSE installation media.\n", device);
+      umount(mountpoint_tg);
     }
-    while( rc && fs_types_atg[i_ii] );
-    
-    if(!rc) {
-        if( (rc = inst_check_instsys()) ) {
-            fprintf(stderr, "%s is not a SuSE installation media.\n", device);
-            umount(mountpoint_tg);
-        }
-    } else
-        fprintf(stderr, "%s does not have a mountable file system.\n", device);
+  }
+  else {
+    fprintf(stderr, "%s does not have a mountable file system.\n", device);
+  }
 
-    return rc;
+  return rc;
 }
 
 void auto2_check_cdrom_update(char *dev)
@@ -214,13 +208,12 @@ void auto2_scan_hardware(char *log_file)
       if(hd->bus == bus_usb) ju++;
       di = hd_driver_info(hd_data, hd);
       if(di && di->any.type == di_kbd) {
-        if(di->kbd.XkbRules) strcpy(xkbrules_tg, di->kbd.XkbRules);
+//        if(di->kbd.XkbRules) strcpy(xkbrules_tg, di->kbd.XkbRules);
         if(di->kbd.XkbModel) strcpy(xkbmodel_tg, di->kbd.XkbModel);
-        if(di->kbd.XkbLayout) strcpy(xkblayout_tg, di->kbd.XkbLayout);
+//        if(di->kbd.XkbLayout) strcpy(xkblayout_tg, di->kbd.XkbLayout);
 	/* UNTESTED !!! */
         if(di->kbd.keymap) {
-          if(config.keymap) free(config.keymap);
-          config.keymap = strdup(di->kbd.keymap);
+          str_copy(&config.keymap, di->kbd.keymap);
         }
       }
       di = hd_free_driver_info(di);

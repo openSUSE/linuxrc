@@ -683,10 +683,6 @@ msgstr ""
 "Базовая система была успешно установлена. Ваш компьютер должен быть перезапущен. Выньте все установочные носители (CD-ROMы, дискеты).\n"
 "Не вынимайте дискету, если начальный загрузчик (LILO) был установлен на нее."
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr "Найдена файловая система reiserfs."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "соединение канал-канал"
@@ -805,5 +801,11 @@ msgstr ""
 
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
+msgstr ""
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
 msgstr ""
 

@@ -60,6 +60,7 @@
 #include "lsh.h"
 #include "bootpc.h"
 #include "http.h"
+#include "fstype.h"
 
 #define LED_TIME     50000
 
@@ -439,8 +440,7 @@ int util_mount_loop (char *file_tv, char *mountpoint_tv)
     if (rc_ii < 0)
         return (rc_ii);
 
-    rc_ii = util_try_mount (util_loopdev_tm, mountpoint_tv,
-                            MS_MGC_VAL | MS_RDONLY, 0);
+    rc_ii = util_mount_ro (util_loopdev_tm, mountpoint_tv);
 
     fprintf (stderr, "Loopmount returns %d\n", rc_ii);
 
@@ -504,26 +504,6 @@ int util_check_break (void)
         }
     else
         return (0);
-    }
-
-
-int util_try_mount (const char *device_pcv,             char *dir_pcv,
-                    unsigned long flags_lv, const void *data_prv)
-    {
-    int   i_ii;
-    int   rc_ii;
-
-
-    if (!device_pcv || !device_pcv [0])
-        return (-1);
-
-    i_ii = 0;
-    do
-        rc_ii = mount (device_pcv, dir_pcv, fs_types_atg [i_ii++],
-                       flags_lv, data_prv);
-    while (rc_ii && fs_types_atg [i_ii]);
-
-    return (rc_ii);
     }
 
 
@@ -812,7 +792,7 @@ int util_chk_driver_update(char *dir)
 #endif
 
 // Why does this not work???
-// i = util_try_mount("/dev/ram3", driver_update_dir, MS_MGC_VAL | MS_RDONLY, 0);
+// i = util_mount_ro("/dev/ram3", driver_update_dir);
 
 //  deb_int(i);
 
@@ -1498,7 +1478,7 @@ int util_mount_main(int argc, char **argv)
 {
   int i;
   char *dir, *srv_dir;
-  char *type = NULL, *dev;
+  char *type = NULL, *dev, *module;
   inet_t inet = {};
 
   argv++; argc--;
@@ -1528,7 +1508,15 @@ int util_mount_main(int argc, char **argv)
   dir = argv[1];
 
   if(!type) {
-    if(strchr(dev, ':')) type = "nfs";
+    if(strchr(dev, ':')) {
+      type = "nfs";
+    }
+    else {
+      type = util_fstype(dev, &module);
+      if(module) {
+        return fprintf(stderr, "fs type not supported, load module \"%s\" first\n", module), 2;
+      }
+    }
     if(!type) return fprintf(stderr, "no fs type given\n"), 2;
   }
 
@@ -1975,9 +1963,14 @@ int util_raidautorun_main(int argc, char **argv)
 int util_free_main(int argc, char **argv)
 {
   file_t *f0, *f;
-  unsigned mem_total = 0, mem_free = 0;
+  unsigned mem_total = 0, mem_free = 0, mem_rd = 0;
   unsigned u;
   char *s;
+#if 0
+  char buf[32];
+  int i, fd;
+  unsigned long kbytes;
+#endif
 
   f0 = file_read_file("/proc/meminfo");
 
@@ -2001,7 +1994,25 @@ int util_free_main(int argc, char **argv)
 
   file_free_file(f0);
 
-  printf("MemTotal: %9u kB\nMemFree: %10u kB\n", mem_total, mem_free);
+#if 0
+  for(i = -1; i < 8; i++) {
+    if(i >= 0) {
+      sprintf(buf, "/dev/ram%d", i);
+    }
+    else {
+      strcpy(buf, "/dev/initrd");
+    }
+    if((fd = open(buf, O_RDONLY | O_NONBLOCK)) >= 0) {
+      if(!ioctl(fd, BLKGETSIZE, &kbytes)) {
+        mem_rd += kbytes;
+        printf("%s: %6lu kB\n", buf, kbytes);
+      }
+      close(fd);
+    }
+  }
+#endif
+
+  printf("MemTotal: %9u kB\nMemFree: %10u kB\n", mem_total, mem_free - mem_rd);
 
   return 0;
 }
@@ -2591,4 +2602,93 @@ int util_wget_main(int argc, char **argv)
   return 0;
 }
 
+
+int util_fstype_main(int argc, char **argv)
+{
+  char *s;
+
+  argv++; argc--;
+
+  if(argc != 1) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
+
+  s = fstype(*argv);
+
+  printf("%s: %s\n", *argv, s ?: "unknown fs");
+
+  return 0;
+}
+
+
+/*
+ * Return fs name. If we have to load a module first, return it in *module.
+ */
+char *util_fstype(char *dev, char **module)
+{
+  char *type, *s;
+  file_t *f0, *f;
+
+  type = dev ? fstype(dev) : NULL;
+
+  if(module) *module = type;
+
+  if(!type) return NULL;
+
+  if(module) {
+    f0 = file_read_file("/proc/filesystems");
+    for(f = f0; f; f = f->next) {
+      s = strcmp(f->key_str, "nodev") ? f->key_str : f->value;
+      if(!strcmp(s, type)) {
+        *module = NULL;
+        break;
+      }
+    }
+
+    file_free_file(f0);
+  }
+
+  return type;
+}
+
+
+int util_mount(char *dev, char *dir, unsigned long flags)
+{
+  char *type;
+  int err = -1;
+  static char *fs_types[] = {
+    "minix", "ext2", "reiserfs", "xfs",
+    "vfat", "iso9660", "msdos", "hpfs",
+    0
+  };
+  char **fs_type = fs_types;
+
+  if(!dev || !dir) return -1;
+
+  type = util_fstype(dev, NULL);
+
+  if(type) {
+    err = mount(dev, dir, type, flags, 0);
+  }
+  else {
+    fprintf(stderr, "%s: unknown fs type\n", dev);
+    while(*fs_type) {
+      err = mount(dev, dir, *fs_type, flags, 0);
+      if(!err) break;
+      fs_type++;
+    }
+  }
+
+  return err;
+}
+
+
+int util_mount_ro(char *dev, char *dir)
+{
+  return util_mount(dev, dir, MS_MGC_VAL | MS_RDONLY);
+}
+
+
+int util_mount_rw(char *dev, char *dir)
+{
+  return util_mount(dev, dir, 0);
+}
 

@@ -138,201 +138,127 @@ static int  root_check_root      (char *root_string_tv);
 static void root_update_status   (int  blocks_iv);
 static void root_load_compressed (void);
 
-static int root_is_reiserfs(char *dev);
-static int root_reiserfs_loaded(void);
 
-#define REISERFS_SUPER_MAGIC_STRING "ReIsErFs"
-#define REISER2FS_SUPER_MAGIC_STRING "ReIsEr2Fs"
-
-int root_is_reiserfs(char *dev)
+int root_load_rootimage(char *infile_tv)
 {
-  int fd;
-  char magic0[11], magic1[11];
+  char  buffer_ti [BLOCKSIZE];
+  int   bytes_read_ii;
+  int   rc_ii;
+  int   current_block_ii;
+  int   compressed_ii;
+  int32_t filesize_li;
+  int   error_ii = FALSE;
 
-  fd = open(dev, O_RDONLY);
-
-  if(fd < 0) return 0;
-
-  if(
-    lseek(fd, 0x2034, SEEK_SET) != 0x2034 ||
-    read(fd, magic0, sizeof magic0) != sizeof magic0
-  ) *magic0 = 0;
-
-  if(
-    lseek(fd, 0x10034, SEEK_SET) != 0x10034 ||
-    read(fd, magic0, sizeof magic1) != sizeof magic1
-  ) *magic1 = 0;
-
-  magic0[sizeof magic0 -1] = magic1[sizeof magic1 -1] = 0;
-
-  close(fd);
+  fprintf(stderr, "Loading Image \"%s\"%s\n", infile_tv, config.win ? "" : "...");
+  mod_free_modules();
 
   if(
-    !strcmp(magic0, REISERFS_SUPER_MAGIC_STRING) ||
-    !strcmp(magic0, REISER2FS_SUPER_MAGIC_STRING) ||
-    !strcmp(magic1, REISERFS_SUPER_MAGIC_STRING) ||
-    !strcmp(magic1, REISER2FS_SUPER_MAGIC_STRING)
+    config.instmode == inst_floppy ||
+    config.instmode == inst_ftp ||
+    config.instmode == inst_http ||
+    config.instmode == inst_tftp
   ) {
-    return 1;
+    if(config.instmode == inst_floppy) {
+      root_nr_blocks_im = (4000L * 1024L) / BLOCKSIZE;
+    }
+    else {
+      root_nr_blocks_im = (11151L * 1024L) / BLOCKSIZE;
+    }
+    compressed_ii = TRUE;
+    sprintf(buffer_ti, "%s%s", txt_get(TXT_LOADING), config.win ? "" : "...");
+  }
+  else {
+    rc_ii = util_fileinfo(infile_tv, &filesize_li, &compressed_ii);
+    if(rc_ii) {
+      if(!config.suppress_warnings) {
+        dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+      }
+      return rc_ii;
+    }
+
+    root_nr_blocks_im = filesize_li / BLOCKSIZE;
+
+    sprintf(buffer_ti, "%s (%d kB)%s",
+      txt_get(TXT_LOADING),
+      (root_nr_blocks_im * BLOCKSIZE) / 1024,
+      config.win ? "" : "..."
+    );
+  }
+
+  dia_status_on(&root_status_win_rm, buffer_ti);
+
+  if(
+    config.instmode == inst_ftp ||
+    config.instmode == inst_http ||
+    config.instmode == inst_tftp
+  ) {
+    root_infile_im = net_open(infile_tv);
+    if(root_infile_im < 0) {
+      util_print_net_error();
+      error_ii = TRUE;
+    }
+  }
+  else {
+    root_infile_im = open(infile_tv, O_RDONLY);
+    if(root_infile_im < 0) error_ii = TRUE;
+  }
+
+  root_outfile_im = open(RAMDISK_2, O_RDWR | O_CREAT | O_TRUNC, 0644);
+  if(root_outfile_im < 0) error_ii = TRUE;
+
+  if(error_ii) {
+    net_close(root_infile_im);
+    close(root_outfile_im);
+    win_close(&root_status_win_rm);
+    return -1;
+  }
+
+  if(compressed_ii) {
+    root_load_compressed();
+  }
+  else {
+    current_block_ii = 0;
+    while((bytes_read_ii = net_read(root_infile_im, buffer_ti, BLOCKSIZE)) > 0) {
+      rc_ii = write (root_outfile_im, buffer_ti, bytes_read_ii);
+      if(rc_ii != bytes_read_ii) return -1;
+      root_update_status(++current_block_ii);
+    }
+  }
+
+  net_close(root_infile_im);
+  close(root_outfile_im);
+
+  win_close(&root_status_win_rm);
+  root_set_root(RAMDISK_2);
+
+  if(config.instmode == inst_floppy) {
+    dia_message(txt_get(TXT_REMOVE_DISK), MSGTYPE_INFO);
   }
 
   return 0;
 }
 
-int root_reiserfs_loaded()
-{
-  FILE *f;
-  char s[100];
-  int ok = 0;
 
-  if((f = fopen("/proc/filesystems", "r"))) {
-    while(fgets(s, sizeof s, f)) {
-      if(strstr(s, "reiserfs")) {
-        ok = 1;
-        break;
-      }
-    }
-    fclose(f);
+int root_check_root(char *root_string_tv)
+{
+  char buf[256];
+  int rc;
+
+  if(strstr(root_string_tv, "/dev/") == root_string_tv) {
+    root_string_tv += sizeof "/dev/" - 1;
   }
 
-  return ok;
+  sprintf(buf, "/dev/%s", root_string_tv);
+
+  if(util_mount_ro(buf, mountpoint_tg)) return -1;
+
+  sprintf(buf, "%s/etc/passwd", mountpoint_tg);
+  rc = util_check_exist(buf);
+
+  umount(mountpoint_tg);
+
+  return rc == TRUE ? 0 : -1;
 }
-
-
-
-int root_load_rootimage (char *infile_tv)
-    {
-    char  buffer_ti [BLOCKSIZE];
-    int   bytes_read_ii;
-    int   rc_ii;
-    int   current_block_ii;
-    int   compressed_ii;
-    int32_t filesize_li;
-    int   error_ii = FALSE;
-
-    fprintf (stderr, "Loading Image \"%s\"%s\n", infile_tv, config.win ? "" : "...");
-    mod_free_modules ();
-    if (
-      config.instmode == inst_floppy ||
-      config.instmode == inst_ftp ||
-      config.instmode == inst_http
-    )
-        {
-        if (config.instmode == inst_floppy)
-            root_nr_blocks_im = (int) ((4000L * 1024L) / BLOCKSIZE);
-        else
-            root_nr_blocks_im = (int) ((11151L * 1024L) / BLOCKSIZE);
-        compressed_ii = TRUE;
-        sprintf (buffer_ti, "%s%s", txt_get (TXT_LOADING), config.win ? "" : "...");
-        }
-    else
-        {
-        rc_ii = util_fileinfo (infile_tv, &filesize_li, &compressed_ii);
-        if (rc_ii)
-            {
-            if (!config.suppress_warnings)
-                dia_message (txt_get (TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-            return (rc_ii);
-            }
-
-        root_nr_blocks_im = (int) (filesize_li / BLOCKSIZE);
-
-        sprintf (buffer_ti, "%s (%d kB)%s", txt_get (TXT_LOADING),
-                 (int) ((long) root_nr_blocks_im * BLOCKSIZE / 1024L),
-                 config.win ? "" : "...");
-        }
-
-    dia_status_on (&root_status_win_rm, buffer_ti);
-
-    if (config.instmode == inst_ftp || config.instmode == inst_http)
-        {
-        root_infile_im = net_open (infile_tv);
-        if (root_infile_im < 0)
-            {
-            util_print_net_error ();
-            error_ii = TRUE;
-            }
-        }
-    else
-        {
-        root_infile_im = open (infile_tv, O_RDONLY);
-        if (root_infile_im < 0)
-            error_ii = TRUE;
-        }
-
-    root_outfile_im = open (RAMDISK_2, O_RDWR | O_CREAT | O_TRUNC, 0644);
-    if (root_outfile_im < 0)
-        error_ii = TRUE;
-
-    if (error_ii)
-        {
-        net_close (root_infile_im);
-        close (root_outfile_im);
-        win_close (&root_status_win_rm);
-        return (-1);
-        }
-
-    if (compressed_ii)
-        root_load_compressed ();
-    else
-        {
-        current_block_ii = 0;
-        while ((bytes_read_ii = net_read (root_infile_im, buffer_ti, BLOCKSIZE)) > 0)
-            {
-            rc_ii = write (root_outfile_im, buffer_ti, bytes_read_ii);
-            if (rc_ii != bytes_read_ii)
-                return (-1);
-
-            root_update_status (++current_block_ii);
-            }
-        }
-
-    net_close (root_infile_im);
-    close (root_outfile_im);
-
-    win_close (&root_status_win_rm);
-    root_set_root (RAMDISK_2);
-
-    if (config.instmode == inst_floppy)
-        dia_message (txt_get (TXT_REMOVE_DISK), MSGTYPE_INFO);
-
-    return (0);
-    }
-
-
-static int root_check_root (char *root_string_tv)
-    {
-    char        *tmp_string_pci;
-    char         device_ti [50];
-    char         filename_ti [MAX_FILENAME];
-    int          rc_ii;
-    char        *compare_file_pci;
-
-
-    if (!strncmp ("/dev/", root_string_tv, 5))
-        tmp_string_pci = root_string_tv + 5;
-    else
-        tmp_string_pci = root_string_tv;
-
-    sprintf (device_ti, "/dev/%s", tmp_string_pci);
-    if (!mount (device_ti, mountpoint_tg, "ext2", MS_MGC_VAL | MS_RDONLY, 0))
-        compare_file_pci = "/etc/passwd";
-    else if (!mount (device_ti, mountpoint_tg, "reiserfs", MS_MGC_VAL | MS_RDONLY, 0))
-        compare_file_pci = "/etc/passwd";
-    else if (!mount (device_ti, mountpoint_tg, "msdos", MS_MGC_VAL | MS_RDONLY, 0))
-        compare_file_pci = "/linux/etc/passwd";
-    else
-        return (-1);
-        
-    sprintf (filename_ti, "%s/%s", mountpoint_tg, compare_file_pci);
-    rc_ii = util_check_exist (filename_ti);
-    umount (mountpoint_tg);
-
-    if (rc_ii == TRUE)
-        return (0);
-    else
-        return (-1);
-    }
 
 
 void root_set_root (char *root_string_tv)
@@ -375,47 +301,52 @@ void root_set_root (char *root_string_tv)
     }
 
 
-int root_boot_system (void)
-    {
-    int  rc_ii;
-    char root_ti [40];
+int root_boot_system()
+{
+  int  rc, mtype;
+  char *root = NULL;
+  char *module, *type;
+  char buf[256];
 
+  str_copy(&root, "/dev/");
 
-    strcpy (root_ti, "/dev/");
-
-    do
-        {
-        rc_ii = dia_input (txt_get (TXT_ENTER_ROOT_FS), root_ti, sizeof root_ti - 1, 25);
-        if (rc_ii)
-            return (rc_ii);
-
-        if(
-          root_is_reiserfs(root_ti) &&
-          !root_reiserfs_loaded()
-        ) {
-          if(!util_check_exist("modules/reiserfs.o")) {
-            char buf[256];
-            int mtype = mod_get_type("file system");
-
-            sprintf(buf, "%s\n\n", txt_get(TXT_REISERFS));
-            mod_disk_text(buf + strlen(buf), mtype);
-
-            rc_ii = dia_okcancel(buf, YES) == YES ? 1 : 0;
-
-            if(rc_ii) mod_add_disk(0, mtype);
-          }
-
-          mod_load_module("reiserfs", NULL);
-        }
-
-        rc_ii = root_check_root (root_ti);
-        if (rc_ii)
-            dia_message (txt_get (TXT_INVALID_ROOT_FS), MSGTYPE_ERROR);
-        }
-    while (rc_ii);
-    root_set_root (root_ti);
-    return (0);
+  do {
+    if((rc = dia_input2(txt_get(TXT_ENTER_ROOT_FS), &root, 25, 0))) {
+      str_copy(&root, NULL);
+      return rc;
     }
+
+    if((type = util_fstype(root, &module))) {
+      if(module && config.module.dir) {
+        sprintf(buf, "%s/%s.o", config.module.dir, module);
+        if(!util_check_exist(buf)) {
+          mtype = mod_get_type("file system");
+
+          sprintf(buf, txt_get(TXT_FILE_SYSTEM), type);
+          strcat(buf, "\n\n");
+          mod_disk_text(buf + strlen(buf), mtype);
+
+          rc = dia_okcancel(buf, YES) == YES ? 1 : 0;
+
+          if(rc) mod_add_disk(0, mtype);
+        }
+
+        mod_load_modules(module, 0);
+      }
+    }
+
+    if((rc = root_check_root(root))) {
+      dia_message(txt_get(TXT_INVALID_ROOT_FS), MSGTYPE_ERROR);
+    }
+  }
+  while(rc);
+
+  root_set_root(root);
+
+  free(root);
+
+  return 0;
+}
 
 
 static void root_update_status (int  blocks_iv)
@@ -490,39 +421,40 @@ static void gzip_release(void **ptr)
  */
 static int fill_inbuf()
 {
-fd_set emptySet, readSet;
-struct timeval timeout;
-int rc;
+  fd_set emptySet, readSet;
+  struct timeval timeout;
+  int rc;
 
-        if (config.instmode == inst_ftp || config.instmode == inst_http)
-            {
-            FD_ZERO(&emptySet);
-            FD_ZERO(&readSet);
-            FD_SET(root_infile_im, &readSet);
+  if(
+    config.instmode == inst_ftp ||
+    config.instmode == inst_http
+    /* !!! NOT '|| config.instmode == inst_tftp' !!! */
+  ) {
+    FD_ZERO(&emptySet);
+    FD_ZERO(&readSet);
+    FD_SET(root_infile_im, &readSet);
 
-            timeout.tv_sec = TIMEOUT_SECS;
-            timeout.tv_usec = 0;
+    timeout.tv_sec = TIMEOUT_SECS;
+    timeout.tv_usec = 0;
 
-            rc = select (root_infile_im + 1, &readSet, &emptySet,
-                         &emptySet, &timeout);
+    rc = select(root_infile_im + 1, &readSet, &emptySet, &emptySet, &timeout);
 
-            if (rc <= 0)
-                {
-                util_print_net_error ();
-                exit_code = 1;
-                insize = INBUFSIZ;
-                inptr = 1;
-                return (-1);
-                }
-            }
+    if(rc <= 0) {
+      util_print_net_error();
+      exit_code = 1;
+      insize = INBUFSIZ;
+      inptr = 1;
+      return -1;
+    }
+  }
 
-        insize = read (root_infile_im, inbuf, INBUFSIZ);
+  insize = net_read(root_infile_im, inbuf, INBUFSIZ);
 
-        if (insize == 0) return -1;
+  if(!insize) return -1;
 
-        inptr = 1;
+  inptr = 1;
 
-        return inbuf[0];
+  return inbuf[0];
 }
 
 /* ===========================================================================

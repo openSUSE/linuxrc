@@ -1,3 +1,7 @@
+11/2/2002:	v1.3.14
+	- added fstype detection
+	- fixed tftp
+
 8/2/2002:	v1.3.13
 	- autoinstall mostly working
 	- 'info' file parser more flexible

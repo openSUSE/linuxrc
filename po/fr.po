@@ -690,10 +690,6 @@ msgstr ""
 "Le système de base a été installé. Votre machine doit être redémarrée. Éjectez tous les supports d'installation (CD-ROM, disquette.\n"
 "Ne retirez pas la disquette si le Linux Loader (LILO) a été installé sur celle-ci."
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr "Système de fichiers reiserfs trouvé."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "Connexion canal à canal"
@@ -813,5 +809,11 @@ msgstr ""
 
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
+msgstr ""
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
 msgstr ""
 

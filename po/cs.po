@@ -706,10 +706,6 @@ msgstr ""
 "Základní systém byl úspì¹nì nainstalován. Nyní bude spu¹tìn, aby se instalace projevila. Prosím odstraòte instalaèní média (CD, disketu).\n"
 "(Nevyjímejte ov¹em disketu, pokud na ní je LILO.)"
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr "Byl nalezen Reiserfs."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "Spojení kanál kanál"
@@ -829,5 +825,11 @@ msgstr ""
 
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
+msgstr ""
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
 msgstr ""
 

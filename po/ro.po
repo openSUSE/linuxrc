@@ -706,10 +706,6 @@ msgstr ""
 "Structura de baza a sistemului a fost instalata cu succes. Sistemul nou va fi repornit pentru a finaliza instalarea. Va rugam sa scoateti din computer suportul media de pe care s-a facut instalarea (CD-ROM, Floppy).\n"
 " Nu scoateti discheta din computer in cazul in care ati optat pentru bootare de pe discheta cu ajutorul sistemului LILO (LInux LOader)."
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr ""
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr ""
@@ -828,5 +824,11 @@ msgstr ""
 
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
+msgstr ""
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
 msgstr ""
 

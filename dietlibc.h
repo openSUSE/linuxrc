@@ -6,6 +6,7 @@ typedef unsigned u_int32_t;
 typedef unsigned char u_char;
 typedef unsigned short u_short;
 typedef unsigned u_int;
+typedef unsigned uint;
 typedef unsigned long u_long;
 
 typedef char *caddr_t;

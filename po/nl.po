@@ -682,10 +682,6 @@ msgstr ""
 "Het basissysteem is met succes geïnstalleerd. Uw computer moet nu opnieuw geboot worden. Verwijder aub alle installatie media (CD-ROM, floppy).\n"
 "De diskette niet verwijderen wanneer de Linux Loader (LILO)  er op is geïnstalleerd."
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr "Reiserfs bestandssysteem gevonden."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "kanaal tot kanaal verbinding"
@@ -805,5 +801,11 @@ msgstr ""
 
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
+msgstr ""
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
 msgstr ""
 

@@ -758,10 +758,6 @@ msgstr ""
 "Entfernen Sie die Floppy nicht, wenn der Linux Loader (LILO) "
 "darauf installiert wurde."
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr "Reiserfs Dateisystem gefunden."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "CTC-Verbindung"
@@ -883,4 +879,10 @@ msgstr "Unbekannte Treiber laden"
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
 msgstr "Bitte legen Sie die Samba-Diskette ein."
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s Dateisystem gefunden."
+msgstr ""
 

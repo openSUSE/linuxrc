@@ -117,6 +117,7 @@ static struct {
   { "raidautorun", util_raidautorun_main },
   { "free",        util_free_main        },
   { "wget",        util_wget_main        },
+  { "fstype",      util_fstype_main      },
   { "nothing",     util_nothing_main     }
 };
 #endif
@@ -284,7 +285,7 @@ void lxrc_change_root (void)
 
 #ifdef SYS_pivot_root
   umount ("/mnt");
-  util_try_mount (lxrc_new_root, "/mnt", MS_MGC_VAL | MS_RDONLY, 0);
+  util_mount_ro(lxrc_new_root, "/mnt");
   chdir ("/mnt");
   if (
 #ifndef DIET

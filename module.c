@@ -515,7 +515,7 @@ int mod_add_disk(int prompt, int type)
   mod_free_modules();
 
   for(i = 0; i < config.floppies; i++) {
-    if(!util_try_mount(config.floppy_dev[i], config.mountpoint.floppy, MS_MGC_VAL | MS_RDONLY, 0)) break;
+    if(!util_mount_ro(config.floppy_dev[i], config.mountpoint.floppy)) break;
   }
 
   if(i < config.floppies) {
@@ -525,7 +525,7 @@ int mod_add_disk(int prompt, int type)
     err = 1;
     /* Try /dev/fd0 anyway, in case the user has inserted a floppy _now_. */
     if(!config.floppies) {
-      err = util_try_mount("/dev/fd0", config.mountpoint.floppy, MS_MGC_VAL | MS_RDONLY, 0);
+      err = util_mount_ro("/dev/fd0", config.mountpoint.floppy);
     }
     if(err) {
       dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
@@ -543,12 +543,7 @@ int mod_add_disk(int prompt, int type)
   }
 
   if(*buf && !err && got_image) {
-    err = util_try_mount(
-      RAMDISK_2,
-      config.tmpfs ? config.mountpoint.ramdisk2 : config.module.dir,
-      MS_MGC_VAL | MS_RDONLY,
-      0
-    );
+    err = util_mount_ro(RAMDISK_2, config.tmpfs ? config.mountpoint.ramdisk2 : config.module.dir);
 
     if(err) {
       dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
@@ -941,7 +936,7 @@ int mod_get_ram_modules (int type_iv)
     if (!util_check_exist (testfile_ti) || mod_force_moddisk_im)
         {
         for(i = 0; i < config.floppies; i++) {
-          if(!util_try_mount(config.floppy_dev[i], mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0)) break;
+          if(!util_mount_ro(config.floppy_dev[i], mountpoint_tg)) break;
         }
         if(i < config.floppies) {
           config.floppy = i;	// remember currently used floppy
@@ -950,7 +945,7 @@ int mod_get_ram_modules (int type_iv)
           rc_ii = -1;
           /* Try /dev/fd0 anyway, in case the user has inserted a floppy _now_. */
           if(!config.floppies) {
-            rc_ii = util_try_mount("/dev/fd0", mountpoint_tg, MS_MGC_VAL | MS_RDONLY, 0);
+            rc_ii = util_mount_ro("/dev/fd0", mountpoint_tg);
           }
           if(rc_ii) {
             dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
@@ -964,7 +959,7 @@ int mod_get_ram_modules (int type_iv)
         umount (mountpoint_tg);
         if (!rc_ii)
             {
-            rc_ii = util_try_mount (RAMDISK_2, config.module.dir, MS_MGC_VAL | MS_RDONLY, 0);
+            rc_ii = util_mount_ro (RAMDISK_2, config.module.dir);
 
             if (rc_ii)
                 dia_message (txt_get (TXT_ERROR_READ_DISK), MSGTYPE_ERROR);

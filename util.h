@@ -32,8 +32,6 @@ extern void util_umount_loop       (char *mountpoint_tv);
 extern void util_truncate_dir      (char *dir_tr);
 extern int  util_check_exist       (char *filename_tv);
 extern int  util_check_break       (void);
-extern int  util_try_mount         (const char *device_pcv,      char *dir_pcv,
-                                    unsigned long flags_lv, const void *data_prv);
 extern void util_print_net_error   (void);
 extern int  util_free_ramdisk      (char *ramdisk_dev_tv);
 extern int  util_cd1_boot          (void);
@@ -70,6 +68,7 @@ extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
 extern int  util_wget_main         (int argc, char **argv);
+extern int  util_fstype_main       (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int new_env);
 extern char *util_process_name     (pid_t pid);
 extern char *util_process_cmdline  (pid_t pid);
@@ -96,3 +95,9 @@ char *get_instmode_name_up(instmode_t instmode);
 int net_open(char *filename);
 void net_close(int fd);
 int net_read(int fd, char *buf, int len);
+
+char *util_fstype(char *dev, char **module);
+int util_mount(char *dev, char *dir, unsigned long flags);
+int util_mount_ro(char *dev, char *dir);
+int util_mount_rw(char *dev, char *dir);
+

@@ -686,10 +686,6 @@ msgstr ""
 "Az alaprendszer telepítése sikerült. A rendszer most újraindul. Kérem, vegye ki a telepítéshez használt médiumokat (CD-ROM, hajlékonylemez) a meghajtóból.\n"
 "A hajlékonylemezt azonban bennt kell hagyni a meghajtóban, ha a Linux Loader (LILO) erre a lemezre lett telepítve."
 
-#. TXT_REISERFS
-msgid "Reiserfs file system found."
-msgstr "Találtam ReiserFS fájlrendszert."
-
 #. TXT_NET_CTC
 msgid "channel to channel connection"
 msgstr "A \"channel connection\"-hez használandó csatorna"
@@ -808,5 +804,11 @@ msgstr ""
 
 #. TXT_SMBDISK
 msgid "Please insert the Samba disk."
+msgstr ""
+
+# %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
 msgstr ""
 
