@@ -20,6 +20,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "dietlibc.h"
+
 #include <string.h>
 #include <netinet/in.h>
 #include <net/if_arp.h>

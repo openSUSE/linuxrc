@@ -20,6 +20,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "dietlibc.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +30,7 @@
 #include <fcntl.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include "diet_ip.h"
 #include <arpa/inet.h>
 #include "dhcpcd.h"
 #include "client.h"
@@ -70,7 +73,7 @@ Copyright (C) January, 1998 Sergei Viznyuk <sv@phystech.com>\n\
 Location: http://www.phystech.com/download/\n");
 }
 /*****************************************************************************/
-int main(argn,argc,argv)
+int dhcpcd_main(argn,argc,argv)
 int argn;
 char *argc[],*argv[];
 {

@@ -23,6 +23,7 @@
 #define UDPIPGEN_H
 
 #include <netinet/ip.h>
+#include "diet_ip.h"
 
 #ifndef IPDEFTTL
 #define IPDEFTTL 64

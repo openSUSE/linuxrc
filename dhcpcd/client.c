@@ -20,6 +20,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "dietlibc.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>

@@ -75,6 +75,7 @@ static void lxrc_makelinks(void);
 int cardmgr_main(int argc, char **argv);
 int insmod_main(int argc, char **argv);
 int loadkeys_main(int argc, char **argv);
+int dhcpcd_main(int argc, char **argv);
 int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
 int rmmod_main(int argc, char **argv);
@@ -89,6 +90,7 @@ static struct {
   { "insmod",   insmod_main       },
   { "rmmod",    rmmod_main        },
   { "loadkeys", loadkeys_main     },
+  { "dhcpcd",   dhcpcd_main       },
 #if WITH_PCMCIA
   { "cardmgr",  cardmgr_main      },
   { "probe",    probe_main        },

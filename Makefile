@@ -28,15 +28,16 @@ else
 LDFLAGS	+= -lhd_tiny
 endif
 
-WARN	= -Wstrict-prototypes -Wall
+WARN	= -Wall
 LIBHDFL	= -DUSE_LIBHD
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po insmod loadkeys pcmcia portmap
-LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a
+SUBDIRS	= po insmod loadkeys pcmcia portmap dhcpcd
+LIBS	= insmod/insmod.a loadkeys/loadkeys.a pcmcia/pcmcia.a \
+	  portmap/portmap.a dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
     USE_MINI_GLIBC	= no
