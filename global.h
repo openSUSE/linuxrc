@@ -249,6 +249,7 @@ typedef struct {
   unsigned floppy_probed:1;	/* tried to detect floppy device */
   unsigned linebreak:1;		/* internal: print a newline first */
   unsigned manual;		/* manual mode */
+  unsigned utf8:1;		/* in utf8 mode */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

@@ -28,7 +28,7 @@ static int is_printable(int key);
 void win_open (window_t *win_prr)
     {
     int  i_ii;
-    char line_aci [MAX_X];
+    int line_aci [MAX_X];
 
 
     if (win_prr->x_left < 1 || win_prr->x_left > max_x_ig)
@@ -56,7 +56,7 @@ void win_open (window_t *win_prr)
         disp_set_color (COL_BLACK, win_prr->bg_color);
     else
         disp_set_color (win_prr->fg_color, win_prr->bg_color);
-    disp_write_string (line_aci);
+    disp_write_utf32string (line_aci);
 
     line_aci [0] = GRAPH_LLCORNER;
     disp_gotoxy (win_prr->x_left, win_prr->y_right);
@@ -85,7 +85,7 @@ void win_open (window_t *win_prr)
         line_aci [i_ii] = GRAPH_HLINE;
     line_aci [i_ii] = GRAPH_LRCORNER;
     disp_gotoxy (win_prr->x_left + 1, win_prr->y_right);
-    disp_write_string (line_aci);
+    disp_write_utf32string (line_aci);
 
     line_aci [0] = GRAPH_URCORNER;
     disp_gotoxy (win_prr->x_right, win_prr->y_left);
@@ -108,7 +108,7 @@ void win_open (window_t *win_prr)
             disp_set_color (win_prr->fg_color, win_prr->bg_color);
 
         disp_gotoxy (win_prr->x_left + 1, win_prr->y_left + win_prr->head + 1);
-        disp_write_string (line_aci);
+        disp_write_utf32string (line_aci);
 
         line_aci [0] = GRAPH_LTEE;
         if (win_prr->style == STYLE_RAISED && colors_prg->has_colors)
@@ -139,7 +139,7 @@ void win_open (window_t *win_prr)
             disp_set_color (win_prr->fg_color, win_prr->bg_color);
 
         disp_gotoxy (win_prr->x_left, win_prr->y_right - win_prr->foot - 1);
-        disp_write_string (line_aci);
+        disp_write_utf32string (line_aci);
 
         line_aci [0] = GRAPH_RTEE;
         if (win_prr->style == STYLE_SUNKEN && colors_prg->has_colors)

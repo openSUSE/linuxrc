@@ -47,21 +47,21 @@
 #define DISP_RESTORE_EXPLODE    1
 #define DISP_RESTORE_IMPLODE    2
 
-typedef struct
-    {
-    char  lrcorner;
-    char  urcorner;
-    char  ulcorner;
-    char  llcorner;
-    char  ltee;
-    char  rtee;
-    char  dtee;
-    char  utee;
-    char  vline;
-    char  hline;
-    char  cross;
-    char  block;
-    } graphics_t;
+typedef struct {
+  int
+    lrcorner,
+    urcorner,
+    ulcorner,
+    llcorner,
+    ltee,
+    rtee,
+    dtee,
+    utee,
+    vline,
+    hline,
+    cross,
+    block;
+} graphics_t;
 
 extern graphics_t graphics_sg;
 extern colorset_t  disp_vgacolors_rm;

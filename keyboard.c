@@ -138,6 +138,9 @@ void kbd_init (int first)
     write(kbd_tty_im, "\033[?1l", sizeof "\033[?1l" - 1);
     fsync(kbd_tty_im);
 
+    write(kbd_tty_im, "\033%G", sizeof "\033[%G" - 1);
+    fsync(kbd_tty_im);
+
     if(first && config.serial) {
       get_screen_size(kbd_tty_im);
 

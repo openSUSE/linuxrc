@@ -122,38 +122,69 @@ void disp_init (void)
         disp_mono_rm.error_fg   = COL_BLACK;
         }
 
-    if (config.test || config.serial)
-        {
-        if(!config.had_segv) fprintf (stderr, "ACS activated\n");
+#if 0
+  { 0x005f, 0x25AE },
+  { 0x0060, 0x25C6 },
+  { 0x0061, 0x2592 },
+  { 0x0062, 0x2409 },
+  { 0x0063, 0x240C },
+  { 0x0064, 0x240D },
+  { 0x0065, 0x240A },
+  { 0x0066, 0x00B0 },
+  { 0x0067, 0x00B1 },
+  { 0x0068, 0x2424 },
+  { 0x0069, 0x240B },
+  { 0x006a, 0x2518 },
+  { 0x006b, 0x2510 },
+  { 0x006c, 0x250C },
+  { 0x006d, 0x2514 },
+  { 0x006e, 0x253C },
+  { 0x006f, 0x23BA },
+  { 0x0070, 0x23BB },
+  { 0x0071, 0x2500 },
+  { 0x0072, 0x23BC },
+  { 0x0073, 0x23BD },
+  { 0x0074, 0x251C },
+  { 0x0075, 0x2524 },
+  { 0x0076, 0x2534 },
+  { 0x0077, 0x252C },
+  { 0x0078, 0x2502 },
+  { 0x0079, 0x2264 },
+  { 0x007a, 0x2265 },
+  { 0x007b, 0x03C0 },
+  { 0x007c, 0x2260 },
+  { 0x007d, 0x00A3 },
+  { 0x007e, 0x00B7 },
+#endif
 
-        graphics_sg.lrcorner = 106;
-        graphics_sg.urcorner = 107;
-        graphics_sg.ulcorner = 108;
-        graphics_sg.llcorner = 109;
-        graphics_sg.ltee     = 116;
-        graphics_sg.rtee     = 117;
-        graphics_sg.dtee     = 118;
-        graphics_sg.utee     = 119;
-        graphics_sg.vline    = 120;
-        graphics_sg.hline    = 113;
-        graphics_sg.cross    = 110;
-        graphics_sg.block    =  97;
-        }
-    else
-        {
-        graphics_sg.lrcorner = 217;
-        graphics_sg.urcorner = 191;
-        graphics_sg.ulcorner = 218;
-        graphics_sg.llcorner = 192;
-        graphics_sg.ltee     = 195;
-        graphics_sg.rtee     = 180;
-        graphics_sg.dtee     = 194;
-        graphics_sg.utee     = 193;
-        graphics_sg.vline    = 179;
-        graphics_sg.hline    = 196;
-        graphics_sg.cross    = 197;
-        graphics_sg.block    = 177;
-        }
+    if(config.utf8) {
+      graphics_sg.lrcorner = 0x2518;
+      graphics_sg.urcorner = 0x2510;
+      graphics_sg.ulcorner = 0x250C;
+      graphics_sg.llcorner = 0x2514;
+      graphics_sg.ltee     = 0x251C;
+      graphics_sg.rtee     = 0x2524;
+      graphics_sg.dtee     = 0x2534;
+      graphics_sg.utee     = 0x252C;
+      graphics_sg.vline    = 0x2502;
+      graphics_sg.hline    = 0x2500;
+      graphics_sg.cross    = 0x253C;
+      graphics_sg.block    = 0x2592;
+    }
+    else {
+      graphics_sg.lrcorner = 0x6a;
+      graphics_sg.urcorner = 0x6b;
+      graphics_sg.ulcorner = 0x6c;
+      graphics_sg.llcorner = 0x6d;
+      graphics_sg.ltee     = 0x74;
+      graphics_sg.rtee     = 0x75;
+      graphics_sg.dtee     = 0x76;
+      graphics_sg.utee     = 0x77;
+      graphics_sg.vline    = 0x78;
+      graphics_sg.hline    = 0x71;
+      graphics_sg.cross    = 0x6e;
+      graphics_sg.block    = 0x61;
+    }
 
     colors_prg = &disp_vgacolors_rm;
 
@@ -271,6 +302,8 @@ void disp_cursor_on (void)
 
 void disp_graph_on (void)
     {
+    if(config.utf8) return;
+
     if (!IS_ALTERNATE (disp_attr_cm))
         {
         if (config.serial || config.test)
@@ -284,6 +317,8 @@ void disp_graph_on (void)
 
 void disp_graph_off (void)
     {
+    if(config.utf8) return;
+
     if (IS_ALTERNATE (disp_attr_cm))
         {
         if (config.serial || config.test)
@@ -575,6 +610,7 @@ void disp_write_utf32string(int *str)
     if(disp_state_im == DISP_ON) {
       buf = malloc(buf_len = len * 6 + 1);
       utf32_to_utf8(buf, buf_len, str);
+      fprintf(stderr, "[<%s>]\n", buf);
       printf("%s", buf);
       free(buf);
     }

@@ -24,84 +24,87 @@
 #if 1	/* I think the line below would catch all anyway... */
 // #if defined(__i386__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__sparc__) || defined(__alpha__)
 
+#define UNI_FONT "LatArCyrHeb-16.psfu"
+
 #define LANG_DEFAULT	3
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
+{ lang_br, "Brezhoneg", "fr-latin1", UNI_FONT, "none", "lat1u.uni", 0, 0, "fr_FR", "breton" },
 #endif
 
 #ifdef TRANS_bs
-{ lang_bs, "Bosnia", "us", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "bs_BA", "bosnia" },
+{ lang_bs, "Bosnia", "us", UNI_FONT, "trivial", "lat2u.uni", 1, 1, "bs_BA", "bosnia" },
 #endif
 
 #ifdef TRANS_cs
-{ lang_cs, "Cestina", "cz-us-qwertz", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
+{ lang_cs, "Cestina", "cz-us-qwertz", UNI_FONT, "trivial", "lat2u.uni", 1, 1, "cs_CZ", "czech" },
 #endif
 
 #ifdef TRANS_de
-{ lang_de, "Deutsch", "de-lat1-nd", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "de_DE", "german" },
+{ lang_de, "Deutsch", "de-lat1-nd", UNI_FONT, "none", "lat1u.uni", 0, 0, "de_DE", "german" },
 #endif
 
 #ifdef TRANS_en
-{ lang_en, "English", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "en_US", "english" },
+{ lang_en, "English", "us", UNI_FONT, "none", "lat1u.uni", 0, 0, "en_US", "english" },
 #endif
 
 #ifdef TRANS_es
-{ lang_es, "Español", "es", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
+{ lang_es, "Español", "es", UNI_FONT, "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
 #endif
 
 #ifdef TRANS_fr
-{ lang_fr, "Français", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
+{ lang_fr, "Français", "fr-latin1", UNI_FONT, "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
 #endif
 
 #ifdef TRANS_el
-{ lang_el, "Hellenic", "gr", "lat7-16.psfu", "trivial", "lat7u.uni", 1, 1, "el_EL", "greek" },
+{ lang_el, "Hellenic", "gr", UNI_FONT, "trivial", "lat7u.uni", 1, 1, "el_EL", "greek" },
 #endif
 
 #ifdef TRANS_id
-{ lang_id, "Indonesia", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "de_DE", "indonesian" },
+{ lang_id, "Indonesia", "us", UNI_FONT, "none", "lat1u.uni", 0, 1, "de_DE", "indonesian" },
 #endif
 
 #ifdef TRANS_it
-{ lang_it, "Italiano", "it", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
+{ lang_it, "Italiano", "it", UNI_FONT, "none", "lat1u.uni", 0, 0, "it_IT", "italian" },
 #endif
 
 #ifdef TRANS_ja
 // currently a fake
-{ lang_ja, "Japanese", "jp106", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "ja_JP", "japanese" },
+{ lang_ja, "Japanese", "jp106", UNI_FONT, "none", "lat1u.uni", 0, 0, "ja_JP", "japanese" },
 #endif
 
 #ifdef TRANS_hu
-{ lang_hu, "Magyar", "hu", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
+{ lang_hu, "Magyar", "hu", UNI_FONT, "trivial", "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
 #endif
 
 #ifdef TRANS_nl
-{ lang_nl, "Nederlands", "us", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "nl_NL", "dutch" },
+{ lang_nl, "Nederlands", "us", UNI_FONT, "none", "lat1u.uni", 0, 1, "nl_NL", "dutch" },
 #endif
 
 #ifdef TRANS_pl
-{ lang_pl, "Polski", "Pl02", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "pl_PL", "polish" },
+{ lang_pl, "Polski", "Pl02", UNI_FONT, "trivial", "lat2u.uni", 1, 1, "pl_PL", "polish" },
 #endif
 
 #ifdef TRANS_pt
-{ lang_pt, "Português", "pt-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
+{ lang_pt, "Português", "pt-latin1", UNI_FONT, "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
 #endif
 
 #ifdef TRANS_pt_BR
-{ lang_pt_BR, "Português Brasileiro", "br-abnt2", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
+{ lang_pt_BR, "Português Brasileiro", "br-abnt2", UNI_FONT, "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
 #endif
 
 #ifdef TRANS_ro
-{ lang_ro, "Romania", "us", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "en_US", "romanian" },
+{ lang_ro, "Romania", "us", UNI_FONT, "trivial", "lat2u.uni", 1, 1, "en_US", "romanian" },
 #endif
 
 #ifdef TRANS_ru
-{ lang_ru, "Russian", "ru1", "Cyr_a8x16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU.KOI8-R", "russian" },
+// { lang_ru, "Russian", "ru1", "LatArCyrHeb-16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU", "russian" },
+{ lang_ru, "Russian", "ru1", UNI_FONT, "none", "cyralt.uni",1, 1, "ru_RU", "russian" },
 #endif
 
 #ifdef TRANS_sk
-{ lang_sk, "Slovencina", "sk-qwerty", "lat2-16.psfu", "trivial", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
+{ lang_sk, "Slovencina", "sk-qwerty", UNI_FONT, "trivial", "lat2u.uni", 1, 1, "sk_SK", "slovak" },
 #endif
 };
 #endif
@@ -642,8 +645,8 @@ static void set_font(char *font, char *map, char *unimap)
     sprintf(dev, "/dev/tty%d", i);
     err |= rename(dev, "/dev/tty");
     system(cmd);
-    f = fopen("/dev/tty", "w");
-    if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
+//    f = fopen("/dev/tty", "w");
+//    if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
     err |= rename("/dev/tty", dev);
   }
   err |= rename("/dev/tty.bak", "/dev/tty");
@@ -653,7 +656,6 @@ static void set_font(char *font, char *map, char *unimap)
   f = fopen("/dev/tty", "w");
   if(f) { fprintf(f, "\033(%c", usermap); fclose(f); }
 #endif
-
 
   // if(err) deb_int(err);
 }
