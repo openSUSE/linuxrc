@@ -84,7 +84,6 @@ static void get_file(char *src, char *dst);
 static void eval_find_config(void);
 static int eval_configure(void);
 static void live_show_state(void);
-static void save_1st_content_file(char *dir, char *loc);
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
@@ -720,7 +719,6 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
-      save_1st_content_file(config.mountpoint.instdata, get_instmode_name(config.instmode));
       util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
       util_do_driver_updates();
 
@@ -827,6 +825,7 @@ int inst_start_install()
   get_file("/media.1/info.txt", "/info.txt");
   get_file("/part.info", "/part.info");
   get_file("/control.xml", "/control.xml");
+  if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
 
   /* look for driver update image; load and apply it */
   i = 1;
@@ -1498,7 +1497,7 @@ int inst_do_tftp()
 int inst_update_cd()
 {
   int  i;
-  char *dev;
+  char *dev, *buf = NULL, *argv[3];
   unsigned old_count;
   slist_t **names;
   window_t win;
@@ -1524,6 +1523,14 @@ int inst_update_cd()
 
   dia_info(&win, "Reading Driver Update...");
 
+  strprintf(&buf, "%s/%s", config.mountpoint.update, SP_FILE);
+
+  if(util_check_exist(buf) == 'r' && !util_check_exist("/" SP_FILE)) {
+    argv[1] = buf;
+    argv[2] = "/";
+    util_cp_main(3, argv);
+  }
+
   util_chk_driver_update(config.mountpoint.update, dev);
 
   util_umount(config.mountpoint.update);
@@ -1543,6 +1550,8 @@ int inst_update_cd()
       dia_message("Driver Update ok", MSGTYPE_INFO);
     }
   }
+
+  free(buf);
 
   return 0;
 }
@@ -2037,26 +2046,6 @@ void live_show_state()
   }
 
   getchar();
-}
-
-
-/*
- * get content file from first medium we see
- */
-void save_1st_content_file(char *dir, char *loc)
-{
-  char *buf = NULL, *argv[3];
-
-  if(dir && loc && !util_check_exist("/tmp/content")) {
-    strprintf(&buf, "%s/content", dir);
-    if(util_check_exist(buf) == 'r') {
-      fprintf(stderr, "1st content file: %s:%s\n", loc, dir);
-      argv[1] = buf;
-      argv[2] = "/tmp";
-      util_cp_main(3, argv);
-    }
-    free(buf);
-  }
 }
 
 

@@ -29,6 +29,8 @@
 
 #define SWISS_ARMY_KNIFE 1
 
+#define SP_FILE "servicepack.tar.gz"
+
 #ifndef TRUE
 #define TRUE			1
 #endif
