@@ -2556,6 +2556,8 @@ int util_wget_main(int argc, char **argv)
   if(!url || !url->scheme) return fprintf(stderr, "invalid url\n"), 2;
 
   set_instmode(url->scheme);
+
+  config.net.tftp_timeout = 10;
   
   config.net.port = url->port;
   str_copy(&config.serverdir, url->dir);
