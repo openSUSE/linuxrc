@@ -8,7 +8,7 @@ msgstr ""
 "Last-Translator: Jordi Jaen Pallares <jordi@suse.de>\n"
 "Language-Team: Spanish <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TXT_OK
@@ -17,11 +17,11 @@ msgstr "Aceptar"
 
 #. TXT_CANCEL
 msgid "Back"
-msgstr "Atrás"
+msgstr "AtrÃ¡s"
 
 #. TXT_YES
 msgid "Yes"
-msgstr "Sí"
+msgstr "SÃ­"
 
 #. TXT_NO
 msgid "No"
@@ -51,26 +51,26 @@ msgstr "Idioma"
 #. TXT_MENU_MODULES
 #, fuzzy
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Módulos del Kernel (Drivers)"
+msgstr "MÃ³dulos del Kernel (Drivers)"
 
 #. TXT_MENU_START
 #, fuzzy
 msgid "Start Installation or System"
-msgstr "Iniciar la instalación / Sistema"
+msgstr "Iniciar la instalaciÃ³n / Sistema"
 
 #. TXT_MENU_INFO
 #, fuzzy
 msgid "System Information"
-msgstr "Información del sistema"
+msgstr "InformaciÃ³n del sistema"
 
 #. TXT_HDR_MAIN
 #, fuzzy
 msgid "Main Menu"
-msgstr "Menú Principal"
+msgstr "MenÃº Principal"
 
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr "Configuración"
+msgstr "ConfiguraciÃ³n"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
@@ -83,7 +83,7 @@ msgstr "Teclado"
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load Network Card Modules"
-msgstr "Cargar módulos para tarjeta de red"
+msgstr "Cargar mÃ³dulos para tarjeta de red"
 
 #. TXT_SHOW_MODULES
 #, fuzzy
@@ -93,7 +93,7 @@ msgstr "Mostrar los drivers cargados"
 #. TXT_AUTO_LOAD
 #, fuzzy
 msgid "Load Modules Automatically"
-msgstr "Cargar módulos automáticamente"
+msgstr "Cargar mÃ³dulos automÃ¡ticamente"
 
 #. TXT_DEL_MODULES
 #, fuzzy
@@ -116,12 +116,12 @@ msgstr ""
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "¡El módulo \"%s\" ha sido instalado correctamente!"
+msgstr "Â¡El mÃ³dulo \"%s\" ha sido instalado correctamente!"
 
 #. TXT_LOAD_FAILED
 #, fuzzy, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "¡Fallo al cargar el driver \"%s\"!"
+msgstr "Â¡Fallo al cargar el driver \"%s\"!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -139,7 +139,7 @@ msgstr "Disco duro"
 #. TXT_START_INSTALL
 #, fuzzy
 msgid "Start Installation or Update"
-msgstr "Comenzar la instalación"
+msgstr "Comenzar la instalaciÃ³n"
 
 #. TXT_START_RESCUE
 #, fuzzy
@@ -168,9 +168,9 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"¡No puedo encontrar la imagen!\n"
+"Â¡No puedo encontrar la imagen!\n"
 "\n"
-"¡Compruebe el directorio!"
+"Â¡Compruebe el directorio!"
 
 #. TXT_LOADING
 #, fuzzy
@@ -227,27 +227,27 @@ msgstr "Inserte el disco y presione ENTER"
 #. TXT_ERROR_READ_DISK
 #, fuzzy
 msgid "Error reading from floppy disk."
-msgstr "¡Error mientras se leía del floppy!"
+msgstr "Â¡Error mientras se leÃ­a del floppy!"
 
 #. TXT_ENTER_ROOT_FS
 #, fuzzy
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Introduzca su partición raíz (p. ej. /dev/hda1)"
+msgstr "Introduzca su particiÃ³n raÃ­z (p. ej. /dev/hda1)"
 
 #. TXT_INVALID_ROOT_FS
 #, fuzzy
 msgid "Invalid root device."
-msgstr "Dispositivo raíz no válido"
+msgstr "Dispositivo raÃ­z no vÃ¡lido"
 
 #. TXT_INVALID_INPUT
 #, fuzzy
 msgid "Invalid input."
-msgstr "¡Entrada no válida!"
+msgstr "Â¡Entrada no vÃ¡lida!"
 
 #. TXT_INPUT_IPADDR
 #, fuzzy
 msgid "Enter your IP address."
-msgstr "Introduzca su dirección IP"
+msgstr "Introduzca su direcciÃ³n IP"
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
@@ -255,7 +255,7 @@ msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
 msgstr ""
-"Introduzca su máscara de red. En una red de clase C, normalmente es "
+"Introduzca su mÃ¡scara de red. En una red de clase C, normalmente es "
 "255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
@@ -285,9 +285,9 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Se obtuvo la siguiente información:\n"
+"Se obtuvo la siguiente informaciÃ³n:\n"
 "\n"
-"Dirección IP: %s\n"
+"DirecciÃ³n IP: %s\n"
 "Nombre: %s\n"
 "Dominio: %s"
 
@@ -297,18 +297,18 @@ msgid ""
 "An error occurred during the network configuration. Your network card "
 "probably was not recognized by the kernel."
 msgstr ""
-"Ocurrió un error mientras se configuraba la red. ¡Posiblemente su tarjeta de "
+"OcurriÃ³ un error mientras se configuraba la red. Â¡Posiblemente su tarjeta de "
 "red no fue reconocida por el kernel!"
 
 #. TXT_INPUT_SERVER
 #, fuzzy
 msgid "Enter the IP address of the NFS server."
-msgstr "Introduzca la dirección IP del servidor NFS."
+msgstr "Introduzca la direcciÃ³n IP del servidor NFS."
 
 #. TXT_INPUT_FTPSERVER
 #, fuzzy
 msgid "Enter the IP address of the FTP server."
-msgstr "Introduzca la dirección del servidor FTP."
+msgstr "Introduzca la direcciÃ³n del servidor FTP."
 
 #. TXT_INPUT_DIR
 #, fuzzy
@@ -318,7 +318,7 @@ msgstr "Especifique el directorio en el servidor."
 #. TXT_ENTER_PARAMS
 #, fuzzy, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr "Introduzca los parámetros para \"%s\"."
+msgstr "Introduzca los parÃ¡metros para \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -338,9 +338,9 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Ocurrió un error mientras se montaba el directorio NFS.\n"
+"OcurriÃ³ un error mientras se montaba el directorio NFS.\n"
 "\n"
-"Razón proporcionada por el servidor: %s"
+"RazÃ³n proporcionada por el servidor: %s"
 
 #. TXT_CHOOSE_KEYMAP
 #, fuzzy
@@ -349,7 +349,7 @@ msgid ""
 "YaST will offer additional keyboard tables later."
 msgstr ""
 "Escoja un tipo de teclado.\n"
-"YaST le permitirá escoger otros tipos más adelante."
+"YaST le permitirÃ¡ escoger otros tipos mÃ¡s adelante."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
@@ -359,7 +359,7 @@ msgstr "Seleccione el driver a descargar."
 #. TXT_NO_MODULES
 #, fuzzy
 msgid "No modules currently loaded."
-msgstr "No se encontraron mñodulos nuevos."
+msgstr "No se encontraron mÃ±odulos nuevos."
 
 #. TXT_AUTO_RUNNING
 #, c-format
@@ -369,17 +369,17 @@ msgstr "Autodetectando (%s)...   "
 #. TXT_WANT_MORE_SCSI
 #, fuzzy
 msgid "Search for additional SCSI host adaptors?"
-msgstr "¿Desea buscar más adaptadores SCSI?"
+msgstr "Â¿Desea buscar mÃ¡s adaptadores SCSI?"
 
 #. TXT_WANT_MORE_NET
 #, fuzzy
 msgid "Search for additional network cards?"
-msgstr "¿Desea buscar más tarjetas de red?"
+msgstr "Â¿Desea buscar mÃ¡s tarjetas de red?"
 
 #. TXT_WANT_MORE_CDROM
 #, fuzzy
 msgid "Search for additional CD-ROM drives?"
-msgstr "¿Desea buscar más unidades de CD-ROM?"
+msgstr "Â¿Desea buscar mÃ¡s unidades de CD-ROM?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
@@ -413,15 +413,15 @@ msgstr "Escoja el dispositivo de red."
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
 msgid "Enter the IP address of the PLIP partner."
-msgstr "Escriba la direccción IP de su par PLIP."
+msgstr "Escriba la direccciÃ³n IP de su par PLIP."
 
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid ""
 "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
-"El chipset PCMCIA no ha podido detectarse automáticamente. Por favor, "
-"especifíquelo manualmente."
+"El chipset PCMCIA no ha podido detectarse automÃ¡ticamente. Por favor, "
+"especifÃ­quelo manualmente."
 
 #. TXT_FOUND_PCMCIA
 #, fuzzy, c-format
@@ -430,14 +430,14 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Se encontró el chipset PCMCIA \"%s\"!\n"
+"Se encontrÃ³ el chipset PCMCIA \"%s\"!\n"
 "\n"
-"Introduzca los parámetros para el driver de PCMCIA"
+"Introduzca los parÃ¡metros para el driver de PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
 #, fuzzy, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Escriba los parámetros específicos del chipset \"%s\""
+msgstr "Escriba los parÃ¡metros especÃ­ficos del chipset \"%s\""
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
@@ -450,12 +450,12 @@ msgstr "Los servicios PCMCIA se iniciaron satisfactoriamente."
 #. TXT_PCMCIA_FAIL
 #, fuzzy
 msgid "Start of PCMCIA card services failed."
-msgstr "¡Falló la iniciación de los servicios PCMCIA!"
+msgstr "Â¡FallÃ³ la iniciaciÃ³n de los servicios PCMCIA!"
 
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
 msgid "PCMCIA card services already running."
-msgstr "¡Los servicios de PCMCIA ya están inciados!"
+msgstr "Â¡Los servicios de PCMCIA ya estÃ¡n inciados!"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
@@ -466,22 +466,22 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Sólo puede salir de Linuxrc mediante la opción\n"
+"SÃ³lo puede salir de Linuxrc mediante la opciÃ³n\n"
 "\n"
-"\"Iniciar la instalación / Sistema\"\n"
+"\"Iniciar la instalaciÃ³n / Sistema\"\n"
 "\n"
-"Para esto, posiblemente necesitará cargar algunos drivers (módulos) que den "
+"Para esto, posiblemente necesitarÃ¡ cargar algunos drivers (mÃ³dulos) que den "
 "soporte a su harware."
 
 #. TXT_NO_CTRLC
 #, fuzzy
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "¡No puede salir de Linuxrc con <ctrl-c>!"
+msgstr "Â¡No puede salir de Linuxrc con <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 #, fuzzy
 msgid "Remove the disk from the drive now."
-msgstr "¡Retire el disco de la unidad ahora!"
+msgstr "Â¡Retire el disco de la unidad ahora!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -505,12 +505,12 @@ msgstr "Intentando montar el CD-ROM..."
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "¡No se ha podido montar el CD-ROM!"
+msgstr "Â¡No se ha podido montar el CD-ROM!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
-msgstr "¿Desea reiniciar ahora el sistema?"
+msgstr "Â¿Desea reiniciar ahora el sistema?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
@@ -518,18 +518,18 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"El sistema básico ha sido instalado correctamente. El sistema será ahora "
-"iniciado para terminar la instalación"
+"El sistema bÃ¡sico ha sido instalado correctamente. El sistema serÃ¡ ahora "
+"iniciado para terminar la instalaciÃ³n"
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Introduzca la partición (por ejemplo /dev/hda1)"
+msgstr "Introduzca la particiÃ³n (por ejemplo /dev/hda1)"
 
 #. TXT_ERROR_HD_MOUNT
 #, fuzzy
 msgid "Could not mount the specified partition."
-msgstr "¡No puedo montar la partición especificada!"
+msgstr "Â¡No puedo montar la particiÃ³n especificada!"
 
 #. TXT_ENTER_HD_DIR
 #, fuzzy
@@ -539,7 +539,7 @@ msgstr "Introduzca el directorio fuente"
 #. TXT_ERROR_INSTALL
 #, fuzzy
 msgid "An error occurred during the installation."
-msgstr "¡Ha ocurrido un error durante la instalación!"
+msgstr "Â¡Ha ocurrido un error durante la instalaciÃ³n!"
 
 #. TXT_DRIVES
 #, fuzzy
@@ -554,14 +554,14 @@ msgid ""
 "Before you acknowledge this message, you must switch to virtual console 2 "
 "(press ALT-F2) to create and activate some swap space."
 msgstr ""
-"¡Su ordenador tiene muy poca memoria!\n"
+"Â¡Su ordenador tiene muy poca memoria!\n"
 "\n"
-"¡Antes de aceptar este mensaje, cambie a la segunda consola virtual (ALT-F2) "
-"para crear y activar espacio para el swap (paginación)!"
+"Â¡Antes de aceptar este mensaje, cambie a la segunda consola virtual (ALT-F2) "
+"para crear y activar espacio para el swap (paginaciÃ³n)!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Animación"
+msgstr "AnimaciÃ³n"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
@@ -579,12 +579,12 @@ msgstr "Debug (experto)"
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load Root Image into RAM Disk"
-msgstr "Cargar imagen raíz (rootimage) en ramdisk"
+msgstr "Cargar imagen raÃ­z (rootimage) en ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
 #, fuzzy
 msgid "Enter Root Image"
-msgstr "Introduzca imagen raíz (rootimage)"
+msgstr "Introduzca imagen raÃ­z (rootimage)"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
@@ -597,30 +597,30 @@ msgid ""
 "file system."
 msgstr ""
 "Introduzca la ruta y nombre del fichero a cargar en el disco RAM como "
-"sistema de ficheros raíz"
+"sistema de ficheros raÃ­z"
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
 msgid "Not yet implemented."
-msgstr "¡Todavía no está implementado!"
+msgstr "Â¡TodavÃ­a no estÃ¡ implementado!"
 
 #. TXT_NEW_INST_SYS
 #, fuzzy
 msgid "Installation System"
-msgstr "Sistema de instalación"
+msgstr "Sistema de instalaciÃ³n"
 
 #. TXT_ENTER_INST_SYS
 #, fuzzy
 msgid "Enter the directory that contains the installation system."
-msgstr "Introduzca el directorio que contiene el sistema de instalación."
+msgstr "Introduzca el directorio que contiene el sistema de instalaciÃ³n."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "No hay información disponible."
+msgstr "No hay informaciÃ³n disponible."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "Preparando la instalación..."
+msgstr "Preparando la instalaciÃ³n..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
@@ -639,7 +639,7 @@ msgstr "Salir / Reiniciar"
 #. TXT_SEARCH_INFOFILE
 #, fuzzy
 msgid "Searching for info file..."
-msgstr "Buscando archivo de información (infofile)..."
+msgstr "Buscando archivo de informaciÃ³n (infofile)..."
 
 #. TXT_NFSPORT
 #, fuzzy
@@ -654,12 +654,12 @@ msgstr "Contactando con el DNS..."
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
 msgid "Host %s was not found."
-msgstr "¡No se encuentra la máquina %s!"
+msgstr "Â¡No se encuentra la mÃ¡quina %s!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "Su red ya está configurada. ¿Desea mantener esta configuración?"
+msgstr "Su red ya estÃ¡ configurada. Â¿Desea mantener esta configuraciÃ³n?"
 
 #. TXT_ASK_BREAK
 #, fuzzy
@@ -672,13 +672,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"¡No se encontró el dispositivo de red! \n"
+"Â¡No se encontrÃ³ el dispositivo de red! \n"
 "Cargue antes un driver."
 
 #. TXT_ALREADY_FOUND
 #, fuzzy, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "¡Un %s ya se había detectado en su sistema!\n"
+msgstr "Â¡Un %s ya se habÃ­a detectado en su sistema!\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -706,7 +706,7 @@ msgstr "Introduzca el password para el acceso al FTP"
 #. TXT_ENTER_FTPPROXY
 #, fuzzy
 msgid "Enter the address of the FTP proxy."
-msgstr "Introduzca la dirección del proxy FTP"
+msgstr "Introduzca la direcciÃ³n del proxy FTP"
 
 #. TXT_ENTER_FTPPORT
 #, fuzzy
@@ -716,7 +716,7 @@ msgstr "Introduzca el puerto del proxy FTP"
 #. TXT_WANT_FTPPROXY
 #, fuzzy
 msgid "Use an FTP proxy?"
-msgstr "¿Desea utilizar un proxy para FTP?"
+msgstr "Â¿Desea utilizar un proxy para FTP?"
 
 #. TXT_NOMEM_FTP
 #, fuzzy, c-format
@@ -724,8 +724,8 @@ msgid ""
 "Your computer does not have enough RAM to install via FTP (%d MB RAM "
 "required)."
 msgstr ""
-"¡Su ordenador no dispone de suficiente memoria para instalar por FTP! (%d MB "
-"RAM mínimo)"
+"Â¡Su ordenador no dispone de suficiente memoria para instalar por FTP! (%d MB "
+"RAM mÃ­nimo)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
@@ -734,15 +734,15 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normalmente la instalación por FTP se realiza en modo anónimo. No obstante, "
+"Normalmente la instalaciÃ³n por FTP se realiza en modo anÃ³nimo. No obstante, "
 "existe la posibilidad de utilizar un nombre de usuario y un password para "
 "acceder.\n"
-"¿Quiere especificar uno?"
+"Â¿Quiere especificar uno?"
 
 #. TXT_MORE_MODULES
 #, fuzzy
 msgid "-- More Modules --"
-msgstr "-- Más drivers --"
+msgstr "-- MÃ¡s drivers --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
@@ -751,12 +751,12 @@ msgstr "Iniciando el puerto paralelo..."
 #. TXT_ENTER_NFSPORT
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
-msgstr "Introduzca el número de puerto donde corre el servidor NFS"
+msgstr "Introduzca el nÃºmero de puerto donde corre el servidor NFS"
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "¡Asegúrese de que el CD número %d está en su unidad!"
+msgstr "Â¡AsegÃºrese de que el CD nÃºmero %d estÃ¡ en su unidad!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
@@ -774,15 +774,15 @@ msgstr "Introduzca el valor de timeout para bootp."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "conexión canal a canal"
+msgstr "conexiÃ³n canal a canal"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr "conexión ESCON"
+msgstr "conexiÃ³n ESCON"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr "conexión IUCV"
+msgstr "conexiÃ³n IUCV"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
@@ -802,8 +802,8 @@ msgid ""
 "Access the share as guest?"
 msgstr ""
 "Si desea acceder al recurso compartido como invitado (guest),\n"
-"no necesita especificar nombre de usuario, contraseña ni grupo detrabajo.\n"
-"¿Desea acceder el recurso compartido como invitado?"
+"no necesita especificar nombre de usuario, contraseÃ±a ni grupo detrabajo.\n"
+"Â¿Desea acceder el recurso compartido como invitado?"
 
 #. TXT_SMB_ENTER_USER
 #, fuzzy
@@ -813,7 +813,7 @@ msgstr "Introduzca su nombre de usuario en el servidor SMB"
 #. TXT_SMB_ENTER_PASSWORD
 #, fuzzy
 msgid "Enter your password on the SMB server."
-msgstr "Introduzca su contraseña para el servidor SMB"
+msgstr "Introduzca su contraseÃ±a para el servidor SMB"
 
 #. TXT_SMB_ENTER_WORKGROUP
 #, fuzzy
@@ -823,7 +823,7 @@ msgid ""
 msgstr ""
 "Introduzca su grupo de trabajo.\n"
 "Si no necesita especificar un grupo de trabajo,\n"
-"deje el campo vacío."
+"deje el campo vacÃ­o."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -840,51 +840,51 @@ msgstr ""
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr "¿Configurar automaticamente via %s?"
+msgstr "Â¿Configurar automaticamente via %s?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr "Enviando petición %s..."
+msgstr "Enviando peticiÃ³n %s..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "Configuración %s ha fallado."
+msgstr "ConfiguraciÃ³n %s ha fallado."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
-msgstr "¿Usar DHCP en vez de BOOTP?"
+msgstr "Â¿Usar DHCP en vez de BOOTP?"
 
 #. TXT_MODDISK0
 #, fuzzy
 msgid "Insert a modules disk."
-msgstr "Por favor introduzca el disquette de módulos."
+msgstr "Por favor introduzca el disquette de mÃ³dulos."
 
 #. TXT_MODDISK1
 #, fuzzy, c-format
 msgid "Insert modules disk %d."
-msgstr "Por favor introduzca el disquette de módulos %d."
+msgstr "Por favor introduzca el disquette de mÃ³dulos %d."
 
 #. TXT_MODDISK2
 #, fuzzy
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
-"Encontrará instrucciones sobre cómo crear uno en boot/README en el CD1 o "
+"EncontrarÃ¡ instrucciones sobre cÃ³mo crear uno en boot/README en el CD1 o "
 "DVD1."
 
 #. TXT_CHOOSE_NETSOURCE
 #, fuzzy
 msgid "Choose the network protocol."
-msgstr "A continuación elija el protocolo de red."
+msgstr "A continuaciÃ³n elija el protocolo de red."
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, fuzzy, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Introduzca la dirección IP del servidor %s."
+msgstr "Introduzca la direcciÃ³n IP del servidor %s."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -900,17 +900,17 @@ msgstr "Red"
 #. TXT_LOAD_MODULES
 #, fuzzy, c-format
 msgid "Load %s Modules"
-msgstr "Cargar módulos %s"
+msgstr "Cargar mÃ³dulos %s"
 
 #. TXT_LOAD_FS
 #, fuzzy
 msgid "Load File System Modules"
-msgstr "Cargar módulos de sistema de ficheros"
+msgstr "Cargar mÃ³dulos de sistema de ficheros"
 
 #. TXT_LOAD_OTHER
 #, fuzzy
 msgid "Load Unknown Modules"
-msgstr "Cargar módulos desconocidos"
+msgstr "Cargar mÃ³dulos desconocidos"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
@@ -928,22 +928,22 @@ msgstr "Abortar"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "No se encontraron mñodulos nuevos."
+msgstr "No se encontraron mÃ±odulos nuevos."
 
 #. TXT_CHOOSE_PARTITION
 #, fuzzy
 msgid "Choose the hard disk partition."
-msgstr "A continuación elija la partición del disco duro."
+msgstr "A continuaciÃ³n elija la particiÃ³n del disco duro."
 
 #. TXT_CHOOSE_ROOT_FS
 #, fuzzy
 msgid "Choose the root partition."
-msgstr "Por favor introduzca la partición raiz (root)."
+msgstr "Por favor introduzca la particiÃ³n raiz (root)."
 
 #. TXT_CHOOSE_SWAP
 #, fuzzy
 msgid "Choose the swap partition."
-msgstr "Por favor seleccione la partición de intercambio (swap)."
+msgstr "Por favor seleccione la particiÃ³n de intercambio (swap)."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
@@ -956,7 +956,7 @@ msgstr "Su computadora no dispone de memoria suficiente para ejecutar YaST."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Para continuar, active más espacio de intercambio (swap)."
+msgstr "Para continuar, active mÃ¡s espacio de intercambio (swap)."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
@@ -965,7 +965,7 @@ msgstr "Error al activar el espacio de intercambio (swap)."
 #. TXT_ENTER_SWAP
 #, fuzzy
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Introduzca la partición de intercambio (p.ej. /dev/sda2)"
+msgstr "Introduzca la particiÃ³n de intercambio (p.ej. /dev/sda2)"
 
 #. TXT_ENTER_USER
 #, fuzzy, c-format
@@ -978,7 +978,7 @@ msgstr ""
 #. TXT_ENTER_PASSWORD
 #, fuzzy, c-format
 msgid "Enter the password for the %s server."
-msgstr "Introduzca la dirección IP del servidor %s."
+msgstr "Introduzca la direcciÃ³n IP del servidor %s."
 
 #. TXT_WANT_PROXY
 #, c-format
@@ -988,7 +988,7 @@ msgstr ""
 #. TXT_ENTER_PROXY
 #, fuzzy, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Introduzca la dirección del proxy FTP"
+msgstr "Introduzca la direcciÃ³n del proxy FTP"
 
 #. TXT_ENTER_PROXYPORT
 #, fuzzy, c-format

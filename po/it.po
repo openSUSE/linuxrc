@@ -8,7 +8,7 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TXT_OK
@@ -116,12 +116,12 @@ msgstr ""
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "Il modulo \"%s\" è stato caricato con successo!"
+msgstr "Il modulo \"%s\" Ã¨ stato caricato con successo!"
 
 #. TXT_LOAD_FAILED
 #, fuzzy, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "Il caricamento del modulo \"%s\" è fallito!"
+msgstr "Il caricamento del modulo \"%s\" Ã¨ fallito!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -168,7 +168,7 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"Image non è stato trovato!\n"
+"Image non Ã¨ stato trovato!\n"
 "\n"
 "Controllate le indicazioni del directory."
 
@@ -259,7 +259,7 @@ msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
 msgstr ""
-"Indicate la Vostra maschera-rete. Per una normale Class-C-rete è "
+"Indicate la Vostra maschera-rete. Per una normale Class-C-rete Ã¨ "
 "255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
@@ -292,7 +292,7 @@ msgstr ""
 "I seguenti computer-dati sono stati determinati:\n"
 "\n"
 "Indirizzo IP: %s\n"
-"Nom d'hôte: %s\n"
+"Nom d'hÃ´te: %s\n"
 "Domain: %s"
 
 #. TXT_ERROR_CONF_NET
@@ -301,8 +301,8 @@ msgid ""
 "An error occurred during the network configuration. Your network card "
 "probably was not recognized by the kernel."
 msgstr ""
-"È avvenuto un errore nel configurare la rete. O non avete caricato il modulo "
-"adatto o la Vostra carta-rete non è stata riconosciuta correttamente dal "
+"Ãˆ avvenuto un errore nel configurare la rete. O non avete caricato il modulo "
+"adatto o la Vostra carta-rete non Ã¨ stata riconosciuta correttamente dal "
 "Kernel!"
 
 #. TXT_INPUT_SERVER
@@ -343,7 +343,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Nel fare il mount del directory NFS del Server è subentrato il seguente "
+"Nel fare il mount del directory NFS del Server Ã¨ subentrato il seguente "
 "errore:\n"
 "\n"
 "Errore dell' NFS-Server: %s"
@@ -355,7 +355,7 @@ msgid ""
 "YaST will offer additional keyboard tables later."
 msgstr ""
 "Scegliete un settaggio della tastiera.\n"
-"YaST Vi darà in seguito altri settaggi."
+"YaST Vi darÃ  in seguito altri settaggi."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
@@ -456,12 +456,12 @@ msgstr "PCMCIA Card Services iniziati con successo."
 #. TXT_PCMCIA_FAIL
 #, fuzzy
 msgid "Start of PCMCIA card services failed."
-msgstr "L'inizio del PCMCIA Card Services è fallito!"
+msgstr "L'inizio del PCMCIA Card Services Ã¨ fallito!"
 
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
 msgid "PCMCIA card services already running."
-msgstr "I PCMCIA Card Services funzionano già!"
+msgstr "I PCMCIA Card Services funzionano giÃ !"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
@@ -472,17 +472,17 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Si può lasciare Linuxrc solo tramite il Menu\n"
+"Si puÃ² lasciare Linuxrc solo tramite il Menu\n"
 "\n"
-"» Installazione / Iniziare il system «\n"
+"Â» Installazione / Iniziare il system Â«\n"
 "\n"
-"Affinchè ciò sia possibile, dovete eventualmente caricare prima l' Hardware-"
+"AffinchÃ¨ ciÃ² sia possibile, dovete eventualmente caricare prima l' Hardware-"
 "Driver (Moduli)."
 
 #. TXT_NO_CTRLC
 #, fuzzy
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Linuxrc non può venire interrotto tramite <ctrl-c>!"
+msgstr "Linuxrc non puÃ² venire interrotto tramite <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 #, fuzzy
@@ -511,7 +511,7 @@ msgstr "Provate a fare il mount del CD-ROM..."
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "Il mount del CD-ROM non è stato possibile!"
+msgstr "Il mount del CD-ROM non Ã¨ stato possibile!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
@@ -524,7 +524,7 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Il sistema di base è stato installato con successo. Questo nuovo sistema "
+"Il sistema di base Ã¨ stato installato con successo. Questo nuovo sistema "
 "viene ora avviato, per chiudere l'installazione."
 
 #. TXT_ENTER_PARTITION
@@ -537,7 +537,7 @@ msgstr ""
 #. TXT_ERROR_HD_MOUNT
 #, fuzzy
 msgid "Could not mount the specified partition."
-msgstr "Non si è potuto fare il mount della partizione indicata!"
+msgstr "Non si Ã¨ potuto fare il mount della partizione indicata!"
 
 #. TXT_ENTER_HD_DIR
 #, fuzzy
@@ -547,7 +547,7 @@ msgstr "Indicate il source-directory"
 #. TXT_ERROR_INSTALL
 #, fuzzy
 msgid "An error occurred during the installation."
-msgstr "L'installazione non è sata terminata regolarmente!"
+msgstr "L'installazione non Ã¨ sata terminata regolarmente!"
 
 #. TXT_DRIVES
 #, fuzzy
@@ -578,7 +578,7 @@ msgstr ""
 #. TXT_NO_DRIVES
 #, fuzzy
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Fin'ora non sono stati riconosciuti nè disk rigidi nè CD-ROM."
+msgstr "Fin'ora non sono stati riconosciuti nÃ¨ disk rigidi nÃ¨ CD-ROM."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
@@ -662,13 +662,13 @@ msgstr "Interrogare il Nameserver..."
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
 msgid "Host %s was not found."
-msgstr "Il computer %s è sconosciuto!"
+msgstr "Il computer %s Ã¨ sconosciuto!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
 msgstr ""
-"La Vostra rete è già configurata. Desiderate mantenere la configurazione?"
+"La Vostra rete Ã¨ giÃ  configurata. Desiderate mantenere la configurazione?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -680,13 +680,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Non è stata trovata una scheda rete!\n"
+"Non Ã¨ stata trovata una scheda rete!\n"
 "Caricate eventualmente un modulo corrispondente."
 
 #. TXT_ALREADY_FOUND
 #, fuzzy, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "Nel Vostro sistema è giá stato trovato un %s!\n"
+msgstr "Nel Vostro sistema Ã¨ giÃ¡ stato trovato un %s!\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -740,8 +740,8 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normalement, une installation FTP est réalisée via FTP anonyme. Mais il est "
-"possible de spécifier un nom d'utilisateur et un mot de passe sur le serveur "
+"Normalement, une installation FTP est rÃ©alisÃ©e via FTP anonyme. Mais il est "
+"possible de spÃ©cifier un nom d'utilisateur et un mot de passe sur le serveur "
 "FTP.\n"
 "Souhaitez-vous le faire?"
 
@@ -928,7 +928,7 @@ msgstr ""
 #. TXT_CHOOSE_SWAP
 #, fuzzy
 msgid "Choose the swap partition."
-msgstr "Non si è potuto fare il mount della partizione indicata!"
+msgstr "Non si Ã¨ potuto fare il mount della partizione indicata!"
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."

@@ -10,7 +10,7 @@ msgstr ""
 "Last-Translator: Stanislav Visnovsky <visnovsky@kde.org>\n"
 "Language-Team: Slovak <sk-i18n@linux.sk>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.2\n"
 
@@ -24,7 +24,7 @@ msgstr "Nazad"
 
 #. TXT_YES
 msgid "Yes"
-msgstr "¡no"
+msgstr "√Åno"
 
 #. TXT_NO
 msgid "No"
@@ -33,15 +33,15 @@ msgstr "Nie"
 #. TXT_CHOOSE_LANGUAGE
 #, fuzzy
 msgid "Select the language."
-msgstr "ProsÌm, vyberte jazyk"
+msgstr "Pros√≠m, vyberte jazyk"
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr "Farebn˝"
+msgstr "Farebn√Ω"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
-msgstr "»iernobiely"
+msgstr "ƒåiernobiely"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
@@ -54,22 +54,22 @@ msgstr "Jazyk"
 #. TXT_MENU_MODULES
 #, fuzzy
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Moduly jadra (ovl·daËe hardware)"
+msgstr "Moduly jadra (ovl√°daƒçe hardware)"
 
 #. TXT_MENU_START
 #, fuzzy
 msgid "Start Installation or System"
-msgstr "©tart inπtal·cie/systÈmu"
+msgstr "≈†tart in≈°tal√°cie/syst√©mu"
 
 #. TXT_MENU_INFO
 #, fuzzy
 msgid "System Information"
-msgstr "SystÈmovÈ inform·cie"
+msgstr "Syst√©mov√© inform√°cie"
 
 #. TXT_HDR_MAIN
 #, fuzzy
 msgid "Main Menu"
-msgstr "HlavnÈ menu"
+msgstr "Hlavn√© menu"
 
 #. TXT_SETTINGS
 msgid "Settings"
@@ -81,27 +81,27 @@ msgstr "Obrazovka"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Kl·vesov· mapa"
+msgstr "Kl√°vesov√° mapa"
 
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load Network Card Modules"
-msgstr "Nahraª modul pre sieªov˙ kartu"
+msgstr "Nahra≈• modul pre sie≈•ov√∫ kartu"
 
 #. TXT_SHOW_MODULES
 #, fuzzy
 msgid "Show Loaded Modules"
-msgstr "Zobraziª nahranÈ moduly"
+msgstr "Zobrazi≈• nahran√© moduly"
 
 #. TXT_AUTO_LOAD
 #, fuzzy
 msgid "Load Modules Automatically"
-msgstr "AutomatickÈ nahratie modulov"
+msgstr "Automatick√© nahratie modulov"
 
 #. TXT_DEL_MODULES
 #, fuzzy
 msgid "Unload Modules"
-msgstr "Uvoµnenie modulov"
+msgstr "Uvoƒænenie modulov"
 
 #. TXT_TRY_TO_LOAD
 #, fuzzy, c-format
@@ -111,20 +111,20 @@ msgid ""
 "During loading, you may want to watch the kernel messages on virtual console "
 "4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Pok˙πam sa nahraª modul \"%s\"...\n"
+"Pok√∫≈°am sa nahra≈• modul \"%s\"...\n"
 "\n"
-"PoËas nahr·vania mÙæete sledovaª spr·vy jadra na virtu·lnej konzole 4 (ALT-"
-"F4). Pre prepnutie sp‰ª pouæite ALT-F1."
+"Poƒças nahr√°vania m√¥≈æete sledova≈• spr√°vy jadra na virtu√°lnej konzole 4 (ALT-"
+"F4). Pre prepnutie sp√§≈• pou≈æite ALT-F1."
 
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "Modul \"%s\" bol ˙speπne nahran˝!"
+msgstr "Modul \"%s\" bol √∫spe≈°ne nahran√Ω!"
 
 #. TXT_LOAD_FAILED
 #, fuzzy, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "Nepodarilo sa nahraª modul \"%s\"!"
+msgstr "Nepodarilo sa nahra≈• modul \"%s\"!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -142,27 +142,27 @@ msgstr "Disk"
 #. TXT_START_INSTALL
 #, fuzzy
 msgid "Start Installation or Update"
-msgstr "©tart inπtal·cie/aktualiz·cie"
+msgstr "≈†tart in≈°tal√°cie/aktualiz√°cie"
 
 #. TXT_START_RESCUE
 #, fuzzy
 msgid "Start Rescue System"
-msgstr "©tart z·chrannÈho systÈmu"
+msgstr "≈†tart z√°chrann√©ho syst√©mu"
 
 #. TXT_LOAD_RS_NFS
 #, fuzzy
 msgid "Load Rescue System via NFS"
-msgstr "Nahratie z·chrannÈho systÈmu cez NFS"
+msgstr "Nahratie z√°chrann√©ho syst√©mu cez NFS"
 
 #. TXT_BOOT_SYSTEM
 #, fuzzy
 msgid "Boot Installed System"
-msgstr "©tart nainπtalovanÈho systÈmu"
+msgstr "≈†tart nain≈°talovan√©ho syst√©mu"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Hµad·m obraz \"%s\"..."
+msgstr "Hƒæad√°m obraz \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 #, fuzzy
@@ -171,19 +171,19 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"NemÙæem n·jsª obraz!\n"
+"Nem√¥≈æem n√°js≈• obraz!\n"
 "\n"
-"Skontrolujte zadan˝ prieËinok!"
+"Skontrolujte zadan√Ω prieƒçinok!"
 
 #. TXT_LOADING
 #, fuzzy
 msgid "Loading data into RAM disk..."
-msgstr "Nahr·vam d·ta do ramdisku"
+msgstr "Nahr√°vam d√°ta do ramdisku"
 
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
-msgstr "Spr·vy jadra"
+msgstr "Spr√°vy jadra"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -196,7 +196,7 @@ msgstr "Zariadenia"
 #. TXT_INFO_NETDEV
 #, fuzzy
 msgid "Network Cards"
-msgstr "SieªovÈ karty"
+msgstr "Sie≈•ov√© karty"
 
 #. TXT_INFO_DMA
 msgid "DMA"
@@ -204,7 +204,7 @@ msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr "Preruπenia"
+msgstr "Preru≈°enia"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
@@ -212,7 +212,7 @@ msgstr "I/O Porty"
 
 #. TXT_INFO_MEM
 msgid "Memory"
-msgstr "Pam‰ª"
+msgstr "Pam√§≈•"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
@@ -225,39 +225,39 @@ msgstr "PCI"
 #. TXT_INSERT_DISK
 #, fuzzy
 msgid "Insert the disk and press ENTER."
-msgstr "Vloæte, prosÌm, disketu a stlaËte ENTER"
+msgstr "Vlo≈æte, pros√≠m, disketu a stlaƒçte ENTER"
 
 #. TXT_ERROR_READ_DISK
 #, fuzzy
 msgid "Error reading from floppy disk."
-msgstr "Chyba pri ËÌtanÌ diskety!"
+msgstr "Chyba pri ƒç√≠tan√≠ diskety!"
 
 #. TXT_ENTER_ROOT_FS
 #, fuzzy
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Zadajte v·π koreÚov˝ oddiel (napr. /dev/sda3)"
+msgstr "Zadajte v√°≈° kore≈àov√Ω oddiel (napr. /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 #, fuzzy
 msgid "Invalid root device."
-msgstr "NeplatnÈ zariadenie oddielu!"
+msgstr "Neplatn√© zariadenie oddielu!"
 
 #. TXT_INVALID_INPUT
 #, fuzzy
 msgid "Invalid input."
-msgstr "Neplatn˝ vstup!"
+msgstr "Neplatn√Ω vstup!"
 
 #. TXT_INPUT_IPADDR
 #, fuzzy
 msgid "Enter your IP address."
-msgstr "Zadajte vaπu IP adresu"
+msgstr "Zadajte va≈°u IP adresu"
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
 msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
-msgstr "Zadajte vaπu sieªov˙ masku. Pre obvykl˙ sieª typu C je 255.255.255.0"
+msgstr "Zadajte va≈°u sie≈•ov√∫ masku. Pre obvykl√∫ sie≈• typu C je 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 #, fuzzy
@@ -265,8 +265,8 @@ msgid ""
 "If you need a gateway to reach the server, enter the IP address of the "
 "gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
-"Ak pre pripojenie k serveru potrebujete br·nu, zadajte jej IP adresu. Ak "
-"br·nu nepotrebujete, zadajte vaπu IP adresu."
+"Ak pre pripojenie k serveru potrebujete br√°nu, zadajte jej IP adresu. Ak "
+"br√°nu nepotrebujete, zadajte va≈°u IP adresu."
 
 #. TXT_INPUT_NAMED
 #, fuzzy
@@ -274,7 +274,7 @@ msgid ""
 "Enter the IP address of your name server. If you do not use a name server, "
 "press ESC."
 msgstr ""
-"Zadajte IP adresu v·πho pomenov·vacieho serveru. Ak ho nepouæÌvate, stlaËte "
+"Zadajte IP adresu v√°≈°ho pomenov√°vacieho serveru. Ak ho nepou≈æ√≠vate, stlaƒçte "
 "iba ESC."
 
 #. TXT_FOUND_HOST
@@ -286,11 +286,11 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Zadali ste nasleduj˙ce ˙daje:\n"
+"Zadali ste nasleduj√∫ce √∫daje:\n"
 "\n"
 "IP adresa: %s\n"
 "Meno: %s\n"
-"DomÈna: %s"
+"Dom√©na: %s"
 
 #. TXT_ERROR_CONF_NET
 #, fuzzy
@@ -298,7 +298,7 @@ msgid ""
 "An error occurred during the network configuration. Your network card "
 "probably was not recognized by the kernel."
 msgstr ""
-"Chyba pri konfigur·cii siete. Pravdepodobne jadro nerozpoznalo vaπu sieªov˙ "
+"Chyba pri konfigur√°cii siete. Pravdepodobne jadro nerozpoznalo va≈°u sie≈•ov√∫ "
 "kartu!"
 
 #. TXT_INPUT_SERVER
@@ -314,7 +314,7 @@ msgstr "Zadajte IP adresu FTP serveru."
 #. TXT_INPUT_DIR
 #, fuzzy
 msgid "Enter the directory on the server."
-msgstr "Zadajte prieËinok na serveri."
+msgstr "Zadajte prieƒçinok na serveri."
 
 #. TXT_ENTER_PARAMS
 #, fuzzy, c-format
@@ -328,7 +328,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Pok˙πam sa pripojiª prieËinok\n"
+"Pok√∫≈°am sa pripoji≈• prieƒçinok\n"
 "\n"
 "\"%s:%s\"..."
 
@@ -339,9 +339,9 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Chyba pri pokuse o pripojenie NFS prieËinku.\n"
+"Chyba pri pokuse o pripojenie NFS prieƒçinku.\n"
 "\n"
-"OdpoveÔ od serveru: %s"
+"Odpoveƒè od serveru: %s"
 
 #. TXT_CHOOSE_KEYMAP
 #, fuzzy
@@ -349,67 +349,67 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"Vyberte si kl·vesov˙ mapu.\n"
-"YaST v·m pon˙kne Ôalπie kl·vesovÈ mapy neskÙr."
+"Vyberte si kl√°vesov√∫ mapu.\n"
+"YaST v√°m pon√∫kne ƒèal≈°ie kl√°vesov√© mapy nesk√¥r."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
 msgid "Choose the module to unload."
-msgstr "Vyberte si modul, ktor˝ chcete uvoµniª."
+msgstr "Vyberte si modul, ktor√Ω chcete uvoƒæni≈•."
 
 #. TXT_NO_MODULES
 #, fuzzy
 msgid "No modules currently loaded."
-msgstr "Nen·jdenÈ æiadne novÈ moduly."
+msgstr "Nen√°jden√© ≈æiadne nov√© moduly."
 
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Automaticky sk˙πam (%s)..."
+msgstr "Automaticky sk√∫≈°am (%s)..."
 
 #. TXT_WANT_MORE_SCSI
 #, fuzzy
 msgid "Search for additional SCSI host adaptors?"
-msgstr "Chcete hµadaª Ôalπie SCSI adaptÈry?"
+msgstr "Chcete hƒæada≈• ƒèal≈°ie SCSI adapt√©ry?"
 
 #. TXT_WANT_MORE_NET
 #, fuzzy
 msgid "Search for additional network cards?"
-msgstr "Chcete hµadaª Ôalπie sieªovÈ karty?"
+msgstr "Chcete hƒæada≈• ƒèal≈°ie sie≈•ov√© karty?"
 
 #. TXT_WANT_MORE_CDROM
 #, fuzzy
 msgid "Search for additional CD-ROM drives?"
-msgstr "Chcete hµadaª Ôalπie mechaniky CD-ROM?"
+msgstr "Chcete hƒæada≈• ƒèal≈°ie mechaniky CD-ROM?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "sieªov· karta typu ethernet"
+msgstr "sie≈•ov√° karta typu ethernet"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "paraleln˝ port"
+msgstr "paraleln√Ω port"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "sieªov· karta typu token ring"
+msgstr "sie≈•ov√° karta typu token ring"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "sieªov· karta typu arcnet"
+msgstr "sie≈•ov√° karta typu arcnet"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "sieªov· karta typu FDDI"
+msgstr "sie≈•ov√° karta typu FDDI"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "sieªov· karta typu HIPPI"
+msgstr "sie≈•ov√° karta typu HIPPI"
 
 #. TXT_CHOOSE_NET
 #, fuzzy
 msgid "Choose the network device."
-msgstr "Vyberte si sieªovÈ zariadenie."
+msgstr "Vyberte si sie≈•ov√© zariadenie."
 
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
@@ -421,7 +421,7 @@ msgstr "Zadajte IP adresu partnera PLIP."
 msgid ""
 "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
-"PCMCIA chipset sa ned· detekovaª automaticky! Zadajte ho, prosÌm, ruËne."
+"PCMCIA chipset sa ned√° detekova≈• automaticky! Zadajte ho, pros√≠m, ruƒçne."
 
 #. TXT_FOUND_PCMCIA
 #, fuzzy, c-format
@@ -430,32 +430,32 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"N·jden˝ PCMCIA chipset \"%s\"!\n"
+"N√°jden√Ω PCMCIA chipset \"%s\"!\n"
 "\n"
 "Zadajte parametre pre PCMCIA moduly."
 
 #. TXT_PCMCIA_PARAMS
 #, fuzzy, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Zadajte πpecifickÈ parametre pre chipset \"%s\""
+msgstr "Zadajte ≈°pecifick√© parametre pre chipset \"%s\""
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "©tartujem spr·vcu kariet..."
+msgstr "≈†tartujem spr√°vcu kariet..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "PCMCIA sluæby boli ˙speπne spustenÈ."
+msgstr "PCMCIA slu≈æby boli √∫spe≈°ne spusten√©."
 
 #. TXT_PCMCIA_FAIL
 #, fuzzy
 msgid "Start of PCMCIA card services failed."
-msgstr "©tart PCMCIA sluæieb zlyhal!"
+msgstr "≈†tart PCMCIA slu≈æieb zlyhal!"
 
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
 msgid "PCMCIA card services already running."
-msgstr "PCMCIA sluæby s˙ uæ spustenÈ!"
+msgstr "PCMCIA slu≈æby s√∫ u≈æ spusten√©!"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
@@ -466,17 +466,17 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"UkonËiª Linuxrc mÙæete iba cez poloæku menu\n"
+"Ukonƒçi≈• Linuxrc m√¥≈æete iba cez polo≈æku menu\n"
 "\n"
-"\"©tart inπtal·cie/systÈmu\"\n"
+"\"≈†tart in≈°tal√°cie/syst√©mu\"\n"
 "\n"
-"Aby ste to mohli urobiª , moæno bude nutnÈ nahraª niektorÈ ovl·daËe (moduly) "
-"pre podporu v·πho hardware."
+"Aby ste to mohli urobi≈• , mo≈æno bude nutn√© nahra≈• niektor√© ovl√°daƒçe (moduly) "
+"pre podporu v√°≈°ho hardware."
 
 #. TXT_NO_CTRLC
 #, fuzzy
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Nie je moænÈ ukonËiª Linuxrc stlaËenÌm <ctrl-c>!"
+msgstr "Nie je mo≈æn√© ukonƒçi≈• Linuxrc stlaƒçen√≠m <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 #, fuzzy
@@ -491,26 +491,26 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"PrÌklad: "
+"Pr√≠klad: "
 
 #. TXT_CHOOSE_SOURCE
 #, fuzzy
 msgid "Choose the source medium."
-msgstr "Vyberte zdrojovÈ mÈdium"
+msgstr "Vyberte zdrojov√© m√©dium"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Pok˙πam sa pripojiª CD-ROM..."
+msgstr "Pok√∫≈°am sa pripoji≈• CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "Nemohol som pripojiª CD-ROM!"
+msgstr "Nemohol som pripoji≈• CD-ROM!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
-msgstr "Chcete teraz reπtartovaª systÈm?"
+msgstr "Chcete teraz re≈°tartova≈• syst√©m?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
@@ -518,28 +518,28 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Z·kladn˝ systÈm bol ˙speπne nainπtalovan˝. Nov˝ systÈm bude spusten˝, aby "
-"ste mohli dokonËiª inπtal·ciu."
+"Z√°kladn√Ω syst√©m bol √∫spe≈°ne nain≈°talovan√Ω. Nov√Ω syst√©m bude spusten√Ω, aby "
+"ste mohli dokonƒçi≈• in≈°tal√°ciu."
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Zadajte oddiel v·πho disku (napr. /dev/sda1)"
+msgstr "Zadajte oddiel v√°≈°ho disku (napr. /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 #, fuzzy
 msgid "Could not mount the specified partition."
-msgstr "Nemohol som pripojiª zadan˝ oddiel!"
+msgstr "Nemohol som pripoji≈• zadan√Ω oddiel!"
 
 #. TXT_ENTER_HD_DIR
 #, fuzzy
 msgid "Enter the source directory."
-msgstr "Zadajte zdrojov˝ prieËinok"
+msgstr "Zadajte zdrojov√Ω prieƒçinok"
 
 #. TXT_ERROR_INSTALL
 #, fuzzy
 msgid "An error occurred during the installation."
-msgstr "Nastala chyba poËas inπtal·cie!"
+msgstr "Nastala chyba poƒças in≈°tal√°cie!"
 
 #. TXT_DRIVES
 #, fuzzy
@@ -554,14 +554,14 @@ msgid ""
 "Before you acknowledge this message, you must switch to virtual console 2 "
 "(press ALT-F2) to create and activate some swap space."
 msgstr ""
-"V·π poËÌtaË m· extrÈmne m·lo pam‰ti!\n"
+"V√°≈° poƒç√≠taƒç m√° extr√©mne m√°lo pam√§ti!\n"
 "\n"
-"Po tejto spr·ve sa musÌte prepn˙ª na virtu·lnu konzolu 2 (stlaËenÌm ALT-F2) "
-"vytvoriª a aktivovaª nejak˝ priestor pre swap!"
+"Po tejto spr√°ve sa mus√≠te prepn√∫≈• na virtu√°lnu konzolu 2 (stlaƒçen√≠m ALT-F2) "
+"vytvori≈• a aktivova≈• nejak√Ω priestor pre swap!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Anim·cia"
+msgstr "Anim√°cia"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
@@ -570,16 +570,16 @@ msgstr ""
 #. TXT_NO_DRIVES
 #, fuzzy
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Ani disk ani CD-ROM neboli n·jdenÈ."
+msgstr "Ani disk ani CD-ROM neboli n√°jden√©."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Ladiª (expert)"
+msgstr "Ladi≈• (expert)"
 
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load Root Image into RAM Disk"
-msgstr "NaËÌtaª obraz systÈmu s˙borov do ramdisku"
+msgstr "Naƒç√≠ta≈• obraz syst√©mu s√∫borov do ramdisku"
 
 #. TXT_NEW_ROOTIMAGE
 #, fuzzy
@@ -596,50 +596,50 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Zadajte cestu a meno s˙boru, ktor˝ chcete aby sa nahral do RAM disku ako "
-"koreÚov˝ systÈm s˙borov."
+"Zadajte cestu a meno s√∫boru, ktor√Ω chcete aby sa nahral do RAM disku ako "
+"kore≈àov√Ω syst√©m s√∫borov."
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
 msgid "Not yet implemented."
-msgstr "Zatiaµ neimplementovanÈ!"
+msgstr "Zatiaƒæ neimplementovan√©!"
 
 #. TXT_NEW_INST_SYS
 #, fuzzy
 msgid "Installation System"
-msgstr "InπtalaËn˝ systÈm"
+msgstr "In≈°talaƒçn√Ω syst√©m"
 
 #. TXT_ENTER_INST_SYS
 #, fuzzy
 msgid "Enter the directory that contains the installation system."
-msgstr "Zadajte prieËinok ktor˝ obsahuje inπtalaËn˝ systÈm."
+msgstr "Zadajte prieƒçinok ktor√Ω obsahuje in≈°talaƒçn√Ω syst√©m."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "Nie s˙ dostupnÈ æiadne inform·cie."
+msgstr "Nie s√∫ dostupn√© ≈æiadne inform√°cie."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "Pripravujem inπtal·ciu..."
+msgstr "Pripravujem in≈°tal√°ciu..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Spustiª Live CD"
+msgstr "Spusti≈• Live CD"
 
 #. TXT_INSERT_LIVECD
 #, fuzzy
 msgid "Insert the Live CD."
-msgstr "Vloæte Live CD."
+msgstr "Vlo≈æte Live CD."
 
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"
-msgstr "Koniec/Reπtart"
+msgstr "Koniec/Re≈°tart"
 
 #. TXT_SEARCH_INFOFILE
 #, fuzzy
 msgid "Searching for info file..."
-msgstr "Hµad·m info s˙bor..."
+msgstr "Hƒæad√°m info s√∫bor..."
 
 #. TXT_NFSPORT
 #, fuzzy
@@ -649,22 +649,22 @@ msgstr "Zadajte NFS port"
 #. TXT_ASKING_NAMED
 #, fuzzy
 msgid "Asking name server..."
-msgstr "P˝tam sa pomenov·vacieho serveru..."
+msgstr "P√Ωtam sa pomenov√°vacieho serveru..."
 
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
 msgid "Host %s was not found."
-msgstr "Hostiteµ %s nen·jden˝."
+msgstr "Hostiteƒæ %s nen√°jden√Ω."
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "Vaπa sieª je uæ nakonfigurovan·. Chcete pouæiª t˙to konfigur·ciu?"
+msgstr "Va≈°a sie≈• je u≈æ nakonfigurovan√°. Chcete pou≈æi≈• t√∫to konfigur√°ciu?"
 
 #. TXT_ASK_BREAK
 #, fuzzy
 msgid "Abort?"
-msgstr "Preruπiª"
+msgstr "Preru≈°i≈•"
 
 #. TXT_NO_NETDEVICE
 #, fuzzy
@@ -672,13 +672,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Nenaπiel som sieªovÈ zariadenie!\n"
-"NajskÙr nahrajte sieªov˝ modul."
+"Nena≈°iel som sie≈•ov√© zariadenie!\n"
+"Najsk√¥r nahrajte sie≈•ov√Ω modul."
 
 #. TXT_ALREADY_FOUND
 #, fuzzy, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "%s uæ bol vo vaπom systÈme n·jden˝!\n"
+msgstr "%s u≈æ bol vo va≈°om syst√©me n√°jden√Ω!\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -687,7 +687,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Chyba pri prÌstupe na FTP server:\n"
+"Chyba pri pr√≠stupe na FTP server:\n"
 "\n"
 "%s"
 
@@ -695,12 +695,12 @@ msgstr ""
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
 msgstr ""
-"Zadajte meno pouæÌvateµa, pomocou ktorÈho chcete pristupovaª na FTP server"
+"Zadajte meno pou≈æ√≠vateƒæa, pomocou ktor√©ho chcete pristupova≈• na FTP server"
 
 #. TXT_ENTER_FTPPASSWD
 #, fuzzy
 msgid "Enter the password for the FTP user account."
-msgstr "Zadajte heslo pre FTP ˙Ëet"
+msgstr "Zadajte heslo pre FTP √∫ƒçet"
 
 #. TXT_ENTER_FTPPROXY
 #, fuzzy
@@ -710,12 +710,12 @@ msgstr "Zadajte IP adresu FTP proxy serveru"
 #. TXT_ENTER_FTPPORT
 #, fuzzy
 msgid "Enter the port of the FTP proxy."
-msgstr "Zadajte ËÌslo portu FTP proxy serveru"
+msgstr "Zadajte ƒç√≠slo portu FTP proxy serveru"
 
 #. TXT_WANT_FTPPROXY
 #, fuzzy
 msgid "Use an FTP proxy?"
-msgstr "Chcete pouæiª FTP proxy?"
+msgstr "Chcete pou≈æi≈• FTP proxy?"
 
 #. TXT_NOMEM_FTP
 #, fuzzy, c-format
@@ -723,8 +723,8 @@ msgid ""
 "Your computer does not have enough RAM to install via FTP (%d MB RAM "
 "required)."
 msgstr ""
-"V·π poËÌtaË nem· dosª pam‰ti RAM aby ste mohli inπtalovaª cez FTP! (Je "
-"potrebn˝ch %dMB RAM)"
+"V√°≈° poƒç√≠taƒç nem√° dos≈• pam√§ti RAM aby ste mohli in≈°talova≈• cez FTP! (Je "
+"potrebn√Ωch %dMB RAM)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
@@ -733,46 +733,46 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Norm·lne sa inπtal·cia cez FTP vykon·va pomocou anonymnÈho FTP. Je tu vπak "
-"moænosª zadaª pouæÌvateµa a jeho heslo na FTP serveri.\n"
+"Norm√°lne sa in≈°tal√°cia cez FTP vykon√°va pomocou anonymn√©ho FTP. Je tu v≈°ak "
+"mo≈ænos≈• zada≈• pou≈æ√≠vateƒæa a jeho heslo na FTP serveri.\n"
 "Chcete to?"
 
 #. TXT_MORE_MODULES
 #, fuzzy
 msgid "-- More Modules --"
-msgstr "-- œalπie moduly --"
+msgstr "-- ƒéal≈°ie moduly --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "Inicializujem paraleln˝ port..."
+msgstr "Inicializujem paraleln√Ω port..."
 
 #. TXT_ENTER_NFSPORT
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
-msgstr "Zadajte ËÌslo portu, na ktorom beæÌ NFS server"
+msgstr "Zadajte ƒç√≠slo portu, na ktorom be≈æ√≠ NFS server"
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "Overte, æe CD ËÌslo %d je v mechanike!"
+msgstr "Overte, ≈æe CD ƒç√≠slo %d je v mechanike!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr "Vysun˙ª CD"
+msgstr "Vysun√∫≈• CD"
 
 #. TXT_BOOTP_TIMEOUT
 #, fuzzy
 msgid "Bootp Time-Out"
-msgstr "»akanie na BOOTP"
+msgstr "ƒåakanie na BOOTP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 #, fuzzy
 msgid "Enter the time-out value for bootp."
-msgstr "Zadajte dÂæku Ëakania na BOOTP."
+msgstr "Zadajte dƒ∫≈æku ƒçakania na BOOTP."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "pripojenie kan·lu na kan·l"
+msgstr "pripojenie kan√°lu na kan√°l"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -784,12 +784,12 @@ msgstr "pripojenie IUCV"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "kan·l pripojen˝ k smerovaËi cisco"
+msgstr "kan√°l pripojen√Ω k smerovaƒçi cisco"
 
 #. TXT_SMB_ENTER_SHARE
 #, fuzzy
 msgid "Enter the share name on the SMB server."
-msgstr "Zadajte meno zdieµanÈho disku na serveri SMB"
+msgstr "Zadajte meno zdieƒæan√©ho disku na serveri SMB"
 
 #. TXT_SMB_GUEST_LOGIN
 #, fuzzy
@@ -798,14 +798,14 @@ msgid ""
 "name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Ak chcete pristupovaª k disku ako hosª, nemusÌte zad·vaª pouæÌvateµa, heslo "
+"Ak chcete pristupova≈• k disku ako hos≈•, nemus√≠te zad√°va≈• pou≈æ√≠vateƒæa, heslo "
 "a skupinu.\n"
-"Chcete pouæiª prÌstup ako hosª?"
+"Chcete pou≈æi≈• pr√≠stup ako hos≈•?"
 
 #. TXT_SMB_ENTER_USER
 #, fuzzy
 msgid "Enter your user name on the SMB server."
-msgstr "Zadajte pouæÌvateµa pre SMB server"
+msgstr "Zadajte pou≈æ√≠vateƒæa pre SMB server"
 
 #. TXT_SMB_ENTER_PASSWORD
 #, fuzzy
@@ -817,7 +817,7 @@ msgstr "Zadajte heslo na SMB serveri"
 msgid ""
 "Enter your workgroup.If you do not need to specify a workgroup,leave the "
 "field empty."
-msgstr "Zadajte skupinu.Ak skupinu nie je nutnÈ uv·dzaª, pole nevypÂÚajte."
+msgstr "Zadajte skupinu.Ak skupinu nie je nutn√© uv√°dza≈•, pole nevypƒ∫≈àajte."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -826,7 +826,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Pok˙πam sa pripojiª disk \n"
+"Pok√∫≈°am sa pripoji≈• disk \n"
 "\n"
 "\"//%s/%s\""
 
@@ -834,44 +834,44 @@ msgstr ""
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr "Automaticky konfigurovaª pomocou %s?"
+msgstr "Automaticky konfigurova≈• pomocou %s?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr "Posielam poæiadavku %s..."
+msgstr "Posielam po≈æiadavku %s..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "Konfigur·cia pomocou %s zlyhala."
+msgstr "Konfigur√°cia pomocou %s zlyhala."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
-msgstr "Pouæiª DHCP namiesto BOOTP?"
+msgstr "Pou≈æi≈• DHCP namiesto BOOTP?"
 
 #. TXT_MODDISK0
 #, fuzzy
 msgid "Insert a modules disk."
-msgstr "Vloæte disk s modulami."
+msgstr "Vlo≈æte disk s modulami."
 
 #. TXT_MODDISK1
 #, fuzzy, c-format
 msgid "Insert modules disk %d."
-msgstr "Vloæte disk s modulami %d."
+msgstr "Vlo≈æte disk s modulami %d."
 
 #. TXT_MODDISK2
 #, fuzzy
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
-"N·vod na to, ako ju vytvoriª, n·jdete s˙bore disks/README na CD 1 alebo DVD1."
+"N√°vod na to, ako ju vytvori≈•, n√°jdete s√∫bore disks/README na CD 1 alebo DVD1."
 
 #. TXT_CHOOSE_NETSOURCE
 #, fuzzy
 msgid "Choose the network protocol."
-msgstr "Vyberte sieªov˝ protokol"
+msgstr "Vyberte sie≈•ov√Ω protokol"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
@@ -883,45 +883,45 @@ msgstr "Zadajte IP adresu serveru %s."
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr "Pok˙πam sa pripojiª na server %s..."
+msgstr "Pok√∫≈°am sa pripoji≈• na server %s..."
 
 #. TXT_NET
 msgid "Network"
-msgstr "Sieª"
+msgstr "Sie≈•"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, fuzzy, c-format
 msgid "Load %s Modules"
-msgstr "NaËÌtaª moduly %s"
+msgstr "Naƒç√≠ta≈• moduly %s"
 
 #. TXT_LOAD_FS
 #, fuzzy
 msgid "Load File System Modules"
-msgstr "NaËÌtaª moduly systÈmu s˙borov"
+msgstr "Naƒç√≠ta≈• moduly syst√©mu s√∫borov"
 
 #. TXT_LOAD_OTHER
 #, fuzzy
 msgid "Load Unknown Modules"
-msgstr "NaËÌtaª nezn·me moduly"
+msgstr "Naƒç√≠ta≈• nezn√°me moduly"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr "N·jden˝ systÈm s˙borov %s."
+msgstr "N√°jden√Ω syst√©m s√∫borov %s."
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr "PokraËovaª"
+msgstr "Pokraƒçova≈•"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "Preruπiª"
+msgstr "Preru≈°i≈•"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "Nen·jdenÈ æiadne novÈ moduly."
+msgstr "Nen√°jden√© ≈æiadne nov√© moduly."
 
 #. TXT_CHOOSE_PARTITION
 #, fuzzy
@@ -931,7 +931,7 @@ msgstr "Vyberte oddiel disku."
 #. TXT_CHOOSE_ROOT_FS
 #, fuzzy
 msgid "Choose the root partition."
-msgstr "Vyberte oddiel pre koreÚov˝ prieËinok."
+msgstr "Vyberte oddiel pre kore≈àov√Ω prieƒçinok."
 
 #. TXT_CHOOSE_SWAP
 #, fuzzy
@@ -940,20 +940,20 @@ msgstr "Vyberte oddiel pre swap."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Pre naËÌtanie vπetk˝ch d·t nie je dosª pam‰ti."
+msgstr "Pre naƒç√≠tanie v≈°etk√Ωch d√°t nie je dos≈• pam√§ti."
 
 #. TXT_LOW_MEMORY2
 #, fuzzy
 msgid "Your computer does not have enough memory to run YaST."
-msgstr "V·π poËÌtaË nem· dosª pam‰ti pre spustenie YaST."
+msgstr "V√°≈° poƒç√≠taƒç nem√° dos≈• pam√§ti pre spustenie YaST."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Aby ste mohli pokraËovaª, musÌte aktivovaª nejak˝ priestor swap."
+msgstr "Aby ste mohli pokraƒçova≈•, mus√≠te aktivova≈• nejak√Ω priestor swap."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Chyba pri aktiv·cii priestoru swap."
+msgstr "Chyba pri aktiv√°cii priestoru swap."
 
 #. TXT_ENTER_SWAP
 #, fuzzy
@@ -963,55 +963,55 @@ msgstr "Zadajte oddiel swap (napr. /dev/sda2)"
 #. TXT_ENTER_USER
 #, fuzzy, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "ProsÌm, zadajte pouæÌvateµa, pomocou ktorÈho chcete pouæiª server %s"
+msgstr "Pros√≠m, zadajte pou≈æ√≠vateƒæa, pomocou ktor√©ho chcete pou≈æi≈• server %s"
 
 #. TXT_ENTER_PASSWORD
 #, fuzzy, c-format
 msgid "Enter the password for the %s server."
-msgstr "ProsÌm, zadajte heslo pre server %s"
+msgstr "Pros√≠m, zadajte heslo pre server %s"
 
 #. TXT_WANT_PROXY
 #, fuzzy, c-format
 msgid "Use a %s proxy?"
-msgstr "Chcete pouæiª proxy %s?"
+msgstr "Chcete pou≈æi≈• proxy %s?"
 
 #. TXT_ENTER_PROXY
 #, fuzzy, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "ProsÌm, zadajte adresu proxy %s"
+msgstr "Pros√≠m, zadajte adresu proxy %s"
 
 #. TXT_ENTER_PROXYPORT
 #, fuzzy, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "ProsÌm, zadajte port proxy %s"
+msgstr "Pros√≠m, zadajte port proxy %s"
 
 #. TXT_VNC_SWITCH
 #, fuzzy
 msgid "VNC Enable or Disable"
-msgstr "Povoliª/zak·zaª VNC"
+msgstr "Povoli≈•/zak√°za≈• VNC"
 
 #. TXT_VNC_YES_NO
 msgid "Use VNC for install?"
-msgstr "Pouæiª VNC pre inπtal·ciu?"
+msgstr "Pou≈æi≈• VNC pre in≈°tal√°ciu?"
 
 #. TXT_SSH_SWITCH
 #, fuzzy
 msgid "Enable or Disable SSH Mode"
-msgstr "Povoliª/zak·zaª reæim SSH"
+msgstr "Povoli≈•/zak√°za≈• re≈æim SSH"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
-msgstr "Spustiª SSH pre textov˙ inπtal·ciu?"
+msgstr "Spusti≈• SSH pre textov√∫ in≈°tal√°ciu?"
 
 #. TXT_VNC_PASSWORD
 #, fuzzy
 msgid "Enter your VNC password."
-msgstr "ProsÌm, zadajte vaπe heslo VNC"
+msgstr "Pros√≠m, zadajte va≈°e heslo VNC"
 
 #. TXT_SSH_PASSWORD
 #, fuzzy
 msgid "Enter your temporary SSH password."
-msgstr "ProsÌm, zadajte vaπe doËasnÈ heslo SSH"
+msgstr "Pros√≠m, zadajte va≈°e doƒçasn√© heslo SSH"
 
 #. TXT_DO_REBOOT
 #, fuzzy
@@ -1020,23 +1020,23 @@ msgid ""
 "rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Z·kladn˝ systÈm je ˙speπne nainπtalovan˝. V·π poËÌtaË je teraz nutnÈ "
-"reπtartovaª. ProsÌm, odstr·Úte vπetky inπtalaËnÈ mÈdi· (CD-ROM, disketa).\n"
-"Ak ste nainπtalovali spr·vcu πtartu na disketu, nechajte ju v mechanike."
+"Z√°kladn√Ω syst√©m je √∫spe≈°ne nain≈°talovan√Ω. V√°≈° poƒç√≠taƒç je teraz nutn√© "
+"re≈°tartova≈•. Pros√≠m, odstr√°≈àte v≈°etky in≈°talaƒçn√© m√©di√° (CD-ROM, disketa).\n"
+"Ak ste nain≈°talovali spr√°vcu ≈°tartu na disketu, nechajte ju v mechanike."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Pridaª aktualiz·ciu ovl·daËa"
+msgstr "Prida≈• aktualiz√°ciu ovl√°daƒça"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Zobraziª aktualiz·cie ovl·daËov"
+msgstr "Zobrazi≈• aktualiz√°cie ovl√°daƒçov"
 
 #. TXT_INPUT_NAMED1
 #, fuzzy, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
-"Zadajte IP adresu v·πho pomenov·vacieho serveru. Ak ho nepouæÌvate, stlaËte "
+"Zadajte IP adresu v√°≈°ho pomenov√°vacieho serveru. Ak ho nepou≈æ√≠vate, stlaƒçte "
 "iba ESC."
 
 #. TXT_ROOT_PASSWORD

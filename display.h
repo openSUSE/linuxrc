@@ -75,8 +75,6 @@ extern void disp_cursor_on      (void);
 extern void disp_cursor_off     (void);
 extern void disp_graph_on       (void);
 extern void disp_graph_off      (void);
-extern void disp_write_char     (char character_cv);
-extern void disp_write_string   (char *string_tv);
 extern void disp_toggle_output  (int state_iv);
 extern void disp_save_area      (window_t *win_prr);
 extern void disp_restore_area   (window_t *win_prr, int mode_iv);
@@ -86,3 +84,6 @@ extern void disp_set_display    (void);
 extern void disp_restore_screen (void);
 extern void disp_clear_screen   (void);
 
+void disp_write_char(int c);
+void disp_write_string(char *str);
+void disp_write_utf32string(int *str);

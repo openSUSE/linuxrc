@@ -1488,6 +1488,7 @@ int net_dhcp()
         break;
 
       case key_gateway:
+        if((s = strchr(f->value, ','))) *s = 0;
         name2inet(&config.net.gateway, f->value);
         net_check_address2(&config.net.gateway, 0);
         break;

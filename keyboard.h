@@ -6,8 +6,7 @@
  *
  */
 
-#define KEY_SPECIAL 0x0400
-#define KEY_FUNC    0x0800
+#define KEY_SPECIAL (1 << 30)
 
 #define KEY_ESC         27
 #define KEY_ENTER       10
@@ -42,20 +41,20 @@
 #define KEY_CTRL_Y      25
 #define KEY_CTRL_Z      26
 
-#define KEY_UP        (65 | KEY_SPECIAL)
-#define KEY_DOWN      (66 | KEY_SPECIAL)
-#define KEY_RIGHT     (67 | KEY_SPECIAL)
-#define KEY_LEFT      (68 | KEY_SPECIAL)
-#define KEY_HOME      (49 | KEY_SPECIAL)
-#define KEY_END       (52 | KEY_SPECIAL)
-#define KEY_PGUP      (53 | KEY_SPECIAL)
-#define KEY_PGDOWN    (54 | KEY_SPECIAL)
-#define KEY_INSERT    (50 | KEY_SPECIAL)
-#define KEY_DEL       (51 | KEY_SPECIAL)
-#define KEY_F1        (49 | KEY_SPECIAL | KEY_FUNC)
-#define KEY_F2        (50 | KEY_SPECIAL | KEY_FUNC)
-#define KEY_F3        (51 | KEY_SPECIAL | KEY_FUNC)
-#define KEY_F4        (52 | KEY_SPECIAL | KEY_FUNC)
+#define KEY_UP        ( 1 | KEY_SPECIAL)
+#define KEY_DOWN      ( 2 | KEY_SPECIAL)
+#define KEY_RIGHT     ( 3 | KEY_SPECIAL)
+#define KEY_LEFT      ( 4 | KEY_SPECIAL)
+#define KEY_HOME      ( 5 | KEY_SPECIAL)
+#define KEY_END       ( 6 | KEY_SPECIAL)
+#define KEY_PGUP      ( 7 | KEY_SPECIAL)
+#define KEY_PGDOWN    ( 8 | KEY_SPECIAL)
+#define KEY_INSERT    ( 9 | KEY_SPECIAL)
+#define KEY_DEL       (10 | KEY_SPECIAL)
+#define KEY_F1        (11 | KEY_SPECIAL)
+#define KEY_F2        (12 | KEY_SPECIAL)
+#define KEY_F3        (13 | KEY_SPECIAL)
+#define KEY_F4        (14 | KEY_SPECIAL)
 
 extern void  kbd_init         (int first);
 extern void  kbd_reset        (void);

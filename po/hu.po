@@ -5,10 +5,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
 "PO-Revision-Date: 2002-03-26 22:55GMT\n"
-"Last-Translator: G·bor Szentiv·nyi <szenti@suselinux.hu>\n"
+"Last-Translator: G√°bor Szentiv√°nyi <szenti@suselinux.hu>\n"
 "Language-Team: hungarian\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
@@ -31,15 +31,15 @@ msgstr "Nem"
 #. TXT_CHOOSE_LANGUAGE
 #, fuzzy
 msgid "Select the language."
-msgstr "KÈrem v·lasszon nyelvet!"
+msgstr "K√©rem v√°lasszon nyelvet!"
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr "SzÌnes monitor"
+msgstr "Sz√≠nes monitor"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
-msgstr "EgyszÌn˚ monitor"
+msgstr "Egysz√≠n≈± monitor"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
@@ -52,26 +52,26 @@ msgstr "Nyelv"
 #. TXT_MENU_MODULES
 #, fuzzy
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Rendszermag modulok (hardver meghajtÛk)"
+msgstr "Rendszermag modulok (hardver meghajt√≥k)"
 
 #. TXT_MENU_START
 #, fuzzy
 msgid "Start Installation or System"
-msgstr "TelepÌtÈs megkezdÈse / rendszerindÌt·s"
+msgstr "Telep√≠t√©s megkezd√©se / rendszerind√≠t√°s"
 
 #. TXT_MENU_INFO
 #, fuzzy
 msgid "System Information"
-msgstr "Rendszerinform·ciÛ"
+msgstr "Rendszerinform√°ci√≥"
 
 #. TXT_HDR_MAIN
 #, fuzzy
 msgid "Main Menu"
-msgstr "Fımen¸"
+msgstr "F≈ëmen√º"
 
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr "Be·llÌt·sok"
+msgstr "Be√°ll√≠t√°sok"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
@@ -79,27 +79,27 @@ msgstr "Monitor"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Billenty˚zetkioszt·s"
+msgstr "Billenty≈±zetkioszt√°s"
 
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load Network Card Modules"
-msgstr "H·lÛzati k·rtya modulok betˆltÈse"
+msgstr "H√°l√≥zati k√°rtya modulok bet√∂lt√©se"
 
 #. TXT_SHOW_MODULES
 #, fuzzy
 msgid "Show Loaded Modules"
-msgstr "Betˆltˆtt modulok megtekintÈse"
+msgstr "Bet√∂lt√∂tt modulok megtekint√©se"
 
 #. TXT_AUTO_LOAD
 #, fuzzy
 msgid "Load Modules Automatically"
-msgstr "Modulok automatikus betˆltÈse"
+msgstr "Modulok automatikus bet√∂lt√©se"
 
 #. TXT_DEL_MODULES
 #, fuzzy
 msgid "Unload Modules"
-msgstr "Modulok elt·volÌt·sa"
+msgstr "Modulok elt√°vol√≠t√°sa"
 
 #. TXT_TRY_TO_LOAD
 #, fuzzy, c-format
@@ -109,21 +109,21 @@ msgid ""
 "During loading, you may want to watch the kernel messages on virtual console "
 "4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"MegprÛb·lom betˆlteni a(z) \"%s\" modult...\n"
+"Megpr√≥b√°lom bet√∂lteni a(z) \"%s\" modult...\n"
 "\n"
-"A betˆltÈs alatt megtekinthetık a rendszermag ¸zenetei a 4-es virtu·lis "
-"konzolon (ALT-F4). Ehhez a kÈpernyıhˆz az ALT-F1 billenty˚kombin·ciÛval "
+"A bet√∂lt√©s alatt megtekinthet≈ëk a rendszermag √ºzenetei a 4-es virtu√°lis "
+"konzolon (ALT-F4). Ehhez a k√©perny≈ëh√∂z az ALT-F1 billenty≈±kombin√°ci√≥val "
 "lehet visszajutni."
 
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "A(z) \"%s\" modul betˆltÈse siker¸lt!"
+msgstr "A(z) \"%s\" modul bet√∂lt√©se siker√ºlt!"
 
 #. TXT_LOAD_FAILED
 #, fuzzy, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "A(z) \"%s\" modul betˆltÈse nem siker¸lt!"
+msgstr "A(z) \"%s\" modul bet√∂lt√©se nem siker√ºlt!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -131,7 +131,7 @@ msgstr "CD-ROM"
 
 #. TXT_FLOPPY
 msgid "Floppy"
-msgstr "HajlÈkonylemez"
+msgstr "Hajl√©konylemez"
 
 #. TXT_HARDDISK
 #, fuzzy
@@ -141,27 +141,27 @@ msgstr "Merevlemez"
 #. TXT_START_INSTALL
 #, fuzzy
 msgid "Start Installation or Update"
-msgstr "TelepÌtÈs/frissÌtÈs megkezdÈse"
+msgstr "Telep√≠t√©s/friss√≠t√©s megkezd√©se"
 
 #. TXT_START_RESCUE
 #, fuzzy
 msgid "Start Rescue System"
-msgstr "Biztons·gi rendszer indÌt·sa"
+msgstr "Biztons√°gi rendszer ind√≠t√°sa"
 
 #. TXT_LOAD_RS_NFS
 #, fuzzy
 msgid "Load Rescue System via NFS"
-msgstr "Biztons·gi rendszer betˆltÈse NFS-en kereszt¸l"
+msgstr "Biztons√°gi rendszer bet√∂lt√©se NFS-en kereszt√ºl"
 
 #. TXT_BOOT_SYSTEM
 #, fuzzy
 msgid "Boot Installed System"
-msgstr "A telepÌtett rendszer indÌt·sa"
+msgstr "A telep√≠tett rendszer ind√≠t√°sa"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "A(z) \"%s\" kÈpm·s keresÈse..."
+msgstr "A(z) \"%s\" k√©pm√°s keres√©se..."
 
 #. TXT_RI_NOT_FOUND
 #, fuzzy
@@ -170,19 +170,19 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"A YaST nem tal·lt kÈpm·st!\n"
+"A YaST nem tal√°lt k√©pm√°st!\n"
 "\n"
-"Ellenırizze az elÈrÈsi utat!"
+"Ellen≈ërizze az el√©r√©si utat!"
 
 #. TXT_LOADING
 #, fuzzy
 msgid "Loading data into RAM disk..."
-msgstr "Adatok betˆltÈse a ramdiszkbe"
+msgstr "Adatok bet√∂lt√©se a ramdiszkbe"
 
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
-msgstr "Rendszermag ¸zenetek"
+msgstr "Rendszermag √ºzenetek"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -190,20 +190,20 @@ msgstr "Processzor"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "Eszkˆzˆk"
+msgstr "Eszk√∂z√∂k"
 
 #. TXT_INFO_NETDEV
 #, fuzzy
 msgid "Network Cards"
-msgstr "H·lÛzati k·rty·k"
+msgstr "H√°l√≥zati k√°rty√°k"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr "Kˆzvetlen memÛriaelÈrÈs (DMA)"
+msgstr "K√∂zvetlen mem√≥riael√©r√©s (DMA)"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr "MegszakÌt·sok"
+msgstr "Megszak√≠t√°sok"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
@@ -211,7 +211,7 @@ msgstr "Ki-/bemeneti (I/O) portok"
 
 #. TXT_INFO_MEM
 msgid "Memory"
-msgstr "MemÛria"
+msgstr "Mem√≥ria"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
@@ -224,22 +224,22 @@ msgstr "PCI"
 #. TXT_INSERT_DISK
 #, fuzzy
 msgid "Insert the disk and press ENTER."
-msgstr "KÈrem helyezze be a lemezt, majd nyomja meg az ENTER-t"
+msgstr "K√©rem helyezze be a lemezt, majd nyomja meg az ENTER-t"
 
 #. TXT_ERROR_READ_DISK
 #, fuzzy
 msgid "Error reading from floppy disk."
-msgstr "Hiba a hajlÈkony lemez olvas·sakor!"
+msgstr "Hiba a hajl√©kony lemez olvas√°sakor!"
 
 #. TXT_ENTER_ROOT_FS
 #, fuzzy
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "KÈrem adja meg a gyˆkÈrparticiÛ elÈrÈsi ˙tvonal·t (pl. /dev/hda3)"
+msgstr "K√©rem adja meg a gy√∂k√©rpartici√≥ el√©r√©si √∫tvonal√°t (pl. /dev/hda3)"
 
 #. TXT_INVALID_ROOT_FS
 #, fuzzy
 msgid "Invalid root device."
-msgstr "A megadott partÌciÛn nincs gyˆkÈrkˆnyvt·r!"
+msgstr "A megadott part√≠ci√≥n nincs gy√∂k√©rk√∂nyvt√°r!"
 
 #. TXT_INVALID_INPUT
 #, fuzzy
@@ -249,7 +249,7 @@ msgstr "Helytelen bevitel!"
 #. TXT_INPUT_IPADDR
 #, fuzzy
 msgid "Enter your IP address."
-msgstr "KÈrem adja meg az IP cÌmÈt"
+msgstr "K√©rem adja meg az IP c√≠m√©t"
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
@@ -257,8 +257,8 @@ msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
 msgstr ""
-"KÈrem adja meg a h·lÛzati maszkot. Egy hagyom·nyos C oszt·ly˙ h·lÛzatn·l ez "
-"·ltal·ban 255.255.255.0"
+"K√©rem adja meg a h√°l√≥zati maszkot. Egy hagyom√°nyos C oszt√°ly√∫ h√°l√≥zatn√°l ez "
+"√°ltal√°ban 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 #, fuzzy
@@ -266,8 +266,8 @@ msgid ""
 "If you need a gateway to reach the server, enter the IP address of the "
 "gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
-"Ha ·tj·rÛn kereszt¸l Èri el a szervert, akkor adja meg az ·tj·rÛ IP cÌmÈt. "
-"Ha nincs sz¸ksÈge ·tj·rÛra, egyszer˚en adja meg a saj·t IP cÌmÈt."
+"Ha √°tj√°r√≥n kereszt√ºl √©ri el a szervert, akkor adja meg az √°tj√°r√≥ IP c√≠m√©t. "
+"Ha nincs sz√ºks√©ge √°tj√°r√≥ra, egyszer≈±en adja meg a saj√°t IP c√≠m√©t."
 
 #. TXT_INPUT_NAMED
 #, fuzzy
@@ -275,8 +275,8 @@ msgid ""
 "Enter the IP address of your name server. If you do not use a name server, "
 "press ESC."
 msgstr ""
-"KÈrem adja meg a nÈvszerver IP cÌmÈt. Ha nem haszn·l nÈvszervert, nyomja meg "
-"az ESC billenty˚t."
+"K√©rem adja meg a n√©vszerver IP c√≠m√©t. Ha nem haszn√°l n√©vszervert, nyomja meg "
+"az ESC billenty≈±t."
 
 #. TXT_FOUND_HOST
 #, fuzzy, c-format
@@ -287,11 +287,11 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Az al·bbi adatokat tal·ltam:\n"
+"Az al√°bbi adatokat tal√°ltam:\n"
 "\n"
-"IP-cÌm: %s\n"
-"NÈv: %s\n"
-"DomÈn: %s"
+"IP-c√≠m: %s\n"
+"N√©v: %s\n"
+"Dom√©n: %s"
 
 #. TXT_ERROR_CONF_NET
 #, fuzzy
@@ -299,28 +299,28 @@ msgid ""
 "An error occurred during the network configuration. Your network card "
 "probably was not recognized by the kernel."
 msgstr ""
-"Hiba lÈpett fel a h·lÛzat be·llÌt·sa kˆzben. ValÛszÌn˚leg a rendszermag nem "
-"ismerte fel a h·lÛzati k·rty·t!"
+"Hiba l√©pett fel a h√°l√≥zat be√°ll√≠t√°sa k√∂zben. Val√≥sz√≠n≈±leg a rendszermag nem "
+"ismerte fel a h√°l√≥zati k√°rty√°t!"
 
 #. TXT_INPUT_SERVER
 #, fuzzy
 msgid "Enter the IP address of the NFS server."
-msgstr "KÈrem adja meg az NFS szerver IP cÌmÈt."
+msgstr "K√©rem adja meg az NFS szerver IP c√≠m√©t."
 
 #. TXT_INPUT_FTPSERVER
 #, fuzzy
 msgid "Enter the IP address of the FTP server."
-msgstr "KÈrem adja meg az FTP szerver IP cÌmÈt."
+msgstr "K√©rem adja meg az FTP szerver IP c√≠m√©t."
 
 #. TXT_INPUT_DIR
 #, fuzzy
 msgid "Enter the directory on the server."
-msgstr "KÈrem adja meg a szerveren lÈvı kˆnyvt·rat."
+msgstr "K√©rem adja meg a szerveren l√©v≈ë k√∂nyvt√°rat."
 
 #. TXT_ENTER_PARAMS
 #, fuzzy, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr "KÈrem adja meg a(z) \"%s\" paramÈtereit:"
+msgstr "K√©rem adja meg a(z) \"%s\" param√©tereit:"
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -329,9 +329,9 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"A YaST megprÛb·lja a \n"
+"A YaST megpr√≥b√°lja a \n"
 "\n"
-"\"%s:%s\" kˆnyvt·rat csatolni..."
+"\"%s:%s\" k√∂nyvt√°rat csatolni..."
 
 #. TXT_ERROR_NFSMOUNT
 #, fuzzy, c-format
@@ -340,9 +340,9 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Hiba lÈpett fel az NFS kˆnyvt·r csatol·sa kˆzben.\n"
+"Hiba l√©pett fel az NFS k√∂nyvt√°r csatol√°sa k√∂zben.\n"
 "\n"
-"A szerver szerint a kˆvetkezı hiba miatt: %s"
+"A szerver szerint a k√∂vetkez≈ë hiba miatt: %s"
 
 #. TXT_CHOOSE_KEYMAP
 #, fuzzy
@@ -350,80 +350,80 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"KÈrem v·lasszon billenty˚zetkioszt·st.\n"
-"Tov·bbi kioszt·sok kˆz¸l kÈsıbb v·laszthat majd."
+"K√©rem v√°lasszon billenty≈±zetkioszt√°st.\n"
+"Tov√°bbi kioszt√°sok k√∂z√ºl k√©s≈ëbb v√°laszthat majd."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
 msgid "Choose the module to unload."
-msgstr "V·lassza ki az elt·volÌtandÛ modult."
+msgstr "V√°lassza ki az elt√°vol√≠tand√≥ modult."
 
 #. TXT_NO_MODULES
 #, fuzzy
 msgid "No modules currently loaded."
-msgstr "Nincs ˙j modul."
+msgstr "Nincs √∫j modul."
 
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "%s ÈrzÈkelÈse...      "
+msgstr "%s √©rz√©kel√©se...      "
 
 #. TXT_WANT_MORE_SCSI
 #, fuzzy
 msgid "Search for additional SCSI host adaptors?"
-msgstr "KÌv·n tov·bbi SCSI k·rty·kat keresni?"
+msgstr "K√≠v√°n tov√°bbi SCSI k√°rty√°kat keresni?"
 
 #. TXT_WANT_MORE_NET
 #, fuzzy
 msgid "Search for additional network cards?"
-msgstr "KÌv·n tov·bbi h·lÛzati k·rty·kat keresni?"
+msgstr "K√≠v√°n tov√°bbi h√°l√≥zati k√°rty√°kat keresni?"
 
 #. TXT_WANT_MORE_CDROM
 #, fuzzy
 msgid "Search for additional CD-ROM drives?"
-msgstr "KÌv·n tov·bbi CD-ROM meghajtÛkat keresni?"
+msgstr "K√≠v√°n tov√°bbi CD-ROM meghajt√≥kat keresni?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "Ethernet h·lÛzati k·rtya"
+msgstr "Ethernet h√°l√≥zati k√°rtya"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "p·rhuzamos port"
+msgstr "p√°rhuzamos port"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "token ring h·lÛzati k·rtya"
+msgstr "token ring h√°l√≥zati k√°rtya"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "arcnet h·lÛzati k·rtya"
+msgstr "arcnet h√°l√≥zati k√°rtya"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "FDDI h·lÛzati k·rtya"
+msgstr "FDDI h√°l√≥zati k√°rtya"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "HIPPI h·lÛzati k·rtya"
+msgstr "HIPPI h√°l√≥zati k√°rtya"
 
 #. TXT_CHOOSE_NET
 #, fuzzy
 msgid "Choose the network device."
-msgstr "KÈrem v·lasszon h·lÛzati eszkˆzt."
+msgstr "K√©rem v√°lasszon h√°l√≥zati eszk√∂zt."
 
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
 msgid "Enter the IP address of the PLIP partner."
-msgstr "KÈrem adja meg PLIP partner IP cÌmÈt."
+msgstr "K√©rem adja meg PLIP partner IP c√≠m√©t."
 
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid ""
 "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
-"A PCMCIA lapkakÈszlet automatikus felismerÈse nem siker¸lt! KÈrem adja meg "
-"manu·lisan a sz¸ksÈges adatokat."
+"A PCMCIA lapkak√©szlet automatikus felismer√©se nem siker√ºlt! K√©rem adja meg "
+"manu√°lisan a sz√ºks√©ges adatokat."
 
 #. TXT_FOUND_PCMCIA
 #, fuzzy, c-format
@@ -432,32 +432,32 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Tal·ltam egy \"%s\" PCMCIA chipkÈszletet!\n"
+"Tal√°ltam egy \"%s\" PCMCIA chipk√©szletet!\n"
 "\n"
-"KÈrem adja meg a PCMCIA alapmodul paramÈtereit"
+"K√©rem adja meg a PCMCIA alapmodul param√©tereit"
 
 #. TXT_PCMCIA_PARAMS
 #, fuzzy, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Adja meg a(z) \"%s\" lapkakÈszlet speci·lis paramÈtereit:"
+msgstr "Adja meg a(z) \"%s\" lapkak√©szlet speci√°lis param√©tereit:"
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "K·rtyakezelı indÌt·sa..."
+msgstr "K√°rtyakezel≈ë ind√≠t√°sa..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "A PCMCIA k·rtya szolg·ltat·sok elindÌt·sa siker¸lt."
+msgstr "A PCMCIA k√°rtya szolg√°ltat√°sok elind√≠t√°sa siker√ºlt."
 
 #. TXT_PCMCIA_FAIL
 #, fuzzy
 msgid "Start of PCMCIA card services failed."
-msgstr "Nem siker¸lt elindÌtani a PCMCIA k·rtyaszolg·ltat·sokat!"
+msgstr "Nem siker√ºlt elind√≠tani a PCMCIA k√°rtyaszolg√°ltat√°sokat!"
 
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
 msgid "PCMCIA card services already running."
-msgstr "A PCMCIA k·rtya szolg·ltat·s m·r fut!"
+msgstr "A PCMCIA k√°rtya szolg√°ltat√°s m√°r fut!"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
@@ -468,22 +468,22 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"A Linuxrc programbÛl csak a \n"
+"A Linuxrc programb√≥l csak a \n"
 "\n"
-"\"TelepÌtÈs megkezdÈse / rendszerindÌt·s\"\n"
+"\"Telep√≠t√©s megkezd√©se / rendszerind√≠t√°s\"\n"
 "\n"
-"men¸ponton kereszt¸l lehet kilÈpni. Lehet, hogy ehhez mÈg be kell tˆlteni "
-"nÈh·ny meghajtÛmodult."
+"men√ºponton kereszt√ºl lehet kil√©pni. Lehet, hogy ehhez m√©g be kell t√∂lteni "
+"n√©h√°ny meghajt√≥modult."
 
 #. TXT_NO_CTRLC
 #, fuzzy
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Nem lÈphet ki a Linuxrc programbÛl a <ctrl-c> megnyom·s·val!"
+msgstr "Nem l√©phet ki a Linuxrc programb√≥l a <ctrl-c> megnyom√°s√°val!"
 
 #. TXT_REMOVE_DISK
 #, fuzzy
 msgid "Remove the disk from the drive now."
-msgstr "KÈrem vegye most ki a lemezt a meghajtÛbÛl!"
+msgstr "K√©rem vegye most ki a lemezt a meghajt√≥b√≥l!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -493,26 +493,26 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"PÈld·ul: "
+"P√©ld√°ul: "
 
 #. TXT_CHOOSE_SOURCE
 #, fuzzy
 msgid "Choose the source medium."
-msgstr "KÈrem v·lasszon forr·smÈdiumot"
+msgstr "K√©rem v√°lasszon forr√°sm√©diumot"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "A CD-ROM csatol·sa..."
+msgstr "A CD-ROM csatol√°sa..."
 
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "A CD-ROM csatol·sa nem siker¸lt!"
+msgstr "A CD-ROM csatol√°sa nem siker√ºlt!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
-msgstr "⁄jraindÌtja most a rendszert?"
+msgstr "√öjraind√≠tja most a rendszert?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
@@ -520,33 +520,33 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Az alaprendszer telepÌtÈse siker¸lt. Az ˙jonan telepÌtett rendszer most "
-"elindul, hogy befejezıdjˆn a telepÌtÈs."
+"Az alaprendszer telep√≠t√©se siker√ºlt. Az √∫jonan telep√≠tett rendszer most "
+"elindul, hogy befejez≈ëdj√∂n a telep√≠t√©s."
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Adja meg a megfelelı merevlemez partÌciÛt (pl. /dev/hda1):"
+msgstr "Adja meg a megfelel≈ë merevlemez part√≠ci√≥t (pl. /dev/hda1):"
 
 #. TXT_ERROR_HD_MOUNT
 #, fuzzy
 msgid "Could not mount the specified partition."
-msgstr "A kijelˆlt particiÛ csatol·sa nem siker¸lt!"
+msgstr "A kijel√∂lt partici√≥ csatol√°sa nem siker√ºlt!"
 
 #. TXT_ENTER_HD_DIR
 #, fuzzy
 msgid "Enter the source directory."
-msgstr "KÈrem adja meg a forr·s kˆnyvt·rat"
+msgstr "K√©rem adja meg a forr√°s k√∂nyvt√°rat"
 
 #. TXT_ERROR_INSTALL
 #, fuzzy
 msgid "An error occurred during the installation."
-msgstr "Hiba tˆrtÈnt a telepÌtÈs folyam·n!"
+msgstr "Hiba t√∂rt√©nt a telep√≠t√©s folyam√°n!"
 
 #. TXT_DRIVES
 #, fuzzy
 msgid "Hard Disks or CD-ROMs"
-msgstr "Merevlemezek Ès CD-ROM-ok"
+msgstr "Merevlemezek √©s CD-ROM-ok"
 
 #. TXT_LITTLE_MEM
 #, fuzzy
@@ -556,14 +556,14 @@ msgid ""
 "Before you acknowledge this message, you must switch to virtual console 2 "
 "(press ALT-F2) to create and activate some swap space."
 msgstr ""
-"A sz·mÌtÛgÈpÈnek nagyon kevÈs memÛri·ja van!\n"
+"A sz√°m√≠t√≥g√©p√©nek nagyon kev√©s mem√≥ri√°ja van!\n"
 "\n"
-"V·ltoson ·t a 2-es virtu·lis konzolra (ALT-F2), hozzon lÈtre egy "
-"cserepartÌciÛt Ès aktiv·lja azt."
+"V√°ltoson √°t a 2-es virtu√°lis konzolra (ALT-F2), hozzon l√©tre egy "
+"cserepart√≠ci√≥t √©s aktiv√°lja azt."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Anim·ciÛ"
+msgstr "Anim√°ci√≥"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
@@ -572,21 +572,21 @@ msgstr ""
 #. TXT_NO_DRIVES
 #, fuzzy
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Eddig nem siker¸lt merevlemezt vagy CD-ROM meghajtÛt felismerni."
+msgstr "Eddig nem siker√ºlt merevlemezt vagy CD-ROM meghajt√≥t felismerni."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Nyomkˆvetı (szakÈrtı)"
+msgstr "Nyomk√∂vet≈ë (szak√©rt≈ë)"
 
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load Root Image into RAM Disk"
-msgstr "GyˆkÈrkÈpm·s betˆltÈse a ramdiszkbe"
+msgstr "Gy√∂k√©rk√©pm√°s bet√∂lt√©se a ramdiszkbe"
 
 #. TXT_NEW_ROOTIMAGE
 #, fuzzy
 msgid "Enter Root Image"
-msgstr "Adja meg a gyˆkÈrkÈpm·s nevÈt:"
+msgstr "Adja meg a gy√∂k√©rk√©pm√°s nev√©t:"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
@@ -598,75 +598,75 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Adja meg a f·jl elÈrÈsi ˙tj·t, amelyet gyˆkÈr-f·jlrendszerkÈnt be akar "
-"tˆlteni a RAM-diszkbe:"
+"Adja meg a f√°jl el√©r√©si √∫tj√°t, amelyet gy√∂k√©r-f√°jlrendszerk√©nt be akar "
+"t√∂lteni a RAM-diszkbe:"
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
 msgid "Not yet implemented."
-msgstr "MÈg nincs implement·lva!"
+msgstr "M√©g nincs implement√°lva!"
 
 #. TXT_NEW_INST_SYS
 #, fuzzy
 msgid "Installation System"
-msgstr "TelepÌtırendszer"
+msgstr "Telep√≠t≈ërendszer"
 
 #. TXT_ENTER_INST_SYS
 #, fuzzy
 msgid "Enter the directory that contains the installation system."
-msgstr "KÈrem adja meg azt a kˆnyvt·rat, amely tartalmazza a telepÌtırendszert"
+msgstr "K√©rem adja meg azt a k√∂nyvt√°rat, amely tartalmazza a telep√≠t≈ërendszert"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "Nincs elÈrhetı inform·ciÛ."
+msgstr "Nincs el√©rhet≈ë inform√°ci√≥."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "TelepÌtÈs elıkÈszÌtÈse ..."
+msgstr "Telep√≠t√©s el≈ëk√©sz√≠t√©se ..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Live CD indÌt·sa"
+msgstr "Live CD ind√≠t√°sa"
 
 #. TXT_INSERT_LIVECD
 #, fuzzy
 msgid "Insert the Live CD."
-msgstr "KÈrem helyezze be a Live CD-t."
+msgstr "K√©rem helyezze be a Live CD-t."
 
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"
-msgstr "KilÈpÈs vagy ˙jraindÌt·s"
+msgstr "Kil√©p√©s vagy √∫jraind√≠t√°s"
 
 #. TXT_SEARCH_INFOFILE
 #, fuzzy
 msgid "Searching for info file..."
-msgstr "Infofile keresÈse..."
+msgstr "Infofile keres√©se..."
 
 #. TXT_NFSPORT
 #, fuzzy
 msgid "Specify the NFS port."
-msgstr "NFS port megad·sa"
+msgstr "NFS port megad√°sa"
 
 #. TXT_ASKING_NAMED
 #, fuzzy
 msgid "Asking name server..."
-msgstr "NÈvszerver lekÈrdezÈse..."
+msgstr "N√©vszerver lek√©rdez√©se..."
 
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
 msgid "Host %s was not found."
-msgstr "A(z) %s gÈp ismeretlen!"
+msgstr "A(z) %s g√©p ismeretlen!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "A h·lÛzat jelenleg be van ·llÌtva. Megtartja ezt a be·llÌt·st?"
+msgstr "A h√°l√≥zat jelenleg be van √°ll√≠tva. Megtartja ezt a be√°ll√≠t√°st?"
 
 #. TXT_ASK_BREAK
 #, fuzzy
 msgid "Abort?"
-msgstr "ElvetÈs"
+msgstr "Elvet√©s"
 
 #. TXT_NO_NETDEVICE
 #, fuzzy
@@ -674,13 +674,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Nem tal·lhatÛ h·lÛzati eszkˆz!\n"
-"Elıszˆr tˆltsˆn be egy h·lÛzati modult."
+"Nem tal√°lhat√≥ h√°l√≥zati eszk√∂z!\n"
+"El≈ësz√∂r t√∂lts√∂n be egy h√°l√≥zati modult."
 
 #. TXT_ALREADY_FOUND
 #, fuzzy, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "A %s jelenleg megtal·lhatÛ a rendszerÈn!\n"
+msgstr "A %s jelenleg megtal√°lhat√≥ a rendszer√©n!\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -689,7 +689,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Hiba tˆrtÈnt az FTP szerver elÈrÈse kˆzben:\n"
+"Hiba t√∂rt√©nt az FTP szerver el√©r√©se k√∂zben:\n"
 "\n"
 "%s"
 
@@ -697,28 +697,28 @@ msgstr ""
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
 msgstr ""
-"KÈrem adja meg azt a felhaszn·lÛ nevet, amellyel el kÌv·nja Èrni az FTP-"
+"K√©rem adja meg azt a felhaszn√°l√≥ nevet, amellyel el k√≠v√°nja √©rni az FTP-"
 "szervert"
 
 #. TXT_ENTER_FTPPASSWD
 #, fuzzy
 msgid "Enter the password for the FTP user account."
-msgstr "Adjon meg egy jelszÛt az FTP haszn·lat·hoz"
+msgstr "Adjon meg egy jelsz√≥t az FTP haszn√°lat√°hoz"
 
 #. TXT_ENTER_FTPPROXY
 #, fuzzy
 msgid "Enter the address of the FTP proxy."
-msgstr "KÈrem adja meg az FTP proxy cÌmÈt"
+msgstr "K√©rem adja meg az FTP proxy c√≠m√©t"
 
 #. TXT_ENTER_FTPPORT
 #, fuzzy
 msgid "Enter the port of the FTP proxy."
-msgstr "KÈrem adja meg az FTP proxy portj·t"
+msgstr "K√©rem adja meg az FTP proxy portj√°t"
 
 #. TXT_WANT_FTPPROXY
 #, fuzzy
 msgid "Use an FTP proxy?"
-msgstr "Akar FTP proxyt haszn·lni?"
+msgstr "Akar FTP proxyt haszn√°lni?"
 
 #. TXT_NOMEM_FTP
 #, fuzzy, c-format
@@ -726,8 +726,8 @@ msgid ""
 "Your computer does not have enough RAM to install via FTP (%d MB RAM "
 "required)."
 msgstr ""
-"A sz·mÌtÛgÈpÈben nincs elegendı RAM az FTP-n kereszt¸li telepÌtÈshez "
-"(legal·bb %d MB RAM kell)."
+"A sz√°m√≠t√≥g√©p√©ben nincs elegend≈ë RAM az FTP-n kereszt√ºli telep√≠t√©shez "
+"(legal√°bb %d MB RAM kell)."
 
 #. TXT_ANONYM_FTP
 #, fuzzy
@@ -736,32 +736,32 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"¡ltal·ban az FTP telepÌtÈs az anonymous felhaszn·lÛ nevÈben tˆrtÈnik meg. "
-"Meghat·rozhat azonban egy felhaszn·lÛt\n"
-"Ès egy hozz·tartozÛ jelszÛt az FTP-hez. SzeretnÈ?"
+"√Åltal√°ban az FTP telep√≠t√©s az anonymous felhaszn√°l√≥ nev√©ben t√∂rt√©nik meg. "
+"Meghat√°rozhat azonban egy felhaszn√°l√≥t\n"
+"√©s egy hozz√°tartoz√≥ jelsz√≥t az FTP-hez. Szeretn√©?"
 
 #. TXT_MORE_MODULES
 #, fuzzy
 msgid "-- More Modules --"
-msgstr "-- tov·bbi modulok --"
+msgstr "-- tov√°bbi modulok --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "a p·rhuzamos port inicializ·l·sa..."
+msgstr "a p√°rhuzamos port inicializ√°l√°sa..."
 
 #. TXT_ENTER_NFSPORT
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
-msgstr "KÈrem adja meg a NFS szerver ·ltal haszn·lt port sz·m·t"
+msgstr "K√©rem adja meg a NFS szerver √°ltal haszn√°lt port sz√°m√°t"
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "KÈrem gyızıdjˆn meg arrÛl, hogy a(z) %d. CD van a meghajtÛban!"
+msgstr "K√©rem gy≈ëz≈ëdj√∂n meg arr√≥l, hogy a(z) %d. CD van a meghajt√≥ban!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr "CD kiad·sa"
+msgstr "CD kiad√°sa"
 
 #. TXT_BOOTP_TIMEOUT
 #, fuzzy
@@ -771,11 +771,11 @@ msgstr "Bootp timeout"
 #. TXT_ENTER_BOOTP_TIMEOUT
 #, fuzzy
 msgid "Enter the time-out value for bootp."
-msgstr "Itt hat·rozhatja meg, hogy h·ny m·sodpercig v·rjak bootp-re"
+msgstr "Itt hat√°rozhatja meg, hogy h√°ny m√°sodpercig v√°rjak bootp-re"
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "A \"channel connection\"-hez haszn·landÛ csatorna"
+msgstr "A \"channel connection\"-hez haszn√°land√≥ csatorna"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -787,12 +787,12 @@ msgstr "IUCV kapcsolat"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "csatorn·hoz csatolt Cisco ˙tv·lasztÛ"
+msgstr "csatorn√°hoz csatolt Cisco √∫tv√°laszt√≥"
 
 #. TXT_SMB_ENTER_SHARE
 #, fuzzy
 msgid "Enter the share name on the SMB server."
-msgstr "Adja meg az SMB szerver ·ltal kiaj·nlott nevet:"
+msgstr "Adja meg az SMB szerver √°ltal kiaj√°nlott nevet:"
 
 #. TXT_SMB_GUEST_LOGIN
 #, fuzzy
@@ -801,19 +801,19 @@ msgid ""
 "name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Ha guest-kÈnt akara a kiaj·nlott kˆnyvt·rat elÈrni, nem kell megadjon "
-"felhaszn·lÛi nevet, jeszÛt Ès munkacsoportot.\n"
-"Guest-kÈnt akar csatlakozni?"
+"Ha guest-k√©nt akara a kiaj√°nlott k√∂nyvt√°rat el√©rni, nem kell megadjon "
+"felhaszn√°l√≥i nevet, jesz√≥t √©s munkacsoportot.\n"
+"Guest-k√©nt akar csatlakozni?"
 
 #. TXT_SMB_ENTER_USER
 #, fuzzy
 msgid "Enter your user name on the SMB server."
-msgstr "Adja meg a felhaszn·lÛi nevÈt az SMB szerveren:"
+msgstr "Adja meg a felhaszn√°l√≥i nev√©t az SMB szerveren:"
 
 #. TXT_SMB_ENTER_PASSWORD
 #, fuzzy
 msgid "Enter your password on the SMB server."
-msgstr "Adja meg a jelszav·t az SMB szerveren:"
+msgstr "Adja meg a jelszav√°t az SMB szerveren:"
 
 #. TXT_SMB_ENTER_WORKGROUP
 #, fuzzy
@@ -821,8 +821,8 @@ msgid ""
 "Enter your workgroup.If you do not need to specify a workgroup,leave the "
 "field empty."
 msgstr ""
-"Adja meg a munkacsoportot:Ha nincs sz¸ksÈg munkacsoportra, hagyja ¸resen a "
-"mezıt."
+"Adja meg a munkacsoportot:Ha nincs sz√ºks√©g munkacsoportra, hagyja √ºresen a "
+"mez≈ët."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -831,153 +831,153 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"PrÛb·lom csatolni a(z) \n"
+"Pr√≥b√°lom csatolni a(z) \n"
 "\n"
-"\"//%s/%s\" kiaj·nl·st"
+"\"//%s/%s\" kiaj√°nl√°st"
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr "Automatikus konfigur·ciÛ a(z) %s-n kereszt¸l?"
+msgstr "Automatikus konfigur√°ci√≥ a(z) %s-n kereszt√ºl?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr "A %s kÈrÈs k¸ldÈse ..."
+msgstr "A %s k√©r√©s k√ºld√©se ..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "A(z) %s konfigur·ciÛ nem siker¸lt."
+msgstr "A(z) %s konfigur√°ci√≥ nem siker√ºlt."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
-msgstr "Haszn·l DHCP-t a BOOTP helyett?"
+msgstr "Haszn√°l DHCP-t a BOOTP helyett?"
 
 #. TXT_MODDISK0
 #, fuzzy
 msgid "Insert a modules disk."
-msgstr "KÈrem tegye be a modulok lemezt."
+msgstr "K√©rem tegye be a modulok lemezt."
 
 #. TXT_MODDISK1
 #, fuzzy, c-format
 msgid "Insert modules disk %d."
-msgstr "KÈrem tegye be a(z) %d modulok lemezt."
+msgstr "K√©rem tegye be a(z) %d modulok lemezt."
 
 #. TXT_MODDISK2
 #, fuzzy
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
-"Az elsı CD-n (vagy DVD1-n) a disks/REAdme f·jlban tal·l inform·ciÛt arrÛl, "
-"hogy hogyan kÈszÌtse el. "
+"Az els≈ë CD-n (vagy DVD1-n) a disks/REAdme f√°jlban tal√°l inform√°ci√≥t arr√≥l, "
+"hogy hogyan k√©sz√≠tse el. "
 
 #. TXT_CHOOSE_NETSOURCE
 #, fuzzy
 msgid "Choose the network protocol."
-msgstr "V·lasszon h·lÛzati protokollt"
+msgstr "V√°lasszon h√°l√≥zati protokollt"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, fuzzy, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Adja meg a(z) %s szerver IP cÌmÈt:"
+msgstr "Adja meg a(z) %s szerver IP c√≠m√©t:"
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr "KapcsolÛd·s a(z) %s szerverhez ..."
+msgstr "Kapcsol√≥d√°s a(z) %s szerverhez ..."
 
 #. TXT_NET
 msgid "Network"
-msgstr "H·lÛzat"
+msgstr "H√°l√≥zat"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, fuzzy, c-format
 msgid "Load %s Modules"
-msgstr "A(z) %s modulok betˆltÈse"
+msgstr "A(z) %s modulok bet√∂lt√©se"
 
 #. TXT_LOAD_FS
 #, fuzzy
 msgid "Load File System Modules"
-msgstr "A f·jlrendszer modulok betˆltÈse"
+msgstr "A f√°jlrendszer modulok bet√∂lt√©se"
 
 #. TXT_LOAD_OTHER
 #, fuzzy
 msgid "Load Unknown Modules"
-msgstr "Ismeretlen modulok betˆltÈse"
+msgstr "Ismeretlen modulok bet√∂lt√©se"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr "Tal·ltam egy %s f·jlrendszert."
+msgstr "Tal√°ltam egy %s f√°jlrendszert."
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr "Folytat·s"
+msgstr "Folytat√°s"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "ElvetÈs"
+msgstr "Elvet√©s"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "Nincs ˙j modul."
+msgstr "Nincs √∫j modul."
 
 #. TXT_CHOOSE_PARTITION
 #, fuzzy
 msgid "Choose the hard disk partition."
-msgstr "V·lasszon egy merevlemez partÌciÛt."
+msgstr "V√°lasszon egy merevlemez part√≠ci√≥t."
 
 #. TXT_CHOOSE_ROOT_FS
 #, fuzzy
 msgid "Choose the root partition."
-msgstr "V·lassza ki a gyˆkÈr partÌciÛt."
+msgstr "V√°lassza ki a gy√∂k√©r part√≠ci√≥t."
 
 #. TXT_CHOOSE_SWAP
 #, fuzzy
 msgid "Choose the swap partition."
-msgstr "V·lassza ki a cserepartÌciÛt (swap)."
+msgstr "V√°lassza ki a cserepart√≠ci√≥t (swap)."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Nincs elÈg memÛria minden adat betˆltÈsÈhez."
+msgstr "Nincs el√©g mem√≥ria minden adat bet√∂lt√©s√©hez."
 
 #. TXT_LOW_MEMORY2
 #, fuzzy
 msgid "Your computer does not have enough memory to run YaST."
-msgstr "Nincs elÈg memÛria a YaST futtat·s·hoz."
+msgstr "Nincs el√©g mem√≥ria a YaST futtat√°s√°hoz."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "A folytat·shoz aktiv·ljon csereter¸letet."
+msgstr "A folytat√°shoz aktiv√°ljon csereter√ºletet."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Hiba a csereter¸let aktiv·l·sa sor·n."
+msgstr "Hiba a csereter√ºlet aktiv√°l√°sa sor√°n."
 
 #. TXT_ENTER_SWAP
 #, fuzzy
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Adja meg a megfelelı merevlemez partÌciÛt (pl. /dev/hda1):"
+msgstr "Adja meg a megfelel≈ë merevlemez part√≠ci√≥t (pl. /dev/hda1):"
 
 #. TXT_ENTER_USER
 #, fuzzy, c-format
 msgid "Enter the user name with which to access the %s server."
 msgstr ""
-"KÈrem adja meg azt a felhaszn·lÛ nevet, amellyel el kÌv·nja Èrni az FTP-"
+"K√©rem adja meg azt a felhaszn√°l√≥ nevet, amellyel el k√≠v√°nja √©rni az FTP-"
 "szervert"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_ENTER_PASSWORD
 #, fuzzy, c-format
 msgid "Enter the password for the %s server."
-msgstr "Adja meg a(z) %s szerver IP cÌmÈt:"
+msgstr "Adja meg a(z) %s szerver IP c√≠m√©t:"
 
 #. TXT_WANT_PROXY
 #, c-format
@@ -987,12 +987,12 @@ msgstr ""
 #. TXT_ENTER_PROXY
 #, fuzzy, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "KÈrem adja meg az FTP proxy cÌmÈt"
+msgstr "K√©rem adja meg az FTP proxy c√≠m√©t"
 
 #. TXT_ENTER_PROXYPORT
 #, fuzzy, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "KÈrem adja meg az FTP proxy portj·t"
+msgstr "K√©rem adja meg az FTP proxy portj√°t"
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -1037,8 +1037,8 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
-"KÈrem adja meg a nÈvszerver IP cÌmÈt. Ha nem haszn·l nÈvszervert, nyomja meg "
-"az ESC billenty˚t."
+"K√©rem adja meg a n√©vszerver IP c√≠m√©t. Ha nem haszn√°l n√©vszervert, nyomja meg "
+"az ESC billenty≈±t."
 
 #. TXT_ROOT_PASSWORD
 msgid ""

@@ -18,9 +18,12 @@
 #include "keyboard.h"
 #include "util.h"
 #include "dialog.h"
+#include "utf8.h"
 
 
 #define MAX_FIELD        40
+
+static int is_printable(int key);
 
 void win_open (window_t *win_prr)
     {
@@ -335,61 +338,83 @@ int win_choose_button (button_t *buttons_arr [], int nr_buttons_iv,
     else
         return (0);
     }
-    
 
-int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
-    {
-    int   key_ii;
-    char  field_ti [MAX_FIELD + 1];
+
+void fill_string(int *str, int len)
+{
+  int i;
+
+  for(len--, i = 0; str[i] && i < len; i++);
+
+  while(i < len) str[i++] = ' ';
+
+  str[i] = 0;
+}
+
+
+int win_input (int x, int y, char *buf, int buf_len, int field_len, int pw_mode)
+{
+  int key, *input;
+  int input_len, end;
+  int *undo_buf, *tmp_buf;
+  int field[MAX_FIELD + 1];
+
     int   current_ii;
     int   offset_ii;
     int   i_ii;
-    int   end_ii;
     int   overwrite_ii;
-    char *undo_pci;
-    char *tmp_pci;
     int   old_end_ii;
     int   tmp_end_ii;
 
 
-    disp_cursor_on ();
-    if (fieldlen_iv > len_iv)
-        fieldlen_iv = len_iv;
-    if (fieldlen_iv > MAX_FIELD)
-        fieldlen_iv = MAX_FIELD;
-    end_ii = strlen (input_tr);
-    if (end_ii > len_iv - 1)
-        end_ii = len_iv - 1;
-    util_fill_string (input_tr, len_iv);
+  disp_cursor_on();
+
+  input_len = buf_len;
+
+  input = malloc(input_len * sizeof *input);
+  undo_buf = malloc(input_len * sizeof *undo_buf);
+  tmp_buf = malloc(input_len * sizeof *tmp_buf);
+
+  utf8_to_utf32(input, input_len, buf);
+
+  if(field_len > input_len) field_len = input_len;
+
+  if(field_len > MAX_FIELD) field_len = MAX_FIELD;
+
+  end = utf32_len(input);
+
+  if(end > input_len - 1) end = input_len - 1;
+
+  fill_string(input, input_len);
+
+
     current_ii = 0;
     offset_ii = 0;
-    key_ii = KEY_END;
-    field_ti [fieldlen_iv] = 0;
+    key = KEY_END;
+    field[field_len] = 0;
     overwrite_ii = FALSE;
-    undo_pci = malloc (len_iv);
-    tmp_pci = malloc (len_iv);
-    old_end_ii = end_ii;
+    old_end_ii = end;
 
     do
         {
         void goto_end (void)
             {
-            if (end_ii < fieldlen_iv)
+            if (end < field_len)
                 {
                 offset_ii = 0;
-                current_ii = end_ii;
+                current_ii = end;
                 }
             else
                 {
-                current_ii = fieldlen_iv - 1;
-                offset_ii = end_ii - current_ii;
+                current_ii = field_len - 1;
+                offset_ii = end - current_ii;
                 }
             }
 
-        memcpy (tmp_pci, input_tr, len_iv);
-        tmp_end_ii = end_ii;
+        memcpy(tmp_buf, input, input_len * sizeof *tmp_buf);
+        tmp_end_ii = end;
 
-        switch (key_ii)
+        switch (key)
             {
             case KEY_LEFT:
                 if (current_ii)
@@ -398,11 +423,11 @@ int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv, 
                     offset_ii--;
                 break;
             case KEY_RIGHT:
-                if (offset_ii + current_ii < end_ii)
+                if (offset_ii + current_ii < end)
                     {
-                    if (current_ii < fieldlen_iv - 1)
+                    if (current_ii < field_len - 1)
                         current_ii++;
-                    else if (offset_ii + current_ii < len_iv - 1)
+                    else if (offset_ii + current_ii < input_len - 1)
                         offset_ii++;
                     }
                 break;
@@ -427,109 +452,117 @@ int win_input (int x_iv, int y_iv, char *input_tr, int len_iv, int fieldlen_iv, 
                         offset_ii--;
                     else if (current_ii)
                         current_ii--;
-                    for (i_ii = offset_ii + current_ii; i_ii < end_ii; i_ii++)
-                        input_tr [i_ii] = input_tr [i_ii + 1];
-                    input_tr [--end_ii] = ' ';
+                    for (i_ii = offset_ii + current_ii; i_ii < end; i_ii++)
+                        input [i_ii] = input [i_ii + 1];
+                    input [--end] = ' ';
                     }
                 break;
             case KEY_DEL:
-                if (end_ii && offset_ii + current_ii < end_ii)
+                if (end && offset_ii + current_ii < end)
                     {
-                    for (i_ii = offset_ii + current_ii; i_ii < end_ii; i_ii++)
-                        input_tr [i_ii] = input_tr [i_ii + 1];
-                    input_tr [--end_ii] = ' ';
+                    for (i_ii = offset_ii + current_ii; i_ii < end; i_ii++)
+                        input [i_ii] = input [i_ii + 1];
+                    input [--end] = ' ';
                     }
                 break;
             case KEY_CTRL_K:
                 current_ii = 0;
                 offset_ii = 0;
-                end_ii = 0;
-                input_tr [0] = 0;
-                util_fill_string (input_tr, len_iv);
+                end = 0;
+                input [0] = 0;
+                fill_string(input, input_len);
                 break;
             case KEY_CTRL_C:
                 dia_handle_ctrlc ();
                 break;
             case KEY_CTRL_U:
-                end_ii = old_end_ii;
-                memcpy (input_tr, undo_pci, len_iv);
+                end = old_end_ii;
+                memcpy(input, undo_buf, input_len * sizeof *input);
                 goto_end ();
                 break;
             case KEY_CTRL_W:
-                while (end_ii && input_tr [end_ii - 1] == ' ')
-                    end_ii--;
-                while (end_ii && input_tr [end_ii - 1] != ' ')
-                    input_tr [--end_ii] = ' ';
+                while (end && input [end - 1] == ' ')
+                    end--;
+                while (end && input [end - 1] != ' ')
+                    input [--end] = ' ';
                 goto_end ();
                 break;
             default:
-/*                if (isprint (key_ii)) */
+                if (is_printable (key))
                     {
                     if (!overwrite_ii)
                         {
-                        for (i_ii = end_ii; i_ii > offset_ii + current_ii; i_ii--)
-                            input_tr [i_ii] = input_tr [i_ii - 1];
+                        for (i_ii = end; i_ii > offset_ii + current_ii; i_ii--)
+                            input [i_ii] = input [i_ii - 1];
 
-                        if (offset_ii + current_ii < len_iv - 1)
-                            input_tr [offset_ii + current_ii] = key_ii;
+                        if (offset_ii + current_ii < input_len - 1)
+                            input [offset_ii + current_ii] = key;
 
-                        if (current_ii < fieldlen_iv - 1)
+                        if (current_ii < field_len - 1)
                             current_ii++;
-                        else if (offset_ii + current_ii < len_iv - 1)
+                        else if (offset_ii + current_ii < input_len - 1)
                             offset_ii++;
 
-                        if (end_ii < len_iv - 1)
-                            end_ii++;
+                        if (end < input_len - 1)
+                            end++;
                         }
                     else
                         {
-                        if (offset_ii + current_ii < len_iv - 1)
-                            input_tr [offset_ii + current_ii] = key_ii;
+                        if (offset_ii + current_ii < input_len - 1)
+                            input [offset_ii + current_ii] = key;
 
-                        if (offset_ii + current_ii == end_ii && end_ii < len_iv - 1)
-                            end_ii++;
+                        if (offset_ii + current_ii == end && end < input_len - 1)
+                            end++;
 
-                        if (current_ii < fieldlen_iv - 1)
+                        if (current_ii < field_len - 1)
                             current_ii++;
-                        else if (offset_ii + current_ii < len_iv - 1)
+                        else if (offset_ii + current_ii < input_len - 1)
                             offset_ii++;
                         }
                     }
                 break;
             }
 
-        input_tr [len_iv - 1] = ' ';
-        for (i_ii = 0; i_ii < fieldlen_iv; i_ii++)
-            if (pw_mode && offset_ii + i_ii < end_ii)
-                field_ti [i_ii] = '*';
+        input [input_len - 1] = ' ';
+        for (i_ii = 0; i_ii < field_len; i_ii++)
+            if (pw_mode && offset_ii + i_ii < end)
+                field[i_ii] = '*';
             else
-                field_ti [i_ii] = input_tr [offset_ii + i_ii];
+                field[i_ii] = input[offset_ii + i_ii];
 
-        if (memcmp (input_tr, tmp_pci, len_iv))
+        if (memcmp(input, tmp_buf, input_len * sizeof *input))
             {
             old_end_ii = tmp_end_ii;
-            memcpy (undo_pci, tmp_pci, len_iv);
+            memcpy(undo_buf, tmp_buf, input_len * sizeof *undo_buf);
             }
 
-        disp_gotoxy (x_iv, y_iv);
+        disp_gotoxy(x, y);
         disp_set_color (colors_prg->input_fg, colors_prg->input_bg);
-        disp_write_string (field_ti);
-        disp_gotoxy (x_iv + current_ii, y_iv);
+        disp_write_utf32string(field);
+        disp_gotoxy(x + current_ii, y);
         fflush (stdout);
 
-        key_ii = kbd_getch (TRUE);
-        if (key_ii == KEY_TAB) key_ii = ' ';
+        key = kbd_getch (TRUE);
+        if (key == KEY_TAB) key = ' ';
         }
-    while (key_ii != KEY_ENTER && key_ii != KEY_ESC);
+    while (key != KEY_ENTER && key != KEY_ESC);
 
-    free (undo_pci);
-    free (tmp_pci);
-    disp_cursor_off ();
-    input_tr [end_ii] = 0;
+  input[end] = 0;
 
-    if (key_ii == KEY_ENTER)
-        return (0);
-    else
-        return (-1);
-    }
+  utf32_to_utf8(buf, buf_len, input);
+
+  free(input);
+  free(undo_buf);
+  free(tmp_buf);
+
+  disp_cursor_off();
+
+  return key == KEY_ENTER ? 0 : -1;
+}
+
+
+int is_printable(int key)
+{
+  return key < 0x20 || key >= (1 << 21) ? 0 : 1;
+}
 

@@ -13,6 +13,7 @@
 
 #include "global.h"
 #include "display.h"
+#include "utf8.h"
 
 /*
  *
@@ -294,52 +295,10 @@ void disp_graph_off (void)
     }
 
 
-void disp_write_char (char character_cv)
-    {
-    if (disp_x_im > 0 && disp_x_im <= max_x_ig &&
-        disp_y_im > 0 && disp_y_im <= max_y_ig)
-        {
-        if (disp_state_im == DISP_ON)
-            printf ("%c", character_cv);
-
-        disp_screen_aprm [disp_y_im - 1][disp_x_im - 1].attr = disp_attr_cm;
-        disp_screen_aprm [disp_y_im - 1][disp_x_im - 1].c = character_cv;
-        disp_x_im++;
-        }
-    }
-
-
-void disp_write_string (char *string_tv)
-    {
-    int  i_ii;
-
-
-    if (disp_x_im > 0 && disp_x_im <= max_x_ig &&
-        disp_y_im > 0 && disp_y_im <= max_y_ig)
-        {
-        if (disp_state_im == DISP_ON)
-            printf ("%s", string_tv);
-
-        for (i_ii = 0; (unsigned) i_ii < strlen (string_tv); i_ii++)
-            if (i_ii + disp_x_im <= max_x_ig)
-                {
-                disp_screen_aprm [disp_y_im - 1][i_ii + disp_x_im - 1].attr =
-                                 disp_attr_cm;
-                disp_screen_aprm [disp_y_im - 1][i_ii + disp_x_im - 1].c =
-                                 string_tv [i_ii];
-                }
-
-        disp_x_im += strlen (string_tv);
-        if (disp_x_im > max_x_ig)
-            disp_gotoxy (1, 1);
-        }
-    }
-
-
-void disp_toggle_output (int state_iv)
-    {
-    disp_state_im = state_iv;
-    }
+void disp_toggle_output(int state)
+{
+  disp_state_im = state;
+}
 
 
 void disp_save_area (window_t *win_prr)
@@ -527,14 +486,14 @@ void disp_restore_area (window_t *win_prr, int mode_iv)
     }
 
 
-void disp_flush_area (window_t *win_prr)
-    {
-    window_t tmp_win_ri;
+void disp_flush_area(window_t *win)
+{
+  window_t tmp_win;
 
-    memcpy (&tmp_win_ri, win_prr, sizeof (window_t));
-    disp_save_area (&tmp_win_ri);
-    disp_restore_area (&tmp_win_ri, DISP_RESTORE_EXPLODE);
-    }
+  tmp_win = *win;
+  disp_save_area(&tmp_win);
+  disp_restore_area(&tmp_win, DISP_RESTORE_EXPLODE);
+}
 
 
 void disp_refresh_char (int x_iv, int y_iv)
@@ -573,29 +532,104 @@ void disp_set_display()
 }
 
 
-void disp_restore_screen (void)
-    {
-    int  y_ii;
-    int  x_ii;
+void disp_restore_screen()
+{
+  int x, y;
+
+  disp_x_im = 0;
+
+  for(y = 0; y < max_y_ig; y++) {
+    disp_gotoxy(1, y + 1);
+    for(x = 0; x < max_x_ig; x++) {
+      disp_set_attr(disp_screen_aprm[y][x].attr);
+      disp_write_char(disp_screen_aprm[y][x].c);
+    }
+  }
+
+  fflush(stdout);
+}
 
 
-    disp_x_im = 0;
-    for (y_ii = 0; y_ii < max_y_ig; y_ii++)
-        {
-        disp_gotoxy (1, y_ii + 1);
-        for (x_ii = 0; x_ii < max_x_ig; x_ii++)
-            {
-            disp_set_attr (disp_screen_aprm [y_ii][x_ii].attr);
-            disp_write_char (disp_screen_aprm [y_ii][x_ii].c);
-            }
-        }
+void disp_clear_screen()
+{
+  printf("\033[H\033[J");
+}
 
-    fflush (stdout);
+
+/*
+ * Write utf32 string.
+ */
+void disp_write_utf32string(int *str)
+{
+  int i, len, buf_len;
+  unsigned char *buf;
+
+  if(
+    disp_x_im > 0 &&
+    disp_x_im <= max_x_ig &&
+    disp_y_im > 0 &&
+    disp_y_im <= max_y_ig
+  ) {
+    len = utf32_len(str);
+
+    if(disp_state_im == DISP_ON) {
+      buf = malloc(buf_len = len * 6 + 1);
+      utf32_to_utf8(buf, buf_len, str);
+      printf("%s", buf);
+      free(buf);
     }
 
-
-void disp_clear_screen (void)
-    {
-    printf ("\033[H\033[J");
+    for(i = 0; i < len; i++) {
+      if(i + disp_x_im <= max_x_ig) {
+        disp_screen_aprm[disp_y_im - 1][i + disp_x_im - 1].attr = disp_attr_cm;
+        disp_screen_aprm[disp_y_im - 1][i + disp_x_im - 1].c = str[i];
+      }
     }
+
+    disp_x_im += len;
+
+    if(disp_x_im > max_x_ig) disp_gotoxy(1, 1);
+  }
+}
+
+
+/*
+ * Write utf8 string.
+ */
+void disp_write_string(char *str)
+{
+  int len, *buf;
+
+  len = strlen(str) + 1;
+
+  buf = malloc(len * sizeof *buf);
+  utf8_to_utf32(buf, len, str);
+  disp_write_utf32string(buf);
+
+  free(buf);
+}
+
+
+/*
+ * Write utf32 char.
+ */
+void disp_write_char(int c)
+{
+  if(
+    disp_x_im > 0 &&
+    disp_x_im <= max_x_ig &&
+    disp_y_im > 0 &&
+    disp_y_im <= max_y_ig
+  ) {
+    if(disp_state_im == DISP_ON) printf("%s", utf8_encode(c));
+
+//    fprintf(stderr, "[u+%02x <%s>]", c, utf8_encode(c));
+
+    disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].attr = disp_attr_cm;
+    disp_screen_aprm[disp_y_im - 1][disp_x_im - 1].c = c;
+
+    disp_x_im++;
+  }
+}
+
 

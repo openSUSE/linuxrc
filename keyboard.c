@@ -22,6 +22,7 @@
 
 #include "global.h"
 #include "keyboard.h"
+#include "utf8.h"
 
 /*
  *
@@ -29,13 +30,47 @@
  *
  */
 
-#define KBD_ESC_DELAY     25000
 #define KBD_TIMEOUT       10000
 
 static struct termios   kbd_norm_tio_rm;
 static struct termios   kbd_tio_rm;
 static int              kbd_tty_im;
 static int              kbd_timeout_im;
+
+typedef struct {
+  unsigned char buffer[16];
+  unsigned pos;
+  int key;
+} kbd_buffer_t;
+
+static kbd_buffer_t kbd;
+
+struct {
+  unsigned char *bytes;
+  int key;
+} key_list[] = {
+  { "\x1b[[A", KEY_F1     },
+  { "\x1b[[B", KEY_F2     },
+  { "\x1b[[C", KEY_F3     },
+  { "\x1b[[D", KEY_F4     },
+  { "\x1b[1~", KEY_HOME   },
+  { "\x1b[2~", KEY_INSERT },
+  { "\x1b[3~", KEY_DEL    },
+  { "\x1b[4~", KEY_END    },
+  { "\x1b[5~", KEY_PGUP   },
+  { "\x1b[6~", KEY_PGDOWN },
+  { "\x1b[A" , KEY_UP     },
+  { "\x1b[B" , KEY_DOWN   },
+  { "\x1b[D" , KEY_LEFT   },
+  { "\x1b[C" , KEY_RIGHT  },
+  { "\x1b[H" , KEY_HOME   },
+  { "\x1b[F" , KEY_END    },
+  { "\x1bOP" , KEY_F1     },
+  { "\x1bOQ" , KEY_F2     },
+  { "\x1bOR" , KEY_F3     },
+  { "\x1bOS" , KEY_F4     },
+};
+
 
 /*
  *
@@ -170,85 +205,144 @@ int kbd_getch(int wait_iv)
 
   if(key == KEY_CTRL_M) key = KEY_ENTER;
 
-//  fprintf(stderr, "key(%d): %d\n", wait_iv, key);
+  if(config.debug >= 3) {
+    fprintf(stderr, "key(%d): 0x%02x\n", wait_iv, key);
+  }
 
   return key;
 }
 
 
-int kbd_getch_raw (int wait_iv)
-    {
-    char  keypress_ci;
-    char  tmp_ci;
-    int   i_ii;
-    int   time_to_wait;
-    int   esc_delay = KBD_ESC_DELAY;
+/*
+ * Remove n keycodes from keyboard buffer.
+ */
+void del_keys(unsigned n)
+{
+  if(n >= kbd.pos) {
+    kbd.pos = 0;
 
-    if(config.escdelay) esc_delay = config.escdelay * 1000;
+    return;
+  }
 
-    keypress_ci = 0;
+  memmove(kbd.buffer, kbd.buffer + n, kbd.pos -= n);
+}
 
-    time_to_wait = config.kbdtimeout * 1000000;
 
-    do
-        {
-        kbd_set_timeout (KBD_TIMEOUT);
-        read (kbd_tty_im, &keypress_ci, 1);
-        kbd_del_timeout ();
-        if(wait_iv && config.kbdtimeout && (time_to_wait -= KBD_TIMEOUT) <= 0)
-            {
-            return KEY_ENTER;
-            }
-        }
-    while (!keypress_ci && wait_iv);
+/*
+ * Check keyboard buffer for key sequences.
+ */
+void check_for_key(int del_garbage)
+{
+  unsigned u, len;
 
-    if (!keypress_ci)
-        return (0);
+  kbd.key = 0;
 
-    config.kbdtimeout = 0;
+  if(!kbd.pos) return;
 
-    if (keypress_ci != KEY_ESC)
-        return ((int) keypress_ci);
-
-    kbd_set_timeout (esc_delay);
-
-    read (kbd_tty_im, &keypress_ci, 1);
-    if (kbd_timeout_im)
-        return ((int) KEY_ESC);
-    else
-        kbd_del_timeout ();
-
-    if (keypress_ci != 91)
-        return (0);
-
-    read (kbd_tty_im, &keypress_ci, 1);
-    if (keypress_ci == (KEY_UP    & 0xff)  ||
-        keypress_ci == (KEY_DOWN  & 0xff)  ||
-        keypress_ci == (KEY_RIGHT & 0xff)  ||
-        keypress_ci == (KEY_LEFT  & 0xff))
-        return (((int) keypress_ci) | KEY_SPECIAL);
-    
-    i_ii = 0;
-    kbd_set_timeout (esc_delay);
-
-    do
-        {
-        tmp_ci = keypress_ci;
-        read (kbd_tty_im, &keypress_ci, 1);
-        i_ii++;
-        }
-    while (!kbd_timeout_im && keypress_ci != 126);
-
-    kbd_del_timeout ();
-
-    if (keypress_ci != 126)
-        return (0);
-
-    if (i_ii == 2)
-        return (((int) tmp_ci) | KEY_SPECIAL | KEY_FUNC);
-    else
-        return (((int) tmp_ci) | KEY_SPECIAL);
+  if(config.debug >= 4) {
+    fprintf(stderr, "kbd buffer(%d):", del_garbage);
+    for(u = 0; u < kbd.pos; u++) {
+      fprintf(stderr, " 0x%02x", kbd.buffer[u]);
     }
+    fprintf(stderr, "\n");
+  }
+
+  /* look for esc sequences */
+  for(u = 0; u < sizeof key_list / sizeof *key_list; u++) {
+    len = strlen(key_list[u].bytes);
+    if(len && len <= kbd.pos && !memcmp(kbd.buffer, key_list[u].bytes, len)) {
+      kbd.key = key_list[u].key;
+      del_keys(len);
+//      fprintf(stderr, "-> key = 0x%02x\n", kbd.key);
+
+      return;
+    }
+  }
+
+  /* kill unknown esc sequences */
+  if(del_garbage && kbd.buffer[0] == '\x1b' && kbd.pos > 1) {
+    kbd.key = 0;
+    del_keys(kbd.pos);
+
+    return;
+  }
+
+  /* utf8 sequence */
+  if(kbd.buffer[0] != '\x1b') {
+    u = utf8_enc_len(kbd.buffer[0]);
+    if(u && u <= kbd.pos) {
+      kbd.key = utf8_decode(kbd.buffer);
+      del_keys(u);
+
+//      fprintf(stderr, "utf8(%u) = 0x%02x\n", u, kbd.key);
+
+      return;
+    }
+  }
+
+  /* kill remaining stuff */
+  if(del_garbage) {
+    /* basically for 'Esc' */
+    if(kbd.pos == 1) kbd.key = kbd.buffer[0];
+
+    del_keys(kbd.pos);
+
+    return;
+  }
+}
+
+
+/*
+ * Read keyboard input until some key sequence has been recognized.
+ */
+int kbd_getch_raw(do_wait)
+{
+  unsigned char key;
+  int i, esc_delay, time_to_wait, esc_count, delay;
+
+  esc_delay = config.escdelay ? config.escdelay * 1000 : 25000;
+
+  time_to_wait = config.kbdtimeout * 1000000;
+
+  check_for_key(1);
+
+  if(kbd.key || !do_wait) return kbd.key;
+
+  esc_count = 0;
+
+  for(;;) {
+    delay = esc_count ? esc_delay : KBD_TIMEOUT;
+    if(esc_count) esc_count--;
+
+    kbd_set_timeout(delay);
+    key = 0;
+    read(kbd_tty_im, &key, 1);
+    kbd_del_timeout();
+    if(do_wait && config.kbdtimeout && (time_to_wait -= delay) <= 0) {
+      /* fake 'Enter' */
+      kbd.pos = 0;
+      kbd.key = KEY_ENTER;
+
+      return kbd.key;
+    }
+
+    /* next 3 keys might be part of an esc sequence */
+    if(key == '\x1b') esc_count = 3;
+
+    if((i = utf8_enc_len(key)) > 1) esc_count = i - 1;
+
+    if(key) {
+      if(kbd.pos < sizeof kbd.buffer) kbd.buffer[kbd.pos++] = key;
+
+      check_for_key(0);
+    }
+    else {
+      check_for_key(1);
+    }
+
+    if(kbd.key || !do_wait) return kbd.key;
+  }
+}
 
 
 void kbd_clear_buffer (void)
@@ -335,4 +429,5 @@ void get_screen_size(int fd)
     fprintf(stderr, "Unexpected response: >>%s<<\n", buf + 1);
   }
 }
+
 

@@ -5,10 +5,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
 "PO-Revision-Date: 09.07.2003. 20:35\n"
-"Last-Translator: Amila AkagiÊ <bono@linux.org.ba>\n"
+"Last-Translator: Amila Akagiƒá <bono@linux.org.ba>\n"
 "Language-Team: Bosnian <lokal@lugbih.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
@@ -84,17 +84,17 @@ msgstr "Raspored tipki"
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load Network Card Modules"
-msgstr "UËitaj module za mreænu kartu"
+msgstr "Uƒçitaj module za mre≈ænu kartu"
 
 #. TXT_SHOW_MODULES
 #, fuzzy
 msgid "Show Loaded Modules"
-msgstr "Prikaæi uËitane module"
+msgstr "Prika≈æi uƒçitane module"
 
 #. TXT_AUTO_LOAD
 #, fuzzy
 msgid "Load Modules Automatically"
-msgstr "Automatski uËitaj module"
+msgstr "Automatski uƒçitaj module"
 
 #. TXT_DEL_MODULES
 #, fuzzy
@@ -109,20 +109,20 @@ msgid ""
 "During loading, you may want to watch the kernel messages on virtual console "
 "4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Pokuπavam uËitati modul \"%s\"...\n"
+"Poku≈°avam uƒçitati modul \"%s\"...\n"
 "\n"
-"Prilikom uËitavanja moæete pogledati poruke koje πalje kernel na virtuelnoj "
-"konzoli 4 (ALT-F4). Sa ALT-F1 moæete se vratiti na ovaj meni."
+"Prilikom uƒçitavanja mo≈æete pogledati poruke koje ≈°alje kernel na virtuelnoj "
+"konzoli 4 (ALT-F4). Sa ALT-F1 mo≈æete se vratiti na ovaj meni."
 
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "Modul \"%s\" je uspjeπno uËitan!"
+msgstr "Modul \"%s\" je uspje≈°no uƒçitan!"
 
 #. TXT_LOAD_FAILED
 #, fuzzy, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "UËitavanje modula \"%s\" nije uspjelo!"
+msgstr "Uƒçitavanje modula \"%s\" nije uspjelo!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -150,7 +150,7 @@ msgstr "Pokreni 'rescue' sistem"
 #. TXT_LOAD_RS_NFS
 #, fuzzy
 msgid "Load Rescue System via NFS"
-msgstr "UËitaj 'rescue' sistem preko NFS-a"
+msgstr "Uƒçitaj 'rescue' sistem preko NFS-a"
 
 #. TXT_BOOT_SYSTEM
 #, fuzzy
@@ -160,7 +160,7 @@ msgstr "Pokreni instalirani sistem"
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Traæim 'image' \"%s\"..."
+msgstr "Tra≈æim 'image' \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 #, fuzzy
@@ -169,14 +169,14 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"Ne mogu pronaÊi 'image'!\n"
+"Ne mogu pronaƒái 'image'!\n"
 "\n"
 "Provjerite kako ste upisali direktorij!"
 
 #. TXT_LOADING
 #, fuzzy
 msgid "Loading data into RAM disk..."
-msgstr "UËitavam podatke u ramdisk"
+msgstr "Uƒçitavam podatke u ramdisk"
 
 #. TXT_INFO_KERNEL
 #, fuzzy
@@ -189,12 +189,12 @@ msgstr "Procesor"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "Ureaji"
+msgstr "Ureƒëaji"
 
 #. TXT_INFO_NETDEV
 #, fuzzy
 msgid "Network Cards"
-msgstr "Mreæne karte"
+msgstr "Mre≈æne karte"
 
 #. TXT_INFO_DMA
 msgid "DMA"
@@ -228,17 +228,17 @@ msgstr "Ubacite disk i pritisnite ENTER"
 #. TXT_ERROR_READ_DISK
 #, fuzzy
 msgid "Error reading from floppy disk."
-msgstr "Pojavila se greπka prilikom Ëitanja diskete!"
+msgstr "Pojavila se gre≈°ka prilikom ƒçitanja diskete!"
 
 #. TXT_ENTER_ROOT_FS
 #, fuzzy
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Unesite vaπu root particiju (npr. /dev/sda3)"
+msgstr "Unesite va≈°u root particiju (npr. /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 #, fuzzy
 msgid "Invalid root device."
-msgstr "Neispravan root ureaj!"
+msgstr "Neispravan root ureƒëaj!"
 
 #. TXT_INVALID_INPUT
 #, fuzzy
@@ -248,7 +248,7 @@ msgstr "Neispravan unos!"
 #. TXT_INPUT_IPADDR
 #, fuzzy
 msgid "Enter your IP address."
-msgstr "Unesite vaπu IP adresu"
+msgstr "Unesite va≈°u IP adresu"
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
@@ -256,7 +256,7 @@ msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
 msgstr ""
-"Unesite vaπu netmask-u. Za mreæu sa klasom C obiËno se radi o vrijednosti "
+"Unesite va≈°u netmask-u. Za mre≈æu sa klasom C obiƒçno se radi o vrijednosti "
 "255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
@@ -265,7 +265,7 @@ msgid ""
 "If you need a gateway to reach the server, enter the IP address of the "
 "gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
-"Ako je potreban gateway kako bi doπli do servera, unesite IP adresu gateway-"
+"Ako je potreban gateway kako bi do≈°li do servera, unesite IP adresu gateway-"
 "a. Ako ne trebate gateway, unesite svoju IP adresu."
 
 #. TXT_INPUT_NAMED
@@ -274,7 +274,7 @@ msgid ""
 "Enter the IP address of your name server. If you do not use a name server, "
 "press ESC."
 msgstr ""
-"Unesite IP adresu vaπeg DNS servera. Ako ga ne koristite, pritisnite ESC."
+"Unesite IP adresu va≈°eg DNS servera. Ako ga ne koristite, pritisnite ESC."
 
 #. TXT_FOUND_HOST
 #, fuzzy, c-format
@@ -285,7 +285,7 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"SlijedeÊi podaci su skupljeni:\n"
+"Slijedeƒái podaci su skupljeni:\n"
 "\n"
 "IP adresa: %s\n"
 "Ime: %s\n"
@@ -297,7 +297,7 @@ msgid ""
 "An error occurred during the network configuration. Your network card "
 "probably was not recognized by the kernel."
 msgstr ""
-"Pojavila se greπka prilikom podeπavanja mreæe. Vjerovatno vaπa kartica nije "
+"Pojavila se gre≈°ka prilikom pode≈°avanja mre≈æe. Vjerovatno va≈°a kartica nije "
 "prepoznata od strane kernela!"
 
 #. TXT_INPUT_SERVER
@@ -327,7 +327,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Pokuπavam montirati direktorij\n"
+"Poku≈°avam montirati direktorij\n"
 "\n"
 "\"%s:%s\"..."
 
@@ -338,7 +338,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Pojavila se greπka prilikom pokuπaja montiranja nfs direktorija.\n"
+"Pojavila se gre≈°ka prilikom poku≈°aja montiranja nfs direktorija.\n"
 "\n"
 "Razlog koji je server poslao: %s"
 
@@ -349,7 +349,7 @@ msgid ""
 "YaST will offer additional keyboard tables later."
 msgstr ""
 "Izaberite raspored za tastaturu.\n"
-" YaST Êe vam naknadno ponuditi dodatne tabele za tastaturu."
+" YaST ƒáe vam naknadno ponuditi dodatne tabele za tastaturu."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
@@ -359,7 +359,7 @@ msgstr "Izaberite modul koji treba ukloniti."
 #. TXT_NO_MODULES
 #, fuzzy
 msgid "No modules currently loaded."
-msgstr "Novi moduli nisu pronaeni."
+msgstr "Novi moduli nisu pronaƒëeni."
 
 #. TXT_AUTO_RUNNING
 #, c-format
@@ -369,21 +369,21 @@ msgstr "Automatsko ispitivanje (%s)...      "
 #. TXT_WANT_MORE_SCSI
 #, fuzzy
 msgid "Search for additional SCSI host adaptors?"
-msgstr "Da li æelite traæiti dodatne SCSI host adaptere?"
+msgstr "Da li ≈æelite tra≈æiti dodatne SCSI host adaptere?"
 
 #. TXT_WANT_MORE_NET
 #, fuzzy
 msgid "Search for additional network cards?"
-msgstr "Da li æelite traæiti dodatne mreæne karte?"
+msgstr "Da li ≈æelite tra≈æiti dodatne mre≈æne karte?"
 
 #. TXT_WANT_MORE_CDROM
 #, fuzzy
 msgid "Search for additional CD-ROM drives?"
-msgstr "Da li æelite traæiti dodatne CD-ROM ureaje?"
+msgstr "Da li ≈æelite tra≈æiti dodatne CD-ROM ureƒëaje?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "ethernet mreæna karta"
+msgstr "ethernet mre≈æna karta"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
@@ -391,24 +391,24 @@ msgstr "paralelni port"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "token ring mreæna karta"
+msgstr "token ring mre≈æna karta"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "arcnet mreæna karta"
+msgstr "arcnet mre≈æna karta"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "FDDI mreæna karta"
+msgstr "FDDI mre≈æna karta"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "HIPPI mreæna karta"
+msgstr "HIPPI mre≈æna karta"
 
 #. TXT_CHOOSE_NET
 #, fuzzy
 msgid "Choose the network device."
-msgstr "Izaberite mreæni ureaj."
+msgstr "Izaberite mre≈æni ureƒëaj."
 
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
@@ -419,7 +419,7 @@ msgstr "Unesite IP adresu PLIP partnera."
 #, fuzzy
 msgid ""
 "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "PCMCIA chipset se nije mogao automatski pronaÊi. Navedite ga ruËno."
+msgstr "PCMCIA chipset se nije mogao automatski pronaƒái. Navedite ga ruƒçno."
 
 #. TXT_FOUND_PCMCIA
 #, fuzzy, c-format
@@ -428,22 +428,22 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Pronaen PCMCIA chipset \"%s\"!\n"
+"Pronaƒëen PCMCIA chipset \"%s\"!\n"
 "\n"
 "Unesite parametre za PCMCIA core module"
 
 #. TXT_PCMCIA_PARAMS
 #, fuzzy, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Unesite odreene parametre za chipset \"%s\""
+msgstr "Unesite odreƒëene parametre za chipset \"%s\""
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "PokreÊem menadæera za karte..."
+msgstr "Pokreƒáem menad≈æera za karte..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "Uspjeπno pokrenuti servisi za PCMCIA kartu."
+msgstr "Uspje≈°no pokrenuti servisi za PCMCIA kartu."
 
 #. TXT_PCMCIA_FAIL
 #, fuzzy
@@ -453,7 +453,7 @@ msgstr "Pokretanje servisa za PCMCIA kartu nije uspjelo!"
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
 msgid "PCMCIA card services already running."
-msgstr "Servisi za PCMCIA kartu su veÊ pokrenuti!"
+msgstr "Servisi za PCMCIA kartu su veƒá pokrenuti!"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
@@ -464,22 +464,22 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Iz Linuxrc-a moæete izaÊi samo preko stavke\n"
+"Iz Linuxrc-a mo≈æete izaƒái samo preko stavke\n"
 "\n"
 "u meniju \"Pokreni instalaciju/sistem\"\n"
 "\n"
-"Da bi dozvolili ovo, moæda Êete trebati uËitati neke drajvere (module) da bi "
-"podræali vaπ hardver."
+"Da bi dozvolili ovo, mo≈æda ƒáete trebati uƒçitati neke drajvere (module) da bi "
+"podr≈æali va≈° hardver."
 
 #. TXT_NO_CTRLC
 #, fuzzy
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Ne moæete izaÊi iz Linuxrc-a sa <ctrl-c>!"
+msgstr "Ne mo≈æete izaƒái iz Linuxrc-a sa <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 #, fuzzy
 msgid "Remove the disk from the drive now."
-msgstr "Uklonite disk iz ureaja sada!"
+msgstr "Uklonite disk iz ureƒëaja sada!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -494,21 +494,21 @@ msgstr ""
 #. TXT_CHOOSE_SOURCE
 #, fuzzy
 msgid "Choose the source medium."
-msgstr "Izaberite izvoriπni medij"
+msgstr "Izaberite izvori≈°ni medij"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Pokuπavam montirati CD-ROM..."
+msgstr "Poku≈°avam montirati CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "Nisam u moguÊnosti montirati CD-ROM!"
+msgstr "Nisam u moguƒánosti montirati CD-ROM!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
-msgstr "Da li æelite sada ponovo pokrenuti sistem?"
+msgstr "Da li ≈æelite sada ponovo pokrenuti sistem?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
@@ -516,8 +516,8 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Osnovni sistem je uspjeπno instaliran. Ovaj novoinstalirani sistem Êe sada "
-"biti pokrenut kako bi zavrπili instalaciju."
+"Osnovni sistem je uspje≈°no instaliran. Ovaj novoinstalirani sistem ƒáe sada "
+"biti pokrenut kako bi zavr≈°ili instalaciju."
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
@@ -532,12 +532,12 @@ msgstr "Ne mogu montirati navedenu particiju!"
 #. TXT_ENTER_HD_DIR
 #, fuzzy
 msgid "Enter the source directory."
-msgstr "Unesite izvoriπni direktorij"
+msgstr "Unesite izvori≈°ni direktorij"
 
 #. TXT_ERROR_INSTALL
 #, fuzzy
 msgid "An error occurred during the installation."
-msgstr "Greπka se pojavila u toku instalacije!"
+msgstr "Gre≈°ka se pojavila u toku instalacije!"
 
 #. TXT_DRIVES
 #, fuzzy
@@ -552,10 +552,10 @@ msgid ""
 "Before you acknowledge this message, you must switch to virtual console 2 "
 "(press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Vaπ raËunar ima ekstremno malo memorije!\n"
+"Va≈° raƒçunar ima ekstremno malo memorije!\n"
 "\n"
 "Prije nego usvojite ovu poruku morate se prebaciti na virtuelnu konzolu "
-"(pritisnite ALT-F2), kreirati i aktivirati neπto swap prostora!"
+"(pritisnite ALT-F2), kreirati i aktivirati ne≈°to swap prostora!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -568,7 +568,7 @@ msgstr ""
 #. TXT_NO_DRIVES
 #, fuzzy
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Do sada nijedan hard disk niti CD-ROM nije pronaen."
+msgstr "Do sada nijedan hard disk niti CD-ROM nije pronaƒëen."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
@@ -577,7 +577,7 @@ msgstr "Debug (za eksperte)"
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load Root Image into RAM Disk"
-msgstr "UËitaj rootimage u ramdisk"
+msgstr "Uƒçitaj rootimage u ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
 #, fuzzy
@@ -594,13 +594,13 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Unesite putanju i naziv datoteke koja Êe biti uËitana u RAM disk kao root "
-"datoteËni sistem"
+"Unesite putanju i naziv datoteke koja ƒáe biti uƒçitana u RAM disk kao root "
+"datoteƒçni sistem"
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
 msgid "Not yet implemented."
-msgstr "Joπ nije implementirano!"
+msgstr "Jo≈° nije implementirano!"
 
 #. TXT_NEW_INST_SYS
 #, fuzzy
@@ -610,7 +610,7 @@ msgstr "Instalacioni sistem"
 #. TXT_ENTER_INST_SYS
 #, fuzzy
 msgid "Enter the directory that contains the installation system."
-msgstr "Unesite direktorij koji sadræi instalacioni sistem."
+msgstr "Unesite direktorij koji sadr≈æi instalacioni sistem."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -637,12 +637,12 @@ msgstr "Izlaz/Reboot"
 #. TXT_SEARCH_INFOFILE
 #, fuzzy
 msgid "Searching for info file..."
-msgstr "Traæim datoteku sa informacijama..."
+msgstr "Tra≈æim datoteku sa informacijama..."
 
 #. TXT_NFSPORT
 #, fuzzy
 msgid "Specify the NFS port."
-msgstr "NaznaËite NFS port"
+msgstr "Naznaƒçite NFS port"
 
 #. TXT_ASKING_NAMED
 #, fuzzy
@@ -652,12 +652,12 @@ msgstr "Pitam DNS server..."
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
 msgid "Host %s was not found."
-msgstr "RaËunar %s nije pronaen!"
+msgstr "Raƒçunar %s nije pronaƒëen!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "Vaπa mreæa je veÊ podeπena. Da li æelite saËuvati ovu konfiguraciju?"
+msgstr "Va≈°a mre≈æa je veƒá pode≈°ena. Da li ≈æelite saƒçuvati ovu konfiguraciju?"
 
 #. TXT_ASK_BREAK
 #, fuzzy
@@ -670,13 +670,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Mreæni ureaj nije pronaen!\n"
-"Prvo uËitajte mreæni modul."
+"Mre≈æni ureƒëaj nije pronaƒëen!\n"
+"Prvo uƒçitajte mre≈æni modul."
 
 #. TXT_ALREADY_FOUND
 #, fuzzy, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "%s je veÊ pronaen na vaπem sistemu!\n"
+msgstr "%s je veƒá pronaƒëen na va≈°em sistemu!\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -685,19 +685,19 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Greπka prilikom pristupa FTP serveru:\n"
+"Gre≈°ka prilikom pristupa FTP serveru:\n"
 "\n"
 "%s"
 
 #. TXT_ENTER_FTPUSER
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
-msgstr "Unesite korisniËko ime s kojim hoÊete pristupiti FTP serveru"
+msgstr "Unesite korisniƒçko ime s kojim hoƒáete pristupiti FTP serveru"
 
 #. TXT_ENTER_FTPPASSWD
 #, fuzzy
 msgid "Enter the password for the FTP user account."
-msgstr "Unesite πifru za FTP raËun"
+msgstr "Unesite ≈°ifru za FTP raƒçun"
 
 #. TXT_ENTER_FTPPROXY
 #, fuzzy
@@ -712,7 +712,7 @@ msgstr "Unesite port FTP proxy-ja"
 #. TXT_WANT_FTPPROXY
 #, fuzzy
 msgid "Use an FTP proxy?"
-msgstr "Da li æelite koristiti FTP proxy?"
+msgstr "Da li ≈æelite koristiti FTP proxy?"
 
 #. TXT_NOMEM_FTP
 #, fuzzy, c-format
@@ -720,7 +720,7 @@ msgid ""
 "Your computer does not have enough RAM to install via FTP (%d MB RAM "
 "required)."
 msgstr ""
-"Vaπ raËunar nema dovoljno RAM-a za instalaciju putem FTP-a! (neophodno je %d "
+"Va≈° raƒçunar nema dovoljno RAM-a za instalaciju putem FTP-a! (neophodno je %d "
 "MB RAM-a)"
 
 #. TXT_ANONYM_FTP
@@ -730,14 +730,14 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"ObiËno se FTP instalacija pokreÊe preko anonimnog FTP-a, ali moguÊe je "
-"koristiti korisniËko ime i πifru za pristup FTP serveru.\n"
-"Da li æelite ovo?"
+"Obiƒçno se FTP instalacija pokreƒáe preko anonimnog FTP-a, ali moguƒáe je "
+"koristiti korisniƒçko ime i ≈°ifru za pristup FTP serveru.\n"
+"Da li ≈æelite ovo?"
 
 #. TXT_MORE_MODULES
 #, fuzzy
 msgid "-- More Modules --"
-msgstr "-- Viπe modula --"
+msgstr "-- Vi≈°e modula --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
@@ -751,7 +751,7 @@ msgstr "Unesite broj porta na kojem je pokrenut nfs server"
 #. TXT_INSERT_CD
 #, fuzzy, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "Provjerite da li je CD broj %d u ureaju!"
+msgstr "Provjerite da li je CD broj %d u ureƒëaju!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
@@ -795,19 +795,19 @@ msgid ""
 "name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Ako æelite pristupiti share-u kao gost, ne morate unijeti korisniËko ime, "
-"πifru i radnu grupu.\n"
-"Da li æelite pristupiti share-u kao gost?"
+"Ako ≈æelite pristupiti share-u kao gost, ne morate unijeti korisniƒçko ime, "
+"≈°ifru i radnu grupu.\n"
+"Da li ≈æelite pristupiti share-u kao gost?"
 
 #. TXT_SMB_ENTER_USER
 #, fuzzy
 msgid "Enter your user name on the SMB server."
-msgstr "Unesite vaπe korisniËko ime na SMB serveru"
+msgstr "Unesite va≈°e korisniƒçko ime na SMB serveru"
 
 #. TXT_SMB_ENTER_PASSWORD
 #, fuzzy
 msgid "Enter your password on the SMB server."
-msgstr "Unesite πifru na SMB serveru"
+msgstr "Unesite ≈°ifru na SMB serveru"
 
 #. TXT_SMB_ENTER_WORKGROUP
 #, fuzzy
@@ -815,7 +815,7 @@ msgid ""
 "Enter your workgroup.If you do not need to specify a workgroup,leave the "
 "field empty."
 msgstr ""
-"Unesite vaπu radnu grupu. Ako ne trebate unijeti radnu grupu, ostavite polje "
+"Unesite va≈°u radnu grupu. Ako ne trebate unijeti radnu grupu, ostavite polje "
 "prazno."
 
 #. TXT_SMB_TRYING_MOUNT
@@ -825,7 +825,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Pokuπavam montirati share\n"
+"Poku≈°avam montirati share\n"
 "\n"
 "\"//%s/%s\""
 
@@ -839,13 +839,13 @@ msgstr "Automatska konfiguracija preko %s?"
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr "©aljem %s zahtjev..."
+msgstr "≈†aljem %s zahtjev..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "%s podeπavanje nije uspjelo."
+msgstr "%s pode≈°avanje nije uspjelo."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
@@ -865,12 +865,12 @@ msgstr "Ubacite disketu %d sa modulima."
 #, fuzzy
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
-"Informacije o tome kako kreirati naÊi Êete u disks/README na CD1 ili DVD-u."
+"Informacije o tome kako kreirati naƒái ƒáete u disks/README na CD1 ili DVD-u."
 
 #. TXT_CHOOSE_NETSOURCE
 #, fuzzy
 msgid "Choose the network protocol."
-msgstr "Izaberite mreæni protokol"
+msgstr "Izaberite mre≈æni protokol"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
@@ -882,33 +882,33 @@ msgstr "Unesite IP adresu %s servera."
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr "Pokuπavam se spojiti na %s server..."
+msgstr "Poku≈°avam se spojiti na %s server..."
 
 #. TXT_NET
 msgid "Network"
-msgstr "Mreæa"
+msgstr "Mre≈æa"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, fuzzy, c-format
 msgid "Load %s Modules"
-msgstr "UËitati %s module"
+msgstr "Uƒçitati %s module"
 
 #. TXT_LOAD_FS
 #, fuzzy
 msgid "Load File System Modules"
-msgstr "UËitati module za datoteËni sistem"
+msgstr "Uƒçitati module za datoteƒçni sistem"
 
 #. TXT_LOAD_OTHER
 #, fuzzy
 msgid "Load Unknown Modules"
-msgstr "UËitati nepoznate module"
+msgstr "Uƒçitati nepoznate module"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr "Pronaen %s datoteËni sistem."
+msgstr "Pronaƒëen %s datoteƒçni sistem."
 
 #. TXT_CONTINUE
 msgid "Continue"
@@ -920,7 +920,7 @@ msgstr "Odustani"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "Novi moduli nisu pronaeni."
+msgstr "Novi moduli nisu pronaƒëeni."
 
 #. TXT_CHOOSE_PARTITION
 #, fuzzy
@@ -939,20 +939,20 @@ msgstr "Izaberite swap particiju."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Nema dovoljno memorije za uËitavanje svih podataka."
+msgstr "Nema dovoljno memorije za uƒçitavanje svih podataka."
 
 #. TXT_LOW_MEMORY2
 #, fuzzy
 msgid "Your computer does not have enough memory to run YaST."
-msgstr "Vaπ raËunar nema dovoljno memorije da pokrene YaST."
+msgstr "Va≈° raƒçunar nema dovoljno memorije da pokrene YaST."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Da nastavite, aktivirajte joπ swap prostora."
+msgstr "Da nastavite, aktivirajte jo≈° swap prostora."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Greπka prilikom aktiviranja swap prostora."
+msgstr "Gre≈°ka prilikom aktiviranja swap prostora."
 
 #. TXT_ENTER_SWAP
 #, fuzzy
@@ -962,7 +962,7 @@ msgstr "Unesite swap particiju (npr. /dev/sda2)"
 #. TXT_ENTER_USER
 #, fuzzy, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "Unesite korisniËko ime s kojim hoÊete pristupiti FTP serveru"
+msgstr "Unesite korisniƒçko ime s kojim hoƒáete pristupiti FTP serveru"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_ENTER_PASSWORD
@@ -1028,7 +1028,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
-"Unesite IP adresu vaπeg DNS servera. Ako ga ne koristite, pritisnite ESC."
+"Unesite IP adresu va≈°eg DNS servera. Ako ga ne koristite, pritisnite ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""

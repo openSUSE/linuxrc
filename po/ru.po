@@ -9,7 +9,7 @@ msgstr ""
 "Last-Translator: Roman Shevtsov <rshev@zhmer.org.ua>\n"
 "Language-Team: Russian <linux@zhmer.org.ua>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=KOI8-R\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
@@ -19,28 +19,28 @@ msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
-msgstr "Назад"
+msgstr "п²п╟п╥п╟п╢"
 
 #. TXT_YES
 msgid "Yes"
-msgstr "Да"
+msgstr "п■п╟"
 
 #. TXT_NO
 msgid "No"
-msgstr "Нет"
+msgstr "п²п╣я┌"
 
 #. TXT_CHOOSE_LANGUAGE
 #, fuzzy
 msgid "Select the language."
-msgstr "Пожалуйста, выберите язык"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡я▀п╠п╣я─п╦я┌п╣ я▐п╥я▀п╨"
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr "Цветной монитор"
+msgstr "п╕п╡п╣я┌п╫п╬п╧ п╪п╬п╫п╦я┌п╬я─"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
-msgstr "Черно-белый монитор"
+msgstr "п╖п╣я─п╫п╬-п╠п╣п╩я▀п╧ п╪п╬п╫п╦я┌п╬я─"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
@@ -48,59 +48,59 @@ msgstr ""
 
 #. TXT_MENU_LANG
 msgid "Language"
-msgstr "Язык"
+msgstr "п╞п╥я▀п╨"
 
 #. TXT_MENU_MODULES
 #, fuzzy
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Модули ядра (драйвера устройств)"
+msgstr "п°п╬п╢я┐п╩п╦ я▐п╢я─п╟ (п╢я─п╟п╧п╡п╣я─п╟ я┐я│я┌я─п╬п╧я│я┌п╡)"
 
 #. TXT_MENU_START
 #, fuzzy
 msgid "Start Installation or System"
-msgstr "Запуск установки / системы"
+msgstr "п≈п╟п©я┐я│п╨ я┐я│я┌п╟п╫п╬п╡п╨п╦ / я│п╦я│я┌п╣п╪я▀"
 
 #. TXT_MENU_INFO
 #, fuzzy
 msgid "System Information"
-msgstr "Информация о системе"
+msgstr "п≤п╫я└п╬я─п╪п╟я├п╦я▐ п╬ я│п╦я│я┌п╣п╪п╣"
 
 #. TXT_HDR_MAIN
 #, fuzzy
 msgid "Main Menu"
-msgstr "Главное меню"
+msgstr "п⌠п╩п╟п╡п╫п╬п╣ п╪п╣п╫я▌"
 
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr "Настройки"
+msgstr "п²п╟я│я┌я─п╬п╧п╨п╦"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr "Монитор"
+msgstr "п°п╬п╫п╦я┌п╬я─"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Раскладка клавиатуры"
+msgstr "п═п╟я│п╨п╩п╟п╢п╨п╟ п╨п╩п╟п╡п╦п╟я┌я┐я─я▀"
 
 #. TXT_LOAD_NET
 #, fuzzy
 msgid "Load Network Card Modules"
-msgstr "Загрузить модули сетевых карт"
+msgstr "п≈п╟пЁя─я┐п╥п╦я┌я▄ п╪п╬п╢я┐п╩п╦ я│п╣я┌п╣п╡я▀я┘ п╨п╟я─я┌"
 
 #. TXT_SHOW_MODULES
 #, fuzzy
 msgid "Show Loaded Modules"
-msgstr "Показать загруженные модули"
+msgstr "п÷п╬п╨п╟п╥п╟я┌я▄ п╥п╟пЁя─я┐п╤п╣п╫п╫я▀п╣ п╪п╬п╢я┐п╩п╦"
 
 #. TXT_AUTO_LOAD
 #, fuzzy
 msgid "Load Modules Automatically"
-msgstr "Автоматическая загрузка модулей"
+msgstr "п░п╡я┌п╬п╪п╟я┌п╦я┤п╣я│п╨п╟я▐ п╥п╟пЁя─я┐п╥п╨п╟ п╪п╬п╢я┐п╩п╣п╧"
 
 #. TXT_DEL_MODULES
 #, fuzzy
 msgid "Unload Modules"
-msgstr "Выгрузить модули"
+msgstr "п▓я▀пЁя─я┐п╥п╦я┌я▄ п╪п╬п╢я┐п╩п╦"
 
 #. TXT_TRY_TO_LOAD
 #, fuzzy, c-format
@@ -110,20 +110,20 @@ msgid ""
 "During loading, you may want to watch the kernel messages on virtual console "
 "4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Пытаюсь загрузить модуль \"%s\"...\n"
+"п÷я▀я┌п╟я▌я│я▄ п╥п╟пЁя─я┐п╥п╦я┌я▄ п╪п╬п╢я┐п╩я▄ \"%s\"...\n"
 "\n"
-"Во время загрузки вы можете наблюдать за сообщениямиядра на виртуальной "
-"консоли номер 4 (ALT-F4)."
+"п▓п╬ п╡я─п╣п╪я▐ п╥п╟пЁя─я┐п╥п╨п╦ п╡я▀ п╪п╬п╤п╣я┌п╣ п╫п╟п╠п╩я▌п╢п╟я┌я▄ п╥п╟ я│п╬п╬п╠я┴п╣п╫п╦я▐п╪п╦я▐п╢я─п╟ п╫п╟ п╡п╦я─я┌я┐п╟п╩я▄п╫п╬п╧ "
+"п╨п╬п╫я│п╬п╩п╦ п╫п╬п╪п╣я─ 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
 #, fuzzy, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "Модуль \"%s\" успешно загрузился!"
+msgstr "п°п╬п╢я┐п╩я▄ \"%s\" я┐я│п©п╣я┬п╫п╬ п╥п╟пЁя─я┐п╥п╦п╩я│я▐!"
 
 #. TXT_LOAD_FAILED
 #, fuzzy, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "Не удалось загрузить модуль  \"%s\"!"
+msgstr "п²п╣ я┐п╢п╟п╩п╬я│я▄ п╥п╟пЁя─я┐п╥п╦я┌я▄ п╪п╬п╢я┐п╩я▄  \"%s\"!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -131,37 +131,37 @@ msgstr "CD-ROM"
 
 #. TXT_FLOPPY
 msgid "Floppy"
-msgstr "Флоппи"
+msgstr "п╓п╩п╬п©п©п╦"
 
 #. TXT_HARDDISK
 #, fuzzy
 msgid "Hard Disk"
-msgstr "Жесткий диск"
+msgstr "п√п╣я│я┌п╨п╦п╧ п╢п╦я│п╨"
 
 #. TXT_START_INSTALL
 #, fuzzy
 msgid "Start Installation or Update"
-msgstr "Запустить установку"
+msgstr "п≈п╟п©я┐я│я┌п╦я┌я▄ я┐я│я┌п╟п╫п╬п╡п╨я┐"
 
 #. TXT_START_RESCUE
 #, fuzzy
 msgid "Start Rescue System"
-msgstr "Запустить спасательную систему"
+msgstr "п≈п╟п©я┐я│я┌п╦я┌я▄ я│п©п╟я│п╟я┌п╣п╩я▄п╫я┐я▌ я│п╦я│я┌п╣п╪я┐"
 
 #. TXT_LOAD_RS_NFS
 #, fuzzy
 msgid "Load Rescue System via NFS"
-msgstr "Загрузить спасательную систему через NFS"
+msgstr "п≈п╟пЁя─я┐п╥п╦я┌я▄ я│п©п╟я│п╟я┌п╣п╩я▄п╫я┐я▌ я│п╦я│я┌п╣п╪я┐ я┤п╣я─п╣п╥ NFS"
 
 #. TXT_BOOT_SYSTEM
 #, fuzzy
 msgid "Boot Installed System"
-msgstr "Загрузить установленную систему"
+msgstr "п≈п╟пЁя─я┐п╥п╦я┌я▄ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я┐я▌ я│п╦я│я┌п╣п╪я┐"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Ищу образ \"%s\"..."
+msgstr "п≤я┴я┐ п╬п╠я─п╟п╥ \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 #, fuzzy
@@ -170,32 +170,32 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"Не могу найти образ!\n"
+"п²п╣ п╪п╬пЁя┐ п╫п╟п╧я┌п╦ п╬п╠я─п╟п╥!\n"
 "\n"
-"Проверьте спецификацию каталога!"
+"п÷я─п╬п╡п╣я─я▄я┌п╣ я│п©п╣я├п╦я└п╦п╨п╟я├п╦я▌ п╨п╟я┌п╟п╩п╬пЁп╟!"
 
 #. TXT_LOADING
 #, fuzzy
 msgid "Loading data into RAM disk..."
-msgstr "Загружаю данные в ramdisk"
+msgstr "п≈п╟пЁя─я┐п╤п╟я▌ п╢п╟п╫п╫я▀п╣ п╡ ramdisk"
 
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
-msgstr "Сообщения ядра"
+msgstr "п║п╬п╬п╠я┴п╣п╫п╦я▐ я▐п╢я─п╟"
 
 #. TXT_INFO_CPU
 msgid "Processor"
-msgstr "Процессор"
+msgstr "п÷я─п╬я├п╣я│я│п╬я─"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "Устройства"
+msgstr "пёя│я┌я─п╬п╧я│я┌п╡п╟"
 
 #. TXT_INFO_NETDEV
 #, fuzzy
 msgid "Network Cards"
-msgstr "Сетевые платы"
+msgstr "п║п╣я┌п╣п╡я▀п╣ п©п╩п╟я┌я▀"
 
 #. TXT_INFO_DMA
 msgid "DMA"
@@ -203,53 +203,53 @@ msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr "Прерывания"
+msgstr "п÷я─п╣я─я▀п╡п╟п╫п╦я▐"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
-msgstr "Порты ввода/вывода"
+msgstr "п÷п╬я─я┌я▀ п╡п╡п╬п╢п╟/п╡я▀п╡п╬п╢п╟"
 
 #. TXT_INFO_MEM
 msgid "Memory"
-msgstr "Память"
+msgstr "п÷п╟п╪я▐я┌я▄"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
-msgstr "Модули"
+msgstr "п°п╬п╢я┐п╩п╦"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr "Шина PCI"
+msgstr "п╗п╦п╫п╟ PCI"
 
 #. TXT_INSERT_DISK
 #, fuzzy
 msgid "Insert the disk and press ENTER."
-msgstr "Пожалуйста, вставьте диск и нажмите ENTER"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡я│я┌п╟п╡я▄я┌п╣ п╢п╦я│п╨ п╦ п╫п╟п╤п╪п╦я┌п╣ ENTER"
 
 #. TXT_ERROR_READ_DISK
 #, fuzzy
 msgid "Error reading from floppy disk."
-msgstr "Ошибка при чтении с дискеты!"
+msgstr "п·я┬п╦п╠п╨п╟ п©я─п╦ я┤я┌п╣п╫п╦п╦ я│ п╢п╦я│п╨п╣я┌я▀!"
 
 #. TXT_ENTER_ROOT_FS
 #, fuzzy
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Пожалуйста, укажите вашу корневой раздел (например /dev/sda3)"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╡п╟я┬я┐ п╨п╬я─п╫п╣п╡п╬п╧ я─п╟п╥п╢п╣п╩ (п╫п╟п©я─п╦п╪п╣я─ /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 #, fuzzy
 msgid "Invalid root device."
-msgstr "Неправильное корневое устройство!"
+msgstr "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╨п╬я─п╫п╣п╡п╬п╣ я┐я│я┌я─п╬п╧я│я┌п╡п╬!"
 
 #. TXT_INVALID_INPUT
 #, fuzzy
 msgid "Invalid input."
-msgstr "Некорректный ввод!"
+msgstr "п²п╣п╨п╬я─я─п╣п╨я┌п╫я▀п╧ п╡п╡п╬п╢!"
 
 #. TXT_INPUT_IPADDR
 #, fuzzy
 msgid "Enter your IP address."
-msgstr "Введите ваш IP-адрес"
+msgstr "п▓п╡п╣п╢п╦я┌п╣ п╡п╟я┬ IP-п╟п╢я─п╣я│"
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
@@ -257,7 +257,7 @@ msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
 msgstr ""
-"Введите маску вашей подсети. Для нормальной сети класса С, она обычно равна "
+"п▓п╡п╣п╢п╦я┌п╣ п╪п╟я│п╨я┐ п╡п╟я┬п╣п╧ п©п╬п╢я│п╣я┌п╦. п■п╩я▐ п╫п╬я─п╪п╟п╩я▄п╫п╬п╧ я│п╣я┌п╦ п╨п╩п╟я│я│п╟ п║, п╬п╫п╟ п╬п╠я▀я┤п╫п╬ я─п╟п╡п╫п╟ "
 "255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
@@ -266,8 +266,8 @@ msgid ""
 "If you need a gateway to reach the server, enter the IP address of the "
 "gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
-"Если для достижения сервера вам нужен шлюз, пожалуйста, укажите IP-адрес "
-"шлюза. Если вам не нужен шлюз, просто укажите ваш собственный IP-адрес."
+"п∙я│п╩п╦ п╢п╩я▐ п╢п╬я│я┌п╦п╤п╣п╫п╦я▐ я│п╣я─п╡п╣я─п╟ п╡п╟п╪ п╫я┐п╤п╣п╫ я┬п╩я▌п╥, п©п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ IP-п╟п╢я─п╣я│ "
+"я┬п╩я▌п╥п╟. п∙я│п╩п╦ п╡п╟п╪ п╫п╣ п╫я┐п╤п╣п╫ я┬п╩я▌п╥, п©я─п╬я│я┌п╬ я┐п╨п╟п╤п╦я┌п╣ п╡п╟я┬ я│п╬п╠я│я┌п╡п╣п╫п╫я▀п╧ IP-п╟п╢я─п╣я│."
 
 #. TXT_INPUT_NAMED
 #, fuzzy
@@ -275,8 +275,8 @@ msgid ""
 "Enter the IP address of your name server. If you do not use a name server, "
 "press ESC."
 msgstr ""
-"Укажите IP-адрес вашего сервера DNS. Если вы не используете сервер DNS, "
-"просто нажмите ESC."
+"пёп╨п╟п╤п╦я┌п╣ IP-п╟п╢я─п╣я│ п╡п╟я┬п╣пЁп╬ я│п╣я─п╡п╣я─п╟ DNS. п∙я│п╩п╦ п╡я▀ п╫п╣ п╦я│п©п╬п╩я▄п╥я┐п╣я┌п╣ я│п╣я─п╡п╣я─ DNS, "
+"п©я─п╬я│я┌п╬ п╫п╟п╤п╪п╦я┌п╣ ESC."
 
 #. TXT_FOUND_HOST
 #, fuzzy, c-format
@@ -287,11 +287,11 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Были получены следующие данные:\n"
+"п▒я▀п╩п╦ п©п╬п╩я┐я┤п╣п╫я▀ я│п╩п╣п╢я┐я▌я┴п╦п╣ п╢п╟п╫п╫я▀п╣:\n"
 "\n"
-"IP-адрес: %s\n"
-"Имя: %s\n"
-"Домен: %s"
+"IP-п╟п╢я─п╣я│: %s\n"
+"п≤п╪я▐: %s\n"
+"п■п╬п╪п╣п╫: %s"
 
 #. TXT_ERROR_CONF_NET
 #, fuzzy
@@ -299,28 +299,28 @@ msgid ""
 "An error occurred during the network configuration. Your network card "
 "probably was not recognized by the kernel."
 msgstr ""
-"Во время настройки сети произошла ошибка. Вероятно, ваша сетевая плата не "
-"была распознана ядром!"
+"п▓п╬ п╡я─п╣п╪я▐ п╫п╟я│я┌я─п╬п╧п╨п╦ я│п╣я┌п╦ п©я─п╬п╦п╥п╬я┬п╩п╟ п╬я┬п╦п╠п╨п╟. п▓п╣я─п╬я▐я┌п╫п╬, п╡п╟я┬п╟ я│п╣я┌п╣п╡п╟я▐ п©п╩п╟я┌п╟ п╫п╣ "
+"п╠я▀п╩п╟ я─п╟я│п©п╬п╥п╫п╟п╫п╟ я▐п╢я─п╬п╪!"
 
 #. TXT_INPUT_SERVER
 #, fuzzy
 msgid "Enter the IP address of the NFS server."
-msgstr "Пожалуйста, введите IP-адрес вашего сервера NFS."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ IP-п╟п╢я─п╣я│ п╡п╟я┬п╣пЁп╬ я│п╣я─п╡п╣я─п╟ NFS."
 
 #. TXT_INPUT_FTPSERVER
 #, fuzzy
 msgid "Enter the IP address of the FTP server."
-msgstr "Пожалуйста, введите IP-адрес вашего сервера FTP."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ IP-п╟п╢я─п╣я│ п╡п╟я┬п╣пЁп╬ я│п╣я─п╡п╣я─п╟ FTP."
 
 #. TXT_INPUT_DIR
 #, fuzzy
 msgid "Enter the directory on the server."
-msgstr "Пожалуйста, укажите каталог на сервере."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╨п╟я┌п╟п╩п╬пЁ п╫п╟ я│п╣я─п╡п╣я─п╣."
 
 #. TXT_ENTER_PARAMS
 #, fuzzy, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr "Пожалуйста, введите параметры для \"%s\"."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ п©п╟я─п╟п╪п╣я┌я─я▀ п╢п╩я▐ \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -329,7 +329,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Пытаюсь смонтировать каталог\n"
+"п÷я▀я┌п╟я▌я│я▄ я│п╪п╬п╫я┌п╦я─п╬п╡п╟я┌я▄ п╨п╟я┌п╟п╩п╬пЁ\n"
 "\n"
 "\"%s:%s\"..."
 
@@ -340,9 +340,9 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Во время попытки смонтировать каталог по nfs произошла ошибка.\n"
+"п▓п╬ п╡я─п╣п╪я▐ п©п╬п©я▀я┌п╨п╦ я│п╪п╬п╫я┌п╦я─п╬п╡п╟я┌я▄ п╨п╟я┌п╟п╩п╬пЁ п©п╬ nfs п©я─п╬п╦п╥п╬я┬п╩п╟ п╬я┬п╦п╠п╨п╟.\n"
 "\n"
-"Сервер указал причину: %s"
+"п║п╣я─п╡п╣я─ я┐п╨п╟п╥п╟п╩ п©я─п╦я┤п╦п╫я┐: %s"
 
 #. TXT_CHOOSE_KEYMAP
 #, fuzzy
@@ -350,13 +350,13 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"Пожалуйста, выберите раскладку клавиатуры.\n"
-"YaST предложит вам дополнительные раскладки позже."
+"п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡я▀п╠п╣я─п╦я┌п╣ я─п╟я│п╨п╩п╟п╢п╨я┐ п╨п╩п╟п╡п╦п╟я┌я┐я─я▀.\n"
+"YaST п©я─п╣п╢п╩п╬п╤п╦я┌ п╡п╟п╪ п╢п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╣ я─п╟я│п╨п╩п╟п╢п╨п╦ п©п╬п╥п╤п╣."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
 msgid "Choose the module to unload."
-msgstr "Выберите выгружаемый модуль."
+msgstr "п▓я▀п╠п╣я─п╦я┌п╣ п╡я▀пЁя─я┐п╤п╟п╣п╪я▀п╧ п╪п╬п╢я┐п╩я▄."
 
 #. TXT_NO_MODULES
 msgid "No modules currently loaded."
@@ -365,63 +365,63 @@ msgstr ""
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Автопоиск (%s)...        "
+msgstr "п░п╡я┌п╬п©п╬п╦я│п╨ (%s)...        "
 
 #. TXT_WANT_MORE_SCSI
 #, fuzzy
 msgid "Search for additional SCSI host adaptors?"
-msgstr "Хотите поискать дополнительные контроллеры SCSI?"
+msgstr "п╔п╬я┌п╦я┌п╣ п©п╬п╦я│п╨п╟я┌я▄ п╢п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╣ п╨п╬п╫я┌я─п╬п╩п╩п╣я─я▀ SCSI?"
 
 #. TXT_WANT_MORE_NET
 #, fuzzy
 msgid "Search for additional network cards?"
-msgstr "Хотите поискать дополнительные сетевые платы?"
+msgstr "п╔п╬я┌п╦я┌п╣ п©п╬п╦я│п╨п╟я┌я▄ п╢п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╣ я│п╣я┌п╣п╡я▀п╣ п©п╩п╟я┌я▀?"
 
 #. TXT_WANT_MORE_CDROM
 #, fuzzy
 msgid "Search for additional CD-ROM drives?"
-msgstr "Хотите поискать дополнительные приводы CD-ROM?"
+msgstr "п╔п╬я┌п╦я┌п╣ п©п╬п╦я│п╨п╟я┌я▄ п╢п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╣ п©я─п╦п╡п╬п╢я▀ CD-ROM?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "сетевая плата ethernet"
+msgstr "я│п╣я┌п╣п╡п╟я▐ п©п╩п╟я┌п╟ ethernet"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "параллельный порт"
+msgstr "п©п╟я─п╟п╩п╩п╣п╩я▄п╫я▀п╧ п©п╬я─я┌"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "сетевая плата token ring"
+msgstr "я│п╣я┌п╣п╡п╟я▐ п©п╩п╟я┌п╟ token ring"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "сетевая плата arcnet"
+msgstr "я│п╣я┌п╣п╡п╟я▐ п©п╩п╟я┌п╟ arcnet"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "сетевая плата FDDI"
+msgstr "я│п╣я┌п╣п╡п╟я▐ п©п╩п╟я┌п╟ FDDI"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "сетевая плата HIPPI"
+msgstr "я│п╣я┌п╣п╡п╟я▐ п©п╩п╟я┌п╟ HIPPI"
 
 #. TXT_CHOOSE_NET
 #, fuzzy
 msgid "Choose the network device."
-msgstr "Пожалуйста, выберите сетевое устройство."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡я▀п╠п╣я─п╦я┌п╣ я│п╣я┌п╣п╡п╬п╣ я┐я│я┌я─п╬п╧я│я┌п╡п╬."
 
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
 msgid "Enter the IP address of the PLIP partner."
-msgstr "Укажите IP-адрес партнера PLIP."
+msgstr "пёп╨п╟п╤п╦я┌п╣ IP-п╟п╢я─п╣я│ п©п╟я─я┌п╫п╣я─п╟ PLIP."
 
 #. TXT_NO_PCMCIA
 #, fuzzy
 msgid ""
 "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
-"Не удается автоматически определить чипсет PCMCIA! Укажите его вручную."
+"п²п╣ я┐п╢п╟п╣я┌я│я▐ п╟п╡я┌п╬п╪п╟я┌п╦я┤п╣я│п╨п╦ п╬п©я─п╣п╢п╣п╩п╦я┌я▄ я┤п╦п©я│п╣я┌ PCMCIA! пёп╨п╟п╤п╦я┌п╣ п╣пЁп╬ п╡я─я┐я┤п╫я┐я▌."
 
 #. TXT_FOUND_PCMCIA
 #, fuzzy, c-format
@@ -430,32 +430,32 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Найден PCMCIA чипсет \"%s\"!\n"
+"п²п╟п╧п╢п╣п╫ PCMCIA я┤п╦п©я│п╣я┌ \"%s\"!\n"
 "\n"
-"Пожалуйста, введите параметры для основных модулей PCMCIA"
+"п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ п©п╟я─п╟п╪п╣я┌я─я▀ п╢п╩я▐ п╬я│п╫п╬п╡п╫я▀я┘ п╪п╬п╢я┐п╩п╣п╧ PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
 #, fuzzy, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Пожалуйста, введите специфические параметры для чипсета \"%s\""
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ я│п©п╣я├п╦я└п╦я┤п╣я│п╨п╦п╣ п©п╟я─п╟п╪п╣я┌я─я▀ п╢п╩я▐ я┤п╦п©я│п╣я┌п╟ \"%s\""
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "Запускаю менеджер карт..."
+msgstr "п≈п╟п©я┐я│п╨п╟я▌ п╪п╣п╫п╣п╢п╤п╣я─ п╨п╟я─я┌..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "Успешно запущены услуги PCMCIA карт."
+msgstr "пёя│п©п╣я┬п╫п╬ п╥п╟п©я┐я┴п╣п╫я▀ я┐я│п╩я┐пЁп╦ PCMCIA п╨п╟я─я┌."
 
 #. TXT_PCMCIA_FAIL
 #, fuzzy
 msgid "Start of PCMCIA card services failed."
-msgstr "Запуск услуг PCMCIA карт не удался!"
+msgstr "п≈п╟п©я┐я│п╨ я┐я│п╩я┐пЁ PCMCIA п╨п╟я─я┌ п╫п╣ я┐п╢п╟п╩я│я▐!"
 
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
 msgid "PCMCIA card services already running."
-msgstr "Услуги PCMCIA карт уже запущены!"
+msgstr "пёя│п╩я┐пЁп╦ PCMCIA п╨п╟я─я┌ я┐п╤п╣ п╥п╟п©я┐я┴п╣п╫я▀!"
 
 #. TXT_NO_LXRC_END
 #, fuzzy
@@ -466,22 +466,22 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Вы можете выйти из Linuxrc только через пункт меню\n"
+"п▓я▀ п╪п╬п╤п╣я┌п╣ п╡я▀п╧я┌п╦ п╦п╥ Linuxrc я┌п╬п╩я▄п╨п╬ я┤п╣я─п╣п╥ п©я┐п╫п╨я┌ п╪п╣п╫я▌\n"
 "\n"
-"\"Запуск установки / системы\"\n"
+"\"п≈п╟п©я┐я│п╨ я┐я│я┌п╟п╫п╬п╡п╨п╦ / я│п╦я│я┌п╣п╪я▀\"\n"
 "\n"
-"Для этого вам может понадобиться загрузить некоторые драйвера (модули) для "
-"поддержки вашего аппаратного обеспечения."
+"п■п╩я▐ я█я┌п╬пЁп╬ п╡п╟п╪ п╪п╬п╤п╣я┌ п©п╬п╫п╟п╢п╬п╠п╦я┌я▄я│я▐ п╥п╟пЁя─я┐п╥п╦я┌я▄ п╫п╣п╨п╬я┌п╬я─я▀п╣ п╢я─п╟п╧п╡п╣я─п╟ (п╪п╬п╢я┐п╩п╦) п╢п╩я▐ "
+"п©п╬п╢п╢п╣я─п╤п╨п╦ п╡п╟я┬п╣пЁп╬ п╟п©п©п╟я─п╟я┌п╫п╬пЁп╬ п╬п╠п╣я│п©п╣я┤п╣п╫п╦я▐."
 
 #. TXT_NO_CTRLC
 #, fuzzy
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Вы не можете выйти из Linuxrc нажатием <ctrl-c>!"
+msgstr "п▓я▀ п╫п╣ п╪п╬п╤п╣я┌п╣ п╡я▀п╧я┌п╦ п╦п╥ Linuxrc п╫п╟п╤п╟я┌п╦п╣п╪ <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 #, fuzzy
 msgid "Remove the disk from the drive now."
-msgstr "Пожалуйста, теперь выньте диск из дисковода!"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┌п╣п©п╣я─я▄ п╡я▀п╫я▄я┌п╣ п╢п╦я│п╨ п╦п╥ п╢п╦я│п╨п╬п╡п╬п╢п╟!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -491,26 +491,26 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Пример: "
+"п÷я─п╦п╪п╣я─: "
 
 #. TXT_CHOOSE_SOURCE
 #, fuzzy
 msgid "Choose the source medium."
-msgstr "Выберите исходный носитель"
+msgstr "п▓я▀п╠п╣я─п╦я┌п╣ п╦я│я┘п╬п╢п╫я▀п╧ п╫п╬я│п╦я┌п╣п╩я▄"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Пытаюсь смонтировать CD-ROM..."
+msgstr "п÷я▀я┌п╟я▌я│я▄ я│п╪п╬п╫я┌п╦я─п╬п╡п╟я┌я▄ CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "Не удалось смонтировать CD-ROM!"
+msgstr "п²п╣ я┐п╢п╟п╩п╬я│я▄ я│п╪п╬п╫я┌п╦я─п╬п╡п╟я┌я▄ CD-ROM!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
-msgstr "Хотите перезагрузить систему?"
+msgstr "п╔п╬я┌п╦я┌п╣ п©п╣я─п╣п╥п╟пЁя─я┐п╥п╦я┌я▄ я│п╦я│я┌п╣п╪я┐?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
@@ -518,33 +518,33 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Базовая система была успешно установлена. Эта новая система будет сейчас "
-"запущена для окончательной установки."
+"п▒п╟п╥п╬п╡п╟я▐ я│п╦я│я┌п╣п╪п╟ п╠я▀п╩п╟ я┐я│п©п╣я┬п╫п╬ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╟. п╜я┌п╟ п╫п╬п╡п╟я▐ я│п╦я│я┌п╣п╪п╟ п╠я┐п╢п╣я┌ я│п╣п╧я┤п╟я│ "
+"п╥п╟п©я┐я┴п╣п╫п╟ п╢п╩я▐ п╬п╨п╬п╫я┤п╟я┌п╣п╩я▄п╫п╬п╧ я┐я│я┌п╟п╫п╬п╡п╨п╦."
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Пожалуйста, укажите раздел жесткого диска(например /dev/sda1)"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ я─п╟п╥п╢п╣п╩ п╤п╣я│я┌п╨п╬пЁп╬ п╢п╦я│п╨п╟(п╫п╟п©я─п╦п╪п╣я─ /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 #, fuzzy
 msgid "Could not mount the specified partition."
-msgstr "Не удалось смонтировать указанный раздел!"
+msgstr "п²п╣ я┐п╢п╟п╩п╬я│я▄ я│п╪п╬п╫я┌п╦я─п╬п╡п╟я┌я▄ я┐п╨п╟п╥п╟п╫п╫я▀п╧ я─п╟п╥п╢п╣п╩!"
 
 #. TXT_ENTER_HD_DIR
 #, fuzzy
 msgid "Enter the source directory."
-msgstr "Пожалуйста, укажите исходный каталог"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╦я│я┘п╬п╢п╫я▀п╧ п╨п╟я┌п╟п╩п╬пЁ"
 
 #. TXT_ERROR_INSTALL
 #, fuzzy
 msgid "An error occurred during the installation."
-msgstr "Во время установки произошла ошибка!"
+msgstr "п▓п╬ п╡я─п╣п╪я▐ я┐я│я┌п╟п╫п╬п╡п╨п╦ п©я─п╬п╦п╥п╬я┬п╩п╟ п╬я┬п╦п╠п╨п╟!"
 
 #. TXT_DRIVES
 #, fuzzy
 msgid "Hard Disks or CD-ROMs"
-msgstr "Жесткие диски / CD-ROM-ы"
+msgstr "п√п╣я│я┌п╨п╦п╣ п╢п╦я│п╨п╦ / CD-ROM-я▀"
 
 #. TXT_LITTLE_MEM
 #, fuzzy
@@ -554,14 +554,14 @@ msgid ""
 "Before you acknowledge this message, you must switch to virtual console 2 "
 "(press ALT-F2) to create and activate some swap space."
 msgstr ""
-"В вашем компьютере очень мало памяти!\n"
+"п▓ п╡п╟я┬п╣п╪ п╨п╬п╪п©я▄я▌я┌п╣я─п╣ п╬я┤п╣п╫я▄ п╪п╟п╩п╬ п©п╟п╪я▐я┌п╦!\n"
 "\n"
-"Перед подтверждением этого сообщения вы должны переключиться на виртуальную "
-"консоль номер 2 (ALT-F2) и создать, а затем активировать swap!"
+"п÷п╣я─п╣п╢ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣п╪ я█я┌п╬пЁп╬ я│п╬п╬п╠я┴п╣п╫п╦я▐ п╡я▀ п╢п╬п╩п╤п╫я▀ п©п╣я─п╣п╨п╩я▌я┤п╦я┌я▄я│я▐ п╫п╟ п╡п╦я─я┌я┐п╟п╩я▄п╫я┐я▌ "
+"п╨п╬п╫я│п╬п╩я▄ п╫п╬п╪п╣я─ 2 (ALT-F2) п╦ я│п╬п╥п╢п╟я┌я▄, п╟ п╥п╟я┌п╣п╪ п╟п╨я┌п╦п╡п╦я─п╬п╡п╟я┌я▄ swap!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Анимация"
+msgstr "п░п╫п╦п╪п╟я├п╦я▐"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
@@ -570,21 +570,21 @@ msgstr ""
 #. TXT_NO_DRIVES
 #, fuzzy
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "На данный момент не обнаружено ни одного жесткого диска или CD-ROMа."
+msgstr "п²п╟ п╢п╟п╫п╫я▀п╧ п╪п╬п╪п╣п╫я┌ п╫п╣ п╬п╠п╫п╟я─я┐п╤п╣п╫п╬ п╫п╦ п╬п╢п╫п╬пЁп╬ п╤п╣я│я┌п╨п╬пЁп╬ п╢п╦я│п╨п╟ п╦п╩п╦ CD-ROMп╟."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Отладка (для экспертов)"
+msgstr "п·я┌п╩п╟п╢п╨п╟ (п╢п╩я▐ я█п╨я│п©п╣я─я┌п╬п╡)"
 
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load Root Image into RAM Disk"
-msgstr "Загрузка образа в ramdisk"
+msgstr "п≈п╟пЁя─я┐п╥п╨п╟ п╬п╠я─п╟п╥п╟ п╡ ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
 #, fuzzy
 msgid "Enter Root Image"
-msgstr "Введите название rootimage"
+msgstr "п▓п╡п╣п╢п╦я┌п╣ п╫п╟п╥п╡п╟п╫п╦п╣ rootimage"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
@@ -596,70 +596,70 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Пожалуйста, укажите имя и путь к файлу, который вы хотите загрузить в RAM "
-"disk в качестве корневой файловой системы"
+"п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╦п╪я▐ п╦ п©я┐я┌я▄ п╨ я└п╟п╧п╩я┐, п╨п╬я┌п╬я─я▀п╧ п╡я▀ я┘п╬я┌п╦я┌п╣ п╥п╟пЁя─я┐п╥п╦я┌я▄ п╡ RAM "
+"disk п╡ п╨п╟я┤п╣я│я┌п╡п╣ п╨п╬я─п╫п╣п╡п╬п╧ я└п╟п╧п╩п╬п╡п╬п╧ я│п╦я│я┌п╣п╪я▀"
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
 msgid "Not yet implemented."
-msgstr "Пока не реализовано!"
+msgstr "п÷п╬п╨п╟ п╫п╣ я─п╣п╟п╩п╦п╥п╬п╡п╟п╫п╬!"
 
 #. TXT_NEW_INST_SYS
 #, fuzzy
 msgid "Installation System"
-msgstr "Установочная система"
+msgstr "пёя│я┌п╟п╫п╬п╡п╬я┤п╫п╟я▐ я│п╦я│я┌п╣п╪п╟"
 
 #. TXT_ENTER_INST_SYS
 #, fuzzy
 msgid "Enter the directory that contains the installation system."
-msgstr "Пожалуйста, укажите каталог, содержащий установочную систему."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╨п╟я┌п╟п╩п╬пЁ, я│п╬п╢п╣я─п╤п╟я┴п╦п╧ я┐я│я┌п╟п╫п╬п╡п╬я┤п╫я┐я▌ я│п╦я│я┌п╣п╪я┐."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "Информация отсутствует."
+msgstr "п≤п╫я└п╬я─п╪п╟я├п╦я▐ п╬я┌я│я┐я┌я│я┌п╡я┐п╣я┌."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "Готовимся к установке..."
+msgstr "п⌠п╬я┌п╬п╡п╦п╪я│я▐ п╨ я┐я│я┌п╟п╫п╬п╡п╨п╣..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Запустить Live CD"
+msgstr "п≈п╟п©я┐я│я┌п╦я┌я▄ Live CD"
 
 #. TXT_INSERT_LIVECD
 #, fuzzy
 msgid "Insert the Live CD."
-msgstr "Пожалуйста, вставьте Live CD."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡я│я┌п╟п╡я▄я┌п╣ Live CD."
 
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"
-msgstr "Готово / Перезагрузка"
+msgstr "п⌠п╬я┌п╬п╡п╬ / п÷п╣я─п╣п╥п╟пЁя─я┐п╥п╨п╟"
 
 #. TXT_SEARCH_INFOFILE
 #, fuzzy
 msgid "Searching for info file..."
-msgstr "Ищу информационный файл..."
+msgstr "п≤я┴я┐ п╦п╫я└п╬я─п╪п╟я├п╦п╬п╫п╫я▀п╧ я└п╟п╧п╩..."
 
 #. TXT_NFSPORT
 #, fuzzy
 msgid "Specify the NFS port."
-msgstr "Укажите порт NFS"
+msgstr "пёп╨п╟п╤п╦я┌п╣ п©п╬я─я┌ NFS"
 
 #. TXT_ASKING_NAMED
 #, fuzzy
 msgid "Asking name server..."
-msgstr "Запрашиваю nameserver..."
+msgstr "п≈п╟п©я─п╟я┬п╦п╡п╟я▌ nameserver..."
 
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
 msgid "Host %s was not found."
-msgstr "Машина %s неизвестна!"
+msgstr "п°п╟я┬п╦п╫п╟ %s п╫п╣п╦п╥п╡п╣я│я┌п╫п╟!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "Ваша сеть уже сконфигурирована. Хотите оставить эту конфигурацию?"
+msgstr "п▓п╟я┬п╟ я│п╣я┌я▄ я┐п╤п╣ я│п╨п╬п╫я└п╦пЁя┐я─п╦я─п╬п╡п╟п╫п╟. п╔п╬я┌п╦я┌п╣ п╬я│я┌п╟п╡п╦я┌я▄ я█я┌я┐ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦я▌?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -671,13 +671,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Сетевое устройство не найдено!\n"
-"Пожалуйста, загрузите сетевой модуль."
+"п║п╣я┌п╣п╡п╬п╣ я┐я│я┌я─п╬п╧я│я┌п╡п╬ п╫п╣ п╫п╟п╧п╢п╣п╫п╬!\n"
+"п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╥п╟пЁя─я┐п╥п╦я┌п╣ я│п╣я┌п╣п╡п╬п╧ п╪п╬п╢я┐п╩я▄."
 
 #. TXT_ALREADY_FOUND
 #, fuzzy, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "%s уже был найден в вашей системе!\n"
+msgstr "%s я┐п╤п╣ п╠я▀п╩ п╫п╟п╧п╢п╣п╫ п╡ п╡п╟я┬п╣п╧ я│п╦я│я┌п╣п╪п╣!\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -686,7 +686,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Ошибка во время доступа к серверу FTP:\n"
+"п·я┬п╦п╠п╨п╟ п╡п╬ п╡я─п╣п╪я▐ п╢п╬я│я┌я┐п©п╟ п╨ я│п╣я─п╡п╣я─я┐ FTP:\n"
 "\n"
 "%s"
 
@@ -694,28 +694,28 @@ msgstr ""
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
 msgstr ""
-"Пожалуйста, введите имя пользователя, под которым вы хотите связаться с "
-"сервером FTP"
+"п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ п╦п╪я▐ п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩я▐, п©п╬п╢ п╨п╬я┌п╬я─я▀п╪ п╡я▀ я┘п╬я┌п╦я┌п╣ я│п╡я▐п╥п╟я┌я▄я│я▐ я│ "
+"я│п╣я─п╡п╣я─п╬п╪ FTP"
 
 #. TXT_ENTER_FTPPASSWD
 #, fuzzy
 msgid "Enter the password for the FTP user account."
-msgstr "Пожалуйста, введите пароль для доступа к серверу FTP"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ п©п╟я─п╬п╩я▄ п╢п╩я▐ п╢п╬я│я┌я┐п©п╟ п╨ я│п╣я─п╡п╣я─я┐ FTP"
 
 #. TXT_ENTER_FTPPROXY
 #, fuzzy
 msgid "Enter the address of the FTP proxy."
-msgstr "Пожалуйста, укажите адрес FTP proxy"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╟п╢я─п╣я│ FTP proxy"
 
 #. TXT_ENTER_FTPPORT
 #, fuzzy
 msgid "Enter the port of the FTP proxy."
-msgstr "Пожалуйста, укажите порт FTP proxy"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п©п╬я─я┌ FTP proxy"
 
 #. TXT_WANT_FTPPROXY
 #, fuzzy
 msgid "Use an FTP proxy?"
-msgstr "Хотите использовать FTP proxy?"
+msgstr "п╔п╬я┌п╦я┌п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ FTP proxy?"
 
 #. TXT_NOMEM_FTP
 #, fuzzy, c-format
@@ -723,8 +723,8 @@ msgid ""
 "Your computer does not have enough RAM to install via FTP (%d MB RAM "
 "required)."
 msgstr ""
-"В вашем компьютере недостаточно RAM для проведения установки через FTP! "
-"(требуется %d MB RAM)"
+"п▓ п╡п╟я┬п╣п╪ п╨п╬п╪п©я▄я▌я┌п╣я─п╣ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ RAM п╢п╩я▐ п©я─п╬п╡п╣п╢п╣п╫п╦я▐ я┐я│я┌п╟п╫п╬п╡п╨п╦ я┤п╣я─п╣п╥ FTP! "
+"(я┌я─п╣п╠я┐п╣я┌я│я▐ %d MB RAM)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
@@ -733,62 +733,62 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Обычно FTP-установка осуществляется через анонимный FTP. Однако есть "
-"возможность указать имя пользователя и пароль. Хотите указать их?"
+"п·п╠я▀я┤п╫п╬ FTP-я┐я│я┌п╟п╫п╬п╡п╨п╟ п╬я│я┐я┴п╣я│я┌п╡п╩я▐п╣я┌я│я▐ я┤п╣я─п╣п╥ п╟п╫п╬п╫п╦п╪п╫я▀п╧ FTP. п·п╢п╫п╟п╨п╬ п╣я│я┌я▄ "
+"п╡п╬п╥п╪п╬п╤п╫п╬я│я┌я▄ я┐п╨п╟п╥п╟я┌я▄ п╦п╪я▐ п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩я▐ п╦ п©п╟я─п╬п╩я▄. п╔п╬я┌п╦я┌п╣ я┐п╨п╟п╥п╟я┌я▄ п╦я┘?"
 
 #. TXT_MORE_MODULES
 #, fuzzy
 msgid "-- More Modules --"
-msgstr "-- Еще модули --"
+msgstr "-- п∙я┴п╣ п╪п╬п╢я┐п╩п╦ --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "Инициализирую параллельный порт..."
+msgstr "п≤п╫п╦я├п╦п╟п╩п╦п╥п╦я─я┐я▌ п©п╟я─п╟п╩п╩п╣п╩я▄п╫я▀п╧ п©п╬я─я┌..."
 
 #. TXT_ENTER_NFSPORT
 #, fuzzy
 msgid "Enter the port number on which the NFS server is running."
-msgstr "Введите номер порта, на котором работает сервер nfs"
+msgstr "п▓п╡п╣п╢п╦я┌п╣ п╫п╬п╪п╣я─ п©п╬я─я┌п╟, п╫п╟ п╨п╬я┌п╬я─п╬п╪ я─п╟п╠п╬я┌п╟п╣я┌ я│п╣я─п╡п╣я─ nfs"
 
 #. TXT_INSERT_CD
 #, fuzzy, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "Убедитесь, что CD номер %d есть в дисководе!"
+msgstr "пёп╠п╣п╢п╦я┌п╣я│я▄, я┤я┌п╬ CD п╫п╬п╪п╣я─ %d п╣я│я┌я▄ п╡ п╢п╦я│п╨п╬п╡п╬п╢п╣!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr "Выброс CD"
+msgstr "п▓я▀п╠я─п╬я│ CD"
 
 #. TXT_BOOTP_TIMEOUT
 #, fuzzy
 msgid "Bootp Time-Out"
-msgstr "Таймаут bootp"
+msgstr "п╒п╟п╧п╪п╟я┐я┌ bootp"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 #, fuzzy
 msgid "Enter the time-out value for bootp."
-msgstr "Введите время-таймаут для bootp."
+msgstr "п▓п╡п╣п╢п╦я┌п╣ п╡я─п╣п╪я▐-я┌п╟п╧п╪п╟я┐я┌ п╢п╩я▐ bootp."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "соединение канал-канал"
+msgstr "я│п╬п╣п╢п╦п╫п╣п╫п╦п╣ п╨п╟п╫п╟п╩-п╨п╟п╫п╟п╩"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr "соединение ESCON"
+msgstr "я│п╬п╣п╢п╦п╫п╣п╫п╦п╣ ESCON"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr "соединение IUCV"
+msgstr "я│п╬п╣п╢п╦п╫п╣п╫п╦п╣ IUCV"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "cisco-роутер, подключенный к каналу"
+msgstr "cisco-я─п╬я┐я┌п╣я─, п©п╬п╢п╨п╩я▌я┤п╣п╫п╫я▀п╧ п╨ п╨п╟п╫п╟п╩я┐"
 
 #. TXT_SMB_ENTER_SHARE
 #, fuzzy
 msgid "Enter the share name on the SMB server."
-msgstr "Пожалуйста, введите IP-адрес вашего сервера NFS."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ IP-п╟п╢я─п╣я│ п╡п╟я┬п╣пЁп╬ я│п╣я─п╡п╣я─п╟ NFS."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
@@ -857,12 +857,12 @@ msgstr ""
 #. TXT_CHOOSE_NETSOURCE
 #, fuzzy
 msgid "Choose the network protocol."
-msgstr "Пожалуйста, выберите сетевое устройство."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡я▀п╠п╣я─п╦я┌п╣ я│п╣я┌п╣п╡п╬п╣ я┐я│я┌я─п╬п╧я│я┌п╡п╬."
 
 #. TXT_INPUT_NETSERVER
 #, fuzzy, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Пожалуйста, введите IP-адрес вашего сервера NFS."
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ IP-п╟п╢я─п╣я│ п╡п╟я┬п╣пЁп╬ я│п╣я─п╡п╣я─п╟ NFS."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -877,7 +877,7 @@ msgstr ""
 #. TXT_LOAD_MODULES
 #, fuzzy, c-format
 msgid "Load %s Modules"
-msgstr "Выгрузить модули"
+msgstr "п▓я▀пЁя─я┐п╥п╦я┌я▄ п╪п╬п╢я┐п╩п╦"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
@@ -886,7 +886,7 @@ msgstr ""
 #. TXT_LOAD_OTHER
 #, fuzzy
 msgid "Load Unknown Modules"
-msgstr "Загрузить модули сетевых карт"
+msgstr "п≈п╟пЁя─я┐п╥п╦я┌я▄ п╪п╬п╢я┐п╩п╦ я│п╣я┌п╣п╡я▀я┘ п╨п╟я─я┌"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
@@ -909,7 +909,7 @@ msgstr ""
 #. TXT_CHOOSE_PARTITION
 #, fuzzy
 msgid "Choose the hard disk partition."
-msgstr "Пожалуйста, укажите раздел жесткого диска(например /dev/sda1)"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ я─п╟п╥п╢п╣п╩ п╤п╣я│я┌п╨п╬пЁп╬ п╢п╦я│п╨п╟(п╫п╟п©я─п╦п╪п╣я─ /dev/sda1)"
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Choose the root partition."
@@ -918,7 +918,7 @@ msgstr ""
 #. TXT_CHOOSE_SWAP
 #, fuzzy
 msgid "Choose the swap partition."
-msgstr "Не удалось смонтировать указанный раздел!"
+msgstr "п²п╣ я┐п╢п╟п╩п╬я│я▄ я│п╪п╬п╫я┌п╦я─п╬п╡п╟я┌я▄ я┐п╨п╟п╥п╟п╫п╫я▀п╧ я─п╟п╥п╢п╣п╩!"
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
@@ -928,8 +928,8 @@ msgstr ""
 #, fuzzy
 msgid "Your computer does not have enough memory to run YaST."
 msgstr ""
-"В вашем компьютере недостаточно RAM для проведения установки через FTP! "
-"(требуется %d MB RAM)"
+"п▓ п╡п╟я┬п╣п╪ п╨п╬п╪п©я▄я▌я┌п╣я─п╣ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ RAM п╢п╩я▐ п©я─п╬п╡п╣п╢п╣п╫п╦я▐ я┐я│я┌п╟п╫п╬п╡п╨п╦ я┤п╣я─п╣п╥ FTP! "
+"(я┌я─п╣п╠я┐п╣я┌я│я▐ %d MB RAM)"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -942,19 +942,19 @@ msgstr ""
 #. TXT_ENTER_SWAP
 #, fuzzy
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Пожалуйста, укажите раздел жесткого диска(например /dev/sda1)"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ я─п╟п╥п╢п╣п╩ п╤п╣я│я┌п╨п╬пЁп╬ п╢п╦я│п╨п╟(п╫п╟п©я─п╦п╪п╣я─ /dev/sda1)"
 
 #. TXT_ENTER_USER
 #, fuzzy, c-format
 msgid "Enter the user name with which to access the %s server."
 msgstr ""
-"Пожалуйста, введите имя пользователя, под которым вы хотите связаться с "
-"сервером FTP"
+"п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ п╦п╪я▐ п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩я▐, п©п╬п╢ п╨п╬я┌п╬я─я▀п╪ п╡я▀ я┘п╬я┌п╦я┌п╣ я│п╡я▐п╥п╟я┌я▄я│я▐ я│ "
+"я│п╣я─п╡п╣я─п╬п╪ FTP"
 
 #. TXT_ENTER_PASSWORD
 #, fuzzy, c-format
 msgid "Enter the password for the %s server."
-msgstr "Пожалуйста, введите пароль для доступа к серверу FTP"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╡п╡п╣п╢п╦я┌п╣ п©п╟я─п╬п╩я▄ п╢п╩я▐ п╢п╬я│я┌я┐п©п╟ п╨ я│п╣я─п╡п╣я─я┐ FTP"
 
 #. TXT_WANT_PROXY
 #, c-format
@@ -964,12 +964,12 @@ msgstr ""
 #. TXT_ENTER_PROXY
 #, fuzzy, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Пожалуйста, укажите адрес FTP proxy"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п╟п╢я─п╣я│ FTP proxy"
 
 #. TXT_ENTER_PROXYPORT
 #, fuzzy, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "Пожалуйста, укажите порт FTP proxy"
+msgstr "п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, я┐п╨п╟п╤п╦я┌п╣ п©п╬я─я┌ FTP proxy"
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -1014,8 +1014,8 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
-"Укажите IP-адрес вашего сервера DNS. Если вы не используете сервер DNS, "
-"просто нажмите ESC."
+"пёп╨п╟п╤п╦я┌п╣ IP-п╟п╢я─п╣я│ п╡п╟я┬п╣пЁп╬ я│п╣я─п╡п╣я─п╟ DNS. п∙я│п╩п╦ п╡я▀ п╫п╣ п╦я│п©п╬п╩я▄п╥я┐п╣я┌п╣ я│п╣я─п╡п╣я─ DNS, "
+"п©я─п╬я│я┌п╬ п╫п╟п╤п╪п╦я┌п╣ ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""

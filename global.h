@@ -70,7 +70,7 @@
 #define MODULE_SUFFIX	".ko"
 
 typedef struct {
-               char c;
+               int c;
                char attr;
                }
         character_t;

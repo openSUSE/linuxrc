@@ -8,7 +8,7 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Breton <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TXT_OK
@@ -17,7 +17,7 @@ msgstr "Mat eo"
 
 #. TXT_CANCEL
 msgid "Back"
-msgstr "Distreiñ"
+msgstr "DistreiÃ±"
 
 #. TXT_YES
 msgid "Yes"
@@ -51,22 +51,22 @@ msgstr "Yezh"
 #. TXT_MENU_MODULES
 #, fuzzy
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Molladou ar graoñenn (sturier periantel)"
+msgstr "Molladou ar graoÃ±enn (sturier periantel)"
 
 #. TXT_MENU_START
 #, fuzzy
 msgid "Start Installation or System"
-msgstr "Loc'hañ ar staliadur / ar reizhiad"
+msgstr "Loc'haÃ± ar staliadur / ar reizhiad"
 
 #. TXT_MENU_INFO
 #, fuzzy
 msgid "System Information"
-msgstr "Titouroù a-zivout ar reizhiad"
+msgstr "TitouroÃ¹ a-zivout ar reizhiad"
 
 #. TXT_HDR_MAIN
 #, fuzzy
 msgid "Main Menu"
-msgstr "Pennlañser"
+msgstr "PennlaÃ±ser"
 
 #. TXT_SETTINGS
 msgid "Settings"
@@ -78,7 +78,7 @@ msgstr "Skramm"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Renkadur stokelloù ar c'hlavier"
+msgstr "Renkadur stokelloÃ¹ ar c'hlavier"
 
 #. TXT_LOAD_NET
 #, fuzzy
@@ -88,17 +88,17 @@ msgstr "Kargadur sturier ar rouedad"
 #. TXT_SHOW_MODULES
 #, fuzzy
 msgid "Show Loaded Modules"
-msgstr "Diskouez ar molladoù karget"
+msgstr "Diskouez ar molladoÃ¹ karget"
 
 #. TXT_AUTO_LOAD
 #, fuzzy
 msgid "Load Modules Automatically"
-msgstr "Kargadur emgefreek ar molladoù"
+msgstr "Kargadur emgefreek ar molladoÃ¹"
 
 #. TXT_DEL_MODULES
 #, fuzzy
 msgid "Unload Modules"
-msgstr "Dilemel ar molladoù karget"
+msgstr "Dilemel ar molladoÃ¹ karget"
 
 #. TXT_TRY_TO_LOAD
 #, fuzzy, c-format
@@ -108,9 +108,9 @@ msgid ""
 "During loading, you may want to watch the kernel messages on virtual console "
 "4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"O klask kargañ ar mollad \"%s\"...\n"
+"O klask kargaÃ± ar mollad \"%s\"...\n"
 "\n"
-"E-doug ar c'hargañ e c'hellit gwelout kemennadoùar graoñenn war al letrin 4 "
+"E-doug ar c'hargaÃ± e c'hellit gwelout kemennadoÃ¹ar graoÃ±enn war al letrin 4 "
 "(ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
@@ -139,22 +139,22 @@ msgstr "Pladenn galet"
 #. TXT_START_INSTALL
 #, fuzzy
 msgid "Start Installation or Update"
-msgstr "Deraouiñ ar staliañ"
+msgstr "DeraouiÃ± ar staliaÃ±"
 
 #. TXT_START_RESCUE
 #, fuzzy
 msgid "Start Rescue System"
-msgstr "Loc'hañ ar reizhiad sikour"
+msgstr "Loc'haÃ± ar reizhiad sikour"
 
 #. TXT_LOAD_RS_NFS
 #, fuzzy
 msgid "Load Rescue System via NFS"
-msgstr "Kargañ ar reizhiad sikour dre NFS"
+msgstr "KargaÃ± ar reizhiad sikour dre NFS"
 
 #. TXT_BOOT_SYSTEM
 #, fuzzy
 msgid "Boot Installed System"
-msgstr "Boulc'hañ ar reizhiad staliet"
+msgstr "Boulc'haÃ± ar reizhiad staliet"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
@@ -175,12 +175,12 @@ msgstr ""
 #. TXT_LOADING
 #, fuzzy
 msgid "Loading data into RAM disk..."
-msgstr "Kargañ ar roadennoù"
+msgstr "KargaÃ± ar roadennoÃ¹"
 
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
-msgstr "Kemennadoù ar graoñell"
+msgstr "KemennadoÃ¹ ar graoÃ±ell"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -188,12 +188,12 @@ msgstr "Kewerier"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "Trobarzhelloù"
+msgstr "TrobarzhelloÃ¹"
 
 #. TXT_INFO_NETDEV
 #, fuzzy
 msgid "Network Cards"
-msgstr "Kartennoù rouedad"
+msgstr "KartennoÃ¹ rouedad"
 
 #. TXT_INFO_DMA
 msgid "DMA"
@@ -201,11 +201,11 @@ msgstr ""
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr "Spanoù"
+msgstr "SpanoÃ¹"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
-msgstr "Porzhioù Enankañ/Ec'hankañ"
+msgstr "PorzhioÃ¹ EnankaÃ±/Ec'hankaÃ±"
 
 #. TXT_INFO_MEM
 msgid "Memory"
@@ -213,7 +213,7 @@ msgstr "Memor"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
-msgstr "Molladoù"
+msgstr "MolladoÃ¹"
 
 #. TXT_INFO_PCI
 msgid "PCI"
@@ -289,7 +289,7 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Kavet eo bet ar stlennoù-da-heul:\n"
+"Kavet eo bet ar stlennoÃ¹-da-heul:\n"
 "\n"
 "Chomlec'h IP: %s\n"
 "Anv: %s\n"
@@ -302,7 +302,7 @@ msgid ""
 "probably was not recognized by the kernel."
 msgstr ""
 "Kammad e-doug kefluniadur ar rouedad. Marteze n'eo ket azas ar mollad ho "
-"peus karget, pe ho kartenn rouedad n'eo ket bet naouaet mat gant ar graoñell!"
+"peus karget, pe ho kartenn rouedad n'eo ket bet naouaet mat gant ar graoÃ±ell!"
 
 #. TXT_INPUT_SERVER
 #, fuzzy
@@ -322,7 +322,7 @@ msgstr "Enankit anv ar c'havlec'h war ar servijer."
 #. TXT_ENTER_PARAMS
 #, fuzzy, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr "Ebarzhit an arventennoù (mar bez) evit \"%s\"."
+msgstr "Ebarzhit an arventennoÃ¹ (mar bez) evit \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -331,7 +331,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"O klask marc'hañ ar c'havlec'h\n"
+"O klask marc'haÃ± ar c'havlec'h\n"
 "\n"
 "\"%s:%s\"\n"
 "\n"
@@ -344,7 +344,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"C'hoarvezet ez eus ur c'hammad pa'z eus bet klasket marc'hañ kavlec'h NFS ar "
+"C'hoarvezet ez eus ur c'hammad pa'z eus bet klasket marc'haÃ± kavlec'h NFS ar "
 "servijer:\n"
 "\n"
 "Fazi ar servijer NFS: %s"
@@ -355,8 +355,8 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"Diuzit renkadur stokelloù ar c'hlavier.\n"
-"YaST a ginnigo deoc'h diwezhatoc'h dibarzhioù all."
+"Diuzit renkadur stokelloÃ¹ ar c'hlavier.\n"
+"YaST a ginnigo deoc'h diwezhatoc'h dibarzhioÃ¹ all."
 
 #. TXT_DELETE_MODULE
 #, fuzzy
@@ -370,22 +370,22 @@ msgstr ""
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Dinoiñ emgefreek (%s)...        "
+msgstr "DinoiÃ± emgefreek (%s)...        "
 
 #. TXT_WANT_MORE_SCSI
 #, fuzzy
 msgid "Search for additional SCSI host adaptors?"
-msgstr "C'hoant ho peus da glask azasaerioù SCSI all?"
+msgstr "C'hoant ho peus da glask azasaerioÃ¹ SCSI all?"
 
 #. TXT_WANT_MORE_NET
 #, fuzzy
 msgid "Search for additional network cards?"
-msgstr "C'hoant ho peus da glask kartennoù rouedad all?"
+msgstr "C'hoant ho peus da glask kartennoÃ¹ rouedad all?"
 
 #. TXT_WANT_MORE_CDROM
 #, fuzzy
 msgid "Search for additional CD-ROM drives?"
-msgstr "C'hoant ho peus da glask lennerioù CD-ROM all?"
+msgstr "C'hoant ho peus da glask lennerioÃ¹ CD-ROM all?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
@@ -414,7 +414,7 @@ msgstr "Kartenn rouedad HIPPI"
 #. TXT_CHOOSE_NET
 #, fuzzy
 msgid "Choose the network device."
-msgstr "Diuzit an doare rouedad a fell deoc'h arverañ evit ar staliañ."
+msgstr "Diuzit an doare rouedad a fell deoc'h arveraÃ± evit ar staliaÃ±."
 
 #. TXT_INPUT_PLIP_IP
 #, fuzzy
@@ -426,7 +426,7 @@ msgstr "Roit chomlec'h IP an urzhiataer kevatal PLIP."
 msgid ""
 "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
-"Ar spletad krugoù PCMCIA en implij n'eo ket bet naouaet ent emgefreek. "
+"Ar spletad krugoÃ¹ PCMCIA en implij n'eo ket bet naouaet ent emgefreek. "
 "Diuzit gant an dorn"
 
 #. TXT_FOUND_PCMCIA
@@ -436,19 +436,19 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Spletat krugoù PCMCIA \"%s\" kavet!\n"
+"Spletat krugoÃ¹ PCMCIA \"%s\" kavet!\n"
 "\n"
-"Ebarzhit an arventennoù (mar bez) evit ar molladoù PCMCIA "
+"Ebarzhit an arventennoÃ¹ (mar bez) evit ar molladoÃ¹ PCMCIA "
 
 #. TXT_PCMCIA_PARAMS
 #, fuzzy, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Ebarzhit an arventennoù (mar bez) evit ar c'hrugoù \"%s\""
+msgstr "Ebarzhit an arventennoÃ¹ (mar bez) evit ar c'hrugoÃ¹ \"%s\""
 
 #. TXT_START_CARDMGR
 #, fuzzy
 msgid "Starting card manager..."
-msgstr "Loc'hañ ar merour kartennoù..."
+msgstr "Loc'haÃ± ar merour kartennoÃ¹..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
@@ -457,7 +457,7 @@ msgstr "PCMCIA Card Services loc'het gant berzh."
 #. TXT_PCMCIA_FAIL
 #, fuzzy
 msgid "Start of PCMCIA card services failed."
-msgstr "Loc'hañ PCMCIA Card Services c'hwitet!"
+msgstr "Loc'haÃ± PCMCIA Card Services c'hwitet!"
 
 #. TXT_PCMCIA_ALREADY
 #, fuzzy
@@ -475,10 +475,10 @@ msgid ""
 msgstr ""
 "Ne c'hellit kuitaat Linuxrc nemet dre ar mellad\n"
 "\n"
-"lañser » Loc'hañ ar staliadur / ar reizhiad «\n"
+"laÃ±ser Â» Loc'haÃ± ar staliadur / ar reizhiad Â«\n"
 "\n"
-"A-raok gallout kuitaat Linuxrc e vo ret deoc'h marteze kargañ sturioù "
-"periantel (molladoù)."
+"A-raok gallout kuitaat Linuxrc e vo ret deoc'h marteze kargaÃ± sturioÃ¹ "
+"periantel (molladoÃ¹)."
 
 #. TXT_NO_CTRLC
 #, fuzzy
@@ -488,7 +488,7 @@ msgstr "Ne c'hellit ket kuitaat Linuxrc gant <ctrl-c>!"
 #. TXT_REMOVE_DISK
 #, fuzzy
 msgid "Remove the disk from the drive now."
-msgstr "Tennit bremañ ar bladennig eus al lenner!"
+msgstr "Tennit bremaÃ± ar bladennig eus al lenner!"
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -507,17 +507,17 @@ msgstr "Diuzit ar skor tarzh"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "O klask marc'hañ ar CD-ROM..."
+msgstr "O klask marc'haÃ± ar CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 #, fuzzy
 msgid "Unable to mount the CD-ROM."
-msgstr "N'eus ket bet tu da varc'hañ ar CD-ROM!"
+msgstr "N'eus ket bet tu da varc'haÃ± ar CD-ROM!"
 
 #. TXT_ASK_REBOOT
 #, fuzzy
 msgid "Reboot the system now?"
-msgstr "C'hoant ho peus bremañ da adloc'hañ ho reizhiad?"
+msgstr "C'hoant ho peus bremaÃ± da adloc'haÃ± ho reizhiad?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
@@ -525,8 +525,8 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Staliet eo bet ar reizhiad diazez. Loc'het e vo bremañ ar reizhiad-se evit "
-"peurechuiñ ar staliadur."
+"Staliet eo bet ar reizhiad diazez. Loc'het e vo bremaÃ± ar reizhiad-se evit "
+"peurechuiÃ± ar staliadur."
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
@@ -538,7 +538,7 @@ msgstr ""
 #. TXT_ERROR_HD_MOUNT
 #, fuzzy
 msgid "Could not mount the specified partition."
-msgstr "N'eus ket bet tu da varc'hañ ar parzhad erspizet!"
+msgstr "N'eus ket bet tu da varc'haÃ± ar parzhad erspizet!"
 
 #. TXT_ENTER_HD_DIR
 #, fuzzy
@@ -553,7 +553,7 @@ msgstr "Ar staliadur n'eo ket bet peurechuet ent reoliek!"
 #. TXT_DRIVES
 #, fuzzy
 msgid "Hard Disks or CD-ROMs"
-msgstr "Pladennoù kalet / CD-ROM"
+msgstr "PladennoÃ¹ kalet / CD-ROM"
 
 #. TXT_LITTLE_MEM
 #, fuzzy
@@ -565,13 +565,13 @@ msgid ""
 msgstr ""
 "Gant hoc'h urzhiataer ez eus gwall nebeut a vemor greiz!\n"
 "\n"
-"A-raok talvoudañ ar c'hemennad-mañ ha luskañ YaST, e rankit mont d'al letrin "
+"A-raok talvoudaÃ± ar c'hemennad-maÃ± ha luskaÃ± YaST, e rankit mont d'al letrin "
 "2(pouezit war ALT-F2), neuze keflugnit hagweredekait gant an dorn ar vemor "
-"disloañ!"
+"disloaÃ±!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Buheziñ"
+msgstr "BuheziÃ±"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
@@ -580,21 +580,21 @@ msgstr ""
 #. TXT_NO_DRIVES
 #, fuzzy
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Betek-henn, n'eus bet naouaet na pladennoù kalet na lennerioù CD-ROM."
+msgstr "Betek-henn, n'eus bet naouaet na pladennoÃ¹ kalet na lennerioÃ¹ CD-ROM."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Digammañ (mailhed hepken!)"
+msgstr "DigammaÃ± (mailhed hepken!)"
 
 #. TXT_FORCE_ROOTIMAGE
 #, fuzzy
 msgid "Load Root Image into RAM Disk"
-msgstr "Forsiñ an adskeudenn root"
+msgstr "ForsiÃ± an adskeudenn root"
 
 #. TXT_NEW_ROOTIMAGE
 #, fuzzy
 msgid "Enter Root Image"
-msgstr "Ebarzhiñ an adskeudenn root"
+msgstr "EbarzhiÃ± an adskeudenn root"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
@@ -606,7 +606,7 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Erspizit treug hag anv ar restr a fell deoc'h kargañ evel reizhiad restroù "
+"Erspizit treug hag anv ar restr a fell deoc'h kargaÃ± evel reizhiad restroÃ¹ "
 "gwrizienn war ar bladenn c'halloudel (RAM)."
 
 #. TXT_NOT_IMPLEMENTED
@@ -617,24 +617,24 @@ msgstr "N'eo ket kefloueraet c'hoazh!"
 #. TXT_NEW_INST_SYS
 #, fuzzy
 msgid "Installation System"
-msgstr "Reizhiad staliañ"
+msgstr "Reizhiad staliaÃ±"
 
 #. TXT_ENTER_INST_SYS
 #, fuzzy
 msgid "Enter the directory that contains the installation system."
-msgstr "Erspizit anv ar c'havlec'h oc'h enderc'hel ar reizhiad staliañ."
+msgstr "Erspizit anv ar c'havlec'h oc'h enderc'hel ar reizhiad staliaÃ±."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "N'eus ket tu da gaout titouroù."
+msgstr "N'eus ket tu da gaout titouroÃ¹."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "O prientiñ ar staliadur..."
+msgstr "O prientiÃ± ar staliadur..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Loc'hañ ar CD-ROM mod diskouez"
+msgstr "Loc'haÃ± ar CD-ROM mod diskouez"
 
 #. TXT_INSERT_LIVECD
 #, fuzzy
@@ -644,7 +644,7 @@ msgstr "Ensoc'hit ar CD mod bev."
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"
-msgstr "Darniñ / Advoulc'hañ"
+msgstr "DarniÃ± / Advoulc'haÃ±"
 
 #. TXT_SEARCH_INFOFILE
 #, fuzzy
@@ -654,12 +654,12 @@ msgstr "O klask ar restr ditour..."
 #. TXT_NFSPORT
 #, fuzzy
 msgid "Specify the NFS port."
-msgstr "Erspizañ ar porzh NFS"
+msgstr "ErspizaÃ± ar porzh NFS"
 
 #. TXT_ASKING_NAMED
 #, fuzzy
 msgid "Asking name server..."
-msgstr "Atersiñ ar servijer envel..."
+msgstr "AtersiÃ± ar servijer envel..."
 
 #. TXT_HOST_NOT_FOUND
 #, fuzzy, c-format
@@ -670,7 +670,7 @@ msgstr "Dianav eo an urzhiataer %s!"
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
 msgstr ""
-"Kefluniet eo ho rouedad dija. Fellout a ra deoc'h mirout ar c'hefluniad-mañ?"
+"Kefluniet eo ho rouedad dija. Fellout a ra deoc'h mirout ar c'hefluniad-maÃ±?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -697,7 +697,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Kammad war ziraeziñ ar servijer FTP:\n"
+"Kammad war ziraeziÃ± ar servijer FTP:\n"
 "\n"
 "%s"
 
@@ -705,7 +705,7 @@ msgstr ""
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
 msgstr ""
-"Enankit an anv arveriad ma fell deoc'h ober gantañ evit tizhout ar servijer "
+"Enankit an anv arveriad ma fell deoc'h ober gantaÃ± evit tizhout ar servijer "
 "FTP"
 
 #. TXT_ENTER_FTPPASSWD
@@ -735,7 +735,7 @@ msgid ""
 "required)."
 msgstr ""
 "Re nebeut a vemor greiz a zo gant hoc'h urzhiataerevit ur staliadur dre FTP! "
-"(%d MB da vihanañ)"
+"(%d MB da vihanaÃ±)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
@@ -744,14 +744,14 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Sevenet e vez peurvuiañ ur staliadur FTP dre FTP dizanv. Bez' e c'hellit "
-"ivez, ma karit, enankañ un anv arveriad hag ur ger-tremen.\n"
+"Sevenet e vez peurvuiaÃ± ur staliadur FTP dre FTP dizanv. Bez' e c'hellit "
+"ivez, ma karit, enankaÃ± un anv arveriad hag ur ger-tremen.\n"
 "Fellout a ra deoc'h hen ober?"
 
 #. TXT_MORE_MODULES
 #, fuzzy
 msgid "-- More Modules --"
-msgstr "-- Muioc'h a volladoù --"
+msgstr "-- Muioc'h a volladoÃ¹ --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
@@ -765,7 +765,7 @@ msgstr "Enankit niverenn ar porzh arveriet gant ar servijer NFS"
 #. TXT_INSERT_CD
 #, fuzzy, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "Diogelit emañ  en ho lenner ar CD niverenn %d!"
+msgstr "Diogelit emaÃ±  en ho lenner ar CD niverenn %d!"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
@@ -867,7 +867,7 @@ msgstr ""
 #. TXT_CHOOSE_NETSOURCE
 #, fuzzy
 msgid "Choose the network protocol."
-msgstr "Diuzit an doare rouedad a fell deoc'h arverañ evit ar staliañ."
+msgstr "Diuzit an doare rouedad a fell deoc'h arveraÃ± evit ar staliaÃ±."
 
 #. TXT_INPUT_NETSERVER
 #, fuzzy, c-format
@@ -887,7 +887,7 @@ msgstr ""
 #. TXT_LOAD_MODULES
 #, fuzzy, c-format
 msgid "Load %s Modules"
-msgstr "Dilemel ar molladoù karget"
+msgstr "Dilemel ar molladoÃ¹ karget"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
@@ -930,7 +930,7 @@ msgstr ""
 #. TXT_CHOOSE_SWAP
 #, fuzzy
 msgid "Choose the swap partition."
-msgstr "N'eus ket bet tu da varc'hañ ar parzhad erspizet!"
+msgstr "N'eus ket bet tu da varc'haÃ± ar parzhad erspizet!"
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
@@ -941,7 +941,7 @@ msgstr ""
 msgid "Your computer does not have enough memory to run YaST."
 msgstr ""
 "Re nebeut a vemor greiz a zo gant hoc'h urzhiataerevit ur staliadur dre FTP! "
-"(%d MB da vihanañ)"
+"(%d MB da vihanaÃ±)"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -962,7 +962,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Enter the user name with which to access the %s server."
 msgstr ""
-"Enankit an anv arveriad ma fell deoc'h ober gantañ evit tizhout ar servijer "
+"Enankit an anv arveriad ma fell deoc'h ober gantaÃ± evit tizhout ar servijer "
 "FTP"
 
 #. TXT_ENTER_PASSWORD

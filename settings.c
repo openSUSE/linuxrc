@@ -48,11 +48,11 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_es
-{ lang_es, "Español", "es", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
+{ lang_es, "EspaÃ±ol", "es", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "es_ES", "spanish" },
 #endif
 
 #ifdef TRANS_fr
-{ lang_fr, "Français", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
+{ lang_fr, "FranÃ§ais", "fr-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 0, "fr_FR", "french" },
 #endif
 
 #ifdef TRANS_el
@@ -85,11 +85,11 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_pt
-{ lang_pt, "Português", "pt-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
+{ lang_pt, "PortuguÃªs", "pt-latin1", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
 #endif
 
 #ifdef TRANS_pt_BR
-{ lang_pt_BR, "Português Brasileiro", "br-abnt2", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
+{ lang_pt_BR, "PortuguÃªs Brasileiro", "br-abnt2", "lat1-16.psfu", "none", "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
 #endif
 
 #ifdef TRANS_ro
@@ -115,8 +115,8 @@ static keymap_t set_keymaps_arm [] =
 { "Deutsch",              "de-lat1-nd"   },
 { "English (UK)",         "uk"           },
 { "English (US)",         "us"           },
-{ "Español",              "es"           },
-{ "Français",             "fr-latin1"    },
+{ "EspaÃ±ol",              "es"           },
+{ "FranÃ§ais",             "fr-latin1"    },
 { "Hellenic",             "gr"           },
 { "Italiano",             "it"           },
 { "Japanese",             "jp106"        },
@@ -124,8 +124,8 @@ static keymap_t set_keymaps_arm [] =
 { "Nederlands",           "nl"           },
 { "Norsk",                "no-latin1"    },
 { "Polski",               "Pl02"         },
-{ "Português Brasileiro", "br-abnt2"     },
-{ "Português",            "pt-latin1"    },
+{ "PortuguÃªs Brasileiro", "br-abnt2"     },
+{ "PortuguÃªs",            "pt-latin1"    },
 { "Russian",              "ru1"          },
 { "Slovak",               "sk-qwerty"    },
 { "Suomi/Svensk",         "fi"           }
@@ -144,11 +144,11 @@ static keymap_t set_keymaps_arm [] =
 { "English/UK (Sun)",            "sunt5-uk"        },
 { "English/US (PS/2)",           "us"              },
 { "English/US (Sun)",            "sunkeymap"       },
-{ "Español (PS/2)",              "es"              },
-{ "Español (Sun Type4)",         "sunt4-es"        },
-{ "Español (Sun Type5)",         "sunt5-es"        },
-{ "Français (PS/2)",             "fr-latin1"       },
-{ "Français (Sun Type5)",        "sunt5-fr-latin1" },
+{ "EspaÃ±ol (PS/2)",              "es"              },
+{ "EspaÃ±ol (Sun Type4)",         "sunt4-es"        },
+{ "EspaÃ±ol (Sun Type5)",         "sunt5-es"        },
+{ "FranÃ§ais (PS/2)",             "fr-latin1"       },
+{ "FranÃ§ais (Sun Type5)",        "sunt5-fr-latin1" },
 { "Hellenic (PS/2)",             "gr"              },
 { "Italiano (PS/2)",             "it"              },
 { "Magyar (PS/2)",               "hu"              },
@@ -156,8 +156,8 @@ static keymap_t set_keymaps_arm [] =
 { "Norsk (PS/2)",                "no-latin1"       },
 { "Norsk (Sun Type5)",           "sunt4-no-latin1" },
 { "Polski (PS/2)",               "Pl02"            },
-{ "Português (PS/2)",            "pt-latin1"       },
-{ "Português Brasileiro (PS/2)", "br-abnt2"        },
+{ "PortuguÃªs (PS/2)",            "pt-latin1"       },
+{ "PortuguÃªs Brasileiro (PS/2)", "br-abnt2"        },
 { "Russian (PS/2)",              "ru1"             },
 { "Russian (Sun Type5)",         "sunt5-ru"        },
 { "Slovak",                      "sk-qwerty"       },
@@ -179,12 +179,12 @@ static keymap_t set_keymaps_arm_mac [] =
 { "Deutsch",              "mac-de-latin1-nodeadkeys" },
 { "English (UK)",         "mac-uk"                   },
 { "English (US)",         "mac-us"                   },
-{ "Español",              "mac-es"                   },
+{ "EspaÃ±ol",              "mac-es"                   },
 { "Flamish",              "mac-be"                   },
-{ "Français (CH)",        "mac-fr_CH"                },
-{ "Français",             "mac-fr-latin1"            },
+{ "FranÃ§ais (CH)",        "mac-fr_CH"                },
+{ "FranÃ§ais",             "mac-fr-latin1"            },
 { "Italiano",             "mac-it"                   },
-{ "Português",            "mac-pt"                   },
+{ "PortuguÃªs",            "mac-pt"                   },
 { "Suomi/Svensk",         "mac-fi"                   },
 { "Svenska",              "mac-se"                   }
 };
