@@ -61,6 +61,10 @@ static const char  *file_txt_start_pcmcia_tm   = "start_pcmcia";
 #ifdef USE_LIBHD
 static const char  *file_txt_mouse_dev_tm      = "Mouse-Device:";
 static const char  *file_txt_mouse_type_tm     = "Mouse-Type:";
+static const char  *file_txt_has_floppy_tm     = "Floppy-Disk:";
+static const char  *file_txt_yast2_update_tm   = "YaST2-Update:";
+static const char  *file_txt_text_mode_tm      = "Textmode:";
+static const char  *file_txt_fb_mode_tm        = "Framebuffer:";
 #endif
 
 static void file_get_value   (char *input_tv, char *value_tr);
@@ -208,6 +212,13 @@ void file_write_yast_info (void)
 
     if (mouse_type_ig)
         fprintf (file_pri, "%s %s\n", file_txt_mouse_type_tm, mouse_type_ig);
+
+    fprintf (file_pri, "%s %d\n", file_txt_has_floppy_tm, has_floppy_ig);
+    fprintf (file_pri, "%s %d\n", file_txt_yast2_update_tm, yast2_update_ig);
+    fprintf (file_pri, "%s %d\n", file_txt_text_mode_tm, text_mode_ig);
+
+    if (frame_buffer_mode_ig)
+        fprintf (file_pri, "%s 0x%04x\n", file_txt_fb_mode_tm, frame_buffer_mode_ig);
 #endif
 
     fclose (file_pri);
