@@ -149,7 +149,7 @@ int mod_load_module (char *module_tv, char *params_tv)
     if (mod_show_kernel_im)
         kbd_switch_tty (4);
 
-    system (command1_ti);
+    if (*command1_ti) system (command1_ti);
     rc_ii = system (command_ti);
 
     if (mod_show_kernel_im)

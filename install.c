@@ -862,7 +862,7 @@ int inst_execute_yast()
 
   lxrc_set_modprobe("/sbin/modprobe");
 
-  system("update");
+  if(util_check_exist("/sbin/update")) system("/sbin/update");
 
   if(!auto2_ig) {
     while(i_ii < 50) {
