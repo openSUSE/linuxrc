@@ -55,7 +55,7 @@ int file_read_info(void);
 int file_read_yast_inf(void);
 file_t *file_get_cmdline(file_key_t key);
 file_t *file_read_cmdline(void);
-module2_t *file_read_modinfo(char *name);
+module_t *file_read_modinfo(char *name);
 int file_sym2num(char *sym);
 char *file_num2sym(char *base_sym, int num);
 file_t *file_parse_buffer(char *buf);

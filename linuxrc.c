@@ -102,6 +102,7 @@ static struct {
   { "mount",       util_mount_main       },
   { "umount",      util_umount_main      },
   { "cat",         util_cat_main         },
+  { "hex",         util_hex_main         },
   { "echo",        util_echo_main        },
   { "ps",          util_ps_main          },
   { "lsof",        util_lsof_main        },
@@ -109,6 +110,7 @@ static struct {
   { "ls",          util_ls_main          },
   { "rm",          util_rm_main          },
   { "mv",          util_mv_main          },
+  { "ln",          util_ln_main          },
   { "mkdir",       util_mkdir_main       },
   { "kill",        util_kill_main        },
   { "bootpc",      util_bootpc_main      },
@@ -119,6 +121,7 @@ static struct {
   { "free",        util_free_main        },
   { "wget",        util_wget_main        },
   { "fstype",      util_fstype_main      },
+  { "modprobe",    util_modprobe_main    },
   { "nothing",     util_nothing_main     }
 };
 #endif

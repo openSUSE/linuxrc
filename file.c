@@ -44,7 +44,7 @@ void file_write_modparms(FILE *f);
 static void file_module_load (char *insmod_arg);
 #ifdef DEBUG_FILE
 static void file_dump_flist(file_t *ft);
-static void file_dump_mlist(module2_t *ml);
+static void file_dump_mlist(module_t *ml);
 #endif
 
 static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
@@ -1061,7 +1061,7 @@ void file_write_mtab()
 void file_write_modparms(FILE *f)
 {
   file_t *ft0, *ft;
-  module2_t *ml;
+  module_t *ml;
   slist_t *sl0 = NULL, *sl1, *sl, *pl0, *pl;
   slist_t *initrd0 = NULL, *initrd;
   slist_t *modules0 = NULL;
@@ -1219,7 +1219,7 @@ void file_module_load(char *insmod_arg)
 
   if(i == 1) *params = 0;
 
-  mod_load_module(module, params);
+  mod_modprobe(module, params);
 }
 
 
@@ -1236,12 +1236,12 @@ void file_dump_flist(file_t *ft)
 #endif
 
 
-module2_t *file_read_modinfo(char *name)
+module_t *file_read_modinfo(char *name)
 {
   FILE *f;
   char buf[1024];
   char *s, *s1, *t, *current;
-  module2_t *ml0 = NULL, **ml = &ml0, *ml1;
+  module_t *ml0 = NULL, **ml = &ml0, *ml1;
   int i, j, quote, fields, esc;
   char *field[8];
   int current_type = MAX_MODULE_TYPES - 1;	/* default to 'other' */
@@ -1402,7 +1402,7 @@ module2_t *file_read_modinfo(char *name)
 
 #ifdef DEBUG_FILE
 
-void file_dump_mlist(module2_t *ml)
+void file_dump_mlist(module_t *ml)
 {
   for(; ml; ml = ml->next) {
     fprintf(stderr, "%s (%s:%s): \"%s\"\n",

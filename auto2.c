@@ -52,7 +52,7 @@ static void auto2_chk_frame_buffer(void);
 static int auto2_find_floppy(void);
 static int auto2_load_usb_storage(void);
 // static void auto2_find_mouse(void);
-static int auto2_has_i2o(void);
+// static int auto2_has_i2o(void);
 static void auto2_progress(char *pos, char *msg);
 static int auto2_ask_for_modules(int prompt, char *type);
 
@@ -166,13 +166,12 @@ void auto2_scan_hardware(char *log_file)
     i = 0;
     if(*usb_mod) {
       if(
-        (i = mod_load_module("usbcore", NULL)) ||
-        (i = mod_load_module(usb_mod, NULL))   ||
-        (i = mod_load_module("input", NULL))   ||
-        (i = mod_load_module("hid", NULL))
+        (i = mod_insmod("usbcore", NULL)) ||
+        (i = mod_insmod(usb_mod, NULL))   ||
+        (i = mod_insmod("input", NULL))   ||
+        (i = mod_insmod("hid", NULL))
       );
-      mod_load_module("keybdev", NULL);
-      mod_load_module("mousedev", NULL);
+      mod_insmod("keybdev", NULL);
     }
     k = mount ("usbdevfs", "/proc/bus/usb", "usbdevfs", 0, 0);
     if(!i) sleep(4);
@@ -183,7 +182,7 @@ void auto2_scan_hardware(char *log_file)
       hd_set_probe_feature(hd_data, pr_int);
       hd_scan(hd_data);
       if(auto2_load_usb_storage()) {
-        mod_load_module("usb-storage", NULL);
+        mod_insmod("usb-storage", NULL);
         hd_clear_probe_feature(hd_data, pr_all);
         hd_set_probe_feature(hd_data, pr_usb);
         hd_set_probe_feature(hd_data, pr_scsi);
@@ -216,6 +215,7 @@ void auto2_scan_hardware(char *log_file)
     }
   }
 
+#if 0
   if(auto2_has_i2o()) {
     i = 0;
     if(
@@ -230,6 +230,7 @@ void auto2_scan_hardware(char *log_file)
       hd_scan(hd_data);
     }
   }
+#endif
 
   hd_sys = hd_list(hd_data, hw_sys, 0, NULL);
 
@@ -543,7 +544,7 @@ int auto2_activate_devices(unsigned base_class, unsigned last_idx)
             // fprintf(stderr, "Going to load module \"%s\"...\n", sl1->str);
             system(mod_cmd);
 #endif
-            mod_load_module(sl1->str, sl2->str);
+            mod_insmod(sl1->str, sl2->str);
           }
 
           /* all modules should be loaded now */
@@ -676,9 +677,9 @@ int auto2_init()
     }
 
     if(
-      (i = mod_load_module("pcmcia_core", NULL)) ||
-      (i = mod_load_module("i82365", pcmcia_params))   ||
-      (i = mod_load_module("ds", NULL))
+      (i = mod_insmod("pcmcia_core", NULL)) ||
+      (i = mod_insmod("i82365", pcmcia_params))   ||
+      (i = mod_insmod("ds", NULL))
     );
 
     if(!i) {
@@ -972,6 +973,7 @@ int auto2_load_usb_storage()
 }
 
 
+#if 0
 int auto2_has_i2o()
 {
   hd_t *hd;
@@ -997,6 +999,7 @@ int auto2_has_i2o()
 
   return i2o_needed > 0 ? TRUE : FALSE;
 }
+#endif
 
 int auto2_pcmcia()
 {

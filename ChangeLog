@@ -4,6 +4,9 @@
 	- added smbmnt
 	- fixed swap dialog
 	- remember nameserver info from dhcp
+	- mount smb shares read-only
+	- better module dependency handling
+	- added ln & hex commands
 
 25/2/2002:	v1.3.20
 	- make vnc usable

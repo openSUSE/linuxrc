@@ -179,7 +179,7 @@ typedef struct module2_s {
   unsigned autoload:1;	/* can be autoloaded */
   unsigned exists:1;	/* module really exists */
   unsigned dontask:1;	/* don't ask for module params */
-} module2_t;
+} module_t;
 
 
 #define MAX_MODULE_TYPES 10
@@ -255,7 +255,7 @@ typedef struct {
     char *type_name[MAX_MODULE_TYPES];	/* module type names */
     char *more_file[MAX_MODULE_TYPES];	/* file name of module archive */
     int disk[MAX_MODULE_TYPES];		/* number of module disk */
-    module2_t *list;			/* list of all modules */
+    module_t *list;			/* list of all modules */
     int scsi_type;		/* for some reasons... */
     int cdrom_type;		/* dto. */
     int network_type;		/* dto. */

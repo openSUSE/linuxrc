@@ -568,11 +568,11 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 #endif
 
   sprintf(tmp,
-    SUDO "smbmount //%s/%s %s -o %s >&2",
+    SUDO "smbmount //%s/%s %s -o ro,%s >&2",
     server->name, hostdir, mountpoint, mount_options
   );
 
-  mod_load_modules("smbfs", 0);
+  mod_modprobe("smbfs", NULL);
 
   if(system(tmp)) {
     sprintf(tmp, "%s", "Error trying to mount SMB share.");
@@ -810,7 +810,7 @@ int net_choose_device()
   if(auto_ig) return 0;
 
   /* re-read - just in case... */
-  mod_update_netdevice_list(NULL, 1);
+  util_update_netdevice_list(NULL, 1);
 
   for(item_cnt = 0, sl = config.net.devices; sl; sl = sl->next) {
     if(sl->key) item_cnt++;

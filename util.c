@@ -860,7 +860,7 @@ int util_chk_driver_update(char *dir)
             sprintf(imod, "%s/%s", mods_src, de->d_name);
             strcpy(rmod, de->d_name); rmod[s - de->d_name] = 0;
             mod_unload_module(rmod);
-            mod_load_module(imod, NULL);
+            mod_insmod(imod, NULL);
           }
         }
       }
@@ -1763,6 +1763,49 @@ int util_cat_main(int argc, char **argv)
 }
 
 
+int util_hex_main(int argc, char **argv)
+{
+  FILE *f;
+  int i, j = 0;
+  char s[17];
+
+  if(argc > 1) {
+    f = fopen(argv[1], "r");
+    if(!f) {
+      perror(argv[1]);
+      return errno;
+    }
+  }
+  else {
+    f = stdin;
+  }
+
+  s[16] = 0;
+  while((i = fgetc(f)) != EOF) {
+    i = i & 0xff;
+    s[j & 15] = (i >= 0x20 && i <= 0x7e) ? i : '.';
+    if(!(j & 15)) {
+      printf("%06x  ", j);
+    }
+    if(!(j & 7) && (j & 15)) printf(" ");
+    printf("%02x ", (int) i);
+    if(!(++j & 15)) {
+      printf(" %s\n", s);
+    }
+  }
+
+  if(j & 15) {
+    s[j & 15] = 0;
+    if(!(j & 8)) printf(" ");
+    printf("%*s %s\n", 3 * (16 - (j & 15)), "", s);
+  }
+
+  fflush(stdout);
+
+  return 0;
+}
+
+
 int util_echo_main(int argc, char **argv)
 {
   int i;
@@ -2044,6 +2087,29 @@ int util_mv_main(int argc, char **argv)
   if(i) {
     i = errno;
     fprintf(stderr, "mv: "); perror(argv[0]);
+  }
+
+  return i;
+}
+
+
+int util_ln_main(int argc, char **argv)
+{
+  int sym = 0, i;
+
+  argv++; argc--;
+
+  if(argc >= 1 && !strcmp(*argv, "-s")) {
+    argv++; argc--;
+    sym = 1;
+  }
+
+  if(argc != 2) return -1;
+
+  i = sym ? symlink(argv[0], argv[1]) : link(argv[0], argv[1]);
+  if(i) {
+    i = errno;
+    fprintf(stderr, "ln: "); perror(argv[0]);
   }
 
   return i;
@@ -2812,6 +2878,16 @@ int util_fstype_main(int argc, char **argv)
 }
 
 
+int util_modprobe_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(!argc) return fprintf(stderr, "usage: modprobe module [module params]\n"), 1;
+
+  return mod_modprobe(argv[0], argc > 1 ? argv[1] : NULL);
+}
+
+
 /*
  * Return fs name. If we have to load a module first, return it in *module.
  */
@@ -2977,6 +3053,34 @@ int util_mount_ro(char *dev, char *dir)
 int util_mount_rw(char *dev, char *dir)
 {
   return util_mount(dev, dir, 0);
+}
+
+
+void util_update_netdevice_list(char *module, int add)
+{
+  file_t *f0, *f;
+  slist_t *sl;
+
+  f0 = file_read_file("/proc/net/dev");
+  if(!f0) return;
+
+  if((f = f0) && (f = f->next)) {	/* skip 2 lines */
+    for(f = f->next; f; f = f->next) {
+      if(!strcmp(f->key_str, "lo")) continue;
+      if(strstr(f->key_str, "sit") == f->key_str) continue;
+      sl = slist_getentry(config.net.devices, f->key_str);
+      if(!sl && add) {
+        sl = slist_append_str(&config.net.devices, f->key_str);
+        str_copy(&sl->value, module);
+      }
+      else if(sl && !add) {
+        str_copy(&sl->key, NULL);
+        str_copy(&sl->value, NULL);
+      }
+    }
+  }
+
+  file_free_file(f0);
 }
 
 

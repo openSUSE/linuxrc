@@ -605,7 +605,7 @@ int root_boot_system()
           if(rc) mod_add_disk(0, mtype);
         }
 
-        mod_load_modules(module, 0);
+        mod_modprobe(module, NULL);
       }
     }
 

@@ -44,19 +44,19 @@ static int mod_menu_last = 0;
 static char *mod_param_text = NULL;
 static int mod_show_kernel_messages = 0;
 
-static void mod_delete_module(void);
-static int mod_menu_cb(int item);
 static int mod_copy_modules(char *src_dir, int doit);
 static void mod_update_list(void);
-static char *mod_get_title(int type);
 static int mod_show_type(int type);
-static int mod_build_list(int type, char ***list, module2_t ***mod_list);
+static int mod_build_list(int type, char ***list, module_t ***mod_list);
+static char *mod_get_title(int type);
+static int mod_menu_cb(int item);
 static int mod_load_manually(int type);
-static int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align);
 static int mod_is_loaded(char *module);
 static int mod_unload_modules(char *modules);
-static char *mod_get_params(module2_t *mod);
+static char *mod_get_params(module_t *mod);
 static void mod_load_module_manual(char *module, int show);
+static int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t align);
+static void mod_delete_module(void);
 static int mod_load_pcmcia(void);
 static int mod_pcmcia_chipset(void);
 
@@ -90,7 +90,7 @@ int mod_get_type(char *type_name)
 int mod_check_modules(char *type_name)
 {
   int i;
-  module2_t **mod_items;
+  module_t **mod_items;
 
   i = mod_get_type(type_name);
 
@@ -170,7 +170,6 @@ int mod_copy_modules(char *src_dir, int doit)
 }
 
 
-
 void mod_free_modules()
 {
   if(config.module.ramdisk >= 0) {
@@ -186,10 +185,10 @@ void mod_free_modules()
 void mod_init()
 {
   char tmp[256];
-  module2_t *ml;
+  module_t *ml;
 
   if(!config.net.devices) {
-    mod_update_netdevice_list(NULL, 1);
+    util_update_netdevice_list(NULL, 1);
   }
 
   setenv("MODPATH", config.module.dir, 1);
@@ -199,15 +198,15 @@ void mod_init()
 
   for(ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
-      mod_load_module(ml->name, ml->param);
+      mod_insmod(ml->name, ml->param);
     }
   }
 }
 
 
-module2_t *mod_get_entry(char *name)
+module_t *mod_get_entry(char *name)
 {
-  module2_t *ml;
+  module_t *ml;
 
   if(!name) return NULL;
 
@@ -221,7 +220,7 @@ module2_t *mod_get_entry(char *name)
 
 void mod_update_list()
 {
-  module2_t *ml, **ml1;
+  module_t *ml, **ml1;
   struct dirent *de;
   DIR *d;
   char buf[32];
@@ -271,7 +270,7 @@ void mod_update_list()
 
 int mod_show_type(int type)
 {
-  module2_t *ml;
+  module_t *ml;
 
   if(!config.module.type_name[type]) return 0;
   if(config.module.more_file[type]) return 1;
@@ -284,11 +283,11 @@ int mod_show_type(int type)
 }
 
 
-int mod_build_list(int type, char ***list, module2_t ***mod_list)
+int mod_build_list(int type, char ***list, module_t ***mod_list)
 {
-  module2_t *ml;
+  module_t *ml;
   static char **items = NULL;
-  static module2_t **mod_items = NULL;
+  static module_t **mod_items = NULL;
   static int mods = 0;
   int i;
   char buf[256];
@@ -428,7 +427,7 @@ int mod_load_manually(int type)
   int i, j, ok;
   char *s;
   char **items;
-  module2_t **mod_items;
+  module_t **mod_items;
   int added = 0;
 
   i = mod_build_list(type, &items, &mod_items);
@@ -579,7 +578,7 @@ void mod_unload_module(char *module)
   util_update_kernellog();
 
   if(!err) {
-    mod_update_netdevice_list(module, 0);
+    util_update_netdevice_list(module, 0);
     util_update_disk_list(module, 0);
     util_update_cdrom_list();
   }
@@ -649,7 +648,7 @@ int mod_load_modules(char *modules, int show)
 }
 
 
-char *mod_get_params(module2_t *mod)
+char *mod_get_params(module_t *mod)
 {
   char buf[256], buf2[256];
   slist_t *sl;
@@ -688,7 +687,7 @@ char *mod_get_params(module2_t *mod)
 
 void mod_load_module_manual(char *module, int show)
 {
-  module2_t *ml;
+  module_t *ml;
   char *s, buf[256];
   window_t win;
   int i;
@@ -708,7 +707,7 @@ void mod_load_module_manual(char *module, int show)
     if(s) {
       sprintf(buf, txt_get(TXT_TRY_TO_LOAD), ml->name);
       dia_info(&win, buf);
-      mod_load_module(ml->name, s);
+      mod_insmod(ml->name, s);
       win_close(&win);
       i = mod_is_loaded(ml->name);
       if(i) {
@@ -723,7 +722,7 @@ void mod_load_module_manual(char *module, int show)
     }
   }
   else {
-    mod_load_module(ml->name, s);
+    mod_insmod(ml->name, s);
     i = mod_is_loaded(ml->name);
     if(!i) {
       util_beep(FALSE);
@@ -732,7 +731,7 @@ void mod_load_module_manual(char *module, int show)
 }
 
 
-int mod_load_module(char *module, char *param)
+int mod_insmod(char *module, char *param)
 {
   char buf[512];
   int err;
@@ -761,7 +760,7 @@ int mod_load_module(char *module, char *param)
 
   strcat(buf, " >&2");
 
-  mod_update_netdevice_list(NULL, 1);
+  util_update_netdevice_list(NULL, 1);
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
@@ -789,7 +788,7 @@ int mod_load_module(char *module, char *param)
 #endif
 
   if(!err) {
-    mod_update_netdevice_list(module, 1);
+    util_update_netdevice_list(module, 1);
     util_update_disk_list(module, 1);
     util_update_cdrom_list();
   }
@@ -798,14 +797,40 @@ int mod_load_module(char *module, char *param)
 }
 
 
-int mod_list_loaded_modules(char ***list, module2_t ***mod_list, dia_align_t align)
+int mod_modprobe(char *module, char *param)
+{
+  int err;
+  module_t *ml;
+
+  if(!module) return -1;
+
+  for(ml = config.module.list; ml; ml = ml->next) {
+    if(ml->name && !strcmp(ml->name, module)) break;
+  }
+
+  if(!ml) return mod_insmod(module, param);
+
+  err = 0;
+  if(ml->pre_inst) {
+    err = !mod_load_modules(ml->pre_inst, 0);
+  }
+  if(!err) err = mod_insmod(ml->name, param);
+  if(!err && ml->post_inst) {
+    err = mod_load_modules(ml->post_inst, 0);
+  }
+
+  return err;
+}
+
+
+int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t align)
 {
   static char **item = NULL;
-  static module2_t **mods = NULL;
+  static module_t **mods = NULL;
   static int max_mods = 0;
   char *s, *t;
   int i, items = 0;
-  module2_t *mod;
+  module_t *mod;
   file_t *f0, *f;
 
   if(item) {
@@ -881,7 +906,7 @@ void mod_delete_module()
 {
   char **list;
   int items, choice;
-  module2_t *mod, **mod_list;
+  module_t *mod, **mod_list;
 
   items = mod_list_loaded_modules(&list, &mod_list, align_none);
 
@@ -1025,32 +1050,6 @@ void mod_disk_text(char *buf, int type)
 }
 
 
-void mod_update_netdevice_list(char *module, int add)
-{
-  file_t *f0, *f;
-  slist_t *sl;
-
-  f0 = file_read_file("/proc/net/dev");
-  if(!f0) return;
-
-  if((f = f0) && (f = f->next)) {	/* skip 2 lines */
-    for(f = f->next; f; f = f->next) {
-      if(!strcmp(f->key_str, "lo")) continue;
-      if(strstr(f->key_str, "sit") == f->key_str) continue;
-      sl = slist_getentry(config.net.devices, f->key_str);
-      if(!sl && add) {
-        sl = slist_append_str(&config.net.devices, f->key_str);
-        str_copy(&sl->value, module);
-      }
-      else if(sl && !add) {
-        str_copy(&sl->key, NULL);
-        str_copy(&sl->value, NULL);
-      }
-    }
-  }
-
-  file_free_file(f0);
-}
 
 
 
