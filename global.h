@@ -150,11 +150,12 @@ typedef struct {
         item_t;
 
 typedef struct {
-  unsigned rebootmsg:1;
+  unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
-  int floppies;
-  int floppy;
-  char *floppy_dev[4];
+  int floppies;			/* number of floppy drives */
+  int floppy;			/* floppy drive recently used */
+  char *floppy_dev[4];		/* list of floppy devices */
+  char *instsys;		/* installation system mount point */
 } config_t;
 
 config_t config;

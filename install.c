@@ -796,6 +796,9 @@ int inst_prepare()
       sprintf(instsys, "%s%s", mountpoint_tg, installdir_tg);
   }
 
+  if(config.instsys) free(config.instsys);
+  config.instsys = strdup(instsys);
+
   setenv("INSTSYS", instsys, TRUE);
 
   inst_setup_dirs(instsys);
@@ -1519,9 +1522,19 @@ static int inst_choose_yast_version (void)
     item_t   items_ari [2];
     int      width_ii = 30;
     int      yast1_ii, yast2_ii;
+    char yast1_file[MAX_FILENAME], yast2_file[MAX_FILENAME];
 
-    yast1_ii = util_check_exist (YAST1_COMMAND);
-    yast2_ii = util_check_exist (YAST2_COMMAND);
+    *yast1_file = *yast2_file = 0;
+    if (config.instsys)
+        {
+        strcpy (yast1_file, config.instsys);
+        strcpy (yast2_file, config.instsys);
+        }
+    strcat (yast1_file, YAST1_COMMAND);
+    strcat (yast2_file, YAST2_COMMAND);
+
+    yast1_ii = util_check_exist (yast1_file);
+    yast2_ii = util_check_exist (yast2_file);
 
     if (!yast_version_ig && auto_ig)
         yast_version_ig = 1;
