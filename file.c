@@ -206,7 +206,8 @@ static struct {
   { key_rw,             "rw",             kf_boot                        },
   { key_netid,          "NetUniqueID",    kf_none                        },
   { key_loglevel,       "LogLevel",       kf_cfg + kf_cmd + kf_cmd_early },
-  { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                }
+  { key_netsetup,       "NetSetup",       kf_cfg + kf_cmd                },
+  { key_rootpassword,   "RootPassword",   kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1131,6 +1132,10 @@ void file_do_info(file_t *f0)
         }
         break;
 
+      case key_rootpassword:
+        if(*f->value) str_copy(&config.rootpassword, f->value);
+        break;
+
       default:
         break;
     }
@@ -1403,6 +1408,10 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
   file_write_num(f, key_usessh, config.usessh);
+  if(
+    config.rootpassword &&
+    strcmp(config.rootpassword, "ask")
+  ) file_write_str(f, key_rootpassword, config.rootpassword);
 
   if(yast2_color_ig) {
     fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);

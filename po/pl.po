@@ -939,3 +939,10 @@ msgstr ""
 msgid "Please enter the IP of name server %u, or press ESC."
 msgstr ""
 
+#. TXT_ROOT_PASSWORD
+msgid ""
+"Enter temporary Root Password.\n"
+"You will be required to change this password "
+"on initial root user login."
+msgstr ""
+

@@ -1335,6 +1335,11 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
+  if(config.rootpassword) {
+    sprintf(buf, "rootpassword = %s", config.rootpassword);
+    slist_append_str(&sl0, buf);
+  }
+
   lang = current_language();
 
   sprintf(buf, "language = %s (%s), keymap = %s", lang->yastcode, lang->locale, config.keymap ?: "");

@@ -240,6 +240,15 @@ int main(int argc, char **argv, char **env)
 
   lxrc_init();
 
+  if(config.rootpassword && !strcmp(config.rootpassword, "ask")) {
+    int win_old;
+
+    if(!(win_old = config.win)) util_disp_init();
+    str_copy(&config.rootpassword, NULL);
+    dia_input2(txt_get(TXT_ROOT_PASSWORD), &config.rootpassword, 20, 1);
+    if(!win_old) util_disp_done();
+  }
+
   if(config.demo) {
     err = inst_start_demo();
   }

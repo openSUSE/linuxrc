@@ -1,5 +1,7 @@
-	- build with NETWORK_CONFIG undefd
+16/2/2004:	v1.6.5
+	- build if NETWORK_CONFIG undefd
 	- handle '-' vs. '_' in module names
+	- added rootpassword option
 
 11/2/2004:	v1.6.4
 	- added netsetup option
