@@ -707,7 +707,10 @@ void file_do_info(file_t *f0)
         break;
 
       case key_memloadimage:
-        if(f->is.numeric) config.memory.load_image = f->nvalue;
+        if(f->is.numeric) {
+          config.memory.load_image = f->nvalue;
+          force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
+        }
         break;
 
       case key_tmpfs:

@@ -1,3 +1,7 @@
+20/9/2002:	v1.4.33
+	- set memory limit defaults _before_ reading them
+	  from config files (#19960)
+
 20/9/2002:	v1.4.32
 	- copy 'content' file from install medium (#19904)
 
