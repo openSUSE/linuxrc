@@ -1,11 +1,12 @@
 # French translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
+# Francoise Lermen <flermen@suse.de>, 2001.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2001-09-11 12:00+MET\n"
+"Last-Translator: Francoise Lermen <flermen@suse.de>\n"
 "Language-Team: French <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -76,26 +77,22 @@ msgid "Keymap"
 msgstr "Disposition du clavier"
 
 #. TXT_LOAD_SCSI
-#, fuzzy
 msgid "Load SCSI modules"
-msgstr "Charger le pilote SCSI"
+msgstr "Chargement des modules SCSI"
 
 #. TXT_LOAD_CDROM
-#, fuzzy
 msgid "Load CD-ROM modules"
-msgstr "Charger le pilote de CD-ROM"
+msgstr "Chargement des modules du CD-ROM"
 
 #. TXT_LOAD_NET
-#, fuzzy
 msgid "Load network card modules"
-msgstr "Charger le pilote réseau"
+msgstr "Chargement des modules de la carte réseau"
 
 #. TXT_SHOW_MODULES
 msgid "Show loaded modules"
 msgstr "Affichage des modules chargés"
 
 #. TXT_AUTO_LOAD
-#, fuzzy
 msgid "Load modules automatically"
 msgstr "Chargement automatique des modules"
 
@@ -115,9 +112,9 @@ msgstr ""
 "Pendant le chargement, vous pouvez visualiser les messages du noyau sur la console 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
-#, fuzzy, c-format
+#, c-format
 msgid "Module \"%s\" loaded successfully!"
-msgstr "Chargement du module \"%s\" effectué avec succès!"
+msgstr "Le \"%s\" a été chargé!"
 
 #. TXT_LOAD_FAILED
 #, c-format
@@ -126,7 +123,7 @@ msgstr "Le chargement du module \"%s\" a échoué!"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr ""
+msgstr "CD-ROM"
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -197,7 +194,7 @@ msgstr "Cartes réseau"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr ""
+msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
@@ -213,11 +210,11 @@ msgstr "Mémoire"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
-msgstr ""
+msgstr "Modules"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr ""
+msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Please insert the disk and press ENTER"
@@ -226,9 +223,8 @@ msgstr ""
 "et appuyez sur ENTRÉE"
 
 #. TXT_ERROR_READ_DISK
-#, fuzzy
 msgid "Error reading from floppy disk!"
-msgstr "Erreur lors de la lecture de la disquette!"
+msgstr "Erreur à la lecture de la disquette!"
 
 #. TXT_ENTER_ROOT_FS
 msgid "Please enter your root partition (eg. /dev/sda3)"
@@ -249,18 +245,16 @@ msgid "Please enter your IP address"
 msgstr "Entrez votre adresse IP."
 
 #. TXT_INPUT_NETMASK
-#, fuzzy
 msgid "Please enter your netmask. For a normal class C network this is usually 255.255.255.0"
-msgstr "Entrez votre masque réseau. Pour un réseau normal classe C, c'est: 255.255.255.0"
+msgstr "Entrez votre masque réseau. Pour un réseau normal classe C, c'est habituellement 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 msgid "If you need a gateway to reach the server, please enter the IP address of the gateway. If you do not need a gateway, just enter your own IP address."
 msgstr "Entrez l'adresse de votre passerelle s'il vous en faut une pour pouvoir accéder au serveur. Sinon entrez simplement votre propre adresse IP."
 
 #. TXT_INPUT_NAMED
-#, fuzzy
 msgid "Please enter the IP address of your name server. If you don't use a name server, press ESC."
-msgstr "Entrez l'adresse IP de votre serveur de noms. Si vous ne souhaitez pas utiliser de serveur de noms,appuyez sur ESC."
+msgstr "Entrez l'adresse IP de votre serveur de noms. Si vous n'utilisez pas de serveur de noms, appuyez sur ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -278,9 +272,8 @@ msgstr ""
 "Domaine: %s"
 
 #. TXT_ERROR_CONF_NET
-#, fuzzy
 msgid "An error occurred during the network configuration. Probably your network card was not recognized by the kernel!"
-msgstr "Lors de la configuration du réseau il s'est produitune erreur. Ou vous n'avez pas chargé de module adéquat, ou bien votre carte réseau n'a pas été reconnue correctement par le noyau!"
+msgstr "Erreur pendant la configuration du réseau. Votre carte réseau n'a probablement pas été reconnue par le noyau!"
 
 #. TXT_INPUT_SERVER
 msgid "Please enter the IP address of the NFS server."
@@ -342,7 +335,7 @@ msgstr "Actuellement aucun module n'est chargé!"
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr ""
+msgstr "Détection automatique (%s)...    "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Do you want to search for additional SCSI host adaptors?"
@@ -385,18 +378,16 @@ msgid "Please choose the network device."
 msgstr "Sélectionnez le type de réseau que vous voulez utiliser pour l'installation."
 
 #. TXT_INPUT_PLIP_IP
-#, fuzzy
 msgid "Please enter the IP address of the PLIP partner."
-msgstr "Entrez l'adresse IP du partenaire PLIP."
+msgstr "Entrez l'adresse IP de la machine PLIP distante."
 
 #. TXT_LOAD_PCMCIA
 msgid "Load PCMCIA modules"
 msgstr "Chargement des modules PCMCIA"
 
 #. TXT_NO_PCMCIA
-#, fuzzy
 msgid "The PCMCIA chipset could not be detectedautomatically. Please specify manually."
-msgstr "Impossible de détecter automatiquement le chipset PCMCIA! Spécifiez-le manuellement."
+msgstr "Impossible de détecter automatiquement le chipset PCMCIA. Spécifiez-le manuellement."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -415,9 +406,8 @@ msgid "Please enter specific parameters for chipset \"%s\""
 msgstr "Entrez les éventuels paramètres spécifiques pour le chipset \"%s\""
 
 #. TXT_START_CARDMGR
-#, fuzzy
 msgid "Starting card manager..."
-msgstr "Lancement du gestionnaire de cartes..."
+msgstr "Lancement du card manager..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
@@ -432,7 +422,6 @@ msgid "PCMCIA card services already running!"
 msgstr "PCMCIA Card Services tournent déjà!"
 
 #. TXT_NO_LXRC_END
-#, fuzzy
 msgid ""
 "You can exit Linuxrc only via the menu item\n"
 "\n"
@@ -440,16 +429,15 @@ msgid ""
 "\n"
 "In order to allow this, you might need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Seule l'option du menu\n"
+"Vous ne pouvez quitter Linuxrc que par l'option de menu\n"
 "\n"
-"» Démarrer l'installation / le système «\n"
+"\"Démarrer l'installation / le système\"\n"
 "\n"
-"permet de quitter Linuxrc. Pour que ce soit possible, vous devez éventuellement charger auparavant le pilote matériel (modules)."
+"Pour que ce soit possible, vous devrez éventuellement charger les pilotes (modules) pour le support de votre matériel."
 
 #. TXT_NO_CTRLC
-#, fuzzy
 msgid "You cannot exit Linuxrc with <ctrl-c>!"
-msgstr "Vous ne pouvez pas quitter Linuxrc à l'aide de <ctrl-c>!"
+msgstr "Vous ne pouvez pas quitter Linuxrc avec <ctrl-c>!"
 
 #. TXT_REMOVE_DISK
 msgid "Please remove the disk from the drive now!"
@@ -463,10 +451,9 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"exemple: "
+"Exemple: "
 
 #. TXT_CHOOSE_SOURCE
-#, fuzzy
 msgid "Please choose the source medium"
 msgstr "Sélectionnez le support source"
 
@@ -475,9 +462,8 @@ msgid "Trying to mount the CD-ROM..."
 msgstr "Tentative de monter le CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
-#, fuzzy
 msgid "Unable to mount the CD-ROM!"
-msgstr "Le CD-ROM n'a pas pu être monté!"
+msgstr "Impossible de monter le CD-ROM!"
 
 #. TXT_START_YAST
 msgid "Starting YaST..."
@@ -506,60 +492,54 @@ msgid "Please enter the source directory"
 msgstr "Entrez le nom du répertoire source"
 
 #. TXT_ERROR_INSTALL
-#, fuzzy
 msgid "An error occurred during the installation!"
-msgstr "L'installation n'a pas été menée à bonne fin!"
+msgstr "Erreur au cours de l'installation!"
 
 #. TXT_DRIVES
 msgid "Harddisks / CD-ROMs"
 msgstr "Disques durs / CD-ROMs"
 
 #. TXT_LITTLE_MEM
-#, fuzzy
 msgid ""
 "Your computer has extremely little memory!\n"
 "\n"
 "Before you acknowledge this message you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space!"
 msgstr ""
-"Votre machine ne dispose que de très peu de mémoire centrale!\n"
+"Votre machine a extrêmement peu de mémoire!\n"
 "\n"
-"Avant de confirmer ce message et avant que YaST puisse être lancé, vous devez passer à la console 2 (appuyez sur ALT-F2) puis configurer et activermanuellement la mémoire de swap!"
+"Avant de confirmer ce message, vous devez passer à la console virtuelle 2 (pressez ALT-F2) pour créer et activer un espace de swap!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr ""
+msgstr "Animation"
 
 #. TXT_ASK_EXPLODE
-#, fuzzy
 msgid ""
 "Do you like \"animated\" windows?\n"
 "\n"
 "Of course ;-)"
 msgstr ""
-"Voulez-vous des fenêtres \"explosives\"?\n"
+"Voulez-vous des fenêtres \"animées\"?\n"
 "\n"
 "Bien sûr ;-)"
 
 #. TXT_NO_DRIVES
-#, fuzzy
 msgid "No harddisks or CD-ROM drives have been detected so far."
-msgstr "Jusqu'à présent, il n'a été reconnu ni disques durs ni lecteurs de CD-ROM."
+msgstr "Aucun disque dur ou lecteur de CD-ROM n'a été détecté jusqu'à présent."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
 msgstr "Débogage (experts)"
 
 #. TXT_FORCE_ROOTIMAGE
-#, fuzzy
 msgid "Load rootimage into ramdisk"
-msgstr "Forçage de l'image de root"
+msgstr "Chargement de l'image de root dans le disque RAM"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter rootimage"
-msgstr "Entrée de l'image de root"
+msgstr "Spécifier l'image de root"
 
 #. TXT_ASK_RI_FORCE
-#, fuzzy
 msgid "Do you want the root image to be loaded into the RAM disk even when a valid installation system was found?"
 msgstr "Faut-il charger l'image de root dans le disque RAM même si un système d'installation valide a été détecté?"
 
@@ -596,9 +576,8 @@ msgid "Please insert the Live CD."
 msgstr "Insérez le CD live."
 
 #. TXT_END_REBOOT
-#, fuzzy
 msgid "Exit / Reboot"
-msgstr "Abandon / Réamorçage"
+msgstr "Quitter / Réamorcer"
 
 #. TXT_ASK_BOOTP
 msgid "Automatic configuration via bootp/DHCP?"
@@ -625,9 +604,9 @@ msgid "Asking nameserver..."
 msgstr "Interrogation du serveur de noms..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format,fuzzy
+#, c-format
 msgid "Host %s was not found!"
-msgstr "La machine %s est inconnue!"
+msgstr "L'hôte %s n'a pas été trouvé!"
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Do you want to keep this configuration?"
@@ -690,22 +669,20 @@ msgid "Please enter the port of the FTP proxy"
 msgstr "Spécifiez le port du proxy FTP"
 
 #. TXT_WANT_FTPPROXY
-#, fuzzy
 msgid "Do you want to use an FTP proxy?"
 msgstr "Voulez-vous utiliser un proxy FTP?"
 
 #. TXT_NOMEM_FTP
-#, fuzzy, c-format
+#, c-format
 msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
-msgstr "Votre machine n'a pas assez de mémoire centrale pourune installation via FTP! (minimum requis: %d Mo)"
+msgstr "Votre machine n'a pas assez de RAM pour une installation via FTP! (%d Mo de RAM sont nécessaires)"
 
 #. TXT_ANONYM_FTP
-#, fuzzy
 msgid ""
 "Usually an FTP installation is performed via anonymous FTP. Nevertheless it is possible to specify a user name and password for the FTP server access.\n"
 "Do you want this?"
 msgstr ""
-"Normalement, une installation FTP se déroule via FTP anonyme. Mais vous avez aussi la possibilité de spécifier un nom d'utilisateur et un mot de passe.\n"
+"Normalement, une installation FTP se déroule via FTP anonyme. Il est cependant possible de spécifier un nom d'utilisateur et un mot de passe pour l'accès au serveur FTP.\n"
 "Voulez-vous le faire?"
 
 #. TXT_ENTER_MODDISK
@@ -721,9 +698,8 @@ msgid "Initializing parallel port..."
 msgstr "Initialisation du port parallèle..."
 
 #. TXT_ENTER_NFSPORT
-#, fuzzy
 msgid "Please enter the port number on which the nfs server is running"
-msgstr "Entrez le numéro du port sur lequel tourne le serveur NFS"
+msgstr "Entrez le numéro du port sur lequel tourne le serveur nfs"
 
 #. TXT_YAST1
 msgid "YaST1 - text based"
@@ -734,9 +710,8 @@ msgid "YaST2 - graphical"
 msgstr "YaST2 - mode graphique"
 
 #. TXT_CHOOSE_YAST
-#, fuzzy
 msgid "Please choose the version of YaST you want to use for the installation."
-msgstr "Choisissez la version de YaST à utiliser pour l'installation."
+msgstr "Choisissez la version de YaST que vous voulez utiliser pour l'installation."
 
 #. TXT_INSERT_CD
 #, c-format
@@ -756,12 +731,11 @@ msgid "Please enter the timeout value for bootp."
 msgstr "Spécifiez la valeur de temporisation pour bootp."
 
 #. TXT_DO_REBOOT
-#, fuzzy
 msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Please remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the Linux Loader (LILO) was installed on it."
 msgstr ""
-"L'installation du système de base a réussi. Ce système nouvellement installé va maintenant être démarré pour que le processus d'installation soit exécuté. Éjectez tous les supports d'installation (CD-ROM, disquette.\n"
+"Le système de base a été installé. Votre machine doit être redémarrée. Éjectez tous les supports d'installation (CD-ROM, disquette.\n"
 "Ne retirez pas la disquette si le Linux Loader (LILO) a été installé sur celle-ci."
 
 #. TXT_REISERFS
@@ -770,23 +744,23 @@ msgstr "Système de fichiers reiserfs trouvé."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr ""
+msgstr "Connexion canal à canal"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr ""
+msgstr "Connexion ESCON"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr ""
+msgstr "Connexion IUV"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr ""
+msgstr "Routeur cisco relié au canal "
 
 #. TXT_SMB
 msgid "Network (Windows Share aka SMB)"
-msgstr ""
+msgstr "Réseau (partage Windows aka SMB)"
 
 #. TXT_SMB_ENTER_SERVER
 msgid "Please enter the IP-address of the SMB server"
@@ -822,4 +796,5 @@ msgstr ""
 #, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr ""
+
 
