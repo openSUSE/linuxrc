@@ -161,7 +161,7 @@ static text_t txt_breton_atm [] =
 { TXT_START_DEMO,     "Loc'hañ ar CD-ROM mod diskouez"                        },
 { TXT_INSERT_LIVECD,  "Ensoc'hit ar CD mod bev."                              },
 { TXT_END_REBOOT,     "Darniñ / Advoulc'hañ"                                  },
-{ TXT_ASK_BOOTP,      "Kefluniad emgefreek dre Bootp?"                        },
+{ TXT_ASK_BOOTP,      "Kefluniad emgefreek dre Bootp/DHCP?"                   },
 { TXT_SEND_BOOTP,     "O Kas aters Bootp..."                                  },
 { TXT_ERROR_BOOTP,    "C'hwitet eo kefluniad Bootp."                          },
 { TXT_SEARCH_INFOFILE,"O klask ar restr ditour..."                            },

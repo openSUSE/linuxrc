@@ -160,7 +160,7 @@ static text_t txt_brasil_atm [] =
 { TXT_START_DEMO,     "Iniciar Live-CD"                                       },
 { TXT_INSERT_LIVECD,  "Favor inserir o Live-CD."                              },
 { TXT_END_REBOOT,     "Interroper / Boot"                                     },
-{ TXT_ASK_BOOTP,      "Configuração automática com Bootp?"                    },
+{ TXT_ASK_BOOTP,      "Configuração automática com Bootp/DHCP?"               },
 { TXT_SEND_BOOTP,     "Envio da mensagem Bootp..."                            },
 { TXT_ERROR_BOOTP,    "Erro na configuração Bootp."                           },
 { TXT_SEARCH_INFOFILE,"Procurando arquivo de informação..."                   },

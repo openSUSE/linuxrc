@@ -147,7 +147,7 @@ static text_t txt_romanian_atm [] =
 { TXT_START_DEMO,     "Porneste Live CD"                                      },
 { TXT_INSERT_LIVECD,  "Introduceti Live CD."                                  },
 { TXT_END_REBOOT,     "Sfarsit / Reboot"                                      },
-{ TXT_ASK_BOOTP,      "Configurare automata via bootp?"                       },
+{ TXT_ASK_BOOTP,      "Configurare automata via bootp/DHCP?"                  },
 { TXT_SEND_BOOTP,     "Trimitand cererea bootp..."                            },
 { TXT_ERROR_BOOTP,    "Esec la configurarea bootp."                           },
 { TXT_SEARCH_INFOFILE,"Cautand fisierul cu informatii..."                     },

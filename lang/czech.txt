@@ -145,7 +145,7 @@ static text_t txt_czech_atm [] =
 { TXT_START_DEMO,     "Startuji Live CD"                                      },
 { TXT_INSERT_LIVECD,  "Vlo¾te prosím Live CD."                                },
 { TXT_END_REBOOT,     "Konec / Reboot"                                        },
-{ TXT_ASK_BOOTP,      "Automatická konfigurace pøes bootp?"                   },
+{ TXT_ASK_BOOTP,      "Automatická konfigurace pøes bootp/DHCP?"              },
 { TXT_SEND_BOOTP,     "Zasílán po¾adavek bootp..."                            },
 { TXT_ERROR_BOOTP,    "Bootp konfigurace selhala."                            },
 { TXT_SEARCH_INFOFILE,"Hledám informaèní soubor..."                           },

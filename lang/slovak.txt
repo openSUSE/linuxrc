@@ -145,7 +145,7 @@ static text_t txt_slovak_atm [] =
 { TXT_START_DEMO,     "©tart Live CD"                                         },
 { TXT_INSERT_LIVECD,  "Vo¾te Live CD."                                        },
 { TXT_END_REBOOT,     "Koniec / Re¹tart"                                      },
-{ TXT_ASK_BOOTP,      "Automatická konfigurácia cez bootp?"                   },
+{ TXT_ASK_BOOTP,      "Automatická konfigurácia cez bootp/DHCP?"              },
 { TXT_SEND_BOOTP,     "Posielam bootp ¾iados»..."                             },
 { TXT_ERROR_BOOTP,    "Bootp konfigurácia zlyhala."                           },
 { TXT_SEARCH_INFOFILE,"Hµadám info súbor..."                                  },

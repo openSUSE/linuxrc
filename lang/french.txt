@@ -165,7 +165,7 @@ static text_t txt_french_atm [] =
 { TXT_START_DEMO,     "Démarrer le CD-ROM démo"                               },
 { TXT_INSERT_LIVECD,  "Insérez le CD live."                                   },
 { TXT_END_REBOOT,     "Abandon / Réamorçage"                                  },
-{ TXT_ASK_BOOTP,      "Configuration automatique via Bootp?"                  },
+{ TXT_ASK_BOOTP,      "Configuration automatique via Bootp/DHCP?"             },
 { TXT_SEND_BOOTP,     "La demande Bootp est envoyée..."                       },
 { TXT_ERROR_BOOTP,    "La configuration Bootp a échoué."                      },
 { TXT_SEARCH_INFOFILE,"Recherche du fichier info..."                          },

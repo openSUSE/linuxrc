@@ -160,7 +160,7 @@ static text_t txt_dutch_atm [] =
 { TXT_START_DEMO,     "Live-CD starten"                                       },
 { TXT_INSERT_LIVECD,  "plaats de Live-CD in de drive."                        },
 { TXT_END_REBOOT,     "Einde / Reboot"                                        },
-{ TXT_ASK_BOOTP,      "Automatische configuratie via Bootp?"                  },
+{ TXT_ASK_BOOTP,      "Automatische configuratie via Bootp/DHCP?"             },
 { TXT_SEND_BOOTP,     "Bootp-Aanvraag wordt verstuurd..."                     },
 { TXT_ERROR_BOOTP,    "Bootp-configuratie is afgebroken."                     },
 { TXT_SEARCH_INFOFILE,"Zoek naar Info-file..."                                },

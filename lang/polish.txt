@@ -155,7 +155,7 @@ static text_t txt_polish_atm [] =
 { TXT_START_DEMO,     "Uruchomienie Live-CD"                                  },
 { TXT_INSERT_LIVECD,  "Proszê umie¶ciæ w napêdzie dysk Live-CD."              },
 { TXT_END_REBOOT,     "Przerwij / Reboot"                                     },
-{ TXT_ASK_BOOTP,      "Konfiguracja automatyczna poprzez Bootp?"              },
+{ TXT_ASK_BOOTP,      "Konfiguracja automatyczna poprzez Bootp/DHCP?"         },
 { TXT_SEND_BOOTP,     "Wysy³am zapytanie Bootp..."                            },
 { TXT_ERROR_BOOTP,    "Konfiguracja poprzez Bootp nie powiod³a siê."          },
 { TXT_SEARCH_INFOFILE,"Szukam pliku Info..."                                  },

@@ -149,7 +149,7 @@ static text_t txt_indonesia_atm [] =
 { TXT_START_DEMO,     "Memulai Live CD"                                       },
 { TXT_INSERT_LIVECD,  "Harap masukkan Live CD."                               },
 { TXT_END_REBOOT,     "Selesai / Reboot"                                      },
-{ TXT_ASK_BOOTP,      "Konfigurasi otomatis melalui bootp ?"                  },
+{ TXT_ASK_BOOTP,      "Konfigurasi otomatis melalui bootp/DHCP?"              },
 { TXT_SEND_BOOTP,     "Mengirim permohonan (request) bootp..."                },
 { TXT_ERROR_BOOTP,    "Konfigurasi bootp gagal."                              },
 { TXT_SEARCH_INFOFILE,"Mencari infofile..."                                   },

@@ -149,7 +149,7 @@ static text_t txt_portuguese_atm [] =
 { TXT_START_DEMO,     "Start Live CD"                                         },
 { TXT_INSERT_LIVECD,  "Please insert the Live CD."                            },
 { TXT_END_REBOOT,     "Fim / Reniciar"                                        },
-{ TXT_ASK_BOOTP,      "Configuração automatica por Bootp?"                    },
+{ TXT_ASK_BOOTP,      "Configuração automatica por Bootp/DHCP?"               },
 { TXT_SEND_BOOTP,     "Enviando pedido de Bootp..."                           },
 { TXT_ERROR_BOOTP,    "Aconfiguração de Bootp falhou."                        },
 { TXT_SEARCH_INFOFILE,"Procurando o infofile..."                              },

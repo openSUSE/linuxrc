@@ -146,7 +146,7 @@ static text_t txt_russian_atm [] =
 { TXT_START_DEMO,     "Запустить Live CD"                                     },
 { TXT_INSERT_LIVECD,  "Пожалуйста, вставьте Live CD."                         },
 { TXT_END_REBOOT,     "Конец / Перезагрузка"                                  },
-{ TXT_ASK_BOOTP,      "Автоматическая конфигурация через bootp?"              },
+{ TXT_ASK_BOOTP,      "Автоматическая конфигурация через bootp/DHCP?"         },
 { TXT_SEND_BOOTP,     "Посылаю bootp-запрос..."                               },
 { TXT_ERROR_BOOTP,    "Конфигурация через bootp не удалась."                  },
 { TXT_SEARCH_INFOFILE,"Ищу информационный файл..."                            },
