@@ -793,8 +793,9 @@ static int net_bootp (void)
             }
         else
             strncpy (server_dir_tg, data_pci, sizeof (server_dir_tg));
-        }
 */
+        }
+
 
     data_pci = getenv ("BOOTP_SERVER");
     if (data_pci && !nfs_server_rg.s_addr)
