@@ -327,14 +327,14 @@ void root_set_root (char *root_string_tv)
 int root_boot_system (void)
     {
     int  rc_ii;
-    char root_ti [20];
+    char root_ti [40];
 
 
     strcpy (root_ti, "/dev/");
 
     do
         {
-        rc_ii = dia_input (txt_get (TXT_ENTER_ROOT_FS), root_ti, 17, 17);
+        rc_ii = dia_input (txt_get (TXT_ENTER_ROOT_FS), root_ti, sizeof root_ti - 1, 25);
         if (rc_ii)
             return (rc_ii);
         rc_ii = root_check_root (root_ti);

@@ -397,6 +397,22 @@ int auto2_net_dev(hd_t **hd0)
 
       strcpy(netdevice_tg, hd->unix_dev_name);
 
+      net_setup_localhost();
+
+      if((valid_net_config_ig & 0x2b) != 0x2b) {
+        fprintf(stderr, "Sending bootp request...");
+        net_bootp();
+        if(
+          !server_dir_tg || !*server_dir_tg || !ipaddr_rg.s_addr ||
+          !netmask_rg.s_addr || !broadcast_rg.s_addr ||
+          !gateway_rg.s_addr || !nfs_server_rg.s_addr
+        ) {
+          fprintf(stderr, "no/incomplete answer.\n");
+          return 1;
+        }
+        fprintf(stderr, "done.\n");
+      }
+
       if(net_activate()) {
         deb_msg("net_activate() failed");
         return 1;
@@ -631,7 +647,8 @@ int auto2_init()
 
 #ifdef __i386__
   {
-    int net_cfg = (valid_net_config_ig & 0x2b) == 0x2b;
+//    int net_cfg = (valid_net_config_ig & 0x2b) == 0x2b;
+    int net_cfg = valid_net_config_ig || bootmode_ig == BOOTMODE_NET;
 
     /* ok, found something */
     if(i) return i;
@@ -701,6 +718,7 @@ int auto2_find_install_medium()
     }
   }
 
+#if 0
   net_setup_localhost();
   if((valid_net_config_ig & 0x2b) != 0x2b) {
     printf("Sending bootp request...");
@@ -712,6 +730,7 @@ int auto2_find_install_medium()
     }
     printf("done.\n");
   }
+#endif
 
   /* if((valid_net_config_ig & 0x2b) != 0x2b) return FALSE; */
 

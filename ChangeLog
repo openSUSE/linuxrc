@@ -1,3 +1,8 @@
+21/2/2001:	v1.1.18.13
+	- changed language name: Norway -> Norsk
+	- bootp & auto2 now hopefully _really_ work together
+	- enlarged 'boot installed system' input field
+
 21/2/2001:	v1.1.18.12
 	- schwab: remember original environment and pass it when launching init
 	- kukuk: fix typo for norwegian keyboard, add finish type4 keyboard

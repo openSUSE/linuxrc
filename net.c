@@ -731,7 +731,11 @@ int net_bootp (void)
 
     if (net_activate ())
         {
-        (void) dia_message (txt_get (TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
+        if (!auto2_ig)
+            dia_message (txt_get (TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
+        else
+            fprintf(stderr, "network setup failed\n");
+            
         return (-1);
         }
 
