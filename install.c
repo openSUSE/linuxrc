@@ -76,7 +76,7 @@ static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
-static void get_content_file(void);
+static void get_file(char *src, char *dst);
 
 #ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
@@ -831,7 +831,8 @@ int inst_start_install()
     if(rc) return rc;
     str_copy(&config.instsys, config.mountpoint.instsys);
 
-    get_content_file();
+    get_file("/content", "/content");
+    get_file("/media.1/info.txt", "/info.txt");
   }
   else if(!util_is_dir(inst_rootimage_tm)) {
     rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
@@ -1550,7 +1551,7 @@ void inst_swapoff()
 }
 
 
-void get_content_file()
+void get_file(char *src, char *dst)
 {
   char buf[0x1000];
   char fname[256];
@@ -1561,10 +1562,10 @@ void get_content_file()
     config.instmode == inst_http ||
     config.instmode == inst_tftp
   ) {
-    sprintf(fname, "%s/content", config.serverdir ?: "");
+    sprintf(fname, "%s%s", config.serverdir ?: "", src);
     fd_in = net_open(fname);
     if(fd_in >= 0) {
-      fd_out = open("/content.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+      fd_out = open("/xxx.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
       if(fd_out >= 0) {
         do {
           i = net_read(fd_in, buf, sizeof buf);
@@ -1574,8 +1575,8 @@ void get_content_file()
         while(i > 0 && j > 0);
         close(fd_out);
         if(!(i < 0 || j < 0)) {
-          unlink("/content");
-          rename("/content.tmp", "/content");
+          unlink(dst);
+          rename("/xxx.tmp", dst);
         }
       }
       net_close(fd_in);
