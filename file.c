@@ -189,7 +189,6 @@ file_t *file_read_file(char *name)
         (*ft)->value = strdup(buf2);
         ft = &(*ft)->next;
       }
-      printf("+%s+ +%s+\n", buf1, buf2);
     }
   }
 

@@ -935,7 +935,7 @@ static int inst_execute_yast (void)
     }
 
     if(rc_ii) {
-      dia_message (txt_get (TXT_ERROR_INSTALL), MSGTYPE_ERROR);
+      dia_message (txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
     }
 
     lxrc_killall (0);
@@ -1024,7 +1024,7 @@ int inst_read_yast_file()
         break;
 
       case key_language:
-        language_ig = set_langidbyname(f->value);
+        set_activate_language(set_langidbyname(f->value));
         do_disp_init_ig = TRUE;
         break;
 

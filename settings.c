@@ -13,6 +13,7 @@
 #include <time.h>
 
 #include "global.h"
+#include "settings.h"
 #include "text.h"
 #include "util.h"
 #include "display.h"
@@ -410,62 +411,58 @@ void set_choose_keytable (int always_show)
     }
 
 
-void set_choose_language (void)
-    {
-    item_t  items_ari [NR_LANGUAGES];
-    int     current_ii;
-    int     rc_ii;
-    int     width_ii = 24;
-    int     i_ii;
-    char    command_ti [MAX_FILENAME];
+/*
+ * Set font and load keymap.
+ */
+void set_activate_language(enum langid_t lang_id)
+{
+  int i;
+  language_t *lang;
+  char cmd[MAX_FILENAME];
 
+  language_ig = lang_id;
+  i = set_get_current_language();
 
-    current_ii = set_get_current_language ();
+  if(i > 0) {
+    lang = set_languages_arm + i - 1;
 
-    util_create_items (items_ari, NR_LANGUAGES, width_ii);
-    for (i_ii = 0; i_ii < NR_LANGUAGES; i_ii++)
-        {
-        strcpy (items_ari [i_ii].text, set_languages_arm [i_ii].descr);
-        util_fill_string (items_ari [i_ii].text, width_ii);
-        }
-
-    if (auto_ig || auto2_ig)
-        rc_ii = current_ii;
-    else
-        rc_ii = dia_menu (txt_get (TXT_CHOOSE_LANGUAGE), items_ari,
-                          NR_LANGUAGES, current_ii);
-
-    if (rc_ii > 0)
-        {
-        language_ig = set_languages_arm [rc_ii - 1].id;
-        if (!serial_ig && set_languages_arm [rc_ii - 1].font)
-            {
-#if 0
-            sprintf (command_ti, "setfont %s -m %s",
-                     set_languages_arm [rc_ii - 1].font,
-                     set_languages_arm [rc_ii - 1].mapscreen /*,
-                     set_languages_arm [rc_ii - 1].unimap */);
-
-            system (command_ti);
-            set_activate_font (set_languages_arm [rc_ii - 1].usermap);
-#endif
-            set_font(
-              set_languages_arm[rc_ii - 1].font,
-              set_languages_arm[rc_ii - 1].mapscreen,
-              NULL /* set_languages_arm[rc_ii - 1].unimap */	/* loading an uni map should be redundant for .psfu fonts? */
-            );
-            }
-        /* Maybe we should always load the keymap??? */
-        if (demo_ig && !serial_ig)
-            {
-            sprintf (command_ti, "loadkeys %s.map", set_languages_arm [rc_ii - 1].keymap);
-            system (command_ti);
-            strcpy (keymap_tg, set_languages_arm [rc_ii - 1].keymap);
-            }
-        }
-
-    util_free_items (items_ari, NR_LANGUAGES);
+    if(!serial_ig && lang->font) {
+      set_font(lang->font, lang->mapscreen, NULL);
     }
+
+    /* Maybe we should always load the keymap??? */
+    if(demo_ig && !serial_ig) {
+      sprintf(cmd, "loadkeys %s.map", strcpy(keymap_tg, lang->keymap));
+      system(cmd);
+    }
+  }
+}
+
+
+/*
+ * Select a language.
+ */
+void set_choose_language()
+{
+  item_t items[NR_LANGUAGES];
+  int i, current, width = 24;
+
+  current = set_get_current_language();
+
+  util_create_items(items, NR_LANGUAGES, width);
+  for(i = 0; i < NR_LANGUAGES; i++) {
+     strcpy(items[i].text, set_languages_arm[i].descr);
+     util_fill_string(items[i].text, width);
+  }
+
+  if(!auto_ig && !auto2_ig) {
+    current = dia_menu(txt_get(TXT_CHOOSE_LANGUAGE), items, NR_LANGUAGES, current);
+  }
+
+  if(current > 0) set_activate_language(set_languages_arm[current - 1].id);
+
+  util_free_items(items, NR_LANGUAGES);
+}
 
 
 static int set_settings_cb (int what_iv)
@@ -633,25 +630,16 @@ void set_write_info (FILE *file_prv)
 
 
 /* Note: this *must* return a value in the range [1, NR_LANGUAGES]! */
-static int set_get_current_language (void)
-    {
-    int     found_ii = FALSE;
-    int     current_ii = 0;
+int set_get_current_language()
+{
+  int i;
 
+  for(i = 0; i < NR_LANGUAGES; i++) {
+    if(set_languages_arm[i].id == language_ig) return i + 1;
+  }
 
-    while (current_ii < NR_LANGUAGES && !found_ii)
-        if (set_languages_arm [current_ii].id == language_ig)
-            found_ii = TRUE;
-        else
-            current_ii++;
-
-    if (!found_ii)
-        current_ii = LANG_DEFAULT + 1;
-    else
-        current_ii++;
-
-    return (current_ii);
-    }
+  return LANG_DEFAULT + 1;
+}
 
 
 #if 0
@@ -663,9 +651,9 @@ static void set_activate_font (int usermap_iv)
     int   i_ii;
 
     if (usermap_iv)
-        strcpy (text_ti, "(K");
+        strcpy (text_ti, "\033(K");
     else
-        strcpy (text_ti, "(B");
+        strcpy (text_ti, "\033(B");
 
     printf("%s", text_ti); fflush(stdout);
 
