@@ -29,7 +29,6 @@ extern int   txt_init (void);
 
 #define TRANS_de
 #define TRANS_en
-#define TRANS_fr
 
 #else
 
