@@ -32,6 +32,8 @@
 #include <arpa/inet.h>
 #include <utime.h>
 #include <net/if.h>
+#include <linux/major.h>
+#include <linux/raid/md_u.h>
 
 // #include <linux/cdrom.h>
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
@@ -474,7 +476,7 @@ void util_truncate_dir(char *dir)
 
   l = strlen(dir);
 
-  if(l && dir[l - 1] == '/') dir[l - 1] = 0;
+  if(l > 1 && dir[l - 1] == '/') dir[l - 1] = 0;
 }
 
 
@@ -533,23 +535,28 @@ void util_print_ftp_error (int error_iv)
     }
 
 
-void util_free_ramdisk (char *ramdisk_dev_tv)
-    {
-    int  fd_ii;
+int util_free_ramdisk(char *ramdisk_dev)
+{
+  int fd;
+  int err = 0;
 
-    fd_ii = open (ramdisk_dev_tv, O_RDWR);
-    if (fd_ii)
-        {
-        if (ioctl (fd_ii, BLKFLSBUF))
-            fprintf (stderr, "Cannot free ramdisk memory\n");
-        else
-            fprintf (stderr, "Ramdisk memory successfully freed\n");
-
-        close (fd_ii);
-        }
-    else
-        fprintf (stderr, "Cannot open ramdisk device\n");
+  if((fd = open(ramdisk_dev, O_RDWR)) >= 0) {
+    if(ioctl(fd, BLKFLSBUF)) {
+      err = errno;
+      perror(ramdisk_dev);
     }
+    else {
+      fprintf(stderr, "ramdisk %s freed\n", ramdisk_dev);
+    }
+    close(fd);
+  }
+  else {
+    err = errno;
+    perror(ramdisk_dev);
+  }
+
+  return err;
+}
 
 
 int util_open_ftp (char *server_tv)
@@ -889,7 +896,11 @@ void util_status_info()
   sprintf(buf, "memory = %" PRIu64, memory_ig);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "bootmode = %d, net_config_mask = 0x%x", bootmode_ig, net_config_mask());
+  sprintf(buf,
+    "instmode = %s [%d], net_config_mask = 0x%x",
+    file_num2sym("no scheme", config.instmode), config.insttype,
+    net_config_mask()
+  );
   slist_append_str(&sl0, buf);
 
   lxrc = getenv("linuxrc");
@@ -1422,8 +1433,8 @@ int util_mount_main(int argc, char **argv)
 {
   int i;
   char *dir, *srv_dir;
-  char *mp_tmp = mountpoint_tg;
   char *type = NULL, *dev;
+  inet_t inet = {};
 
   argv++; argc--;
 
@@ -1467,16 +1478,13 @@ int util_mount_main(int argc, char **argv)
 
   *srv_dir++ = 0;
 
-  mountpoint_tg = dir;
-
-  i = net_mount_nfs(dev, srv_dir);
+  inet.name = dev;
+  i = net_mount_nfs(dir, &inet, srv_dir);
 
   if(i && errno) {
     i = errno;
     perror("mount");
   }
-
-  mountpoint_tg = mp_tmp;
 
   return i;
 }
@@ -1863,9 +1871,75 @@ int util_swapoff_main(int argc, char **argv)
 }
 
 
+int util_freeramdisk_main(int argc, char **argv)
+{
+  argv++; argc--;
+
+  if(argc != 1) return -1;
+
+  return util_free_ramdisk(*argv);
+}
+
+
 int util_lsmod_main(int argc, char **argv)
 {
   return system("cat /proc/modules");
+}
+
+
+int util_raidautorun_main(int argc, char **argv)
+{
+  int err = 0;
+  int fd;
+
+  if((fd = open("/dev/md0", O_RDWR)) >= 0) {
+    if(ioctl(fd , RAID_AUTORUN, 0)) {
+      err = errno;
+      perror("/dev/md0");
+    }
+    close(fd);
+  }
+  else {
+    err = errno;
+    perror("/dev/md0");
+  }
+
+  return err;
+}
+
+
+int util_free_main(int argc, char **argv)
+{
+  file_t *f0, *f;
+  unsigned mem_total = 0, mem_free = 0;
+  unsigned u;
+  char *s;
+
+  f0 = file_read_file("/proc/meminfo");
+
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+      case key_memtotal:
+        u = strtoul(f->value, &s, 10);
+        if(!*s || *s == ' ') mem_total += u;
+        break;
+
+      case key_memfree:
+      case key_buffers:
+      case key_cached:
+        u = strtoul(f->value, &s, 10);
+        if(!*s || *s == ' ') mem_free += u;
+        break;
+
+      default:
+    }
+  }
+
+  file_free_file(f0);
+
+  printf("MemTotal: %9u kB\nMemFree: %10u kB\n", mem_total, mem_free);
+
+  return 0;
 }
 
 
@@ -2100,18 +2174,124 @@ char *inet2print(inet_t *inet)
 }
 
 
+#if 0
+
+ftp://flup:flup1@ftp.zap:21/pub/suse
+file:/blub/blubber
+
+#endif
+
 url_t *parse_url(char *str)
 {
   static url_t url = {};
+  char *s, *s0, *s1;
+  unsigned u;
+  int scheme = -1;
 
   if(!str) return NULL;
+  str = strdup(str);
 
-  if(url.proto) { free(url.proto); url.proto = NULL; }
-  if(url.server) { free(url.server); url.server = NULL; }
-  if(url.dir) { free(url.dir); url.dir = NULL; }
+#if 0
+  fprintf(stderr, "url = \"%s\"\n", str);
+#endif
 
-  if(url.proto && url.server && url.dir) return &url;
+  if(url.server) free(url.server);
+  if(url.dir) free(url.dir);
+  if(url.user) free(url.user);
+  if(url.password) free(url.password);
+
+  memset(&url, 0, sizeof url);
+
+  if((s0 = strchr(str, ':'))) {
+    *s0++ = 0;
+
+    if(*str) scheme = file_sym2num(str);
+
+    if(s0[0] == '/' && s0[1] == '/') {
+      s0 += 2;
+      if((s = strchr(s0, '/'))) {
+        url.dir = strdup(s);
+        *s = 0;
+      }
+      else {
+        url.dir = strdup("/");
+      }
+
+      if((s = strchr(s1 = s0, '@'))) {
+        *s = 0;
+        s0 = s + 1;
+
+        if((s = strchr(s1, ':'))) {
+         *s++ = 0;
+         if(*s) url.password = strdup(s);
+        }
+        if(*s1) url.user = strdup(s1);
+      }
+
+      if((s = strchr(s0, ':'))) {
+        *s++ = 0;
+        if(*s) {
+          u = strtoul(s, &s1, 0);
+          if(!*s1) url.port = u;
+        }
+      }
+      if(*s0) url.server = strdup(s0);
+    }
+    else {
+      url.dir = strdup(*s0 ? s0 : "/");
+    }
+  }
+
+  free(str);
+  if(scheme >= 0) url.scheme = scheme;
+
+#if 0
+  fprintf(stderr,
+    "  scheme = %s, server = \"%s\", dir = \"%s\"\n"
+    "  user = \"%s\", password = \"%s\", port = %u\n",
+    file_num2sym("no scheme", url.scheme), url.server, url.dir,
+    url.user, url.password, url.port
+  );
+#endif
+
+  if(url.scheme && url.dir) return &url;
 
   return NULL;
+}
+
+
+/*
+ * copy strings, *dst points to malloc'ed memory
+ */
+void str_copy(char **dst, char *src)
+{
+  if(!dst) return;
+
+  if(*dst) free(*dst);
+  *dst = NULL;
+
+  if(src) *dst = strdup(src);
+}
+
+
+void set_instmode(instmode_t instmode)
+{
+  config.instmode = instmode;
+  switch(instmode) {
+    case inst_cdrom:
+      config.insttype = insttype_cdrom;
+      break;
+
+    case inst_hd:
+      config.insttype = insttype_hd;
+      break;
+
+    case inst_floppy:
+      config.insttype = insttype_floppy;
+      break;
+
+    default:
+      config.insttype = insttype_net;
+  }
 }
 

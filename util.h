@@ -35,7 +35,7 @@ extern int  util_check_break       (void);
 extern int  util_try_mount         (const char *device_pcv,      char *dir_pcv,
                                     unsigned long flags_lv, const void *data_prv);
 extern void util_print_ftp_error   (int error_iv);
-extern void util_free_ramdisk      (char *ramdisk_dev_tv);
+extern int  util_free_ramdisk      (char *ramdisk_dev_tv);
 extern int  util_open_ftp          (char *server_tv);
 extern int  util_cd1_boot          (void);
 
@@ -63,7 +63,10 @@ extern int  util_rm_main           (int argc, char **argv);
 extern int  util_mv_main           (int argc, char **argv);
 extern int  util_swapon_main       (int argc, char **argv);
 extern int  util_swapoff_main      (int argc, char **argv);
+extern int  util_freeramdisk_main  (int argc, char **argv);
 extern int  util_lsmod_main        (int argc, char **argv);
+extern int  util_raidautorun_main  (int argc, char **argv);
+extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
@@ -84,4 +87,7 @@ void name2inet(inet_t *inet, char *name);
 void s_addr2inet(inet_t *inet, unsigned long s_addr);
 char *inet2print(inet_t *inet);
 url_t *parse_url(char *str);
+void str_copy(char **dst, char *src);
+
+void set_instmode(instmode_t instmode);
 

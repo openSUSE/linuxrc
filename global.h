@@ -61,6 +61,7 @@
 #define MAX_PARAM_LEN    256
 #define STATUS_SIZE       50
 
+#if 0
 #define BOOTMODE_FLOPPY    0
 #define BOOTMODE_CD        1
 #define BOOTMODE_NET       2
@@ -68,6 +69,7 @@
 #define BOOTMODE_FTP       4
 #define BOOTMODE_CDWITHNET 5
 #define BOOTMODE_SMB       6
+#endif
 
 #define  LXRC_DEBUG
 
@@ -145,6 +147,28 @@ typedef struct {
                }
         colorset_t;
 
+/*
+ * check sym_constants[] in file.c before rearranging things
+ */
+typedef enum {
+  inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
+  inst_http, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
+  inst_dvd, inst_cdwithnet
+} instmode_t;
+
+#define BOOTMODE_FLOPPY    inst_floppy
+#define BOOTMODE_CD        inst_cdrom
+#define BOOTMODE_NET       inst_nfs
+#define BOOTMODE_HARDDISK  inst_hd
+#define BOOTMODE_FTP       inst_ftp
+#define BOOTMODE_CDWITHNET inst_cdwithnet
+#define BOOTMODE_SMB       inst_smb
+
+typedef enum {
+  insttype_cdrom, insttype_hd, insttype_floppy, insttype_net
+} insttype_t;
+
+
 typedef struct {
   char *text;
   int (*func) (int);
@@ -166,9 +190,12 @@ typedef struct {
 
 
 typedef struct {
-  char *proto;
+  instmode_t scheme;
   char *server;
   char *dir;
+  char *user;
+  char *password;
+  unsigned port;
 } url_t;
 
 
@@ -213,6 +240,8 @@ typedef struct {
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
   char *serverdir;		/* install base directory on server */
+  instmode_t instmode;		/* ftp, nfs, smb, etc. */
+  insttype_t insttype;		/* install type (cdrom, network, etc. )*/
 
   struct {
     char *dir;				/* modules directory */
@@ -239,11 +268,13 @@ typedef struct {
     unsigned smb_available:1;	/* set if SMB functionality is available */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
+    unsigned proxyport;		/* proxy port */
     inet_t netmask;
     inet_t network;
     inet_t broadcast;
     inet_t gateway;
     inet_t nameserver;
+    inet_t proxy;
     inet_t hostname;
     inet_t server;
     inet_t pliphost;

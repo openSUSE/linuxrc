@@ -86,36 +86,39 @@ static struct {
   char *name;
   int (*func)(int, char **);
 } lxrc_internal[] = {
-  { "sh",       util_sh_main      },
-  { "lsh",      lsh_main          },
-  { "insmod",   insmod_main       },
-  { "rmmod",    rmmod_main        },
-  { "lsmod",    util_lsmod_main   },
-  { "loadkeys", loadkeys_main     },
-  { "dhcpcd",   dhcpcd_main       },
+  { "sh",          util_sh_main          },
+  { "lsh",         lsh_main              },
+  { "insmod",      insmod_main           },
+  { "rmmod",       rmmod_main            },
+  { "lsmod",       util_lsmod_main       },
+  { "loadkeys",    loadkeys_main         },
+  { "dhcpcd",      dhcpcd_main           },
 #if WITH_PCMCIA
-  { "cardmgr",  cardmgr_main      },
-  { "probe",    probe_main        },
+  { "cardmgr",     cardmgr_main          },
+  { "probe",       probe_main            },
 #endif
-  { "setfont",  setfont_main      },
-  { "portmap",  portmap_main      },
-  { "mount",    util_mount_main   },
-  { "umount",   util_umount_main  },
-  { "cat",      util_cat_main     },
-  { "echo",     util_echo_main    },
-  { "ps",       util_ps_main      },
-  { "lsof",     util_lsof_main    },
-  { "cp",       util_cp_main      },
-  { "ls",       util_ls_main      },
-  { "rm",       util_rm_main      },
-  { "mv",       util_mv_main      },
-  { "mkdir",    util_mkdir_main   },
-  { "kill",     util_kill_main    },
-  { "bootpc",   util_bootpc_main  },
-  { "swapon",   util_swapon_main  },
-  { "swapoff",  util_swapoff_main },
-  { "wget",     wget_main         },
-  { "nothing",  util_nothing_main }
+  { "setfont",     setfont_main          },
+  { "portmap",     portmap_main          },
+  { "mount",       util_mount_main       },
+  { "umount",      util_umount_main      },
+  { "cat",         util_cat_main         },
+  { "echo",        util_echo_main        },
+  { "ps",          util_ps_main          },
+  { "lsof",        util_lsof_main        },
+  { "cp",          util_cp_main          },
+  { "ls",          util_ls_main          },
+  { "rm",          util_rm_main          },
+  { "mv",          util_mv_main          },
+  { "mkdir",       util_mkdir_main       },
+  { "kill",        util_kill_main        },
+  { "bootpc",      util_bootpc_main      },
+  { "swapon",      util_swapon_main      },
+  { "swapoff",     util_swapoff_main     },
+  { "freeramdisk", util_freeramdisk_main },
+  { "raidautorun", util_raidautorun_main },
+  { "free",        util_free_main        },
+  { "wget",        wget_main             },
+  { "nothing",     util_nothing_main     }
 };
 #endif
 
@@ -494,7 +497,7 @@ void lxrc_init()
   file_t *ft;
   char *s, *t0, *t, buf[256];
 
-  printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2001 SuSE GmbH <<<\n");
+  printf(">>> SuSE installation program v" LXRC_VERSION " (c) 1996-2002 SuSE GmbH <<<\n");
   fflush(stdout);
 
   if(!config.test && getpid() > 19) {

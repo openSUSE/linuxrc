@@ -492,26 +492,35 @@ int net_check_address2(inet_t *inet, int do_dns)
 }
 
 
-void net_smb_get_mount_options(char *options)
+void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup)
 {
-  sprintf(options,"ip=%s", inet_ntoa(config.net.server.ip));
+  if(!options) return;
+  *options = 0;
 
-  if(config.net.user && config.net.password) {
+  if(!server) return;
+  sprintf(options,"ip=%s", inet_ntoa(server->ip));
+
+  if(user) {
     strcat(options, ",username=");
-    strcat(options, config.net.user);
+    strcat(options, user);
     strcat(options, ",password=");
-    strcat(options, config.net.password);
-    if(config.net.workgroup) {
-      strcat(options,",workgroup=");
-      strcat(options,config.net.workgroup);
+    strcat(options, password ?: "");
+    if(workgroup) {
+      strcat(options, ",workgroup=");
+      strcat(options, workgroup);
     }
   } else {
-    strcat(options,",guest");
+    strcat(options, ",guest");
   }
 }
 
 
-int net_mount_smb()
+/*
+ * mount windows share
+ *
+ * if user == NULL, use 'guest' login
+ */
+int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup)
 {
     /*******************************************************************
 
@@ -534,7 +543,12 @@ int net_mount_smb()
   char tmp[1024];
   char mount_options[256];
 
-  net_smb_get_mount_options(mount_options);
+  if(net_check_address2(server, 1)) return -1;
+
+  if(!hostdir) hostdir = "/";
+  if(!mountpoint || !*mountpoint) mountpoint = "/";
+
+  net_smb_get_mount_options(mount_options, server, user, password, workgroup);
 
 #if !defined(SUDO)
 #  define SUDO
@@ -542,17 +556,13 @@ int net_mount_smb()
 
   sprintf(tmp,
     SUDO "smbmount //%s/%s %s -o %s >&2",
-    config.net.server.name,
-    config.serverdir,
-    mountpoint_tg,
-    mount_options
+    server->name, hostdir, mountpoint, mount_options
   );
 
   mod_load_modules("smbfs", 0);
 
   if(system(tmp)) {
-
-    sprintf(tmp, "%s", "Error trying to mount the SMB share.");
+    sprintf(tmp, "%s", "Error trying to mount SMB share.");
 
     if(config.win) {
       dia_message(tmp, MSGTYPE_ERROR);
@@ -568,8 +578,39 @@ int net_mount_smb()
 }
 
 #ifdef WITH_NFS
-int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
+int xdr_dirpath (XDR *xdrs, dirpath *objp)
     {
+    if (!xdr_string(xdrs, objp, MNTPATHLEN))
+        return (FALSE);
+    else
+        return (TRUE);
+    }
+
+
+int xdr_fhandle (XDR *xdrs, fhandle objp)
+    {
+    if (!xdr_opaque(xdrs, objp, FHSIZE))
+        return (FALSE);
+    else
+        return (TRUE);
+    }
+
+
+int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
+    {
+    if (!xdr_u_int(xdrs, &objp->fhs_status))
+        return (FALSE);
+
+    if (!objp->fhs_status)
+        if (!xdr_fhandle(xdrs, objp->fhstatus_u.fhs_fhandle))
+            return (FALSE);
+
+    return (TRUE);
+    }
+
+
+int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
+{
     struct sockaddr_in     server_ri;
     struct sockaddr_in     mount_server_ri;
     struct nfs_mount_data  mount_data_ri;
@@ -582,21 +623,16 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     struct fhstatus        status_ri;
     char                   tmp_ti [1024];
     char                  *opts_pci;
-    inet_t inet = {};
 
-    inet.name = strdup(server_addr_tv);
-    if(net_check_address2(&inet, 1)) {
-      free(inet.name);
-      return -1;
-    }
+  if(net_check_address2(server, 1)) return -1;
+
+  if(!hostdir) hostdir = "/";
+  if(!mountpoint || !*mountpoint) mountpoint = "/";
 
     memset (&server_ri, 0, sizeof (struct sockaddr_in));
     server_ri.sin_family = AF_INET;
-    server_ri.sin_addr.s_addr = inet.ip.s_addr;
+    server_ri.sin_addr.s_addr = server->ip.s_addr;
     memcpy (&mount_server_ri, &server_ri, sizeof (struct sockaddr_in));
-
-    free(inet.name);
-    inet.name = NULL; inet.ok = 0;
 
     memset (&mount_data_ri, 0, sizeof (struct nfs_mount_data));
 //    mount_data_ri.flags = NFS_MOUNT_NONLM;
@@ -654,7 +690,7 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     timeout_ri.tv_usec = 0;
 
     rc_ii = clnt_call (mount_client_pri, MOUNTPROC_MNT,
-                       (xdrproc_t) xdr_dirpath, (caddr_t) &hostdir_tv,
+                       (xdrproc_t) xdr_dirpath, (caddr_t) &hostdir,
                        (xdrproc_t) xdr_fhstatus, (caddr_t) &status_ri,
                        timeout_ri);
     if (rc_ii)
@@ -708,53 +744,23 @@ int net_mount_nfs (char *server_addr_tv, char *hostdir_tv)
     mount_data_ri.fd = fsock_ii;
     memcpy ((char *) &mount_data_ri.addr, (char *) &server_ri,
             sizeof (mount_data_ri.addr));
-    strncpy (mount_data_ri.hostname, server_addr_tv,
+    strncpy (mount_data_ri.hostname, inet_ntoa(server->ip),
              sizeof (mount_data_ri.hostname));
 
     auth_destroy (mount_client_pri->cl_auth);
     clnt_destroy (mount_client_pri);
     close (socket_ii);
 
-    sprintf (tmp_ti, "%s:%s", server_addr_tv, hostdir_tv);
+    sprintf (tmp_ti, "%s:%s", inet_ntoa(server->ip), hostdir);
     opts_pci = (char *) &mount_data_ri;
-    rc_ii = mount (tmp_ti, mountpoint_tg, "nfs", MS_RDONLY | MS_MGC_VAL, opts_pci);
+    rc_ii = mount (tmp_ti, mountpoint, "nfs", MS_RDONLY | MS_MGC_VAL, opts_pci);
 
-    return (rc_ii);
-    }
+  return rc_ii;
+}
 
-
-int xdr_dirpath (XDR *xdrs, dirpath *objp)
-    {
-    if (!xdr_string(xdrs, objp, MNTPATHLEN))
-        return (FALSE);
-    else
-        return (TRUE);
-    }
-
-
-int xdr_fhandle (XDR *xdrs, fhandle objp)
-    {
-    if (!xdr_opaque(xdrs, objp, FHSIZE))
-        return (FALSE);
-    else
-        return (TRUE);
-    }
-
-
-int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
-    {
-    if (!xdr_u_int(xdrs, &objp->fhs_status))
-        return (FALSE);
-
-    if (!objp->fhs_status)
-        if (!xdr_fhandle(xdrs, objp->fhstatus_u.fhs_fhandle))
-            return (FALSE);
-
-    return (TRUE);
-    }
 #else
 
-int net_mount_nfs(char *server_addr_tv, char *hostdir_tv)
+int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
 {
   return -1;
 }
@@ -1098,7 +1104,7 @@ int net_bootp()
 
     if(*t && !config.serverdir) config.serverdir = strdup(t);
 
-    if(t != s) {
+    if(t != s && !config.net.server.name) {
       name2inet(&config.net.server, s);
       net_check_address2(&config.net.server, 0);
     }
@@ -1205,15 +1211,16 @@ int net_dhcp()
         break;
 
       case key_dhcpsiaddr:
-        name2inet(&config.net.server, f->value);
-        net_check_address2(&config.net.server, 0);
+        if(!config.net.server.name) {
+          name2inet(&config.net.server, f->value);
+          net_check_address2(&config.net.server, 0);
+        }
         break;
 
       case key_rootpath:
       case key_bootfile:
-        if(*f->value) {
-          if(config.serverdir) free(config.serverdir);
-          config.serverdir = strdup(f->value);
+        if(*f->value && !config.serverdir) {
+          str_copy(&config.serverdir, f->value);
         }
         break;
 

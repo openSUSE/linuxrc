@@ -446,7 +446,12 @@ int auto2_net_dev(hd_t **hd0)
           config.serverdir
         );
         
-        if(net_mount_smb()) {
+        if(
+          net_mount_smb(mountpoint_tg,
+            &config.net.server, config.serverdir,
+            config.net.user, config.net.password, config.net.workgroup
+          )
+        ) {
           deb_msg("SMB mount failed.");
           return 1;
         }
@@ -462,7 +467,7 @@ int auto2_net_dev(hd_t **hd0)
           config.serverdir ?: ""
         );
 
-        if(net_mount_nfs(inet_ntoa(config.net.server.ip), config.serverdir ?: "")) {
+        if(net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir)) {
           deb_msg("NFS mount failed.");
           return 1;
         }

@@ -77,14 +77,11 @@ static int   inst_menu_cb             (dia_item_t di);
 static int   inst_init_cache          (void);
 static int   inst_umount              (void);
 static int   inst_mount_smb           (void);
-static int   inst_ftp                 (void);
+static int   inst_do_ftp                 (void);
 static int   inst_get_ftpsetup        (void);
 static int   inst_choose_yast_version (void);
 static int   inst_update_cd           (void);
 static void  inst_swapoff             (void);
-
-static int inst_get_smbserver(void);
-static int inst_get_smbsetup (void);
 
 #ifdef OBSOLETE_YAST_LIVECD
 /* 'Live' entry in yast.inf */
@@ -104,19 +101,19 @@ int inst_auto_install (void)
 
     inst_rescue_im = FALSE;
 
-    switch (bootmode_ig)
+    switch (config.instmode)
         {
-        case BOOTMODE_CD:
-        case BOOTMODE_CDWITHNET:
+        case inst_cdrom:
+//        case BOOTMODE_CDWITHNET:
             rc_ii = inst_mount_cdrom (1);
             break;
-        case BOOTMODE_SMB:
+        case inst_smb:
             rc_ii = inst_mount_smb ();
             break;
-        case BOOTMODE_NET:
+        case inst_nfs:
             rc_ii = inst_mount_nfs ();
             break;
-        case BOOTMODE_HARDDISK:
+        case inst_hd:
             rc_ii = inst_mount_harddisk();
             break;
         default:
@@ -381,7 +378,7 @@ int inst_choose_source_cb(dia_item_t di)
       break;
 
     case di_source_ftp:
-      error = inst_ftp();
+      error = inst_do_ftp();
       break;
 
     case di_source_smb:
@@ -497,34 +494,6 @@ static int inst_mount_cdrom (int show_err)
     }
 
 
-int inst_mount_nfs()
-{
-  int rc;
-  window_t win;
-  char text[256 + MAX_FILENAME];
-
-  bootmode_ig = BOOTMODE_NET;
-
-  if((rc = net_config())) return rc;
-
-  if(config.win && !auto_ig) {
-    if((rc = net_get_address(txt_get(TXT_INPUT_SERVER), &config.net.server, 1))) return rc;
-    if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
-  }
-  util_truncate_dir(config.serverdir);
-
-  sprintf(text, txt_get(TXT_TRY_NFS_MOUNT), config.net.server.name, config.serverdir);
-  dia_info(&win, text);
-
-  system("portmap");
-
-  rc = net_mount_nfs(inet_ntoa(config.net.server.ip), config.serverdir);
-  win_close(&win);
-
-  return rc;
-}
-
-
 static int inst_mount_harddisk (void)
     {
     int   rc_ii = 0;
@@ -582,6 +551,91 @@ static int inst_mount_harddisk (void)
 
     return (0);
     }
+
+
+int inst_mount_nfs()
+{
+  int rc;
+  window_t win;
+  char text[256];
+
+  bootmode_ig = BOOTMODE_NET;
+
+  set_instmode(inst_nfs);
+
+  if((rc = net_config())) return rc;
+
+  if(config.win && !auto_ig) {
+    if((rc = net_get_address(txt_get(TXT_INPUT_SERVER), &config.net.server, 1))) return rc;
+    if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
+  }
+  util_truncate_dir(config.serverdir);
+
+  sprintf(text, txt_get(TXT_TRY_NFS_MOUNT), config.net.server.name, config.serverdir);
+
+  dia_info(&win, text);
+
+  system("portmap");
+
+  rc = net_mount_nfs(mountpoint_tg, &config.net.server, config.serverdir);
+
+  win_close(&win);
+
+  return rc;
+}
+
+
+int inst_mount_smb()
+{
+  int rc;
+  window_t win;
+  char msg[256];
+
+  bootmode_ig = BOOTMODE_SMB;
+
+  set_instmode(inst_smb);
+
+  if((rc = net_config())) return rc;
+
+  if(config.win && !auto_ig) {
+    if((rc = net_get_address(txt_get(TXT_SMB_ENTER_SERVER), &config.net.server, 1))) return rc;
+    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.serverdir, 30, 0))) return rc;
+  }
+  util_truncate_dir(config.serverdir);
+
+  rc = dia_yesno(txt_get(TXT_SMB_GUEST_LOGIN), YES);
+
+  if(rc == ESCAPE) {
+    return -1;
+  }
+  else {
+    if(rc == YES) {
+      str_copy(&config.net.user, NULL);
+      str_copy(&config.net.password, NULL);
+      str_copy(&config.net.workgroup, NULL);
+    }
+    else {
+      if((rc = dia_input2(txt_get(TXT_SMB_ENTER_USER), &config.net.user, 20, 0))) return rc;
+      if((rc = dia_input2(txt_get(TXT_SMB_ENTER_PASSWORD), &config.net.password, 20, 1))) return rc;
+      if((rc = dia_input2(txt_get(TXT_SMB_ENTER_WORKGROUP), &config.net.workgroup, 20, 0))) return rc;
+    }
+  }
+
+  sprintf(msg, txt_get(TXT_SMB_TRYING_MOUNT), config.net.server.name, config.serverdir);
+
+  dia_info(&win, msg);
+
+  rc = net_mount_smb(mountpoint_tg,
+    &config.net.server, config.serverdir,
+    config.net.user, config.net.password, config.net.workgroup
+  );
+
+  win_close(&win);
+
+  if(rc) return -1;
+
+  return 0;
+}
 
 
 int inst_check_instsys (void)
@@ -1156,42 +1210,7 @@ int inst_umount()
 }
 
 
-int inst_get_smbserver()
-{
-  int rc;
-
-  if(net_get_address(txt_get(TXT_SMB_ENTER_SERVER), &config.net.server, 1)) return -1;
-  if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.serverdir, 20, 0))) return rc;
-
-  return 0;
-}
-
-
-int inst_get_smbsetup()
-{
-  int rc;
-
-  rc = dia_yesno(txt_get(TXT_SMB_GUEST_LOGIN), YES);
-
-  if(rc == ESCAPE) return -1;
-
-  if(rc == YES) {
-    if(config.net.user) free(config.net.user);
-    config.net.user = NULL;
-    if(config.net.password) free(config.net.password);
-    config.net.password = NULL;
-  }
-  else {
-    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_USER), &config.net.user, 20, 0))) return rc;
-    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_PASSWORD), &config.net.password, 20, 1))) return rc;
-    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_WORKGROUP), &config.net.workgroup, 20, 0))) return rc;
-  }
-
-  return 0;
-}
-
-
-int inst_ftp()
+int inst_do_ftp()
 {
   int rc;
   window_t win;
@@ -1237,148 +1256,51 @@ int inst_ftp()
 }
 
 
-static int inst_get_ftpsetup (void)
-    {
-    int             rc_ii;
-    char            tmp_ti [MAX_FILENAME];
-    struct in_addr  dummy_ri;
-    int             i_ii;
-
-
-    rc_ii = dia_yesno (txt_get (TXT_ANONYM_FTP), NO);
-    if (rc_ii == ESCAPE)
-        return (-1);
-
-    if (rc_ii == NO)
-        {
-        strcpy (ftp_user_tg, "anonymous");
-        strcpy (ftp_password_tg, "root@");
-        }
-    else
-        {
-        strcpy (tmp_ti, ftp_user_tg);
-        rc_ii = dia_input (txt_get (TXT_ENTER_FTPUSER), tmp_ti,
-                           sizeof (ftp_user_tg) - 1, 20);
-        if (rc_ii)
-            return (rc_ii);
-        strcpy (ftp_user_tg, tmp_ti);
-
-        strcpy (tmp_ti, ftp_password_tg);
-        passwd_mode_ig = TRUE;
-        rc_ii = dia_input (txt_get (TXT_ENTER_FTPPASSWD), tmp_ti,
-                           sizeof (ftp_password_tg) - 1, 20);
-        passwd_mode_ig = FALSE;
-        if (rc_ii)
-            return (rc_ii);
-        strcpy (ftp_password_tg, tmp_ti);
-        }
-
-
-    rc_ii = dia_yesno (txt_get (TXT_WANT_FTPPROXY), NO);
-    if (rc_ii == ESCAPE)
-        return (-1);
-
-    if (rc_ii == YES)
-        {
-        strcpy (tmp_ti, ftp_proxy_tg);
-        do
-            {
-            rc_ii = dia_input (txt_get (TXT_ENTER_FTPPROXY), tmp_ti,
-                               sizeof (ftp_proxy_tg) - 1, 30);
-            if (rc_ii)
-                return (rc_ii);
-
-            if (isdigit (tmp_ti [0]))
-                {
-                rc_ii = net_check_address (tmp_ti, &dummy_ri);
-                if (rc_ii)
-                    (void) dia_message (txt_get (TXT_INVALID_INPUT),
-                                        MSGTYPE_ERROR);
-                }
-            }
-        while (rc_ii);
-        strcpy (ftp_proxy_tg, tmp_ti);
-
-        if (ftp_proxyport_ig == -1)
-            tmp_ti [0] = 0;
-        else
-            sprintf (tmp_ti, "%d", ftp_proxyport_ig);
-
-        do
-            {
-            rc_ii = dia_input (txt_get (TXT_ENTER_FTPPORT), tmp_ti,
-                               6, 6);
-            if (rc_ii)
-                return (rc_ii);
-
-            for (i_ii = 0; i_ii < strlen (tmp_ti); i_ii++)
-                if (!isdigit (tmp_ti [i_ii]))
-                    rc_ii = -1;
-
-            if (rc_ii)
-                (void) dia_message (txt_get (TXT_INVALID_INPUT), MSGTYPE_ERROR);
-            }
-        while (rc_ii);
-
-        ftp_proxyport_ig = atoi (tmp_ti);
-        }
-    else
-        {
-        ftp_proxy_tg [0] = 0;
-        ftp_proxyport_ig = -1;
-        }
-
-    return (0);
-    }
-
-
-int inst_mount_smb()
+int inst_get_ftpsetup()
 {
   int rc;
-  window_t  win_ri;
-  char msg[256];
+  char *s, tmp[256];
+  unsigned u;
 
-  rc = net_config();
-  if(rc) return rc;
+  rc = dia_yesno(txt_get(TXT_ANONYM_FTP), NO);
+  if(rc == ESCAPE) return -1;
 
-    /*******************************************************************
-  
-    CD location
-  
-  	 server              :  SERVER
-  	 server IP (optional):  SERVER_IP
-  	 share               :  SHARE
-  
-    authentification for this CD-ROM share
-  
-  	 [X] Guest login  or
-  
-  	 username            :  USERNAME
-  	 password            :  PASSWORD
-  	 workgroup (optional):  WORKGROUP
-  
-    *******************************************************************/
-    
-  rc = inst_get_smbserver();
-  if(rc) return rc;
+  if(rc == NO) {
+    str_copy(&config.net.user, "anonymous");
+    str_copy(&config.net.password, "root@");
+  }
+  else {
+    if((rc = dia_input2(txt_get(TXT_ENTER_FTPUSER), &config.net.user, 20, 0))) return rc;
+    if((rc = dia_input2(txt_get(TXT_ENTER_FTPPASSWD), &config.net.password, 20, 1))) return rc;
+  }
 
-  rc = inst_get_smbsetup();
-  if(rc) return rc;
+  rc = dia_yesno(txt_get(TXT_WANT_FTPPROXY), NO);
+  if(rc == ESCAPE) return -1;
 
-  sprintf(msg, txt_get(TXT_SMB_TRYING_MOUNT),
-    config.net.server.name,
-    config.serverdir
-  );
+  if(rc == YES) {
+    if((rc = net_get_address(txt_get(TXT_ENTER_FTPPROXY), &config.net.proxy, 1))) return rc;
 
-  dia_info(&win_ri, msg);
+    *tmp = 0;
+    if(config.net.proxyport) sprintf(tmp, "%u", config.net.proxyport);
 
-  rc = net_mount_smb();
+    do {
+      rc = dia_input(txt_get(TXT_ENTER_FTPPORT), tmp, 6, 6);
+      if(rc) return rc;
+      u = strtoul(tmp, &s, 0);
+      if(*s) {
+        rc = -1;
+        dia_message (txt_get (TXT_INVALID_INPUT), MSGTYPE_ERROR);
+      }
+    }
+    while(rc);
 
-  win_close(&win_ri);
+    config.net.proxyport = u;
+  }
+  else {
+    name2inet(&config.net.proxy, "");
+    config.net.proxyport = 0;
+  }
 
-  if(rc) return -1;
-
-  bootmode_ig = BOOTMODE_SMB;
   return 0;
 }
 

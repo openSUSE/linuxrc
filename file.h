@@ -23,7 +23,8 @@ typedef enum {
   key_dhcp, key_ipaddr, key_hostname, key_nisdomain, key_nisservers,
   key_dns, key_nptservers, key_dhcpsid, key_dhcpgiaddr, key_dhcpsiaddr,
   key_dhcpchaddr, key_dhcpshaddr, key_dhcpsname, key_rootpath, key_bootfile,
-  key_install
+  key_install, key_instmode, key_memtotal, key_memfree, key_buffers,
+  key_cached
 } file_key_t;
 
 typedef struct file_s {
@@ -50,3 +51,5 @@ int file_read_info(void);
 int file_read_yast_inf(void);
 file_t *file_get_cmdline(file_key_t key);
 module2_t *file_read_modinfo(char *name);
+int file_sym2num(char *sym);
+char *file_num2sym(char *base_sym, int num);

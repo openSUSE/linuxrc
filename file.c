@@ -133,7 +133,12 @@ static struct {
   { key_dhcpsname,      "DHCPSName"        },
   { key_rootpath,       "RootPath"         },
   { key_bootfile,       "BootFile"         },
-  { key_install,        "Install"          }
+  { key_install,        "Install"          },
+  { key_instmode,       "InstMode"         },
+  { key_memtotal,       "MemTotal"         },
+  { key_memfree,        "MemFree"          },
+  { key_buffers,        "Buffers"          },
+  { key_cached,         "Cached"           }
 };
 
 static struct {
@@ -151,13 +156,29 @@ static struct {
   { "Color",     2                  },
   { "Alt"  ,     3                  },
   { "Reboot",    1                  },
+#if 0
   { "Floppy",    BOOTMODE_FLOPPY    },
   { "CD",        BOOTMODE_CD        },
   { "Net",       BOOTMODE_NET       },
   { "Harddisk",  BOOTMODE_HARDDISK  },
   { "FTP",       BOOTMODE_FTP       },
   { "CDwithNET", BOOTMODE_CDWITHNET },
-  { "SMB",       BOOTMODE_SMB       }
+  { "SMB",       BOOTMODE_SMB       },
+#endif
+  { "no scheme", inst_none          },
+  { "file",      inst_file          },
+  { "nfs",       inst_nfs           },
+  { "ftp",       inst_ftp           },
+  { "smb",       inst_smb           },
+  { "http",      inst_http          },
+  { "tftp",      inst_tftp          },
+  { "cd",        inst_cdrom         },
+  { "floppy",    inst_floppy        },
+  { "hd",        inst_hd            },
+  { "dvd",       inst_dvd           },
+  { "cdwithnet", inst_cdwithnet     },
+  { "harddisk",  inst_hd            },
+  { "cdrom",     inst_cdrom         }
 };
 
 char *file_key2str(file_key_t key)
@@ -199,6 +220,30 @@ int sym2index(char *sym)
   }
 
   return -1;
+}
+
+
+int file_sym2num(char *sym)
+{
+  int i;
+
+  if((i = sym2index(sym)) < 0) return -1;
+
+  return sym_constants[i].value;
+}
+
+
+char *file_num2sym(char *base_sym, int num)
+{
+  int i;
+
+  i = sym2index(base_sym);
+
+  if(i < 0 || num < 0 || i + num >= sizeof sym_constants / sizeof *sym_constants) {
+    return NULL;
+  }
+
+  return sym_constants[i + num].name;
 }
 
 
@@ -415,7 +460,14 @@ char *file_read_info_file(char *file, char *file2)
         break;
 
       case key_bootmode:
-        if(f->is.numeric) bootmode_ig = f->nvalue;
+        if(f->is.numeric) {
+          bootmode_ig = f->nvalue;
+          set_instmode(f->nvalue);
+        }
+        break;
+
+      case key_instmode:
+        if(f->is.numeric) set_instmode(f->nvalue);
         break;
 
       case key_ip:
@@ -463,7 +515,7 @@ char *file_read_info_file(char *file, char *file2)
       case key_livesrc:
         strncpy(livesrc_tg, f->value, sizeof livesrc_tg);
         livesrc_tg[sizeof livesrc_tg - 1] = 0;
-        if(config.serverdir) bootmode_ig = BOOTMODE_NET;
+        if(config.serverdir) set_instmode(inst_nfs);
         break;
 
       case key_bootpwait:
@@ -514,13 +566,15 @@ char *file_read_info_file(char *file, char *file2)
       case key_install:
         url = parse_url(f->value);
         if(url) {
-          if(!strcmp(url->proto, "nfs")) {
-            name2inet(&config.net.server, f->value);
-            if(config.serverdir) free(config.serverdir);
-            config.serverdir = NULL;
-            if(url->dir && *url->dir) {
-              config.serverdir = strdup(url->dir);
-            }
+          bootmode_ig = url->scheme;
+          set_instmode(url->scheme);
+
+          str_copy(&config.serverdir, url->dir);
+          str_copy(&config.net.user, url->user);
+          str_copy(&config.net.password, url->password);
+
+          if(config.insttype == insttype_net) {
+            name2inet(&config.net.server, url->server);
           }
         }
         break;
@@ -644,7 +698,6 @@ void file_write_install_inf(char *dir)
 {
   FILE *f;
   char file_name[256];
-  int i;
 
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
@@ -686,25 +739,22 @@ void file_write_install_inf(char *dir)
 
   if(serial_ig) file_write_str(f, key_console, console_parms_tg);
 
-  i = bootmode_ig != BOOTMODE_CDWITHNET ? bootmode_ig : BOOTMODE_CD;
-  file_write_sym(f, key_bootmode, "Floppy", i);
+//  i = bootmode_ig != BOOTMODE_CDWITHNET ? bootmode_ig : BOOTMODE_CD;
+  file_write_sym(f, key_instmode, "no scheme", config.instmode);
 
-  if(bootmode_ig == BOOTMODE_HARDDISK) {
+  if(config.insttype == insttype_hd) {
     file_write_str(f, key_partition, harddisk_tg);
     file_write_str(f, key_fstype, fstype_tg);
     file_write_str(f, key_serverdir, config.serverdir);
   }
 
-  if(
-    bootmode_ig == BOOTMODE_NET ||
-    bootmode_ig == BOOTMODE_SMB ||
-    bootmode_ig == BOOTMODE_FTP ||
-    bootmode_ig == BOOTMODE_CDWITHNET
-  ) {
+// what about 'bootmode_ig == BOOTMODE_CDWITHNET' ???
+  if(config.insttype == insttype_net) {
     file_write_str(f, key_netdevice, netdevice_tg);
     file_write_inet(f, key_ip, &config.net.hostname);
     file_write_str(f, key_hostname, config.net.hostname.name);
 
+#if 0
     if(bootmode_ig == BOOTMODE_CDWITHNET) {
       s_addr2inet(
         &config.net.broadcast,
@@ -714,9 +764,11 @@ void file_write_install_inf(char *dir)
         &config.net.network,
         config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
       );
-      file_write_inet(f, key_broadcast, &config.net.broadcast);
-      file_write_inet(f, key_network, &config.net.network);
     }
+#endif
+
+    file_write_inet(f, key_broadcast, &config.net.broadcast);
+    file_write_inet(f, key_network, &config.net.network);
 
     if(config.net.pliphost.ok) {
       file_write_inet(f, key_pliphost, &config.net.pliphost);
@@ -735,16 +787,9 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_domain, config.net.domain);
   }
 
-  if(bootmode_ig == BOOTMODE_FTP) {
-    if(*ftp_user_tg) {
-      file_write_str(f, key_ftpuser, ftp_user_tg);
-    }
-    if(*ftp_proxy_tg) {
-      file_write_str(f, key_ftpproxy, ftp_proxy_tg);
-    }
-    if(ftp_proxyport_ig != -1) {
-      file_write_num(f, key_ftpproxyport, ftp_proxyport_ig);
-    }
+  file_write_inet(f, key_ftpproxy, &config.net.proxy);
+  if(config.net.proxyport) {
+    file_write_num(f, key_ftpproxyport, config.net.proxyport);
   }
 
   file_write_str(f, key_username, config.net.user);
@@ -809,27 +854,32 @@ void file_write_mtab()
   );
 
   if(!ramdisk_ig) {
-    switch(bootmode_ig) {
-      case BOOTMODE_CD:
-      case BOOTMODE_CDWITHNET:
+    switch(config.instmode) {
+      case inst_cdrom:
         fprintf(f, "/dev/%s %s iso9660 ro 0 0\n", cdrom_tg, mountpoint_tg);
         break;
 
-      case BOOTMODE_NET:
+      case inst_nfs:
         fprintf(f,
           "%s:%s %s nfs ro 0 0\n",
           inet_ntoa(config.net.server.ip), config.serverdir ?: "", mountpoint_tg
         );
         break;
 
-      case BOOTMODE_SMB:
-        net_smb_get_mount_options(smb_mount_options);
+      case inst_smb:
+        net_smb_get_mount_options(
+          smb_mount_options,
+          &config.net.server, config.net.user,
+          config.net.password, config.net.workgroup
+        );
         fprintf(f,
           "//%s/%s %s smbfs ro,%s 0 0\n",
           config.net.server.name, config.serverdir ?: "",
           mountpoint_tg, smb_mount_options
         );
         break;
+
+      default:
     }
   }
   else {
