@@ -53,7 +53,6 @@ static int mod_build_list(int type, char ***list, module_t ***mod_list);
 static char *mod_get_title(int type);
 static int mod_menu_cb(int item);
 static int mod_load_manually(int type);
-static int mod_unload_modules(char *modules);
 static char *mod_get_params(module_t *mod);
 static void mod_load_module_manual(char *module, int show);
 static int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t align);

@@ -838,14 +838,6 @@ int auto2_init()
   if(!config.hwcheck) {
     file_read_info();
     util_debugwait("got info file");
-    if(config.update.ask && !config.update.shown) {
-      if(!(win_old = config.win)) util_disp_init();
-      if(config.update.name_list) {
-        dia_show_lines2("Driver Updates added", config.update.name_list, 64);
-      }
-      while(!inst_update_cd());
-      if(!win_old) util_disp_done();
-    }
   }
 
 #if WITH_PCMCIA
@@ -917,6 +909,16 @@ int auto2_init()
 #endif
 
   util_splash_bar(40);
+
+  if(config.update.ask && !config.update.shown) {
+    auto2_activate_devices(hw_storage_ctrl, 0);
+    if(!(win_old = config.win)) util_disp_init();
+    if(config.update.name_list) {
+      dia_show_lines2("Driver Updates added", config.update.name_list, 64);
+    }
+    while(!inst_update_cd());
+    if(!win_old) util_disp_done();
+  }
 
   if(config.zen) get_zen_config();
 

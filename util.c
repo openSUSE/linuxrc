@@ -818,9 +818,6 @@ void add_driver_update(char *dir, char *loc)
 
   str_copy(&config.update.id, NULL);
 
-  /* module version may not match kernel exactly */
-  config.forceinsmod = 1;
-
   prio = config.update.count;
 
   /* preliminary config file read for update id & priority */
@@ -1077,10 +1074,13 @@ void util_do_driver_update(unsigned idx)
     mod_init(1);
   }
   else {
+    str_copy(&buf1, "");
     for(f = f0; f; f = f->next) {
-//      strprintf(&buf2, "/modules/%s", f->key_str);
       if((s = strrchr(f->key_str, '.'))) *s = 0;
-      if(mod_is_loaded(f->key_str)) mod_unload_module(f->key_str);
+      strprintf(&buf1, "%s %s", buf1, f->key_str);
+    }
+    if(*buf1) mod_unload_modules(buf1);
+    for(f = f0; f; f = f->next) {
       mod_modprobe(f->key_str, NULL);
     }
   }

@@ -1,3 +1,6 @@
+17/3/2005:	v1.8.5
+	- load storage modules before asking for update disk (#73530)
+
 15/3/2005:	v1.8.4
 	- load acpi modules if necessary (#72146)
 	- no error if asian fonts are missing (#72992)
