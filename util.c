@@ -715,8 +715,8 @@ int util_chk_driver_update(char *dir)
   if(!dir) return 0;
   if(*driver_update_dir) return 0;
 
-  sprintf(drv_src, "%s/linux/%s/" LX_ARCH "-" LX_REL, dir, config.product_dir);
-  sprintf(mods_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/modules", dir, config.product_dir);
+  sprintf(drv_src, "%s%s", dir, config.updatedir);
+  sprintf(mods_src, "%s%s/modules", dir, config.updatedir);
 
   if(stat(drv_src, &st) == -1) return 0;
   if(!S_ISDIR(st.st_mode)) return 0;
@@ -731,7 +731,7 @@ int util_chk_driver_update(char *dir)
   if(mount("shmfs", driver_update_dir, "shm", 0, 0)) return 0;
 
   for(i = 0; i < sizeof copy_dir / sizeof *copy_dir; i++) {
-    sprintf(inst_src, "%s/linux/%s/" LX_ARCH "-" LX_REL "/%s", dir, config.product_dir, copy_dir[i]);
+    sprintf(inst_src, "%s%s/%s", dir, config.updatedir, copy_dir[i]);
     sprintf(inst_dst, "%s/%s", driver_update_dir, copy_dir[i]);
     if(
       !stat(inst_src, &st) &&

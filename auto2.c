@@ -765,6 +765,20 @@ int auto2_init()
   return i;
 }
 
+static void auto2_ask_net_if_vnc()
+{
+    if (config.vnc || config.usessh) {
+      int win_old;
+
+      auto2_activate_devices(bc_network, 0);
+      if(!(win_old = config.win)) util_disp_init();
+      if (net_config())
+	config.vnc = config.usessh = 0;
+      if(!win_old) util_disp_done();
+    }
+
+}
+
 /*
  * mmj@suse.de - first check if we're running automated harddisk install 
  * 
@@ -780,18 +794,11 @@ int auto2_find_install_medium()
   if(config.instmode == inst_hd) {
     if(!config.partition) return FALSE;
 
-    if (config.vnc || config.usessh) {
-      int win_old;
-
-      auto2_activate_devices(bc_network, 0);
-      if(!(win_old = config.win)) util_disp_init();
-      if (net_config())
-	config.vnc = config.usessh = 0;
-      if(!win_old) util_disp_done();
-    }
-
     sprintf(buf, "/dev/%s", config.partition);
-    if(!(i = auto2_mount_harddisk(buf))) return TRUE;
+    if(!(i = auto2_mount_harddisk(buf))) {
+	auto2_ask_net_if_vnc();
+    	return TRUE;
+    }
   }
     
   if(config.instmode == inst_cdrom || !config.instmode) {
@@ -803,20 +810,12 @@ int auto2_find_install_medium()
 
     need_modules = 0;
   
-    if (config.vnc || config.usessh) {
-      int win_old;
-      auto2_activate_devices(bc_network, 0);
-      if(!(win_old = config.win)) util_disp_init();
-      if(net_config())
-	config.vnc = config.usessh = 0;
-      if(!win_old) util_disp_done();
-    }
-
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
       if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
       if(config.activate_network) auto2_activate_devices(bc_network, 0);
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
+      auto2_ask_net_if_vnc();
       return TRUE;
     }
 
@@ -836,12 +835,14 @@ int auto2_find_install_medium()
         if(config.activate_storage) auto2_activate_devices(bc_storage, 0);
         if(config.activate_network) auto2_activate_devices(bc_network, 0);
         if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
+        auto2_ask_net_if_vnc();
         return TRUE;
       }
     }
 
     if(config.cdrom) {
       if(!*driver_update_dir) util_chk_driver_update(mountpoint_tg);
+      auto2_ask_net_if_vnc();
       return TRUE;
     }
   }
@@ -1067,7 +1068,7 @@ char *auto2_disk_list(int *boot_disk)
 extern void hd_scan_kbd(hd_data_t *hd_data);
 char *auto2_serial_console (void)
 {
-  static char console[32];
+  char console[32];
   char buf[256];
   hd_data_t *hd_data2;
   hd_t *hd;
@@ -1114,8 +1115,8 @@ char *auto2_serial_console (void)
       free (hd_data2);
     }
 
-  if (strlen (console) > 0)
-    return console;
+  if (*console)
+    return config.serial;
   else
     return NULL;
 }
