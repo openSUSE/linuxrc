@@ -30,90 +30,115 @@
 #define L7_FONT "lat7-16.psfu"
 #define CYR_FONT "Cyr_a8x16.psfu"
 
-#define LANG_DEFAULT	3
+#define KM_L1 "iso-8859-15"
+#define KM_L2 "iso-8859-2"
+#define KM_L7 "iso-8859-7"
+#define KM_KOI "koi8-r"
+
+
+/* keymap encodings */
+struct {
+  char *map;
+  char *enc;
+} km_enc[] = {
+  { "br-abnt2",     KM_L1  },
+  { "cz-us-qwertz", KM_L2  },
+  { "de-lat1-nd",   KM_L1  },
+  { "es",           KM_L1  },
+  { "fr-latin1",    KM_L1  },
+  { "gr",           KM_L7  },
+  { "hu",           KM_L2  },
+  { "it",           KM_L1  },
+  { "Pl02",         KM_L2  },
+  { "pt-latin1",    KM_L1  },
+  { "ru1",          KM_KOI },
+  { "sk-qwerty",    KM_L2  }
+};
+
+
+#define LANG_DEFAULT	5
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_ar
 // currently a fake
-{ lang_ar, "Arabic", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "ar", "arabic" },
+{ lang_ar, "Arabic", "us", L1_FONT, UNI_FONT, 0, 0, "ar", "arabic" },
 #endif
 
 #ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "fr_FR", "breton" },
+{ lang_br, "Brezhoneg", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR", "breton" },
 #endif
 
 #ifdef TRANS_bs
-{ lang_bs, "Bosnia", "us", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "bs_BA", "bosnia" },
+{ lang_bs, "Bosnia", "us", L2_FONT, UNI_FONT, 1, 1, "bs_BA", "bosnia" },
 #endif
 
 #ifdef TRANS_cs
-{ lang_cs, "Cestina", "cz-us-qwertz", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "cs_CZ", "czech" },
+{ lang_cs, "Cestina", "cz-us-qwertz", L2_FONT, UNI_FONT, 1, 1, "cs_CZ", "czech" },
 #endif
 
 #ifdef TRANS_de
-{ lang_de, "Deutsch", "de-lat1-nd", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "de_DE", "german" },
+{ lang_de, "Deutsch", "de-lat1-nd", L1_FONT, UNI_FONT, 0, 0, "de_DE", "german" },
 #endif
 
 #ifdef TRANS_en
-{ lang_en, "English", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "en_US", "english" },
+{ lang_en, "English", "us", L1_FONT, UNI_FONT, 0, 0, "en_US", "english" },
 #endif
 
 #ifdef TRANS_es
-{ lang_es, "Español", "es", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "es_ES", "spanish" },
+{ lang_es, "Español", "es", L1_FONT, UNI_FONT, 0, 1, "es_ES", "spanish" },
 #endif
 
 #ifdef TRANS_fr
-{ lang_fr, "Français", "fr-latin1", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "fr_FR", "french" },
+{ lang_fr, "Français", "fr-latin1", L1_FONT, UNI_FONT, 0, 0, "fr_FR", "french" },
 #endif
 
 #ifdef TRANS_el
-{ lang_el, "Hellenic", "gr", L7_FONT, L7_FONT, "lat7u.uni", 1, 1, "el_EL", "greek" },
+{ lang_el, "Hellenic", "gr", L7_FONT, L7_FONT, 1, 1, "el_EL", "greek" },
 #endif
 
 #ifdef TRANS_id
-{ lang_id, "Indonesia", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "de_DE", "indonesian" },
+{ lang_id, "Indonesia", "us", L1_FONT, UNI_FONT, 0, 1, "de_DE", "indonesian" },
 #endif
 
 #ifdef TRANS_it
-{ lang_it, "Italiano", "it", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "it_IT", "italian" },
+{ lang_it, "Italiano", "it", L1_FONT, UNI_FONT, 0, 0, "it_IT", "italian" },
 #endif
 
 #ifdef TRANS_ja
 // currently a fake
-{ lang_ja, "Japanese", "jp106", L1_FONT, UNI_FONT, "lat1u.uni", 0, 0, "ja_JP", "japanese" },
+{ lang_ja, "Japanese", "jp106", L1_FONT, UNI_FONT, 0, 0, "ja_JP", "japanese" },
 #endif
 
 #ifdef TRANS_hu
-{ lang_hu, "Magyar", "hu", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "hu_HU", "hungarian" },
+{ lang_hu, "Magyar", "hu", L2_FONT, UNI_FONT, 1, 1, "hu_HU", "hungarian" },
 #endif
 
 #ifdef TRANS_nl
-{ lang_nl, "Nederlands", "us", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "nl_NL", "dutch" },
+{ lang_nl, "Nederlands", "us", L1_FONT, UNI_FONT, 0, 1, "nl_NL", "dutch" },
 #endif
 
 #ifdef TRANS_pl
-{ lang_pl, "Polski", "Pl02", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "pl_PL", "polish" },
+{ lang_pl, "Polski", "Pl02", L2_FONT, UNI_FONT, 1, 1, "pl_PL", "polish" },
 #endif
 
 #ifdef TRANS_pt
-{ lang_pt, "Português", "pt-latin1", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "pt_PT", "portuguese" },
+{ lang_pt, "Português", "pt-latin1", L1_FONT, UNI_FONT, 0, 1, "pt_PT", "portuguese" },
 #endif
 
 #ifdef TRANS_pt_BR
-{ lang_pt_BR, "Português Brasileiro", "br-abnt2", L1_FONT, UNI_FONT, "lat1u.uni", 0, 1, "pt_BR", "brazilian" },
+{ lang_pt_BR, "Português Brasileiro", "br-abnt2", L1_FONT, UNI_FONT, 0, 1, "pt_BR", "brazilian" },
 #endif
 
 #ifdef TRANS_ro
-{ lang_ro, "Romania", "us", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "en_US", "romanian" },
+{ lang_ro, "Romania", "us", L2_FONT, UNI_FONT, 1, 1, "en_US", "romanian" },
 #endif
 
 #ifdef TRANS_ru
-// { lang_ru, "Russian", "ru1", "LatArCyrHeb-16.psfu", "koi2alt", "cyralt.uni",1, 1, "ru_RU", "russian" },
-{ lang_ru, "Russian", "ru1", CYR_FONT, UNI_FONT, "cyralt.uni",1, 1, "ru_RU", "russian" },
+{ lang_ru, "Russian", "ru1", CYR_FONT, UNI_FONT, 1, 1, "ru_RU", "russian" },
 #endif
 
 #ifdef TRANS_sk
-{ lang_sk, "Slovencina", "sk-qwerty", L2_FONT, UNI_FONT, "lat2u.uni", 1, 1, "sk_SK", "slovak" },
+{ lang_sk, "Slovencina", "sk-qwerty", L2_FONT, UNI_FONT, 1, 1, "sk_SK", "slovak" },
 #endif
 };
 #endif
@@ -219,6 +244,7 @@ static void set_expert               (void);
 static int  set_expert_cb            (dia_item_t di);
 static int  set_get_current_language (void);
 static void set_font(language_t *lang);
+static char *keymap_encoding(char *map);
 
 /*
  *
@@ -402,6 +428,7 @@ void set_activate_language(enum langid_t lang_id)
 void set_activate_keymap(char *keymap)
 {
   char cmd[MAX_FILENAME];
+  char *s, enc[64];
 
   /* keymap might be config.keymap, so be careful... */
   keymap = keymap ? strdup(keymap) : NULL;
@@ -410,8 +437,18 @@ void set_activate_keymap(char *keymap)
 
   if((config.keymap = keymap)) {
     kbd_unimode();
-    sprintf(cmd, "loadkeys %s.map ; dumpkeys >/tmp/dk ; loadkeys --unicode </tmp/dk", keymap);
-    if(!config.test) system(cmd);
+    *enc = 0;
+    if((s = keymap_encoding(config.keymap))) {
+      sprintf(enc, " -c %s", s);
+    }
+    sprintf(cmd,
+      "loadkeys %s.map ; dumpkeys%s >/tmp/dk ; loadkeys --unicode </tmp/dk",
+      keymap, enc
+    );
+    if(!config.test) {
+      if(config.debug) fprintf(stderr, "%s\n", cmd);
+      system(cmd);
+    }
   }
 }
 
@@ -630,4 +667,20 @@ language_t *current_language()
 {
   return set_languages_arm + set_get_current_language() - 1;
 }
+
+
+/* look up keymap encoding */
+char *keymap_encoding(char *map)
+{
+  int i;
+
+  if(map) {
+    for(i = 0; i < sizeof km_enc / sizeof *km_enc; i++) {
+      if(!strcmp(km_enc[i].map, map)) return km_enc[i].enc;
+    }
+ }
+
+  return NULL;
+}
+
 

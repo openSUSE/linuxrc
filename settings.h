@@ -15,7 +15,6 @@ typedef struct {
   char *keymap;
   char *font1;
   char *font2;
-  char *unimap;
   int usermap;	// redundant, will drop it later -- snwint
   int write_info;
   char *locale;

@@ -1938,6 +1938,11 @@ void util_start_shell(char *tty, char *shell, int new_env)
     dup(fd);
     dup(fd);
 
+    if(config.utf8) {
+      printf("\033%%G");
+      fflush(stdout);
+    }
+
     execve(shell, args, new_env ? env : environ);
     fprintf(stderr, "Couldn't start shell (errno = %d)\n", errno);
     exit(-1);

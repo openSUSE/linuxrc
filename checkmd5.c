@@ -39,7 +39,7 @@ void md5_verify()
   slist_t *sl;
   char buf[256];
 
-  dia_message("Insert Installation CD-ROM or DVD.", MSGTYPE_INFO);
+  if(dia_message("Insert Installation CD-ROM or DVD.", MSGTYPE_INFO)) return;
 
   get_info(long_dev(config.cdrom));
 
