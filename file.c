@@ -576,6 +576,9 @@ void file_do_info(file_t *f0)
       case key_hostip:
         name2inet(&config.net.hostname, f->value);
         net_check_address2(&config.net.hostname, 0);
+        if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
+          s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
+        }
         break;
 
       case key_hostname:

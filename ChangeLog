@@ -7,6 +7,7 @@
 	- updated cardmgr (#23839)
 	- support kernel-pcmcia
 	- fixed linuxrc modprobe
+	- allow ip_addr/network_bits notation in hostip
 
 18/2/2003:	v1.4.42
 	- fix for current bison (end all rules with ";")

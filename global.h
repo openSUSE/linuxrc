@@ -144,6 +144,7 @@ typedef struct slist_s {
 typedef struct {
   unsigned ok:1;		/* ip field is valid */
   struct in_addr ip;
+  struct in_addr net;
   char *name;
 } inet_t;
 

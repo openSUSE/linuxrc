@@ -17,7 +17,7 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup);
 
 extern void net_stop            (void);
-extern int  net_check_address   (char *input_tv, struct in_addr *address_prr);
+extern int  net_check_address   (char *input_tv, struct in_addr *address_prr, int *net_bits);
 int net_check_address2(inet_t *inet, int do_dns);
 extern int  net_setup_localhost (void);
 

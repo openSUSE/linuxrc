@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <net/if.h>
 #include <net/route.h>
+#include <netinet/in.h>
 #include <nfs/nfs.h>
 #include "nfs_mount4.h"
 
@@ -386,9 +387,9 @@ int net_activate (void)
     }
 
 
-int net_check_address (char *input_tv, struct in_addr *address_prr)
+int net_check_address (char *input_tv, struct in_addr *address_prr, int *net_bits)
     {
-    unsigned char  tmp_ti [20];
+    unsigned char  tmp_ti [32];
     unsigned char *start_pci;
     unsigned char *end_pci;
     int            i_ii;
@@ -399,6 +400,18 @@ int net_check_address (char *input_tv, struct in_addr *address_prr)
 
     strncpy (tmp_ti, input_tv, sizeof (tmp_ti));
     tmp_ti [sizeof (tmp_ti) - 1] = 0;
+
+    *net_bits = -1;
+    if((start_pci = strrchr(tmp_ti, '/'))) {
+      *start_pci++ = 0;
+      i_ii = strtol(start_pci, (char **) &end_pci, 10);
+      if(start_pci != end_pci && !*end_pci && i_ii > 0 && i_ii <= 32) {
+        *net_bits = i_ii;
+      }
+      else {
+        return -1;
+      }
+    }
 
     for (i_ii = 0; i_ii < (int) strlen (tmp_ti); i_ii++)
         if (!isdigit (tmp_ti [i_ii]) && tmp_ti [i_ii] != '.')
@@ -438,6 +451,8 @@ int net_check_address2(inet_t *inet, int do_dns)
   struct hostent *he = NULL;
   struct in_addr iaddr;
   slist_t *sl;
+  int net_bits;
+  uint32_t u32;
 #ifdef DIET
   char *s;
   file_t *f0, *f;
@@ -450,10 +465,15 @@ int net_check_address2(inet_t *inet, int do_dns)
 
   if(!inet->name || !*inet->name) return -1;
 
-  if(!net_check_address(inet->name, &iaddr)) {
+  if(!net_check_address(inet->name, &iaddr, &net_bits)) {
     inet->ok = 1;
     inet->ip = iaddr;
 
+    if(net_bits >= 0) {
+      u32 = -(1 << (32 - net_bits));
+      inet->net.s_addr = htonl(u32);
+    }
+  
     str_copy(&inet->name, inet_ntoa(inet->ip));
 
     return 0;
@@ -461,7 +481,7 @@ int net_check_address2(inet_t *inet, int do_dns)
 
   for(sl = config.net.dns_cache; sl; sl = sl->next) {
     if(sl->key && sl->value && !strcasecmp(sl->key, inet->name)) {
-      if(!net_check_address(sl->value, &iaddr)) {
+      if(!net_check_address(sl->value, &iaddr, &net_bits)) {
         inet->ok = 1;
         inet->ip = iaddr;
         return 0;
@@ -977,6 +997,10 @@ int net_input_data()
 {
   if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 1)) return -1;
 
+  if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
+    s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
+  }
+
   if(net_is_plip_im) {
     if(!config.net.pliphost.name) {
       name2inet(&config.net.pliphost, config.net.hostname.name);
@@ -1079,6 +1103,10 @@ int net_bootp()
       dia_input("HOSTNAME", machine_name_tg, sizeof machine_name_tg - 1, 16, 0);
 
       if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 0)) netconf_error++;
+
+      if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
+        s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
+      }
 
       if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) netconf_error++;
 
