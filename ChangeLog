@@ -1,3 +1,5 @@
+	- new hungarian texts
+
 12/10/2004:	v1.7.18
 	- linuxrc should *not* ask for dhcp after netsetup=dhcp
 
