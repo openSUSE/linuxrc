@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-09-17 15:41+0200\n"
+"PO-Revision-Date: 2001-09-22 08:19+0200\n"
 "Last-Translator: Roman Shevtsov <rshev@zhmer.org.ua>\n"
 "Language-Team: Russian <linux@zhmer.org.ua>\n"
 "MIME-Version: 1.0\n"
@@ -470,7 +470,7 @@ msgstr "Хотите перезагрузить систему?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This new installed system will now be started in order to commit the installation."
-msgstr "Базовая система была успешно установлена. Эта новая система бует сейчас запущена для окончательной установки."
+msgstr "Базовая система была успешно установлена. Эта новая система будет сейчас запущена для окончательной установки."
 
 #. TXT_ENTER_PARTITION
 msgid "Please enter the harddisk partition (eg. /dev/sda1)"
@@ -512,7 +512,7 @@ msgid ""
 "\n"
 "Of course ;-)"
 msgstr ""
-"Вам нравятся \"анимированые\" окна?\n"
+"Вам нравятся \"анимированные\" окна?\n"
 "\n"
 "Конечно ;-)"
 
@@ -651,7 +651,7 @@ msgstr "Пожалуйста, введите имя пользователя, под которым вы хотите связаться с 
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Please enter the password for the FTP user account"
-msgstr "Пожалйуста, введите пароль для доступа к серверу FTP"
+msgstr "Пожалуйста, введите пароль для доступа к серверу FTP"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Please enter the address of the FTP proxy"
@@ -668,7 +668,7 @@ msgstr "Хотите использовать FTP proxy?"
 #. TXT_NOMEM_FTP
 #, c-format
 msgid "Your computer does not have enough RAM to install via FTP! (%d MB RAM required)"
-msgstr "В вашем копьютере недостаточно RAM для проведения установки через FTP! (требуется %d MB RAM)"
+msgstr "В вашем компьютере недостаточно RAM для проведения установки через FTP! (требуется %d MB RAM)"
 
 #. TXT_ANONYM_FTP
 msgid ""
