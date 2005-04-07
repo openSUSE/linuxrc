@@ -1249,6 +1249,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
+  add_flag(&sl0, buf, config.zen, "zen");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
@@ -2993,7 +2994,7 @@ url_t *parse_url(char *str)
     if(s0[0] == '/' && s0[1] == '/') {
       s0 += 2;
       if((s = strchr(s0, '/'))) {
-        url.dir = strdup(s);
+        url.dir = strdup(config.zen ? s + 1 : s);
         *s = 0;
       }
       else {
@@ -3333,6 +3334,10 @@ void net_close(int fd)
 
     ftpGetFileDone(config.net.ftp_sock);
     ftpClose(config.net.ftp_sock);
+  }
+
+  if(config.instmode == inst_tftp) {
+    tftp_close(&config.net.tftp);
   }
 
   net_read_cleanup();

@@ -161,7 +161,7 @@ int net_config()
   if(
     config.win &&
     config.net.is_configured &&
-    dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES
+    (!config.manual || dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES)
   ) {
     return 0;
   }
@@ -181,7 +181,7 @@ int net_config()
 
   config.net.configured = nc_none;
 
-  if(config.win) {
+  if(config.win && config.net.setup != NS_DHCP) {
     if((config.net.setup & NS_DHCP)) {
       sprintf(buf, txt_get(TXT_ASK_DHCP), config.net.use_dhcp ? "DHCP" : "BOOTP");
       rc = dia_yesno(buf, NO);

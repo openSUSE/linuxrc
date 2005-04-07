@@ -40,7 +40,7 @@ typedef enum {
   key_rw, key_netid, key_nethwaddr, key_loglevel, key_netsetup,
   key_rootpassword, key_loghost, key_escdelay, key_minmem, key_updateprio,
   key_instnetdev, key_iucvpeer, key_portname, key_readchan, key_writechan,
-  key_datachan, key_ctcprotocol, key_netwait
+  key_datachan, key_ctcprotocol, key_netwait, key_zen, key_zenconfig
 } file_key_t;
 
 typedef enum {

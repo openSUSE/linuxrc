@@ -225,7 +225,9 @@ static struct {
   { key_datachan,	"DataChannel",	  kf_cfg + kf_cmd		 },
   { key_ctcprotocol,	"CTCProtocol",	  kf_cfg + kf_cmd		 },
 #endif
-  { key_netwait,        "NetWait",        kf_cfg + kf_cmd                }
+  { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
+  { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
+  { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -1208,6 +1210,18 @@ void file_do_info(file_t *f0)
         break;        
 #endif      
 
+      case key_netwait:
+        if(f->is.numeric) config.net.ifup_wait = f->nvalue;
+        break;
+
+      case key_zen:
+        if(f->is.numeric) config.zen = f->nvalue;
+        break;
+
+      case key_zenconfig:
+        if(*f->value) str_copy(&config.zenconfig, f->value);
+        break;
+
       default:
         break;
     }
@@ -1255,10 +1269,6 @@ int file_read_yast_inf()
 
       case key_aborted:
         config.aborted = f->nvalue;
-        break;
-
-      case key_netwait:
-        if(f->is.numeric) config.net.ifup_wait = f->nvalue;
         break;
 
       default:

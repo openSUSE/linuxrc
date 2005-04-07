@@ -646,6 +646,8 @@ void lxrc_init()
 
   config.update.map = calloc(1, MAX_UPDATES);
 
+  config.zenconfig = strdup("settings.txt");
+
   util_set_product_dir("suse");
 
   config.net.bootp_timeout = 10;

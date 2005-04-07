@@ -1,3 +1,9 @@
+7/3/2005:	v1.7.18
+	- netwait=N option fixed
+	- some zenworks stuff
+	- zen: urls specfify relative paths
+	- don't show unnecessary network config popup during autoinstall (#47690)
+
 1/10/2004:	v1.7.17
 	- italian translations
 
