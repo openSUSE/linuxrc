@@ -11,6 +11,9 @@ endif
 ifeq "$(ARCH)" "i686"
 ARCH	:= i386
 endif
+ifeq "$(ARCH)" "armv5tel"
+ARCH	:= armv4l
+endif
 
 CC_DIET	= diet gcc
 CC_UC	= /opt/$(ARCH)-linux-uclibc/usr/bin/gcc
@@ -85,6 +88,10 @@ ifeq ($(ARCH),mips)
     LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
     OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"mips\"
+endif
+
+ifeq ($(ARCH),armv4l)
+    CFLAGS		+= -DLX_ARCH=\"armv4l\"
 endif
 
 ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))

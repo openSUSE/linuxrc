@@ -275,14 +275,11 @@ static struct {
   { "cdrom",     inst_cdrom         },
   { "cifs",      inst_smb           },
 #if defined(__s390__) || defined(__s390x__)
-  { "osatr",	 di_390net_osatr    },
-  { "osaeth",	 di_390net_osaeth   },
-  { "osaexeth",	 di_390net_osaexeth },
+  { "osa",	 di_390net_osa      },
   { "ctc",	 di_390net_ctc	    },
   { "escon",	 di_390net_escon    },
   { "iucv",	 di_390net_iucv     },
   { "hsi",	 di_390net_hsi	    },
-  { "osaextr",	 di_390net_osaextr  },
 #endif
 };
 

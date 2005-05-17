@@ -492,6 +492,8 @@ typedef struct {
     int protocol;
     char* portname;
     int type;
+    int interface;
+    int medium;
   } hwp;
   
 #endif

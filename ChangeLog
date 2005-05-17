@@ -1,3 +1,6 @@
+	- s390: restructured net IF config as suggested by Ihnken Menssen
+	- added armv4l support to Makefile
+
 6/4/2005:	v1.8.9
 	- s390: SCRIPTUP_* entries in hwcfg-* files must be lower-case
 	  after the underscore

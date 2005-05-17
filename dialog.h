@@ -80,18 +80,20 @@ typedef enum {
   di_display_vnc,
   di_display_ssh,
 
-  di_390net_osatr,
-  di_390net_osaeth,
-  di_390net_osaexeth,
+  di_390net_osa,
   di_390net_ctc,
   di_390net_escon,
   di_390net_iucv,
   di_390net_hsi,
-  di_390net_osaextr,
   
   di_ctc_compat,
   di_ctc_ext,
-  di_ctc_zos390
+  di_ctc_zos390,
+  
+  di_osa_eth,
+  di_osa_tr,
+  di_osa_lcs,
+  di_osa_qdio,
 
 } dia_item_t;
 

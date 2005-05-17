@@ -1789,14 +1789,11 @@ int net_activate_s390_devs(void)
 
   dia_item_t di;
   dia_item_t items[] = {
-    di_390net_osatr,
-    di_390net_osaeth,
-    di_390net_osaexeth,
+    di_390net_osa,
+    di_390net_hsi,
     di_390net_ctc,
     di_390net_escon,
     di_390net_iucv,
-    di_390net_hsi,
-    di_390net_osaextr,
     di_none
   };
 
@@ -1883,78 +1880,119 @@ int net_activate_s390_devs(void)
     
     break;
     
-  case di_390net_osaexeth:
+  case di_390net_osa:
   case di_390net_hsi:
-  case di_390net_osaextr:
-    mod_modprobe("qeth",NULL);	// FIXME: error handling
-
-    net_list_s390_devs("qeth",di==di_390net_hsi?5:1);
-
-    if((rc=net_s390_getrwchans())) return rc;
-    IFNOTAUTO(config.hwp.datachan)
-      if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
-    if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
-    
-    IFNOTAUTO(config.hwp.portname)
+    if(di == di_390net_hsi)
     {
-      if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
-      // FIXME: warn about problems related to empty portnames
+      config.hwp.interface=di_osa_qdio;
+      config.hwp.medium=di_osa_eth;
     }
-    
-    if((rc=net_s390_group_chans(3,"qeth"))) return rc;
-
-    /* set portname */
-    devpath=hotplug_get_info("DEVPATH");
-    hotplug_event_handled();
-    if(!devpath) return -1;
-    if(strlen(config.hwp.portname)>0)
+    else
     {
-      sprintf(buf,"/sys/%s/portname",devpath);
-      if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
+      /* ask for LCS/QDIO */
+      dia_item_t interfaces[] = {
+        di_osa_qdio,
+        di_osa_lcs,
+        di_none
+      };
+
+      IFNOTAUTO(config.hwp.interface)
+      {
+        rc = dia_menu2(txt_get(TXT_CHOOSE_OSA_INTERFACE), 33, 0, interfaces, config.hwp.interface?:di_osa_qdio);
+        if(rc == -1) return rc;
+        config.hwp.interface=rc;
+      }
+      else
+        rc=config.hwp.interface;
+
+      /* ask for TR/ETH */
+
+      dia_item_t media[] = {
+        di_osa_eth,
+        di_osa_tr,
+        di_none
+      };
+
+      IFNOTAUTO(config.hwp.medium)
+      {
+        rc = dia_menu2(txt_get(TXT_CHOOSE_OSA_MEDIUM), 33, 0, media, config.hwp.medium?:di_osa_eth);
+        if(rc == -1) return rc;
+        config.hwp.medium=rc;
+      }
+      else
+        rc=config.hwp.medium;
     }
 
-    if((rc=net_s390_put_online(devpath))) return rc;
-    
-    sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
-    config.hwp.module="qeth_mod";
-    net_s390_set_config_ccwdev();
-    config.hwp.scriptup_ccwgroup="hwup-qeth";
-    strprintf(&config.hwp.ccw_chan_ids,"%s %s %s",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
-    config.hwp.ccw_chan_num=3;
-    
-    break;
-    
-  case di_390net_osatr:
-  case di_390net_osaeth:
-    mod_modprobe("lcs",NULL);	// FIXME: error handling
-    
-    net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
-    
-    if((rc=net_s390_getrwchans())) return rc;
-    
-    IFNOTAUTO(config.hwp.portname)
-      if((rc=dia_input2(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
-
-    if((rc=net_s390_group_chans(2,"lcs"))) return rc;
-    
-    /* set portname */
-    devpath=hotplug_get_info("DEVPATH");
-    hotplug_event_handled();
-    if(!devpath) return -1;
-    if(strlen(config.hwp.portname)>0)
+    if(config.hwp.medium == di_osa_eth)
     {
-      sprintf(buf,"/sys/%s/portno",devpath);
-      if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
+      mod_modprobe("qeth",NULL);	// FIXME: error handling
+
+      net_list_s390_devs("qeth",di==di_390net_hsi?5:1);
+
+      if((rc=net_s390_getrwchans())) return rc;
+      IFNOTAUTO(config.hwp.datachan)
+        if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
+      if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
+      
+      IFNOTAUTO(config.hwp.portname)
+      {
+        if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
+        // FIXME: warn about problems related to empty portnames
+      }
+      
+      if((rc=net_s390_group_chans(3,"qeth"))) return rc;
+
+      /* set portname */
+      devpath=hotplug_get_info("DEVPATH");
+      hotplug_event_handled();
+      if(!devpath) return -1;
+      if(strlen(config.hwp.portname)>0)
+      {
+        sprintf(buf,"/sys/%s/portname",devpath);
+        if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
+      }
+
+      if((rc=net_s390_put_online(devpath))) return rc;
+      
+      sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
+      config.hwp.module="qeth_mod";
+      net_s390_set_config_ccwdev();
+      config.hwp.scriptup_ccwgroup="hwup-qeth";
+      strprintf(&config.hwp.ccw_chan_ids,"%s %s %s",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
+      config.hwp.ccw_chan_num=3;
     }
-    
-    if((rc=net_s390_put_online(devpath))) return rc;
-    
-    net_s390_set_config_ccwdev();
-    sprintf(hwcfg_name, "lcs-bus-ccw-%s",config.hwp.readchan);
-    config.hwp.module="lcs";
-    config.hwp.scriptup_ccwgroup="hwup-lcs";
-    config.hwp.ccw_chan_num=2;
-    strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
+    else	/* LCS */
+    {
+      mod_modprobe("lcs",NULL);	// FIXME: error handling
+      
+      net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
+      
+      if((rc=net_s390_getrwchans())) return rc;
+      
+      IFNOTAUTO(config.hwp.portname)
+        if((rc=dia_input2(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
+
+      if((rc=net_s390_group_chans(2,"lcs"))) return rc;
+      
+      /* set portname */
+      devpath=hotplug_get_info("DEVPATH");
+      hotplug_event_handled();
+      if(!devpath) return -1;
+      if(strlen(config.hwp.portname)>0)
+      {
+        sprintf(buf,"/sys/%s/portno",devpath);
+        if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
+      }
+      
+      if((rc=net_s390_put_online(devpath))) return rc;
+      
+      net_s390_set_config_ccwdev();
+      sprintf(hwcfg_name, "lcs-bus-ccw-%s",config.hwp.readchan);
+      config.hwp.module="lcs";
+      config.hwp.scriptup_ccwgroup="hwup-lcs";
+      config.hwp.ccw_chan_num=2;
+      strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
+    }
     
     break;
     

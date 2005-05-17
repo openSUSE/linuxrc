@@ -100,18 +100,20 @@ struct {
   { di_display_x11,	0, "X11"	    },
   { di_display_ssh,     0, "SSH"	    },
   
-  { di_390net_osatr,	TXT_390NET_OSATR    },
-  { di_390net_osaeth,	TXT_390NET_OSAETH   },
-  { di_390net_osaexeth, TXT_390NET_OSAEXETH },
+  { di_390net_osa,	TXT_390NET_OSA      },
   { di_390net_ctc,	TXT_390NET_CTC	    },
   { di_390net_escon,	TXT_390NET_ESCON    },
   { di_390net_iucv,	TXT_390NET_IUCV     },
   { di_390net_hsi,	TXT_390NET_HSI	    },
-  { di_390net_osaextr,	TXT_390NET_OSAEXTR  },
   
   { di_ctc_compat,	TXT_CTC_PROT_COMPAT },
   { di_ctc_ext,		TXT_CTC_PROT_EXT    },
-  { di_ctc_zos390,	TXT_CTC_PROT_ZOS390 }
+  { di_ctc_zos390,	TXT_CTC_PROT_ZOS390 },
+  
+  { di_osa_eth,		TXT_OSA_ETH         },
+  { di_osa_tr,		TXT_OSA_TR          },
+  { di_osa_lcs,		TXT_OSA_LCS         },
+  { di_osa_qdio,	TXT_OSA_QDIO        },
 
 };
 

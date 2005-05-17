@@ -11,6 +11,7 @@ int hotplug_main(int argc, char** argv)
   char** e=environ;
   char* eq;	/* position of the equal sign in each string */
   
+  printf("/sbin/hotplug called\n");
   FILE* fp=fopen("/hotplug.msg","w");
   
   fprintf(fp,"%s\n",argc>1?argv[1]:"");	/* write type of hotplug event */
@@ -22,6 +23,7 @@ int hotplug_main(int argc, char** argv)
     {
       *eq++=0;	/* split string at '=' character */
       fprintf(fp,"%s: %s\n",e[0],eq);
+      printf("%s: %s\n",e[0],eq);
     }
     e++;
   }
@@ -36,6 +38,7 @@ int hotplug_wait_for_event(char* type)
   const int sleeps[10]={2,1,2,3,4,5,6,7,8,9};	/* number of seconds to sleep between tries */
   FILE* fp;
   int counter;
+  printf("waiting for event %s\n",type);
   for(counter=0;counter<10;counter++)
   {
     sleep(sleeps[counter]);
@@ -53,6 +56,7 @@ char* hotplug_get_info(char* key)
 {
   static char info[100];
   file_t *f,*g;
+  printf("reading key %s from /hotplug.msg\n",key);
   f=file_read_file("/hotplug.msg",kf_none);
   g=file_getentry(f,key);
   if(!g) return 0;	/* key not found */
@@ -63,5 +67,6 @@ char* hotplug_get_info(char* key)
 
 void hotplug_event_handled(void)
 {
+  printf("deleting /hotplug.msg\n");
   unlink("/hotplug.msg");
 }

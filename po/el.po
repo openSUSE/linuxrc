@@ -970,18 +970,6 @@ msgstr "Παρακαλώ επιλέξτε τον τύπο της συσκευή�
 msgid "Please enter the name (user ID) of the VM peer to connect to."
 msgstr "Παρακαλώ εισάγετε το όνομα(Αναγνωριστικό χρήστη) του VM ισότιμου για σύνδεση σε αυτό"
 
-#. TXT_390NET_OSATR
-msgid "OSA Token Ring (LCS)"
-msgstr "OSA Token Ring (LCS)"
-
-#. TXT_390NET_OSAETH
-msgid "OSA Ethernet"
-msgstr "OSA Ethernet"
-
-#. TXT_390NET_OSAEXETH
-msgid "OSA Gigabit Ethernet or OSA Express Fast Ethernet"
-msgstr "OSA Gigabit Ethernet ή OSA Express Fast Ethernet"
-
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"
 msgstr "Channel To Channel (CTC)"
@@ -997,10 +985,6 @@ msgstr "Inter-User Communication Vehicle (IUCV)"
 #. TXT_390NET_HSI
 msgid "Hipersockets"
 msgstr "Hipersockets"
-
-#. TXT_390NET_OSAEXTR
-msgid "OSA High Speed Token Ring"
-msgstr "OSA High Speed Token Ring"
 
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
@@ -1162,4 +1146,32 @@ msgstr "Hipersocket"
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Θέλετε να απενεργοποιήσετε το σύστημα τώρα;"
+
+#. TXT_390NET_OSA
+msgid "OSA-2 or OSA Express"
+msgstr ""
+
+#. TXT_OSA_ETH
+msgid "Ethernet"
+msgstr ""
+
+#. TXT_OSA_TR
+msgid "Token Ring"
+msgstr ""
+
+#. TXT_OSA_LCS
+msgid "LCS"
+msgstr ""
+
+#. TXT_OSA_QDIO
+msgid "QDIO"
+msgstr ""
+
+#. TXT_CHOOSE_OSA_INTERFACE
+msgid "Please choose the CCW bus interface."
+msgstr ""
+
+#. TXT_CHOOSE_OSA_MEDIUM
+msgid "Please choose the physical medium."
+msgstr ""
 
