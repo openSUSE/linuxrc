@@ -408,18 +408,28 @@ void lxrc_change_root2()
   fprintf(stderr, "starting %s\n", config.new_root);
 
   umount("/mnt");
-  util_mount_ro(config.new_root, "/mnt");
+  if(config.rescue) {
+    util_mount_rw(config.new_root, "/mnt");
+  }
+  else{
+    util_mount_ro(config.new_root, "/mnt");
+  }
   chdir("/mnt");
 
+  if(config.rescue && util_check_exist("/mnt/lib/modules") == 'd') {
+    mount("/lib/modules", "/mnt/lib/modules", "none", MS_BIND, 0);
+  }
+
   umount2("/", MNT_DETACH);
+
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
 
   /* really necessary? */
-  umount2("/", MNT_DETACH);
+  if(!config.rescue) umount2("/", MNT_DETACH);
 
   /* put / entry back into /proc/mounts */
-  mount("/", "/", "none", MS_BIND, 0);
+  if(!config.rescue) mount("/", "/", "none", MS_BIND, 0);
 
   execl("/sbin/init", "init", NULL);
 
@@ -810,9 +820,17 @@ void lxrc_init()
   config.initrd_has_ldso = 1;
 #endif
 
-  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
-    sprintf(buf, "/dev/ram%d", i + 2);
-    str_copy(&config.ramdisk[i].dev, buf);
+  if(config.tmpfs && util_check_exist("/download") == 'd') {
+    for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+      sprintf(buf, "/download/image%d", i);
+      str_copy(&config.ramdisk[i].dev, buf);
+    }
+  }
+  else {
+    for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
+      sprintf(buf, "/dev/ram%d", i + 2);
+      str_copy(&config.ramdisk[i].dev, buf);
+    }
   }
 
   config.inst_ramdisk = -1;
