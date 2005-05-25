@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <inttypes.h>
 #include <ctype.h>
+#include <errno.h>
 
 #ifdef DIET
 #include <asm/sigcontext.h>
@@ -74,6 +75,7 @@
 
 static void lxrc_main_menu     (void);
 static void lxrc_catch_signal_11(SIGNAL_ARGS);
+static void sig_chld(int signum);
 static void lxrc_catch_signal  (int signum);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (dia_item_t di);
@@ -713,15 +715,34 @@ void lxrc_catch_signal(int signum)
 }
 
 
+void sig_chld(int signum)
+{
+  while(waitpid(-1, NULL, WNOHANG) && errno != ECHILD);
+}
+
+
 void lxrc_init()
 {
   int i, j;
   char buf[256];
+  pid_t lxrc_pid;
 
   if(txt_init()) {
     printf("Linuxrc error: Corrupted texts!\n");
     exit(-1);
   }
+
+#if 0
+  if(!config.test && (lxrc_pid = fork())) {
+    if(lxrc_pid != -1) {
+      signal(SIGCHLD, sig_chld);
+
+      waitpid(lxrc_pid, NULL, 0);
+    }
+
+    exit(0);
+  }
+#endif
 
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);

@@ -1954,20 +1954,32 @@ void free_hlink_list()
 }
 
 
-void util_start_shell(char *tty, char *shell, int new_env)
+/*
+ * flags:
+ *   bit 0: 0 = keep env, 1 = set new env
+ *   bit 1: 1 = login shell ("-l")
+ */
+void util_start_shell(char *tty, char *shell, int flags)
 {
   int fd;
-  char *s, *args[] = { NULL, NULL };
+  char *s, *args[] = { NULL, NULL, NULL };
   char *env[] = {
-    "TERM=linux",
+    NULL,	/* TERM */
+    NULL,	/* INSTSYS */
+    "LANG=en_US.UTF-8",
     "PS1=\\w # ",
     "HOME=/",
-    "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/YaST2/bin:/usr/X11R6/bin",
+    "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/lib/YaST2/bin:/lbin",
     NULL
   };
   extern char **environ;
 
   *args = (s = strrchr(shell, '/')) ? s + 1 : shell;
+
+  if((flags & 2)) args[1] = "-l";
+
+  strprintf(env + 0, "TERM=%s", getenv("TERM") ?: "linux");
+  strprintf(env + 1, "INSTSYS=%s", getenv("INSTSYS") ?: "");
 
   if(!fork()) {
     for(fd = 0; fd < 20; fd++) close(fd);
@@ -1977,12 +1989,14 @@ void util_start_shell(char *tty, char *shell, int new_env)
     dup(fd);
     dup(fd);
 
+    printf("\033c");
+
     if(config.utf8) {
       printf("\033%%G");
       fflush(stdout);
     }
 
-    execve(shell, args, new_env ? env : environ);
+    execve(shell, args, (flags & 1) ? env : environ);
     fprintf(stderr, "Couldn't start shell (errno = %d)\n", errno);
     exit(-1);
   }

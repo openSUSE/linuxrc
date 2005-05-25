@@ -1,3 +1,5 @@
+	- export INSTSYS to all shells (#85617)
+
 23/5/2005:	v1.9.0
 	- s390: restructured net IF config as suggested by Ihnken Menssen
 	- added armv4l support to Makefile
