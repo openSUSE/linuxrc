@@ -245,7 +245,7 @@ int ask_for_swap(int size, char *msg)
 /*
  * returns ramdisk index if successful
  */
-int load_image(char *file_name, instmode_t mode)
+int load_image(char *file_name, instmode_t mode, char *label)
 {
   char buffer[BLOCKSIZE], cramfs_name[17];
   int bytes_read, current_pos;
@@ -379,14 +379,15 @@ int load_image(char *file_name, instmode_t mode)
       return image.rd = -1;
     }
 
-    sprintf(buffer, "%s (%d kB)%s",
-      txt_get(TXT_LOADING),
+    sprintf(buffer, "%s %s (%d kB)%s",
+      "Loading",	// txt_get(TXT_LOADING)
+      label,
       root_nr_blocks_im * BLOCKSIZE_KB,
-      config.win ? "" : "..."
+      config.win ? "" : " -     "
     );
   }
   else {
-    sprintf(buffer, "%s%s", txt_get(TXT_LOADING), config.win ? "" : "...");
+    sprintf(buffer, "%s %s%s", "Loading" /* txt_get(TXT_LOADING) */, label, config.win ? "" : " -     ");
   }
 
   dia_status_on(&root_status_win_rm, buffer);

@@ -521,7 +521,7 @@ int mod_add_disk(int prompt, int type)
   if(config.module.more_file[type] && *config.module.more_file[type]) {
     sprintf(buf, "%s/%s", config.mountpoint.floppy, config.module.more_file[type]);
     if(util_check_exist(buf)) {
-      config.module.ramdisk = load_image(buf, inst_file);
+      config.module.ramdisk = load_image(buf, inst_file, "Modules");
       if(config.module.ramdisk >= 0) {
         got_image = 1;
       }

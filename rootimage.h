@@ -8,7 +8,7 @@
 
 extern void root_set_root       (char *root_tv);
 extern int  root_boot_system    (void);
-int load_image(char *file_name, instmode_t mode);
+int load_image(char *file_name, instmode_t mode, char *label);
 int ramdisk_open(void);
 void ramdisk_close(int rd);
 void ramdisk_free(int rd);

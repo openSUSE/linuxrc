@@ -817,35 +817,27 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     }
 
 
-void dia_status (window_t *win_prv, int percent_iv)
-    {
-    char line_ti [STATUS_SIZE + 1];
-    int  i_ii;
-    static unsigned count = 0;
+void dia_status (window_t *win, int p)
+{
+  char buf[STATUS_SIZE + 1];
+  int i;
 
-    if(!config.win || config.linemode) {
-      if(percent_iv >= 100) {
-        printf(".");
-      }
-      else {
-        if(!(count & 3)) printf(".");
-      }
-      count++;
-      fflush(stdout);
-      return;
-    }
+  if(p > 100) p = 100;
 
-    if (percent_iv > 100)
-        percent_iv = 100;
+  if(!config.win || config.linemode) {
+    printf("\x08\x08\x08\x08%3d%%", p);
+  }
+  else {
+    for(i = 0; i < p * STATUS_SIZE / 100; i++) buf[i] = ' ';
+    buf[i] = 0;
 
-    for (i_ii = 0; i_ii < percent_iv * STATUS_SIZE / 100; i_ii++)
-        line_ti [i_ii] = ' ';
-    line_ti [i_ii] = 0;
-    disp_set_color (win_prv->bg_color, win_prv->fg_color);
-    disp_gotoxy (win_prv->x_left + 3, win_prv->y_right - 2);
-    disp_write_string (line_ti);
-    fflush (stdout);
-    }
+    disp_set_color(win->bg_color, win->fg_color);
+    disp_gotoxy(win->x_left + 3, win->y_right - 2);
+    disp_write_string(buf);
+  }
+
+  fflush(stdout);
+}
 
 void dia_status_off (window_t *win_prv)
 {
