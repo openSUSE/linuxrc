@@ -422,7 +422,7 @@ void lxrc_change_root2()
     mount("/lib/modules", "/mnt/lib/modules", "none", MS_BIND, 0);
   }
 
-  umount2("/", MNT_DETACH);
+  if((config.xxx & 2)) umount2("/", MNT_DETACH);
 
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
@@ -479,7 +479,7 @@ void lxrc_movetotmpfs2()
 
   if(mkdir("oldroot", 0755)) perror("oldroot");
 
-  umount2("/", MNT_DETACH);
+  if((config.xxx & 1)) umount2("/", MNT_DETACH);
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
 

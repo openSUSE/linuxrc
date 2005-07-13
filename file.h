@@ -41,7 +41,7 @@ typedef enum {
   key_rootpassword, key_loghost, key_escdelay, key_minmem, key_updateprio,
   key_instnetdev, key_iucvpeer, key_portname, key_readchan, key_writechan,
   key_datachan, key_ctcprotocol, key_netwait, key_newid, key_moduledisks,
-  key_zen, key_zenconfig, key_port, key_smbshare, key_rootimage2
+  key_zen, key_zenconfig, key_port, key_smbshare, key_rootimage2, key_xxx
 } file_key_t;
 
 typedef enum {

@@ -237,7 +237,8 @@ static struct {
   { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_port,           "Port",           kf_none                        },
   { key_smbshare,       "Share",          kf_none                        },
-  { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                }
+  { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                },
+  { key_xxx,            "xxx",            kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -1255,6 +1256,10 @@ void file_do_info(file_t *f0)
             sl->value = strdup(s);
           }
         }
+        break;
+
+      case key_xxx:
+        if(f->is.numeric) config.xxx = f->nvalue;
         break;
 
       default:
