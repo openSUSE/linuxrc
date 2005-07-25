@@ -431,12 +431,10 @@ void set_choose_keytable(int always_show)
     }
   }
 
-  if(config.keymap && !always_show) {
+  if(!config.win || (config.keymap && !always_show)) {
     set_activate_keymap(config.keymap);
     return;
   }
-
-  if(!config.win && !always_show) return;
 
   for(i = cnt = default_idx = 0; i < keymaps; i++) {
     sprintf(buf, "/kbd/keymaps/%s.map", keymap[i].mapname);

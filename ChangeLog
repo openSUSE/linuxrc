@@ -1,3 +1,6 @@
+25/7/2005:	v1.9.4
+	- show kbd layout dialog for rescue system only when needed
+
 13/7/2005:	v1.9.3
 	- temporary workaround for mount problem
 

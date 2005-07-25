@@ -286,8 +286,12 @@ int main(int argc, char **argv, char **env)
 #ifdef USE_LIBHD
   else if(!config.manual) {
     if(config.rescue) {
-      int win_old;
-      if(!(win_old = config.win)) util_disp_init();
+      int win_old = 1;
+
+      if(
+        config.language == lang_undef &&
+        !(win_old = config.win)
+      ) util_disp_init();
       set_choose_keytable(0);
       if(!win_old) util_disp_done();
       
