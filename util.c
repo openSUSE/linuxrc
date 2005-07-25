@@ -643,6 +643,8 @@ int util_free_ramdisk(char *ramdisk_dev)
   int fd;
   int err = 0;
 
+  if(util_check_exist(ramdisk_dev) != 'b') return 0;
+
   if((fd = open(ramdisk_dev, O_RDWR)) >= 0) {
     if(ioctl(fd, BLKFLSBUF)) {
       err = errno;
