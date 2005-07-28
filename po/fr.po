@@ -195,11 +195,6 @@ msgstr ""
 "\n"
 "Vérifiez la spécification du répertoire."
 
-# TLABEL linuxrc_2002_03_29_0036__32
-#. TXT_LOADING
-msgid "Loading data into RAM disk..."
-msgstr "Chargement des données dans le disque RAM..."
-
 # TLABEL linuxrc_2002_03_29_0036__33
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
@@ -1361,5 +1356,30 @@ msgstr ""
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_MODULES
+msgid "Loading Modules"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_INSTSYS
+msgid "Loading Installation System"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_FONTS
+msgid "Loading Additional Fonts"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_UPDATE
+msgid "Loading Driver Update"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_RESCUE
+msgid "Loading Rescue System"
 msgstr ""
 

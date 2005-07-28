@@ -238,7 +238,10 @@ static struct {
   { key_port,           "Port",           kf_none                        },
   { key_smbshare,       "Share",          kf_none                        },
   { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                },
-  { key_xxx,            "xxx",            kf_cfg + kf_cmd + kf_cmd_early }
+  { key_xxx,            "xxx",            kf_cfg + kf_cmd + kf_cmd_early },
+  { key_instsys_id,     "InstsysID",      kf_cfg                         },
+  { key_initrd_id,      "InitrdID",       kf_cfg                         },
+  { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd + kf_cmd_early }
 };
 
 static struct {
@@ -1260,6 +1263,18 @@ void file_do_info(file_t *f0)
 
       case key_xxx:
         if(f->is.numeric) config.xxx = f->nvalue;
+        break;
+
+      case key_instsys_complain:
+        if(f->is.numeric) config.instsys_complain = f->nvalue;
+        break;
+
+      case key_instsys_id:
+        str_copy(&config.instsys_id, f->value);
+        break;
+
+      case key_initrd_id:
+        str_copy(&config.initrd_id, f->value);
         break;
 
       default:

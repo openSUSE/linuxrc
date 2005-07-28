@@ -3,1095 +3,1177 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <i18n@suse.de>\n"
+"Project-Id-Version: Linuxrc\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-02-23 15:06+0100\n"
+"PO-Revision-Date: 2004-09-28 14:50+0200\n"
+"Last-Translator: Craig Jeffares <cjeffares@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
-msgstr ""
+msgstr "戻る"
 
 #. TXT_YES
 msgid "Yes"
-msgstr ""
+msgstr "はい"
 
 #. TXT_NO
 msgid "No"
-msgstr ""
+msgstr "いいえ"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Select the language."
-msgstr ""
+msgstr "言語を選択してください。"
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr ""
+msgstr "カラーディスプレイ"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
-msgstr ""
+msgstr "モノクロディスプレイ"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
-msgstr ""
+msgstr "ディスプレイの種類を選択してください。"
 
 #. TXT_MENU_LANG
 msgid "Language"
-msgstr ""
+msgstr "言語"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr ""
+msgstr "カーネルモジュール(ハードウェアドライバ)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
-msgstr ""
+msgstr "インストール処理またはシステムを開始する"
 
 #. TXT_MENU_INFO
 msgid "System Information"
-msgstr ""
+msgstr "システム情報"
 
 #. TXT_HDR_MAIN
 msgid "Main Menu"
-msgstr ""
+msgstr "メインメニュー"
 
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr ""
+msgstr "ディスプレイ"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr ""
+msgstr "キーマップ"
 
 #. TXT_LOAD_NET
 msgid "Load Network Card Modules"
-msgstr ""
+msgstr "ネットワークカードモジュールをロードする"
 
 #. TXT_SHOW_MODULES
 msgid "Show Loaded Modules"
-msgstr ""
+msgstr "ロードされているモジュールを表示する"
 
 #. TXT_AUTO_LOAD
 msgid "Load Modules Automatically"
-msgstr ""
+msgstr "モジュールを自動ロードする"
 
 #. TXT_DEL_MODULES
 msgid "Unload Modules"
-msgstr ""
+msgstr "モジュールをアンロードする"
 
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console "
+"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
+"モジュール\"%s\"をロードしています...\n"
+"\n"
+"ロード中、<Alt>キーを押しながら<F4>キーを押すと、仮想コンソール4でカーネル"
+"メッセージを監視できます。 このメニューに戻るには、<Alt>キーを押しながら<F1>"
+"キーを押します。"
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr ""
+msgstr "モジュール\"%s\"がロードされました。"
 
 #. TXT_LOAD_FAILED
 #, c-format
 msgid "Failed to load module \"%s\"."
-msgstr ""
+msgstr "モジュール\"%s\"をロードできませんでした。"
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr ""
+msgstr "CD-ROM"
 
 #. TXT_FLOPPY
 msgid "Floppy"
-msgstr ""
+msgstr "フロッピーディスク"
 
 #. TXT_HARDDISK
 msgid "Hard Disk"
-msgstr ""
+msgstr "ハードディスク"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr ""
+msgstr "インストールまたはアップデートを開始する"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
-msgstr ""
+msgstr "レスキューシステムを開始する"
 
 #. TXT_LOAD_RS_NFS
 msgid "Load Rescue System via NFS"
-msgstr ""
+msgstr "NFSを使用してレスキューシステムをロードする"
 
 #. TXT_BOOT_SYSTEM
 msgid "Boot Installed System"
-msgstr ""
+msgstr "インストールしたシステムをブートする"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr ""
+msgstr "画像\"%s\"を検索しています..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
-
-#. TXT_LOADING
-msgid "Loading data into RAM disk..."
-msgstr ""
+"画像が見つかりませんでした。\n"
+"\n"
+"ディレクトリの指定が正しいかどうかを確認してください。"
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
-msgstr ""
+msgstr "カーネルメッセージ"
 
 #. TXT_INFO_CPU
 msgid "Processor"
-msgstr ""
+msgstr "プロセッサ"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr ""
+msgstr "デバイス"
 
 #. TXT_INFO_NETDEV
 msgid "Network Cards"
-msgstr ""
+msgstr "ネットワークカード"
 
 #. TXT_INFO_DMA
 msgid "DMA"
-msgstr ""
+msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr ""
+msgstr "割り込み"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
-msgstr ""
+msgstr "I/Oポート"
 
 #. TXT_INFO_MEM
 msgid "Memory"
-msgstr ""
+msgstr "メモリ"
 
 #. TXT_INFO_MODULES
 msgid "Modules"
-msgstr ""
+msgstr "モジュール"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr ""
+msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Insert the disk and press ENTER."
-msgstr ""
+msgstr "ディスクを挿入し、<Enter>キーを押してください。"
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
-msgstr ""
+msgstr "フロッピーディスクからデータを読み取る処理で、エラーが発生しました。"
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr ""
+msgstr "ルートパーティションを入力してください(例:「/dev/sda3」)。"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device."
-msgstr ""
+msgstr "ルートデバイスが無効です。"
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr ""
+msgstr "入力値が無効です。"
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
-msgstr ""
+msgstr "IPアドレスを入力してください。"
 
 #. TXT_INPUT_NETMASK
 msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
+"Enter your netmask. For a normal class C network, this is usually "
+"255.255.255.0."
 msgstr ""
+"ネットマスクを入力してください。 一般的なクラスCネットワークの場合、ネットマ"
+"スクは通常「255.255.255.0」です。"
 
 #. TXT_INPUT_GATEWAY
 msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
+"If you need a gateway to reach the server, enter the IP address of the "
+"gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
+"サーバに接続するためにゲートウェイが必要な場合、そのゲートウェイのIPアドレス"
+"を入力してください。 ゲートウェイが不要な場合は、自分のコンピュータのIPアドレ"
+"スを入力してください。"
 
 #. TXT_INPUT_NAMED
 msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
+"Enter the IP address of your name server. If you do not use a name server, "
+"press ESC."
 msgstr ""
+"ネームサーバのIPアドレスを入力してください。 ネームサーバを使用しない場合は、"
+"<ESC>キーを押してください。"
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
+"次のデータが取得されました:\n"
+"\n"
+"IPアドレス: %s \n"
+"名前: %s \n"
+"ドメイン: %s"
 
 #. TXT_ERROR_CONF_NET
 msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
+"An error occurred during the network configuration. Your network card "
+"probably was not recognized by the kernel."
 msgstr ""
+"ネットワーク環境を設定する処理で、エラーが発生しました。 ネットワークカードが"
+"カーネルによって認識されなかった可能性があります。"
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
-msgstr ""
+msgstr "NFSサーバのIPアドレスを入力してください。"
 
 #. TXT_INPUT_FTPSERVER
 msgid "Enter the IP address of the FTP server."
-msgstr ""
+msgstr "FTPサーバのIPアドレスを入力してください。"
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
-msgstr ""
+msgstr "サーバ上のディレクトリを入力してください。"
 
 #. TXT_ENTER_PARAMS
 #, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr ""
+msgstr "\"%s\"に対するパラメータを入力してください。"
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
 msgstr ""
+"ディレクトリ\n"
+"\n"
+"\"%s:%s\"をマウントしています..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
+"NFSディレクトリをマウントする処理で、エラーが発生しました。\n"
+"\n"
+"サーバから通知された理由: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
+"キーボードマップを選択してください。\n"
+"YaSTによって、後で追加のキーボードテーブルが用意されます。"
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
-msgstr ""
+msgstr "アンロードするモジュールを選択してください。"
 
 #. TXT_NO_MODULES
 msgid "No modules currently loaded."
-msgstr ""
+msgstr "現在、モジュールは一つもロードされていません。"
 
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr ""
+msgstr "自動検出を実行しています(%s)...      "
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
-msgstr ""
+msgid "Search for additional SCSI host adaptors?"
+msgstr "他のSCSIホストアダプタを検索しますか?"
 
 #. TXT_WANT_MORE_NET
 msgid "Search for additional network cards?"
-msgstr ""
+msgstr "他のネットワークカードを検索しますか?"
 
 #. TXT_WANT_MORE_CDROM
 msgid "Search for additional CD-ROM drives?"
-msgstr ""
+msgstr "他のCD-ROMドライブを検索しますか?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr ""
+msgstr "Ethernetネットワークカード"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr ""
+msgstr "パラレルポート"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr ""
+msgstr "トークンリングネットワークカード"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr ""
+msgstr "ARCNETネットワークカード"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr ""
+msgstr "FDDIネットワークカード"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr ""
+msgstr "HIPPIネットワークカード"
 
 #. TXT_CHOOSE_NET
 msgid "Choose the network device."
-msgstr ""
+msgstr "ネットワークデバイスを選択してください。"
 
 #. TXT_INPUT_PLIP_IP
 msgid "Enter the IP address of the PLIP partner."
-msgstr ""
+msgstr "PLIPの通信相手のIPアドレスを入力してください。"
 
 #. TXT_NO_PCMCIA
 msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
+"PCMCIAチップセットが自動検出されませんでした。 PCMCIAチップセットを直接指定し"
+"てください。"
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
+"PCMCIAチップセット\"%s\"が見つかりました。\n"
+"\n"
+"PCMCIAコアモジュールに対するパラメータを入力してください。"
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr ""
+msgstr "チップセット\"%s\"に対するパラメータを入力してください。"
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr ""
+msgstr "カードマネージャを起動しています..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr ""
+msgstr "PCMCIAカードサービスが開始されました。"
 
 #. TXT_PCMCIA_FAIL
 msgid "Start of PCMCIA card services failed."
-msgstr ""
+msgstr "PCMCIAカードサービスを開始できませんでした。"
 
 #. TXT_PCMCIA_ALREADY
 msgid "PCMCIA card services already running."
-msgstr ""
+msgstr "PCMCIAカードサービスはすでに実行中です。"
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
+"linuxrcから抜けるには、\n"
+"\n"
+"［インストール処理またはシステムを開始する］を使用する必要があります。\n"
+"\n"
+"場合によっては、ハードウェア用のドライバ(モジュール)をロードする必要がありま"
+"す。"
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
 msgstr ""
+"<Ctrl>キーを押しながら<C>キーを押しても、linuxrcを終了することはできません。"
 
 #. TXT_REMOVE_DISK
 msgid "Remove the disk from the drive now."
-msgstr ""
+msgstr "ここで、ドライブからディスクを取り出してください。"
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
+msgid ""
+"\n"
+"\n"
+"Example: "
 msgstr ""
+"\n"
+"\n"
+"例:  "
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr ""
+msgstr "ソースメディアを選択してください。"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr ""
+msgstr "CD-ROMをマウントしています..."
 
 #. TXT_ERROR_CD_MOUNT
 msgid "Unable to mount the CD-ROM."
-msgstr ""
+msgstr "CD-ROMをマウントできませんでした。"
 
 #. TXT_ASK_REBOOT
 msgid "Reboot the system now?"
-msgstr ""
+msgstr "システムを今すぐ再起動しますか?"
 
 #. TXT_INSTALL_SUCCESS
 msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
+"The base system has been successfully installed. This newly installed system "
+"will now be started to commit the installation."
 msgstr ""
+"ベースシステムがインストールされました。 この新規にインストールしたシステムが"
+"すぐに起動されます。これによって、インストールが完了します。"
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr ""
+msgstr "ハードディスクのパーティションを入力してください(例:「/dev/sda1」)。"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
-msgstr ""
+msgstr "指定されたパーティションをマウントできませんでした。"
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
-msgstr ""
+msgstr "ソースディレクトリを入力してください。"
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
-msgstr ""
+msgstr "インストール処理で、エラーが発生しました。"
 
 #. TXT_DRIVES
 msgid "Hard Disks or CD-ROMs"
-msgstr ""
+msgstr "ハードディスクまたはCD-ROM"
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 "
+"(press ALT-F2) to create and activate some swap space."
 msgstr ""
+"コンピュータのメモリ容量が少なすぎます。\n"
+"\n"
+"このメッセージに応答する前に、<Alt>キーを押しながら<F2>キーを押して仮想コン"
+"ソール2に切り替え、スワップ領域を作成して有効にする必要があります。"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr ""
+msgstr "アニメーション"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
-msgstr ""
+msgstr "ウィンドウをアニメーション表示しますか?"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
-msgstr ""
+msgid "No hard disks or CD-ROM drives have been detected so far."
+msgstr "現時点では、ハードディスクもCD-ROMドライブも検出されていません。"
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr ""
+msgstr "デバッグ(エキスパート)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr ""
+msgstr "ルートイメージをRAMディスクにロードする"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr ""
+msgstr "ルートイメージを入力する"
 
 #. TXT_ASK_RI_FORCE
-msgid ""
-"Should the root image be loaded into the RAM disk?"
-msgstr ""
+msgid "Should the root image be loaded into the RAM disk?"
+msgstr "ルートイメージをRAMディスクにロードしますか?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
+"Enter the path and name of the file to load into the RAM disk as the root "
+"file system."
 msgstr ""
+"ルートファイルシステムとしてRAMディスクにロードするファイルの、パスと名前を入"
+"力してください。"
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
-msgstr ""
+msgstr "まだ実装されていません。"
 
 #. TXT_NEW_INST_SYS
 msgid "Installation System"
-msgstr ""
+msgstr "インストールシステム"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
-msgstr ""
+msgid "Enter the directory that contains the installation system."
+msgstr "インストールシステムが存在するディレクトリを入力してください。"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr ""
+msgstr "情報を取得できませんでした。"
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr ""
+msgstr "インストールの準備をしています..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr ""
+msgstr "Live CDを起動する"
 
 #. TXT_INSERT_LIVECD
 msgid "Insert the Live CD."
-msgstr ""
+msgstr "Live CDを挿入してください。"
 
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
-msgstr ""
+msgstr "終了または再起動する"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
-msgstr ""
+msgstr "情報ファイルを検索しています..."
 
 #. TXT_NFSPORT
 msgid "Specify the NFS port."
-msgstr ""
+msgstr "NFSポートを指定してください。"
 
 #. TXT_ASKING_NAMED
 msgid "Asking name server..."
-msgstr ""
+msgstr "ネームサーバを要求しています..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
 msgid "Host %s was not found."
-msgstr ""
+msgstr "ホスト%sが見つかりませんでした。"
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
-msgstr ""
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "ネットワーク環境はすでに設定されています。 この環境設定を保持しますか?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
-msgstr ""
+msgstr "中止しますか?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
+"ネットワークデバイスが見つかりませんでした。\n"
+"最初にネットワークモジュールをロードしてください。"
 
 #. TXT_ALREADY_FOUND
 #, c-format
 msgid "A %s was already found in your system.\n"
-msgstr ""
+msgstr "%sはすでにシステム上に存在しています。\n"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
 msgstr ""
+"FTPサーバにアクセスする処理で、エラーが発生しました:\n"
+"\n"
+"%s"
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
-msgstr ""
+msgid "Enter the user name with which to access the FTP server."
+msgstr "FTPサーバにアクセスする際に使用する、ユーザ名を入力してください。"
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
-msgstr ""
+msgstr "FTPユーザアカウントのパスワードを入力してください。"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr ""
+msgstr "FTPプロキシサーバのIPアドレスを入力してください。"
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr ""
+msgstr "FTPプロキシサーバのポート番号を入力してください。"
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
-msgstr ""
+msgstr "FTPプロキシサーバを使用しますか?"
 
 #. TXT_NOMEM_FTP
 #, c-format
 msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
+"Your computer does not have enough RAM to install via FTP (%d MB RAM "
+"required)."
 msgstr ""
+"RAM容量が不足しているため、FTPを使用したインストールを実行できません(%dMBの"
+"RAMが必要)。"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible "
+"to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
+"FTPを使用してインストールする場合、通常はanonymous FTPを使用します。 FTPサー"
+"バにアクセスする際に使用する、ユーザ名とパスワードを指定できます。\n"
+"ユーザ名とパスワードを使用しますか?"
 
 #. TXT_MORE_MODULES
 msgid "-- More Modules --"
-msgstr ""
+msgstr "-- 他にもモジュールがあります --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr ""
+msgstr "パラレルポートを初期化しています..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
-msgstr ""
+msgid "Enter the port number on which the NFS server is running."
+msgstr "NFSサーバが実行されているポート番号を入力してください。"
 
 #. TXT_INSERT_CD
 #, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr ""
+msgstr "CD-ROM(番号%d)がドライブに挿入されていることを確認してください。"
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr ""
+msgstr "CD-ROMを取り出す"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp Time-Out"
-msgstr ""
+msgstr "BOOTPがタイムアウトになりました"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for bootp."
-msgstr ""
+msgstr "BOOTPのタイムアウト値を入力してください。"
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr ""
+msgstr "Channel to Channel接続"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
-msgstr ""
+msgstr "ESCON接続"
 
 #. TXT_NET_IUCV
 msgid "IUCV connection"
-msgstr ""
+msgstr "IUCV接続"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr ""
+msgstr "チャネル接続型のCisco製ルータ"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
-msgstr ""
+msgstr "SMBサーバ上の共有名を入力してください。"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user "
+"name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
+"共有にguestとしてアクセスする場合、ユーザ名、パスワード、およびワークグループ"
+"を指定する必要はありません。\n"
+"共有にguestとしてアクセスしますか?"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
-msgstr ""
+msgstr "SMBサーバに対するユーザ名を入力してください。"
 
 #. TXT_SMB_ENTER_PASSWORD
 msgid "Enter your password on the SMB server."
-msgstr ""
+msgstr "SMBサーバに対するパスワードを入力してください。"
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
+"Enter your workgroup.If you do not need to specify a workgroup,leave the "
+"field empty."
 msgstr ""
+"ワークグループを入力してください。ワークグループを指定する必要がない場合は、"
+"このフィールドを空のままにしておいてください。"
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
 msgstr ""
+"共有\n"
+"\n"
+"\"//%s/%s\"をマウントしています"
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr ""
+msgstr "%sを使用して自動設定しますか?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr ""
+msgstr "%s要求を送信しています..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr ""
+msgstr "%sを設定できませんでした。"
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
-msgstr ""
+msgstr "BOOTPの代わりにDHCPを使用しますか?"
 
 #. TXT_MODDISK0
 msgid "Insert a modules disk."
-msgstr ""
+msgstr "モジュールディスクを挿入してください。"
 
 #. TXT_MODDISK1
 #, c-format
 msgid "Insert modules disk %d."
-msgstr ""
+msgstr "モジュールディスク%dを挿入してください。"
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
 msgstr ""
+"CD-ROM1またはDVD1のboot/READMEに記載されている、作成指示を確認してください。"
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
-msgstr ""
+msgstr "ネットワークプロトコルを選択してください。"
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
-msgstr ""
+msgstr "%sサーバのIPアドレスを入力してください。"
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr ""
+msgstr "%sサーバに接続しています..."
 
 #. TXT_NET
 msgid "Network"
-msgstr ""
+msgstr "ネットワーク"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
-msgstr ""
+msgstr "%sモジュールをロードする"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
-msgstr ""
+msgstr "ファイルシステムモジュールをロードする"
 
 #. TXT_LOAD_OTHER
 msgid "Load Unknown Modules"
-msgstr ""
+msgstr "不明モジュールをロードする"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr ""
+msgstr "%sファイルシステムが見つかりませんでした。"
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr ""
+msgstr "続行する"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr ""
+msgstr "中止する"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr ""
+msgstr "新しいモジュールが見つかりませんでした。"
 
 #. TXT_CHOOSE_PARTITION
 msgid "Choose the hard disk partition."
-msgstr ""
+msgstr "ハードディスクのパーティションを選択してください。"
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Choose the root partition."
-msgstr ""
+msgstr "ルートパーティションを選択してください。"
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
-msgstr ""
+msgstr "スワップパーティションを選択してください。"
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr ""
+msgstr "メモリ容量が少ないため、すべてのデータをロードできません。"
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
-msgstr ""
+msgstr "メモリ容量が少ないため、YaSTを実行できません。"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr ""
+msgstr "続行するには、スワップ領域を有効にしてください。"
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr ""
+msgstr "スワップ領域を有効にする処理で、エラーが発生しました。"
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr ""
+msgstr "スワップパーティションを入力してください(例:「/dev/sda2」)。"
 
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
+msgstr "%sサーバにアクセスする際に使用する、ユーザ名を入力してください。"
 
 #. TXT_ENTER_PASSWORD
 #, c-format
 msgid "Enter the password for the %s server."
-msgstr ""
+msgstr "%sサーバにアクセスする際に使用する、パスワードを入力してください。"
 
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Use a %s proxy?"
-msgstr ""
+msgstr "%sプロキシを使用しますか?"
 
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr ""
+msgstr "%sプロキシのアドレスを入力してください。"
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr ""
+msgstr "%sプロキシのポート番号を入力してください。"
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
-msgstr ""
+msgstr "VNCの有効/無効を切り替える"
 
 #. TXT_VNC_YES_NO
 msgid "Use VNC for install?"
-msgstr ""
+msgstr "VNCを使用してインストールしますか?"
 
 #. TXT_SSH_SWITCH
 msgid "Enable or Disable SSH Mode"
-msgstr ""
+msgstr "SSHモードの有効/無効を切り替える"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
-msgstr ""
+msgstr "テキストモードでインストールする際にSSHを起動しますか?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."
-msgstr ""
+msgstr "VNCのパスワードを入力してください。"
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr ""
+msgstr "SSHの一時パスワードを入力してください。"
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be "
+"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
+"ベースシステムがインストールされました。 今すぐコンピュータを再起動する必要が"
+"あります。 ドライブに挿入されているインストール用メディア(CD-ROM、フロッピー"
+"ディスク)をすべて取り出してください。\n"
+"ただし、ブートマネージャをフロッピーディスクにインストールした場合は、フロッ"
+"ピーディスクを取り出さないでください。"
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr ""
+msgstr "ドライバアップデートを追加する"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr ""
+msgstr "ドライバアップデートを表示する"
 
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr ""
+"ネームサーバ%uのIPアドレスを入力するか、または<ESC>キーを押してください。"
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr ""
+"ルートの一時パスワードを入力してください。\n"
+"ルートユーザとして初めてログインしたとき、このパスワードを変更するよう要求さ"
+"れます。"
 
 #. TXT_REBOOT
 msgid "Reboot"
-msgstr ""
+msgstr "再起動する"
 
 #. TXT_NO_RAM
 #, c-format
 msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+"Your computer does not have enough RAM for the installation of %s. You need "
+"at least %d MB."
 msgstr ""
+"RAM容量が少ないため、%sをインストールできません。 %dMB以上の容量が必要です。"
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 5 characters)."
-msgstr ""
+msgstr "パスワードの文字数が少なすぎます。5文字以上にしてください。"
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr ""
+msgstr "X11サーバを実行しているホストのIPアドレスを入力してください。"
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr ""
+msgstr "ネットワークデバイスの種類を選択してください。"
 
 #. TXT_IUCV_PEER
-msgid "Please enter the name (user ID) of the VM peer to connect to."
-msgstr ""
+msgid "Please enter the name (user ID) of the target VM guest."
+msgstr "ターゲットVMのguestの名前(ユーザID)を入力してください。"
 
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"
-msgstr ""
+msgstr "Channel To Channel(CTC)"
 
 #. TXT_390NET_ESCON
 msgid "ESCON"
-msgstr ""
+msgstr "ESCON"
 
 #. TXT_390NET_IUCV
 msgid "Inter-User Communication Vehicle (IUCV)"
-msgstr ""
+msgstr "Inter-User Communication Vehicle (IUCV)"
 
 #. TXT_390NET_HSI
 msgid "Hipersockets"
-msgstr ""
+msgstr "Hipersockets"
 
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
-msgstr ""
+msgstr "読み取りチャネルに対するデバイスアドレス"
 
 #. TXT_CTC_CHANNEL_WRITE
 msgid "Device address for write channel"
-msgstr ""
+msgstr "書き込みチャネルに対するデバイスアドレス"
 
 #. TXT_CTC_CHANNEL_DATA
 msgid "Device address for data channel"
-msgstr ""
+msgstr "データチャネルに対するデバイスアドレス"
 
 #. TXT_CHOOSE_CTC_PROTOCOL
 msgid "Select protocol for this CTC device."
-msgstr ""
+msgstr "このCTCデバイスで使用するプロトコルを選択してください。"
 
 #. TXT_CTC_PROT_COMPAT
 msgid "Compatibility mode (default)"
-msgstr ""
+msgstr "互換モード(デフォルト)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
-msgstr ""
+msgstr "拡張モード"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr ""
+msgstr "OS/390およびz/OSのピアに対する互換モード"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
-msgstr ""
+msgstr "使用するポート名"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
-msgstr ""
+msgstr "完全修飾ホスト名"
 
 #. TXT_OSA_PORTNO
 msgid "Enter the relative port number"
-msgstr ""
+msgstr "関連ポート番号を入力する"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
-msgstr ""
+msgstr "インストール用CD-ROM/DVDを確認する"
 
 # turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
-msgstr ""
+msgstr "電源をオフにする"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr ""
+msgstr "ドライバアップデートメディアにアクセスできませんでした。"
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr ""
+msgstr "ドライバアップデートを読み取っています..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr ""
+msgstr "新しいドライバアップデートが見つかりませんでした。"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr ""
+msgstr "ドライバアップデートが追加されました"
 
 # shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr ""
+msgstr "ドライバアップデートに問題はありません"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr ""
+msgstr "ドライバアップデートメディアを選択してください。"
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr ""
+msgstr "ドライバアップデートデバイスを入力してください。"
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
-msgstr ""
+msgstr "デバイス名が無効です。"
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
-msgstr ""
+msgstr "CD-ROMドライブを探しています..."
 
 #. TXT_NO_CDROM
 msgid "No CD-ROM drives found."
-msgstr ""
+msgstr "CD-ROMドライブが見つかりませんでした。"
 
 #. TXT_SEARCH_FLOPPY
 msgid "Looking for floppy disks..."
-msgstr ""
+msgstr "フロッピーディスクを探しています..."
 
 #. TXT_NO_FLOPPY
 msgid "No floppy disk found."
-msgstr ""
+msgstr "フロッピーディスクが見つかりませんでした。"
 
 # heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr ""
+msgstr "ドライバアップデートの一覧"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr ""
+msgstr "現時点では、ドライバアップデートは存在していません。"
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
-msgstr ""
+msgstr "インストール用のCD-ROMまたはDVDを挿入してください。"
 
 #. TXT_NO_CD_DVD
 msgid "No CD-ROM or DVD found."
-msgstr ""
+msgstr "CD-ROMまたはDVDが見つかりませんでした。"
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
-msgstr ""
+msgstr "これは%sのCD-ROMではありません。"
 
 #. TXT_CD_CHECK_OK
 msgid "No errors found."
-msgstr ""
+msgstr "エラーが見つかりませんでした。"
 
 #. TXT_CD_MD5_FAILED
 msgid "Checksum wrong."
-msgstr ""
+msgstr "チェックサムが誤っています。"
 
 #. TXT_CD_READ_FAILED
 #, c-format
 msgid "Error reading sector %u."
-msgstr ""
+msgstr "セクタ%uを読み取る処理で、エラーが発生しました。"
 
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
+msgid ""
+"\n"
+"This %s is broken."
 msgstr ""
+"\n"
+"この%sは壊れています。"
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
-msgstr ""
+msgstr "インストール元を選択する"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr ""
+msgstr "この完全修飾ホスト名は無効です。"
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
-msgstr ""
+msgstr "このCCWアドレスは無効です。"
 
 #. TXT_NET_HSI
 msgid "Hipersocket"
-msgstr ""
+msgstr "Hipersockets"
 
 # power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr ""
+msgstr "システムを今すぐ停止しますか?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
 msgstr ""
 
 #. TXT_OSA_ETH
+#, fuzzy
 msgid "Ethernet"
-msgstr ""
+msgstr "OSA Ethernet"
 
 #. TXT_OSA_TR
+#, fuzzy
 msgid "Token Ring"
-msgstr ""
+msgstr "OSAトークンリング(LCS)"
 
 #. TXT_OSA_LCS
 msgid "LCS"
@@ -1102,10 +1184,37 @@ msgid "QDIO"
 msgstr ""
 
 #. TXT_CHOOSE_OSA_INTERFACE
+#, fuzzy
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "ドライバアップデートメディアを選択してください。"
 
 #. TXT_CHOOSE_OSA_MEDIUM
+#, fuzzy
 msgid "Please choose the physical medium."
+msgstr "ドライバアップデートメディアを選択してください。"
+
+# progress indicator label
+#. TXT_LOADING_MODULES
+msgid "Loading Modules"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_INSTSYS
+msgid "Loading Installation System"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_FONTS
+msgid "Loading Additional Fonts"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_UPDATE
+msgid "Loading Driver Update"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_RESCUE
+msgid "Loading Rescue System"
 msgstr ""
 

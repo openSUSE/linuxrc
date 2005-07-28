@@ -1,3 +1,7 @@
+28/7/2005:	v1.9.5
+	- updated texts
+	- add check to ensure inst-sys matches initrd
+
 25/7/2005:	v1.9.4
 	- show kbd layout dialog for rescue system only when needed
 

@@ -183,7 +183,7 @@ int inst_start_demo()
     return -1;
   }
 
-  config.inst_ramdisk = load_image(buf, config.instmode, "Live Image");
+  config.inst_ramdisk = load_image(buf, config.instmode, "Loading Live Image");
 
   inst_umount();	// what for???, cf. inst_start_rescue()
 
@@ -869,7 +869,7 @@ int inst_start_install()
   str_copy(&config.instsys2, NULL);
 
   if(config.use_ramdisk) {
-    config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, "Installation System");
+    config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(TXT_LOADING_INSTSYS));
     // maybe: inst_umount(); ???
     if(config.inst_ramdisk < 0) return -1;
 
@@ -886,7 +886,7 @@ int inst_start_install()
     if(config.rootimage2) {
       strprintf(&buf, "%s%s", inst_rootimage_tm, config.rootimage2);
       config.noerrors = 1;
-      config.inst2_ramdisk = load_image(buf, config.instmode, "Extra Fonts");
+      config.inst2_ramdisk = load_image(buf, config.instmode, txt_get(TXT_LOADING_FONTS));
       config.noerrors = 0;
       if(config.inst2_ramdisk >= 0) {
         if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
@@ -907,7 +907,7 @@ int inst_start_install()
       }
       else {
         config.noerrors = 1;
-        config.inst2_ramdisk = load_image(buf, config.instmode, "Extra Fonts");
+        config.inst2_ramdisk = load_image(buf, config.instmode, txt_get(TXT_LOADING_FONTS));
         config.noerrors = 0;
         if(config.inst2_ramdisk >= 0) {
           if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
@@ -963,7 +963,7 @@ int inst_start_install()
 
   if(i) {
     config.noerrors = 1;
-    update_rd = load_image(buf, config.instmode, "Driver Update");
+    update_rd = load_image(buf, config.instmode, txt_get(TXT_LOADING_UPDATE));
     config.noerrors = 0;
 
     if(update_rd >= 0) {
@@ -989,7 +989,7 @@ int inst_start_rescue()
 
   if((rc = inst_choose_source())) return rc;
 
-  config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, "Rescue System");
+  config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(TXT_LOADING_RESCUE));
 
   inst_umount();	// what for???
 
@@ -1030,6 +1030,7 @@ int add_instsys()
   setenv("YAST_DEBUG", "/debug/yast.debug", 1);
 
   file_write_install_inf("");
+
   if(!config.test) {
     // file_write_mtab();
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");

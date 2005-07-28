@@ -270,9 +270,12 @@ typedef struct {
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
   unsigned fb:1;		/* has frame buffer */
+  unsigned instsys_complain:1;	/* check instsys id */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
+  char *instsys_id;		/* instsys id */
+  char *initrd_id;		/* initrd id */
   int floppies;			/* number of floppy drives */
   int floppy;			/* floppy drive recently used */
   char *floppy_dev[4];		/* list of floppy devices */

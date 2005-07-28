@@ -174,11 +174,6 @@ msgstr ""
 "\n"
 "Проверьте спецификацию каталога!"
 
-#. TXT_LOADING
-#, fuzzy
-msgid "Loading data into RAM disk..."
-msgstr "Загружаю данные в ramdisk"
-
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
@@ -1253,5 +1248,30 @@ msgstr ""
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_MODULES
+msgid "Loading Modules"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_INSTSYS
+msgid "Loading Installation System"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_FONTS
+msgid "Loading Additional Fonts"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_UPDATE
+msgid "Loading Driver Update"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_RESCUE
+msgid "Loading Rescue System"
 msgstr ""
 

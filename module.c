@@ -521,7 +521,7 @@ int mod_add_disk(int prompt, int type)
   if(config.module.more_file[type] && *config.module.more_file[type]) {
     sprintf(buf, "%s/%s", config.mountpoint.floppy, config.module.more_file[type]);
     if(util_check_exist(buf)) {
-      config.module.ramdisk = load_image(buf, inst_file, "Modules");
+      config.module.ramdisk = load_image(buf, inst_file, txt_get(TXT_LOADING_MODULES));
       if(config.module.ramdisk >= 0) {
         got_image = 1;
       }
@@ -800,6 +800,9 @@ int mod_insmod(char *module, char *param)
         cnt += apply_driverid(drv);
       }
     }
+  }
+  else {
+    if(config.debug) fprintf(stderr, "insmod error: %d\n", err);
   }
 
   if(cnt) sleep(config.module.delay + 1);

@@ -1,10 +1,10 @@
 # LANGUAGE translations for linuxrc.
-# Copyright (C) 2001 SuSE GmbH.
+# Copyright (C) 2005 SUSE Linux Products GmbH
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
+"PO-Revision-Date: 2007-07-28 12:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
@@ -147,10 +147,6 @@ msgstr ""
 msgid ""
 "Cannot find the image.\n\n"
 "Check the directory specification."
-msgstr ""
-
-#. TXT_LOADING
-msgid "Loading data into RAM disk..."
 msgstr ""
 
 #. TXT_INFO_KERNEL
@@ -1107,5 +1103,30 @@ msgstr ""
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_MODULES
+msgid "Loading Modules"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_INSTSYS
+msgid "Loading Installation System"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_FONTS
+msgid "Loading Additional Fonts"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_UPDATE
+msgid "Loading Driver Update"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_RESCUE
+msgid "Loading Rescue System"
 msgstr ""
 

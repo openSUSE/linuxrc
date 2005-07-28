@@ -114,7 +114,6 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_ja
-// currently a fake
 { lang_ja, "Japanese", "jp106", SMALL_FONT, UNI_FONT, 0, 0, "ja_JP", 1 },
 #endif
 
@@ -168,13 +167,11 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_zh_CN
-// currently a fake
 { lang_zh_CN, "Simplified Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_CN", 1 },
 #endif
 
 #ifdef TRANS_zh_TW
-// currently a fake
-{ lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
+{ lang_zh_TW, "Traditional Chinese (Taiwan)", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
 #endif
 
 // dummy for unknown language, must be last entry
@@ -518,7 +515,7 @@ void set_choose_language()
   i = set_get_current_language(lang_undef);
   if(set_languages_arm[i - 1].id == lang_dummy) i = set_get_current_language(LANG_DEFAULT);
 
-  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 24, NULL, items, i, align_left);
+  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 29, NULL, items, i, align_left);
 
   if(i > 0) set_activate_language(set_languages_arm[i - 1].id);
 }

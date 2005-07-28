@@ -159,10 +159,6 @@ msgstr ""
 "Kan ikke finne diskbilde.\n\n"
 "Kontroller om riktig katalog er angitt."
 
-#. TXT_LOADING
-msgid "Loading data into RAM disk..."
-msgstr "Laster inn data i RAM-disk..."
-
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
 msgstr "Meldinger fra kjerne"
@@ -1182,5 +1178,30 @@ msgstr ""
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_MODULES
+msgid "Loading Modules"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_INSTSYS
+msgid "Loading Installation System"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_FONTS
+msgid "Loading Additional Fonts"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_UPDATE
+msgid "Loading Driver Update"
+msgstr ""
+
+# progress indicator label
+#. TXT_LOADING_RESCUE
+msgid "Loading Rescue System"
 msgstr ""
 

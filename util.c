@@ -1222,6 +1222,16 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
+    "InstsysID: %s%s",
+    config.instsys_id ?: "none",
+    config.instsys_complain ? " (checked)" : ""
+  );
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "InitrdID: %s", config.initrd_id ?: "none");
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf,
     "instmode = %s%s%s [%s], net_config_mask = 0x%x",
     get_instmode_name(config.instmode),
     config.instmode == config.instmode_extra ? "" : "/",
