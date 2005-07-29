@@ -270,7 +270,7 @@ typedef struct {
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
   unsigned fb:1;		/* has frame buffer */
-  unsigned instsys_complain:1;	/* check instsys id */
+  unsigned instsys_complain:2;	/* check instsys id */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */

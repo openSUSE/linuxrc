@@ -239,9 +239,9 @@ static struct {
   { key_smbshare,       "Share",          kf_none                        },
   { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                },
   { key_xxx,            "xxx",            kf_cfg + kf_cmd + kf_cmd_early },
-  { key_instsys_id,     "InstsysID",      kf_cfg                         },
-  { key_initrd_id,      "InitrdID",       kf_cfg                         },
-  { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd + kf_cmd_early }
+  { key_instsys_id,     "InstsysID",      kf_cfg + kf_cmd                },
+  { key_initrd_id,      "InitrdID",       kf_cfg + kf_cmd                },
+  { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd               }
 };
 
 static struct {
@@ -1594,6 +1594,9 @@ void file_write_install_inf(char *dir)
     }
   }
   if(i) fprintf(f, "\n");
+
+  file_write_str(f, key_initrd_id, config.initrd_id);
+  file_write_str(f, key_instsys_id, config.instsys_id);
 
   file_free_file(ft0);
 

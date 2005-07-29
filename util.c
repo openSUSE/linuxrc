@@ -1223,12 +1223,12 @@ void util_status_info()
 
   sprintf(buf,
     "InstsysID: %s%s",
-    config.instsys_id ?: "none",
-    config.instsys_complain ? " (checked)" : ""
+    config.instsys_id ?: "unset",
+    config.instsys_complain ? config.instsys_complain == 1 ? " (check)" : " (block)" : ""
   );
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "InitrdID: %s", config.initrd_id ?: "none");
+  sprintf(buf, "InitrdID: %s", config.initrd_id ?: "unset");
   slist_append_str(&sl0, buf);
 
   sprintf(buf,

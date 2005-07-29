@@ -59,7 +59,6 @@ static int   inst_try_cdrom           (char *device_tv);
 static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
 static int   inst_start_rescue        (void);
-// static int   inst_prepare             (void);
 static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
@@ -90,62 +89,6 @@ static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
 static dia_item_t di_inst_choose_display_last = di_none;
-
-#if 0
-int inst_auto_install()
-{
-  int rc;
-
-  if(config.manual) return -1;
-
-  switch(config.instmode) {
-    case inst_cdrom:
-//  case BOOTMODE_CDWITHNET:
-      rc = inst_mount_cdrom(1);
-      break;
-
-    case inst_smb:
-      rc = inst_mount_smb();
-      break;
-
-    case inst_nfs:
-      rc = inst_mount_nfs();
-      break;
-
-    case inst_hd:
-      rc = inst_mount_harddisk();
-      break;
-
-    case inst_ftp:
-      rc = inst_do_ftp();
-      break;
-
-    case inst_http:
-      rc = inst_do_http();
-      break;
-
-    case inst_tftp:
-      rc = inst_do_tftp();
-      break;
-
-    default:
-      rc = -1;
-      break;
-  }
-
-  if(!rc) rc = inst_check_instsys();
-
-  if(rc) {
-    inst_umount();
-    return -1;
-  }
-
-  config.rescue = 0;
-
-  return inst_start_install();
-}
-#endif
-
 
 int inst_start_demo()
 {
@@ -262,10 +205,9 @@ int inst_menu_cb(dia_item_t di)
       config.rescue = 0;
       error = inst_start_install();
      /*
-      * Fall through to the main menu if we return from a failed installation
-      * attempt.
+      * Back to main menu.
       */
-      if(config.redraw_menu) rc = -1;
+      rc = -1;
       break;
 
     case di_inst_demo:
@@ -1029,7 +971,37 @@ int add_instsys()
 
   setenv("YAST_DEBUG", "/debug/yast.debug", 1);
 
+  sprintf(buf, "file:%s/.instsys.config", config.mountpoint.instsys);
+  file_read_info_file(buf, kf_cfg);
+
   file_write_install_inf("");
+
+  if(
+    config.instsys_complain &&
+    config.initrd_id &&
+    config.instsys_id &&
+    strcmp(config.initrd_id, config.instsys_id)
+  ) {
+    int win;
+
+    if(!(win = config.win)) util_disp_init();
+    if(config.instsys_complain == 1) {
+      dia_message(
+        "Installation system does not match your boot medium.\n\n"
+        "It may make your bugreports worthless.",
+        MSGTYPE_ERROR
+      );
+    }
+    else {
+      dia_message(
+        "Installation system does not match your boot medium.\n\n"
+        "Sorry, this will not work.",
+        MSGTYPE_ERROR
+      );
+      rc = 1;
+    }
+    if(!win) util_disp_done();
+  }
 
   if(!config.test) {
     // file_write_mtab();
@@ -1109,9 +1081,11 @@ int inst_execute_yast()
   int i, rc;
   char cmd[256];
 
-//  rc = inst_prepare();
   rc = add_instsys();
-  if(rc) return rc;
+  if(rc) {
+    inst_yast_done();
+    return rc;
+  }
 
   if(!config.test) {
     lxrc_set_modprobe("/sbin/modprobe");
