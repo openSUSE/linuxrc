@@ -1391,6 +1391,7 @@ int net_bootp()
     config.net.domain = strdup(s);
   }
 
+#if 0
   s = getenv("BOOTP_ROOT_PATH");
   if(!s) s = getenv("BOOTP_BOOTFILE");
 
@@ -1415,6 +1416,7 @@ int net_bootp()
 
     free(s);
   }
+#endif
 
   if(!config.net.server.name) {
     name2inet(&config.net.server, getenv("BOOTP_SERVER"));
@@ -1545,12 +1547,14 @@ int net_dhcp()
         }
         break;
 
+#if 0
       case key_rootpath:
       case key_bootfile:
         if(*f->value && !config.serverdir) {
           str_copy(&config.serverdir, f->value);
         }
         break;
+#endif
 
       case key_dns:
         if((s = strchr(f->value, ','))) *s = 0;

@@ -1,3 +1,6 @@
+5/8/2005:	v1.9.6
+	- don't use root path dhcp reply for anything (#98937)
+
 28/7/2005:	v1.9.5
 	- updated texts
 	- add check to ensure inst-sys matches initrd
