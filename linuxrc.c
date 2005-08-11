@@ -426,16 +426,18 @@ void lxrc_change_root2()
     mount("/lib/modules", "/mnt/lib/modules", "none", MS_BIND, 0);
   }
 
-  if((config.xxx & 2)) umount2("/", MNT_DETACH);
+  // if((config.xxx & 2)) umount2("/", MNT_DETACH);
 
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
 
+#if 0
   /* really necessary? */
   if(!config.rescue) umount2("/", MNT_DETACH);
 
   /* put / entry back into /proc/mounts */
   if(!config.rescue) mount("/", "/", "none", MS_BIND, 0);
+#endif
 
   execl("/sbin/init", "init", NULL);
 
