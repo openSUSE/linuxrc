@@ -1589,6 +1589,7 @@ void util_get_splash_status()
   if((f = fopen("/proc/splash", "r"))) {
     if(fgets(s, sizeof s, f)) {
       if(strstr(s, ": on")) config.splash = 1;
+      setenv("SPLASHCFG", "/etc/splash.cfg", 1);
     }
     fclose(f);
   }
@@ -1598,18 +1599,24 @@ void util_get_splash_status()
 /*
  * Set splash progress bar to num percent.
  */
-void util_splash_bar(unsigned num)
+void util_splash_bar(unsigned num, char *trigger)
 {
-  FILE *f;
+  static unsigned old = 0;
+  char buf[256], buf2[256];
 
   if(num > 100) num = 100;
 
-  num = (num*65534)/100;
+  num = (num * 65535) / 100;
 
-  if((f = fopen("/proc/splash", "w"))) {
-    fprintf(f, "show %u\n", num);
-    fclose(f);
-  }
+  if(num < old) old = num;
+
+  *buf2 = 0;
+  if(trigger) sprintf(buf2, "-t '%s'", trigger);
+
+  sprintf(buf, "/sbin/splash -p %u:%d %s", old, num - old, buf2);
+  system(buf);
+
+  old = num;
 }
 
 

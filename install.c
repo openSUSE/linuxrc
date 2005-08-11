@@ -918,7 +918,7 @@ int inst_start_install()
 
   free(buf);
 
-  util_splash_bar(60);
+  util_splash_bar(60, SPLASH_60);
 
   return inst_execute_yast();
 }

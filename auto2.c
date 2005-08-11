@@ -169,7 +169,7 @@ void auto2_scan_hardware(char *log_file)
     fflush(stdout);
   }
 
-  util_splash_bar(20);
+  util_splash_bar(20, SPLASH_20);
 
   hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL);
 
@@ -240,7 +240,7 @@ void auto2_scan_hardware(char *log_file)
     fflush(stdout);
   }
 
-  util_splash_bar(30);
+  util_splash_bar(30, SPLASH_30);
 
   /* look for keyboards & mice */
   has_kbd_ig = FALSE;
@@ -908,7 +908,7 @@ int auto2_init()
 
 #endif
 
-  util_splash_bar(40);
+  util_splash_bar(40, SPLASH_40);
 
   if(config.update.ask && !config.update.shown) {
     auto2_activate_devices(hw_storage_ctrl, 0);
@@ -926,7 +926,7 @@ int auto2_init()
 
   i = auto2_find_install_medium();
 
-  util_splash_bar(50);
+  util_splash_bar(50, SPLASH_50);
 
   if(!i && config.hwcheck) i = 1;
 

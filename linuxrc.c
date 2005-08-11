@@ -922,7 +922,7 @@ void lxrc_init()
 
   util_get_splash_status();
 
-  util_splash_bar(10);
+  util_splash_bar(10, SPLASH_10);
 
   if(util_check_exist("/proc/iSeries")) {
     config.is_iseries = 1;

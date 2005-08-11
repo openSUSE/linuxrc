@@ -1,3 +1,7 @@
+10/8/2005:	v1.9.7
+	- full bootsplash support (#104009)
+	- 'start installed system': rootfs accidentally unmounted (#102697)
+
 5/8/2005:	v1.9.6
 	- don't use root path dhcp reply for anything (#98937)
 

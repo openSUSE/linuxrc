@@ -219,6 +219,13 @@ typedef enum {
 
 #define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER)
 
+#define SPLASH_10	NULL
+#define SPLASH_20	"rlchange B"
+#define SPLASH_30	NULL
+#define SPLASH_40	NULL
+#define SPLASH_50	"rlchange 3"
+#define SPLASH_60	"splash_early start"
+
 typedef struct {
   unsigned rebootmsg:1;		/* show reboot message */
   unsigned redraw_menu:1;	/* we need a better solution for this */
