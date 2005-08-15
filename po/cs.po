@@ -1,3 +1,4 @@
+# translation of cs.po to Czech
 # translation of cs.po to cs_CZ
 # translation of cs.po to czech
 # Czech translations for linuxrc.
@@ -8,13 +9,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
-"PO-Revision-Date: 2005-03-03 14:57+0100\n"
+"PO-Revision-Date: 2005-07-31 18:35+0200\n"
 "Last-Translator: Klara Cihlarova <koty@seznam.cz>\n"
-"Language-Team: cs_CZ <cs@li.org>\n"
+"Language-Team: Czech <suse@suse.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.9\n"
+"X-Generator: KBabel 1.10.1\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1147,54 +1149,54 @@ msgstr "Chcete systém nyní vypnout?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 nebo OSA-Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Zvolte prosím rozhraní CCW sběrnice."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Zvolte prosím fyzické médium."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Zavádí se moduly"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Zavádí se instalační systém"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Zavádí se doplňující písma"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Zavádí se update ovladače"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "Zavádí se záchranný systém"
 

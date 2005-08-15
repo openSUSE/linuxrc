@@ -1,3 +1,6 @@
+15/8/2005:	v1.9.8
+	- new translations
+
 10/8/2005:	v1.9.7
 	- full bootsplash support (#104009)
 	- 'start installed system': rootfs accidentally unmounted (#102697)

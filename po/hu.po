@@ -9,13 +9,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: hu\n"
-"PO-Revision-Date: 2005-03-09 14:56+0100\n"
+"PO-Revision-Date: 2005-08-07 03:00+0100\n"
 "Last-Translator: Szabolcs Varga <shirokuma@shirokuma.hu>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.3.1\n"
+"POT-Creation-Date: \n"
 
 #. TXT_OK
 msgid "OK"
@@ -102,13 +103,11 @@ msgstr "Modulok eltávolítása"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Megpróbálom betölteni a(z) \"%s\" modult...\n"
 "\n"
-"A betöltés alatt a rendszermag üzenetei a 4-es virtuális konzolon (ALT-F4) tekinthetők meg. Ehhez a menühöz az ALT-F1 billentyűkombinációval lehet "
-"visszajutni."
+"A betöltés alatt a rendszermag üzenetei a 4-es virtuális konzolon (ALT-F4) tekinthetők meg. Ehhez a menühöz az ALT-F1 billentyűkombinációval lehet visszajutni."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -228,28 +227,16 @@ msgid "Enter your IP address."
 msgstr "Adja meg az IP-címét."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Adja meg a hálózati maszkot. Egy hagyományos C osztályú hálózatnál ez "
-"általában 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Adja meg a hálózati maszkot. Egy hagyományos C osztályú hálózatnál ez általában 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Ha átjárón keresztül éri el a szervert, akkor adja meg az átjáró IP-címét. "
-"Ha nincs szüksége átjáróra, egyszerűen adja meg a saját IP-címét."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Ha átjárón keresztül éri el a szervert, akkor adja meg az átjáró IP-címét. Ha nincs szüksége átjáróra, egyszerűen adja meg a saját IP-címét."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Kérem adja meg a névszerver IP-címét. Ha nem használ névszervert, nyomja meg "
-"az ESC billentyűt."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Kérem adja meg a névszerver IP-címét. Ha nem használ névszervert, nyomja meg az ESC billentyűt."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -267,12 +254,8 @@ msgstr ""
 "Domén: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Hiba lépett fel a hálózat beállítása közben. Valószínűleg a rendszermag nem "
-"ismerte fel a hálózati kártyát."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Hiba lépett fel a hálózat beállítása közben. Valószínűleg a rendszermag nem ismerte fel a hálózati kártyát."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -380,9 +363,7 @@ msgstr "Adja meg a PLIP partner IP-címét."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"A PCMCIA lapkakészlet automatikus felismerése nem sikerült. Adja meg "
-"manuálisan a szükséges adatokat."
+msgstr "A PCMCIA lapkakészlet automatikus felismerése nem sikerült. Adja meg manuálisan a szükséges adatokat."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -428,8 +409,7 @@ msgstr ""
 "\n"
 "\"Telepítés megkezdése / rendszerindítás\"\n"
 "\n"
-"menüponton keresztül lehet kilépni. Lehet, hogy ehhez még be kell tölteni "
-"néhány meghajtómodult."
+"menüponton keresztül lehet kilépni. Lehet, hogy ehhez még be kell tölteni néhány meghajtómodult."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -466,12 +446,8 @@ msgid "Reboot the system now?"
 msgstr "Újraindítja most a rendszert?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Az alaprendszer telepítése sikerült. Az újonnan telepített rendszer most "
-"elindul, hogy befejeződjön a telepítés."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Az alaprendszer telepítése sikerült. Az újonnan telepített rendszer most elindul, hogy befejeződjön a telepítés."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -497,13 +473,11 @@ msgstr "Merevlemezek vagy CD-ROM-ok"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "A számítógépének nagyon kevés memóriája van.\n"
 "\n"
-"Váltson át a 2-es virtuális konzolra (ALT-F2), hozzon létre egy "
-"cserepartíciót és aktiválja azt."
+"Váltson át a 2-es virtuális konzolra (ALT-F2), hozzon létre egy cserepartíciót és aktiválja azt."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -534,12 +508,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "A gyökérképmás be legyen töltve a RAM-diszkbe?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Adja meg a fájl elérési útját és nevét, amelyet gyökér-fájlrendszerként be "
-"akar tölteni a RAM-diszkbe."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Adja meg a fájl elérési útját és nevét, amelyet gyökér-fájlrendszerként be akar tölteni a RAM-diszkbe."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -644,21 +614,15 @@ msgstr "Akar FTP proxyt használni?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"A számítógépében nincs elegendő RAM az FTP-n keresztüli telepítéshez "
-"(legalább %d MB RAM szükséges)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "A számítógépében nincs elegendő RAM az FTP-n keresztüli telepítéshez (legalább %d MB RAM szükséges)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Általában az FTP telepítés az anonymous felhasználó nevében történik meg. "
-"Meghatározhat azonban egy felhasználót\n"
+"Általában az FTP telepítés az anonymous felhasználó nevében történik meg. Meghatározhat azonban egy felhasználót\n"
 "és egy hozzátartozó jelszót az FTP-hez. Szeretné?"
 
 #. TXT_MORE_MODULES
@@ -712,12 +676,10 @@ msgstr "Adja meg az SMB kiszolgáló által kiajánlott nevet."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Ha guest-ként akarja a kiajánlott könyvtárat elérni, nem kell megadjon "
-"felhasználói nevet, jelszót és munkacsoportot.\n"
+"Ha guest-ként akarja a kiajánlott könyvtárat elérni, nem kell megadjon felhasználói nevet, jelszót és munkacsoportot.\n"
 "Guest-ként akar csatlakozni?"
 
 #. TXT_SMB_ENTER_USER
@@ -729,12 +691,8 @@ msgid "Enter your password on the SMB server."
 msgstr "Adja meg a jelszavát az SMB kiszolgálón."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
-msgstr ""
-"Adja meg a munkacsoportot. Ha nincs szükség munkacsoportra, hagyja üresen a "
-"mezőt."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Adja meg a munkacsoportot. Ha nincs szükség munkacsoportra, hagyja üresen a mezőt."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -780,9 +738,7 @@ msgstr "Tegye be a(z) %d modulok lemezt."
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr ""
-"Az első CD-n vagy DVD-n a boot/README fájlban talál információt arról, hogy "
-"hogyan készítse el."
+msgstr "Az első CD-n vagy DVD-n a boot/README fájlban talál információt arról, hogy hogyan készítse el."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
@@ -920,12 +876,10 @@ msgstr "Adja meg az átmeneti SSH-jelszavát."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Az alaprendszer sikeresen települt. A számítógépét most újra kell indítani. "
-"Távolítsa el az összes telepítő adathordozót (CD-ROM, floppy).\n"
+"Az alaprendszer sikeresen települt. A számítógépét most újra kell indítani. Távolítsa el az összes telepítő adathordozót (CD-ROM, floppy).\n"
 "Ne távolítsa el a floppy lemezt, ha a rendszerindító arra lett telepítve."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -947,8 +901,7 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Adja meg az átmeneti root jelszót.\n"
-"A kezdeti root felhasználói bejelentkezésnél majd meg kell változtatnia ezt "
-"a jelszót."
+"A kezdeti root felhasználói bejelentkezésnél majd meg kell változtatnia ezt a jelszót."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -956,12 +909,8 @@ msgstr "Újraindítás"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
-msgstr ""
-"A számítógépében nincs elegendő RAM a(z) %s telepítéséhez. Legalább %d MB "
-"szükséges."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "A számítógépében nincs elegendő RAM a(z) %s telepítéséhez. Legalább %d MB szükséges."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 5 characters)."
@@ -1163,54 +1112,54 @@ msgstr "Kívánja most leállítani a rendszert?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 vagy OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Válassza ki a CCW busz csatolóját."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Válassza ki a fizikai közeget."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Modulok betöltése"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Telepítőrendszer betöltése"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "További betűkészletek betöltése"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Illesztőprogram-frissítés betöltése"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "Mentőrendszer betöltése"
 

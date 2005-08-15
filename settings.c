@@ -80,6 +80,10 @@ static language_t set_languages_arm [] =
 { lang_cs, "Čeština", "cz-us-qwertz", SMALL_FONT, UNI_FONT, 1, 1, "cs_CZ", 0 },
 #endif
 
+#ifdef TRANS_da
+{ lang_da, "Dansk", "us", SMALL_FONT, UNI_FONT, 0, 0, "da_DK", 0 },
+#endif
+
 #ifdef TRANS_de
 { lang_de, "Deutsch", "de-lat1-nd", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", 0 },
 #endif
