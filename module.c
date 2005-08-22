@@ -966,25 +966,6 @@ void mod_delete_module()
 }
 
 
-int mod_pcmcia_ok()
-{
-  file_t *f;
-  int i, ok = 0;
-
-  if(util_check_exist(CARDMGR_PIDFILE)) {
-    f = file_read_file(CARDMGR_PIDFILE, kf_none);
-
-    if(f && (i = atoi(f->key_str))) {
-      if(!strcmp(util_process_name(i), "cardmgr")) ok = 1;
-    }
-
-    file_free_file(f);
-  }
-
-  return ok;
-}
-
-
 int mod_load_pcmcia()
 {
   int i, type, ok;

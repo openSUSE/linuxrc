@@ -95,7 +95,6 @@ static void lxrc_makelinks(char *name);
 #endif
 
 #if SWISS_ARMY_KNIFE
-int cardmgr_main(int argc, char **argv);
 // int insmod_main(int argc, char **argv);
 int loadkeys_main(int argc, char **argv);
 int dumpkeys_main(int argc, char **argv);
@@ -123,10 +122,6 @@ static struct {
 #endif
   { "portmap",     portmap_main          },
   { "dhcpcd",      dhcpcd_main           },
-#if WITH_PCMCIA
-  { "cardmgr",     cardmgr_main          },
-  { "probe",       probe_main            },
-#endif
   { "smbmnt",      smbmnt_main           },
   { "mount",       util_mount_main       },
   { "umount",      util_umount_main      },
@@ -567,7 +562,7 @@ void lxrc_end()
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs", "cardmgr"
+    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs"
   };
   int i;
 

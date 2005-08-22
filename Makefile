@@ -1,5 +1,3 @@
-# include pcmcia/config.mk
-
 TOPDIR	:= $(CURDIR)
 ARCH	:= $(shell uname -m)
 ifeq "$(ARCH)" "i486"
@@ -43,8 +41,8 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po loadkeys pcmcia portmap dhcpcd mkpsfu
-LIBS	= loadkeys/loadkeys.a pcmcia/pcmcia.a portmap/portmap.a dhcpcd/dhcpcd.a
+SUBDIRS	= po loadkeys portmap dhcpcd mkpsfu
+LIBS	= loadkeys/loadkeys.a portmap/portmap.a dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
     CFLAGS		+= -DLX_ARCH=\"i386\"
@@ -59,23 +57,14 @@ ifeq ($(ARCH),alpha)
 endif
 
 ifneq ($(findstring $(ARCH),ppc ppc64),)
-    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
-    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
-    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"ppc\"
 endif
 
 ifeq ($(ARCH),sparc)
-    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
-    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
-    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"sparc\"
 endif
 
 ifeq ($(ARCH),sparc64)
-    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
-    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
-    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"sparc64\"
 endif
 
@@ -84,9 +73,6 @@ ifeq ($(ARCH),ia64)
 endif
 
 ifeq ($(ARCH),mips)
-    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
-    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
-    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"mips\"
 endif
 
@@ -95,9 +81,6 @@ ifeq ($(ARCH),armv4l)
 endif
 
 ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
-    SUBDIRS		:= $(filter-out pcmcia, $(SUBDIRS))
-    LIBS		:= $(filter-out pcmcia/pcmcia.a, $(LIBS))
-    OBJ			:= $(filter-out pcmcia.o, $(OBJ))
     SUBDIRS		:= $(filter-out loadkeys, $(SUBDIRS))
     LIBS		:= $(filter-out loadkeys/loadkeys.a, $(LIBS))
     OBJ			:= $(filter-out loadkeys.o, $(OBJ))

@@ -695,8 +695,7 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list)
 
   if(hd->is.notready) return 1;
 
-  /* skip pcmcia devices; card manager handles those */
-  if(ID_TAG(hd->vendor.id) == TAG_PCMCIA) return 0;
+  // if(ID_TAG(hd->vendor.id) == TAG_PCMCIA) return 0;
 
   for(di = hd->driver_info; di; di = di->next) {
     if(di->module.type == di_module) {
@@ -843,68 +842,28 @@ int auto2_init()
 #if WITH_PCMCIA
   if(
     !config.nopcmcia &&
-    hd_has_pcmcia(hd_data) &&
-    !mod_pcmcia_ok()
+    hd_has_pcmcia(hd_data)
   ) {
     fprintf(stderr, "Going to load PCMCIA support...\n");
     printf("Activating PCMCIA devices...");
     fflush(stdout);
 
-#if 0
-    if(!util_check_exist("/modules/pcmcia_core" MODULE_SUFFIX)) {
-      char buf[256], *t;
-
-      util_disp_init();
-
-      sprintf(buf, txt_get(TXT_FOUND_PCMCIA), pcmcia_driver(2));
-      t = strchr(buf, '\n');
-      if(t) {
-        *t = 0;
-        strcat(t, "\n\n");
-      }
-      else {
-        *buf = 0;
-      }
-
-      mod_disk_text(buf + strlen(buf), config.module.pcmcia_type);
-
-      j = dia_okcancel(buf, YES) == YES ? 1 : 0;
-
-      if(j) mod_add_disk(0, config.module.pcmcia_type);
-
-      util_disp_done();
-    }
-#endif
-
     config.module.delay += 1;
 
     i = mod_modprobe(pcmcia_driver(2), pcmcia_params);
-    if(i) fprintf(stderr, "Error %d loading PCMCIA modules.\n", i);
-    i = 0;
-
-    if(!i) {
-      fprintf(stderr, "PCMCIA modules loaded - starting card manager.\n");
-      pcmcia_chip_ig = 2;
-      i = system("cardmgr -d -v -m /modules -n \"\" >&2");
-      if(i)
-        fprintf(stderr, "Oops: card manager didn't start.\n");
-      else {
-        fprintf(stderr, "card manager ok.\n");
-      }
-      /* wait for cards to be activated... */
-      sleep(config.usbwait > 0 ? config.usbwait : is_vaio ? 10 : 6);
-      /* check for cdrom & net devs */
-      hd_list2(hd_data, hw_items, 1);
+    if(i) {
+      fprintf(stderr, "Error %d loading PCMCIA core modules.\n", i);
     }
     else {
-      fprintf(stderr, "Error loading PCMCIA modules.\n");
-      i = -1;
+      sleep(config.usbwait > 0 ? config.usbwait : is_vaio ? 10 : 6);
     }
-    printf("\r%s%s", "Activating PCMCIA devices...", i ? " failed\n" : " done\n");
-    fflush(stdout);
-  }
+    hd_list2(hd_data, hw_items, 1);
 
-  config.module.delay -= 1;
+    printf(" done\n");
+    fflush(stdout);
+
+    config.module.delay -= 1;
+  }
 
 #endif
 

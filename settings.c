@@ -81,7 +81,7 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_da
-{ lang_da, "Dansk", "us", SMALL_FONT, UNI_FONT, 0, 0, "da_DK", 0 },
+{ lang_da, "Dansk", "dk", SMALL_FONT, UNI_FONT, 0, 0, "da_DK", 0 },
 #endif
 
 #ifdef TRANS_de
