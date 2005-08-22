@@ -1,7 +1,7 @@
 22/8/2005:	v1.9.10
 	- use Dansk keymap
 	- translations updated
-	- fix pcmcia support (#103740)
+	- fix pcmcia support (#103740, #104517)
 
 17/8/2005:	v1.9.9
 	- ignore padding when checking media
