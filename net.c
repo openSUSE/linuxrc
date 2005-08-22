@@ -1316,7 +1316,7 @@ int net_bootp()
 {
   window_t  win;
   int rc, netconf_error;
-  char *s, *t;
+  char *s;
   char tmp[256];
 
   if(config.net.hostname.ok) return 0;

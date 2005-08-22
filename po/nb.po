@@ -1,19 +1,21 @@
-# translation of linuxrc.nb.po to 
+# translation of nb.po to
+# translation of linuxrc.nb.po to
 # translation of linuxrc.po to
 # Norsk translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
 # Olav Pettershagen <olav.pettershagen@trysil.online.no>, 2004.
+# Olav Pettershagen <olav.pet@online.no>, 2005.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.nb\n"
-"PO-Revision-Date: 2004-09-06 14:22+0200\n"
-"Last-Translator: Olav Pettershagen <olav.pettershagen@trysil.online.no>\n"
-"Language-Team:  <nn@li.org>\n"
+"Project-Id-Version: nb\n"
+"PO-Revision-Date: 2005-08-13 12:48+0200\n"
+"Last-Translator: Olav Pettershagen <olav.pet@online.no>\n"
+"Language-Team:  <nb@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.9\n"
+"X-Generator: KBabel 1.10.2\n"
 
 #. TXT_OK
 msgid "OK"
@@ -96,7 +98,6 @@ msgid "Unload Modules"
 msgstr "Fjern lastede moduler"
 
 #. TXT_TRY_TO_LOAD
-#, c-format
 msgid ""
 "Trying to load module \"%s\"...\n\n"
 "During loading, you may want to watch the kernel "
@@ -109,12 +110,10 @@ msgstr ""
 "for å gå tilbake til denne menyen."
 
 #. TXT_LOAD_SUCCESSFUL
-#, c-format
 msgid "Module \"%s\" loaded successfully."
 msgstr "Modulen \"%s\" er lastet."
 
 #. TXT_LOAD_FAILED
-#, c-format
 msgid "Failed to load module \"%s\"."
 msgstr "Kunne ikke laste modulen \"%s\"."
 
@@ -147,7 +146,6 @@ msgid "Boot Installed System"
 msgstr "Start installert system"
 
 #. TXT_SEARCH_FOR_RI
-#, c-format
 msgid "Searching for image \"%s\"..."
 msgstr "Søker etter diskbildet \"%s\"..."
 
@@ -250,7 +248,6 @@ msgstr ""
 "ESC hvis du ikke bruker noen navneserver."
 
 #. TXT_FOUND_HOST
-#, c-format
 msgid ""
 "The following data has been retrieved:\n\n"
 "IP address: %s\n"
@@ -285,17 +282,14 @@ msgid "Enter the directory on the server."
 msgstr "Angi katalogen på serveren."
 
 #. TXT_ENTER_PARAMS
-#, c-format
 msgid "Enter parameters for \"%s\"."
 msgstr "Angi parametere for \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
-#, c-format
 msgid "Trying to mount the directory\n\n\"%s:%s\"..."
 msgstr "Forsøker å montere katalogen\n\n\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
-#, c-format
 msgid ""
 "An error occurred while trying to mount the NFS "
 "directory.\n\nReason given by server: %s"
@@ -318,7 +312,6 @@ msgid "No modules currently loaded."
 msgstr "Ingen moduler er lastet."
 
 #. TXT_AUTO_RUNNING
-#, c-format
 msgid "Autoprobing (%s)...      "
 msgstr "Automatisk søk (%s)...      "
 
@@ -379,7 +372,6 @@ msgstr ""
 "automatisk. Spesifiser manuelt."
 
 #. TXT_FOUND_PCMCIA
-#, c-format
 msgid ""
 "Found PCMCIA chipset \"%s\".\n\nEnter "
 "parameters for PCMCIA core modules."
@@ -388,7 +380,6 @@ msgstr ""
 "parametere for PCMCIA-kjernemodulene."
 
 #. TXT_PCMCIA_PARAMS
-#, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
 msgstr "Angi spesifikke parametere for brikkesettet \"%s\"."
 
@@ -577,7 +568,6 @@ msgid "Asking name server..."
 msgstr "Spør navneserveren..."
 
 #. TXT_HOST_NOT_FOUND
-#, c-format
 msgid "Host %s was not found."
 msgstr "Vertsmaskinen %s ble ikke funnet."
 
@@ -602,12 +592,10 @@ msgstr ""
 "først."
 
 #. TXT_ALREADY_FOUND
-#, c-format
 msgid "A %s was already found in your system.\n"
 msgstr "En %s finnes fra før i systemet.\n"
 
 #. TXT_ERROR_FTP
-#, c-format
 msgid "Error while accessing the FTP server:\n\n%s"
 msgstr "Feil ved tilkobling til FTP server:\n\n%s"
 
@@ -636,7 +624,6 @@ msgid "Use an FTP proxy?"
 msgstr "Vil du bruke en FTP-mellomserver?"
 
 #. TXT_NOMEM_FTP
-#, c-format
 msgid ""
 "Your computer does not have enough RAM to install "
 "via FTP (%d MB RAM required)."
@@ -673,7 +660,6 @@ msgstr ""
 "benytter."
 
 #. TXT_INSERT_CD
-#, c-format
 msgid "Make sure that CD number %d is in your drive."
 msgstr "Kontroller at CD nummer %d sitter i stasjonen."
 
@@ -738,25 +724,21 @@ msgstr ""
 "kan du la feltet være tomt."
 
 #. TXT_SMB_TRYING_MOUNT
-#, c-format
 msgid "Trying to mount the share\n\n\"//%s/%s\""
 msgstr "Forsøker å montere den delte ressursen\n\n\"//%s/%s\""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
-#, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Automatisk konfigurasjon via %s?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
-#, c-format
 msgid "Sending %s request..."
 msgstr "Sender %s-forespørsel..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
-#, c-format
 msgid "%s configuration failed."
 msgstr "%s-konfigurasjonen mislyktes."
 
@@ -769,7 +751,6 @@ msgid "Insert a modules disk."
 msgstr "Sett inn en moduldiskett."
 
 #. TXT_MODDISK1
-#, c-format
 msgid "Insert modules disk %d."
 msgstr "Sett inn moduldisketten %d."
 
@@ -783,13 +764,11 @@ msgstr "Velg nettverksprotokoll."
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
-#, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "Angi IP-adressen til %s-serveren."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
-#, c-format
 msgid "Trying to connect to the %s server..."
 msgstr "Forsøker å koble til %s-serveren..."
 
@@ -799,7 +778,6 @@ msgstr "Nettverk"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
-#, c-format
 msgid "Load %s Modules"
 msgstr "Last %s-moduler"
 
@@ -813,7 +791,6 @@ msgstr "Last ukjente moduler"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
-#, c-format
 msgid "%s file system found."
 msgstr "%s-filsystem funnet."
 
@@ -862,27 +839,22 @@ msgid "Enter the swap partition (e.g., /dev/sda2)"
 msgstr "Angi veksleminnepartisjonen (f.eks. /dev/sda2)"
 
 #. TXT_ENTER_USER
-#, c-format
 msgid "Enter the user name with which to access the %s server."
 msgstr "Angi brukernavnet for tilgang til %s-serveren."
 
 #. TXT_ENTER_PASSWORD
-#, c-format
 msgid "Enter the password for the %s server."
 msgstr "Angi passordet for %s-serveren."
 
 #. TXT_WANT_PROXY
-#, c-format
 msgid "Use a %s proxy?"
 msgstr "Bruk en %s-mellomserver?"
 
 #. TXT_ENTER_PROXY
-#, c-format
 msgid "Enter the address of the %s proxy."
 msgstr "Angi adressen til %s-mellomserveren."
 
 #. TXT_ENTER_PROXYPORT
-#, c-format
 msgid "Enter the port of the %s proxy."
 msgstr "Angi porten for %s-mellomserveren."
 
@@ -932,7 +904,6 @@ msgid "Show Driver Updates"
 msgstr "Vis driveroppgraderinger"
 
 #. TXT_INPUT_NAMED1
-#, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr "Angi IP-adressen til navneserveren %u eller trykk på ESC."
 
@@ -951,7 +922,6 @@ msgid "Reboot"
 msgstr "Start på nytt"
 
 #. TXT_NO_RAM
-#, c-format
 msgid ""
 "Your computer does not have enough RAM for the installation of %s. "
 "You need at least %d MB."
@@ -1108,7 +1078,6 @@ msgstr "Ingen CD-ROM eller DVD funnet."
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
-#, c-format
 msgid "This is not a %s CD-ROM."
 msgstr "Dette er ikke en %s-CD-ROM."
 
@@ -1121,13 +1090,11 @@ msgid "Checksum wrong."
 msgstr "Feil kontrollsum."
 
 #. TXT_CD_READ_FAILED
-#, c-format
 msgid "Error reading sector %u."
 msgstr "Feil under lesing av sektor %u."
 
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
-#, c-format
 msgid "\nThis %s is broken."
 msgstr "\nFeil på %s."
 
@@ -1137,71 +1104,71 @@ msgstr "Velg en installasjonskilde"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr ""
+msgstr "Dette er ikke et fullstendig og gyldig vertsnavn."
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
-msgstr ""
+msgstr "Dette er ikke en gyldig CCW-adresse."
 
 #. TXT_NET_HSI
 msgid "Hipersocket"
-msgstr ""
+msgstr "Hipersocket"
 
 # power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr ""
+msgstr "Vil du slå av maskinen nå?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 eller OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Velg grensesnitt for CCW-bussen."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Velg et fysisk medium."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Laster moduler"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Laster installasjonssystem"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Laster flere skrifttyper"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Laster driveroppgradering"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "Laster redningssystem"
 

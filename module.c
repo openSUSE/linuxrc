@@ -57,8 +57,6 @@ static char *mod_get_params(module_t *mod);
 static void mod_load_module_manual(char *module, int show);
 static int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t align);
 static void mod_delete_module(void);
-static int mod_load_pcmcia(void);
-static int mod_pcmcia_chipset(void);
 
 static int mod_cmp(char *str1, char *str2);
 
@@ -447,32 +445,27 @@ int mod_load_manually(int type)
   if(!i || (i == 1 && !*mod_items)) return 0;
 
   if(i) {
-    if(type == config.module.pcmcia_type) {
-      mod_load_pcmcia();
-    }
-    else {
-      s = mod_get_title(type);
-      i = dia_list(s, MENU_WIDTH, NULL, items, 1, align_left);
+    s = mod_get_title(type);
+    i = dia_list(s, MENU_WIDTH, NULL, items, 1, align_left);
 
-      if(i--) {
-        if(mod_items[i]) {
-          ok = 1;
-          if(mod_items[i]->pre_inst) {
-            ok = mod_load_modules(mod_items[i]->pre_inst, 1);
-          }
-          if(ok) ok = mod_load_modules(mod_items[i]->name, 2);
-          if(ok && mod_items[i]->post_inst) {
-            ok = mod_load_modules(mod_items[i]->post_inst, 1);
-          }
+    if(i--) {
+      if(mod_items[i]) {
+        ok = 1;
+        if(mod_items[i]->pre_inst) {
+          ok = mod_load_modules(mod_items[i]->pre_inst, 1);
         }
-        else {
-          j = mod_add_disk(1, type);
-          added = j ? 1 : 0;
+        if(ok) ok = mod_load_modules(mod_items[i]->name, 2);
+        if(ok && mod_items[i]->post_inst) {
+          ok = mod_load_modules(mod_items[i]->post_inst, 1);
         }
       }
-
-      free(s);
+      else {
+        j = mod_add_disk(1, type);
+        added = j ? 1 : 0;
+      }
     }
+
+    free(s);
   }
 
   return added;
@@ -963,94 +956,6 @@ void mod_delete_module()
   else {
     dia_message(txt_get(TXT_NO_MODULES), MSGTYPE_INFO);
   }
-}
-
-
-int mod_load_pcmcia()
-{
-  int i, type, ok;
-  char buf[256];
-  window_t status, win;
-
-  if(mod_pcmcia_ok()) {
-    dia_message(txt_get(TXT_PCMCIA_ALREADY), MSGTYPE_INFO);
-    return 0;
-  }
-
-  type = mod_pcmcia_chipset();
-
-  if(type != 1 && type != 2) return -1;
-
-  mod_param_text = buf;
-
-  sprintf(buf, txt_get(TXT_FOUND_PCMCIA), pcmcia_driver(type));
-  ok = mod_load_modules("pcmcia_core", 1);
-  mod_load_modules("rsrc_nonstatic", 1);
-
-  if(ok) {
-    sprintf(buf, txt_get(TXT_PCMCIA_PARAMS), pcmcia_driver(type));
-    ok = mod_load_modules(pcmcia_driver(type), 1);
-  }
-
-  mod_param_text = NULL;
-
-  if(ok) ok = mod_load_modules("pcmcia", 0);
-
-  if(ok) {
-    dia_status_on(&status, txt_get(TXT_START_CARDMGR));
-    system("cardmgr -d -v -m /modules -n \"\" >&2");
-    for(i = 0; i <= 100; i++) {
-      dia_status(&status, i++);
-      usleep(100000);
-    }
-    dia_status_off(&status);
-  }
-
-  ok = mod_pcmcia_ok();
-
-  if(ok) {
-    pcmcia_chip_ig = type;
-
-    if(config.manual) {
-      dia_message(txt_get(TXT_PCMCIA_SUCCESS), MSGTYPE_INFO);
-    }
-    else {
-      dia_info(&win, txt_get(TXT_PCMCIA_SUCCESS));
-      sleep(4);
-      win_close(&win);
-    }
-  }
-  else {
-    dia_message(txt_get(TXT_PCMCIA_FAIL), MSGTYPE_ERROR);
-  }
-
-  util_update_kernellog();
-
-  if(config.manual) dia_show_file(txt_get(TXT_INFO_KERNEL), lastlog_tg, TRUE);
-
-  return ok ? 0 : -1;
-}
-
-
-int mod_pcmcia_chipset()
-{
-  char *items[] = {
-    pcmcia_driver(1),
-    pcmcia_driver(2),
-    NULL
-  };
-  static int last_item = 0;
-  int type;
-
-  type = system("probe >&2");
-  type >>= 8;
-
-  if(type != 1 && type != 2) {
-    type = dia_list(txt_get(TXT_NO_PCMCIA), 10, NULL, items, last_item, align_center);
-    if(type) last_item = type;
-  }
-
-  return type;
 }
 
 

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "PO-Revision-Date: 2005-03-09 12:25+0100\n"
-"Last-Translator: Patricia Vaz <patricia@suse.de>\n"
-"Language-Team:  <fr@li.org>\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -456,7 +456,8 @@ msgstr "Entrez l'adresse IP de la machine PLIP partenaire."
 
 # TLABEL linuxrc_2002_03_29_0036__75
 #. TXT_NO_PCMCIA
-msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgid ""
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
 "Impossible de détecter automatiquement le jeu de puces PCMCIA. Spécifiez-le "
 "manuellement."
@@ -512,7 +513,8 @@ msgstr ""
 "\n"
 "\"Démarrer l'installation ou le système\"\n"
 "\n"
-"Vous devrez éventuellement charger quelques pilotes (modules) pour la prise en charge de votre matériel."
+"Vous devrez éventuellement charger quelques pilotes (modules) pour la prise "
+"en charge de votre matériel."
 
 # TLABEL linuxrc_2002_03_29_0036__83
 #. TXT_NO_CTRLC
@@ -561,8 +563,8 @@ msgid ""
 "The base system has been successfully installed. This newly installed system "
 "will now be started to commit the installation."
 msgstr ""
-"Le système de base a été installé avec succès. Ce système nouvellement installé est maintenant "
-"démarré pour terminer l'installation."
+"Le système de base a été installé avec succès. Ce système nouvellement "
+"installé est maintenant démarré pour terminer l'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__92
 #. TXT_ENTER_PARTITION
@@ -708,7 +710,8 @@ msgstr "L'hôte %s n'a pas été trouvé."
 # TLABEL linuxrc_2002_03_29_0036__118
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "Votre réseau est déjà configuré. Voulez-vous conserver la configuration ?"
+msgstr ""
+"Votre réseau est déjà configuré. Voulez-vous conserver la configuration ?"
 
 # TLABEL linuxrc_2002_03_29_0036__167
 #. TXT_ASK_BREAK
@@ -745,7 +748,8 @@ msgstr ""
 # TLABEL linuxrc_2002_03_29_0036__123
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr "Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP."
+msgstr ""
+"Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP."
 
 # TLABEL linuxrc_2002_03_29_0036__124
 #. TXT_ENTER_FTPPASSWD
@@ -784,8 +788,9 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normalement, une installation FTP se déroule via FTP anonyme. Il est cependant possible "
-"de spécifier un nom d'utilisateur et un mot de passe pour l'accès au serveur FTP.\n"
+"Normalement, une installation FTP se déroule via FTP anonyme. Il est "
+"cependant possible de spécifier un nom d'utilisateur et un mot de passe pour "
+"l'accès au serveur FTP.\n"
 "Voulez-vous le utiliser un nom d'utilisateur et un mot de passe ?"
 
 # TLABEL linuxrc_2002_03_29_0036__130
@@ -1042,7 +1047,8 @@ msgstr "Entrez le nom de la partition d'échange (swap) (par exemple /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur %s."
+msgstr ""
+"Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur %s."
 
 # TLABEL linuxrc_2002_03_29_0036__159
 # %s is NFS, FTP, HTTP or SMB
@@ -1122,7 +1128,8 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Entrez le mot de passe root temporaire.\n"
-"Vous devrez changer ce mot de passe lors de la connexion initiale de l'utilisateur root."
+"Vous devrez changer ce mot de passe lors de la connexion initiale de "
+"l'utilisateur root."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -1131,15 +1138,16 @@ msgstr "Réamorcer"
 #. TXT_NO_RAM
 #, c-format
 msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+"Your computer does not have enough RAM for the installation of %s. You need "
+"at least %d MB."
 msgstr ""
-"Votre ordinateur n'ont pas assez de RAM pour l'installation de %s. "
-"Vous nécessitez au moins %d Mo."
+"Votre ordinateur n'ont pas assez de RAM pour l'installation de %s. Vous "
+"nécessitez au moins %d Mo."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 5 characters)."
-msgstr "Le mot de passe est trop court (il doit contenir au moins 5 caractères)."
+msgstr ""
+"Le mot de passe est trop court (il doit contenir au moins 5 caractères)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1150,8 +1158,8 @@ msgid "Please select the type of your network device."
 msgstr "Veuillez sélectionner le type de votre périphérique réseau."
 
 #. TXT_IUCV_PEER
-msgid "Please enter the name (user ID) of the VM peer to connect to."
-msgstr "Veuillez entrer le nom (utilisateur ID) de l'invité VM cible."
+msgid "Please enter the name (user ID) of the target VM guest."
+msgstr "Entrez le nom (ID utilisateur) de l'invité VM cible."
 
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"
@@ -1306,8 +1314,12 @@ msgstr "Erreur lors de la lecture du secteur %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\nCe %s est abimé."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Ce %s est abimé."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1332,54 +1344,53 @@ msgstr "Voulez-vous arrêter le système maintenant ?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 ou OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Choisissez l'interface de bus CCW."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Choisissez le support physique."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Chargement des modules"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Chargement du système d'installation"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Chargement des polices supplémentaires"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Chargement de la mise à jour des pilotes"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
-
+msgstr "Chargement du système de secours"

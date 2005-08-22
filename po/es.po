@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "PO-Revision-Date: 2005-03-07 11:08+0100\n"
-"Last-Translator: Ines Pozo <Ines.Pozo@novell.com>\n"
-"Language-Team:  <de@li.org>\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team:  Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -229,8 +229,7 @@ msgid ""
 "Enter your netmask. For a normal class C network, this is usually "
 "255.255.255.0."
 msgstr ""
-"Introduzca la máscara de red. En una red de clase C, suele ser "
-"255.255.255.0"
+"Introduzca la máscara de red. En una red de clase C, suele ser 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 msgid ""
@@ -245,8 +244,8 @@ msgid ""
 "Enter the IP address of your name server. If you do not use a name server, "
 "press ESC."
 msgstr ""
-"Introduzca la dirección IP del servidor de nombres. Si no necesita uno, pulse "
-"ESC."
+"Introduzca la dirección IP del servidor de nombres. Si no necesita uno, "
+"pulse ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -376,7 +375,8 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Introduzca la direccción IP del conector PLIP."
 
 #. TXT_NO_PCMCIA
-msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgid ""
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
 "El chipset PCMCIA no ha podido detectarse automáticamente. Por favor, "
 "especifíquelo manualmente."
@@ -425,7 +425,8 @@ msgstr ""
 "\n"
 "\"Iniciar instalación o sistema\"\n"
 "\n"
-"Puede que necesite cargar algunos controladores (módulos) para soportar el harware."
+"Puede que necesite cargar algunos controladores (módulos) para soportar el "
+"harware."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -534,8 +535,8 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Introduzca la ruta y nombre del archivo que se va a cargar en el disco RAM como "
-"sistema de archivos raíz."
+"Introduzca la ruta y nombre del archivo que se va a cargar en el disco RAM "
+"como sistema de archivos raíz."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -654,7 +655,8 @@ msgid ""
 "Use a user name and password?"
 msgstr ""
 "Normalmente la instalación por FTP se realiza en modo anónimo. No obstante, "
-"puede especificar un nombre de usuario y una contraseña para el acceso a FTP.\n"
+"puede especificar un nombre de usuario y una contraseña para el acceso a "
+"FTP.\n"
 "¿Desea especificarlos?"
 
 #. TXT_MORE_MODULES
@@ -776,7 +778,8 @@ msgstr "Introduzca el disquete de módulos %d."
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr "Encontrará instrucciones para crear uno en boot/README en el CD1 o DVD1."
+msgstr ""
+"Encontrará instrucciones para crear uno en boot/README en el CD1 o DVD1."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
@@ -918,8 +921,8 @@ msgid ""
 "rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"El sistema base se ha instalado correctamente. Ahora es necesario reiniciar el "
-"equipo. Retire todos los medios de instalación (CD-ROM, disquete).\n"
+"El sistema base se ha instalado correctamente. Ahora es necesario reiniciar "
+"el equipo. Retire todos los medios de instalación (CD-ROM, disquete).\n"
 "No extraiga el disquete si el gestor de arranque estaba instalado en él."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -941,7 +944,8 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Introduzca la contraseña root temporal.\n"
-"Se le pedirá que cambie la contraseña la primera vez que se registre como root."
+"Se le pedirá que cambie la contraseña la primera vez que se registre como "
+"root."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -950,8 +954,8 @@ msgstr "Reiniciar"
 #. TXT_NO_RAM
 #, c-format
 msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+"Your computer does not have enough RAM for the installation of %s. You need "
+"at least %d MB."
 msgstr ""
 "El ordenador no dispone de memoria suficiente para la instalación de %s. "
 "Necesita al menos %d MB."
@@ -969,8 +973,8 @@ msgid "Please select the type of your network device."
 msgstr "Seleccione el tipo de dispositivo de red."
 
 #. TXT_IUCV_PEER
-msgid "Please enter the name (user ID) of the VM peer to connect to."
-msgstr "Introduzca el nombre (user ID) del conector VM."
+msgid "Please enter the name (user ID) of the target VM guest."
+msgstr "Introduzca el nombre (ID de usuario) del invitado VM de destino."
 
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"
@@ -1125,8 +1129,12 @@ msgstr "Error al leer el sector %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\nEste %s está defectuoso."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Este %s está defectuoso."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1151,54 +1159,53 @@ msgstr "¿Detener el sistema ahora?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 o OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token-Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Seleccione la interfaz de bus CCW."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Seleccione el medio físico."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Cargando módulos"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Cargando sistema de instalación"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Cargando fuentes adicionales"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Cargando actualización de controlador"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
-
+msgstr "Cargando sistema de rescate"

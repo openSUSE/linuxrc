@@ -37,9 +37,6 @@
 #ifdef USE_LIBHD
 
 static hd_data_t *hd_data = NULL;
-static char *pcmcia_params = NULL;
-static int is_vaio = 0;
-static int need_modules = 0;
 
 static void auto2_user_netconfig(void);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
@@ -52,7 +49,6 @@ static int driver_is_active(hd_t *hd);
 static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
-static int auto2_ask_for_modules(int prompt, char *type);
 static void get_zen_config(void);
 
 /*
@@ -142,10 +138,9 @@ int auto2_mount_harddisk(char *dev)
 void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
-  hd_t *hd, *hd_sys, *hd_usb, *hd_fw;
+  hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia;
   driver_info_t *di;
   int j, ju, k, with_usb;
-  sys_info_t *st;
   slist_t *usb_modules = NULL;
   int storage_loaded = 0;
 
@@ -178,6 +173,8 @@ void auto2_scan_hardware(char *log_file)
     storage_loaded = 1;
 
     printf("Activating usb devices...");
+    fflush(stdout);
+
     hd_data->progress = NULL;
 
     config.module.delay += 1;
@@ -196,8 +193,6 @@ void auto2_scan_hardware(char *log_file)
 
     for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, &usb_modules);
     hd_usb = hd_free_hd_list(hd_usb);
-
-    fflush(stdout);
 
     mod_modprobe("input", NULL);
     mod_modprobe("usbhid", NULL);
@@ -228,13 +223,37 @@ void auto2_scan_hardware(char *log_file)
     config.module.delay += 3;
 
     for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
-    hd_usb = hd_free_hd_list(hd_fw);
+    hd_fw = hd_free_hd_list(hd_fw);
 
     mod_modprobe("sbp2", NULL);
 
     config.module.delay -= 3;
 
     if(config.usbwait > 0) sleep(config.usbwait);
+
+    printf(" done\n");
+    fflush(stdout);
+  }
+
+
+  hd_pcmcia = hd_list(hd_data, hw_pcmcia_ctrl, 0, NULL);
+
+  if(hd_pcmcia) {
+    printf("Activating pcmcia devices...");
+    fflush(stdout);
+
+    hd_data->progress = NULL;
+
+    config.module.delay += 2;
+
+    for(hd = hd_pcmcia; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
+    hd_pcmcia = hd_free_hd_list(hd_pcmcia);
+
+    config.module.delay -= 2;
+
+    if(config.usbwait > 0) sleep(config.usbwait);
+
+    hd_free_hd_list(hd_list(hd_data, hw_pcmcia, 1, NULL));
 
     printf(" done\n");
     fflush(stdout);
@@ -264,21 +283,6 @@ void auto2_scan_hardware(char *log_file)
   hd_sys = hd_list(hd_data, hw_sys, 1, NULL);
 
   activate_driver(hd_data, hd_sys, NULL);
-
-  if(
-    hd_sys &&
-    hd_sys->detail && hd_sys->detail->type == hd_detail_sys &&
-    (st = hd_sys->detail->sys.data)
-  ) {
-    if(st->model && strstr(st->model, "PCG-") == st->model) {
-      /* is a Sony Vaio */
-      fprintf(stderr, "is a Vaio\n");
-      is_vaio = 1;
-      if(!config.kernel_pcmcia) pcmcia_params = "irq_list=9,10,11,15";
-      slist_append(&config.module.initrd, usb_modules);
-      usb_modules = NULL;
-    }
-  }
 
   /* usb keyboard ? */
   if(ju) {
@@ -690,12 +694,25 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list)
   str_list_t *sl1, *sl2;
   slist_t *slm;
   int i, ok = 0;
+  char buf[256];
 
   if(!hd || driver_is_active(hd)) return 1;
 
   if(hd->is.notready) return 1;
 
   // if(ID_TAG(hd->vendor.id) == TAG_PCMCIA) return 0;
+
+  if(
+    !config.nopcmcia &&
+    hd->hotplug == hp_pcmcia &&
+    hd->hotplug_slot &&
+    util_check_exist("/sbin/pcmcia-socket-startup")
+  ) {
+    sprintf(buf, "%s %d\n", "/sbin/pcmcia-socket-startup", hd->hotplug_slot - 1);
+    fprintf(stderr, "pcmcia socket startup for: %s (%d)\n", hd->sysfs_id, hd->hotplug_slot - 1);
+
+    system(buf);
+  }
 
   for(di = hd->driver_info; di; di = di->next) {
     if(di->module.type == di_module) {
@@ -751,9 +768,6 @@ int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
         fprintf(stderr, "Ok, that seems to have worked. :-)\n");
       }
       else {
-#ifdef __i386__
-        need_modules = 1;
-#endif
         fprintf(stderr, "Oops, that didn't work.\n");
       }
 
@@ -783,15 +797,8 @@ int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
 int auto2_init()
 {
   int i, win_old;
-#if 0	/* def __i386__ */
-  int net_cfg;
-#endif
   hd_t *hd;
   char buf[256];
-#if WITH_PCMCIA
-//  int j;
-  hd_hw_item_t hw_items[] = { hw_cdrom, hw_network, 0 };
-#endif
 
   auto2_chk_frame_buffer();
 
@@ -838,34 +845,6 @@ int auto2_init()
     file_read_info();
     util_debugwait("got info file");
   }
-
-#if WITH_PCMCIA
-  if(
-    !config.nopcmcia &&
-    hd_has_pcmcia(hd_data)
-  ) {
-    fprintf(stderr, "Going to load PCMCIA support...\n");
-    printf("Activating PCMCIA devices...");
-    fflush(stdout);
-
-    config.module.delay += 1;
-
-    i = mod_modprobe(pcmcia_driver(2), pcmcia_params);
-    if(i) {
-      fprintf(stderr, "Error %d loading PCMCIA core modules.\n", i);
-    }
-    else {
-      sleep(config.usbwait > 0 ? config.usbwait : is_vaio ? 10 : 6);
-    }
-    hd_list2(hd_data, hw_items, 1);
-
-    printf(" done\n");
-    fflush(stdout);
-
-    config.module.delay -= 1;
-  }
-
-#endif
 
   util_splash_bar(40, SPLASH_40);
 
@@ -941,19 +920,9 @@ int auto2_find_install_medium()
 
     util_debugwait("CD?");
 
-    do {
-      need_modules = 0;
+    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
-      if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
-    }
-    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
-
-    do {
-      need_modules = 0;
-
-      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-    }
-    while(need_modules && auto2_ask_for_modules(1, "network"));
+    if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
 
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev(&hd_devs))) {
@@ -961,28 +930,23 @@ int auto2_find_install_medium()
       return TRUE;
     }
 
-    do {
-      need_modules = 0;
+    for(last_idx = 0;;) {
+      /* i == 1 -> try to activate another storage device */
+      if(i == 1) {
+        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+      }
 
-      for(last_idx = 0;;) {
-        /* i == 1 -> try to activate another storage device */
-        if(i == 1) {
-          fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-        }
+      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
+        fprintf(stderr, "No further storage devices found; giving up.\n");
+        break;
+      }
 
-        if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
-          fprintf(stderr, "No further storage devices found; giving up.\n");
-          break;
-        }
-
-        fprintf(stderr, "Looking for a %s CD again...\n", config.product);
-        if(!(i = auto2_cdrom_dev(&hd_devs))) {
-          auto2_user_netconfig();
-          return TRUE;
-        }
+      fprintf(stderr, "Looking for a %s CD again...\n", config.product);
+      if(!(i = auto2_cdrom_dev(&hd_devs))) {
+        auto2_user_netconfig();
+        return TRUE;
       }
     }
-    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
 
     if(config.cdrom) {
       auto2_user_netconfig();
@@ -994,19 +958,9 @@ int auto2_find_install_medium()
 
     util_debugwait("HD?");
 
-    do {
-      need_modules = 0;
-  
-      if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
-    }
-    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
+    if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
-    do {
-      need_modules = 0;
-
-      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-    }
-    while(need_modules && auto2_ask_for_modules(1, "network"));
+    if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
 
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev(&hd_devs))) {
@@ -1014,28 +968,23 @@ int auto2_find_install_medium()
       return TRUE;
     }
 
-    do {
-      need_modules = 0;
+    for(last_idx = 0;;) {
+      /* i == 1 -> try to activate another storage device */
+      if(i == 1) {
+        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
+      }
 
-      for(last_idx = 0;;) {
-        /* i == 1 -> try to activate another storage device */
-        if(i == 1) {
-          fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-        }
+      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
+        fprintf(stderr, "No further storage devices found; giving up.\n");
+        break;
+      }
 
-        if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
-          fprintf(stderr, "No further storage devices found; giving up.\n");
-          break;
-        }
-
-        fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
-        if(!(i = auto2_harddisk_dev(&hd_devs))) {
-          auto2_user_netconfig();
-          return TRUE;
-        }
+      fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
+      if(!(i = auto2_harddisk_dev(&hd_devs))) {
+        auto2_user_netconfig();
+        return TRUE;
       }
     }
-    while(need_modules && auto2_ask_for_modules(1, "ide/raid/scsi"));
 
   }
 
@@ -1057,34 +1006,24 @@ int auto2_find_install_medium()
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
-    do {
-      need_modules = 0;
-
-      if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-    }
-    while(need_modules && auto2_ask_for_modules(1, "network"));
+    if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
 
     if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
 
     fprintf(stderr, "Looking for a network server...\n");
     if(!auto2_net_dev(&hd_devs)) return TRUE;
 
-    do {
-      need_modules = 0;
+    for(last_idx = 0;;) {
+      fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
 
-      for(last_idx = 0;;) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
-
-        if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
-          fprintf(stderr, "No further network cards found; giving up.\n");
-          break;
-        }
-
-        fprintf(stderr, "Looking for a network server again...\n");
-        if(!auto2_net_dev(&hd_devs)) return TRUE;
+      if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
+        fprintf(stderr, "No further network cards found; giving up.\n");
+        break;
       }
+
+      fprintf(stderr, "Looking for a network server again...\n");
+      if(!auto2_net_dev(&hd_devs)) return TRUE;
     }
-    while(need_modules && auto2_ask_for_modules(1, "network"));
 
   }
 
@@ -1284,38 +1223,6 @@ void auto2_progress(char *pos, char *msg)
   printf("\r%64s\r", "");
   printf("> %s: %s", pos, msg);
   fflush(stdout);
-}
-
-
-/*
- * Prompt for module floppy; does some real things only on i386 (other
- * archs don't have module floppies).
- */
-int auto2_ask_for_modules(int prompt, char *type)
-{
-  int do_something = 0;
-
-#ifdef __i386__
-  char buf[256];
-  int mtype = mod_get_type(type);
-
-  if(!config.module.disks) return do_something;
-
-  if(mod_check_modules(type)) return do_something;
-
-  util_disp_init();
-
-  *buf = 0;
-  mod_disk_text(buf, mtype);
-
-  do_something = prompt ? dia_okcancel(buf, YES) == YES ? 1 : 0 : 1;
-
-  if(do_something) mod_add_disk(0, mtype);
-
-  util_disp_done();
-#endif
-
-  return do_something;
 }
 
 
