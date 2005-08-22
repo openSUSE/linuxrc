@@ -214,7 +214,7 @@ int main(int argc, char **argv, char **env)
 
   if(!config.had_segv) config.restart_on_segv = 1;
 
-  if(util_check_exist("/opt") || getuid()) {
+  if(util_check_exist("/usr/src/packages") || getuid()) {
     printf("Seems we are on a running system; activating testmode...\n");
     config.test = 1;
     str_copy(&config.console, "/dev/tty");

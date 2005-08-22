@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,6 +30,8 @@ struct {
   char app_data[0x201];		/* app specific data*/
   unsigned char old_md5[16];	/* md5sum stored in iso */
   unsigned char md5[16];	/* md5sum */
+  unsigned char full_md5[16];	/* complete md5sum */
+  unsigned pad;			/* pad size in kb */
 } iso;
 
 window_t win;
@@ -67,18 +70,19 @@ void md5_verify()
   }
 
   fprintf(stderr,
-    "  app: %s\nmedia: %s%d\n size: %u kB\n",
+    "  app: %s\nmedia: %s%d\n size: %u kB\n  pad: %u kB\n",
     iso.app_id,
     iso.media_type,
     iso.media_nr ?: 1,
-    iso.size
+    iso.size,
+    iso.pad
   );
 
-  fprintf(stderr, "  md5: ");
+  fprintf(stderr, "  ref: ");
   if(iso.got_old_md5) for(i = 0; i < sizeof iso.old_md5; i++) fprintf(stderr, "%02x", iso.old_md5[i]);
   fprintf(stderr, "\n");
 
-  if(!*iso.app_id || !iso.got_old_md5) {
+  if(!*iso.app_id || !iso.got_old_md5 || iso.pad >= iso.size) {
     sprintf(buf, txt_get(TXT_WRONG_CD), config.product);
     dia_message(buf, MSGTYPE_ERROR);
     return;
@@ -93,23 +97,21 @@ void md5_verify()
   fprintf(stderr, "check: ");
   if(iso.got_old_md5) {
     if(iso.md5_ok) {
-      fprintf(stderr, "md5sum ok");
+      fprintf(stderr, "md5sum ok\n");
     }
     else {
-      fprintf(stderr, "md5sum wrong");
+      fprintf(stderr, "md5sum wrong\n");
     }
   }
   else {
-    fprintf(stderr, "md5sum not checked");
+    fprintf(stderr, "md5sum not checked\n");
   }
 
-  if(iso.got_md5 && !iso.md5_ok) {
-    fprintf(stderr, " (");
-    for(i = 0; i < sizeof iso.md5; i++) fprintf(stderr, "%02x", iso.md5[i]);
-    fprintf(stderr, ")");
+  if(iso.got_md5) {
+    fprintf(stderr, "  md5: ");
+    for(i = 0; i < sizeof iso.full_md5; i++) fprintf(stderr, "%02x", iso.full_md5[i]);
+    fprintf(stderr, "\n");
   }
-
-  fprintf(stderr, "\n");
 
   if(iso.md5_ok) {
     dia_message(txt_get(TXT_CD_CHECK_OK), MSGTYPE_INFO);
@@ -137,11 +139,11 @@ void md5_verify()
 void do_md5(char *file)
 {
   unsigned char buffer[64 << 10]; /* at least 36k! */
-  struct md5_ctx ctx;
+  struct md5_ctx ctx, full_ctx;
   int fd, err = 0;
-  unsigned chunks = iso.size / (sizeof buffer >> 10);
+  unsigned chunks = (iso.size - iso.pad) / (sizeof buffer >> 10);
   unsigned chunk, u;
-  unsigned last_size = (iso.size % (sizeof buffer >> 10)) << 10;
+  unsigned last_size = ((iso.size - iso.pad) % (sizeof buffer >> 10)) << 10;
   char msg[256];
 
   if((fd = open(file, O_RDONLY)) == -1) return;
@@ -150,6 +152,7 @@ void do_md5(char *file)
   dia_status_on(&win, msg);
 
   md5_init_ctx(&ctx);
+  md5_init_ctx(&full_ctx);
 
   /*
    * Note: md5_process_block() below *requires* buffer sizes to be a
@@ -163,6 +166,8 @@ void do_md5(char *file)
       iso.err_ofs = (u >> 10) + chunk * (sizeof buffer >> 10);
       break;
     };
+
+    md5_process_block(buffer, sizeof buffer, &full_ctx);
 
     if(chunk == 0) memset(buffer + 0x8373, ' ', 0x200);
 
@@ -179,12 +184,24 @@ void do_md5(char *file)
     }
     else {
       md5_process_block(buffer, last_size, &ctx);
+      md5_process_block(buffer, last_size, &full_ctx);
 
-      update_progress(iso.size);
+      update_progress(iso.size - iso.pad);
+    }
+  }
+
+  if(!err) {
+    memset(buffer, 0, 2 << 10);		/* 2k */
+    for(u = 0; u < (iso.pad >> 1); u++) {
+      md5_process_block(buffer, 2 << 10, &ctx);
+      md5_process_block(buffer, 2 << 10, &full_ctx);
+
+      update_progress(iso.size - iso.pad + ((u + 1) << 1));
     }
   }
 
   md5_finish_ctx(&ctx, iso.md5);
+  md5_finish_ctx(&full_ctx, iso.full_md5);
 
   dia_status_off(&win);
 
@@ -291,6 +308,12 @@ void get_info(char *file)
       if(u == sizeof iso.old_md5) iso.got_old_md5 = 1;
     }
   }
+
+  if((s = strstr(iso.app_data, "pad="))) {
+    s += sizeof "pad=" - 1;
+    if(isdigit(*s)) iso.pad = strtoul(s, NULL, 0) << 1;
+  }
+
 }
 
 
