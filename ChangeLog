@@ -1,3 +1,8 @@
+23/8/2005:	v1.9.11
+	- better vfat detection
+	- tag auto-detected modules in module loading dialog
+	- set keymap in auto mode (#105690)
+
 22/8/2005:	v1.9.10
 	- use Dansk keymap
 	- translations updated

@@ -174,6 +174,7 @@ typedef struct module2_s {
   unsigned autoload:1;	/* can be autoloaded */
   unsigned exists:1;	/* module really exists */
   unsigned dontask:1;	/* don't ask for module params */
+  unsigned detected:1;	/* auto-detected */
 } module_t;
 
 

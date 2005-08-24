@@ -433,7 +433,7 @@ void set_choose_keytable(int always_show)
   }
 
   if(!config.win || (config.keymap && !always_show)) {
-    set_activate_keymap(config.keymap);
+    set_activate_keymap(def_keymap);
     return;
   }
 

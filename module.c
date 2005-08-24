@@ -59,6 +59,7 @@ static int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align
 static void mod_delete_module(void);
 
 static int mod_cmp(char *str1, char *str2);
+static void mod_auto_detect(void);
 
 /*
  * return:
@@ -310,7 +311,10 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
   for(i = 0, ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == type && ml->exists && ml->descr) {
-      sprintf(buf, "%14s%s%s", ml->name, *ml->descr ? " : " : "", ml->descr);
+      sprintf(buf, "%14s%s%s",
+        ml->name,
+        *ml->descr ? ml->detected ? " * " : " : " : "", ml->descr
+      );
       items[i] = strdup(buf);
       mod_items[i++] = ml;
     }
@@ -431,6 +435,8 @@ int mod_load_manually(int type)
   char **items;
   module_t **mod_items;
   int added = 0;
+
+  mod_auto_detect();
 
   i = mod_build_list(type, &items, &mod_items);
 
@@ -834,9 +840,7 @@ int mod_modprobe(char *module, char *param)
 
   if(!module) return -1;
 
-  for(ml = config.module.list; ml; ml = ml->next) {
-    if(ml->name && !strcmp(ml->name, module)) break;
-  }
+  ml = mod_get_entry(module);
 
   if(!ml) return mod_insmod(module, param);
 
@@ -994,6 +998,43 @@ int mod_cmp(char *str1, char *str2)
   free(str2);
 
   return i;
+}
+
+
+/*
+ * Update list of detected modules.
+ */
+void mod_auto_detect()
+{
+  hd_data_t *hd_data = NULL;
+  hd_t *hd;
+  driver_info_t *di;
+  str_list_t *sl;
+  hd_hw_item_t hw_items[] = { hw_pci, hw_pcmcia, hw_usb, 0 };
+  module_t *ml;
+
+  if(config.manual >= 2) return;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  hd = hd_list2(hd_data, hw_items, 1);
+
+  for(; hd; hd = hd->next) {
+    if(
+      (di = hd->driver_info) &&
+      di->any.type == di_module
+    ) {
+      for(sl = di->module.names; sl; sl = sl->next) {
+        for(ml = config.module.list; ml; ml = ml->next) {
+          if(!mod_cmp(ml->name, sl->str)) ml->detected = 1;
+        }
+      }
+    }
+  }
+
+  hd_free_hd_data(hd_data);
+
+  free(hd_data);
 }
 
 
