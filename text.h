@@ -59,6 +59,7 @@ extern int   txt_init (void);
 // #define TRANS_ro
 #define TRANS_ru
 #define TRANS_sk
+#define TRANS_sl
 #define TRANS_sv
 #define TRANS_uk
 #define TRANS_zh_CN

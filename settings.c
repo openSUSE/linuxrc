@@ -47,7 +47,8 @@ struct {
   { "no-latin1",    KM_L1  },
   { "pt-latin1",    KM_L1  },
   { "ru1",          KM_KOI },
-  { "sk-qwerty",    KM_L2  }
+  { "sk-qwerty",    KM_L2  },
+  { "slovene",      KM_L2  }
 };
 
 
@@ -162,6 +163,10 @@ static language_t set_languages_arm [] =
 { lang_sk, "Slovenčina", "sk-qwerty", SMALL_FONT, UNI_FONT, 1, 1, "sk_SK", 0 },
 #endif
 
+#ifdef TRANS_sl
+{ lang_sl, "Slovenščina", "slovene", SMALL_FONT, UNI_FONT, 1, 1, "sl_SI", 0 },
+#endif
+
 #ifdef TRANS_sv
 { lang_sv, "Svenska", "sv-latin1", SMALL_FONT, UNI_FONT, 0, 1, "sv_SE", 0 },
 #endif
@@ -204,6 +209,7 @@ static keymap_t set_keymaps_arm [] =
 { "Português",            "pt-latin1"    },
 { "Russian",              "ru1"          },
 { "Slovak",               "sk-qwerty"    },
+{ "Slovene",              "slovene"      },
 { "Svensk",               "sv-latin1"    }
 };
 #endif

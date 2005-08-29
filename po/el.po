@@ -1,20 +1,25 @@
+# translation of el.po to Hellenic-Ελληνικά-Greek
+# translation of el.po to
+# translation of el.po to Ελληνικά
 # translation of el.po to Hellenic
 # translation of el.po to Hellenic-Greek
 # Hellenic translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
 # Filippos Papadopoulos <filip@cs.uoi.gr>, 2005.
 # Hellenic SuSE Translators Group <hstg@billg.gr>, 2005.
+# Hellenic SuSE Translators Group <billg@billg.gr>, 2005.
+# Hellenic SuSE Translation Team <hstg@billg.gr>, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: el\n"
-"PO-Revision-Date: 2005-03-08 02:05+0200\n"
-"Last-Translator: Filippos Papadopoulos <filip@cs.uoi.gr>\n"
-"Language-Team: Hellenic-Greek <->\n"
+"PO-Revision-Date: 2005-08-25 18:30+0300\n"
+"Last-Translator: Hellenic SuSE Translation Team <hstg@billg.gr>\n"
+"Language-Team: Hellenic-Ελληνικά-Greek <hstg@billg.gr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.9.1\n"
+"X-Generator: KBabel 1.10\n"
 
 #. TXT_OK
 msgid "OK"
@@ -94,7 +99,7 @@ msgstr "Φόρτωση Μονάδων Αυτόματα"
 
 #. TXT_DEL_MODULES
 msgid "Unload Modules"
-msgstr "Ξεφόρτωση Μονάδων"
+msgstr "Εκφόρτωση Μονάδων"
 
 #. TXT_TRY_TO_LOAD
 #, c-format
@@ -317,7 +322,7 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"Παρακαλώ επιλέξτε μια αντιστοίχηση πληκτρολογίου.\n"
+"Παρακαλώ επιλέξτε μια αντιστοίχιση πληκτρολογίου.\n"
 "Το YaST θα σας προσφέρει περισσότερους πίνακες πληκτρολογίων στη συνέχεια."
 
 #. TXT_DELETE_MODULE
@@ -355,7 +360,7 @@ msgstr "Παράλληλη θύρα"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "Κάρτα δικτύου token ring"
+msgstr "Κάρτα δικτύου δακτυλίου με κουπόνι"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
@@ -375,11 +380,11 @@ msgstr "Επιλέξτε την συσκευή δικτύου."
 
 #. TXT_INPUT_PLIP_IP
 msgid "Enter the IP address of the PLIP partner."
-msgstr "Εισάγετε την διεύθυνση ΙΡ του PLIP partner."
+msgstr "Εισάγετε την διεύθυνση ΙΡ του συνεταίρου PLIP."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "Δεν μπόρεσε να ανιχνευθεί αυτόματα κανένα PCMCIA chipset. Παρακαλώ ορίστε το χειροκίνητα."
+msgstr "Δεν μπόρεσε να ανιχνευτεί αυτόματα κανένα PCMCIA chipset. Παρακαλώ ορίστε το χειροκίνητα."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -1145,54 +1150,54 @@ msgstr "Θέλετε να απενεργοποιήσετε το σύστημα �
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 ή OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Δίκτυο Δακτυλίου με Κουπόνι"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Παρακαλώ επιλέξτε την διασύνδεση διαύλου CCW"
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Παρακαλώ επιλέξτε το φυσικό μέσο"
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Φόρτωση Μονάδων"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Φόρτωση Συστήματος Εγκατάστασης"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Φόρτωση Επιπρόσθετων Γραμματοσειρών"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Φόρτωση Ενημέρωση Οδηγού"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "Φόρτωση Συστήματος Διάσωσης"
 

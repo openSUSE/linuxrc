@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <string.h>
+#include <dirent.h>
 #include <sys/mount.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -252,6 +253,10 @@ void auto2_scan_hardware(char *log_file)
     config.module.delay -= 2;
 
     if(config.usbwait > 0) sleep(config.usbwait);
+
+    pcmcia_socket_startup();
+
+    sleep(2);
 
     hd_free_hd_list(hd_list(hd_data, hw_pcmcia, 1, NULL));
 
@@ -709,7 +714,7 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list)
     util_check_exist("/sbin/pcmcia-socket-startup")
   ) {
     sprintf(buf, "%s %d\n", "/sbin/pcmcia-socket-startup", hd->hotplug_slot - 1);
-    fprintf(stderr, "pcmcia socket startup for: %s (%d)\n", hd->sysfs_id, hd->hotplug_slot - 1);
+    fprintf(stderr, "pcmcia socket startup for: %s (socket %d)\n", hd->sysfs_id, hd->hotplug_slot - 1);
 
     system(buf);
   }
@@ -1289,6 +1294,39 @@ void get_zen_config()
   printf(cfg_ok ? " - got it\n" : " - not found\n");
 
   free(cfg);
+}
+
+
+void pcmcia_socket_startup()
+{
+  char buf[256];
+  struct dirent *de;
+  DIR *d;
+  FILE *f;
+  int i, socket;
+
+  if(!util_check_exist("/sbin/pcmcia-socket-startup")) return;
+
+  if((d = opendir("/sys/class/pcmcia_socket"))) {
+    while((de = readdir(d))) {
+      if(sscanf(de->d_name, "pcmcia_socket%d", &socket) == 1) {
+        sprintf(buf, "%s/%s/card_type", "/sys/class/pcmcia_socket", de->d_name);
+        i = 0;
+        if((f = fopen(buf, "r"))) {
+          i = fgetc(f) == EOF ? 0 : 1;
+          fclose(f);
+        }
+
+        if(!i) continue;
+
+        sprintf(buf, "%s %d\n", "/sbin/pcmcia-socket-startup", socket);
+        fprintf(stderr, "pcmcia socket startup for: socket %d\n", socket);
+
+        system(buf);
+      }
+    }
+    closedir(d);
+  }
 }
 
 

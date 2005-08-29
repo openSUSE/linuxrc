@@ -1,3 +1,8 @@
+29/8/2005:	v1.9.12
+	- run pcmcia startup
+	- add config option for NFS via TCP (#76717)
+	- new translations
+
 23/8/2005:	v1.9.11
 	- better vfat detection
 	- tag auto-detected modules in module loading dialog

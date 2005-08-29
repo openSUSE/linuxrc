@@ -1257,6 +1257,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
   add_flag(&sl0, buf, config.net.use_dhcp, "dhcp");
   add_flag(&sl0, buf, config.net.dhcp_active, "dhcp_active");
+  add_flag(&sl0, buf, config.net.nfs_tcp, "nfs.tcp");
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");

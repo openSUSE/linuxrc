@@ -279,6 +279,7 @@ typedef struct {
   unsigned utf8:1;		/* in utf8 mode */
   unsigned fb:1;		/* has frame buffer */
   unsigned instsys_complain:2;	/* check instsys id */
+  unsigned do_pcmcia_startup:1;	/* run pcmcia-socket-startup */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
@@ -435,6 +436,7 @@ typedef struct {
     unsigned device_given:1;	/* netdevice explicity set in info file */
     unsigned ifconfig:1;	/* setup network interface */
     unsigned is_configured:1;	/* set if network is configured */
+    unsigned nfs_tcp:1;		/* use TCP for NFS */
     unsigned do_setup;		/* do network setup */
     unsigned setup;		/* bitmask: do these network setup things */
     char *device;		/* currently used device */
