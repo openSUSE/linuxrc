@@ -1,3 +1,7 @@
+5/9/2005:	v1.9.14
+	- fix segfault when doing hd install & network setup (#114938)
+	- don't try network install if cd install fails (#84171)
+
 1/9/2005:	v1.9.13
 	- free initramfs data
 

@@ -890,6 +890,11 @@ void auto2_user_netconfig()
 
   if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
     config.net.configured = nc_static;
+    /* looks a bit weird, but we need it here for net_activate_ns() */
+    if(!config.net.device) {
+      util_update_netdevice_list(NULL, 1);
+      if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+    }
     if(net_activate_ns()) {
       fprintf(stderr, "net activation failed\n");
       config.net.configured = nc_none;
@@ -957,6 +962,10 @@ int auto2_find_install_medium()
       auto2_user_netconfig();
       return TRUE;
     }
+
+    util_debugwait("Nothing found");
+
+    return FALSE;
   }
 
   if(config.instmode == inst_hd) {
@@ -991,6 +1000,9 @@ int auto2_find_install_medium()
       }
     }
 
+    util_debugwait("Nothing found");
+
+    return FALSE;
   }
 
   if(net_config_mask() || config.insttype == inst_net) {

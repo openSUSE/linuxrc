@@ -398,6 +398,11 @@ int net_activate()
 
     if(config.test || !config.net.ifconfig || config.net.dhcp_active) return 0;
 
+    if(!config.net.device) {
+      fprintf(stderr, "net_activate: no network interface!\n");
+      return 1;
+    }
+
     config.net.is_configured = 0;
 
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
