@@ -49,6 +49,17 @@ char *txt_get (enum textid_t id_iv)
         else
             i_ii++;
 
+    /* deserves a proper solution */
+    if(
+      !config.serial &&
+      !config.test && (
+        config.language == lang_ja ||
+        config.language == lang_ko ||
+        config.language == lang_zh_CN ||
+        config.language == lang_zh_TW
+      )
+    ) found_ii = FALSE;
+
     if (found_ii)
         txt_pci = alltexts_arm [i_ii].texts;
     else
