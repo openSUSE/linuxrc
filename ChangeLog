@@ -1,3 +1,6 @@
+13/9/2005:	v1.9.16
+	- load all pcmcia drivers (#104517)
+
 12/9/2005:	v1.9.15
 	- don't activate wide-char languages on normal linux console (#116289)
 

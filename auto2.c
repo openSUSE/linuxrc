@@ -139,7 +139,7 @@ int auto2_mount_harddisk(char *dev)
 void auto2_scan_hardware(char *log_file)
 {
   FILE *f = NULL;
-  hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia;
+  hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
   int j, ju, k, with_usb;
   slist_t *usb_modules = NULL;
@@ -258,7 +258,9 @@ void auto2_scan_hardware(char *log_file)
 
     sleep(2);
 
-    hd_free_hd_list(hd_list(hd_data, hw_pcmcia, 1, NULL));
+    hd_pcmcia2 = hd_list(hd_data, hw_pcmcia, 1, NULL);
+    for(hd = hd_pcmcia2; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
+    hd_pcmcia2 = hd_free_hd_list(hd_pcmcia2);
 
     printf(" done\n");
     fflush(stdout);
