@@ -1,3 +1,5 @@
+	- add new s390 net parameters
+
 13/9/2005:	v1.9.16
 	- load all pcmcia drivers (#104517)
 
