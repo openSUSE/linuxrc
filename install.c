@@ -885,8 +885,8 @@ int inst_start_install()
     }
   }
 
-  /* only if we need it for ftp/http installs, too */
-  /* if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE); */
+  /* remove it if not needed, might be a leftover from an earlier install attempt */
+  if(config.insttype == inst_net) unlink("/" SP_FILE);
 
   /* look for driver update image; load and apply it */
   i = 1;

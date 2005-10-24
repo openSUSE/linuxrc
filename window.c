@@ -359,13 +359,22 @@ int win_input (int x, int y, char *buf, int buf_len, int field_len, int pw_mode)
   int *undo_buf, *tmp_buf;
   int field[MAX_FIELD + 1];
 
-    int   current_ii;
-    int   offset_ii;
-    int   i_ii;
-    int   overwrite_ii;
+  int i, cur, ofs, overwrite;
+
     int   old_end_ii;
     int   tmp_end_ii;
 
+  void goto_end(void)
+  {
+    if(end < field_len) {
+      ofs = 0;
+      cur = end;
+    }
+    else {
+      cur = field_len - 1;
+      ofs = end - cur;
+    }
+  }
 
   disp_cursor_on();
 
@@ -388,164 +397,161 @@ int win_input (int x, int y, char *buf, int buf_len, int field_len, int pw_mode)
   fill_string(input, input_len);
 
 
-    current_ii = 0;
-    offset_ii = 0;
-    key = KEY_END;
-    field[field_len] = 0;
-    overwrite_ii = FALSE;
-    old_end_ii = end;
+  cur = ofs = 0;
+  overwrite = 0;
 
-    do
-        {
-        void goto_end (void)
-            {
-            if (end < field_len)
-                {
-                offset_ii = 0;
-                current_ii = end;
-                }
-            else
-                {
-                current_ii = field_len - 1;
-                offset_ii = end - current_ii;
-                }
-            }
+  key = KEY_END;
+  field[field_len] = 0;
 
-        memcpy(tmp_buf, input, input_len * sizeof *tmp_buf);
-        tmp_end_ii = end;
+  old_end_ii = end;
 
-        switch (key)
-            {
-            case KEY_LEFT:
-                if (current_ii)
-                    current_ii--;
-                else if (offset_ii)
-                    offset_ii--;
-                break;
-            case KEY_RIGHT:
-                if (offset_ii + current_ii < end)
-                    {
-                    if (current_ii < field_len - 1)
-                        current_ii++;
-                    else if (offset_ii + current_ii < input_len - 1)
-                        offset_ii++;
-                    }
-                break;
-            case KEY_HOME:
-            case KEY_CTRL_A:
-                offset_ii = 0;
-                current_ii = 0;
-                break;
-            case KEY_END:
-            case KEY_CTRL_E:
-                goto_end ();
-                break;
-            case KEY_INSERT:
-                overwrite_ii = !overwrite_ii;
-                break;
-            case KEY_BACKSPACE:
-            case KEY_CTRL_D:
-            case KEY_CTRL_H:
-                if (offset_ii + current_ii)
-                    {
-                    if (offset_ii)
-                        offset_ii--;
-                    else if (current_ii)
-                        current_ii--;
-                    for (i_ii = offset_ii + current_ii; i_ii < end; i_ii++)
-                        input [i_ii] = input [i_ii + 1];
-                    input [--end] = ' ';
-                    }
-                break;
-            case KEY_DEL:
-                if (end && offset_ii + current_ii < end)
-                    {
-                    for (i_ii = offset_ii + current_ii; i_ii < end; i_ii++)
-                        input [i_ii] = input [i_ii + 1];
-                    input [--end] = ' ';
-                    }
-                break;
-            case KEY_CTRL_K:
-                current_ii = 0;
-                offset_ii = 0;
-                end = 0;
-                input [0] = 0;
-                fill_string(input, input_len);
-                break;
-            case KEY_CTRL_C:
-                dia_handle_ctrlc ();
-                break;
-            case KEY_CTRL_U:
-                end = old_end_ii;
-                memcpy(input, undo_buf, input_len * sizeof *input);
-                goto_end ();
-                break;
-            case KEY_CTRL_W:
-                while (end && input [end - 1] == ' ')
-                    end--;
-                while (end && input [end - 1] != ' ')
-                    input [--end] = ' ';
-                goto_end ();
-                break;
-            default:
-                if (is_printable (key))
-                    {
-                    if (!overwrite_ii)
-                        {
-                        for (i_ii = end; i_ii > offset_ii + current_ii; i_ii--)
-                            input [i_ii] = input [i_ii - 1];
+  do {
+    memcpy(tmp_buf, input, input_len * sizeof *tmp_buf);
 
-                        if (offset_ii + current_ii < input_len - 1)
-                            input [offset_ii + current_ii] = key;
+    tmp_end_ii = end;
 
-                        if (current_ii < field_len - 1)
-                            current_ii++;
-                        else if (offset_ii + current_ii < input_len - 1)
-                            offset_ii++;
+    switch(key) {
 
-                        if (end < input_len - 1)
-                            end++;
-                        }
-                    else
-                        {
-                        if (offset_ii + current_ii < input_len - 1)
-                            input [offset_ii + current_ii] = key;
+      case KEY_NONE:
+        break;
 
-                        if (offset_ii + current_ii == end && end < input_len - 1)
-                            end++;
-
-                        if (current_ii < field_len - 1)
-                            current_ii++;
-                        else if (offset_ii + current_ii < input_len - 1)
-                            offset_ii++;
-                        }
-                    }
-                break;
-            }
-
-        input [input_len - 1] = ' ';
-        for (i_ii = 0; i_ii < field_len; i_ii++)
-            if (pw_mode && offset_ii + i_ii < end)
-                field[i_ii] = '*';
-            else
-                field[i_ii] = input[offset_ii + i_ii];
-
-        if (memcmp(input, tmp_buf, input_len * sizeof *input))
-            {
-            old_end_ii = tmp_end_ii;
-            memcpy(undo_buf, tmp_buf, input_len * sizeof *undo_buf);
-            }
-
-        disp_gotoxy(x, y);
-        disp_set_color (colors_prg->input_fg, colors_prg->input_bg);
-        disp_write_utf32string(field);
-        disp_gotoxy(x + current_ii, y);
-        fflush (stdout);
-
-        key = kbd_getch (TRUE);
-        if (key == KEY_TAB) key = ' ';
+      case KEY_LEFT:
+        if(cur) {
+          cur--;
         }
-    while (key != KEY_ENTER && key != KEY_ESC);
+        else if(ofs) {
+          ofs--;
+        }
+        break;
+
+      case KEY_RIGHT:
+        if(ofs + cur < end) {
+          if(cur < field_len - 1) {
+            cur++;
+          }
+          else if(ofs + cur < input_len - 1) {
+            ofs++;
+          }
+        }
+        break;
+
+      case KEY_HOME:
+      case KEY_CTRL_A:
+        ofs = cur = 0;
+        break;
+
+      case KEY_END:
+      case KEY_CTRL_E:
+        goto_end();
+        break;
+
+      case KEY_INSERT:
+        overwrite = !overwrite;
+        break;
+
+      case KEY_BACKSPACE:
+      case KEY_CTRL_D:
+      case KEY_CTRL_H:
+        if(ofs + cur) {
+          if(ofs) {
+            ofs--;
+          }
+          else if(cur) {
+            cur--;
+          }
+          for(i = ofs + cur; i < end; i++) input[i] = input[i + 1];
+          input[--end] = ' ';
+        }
+        break;
+
+      case KEY_DEL:
+        if(end && ofs + cur < end) {
+          for(i = ofs + cur; i < end; i++) input[i] = input[i + 1];
+          input[--end] = ' ';
+        }
+        break;
+
+      case KEY_CTRL_K:
+        cur = ofs = end = 0;
+        input[0] = 0;
+        fill_string(input, input_len);
+        break;
+
+      case KEY_CTRL_C:
+        dia_handle_ctrlc();
+        break;
+
+      case KEY_CTRL_U:
+        end = old_end_ii;
+        memcpy(input, undo_buf, input_len * sizeof *input);
+        goto_end();
+        break;
+
+      case KEY_CTRL_W:
+        while(end && input[end - 1] == ' ') end--;
+        while(end && input[end - 1] != ' ') input[--end] = ' ';
+        goto_end();
+        break;
+
+      default:
+        if(is_printable(key)) {
+          if(!overwrite) {
+            for(i = end; i > ofs + cur; i--) input[i] = input[i - 1];
+
+            if(ofs + cur < input_len - 1) input [ofs + cur] = key;
+
+            if(cur < field_len - 1) {
+              cur++;
+            }
+            else if(ofs + cur < input_len - 1) {
+              ofs++;
+            }
+
+            if(end < input_len - 1) end++;
+          }
+          else {
+            if(ofs + cur < input_len - 1) input[ofs + cur] = key;
+
+            if(ofs + cur == end && end < input_len - 1) end++;
+
+            if(cur < field_len - 1) {
+              cur++;
+            }
+            else if(ofs + cur < input_len - 1) {
+              ofs++;
+            }
+          }
+        }
+        break;
+
+    }
+
+    input[input_len - 1] = ' ';
+    for(i = 0; i < field_len; i++) {
+      if(pw_mode && ofs + i < end) {
+        field[i] = '*';
+      }
+      else {
+        field[i] = input[ofs + i];
+      }
+    }
+
+    if(memcmp(input, tmp_buf, input_len * sizeof *input)) {
+      old_end_ii = tmp_end_ii;
+      memcpy(undo_buf, tmp_buf, input_len * sizeof *undo_buf);
+    }
+
+    disp_gotoxy(x, y);
+    disp_set_color(colors_prg->input_fg, colors_prg->input_bg);
+    disp_write_utf32string(field);
+    disp_gotoxy(x + cur, y);
+    fflush(stdout);
+
+    key = kbd_getch(TRUE);
+
+    if(key == KEY_TAB) key = ' ';
+  }
+  while(key != KEY_ENTER && key != KEY_ESC);
 
   input[end] = 0;
 

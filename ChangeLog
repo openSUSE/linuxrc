@@ -1,3 +1,7 @@
+23/9/2005:	v2.0.0
+	- new stuff
+	- fix floppy detection in module loading dialog (#55566, #64391)
+	- ensure there's no servicepack.tar.gz in network installs (#117099)
 	- add new s390 net parameters
 
 13/9/2005:	v1.9.16

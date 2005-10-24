@@ -8,6 +8,8 @@
 
 #define KEY_SPECIAL (1 << 30)
 
+#define KEY_NONE         0
+
 #define KEY_ESC         27
 #define KEY_ENTER       10
 #define KEY_TAB          9

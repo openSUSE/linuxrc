@@ -490,7 +490,7 @@ int mod_load_manually(int type)
 int mod_add_disk(int prompt, int type)
 {
   char buf[256];
-  int i, err = 0, added = 0;
+  int i, j, err = 0, added = 0;
   int got_image = 0;
 
   if(type < 0) return 0;
@@ -503,23 +503,39 @@ int mod_add_disk(int prompt, int type)
 
   mod_free_modules();
 
+  /* try recently used floppy first */
+  if(config.floppies) {
+    err = util_mount_ro(config.floppy_dev[config.floppy], config.mountpoint.floppy);
+    if(config.debug) {
+      fprintf(stderr,
+        "mount floppy %d (%s) = %d\n",
+        config.floppy,
+        config.floppy_dev[config.floppy],
+        err
+      );
+    }
+  }
+
+  if(!config.floppies || err) {
+    err = 0;
+    if(!auto2_find_floppy()) {
+      dia_message("No floppy disk found.", MSGTYPE_ERROR);
+      return 0;
+    }
+  }
+
   for(i = 0; i < config.floppies; i++) {
-    if(!util_mount_ro(config.floppy_dev[i], config.mountpoint.floppy)) break;
+    j = util_mount_ro(config.floppy_dev[i], config.mountpoint.floppy);
+    if(config.debug) fprintf(stderr, "mount floppy %d (%s) = %d\n", i, config.floppy_dev[i], j);
+    if(!j) break;
   }
 
   if(i < config.floppies) {
     config.floppy = i;	// remember currently used floppy
   }
   else {
-    err = 1;
-    /* Try /dev/fd0 anyway, in case the user has inserted a floppy _now_. */
-    if(!config.floppies) {
-      err = util_mount_ro("/dev/fd0", config.mountpoint.floppy);
-    }
-    if(err) {
-      dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-      return 0;
-    }
+    dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
+    return 0;
   }
 
   *buf = 0;

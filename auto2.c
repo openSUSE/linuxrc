@@ -1085,6 +1085,7 @@ void auto2_chk_frame_buffer()
  */
 int auto2_find_floppy()
 {
+  hd_data_t *hd_data;
   hd_t *hd, *hd0;
   hd_res_t *res;
   int i, small_floppy = 0;
@@ -1099,12 +1100,7 @@ int auto2_find_floppy()
     return config.floppies = 1;
   }
 
-  if(!hd_data) {
-    hd_data = calloc(1, sizeof *hd_data);
-    hd_set_probe_feature(hd_data, pr_lxrc);
-    hd_clear_probe_feature(hd_data, pr_parallel);
-    hd_scan(hd_data);
-  }
+  hd_data = calloc(1, sizeof *hd_data);
 
   config.floppy = config.floppies = 0;
   for(
@@ -1138,6 +1134,10 @@ int auto2_find_floppy()
   }
 
   hd_free_hd_list(hd0);
+
+  hd_free_hd_data(hd_data);
+
+  free(hd_data);
 
   /* try 'real' floppy first */
   if(small_floppy) {
