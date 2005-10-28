@@ -1003,6 +1003,33 @@ int add_instsys()
     if(!win) util_disp_done();
   }
 
+  if(
+    config.update_complain &&
+    config.update.expected_name_list
+  ) {
+    int win;
+    slist_t *sl;
+
+    for(sl = config.update.expected_name_list; sl; sl = sl->next) {
+      if(!slist_getentry(config.update.name_list, sl->key)) break;
+    }
+
+    if(sl) {
+      if(!(win = config.win)) util_disp_init();
+
+      sprintf(buf,
+        "The following driver update has not been applied:\n\n%s\n\n"
+        "You can continue, but things will not work as expected.\n"
+        "If you don't want to see this message, boot with 'updatecomplain=0'.",
+        sl->key
+      );
+
+      dia_message(buf, MSGTYPE_ERROR);
+
+      if(!win) util_disp_done();
+    }
+  }
+
   if(!config.test) {
     // file_write_mtab();
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");

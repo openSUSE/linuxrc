@@ -244,7 +244,9 @@ static struct {
   { key_xxx,            "xxx",            kf_cfg + kf_cmd + kf_cmd_early },
   { key_instsys_id,     "InstsysID",      kf_cfg + kf_cmd                },
   { key_initrd_id,      "InitrdID",       kf_cfg + kf_cmd                },
-  { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd               }
+  { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd             },
+  { key_dud_complain,   "UpdateComplain", kf_cfg + kf_cmd                },
+  { key_dud_expected,   "UpdateExpected", kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1292,6 +1294,14 @@ void file_do_info(file_t *f0)
 
       case key_initrd_id:
         str_copy(&config.initrd_id, f->value);
+        break;
+
+      case key_dud_complain:
+        if(f->is.numeric) config.update_complain = f->nvalue;
+        break;
+
+      case key_dud_expected:
+        if(*f->value) slist_append_str(&config.update.expected_name_list, f->value);
         break;
 
       default:

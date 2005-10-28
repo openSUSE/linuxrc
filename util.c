@@ -1231,6 +1231,11 @@ void util_status_info()
   sprintf(buf, "InitrdID: %s", config.initrd_id ?: "unset");
   slist_append_str(&sl0, buf);
 
+  for(sl = config.update.expected_name_list; sl; sl = sl->next) {
+    sprintf(buf, "expected update: %s", sl->key);
+    slist_append_str(&sl0, buf);
+  }
+
   sprintf(buf,
     "instmode = %s%s%s [%s], net_config_mask = 0x%x",
     get_instmode_name(config.instmode),

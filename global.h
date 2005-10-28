@@ -280,6 +280,7 @@ typedef struct {
   unsigned fb:1;		/* has frame buffer */
   unsigned instsys_complain:2;	/* check instsys id */
   unsigned do_pcmcia_startup:1;	/* run pcmcia-socket-startup */
+  unsigned update_complain:2;	/* check for certain updates */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
@@ -352,6 +353,7 @@ typedef struct {
     slist_t *id_list;		/* list of updates */
     slist_t *name_list;		/* list of update names */
     slist_t **next_name;	/* points into name_list */
+    slist_t *expected_name_list;	/* updates we must have */
   } update;
 
   struct {
