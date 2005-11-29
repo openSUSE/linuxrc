@@ -869,6 +869,7 @@ int inst_start_install()
   if(!config.zen) {
     get_file("/content", "/content");
     get_file("/media.1/info.txt", "/info.txt");
+    get_file("/media.1/license.zip", "/license.zip");
     get_file("/part.info", "/part.info");
     get_file("/control.xml", "/control.xml");
   }

@@ -1,3 +1,7 @@
+29/11/2005:	v2.0.1
+	- remove /usr/lib/YaST2/bin from PATH (#131766)
+	- copy license.zip (feat #110081)
+
 23/9/2005:	v2.0.0
 	- new stuff
 	- fix floppy detection in module loading dialog (#55566, #64391)

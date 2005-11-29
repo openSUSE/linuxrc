@@ -1994,7 +1994,7 @@ void util_start_shell(char *tty, char *shell, int flags)
     "LANG=en_US.UTF-8",
     "PS1=\\w # ",
     "HOME=/",
-    "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/lib/YaST2/bin:/lbin",
+    "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/lbin",
     NULL
   };
   extern char **environ;
