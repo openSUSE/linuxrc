@@ -96,13 +96,13 @@ static void lxrc_makelinks(char *name);
 
 #if SWISS_ARMY_KNIFE
 // int insmod_main(int argc, char **argv);
-int loadkeys_main(int argc, char **argv);
-int dumpkeys_main(int argc, char **argv);
+// int loadkeys_main(int argc, char **argv);
+// int dumpkeys_main(int argc, char **argv);
 int dhcpcd_main(int argc, char **argv);
 int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
 int rmmod_main(int argc, char **argv);
-int setfont_main(int argc, char **argv);
+// int setfont_main(int argc, char **argv);
 int smbmnt_main(int argc, char **argv);
 
 static struct {
@@ -116,9 +116,9 @@ static struct {
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
 #if !defined(__s390__) && !defined(__s390x__)
-  { "loadkeys",    loadkeys_main         },
-  { "dumpkeys",    dumpkeys_main         },
-  { "setfont",     setfont_main          },
+//  { "loadkeys",    loadkeys_main         },
+//  { "dumpkeys",    dumpkeys_main         },
+//  { "setfont",     setfont_main          },
 #endif
   { "portmap",     portmap_main          },
   { "dhcpcd",      dhcpcd_main           },
@@ -248,7 +248,7 @@ int main(int argc, char **argv, char **env)
       }
 
       if(!config.serial && config.debugwait) {
-        util_start_shell("/dev/tty9", "/lbin/lsh", 0);
+        util_start_shell("/dev/tty9", "/bin/bash", 1);
         config.shell_started = 1;
       }
       deb_wait;
@@ -936,7 +936,7 @@ void lxrc_init()
   util_update_cdrom_list();
 
   if(!(config.test || config.serial || config.shell_started || config.noshell)) {
-    util_start_shell("/dev/tty9", "/lbin/lsh", 0);
+    util_start_shell("/dev/tty9", "/bin/bash", 1);
     config.shell_started = 1;
   }
 

@@ -1,3 +1,8 @@
+2/12/2005:	v2.0.2
+	- -Taiwan
+	- use bash, not linuxrc shell
+	- removed complied-in kbd tools
+
 29/11/2005:	v2.0.1
 	- remove /usr/lib/YaST2/bin from PATH (#131766)
 	- copy license.zip (feat #110081)

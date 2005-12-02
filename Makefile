@@ -41,8 +41,8 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po loadkeys portmap dhcpcd mkpsfu
-LIBS	= loadkeys/loadkeys.a portmap/portmap.a dhcpcd/dhcpcd.a
+SUBDIRS	= po portmap dhcpcd mkpsfu
+LIBS	= portmap/portmap.a dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
     CFLAGS		+= -DLX_ARCH=\"i386\"
@@ -81,9 +81,6 @@ ifeq ($(ARCH),armv4l)
 endif
 
 ifneq (,$(findstring -$(ARCH)-,-s390-s390x-))
-    SUBDIRS		:= $(filter-out loadkeys, $(SUBDIRS))
-    LIBS		:= $(filter-out loadkeys/loadkeys.a, $(LIBS))
-    OBJ			:= $(filter-out loadkeys.o, $(OBJ))
     CFLAGS		+= -DLX_ARCH=\"s390\"
 endif
 

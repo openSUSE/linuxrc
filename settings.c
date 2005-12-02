@@ -180,7 +180,7 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_zh_TW
-{ lang_zh_TW, "Traditional Chinese (Taiwan)", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
+{ lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
 #endif
 
 // dummy for unknown language, must be last entry
@@ -444,7 +444,7 @@ void set_choose_keytable(int always_show)
   }
 
   for(i = cnt = default_idx = 0; i < keymaps; i++) {
-    sprintf(buf, "/kbd/keymaps/%s.map", keymap[i].mapname);
+    sprintf(buf, "/usr/share/kbd/keymaps/%s.map", keymap[i].mapname);
     if(config.test || util_check_exist(buf)) {
       if(i == def_keymap_idx) default_idx = cnt;
       items[cnt++] = keymap[i].descr;
