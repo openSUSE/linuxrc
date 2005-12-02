@@ -95,14 +95,10 @@ static void lxrc_makelinks(char *name);
 #endif
 
 #if SWISS_ARMY_KNIFE
-// int insmod_main(int argc, char **argv);
-// int loadkeys_main(int argc, char **argv);
-// int dumpkeys_main(int argc, char **argv);
 int dhcpcd_main(int argc, char **argv);
 int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
 int rmmod_main(int argc, char **argv);
-// int setfont_main(int argc, char **argv);
 int smbmnt_main(int argc, char **argv);
 
 static struct {
@@ -112,14 +108,8 @@ static struct {
   { "sh",          util_sh_main          },
   { "lsh",         lsh_main              },
   { "mkdevs",      mkdevs_main           },
-//  { "insmod",      insmod_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
-#if !defined(__s390__) && !defined(__s390x__)
-//  { "loadkeys",    loadkeys_main         },
-//  { "dumpkeys",    dumpkeys_main         },
-//  { "setfont",     setfont_main          },
-#endif
   { "portmap",     portmap_main          },
   { "dhcpcd",      dhcpcd_main           },
   { "smbmnt",      smbmnt_main           },
