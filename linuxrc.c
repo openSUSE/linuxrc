@@ -96,7 +96,6 @@ static void lxrc_makelinks(char *name);
 
 #if SWISS_ARMY_KNIFE
 int dhcpcd_main(int argc, char **argv);
-int portmap_main(int argc, char **argv);
 int probe_main(int argc, char **argv);
 int rmmod_main(int argc, char **argv);
 int smbmnt_main(int argc, char **argv);
@@ -110,7 +109,6 @@ static struct {
   { "mkdevs",      mkdevs_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
-  { "portmap",     portmap_main          },
   { "dhcpcd",      dhcpcd_main           },
   { "smbmnt",      smbmnt_main           },
   { "mount",       util_mount_main       },

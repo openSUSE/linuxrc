@@ -41,8 +41,8 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po portmap dhcpcd mkpsfu
-LIBS	= portmap/portmap.a dhcpcd/dhcpcd.a
+SUBDIRS	= po dhcpcd mkpsfu
+LIBS	= dhcpcd/dhcpcd.a
 
 ifeq ($(ARCH),i386)
     CFLAGS		+= -DLX_ARCH=\"i386\"

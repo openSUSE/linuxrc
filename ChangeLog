@@ -1,3 +1,5 @@
+	- portmap gone
+
 2/12/2005:	v2.0.2
 	- -Taiwan
 	- use bash, not linuxrc shell
