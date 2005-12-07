@@ -200,7 +200,7 @@ void mod_init(int autoload)
   if(autoload) {
     for(ml = config.module.list; ml; ml = ml->next) {
       if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
-        mod_insmod(ml->name, ml->param);
+        mod_modprobe(ml->name, ml->param);
       }
     }
   }

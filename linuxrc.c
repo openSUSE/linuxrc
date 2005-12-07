@@ -456,7 +456,7 @@ void lxrc_movetotmpfs2()
 
   fprintf(stderr, " done.\n");
 
-  system("/bin/rm -r /lib /dev /bin /sbin /usr /etc /kbd /init /lbin");
+  system("/bin/rm -r /lib /dev /bin /sbin /usr /etc /init /lbin");
 
   if(chdir(newroot)) perror(newroot);
 

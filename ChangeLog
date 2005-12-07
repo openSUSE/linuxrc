@@ -1,4 +1,6 @@
+7/12/2005:	v2.0.3
 	- portmap gone
+	- autoloading modules now resolves dependencies
 
 2/12/2005:	v2.0.2
 	- -Taiwan
