@@ -1,3 +1,7 @@
+8/12/2005:	v2.0.4
+	- remove compiled-in dhcpcd
+	- write resolv.conf even if dhcp is used
+
 7/12/2005:	v2.0.3
 	- portmap gone
 	- autoloading modules now resolves dependencies

@@ -357,7 +357,6 @@ int net_setup_localhost()
  *  config.net.is_configured
  *  config.net.nameserver
  *
- * Does nothing if DHCP is active.
  * Writes nameserver & domain to /etc/resolv.conf.
  *
  * config.net.device: interface
@@ -1155,7 +1154,6 @@ static void net_show_error(enum nfs_stat status_rv)
 /*
  * Let user enter nameservers.
  *
- * Does nothing if dhcp is active.
  * Asks for name servers if window mode is active.
  *
  * Writes nameserver & domain to /etc/resolv.conf.
@@ -1169,9 +1167,7 @@ void net_setup_nameserver()
   FILE *f;
   unsigned u;
 
-  if(config.net.dhcp_active) return;
-
-  if(config.win) {
+  if(config.win && !config.net.dhcp_active) {
 
     if(!config.net.nameserver[0].name && config.net.hostname.ok) {
       s = inet_ntoa(config.net.hostname.ip);
