@@ -1,3 +1,6 @@
+9/12/2005:	v2.0.5
+	- support rescue system as cramfs
+
 9/12/2005:	v2.0.4
 	- remove compiled-in dhcpcd
 	- write resolv.conf even if dhcp is used

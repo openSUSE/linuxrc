@@ -382,13 +382,38 @@ void lxrc_change_root()
 
 void lxrc_change_root2()
 {
+  int fd;
+
   if(config.test) return;
 
   fprintf(stderr, "starting %s\n", config.new_root);
 
   umount("/mnt");
   if(config.rescue) {
-    util_mount_rw(config.new_root, "/mnt");
+    if(util_mount_rw(config.new_root, "/mnt")) {
+      util_mount_ro(config.new_root, "/mnt");
+    }
+    fd = open("/mnt/tmp/xxx", O_WRONLY|O_CREAT, 0644);
+    if(fd >= 0) {
+      close(fd);
+      unlink("/mnt/tmp/xxx");
+    }
+    else {
+      util_mount_ro(config.new_root, "/mnt/mnt");
+
+      mount("tmpfs", "/mnt/tmp", "tmpfs", 0, "size=0,nr_inodes=0");
+      chmod("/mnt/tmp", 01777);
+
+      mount("tmpfs", "/mnt/var", "tmpfs", 0, "size=0,nr_inodes=0");
+      util_do_cp("/mnt/mnt/var", "/mnt/var");
+      chmod("/mnt/var", 0755);
+
+      mount("tmpfs", "/mnt/etc", "tmpfs", 0, "size=0,nr_inodes=0");
+      util_do_cp("/mnt/mnt/etc", "/mnt/etc");
+      chmod("/mnt/etc", 0755);
+
+      umount("/mnt/mnt");
+    }
   }
   else{
     util_mount_ro(config.new_root, "/mnt");
