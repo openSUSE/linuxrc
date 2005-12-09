@@ -67,7 +67,7 @@
 
 static void lxrc_main_menu     (void);
 static void lxrc_catch_signal_11(SIGNAL_ARGS);
-static void sig_chld(int signum);
+// static void sig_chld(int signum);
 static void lxrc_catch_signal  (int signum);
 static void lxrc_init          (void);
 static int  lxrc_main_cb       (dia_item_t di);
@@ -685,17 +685,18 @@ void lxrc_catch_signal(int signum)
 }
 
 
+#if 0
 void sig_chld(int signum)
 {
   while(waitpid(-1, NULL, WNOHANG) && errno != ECHILD);
 }
-
+#endif
 
 void lxrc_init()
 {
   int i, j;
   char buf[256];
-  pid_t lxrc_pid;
+//  pid_t lxrc_pid;
 
   if(txt_init()) {
     printf("Linuxrc error: Corrupted texts!\n");

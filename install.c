@@ -64,8 +64,10 @@ static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_netsource    (void);
 static int   inst_choose_netsource_cb (dia_item_t di);
+#if defined(__s390__) || defined(__s390x__)
 static int   inst_choose_display      (void);
 static int   inst_choose_display_cb   (dia_item_t di);
+#endif
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
@@ -86,7 +88,9 @@ static void live_show_state(void);
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
+#if defined(__s390__) || defined(__s390x__)  
 static dia_item_t di_inst_choose_display_last = di_none;
+#endif
 
 int inst_start_demo()
 {
@@ -303,6 +307,7 @@ int inst_choose_netsource_cb(dia_item_t di)
   return error ? 1 : 0;
 }
 
+#if defined(__s390__) || defined(__s390x__)  
 int inst_choose_display()
 {
   dia_item_t di;
@@ -352,7 +357,7 @@ int inst_choose_display_cb(dia_item_t di)
 
   return 0;
 }
-
+#endif
 
 int inst_choose_source()
 {
