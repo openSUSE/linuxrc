@@ -15,11 +15,7 @@
 #include <sys/types.h>
 
 #include <asm/types.h>
-#ifdef DIET
-#include "dietlibc.h"
-#else
 #include <asm/posix_types.h>
-#endif
 #include <linux/smb.h>
 #include <linux/smb_mount.h>
 #include <asm/unistd.h>

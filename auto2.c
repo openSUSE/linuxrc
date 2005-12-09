@@ -35,8 +35,6 @@
 #include "settings.h"
 
 
-#ifdef USE_LIBHD
-
 static hd_data_t *hd_data = NULL;
 
 static void auto2_user_netconfig(void);
@@ -1342,7 +1340,4 @@ void pcmcia_socket_startup()
     closedir(d);
   }
 }
-
-
-#endif	/* USE_LIBHD */
 

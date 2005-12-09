@@ -11,8 +11,6 @@
   $Date: 2003/03/03 17:27:51 $
 */
 
-#include "dietlibc.h"
-
 /* Standard headers */
 #include <stdio.h>
 #include <sys/types.h>

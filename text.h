@@ -17,21 +17,6 @@ extern int   txt_init (void);
 
 /* define which translations should actually be supported */
 
-#ifdef __alpha__
-
-#define TRANS_de
-#define TRANS_en
-#define TRANS_fr
-
-#else
-
-#if LXRC_TINY >= 1
-
-#define TRANS_de
-#define TRANS_en
-
-#else
-
 /* all we have */
 // #define TRANS_br
 // #define TRANS_ar
@@ -64,9 +49,5 @@ extern int   txt_init (void);
 #define TRANS_uk
 #define TRANS_zh_CN
 #define TRANS_zh_TW
-
-#endif	/* LXRC_TINY */
-
-#endif	/* __alpha__ */
 
 #endif  /* _TEXT_H */

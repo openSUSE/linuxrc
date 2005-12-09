@@ -6,8 +6,6 @@
  *
  */
 
-#include "dietlibc.h"
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -266,7 +264,6 @@ int main(int argc, char **argv, char **env)
   if(config.demo) {
     err = inst_start_demo();
   }
-#ifdef USE_LIBHD
   else if(!config.manual) {
     if(config.rescue) {
       int win_old = 1;
@@ -287,7 +284,6 @@ int main(int argc, char **argv, char **env)
       err = inst_start_install();
     }
   }
-#endif
   else {
     err = 99;
   }
@@ -762,7 +758,6 @@ void lxrc_init()
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
-  config.update.dir = strdup("/linux/suse/" LX_ARCH);
   config.update.dst = strdup("/update");
 
   config.update.map = calloc(1, MAX_UPDATES);
@@ -957,7 +952,6 @@ void lxrc_init()
     }
   }
 
-#ifdef USE_LIBHD
   if(!config.manual) {
     if(auto2_init()) {
       config.manual = 0;	/* ###### does it make sense? */
@@ -997,7 +991,6 @@ void lxrc_init()
       }
     }
   }
-#endif
 
   /* file_read_info() is called in auto2_init(), too */
   if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
@@ -1183,19 +1176,7 @@ void lxrc_set_modprobe(char *prog)
    commandline. On SPARC, we use the result from hardwareprobing. */
 void lxrc_check_console()
 {
-#ifdef USE_LIBHD
-
   util_set_serial_console(auto2_serial_console());
-
-#else
-
-  file_t *ft;
-
-  if(!(ft = file_get_cmdline(key_console)) || !*ft->value) return;
-
-  util_set_serial_console(ft->value);
-
-#endif
 
   if(config.serial) {
     fprintf(stderr,

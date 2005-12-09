@@ -3,8 +3,6 @@
    only designed to be able to check a magic number
    in case no filesystem type was given. */
 
-#include "dietlibc.h"
-
 #ifndef BLKGETSIZE
 #ifndef _IO
 /* pre-1.3.45 */

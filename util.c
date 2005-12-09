@@ -973,7 +973,7 @@ int util_chk_driver_update(char *dir, char *loc)
   struct dirent *de;
   DIR *d;
 
-  if(!dir || !loc || !config.tmpfs) return 0;
+  if(!dir || !loc || !config.tmpfs || !config.update.dir) return 0;
 
   /* never delete module dir */
   config.memory.min_modules = 0;
@@ -1577,7 +1577,7 @@ void util_status_info()
     }
   }
 
-  dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION "/" LX_ARCH " (" __DATE__ ", " __TIME__ ")", sl0, 76);
+  dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
 
   slist_free(sl0);
 

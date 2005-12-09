@@ -7,7 +7,8 @@ map { s/^(.*\/)?([^\/]+)\.po/$2/ } @ARGV;
 open W, ">text_inc.h";
 print W "/*\n * This file is generated automatically. Editing it is pointless.\n */\n\n";
 for (@ARGV) {
-  print W "#ifdef TRANS_$_\n#include \"po/$_.h\"\n#endif\n\n"
+  # print W "#ifdef TRANS_$_\n#include \"po/$_.h\"\n#endif\n\n"
+  print W "#ifdef TRANS_$_\n#include \"$_.h\"\n#endif\n\n"
 }
 close W;
 

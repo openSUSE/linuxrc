@@ -1470,9 +1470,8 @@ void file_write_install_inf(char *dir)
   }
 #endif
 
-#ifdef USE_LIBHD
   file_write_num(f, key_haspcmcia, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
-#endif
+
   file_write_num(f, key_nopcmcia, config.nopcmcia);
 
   file_write_str(f, key_console, config.serial);
@@ -1566,7 +1565,6 @@ void file_write_install_inf(char *dir)
 
   if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
 
-#ifdef USE_LIBHD
   if(config.floppies) {
     file_write_str(f, key_floppydisk, config.floppy_dev[config.floppy]);
   }
@@ -1610,7 +1608,6 @@ void file_write_install_inf(char *dir)
       file_write_str(f, key_disks, s);
     }
   }
-#endif
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 

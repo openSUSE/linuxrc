@@ -6,8 +6,6 @@
  *
  */
 
-#include "dietlibc.h"
-
 #define WITH_NFS
 
 #include <stdio.h>
@@ -80,8 +78,6 @@ static int net_input_data(void);
 #ifdef WITH_NFS
 static void net_show_error(enum nfs_stat status_rv);
 #endif
-
-#include "static_resolv.h"
 
 static void if_down(char *dev);
 
@@ -526,7 +522,7 @@ int net_check_address (char *input_tv, struct in_addr *address_prr, int *net_bit
     *net_bits = -1;
     if((start_pci = strrchr(tmp_ti, '/'))) {
       *start_pci++ = 0;
-      i_ii = strtol(start_pci, (char **) &end_pci, 10);
+      i_ii = strtol(start_pci, (void *) &end_pci, 10);
       if(start_pci != end_pci && !*end_pci && i_ii > 0 && i_ii <= 32) {
         *net_bits = i_ii;
       }
