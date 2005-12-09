@@ -25,10 +25,6 @@
 #include <ctype.h>
 #include <errno.h>
 
-#ifdef DIET
-#include <asm/sigcontext.h>
-#endif
-
 #include <hd.h>
 
 #include "global.h"
@@ -59,9 +55,7 @@
 #define SIGNAL_ARGS	int signum, struct sigcontext scp
 #endif
 
-#ifndef DIET
 #define pivot_root(a, b) syscall(SYS_pivot_root, a, b)
-#endif
 
 #ifndef MS_MOVE
 #define MS_MOVE		(1 << 13)
@@ -1244,13 +1238,7 @@ void lxrc_movetotmpfs()
     return;
   }
 
-  if(
-#ifndef DIET
-    !syscall(SYS_pivot_root, ".", "oldroot")
-#else
-    !pivot_root(".", "oldroot")
-#endif
-  ) {
+  if(!syscall(SYS_pivot_root, ".", "oldroot")) {
     for(i = 0; i < 20; i++) close(i);
     chroot(".");
     open("/dev/console", O_RDWR);

@@ -571,11 +571,6 @@ int net_check_address2(inet_t *inet, int do_dns)
   slist_t *sl;
   int net_bits;
   uint32_t u32;
-#ifdef DIET
-  char *s;
-  file_t *f0, *f;
-  char *has_dots;
-#endif
 
   if(!inet) return -1;
 
@@ -618,40 +613,7 @@ int net_check_address2(inet_t *inet, int do_dns)
     return -1;
   }
 
-#ifdef DIET
-  has_dots = strchr(inet->name, '.');
-
-  if(has_dots) {
-//    fprintf(stderr, "trying >%s<\n", inet->name);
-    he = gethostbyname(inet->name);
-//    fprintf(stderr, "%p\n", he);  
-  }
-
-  if(!he) {
-    f0 = file_read_file("/etc/resolv.conf", kf_none);
-    for(f = f0; f; f = f->next) {
-      if(!strcmp(f->key_str, "search")) {
-        s = malloc(strlen(inet->name) + strlen(f->value) + 2);
-        sprintf(s, "%s.%s", inet->name, f->value);
-//        fprintf(stderr, "trying >%s<\n", s);
-        he = gethostbyname(s);
-//        fprintf(stderr, "%p\n", he);
-        if(!he) {
-          he = gethostbyname(s);
-//          fprintf(stderr, "%p\n", he);
-        }
-        free(s);
-        if(he) break;
-      }
-    }
-    file_free_file(f0);
-  }
-
-#else
-
   he = gethostbyname(inet->name);
-
-#endif
 
   if(!he) {
     if(config.run_as_linuxrc) {

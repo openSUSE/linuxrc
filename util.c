@@ -4027,14 +4027,7 @@ void util_set_stderr(char *name)
 
   freopen(config.stderr_name, "a", stderr);
 
-#ifndef DIET
   setlinebuf(stderr);
-#else
-  {
-    static char buf[128];
-    setvbuf(stderr, buf, _IOLBF, sizeof buf);
-  }
-#endif
 }
 
 
