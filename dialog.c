@@ -410,33 +410,43 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     int       rc_ii;
     int len0, len1, len_max;
     char *s0, *s1;
+    int dir, cur_new, ofs_new;
 
 
     if (config.linemode)
       {
-	int i;
+	int i, cnt;
 	char *p;
+	int *item_index = calloc(nr_items_iv + 1, sizeof (int));
 
         for (;;)
 	  {
 	    putchar('\n');
 	    dia_printformatted(head_tv, 0, max_x_ig - 1, 1);
 	    putchar('\n');
-	    for (i = 0; i < nr_items_iv; i++)
+	    for (i = cnt = 0; i < nr_items_iv; i++)
 	      {
 	        for (p = items_arv[i].text; *p == ' '; p++)
 		  ;
-	        printf(nr_items_iv >= 10 ? "%2d) %s\n" : "%d) %s\n", i + 1, p);
+		if(items_arv[i].tag.head) {
+		  printf("%s\n", p);
+		  // printf(nr_items_iv >= 10 ? "    %s\n" : "   %s\n", p);
+		}
+		else {
+		  item_index[cnt++] = i;
+		  printf(nr_items_iv >= 10 ? "%2d) %s\n" : "%d) %s\n", cnt, p);
+		}
 	      }
 	    printf("\n> ");fflush(stdout);
 	    current_ii = dia_readnum();
 	    if (current_ii == -'x')
 	      dia_handle_ctrlc ();
-	    if (current_ii < 0 || current_ii > nr_items_iv)
+	    if (current_ii < 0 || current_ii > cnt)
 	      continue;
 	    current_ii--;
 	    if (current_ii == -1)
 	      break;
+            #if 0
 	    if (items_arv[current_ii].func)
 	      {
 		i_ii = items_arv[current_ii].di ? : current_ii + 1;
@@ -446,9 +456,15 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 		else if (rc_ii)
 		  continue;
 	      }
+	    #endif
 	    break;
 	  }
-	return current_ii + 1;
+
+        i = item_index[current_ii];
+
+        free(item_index);
+
+	return i + 1;
       }
     disp_toggle_output (DISP_OFF);
     kbd_clear_buffer ();
@@ -599,9 +615,14 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
             }
 
         need_redraw_ii = FALSE;
+
+	dir = 0;
+	ofs_new = offset_ii;
+
         switch (key_ii)
             {
             case KEY_DOWN:
+                #if 0
                 if (current_ii < phys_items_ii - 1)
                     current_ii++;
                 else if (offset_ii + current_ii < nr_items_iv - 1)
@@ -611,8 +632,13 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
                     }
                 else if (phys_items_ii == nr_items_iv)
                     current_ii = (current_ii + 1) % phys_items_ii;
+                #endif
+                cur_new = current_ii + offset_ii + 1;
+                if(phys_items_ii == nr_items_iv && cur_new == nr_items_iv) cur_new = 0;
+                dir = 1;
                 break;
             case KEY_UP:
+                #if 0
                 if (current_ii > 0)
                     current_ii--;
                 else if (offset_ii > 0)
@@ -623,13 +649,20 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
                 else if (phys_items_ii == nr_items_iv)
                     current_ii = (current_ii + phys_items_ii - 1) %
                                          phys_items_ii;
+                #endif
+                cur_new = current_ii + offset_ii - 1;
+                if(phys_items_ii == nr_items_iv && cur_new == -1) cur_new = nr_items_iv - 1;
+                dir = -1;
                 break;
             case KEY_HOME:
-                offset_ii = 0;
-                current_ii = 0;
-                need_redraw_ii = TRUE;
+                // offset_ii = 0;
+                // current_ii = 0;
+                // need_redraw_ii = TRUE;
+                cur_new = 0;
+                dir = 1;
                 break;
             case KEY_PGUP:
+                #if 0
                 if (offset_ii == 0)
                     current_ii = 0;
                 else
@@ -639,13 +672,20 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
                         offset_ii = 0;
                     }
                 need_redraw_ii = TRUE;
+                #endif
+                cur_new = current_ii + offset_ii - phys_items_ii;
+                ofs_new -= phys_items_ii;
+                dir = -1;
                 break;
             case KEY_END:
-                offset_ii = nr_items_iv - phys_items_ii;
-                current_ii = phys_items_ii - 1;
-                need_redraw_ii = TRUE;
+                // offset_ii = nr_items_iv - phys_items_ii;
+                // current_ii = phys_items_ii - 1;
+                // need_redraw_ii = TRUE;
+                cur_new = nr_items_iv - 1;
+                dir = -1;
                 break;
             case KEY_PGDOWN:
+                #if 0
                 if (offset_ii + phys_items_ii >= nr_items_iv - 1)
                     current_ii = phys_items_ii - 1;
                 else
@@ -655,6 +695,10 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
                         offset_ii = nr_items_iv - phys_items_ii;
                     }
                 need_redraw_ii = TRUE;
+                #endif
+                cur_new = current_ii + offset_ii + phys_items_ii;
+                ofs_new += phys_items_ii;
+                dir = 1;
                 break;
             case KEY_LEFT:
             case KEY_RIGHT:
@@ -700,6 +744,43 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
             default:
                 break;
             }
+
+	if(dir) {
+	  if(cur_new < 0) cur_new = 0;
+	  if(cur_new > nr_items_iv - 1) cur_new = nr_items_iv - 1;
+
+          while(cur_new + dir >= 0 && cur_new + dir < nr_items_iv && items_arv[cur_new].tag.head) {
+            cur_new += dir;
+          }
+
+          if(items_arv[cur_new].tag.head) {
+            dir *= -1;
+            while(cur_new + dir >= 0 && cur_new + dir < nr_items_iv && items_arv[cur_new].tag.head) {
+              cur_new += dir;
+            }
+          }
+
+          if(items_arv[cur_new].tag.head) {
+            cur_new = current_ii + offset_ii;
+            ofs_new = offset_ii;
+          }
+
+          if(ofs_new < 0) ofs_new = 0;
+          if(ofs_new > nr_items_iv - phys_items_ii) ofs_new = nr_items_iv - phys_items_ii;
+
+          if(cur_new < ofs_new) {
+            ofs_new = cur_new;
+          }
+
+          if(cur_new > ofs_new + phys_items_ii - 1) {
+            ofs_new = cur_new - phys_items_ii + 1;
+          }
+
+          if(ofs_new != offset_ii) need_redraw_ii = 1;
+
+          current_ii = cur_new - ofs_new;
+          offset_ii = ofs_new;
+	}
 
         if (need_redraw_ii)
             {
@@ -1456,6 +1537,7 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
   int item_cnt, default_idx, i;
   dia_item_t *it, di;
   item_t *item_list;
+  char *s;
 
   for(item_cnt = 0, it = items; *it != di_none; it++) {
     if(*it != di_skip) item_cnt++;
@@ -1471,7 +1553,12 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
   for(i = 0, it = items; *it != di_none; it++) {
     if(*it != di_skip) {
       if(*it == default_item) default_idx = i + 1;
-      utf8_strwcpy(item_list[i].text, dia_get_text(*it), width);
+      s = dia_get_text(*it);
+      if(*s == '#') {
+        s++;
+        item_list[i].tag.head = 1;
+      }
+      utf8_strwcpy(item_list[i].text, s, width);
       item_list[i].di = *it;
       item_list[i].func = (int (*)(int)) func;
       util_center_text(item_list[i].text, width);
@@ -1500,7 +1587,7 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
 int dia_list(char *title, int width, int (*func)(int), char **items, int default_item, dia_align_t align)
 {
   int item_cnt, i;
-  char **it;
+  char **it, *s;
   item_t *item_list;
 
   for(item_cnt = 0, it = items; *it; it++) item_cnt++;
@@ -1514,7 +1601,12 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
   if(default_item < 1 || default_item > item_cnt) default_item = 1;
 
   for(i = 0, it = items; *it; it++, i++) {
-    utf8_strwcpy(item_list[i].text, *it, width);
+    s = *it;
+    if(*s == '#') {
+      s++;
+      item_list[i].tag.head = 1;
+    }
+    utf8_strwcpy(item_list[i].text, s, width);
     item_list[i].func = func;
     if(align == align_center) {
       util_center_text(item_list[i].text, width);

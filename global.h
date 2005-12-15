@@ -133,6 +133,9 @@ typedef struct {
   char *text;
   int (*func) (int);
   int di;
+  struct {
+    unsigned head:1;
+  } tag;
 } item_t;
 
 
