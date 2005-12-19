@@ -3556,22 +3556,6 @@ int util_fstype_main(int argc, char **argv)
 }
 
 
-int util_modprobe_main(int argc, char **argv)
-{
-  argv++; argc--;
-
-  /* skip all options */
-  while(argc && **argv == '-') { argc--; argv++; }
-
-  if(!argc) return fprintf(stderr, "usage: modprobe module [module params]\n"), 1;
-
-  str_copy(&config.module.dir, "/modules");
-  mod_init(0);
-
-  return mod_modprobe(argv[0], argc > 1 ? argv[1] : NULL);
-}
-
-
 /*
  * Return fs name. If we have to load a module first, return it in *module.
  */
@@ -4156,7 +4140,9 @@ void util_mkdevs()
   FILE *f;
   size_t len;
   unsigned char *buf;
-  int i;
+  int inodes = 0;
+
+  fprintf(stderr, "Creating /dev tree ");
 
   if((f = fopen("/devz", "r"))) {
     len = (fgetc(f) & 0xff) << 8;
@@ -4164,14 +4150,15 @@ void util_mkdevs()
     if(len) {
       buf = malloc(len);
       if(fread(buf, len, 1, f) == 1) {
-        i = mkdevs(buf, 1);
+        inodes = mkdevs(buf, 1);
         unlink("/devz");
-        fprintf(stderr, "created /dev tree (%d inodes)\n", i);
       }
       free(buf);
     }
     fclose(f);
   }
+
+  fprintf(stderr, "(%d inodes)\n", inodes);
 }
 
 

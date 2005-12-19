@@ -1,4 +1,7 @@
+19/12/2005:	v2.0.6
 	- support sub-headings in lists and dialogs
+	- allow udevd to manage /dev tree
+	- removed internal modprobe
 
 9/12/2005:	v2.0.5
 	- support rescue system as cramfs

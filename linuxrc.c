@@ -125,7 +125,6 @@ static struct {
   { "free",        util_free_main        },
   { "wget",        util_wget_main        },
   { "fstype",      util_fstype_main      },
-  { "modprobe",    util_modprobe_main    },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
   { "hotplug",     hotplug_main		 },
@@ -239,8 +238,6 @@ int main(int argc, char **argv, char **env)
       }
     }
   }
-
-  util_mkdevs();
 
   setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin", 1);
 
@@ -876,6 +873,15 @@ void lxrc_init()
 
   get_ide_options();
   file_read_info_file("cmdline", kf_cmd_early);
+
+  if(config.staticdevices) {
+    util_mkdevs();
+  }
+  else {
+    fprintf(stderr, "Starting udev ...\n");
+    system("/bin/myudevstart >/dev/null 2>&1");
+    fprintf(stderr, "... udev running\n");
+  }
 
   util_set_stderr(config.stderr_name);
 
