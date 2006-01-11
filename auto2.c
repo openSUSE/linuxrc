@@ -589,12 +589,6 @@ int auto2_net_dev1(hd_t *hd)
     fprintf(stderr, "ok.\n");
 
     config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
-
-    if(net_check_address2(&config.net.server, 1)) {
-      fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
-      config.net.configured = nc_none;
-      return 1;
-    }
   }
 
   if(net_activate_ns()) {
@@ -604,6 +598,12 @@ int auto2_net_dev1(hd_t *hd)
   }
   else {
     fprintf(stderr, "%s activated\n", device);
+  }
+
+  if(net_check_address2(&config.net.server, 1)) {
+    fprintf(stderr, "invalid server address: %s\n", config.net.server.name);
+    config.net.configured = nc_none;
+    return 1;
   }
 
   while(config.instmode == inst_slp) {
