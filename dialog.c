@@ -415,7 +415,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 
     if (config.linemode)
       {
-	int i, cnt;
+	int i, j, cnt;
 	char *p;
 	int *item_index = calloc(nr_items_iv + 1, sizeof (int));
 
@@ -437,26 +437,28 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 		  printf(nr_items_iv >= 10 ? "%2d) %s\n" : "%d) %s\n", cnt, p);
 		}
 	      }
-	    printf("\n> ");fflush(stdout);
+
+	    printf("\n> "); fflush(stdout);
+
 	    current_ii = dia_readnum();
-	    if (current_ii == -'x')
-	      dia_handle_ctrlc ();
-	    if (current_ii < 0 || current_ii > cnt)
-	      continue;
+	    if(current_ii == -'x') dia_handle_ctrlc();
+
+	    if(current_ii < 0 || current_ii > cnt) continue;
 	    current_ii--;
-	    if (current_ii == -1)
-	      break;
-            #if 0
-	    if (items_arv[current_ii].func)
-	      {
-		i_ii = items_arv[current_ii].di ? : current_ii + 1;
-		rc_ii = items_arv[current_ii].func(i_ii);
-		if (rc_ii == -1)
-		  current_ii = -1;
-		else if (rc_ii)
-		  continue;
+
+	    if(current_ii == -1) break;
+
+            i = item_index[current_ii];
+	    if(items_arv[i].func) {
+	      j = items_arv[i].di ? : i + 1;
+	      rc_ii = items_arv[i].func(j);
+	      if(rc_ii == -1) {
+	        current_ii = -1;
 	      }
-	    #endif
+	      else if(rc_ii) {
+	        continue;
+	      }
+	    }
 	    break;
 	  }
 
