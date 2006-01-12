@@ -288,6 +288,7 @@ typedef struct {
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
+  unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
   int floppies;			/* number of floppy drives */

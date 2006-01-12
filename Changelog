@@ -1,3 +1,5 @@
+	- pass iscsi option to yast (feature #85)
+
 11/1/2006:	v2.0.8
 	- fix dns-resolve bug (#139546)
 

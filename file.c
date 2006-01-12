@@ -247,7 +247,8 @@ static struct {
   { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd             },
   { key_dud_complain,   "UpdateComplain", kf_cfg + kf_cmd                },
   { key_dud_expected,   "UpdateExpected", kf_cfg + kf_cmd                },
-  { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          }
+  { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
+  { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1309,6 +1310,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.staticdevices = f->nvalue;
         break;
 
+      case key_withiscsi:
+        if(f->is.numeric) config.withiscsi = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1626,6 +1631,8 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_initrd_id, config.initrd_id);
   file_write_str(f, key_instsys_id, config.instsys_id);
+
+  file_write_num(f, key_withiscsi, config.withiscsi);
 
   file_free_file(ft0);
 
