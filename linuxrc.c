@@ -881,6 +881,7 @@ void lxrc_init()
     fprintf(stderr, "Starting udev ...\n");
     system("/bin/myudevstart >/dev/null 2>&1");
     fprintf(stderr, "... udev running\n");
+    unlink("/devz");	/* cf. util_mkdevs() */
   }
 
   util_set_stderr(config.stderr_name);
