@@ -1,4 +1,5 @@
 16/1/2006:	v2.0.9
+	- make sure /sbin/hotplug gets events
 	- pass iscsi option to yast (feature #85)
 
 11/1/2006:	v2.0.8
