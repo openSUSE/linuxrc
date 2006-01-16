@@ -35,9 +35,20 @@ int hotplug_main(int argc, char** argv)
 int hotplug_wait_for_event(char* type)
 {
   static char event[50];
+  static int inited = 0;
   const int sleeps[10]={2,1,2,3,4,5,6,7,8,9};	/* number of seconds to sleep between tries */
   FILE* fp;
   int counter;
+  
+  if(!inited)
+  {
+    /* make sure we get hotplug events */
+    fp=fopen("/proc/sys/kernel/hotplug","w");
+    fputs("/sbin/hotplug",fp);
+    fclose(fp);
+    inited=1;
+  }
+  
   printf("waiting for event %s\n",type);
   for(counter=0;counter<10;counter++)
   {
