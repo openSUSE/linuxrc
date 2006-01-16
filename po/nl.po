@@ -8,7 +8,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: nl\n"
-"PO-Revision-Date: 2005-08-26 13:18+0200\n"
+"PO-Revision-Date: 2005-11-22 22:51+0100\n"
 "Last-Translator: Rinse de Vries <rinsedevries@kde.nl>\n"
 "Language-Team: Dutch <kde-i18n-nl@kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +55,7 @@ msgstr "Taal"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Kernel-modules (hardware-stuurprogramma's)"
+msgstr "Kernel-modules (hardwarestuurprogramma's)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
@@ -241,7 +241,8 @@ msgid ""
 "gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
 "Voer het adres van de gateway in indien u er één nodig heeft om de server te "
-"kunnen bereiken. Voer uw eigen IP-adres in wanneer u geen gateway nodig heeft."
+"kunnen bereiken. Voer uw eigen IP-adres in wanneer u geen gateway nodig "
+"heeft."
 
 #. TXT_INPUT_NAMED
 msgid ""
@@ -349,7 +350,7 @@ msgstr "Wilt u naar extra CD-ROM-stations zoeken?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "ethernet-netwerkkaart"
+msgstr "ethernetnetwerkkaart"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
@@ -380,8 +381,11 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Geef het IP-adres van de PLIP-partner op."
 
 #. TXT_NO_PCMCIA
-msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "De PCMCIA-chipset kon niet automatisch gedetecteerd worden. Specificeer het handmatig."
+msgid ""
+"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr ""
+"De PCMCIA-chipset kon niet automatisch gedetecteerd worden. Specificeer het "
+"handmatig."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -427,7 +431,8 @@ msgstr ""
 "\n"
 "\"Installatie of systeem starten\"\n"
 "\n"
-"verlaten worden. Het is mogelijk dat u enkele stuurprogramma's (modules) moet laden voor de ondersteuning van uw hardware."
+"verlaten worden. Het is mogelijk dat u enkele stuurprogramma's (modules) "
+"moet laden voor de ondersteuning van uw hardware."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -473,7 +478,7 @@ msgstr ""
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Geef de harde-schijf-partitie op (bijv: /dev/sda1)"
+msgstr "Geef de partitie op (bijv: /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
@@ -500,8 +505,8 @@ msgid ""
 msgstr ""
 "Uw computer beschikt over erg weinig geheugen.\n"
 "\n"
-"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op ALT-"
-"F2) om enige swapruimte te maken en te activeren."
+"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op "
+"ALT-F2) om enige swapruimte te maken en te activeren."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -513,7 +518,8 @@ msgstr "Geanimeerde vensters gebruiken?"
 
 #. TXT_NO_DRIVES
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Er zijn tot nu toe geen harde schijven of CD-ROM-stations gedetecteerd."
+msgstr ""
+"Er zijn tot nu toe geen harde schijven of CD-ROM-stations gedetecteerd."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
@@ -536,7 +542,7 @@ msgid ""
 "Enter the path and name of the file to load into the RAM disk as the root "
 "file system."
 msgstr ""
-"Geef het pad en de naam op van het bestand dat u als root-bestandssysteem in "
+"Geef het pad en de naam op van het bestand dat u als hoofdbestandssysteem in "
 "de RAM disk wilt laden."
 
 #. TXT_NOT_IMPLEMENTED
@@ -622,7 +628,9 @@ msgstr ""
 
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr "Geef de gebruikersnaam op waarmee verbinding met de FTP-server moet worden gemaakt."
+msgstr ""
+"Geef de gebruikersnaam op waarmee verbinding met de FTP-server moet worden "
+"gemaakt."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -646,8 +654,8 @@ msgid ""
 "Your computer does not have enough RAM to install via FTP (%d MB RAM "
 "required)."
 msgstr ""
-"Voor een FTP installatie bevat uw computer niet genoeg RAM geheugen (er is %d "
-"MB aan RAM nodig)."
+"Voor een FTP installatie bevat uw computer niet genoeg RAM geheugen (er is %"
+"d MB aan RAM nodig)."
 
 #. TXT_ANONYM_FTP
 msgid ""
@@ -655,8 +663,9 @@ msgid ""
 "to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normaal wordt een FTP installatie via anonieme FTP gedaan. Het is mogelijkheid om een "
-"gebruikersnaam en een wachtwoord te specificeren voor de FTP-server toegang.\n"
+"Normaal wordt een FTP installatie via anonieme FTP gedaan. Het is "
+"mogelijkheid om een gebruikersnaam en een wachtwoord te specificeren voor de "
+"FTP-server toegang.\n"
 "Wilt u een gebruikersnaam en een wachtwoord opgeven?"
 
 #. TXT_MORE_MODULES
@@ -714,8 +723,8 @@ msgid ""
 "name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Wanneer u de share als gast wilt benaderen, hoeft u de gebruikersnaam, het wachtwoord en de werkgroep niet "
-"op te geven.\n"
+"Wanneer u de share als gast wilt benaderen, hoeft u de gebruikersnaam, het "
+"wachtwoord en de werkgroep niet op te geven.\n"
 "De share als gast benaderen?"
 
 #. TXT_SMB_ENTER_USER
@@ -730,7 +739,9 @@ msgstr "Geef uw wachtwoord voor de SMB-server op."
 msgid ""
 "Enter your workgroup.If you do not need to specify a workgroup,leave the "
 "field empty."
-msgstr "Geef uw werkgroep op. Laat het veld leeg indien u geen werkgroep hoeft te specificeren."
+msgstr ""
+"Geef uw werkgroep op. Laat het veld leeg indien u geen werkgroep hoeft te "
+"specificeren."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -759,7 +770,7 @@ msgstr "%s verzoek wordt verzonden..."
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "%s configuratie is mislukt."
+msgstr "%s-configuratie is mislukt."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
@@ -863,7 +874,8 @@ msgstr "Geef de swap partitie op (bijv: /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "Geef de gebruikersnaam op waarmee u verbinding met de %s server wilt maken."
+msgstr ""
+"Geef de gebruikersnaam op waarmee u verbinding met de %s server wilt maken."
 
 #. TXT_ENTER_PASSWORD
 #, c-format
@@ -938,7 +950,8 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Geef het tijdelijke root-wachtwoord op.\n"
-"U moet dit wachtwoord tijdens de initiële aanmelding van de root gebruiker wijzigen."
+"U moet dit wachtwoord tijdens de initiële aanmelding van de root gebruiker "
+"wijzigen."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -947,11 +960,11 @@ msgstr "Herstarten"
 #. TXT_NO_RAM
 #, c-format
 msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+"Your computer does not have enough RAM for the installation of %s. You need "
+"at least %d MB."
 msgstr ""
-"Uw computer heeft niet genoeg RAM om %s te kunnen installeren. "
-"U heeft minstens %d MB nodig."
+"Uw computer heeft niet genoeg RAM om %s te kunnen installeren. U heeft "
+"minstens %d MB nodig."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 5 characters)."
@@ -966,7 +979,8 @@ msgid "Please select the type of your network device."
 msgstr "Selecteer uw type netwerk apparaat aub."
 
 #. TXT_IUCV_PEER
-msgid "Please enter the name (user ID) of the VM peer to connect to."
+#, fuzzy
+msgid "Please enter the name (user ID) of the target VM guest."
 msgstr "Geef de naam (gebruiker's ID) van de doel VM gast op aub."
 
 #. TXT_390NET_CTC
@@ -1122,8 +1136,12 @@ msgstr "Fout opgetreden tijdens het lezen van sector %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\nDeze %s is defect."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Deze %s is defect."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1198,4 +1216,3 @@ msgstr "Stuurprogramma-update laden"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Reddingssysteem laden"
-
