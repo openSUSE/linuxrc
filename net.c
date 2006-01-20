@@ -1726,23 +1726,72 @@ static int net_s390_group_chans(int num, char* driver)
     return -1;
   
   sprintf(path,"/sys/bus/ccwgroup/drivers/%s/group",driver);
-  hotplug_event_handled(); /* remove stale events */
   if((rc=util_set_sysfs_attr(path,devs))) return rc;
-  if((rc=hotplug_wait_for_event("ccwgroup"))) return rc;
-  /* no hotplug_event_handled() call, we usually need the info later */
+  sprintf(path,"/sys/bus/ccwgroup/devices/%s", config.hwp.readchan);
+  if((rc=hotplug_wait_for_path(path))) return rc;
   return 0;
 }
 
+/* set protocol */
+static int net_s390_ctc_protocol(int protocol)
+{
+    char devpath[256];
+    char proto_value[3];
+    int rc;
+
+    sprintf(devpath,"/sys/bus/ccwgroup/devices/%s/protocol",
+	    config.hwp.readchan);
+    sprintf(proto_value,"%d", protocol);
+    rc=util_set_sysfs_attr(devpath,proto_value);
+
+    return rc;
+}
+
+/* set port number */
+static int net_s390_lcs_portno(char *portno)
+{
+    char devpath[256];
+    int rc = 0;
+
+    if (portno && strlen(portno) > 0) {
+	sprintf(devpath,"/sys/bus/ccwgroup/devices/%s/portno",
+		config.hwp.readchan);
+        rc=util_set_sysfs_attr(devpath,portno);
+    }
+
+    return rc;
+}
+
+/* set portname */
+static int net_s390_qdio_portname(char *portname)
+{
+    char devpath[256];
+    int rc = 0;
+
+    if(portname && strlen(portname) > 0)
+    {
+	sprintf(devpath,"/sys/bus/ccwgroup/devices/%s/portname",
+		config.hwp.readchan);
+        rc=util_set_sysfs_attr(devpath,portname);
+    }
+
+    return rc;
+}
+
 /* put device online */
-static int net_s390_put_online(char* devpath)
+static int net_s390_put_online(char* channel)
 {
   int rc;
-  char path[100];
-  sprintf(path,"/sys/%s/online",devpath);
-  hotplug_event_handled(); /* remove stale events */
+  char path[256];
+  int online;
+
+  if (!channel || !strlen(channel))
+      return 1;
+  sprintf(path,"/sys/bus/ccwgroup/devices/%s/online",channel);
   if((rc=util_set_sysfs_attr(path,"1"))) return rc;
-  if((rc=hotplug_wait_for_event("net"))) return rc;
-  hotplug_event_handled();
+  if((rc=util_get_sysfs_int_attr(path,&online))) return rc;
+  if (online == 0)
+      return 1;
   return 0;
 }
 
@@ -1751,7 +1800,6 @@ int net_activate_s390_devs(void)
   int rc;
   char buf[100];
   char hwcfg_name[40];
-  char* devpath;
 
   dia_item_t di;
   dia_item_t items[] = {
@@ -1830,13 +1878,12 @@ int net_activate_s390_devs(void)
     if((rc=net_s390_group_chans(2,"ctc"))) return rc;
 
     /* set protocol */
-    devpath=hotplug_get_info("DEVPATH");
-    sprintf(buf,"/sys/%s/protocol",devpath);
-    sprintf(hwcfg_name,"%d",config.hwp.protocol-1);
-    if((rc=util_set_sysfs_attr(buf,hwcfg_name))) return rc;
+    if ((rc=net_s390_ctc_protocol(config.hwp.protocol-1))) return rc;
     
-    if((rc=net_s390_put_online(devpath))) return rc;
-    
+    if((rc=net_s390_put_online(config.hwp.readchan))) {
+	fprintf(stderr,"Could not activate device\n");
+	return rc;
+    }
     net_s390_set_config_ccwdev();
     sprintf(hwcfg_name, "ctc-bus-ccw-%s",config.hwp.readchan);
     config.hwp.module="ctc";
@@ -1899,26 +1946,20 @@ int net_activate_s390_devs(void)
       IFNOTAUTO(config.hwp.datachan)
         if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
       if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
-      
-      IFNOTAUTO(config.hwp.portname)
-      {
-        if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
+
+      if (di != di_390net_hsi) {
+	  IFNOTAUTO(config.hwp.portname)
+	  {
+	      if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
         // FIXME: warn about problems related to empty portnames
+	  }
       }
       
       if((rc=net_s390_group_chans(3,"qeth"))) return rc;
 
-      /* set portname */
-      devpath=hotplug_get_info("DEVPATH");
-      hotplug_event_handled();
-      if(!devpath) return -1;
-      if(strlen(config.hwp.portname)>0)
-      {
-        sprintf(buf,"/sys/%s/portname",devpath);
-        if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
-      }
+      if((rc=net_s390_qdio_portname(config.hwp.portname))) return rc;
 
-      if((rc=net_s390_put_online(devpath))) return rc;
+      if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
       
       sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
       config.hwp.module="qeth_mod";
@@ -1940,17 +1981,10 @@ int net_activate_s390_devs(void)
 
       if((rc=net_s390_group_chans(2,"lcs"))) return rc;
       
-      /* set portname */
-      devpath=hotplug_get_info("DEVPATH");
-      hotplug_event_handled();
-      if(!devpath) return -1;
-      if(strlen(config.hwp.portname)>0)
-      {
-        sprintf(buf,"/sys/%s/portno",devpath);
-        if((rc=util_set_sysfs_attr(buf,config.hwp.portname))) return rc;
-      }
+      /* set port number */
+      if((rc=net_s390_lcs_portno(config.hwp.portname))) return rc;
       
-      if((rc=net_s390_put_online(devpath))) return rc;
+      if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
       
       net_s390_set_config_ccwdev();
       sprintf(hwcfg_name, "lcs-bus-ccw-%s",config.hwp.readchan);

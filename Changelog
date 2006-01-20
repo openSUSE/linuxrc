@@ -1,3 +1,6 @@
+20/1/2006:	2.0.10
+	- hare: s390 hotplug fix
+
 16/1/2006:	v2.0.9
 	- make sure /sbin/hotplug gets events
 	- pass iscsi option to yast (feature #85)

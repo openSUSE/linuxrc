@@ -4478,6 +4478,24 @@ int util_set_sysfs_attr(char* attr, char* value)
   return rc;
 }
 
+int util_get_sysfs_int_attr(char* attr, int *retval)
+{
+  int rc;
+  struct sysfs_attribute* sa;
+
+  sa=sysfs_open_attribute(attr);
+  if(!sa) return -1;
+    
+  rc=sysfs_read_attribute(sa);
+  if (sa->value)
+      *retval = strtol(sa->value,NULL,10);
+  else
+      rc = 1;
+
+  sysfs_close_attribute(sa);
+  return rc;
+}
+
 char *print_driverid(driver_t *drv, int with_0x)
 {
   static char buf[256], *s;

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "file.h"
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 extern char** environ;
@@ -59,6 +60,23 @@ int hotplug_wait_for_event(char* type)
     event[strlen(event)-1]=0;	/* chop LF */
     fclose(fp);
     if(!strcmp(event,type)) return 0;
+  }
+  return -1;	/* timeout */
+}
+
+int hotplug_wait_for_path(char* path)
+{
+  const int sleeps[10]={2,1,2,3,4,5,6,7,8,9};	/* number of seconds to sleep between tries */
+  struct stat statbuf;
+  int counter;
+  
+  for(counter=0;counter<10;counter++)
+  {
+    sleep(sleeps[counter]);
+    if (stat(path,&statbuf) < 0)
+	continue;	/* stat failed -> continue waiting */
+    else
+	return 0;
   }
   return -1;	/* timeout */
 }
