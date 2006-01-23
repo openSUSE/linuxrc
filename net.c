@@ -402,7 +402,10 @@ int net_activate()
 
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)
+    {
+        fprintf(stderr, "net_activate: socket(AF_INET, SOCK_DGRAM, 0) failed at %d\n",__LINE__);
         return (socket_ii);
+    }
 
     memset (&interface_ri, 0, sizeof (struct ifreq));
     strcpy (interface_ri.ifr_name, config.net.device);
@@ -412,14 +415,20 @@ int net_activate()
     sockaddr_ri.sin_addr = config.net.hostname.ip;
     memcpy (&interface_ri.ifr_addr, &sockaddr_ri, sizeof (sockaddr_ri));
     if (ioctl (socket_ii, SIOCSIFADDR, &interface_ri) < 0)
+    {
         error_ii = TRUE;
+        fprintf(stderr, "net_activate: SIOCSIFADDR failed at %d\n",__LINE__);
+    }
 
     if (net_is_ptp_im)
         {
         sockaddr_ri.sin_addr = config.net.ptphost.ip;
         memcpy (&interface_ri.ifr_dstaddr, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFDSTADDR, &interface_ri) < 0)
+        {
             error_ii = TRUE;
+            fprintf(stderr, "net_activate: SIOCSIFDSTADDR failed at %d\n",__LINE__);
+        }
         }
     else
         {
@@ -427,17 +436,26 @@ int net_activate()
         memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
             if (config.net.netmask.ip.s_addr)
+            {
                 error_ii = TRUE;
+                fprintf(stderr, "net_activate: SIOCSIFNETMASK failed at %d\n",__LINE__);
+            }
 
         sockaddr_ri.sin_addr = config.net.broadcast.ip;
         memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
         if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
             if (config.net.broadcast.ip.s_addr != 0xffffffff)
+            {
                 error_ii = TRUE;
+                fprintf(stderr, "net_activate: SIOCSIFBRDADDR failed at %d\n",__LINE__);
+            }
         }
 
     if (ioctl (socket_ii, SIOCGIFFLAGS, &interface_ri) < 0)
+    {
         error_ii = TRUE;
+        fprintf(stderr, "net_activate: SIOCGIFFLAGS failed at %d\n",__LINE__);
+    }
 
     interface_ri.ifr_flags |= IFF_UP | IFF_RUNNING;
     if (net_is_ptp_im)
@@ -445,7 +463,10 @@ int net_activate()
     else
         interface_ri.ifr_flags |= IFF_BROADCAST;
     if (ioctl (socket_ii, SIOCSIFFLAGS, &interface_ri) < 0)
+    {
         error_ii = TRUE;
+        fprintf(stderr, "net_activate: SIOCSIFFLAGS failed at %d\n",__LINE__);
+    }
 
     memset (&route_ri, 0, sizeof (struct rtentry));
     route_ri.rt_dev = config.net.device;
@@ -456,14 +477,20 @@ int net_activate()
         memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
         route_ri.rt_flags = RTF_UP | RTF_HOST;
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
+        {
             error_ii = TRUE;
+            fprintf(stderr, "net_activate: SIOCADDRT failed at %d\n",__LINE__);
+        }
 
         memset (&route_ri.rt_dst, 0, sizeof (route_ri.rt_dst));
         route_ri.rt_dst.sa_family = AF_INET;
         memcpy (&route_ri.rt_gateway, &sockaddr_ri, sizeof (sockaddr_ri));
         route_ri.rt_flags = RTF_UP | RTF_GATEWAY;
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
+        {
             error_ii = TRUE;
+            fprintf(stderr, "net_activate: SIOCADDRT failed at %d\n",__LINE__);
+        }
         }
     else
         {
@@ -490,7 +517,10 @@ int net_activate()
 
             route_ri.rt_flags = RTF_UP | RTF_GATEWAY;
             if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
+            {
                 error_ii = TRUE;
+                fprintf(stderr, "net_activate: SIOCADDRT failed at %d\n",__LINE__);
+            }
             }
         }
 
