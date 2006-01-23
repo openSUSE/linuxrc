@@ -1992,7 +1992,7 @@ int net_activate_s390_devs(void)
       if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
       
       sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
-      config.hwp.module="qeth_mod";
+      config.hwp.module="qeth";
       net_s390_set_config_ccwdev();
       config.hwp.scriptup_ccwgroup="hwup-qeth";
       strprintf(&config.hwp.ccw_chan_ids,"%s %s %s",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
