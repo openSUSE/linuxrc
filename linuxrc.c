@@ -940,6 +940,10 @@ void lxrc_init()
   info_init();
 
   mod_init(1);
+
+  /* look for driver updates in initrd */
+  util_chk_driver_update("/", "/");
+
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
@@ -1042,7 +1046,7 @@ void lxrc_init()
   /* after we've told the user about the last segv, turn it on... */
   config.restart_on_segv = 1;
 
-  if(!config.language && config.win) set_choose_language();
+  if(!config.language && config.win && !config.linemode) set_choose_language();
 
   util_print_banner();
 
@@ -1054,7 +1058,7 @@ void lxrc_init()
     if(old_win) util_print_banner(); else util_disp_done();
   }
 
-  if(!(config.serial || config.is_iseries)) {
+  if(!(config.serial || config.is_iseries || config.linemode)) {
     set_choose_keytable(0);
   }
 

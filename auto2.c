@@ -153,7 +153,9 @@ void auto2_scan_hardware(char *log_file)
 
   hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
   hd_clear_probe_feature(hd_data, pr_parallel);
+#if !defined(__s390__) && !defined(__s390x__)
   if(!log_file) hd_data->progress = auto2_progress;
+#endif
 
   with_usb = hd_probe_feature(hd_data, pr_usb);
   hd_clear_probe_feature(hd_data, pr_usb);
@@ -208,7 +210,9 @@ void auto2_scan_hardware(char *log_file)
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
     }
     printf(" done\n"); fflush(stdout);
+#if !defined(__s390__) && !defined(__s390x__)
     if(!log_file) hd_data->progress = auto2_progress;
+#endif
   }
 
   hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL);
