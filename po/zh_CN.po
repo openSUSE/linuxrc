@@ -1190,3 +1190,7 @@ progress indicator label
 msgid "Loading Rescue System"
 msgstr ""
 
+#. TXT_SEPARATOR20
+msgid "#--------------------"
+msgstr ""
+

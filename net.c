@@ -1835,6 +1835,7 @@ int net_activate_s390_devs(void)
   dia_item_t items[] = {
     di_390net_osa,
     di_390net_hsi,
+    di_390net_sep,
     di_390net_ctc,
     di_390net_escon,
     di_390net_iucv,

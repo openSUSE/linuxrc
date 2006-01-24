@@ -1211,3 +1211,7 @@ msgstr "Зареждане на подновяването на драйвери
 msgid "Loading Rescue System"
 msgstr "Зареждане на спасителната система"
 
+#. TXT_SEPARATOR20
+msgid "#--------------------"
+msgstr ""
+

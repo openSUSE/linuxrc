@@ -1164,3 +1164,7 @@ msgstr "Indlæser driveropdateringer"
 msgid "Loading Rescue System"
 msgstr "Indlæser redningssystem"
 
+#. TXT_SEPARATOR20
+msgid "#--------------------"
+msgstr ""
+
