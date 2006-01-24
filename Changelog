@@ -1,3 +1,6 @@
+24/1/2006:	v2.0.12
+	- another linemode fix (#144886)
+
 23/1/2006:	v2.0.11
 	- search for driver updates in initrd (feat #152)
 	- make net IF error handling a bit more verbose

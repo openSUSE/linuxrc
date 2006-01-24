@@ -462,7 +462,7 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 	    break;
 	  }
 
-        i = item_index[current_ii];
+        i = current_ii >= 0 ? item_index[current_ii] : -1;
 
         free(item_index);
 
