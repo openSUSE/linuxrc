@@ -1,4 +1,6 @@
+26/1/2006:	v2.0.13
 	- separate deprecated s390 devices visually (bug #144243)
+	- handle startshell in linuxrc (#145619)
 
 24/1/2006:	v2.0.12
 	- another linemode fix (#144886)

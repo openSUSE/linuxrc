@@ -1394,7 +1394,4 @@ msgstr "Chargement de la mise à jour des pilotes"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Chargement du système de secours"
-#. TXT_SEPARATOR20
-msgid "#--------------------"
-msgstr ""
 

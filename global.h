@@ -285,6 +285,7 @@ typedef struct {
   unsigned do_pcmcia_startup:1;	/* run pcmcia-socket-startup */
   unsigned update_complain:2;	/* check for certain updates */
   unsigned staticdevices:1;	/* use static /dev tree (not udev) */
+  unsigned startshell:1;	/* start shell before & after yast */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */

@@ -1174,7 +1174,3 @@ msgstr "Ładowanie aktualizacji sterowników"
 msgid "Loading Rescue System"
 msgstr "Ładowanie systemu awaryjnego"
 
-#. TXT_SEPARATOR20
-msgid "#--------------------"
-msgstr ""
-

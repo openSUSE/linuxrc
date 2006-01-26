@@ -1201,7 +1201,3 @@ msgstr "Φόρτωση Ενημέρωση Οδηγού"
 msgid "Loading Rescue System"
 msgstr "Φόρτωση Συστήματος Διάσωσης"
 
-#. TXT_SEPARATOR20
-msgid "#--------------------"
-msgstr ""
-

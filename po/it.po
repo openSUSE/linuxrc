@@ -1265,7 +1265,4 @@ msgstr "Caricamento aggiornamento driver"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Caricamento sistema di salvataggio"
-#. TXT_SEPARATOR20
-msgid "#--------------------"
-msgstr ""
 

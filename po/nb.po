@@ -1172,7 +1172,3 @@ msgstr "Laster driveroppgradering"
 msgid "Loading Rescue System"
 msgstr "Laster redningssystem"
 
-#. TXT_SEPARATOR20
-msgid "#--------------------"
-msgstr ""
-

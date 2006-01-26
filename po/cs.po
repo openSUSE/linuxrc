@@ -1200,7 +1200,3 @@ msgstr "Zavádí se update ovladače"
 msgid "Loading Rescue System"
 msgstr "Zavádí se záchranný systém"
 
-#. TXT_SEPARATOR20
-msgid "#--------------------"
-msgstr ""
-

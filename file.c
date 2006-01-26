@@ -210,7 +210,7 @@ static struct {
   { key_suse,           "SuSE",           kf_boot                        },
   { key_showopts,       "showopts",       kf_boot                        },
   { key_nosshkey,       "nosshkey",       kf_boot                        },
-  { key_startshell,     "startshell",     kf_boot                        },
+  { key_startshell,     "StartShell",     kf_cfg + kf_cmd                },
   { key_y2debug,        "y2debug",        kf_boot                        },
   { key_ro,             "ro",             kf_boot                        },
   { key_rw,             "rw",             kf_boot                        },
@@ -1315,6 +1315,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.withiscsi = f->nvalue;
         break;
 
+      case key_startshell:
+        if(f->is.numeric) config.startshell = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1634,6 +1638,9 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_instsys_id, config.instsys_id);
 
   file_write_num(f, key_withiscsi, config.withiscsi);
+
+  file_write_num(f, key_startshell, config.startshell);
+
 
   file_free_file(ft0);
 
