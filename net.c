@@ -1734,9 +1734,9 @@ static void net_s390_set_config_ccwdev()
 static int net_s390_getrwchans()
 {
   int rc;
-  IFNOTAUTO(config.hwp.readchan) if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
+  IFNOTAUTO(config.hwp.readchan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
   if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
-  IFNOTAUTO(config.hwp.writechan) if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
+  IFNOTAUTO(config.hwp.writechan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
   if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
   return 0;
 }
@@ -1859,7 +1859,7 @@ int net_activate_s390_devs(void)
   {
   case di_390net_iucv:
     IFNOTAUTO(config.hwp.userid)
-      if((rc=dia_input2(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
+      if((rc=dia_input2_chopspace(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
 
     mod_modprobe("netiucv",NULL);	// FIXME: error handling
 
@@ -1975,14 +1975,14 @@ int net_activate_s390_devs(void)
 
       if((rc=net_s390_getrwchans())) return rc;
       IFNOTAUTO(config.hwp.datachan)
-        if((rc=dia_input2(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
+        if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
       if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
 
       if (di != di_390net_hsi) {
 	  IFNOTAUTO(config.hwp.portname)
 	  {
-	      if((rc=dia_input2(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
-        // FIXME: warn about problems related to empty portnames
+	      if((rc=dia_input2_chopspace(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
+	      // FIXME: warn about problems related to empty portnames
 	  }
       }
       
@@ -2008,7 +2008,7 @@ int net_activate_s390_devs(void)
       if((rc=net_s390_getrwchans())) return rc;
       
       IFNOTAUTO(config.hwp.portname)
-        if((rc=dia_input2(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
+        if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
 
       if((rc=net_s390_group_chans(2,"lcs"))) return rc;
       

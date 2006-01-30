@@ -1,3 +1,8 @@
+	- added dia_input2_chopspace() (removes leading and trailing
+	  whitespace)
+	- use dia_input2_chopspace() for s390 device parameters
+	  (bug #144255)
+
 26/1/2006:	v2.0.13
 	- separate deprecated s390 devices visually (bug #144243)
 	- handle startshell in linuxrc (#145619)

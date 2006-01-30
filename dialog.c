@@ -1676,4 +1676,27 @@ int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
   return i;
 }
 
-
+int dia_input2_chopspace(char* txt, char** input, int fieldlen, int pw_mode)
+{
+  int retval;
+  char* final;	/* stripped string */
+  char* oinput;	/* original pointer to input string */
+  
+  retval = dia_input2(txt, input, fieldlen, pw_mode);
+  oinput = *input;
+  
+  /* null pointer or empty string */
+  if(!*input || !**input) return retval;
+  
+  while(**input && isspace(**input)) /* skip leading whitespace */
+    (*input)++;
+  while(isspace(*(*input+strlen(*input)-1))) /* overwrite trailing whitespace */
+    *(*input+strlen(*input)-1) = 0;
+  
+  /* copy result and discard original string */
+  final = strdup(*input);
+  free(oinput);
+  *input = final;
+  
+  return retval;
+}
