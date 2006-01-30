@@ -14,6 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <fnmatch.h>
 #include <rpc/rpc.h>
 #include <rpc/pmap_prot.h>
 #include <rpc/pmap_clnt.h>
@@ -399,6 +400,8 @@ int net_activate()
     }
 
     config.net.is_configured = 0;
+
+    net_apply_ethtool(config.net.device, config.net.hwaddr);
 
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)
@@ -1482,6 +1485,8 @@ int net_dhcp()
     dia_info(&win, cmd);
   }
 
+  net_apply_ethtool(config.net.device, config.net.hwaddr);
+
   strcpy(cmd, "dhcpcd -B");
   if(config.net.dhcp_timeout != 60) {
     sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
@@ -2057,4 +2062,39 @@ int net_activate_s390_devs(void)
 
   return 0;
 }
+
 #endif
+
+
+/*
+ * Run ethtool for matching devices.
+ */
+void net_apply_ethtool(char *device, char *hwaddr)
+{
+  slist_t *sl;
+  char *s = NULL;
+
+  for(sl = config.ethtool; sl; sl = sl->next) {
+    if(
+      (device && !fnmatch(sl->key, device, 0)) ||
+      (hwaddr && !fnmatch(sl->key, hwaddr, 0))
+    ) {
+      if(s) {
+        strprintf(&s, "%s %s", s, sl->value);
+      }
+      else {
+        str_copy(&s, sl->value);
+      }
+    }
+  }
+
+  if(s) {
+    str_copy(&config.net.ethtool_used, s);
+    strprintf(&s, "ethtool -s %s %s", device, s);
+    fprintf(stderr, "%s\n", s);
+    system(s);
+    free(s);
+  }
+}
+
+

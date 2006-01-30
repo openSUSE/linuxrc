@@ -28,6 +28,7 @@
 #include <syscall.h>
 #include <dirent.h>
 #include <errno.h>
+#include <fnmatch.h>
 #include <signal.h>
 #include <sys/swap.h>
 #include <sys/socket.h>
@@ -1509,6 +1510,15 @@ void util_status_info()
     for(sl = config.module.initrd; sl; sl = sl->next) {
       if(!sl->key) continue;
       sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
+  if(config.ethtool) {
+    strcpy(buf, "ethtool options:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ethtool; sl; sl = sl->next) {
+      sprintf(buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
@@ -4656,5 +4666,24 @@ char *url_decode(char *str)
   return s0;
 }
 
+
+/*
+ * Check if network device matches.
+ *
+ * Return:
+ *   0: no match
+ *   1: ok
+ */
+int match_netdevice(char *device, char *hwaddr, char *key)
+{
+  if(!key) return 0;
+
+  if(
+    (device && !fnmatch(key, device, 0)) ||
+    (hwaddr && !fnmatch(key, hwaddr, 0))
+  ) return 1;
+
+  return 0;
+}
 
 

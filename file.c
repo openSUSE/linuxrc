@@ -55,6 +55,7 @@ static void file_write_inet_str(FILE *f, char *name, inet_t *inet);
 static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
 
 static void add_driver(char *str);
+static void parse_ethtool(slist_t *sl, char *str);
 
 
 static struct {
@@ -248,7 +249,8 @@ static struct {
   { key_dud_complain,   "UpdateComplain", kf_cfg + kf_cmd                },
   { key_dud_expected,   "UpdateExpected", kf_cfg + kf_cmd                },
   { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
-  { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                }
+  { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
+  { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          }
 };
 
 static struct {
@@ -1319,6 +1321,13 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.startshell = f->nvalue;
         break;
 
+      case key_ethtool:
+        if(*f->value) {
+          sl = slist_append(&config.ethtool, slist_new());
+          parse_ethtool(sl, f->value);
+        }
+        break;
+
       default:
         break;
     }
@@ -1520,6 +1529,7 @@ void file_write_install_inf(char *dir)
     if(config.manual < 2) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
+    file_write_str(f, key_ethtool, config.net.ethtool_used);
     file_write_inet(f, key_ip, &config.net.hostname);
     if(config.net.realhostname) {
       file_write_str(f, key_hostname, config.net.realhostname);
@@ -2176,6 +2186,32 @@ void get_ide_options()
     sl = slist_add(&config.module.options, slist_new());
     sl->key = strdup("ide-core");
     sl->value = buf;
+  }
+}
+
+
+/*
+ * Parse str and return result in sl. Modifies str.
+ *
+ * Syntax: [if:]ethtool_options
+ */
+void parse_ethtool(slist_t *sl, char *str)
+{
+  char *s1, *s2;
+
+  s1 = strchr(str, ' ');
+  s2 = strchr(str, '=');
+
+  if(s2 && (!s1 || s1 > s2)) {
+    *s2++ = 0;
+    while(*s2 == ' ') s2++;
+    str_copy(&sl->key, str);
+    str_copy(&sl->value, s2);
+  }
+  else {
+    str_copy(&sl->key, "*");
+    while(*str == ' ') str++;
+    str_copy(&sl->value, str);
   }
 }
 

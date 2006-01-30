@@ -145,4 +145,5 @@ int apply_driverid(driver_t *drv);
 void store_driverid(driver_t *drv);
 
 char *url_decode(char *str);
+int match_netdevice(char *device, char *hwaddr, char *key);
 

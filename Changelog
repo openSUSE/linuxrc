@@ -1,7 +1,9 @@
+30/1/2006:	v2.0.14
 	- added dia_input2_chopspace() (removes leading and trailing
 	  whitespace)
 	- use dia_input2_chopspace() for s390 device parameters
 	  (bug #144255)
+	- implemented ethtool option (#145041)
 
 26/1/2006:	v2.0.13
 	- separate deprecated s390 devices visually (bug #144243)

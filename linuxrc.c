@@ -802,7 +802,8 @@ void lxrc_init()
 
   config.hwdetect = 1;
 
-  config.scsi_rename = 1;
+  config.scsi_rename = 0;
+  config.scsi_before_usb = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
 
   config.module.disks = 1;

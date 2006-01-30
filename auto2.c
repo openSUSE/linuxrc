@@ -41,7 +41,6 @@ static void auto2_user_netconfig(void);
 static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(hd_t **);
 static int auto2_cdrom_dev(hd_t **);
-static int hwaddr_cmp(char *str, char *addr);
 static int auto2_net_dev(hd_t **);
 static int auto2_net_dev1(hd_t *hd);
 static int driver_is_active(hd_t *hd);
@@ -483,31 +482,6 @@ int auto2_net_dev(hd_t **hd0)
 
 
 /*
- * 0: match, 1: no match
- */
-int hwaddr_cmp(char *str, char *addr)
-{
-  int alen, slen;
-  int wc = 0;
-
-  alen = strlen(addr);
-
-  if(*str == '*') {
-    str++;
-    wc = 1;
-  }
-
-  slen = strlen(str);
-
-  if(slen > alen) return 1;
-
-  if(wc) addr += alen - slen;
-
-  return strcasecmp(addr, str);
-}
-
-
-/*
  * Try to get inst-sys from network device.
  *
  * Return:
@@ -534,8 +508,7 @@ int auto2_net_dev1(hd_t *hd)
 
   if(
     config.net.device_given &&
-    strcmp(config.net.device, device) &&
-    hwaddr_cmp(config.net.device, hwaddr)
+    !match_netdevice(device, hwaddr, config.net.device)
   ) return 1;
 
   /* net_stop() - just in case */
@@ -564,6 +537,7 @@ int auto2_net_dev1(hd_t *hd)
 #endif
 
   str_copy(&config.net.device, device);
+  str_copy(&config.net.hwaddr, hwaddr);
 
   net_setup_localhost();
 

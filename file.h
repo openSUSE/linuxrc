@@ -44,7 +44,7 @@ typedef enum {
   key_zen, key_zenconfig, key_port, key_smbshare, key_rootimage2, key_xxx,
   key_instsys_id, key_initrd_id, key_instsys_complain, key_nfstcp,
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
-  key_staticdevices, key_withiscsi
+  key_staticdevices, key_withiscsi, key_ethtool
 } file_key_t;
 
 typedef enum {

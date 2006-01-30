@@ -343,6 +343,7 @@ typedef struct {
   char *loghost;		/* syslog host */
   char *rootpassword;
   int kbd_fd;			/* fd for console */
+  slist_t *ethtool;		/* ethtool options */
   struct {
     char *dir;			/* driver update source dir */
     char *dst;			/* driver update destination dir */
@@ -488,6 +489,7 @@ typedef struct {
     net_config_t configured;	/* how we configured the network device */
     char *unique_id;		/* unique id of network card */
     char *hwaddr;		/* hardware addr of network card */
+    char *ethtool_used;		/* ethtool options used for active card */
     struct {
       char *binary;		/* cifs/smb mount binary */
       char *module;		/* cifs/smb kernel module */
