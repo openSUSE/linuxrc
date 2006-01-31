@@ -1620,6 +1620,8 @@ void util_splash_bar(unsigned num, char *trigger)
   static unsigned old = 0;
   char buf[256], buf2[256];
 
+  if(!config.splash) return;
+
   if(num > 100) num = 100;
 
   num = (num * 65535) / 100;

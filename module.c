@@ -320,7 +320,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
     }
   }
 
-  if(config.module.more_file[type]) {
+  if(config.module.disks && config.module.more_file[type]) {
     items[i++] = strdup(txt_get(TXT_MORE_MODULES));
   }
 
@@ -991,14 +991,7 @@ void mod_disk_text(char *buf, int type)
 {
   if(!buf) return;
 
-  if(config.module.disk[type]) {
-    sprintf(buf + strlen(buf), txt_get(TXT_MODDISK1), config.module.disk[type]);
-  }
-  else {
-    strcat(buf, txt_get(TXT_MODDISK0));
-  }
-
-  strcat(strcat(buf, "\n\n"), txt_get(TXT_MODDISK2));
+  strcat(buf, txt_get(TXT_MODDISK0));
 }
 
 

@@ -806,8 +806,6 @@ void lxrc_init()
   config.scsi_before_usb = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
 
-  config.module.disks = 1;
-
   // default memory limits for i386 version
   config.memory.min_free =       12 * 1024;
   config.memory.min_yast_text =  32 * 1024;
