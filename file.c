@@ -1318,6 +1318,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_startshell:
+        if(!*f->value) config.startshell = 1;
         if(f->is.numeric) config.startshell = f->nvalue;
         break;
 

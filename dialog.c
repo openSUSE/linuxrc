@@ -59,6 +59,7 @@ struct {
   { di_expert_dhcp,         0, "DHCP/BOOTP"      },
   { di_expert_vnc,          TXT_VNC_SWITCH       },
   { di_expert_usessh,       TXT_SSH_SWITCH       },
+  { di_expert_startshell,   0, "Start Shell"     },
 
   { di_inst_install,     TXT_START_INSTALL,       },
   { di_inst_demo,        TXT_START_DEMO,          },

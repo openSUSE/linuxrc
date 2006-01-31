@@ -548,6 +548,7 @@ void set_expert()
     di_expert_dhcp,
     di_expert_vnc,
     di_expert_usessh,
+    di_expert_startshell,
     di_none
   };
 
@@ -635,6 +636,11 @@ int set_expert_cb(dia_item_t di)
       else {
         config.net.do_setup &= ~DS_SSH;
       }
+      break;
+
+    case di_expert_startshell:
+      rc = dia_yesno("Start shell before and after YaST?", config.startshell ? YES : NO);
+      config.startshell = rc == YES ? 1 : 0;
       break;
 
     default:
