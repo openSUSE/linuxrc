@@ -1,3 +1,5 @@
+	- SLP accepts key to limit selection
+
 31/1/2006:	v2.0.15
 	- startshell, again (#144886)
 	- removed modules disk references, adjusted texts (#146540)

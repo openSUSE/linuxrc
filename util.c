@@ -1365,6 +1365,11 @@ void util_status_info()
   sprintf(buf, "ptp host = %s", inet2print(&config.net.ptphost));
   slist_append_str(&sl0, buf);
 
+  if(config.slp.proto || config.slp.key) {
+    sprintf(buf, "slp: key = %s, proto = %s", config.slp.key ?: "", config.slp.proto ?: "");
+    slist_append_str(&sl0, buf);
+  }
+
   if(config.serverdir) {
     sprintf(buf, "server dir = %s", config.serverdir);
     slist_append_str(&sl0, buf);

@@ -835,20 +835,28 @@ void file_do_info(file_t *f0)
         if(url && url->scheme) {
           set_instmode(url->scheme);
           if(url->port) config.net.port = url->port;
-          str_copy(&config.serverdir, url->dir);
-          str_copy(&config.net.user, url->user);
-          str_copy(&config.net.password, url->password);
-          str_copy(&config.net.share, url->share);
-          str_copy(&config.net.workgroup, url->domain);
 
-          if(config.insttype == inst_net) {
-            name2inet(&config.net.server, url->server);
+          if(config.instmode == inst_slp) {
+            str_copy(&config.slp.proto, url->server && *url->server ? url->server : NULL);
+            str_copy(&config.slp.key, url->dir && *url->dir && strcmp(url->dir, "/") ? url->dir : NULL);
+            str_copy(&config.serverdir, "/");		/* necessary - believe me */
           }
-          else if(config.insttype == inst_cdrom && url->server) {
-            str_copy(&config.cdromdev, url->server);
-          }
-          else if(config.insttype == inst_hd && url->server) {
-            str_copy(&config.partition, url->server);
+          else {
+            str_copy(&config.serverdir, url->dir);
+            str_copy(&config.net.user, url->user);
+            str_copy(&config.net.password, url->password);
+            str_copy(&config.net.share, url->share);
+            str_copy(&config.net.workgroup, url->domain);
+
+            if(config.insttype == inst_net) {
+              name2inet(&config.net.server, url->server);
+            }
+            else if(config.insttype == inst_cdrom && url->server) {
+              str_copy(&config.cdromdev, url->server);
+            }
+            else if(config.insttype == inst_hd && url->server) {
+              str_copy(&config.partition, url->server);
+            }
           }
         }
         break;

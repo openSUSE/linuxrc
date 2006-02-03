@@ -21,6 +21,8 @@
 #include "dialog.h"
 #include "file.h"
 
+extern int slp_get_install(void);
+
 #define UNI_FONT	"linuxrc2-16.psfu"
 #define SMALL_FONT	"linuxrc-16.psfu"
 
@@ -549,6 +551,7 @@ void set_expert()
     di_expert_vnc,
     di_expert_usessh,
     di_expert_startshell,
+    di_expert_slp,
     di_none
   };
 
@@ -641,6 +644,20 @@ int set_expert_cb(dia_item_t di)
     case di_expert_startshell:
       rc = dia_yesno("Start shell before and after YaST?", config.startshell ? YES : NO);
       config.startshell = rc == YES ? 1 : 0;
+      break;
+
+    case di_expert_slp:
+      if(config.instmode != inst_slp) {
+        config.instmode = inst_slp;
+        str_copy(&config.slp.proto, NULL);
+        str_copy(&config.slp.key, NULL);
+      }
+      while(config.instmode == inst_slp) {
+        if(slp_get_install()) {
+          dia_message("SLP failed", MSGTYPE_ERROR);
+          break;
+        }
+      }
       break;
 
     default:

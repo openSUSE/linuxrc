@@ -1,7 +1,10 @@
+#define _GNU_SOURCE	/* for FNM_CASEFOLD */
+
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <fnmatch.h>
 #include <sys/socket.h>
 #include <sys/utsname.h>
 #include <netinet/in.h>
@@ -174,6 +177,7 @@ slp_get_install()
   unsigned char *origurl;
   int origurllen;
   struct utsname utsname;
+  char *key = NULL;
 
   mysa.sin_family = AF_INET;
   mysa.sin_port = 0;
@@ -381,25 +385,43 @@ slp_get_install()
   *urlbuf = 0;
   for (;;)
     {
-      for (i = acnt = 0; i < urlcnt; i++)
-	if (acnt == 0 || strcmp(descs[i], ambg[acnt - 1]))
-	  ambg[acnt++] = descs[i];
-      ambg[acnt] = 0;
+      if(config.slp.key) strprintf(&key, "*%s*", config.slp.key);
 
-      i = dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
+      while(1) {
+        for(i = acnt = 0; i < urlcnt; i++) {
+          if(key && fnmatch(key, descs[i], FNM_CASEFOLD)) continue;
+          if(acnt == 0 || strcmp(descs[i], ambg[acnt - 1])) {
+            ambg[acnt++] = descs[i];
+          }
+        }
+        ambg[acnt] = 0;
+        if(acnt || !key) break;
+        str_copy(&key, NULL);
+      }
+
+      i = acnt == 1 && !config.manual ? 1 : dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
       if (i <= 0 || i > acnt)
 	break;
       d = ambg[i - 1];
-      for (i = acnt = 0; i < urlcnt; i++)
-        if (!strcmp(descs[i], d))
-	  ambg[acnt++] = urls[i];
-      ambg[acnt] = 0;
-      if (acnt == 0)
-	break;
-      if (acnt > 1)
-        i = dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
-      else
-	i = 1;
+
+      str_copy(&key, config.slp.proto);
+
+      while(1) {
+        for(i = acnt = 0; i < urlcnt; i++) {
+          if(key && strncasecmp(urls[i], key, strlen(key))) continue;
+          if(!strcmp(descs[i], d)) {
+            ambg[acnt++] = urls[i];
+          }
+        }
+        ambg[acnt] = 0;
+        if(acnt || !key) break;
+        str_copy(&key, NULL);
+      }
+
+      if(acnt == 0) break;
+
+      i = acnt == 1 ? 1 : dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
+
       if (i > 0 && i - 1 < acnt)
 	{
 	  sprintf(urlbuf, "install=%s", ambg[i - 1]);

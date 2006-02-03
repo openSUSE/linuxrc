@@ -60,6 +60,7 @@ struct {
   { di_expert_vnc,          TXT_VNC_SWITCH       },
   { di_expert_usessh,       TXT_SSH_SWITCH       },
   { di_expert_startshell,   0, "Start Shell"     },
+  { di_expert_slp,          0, "Get SLP Info"    },
 
   { di_inst_install,     TXT_START_INSTALL,       },
   { di_inst_demo,        TXT_START_DEMO,          },

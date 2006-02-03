@@ -87,7 +87,7 @@ static void live_show_state(void);
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
-static dia_item_t di_inst_choose_netsource_last = di_netsource_nfs;
+static dia_item_t di_inst_choose_netsource_last = di_none;
 #if defined(__s390__) || defined(__s390x__)  
 static dia_item_t di_inst_choose_display_last = di_none;
 #endif
@@ -254,6 +254,30 @@ int inst_choose_netsource()
 
   if(!(config.test || config.net.cifs.binary)) items[3] = di_skip;
 
+  if(di_inst_choose_netsource_last == di_none) {
+    switch(config.instmode) {
+      case inst_ftp:
+        di_inst_choose_netsource_last = di_netsource_ftp;
+        break;
+
+      case inst_http:
+        di_inst_choose_netsource_last = di_netsource_http;
+        break;
+
+      case inst_smb:
+        di_inst_choose_netsource_last = di_netsource_smb;
+        break;
+
+      case inst_tftp:
+        di_inst_choose_netsource_last = di_netsource_tftp;
+        break;
+
+      default:
+        di_inst_choose_netsource_last = di_netsource_nfs;
+        break;
+    }
+  }
+
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
   return di == di_none ? -1 : 0;
@@ -373,6 +397,12 @@ int inst_choose_source()
   inst_umount();
 
   if(!config.rescue) items[3] = di_skip;
+
+  if(di_inst_choose_source_last == di_none) {
+    if(config.insttype == inst_net) di_inst_choose_source_last = di_source_net;
+    if(config.instmode == inst_hd) di_inst_choose_source_last = di_source_hd;
+    if(config.instmode == inst_floppy) di_inst_choose_source_last = di_source_floppy;
+  }
 
   di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
 

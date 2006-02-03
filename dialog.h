@@ -40,6 +40,7 @@ typedef enum {
   di_expert_vnc,
   di_expert_usessh,
   di_expert_startshell,
+  di_expert_slp,
 
   di_inst_install,
   di_inst_demo,
