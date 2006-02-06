@@ -22,6 +22,7 @@ int net_check_address2(inet_t *inet, int do_dns);
 extern int  net_setup_localhost (void);
 
 extern int  net_activate_ns      (void);
+extern int net_activate_s390_devs (void);
 
 int net_dhcp(void);
 void net_dhcp_stop(void);

@@ -293,10 +293,10 @@ static struct {
   { "escon",	 di_390net_escon    },
   { "iucv",	 di_390net_iucv     },
   { "hsi",	 di_390net_hsi	    },
-  { "eth",	 di_390net_eth	    },
-  { "tr",	 di_390net_tr	    },
-  { "qdio",	 di_390net_qdio	    },
-  { "lcs",	 di_390net_lcs	    },
+  { "eth",	 di_osa_eth	    },
+  { "tr",	 di_osa_tr	    },
+  { "qdio",	 di_osa_qdio	    },
+  { "lcs",	 di_osa_lcs	    },
 #endif
 };
 

@@ -1,3 +1,6 @@
+	- s390: made sure net IF setup code is also called in
+	  autoinstall mode (bug #146290)
+	- s390: fixed two buglets while testing the above
 	- s390: do not ask for hostname
 	- SLP accepts key to limit selection
 

@@ -468,7 +468,15 @@ int auto2_cdrom_dev(hd_t **hd0)
 int auto2_net_dev(hd_t **hd0)
 {
   hd_t *hd;
-
+#if defined(__s390__) || defined(__s390x__)
+  static int as3d = 0;
+  
+  if(!as3d)
+  {
+    as3d = 1;
+    if(net_activate_s390_devs()) return 1;
+  }
+#endif
   if(!(net_config_mask() || config.insttype == inst_net)) return 1;
 
   for(hd = hd_list(hd_data, hw_network, 1, *hd0); hd; hd = hd->next) {

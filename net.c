@@ -68,7 +68,7 @@ static int  net_is_ptp_im = FALSE;
 
 static int net_activate(void);
 #if defined(__s390__) || defined(__s390x__)
-static int net_activate_s390_devs(void);
+int net_activate_s390_devs(void);
 #endif
 static void net_setup_nameserver(void);
 
@@ -1983,7 +1983,7 @@ int net_activate_s390_devs(void)
         rc=config.hwp.medium;
     }
 
-    if(config.hwp.medium == di_osa_eth)
+    if(config.hwp.interface == di_osa_qdio)
     {
       mod_modprobe("qeth",NULL);	// FIXME: error handling
 
