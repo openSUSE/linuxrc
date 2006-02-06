@@ -1243,6 +1243,20 @@ void load_storage_mods()
 }
 
 
+void load_network_mods()
+{
+  if(!hd_data) {
+    hd_data = calloc(1, sizeof *hd_data);
+    hd_set_probe_feature(hd_data, pr_lxrc);
+    hd_clear_probe_feature(hd_data, pr_parallel);
+    hd_scan(hd_data);
+  }
+
+  config.activate_network = 1;
+  auto2_activate_devices(hw_network_ctrl, 0);
+}
+
+
 void get_zen_config()
 {
   static char *zen_mp = "/mounts/zen";

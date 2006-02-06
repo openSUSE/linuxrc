@@ -129,6 +129,7 @@ struct {
 
 static int dia_binary(char *txt, char *button0, char *button1, int def);
 static int dia_win_open (window_t *win_prr, char *txt_tv);
+static int lgetchar(void);
 
 /*
  *
@@ -189,20 +190,20 @@ static int dia_readnum()
   int c, n = 0, first = 1;
   for (;;)
     {
-      c = getchar();
+      c = lgetchar();
       if (c == '\r' || c == '\n' || c == EOF)
 	return n;
       if (first && (c == 'x' || c == 033))
 	{
 	  n = c == 'x' ? -c : 0;
-	  c = getchar();
+	  c = lgetchar();
           if (c == '\r' || c == '\n' || c == EOF)
 	    return n;
 	  c = 0;
 	}
       if (c < '0' || c > '9')
 	{
-          while ((c = getchar()) != '\r' && c != '\n' && c != EOF)
+          while ((c = lgetchar()) != '\r' && c != '\n' && c != EOF)
 	    ;
 	  return -1;
 	}
@@ -324,7 +325,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
 	  {
 	    int c;
 	    do
-	      c = getchar();
+	      c = lgetchar();
 	    while (c != '\n' && c != '\r' && c != EOF);
 	  }
 	return 0;
@@ -967,7 +968,7 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	  kbd_echo_off();
 	for (i = 0; ; i++)
 	  {
-	    c = getchar();
+	    c = lgetchar();
 	    if (c == '\n' || c == '\r' || c == EOF)
 	      {
 		if (i == 0)
@@ -977,7 +978,7 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	      }
 	    if (i == 0 && c == 033)
 	      {
-		c = getchar();
+		c = lgetchar();
 		if (c == '\n' || c == '\r' || c == EOF)
 		  {
 		    if (pw_mode)
@@ -1702,3 +1703,14 @@ int dia_input2_chopspace(char* txt, char** input, int fieldlen, int pw_mode)
   
   return retval;
 }
+
+
+int lgetchar()
+{
+  int i;
+
+  while((i = getchar()) == '\r' && config.listen);
+
+  return i;
+}
+

@@ -13,6 +13,12 @@
 #include <unistd.h>
 #include <sys/mount.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <sys/select.h>
 
 #include <hd.h>
 
@@ -29,6 +35,7 @@
 #include "rootimage.h"
 #include "display.h"
 #include "fstype.h"
+#include "keyboard.h"
 
 #define YAST_INF_FILE		"/etc/yast.inf"
 #define INSTALL_INF_FILE	"/etc/install.inf"
@@ -56,6 +63,8 @@ static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
 
 static void add_driver(char *str);
 static void parse_ethtool(slist_t *sl, char *str);
+static void wait_for_conn(int port);
+static int activate_network(void);
 
 
 static struct {
@@ -250,7 +259,8 @@ static struct {
   { key_dud_expected,   "UpdateExpected", kf_cfg + kf_cmd                },
   { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
   { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
-  { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          }
+  { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
+  { key_listen,         "listen",         kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1337,6 +1347,45 @@ void file_do_info(file_t *f0)
         }
         break;
 
+      case key_listen:
+        if(f->is.numeric) {
+          if(activate_network()) {
+
+            kbd_end(0);
+            if(config.win) {
+              disp_cursor_on();
+            }
+            if(!config.linemode) {
+              if(config.utf8) printf("\033%%G");
+              fflush(stdout);
+            }
+            
+            wait_for_conn(f->nvalue);
+
+            config.serial = strdup("/dev/tcp");
+            if(!config.linemode) {
+              char buf[10];
+              fd_set fds;
+              struct timeval timeout = { tv_sec: 2 };
+
+              FD_ZERO(&fds);
+              FD_SET(0, &fds);
+
+              write(1, "\xff\xfb\03\xff\xfb\x01", 6);
+              if(select(1, &fds, NULL, NULL, &timeout)) {
+                read(0, buf, 10);
+              }
+            }
+            kbd_init(1);
+            disp_init();
+            if(config.win) {
+              disp_cursor_off();
+              if(!config.linemode) disp_restore_screen();
+            }
+          }
+        }
+        break;
+
       default:
         break;
     }
@@ -2222,5 +2271,66 @@ void parse_ethtool(slist_t *sl, char *str)
     while(*str == ' ') str++;
     str_copy(&sl->value, str);
   }
+}
+
+
+void wait_for_conn(int port)
+{
+  int fd, sock;
+  struct sockaddr_in addr = { sin_family: AF_INET, sin_addr: { s_addr: INADDR_ANY } };
+  struct sockaddr peer;
+  socklen_t peer_len;
+
+  addr.sin_port = htons(port);
+
+  printf("\nwaiting for connection on port %d\n", port);
+  fflush(stdout);
+
+  if(
+    (sock = socket(AF_INET, SOCK_STREAM, 0)) == -1 ||
+    bind(sock, (struct sockaddr *) &addr, sizeof addr) ||
+    listen(sock, 5) ||
+    (fd = accept(sock, &peer, &peer_len)) == -1
+  ) {
+    close(sock);
+    return;
+  }
+
+  dup2(fd, 0);
+  dup2(fd, 1);
+  dup2(fd, 2);
+  close(fd);
+
+  setvbuf(stdin, NULL, _IONBF, 0);
+  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stderr, NULL, _IONBF, 0);
+
+  close(sock);
+
+  config.listen = 1;
+}
+
+
+int activate_network()
+{
+  if(config.net.configured != nc_none || config.test) return 1;
+
+  load_network_mods();
+
+  if(!config.net.device) {
+    util_update_netdevice_list(NULL, 1);
+    if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+  }
+
+  net_dhcp();
+
+  if(!config.net.hostname.ok) {
+    fprintf(stderr, "%s: DHCP network setup failed\n", config.net.device);
+    return 0;
+  }
+
+  config.net.configured = nc_dhcp;
+
+  return 1;
 }
 
