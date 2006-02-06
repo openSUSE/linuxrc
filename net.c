@@ -1707,6 +1707,7 @@ void net_list_s390_devs(char* driver, int model)
 int net_check_ccw_address(char* addr)
 {
   int i;
+  fprintf(stderr, "checking CCW address %s\n",addr);
   /* format: x.x.xxxx, each x is a hex digit */
   if(strlen(addr)!=8) goto error;
   for(i=0;i<8;i++)
@@ -1753,6 +1754,8 @@ static int net_s390_group_chans(int num, char* driver)
   char devs[8*3+1*3+1];	/* three channel addresses, commas/LF, zero */
   char path[100];
 
+  fprintf(stderr,"grouping %d channels for driver %s\n",num,driver);
+  
   if(num==2)
     sprintf(devs,"%s,%s\n",config.hwp.readchan,config.hwp.writechan);
   else if(num==3)
@@ -1773,6 +1776,8 @@ static int net_s390_ctc_protocol(int protocol)
     char devpath[256];
     char proto_value[3];
     int rc;
+    
+    fprintf(stderr,"setting CTC protocol to %d\n",protocol);
 
     sprintf(devpath,"/sys/bus/ccwgroup/devices/%s/protocol",
 	    config.hwp.readchan);
@@ -1787,6 +1792,8 @@ static int net_s390_lcs_portno(char *portno)
 {
     char devpath[256];
     int rc = 0;
+    
+    fprintf(stderr, "setting LCS port number to %s\n",portno);
 
     if (portno && strlen(portno) > 0) {
 	sprintf(devpath,"/sys/bus/ccwgroup/devices/%s/portno",
@@ -1802,6 +1809,8 @@ static int net_s390_qdio_portname(char *portname)
 {
     char devpath[256];
     int rc = 0;
+    
+    fprintf(stderr, "setting QDIO portname to %s\n",portname);
 
     if(portname && strlen(portname) > 0)
     {
@@ -1819,6 +1828,8 @@ static int net_s390_put_online(char* channel)
   int rc;
   char path[256];
   int online;
+  
+  fprintf(stderr, "putting device %s online\n",channel);
 
   if (!channel || !strlen(channel))
       return 1;
@@ -2058,7 +2069,7 @@ int net_activate_s390_devs(void)
 # undef HWE
   fclose(fp);
   
-  net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
+  //net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
 
   return 0;
 }

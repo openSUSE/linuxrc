@@ -1,3 +1,4 @@
+	- s390: do not ask for hostname
 	- SLP accepts key to limit selection
 
 31/1/2006:	v2.0.15
