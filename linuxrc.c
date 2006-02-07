@@ -85,6 +85,7 @@ static void lxrc_movetotmpfs2(void);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
+static void config_rescue(char *mp);
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
@@ -394,6 +395,8 @@ void lxrc_change_root2()
     if(fd >= 0) {
       close(fd);
       unlink("/mnt/tmp/xxx");
+
+      config_rescue("/mnt");
     }
     else {
       util_mount_ro(config.new_root, "/mnt/mnt");
@@ -408,6 +411,8 @@ void lxrc_change_root2()
       mount("tmpfs", "/mnt/etc", "tmpfs", 0, "size=0,nr_inodes=0");
       util_do_cp("/mnt/mnt/etc", "/mnt/etc");
       chmod("/mnt/etc", 0755);
+
+      config_rescue("/mnt");
 
       umount("/mnt/mnt");
     }
@@ -1320,6 +1325,32 @@ void find_shell()
     unlink("/bin/sh");
     symlink("/lbin/sh", "/bin/sh");
   }
+}
+
+
+/*
+ * Configure rescue system mounted at mp.
+ */
+void config_rescue(char *mp)
+{
+  char *s = NULL;
+  FILE *f;
+
+  /* add getty entry for /dev/console */
+  if(config.serial) {
+    strprintf(&s, "%s/etc/securetty", mp);
+    if((f = fopen(s, "a"))) {
+      fprintf(f, "console\n");
+      fclose(f);
+    }
+
+    strprintf(&s, "%s/etc/inittab", mp);
+    if((f = fopen(s, "a"))) {
+      fprintf(f, "c:2345:respawn:/sbin/mingetty --noclear console\n");
+      fclose(f);
+    }
+  }
+
 }
 
 

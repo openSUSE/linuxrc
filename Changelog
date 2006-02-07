@@ -1,3 +1,6 @@
+7/2/2006:	v2.0.17
+	- start getty on serial console in rescue system (#145357)
+
 6/2/2006:	v2.0.16
 	- s390: made sure net IF setup code is also called in
 	  autoinstall mode (bug #146290)
