@@ -101,7 +101,7 @@ static struct {
   { key_pcmcia,         "PCMCIA",         kf_none                        },
   { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
   { key_console,        "Console",        kf_none                        },
-  { key_ptphost,        "Pointopoint",    kf_none                        },
+  { key_ptphost,        "Pointopoint",    kf_cfg + kf_cmd                },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_demo,           "Demo",           kf_none                        },	/* obsolete */
@@ -659,6 +659,11 @@ void file_do_info(file_t *f0)
         net_check_address2(&config.net.gateway, 0);
         break;
 
+      case key_ptphost:
+        name2inet(&config.net.ptphost, f->value);
+        net_check_address2(&config.net.ptphost, 0);
+        break;
+      
       case key_server:
         name2inet(&config.net.server, f->value);
         net_check_address2(&config.net.server, 0);
