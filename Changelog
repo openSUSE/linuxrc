@@ -1,3 +1,6 @@
+	- s390: avoid buffer overrun on systems with many devices
+	  (bug #148043)
+
 14/2/2006:	v2.0.18
 	- read Pointopoint (config.net.ptphost) from config file and
 	  command line

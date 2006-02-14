@@ -1679,12 +1679,13 @@ void if_down(char *dev)
 
 void net_list_s390_devs(char* driver, int model)
 {
-  char buf[4<<10];
+  char buf[4<<10];	/* good enough for ca. 240 devices */
   struct sysfs_driver* driv;
   struct dlist* devs;
   struct sysfs_device* dev;
   struct sysfs_attribute* attr;
   char* bp=&buf[0];
+  int count = 0;
 
   strcpy(buf,"no devices found\n");
 
@@ -1698,10 +1699,17 @@ void net_list_s390_devs(char* driver, int model)
     if(model && strtol(attr->value+5,NULL,16)!=model) continue;
     bp+=sprintf(bp,"%s ",dev->bus_id);
     bp+=sprintf(bp,"%s",attr->value);	/* attr->value contains a LF */
+    count++;
+    if(count % 100 == 0)	/* avoid buffer overruns with many devices */
+    {
+      dia_message(buf, MSGTYPE_INFO);
+      bp = &buf[0];
+      buf[0] = 0;
+    }
   }
   sysfs_close_list(devs);
   /* calling sysfs_close_driver() here causes double free()s */
-  dia_message(buf,MSGTYPE_INFO);
+  if(buf[0]) dia_message(buf,MSGTYPE_INFO);
 }
 
 int net_check_ccw_address(char* addr)
