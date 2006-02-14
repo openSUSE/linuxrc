@@ -85,7 +85,7 @@ static void lxrc_movetotmpfs2(void);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
-static void config_rescue(char *mp);
+// static void config_rescue(char *mp);
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
@@ -396,7 +396,7 @@ void lxrc_change_root2()
       close(fd);
       unlink("/mnt/tmp/xxx");
 
-      config_rescue("/mnt");
+      // config_rescue("/mnt");
     }
     else {
       util_mount_ro(config.new_root, "/mnt/mnt");
@@ -412,7 +412,7 @@ void lxrc_change_root2()
       util_do_cp("/mnt/mnt/etc", "/mnt/etc");
       chmod("/mnt/etc", 0755);
 
-      config_rescue("/mnt");
+      // config_rescue("/mnt");
 
       umount("/mnt/mnt");
     }
@@ -1328,6 +1328,7 @@ void find_shell()
 }
 
 
+#if 0
 /*
  * Configure rescue system mounted at mp.
  */
@@ -1353,4 +1354,5 @@ void config_rescue(char *mp)
 
 }
 
+#endif
 
