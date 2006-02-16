@@ -2158,7 +2158,7 @@ int util_mount_main(int argc, char **argv)
 
   *srv_dir++ = 0;
 
-  inet.name = dev;
+  str_copy(&inet.name, dev);
   i = net_mount_nfs(dir, &inet, srv_dir);
 
   if(i && errno) {
