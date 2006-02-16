@@ -1,3 +1,5 @@
+	- Belgian keymap added (#117185)
+
 16/2/2006:	v2.0.19
 	- fix free()-bug (#150012)
 	- s390: avoid buffer overrun on systems with many devices (bug #148043)

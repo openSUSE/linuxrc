@@ -38,6 +38,7 @@ struct {
   char *enc;
 } km_enc[] = {
   { "Pl02",         KM_L2  },
+  { "be-latin1",    KM_L1  },
   { "br-abnt2",     KM_L1  },
   { "cz-us-qwertz", KM_L2  },
   { "de-lat1-nd",   KM_L1  },
@@ -193,6 +194,7 @@ static language_t set_languages_arm [] =
 #define KEYMAP_DEFAULT	"us"
 static keymap_t set_keymaps_arm [] =
 {
+{ "Belgian",              "be-latin1"    },
 { "Ceske",                "cz-us-qwertz" },
 { "Dansk",                "dk"           },
 { "Deutsch",              "de-lat1-nd"   },
