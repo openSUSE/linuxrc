@@ -412,6 +412,11 @@ void lxrc_change_root2()
       util_do_cp("/mnt/mnt/etc", "/mnt/etc");
       chmod("/mnt/etc", 0755);
 
+      mount("tmpfs", "/mnt/dev", "tmpfs", 0, "size=0,nr_inodes=0");
+      util_do_cp("/mnt/mnt/dev", "/mnt/dev");
+      util_do_cp("/dev", "/mnt/dev");
+      chmod("/mnt/dev", 0755);
+
       // config_rescue("/mnt");
 
       umount("/mnt/mnt");

@@ -1,4 +1,6 @@
+20/2/2006:	v2.0.20
 	- Belgian keymap added (#117185)
+	- get rescue /dev dir right
 
 16/2/2006:	v2.0.19
 	- fix free()-bug (#150012)
