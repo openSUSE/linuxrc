@@ -1,3 +1,6 @@
+28/2/2006:	v2.0.21
+	- s390: bring up FCP adapter when booted from SCSI (bug #153336)
+
 20/2/2006:	v2.0.20
 	- Belgian keymap added (#117185)
 	- get rescue /dev dir right

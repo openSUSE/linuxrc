@@ -147,3 +147,5 @@ void store_driverid(driver_t *drv);
 char *url_decode(char *str);
 int match_netdevice(char *device, char *hwaddr, char *key);
 
+char* util_chop_lf(char* str);
+int util_read_and_chop(char* path, char* dst);

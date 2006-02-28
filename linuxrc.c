@@ -965,6 +965,42 @@ void lxrc_init()
 
   /* get usb keyboard working */
   if(config.manual == 1 && !config.had_segv) util_load_usb();
+  
+#if defined(__s390__) || defined(__s390x__)
+  /* activate boot FCP adapter */
+  {
+    char ipl_type[40];
+    char device[40];
+    char wwpn[40];
+    char lun[40];
+    char cmd[200];
+    
+    if(util_read_and_chop("/sys/firmware/ipl/ipl_type",ipl_type))
+    {
+      if(strcmp(ipl_type,"fcp")==0)
+      {
+        mod_insmod("zfcp","");
+        if(util_read_and_chop("/sys/firmware/ipl/device",device))
+        {
+          sprintf(cmd,"/sbin/zfcp_host_configure %s",device);
+          fprintf(stderr,"executing %s\n",cmd);
+          if(!config.test) system(cmd);
+          if(util_read_and_chop("/sys/firmware/ipl/wwpn",wwpn))
+          {
+            if(util_read_and_chop("/sys/firmware/ipl/lun",lun))
+            {
+              sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s",device,wwpn,lun);
+              fprintf(stderr,"executing %s\n",cmd);
+              if(!config.test) system(cmd);
+            }
+          }
+        }
+      }
+      else fprintf(stderr,"not booted via FCP\n");
+    }
+    else fprintf(stderr,"could not read /sys/firmware/ipl/ipl_type\n");
+  }
+#endif
 
   if(config.memory.ram_min && !config.had_segv) {
     int window = config.win, ram;

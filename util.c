@@ -4693,4 +4693,20 @@ int match_netdevice(char *device, char *hwaddr, char *key)
   return 0;
 }
 
+char* util_chop_lf(char* str)
+{
+  int lfp = strlen(str)-1;
+  if(str[lfp] == '\n') str[lfp]=0;
+  return str;
+}
 
+int util_read_and_chop(char* path, char* dst)
+{
+  FILE* fp;
+  fp=fopen(path,"r");
+  if(!fp) return 0;
+  if(!fgets(dst,39,fp)) { fclose(fp); return 0; }
+  util_chop_lf(dst);
+  fclose(fp);
+  return 1;
+}
