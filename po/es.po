@@ -1209,4 +1209,3 @@ msgstr "Cargando actualización de controlador"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Cargando sistema de rescate"
-

@@ -30,6 +30,7 @@ extern int   txt_init (void);
 #define TRANS_en
 #define TRANS_es
 #define TRANS_fr
+#define TRANS_fi
 #define TRANS_he
 #define TRANS_hu
 // #define TRANS_id

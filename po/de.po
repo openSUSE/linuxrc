@@ -1222,4 +1222,3 @@ msgstr "Treiberaktualisierung wird geladen"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Rettungssystem wird geladen"
-

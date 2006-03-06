@@ -49,6 +49,8 @@ struct {
   { "it",           KM_L1  },
   { "no-latin1",    KM_L1  },
   { "pt-latin1",    KM_L1  },
+  { "fi-latin1",    KM_L1  },
+  { "sv-latin1",    KM_L1  },
   { "ru1",          KM_KOI },
   { "sk-qwerty",    KM_L2  },
   { "slovene",      KM_L2  }
@@ -63,21 +65,21 @@ static language_t set_languages_arm [] =
 { lang_ar, "Arabic", "us", SMALL_FONT, UNI_FONT, 0, 0, "ar", 0 },
 #endif
 
-#ifdef TRANS_bg
-{ lang_bg, "Български", "us", SMALL_FONT, UNI_FONT, 0, 0, "bg_BG", 0 },
-#endif
-
 #ifdef TRANS_bn
 // currently a fake
 { lang_bn, "Bengali", "us", SMALL_FONT, UNI_FONT, 0, 0, "bn_BD", 0 },
 #endif
 
-#ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", 0 },
-#endif
-
 #ifdef TRANS_bs
 { lang_bs, "Bosnia", "us", SMALL_FONT, UNI_FONT, 1, 1, "bs_BA", 0 },
+#endif
+
+#ifdef TRANS_bg
+{ lang_bg, "Български", "us", SMALL_FONT, UNI_FONT, 0, 0, "bg_BG", 0 },
+#endif
+
+#ifdef TRANS_br
+{ lang_br, "Brezhoneg", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", 0 },
 #endif
 
 #ifdef TRANS_cs
@@ -92,10 +94,6 @@ static language_t set_languages_arm [] =
 { lang_de, "Deutsch", "de-lat1-nd", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", 0 },
 #endif
 
-#ifdef TRANS_el
-{ lang_el, "Ελληνικά", "gr", SMALL_FONT, UNI_FONT, 1, 1, "el_GR", 0 },
-#endif
-
 #ifdef TRANS_en
 { lang_en, "English", "us", SMALL_FONT, UNI_FONT, 0, 0, "en_US", 0 },
 #endif
@@ -106,6 +104,10 @@ static language_t set_languages_arm [] =
 
 #ifdef TRANS_fr
 { lang_fr, "Français", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", 0 },
+#endif
+
+#ifdef TRANS_el
+{ lang_el, "Ελληνικά", "gr", SMALL_FONT, UNI_FONT, 1, 1, "el_GR", 0 },
 #endif
 
 #ifdef TRANS_id
@@ -162,6 +164,10 @@ static language_t set_languages_arm [] =
 { lang_ru, "Русский", "ru1", SMALL_FONT, UNI_FONT, 1, 1, "ru_RU", 0 },
 #endif
 
+#ifdef TRANS_zh_CN
+{ lang_zh_CN, "Simplified Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_CN", 1 },
+#endif
+
 #ifdef TRANS_sk
 { lang_sk, "Slovenčina", "sk-qwerty", SMALL_FONT, UNI_FONT, 1, 1, "sk_SK", 0 },
 #endif
@@ -170,16 +176,16 @@ static language_t set_languages_arm [] =
 { lang_sl, "Slovenščina", "slovene", SMALL_FONT, UNI_FONT, 1, 1, "sl_SI", 0 },
 #endif
 
+#ifdef TRANS_fi
+{ lang_fi, "Suomi", "fi-latin1", SMALL_FONT, UNI_FONT, 0, 1, "fi_FI", 0 },
+#endif
+
 #ifdef TRANS_sv
 { lang_sv, "Svenska", "sv-latin1", SMALL_FONT, UNI_FONT, 0, 1, "sv_SE", 0 },
 #endif
 
 #ifdef TRANS_uk
 { lang_uk, "Українська", "us", SMALL_FONT, UNI_FONT, 0, 1, "uk_UA", 0 },
-#endif
-
-#ifdef TRANS_zh_CN
-{ lang_zh_CN, "Simplified Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_CN", 1 },
 #endif
 
 #ifdef TRANS_zh_TW
@@ -214,6 +220,7 @@ static keymap_t set_keymaps_arm [] =
 { "Russian",              "ru1"          },
 { "Slovak",               "sk-qwerty"    },
 { "Slovene",              "slovene"      },
+{ "Suomi",                "fi-latin1"    },
 { "Svensk",               "sv-latin1"    }
 };
 #endif

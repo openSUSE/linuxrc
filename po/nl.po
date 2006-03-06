@@ -1,20 +1,19 @@
 # translation of nl.po to Dutch
-# translation of linuxrc.po to Dutch
+# Arthur & Ettie Kerkmeester <a.s.kerkmeester@hccnet.nl>, 2000-2004, 2005.
+# Rinse de Vries <rinsedevries@kde.nl>, 2005, 2006.
 # Dutch translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
 # nagelezen tot 120
-# Arthur & Ettie Kerkmeester <a.s.kerkmeester@hccnet.nl>, 2000-2004, 2005.
-# Rinse de Vries <rinsedevries@kde.nl>, 2005.
 msgid ""
 msgstr ""
 "Project-Id-Version: nl\n"
-"PO-Revision-Date: 2005-11-22 22:51+0100\n"
+"PO-Revision-Date: 2006-01-28 12:11+0100\n"
 "Last-Translator: Rinse de Vries <rinsedevries@kde.nl>\n"
 "Language-Team: Dutch <kde-i18n-nl@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.2\n"
+"X-Generator: KBabel 1.11.1\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
@@ -381,8 +380,7 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Geef het IP-adres van de PLIP-partner op."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
 "De PCMCIA-chipset kon niet automatisch gedetecteerd worden. Specificeer het "
 "handmatig."
@@ -518,8 +516,7 @@ msgstr "Geanimeerde vensters gebruiken?"
 
 #. TXT_NO_DRIVES
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr ""
-"Er zijn tot nu toe geen harde schijven of CD-ROM-stations gedetecteerd."
+msgstr "Er zijn tot nu toe geen harde schijven of CD-ROM-stations gedetecteerd."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
@@ -874,8 +871,7 @@ msgstr "Geef de swap partitie op (bijv: /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
-"Geef de gebruikersnaam op waarmee u verbinding met de %s server wilt maken."
+msgstr "Geef de gebruikersnaam op waarmee u verbinding met de %s server wilt maken."
 
 #. TXT_ENTER_PASSWORD
 #, c-format
@@ -979,9 +975,8 @@ msgid "Please select the type of your network device."
 msgstr "Selecteer uw type netwerk apparaat aub."
 
 #. TXT_IUCV_PEER
-#, fuzzy
 msgid "Please enter the name (user ID) of the target VM guest."
-msgstr "Geef de naam (gebruiker's ID) van de doel VM gast op aub."
+msgstr "Geef de naam (gebruiker's ID) van de doel VM-gast op."
 
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"

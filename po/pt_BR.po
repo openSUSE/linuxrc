@@ -57,7 +57,7 @@ msgstr "Iniciar Instalação ou Sistema"
 
 #. TXT_MENU_INFO
 msgid "System Information"
-msgstr "informação do Sistema"
+msgstr "Informação do Sistema"
 
 #. TXT_HDR_MAIN
 msgid "Main Menu"
@@ -1206,4 +1206,3 @@ msgstr "Carregando Atualização de Driver"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Carregando Sistema de Resgate"
-
