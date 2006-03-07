@@ -937,7 +937,7 @@ void dia_status_off (window_t *win_prv)
 }
 
 int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
-    {
+{
     window_t  win_ri;
     int       width_ii;
     window_t  tmp_win_ri;
@@ -976,7 +976,7 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	        input_tr[i < len_iv - 1 ? i : len_iv - 1] = 0;
 	        break;
 	      }
-	    if (i == 0 && c == 033)
+	    if (i == 0 && c == 033 /* escape */)
 	      {
 		c = lgetchar();
 		if (c == '\n' || c == '\r' || c == EOF)
@@ -996,32 +996,39 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	  }
 	if (pw_mode)
 	  kbd_reset();
-	return 0;
+        rc_ii = 0;
       }
-    disp_toggle_output (DISP_OFF);
-    memset (&win_ri, 0, sizeof (window_t));
-    win_ri.bg_color = colors_prg->input_win;
-    win_ri.fg_color = colors_prg->msg_fg;
-    width_ii = dia_win_open (&win_ri, txt_tv);
+    else
+    {
+      disp_toggle_output (DISP_OFF);
+      memset (&win_ri, 0, sizeof (window_t));
+      win_ri.bg_color = colors_prg->input_win;
+      win_ri.fg_color = colors_prg->msg_fg;
+      width_ii = dia_win_open (&win_ri, txt_tv);
 
-    memset (&tmp_win_ri, 0, sizeof (window_t));
-    tmp_win_ri.x_left = win_ri.x_left + 1;
-    tmp_win_ri.y_left = win_ri.y_right - 3;
-    tmp_win_ri.x_right = win_ri.x_right - 1;
-    tmp_win_ri.y_right = win_ri.y_right - 1;
-    tmp_win_ri.style = STYLE_RAISED;
-    tmp_win_ri.bg_color = win_ri.bg_color;
-    tmp_win_ri.fg_color = win_ri.fg_color;
-    win_open (&tmp_win_ri);
-    win_clear (&tmp_win_ri);
-    disp_flush_area (&win_ri);
+      memset (&tmp_win_ri, 0, sizeof (window_t));
+      tmp_win_ri.x_left = win_ri.x_left + 1;
+      tmp_win_ri.y_left = win_ri.y_right - 3;
+      tmp_win_ri.x_right = win_ri.x_right - 1;
+      tmp_win_ri.y_right = win_ri.y_right - 1;
+      tmp_win_ri.style = STYLE_RAISED;
+      tmp_win_ri.bg_color = win_ri.bg_color;
+      tmp_win_ri.fg_color = win_ri.fg_color;
+      win_open (&tmp_win_ri);
+      win_clear (&tmp_win_ri);
+      disp_flush_area (&win_ri);
 
-    rc_ii = win_input (max_x_ig / 2 - fieldlen_iv / 2, win_ri.y_right - 2,
-                       input_tr, len_iv, fieldlen_iv, pw_mode);
+      rc_ii = win_input (max_x_ig / 2 - fieldlen_iv / 2, win_ri.y_right - 2,
+                         input_tr, len_iv, fieldlen_iv, pw_mode);
 
-    win_close (&win_ri);
-    return (rc_ii);
+      win_close (&win_ri);
     }
+    
+    if(strcmp(input_tr, "+++") == 0)	/* escape sequence */
+      return -1;
+    else
+      return (rc_ii);
+}
 
 
 int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
