@@ -149,3 +149,6 @@ int match_netdevice(char *device, char *hwaddr, char *key);
 
 char* util_chop_lf(char* str);
 int util_read_and_chop(char* path, char* dst);
+
+char *get_translation(slist_t *trans, char *locale);
+

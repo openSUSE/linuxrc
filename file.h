@@ -91,4 +91,5 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags);
 void file_do_info(file_t *f0);
 void file_write_live_config(char *dir);
 void get_ide_options(void);
+slist_t *file_parse_xmllike(char *name, char *tag);
 

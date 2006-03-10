@@ -4710,3 +4710,45 @@ int util_read_and_chop(char* path, char* dst)
   fclose(fp);
   return 1;
 }
+
+
+/*
+ * Find text for locale, or 'en' if no locale matches.
+ */
+char *get_translation(slist_t *trans, char *locale)
+{
+  slist_t *sl;
+  char *search_loc = NULL, *s;
+
+  if(!trans || !locale) return NULL;
+
+  locale = strdup(locale);
+
+  strprintf(&search_loc, "lang=\"%s\"", locale);
+
+  for(sl = trans; sl; sl = sl->next) {
+    if(sl->key && strstr(sl->key, search_loc)) break;
+  }
+
+  if(!sl && (s = strchr(locale, '_'))) {
+    *s = 0;
+    strprintf(&search_loc, "lang=\"%s\"", locale);
+    for(sl = trans; sl; sl = sl->next) {
+      if(sl->key && strstr(sl->key, search_loc)) break;
+    }
+  }
+
+  if(!sl && strcmp(locale, "en")) {
+    strprintf(&search_loc, "lang=\"en\"");
+    for(sl = trans; sl; sl = sl->next) {
+      if(sl->key && strstr(sl->key, search_loc)) break;
+    }
+  }
+
+  free(locale);
+  free(search_loc);
+
+  return sl ? sl->value : NULL;
+}
+
+

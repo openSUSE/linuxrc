@@ -756,6 +756,10 @@ int inst_check_instsys()
       config.instdata_mounted = 1;
 
       if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
+      if(!util_check_exist("/" TEXTS_FILE)) {
+        get_file("/media.1/" TEXTS_FILE, "/" TEXTS_FILE);
+        config.cd1texts = file_parse_xmllike("/" TEXTS_FILE, "text");
+      }
       util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
       util_do_driver_updates();
 
@@ -1863,6 +1867,8 @@ void get_file(char *src, char *dst)
   char buf[0x1000];
   char fname[256];
   int i, j, fd_in, fd_out;
+
+  if(config.debug) fprintf(stderr, "get_file: src = %s, dst = %s\n", src, dst);
 
   if(
     config.instmode == inst_ftp ||

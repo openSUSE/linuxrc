@@ -1039,18 +1039,23 @@ void lxrc_init()
       i = 0;
       j = 1;
       if(config.insttype == inst_cdrom && cdrom_drives && !config.demo) {
-        sprintf(buf, txt_get(TXT_INSERT_CD), 1);
-        j = dia_okcancel(buf, YES) == YES ? 1 : 0;
-        if(j) {
-          util_disp_done();
-          i = auto2_find_install_medium();
-        }
+        char *s = get_translation(config.cd1texts, current_language()->locale);
+        char *buf = NULL;
+
+        strprintf(&buf, s ?: txt_get(TXT_INSERT_CD), 1);
+        do {
+          j = dia_okcancel(buf, YES) == YES ? 1 : 0;
+          if(j) {
+            i = auto2_find_install_medium();
+          }
+        } while(!i && j);
+
+        free(buf);
       }
 
       if(!i) {
         config.rescue = 0;
         config.manual |= 1;
-        util_disp_init();
         if(j) {
           sprintf(buf, "Could not find the %s ", config.product);
           if(config.insttype == inst_cdrom) {
@@ -1064,6 +1069,9 @@ void lxrc_init()
           strcat(buf, "\n\nActivating manual setup program.\n");
           dia_message(buf, MSGTYPE_ERROR);
         }
+      }
+      else {
+        util_disp_done();
       }
     }
   }
@@ -1396,4 +1404,5 @@ void config_rescue(char *mp)
 }
 
 #endif
+
 

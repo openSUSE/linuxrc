@@ -30,6 +30,7 @@
 #define SWISS_ARMY_KNIFE 1
 
 #define SP_FILE "servicepack.tar.gz"
+#define TEXTS_FILE "nextmedia"
 
 #ifndef TRUE
 #define TRUE			1
@@ -345,6 +346,8 @@ typedef struct {
   char *rootpassword;
   int kbd_fd;			/* fd for console */
   slist_t *ethtool;		/* ethtool options */
+  slist_t *cd1texts;		/* text for requesting next product cd */
+
   struct {
     char *dir;			/* driver update source dir */
     char *dst;			/* driver update destination dir */

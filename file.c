@@ -2339,3 +2339,83 @@ int activate_network()
   return 1;
 }
 
+
+slist_t *file_parse_xmllike(char *name, char *tag)
+{
+  slist_t *sl, *sl0 = NULL;
+  FILE *f;
+  char *buf = NULL, *tag_start = NULL, *tag_end = NULL;
+  char *attr = NULL, *data = NULL;
+  int buf_size = 0, buf_ptr = 0, i;
+  char *ptr, *s0, *s1;
+
+  if(!tag) return sl0;
+
+  if(!(f = fopen(name, "r"))) return sl0;
+
+  do {
+    buf = realloc(buf, buf_size += 0x1000);
+    i = fread(buf + buf_ptr, 1, buf_size - buf_ptr - 1, f);
+    buf_ptr += i;
+  }
+  while(buf_ptr == buf_size - 1);
+
+  buf[buf_ptr] = 0;
+
+  fclose(f);
+
+  if(!(buf_size = buf_ptr)) return sl0;
+
+  strprintf(&tag_start, "<%s ", tag);
+  strprintf(&tag_end, "</%s>", tag);
+
+  ptr = buf;
+
+  while(*ptr) {
+    if(attr) {
+      if((s0 = strstr(ptr, tag_end))) {
+        *s0 = 0;
+        ptr = s0 + strlen(tag_end);
+
+        i = strlen(data);
+        while(i > 0 && isspace(data[i - 1])) data[--i] = 0;
+
+        sl = slist_append(&sl0, slist_new());
+        str_copy(&sl->key, attr);
+        str_copy(&sl->value, data);
+
+        attr = data = NULL;
+      }
+      else {
+        break;
+      }
+    }
+    else {
+      if((s0 = strstr(ptr, tag_start)) && (s1 = strchr(s0, '>'))) {
+        *s1++ = 0;
+        s0 += strlen(tag_start);
+        while(isspace(*s0)) s0++;
+        while(isspace(*s1)) s1++;
+        attr = s0;
+        ptr = data = s1;
+      }
+      else {
+        break;
+      }
+    }
+  }
+
+  free(buf);
+  free(tag_start);
+  free(tag_end);
+
+#if 0
+  for(sl = sl0; sl; sl = sl->next) {
+    fprintf(stderr, "key = \'%s\'\n", sl->key);
+    fprintf(stderr, "value = \'%s\'\n", sl->value);
+  }
+#endif
+
+  return sl0;
+}
+
