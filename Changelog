@@ -1,7 +1,9 @@
+10/3/2006:	v2.0.24
+	- 'request for CD1' message texts are read from CD (#64750)
+
 7/3/2006:	v2.0.23
 	- now possible to enter +++ as an escape sequence instead of
 	  pressing ^[ in dia_input*() (bug #144245)
-	- 'request for CD1' message texts are read from CD (#64750)
 
 6/3/2006:	v2.0.22
 	- translations updated
