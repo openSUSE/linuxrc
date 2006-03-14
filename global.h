@@ -288,6 +288,7 @@ typedef struct {
   unsigned staticdevices:1;	/* use static /dev tree (not udev) */
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
+  unsigned zombies:1;		/* keep zombies around */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */

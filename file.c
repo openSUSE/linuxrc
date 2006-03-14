@@ -260,7 +260,8 @@ static struct {
   { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
   { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
-  { key_listen,         "listen",         kf_cfg + kf_cmd                }
+  { key_listen,         "listen",         kf_cfg + kf_cmd                },
+  { key_zombies,        "Zombies",        kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1389,6 +1390,10 @@ void file_do_info(file_t *f0)
             }
           }
         }
+        break;
+
+      case key_zombies:
+        if(f->is.numeric) config.zombies = f->nvalue;
         break;
 
       default:

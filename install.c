@@ -1223,7 +1223,36 @@ int inst_execute_yast()
     rc = system("/bin/bash 2>&1");
   }
   else {
-    rc = system(config.setupcmd);
+    if(config.zombies) {
+      rc = system(config.setupcmd);
+    }
+    else {
+      pid_t pid, inst_pid;
+
+      inst_pid = fork();
+
+      if(inst_pid) {
+        // fprintf(stderr, "%d: inst_pid = %d\n", getpid(), inst_pid);
+
+        while((pid = waitpid(-1, &rc, 0))) {
+          // fprintf(stderr, "%d: chld(%d) = %d\n", getpid(), pid, rc);
+          if(pid == inst_pid) {
+            // fprintf(stderr, "%d: last chld\n", getpid());
+            break;
+          }
+        }
+
+        // fprintf(stderr, "%d: back from loop\n", getpid());
+      }
+      else {
+        // fprintf(stderr, "%d: system()\n", getpid());
+        rc = system(config.setupcmd);
+        // fprintf(stderr, "%d: exit(%d)\n", getpid(), rc);
+        exit(WEXITSTATUS(rc));
+      }
+
+      // fprintf(stderr, "%d: back, rc = %d\n", getpid(), rc);
+    }
   }
 
   if(rc) {
