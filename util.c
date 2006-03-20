@@ -4004,7 +4004,8 @@ void util_set_serial_console(char *str)
   sl = slist_split(',', config.serial);
 
   if(sl) {
-    str_copy(&config.console, long_dev(sl->key));
+    /* if it's uart, don't bother to find the matching ttySx */
+    str_copy(&config.console, long_dev(strcmp(sl->key, "uart") ? sl->key : "console"));
 #if 0
     s = long_dev(sl->key);
     if(!config.console || strcmp(s, config.console)) {
