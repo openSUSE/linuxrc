@@ -1,3 +1,7 @@
+20/3/2006:	v2.0.27
+	- fix 'loading' message in linemode
+	- fix rescue loading message
+
 20/3/2006:	v2.0.26
 	- accept console=uart,... option (#152221)
 	- don't kill shell on console 9

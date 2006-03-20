@@ -382,11 +382,11 @@ int load_image(char *file_name, instmode_t mode, char *label)
     sprintf(buffer, "%s (%d kB)%s",
       label,
       root_nr_blocks_im * BLOCKSIZE_KB,
-      config.win ? "" : " -     "
+      config.win && !config.linemode ? "" : " -     "
     );
   }
   else {
-    sprintf(buffer, "%s%s", label, config.win ? "" : " -     ");
+    sprintf(buffer, "%s%s", label, config.win && !config.linemode ? "" : " -     ");
   }
 
   dia_status_on(&root_status_win_rm, buffer);

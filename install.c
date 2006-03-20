@@ -848,7 +848,7 @@ int inst_start_install()
   str_copy(&config.instsys2, NULL);
 
   if(config.use_ramdisk) {
-    config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(TXT_LOADING_INSTSYS));
+    config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
     // maybe: inst_umount(); ???
     if(config.inst_ramdisk < 0) return -1;
 
