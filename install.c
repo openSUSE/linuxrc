@@ -1264,9 +1264,15 @@ int inst_execute_yast()
     }
   }
 
-  freopen(config.console, "r", stdin);
-  freopen(config.console, "a", stdout);
-  freopen(config.stderr_name, "a", stderr);
+  if(!config.listen) {
+    freopen(config.console, "r", stdin);
+    freopen(config.console, "a", stdout);
+    freopen(config.stderr_name, "a", stderr);
+  }
+  else {
+    dup2(1, 0);
+    config.kbd_fd = 0;
+  }
   kbd_init(0);
   util_notty();
 

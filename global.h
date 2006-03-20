@@ -451,6 +451,7 @@ typedef struct {
     unsigned ifconfig:1;	/* setup network interface */
     unsigned is_configured:1;	/* set if network is configured */
     unsigned nfs_tcp:1;		/* use TCP for NFS */
+    unsigned keep:1;		/* keep network interface up */
     unsigned do_setup;		/* do network setup */
     unsigned setup;		/* bitmask: do these network setup things */
     char *device;		/* currently used device */

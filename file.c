@@ -1356,8 +1356,13 @@ void file_do_info(file_t *f0)
       case key_listen:
         if(f->is.numeric) {
           if(activate_network()) {
+            config.net.keep = 1;
+            str_copy(&config.setupcmd, "inst_setup yast");
 
             kbd_end(0);
+
+            config.kbd_fd = 0;
+
             if(config.win) {
               disp_cursor_on();
             }
@@ -2293,7 +2298,7 @@ void wait_for_conn(int port)
 
   addr.sin_port = htons(port);
 
-  printf("\nwaiting for connection on port %d\n", port);
+  printf("\n%s waiting for connection on port %d\n", inet2print(&config.net.hostname), port);
   fflush(stdout);
 
   if(
@@ -2308,12 +2313,12 @@ void wait_for_conn(int port)
 
   dup2(fd, 0);
   dup2(fd, 1);
-  dup2(fd, 2);
+  // dup2(fd, 2);
   close(fd);
 
   setvbuf(stdin, NULL, _IONBF, 0);
   setvbuf(stdout, NULL, _IONBF, 0);
-  setvbuf(stderr, NULL, _IONBF, 0);
+  // setvbuf(stderr, NULL, _IONBF, 0);
 
   close(sock);
 
@@ -2332,14 +2337,23 @@ int activate_network()
     if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
   }
 
-  net_dhcp();
+  if(!config.net.hostname.ok || !config.net.netmask.ok) {
+    config.net.use_dhcp ? net_dhcp() : net_bootp();
+    if(!config.net.hostname.ok) {
+      fprintf(stderr, "%s: DHCP network setup failed\n", config.net.device);
+      return 0;
+    }
 
-  if(!config.net.hostname.ok) {
-    fprintf(stderr, "%s: DHCP network setup failed\n", config.net.device);
-    return 0;
+    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
   }
+  else {
+    if(net_activate_ns()) {
+      fprintf(stderr, "net activation failed\n");
+      return 0;
+    }
 
-  config.net.configured = nc_dhcp;
+    config.net.configured = nc_static;
+  }
 
   return 1;
 }

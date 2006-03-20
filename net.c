@@ -153,6 +153,8 @@ int net_config()
 #if NETWORK_CONFIG
   char buf[256];
 
+  if(config.net.keep) return 0;
+
   net_ask_password();
 
   if(
@@ -231,6 +233,10 @@ void net_stop()
 {
   file_t *f0, *f;
   slist_t *sl0 = NULL, *sl;
+
+  if(config.debug) fprintf(stderr, "shutting network down\n");
+
+  if(config.net.keep) return;
 
   if(config.test) {
     config.net.is_configured = 0;
@@ -362,6 +368,8 @@ int net_activate_ns()
 {
   int rc;
 
+  if(config.net.keep) return 0;
+
   rc = net_activate();
 
   if(!rc) net_setup_nameserver();
@@ -392,7 +400,7 @@ int net_activate()
     struct sockaddr_in  sockaddr_ri;
     int                 error_ii = FALSE;
 
-    if(config.test || !config.net.ifconfig || config.net.dhcp_active) return 0;
+    if(config.test || !config.net.ifconfig || config.net.dhcp_active || config.net.keep) return 0;
 
     if(!config.net.device) {
       fprintf(stderr, "net_activate: no network interface!\n");
@@ -1314,7 +1322,7 @@ int net_bootp()
   char *s;
   char tmp[256];
 
-  if(config.net.hostname.ok) return 0;
+  if(config.net.hostname.ok || config.net.keep) return 0;
 
   if(config.test) return 0;
 
@@ -1476,7 +1484,7 @@ int net_dhcp()
   file_t *f0, *f;
   window_t win;
 
-  if(config.net.dhcp_active) return 0;
+  if(config.net.dhcp_active || config.net.keep) return 0;
 
   if(config.test) return 0;
 

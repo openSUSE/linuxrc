@@ -225,7 +225,7 @@ int main(int argc, char **argv, char **env)
       }
 
       if(!config.serial && config.debugwait) {
-        util_start_shell("/dev/tty9", "/bin/bash", 1);
+        util_start_shell("/dev/tty9", "/bin/lsh", 1);
         config.shell_started = 1;
       }
       deb_wait;
@@ -936,7 +936,7 @@ void lxrc_init()
   util_update_cdrom_list();
 
   if(!(config.test || config.serial || config.shell_started || config.noshell)) {
-    util_start_shell("/dev/tty9", "/bin/bash", 1);
+    util_start_shell("/dev/tty9", "/bin/lsh", 1);
     config.shell_started = 1;
   }
 

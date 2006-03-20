@@ -1,5 +1,7 @@
 20/3/2006:	v2.0.26
 	- accept console=uart,... option (#152221)
+	- don't kill shell on console 9
+	- 'listen' mode improved
 
 14/3/2006:	v2.0.25
 	- kill zombies (#150208)
