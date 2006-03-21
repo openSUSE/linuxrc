@@ -25,8 +25,6 @@ extern int  util_fileinfo          (char *file_name, int *size, int *compressed)
 extern void util_update_kernellog  (void);
 extern void util_print_banner      (void);
 extern void util_beep              (int  success_iv);
-extern int  util_mount_loop        (char *file_tv, char *mountpoint_tv);
-extern void util_umount_loop       (char *mountpoint_tv);
 extern void util_truncate_dir      (char *dir_tr);
 extern int  util_check_exist       (char *filename_tv);
 extern int  util_check_break       (void);

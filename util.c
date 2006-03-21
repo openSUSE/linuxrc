@@ -73,8 +73,6 @@
 
 #define LED_TIME     50000
 
-static char  *util_loopdev_tm = "/dev/loop0";
-
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
 
@@ -515,62 +513,6 @@ void util_beep (int  success_iv)
         }
 
     close (fd_ii);
-    }
-
-
-int util_mount_loop (char *file_tv, char *mountpoint_tv)
-    {
-    struct loop_info  loopinfo_ri;
-    int               fd_ii;
-    int               device_ii;
-    int               rc_ii;
-
-
-    fprintf (stderr, "Trying loopmount %s\n", file_tv);
-
-    fd_ii = open (file_tv, O_RDONLY);
-    if (fd_ii < 0)
-        return (-1);
-
-    device_ii = open (util_loopdev_tm, O_RDONLY);
-    if (device_ii < 0)
-        {
-        close (fd_ii);
-        return (-1);
-        }
-
-    memset (&loopinfo_ri, 0, sizeof (loopinfo_ri));
-    strcpy (loopinfo_ri.lo_name, file_tv);
-    rc_ii = ioctl (device_ii, LOOP_SET_FD, fd_ii);
-    if (!(rc_ii < 0))
-        rc_ii = ioctl (device_ii, LOOP_SET_STATUS, &loopinfo_ri);
-
-    close (fd_ii);
-    close (device_ii);
-    if (rc_ii < 0)
-        return (rc_ii);
-
-    rc_ii = util_mount_ro (util_loopdev_tm, mountpoint_tv);
-
-    fprintf (stderr, "Loopmount returns %d\n", rc_ii);
-
-    return (rc_ii);
-    }
-
-
-void util_umount_loop (char *mountpoint_tv)
-    {
-    int   fd_ii;
-
-
-    umount (mountpoint_tv);
-
-    fd_ii = open (util_loopdev_tm, O_RDONLY);
-    if (fd_ii >= 0)
-        {
-        ioctl (fd_ii, LOOP_CLR_FD, 0);
-        close (fd_ii);
-        }
     }
 
 
@@ -2143,14 +2085,14 @@ int util_mount_main(int argc, char **argv)
 
   if(notype) {
     if(!util_mount(dev, dir, flags)) return 0;
-    perror("mount");
-    return errno;
+    if(errno) perror("mount");
+    return 1;
   }
 
   if(strcmp(type, "nfs")) {
     if(!mount(dev, dir, type, flags, 0)) return 0;
-    perror("mount");
-    return errno;
+    if(errno) perror("mount");
+    return 1;
   }
 
   srv_dir = strchr(dev, ':');
@@ -3588,16 +3530,20 @@ char *util_fstype(char *dev, char **module)
   if(!type) return NULL;
 
   if(module) {
-    f0 = file_read_file("/proc/filesystems", kf_none);
-    for(f = f0; f; f = f->next) {
-      s = strcmp(f->key_str, "nodev") ? f->key_str : f->value;
-      if(!strcmp(s, type)) {
-        *module = NULL;
-        break;
-      }
+    if(!strcmp(type, "cpio")) {
+      *module = NULL;
     }
-
-    file_free_file(f0);
+    else {
+      f0 = file_read_file("/proc/filesystems", kf_none);
+      for(f = f0; f; f = f->next) {
+        s = strcmp(f->key_str, "nodev") ? f->key_str : f->value;
+        if(!strcmp(s, type)) {
+          *module = NULL;
+          break;
+        }
+      }
+      file_free_file(f0);
+    }
   }
 
   return type;
@@ -3660,12 +3606,6 @@ int util_mount(char *dev, char *dir, unsigned long flags)
 {
   char *type, *loop_dev;
   int err = -1;
-  static char *fs_types[] = {
-    "minix", "ext2", "reiserfs", "xfs",
-    "vfat", "iso9660", "msdos", "hpfs",
-    0
-  };
-  char **fs_type = fs_types;
   struct stat sbuf;
 
   if(!dev || !dir) return -1;
@@ -3694,6 +3634,28 @@ int util_mount(char *dev, char *dir, unsigned long flags)
 
   type = util_fstype(dev, NULL);
 
+  if(type && !strcmp(type, "cpio")) {
+    char *buf = NULL;
+
+    err = mount("tmpfs", dir, "tmpfs", 0, "size=0,nr_inodes=0");
+    if(err) {
+      if(config.run_as_linuxrc) fprintf(stderr, "mount: tmpfs: %s\n", strerror(errno));
+      return err;
+    }
+
+    strprintf(&buf, "cd %s ; cpio -i --quiet < %s", dir, dev);
+    err = system(buf);
+    free(buf);
+
+    if(err) {
+      if(config.run_as_linuxrc) fprintf(stderr, "mount: cpio failed\n");
+      umount(dir);
+      return err;
+    }
+
+    return err;
+  }
+
   if(type &&
     (
       S_ISREG(sbuf.st_mode) ||
@@ -3718,11 +3680,7 @@ int util_mount(char *dev, char *dir, unsigned long flags)
   }
   else {
     fprintf(stderr, "%s: unknown fs type\n", dev);
-    while(*fs_type) {
-      err = mount(dev, dir, *fs_type, flags, 0);
-      if(!err) break;
-      fs_type++;
-    }
+    err = -1;
   }
 
   return err;

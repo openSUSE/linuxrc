@@ -1605,7 +1605,7 @@ int inst_do_tftp()
  */
 int inst_update_cd()
 {
-  int  i;
+  int i, update_rd;
   char *dev, *buf = NULL, *argv[3], *module;
   unsigned old_count;
   slist_t **names;
@@ -1644,6 +1644,17 @@ int inst_update_cd()
   }
 
   util_chk_driver_update(config.mountpoint.update, dev);
+
+  strprintf(&buf, "%s/driverupdate", config.mountpoint.update);
+  if(util_check_exist(buf) == 'r') {
+    update_rd = load_image(buf, inst_file, txt_get(TXT_LOADING_UPDATE));
+
+    if(update_rd >= 0) {
+      i = ramdisk_mount(update_rd, config.mountpoint.update);
+      if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(inst_file));
+      ramdisk_free(update_rd);
+    }
+  }
 
   util_umount(config.mountpoint.update);
 

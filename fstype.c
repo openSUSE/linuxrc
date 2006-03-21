@@ -241,6 +241,18 @@ fstype(const char *device) {
 	      type = "vfat";	/* only guessing - might as well be fat or umsdos */
     }
 
+    if(!type) {
+      char buf[7];
+
+      if(
+        lseek(fd, 0, SEEK_SET) != 0 ||
+        read(fd, buf, sizeof buf - 1) != sizeof buf - 1
+      ) goto io_error;
+
+      buf[sizeof buf - 1] = 0;
+      if(!strcmp(buf, "070701")) type = "cpio";
+    }
+
 #ifdef ALL_TYPES
     if (!type) {
 	    /* sector 1 */
