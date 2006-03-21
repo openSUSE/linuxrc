@@ -1,4 +1,4 @@
-21/3/2006.	v2.0.28
+21/3/2006:	v2.0.28
 	- 'driverupdate' files were not always allowed (#153667)
 	- accept cpio archive when loading images
 	- removed some ancient loop-mount code
