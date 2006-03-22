@@ -310,7 +310,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Beim Versuch, das NFS-Verzeichnis zu mounten, ist einFehler aufgetreten:\n"
+"Beim Versuch, das NFS-Verzeichnis zu mounten, ist ein Fehler aufgetreten:\n"
 "\n"
 "Fehlerausgabe vom Server: %s"
 

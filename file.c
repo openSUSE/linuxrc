@@ -1656,6 +1656,10 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_password, config.net.password);
   file_write_str(f, key_workdomain, config.net.workgroup);
 
+  if(config.serverpath && config.serverfile) {
+    fprintf(f, "ServerPath: %s\nServerFile: %s\n", config.serverpath, config.serverfile);
+  }
+
   file_write_modparms(f);
 
   file_write_num(f, key_manual, config.manual);

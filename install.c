@@ -644,7 +644,6 @@ int inst_mount_harddisk()
 int inst_mount_nfs()
 {
   int rc;
-  window_t win;
   char text[256];
 
   set_instmode(inst_nfs);
@@ -658,17 +657,7 @@ int inst_mount_nfs()
   }
   util_truncate_dir(config.serverdir);
 
-  sprintf(text, txt_get(TXT_TRY_NFS_MOUNT), config.net.server.name, config.serverdir);
-
-  dia_info(&win, text);
-
-  system("portmap");
-
-  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
-
-  win_close(&win);
-
-  return rc;
+  return do_mount_nfs();
 }
 
 
@@ -1118,10 +1107,19 @@ int add_instsys()
 void inst_yast_done()
 {
   int count;
+  char *buf = NULL;
 
   lxrc_set_modprobe("/etc/nothing");
 
   lxrc_killall(0);
+
+  for(count = 0; count < 8; count++) {
+    strprintf(&buf, "/dev/loop%d", count);
+    util_detach_loop(buf);
+  }
+
+  str_copy(&buf, NULL);
+
   inst_umount();
 
   util_debugwait("going to umount inst-sys");
@@ -2200,6 +2198,102 @@ void live_show_state()
   }
 
   getchar();
+}
+
+
+/*
+ * Mount nfs install source.
+ *
+ * If config.serverdir points to a file, mount one level higher and
+ * loop-mount the file.
+ */
+int do_mount_nfs()
+{
+  int rc;
+  window_t win;
+  char *buf = NULL, *serverdir = NULL, *file = NULL;
+
+  str_copy(&config.serverpath, NULL);
+  str_copy(&config.serverfile, NULL);
+
+  strprintf(&buf,
+    config.win ? txt_get(TXT_TRY_NFS_MOUNT) : "nfs: trying to mount %s:%s\n" ,
+    config.net.server.name, config.serverdir ?: ""
+  );
+
+  if(config.win) {
+    dia_info(&win, buf);
+  }
+  else {
+    fprintf(stderr, "%s", buf);
+  }
+
+  fprintf(stderr, "Starting portmap.\n");
+  system("portmap");
+
+  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
+
+  if(config.debug) fprintf(stderr, "nfs err #1 = %d\n", rc);
+
+  if(rc == ENOTDIR && config.serverdir) {
+    str_copy(&serverdir, config.serverdir);
+
+    if((file = strrchr(serverdir, '/')) && file != serverdir && file[1]) {
+      *file++ = 0;
+      mkdir(config.mountpoint.extra, 0755);
+
+      fprintf(stderr, "nfs: trying to mount %s:%s\n", config.net.server.name, serverdir);
+
+      rc = net_mount_nfs(config.mountpoint.extra, &config.net.server, serverdir);
+
+      if(config.debug) fprintf(stderr, "nfs err #2 = %d\n", rc);
+    }
+  }
+
+  if(file && !rc) {
+    config.extramount = 1;
+
+    strprintf(&buf, "%s/%s", config.mountpoint.extra, file);
+    rc = util_mount_ro(buf, config.mountpoint.instdata);
+
+    fprintf(stderr, "nfs err #3 = %d\n", rc);
+
+    if(rc) {
+      fprintf(stderr, "file not found on nfs server: %s\n", file);
+      inst_umount();
+      rc = 2;
+    }
+    else {
+      str_copy(&config.serverpath, serverdir);
+      str_copy(&config.serverfile, file);
+    }
+  }
+
+  str_copy(&serverdir, NULL);
+
+  if(config.debug) fprintf(stderr, "nfs err final = %d\n", rc);
+
+  /* rc = -1 --> error was shown in net_mount_nfs() */
+  if(rc == -2) {
+    fprintf(stderr, "network setup failed\n");
+    if(config.win) dia_message("Network setup failed", MSGTYPE_ERROR);
+  }
+  else if(rc > 0) {
+    strprintf(&buf, "nfs mount failed: %s", strerror(rc));
+
+    fprintf(stderr, "%s\n", buf);
+    if(config.win) dia_message(buf, MSGTYPE_ERROR);
+  }
+
+  if(config.win) {
+    win_close(&win);
+  }
+
+  if(!rc) fprintf(stderr, "nfs mount ok\n");
+
+  str_copy(&buf, NULL);
+
+  return rc;
 }
 
 

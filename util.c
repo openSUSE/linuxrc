@@ -94,9 +94,6 @@ static int do_cp(char *src, char *dst);
 static char *walk_hlink_list(ino_t ino, dev_t dev, char *dst);
 static void free_hlink_list(void);
 
-static char *util_attach_loop(char *file, int ro);
-static int util_detach_loop(char *dev);
-
 static void add_driver_update(char *dir, char *loc);
 static int cmp_dir_entry(slist_t *sl0, slist_t *sl1);
 static int cmp_dir_entry_s(const void *p0, const void *p1);

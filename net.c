@@ -837,7 +837,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
     char                   tmp_ti [1024];
     char                  *opts_pci;
 
-  if(net_check_address2(server, 1)) return -1;
+  if(net_check_address2(server, 1)) return -2;
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
@@ -970,6 +970,8 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
     sprintf (tmp_ti, "%s:%s", inet_ntoa(server->ip), hostdir);
     opts_pci = (char *) &mount_data_ri;
     rc_ii = mount (tmp_ti, mountpoint, "nfs", MS_RDONLY | MS_MGC_VAL, opts_pci);
+
+    if(rc_ii == -1) return errno;
 
   return rc_ii;
 }
@@ -1133,18 +1135,16 @@ static void net_show_error(enum nfs_stat status_rv)
     s = tmp2;
   }
 
-  if(config.run_as_linuxrc) {
-    sprintf(tmp, txt_get(TXT_ERROR_NFSMOUNT), s);
+  sprintf(tmp,
+    config.win ? txt_get(TXT_ERROR_NFSMOUNT) : "mount: nfs mount failed, server says: %s\n",
+    s
+  );
 
-    if(config.win) {
-      dia_message(tmp, MSGTYPE_ERROR);
-    }
-    else {
-      fprintf(stderr, "%s\n", tmp);
-    }
+  if(config.win) {
+    dia_message(tmp, MSGTYPE_ERROR);
   }
   else {
-    fprintf(stderr, "mount: nfs mount failed, reason given by server: %s\n", s);
+    fprintf(stderr, "%s\n", tmp);
   }
 }
 #endif

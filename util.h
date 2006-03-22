@@ -84,6 +84,9 @@ slist_t *slist_reverse(slist_t *sl0);
 slist_t *slist_sort(slist_t *sl0, int (*cmp_func)(const void *, const void *));
 slist_t *slist_split(char del, char *text);
 
+char *util_attach_loop(char *file, int ro);
+int util_detach_loop(char *dev);
+
 void name2inet(inet_t *inet, char *name);
 void s_addr2inet(inet_t *inet, unsigned long s_addr);
 char *inet2print(inet_t *inet);

@@ -629,17 +629,7 @@ int auto2_net_dev1(hd_t *hd)
       break;
 
     case inst_nfs:
-      fprintf(stderr, "Starting portmap.\n");
-      system("portmap");
-
-      fprintf(stderr, "OK, going to mount %s:%s ...\n", inet_ntoa(config.net.server.ip), config.serverdir ?: "");
-
-      if(net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir)) {
-        fprintf(stderr, "NFS mount failed\n");
-        return 1;
-      }
-
-      fprintf(stderr, "NFS mount ok\n");
+      if(do_mount_nfs()) return 1;
       break;
 
     case inst_ftp:

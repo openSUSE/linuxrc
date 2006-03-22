@@ -1,3 +1,5 @@
+	- reworked NFS code to allow ISO images (#159565)
+
 21/3/2006:	v2.0.28
 	- 'driverupdate' files were not always allowed (#153667)
 	- accept cpio archive when loading images
