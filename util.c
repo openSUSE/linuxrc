@@ -580,27 +580,29 @@ void util_print_net_error()
 
 int util_free_ramdisk(char *ramdisk_dev)
 {
-  int fd;
+  int fd, rd_type;
   int err = 0;
 
-  if(util_check_exist(ramdisk_dev) != 'b') return 0;
+  rd_type = util_check_exist(ramdisk_dev);
 
-  if((fd = open(ramdisk_dev, O_RDWR)) >= 0) {
-    if(ioctl(fd, BLKFLSBUF)) {
+  if(rd_type == 'b') {
+    if((fd = open(ramdisk_dev, O_RDWR)) >= 0) {
+      if(ioctl(fd, BLKFLSBUF)) {
+        err = errno;
+        perror(ramdisk_dev);
+      }
+      else {
+        fprintf(stderr, "ramdisk %s freed\n", ramdisk_dev);
+      }
+      close(fd);
+    }
+    else {
       err = errno;
       perror(ramdisk_dev);
     }
-    else {
-      fprintf(stderr, "ramdisk %s freed\n", ramdisk_dev);
-    }
-    close(fd);
-  }
-  else {
-    err = errno;
-    perror(ramdisk_dev);
   }
 
-  if(strncmp(ramdisk_dev, "/dev/", sizeof "/dev/" - 1)) {
+  if(rd_type == 'r') {
     unlink(ramdisk_dev);
     fprintf(stderr, "%s removed\n", ramdisk_dev);
   }

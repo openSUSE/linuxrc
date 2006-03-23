@@ -1,4 +1,6 @@
-	- reworked NFS code to allow ISO images (#159565)
+23/3/2006:	v2.0.29
+	- allow ISO images as install source (#159565)
+	- downloaded files were not unlinked after use
 
 21/3/2006:	v2.0.28
 	- 'driverupdate' files were not always allowed (#153667)

@@ -62,18 +62,18 @@ int auto2_mount_cdrom(char *device)
 
   if(config.cdid && strstr(config.cdid, "-DVD-")) set_instmode(inst_dvd);
 
-  rc = mount(device, config.mountpoint.instdata, "iso9660", MS_MGC_VAL | MS_RDONLY, 0);
+  rc = do_mount_disk(device, 0);
+
   if(!rc) {
     if((rc = inst_check_instsys())) {
-      fprintf(stderr, "%s is not a %s Installation CD.\n", device, config.product);
-      umount(config.mountpoint.instdata);
+      fprintf(stderr, "disk: %s: not a %s install medium.\n", device, config.product);
+      inst_umount();
     } else {
-      /* skip "/dev/" !!! */
-      str_copy(&config.cdrom, device + sizeof "/dev/" - 1);
+      str_copy(&config.cdrom, short_dev(device));
     }
   }
   else {
-    fprintf(stderr, "%s does'nt have an ISO9660 file system.\n", device);
+    fprintf(stderr, "disk: %s: no filesystem\n", device);
   }
 
   if(rc) set_instmode(inst_cdrom);
@@ -85,40 +85,20 @@ int auto2_mount_cdrom(char *device)
 int auto2_mount_harddisk(char *dev)
 {
   int rc = 0;
-  char buf[256];
-  char *module, *type;
 
   set_instmode(inst_hd);
 
-  /* load fs module if necessary */
+  if(do_mount_disk(dev, 1)) return 1;
 
-  type = util_fstype(dev, &module);
-  if(module) mod_modprobe(module, NULL);
-
-  if(!type || !strcmp(type, "swap")) rc = -1;
-
-  if(!rc) {
-    rc = util_mount_ro(dev, config.mountpoint.extra);
+  if((rc = inst_check_instsys())) {
+    fprintf(stderr, "disk: %s::%s is not an installation source\n", dev, config.serverdir);
   }
-
-  if(!rc) {
-    config.extramount = 1;
-    util_truncate_dir(config.serverdir);
-    sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
-    rc = util_check_exist(buf) ? util_mount_ro(buf, config.mountpoint.instdata) : -1;
-  }
-
-  if(!rc) {
-    if((rc = inst_check_instsys())) {
-      fprintf(stderr, "%s::%s is not an installation source\n", dev, config.serverdir);
-    }
-    else {
-      fprintf(stderr, "using %s::%s\n", dev, config.serverdir);
-    }
+  else {
+    fprintf(stderr, "disk: using %s::%s\n", dev, config.serverdir);
   }
 
   if(rc) {
-    fprintf(stderr, "nothing found on %s\n", dev);
+    fprintf(stderr, "disk: %s: no install data found\n", dev);
     inst_umount();
   }
 
@@ -382,7 +362,7 @@ int auto2_harddisk_dev(hd_t **hd0)
       strcmp(config.partition, hd->unix_dev_name + sizeof "/dev/" - 1)
     ) continue;
 
-    fprintf(stderr, "Checking partition: %s\n", hd->unix_dev_name);
+    fprintf(stderr, "disk: trying to mount: %s\n", hd->unix_dev_name);
 
     i = auto2_mount_harddisk(hd->unix_dev_name) ? config.partition ? 1 : 2 : 0;
 
@@ -422,7 +402,7 @@ int auto2_cdrom_dev(hd_t **hd0)
   }
 
   for(hd = hd_list(hd_data, hw_cdrom, 1, *hd0); hd; hd = hd->next) {
-    fprintf(stderr, "Checking CD: %s\n", hd->unix_dev_name);
+    fprintf(stderr, "disk: trying to mount %s\n", hd->unix_dev_name);
     
     cdrom_drives++;
     add_hd_entry(hd0, hd);
@@ -438,7 +418,7 @@ int auto2_cdrom_dev(hd_t **hd0)
       }
       else {
         if(ci->iso9660.ok && ci->iso9660.volume) {
-          fprintf(stderr, "Found CD in %s\n", hd->unix_dev_name);
+          fprintf(stderr, "disk: media found in %s\n", hd->unix_dev_name);
           str_copy(&config.cdid, ci->iso9660.volume);
           if(ci->iso9660.application) str_copy(&config.cdid, ci->iso9660.application);
           /* CD found -> try to mount it */
@@ -499,7 +479,6 @@ int auto2_net_dev(hd_t **hd0)
 int auto2_net_dev1(hd_t *hd)
 {
   int i /*, link */;
-  char buf[256];
   char *device, *hwaddr = NULL;
   hd_res_t *res;
 
@@ -604,28 +583,7 @@ int auto2_net_dev1(hd_t *hd)
 
   switch(config.instmode) {
     case inst_smb:
-      fprintf(stderr, "OK, going to mount //%s/%s ...\n", config.net.server.name, config.net.share);
-
-      mkdir(config.mountpoint.extra, 0755);
-
-      i = net_mount_smb(config.mountpoint.extra,
-        &config.net.server, config.net.share,
-        config.net.user, config.net.password, config.net.workgroup
-      );
-
-      if(!i) {
-        config.extramount = 1;
-        util_truncate_dir(config.serverdir);
-        sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
-        i = util_check_exist(buf) ? util_mount_ro(buf, config.mountpoint.instdata) : -1;
-      }
-      
-      if(i) {
-        fprintf(stderr, "SMB mount failed\n");
-        return 1;
-      }
-
-      fprintf(stderr, "SMB mount ok\n");
+      if(do_mount_smb()) return 1;
       break;
 
     case inst_nfs:

@@ -320,6 +320,7 @@ typedef struct {
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
   char *serverdir;		/* install base directory on server */
+  unsigned sourcetype:1;	/* 0: directory, 1: file */
   char *serverfile;		/* file below serverdir (eg. some ISO) */
   char *serverpath;		/* path to serverfile */
   instmode_t insttype;		/* install type (cdrom, network, etc. )*/

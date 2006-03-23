@@ -741,9 +741,9 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
   char tmp[1024];
   char mount_options[256];
 
-  if(!config.net.cifs.binary) return -1;
+  if(!config.net.cifs.binary) return -2;
 
-  if(net_check_address2(server, 1)) return -1;
+  if(net_check_address2(server, 1)) return -3;
 
   if(!share) share = "";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
@@ -758,18 +758,8 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
   mod_modprobe(config.net.cifs.module, NULL);
 
   fprintf(stderr, "%s\n", tmp);
-  if(system(tmp)) {
-    sprintf(tmp, "%s", "Error trying to mount SMB share.");
 
-    if(config.win) {
-      dia_message(tmp, MSGTYPE_ERROR);
-    }
-    else {
-      fprintf(stderr, "%s\n", tmp);
-    }
-
-    return -1;
-  }
+  if(system(tmp)) return -1;
 
   return 0;
 }

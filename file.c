@@ -1656,9 +1656,13 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_password, config.net.password);
   file_write_str(f, key_workdomain, config.net.workgroup);
 
+  fprintf(f, "SourceType: %s\n", config.sourcetype ? "file" : "dir");
+
+#if 0
   if(config.serverpath && config.serverfile) {
     fprintf(f, "ServerPath: %s\nServerFile: %s\n", config.serverpath, config.serverfile);
   }
+#endif
 
   file_write_modparms(f);
 

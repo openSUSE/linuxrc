@@ -462,20 +462,22 @@ int inst_choose_source_cb(dia_item_t di)
 
 int inst_try_cdrom(char *dev)
 {
-  char buf[64];
-  int rc;
+  int rc, win_old = config.win;
 
-  sprintf(buf, "/dev/%s", dev);
-  rc = util_mount_ro(buf, config.mountpoint.instdata);
+  config.win = 0;
+
+  rc = do_mount_disk(long_dev(dev), 0);
+
+  config.win = win_old;
 
   if(rc) return 1;
 
-  if((rc = inst_check_instsys())) {
+  if(inst_check_instsys()) {
     inst_umount();
     return 2;
   }
 
-  return rc;
+  return 0;
 }
 
 
@@ -599,41 +601,20 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
 int inst_mount_harddisk()
 {
   int rc = 0;
-  char buf[256];
-  char *module;
 
   set_instmode(inst_hd);
 
   if(config.net.do_setup && (rc = net_config())) return rc;
 
   do {
-    rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION));
-    if(rc) return -1;
+    if((rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION)))) return rc;
+    if((rc = dia_input2(txt_get(TXT_ENTER_HD_DIR), &config.serverdir, 30, 0))) return rc;
 
     if(config.partition) {
-      sprintf(buf, "/dev/%s", config.partition);
-      util_fstype(buf, &module);
-      if(module) mod_modprobe(module, NULL);
-      rc = util_mount_ro(buf, config.mountpoint.extra);
-      if(!rc) config.extramount = 1;
+      rc = do_mount_disk(long_dev(config.partition), 1);
     }
     else {
       rc = -1;
-    }
-
-    if(rc) {
-      dia_message (txt_get(TXT_ERROR_HD_MOUNT), MSGTYPE_ERROR);
-    }
-    else {
-      rc = dia_input2(txt_get(TXT_ENTER_HD_DIR), &config.serverdir, 30, 0);
-      util_truncate_dir(config.serverdir);
-      sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
-      if(!rc) rc = util_mount_ro(buf, config.mountpoint.instdata);
-      if(rc) {
-        fprintf(stderr, "doing umount\n");
-        inst_umount();
-        return rc;
-      }
     }
   } while(rc);
 
@@ -655,8 +636,6 @@ int inst_mount_nfs()
     if((rc = net_get_address(text, &config.net.server, 1))) return rc;
     if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
   }
-  util_truncate_dir(config.serverdir);
-
   return do_mount_nfs();
 }
 
@@ -664,7 +643,6 @@ int inst_mount_nfs()
 int inst_mount_smb()
 {
   int rc;
-  window_t win;
   char buf[256];
 
   set_instmode(inst_smb);
@@ -677,7 +655,6 @@ int inst_mount_smb()
     if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.net.share, 30, 0))) return rc;
     if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
   }
-  util_truncate_dir(config.serverdir);
 
   rc = dia_yesno(txt_get(TXT_SMB_GUEST_LOGIN), YES);
 
@@ -697,31 +674,7 @@ int inst_mount_smb()
     }
   }
 
-  sprintf(buf, txt_get(TXT_SMB_TRYING_MOUNT), config.net.server.name, config.net.share);
-
-  dia_info(&win, buf);
-
-  mkdir(config.mountpoint.extra, 0755);
-
-  rc = net_mount_smb(config.mountpoint.extra,
-    &config.net.server, config.net.share,
-    config.net.user, config.net.password, config.net.workgroup
-  );
-
-  if(!rc) config.extramount = 1;
-
-  sprintf(buf, "%s/%s", config.mountpoint.extra, config.serverdir);
-  if(!rc) rc = util_mount_ro(buf, config.mountpoint.instdata);
-
-  win_close(&win);
-
-  if(rc) {
-    fprintf(stderr, "doing umount\n");
-    inst_umount();
-    return -1;
-  }
-
-  return 0;
+  return do_mount_smb();
 }
 
 
@@ -2209,12 +2162,14 @@ void live_show_state()
  */
 int do_mount_nfs()
 {
-  int rc;
+  int rc, file_type = 0;
   window_t win;
   char *buf = NULL, *serverdir = NULL, *file = NULL;
 
   str_copy(&config.serverpath, NULL);
   str_copy(&config.serverfile, NULL);
+
+  util_truncate_dir(config.serverdir);
 
   strprintf(&buf,
     config.win ? txt_get(TXT_TRY_NFS_MOUNT) : "nfs: trying to mount %s:%s\n" ,
@@ -2233,7 +2188,7 @@ int do_mount_nfs()
 
   rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
 
-  if(config.debug) fprintf(stderr, "nfs err #1 = %d\n", rc);
+  if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", rc);
 
   if(rc == ENOTDIR && config.serverdir) {
     str_copy(&serverdir, config.serverdir);
@@ -2246,7 +2201,7 @@ int do_mount_nfs()
 
       rc = net_mount_nfs(config.mountpoint.extra, &config.net.server, serverdir);
 
-      if(config.debug) fprintf(stderr, "nfs err #2 = %d\n", rc);
+      if(config.debug) fprintf(stderr, "nfs: err #2 = %d\n", rc);
     }
   }
 
@@ -2256,14 +2211,15 @@ int do_mount_nfs()
     strprintf(&buf, "%s/%s", config.mountpoint.extra, file);
     rc = util_mount_ro(buf, config.mountpoint.instdata);
 
-    fprintf(stderr, "nfs err #3 = %d\n", rc);
+    fprintf(stderr, "nfs: err #3 = %d\n", rc);
 
     if(rc) {
-      fprintf(stderr, "file not found on nfs server: %s\n", file);
+      fprintf(stderr, "nfs: %s: not found\n", file);
       inst_umount();
       rc = 2;
     }
     else {
+      file_type = 1;
       str_copy(&config.serverpath, serverdir);
       str_copy(&config.serverfile, file);
     }
@@ -2271,7 +2227,7 @@ int do_mount_nfs()
 
   str_copy(&serverdir, NULL);
 
-  if(config.debug) fprintf(stderr, "nfs err final = %d\n", rc);
+  if(config.debug) fprintf(stderr, "nfs: err #4 = %d\n", rc);
 
   /* rc = -1 --> error was shown in net_mount_nfs() */
   if(rc == -2) {
@@ -2279,7 +2235,7 @@ int do_mount_nfs()
     if(config.win) dia_message("Network setup failed", MSGTYPE_ERROR);
   }
   else if(rc > 0) {
-    strprintf(&buf, "nfs mount failed: %s", strerror(rc));
+    strprintf(&buf, "nfs: mount failed: %s", strerror(rc));
 
     fprintf(stderr, "%s\n", buf);
     if(config.win) dia_message(buf, MSGTYPE_ERROR);
@@ -2289,7 +2245,151 @@ int do_mount_nfs()
     win_close(&win);
   }
 
-  if(!rc) fprintf(stderr, "nfs mount ok\n");
+  if(!rc) {
+    fprintf(stderr, "nfs: mount ok\n");
+    config.sourcetype = file_type;
+  }
+
+  str_copy(&buf, NULL);
+
+  return rc;
+}
+
+
+/*
+ * Mount smb install source.
+ *
+ * If config.serverdir points to a file, loop-mount the file.
+ */
+int do_mount_smb()
+{
+  int rc, file_type = 0;
+  window_t win;
+  char *buf = NULL;
+
+  util_truncate_dir(config.serverdir);
+
+  strprintf(&buf,
+    config.win ? txt_get(TXT_SMB_TRYING_MOUNT) : "smb: trying to mount //%s/%s\n" ,
+    config.net.server.name, config.net.share
+  );
+
+  if(config.win) {
+    dia_info(&win, buf);
+  }
+  else {
+    fprintf(stderr, "%s", buf);
+  }
+
+  mkdir(config.mountpoint.extra, 0755);
+
+  rc = net_mount_smb(config.mountpoint.extra,
+    &config.net.server, config.net.share,
+    config.net.user, config.net.password, config.net.workgroup
+  );
+
+  if(!rc) {
+    config.extramount = 1;
+    strprintf(&buf, "%s/%s", config.mountpoint.extra, config.serverdir);
+    if((file_type = util_check_exist(buf))) {
+      rc = util_mount_ro(buf, config.mountpoint.instdata);
+    }
+    else {
+      fprintf(stderr, "smb: %s: not found\n", config.serverdir);
+      rc = -1;
+    }
+  }
+
+  switch(rc) {
+    case 0:
+      break;
+
+    case -3:
+      fprintf(stderr, "smb: network setup failed\n");
+      if(config.win) dia_message("Network setup failed", MSGTYPE_ERROR);
+      break;
+
+    case -2:
+      fprintf(stderr, "smb: smb/cifs not supported\n");
+      if(config.win) dia_message("SMB/CIFS not supported", MSGTYPE_ERROR);
+      break;
+
+    default:	/* -1 */
+      fprintf(stderr, "smb: mount failed\n");
+      if(config.win) dia_message("SMB/CIFS mount failed", MSGTYPE_ERROR);
+  }
+
+  if(config.win) win_close(&win);
+
+  if(rc) {
+    inst_umount();
+  }
+  else {
+    fprintf(stderr, "smb: mount ok\n");
+  }
+
+  if(!rc) config.sourcetype = file_type == 'r' ? 1 : 0;
+
+  str_copy(&buf, NULL);
+
+  return rc;
+}
+
+
+/*
+ * Mount disk install source.
+ *
+ * If config.serverdir points to a file, loop-mount file.
+ *
+ * disk_type: 0 = cd, 1 = hd (only used for error message)
+ */
+int do_mount_disk(char *dev, int disk_type)
+{
+  int rc = 0, file_type = 0;
+  char *buf = NULL, *module, *type;
+  char *dir;
+
+  util_truncate_dir(config.serverdir);
+
+  dir = config.serverdir;
+  if(!dir || !*dir || !strcmp(dir, "/")) dir = NULL;
+
+  /* load fs module if necessary */
+  type = util_fstype(dev, &module);
+  if(module) mod_modprobe(module, NULL);
+
+  if(!type || !strcmp(type, "swap")) rc = -1;
+
+  mkdir(config.mountpoint.extra, 0755);
+
+  if(!rc) {
+    rc = util_mount_ro(dev, dir ? config.mountpoint.extra : config.mountpoint.instdata);
+  }
+
+  if(rc) {
+    fprintf(stderr, "disk: %s: mount failed\n", dev);
+    if(config.win) dia_message(txt_get(disk_type ? TXT_ERROR_HD_MOUNT : TXT_ERROR_CD_MOUNT), MSGTYPE_ERROR);
+  }
+  else {
+    if(dir) {
+      config.extramount = 1;
+      strprintf(&buf, "%s/%s", config.mountpoint.extra, dir);
+      file_type = util_check_exist(buf);
+      rc = file_type ? util_mount_ro(buf, config.mountpoint.instdata) : -1;
+
+      if(rc) {
+        fprintf(stderr, "disk: %s: not found\n", dir);
+        if(config.win) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+        inst_umount();
+      }
+    }
+
+    if(!rc) {
+      fprintf(stderr, "disk: %s: mount ok\n", dev);
+    }
+  }
+
+  if(!rc) config.sourcetype = file_type == 'r' ? 1 : 0;
 
   str_copy(&buf, NULL);
 

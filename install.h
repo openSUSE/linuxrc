@@ -15,4 +15,6 @@ int inst_umount (void);
 int inst_update_cd(void);
 
 int do_mount_nfs(void);
+int do_mount_smb(void);
+int do_mount_disk(char *dev, int disk_type);
 
