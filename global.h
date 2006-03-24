@@ -31,6 +31,7 @@
 
 #define SP_FILE "servicepack.tar.gz"
 #define TEXTS_FILE "nextmedia"
+#define INSTALL_FILE_LIST "installfiles"
 
 #ifndef TRUE
 #define TRUE			1
@@ -289,6 +290,7 @@ typedef struct {
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
   unsigned zombies:1;		/* keep zombies around */
+  unsigned installfilesread:1;	/* already got install files */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */

@@ -84,6 +84,7 @@ static void get_file(char *src, char *dst);
 static void eval_find_config(void);
 static int eval_configure(void);
 static void live_show_state(void);
+static void read_install_files(void);
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
@@ -682,6 +683,8 @@ int inst_check_instsys()
 {
   char filename[MAX_FILENAME];
 
+  config.installfilesread = 0;
+
   switch(config.instmode) {
     case inst_floppy:
       config.use_ramdisk = 1;
@@ -697,11 +700,17 @@ int inst_check_instsys()
       config.use_ramdisk = 0;
       config.instdata_mounted = 1;
 
-      if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
-      if(!util_check_exist("/" TEXTS_FILE)) {
-        get_file("/media.1/" TEXTS_FILE, "/" TEXTS_FILE);
+      read_install_files();
+
+      if(!config.installfilesread) {
+        if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
+        if(!util_check_exist("/" TEXTS_FILE)) get_file("/media.1/" TEXTS_FILE, "/" TEXTS_FILE);
+      }
+
+      if(util_check_exist("/" TEXTS_FILE)) {
         config.cd1texts = file_parse_xmllike("/" TEXTS_FILE, "text");
       }
+
       util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
       util_do_driver_updates();
 
@@ -846,11 +855,17 @@ int inst_start_install()
   /* load some extra files, if they exist */
 
   if(!config.zen) {
-    get_file("/content", "/content");
-    get_file("/media.1/info.txt", "/info.txt");
-    get_file("/media.1/license.zip", "/license.zip");
-    get_file("/part.info", "/part.info");
-    get_file("/control.xml", "/control.xml");
+    /* inly if we did not already read them in inst_check_instsys() */
+    if(!config.installfilesread) {
+      read_install_files();
+      if(!config.installfilesread) {
+        get_file("/content", "/content");
+        get_file("/media.1/info.txt", "/info.txt");
+        get_file("/media.1/license.zip", "/license.zip");
+        get_file("/part.info", "/part.info");
+        get_file("/control.xml", "/control.xml");
+      }
+    }
   }
   else if(
     config.zenconfig &&
@@ -1898,14 +1913,14 @@ void get_file(char *src, char *dst)
     config.instmode == inst_nfs ||
     config.instmode == inst_smb
   ) {
-    /* copy content file */
+    /* simply copy file */
     sprintf(fname, "%s%s", config.mountpoint.instdata, src);
     if(util_check_exist(fname)) {
       char *argv[3];
 
       unlink(dst);
       argv[1] = fname;
-      argv[2] = "/";
+      argv[2] = dst;
       util_cp_main(3, argv);
     }
   }
@@ -2396,4 +2411,38 @@ int do_mount_disk(char *dev, int disk_type)
   return rc;
 }
 
+
+void read_install_files()
+{
+  file_t *f0, *f;
+  char *dst = NULL, *dst_dir, *s, *t;
+
+  unlink("/" INSTALL_FILE_LIST);
+  get_file("/media.1/" INSTALL_FILE_LIST, "/" INSTALL_FILE_LIST);
+
+  if(!(f0 = file_read_file("/" INSTALL_FILE_LIST, kf_none))) return;
+
+  config.installfilesread = 1;
+
+  for(f = f0; f; f = f->next) {
+    dst_dir = f->value;
+    if(*dst_dir == '/') dst_dir++;
+    s = strrchr(f->key_str, '/');
+    s = s ? s + 1 : f->key_str;
+    strprintf(&dst, "/%s/%s", dst_dir, s);
+
+    for(s = dst_dir; (t = strchr(s, '/')); s = t + 1) {
+      *t = 0;
+      if(*dst_dir) mkdir(dst_dir, 0755);
+      *t = '/';
+    }
+    mkdir(dst_dir, 0755);
+    unlink(dst);
+    get_file(f->key_str, dst);
+  }
+
+  file_free_file(f0);
+
+  str_copy(&dst, NULL);
+}
 

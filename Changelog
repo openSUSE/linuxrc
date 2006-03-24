@@ -1,3 +1,6 @@
+24/3/2006:	v2.0.30
+	- introduce media.1/installfiles (to handle SPs)
+
 23/3/2006:	v2.0.29
 	- allow ISO images as install source (#159565)
 	- downloaded files were not unlinked after use

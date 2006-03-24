@@ -3587,12 +3587,12 @@ int util_detach_loop(char *dev)
   int i, fd;
 
   if((fd = open(dev, O_RDONLY)) < 0) {
-    perror(dev);
+    if(config.debug) perror(dev);
     return -1;
   }
 
   if((i = ioctl(fd, LOOP_CLR_FD, 0)) == -1) {
-    perror(dev);
+    if(config.debug) perror(dev);
   }
 
   close(fd);
