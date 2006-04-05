@@ -681,7 +681,8 @@ int inst_mount_smb()
 
 int inst_check_instsys()
 {
-  char filename[MAX_FILENAME];
+  char *buf = NULL;
+  int update_rd, i;
 
   config.installfilesread = 0;
 
@@ -712,35 +713,36 @@ int inst_check_instsys()
       }
 
       util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
+
+      strprintf(&buf, "%s/driverupdate", config.mountpoint.instdata);
+      if(util_check_exist(buf) == 'r') {
+        update_rd = load_image(buf, inst_file, txt_get(TXT_LOADING_UPDATE));
+
+        if(update_rd >= 0) {
+          i = ramdisk_mount(update_rd, config.mountpoint.update);
+          if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(inst_file));
+          ramdisk_free(update_rd);
+        }
+      }
+
       util_do_driver_updates();
 
-      sprintf(filename, "%s%s", config.mountpoint.instdata, config.installdir);
-      if(config.rescue || !util_is_dir(filename)) {
-        sprintf(filename, "%s%s",
+      strprintf(&buf, "%s%s", config.mountpoint.instdata, config.installdir);
+      if(config.rescue || !util_is_dir(buf)) {
+        strprintf(&buf, "%s%s",
           config.mountpoint.instdata,
           config.demo ? config.live.image : config.rescue ? config.rescueimage : config.rootimage
         );
       }
 
-#if 0
-      deb_int(config.rescue);
-      deb_int(force_ri_ig);
-      deb_int(util_is_mountable(filename));
-      deb_int(util_is_dir(filename));
-#endif
-
       if(
-        (config.rescue || force_ri_ig || !util_is_mountable(filename)) &&
-        !util_is_dir(filename)
+        (config.rescue || force_ri_ig || !util_is_mountable(buf)) &&
+        !util_is_dir(buf)
       ) {
         config.use_ramdisk = 1;
       }
-      strcpy(inst_rootimage_tm, filename);
+      strcpy(inst_rootimage_tm, buf);
       
-      // TODO: handle demo image!
-
-      // deb_int(config.use_ramdisk);
-
       break;
 
     case inst_ftp:
@@ -758,6 +760,8 @@ int inst_check_instsys()
     default:
       break;
   }
+
+  free(buf);
 
   if(
     config.instmode != inst_ftp &&

@@ -1,3 +1,6 @@
+5/4/2006:	v2.0.31
+	- fixed driverupdate loading
+
 24/3/2006:	v2.0.30
 	- introduce media.1/installfiles (to handle SPs)
 
