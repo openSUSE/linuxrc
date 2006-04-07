@@ -1,19 +1,18 @@
-# translation of fi.po to suomi
-# translation of linuxrc.po to suomi
+# translation of fi.po to
 # LANGUAGE translations for linuxrc.
 # Copyright (C) 2005 SUSE Linux Products GmbH
-# Jyri Palokangas <jmp@netti.fi>, 2005.
 #
+# Jyri Palokangas <jmp@netti.fi>, 2005, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2005-09-18 10:54+0300\n"
+"Project-Id-Version: fi\n"
+"PO-Revision-Date: 2006-03-20 10:05+0200\n"
 "Last-Translator: Jyri Palokangas <jmp@netti.fi>\n"
-"Language-Team: suomi <fi@li.org>\n"
+"Language-Team:  <yast-trans-fi@kotoistaminen.novell.fi>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.2\n"
+"X-Generator: KBabel 1.11.2\n"
 
 #. TXT_OK
 msgid "OK"
@@ -104,7 +103,7 @@ msgid ""
 "to switch back to this menu."
 msgstr ""
 "Yritetään ottaa käyttöön moduulia \"%s\"...\n\n"
-"Käyttöönoton aikana voit ehkä haluta seurata ytimen viestejä virtuaalikonsolissa 4 (ALT-F4). Käytä ALT-F1 "
+"Käyttöönoton aikana voit seurata ytimen viestejä virtuaalikonsolissa 4 (ALT-F4). Käytä ALT-F1 "
 "palataksesi takaisin tähän valikkoon."
 
 #. TXT_LOAD_SUCCESSFUL
@@ -131,7 +130,7 @@ msgstr "Kiintolevy"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr "Käynnistä asennus tai järjestelmä"
+msgstr "Käynnistä asennus tai päivitys"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
@@ -226,7 +225,9 @@ msgstr "Anna IP-osoitteesi."
 msgid ""
 "Enter your netmask. For a normal class C "
 "network, this is usually 255.255.255.0."
-msgstr "Anna verkonpeite. Normaalissa C-luokan verkossa se on yleensä 255.255.255.0."
+msgstr ""
+"Anna verkonpeite. Normaalissa C-luokan verkossa "
+"se on yleensä 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
 msgid ""
@@ -241,7 +242,9 @@ msgstr ""
 msgid ""
 "Enter the IP address of your name server. If "
 "you do not use a name server, press ESC."
-msgstr "Anna nimipalvelimesi IP-osoite. Jos et käytä nimipalvelinta, paina ESC."
+msgstr ""
+"Anna nimipalvelimesi IP-osoite. Jos "
+"et käytä nimipalvelinta, paina ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -311,7 +314,7 @@ msgstr "Moduuleja ei ole tällä hetkellä käytössä."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Automaattitunnistus (%s)...      "
+msgstr "Automaattinen tunnistus (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid ""
@@ -363,7 +366,9 @@ msgstr "Anna PLIP-kumppanin IP-osoite."
 msgid ""
 "The PCMCIA chipset could not be detected"
 "automatically. Specify it manually."
-msgstr "PCMCIA-piirisarjaa ei voitu tunnistaa automaattisesti. Määritä se käsin."
+msgstr ""
+"PCMCIA-piirisarjaa ei voitu tunnistaa "
+"automaattisesti. Määritä se käsin."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -753,7 +758,7 @@ msgstr "Valitse verkkoyhteyskäytäntö."
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Anna  %s-palvelimen IP-osoite."
+msgstr "Anna %s-palvelimen IP-osoite."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -888,7 +893,7 @@ msgid ""
 msgstr ""
 "Perusjärjestelmä asennettiin onnistuneesti. Tietokoneesi täytyy uudelleen käynnistää. "
 "Poista kaikki asennusmediat (CD-ROM, levyke).\n"
-"Älä poista levykettä, jos käynnistyslataaja on asennettu sille."
+"Älä poista levykettä, jos käynnistyslatain on asennettu sille."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
