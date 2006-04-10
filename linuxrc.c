@@ -958,7 +958,7 @@ void lxrc_init()
     {
       if(strcmp(ipl_type,"fcp")==0)
       {
-        mod_insmod("zfcp","");
+        mod_modprobe("zfcp","");
         if(util_read_and_chop("/sys/firmware/ipl/device",device))
         {
           sprintf(cmd,"/sbin/zfcp_host_configure %s",device);

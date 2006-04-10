@@ -1,3 +1,7 @@
+10/4/2006:	v2.0.33
+	- s390: use mod_modprobe() instead of mod_insmod() to load zfcp
+	  module (bug #162954)
+
 7/4/2006:	v2.0.32
 	- translations updated
 
