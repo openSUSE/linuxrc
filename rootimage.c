@@ -343,7 +343,10 @@ int load_image(char *file_name, instmode_t mode, char *label)
       }
       else {
         cramfssb = (struct cramfs_super_block *) config.cache.buf;
-        if(cramfsmagic((*cramfssb)) == CRAMFS_SUPER_MAGIC) {
+        if(
+          cramfsmagic((*cramfssb)) == CRAMFS_SUPER_MAGIC ||
+          cramfsmagic((*cramfssb)) == CRAMFS_SUPER_MAGIC_BIG
+        ) {
           /* cramfs */
           memcpy(cramfs_name, config.cache.buf + 0x30, sizeof cramfs_name - 1);
           cramfs_name[sizeof cramfs_name - 1] = 0;
