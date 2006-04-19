@@ -136,11 +136,14 @@ void kbd_init (int first)
 
     tcsetattr (config.kbd_fd, TCSAFLUSH, &kbd_tio_rm);
 
-    write(config.kbd_fd, "\033[?1l", sizeof "\033[?1l" - 1);
-    fsync(config.kbd_fd);
+    if (config.utf8)
+    {
+      write(config.kbd_fd, "\033[?1l", sizeof "\033[?1l" - 1);
+      fsync(config.kbd_fd);
 
-    write(config.kbd_fd, "\033%G", sizeof "\033%G" - 1);
-    fsync(config.kbd_fd);
+      write(config.kbd_fd, "\033%G", sizeof "\033%G" - 1);
+      fsync(config.kbd_fd);
+    }
 
     if(first && config.serial) {
       get_screen_size(config.kbd_fd);
