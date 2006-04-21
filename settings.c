@@ -749,8 +749,10 @@ void set_font(language_t *lang)
       sprintf(dev, "/dev/tty%d", i);
       err |= rename(dev, "/dev/tty");
       system(cmd);
-      f = fopen("/dev/tty", "w");
-      if(f && config.utf8) { fprintf(f, "\033%%G"); fclose(f); }
+      if(config.utf8) {
+        f = fopen("/dev/tty", "w");
+        fprintf(f, "\033%%G"); fclose(f);
+      }
       err |= rename("/dev/tty", dev);
     }
     err |= rename("/dev/tty.bak", "/dev/tty");
