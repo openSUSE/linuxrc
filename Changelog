@@ -1,4 +1,5 @@
-	- don't do any %G stuff if not utf8
+21/4/2006:	v2.0.35
+	- don't do any %G stuff if not utf8 (#165564)
 
 12/4/2006:	v2.0.34
 	- fixed cramfs handling on big-endian machines (#164659)
