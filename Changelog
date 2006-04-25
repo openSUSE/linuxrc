@@ -1,3 +1,6 @@
+25/4/2006:	v2.0.36
+	- s390: fixed zfcp_disk_configure parameters (bug #162954)
+
 21/4/2006:	v2.0.35
 	- don't do any %G stuff if not utf8 (#165564)
 

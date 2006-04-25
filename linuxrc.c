@@ -968,7 +968,7 @@ void lxrc_init()
           {
             if(util_read_and_chop("/sys/firmware/ipl/lun",lun))
             {
-              sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s",device,wwpn,lun);
+              sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s 1",device,wwpn,lun);
               fprintf(stderr,"executing %s\n",cmd);
               if(!config.test) system(cmd);
             }
