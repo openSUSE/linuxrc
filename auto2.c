@@ -184,7 +184,13 @@ void auto2_scan_hardware(char *log_file)
     if(config.usbwait > 0) sleep(config.usbwait);
 
     if(with_usb) {
+      int max_wait = 30;
+
       mod_modprobe("usb-storage", NULL);
+      do {
+        sleep(1);
+      } while(max_wait-- && util_process_running("usb-stor-scan"));
+
       if(config.usbwait > 0) sleep(config.usbwait);
       hd_free_hd_list(hd_list(hd_data, hw_usb, 1, NULL));
     }

@@ -152,4 +152,5 @@ char* util_chop_lf(char* str);
 int util_read_and_chop(char* path, char* dst);
 
 char *get_translation(slist_t *trans, char *locale);
+int util_process_running(char *name);
 

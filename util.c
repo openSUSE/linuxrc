@@ -4710,3 +4710,24 @@ char *get_translation(slist_t *trans, char *locale)
 }
 
 
+int util_process_running(char *name)
+{
+  pid_t pid;
+  struct dirent *de;
+  DIR *d;
+  char *s;
+
+  if(!name) return 0;
+
+  if(!(d = opendir("/proc"))) return 0;
+
+  while((de = readdir(d))) {
+    pid = strtoul(de->d_name, &s, 10);
+    if(!*s && !strcmp(util_process_name(pid), name)) break;
+  }
+
+  closedir(d);
+
+  return de ? 1 : 0;
+}
+

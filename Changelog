@@ -1,3 +1,6 @@
+27/4/2006:	v2.0.37
+	- wait for usb-stor-scan to finish (#168983)
+
 25/4/2006:	v2.0.36
 	- s390: fixed zfcp_disk_configure parameters (bug #162954)
 
