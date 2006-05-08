@@ -261,7 +261,8 @@ static struct {
   { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
-  { key_zombies,        "Zombies",        kf_cfg + kf_cmd                }
+  { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
+  { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1399,6 +1400,10 @@ void file_do_info(file_t *f0)
 
       case key_zombies:
         if(f->is.numeric) config.zombies = f->nvalue;
+        break;
+
+      case key_dhcpcd:
+        if(*f->value) str_copy(&config.net.dhcpcd, f->value);
         break;
 
       default:

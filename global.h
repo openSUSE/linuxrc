@@ -505,6 +505,7 @@ typedef struct {
       char *binary;		/* cifs/smb mount binary */
       char *module;		/* cifs/smb kernel module */
     } cifs;
+    char *dhcpcd;		/* dhcpcd parameters (if any) */
   } net;
 
   struct {

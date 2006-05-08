@@ -1485,7 +1485,12 @@ int net_dhcp()
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-  strcpy(cmd, "dhcpcd -B");
+  strcpy(cmd, "dhcpcd");
+
+  if(config.net.dhcpcd) {
+    sprintf(cmd + strlen(cmd), " %s", config.net.dhcpcd);
+  }
+
   if(config.net.dhcp_timeout != 60) {
     sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
   }
