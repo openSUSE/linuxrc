@@ -55,7 +55,8 @@ typedef enum {
   kf_yast = 1 << 3,		/* /etc/yast.inf */
   kf_dhcp = 1 << 4,		/* dhcp info file */
   kf_mem = 1 << 5,		/* /proc/meminfo */
-  kf_boot = 1 << 6		/* things the boot loader used */
+  kf_boot = 1 << 6,		/* things the boot loader used */
+  kf_cmd1 = 1 << 7		/* between cmd_early and start of hw detection */
 } file_key_flag_t;
 
 typedef struct file_s {

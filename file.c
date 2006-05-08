@@ -79,7 +79,7 @@ static struct {
   { key_language,       "Language",       kf_cfg + kf_cmd + kf_yast      },
   { key_language,       "lang",           kf_cfg + kf_cmd                },
   { key_rebootmsg,      "RebootMsg",      kf_yast                        },
-  { key_insmod,         "Insmod",         kf_cfg + kf_cmd                },
+  { key_insmod,         "Insmod",         kf_cfg + kf_cmd1               },
   { key_display,        "Display",        kf_cfg + kf_cmd                },
   { key_ip,             "IP",             kf_none                        },
   { key_netmask,        "Netmask",        kf_cfg + kf_cmd + kf_dhcp      },

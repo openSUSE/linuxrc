@@ -940,6 +940,8 @@ void lxrc_init()
     config.shell_started = 1;
   }
 
+  file_read_info_file("cmdline", kf_cmd1);
+
   if(config.had_segv) config.manual = 1;
 
   /* get usb keyboard working */

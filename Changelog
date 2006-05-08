@@ -1,3 +1,7 @@
+8/5/2006:	v2.0.38
+	- evaluate 'insmod' option earlier, so modules are loaded before
+	  hardware detection starts (#164213)
+
 27/4/2006:	v2.0.37
 	- wait for usb-stor-scan to finish (#168983)
 
