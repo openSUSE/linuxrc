@@ -1,3 +1,6 @@
+9/5/2006:	v2.0.40
+	- fix zfcp_host_configure call (bug #whatever)
+
 8/5/2006:	v2.0.39
 	- don't use broadcast flag for dhcp; make dhcpcd options
 	  configurable (#166222)

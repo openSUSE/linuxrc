@@ -963,7 +963,7 @@ void lxrc_init()
         mod_modprobe("zfcp","");
         if(util_read_and_chop("/sys/firmware/ipl/device",device))
         {
-          sprintf(cmd,"/sbin/zfcp_host_configure %s",device);
+          sprintf(cmd,"/sbin/zfcp_host_configure %s 1",device);
           fprintf(stderr,"executing %s\n",cmd);
           if(!config.test) system(cmd);
           if(util_read_and_chop("/sys/firmware/ipl/wwpn",wwpn))
