@@ -1,3 +1,7 @@
+11/5/2006:	v2.0.41
+	- allow block devs without partition table as harddisk install
+	  source (#158529)
+
 9/5/2006:	v2.0.40
 	- fix zfcp_host_configure call (bug #whatever)
 

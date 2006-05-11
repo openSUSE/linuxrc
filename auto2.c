@@ -342,12 +342,12 @@ hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd)
 
 
 /*
- * Look for a SuSE HD and mount it.
+ * Look for a block device with install source and mount it.
  *
  * Returns:
- *    0: OK, HD was mounted
- *    1: no HD found
- *   >1: HD found, but contiune the search
+ *    0: ok, device was mounted
+ *    1: no device found
+ *   >1: device found, but continue search
  *
  */
 int auto2_harddisk_dev(hd_t **hd0)
@@ -355,17 +355,19 @@ int auto2_harddisk_dev(hd_t **hd0)
   int i = 1;
   hd_t *hd;
 
-  for(hd = hd_list(hd_data, hw_partition, 1, *hd0); hd; hd = hd->next) {
+  for(hd = hd_list(hd_data, hw_block, 1, *hd0); hd; hd = hd->next) {
     add_hd_entry(hd0, hd);
 
     if(
-      !hd->unix_dev_name ||
-      strncmp(hd->unix_dev_name, "/dev/", sizeof "/dev/" - 1)
+      hd_is_hw_class(hd, hw_floppy) ||		/* no floppies */
+      hd_is_hw_class(hd, hw_cdrom) ||		/* no cd-roms */
+      hd->child_ids ||				/* no block devs with partitions */
+      !hd->unix_dev_name
     ) continue;
 
     if(
       config.partition &&
-      strcmp(config.partition, hd->unix_dev_name + sizeof "/dev/" - 1)
+      strcmp(config.partition, short_dev(hd->unix_dev_name))
     ) continue;
 
     fprintf(stderr, "disk: trying to mount: %s\n", hd->unix_dev_name);
@@ -373,7 +375,7 @@ int auto2_harddisk_dev(hd_t **hd0)
     i = auto2_mount_harddisk(hd->unix_dev_name) ? config.partition ? 1 : 2 : 0;
 
     if(i == 0) {
-      str_copy(&config.partition, hd->unix_dev_name + sizeof "/dev/" - 1);
+      str_copy(&config.partition, short_dev(hd->unix_dev_name));
     }
 
     if(i == 0) break;
