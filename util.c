@@ -381,7 +381,7 @@ void util_update_kernellog (void)
     FILE  *outfile_pri;
     FILE  *lastfile_pri;
     FILE  *bootmsg_pri;
-    char   buffer_ti [16384];
+    char   buffer_ti [1 << 19];
     char   line_ti [MAX_X - 30];
     int    i_ii = 1;
     int    pos_ii;
