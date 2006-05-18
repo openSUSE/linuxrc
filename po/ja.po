@@ -1218,3 +1218,7 @@ msgstr ""
 msgid "Loading Rescue System"
 msgstr ""
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

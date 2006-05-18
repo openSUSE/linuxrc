@@ -1172,3 +1172,7 @@ msgstr "Laster driveroppgradering"
 msgid "Loading Rescue System"
 msgstr "Laster redningssystem"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

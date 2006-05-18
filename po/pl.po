@@ -1174,3 +1174,7 @@ msgstr "Wczytywanie aktualizacji sterowników"
 msgid "Loading Rescue System"
 msgstr "Wczytywanie systemu awaryjnego"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

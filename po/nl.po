@@ -1212,3 +1212,7 @@ msgstr "Stuurprogramma-update laden"
 msgid "Loading Rescue System"
 msgstr "Reddingssysteem laden"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

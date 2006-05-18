@@ -1833,6 +1833,20 @@ static int net_s390_qdio_portname(char *portname)
     return rc;
 }
 
+/* enable layer2 support */
+static int net_s390_enable_layer2(int enable)
+{
+    char devpath[256];
+    char value[10];
+    
+    fprintf(stderr, "setting layer2 support to %d\n",enable);
+
+    sprintf(devpath,"/sys/bus/ccwgroup/devices/%s/layer2",
+            config.hwp.readchan);
+    sprintf(value,"%d",enable);
+    return util_set_sysfs_attr(devpath,value);
+}
+
 /* put device online */
 static int net_s390_put_online(char* channel)
 {
@@ -2013,9 +2027,19 @@ int net_activate_s390_devs(void)
 	  }
       }
       
+      if(config.hwp.medium == di_osa_eth)
+      {
+        IFNOTAUTO(config.hwp.layer2)
+        {
+          config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
+        }
+      }
+      
       if((rc=net_s390_group_chans(3,"qeth"))) return rc;
 
       if((rc=net_s390_qdio_portname(config.hwp.portname))) return rc;
+      
+      if(config.hwp.layer2 == 2) if((rc=net_s390_enable_layer2(1))) return rc;
 
       if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
       
@@ -2077,6 +2101,7 @@ int net_activate_s390_devs(void)
   if(config.hwp.ccw_chan_num) fprintf(fp,"CCW_CHAN_NUM=\"%d\"\n",config.hwp.ccw_chan_num);
   if(config.hwp.protocol) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",config.hwp.protocol-1);
   HWE(portname,CCW_CHAN_MODE)
+  if(config.hwp.layer2) fprintf(fp,"QETH_LAYER2_SUPPORT=\"%d\"\n",config.hwp.layer2 - 1);
 # undef HWE
   fclose(fp);
   

@@ -1394,3 +1394,7 @@ msgstr "Chargement de la mise à jour des pilotes"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Chargement du système de secours"
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

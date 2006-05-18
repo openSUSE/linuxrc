@@ -1177,3 +1177,7 @@ msgstr "Ladataan ohjainpäivitys"
 msgid "Loading Rescue System"
 msgstr "Ladataan korjausjärjestelmä"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

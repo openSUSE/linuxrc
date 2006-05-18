@@ -1158,3 +1158,7 @@ msgstr "A carregar Actualização do Driver"
 msgid "Loading Rescue System"
 msgstr "A carregar Sistema de Recuperação"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

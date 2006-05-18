@@ -535,6 +535,7 @@ typedef struct {
     int type;
     int interface;
     int medium;
+    int layer2;
   } hwp;
   
 #endif

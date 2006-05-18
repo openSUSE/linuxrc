@@ -1166,3 +1166,7 @@ msgstr "Завантаження оновлення драйверів"
 msgid "Loading Rescue System"
 msgstr "Завантаження системи порятунку"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

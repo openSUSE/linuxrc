@@ -1200,3 +1200,7 @@ msgstr "Zavádí se update ovladače"
 msgid "Loading Rescue System"
 msgstr "Zavádí se záchranný systém"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+

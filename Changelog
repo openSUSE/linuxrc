@@ -1,3 +1,5 @@
+	- s390: add layer2 option for qdio/eth interfaces
+
 11/5/2006:	v2.0.41
 	- allow block devs without partition table as harddisk install
 	  source (#158529)

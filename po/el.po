@@ -1201,3 +1201,7 @@ msgstr "Φόρτωση Ενημέρωση Οδηγού"
 msgid "Loading Rescue System"
 msgstr "Φόρτωση Συστήματος Διάσωσης"
 
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr ""
+
