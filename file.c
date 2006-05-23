@@ -242,6 +242,7 @@ static struct {
   { key_ctcprotocol,	"CTCProtocol",	  kf_cfg + kf_cmd		 },
   { key_osamedium,	"OSAMedium",	  kf_cfg + kf_cmd		 },
   { key_osainterface,	"OSAInterface",	  kf_cfg + kf_cmd		 },
+  { key_layer2,		"Layer2",	  kf_cfg + kf_cmd		 },
 #endif
   { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
   { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
@@ -1271,6 +1272,9 @@ void file_do_info(file_t *f0)
         break;
       case key_osainterface:
         if(*f->value) config.hwp.interface=file_sym2num(f->value);
+        break;
+      case key_layer2:
+        if(f->is.numeric) config.hwp.layer2 = f->nvalue + 1;
         break;
 #endif      
 

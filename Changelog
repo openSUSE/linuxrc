@@ -1,4 +1,7 @@
+	- s390: add layer2 parameter to set layer2 option (bug #168492)
+
 *** there is a 10.1 branch ***
+*** demzweng muss des trotzdem in stable ***
 
 
 18/5/2006:	v2.0.42
