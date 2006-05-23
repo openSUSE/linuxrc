@@ -45,7 +45,7 @@ typedef enum {
   key_instsys_id, key_initrd_id, key_instsys_complain, key_nfstcp,
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
   key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies,
-  key_dhcpcd
+  key_dhcpcd, key_layer2,
 } file_key_t;
 
 typedef enum {
