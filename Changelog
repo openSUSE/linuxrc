@@ -1,4 +1,6 @@
 	- s390: add layer2 parameter to set layer2 option (bug #168492)
+	- s390: don't show layer2 dialog if network IF is hsi (not
+          supported)
 
 *** there is a 10.1 branch ***
 *** demzweng muss des trotzdem in stable ***
