@@ -339,29 +339,51 @@ char *file_key2str(file_key_t key)
   return "";
 }
 
-
-/* !!! str is overwritten !!! */
-file_key_t file_str2key(char *str, file_key_flag_t flags)
+/* compare strings, ignoring '-' and '_' characters in strings not starting
+   with '_' */
+static int strcasecmpignorestrich(const char* s1, const char* s2)
 {
+  char* str1 = strdup(s1);
+  char* str2 = strdup(s2);
+  char* s;
   int i;
-  char *s;
-
-  if(!str || !*str || flags == kf_none) return key_none;
-
+  
   /* remove all '-' and '_' */
-  if(*str != '_') {
-    for(i = 0, s = str; str[i]; i++) {
-      if(str[i] != '_' && str[i] != '-') {
-        *s++ = str[i];
+  if(*str1 != '_') {
+    for(i = 0, s = str1; str1[i]; i++) {
+      if(str1[i] != '_' && str1[i] != '-') {
+        *s++ = str1[i];
       }
     }
     *s = 0;
   }
 
+  /* remove all '-' and '_' */
+  if(*str2 != '_') {
+    for(i = 0, s = str2; str2[i]; i++) {
+      if(str2[i] != '_' && str2[i] != '-') {
+        *s++ = str2[i];
+      }
+    }
+    *s = 0;
+  }
+
+  i = strcasecmp(str1, str2);
+  free(str1); free(str2);
+  return i;
+}
+
+/* !!! str is overwritten !!! */
+file_key_t file_str2key(char *str, file_key_flag_t flags)
+{
+  int i;
+
+  if(!str || !*str || flags == kf_none) return key_none;
+
   if(!*str) return key_none;
 
   for(i = 0; (unsigned) i < sizeof keywords / sizeof *keywords; i++) {
-    if((keywords[i].flags & flags) && !strcasecmp(keywords[i].value, str)) {
+    if((keywords[i].flags & flags) && !strcasecmpignorestrich(keywords[i].value, str)) {
       return keywords[i].key;
     }
   }
