@@ -1,3 +1,6 @@
+	- strip - and _ from both given parameters and parameter keywords;
+	  otherwise parameters with these characters won't match their
+	  keywords (bug #165458)
 	- s390: add layer2 parameter to set layer2 option (bug #168492)
 	- s390: don't show layer2 dialog if network IF is hsi (not
           supported)
