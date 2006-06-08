@@ -1864,7 +1864,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
   else {
     if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
     cmdline = calloc(1024, 1);
-    if(!fgets(cmdline, 1024, f)) *cmdline = 0;
+    if(!fread(cmdline, 1, 1024, f)) *cmdline = 0;
     fclose(f);
   }
 
