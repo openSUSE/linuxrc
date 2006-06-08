@@ -1,3 +1,7 @@
+8/6/2006:	v2.0.45
+	- read /proc/cmdline with fread() instead of fgets() (i.e. do not
+          stop at LF, bug #176095)
+
 31/5/2006:	v2.0.44
 	- strip - and _ from both given parameters and parameter keywords;
 	  otherwise parameters with these characters won't match their
