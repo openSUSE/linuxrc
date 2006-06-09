@@ -132,6 +132,7 @@ void auto2_scan_hardware(char *log_file)
 
   hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
   hd_clear_probe_feature(hd_data, pr_parallel);
+  hd_clear_probe_feature(hd_data, pr_udev);
 #if !defined(__s390__) && !defined(__s390x__)
   if(!log_file) hd_data->progress = auto2_progress;
 #endif
@@ -350,6 +351,9 @@ hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd)
  *   >1: device found, but continue search
  *
  */
+
+extern str_list_t *search_str_list(str_list_t *sl, char *str);	/* libhd function */
+
 int auto2_harddisk_dev(hd_t **hd0)
 {
   int i = 1;
@@ -367,7 +371,8 @@ int auto2_harddisk_dev(hd_t **hd0)
 
     if(
       config.partition &&
-      strcmp(config.partition, short_dev(hd->unix_dev_name))
+      strcmp(hd->unix_dev_name, long_dev(config.partition)) &&
+      !search_str_list(hd->unix_dev_names, long_dev(config.partition))
     ) continue;
 
     fprintf(stderr, "disk: trying to mount: %s\n", hd->unix_dev_name);
@@ -1191,6 +1196,7 @@ void load_storage_mods()
     hd_data = calloc(1, sizeof *hd_data);
     hd_set_probe_feature(hd_data, pr_lxrc);
     hd_clear_probe_feature(hd_data, pr_parallel);
+    hd_clear_probe_feature(hd_data, pr_udev);
     hd_scan(hd_data);
   }
 
@@ -1205,6 +1211,7 @@ void load_network_mods()
     hd_data = calloc(1, sizeof *hd_data);
     hd_set_probe_feature(hd_data, pr_lxrc);
     hd_clear_probe_feature(hd_data, pr_parallel);
+    hd_clear_probe_feature(hd_data, pr_udev);
     hd_scan(hd_data);
   }
 
