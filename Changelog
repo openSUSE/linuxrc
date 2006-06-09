@@ -1,6 +1,7 @@
-8/6/2006:	v2.0.45
+9/6/2006:	v2.0.45
+	- fixed device name matching for hard disk install (#177055)
 	- read /proc/cmdline with fread() instead of fgets() (i.e. do not
-          stop at LF, bug #176095)
+	  stop at LF, bug #176095)
 
 31/5/2006:	v2.0.44
 	- strip - and _ from both given parameters and parameter keywords;
