@@ -1,3 +1,5 @@
+9/6/2006:	v2.1.0
+	- fixed device name matching for hard disk install (#177055)
 	- read /proc/cmdline with fread() instead of fgets() (i.e. do not
 	  stop at LF, bug #176095)
 	- strip - and _ from both given parameters and parameter keywords;
@@ -5,11 +7,7 @@
 	  keywords (bug #165458)
 	- s390: add layer2 parameter to set layer2 option (bug #168492)
 	- s390: don't show layer2 dialog if network IF is hsi (not
-          supported)
-
-*** there is a 10.1 branch ***
-*** demzweng muss des trotzdem in stable ***
-
+	  supported)
 
 18/5/2006:	v2.0.42
 	- increase klog buffer so we don't miss important kernel messages (#172971)
