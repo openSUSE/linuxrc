@@ -1937,7 +1937,7 @@ int net_activate_s390_devs(void)
     else rc=0;    
     IFNOTAUTO(config.hwp.protocol)
     {
-      rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 33, 0, protocols, rc);
+      rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 50, 0, protocols, rc);
       switch(rc)
       {
       case di_ctc_compat: config.hwp.protocol=0+1; break;
