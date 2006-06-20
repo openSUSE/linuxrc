@@ -1,3 +1,6 @@
+20/6/2006:	v2.0.46
+	- s390: make CTC mode dialog wider (bug #186563)
+
 9/6/2006:	v2.0.45
 	- fixed device name matching for hard disk install (#177055)
 	- read /proc/cmdline with fread() instead of fgets() (i.e. do not
