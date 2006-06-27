@@ -963,8 +963,8 @@ msgstr ""
 "minstens %d MB nodig."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
-msgstr "Wachtwoord is te kort (moet uit minstens 5 karakters bestaan)."
+msgid "Password is too short (must have at least 8 characters)."
+msgstr "Wachtwoord is te kort (moet uit minstens 8 karakters bestaan)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."

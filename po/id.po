@@ -1026,7 +1026,7 @@ msgid ""
 msgstr ""
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
+msgid "Password is too short (must have at least 8 characters)."
 msgstr ""
 
 #. TXT_XSERVER_IP
