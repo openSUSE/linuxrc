@@ -1728,7 +1728,10 @@ int net_check_ccw_address(char* addr)
      if(addr[i] != '.') goto error;
     }
     else
+    {
+     addr[i] = tolower(addr[i]);
      if((addr[i] < 'a' || addr[i] > 'f') && (addr[i] < '0' || addr[i] > '9')) goto error;
+    }
   }
 
   return 0;

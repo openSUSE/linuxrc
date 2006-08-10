@@ -1,3 +1,5 @@
+	- tell the user what file we failed to FTP
+	- s390: accept upper-case CCW addresses
 	- s390: make CTC mode dialog wider (bug #186563)
 	- set min vnc password length to 8 (#184204)
 

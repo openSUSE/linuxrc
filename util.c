@@ -3332,7 +3332,7 @@ int net_open(char *filename)
     fd = ftpGetFileDesc(config.net.ftp_sock, url_decode(filename));
 
     if(fd < 0) {
-      str_copy(&config.net.error, (char *) ftpStrerror(fd));
+      strprintf(&config.net.error, "%s: %s", filename, (char *) ftpStrerror(fd));
       ftpClose(config.net.ftp_sock);
       return config.net.ftp_sock = -1;
     }
