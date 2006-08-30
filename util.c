@@ -38,8 +38,6 @@
 #include <net/if.h>
 #include <linux/major.h>
 #include <linux/raid/md_u.h>
-#include <sysfs/dlist.h>
-#include <sysfs/libsysfs.h>
 
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
 

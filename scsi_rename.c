@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sysfs/dlist.h>
-#include <sysfs/libsysfs.h>
 
 #include <hd.h>
 
