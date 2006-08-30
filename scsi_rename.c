@@ -4,12 +4,15 @@
 #include <sysfs/dlist.h>
 #include <sysfs/libsysfs.h>
 
+#include <hd.h>
+
 /*
  * Rename SCSI devices (disk & CD-ROM) writing add/remove-single-device to
  * /proc/scsi/scsi so that USB & Firewire devices are last.
  */
 
 #include "global.h"
+#include "util.h"
 #include "scsi_rename.h"
 
 #define MAX_SCSI_DEVS	0x110
@@ -47,58 +50,66 @@ int scsi_rename_main(int argc, char **argv)
 }
 
 
+str_list_t *reverse_str_list(str_list_t *list);
+str_list_t *free_str_list(str_list_t *list);
+str_list_t *read_dir(char *dir_name, int type);
+char *hd_read_sysfs_link(char *base_dir, char *link_name);
+
 void get_scsi_list()
 {
   scsi_dev_t *scsi_dev;
   char *s;
   unsigned u;
-
-  struct sysfs_class *sf_class;
-  struct sysfs_class_device *sf_cdev;
-  struct sysfs_device *sf_dev;
-  struct dlist *sf_cdev_list;
+  str_list_t *sf_class, *sf_class_e;
+  char *sf_cdev = NULL, *sf_dev, *sf_cdev_name, *bus_id;
 
   scsi_list = calloc(MAX_SCSI_DEVS + 1, sizeof *scsi_list);
 
-  sf_class = sysfs_open_class("block");
+  sf_class = reverse_str_list(read_dir("/sys/block", 'd'));
 
   if(!sf_class) {
     if(config.debug) fprintf(stderr, "no block devices\n");
     return;
   }
 
-  sf_cdev_list = sysfs_get_class_devices(sf_class);
-  if(sf_cdev_list) dlist_for_each_data(sf_cdev_list, sf_cdev, struct sysfs_class_device) {
-    sf_dev = sysfs_get_classdev_device(sf_cdev);
+  for(sf_class_e = sf_class; sf_class_e; sf_class_e = sf_class_e->next) {
+    strprintf(&sf_cdev, "/sys/block/%s", sf_class_e->str);
+    sf_dev = hd_read_sysfs_link(sf_cdev, "device");
 
-    if(sf_dev) {
+    sf_cdev_name = strrchr(sf_cdev, '/');
+    if(sf_cdev_name) sf_cdev_name++;
+
+    if(sf_dev && sf_cdev_name) {
+      bus_id = strrchr(sf_dev, '/');
+      if(bus_id) bus_id++;
+
       scsi_dev = NULL;
 
       if(
         (
-          !strncmp(sf_cdev->name, "sr", 2) ||
-          !strncmp(sf_cdev->name, "sd", 2)
+          !strncmp(sf_cdev_name, "sr", 2) ||
+          !strncmp(sf_cdev_name, "sd", 2)
         ) &&
         scsi_list_len < MAX_SCSI_DEVS
       ) {
         scsi_dev = scsi_list[scsi_list_len++] = calloc(1, sizeof *scsi_dev);
 
-        scsi_dev->name = strdup(sf_cdev->name);
-        scsi_dev->bus_id = strdup(sf_dev->bus_id);
+        scsi_dev->name = strdup(sf_cdev_name);
+        scsi_dev->bus_id = strdup(bus_id);
         for(s = scsi_dev->bus_id; *s; s++) if(*s == ':') *s = ' ';
-        scsi_dev->path = strdup(sf_dev->path);
+        scsi_dev->path = strdup(sf_dev);
         if(
-          strstr(sf_dev->path, "/usb") ||
-          strstr(sf_dev->path, "/fw-host")
+          strstr(sf_dev, "/usb") ||
+          strstr(sf_dev, "/fw-host")
         ) {
           scsi_dev->hotplug = 1;
         }
       }
-
     }
   }
 
-  sysfs_close_class(sf_class);
+  free(sf_cdev);
+  sf_class = free_str_list(sf_class);
 
   if(scsi_list_len) {
     qsort(scsi_list, scsi_list_len, sizeof *scsi_list, cmp_func);
@@ -198,23 +209,13 @@ void rename_scsi_devs()
   unsigned u;
   char *s;
 
-  struct sysfs_directory *sf_dir;
-  struct sysfs_link *sf_link;
-
   do_rename(disk_list, disk_list_len);
   do_rename(cdrom_list, cdrom_list_len);
 
   for(u = 0; u < scsi_list_len; u++) {
     if(scsi_list[u]->renamed) {
-      sf_dir = sysfs_open_directory(scsi_list[u]->path);
-      if(sf_dir) {
-        sysfs_read_directory(sf_dir);
-        sf_link = sysfs_get_directory_link(sf_dir, "block");
-        if(sf_link) {
-          if((s = strrchr(sf_link->target, '/')))
-          scsi_list[u]->new_name = strdup(s + 1);
-        }
-        sysfs_close_directory(sf_dir);
+      if((s = hd_read_sysfs_link(scsi_list[u]->path, "block"))) {
+        if((s = strrchr(s, '/'))) scsi_list[u]->new_name = strdup(s + 1);
       }
     }
   }
@@ -224,7 +225,6 @@ void rename_scsi_devs()
       fprintf(stderr, "%s -> %s\n", scsi_list[u]->name, scsi_list[u]->new_name);
     }
   }
-
 }
 
 

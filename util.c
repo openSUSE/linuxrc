@@ -4441,34 +4441,38 @@ void util_load_usb()
 
 int util_set_sysfs_attr(char* attr, char* value)
 {
-  int rc;
-  struct sysfs_attribute* sa;
+  int i, fd;
 
-  sa=sysfs_open_attribute(attr);
-  if(!sa) return -1;
-    
-  rc=sysfs_write_attribute(sa,value,strlen(value));
+  if((fd = open(attr, O_WRONLY)) < 0) return -1;
 
-  sysfs_close_attribute(sa);
-  return rc;
+  i = write(fd, value, strlen(value));
+  
+  close(fd);
+
+  return i < 0 ? i : 0;
 }
 
 int util_get_sysfs_int_attr(char* attr, int *retval)
 {
-  int rc;
-  struct sysfs_attribute* sa;
+  int i, fd;
+  char buf[1024];
 
-  sa=sysfs_open_attribute(attr);
-  if(!sa) return -1;
+  if((fd = open(buf, O_RDONLY)) < 0) return -1;
+
+  i = read(fd, buf, sizeof buf - 1);
+
+  close(fd);
+
+  if(i >= 0) {
+    buf[i] = 0;
+  }
+  else {
+    return -1;
+  }
     
-  rc=sysfs_read_attribute(sa);
-  if (sa->value)
-      *retval = strtol(sa->value,NULL,10);
-  else
-      rc = 1;
+  *retval = strtol(buf, NULL, 0);
 
-  sysfs_close_attribute(sa);
-  return rc;
+  return 0;
 }
 
 char *print_driverid(driver_t *drv, int with_0x)
