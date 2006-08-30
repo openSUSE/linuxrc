@@ -1677,16 +1677,14 @@ void if_down(char *dev)
                         } \
                         if(config.manual)
 
-#include <sysfs/dlist.h>
-#include <sysfs/libsysfs.h>
+#include <dirent.h>
 
 void net_list_s390_devs(char* driver, int model)
 {
   char buf[4<<10];	/* good enough for ca. 240 devices */
-  struct sysfs_driver* driv;
-  struct dlist* devs;
-  struct sysfs_device* dev;
-  struct sysfs_attribute* attr;
+  char tmp[256];
+  DIR* driv;
+  struct dirent* devs;
   char* bp=&buf[0];
   int count = 0;
 
@@ -1694,14 +1692,15 @@ void net_list_s390_devs(char* driver, int model)
 
   if(!config.manual) return;
   
-  driv=sysfs_open_driver("ccw",driver);	 // FIXME: error handling
-  devs=sysfs_get_driver_devices(driv);	 // FIXME: error handling
-  dlist_for_each_data(devs,dev,struct sysfs_device)
+  driv=opendir("/sys/bus/ccw/devices");
+  while((devs = readdir(driv)))
   {
-    attr=sysfs_get_device_attr(dev,"cutype");
-    if(model && strtol(attr->value+5,NULL,16)!=model) continue;
-    bp+=sprintf(bp,"%s ",dev->bus_id);
-    bp+=sprintf(bp,"%s",attr->value);	/* attr->value contains a LF */
+    if(devs->d_type == DT_DIR) continue;
+    sprintf(tmp,"/sys/bus/ccw/devices/%s/cutype", devs->d_name);
+    util_read_and_chop(tmp, tmp);
+    if(model && strtol(tmp+5,NULL,16)!=model) continue;
+    bp+=sprintf(bp,"%s ",devs->d_name);
+    bp+=sprintf(bp,"%s",tmp);	/* attribute contains a LF */
     count++;
     if(count % 100 == 0)	/* avoid buffer overruns with many devices */
     {
@@ -1710,8 +1709,7 @@ void net_list_s390_devs(char* driver, int model)
       buf[0] = 0;
     }
   }
-  sysfs_close_list(devs);
-  /* calling sysfs_close_driver() here causes double free()s */
+  closedir(driv);
   if(buf[0]) dia_message(buf,MSGTYPE_INFO);
 }
 
