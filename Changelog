@@ -1,7 +1,9 @@
+30/8/2006:	v2.1.1
 	- tell the user what file we failed to FTP
 	- s390: accept upper-case CCW addresses
 	- s390: make CTC mode dialog wider (bug #186563)
 	- set min vnc password length to 8 (#184204)
+	- changed tftp to bind to different port for each connection (#187745)
 
 9/6/2006:	v2.1.0
 	- fixed device name matching for hard disk install (#177055)

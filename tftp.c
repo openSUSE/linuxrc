@@ -86,6 +86,7 @@ int timo;
   struct sockaddr_in msa;
   int s;
   int r, nl;
+  static int rid;
 
   nl = strlen(filename);
   if (nl > 500)
@@ -100,15 +101,21 @@ int timo;
       sprintf(tftp->buf, "socket: %s", strerror(errno));
       return -1;
     }
-  msa.sin_family = AF_INET;
-  msa.sin_addr.s_addr = INADDR_ANY;
-  msa.sin_port = 0;
-  if (bind(s, (struct sockaddr *)&msa, sizeof(msa)))
+  for (r = 0; r <= 8192; r++)
+    {
+      msa.sin_family = AF_INET;
+      msa.sin_addr.s_addr = INADDR_ANY;
+      msa.sin_port = r == 8192 ? 0 : htons(((r + rid) & 8191) + 30000);
+      if (!bind(s, (struct sockaddr *)&msa, sizeof(msa)))
+	break;
+    }
+  if (r == 8193)
     {
       sprintf(tftp->buf, "bind: %s", strerror(errno));
       close(s);
       return -1;
     }
+  rid = r + 1;
   tftp->nr = 0;
   tftp->s = s;
   tftp->timo = timo;
