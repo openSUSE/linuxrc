@@ -296,6 +296,7 @@ static struct {
   { "cdwithnet", inst_cdwithnet     },
   { "net",       inst_net           },
   { "slp",       inst_slp           },
+  { "exec",      inst_exec          },
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
   { "cdrom",     inst_cdrom         },

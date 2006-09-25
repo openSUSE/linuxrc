@@ -3221,6 +3221,11 @@ void set_instmode(instmode_t instmode)
       config.insttype = inst_floppy;
       break;
 
+    case inst_none:
+    case inst_exec:
+      config.insttype = inst_none;
+      break;
+
     default:
       config.insttype = inst_net;
       config.net.do_setup |= DS_INSTALL;

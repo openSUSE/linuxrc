@@ -802,6 +802,11 @@ int inst_start_install()
   str_copy(&config.instsys, NULL);
   str_copy(&config.instsys2, NULL);
 
+  if(config.insttype == inst_none) {
+    util_splash_bar(60, SPLASH_60);
+    return inst_execute_yast();
+  }
+
   if(config.use_ramdisk) {
     config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
     // maybe: inst_umount(); ???
@@ -1062,9 +1067,11 @@ int add_instsys()
     }
   }
 
-  argv[1] = config.instsys;
-  argv[2] = "/";
-  util_lndir_main(3, argv);
+  if(config.instsys) {
+    argv[1] = config.instsys;
+    argv[2] = "/";
+    util_lndir_main(3, argv);
+  }
 
   if(config.instsys2) {
     argv[1] = config.instsys2;
@@ -1115,6 +1122,7 @@ int inst_execute_yast()
 {
   int i, rc;
   char cmd[256];
+  char *setupcmd = NULL;
 
   rc = add_instsys();
   if(rc) {
@@ -1184,7 +1192,13 @@ int inst_execute_yast()
 
   if(config.splash && config.textmode) system("echo 0 >/proc/splash");
 
-  fprintf(stderr, "starting %s\n", config.setupcmd);
+  str_copy(&setupcmd, config.setupcmd);
+
+  if(config.instmode == inst_exec && config.serverdir && *config.serverdir) {
+    strprintf(&setupcmd, "setctsid `showconsole` %s", config.serverdir);
+  }
+
+  fprintf(stderr, "starting %s\n", setupcmd);
 
   kbd_end(1);
   util_notty();
@@ -1194,7 +1208,7 @@ int inst_execute_yast()
   }
   else {
     if(config.zombies) {
-      rc = system(config.setupcmd);
+      rc = system(setupcmd);
     }
     else {
       pid_t pid, inst_pid;
@@ -1216,7 +1230,7 @@ int inst_execute_yast()
       }
       else {
         // fprintf(stderr, "%d: system()\n", getpid());
-        rc = system(config.setupcmd);
+        rc = system(setupcmd);
         // fprintf(stderr, "%d: exit(%d)\n", getpid(), rc);
         exit(WEXITSTATUS(rc));
       }
@@ -1245,6 +1259,8 @@ int inst_execute_yast()
   }
   kbd_init(0);
   util_notty();
+
+  str_copy(&setupcmd, NULL);
 
   if(config.splash && config.textmode) system("echo 1 >/proc/splash");
 

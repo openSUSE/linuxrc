@@ -870,6 +870,8 @@ int auto2_find_install_medium()
   unsigned last_idx;
   hd_t *hd_devs = NULL;
 
+  if(config.insttype == inst_none) return TRUE;
+
   if(config.instmode == inst_cdrom || !config.instmode) {
     set_instmode(inst_cdrom);
 
