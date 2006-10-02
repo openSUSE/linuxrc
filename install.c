@@ -802,7 +802,7 @@ int inst_start_install()
   str_copy(&config.instsys, NULL);
   str_copy(&config.instsys2, NULL);
 
-  if(config.insttype == inst_none) {
+  if(config.instmode == inst_exec) {
     util_splash_bar(60, SPLASH_60);
     return inst_execute_yast();
   }

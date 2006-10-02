@@ -1,3 +1,7 @@
+2/10/2006:	v2.1.5
+	- cdrom install works again
+	- allow network config in 'exec' scheme
+
 25/9/2006:	v2.1.4
 	- added 'exec' url scheme that just runs a program
 
