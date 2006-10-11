@@ -180,6 +180,7 @@ typedef struct module2_s {
   unsigned exists:1;	/* module really exists */
   unsigned dontask:1;	/* don't ask for module params */
   unsigned detected:1;	/* auto-detected */
+  unsigned active:1;	/* module loaded */
 } module_t;
 
 

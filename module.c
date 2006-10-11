@@ -313,7 +313,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
     if(ml->type == type && ml->exists && ml->descr) {
       sprintf(buf, "%14s%s%s",
         ml->name,
-        *ml->descr ? ml->detected ? " * " : " : " : "", ml->descr
+        *ml->descr ? ml->detected ? ml->active ? " * " : " + " : " : " : "", ml->descr
       );
       items[i] = strdup(buf);
       mod_items[i++] = ml;
@@ -1037,13 +1037,15 @@ void mod_auto_detect()
   hd = hd_list2(hd_data, hw_items, 1);
 
   for(; hd; hd = hd->next) {
-    if(
-      (di = hd->driver_info) &&
-      di->any.type == di_module
-    ) {
+    for(di = hd->driver_info; di; di = di->next) {
+      if(di->any.type != di_module) continue;
+
       for(sl = di->module.names; sl; sl = sl->next) {
         for(ml = config.module.list; ml; ml = ml->next) {
-          if(!mod_cmp(ml->name, sl->str)) ml->detected = 1;
+          if(!mod_cmp(ml->name, sl->str)) {
+            ml->detected = 1;
+            ml->active = di->module.active ? 1 : 0;
+          }
         }
       }
     }

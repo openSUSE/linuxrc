@@ -1,3 +1,5 @@
+	- mark loaded/loadable modules differently in module selection dialog
+
 2/10/2006:	v2.1.5
 	- cdrom install works again
 	- allow network config in 'exec' scheme
