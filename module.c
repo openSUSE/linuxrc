@@ -291,7 +291,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   static char **items = NULL;
   static module_t **mod_items = NULL;
   static int mods = 0;
-  int i;
+  int i, width;
   char buf[256];
 
   if(items) {
@@ -309,9 +309,17 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   items = calloc(mods + 1, sizeof *items);
   mod_items = calloc(mods + 1, sizeof *mod_items);
 
+  for(width = 0, ml = config.module.list; ml; ml = ml->next) {
+    if(ml->type == type && ml->exists && ml->descr) {
+      i = strlen(ml->name);
+      if(i > width) width = i;
+    }
+  }
+
   for(i = 0, ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == type && ml->exists && ml->descr) {
-      sprintf(buf, "%14s%s%s",
+      sprintf(buf, "%*s%s%s",
+        width,
         ml->name,
         *ml->descr ? ml->detected ? ml->active ? " * " : " + " : " : " : "", ml->descr
       );

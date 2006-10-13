@@ -340,8 +340,10 @@ char *file_key2str(file_key_t key)
   return "";
 }
 
-/* compare strings, ignoring '-' and '_' characters in strings not starting
-   with '_' */
+/*
+ * Compare strings, ignoring '-', '_', and '.' characters in strings not
+ * starting with '_'.
+ */
 static int strcasecmpignorestrich(const char* s1, const char* s2)
 {
   char* str1 = strdup(s1);
@@ -352,7 +354,7 @@ static int strcasecmpignorestrich(const char* s1, const char* s2)
   /* remove all '-' and '_' */
   if(*str1 != '_') {
     for(i = 0, s = str1; str1[i]; i++) {
-      if(str1[i] != '_' && str1[i] != '-') {
+      if(str1[i] != '_' && str1[i] != '-' && str1[i] != '.') {
         *s++ = str1[i];
       }
     }
@@ -362,7 +364,7 @@ static int strcasecmpignorestrich(const char* s1, const char* s2)
   /* remove all '-' and '_' */
   if(*str2 != '_') {
     for(i = 0, s = str2; str2[i]; i++) {
-      if(str2[i] != '_' && str2[i] != '-') {
+      if(str2[i] != '_' && str2[i] != '-' && str2[i] != '.') {
         *s++ = str2[i];
       }
     }

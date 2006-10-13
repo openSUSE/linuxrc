@@ -118,6 +118,11 @@ struct {
   { di_osa_lcs,		TXT_OSA_LCS         },
   { di_osa_qdio,	TXT_OSA_QDIO        },
 
+  { di_wlan_open,  0, "No Authentication"   },
+  { di_wlan_wep_o, 0, "WEP - Open"          },
+  { di_wlan_wep_r, 0, "WEP - Shared Key"    },
+  { di_wlan_wpa,   0, "WPA-PSK"             },
+
 };
 
 
@@ -1619,7 +1624,7 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
       s++;
       item_list[i].tag.head = 1;
     }
-    utf8_strwcpy(item_list[i].text, s, width);
+    utf8_strwcpy(item_list[i].text, s, width - 1);
     item_list[i].func = func;
     if(align == align_center) {
       util_center_text(item_list[i].text, width);

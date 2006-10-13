@@ -44,6 +44,8 @@
 #define NFS_PORT 2049
 #endif
 
+#include <hd.h>
+
 #include "global.h"
 #include "text.h"
 #include "dialog.h"
@@ -57,8 +59,6 @@
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
-
-#define MAX_NETDEVICE      64
 
 static int  net_is_ptp_im = FALSE;
 
@@ -81,7 +81,10 @@ static void net_show_error(enum nfs_stat status_rv);
 #endif
 
 static void if_down(char *dev);
+static int wlan_setup(void);
+static int wlan_auth_cb(dia_item_t di);
 
+static dia_item_t di_wlan_auth_last = di_none;
 
 /*
  * Ask for VNC & SSH password, unless they have already been set.
@@ -997,9 +1000,9 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
  */
 int net_choose_device()
 {
-  char *items[MAX_NETDEVICE + 1], *s;
-  int i, item_cnt, choice;
-  char buf[MAX_X];
+  char **items, **item_devs = NULL;
+  int i, max_items = 0, item_cnt, choice, width;
+  char *buf = NULL;
   file_t *f0, *f;
   slist_t *sl;
   static int last_item = 0;
@@ -1020,31 +1023,64 @@ int net_choose_device()
     { "iucv",  TXT_NET_IUCV  },
     { "hsi",   TXT_NET_HSI   }
   };
+  hd_data_t *hd_data = calloc(1, sizeof *hd_data);
+  hd_t *hd, *hd_cards;
+  hd_t **item_hds = NULL;
     
   if(config.net.device_given) return 0;
 
-  /* re-read - just in case... */
-  util_update_netdevice_list(NULL, 1);
+  if(config.manual >= 2) {
+    /* re-read - just in case... */
+    util_update_netdevice_list(NULL, 1);
 
-  for(item_cnt = 0, sl = config.net.devices; sl; sl = sl->next) {
-    if(sl->key) item_cnt++;
-  }
+    for(sl = config.net.devices; sl; sl = sl->next) {
+      if(sl->key) max_items++;
+    }
 
-  f0 = file_read_file("/proc/net/dev", kf_none);
-  if(!f0) return -1;
+    items = calloc(max_items + 1, sizeof *items);
+    item_devs = calloc(max_items + 1, sizeof *item_devs);
 
-  for(item_cnt = 0, f = f0; f && (unsigned) item_cnt < sizeof items / sizeof *items - 1; f = f->next) {
-    for(i = 0; (unsigned) i < sizeof net_dev / sizeof *net_dev; i++) {
-      if(strstr(f->key_str, net_dev[i].dev) == f->key_str) {
-        sprintf(buf, "%-6s : %s", f->key_str, txt_get(net_dev[i].name));
-        items[item_cnt++] = strdup(buf);
-        break;
+    f0 = file_read_file("/proc/net/dev", kf_none);
+    if(!f0) return -1;
+
+    for(item_cnt = 0, f = f0; f && item_cnt < max_items; f = f->next) {
+      for(i = 0; i < sizeof net_dev / sizeof *net_dev; i++) {
+        if(strstr(f->key_str, net_dev[i].dev) == f->key_str) {
+          strprintf(&buf, "%-6s : %s", f->key_str, txt_get(net_dev[i].name));
+          item_devs[item_cnt] = strdup(f->key_str);
+          items[item_cnt++] = strdup(buf);
+          break;
+        }
       }
     }
-  }
-  items[item_cnt] = NULL;
 
-  file_free_file(f0);
+    file_free_file(f0);
+  }
+  else {
+    hd_data->flags.nowpa = 1;
+
+    hd_cards = hd_list(hd_data, hw_network_ctrl, 1, NULL);
+    for(hd = hd_cards; hd; hd = hd->next) max_items++;
+
+    items = calloc(max_items + 1, sizeof *items);
+    item_devs = calloc(max_items + 1, sizeof *item_devs);
+    item_hds = calloc(max_items + 1, sizeof *item_hds);
+
+    for(width = 0, hd = hd_cards; hd; hd = hd->next) {
+      if(hd->unix_dev_name) {
+        i = strlen(hd->unix_dev_name);
+        if(i > width) width = i;
+      }
+    }
+
+    for(item_cnt = 0, hd = hd_cards; hd; hd = hd->next) {
+      item_hds[item_cnt] = hd;
+      if(hd->unix_dev_name) {
+        item_devs[item_cnt] = strdup(hd->unix_dev_name);
+      }
+      strprintf(items + item_cnt++, "%*s : %s", -width, hd->unix_dev_name ?: "", hd->model);
+    }
+  }
 
   if(item_cnt == 0) {
     dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
@@ -1057,17 +1093,38 @@ int net_choose_device()
     if(choice) last_item = choice;
   }
 
-  if(choice > 0) {
-    s = strchr(items[choice - 1], ' ');
-    if(s) *s = 0;
-    str_copy(&config.net.device, items[choice - 1]);
-    net_is_ptp_im=FALSE;
-    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im=TRUE;
-    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im=TRUE;
-    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im=TRUE;
+  if(choice > 0 && !item_devs[choice - 1]) {
+    dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
+    choice = -1;
   }
 
-  for(i = 0; i < item_cnt; i++) free(items[i]);
+  if(choice > 0) {
+    str_copy(&config.net.device, item_devs[choice - 1]);
+    net_is_ptp_im = FALSE;
+    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im = TRUE;
+    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
+    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
+
+    if(item_hds) {
+      hd = item_hds[choice - 1];
+      if(hd->is.wlan) {
+        if(wlan_setup()) choice = -1;
+      }
+    }
+  }
+
+  for(i = 0; i < item_cnt; i++) {
+    free(items[i]);
+    if(item_devs) free(item_devs[i]);
+  }
+  free(items);
+  free(item_devs);
+  free(item_hds);
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  free(buf);
 
   return choice > 0 ? 0 : -1;
 }
@@ -2143,6 +2200,218 @@ void net_apply_ethtool(char *device, char *hwaddr)
     system(s);
     free(s);
   }
+}
+
+
+/*
+ * 0: ok, 1: failed
+ */
+int wlan_setup()
+{
+  dia_item_t di;
+  dia_item_t items[] = {
+    di_wlan_open,
+    di_wlan_wep_o,
+    di_wlan_wep_r,
+    di_wlan_wpa,
+    di_none
+  };
+
+  di = dia_menu2("WLAN Authentication", 40, wlan_auth_cb, items, di_wlan_auth_last);
+
+  return di == di_none ? 1 : 0;
+}
+
+
+/*
+ * return values:
+ * -1    : abort (aka ESC)
+ *  0    : ok
+ *  other: stay in menu
+ */
+int wlan_auth_cb(dia_item_t di)
+{
+  int rc = 1, i, j;
+  char *buf = NULL, *key = NULL, *s;
+  int wep_mode = 0, pass_mode = 0;
+  static char *wep_key_items[] = {
+    "ASCII", "HEX", "Passphrase - 40 bit", "Passphrase - 104 bit",
+    NULL
+  };
+  static char *wpa_key_items[] = {
+    "HEX", "Passphrase",
+    NULL
+  };
+  FILE *f;
+
+  di_wlan_auth_last = di;
+
+  switch(di) {
+    case di_wlan_open:
+      config.net.wlan.auth = wa_open;
+
+      if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
+        rc = -1;
+        break;
+      }
+
+      strprintf(&buf, "iwconfig %s essid %s'%s'",
+        config.net.device,
+        config.net.wlan.essid ? "-- " : "",
+        config.net.wlan.essid ?: "any"
+      );
+      fprintf(stderr, "%s\n", buf);
+      system_log(buf);
+
+      rc = 0;
+      break;
+
+    case di_wlan_wep_o:
+      wep_mode = 1;
+
+    case di_wlan_wep_r:
+      config.net.wlan.auth = wep_mode ? wa_wep_open : wa_wep_resticted;
+
+      if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
+        rc = -1;
+        break;
+      }
+
+      i = dia_list("WEP Key Type", 30, NULL, wep_key_items, config.net.wlan.key_type + 1, align_left) - 1;
+
+      if(i < 0) {
+        rc = -1;
+        break;
+      }
+
+      config.net.wlan.key_type = i;
+
+      if(dia_input2("WEP Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
+        rc = -1;
+        break;
+      }
+
+      switch(config.net.wlan.key_type) {
+        case kt_ascii:
+          strprintf(&key, "s:%s", config.net.wlan.key);
+          break;
+
+        case kt_hex:
+          str_copy(&key, config.net.wlan.key);
+          break;
+
+        case kt_pass_40:
+          pass_mode = 1;
+
+        case kt_pass_104:
+          strprintf(&buf, "lwepgen%s '%s'", pass_mode ? "" : " -s", config.net.wlan.key);
+          f = popen(buf, "r");
+          if(f) {
+            fgets(key = calloc(1, 256), 256, f);
+            if((s = strchr(key, '\n'))) *s = 0;
+            pclose(f);
+            if(!*key) rc = -1;
+          }
+          else {
+            rc = -1;
+          }
+          break;
+
+        default:
+          rc = -1;
+          break;
+      
+      }
+
+      if(rc == -1) break;
+
+      strprintf(&buf, "iwconfig %s essid %s'%s'",
+        config.net.device,
+        config.net.wlan.essid ? "-- " : "",
+        config.net.wlan.essid ?: "any"
+      );
+      fprintf(stderr, "%s\n", buf);
+      system_log(buf);
+
+      strprintf(&buf, "iwconfig %s key %s '%s'",
+        config.net.device,
+        config.net.wlan.auth == wa_wep_open ? "open" : "restricted",
+        key
+      );
+      fprintf(stderr, "%s\n", buf);
+      system_log(buf);
+
+      rc = 0;
+      break;
+
+    case di_wlan_wpa:
+      if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
+        rc = -1;
+        break;
+      }
+
+      j = config.net.wlan.key_type == kt_pass_wpa ? 2 : 1;
+
+      i = dia_list("WPA Key Type", 30, NULL, wpa_key_items, j, align_left);
+
+      if(i < 1) {
+        rc = -1;
+        break;
+      }
+
+      config.net.wlan.key_type = i == 1 ? kt_hex : kt_pass_wpa;
+
+      if(dia_input2("WPA Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
+        rc = -1;
+        break;
+      }
+
+      if(config.net.wlan.key_type == kt_pass_wpa) {
+        strprintf(&key, "\"%s\"", config.net.wlan.key);
+      }
+      else {
+        str_copy(&key, config.net.wlan.key);
+      }
+
+      f = fopen("/tmp/wpa_supplicant.conf", "w");
+      if(!f) {
+        rc = -1;
+        break;
+      }
+      fprintf(f,
+        "ap_scan=1\n"
+        "network={\n"
+        "  key_mgmt=WPA-PSK\n"
+        "  scan_ssid=1\n"
+        "  essid=\"%s\"\n"
+        "  psk=%s\n"
+        "}\n",
+        config.net.wlan.essid,
+        key
+      );
+      fclose(f);
+
+      util_killall("wpa_supplicant", 15);
+      sleep(1);
+      util_killall("wpa_supplicant", 9);
+
+      strprintf(&buf, "wpa_supplicant -B -Dwext -i%s -c/tmp/wpa_supplicant.conf",
+        config.net.device
+      );
+      fprintf(stderr, "%s\n", buf);
+      system_log(buf);
+
+      rc = 0;
+      break;
+
+    default:
+      break;
+  }
+
+  free(buf);
+  free(key);
+
+  return rc;
 }
 
 

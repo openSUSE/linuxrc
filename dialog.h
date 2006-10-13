@@ -102,6 +102,11 @@ typedef enum {
   di_osa_lcs,
   di_osa_qdio,
 
+  di_wlan_open,
+  di_wlan_wep_o,
+  di_wlan_wep_r,
+  di_wlan_wpa,
+
 } dia_item_t;
 
 typedef enum {

@@ -1,4 +1,8 @@
+13/10/2006:	v2.1.6
 	- mark loaded/loadable modules differently in module selection dialog
+	- fixed drawing bug in too small windows
+	- better network device selection
+	- basic wlan support
 
 2/10/2006:	v2.1.5
 	- cdrom install works again

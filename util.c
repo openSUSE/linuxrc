@@ -4738,3 +4738,23 @@ int util_process_running(char *name)
   return de ? 1 : 0;
 }
 
+
+/*
+ * like system() but redirect stdout to stderr
+ */
+int system_log(char *cmd)
+{
+  char *buf = NULL;
+  int i;
+
+  if(!cmd) return 0;
+
+  strprintf(&buf, "%s >&2", cmd);
+
+  i = system(buf);
+
+  free(buf);
+
+  return i;
+}
+

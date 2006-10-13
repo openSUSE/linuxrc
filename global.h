@@ -203,6 +203,17 @@ typedef enum {
   nc_none, nc_static, nc_bootp, nc_dhcp
 } net_config_t;
 
+typedef enum {
+  wa_none, wa_open, wa_wep_open, wa_wep_resticted, wa_wpa
+} wlan_auth_t;
+
+/*
+ * keep the values - see wlan_auth_cb()
+ */
+typedef enum {
+  kt_ascii, kt_hex, kt_pass_40, kt_pass_104, kt_pass_wpa
+} key_type_t;
+
 /* > 100 and <= 1000 */
 #define MAX_UPDATES		1000
 
@@ -507,6 +518,12 @@ typedef struct {
       char *module;		/* cifs/smb kernel module */
     } cifs;
     char *dhcpcd;		/* dhcpcd parameters (if any) */
+    struct {
+      wlan_auth_t auth;		/* open, wep, wpa */
+      char *essid;		/* ESSID */
+      char *key;		/* wep/wpa key */
+      key_type_t key_type;	/* ascii, hex, passphrase */
+    } wlan;
   } net;
 
   struct {

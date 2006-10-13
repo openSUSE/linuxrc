@@ -778,6 +778,7 @@ void lxrc_init()
   config.net.ifconfig = 1;
   config.net.setup = NS_DEFAULT;
   config.net.nameservers = 1;
+  config.net.nfs_tcp = 1;
 
   config.explode_win = 1;
   config.color = 2;
