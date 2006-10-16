@@ -1078,7 +1078,12 @@ int net_choose_device()
       if(hd->unix_dev_name) {
         item_devs[item_cnt] = strdup(hd->unix_dev_name);
       }
-      strprintf(items + item_cnt++, "%*s : %s", -width, hd->unix_dev_name ?: "", hd->model);
+      if(hd->unix_dev_name) {
+        strprintf(items + item_cnt++, "%*s : %s", -width, hd->unix_dev_name, hd->model);
+      }
+      else {
+        strprintf(items + item_cnt++, "%s", hd->model);
+      }
     }
   }
 
@@ -2366,6 +2371,12 @@ int wlan_auth_cb(dia_item_t di)
         break;
       }
 
+      if(config.net.wlan.key_type == kt_pass_wpa && strlen(config.net.wlan.key) < 8) {
+        dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
+        rc = -1;
+        break;
+      }
+
       if(config.net.wlan.key_type == kt_pass_wpa) {
         strprintf(&key, "\"%s\"", config.net.wlan.key);
       }
@@ -2383,7 +2394,7 @@ int wlan_auth_cb(dia_item_t di)
         "network={\n"
         "  key_mgmt=WPA-PSK\n"
         "  scan_ssid=1\n"
-        "  essid=\"%s\"\n"
+        "  ssid=\"%s\"\n"
         "  psk=%s\n"
         "}\n",
         config.net.wlan.essid,
