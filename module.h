@@ -12,7 +12,6 @@ void       mod_free_modules(void);
 void       mod_init(int autoload);
 module_t  *mod_get_entry(char *name);
 void       mod_menu(void);
-int        mod_add_disk(int prompt, int type);
 void       mod_unload_module(char *module);
 int        mod_unload_modules(char *modules);
 int        mod_is_loaded(char *module);

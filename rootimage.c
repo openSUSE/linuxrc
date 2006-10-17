@@ -480,7 +480,7 @@ void root_set_root(char *dev)
 
 int root_boot_system()
 {
-  int  rc, mtype;
+  int  rc;
   char *module, *type;
   char buf[256], root[64];
 
@@ -492,18 +492,6 @@ int root_boot_system()
     if((type = util_fstype(root, &module))) {
       if(module && config.module.dir) {
         sprintf(buf, "%s/%s" MODULE_SUFFIX, config.module.dir, module);
-        if(!util_check_exist(buf)) {
-          mtype = mod_get_type("file system");
-
-          sprintf(buf, txt_get(TXT_FILE_SYSTEM), type);
-          strcat(buf, "\n\n");
-          mod_disk_text(buf + strlen(buf), mtype);
-
-          rc = dia_okcancel(buf, YES) == YES ? 1 : 0;
-
-          if(rc) mod_add_disk(0, mtype);
-        }
-
         mod_modprobe(module, NULL);
       }
     }

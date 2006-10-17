@@ -1411,9 +1411,6 @@ void util_status_info()
   );
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "vga = 0x%04x", frame_buffer_mode_ig);
-  slist_append_str(&sl0, buf);
-
   if(config.term) {
     sprintf(buf, "term = \"%s\"", config.term);
     slist_append_str(&sl0, buf);

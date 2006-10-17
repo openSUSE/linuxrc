@@ -438,7 +438,7 @@ int mod_menu_cb(int item)
 
 int mod_load_manually(int type)
 {
-  int i, j, ok;
+  int i, ok;
   char *s;
   char **items;
   module_t **mod_items;
@@ -449,11 +449,7 @@ int mod_load_manually(int type)
   i = mod_build_list(type, &items, &mod_items);
 
   if(!i || (i == 1 && !*mod_items)) {
-    /* list has just a 'more modules' line */
-    j = mod_add_disk(1, type);
-    if(!j) return 0;	/* no new modules */
-    added = 1;
-    i = mod_build_list(type, &items, &mod_items);
+    return 0;	/* no new modules */
   }
 
   if(!i || (i == 1 && !*mod_items)) return 0;
@@ -480,128 +476,12 @@ int mod_load_manually(int type)
         }
       }
       else {
-        j = mod_add_disk(1, type);
-        added = j ? 1 : 0;
+        added = 0;
       }
     }
 
     free(s);
   }
-
-  return added;
-}
-
-
-/*
- * returns number of modules that were added (-1 if the actual number is unknown)
- */
-int mod_add_disk(int prompt, int type)
-{
-  char buf[256];
-  int i, j, err = 0, added = 0;
-  int got_image = 0;
-
-  if(type < 0) return 0;
-
-  if(prompt) {
-    *buf = 0;
-    mod_disk_text(buf, type);
-    if(dia_okcancel(buf, YES) != YES) return 0;
-  }
-
-  mod_free_modules();
-
-  /* try recently used floppy first */
-  if(config.floppies) {
-    err = util_mount_ro(config.floppy_dev[config.floppy], config.mountpoint.floppy);
-    if(config.debug) {
-      fprintf(stderr,
-        "mount floppy %d (%s) = %d\n",
-        config.floppy,
-        config.floppy_dev[config.floppy],
-        err
-      );
-    }
-  }
-
-  if(!config.floppies || err) {
-    err = 0;
-    if(!auto2_find_floppy()) {
-      dia_message("No floppy disk found.", MSGTYPE_ERROR);
-      return 0;
-    }
-  }
-
-  for(i = 0; i < config.floppies; i++) {
-    j = util_mount_ro(config.floppy_dev[i], config.mountpoint.floppy);
-    if(config.debug) fprintf(stderr, "mount floppy %d (%s) = %d\n", i, config.floppy_dev[i], j);
-    if(!j) break;
-  }
-
-  if(i < config.floppies) {
-    config.floppy = i;	// remember currently used floppy
-  }
-  else {
-    dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-    return 0;
-  }
-
-  *buf = 0;
-  if(config.module.more_file[type] && *config.module.more_file[type]) {
-    sprintf(buf, "%s/%s", config.mountpoint.floppy, config.module.more_file[type]);
-    if(util_check_exist(buf)) {
-      config.module.ramdisk = load_image(buf, inst_file, txt_get(TXT_LOADING_MODULES));
-      if(config.module.ramdisk >= 0) {
-        got_image = 1;
-      }
-      else {
-        err = -1;
-      }
-    }
-  }
-
-  if(*buf && !err && got_image) {
-    err = ramdisk_mount(
-      config.module.ramdisk,
-      config.tmpfs ? config.mountpoint.ramdisk2 : config.module.dir
-    );
-
-    if(err) {
-      dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-    }
-    else {
-      if(config.tmpfs) {
-        added = mod_copy_modules(config.mountpoint.ramdisk2, 1);
-        sprintf(buf, "%s/modules", config.mountpoint.ramdisk2);
-        added += mod_copy_modules(buf, 1);
-        ramdisk_free(config.module.ramdisk);
-        config.module.ramdisk = -1;
-      }
-      mod_init(1);
-    }
-  }
-
-  if(config.tmpfs) {
-    mod_copy_modules(config.mountpoint.floppy, 0);
-    added += mod_copy_modules(config.mountpoint.floppy, 2);
-  }
-  else {
-    sprintf(buf, "%s/" MODULE_CONFIG, config.mountpoint.floppy);
-    file_read_modinfo(buf);
-  }
-  mod_init(1);
-
-  umount(config.mountpoint.floppy);
-
-  if(!err) {
-    if(!got_image && !added) {
-      dia_message(txt_get(TXT_NO_NEW_MODULES), MSGTYPE_INFO);
-    }
-  }
-
-  if(!err && !added && got_image) added = -1;
-
-  if(added) mod_update_list();
 
   return added;
 }

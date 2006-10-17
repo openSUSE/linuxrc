@@ -45,7 +45,6 @@ static int auto2_net_dev(hd_t **);
 static int auto2_net_dev1(hd_t *hd);
 static int driver_is_active(hd_t *hd);
 static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
-static void auto2_chk_frame_buffer(void);
 static void auto2_progress(char *pos, char *msg);
 static void get_zen_config(void);
 
@@ -750,9 +749,7 @@ int auto2_init()
 {
   int i, win_old;
 
-  auto2_chk_frame_buffer();
-
-  fprintf(stderr, "Beginning hardware probing...\n");
+  fprintf(stderr, "Starting hardware detection...\n");
   fflush(stderr);
   printf("Starting hardware detection...\n");
   fflush(stdout);
@@ -971,31 +968,6 @@ int auto2_find_install_medium()
   util_debugwait("Nothing found");
 
   return FALSE;
-}
-
-
-/*
- * Read "vga=" entry from the kernel command line.
- */
-void auto2_chk_frame_buffer()
-{
-  file_t *f0, *f;
-  int fb_mode = -1;
-
-  f0 = file_read_cmdline(kf_cmd);
-  for(f = f0; f; f = f->next) {
-    if(strcmp(f->key_str, "vga")) {
-      if(strcmp(f->value, "normal")) {
-        fb_mode = 0;
-      }
-      else if(f->is.numeric) {
-        fb_mode = f->nvalue;
-      }
-    }
-  }
-  file_free_file(f0);
-  
-  if(fb_mode > 0x10) frame_buffer_mode_ig = fb_mode;
 }
 
 
