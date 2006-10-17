@@ -2238,7 +2238,7 @@ int wlan_auth_cb(dia_item_t di)
 {
   int rc = 1, i, j;
   char *buf = NULL, *key = NULL, *s;
-  int wep_mode = 0, pass_mode = 0;
+  int wep_mode = 0;
   static char *wep_key_items[] = {
     "ASCII", "HEX", "Passphrase - 40 bit", "Passphrase - 104 bit",
     NULL
@@ -2289,7 +2289,27 @@ int wlan_auth_cb(dia_item_t di)
         break;
       }
 
-      config.net.wlan.key_type = i;
+      switch(i) {
+        case 0:
+          config.net.wlan.key_type = kt_ascii;
+          config.net.wlan.key_len = 0;
+          break;
+
+        case 1:
+          config.net.wlan.key_type = kt_hex;
+          config.net.wlan.key_len = 0;
+          break;
+
+        case 2:
+          config.net.wlan.key_type = kt_pass;
+          config.net.wlan.key_len = 40;
+          break;
+
+        case 3:
+          config.net.wlan.key_type = kt_pass;
+          config.net.wlan.key_len = 104;
+          break;
+      }
 
       if(dia_input2("WEP Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
         rc = -1;
@@ -2305,11 +2325,11 @@ int wlan_auth_cb(dia_item_t di)
           str_copy(&key, config.net.wlan.key);
           break;
 
-        case kt_pass_40:
-          pass_mode = 1;
-
-        case kt_pass_104:
-          strprintf(&buf, "lwepgen%s '%s'", pass_mode ? "" : " -s", config.net.wlan.key);
+        case kt_pass:
+          strprintf(&buf, "lwepgen%s '%s'",
+            config.net.wlan.key_len == 104 ? " -s" : "",
+            config.net.wlan.key
+          );
           f = popen(buf, "r");
           if(f) {
             fgets(key = calloc(1, 256), 256, f);
@@ -2355,7 +2375,7 @@ int wlan_auth_cb(dia_item_t di)
         break;
       }
 
-      j = config.net.wlan.key_type == kt_pass_wpa ? 2 : 1;
+      j = config.net.wlan.key_type == kt_pass ? 2 : 1;
 
       i = dia_list("WPA Key Type", 30, NULL, wpa_key_items, j, align_left);
 
@@ -2364,20 +2384,21 @@ int wlan_auth_cb(dia_item_t di)
         break;
       }
 
-      config.net.wlan.key_type = i == 1 ? kt_hex : kt_pass_wpa;
+      config.net.wlan.key_type = i == 1 ? kt_hex : kt_pass;
+      config.net.wlan.key_len = 0;
 
       if(dia_input2("WPA Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
         rc = -1;
         break;
       }
 
-      if(config.net.wlan.key_type == kt_pass_wpa && strlen(config.net.wlan.key) < 8) {
+      if(config.net.wlan.key_type == kt_pass && strlen(config.net.wlan.key) < 8) {
         dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
         rc = -1;
         break;
       }
 
-      if(config.net.wlan.key_type == kt_pass_wpa) {
+      if(config.net.wlan.key_type == kt_pass) {
         strprintf(&key, "\"%s\"", config.net.wlan.key);
       }
       else {

@@ -749,8 +749,6 @@ int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
 int auto2_init()
 {
   int i, win_old;
-  hd_t *hd;
-  char buf[256];
 
   auto2_chk_frame_buffer();
 
@@ -764,28 +762,6 @@ int auto2_init()
   printf("\r%64s\r", "");
   fflush(stdout);
 
-  if(config.idescsi) {
-    strcpy(buf, "ignore=");
-    for(i = 0, hd = hd_list(hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
-      if(
-        hd->bus.id == bus_ide &&
-        (config.idescsi > 1 || hd->is.cdr || hd->is.cdrw || hd->is.dvdr) &&
-        hd->unix_dev_name &&
-        !strncmp(hd->unix_dev_name, "/dev/hd", sizeof "/dev/hd" - 1)
-      ) {
-        sprintf(buf + strlen(buf), "%s%s", i ? "," : "", hd->unix_dev_name + 5);
-        i = 1;
-      }
-    }
-
-    if(i) {
-      mod_unload_module("ide-cd");
-      mod_modprobe("ide-cd", buf);
-      mod_modprobe("ide-scsi", NULL);
-      hd_list(hd_data, hw_cdrom, 1, NULL);
-    }
-  }
-
   fprintf(stderr, "Hardware probing finished.\n");
   fflush(stderr);
 
@@ -793,10 +769,8 @@ int auto2_init()
     fprintf(stderr, "There seems to be no floppy disk.\n");
   }
 
-  if(!config.hwcheck) {
-    file_read_info();
-    util_debugwait("got info file");
-  }
+  file_read_info();
+  util_debugwait("got info file");
 
   util_splash_bar(40, SPLASH_40);
 
@@ -817,8 +791,6 @@ int auto2_init()
   i = auto2_find_install_medium();
 
   util_splash_bar(50, SPLASH_50);
-
-  if(!i && config.hwcheck) i = 1;
 
   return i;
 }

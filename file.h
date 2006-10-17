@@ -27,14 +27,14 @@ typedef enum {
   key_rescue, key_rootimage, key_rescueimage, key_installdir, key_nopcmcia,
   key_vnc, key_vncpassword, key_displayip, key_sshpassword, key_usepivotroot, key_term,
   key_addswap, key_aborted, key_memyasttext, key_netstop, key_exec,
-  key_usbwait, key_nfsrsize, key_nfswsize, key_hwcheck, key_setupcmd,
+  key_usbwait, key_nfsrsize, key_nfswsize, key_setupcmd,
   key_setupnetif, key_netconfig, key_usessh, key_noshell, key_hwdetect,
   key_floppydevice, key_cdromdevice, key_consoledevice, key_product,
   key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
   key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
   key_linemode, key_moduledelay, key_updatedir, key_scsirename,
   key_doscsirename, key_lxrcdebug, key_kernel_pcmcia, key_liveconfig,
-  key_useidescsi, key_updatename, key_updatestyle, key_updateid,
+  key_updatename, key_updatestyle, key_updateid,
   key_updateask, key_initrd, key_vga, key_bootimage, key_ramdisksize,
   key_suse, key_showopts, key_nosshkey, key_startshell, key_y2debug, key_ro,
   key_rw, key_netid, key_nethwaddr, key_loglevel, key_netsetup,
@@ -45,7 +45,8 @@ typedef enum {
   key_instsys_id, key_initrd_id, key_instsys_complain, key_nfstcp,
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
   key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies,
-  key_dhcpcd, key_layer2,
+  key_dhcpcd, key_layer2, key_wlan_essid, key_wlan_auth, key_wlan_key_ascii,
+  key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len
 } file_key_t;
 
 typedef enum {

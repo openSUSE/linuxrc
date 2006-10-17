@@ -180,7 +180,6 @@ static struct {
   { key_nfsrsize,       "NFS.RSize",      kf_cfg + kf_cmd                },
   { key_nfswsize,       "NFS.WSize",      kf_cfg + kf_cmd                },
   { key_nfstcp,         "NFS.TCP",        kf_cfg + kf_cmd                },
-  { key_hwcheck,        "HWCheck",        kf_cfg + kf_cmd                },
   { key_setupcmd,       "SetupCmd",       kf_cfg + kf_cmd                },
   { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
   { key_netconfig,      "NetConfig",      kf_none                        },
@@ -206,7 +205,6 @@ static struct {
   { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
   { key_liveconfig,     "LiveConfig",     kf_cfg + kf_cmd                },
-  { key_useidescsi,     "UseIDESCSI",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_updatename,     "UpdateName",     kf_cfg + kf_cmd                },
   { key_updatestyle,    "UpdateStyle",    kf_cfg + kf_cmd                },
   { key_updateid,       "UpdateID",       kf_cfg                         },
@@ -263,7 +261,13 @@ static struct {
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
   { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
-  { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                }
+  { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                },
+  { key_wlan_essid,     "WlanESSID",      kf_cfg + kf_cmd                },
+  { key_wlan_auth,      "WlanAuth",       kf_cfg + kf_cmd                },
+  { key_wlan_key_ascii, "WlanKeyAscii",   kf_cfg + kf_cmd                },
+  { key_wlan_key_hex,   "WlanKeyHex",     kf_cfg + kf_cmd                },
+  { key_wlan_key_pass,  "WlanKeyPass",    kf_cfg + kf_cmd                },
+  { key_wlan_key_len,   "WlanKeyLen",     kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -312,6 +316,11 @@ static struct {
   { "qdio",	 di_osa_qdio	    },
   { "lcs",	 di_osa_lcs	    },
 #endif
+  { "open",      wa_open            },
+  { "wep",       wa_wep_open        },
+  { "wep_o",     wa_wep_open        },
+  { "wep_r",     wa_wep_resticted   },
+  { "wpa",       wa_wpa             },
 };
 
 
@@ -864,13 +873,11 @@ void file_do_info(file_t *f0)
         str_copy(&config.installdir, f->value);
         break;
 
-      case key_hwcheck:
       case key_rescue:
       case key_install:
         i = f->is.numeric ? f->nvalue : 1;
         if(f->key == key_rescue) config.rescue = i;
-        config.hwcheck = f->key == key_hwcheck ? i : 0;
-        if(config.rescue || config.hwcheck) {
+        if(config.rescue) {
           config.activate_storage = 1;
           config.activate_network = 1;
         }
@@ -1172,10 +1179,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_useidescsi:
-        if(f->is.numeric) config.idescsi = f->nvalue;
-        break;
-
       case key_kernel_pcmcia:
         if(f->is.numeric) config.kernel_pcmcia = f->nvalue;
         break;
@@ -1433,6 +1436,33 @@ void file_do_info(file_t *f0)
 
       case key_dhcpcd:
         if(*f->value) str_copy(&config.net.dhcpcd, f->value);
+        break;
+
+      case key_wlan_essid:
+        str_copy(&config.net.wlan.essid, *f->value ? f->value : NULL);
+        break;
+
+      case key_wlan_key_ascii:
+        str_copy(&config.net.wlan.key, *f->value ? f->value : NULL);
+        config.net.wlan.key_type = kt_ascii;
+        break;
+
+      case key_wlan_key_hex:
+        str_copy(&config.net.wlan.key, *f->value ? f->value : NULL);
+        config.net.wlan.key_type = kt_hex;
+        break;
+
+      case key_wlan_key_pass:
+        str_copy(&config.net.wlan.key, *f->value ? f->value : NULL);
+        config.net.wlan.key_type = kt_pass;
+        break;
+
+      case key_wlan_key_len:
+        if(f->is.numeric) config.net.wlan.key_len = f->nvalue;
+        break;
+
+      case key_wlan_auth:
+        if(f->is.numeric) config.net.wlan.auth = f->nvalue;
         break;
 
       default:

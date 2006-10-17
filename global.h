@@ -207,11 +207,8 @@ typedef enum {
   wa_none, wa_open, wa_wep_open, wa_wep_resticted, wa_wpa
 } wlan_auth_t;
 
-/*
- * keep the values - see wlan_auth_cb()
- */
 typedef enum {
-  kt_ascii, kt_hex, kt_pass_40, kt_pass_104, kt_pass_wpa
+  kt_ascii, kt_hex, kt_pass
 } key_type_t;
 
 /* > 100 and <= 1000 */
@@ -259,7 +256,6 @@ typedef struct {
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
   unsigned demo:1;		/* start live cd */
-  unsigned hwcheck:1;		/* do hardware check */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   unsigned extramount:1;	/* mountpoints.extra is in use */
   unsigned instdata_mounted:1;	/* install data are mounted */
@@ -289,7 +285,6 @@ typedef struct {
   unsigned scsi_rename:1;	/* ensure hotplug scsi devs are last */
   unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
-  unsigned idescsi;		/* use ide-scsi module */
   unsigned floppy_probed:1;	/* tried to detect floppy device */
   unsigned linebreak:1;		/* internal: print a newline first */
   unsigned manual;		/* manual mode */
@@ -523,6 +518,7 @@ typedef struct {
       char *essid;		/* ESSID */
       char *key;		/* wep/wpa key */
       key_type_t key_type;	/* ascii, hex, passphrase */
+      int key_len;		/* key length in bits (40/104 for wep) */
     } wlan;
   } net;
 

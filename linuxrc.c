@@ -267,13 +267,7 @@ int main(int argc, char **argv, char **env)
       if(!win_old) util_disp_done();
       
     }
-    if(config.hwcheck) {
-      // util_hwcheck();
-      err = 11;
-    }
-    else {
-      err = inst_start_install();
-    }
+    err = inst_start_install();
   }
   else {
     err = 99;
@@ -1059,7 +1053,7 @@ void lxrc_init()
   }
 
   /* file_read_info() is called in auto2_init(), too */
-  if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
+  if(!config.info.loaded && !config.had_segv) file_read_info();
 
   set_activate_language(config.language);
 
@@ -1118,7 +1112,6 @@ void lxrc_main_menu()
     di_main_start,
     di_main_verify,
     di_main_eject,
-//    di_main_hwcheck,
     di_main_reboot,
     di_main_halt,
     di_none
@@ -1127,17 +1120,6 @@ void lxrc_main_menu()
   config.manual |= 1;
 
   di_lxrc_main_menu_last = di_main_start;
-
-#if 0
-  di_lxrc_main_menu_last = config.hwcheck ? di_main_hwcheck : di_main_start;
-
-  if(config.hwcheck) {
-    items[0] = items[1] = items[2] = items[3] = items[4] = items[5] = di_skip;
-  }
-  else {
-    items[6] = di_skip;
-  }
-#endif
 
   for(;;) {
     di = dia_menu2(txt_get(TXT_HDR_MAIN), 40, lxrc_main_cb, items, di_lxrc_main_menu_last);
@@ -1199,13 +1181,6 @@ int lxrc_main_cb(dia_item_t di)
       util_eject_cdrom(config.cdrom);
       rc = 1;
       break;
-
-#if 0
-    case di_main_hwcheck:
-      util_hwcheck();
-      rc = 1;
-      break;
-#endif
 
     case di_main_reboot:
       lxrc_reboot();

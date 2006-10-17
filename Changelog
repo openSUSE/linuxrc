@@ -1,3 +1,7 @@
+17/10/2006:	v2.1.7
+	- better wlan support
+	- removed ancient ide-scsi/hwcheck code 
+
 13/10/2006:	v2.1.6
 	- mark loaded/loadable modules differently in module selection dialog
 	- fixed drawing bug in too small windows

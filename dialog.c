@@ -41,7 +41,6 @@ struct {
   { di_main_start,    TXT_MENU_START,     },
   { di_main_verify,   TXT_CHECK_CD,       },
   { di_main_eject,    TXT_EJECT_CD,       },
-  { di_main_hwcheck,  0, "Hardware Check" },
   { di_main_reboot,   TXT_END_REBOOT,     },
   { di_main_halt,     TXT_POWER_OFF,      },
 
