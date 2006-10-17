@@ -117,7 +117,7 @@ void auto2_scan_hardware(char *log_file)
   FILE *f = NULL;
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int j, ju, k, with_usb;
+  int ju, k, with_usb;
   slist_t *usb_modules = NULL;
   int storage_loaded = 0;
 
@@ -255,14 +255,9 @@ void auto2_scan_hardware(char *log_file)
 
   util_splash_bar(30, SPLASH_30);
 
-  /* look for keyboards & mice */
-  has_kbd_ig = FALSE;
-
-  j = ju = 0;
-  for(hd = hd_data->hd; hd; hd = hd->next) {
-    if(hd->base_class.id == bc_mouse && hd->bus.id == bus_usb) j++;
+  /* look for keyboard and remember if it's usb */
+  for(ju = 0, hd = hd_data->hd; hd; hd = hd->next) {
     if(hd->base_class.id == bc_keyboard) {
-      has_kbd_ig = TRUE;
       if(hd->bus.id == bus_usb) ju++;
       di = hd->driver_info;
       if(di && di->any.type == di_kbd) {
@@ -278,7 +273,7 @@ void auto2_scan_hardware(char *log_file)
 
   activate_driver(hd_data, hd_sys, NULL);
 
-  /* usb keyboard ? */
+  /* usb keyboard -> load usb */
   if(ju) {
     slist_append(&config.module.initrd, usb_modules);
     usb_modules = NULL;

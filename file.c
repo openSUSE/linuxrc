@@ -1739,8 +1739,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_floppydisk, config.floppy_dev[config.floppy]);
   }
 
-  /*we always have one */
-  file_write_num(f, key_keyboard, 1 /* has_kbd_ig */);
+  file_write_num(f, key_keyboard, 1);	/* we always have one - what's the point ??? */
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
 

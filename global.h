@@ -569,7 +569,6 @@ extern int             cpu_ig;
 extern int             force_ri_ig;
 extern char            ppcd_tg [10];
 extern int             has_floppy_ig;
-extern int             has_kbd_ig;
 extern int             reboot_ig;
 extern int             usb_ig;
 extern char            *usb_mods_ig;

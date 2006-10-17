@@ -29,7 +29,6 @@ int             cpu_ig = 0;
 int             force_ri_ig = FALSE;
 char            ppcd_tg [10];
 int             has_floppy_ig = TRUE;
-int             has_kbd_ig = TRUE;
 int             reboot_ig;
 int             usb_ig = 0;
 char            *usb_mods_ig = NULL;
