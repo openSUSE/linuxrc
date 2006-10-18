@@ -1211,11 +1211,11 @@ void util_status_info()
   add_flag(&sl0, buf, config.addswap, "addswap");
   add_flag(&sl0, buf, config.splash, "splash");
   add_flag(&sl0, buf, config.noshell, "noshell");
-  add_flag(&sl0, buf, config.hwdetect, "hwdetect");
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
   add_flag(&sl0, buf, config.zen, "zen");
+  add_flag(&sl0, buf, config.has_pcmcia, "pcmcia");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
@@ -1424,13 +1424,6 @@ void util_status_info()
 
 
   sprintf(buf, "stderr = \"%s\"", config.stderr_name);
-  slist_append_str(&sl0, buf);
-
-  sprintf(buf,
-    "pcmcia = %d, pcmcia_chip = \"%s\"",
-    auto2_pcmcia(),
-    pcmcia_driver(pcmcia_chip_ig)
-  );
   slist_append_str(&sl0, buf);
 
   if(config.instsys) {
@@ -4011,22 +4004,6 @@ void scsi_rename_onedevice(char **dev)
 }
 
 
-char *pcmcia_driver(int pcmcia_type)
-{
-  char *s;
-
-  switch(pcmcia_type) {
-    case 1:
-      s = "tcic"; break;
-    case 2: 
-    default:
-      s = config.kernel_pcmcia ? "yenta_socket" : "i82365";
-  }
-
-  return s;
-}
-
-
 char *short_dev(char *dev)
 {
   if(dev && !strncmp(dev, "/dev/", sizeof "/dev/" - 1)) {
@@ -4372,7 +4349,7 @@ void util_load_usb()
     }
   }
 
-  for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, NULL);
+  for(hd = hd_usb; hd; hd = hd->next) activate_driver2(hd_data, hd, NULL, 0);
 
   hd_free_hd_data(hd_data);
 }

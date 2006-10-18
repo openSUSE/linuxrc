@@ -2,6 +2,10 @@
 	- better wlan support
 	- removed ancient ide-scsi/hwcheck code 
 	- removed module disk support
+	- removed strange passwd/shadow handling code
+	- rewrote hardware activation: per default all storage & network
+	  modules are loaded now
+	- removed (hopefully) obsolete pcmcia code
 
 13/10/2006:	v2.1.6
 	- mark loaded/loadable modules differently in module selection dialog

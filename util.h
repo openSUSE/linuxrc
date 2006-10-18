@@ -121,7 +121,6 @@ void util_set_stderr(char *name);
 void util_set_product_dir(char *prod);
 
 void scsi_rename(void);
-char *pcmcia_driver(int pcmcia_type);
 
 char *short_dev(char *dev);
 char *long_dev(char *dev);

@@ -184,13 +184,13 @@ static struct {
   { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
   { key_netconfig,      "NetConfig",      kf_none                        },
   { key_noshell,        "NoShell",        kf_cfg + kf_cmd + kf_cmd_early },
-  { key_hwdetect,       "HWDetect",       kf_cfg + kf_cmd                },
   { key_floppydevice,   "FloppyDevice",   kf_cfg + kf_cmd                },
   { key_cdromdevice,    "CDROMDevice",    kf_cfg + kf_cmd                },
   { key_consoledevice,  "ConsoleDevice",  kf_cfg + kf_cmd                },
   { key_product,        "Product",        kf_cfg + kf_cmd                },
   { key_productdir,     "ProductDir",     kf_cfg + kf_cmd                },
   { key_linuxrcstderr,  "LinuxrcSTDERR",  kf_cfg + kf_cmd + kf_cmd_early },
+  { key_linuxrcstderr,  "LinuxrcLog",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_comment,        "#",              kf_cfg                         },
   { key_kbdtimeout,     "KBDTimeout",     kf_cfg + kf_cmd                },
   { key_brokenmodules,  "BrokenModules",  kf_cfg + kf_cmd + kf_cmd_early },
@@ -203,6 +203,7 @@ static struct {
   { key_scsirename,     "SCSIRename",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_doscsirename,   "DoSCSIRename",   kf_cfg + kf_cmd                },
   { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
+  { key_lxrcdebug,      "LinuxrcDebug",   kf_cfg + kf_cmd + kf_cmd_early },
   { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
   { key_liveconfig,     "LiveConfig",     kf_cfg + kf_cmd                },
   { key_updatename,     "UpdateName",     kf_cfg + kf_cmd                },
@@ -1051,10 +1052,6 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.noshell = f->nvalue;
         break;
 
-      case key_hwdetect:
-        if(f->is.numeric) config.hwdetect = f->nvalue;
-        break;
-
       case key_floppydevice:
         str_copy(
           &config.floppydev,
@@ -1625,13 +1622,15 @@ void file_write_install_inf(char *dir)
     fprintf(f, "pre-remove paride rmmod %s\n", ppcd_tg);
   }
 
+#if 0
 #if WITH_PCMCIA
   if(pcmcia_chip_ig == 1 || pcmcia_chip_ig == 2) {
     file_write_str(f, key_pcmcia, pcmcia_driver(pcmcia_chip_ig));
   }
 #endif
+#endif
 
-  file_write_num(f, key_haspcmcia, auto2_pcmcia() || pcmcia_chip_ig ? 1 : 0);
+  file_write_num(f, key_haspcmcia, config.has_pcmcia);
 
   file_write_num(f, key_nopcmcia, config.nopcmcia);
 
@@ -1766,6 +1765,7 @@ void file_write_install_inf(char *dir)
 
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);
 
+#if 0
   {
     char *s;
     int boot_disk;
@@ -1777,6 +1777,7 @@ void file_write_install_inf(char *dir)
       file_write_str(f, key_disks, s);
     }
   }
+#endif
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 

@@ -2251,6 +2251,10 @@ int wlan_auth_cb(dia_item_t di)
 
   di_wlan_auth_last = di;
 
+  util_killall("wpa_supplicant", 15);
+  usleep(100000);
+  util_killall("wpa_supplicant", 9);
+
   switch(di) {
     case di_wlan_open:
       config.net.wlan.auth = wa_open;
@@ -2422,10 +2426,6 @@ int wlan_auth_cb(dia_item_t di)
         key
       );
       fclose(f);
-
-      util_killall("wpa_supplicant", 15);
-      sleep(1);
-      util_killall("wpa_supplicant", 9);
 
       strprintf(&buf, "wpa_supplicant -B -Dwext -i%s -c/tmp/wpa_supplicant.conf",
         config.net.device

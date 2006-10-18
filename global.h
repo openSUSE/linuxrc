@@ -279,7 +279,6 @@ typedef struct {
   unsigned noshell:1;		/* don't start any shells */
   volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
   unsigned had_segv:1;		/* last linuxrc run ended with segv */
-  unsigned hwdetect:1;		/* do automatic hardware detection */
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
   unsigned scsi_rename:1;	/* ensure hotplug scsi devs are last */
@@ -298,6 +297,7 @@ typedef struct {
   unsigned listen:1;		/* listen on port */
   unsigned zombies:1;		/* keep zombies around */
   unsigned installfilesread:1;	/* already got install files */
+  unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
@@ -564,7 +564,6 @@ extern colorset_t     *colors_prg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
-extern int             pcmcia_chip_ig;
 extern int             cpu_ig;
 extern int             force_ri_ig;
 extern char            ppcd_tg [10];

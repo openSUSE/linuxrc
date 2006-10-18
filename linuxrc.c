@@ -784,8 +784,6 @@ void lxrc_init()
   config.utf8 = 1;
   config.kbd_fd = -1;
 
-  config.hwdetect = 1;
-
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
   config.activate_storage = 1;		/* together with scsi_rename */
@@ -861,9 +859,10 @@ void lxrc_init()
     util_mkdevs();
   }
   else {
-    fprintf(stderr, "Starting udev ...\n");
+    fprintf(stderr, "Starting udev... ");
+    fflush(stderr);
     system("/bin/myudevstart >/dev/null 2>&1");
-    fprintf(stderr, "... udev running\n");
+    fprintf(stderr, "ok\n");
     unlink("/devz");	/* cf. util_mkdevs() */
   }
 
@@ -922,7 +921,11 @@ void lxrc_init()
 
   info_init();
 
+  printf("Loading basic drivers...");
+  fflush(stdout);
   mod_init(1);
+  printf(" ok\n");
+  fflush(stdout);
 
   /* look for driver updates in initrd */
   util_chk_driver_update("/", "/");
