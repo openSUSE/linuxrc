@@ -1121,8 +1121,8 @@ void inst_yast_done()
 int inst_execute_yast()
 {
   int i, rc;
-  char cmd[256];
   char *setupcmd = NULL;
+  FILE *f;
 
   rc = add_instsys();
   if(rc) {
@@ -1160,21 +1160,10 @@ int inst_execute_yast()
     return -1;
   }
 
-  if (!config.test && config.usessh && config.net.sshpassword) {
-    FILE *passwd;
-
-    /* symlink to ro medium, but we need to overwrite them. */  
-    unlink("/etc/passwd");
-    unlink("/etc/shadow");
-    sprintf(cmd, "cp %s/etc/shadow /etc", config.instsys);system(cmd);
-    sprintf(cmd, "cp %s/etc/passwd /etc", config.instsys);system(cmd);
-    sprintf(cmd, "%s/etc/pam.d", config.instsys);symlink(cmd,"/etc/pam.d");
-
- 
-    passwd = popen("/usr/sbin/chpasswd","w");
-    if (passwd) {
-      fprintf(passwd,"root:%s\n",config.net.sshpassword);
-      pclose(passwd);
+  if(!config.test && config.usessh && config.net.sshpassword) {
+    if((f = popen("/usr/sbin/chpasswd", "w"))) {
+      fprintf(f, "root:%s\n", config.net.sshpassword);
+      pclose(f);
     }
   }
 
