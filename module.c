@@ -57,8 +57,6 @@ static char *mod_get_params(module_t *mod);
 static void mod_load_module_manual(char *module, int show);
 static int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t align);
 static void mod_delete_module(void);
-
-static int mod_cmp(char *str1, char *str2);
 static void mod_auto_detect(void);
 
 /*
@@ -890,6 +888,8 @@ int mod_cmp(char *str1, char *str2)
 {
   char *s;
   int i;
+
+  if(!str1 || !str2) return 1;
 
   str1 = strdup(str1);
   str2 = strdup(str2);

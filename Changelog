@@ -1,3 +1,7 @@
+19/10/2006:	v2.1.8
+	- extend $PATH for busybox
+	- better active driver detection
+
 17/10/2006:	v2.1.7
 	- better wlan support
 	- removed ancient ide-scsi/hwcheck code 

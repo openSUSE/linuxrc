@@ -239,7 +239,7 @@ int main(int argc, char **argv, char **env)
     }
   }
 
-  setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin", 1);
+  setenv("PATH", "/lbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin", 1);
 
   lxrc_init();
 
