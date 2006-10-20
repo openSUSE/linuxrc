@@ -184,6 +184,9 @@ int inst_menu()
 
   items[config.demo ? 0 : 1] = di_skip;
 
+  /* hope this is correct... */
+  config.net.do_setup = 0;
+
   di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
 
   return di == di_none ? 1 : 0;
@@ -426,6 +429,7 @@ int inst_choose_source_cb(dia_item_t di)
 
   switch(di) {
     case di_source_cdrom:
+      str_copy(&config.serverdir, NULL);
       error = inst_mount_cdrom(0);
       if(error) {
         sprintf(tmp, txt_get(TXT_INSERT_CD), 1);

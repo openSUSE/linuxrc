@@ -81,7 +81,6 @@ static void net_show_error(enum nfs_stat status_rv);
 #endif
 
 static void if_down(char *dev);
-static int wlan_setup(void);
 static int wlan_auth_cb(dia_item_t di);
 
 static dia_item_t di_wlan_auth_last = di_none;
@@ -2213,6 +2212,7 @@ void net_apply_ethtool(char *device, char *hwaddr)
  */
 int wlan_setup()
 {
+  int win_old = config.win;
   dia_item_t di;
   dia_item_t items[] = {
     di_wlan_open,
@@ -2222,7 +2222,35 @@ int wlan_setup()
     di_none
   };
 
-  di = dia_menu2("WLAN Authentication", 40, wlan_auth_cb, items, di_wlan_auth_last);
+  switch(config.net.wlan.auth) {
+    case wa_open:
+      di = di_wlan_open;
+      break;
+
+    case wa_wep_open:
+      di = di_wlan_wep_o;
+      break;
+
+    case wa_wep_resticted:
+      di = di_wlan_wep_r;
+      break;
+
+    case wa_wpa:
+      di = di_wlan_wpa;
+      break;
+
+    default:
+      di = di_none;
+  }
+
+  if(config.manual || di == di_none) {
+    di = dia_menu2("WLAN Authentication", 40, wlan_auth_cb, items, di_wlan_auth_last);
+  }
+  else {
+    if(wlan_auth_cb(di)) di = di_none;
+  }
+
+  if(config.win && !win_old) util_disp_done();
 
   return di == di_none ? 1 : 0;
 }
@@ -2259,9 +2287,11 @@ int wlan_auth_cb(dia_item_t di)
     case di_wlan_open:
       config.net.wlan.auth = wa_open;
 
-      if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
-        rc = -1;
-        break;
+      if(config.manual || !config.net.wlan.essid) {
+        if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
+         rc = -1;
+          break;
+        }
       }
 
       strprintf(&buf, "iwconfig %s essid %s'%s'",
@@ -2281,43 +2311,47 @@ int wlan_auth_cb(dia_item_t di)
     case di_wlan_wep_r:
       config.net.wlan.auth = wep_mode ? wa_wep_open : wa_wep_resticted;
 
-      if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
-        rc = -1;
-        break;
+      if(config.manual || !config.net.wlan.essid) {
+        if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
+          rc = -1;
+         break;
+        }
       }
 
-      i = dia_list("WEP Key Type", 30, NULL, wep_key_items, config.net.wlan.key_type + 1, align_left) - 1;
+      if(config.manual || !config.net.wlan.key) {
+        i = dia_list("WEP Key Type", 30, NULL, wep_key_items, config.net.wlan.key_type + 1, align_left) - 1;
 
-      if(i < 0) {
-        rc = -1;
-        break;
-      }
-
-      switch(i) {
-        case 0:
-          config.net.wlan.key_type = kt_ascii;
-          config.net.wlan.key_len = 0;
+        if(i < 0) {
+          rc = -1;
           break;
+        }
 
-        case 1:
-          config.net.wlan.key_type = kt_hex;
-          config.net.wlan.key_len = 0;
+        switch(i) {
+          case 0:
+            config.net.wlan.key_type = kt_ascii;
+            config.net.wlan.key_len = 0;
+            break;
+
+          case 1:
+            config.net.wlan.key_type = kt_hex;
+            config.net.wlan.key_len = 0;
+            break;
+
+          case 2:
+            config.net.wlan.key_type = kt_pass;
+            config.net.wlan.key_len = 40;
+            break;
+
+          case 3:
+            config.net.wlan.key_type = kt_pass;
+            config.net.wlan.key_len = 104;
+            break;
+        }
+
+        if(dia_input2("WEP Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
+          rc = -1;
           break;
-
-        case 2:
-          config.net.wlan.key_type = kt_pass;
-          config.net.wlan.key_len = 40;
-          break;
-
-        case 3:
-          config.net.wlan.key_type = kt_pass;
-          config.net.wlan.key_len = 104;
-          break;
-      }
-
-      if(dia_input2("WEP Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
-        rc = -1;
-        break;
+        }
       }
 
       switch(config.net.wlan.key_type) {
@@ -2349,7 +2383,6 @@ int wlan_auth_cb(dia_item_t di)
         default:
           rc = -1;
           break;
-      
       }
 
       if(rc == -1) break;
@@ -2374,32 +2407,36 @@ int wlan_auth_cb(dia_item_t di)
       break;
 
     case di_wlan_wpa:
-      if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
-        rc = -1;
-        break;
+      if(config.manual || !config.net.wlan.essid) {
+        if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
+          rc = -1;
+          break;
+        }
       }
 
-      j = config.net.wlan.key_type == kt_pass ? 2 : 1;
+      if(config.manual || !config.net.wlan.key) {
+        j = config.net.wlan.key_type == kt_pass ? 2 : 1;
 
-      i = dia_list("WPA Key Type", 30, NULL, wpa_key_items, j, align_left);
+        i = dia_list("WPA Key Type", 30, NULL, wpa_key_items, j, align_left);
 
-      if(i < 1) {
-        rc = -1;
-        break;
-      }
+        if(i < 1) {
+          rc = -1;
+          break;
+        }
 
-      config.net.wlan.key_type = i == 1 ? kt_hex : kt_pass;
-      config.net.wlan.key_len = 0;
+        config.net.wlan.key_type = i == 1 ? kt_hex : kt_pass;
+        config.net.wlan.key_len = 0;
 
-      if(dia_input2("WPA Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
-        rc = -1;
-        break;
-      }
+        if(dia_input2("WPA Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
+          rc = -1;
+          break;
+        }
 
-      if(config.net.wlan.key_type == kt_pass && strlen(config.net.wlan.key) < 8) {
-        dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
-        rc = -1;
-        break;
+        if(config.net.wlan.key_type == kt_pass && strlen(config.net.wlan.key) < 8) {
+          dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
+          rc = -1;
+          break;
+        }
       }
 
       if(config.net.wlan.key_type == kt_pass) {

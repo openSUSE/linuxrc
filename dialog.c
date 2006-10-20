@@ -319,6 +319,8 @@ int dia_message (char *txt_tv, int msgtype_iv)
     int       key_ii;
     char *s;
 
+    if(!config.win) util_disp_init();
+
     if (config.linemode)
       {
 	putchar('\n');
@@ -1556,6 +1558,8 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
   item_t *item_list;
   char *s;
 
+  if(!config.win) util_disp_init();
+
   for(item_cnt = 0, it = items; *it != di_none; it++) {
     if(*it != di_skip) item_cnt++;
   }
@@ -1610,6 +1614,8 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
   for(item_cnt = 0, it = items; *it; it++) item_cnt++;
 
   if(!item_cnt) return 0;
+
+  if(!config.win) util_disp_init();
 
   item_list = calloc(item_cnt, sizeof *item_list);
 
@@ -1674,6 +1680,8 @@ int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
   int i;
 
   if(!input) return 0;
+
+  if(!config.win) util_disp_init();
 
   *buf = 0;
   if(*input) strncpy(buf, *input, sizeof buf - 1);

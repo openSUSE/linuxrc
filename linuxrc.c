@@ -836,7 +836,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2006 SUSE Linux Products GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2006 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)

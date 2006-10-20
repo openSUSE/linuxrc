@@ -36,13 +36,11 @@
 
 
 static void auto2_user_netconfig(void);
-// static hd_t *add_hd_entry(hd_t **hd, hd_t *new_hd);
 static int auto2_harddisk_dev(void);
 static int auto2_cdrom_dev(void);
 static int auto2_net_dev(hd_t **);
 static int auto2_net_dev1(hd_t *hd);
 static int driver_is_active(hd_t *hd);
-// static int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx);
 static void auto2_progress(char *pos, char *msg);
 static void get_zen_config(void);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
@@ -168,7 +166,7 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay += 2;
 
-    for(hd = hd_pcmcia; hd; hd = hd->next) activate_driver2(hd_data, hd, NULL, 0);
+    for(hd = hd_pcmcia; hd; hd = hd->next) activate_driver(hd_data, hd, NULL, 0);
     hd_pcmcia = hd_free_hd_list(hd_pcmcia);
 
     config.module.delay -= 2;
@@ -181,7 +179,7 @@ void auto2_scan_hardware(char *log_file)
 
     hd_pcmcia2 = hd_list(hd_data, hw_pcmcia, 1, NULL);
     if(hd_pcmcia2) config.has_pcmcia = 1;
-    for(hd = hd_pcmcia2; hd; hd = hd->next) activate_driver2(hd_data, hd, NULL, 0);
+    for(hd = hd_pcmcia2; hd; hd = hd->next) activate_driver(hd_data, hd, NULL, 0);
     hd_pcmcia2 = hd_free_hd_list(hd_pcmcia2);
 
     printf(" ok\n");
@@ -208,7 +206,7 @@ void auto2_scan_hardware(char *log_file)
       }
     }
 
-    for(hd = hd_usb; hd; hd = hd->next) activate_driver2(hd_data, hd, &usb_modules, 0);
+    for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, &usb_modules, 0);
     hd_usb = hd_free_hd_list(hd_usb);
 
     mod_modprobe("input", NULL);
@@ -244,7 +242,7 @@ void auto2_scan_hardware(char *log_file)
 
     config.module.delay += 3;
 
-    for(hd = hd_fw; hd; hd = hd->next) activate_driver2(hd_data, hd, NULL, 0);
+    for(hd = hd_fw; hd; hd = hd->next) activate_driver(hd_data, hd, NULL, 0);
     hd_fw = hd_free_hd_list(hd_fw);
 
     mod_modprobe("sbp2", NULL);
@@ -275,7 +273,7 @@ void auto2_scan_hardware(char *log_file)
 
   hd_sys = hd_list(hd_data, hw_sys, 0, NULL);
 
-  activate_driver2(hd_data, hd_sys, NULL, 0);
+  activate_driver(hd_data, hd_sys, NULL, 0);
 
   /* usb keyboard -> load usb */
   if(ju) {
@@ -456,9 +454,12 @@ int auto2_cdrom_dev()
  */
 int auto2_net_dev(hd_t **hd0)
 {
-  hd_t *hd;
+  hd_t *hd, *hd_card;
   hd_data_t *hd_data;
   int err = 1;
+  hd_hw_item_t hw_items[] = {
+    hw_network_ctrl, hw_network
+  };
 
 #if defined(__s390__) || defined(__s390x__)
   static int as3d = 0;
@@ -473,7 +474,13 @@ int auto2_net_dev(hd_t **hd0)
 
   hd_data = calloc(1, sizeof *hd_data);
 
-  for(hd = hd_list(hd_data, hw_network, 1, NULL); hd; hd = hd->next) {
+  hd_list2(hd_data, hw_items, 1);
+
+  for(hd = hd_list(hd_data, hw_network, 0, NULL); hd; hd = hd->next) {
+    // set wlan tag for interface
+    hd_card = hd_get_device_by_idx(hd_data, hd->attached_to);
+    if(hd_card && hd_card->is.wlan) hd->is.wlan = 1;
+
     if(!auto2_net_dev1(hd)) {
       err = 0;
       break;
@@ -503,6 +510,7 @@ int auto2_net_dev1(hd_t *hd)
   if(!hd || !(device = hd->unix_dev_name)) return 1;
 
   if(!strncmp(device, "lo", sizeof "lo" - 1)) return 1;
+  if(!strncmp(device, "sit", sizeof "sit" - 1)) return 1;
 
   for(res = hd->res; res; res = res->next) {
     if(res->any.type == res_hwaddr) {
@@ -547,6 +555,8 @@ int auto2_net_dev1(hd_t *hd)
   net_setup_localhost();
 
   config.net.configured = nc_static;
+
+  if(hd->is.wlan) wlan_setup();
 
   /* do bootp if there's some indication that a net install is intended
    * but some data are still missing
@@ -641,72 +651,11 @@ int driver_is_active(hd_t *hd)
 }
 
 
-#if 0
 /*
  * Activate device driver.
  * Returns 1 if it worked, else 0.
  */
-int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list)
-{
-  driver_info_t *di;
-  str_list_t *sl1, *sl2;
-  slist_t *slm;
-  int i, ok = 0;
-  char buf[256];
-
-  if(!hd || driver_is_active(hd)) return 1;
-
-  if(hd->is.notready) return 1;
-
-  // if(ID_TAG(hd->vendor.id) == TAG_PCMCIA) return 0;
-
-  if(
-    !config.nopcmcia &&
-    hd->hotplug == hp_pcmcia &&
-    hd->hotplug_slot &&
-    util_check_exist("/sbin/pcmcia-socket-startup")
-  ) {
-    sprintf(buf, "%s %d\n", "/sbin/pcmcia-socket-startup", hd->hotplug_slot - 1);
-    fprintf(stderr, "pcmcia socket startup for: %s (socket %d)\n", hd->sysfs_id, hd->hotplug_slot - 1);
-
-    system(buf);
-  }
-
-  for(di = hd->driver_info; di; di = di->next) {
-    if(di->module.type == di_module) {
-      for(
-        sl1 = di->module.names, sl2 = di->module.mod_args;
-        sl1 && sl2;
-        sl1 = sl1->next, sl2 = sl2->next
-      ) {
-        di->module.modprobe ? mod_modprobe(sl1->str, sl2->str) : mod_insmod(sl1->str, sl2->str);
-        if(mod_list) {
-          slm = slist_add(mod_list, slist_new());
-          str_copy(&slm->key, sl1->str);
-        }
-      }
-
-      /* all modules should be loaded now */
-      for(i = 1, sl1 = di->module.names; sl1; sl1 = sl1->next) {
-        i &= hd_module_is_active(hd_data, sl1->str);
-      }
-
-      if(i) {
-        ok = 1;
-        break;
-      }
-    }
-  }
-
-  return ok;
-}
-#endif
-
-/*
- * Activate device driver.
- * Returns 1 if it worked, else 0.
- */
-int activate_driver2(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_modules)
+int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_modules)
 {
   driver_info_t *di;
   str_list_t *sl1, *sl2;
@@ -767,49 +716,6 @@ int activate_driver2(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_
 }
 
 
-#if 0
-/*
- * Activate storage/network devices.
- * Returns 0 or the index of the last controller we activated.
- */
-int auto2_activate_devices(hd_hw_item_t hw_class, unsigned last_idx)
-{
-  hd_t *hd;
-  int ok;
-
-  for(hd = hd_data->hd; hd; hd = hd->next) {
-    if(hd->idx > last_idx) break;
-  }
-
-  last_idx = 0;		/* re-use */
-
-  if(!hd) return 0;	/* no further entries */
-
-  for(; hd; hd = hd->next) {
-    if(hd_is_hw_class(hd, hw_class) && !driver_is_active(hd)) {
-      if((ok = activate_driver(hd_data, hd, NULL))) {
-        last_idx = hd->idx;
-        fprintf(stderr, "Ok, that seems to have worked. :-)\n");
-      }
-      else {
-        fprintf(stderr, "Oops, that didn't work.\n");
-      }
-
-      /* some module was loaded...; in demo mode activate all disks */
-      if(
-        !(
-          (config.activate_storage && hw_class == hw_storage_ctrl) ||
-          (config.activate_network && hw_class == hw_network_ctrl)
-        ) &&
-        ok
-      ) break;
-    }
-  }
-
-  return last_idx;
-}
-#endif
-
 /*
  * Checks if autoinstall is possible.
  *
@@ -834,7 +740,6 @@ int auto2_init()
   util_splash_bar(40, SPLASH_40);
 
   if(config.update.ask && !config.update.shown) {
-    // auto2_activate_devices(hw_storage_ctrl, 0);
     if(!(win_old = config.win)) util_disp_init();
     if(config.update.name_list) {
       dia_show_lines2("Driver Updates added", config.update.name_list, 64);
@@ -863,8 +768,6 @@ void auto2_user_netconfig()
   int win_old;
 
   if(!config.net.do_setup) return;
-
-  // auto2_activate_devices(hw_network_ctrl, 0);
 
   if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
     config.net.configured = nc_static;
@@ -912,35 +815,11 @@ int auto2_find_install_medium()
 
     util_debugwait("CD?");
 
-    // if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
-
-    // if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-
     fprintf(stderr, "Looking for a %s CD...\n", config.product);
     if(!(i = auto2_cdrom_dev())) {
       auto2_user_netconfig();
       return TRUE;
     }
-
-#if 0
-    for(last_idx = 0;;) {
-      /* i == 1 -> try to activate another storage device */
-      if(i == 1) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-      }
-
-      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
-        fprintf(stderr, "No further storage devices found; giving up.\n");
-        break;
-      }
-
-      fprintf(stderr, "Looking for a %s CD again...\n", config.product);
-      if(!(i = auto2_cdrom_dev(&hd_devs))) {
-        auto2_user_netconfig();
-        return TRUE;
-      }
-    }
-#endif
 
     if(config.cdrom) {
       auto2_user_netconfig();
@@ -956,35 +835,11 @@ int auto2_find_install_medium()
 
     util_debugwait("HD?");
 
-    // if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
-
-    // if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-
     fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
     if(!(i = auto2_harddisk_dev())) {
       auto2_user_netconfig();
       return TRUE;
     }
-
-#if 0
-    for(last_idx = 0;;) {
-      /* i == 1 -> try to activate another storage device */
-      if(i == 1) {
-        fprintf(stderr, "Ok, that didn't work; see if we can activate another storage device...\n");
-      }
-
-      if(!(last_idx = auto2_activate_devices(hw_storage_ctrl, last_idx))) {
-        fprintf(stderr, "No further storage devices found; giving up.\n");
-        break;
-      }
-
-      fprintf(stderr, "Looking for a %s hard disk again...\n", config.product);
-      if(!(i = auto2_harddisk_dev(&hd_devs))) {
-        auto2_user_netconfig();
-        return TRUE;
-      }
-    }
-#endif
 
     util_debugwait("Nothing found");
 
@@ -1009,26 +864,8 @@ int auto2_find_install_medium()
     fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
     fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
 
-    // if(config.activate_network) auto2_activate_devices(hw_network_ctrl, 0);
-
-    // if(config.activate_storage) auto2_activate_devices(hw_storage_ctrl, 0);
-
     fprintf(stderr, "Looking for a network server...\n");
     if(!auto2_net_dev(&hd_devs)) return TRUE;
-
-#if 0
-    for(last_idx = 0;;) {
-      fprintf(stderr, "Ok, that didn't work; see if we can activate another network device...\n");
-
-      if(!(last_idx = auto2_activate_devices(hw_network_ctrl, last_idx))) {
-        fprintf(stderr, "No further network cards found; giving up.\n");
-        break;
-      }
-
-      fprintf(stderr, "Looking for a network server again...\n");
-      if(!auto2_net_dev(&hd_devs)) return TRUE;
-    }
-#endif
 
   }
 
@@ -1252,7 +1089,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
         fflush(stdout);
       }
     }
-    activate_driver2(hd_data, hd, NULL, 1);
+    activate_driver(hd_data, hd, NULL, 1);
   }
 }
 
