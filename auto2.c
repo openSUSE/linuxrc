@@ -114,7 +114,7 @@ void auto2_scan_hardware(char *log_file)
   FILE *f = NULL;
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int ju, k;
+  int i, ju, k;
   slist_t *usb_modules = NULL;
   int storage_loaded = 0, max_wait;
   hd_data_t *hd_data;
@@ -311,6 +311,25 @@ void auto2_scan_hardware(char *log_file)
 
   if(!storage_loaded) load_drivers(hd_data, hw_storage_ctrl);
   load_drivers(hd_data, hw_network_ctrl);
+
+  if(config.info.add_cmdline) {
+    file_read_info_file("cmdline", kf_cmd);
+  }
+
+  if(config.info.file) {
+    fprintf(stderr, "Looking for info file: %s\n", config.info.file);
+    printf("Reading info file:\n  %s ...", config.info.file);
+    fflush(stdout);
+    i = get_url(config.info.file, "/download/info");
+    printf("%s\n", i ? " failed" : " ok");
+    if(!i) {
+      fprintf(stderr, "Parsing info file: %s\n", config.info.file);
+      file_read_info_file("file:/download/info", kf_cfg);
+    }
+    else {
+      fprintf(stderr, "Info file not found: %s\n", config.info.file);
+    }
+  }
 
   if(log_file && (f = fopen(log_file, "w+"))) {
 
@@ -730,13 +749,6 @@ int auto2_init()
 
   auto2_scan_hardware(NULL);
 
-  if(!auto2_find_floppy()) {
-    fprintf(stderr, "There seems to be no floppy disk.\n");
-  }
-
-  file_read_info();
-  util_debugwait("got info file");
-
   util_splash_bar(40, SPLASH_40);
 
   if(config.update.ask && !config.update.shown) {
@@ -873,117 +885,6 @@ int auto2_find_install_medium()
 
   return FALSE;
 }
-
-
-/*
- * Scans the hardware list for a floppy and puts the result into
- * config.floppies & config.floppy_dev[].
- *
- * Returns number of floppies (with medium inserted!) found.
- */
-int auto2_find_floppy()
-{
-  hd_data_t *hd_data;
-  hd_t *hd, *hd0;
-  hd_res_t *res;
-  int i, small_floppy = 0;
-  char *s, buf[256];
-
-  config.floppy_probed = 1;
-
-  if(config.floppydev) {
-    config.floppy = 0;
-    sprintf(buf, "/dev/%s", config.floppydev);
-    str_copy(&config.floppy_dev[0], buf);
-    return config.floppies = 1;
-  }
-
-  hd_data = calloc(1, sizeof *hd_data);
-
-  config.floppy = config.floppies = 0;
-  for(
-    i = 0;
-    (unsigned) i < sizeof config.floppy_dev / sizeof *config.floppy_dev && config.floppy_dev[i];
-    i++
-  ) {
-    free(config.floppy_dev[i]);
-    config.floppy_dev[i] = NULL;
-  }
-
-  hd0 = hd_list(hd_data, hw_floppy, 1, NULL);
-
-  for(hd = hd0; hd; hd = hd->next) {
-    if(
-      (unsigned) config.floppies < sizeof config.floppy_dev / sizeof *config.floppy_dev &&
-      hd->unix_dev_name &&			/* and has a device name */
-      !hd->is.notready				/* medium inserted */
-    ) {
-      config.floppy_dev[config.floppies++] = strdup(hd->unix_dev_name);
-      fprintf(stderr, "floppy: %s\n", hd->unix_dev_name);
-      for(res = hd->res; res; res = res->next) {
-        if(
-          !small_floppy &&
-          res->any.type == res_size &&
-          res->size.unit == size_unit_sectors &&
-          res->size.val1 >= 0 && res->size.val1 <= 2880 * 2
-        ) small_floppy = config.floppies - 1;
-      }
-    }
-  }
-
-  hd_free_hd_list(hd0);
-
-  hd_free_hd_data(hd_data);
-
-  free(hd_data);
-
-  /* try 'real' floppy first */
-  if(small_floppy) {
-    s = config.floppy_dev[0];
-    config.floppy_dev[0] = config.floppy_dev[small_floppy];
-    config.floppy_dev[small_floppy] = s;
-  }
-
-  return config.floppies;
-}
-
-
-#if 0
-char *auto2_disk_list(int *boot_disk)
-{
-  static char buf[256];
-  char bdev[64];
-  hd_t *hd;
-  int matches;
-  unsigned boot_idx;
-
-  *boot_disk = 0;
-  *buf = 0;
-  *bdev = 0;
-  if(!hd_data) return buf;
-
-  boot_idx = hd_boot_disk(hd_data, &matches);
-  if(boot_idx && matches == 1) {
-    hd = hd_get_device_by_idx(hd_data, boot_idx);
-    if(hd && hd->unix_dev_name) {
-      *boot_disk = boot_idx;
-      strcpy(buf, hd->unix_dev_name);
-      strcpy(bdev, hd->unix_dev_name);
-    }
-  }
-
-  for(hd = hd_list(hd_data, hw_disk, 1, NULL); hd; hd = hd->next) {
-    if(hd->unix_dev_name && strcmp(bdev, hd->unix_dev_name)) {
-      if(*buf) strcat(buf, " ");
-      strcat(buf, hd->unix_dev_name);
-    }
-  }
-
-  hd = hd_free_hd_list(hd);
-
-  return buf;
-}
-#endif
 
 
 char *auto2_serial_console()
@@ -1177,4 +1078,5 @@ void pcmcia_socket_startup()
     closedir(d);
   }
 }
+
 

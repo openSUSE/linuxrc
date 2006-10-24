@@ -153,4 +153,5 @@ char *get_translation(slist_t *trans, char *locale);
 int util_process_running(char *name);
 
 int system_log(char *cmd);
+int get_url(char *src_url, char *dst);
 

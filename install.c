@@ -60,7 +60,6 @@ static int   inst_start_rescue        (void);
 static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
-static int   inst_check_floppy        (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_netsource    (void);
 static int   inst_choose_netsource_cb (dia_item_t di);
@@ -77,8 +76,6 @@ static int   inst_do_http             (void);
 static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
 static int choose_dud(char **dev);
-// static int dud_probe_cdrom(char **dev);
-// static int dud_probe_floppy(char **dev);
 static void  inst_swapoff             (void);
 static void get_file(char *src, char *dst);
 static void eval_find_config(void);
@@ -387,6 +384,7 @@ int inst_choose_display_cb(dia_item_t di)
 }
 #endif
 
+
 int inst_choose_source()
 {
   dia_item_t di;
@@ -394,18 +392,14 @@ int inst_choose_source()
     di_source_cdrom,
     di_source_net,
     di_source_hd,
-    di_source_floppy,
     di_none
   };
 
   inst_umount();
 
-  if(!config.rescue) items[3] = di_skip;
-
   if(di_inst_choose_source_last == di_none) {
     if(config.insttype == inst_net) di_inst_choose_source_last = di_source_net;
     if(config.instmode == inst_hd) di_inst_choose_source_last = di_source_hd;
-    if(config.instmode == inst_floppy) di_inst_choose_source_last = di_source_floppy;
   }
 
   di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
@@ -444,10 +438,6 @@ int inst_choose_source_cb(dia_item_t di)
 
     case di_source_hd:
       error = inst_mount_harddisk();
-      break;
-
-    case di_source_floppy:
-      error = inst_check_floppy();
       break;
 
     default:
@@ -691,13 +681,6 @@ int inst_check_instsys()
   config.installfilesread = 0;
 
   switch(config.instmode) {
-    case inst_floppy:
-      config.use_ramdisk = 1;
-      config.instdata_mounted = 0;
-
-      strcpy(inst_rootimage_tm, config.floppies ? config.floppy_dev[config.floppy] : "/dev/fd0");
-      break;
-
     case inst_hd:
     case inst_cdrom:
     case inst_nfs:
@@ -1310,42 +1293,6 @@ int inst_execute_yast()
   }
 
   return rc;
-}
-
-
-/*
- * Look for a usable (aka with medium) floppy drive.
- *
- * return: 0: ok, < 0: failed
- */
-// ####### We should make sure the floppy has the rescue system on it!
-int inst_check_floppy()
-{
-  int i, fd = -1;
-  char *s;
-
-  set_instmode(inst_floppy);
-
-  i = dia_message(txt_get(TXT_INSERT_DISK), MSGTYPE_INFOENTER);
-  if(i) return i;
-
-  for(i = -1; i < config.floppies; i++) {
-    /* try last working floppy first */
-    if(i == config.floppy) continue;
-    s = config.floppy_dev[i == -1 ? config.floppy : i];
-    if(!s) continue;
-    fd = open(s, O_RDONLY);
-    if(fd < 0) continue;
-    config.floppy = i == -1 ? config.floppy : i;
-    break;
-  }
-
-  if(fd < 0)
-    dia_message(txt_get(TXT_ERROR_READ_DISK), MSGTYPE_ERROR);
-  else
-    close(fd);
-
-  return fd < 0 ? fd : 0;
 }
 
 

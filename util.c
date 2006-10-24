@@ -8,6 +8,8 @@
 
 #define __LIBRARY__
 
+#define _GNU_SOURCE	/* stat64 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -530,9 +532,9 @@ void util_truncate_dir(char *dir)
 
 int util_check_exist(char *file)
 {
-  struct stat sbuf;
+  struct stat64 sbuf;
 
-  if(stat(file, &sbuf)) return 0;
+  if(!file || stat64(file, &sbuf)) return 0;
 
   if(S_ISREG(sbuf.st_mode)) return 'r';
   if(S_ISDIR(sbuf.st_mode)) return 'd';
@@ -1233,20 +1235,6 @@ void util_status_info()
   sprintf(buf, "info = ");
   if(*s) sprintf(buf + strlen(buf), "%s", s);
   if(*t) sprintf(buf + strlen(buf), ", %s", t);
-  slist_append_str(&sl0, buf);
-
-  strcpy(buf, "floppies = (");
-  for(i = 0; i < config.floppies; i++) {
-    sprintf(buf + strlen(buf), "%s%s%s",
-      i ? ", " : " ",
-      config.floppy_dev[i],
-      i == config.floppy && config.floppies != 1 ? "*" : ""
-    );
-  }
-  strcat(buf, " )");
-  if(config.floppydev) {
-    sprintf(buf + strlen(buf), " [%s]", config.floppydev);
-  }
   slist_append_str(&sl0, buf);
 
   strcpy(buf, "net devices = (");
@@ -3966,11 +3954,7 @@ void scsi_rename_devices()
 {
   size_t i;
   slist_t *sl;
-  char **rs[] = { &config.floppydev, &config.update.dev, &config.cdrom };
-
-  for(i = 0; i < sizeof config.floppy_dev / sizeof *config.floppy_dev; i++) {
-    scsi_rename_onedevice(config.floppy_dev + i);
-  }
+  char **rs[] = { &config.update.dev, &config.cdrom };
 
   for(i = 0; i < sizeof rs / sizeof *rs; i++) {
     scsi_rename_onedevice(rs[i]);
@@ -4669,4 +4653,119 @@ int system_log(char *cmd)
 
   return i;
 }
+
+
+/*
+ *
+ */
+int get_url(char *src_url, char *dst)
+{
+  url_t *url;
+  int err = 1, i;
+  hd_data_t *hd_data;
+  hd_t *hd;
+  char *dir = NULL;
+  hd_hw_item_t hw_item;
+  char *dev, *module, *type;
+
+  if(!src_url || !dst) return err;
+
+  url = parse_url(src_url);
+  if(!url || !url->scheme) return err;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  switch(url->scheme) {
+    case inst_file:
+      if(util_check_exist(url->dir) == 'r') {
+        char *argv[3];
+
+        unlink(dst);
+        argv[1] = url->dir;
+        argv[2] = dst;
+        util_cp_main(3, argv);
+
+        err = 0;
+      }
+      break;
+
+    case inst_cdrom:
+    case inst_dvd:
+    case inst_floppy:
+    case inst_hd:
+      switch(url->scheme) {
+        case inst_cdrom:
+        case inst_dvd:
+          hw_item = hw_cdrom;
+          break;
+        case inst_floppy:
+          hw_item = hw_floppy;
+          break;
+        default:
+          hw_item = hw_block;
+      }
+
+      for(hd = hd_list(hd_data, hw_item, 1, NULL); hd && err; hd = hd->next) {
+        /* no block devs with partitions */
+        if(hd->child_ids || !hd->unix_dev_name) continue;
+
+        dev = long_dev(url->server);
+
+        if(
+          url->server &&
+          strcmp(hd->unix_dev_name, dev) &&
+          !search_str_list(hd->unix_dev_names, dev)
+        ) continue;
+
+        dev = hd->unix_dev_name;
+
+        fprintf(stderr, "disk: trying to mount: %s\n", dev);
+
+        /* load fs module if necessary */
+        type = util_fstype(dev, &module);
+        if(module) mod_modprobe(module, NULL);
+        if(!type || !strcmp(type, "swap")) continue;
+
+        i = util_mount_ro(dev, "/mnt");
+        if(i) {
+          fprintf(stderr, "disk: %s: mount failed\n", dev);
+          continue;
+        }
+        else {
+          fprintf(stderr, "disk: %s: mount ok\n", dev);
+        }
+
+        strprintf(&dir, "/mnt/%s", url->dir);
+
+        if(util_check_exist(dir) == 'r') {
+          char *argv[3];
+
+          unlink(dst);
+          argv[1] = dir;
+          argv[2] = dst;
+          util_cp_main(3, argv);
+
+          err = 0;
+          fprintf(stderr, "disk: %s::%s: got info file\n", dev, url->dir);
+        }
+        else {
+          fprintf(stderr, "disk: %s::%s: file not found\n", dev, url->dir);
+        }
+
+        umount("/mnt");
+      }
+      break;
+
+    default:
+      break;
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  free(dir);
+
+  return err;
+}
+
 

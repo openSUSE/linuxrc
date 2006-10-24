@@ -844,14 +844,6 @@ void lxrc_init()
     fflush(stdout);
   }
 
-  /* just a default for manual mode */
-  config.floppies = 1;
-  config.floppy_dev[0] = strdup("/dev/fd0");
-  if(config.floppydev) {
-    sprintf(buf, "/dev/%s", config.floppydev);
-    str_copy(&config.floppy_dev[0], buf);
-  }
-
   get_ide_options();
   file_read_info_file("cmdline", kf_cmd_early);
 
@@ -1056,7 +1048,7 @@ void lxrc_init()
   }
 
   /* file_read_info() is called in auto2_init(), too */
-  if(!config.info.loaded && !config.had_segv) file_read_info();
+  // if(!config.info.loaded && !config.had_segv) file_read_info();
 
   set_activate_language(config.language);
 

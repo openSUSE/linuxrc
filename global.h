@@ -284,7 +284,6 @@ typedef struct {
   unsigned scsi_rename:1;	/* ensure hotplug scsi devs are last */
   unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
-  unsigned floppy_probed:1;	/* tried to detect floppy device */
   unsigned linebreak:1;		/* internal: print a newline first */
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
@@ -304,9 +303,6 @@ typedef struct {
   unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
-  int floppies;			/* number of floppy drives */
-  int floppy;			/* floppy drive recently used */
-  char *floppy_dev[4];		/* list of floppy devices */
   slist_t *disks;		/* list of harddisk, without '/dev/' */
   slist_t *partitions;		/* list of partitions, without '/dev/' */
   char *partition;		/* currently used partition (hd install), without '/dev/' */

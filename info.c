@@ -129,10 +129,6 @@ void info_init (void)
     char               line_ti [100];
     char               dummy_ti [20];
     char              *tmp_pci;
-    struct hd_driveid  driveinfo_ri;
-    char               devname_ti [30];
-    int                fd_ii;
-    int                i_ii;
     uint64_t           memory_ig;
 
 
@@ -178,30 +174,6 @@ void info_init (void)
     if(!config.had_segv) fprintf (stderr, "CPU: %d, Memory: %"PRId64"\n",
              cpu_ig, memory_ig);
 
-#ifndef __powerpc__
-    /* Check for LS-120 */
-    /* ---------------- */
-
-    for (i_ii = 0; i_ii < 8; i_ii++)
-        {
-        sprintf (devname_ti, "/dev/hd%c", i_ii + 'a');
-        fd_ii = open (devname_ti, O_RDONLY);
-        if (fd_ii >= 0)
-            if (!ioctl (fd_ii, HDIO_GET_IDENTITY, &driveinfo_ri))
-                {
-                fprintf (stderr, "%s: %s\n", devname_ti, driveinfo_ri.model);
-                if (strstr (driveinfo_ri.model, "LS-120"))
-                    {
-                    fprintf (stderr, "Found LS-120 as %s\n", devname_ti);
-                    config.floppies = 1;
-                    config.floppy_dev[0] = strdup(devname_ti);
-                    i_ii = 8;
-                    }
-                }
-
-        close (fd_ii);
-        }
-#endif
     }
 
 

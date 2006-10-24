@@ -304,6 +304,7 @@ static struct {
   { "exec",      inst_exec          },
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
+  { "disk",      inst_hd            },
   { "cdrom",     inst_cdrom         },
   { "cifs",      inst_smb           },
 #if defined(__s390__) || defined(__s390x__)
@@ -578,8 +579,6 @@ int file_read_info()
 
 char *file_read_info_file(char *file, file_key_flag_t flags)
 {
-  char filename[MAX_FILENAME];
-  int i, mounted = 0, dud = 0;
   file_t *f0 = NULL;
 
 #ifdef DEBUG_FILE
@@ -592,23 +591,6 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
   else if(!strncmp(file, "file:", 5)) {
     f0 = file_read_file(file + 5, flags);
   }
-  else if(!strncmp(file, "floppy:", 7)) {
-    for(i = 0; i < config.floppies; i++) {
-      if(!util_mount_ro(config.floppy_dev[i], config.mountpoint.instdata)) break;
-    }
-    if(i < config.floppies) {
-      config.floppy = i;	// remember currently used floppy
-      mounted = 1;
-      util_chk_driver_update(config.mountpoint.instdata, "floppy");
-      dud = 1;
-      sprintf(filename, "%s/%s", config.mountpoint.instdata, file + 7);
-      f0 = file_read_file(filename, flags);
-    }
-  }
-
-  if(mounted) umount(config.mountpoint.instdata);
-
-  if(dud) util_do_driver_updates();
 
   if(!f0) return NULL;
 
@@ -1053,6 +1035,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_floppydevice:
+#if 0
         str_copy(
           &config.floppydev,
           strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
@@ -1062,6 +1045,7 @@ void file_do_info(file_t *f0)
         config.floppy = 0;
         sprintf(buf, "/dev/%s", config.floppydev);
         str_copy(&config.floppy_dev[0], buf);
+#endif
         break;
 
       case key_cdromdevice:
@@ -1733,10 +1717,6 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_demo, config.demo);
 
   if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
-
-  if(config.floppies) {
-    file_write_str(f, key_floppydisk, config.floppy_dev[config.floppy]);
-  }
 
   file_write_num(f, key_keyboard, 1);	/* we always have one - what's the point ??? */
   file_write_str(f, key_updatedir, config.update.dir);
