@@ -2334,7 +2334,7 @@ int util_ls_main(int argc, char **argv)
   char *src;
   int i;
   char buf[0x100], c, *s, *t;
-  struct stat sbuf;
+  struct stat64 sbuf;
   struct dirent *de;
   DIR *d;
 
@@ -2360,7 +2360,7 @@ int util_ls_main(int argc, char **argv)
   while((de = readdir(d))) {
     if(full) {
       sprintf(buf, "%s/%s", src, de->d_name);
-      i = lstat(buf, &sbuf);
+      i = lstat64(buf, &sbuf);
       if(i) {
         printf("?????????  %s\n", de->d_name);
       }
@@ -2407,12 +2407,12 @@ int util_ls_main(int argc, char **argv)
           s += 4; s[12] = 0;
         }
 
-        printf("%s %4d %-8d %-8d %8ld %s %s",
+        printf("%s %4d %-8d %-8d %8lld %s %s",
           buf,
           (int) sbuf.st_nlink,
           (int) sbuf.st_uid,
           (int) sbuf.st_gid,
-          (long) sbuf.st_size,
+          (long long) sbuf.st_size,
           s,
           de->d_name
         );
@@ -3563,14 +3563,14 @@ char *util_attach_loop(char *file, int ro)
   int fd, rc, i, device;
   static char buf[32];
 
-  if((fd = open(file, ro ? O_RDONLY : O_RDWR)) < 0) {
+  if((fd = open(file, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) < 0) {
     perror(file);
     return NULL;
   }
 
   for(i = 0; i < 8; i++) {
     sprintf(buf, "/dev/loop%d", i);
-    if((device = open(buf, ro ? O_RDONLY : O_RDWR)) >= 0) {
+    if((device = open(buf, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) >= 0) {
       memset(&loopinfo, 0, sizeof loopinfo);
       strcpy(loopinfo.lo_name, file);
       rc = ioctl(device, LOOP_SET_FD, fd);
@@ -3590,7 +3590,7 @@ int util_detach_loop(char *dev)
 {
   int i, fd;
 
-  if((fd = open(dev, O_RDONLY)) < 0) {
+  if((fd = open(dev, O_RDONLY | O_LARGEFILE)) < 0) {
     if(config.debug) perror(dev);
     return -1;
   }
@@ -3609,15 +3609,15 @@ int util_mount(char *dev, char *dir, unsigned long flags)
 {
   char *type, *loop_dev;
   int err = -1;
-  struct stat sbuf;
+  struct stat64 sbuf;
 
   if(!dev || !dir) return -1;
 
-  if(strstr(dir, "/mounts/") == dir && stat(dir, &sbuf)) {
+  if(strstr(dir, "/mounts/") == dir && stat64(dir, &sbuf)) {
     mkdir(dir, 0755);
   }
 
-  if(stat(dev, &sbuf)) {
+  if(stat64(dev, &sbuf)) {
     fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
     return -1;
   }
@@ -3828,16 +3828,6 @@ void util_update_swap_list()
   }
 
   file_free_file(f0);
-}
-
-
-int util_is_dir(char *dir)
-{
-  struct stat sbuf;
-
-  if(stat(dir, &sbuf)) return 0;
-
-  return S_ISDIR(sbuf.st_mode) ? 1 : 0;
 }
 
 
@@ -4661,12 +4651,14 @@ int system_log(char *cmd)
 int get_url(char *src_url, char *dst)
 {
   url_t *url;
-  int err = 1, i;
+  int err = 1, i, j, win_old, fd_in, fd_out;
   hd_data_t *hd_data;
   hd_t *hd;
   char *dir = NULL;
+  char buf[0x1000];
   hd_hw_item_t hw_item;
   char *dev, *module, *type;
+  instmode_t instmode_save;
 
   if(!src_url || !dst) return err;
 
@@ -4754,6 +4746,72 @@ int get_url(char *src_url, char *dst)
 
         umount("/mnt");
       }
+      break;
+
+    case inst_ftp:
+    case inst_tftp:
+    case inst_http:
+    case inst_nfs:
+    case inst_smb:
+      if(config.net.configured == nc_none) {
+        if((net_config_mask() & 3) == 3) {    /* we have ip & netmask */
+          config.net.configured = nc_static;
+          /* looks a bit weird, but we need it here for net_activate_ns() */
+          if(!config.net.device) {
+            util_update_netdevice_list(NULL, 1);
+            if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+          }
+          if(net_activate_ns()) {
+            fprintf(stderr, "%s: net activation failed\n", config.net.device);
+            config.net.configured = nc_none;
+          }
+        }
+
+        if(config.net.configured == nc_none) {
+          if(!(win_old = config.win)) util_disp_init();
+          net_config();
+          if(!win_old) util_disp_done();
+        }
+      }
+
+      if(config.net.configured == nc_none) {
+        fprintf(stderr, "no configured network interface\n");
+        break;
+      }
+
+      fprintf(stderr, "using %s\n", config.net.device);
+
+      instmode_save = config.instmode;
+
+      config.instmode = url->scheme;
+
+      str_copy(&dir, url->dir ?: "");
+      fd_in = net_open(dir);
+      if(fd_in >= 0) {
+        fprintf(stderr, "net_open: \"%s\" ok\n", dir);
+        fd_out = open("/xxx.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if(fd_out >= 0) {
+          do {
+            i = net_read(fd_in, buf, sizeof buf);
+            j = 0;
+            if(i > 0) j = write(fd_out, buf, i);
+          }  
+          while(i > 0 && j > 0);
+          close(fd_out);
+          if(!(i < 0 || j < 0)) {
+            unlink(dst);
+            rename("/xxx.tmp", dst);
+            err = 0;
+          }
+        }
+        net_close(fd_in);
+      }
+      else {
+        fprintf(stderr, "net_open: \"%s\": %s\n", dir, config.net.error);
+      }
+
+      config.instmode = instmode_save;
+
       break;
 
     default:

@@ -715,7 +715,7 @@ int inst_check_instsys()
       util_do_driver_updates();
 
       strprintf(&buf, "%s%s", config.mountpoint.instdata, config.installdir);
-      if(config.rescue || !util_is_dir(buf)) {
+      if(config.rescue || util_check_exist(buf) != 'd') {
         strprintf(&buf, "%s%s",
           config.mountpoint.instdata,
           config.demo ? config.live.image : config.rescue ? config.rescueimage : config.rootimage
@@ -724,7 +724,7 @@ int inst_check_instsys()
 
       if(
         (config.rescue || force_ri_ig || !util_is_mountable(buf)) &&
-        !util_is_dir(buf)
+        util_check_exist(buf) != 'd'
       ) {
         config.use_ramdisk = 1;
       }
@@ -821,7 +821,7 @@ int inst_start_install()
       }
     }
   }
-  else if(!util_is_dir(inst_rootimage_tm)) {
+  else if(util_check_exist(inst_rootimage_tm) != 'd') {
     rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
     if(rc) return rc;
     str_copy(&config.instsys, config.mountpoint.instsys);

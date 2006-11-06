@@ -1,3 +1,7 @@
+6/11/2006:	v2.1.11
+	- more large file fixes
+	- info file via network, first step
+
 24/10/2006:	v2.1.10
 	- use stat64 when checking for files (#184448)
 	- info file can be on any local media (#56845)
