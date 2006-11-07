@@ -101,13 +101,11 @@ msgstr "Modules uitladen"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Probeert module \"%s\" te laden...\n"
 "\n"
-"Tijdens het laden kunt u de kernel-berichten op virtuele console 4 (ALT-F4) "
-"bekijken. Gebruik ALT-F1 om terug te gaan naar dit menu."
+"Tijdens het laden kunt u de kernel-berichten op virtuele console 4 (ALT-F4) bekijken. Gebruik ALT-F1 om terug te gaan naar dit menu."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -227,29 +225,16 @@ msgid "Enter your IP address."
 msgstr "Voer uw IP-adres in."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Voer uw netmasker in. Voor een normaal klasse C netwerk is dit meestal "
-"255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Voer uw netmasker in. Voor een normaal klasse C netwerk is dit meestal 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Voer het adres van de gateway in indien u er één nodig heeft om de server te "
-"kunnen bereiken. Voer uw eigen IP-adres in wanneer u geen gateway nodig "
-"heeft."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Voer het adres van de gateway in indien u er één nodig heeft om de server te kunnen bereiken. Voer uw eigen IP-adres in wanneer u geen gateway nodig heeft."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Voer het IP-adres van uw naamserver in. Druk op ESC wanneer u geen "
-"naamserver gebruikt."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Voer het IP-adres van uw naamserver in. Druk op ESC wanneer u geen naamserver gebruikt."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -267,12 +252,8 @@ msgstr ""
 "Domein: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Bij de configuratie van het netwerk is een fout opgetreden. Waarschijnlijk "
-"is uw netwerkkaart niet door de kernel herkent."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Bij de configuratie van het netwerk is een fout opgetreden. Waarschijnlijk is uw netwerkkaart niet door de kernel herkent."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -381,9 +362,7 @@ msgstr "Geef het IP-adres van de PLIP-partner op."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"De PCMCIA-chipset kon niet automatisch gedetecteerd worden. Specificeer het "
-"handmatig."
+msgstr "De PCMCIA-chipset kon niet automatisch gedetecteerd worden. Specificeer het handmatig."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -429,8 +408,7 @@ msgstr ""
 "\n"
 "\"Installatie of systeem starten\"\n"
 "\n"
-"verlaten worden. Het is mogelijk dat u enkele stuurprogramma's (modules) "
-"moet laden voor de ondersteuning van uw hardware."
+"verlaten worden. Het is mogelijk dat u enkele stuurprogramma's (modules) moet laden voor de ondersteuning van uw hardware."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -467,12 +445,8 @@ msgid "Reboot the system now?"
 msgstr "Het systeem nu opnieuw starten?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Het basissysteem is met succes geïnstalleerd. Dit nieuwe geïnstalleerde "
-"systeem wordt nu gestart om de installatie af te ronden."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Het basissysteem is met succes geïnstalleerd. Dit nieuwe geïnstalleerde systeem wordt nu gestart om de installatie af te ronden."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -498,13 +472,11 @@ msgstr "Harde schijven of CD-ROM's"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Uw computer beschikt over erg weinig geheugen.\n"
 "\n"
-"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op "
-"ALT-F2) om enige swapruimte te maken en te activeren."
+"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op ALT-F2) om enige swapruimte te maken en te activeren."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -535,12 +507,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Moet de root image in de RAM disk geladen worden?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Geef het pad en de naam op van het bestand dat u als hoofdbestandssysteem in "
-"de RAM disk wilt laden."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Geef het pad en de naam op van het bestand dat u als hoofdbestandssysteem in de RAM disk wilt laden."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -625,9 +593,7 @@ msgstr ""
 
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr ""
-"Geef de gebruikersnaam op waarmee verbinding met de FTP-server moet worden "
-"gemaakt."
+msgstr "Geef de gebruikersnaam op waarmee verbinding met de FTP-server moet worden gemaakt."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -647,22 +613,15 @@ msgstr "Een FTP proxy gebruiken?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"Voor een FTP installatie bevat uw computer niet genoeg RAM geheugen (er is %"
-"d MB aan RAM nodig)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Voor een FTP installatie bevat uw computer niet genoeg RAM geheugen (er is %d MB aan RAM nodig)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normaal wordt een FTP installatie via anonieme FTP gedaan. Het is "
-"mogelijkheid om een gebruikersnaam en een wachtwoord te specificeren voor de "
-"FTP-server toegang.\n"
+"Normaal wordt een FTP installatie via anonieme FTP gedaan. Het is mogelijkheid om een gebruikersnaam en een wachtwoord te specificeren voor de FTP-server toegang.\n"
 "Wilt u een gebruikersnaam en een wachtwoord opgeven?"
 
 #. TXT_MORE_MODULES
@@ -716,12 +675,10 @@ msgstr "Geef de share naam van de SMB-server op."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Wanneer u de share als gast wilt benaderen, hoeft u de gebruikersnaam, het "
-"wachtwoord en de werkgroep niet op te geven.\n"
+"Wanneer u de share als gast wilt benaderen, hoeft u de gebruikersnaam, het wachtwoord en de werkgroep niet op te geven.\n"
 "De share als gast benaderen?"
 
 #. TXT_SMB_ENTER_USER
@@ -733,12 +690,8 @@ msgid "Enter your password on the SMB server."
 msgstr "Geef uw wachtwoord voor de SMB-server op."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
-msgstr ""
-"Geef uw werkgroep op. Laat het veld leeg indien u geen werkgroep hoeft te "
-"specificeren."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Geef uw werkgroep op. Laat het veld leeg indien u geen werkgroep hoeft te specificeren."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -919,12 +872,10 @@ msgstr "Geef uw tijdelijke SSH wachtwoord op."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Het basissysteem is met succes geïnstalleerd. Uw machine moet nu opnieuw "
-"gestart worden. Verwijder alle installatie media (CD-ROM, diskette).\n"
+"Het basissysteem is met succes geïnstalleerd. Uw machine moet nu opnieuw gestart worden. Verwijder alle installatie media (CD-ROM, diskette).\n"
 "Verwijder de diskette niet als hierop de bootmanager geïnstalleerd is."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -946,8 +897,7 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Geef het tijdelijke root-wachtwoord op.\n"
-"U moet dit wachtwoord tijdens de initiële aanmelding van de root gebruiker "
-"wijzigen."
+"U moet dit wachtwoord tijdens de initiële aanmelding van de root gebruiker wijzigen."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -955,16 +905,13 @@ msgstr "Herstarten"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
-msgstr ""
-"Uw computer heeft niet genoeg RAM om %s te kunnen installeren. U heeft "
-"minstens %d MB nodig."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Uw computer heeft niet genoeg RAM om %s te kunnen installeren. U heeft minstens %d MB nodig."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
+#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Wachtwoord is te kort (moet uit minstens 8 karakters bestaan)."
+msgstr "Wachtwoord is te kort (moet uit minstens 5 karakters bestaan)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1215,4 +1162,3 @@ msgstr "Reddingssysteem laden"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
-

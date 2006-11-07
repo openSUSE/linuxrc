@@ -101,25 +101,23 @@ msgid "Unload Modules"
 msgstr "Dilemel ar molladoù karget"
 
 #. TXT_TRY_TO_LOAD
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "O klask kargañ ar mollad \"%s\"...\n"
 "\n"
-"E-doug ar c'hargañ e c'hellit gwelout kemennadoùar graoñenn war al letrin 4 "
-"(ALT-F4)."
+"E-doug ar c'hargañ e c'hellit gwelout kemennadoùar graoñenn war al letrin 4 (ALT-F4)."
 
 #. TXT_LOAD_SUCCESSFUL
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Module \"%s\" loaded successfully."
 msgstr "Kargadur ar mollad \"%s\" kaset da benn vat!"
 
 #. TXT_LOAD_FAILED
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Failed to load module \"%s\"."
 msgstr "Kargadur ar mollad \"%s\" c'hwitet!"
 
@@ -250,33 +248,21 @@ msgstr "Enankit ho chomlec'h IP."
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Erspizit ho maskl rouedad. Evit ur rouedad reoliek eus ar rummad C e vo: "
-"255.255.255.0"
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Erspizit ho maskl rouedad. Evit ur rouedad reoliek eus ar rummad C e vo: 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 #, fuzzy
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Enankit chomlec'h ho treuzell m'ho peus ezhomm eus unan evit tizhout ar "
-"servijer. A-hend-all, roit ho chomlec'h IP hepken."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Enankit chomlec'h ho treuzell m'ho peus ezhomm eus unan evit tizhout ar servijer. A-hend-all, roit ho chomlec'h IP hepken."
 
 #. TXT_INPUT_NAMED
 #, fuzzy
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Enankit chomlec'h IP ho servijer envel. Ma ne fell ket deoc'h ober gant ur "
-"servijer envel, pouezit war ACHAP."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Enankit chomlec'h IP ho servijer envel. Ma ne fell ket deoc'h ober gant ur servijer envel, pouezit war ACHAP."
 
 #. TXT_FOUND_HOST
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "The following data has been retrieved:\n"
 "\n"
@@ -292,12 +278,8 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 #, fuzzy
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Kammad e-doug kefluniadur ar rouedad. Marteze n'eo ket azas ar mollad ho "
-"peus karget, pe ho kartenn rouedad n'eo ket bet naouaet mat gant ar graoñell!"
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Kammad e-doug kefluniadur ar rouedad. Marteze n'eo ket azas ar mollad ho peus karget, pe ho kartenn rouedad n'eo ket bet naouaet mat gant ar graoñell!"
 
 #. TXT_INPUT_SERVER
 #, fuzzy
@@ -315,7 +297,7 @@ msgid "Enter the directory on the server."
 msgstr "Enankit anv ar c'havlec'h war ar servijer."
 
 #. TXT_ENTER_PARAMS
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter parameters for \"%s\"."
 msgstr "Ebarzhit an arventennoù (mar bez) evit \"%s\"."
 
@@ -333,14 +315,13 @@ msgstr ""
 "... "
 
 #. TXT_ERROR_NFSMOUNT
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "An error occurred while trying to mount the NFS directory.\n"
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"C'hoarvezet ez eus ur c'hammad pa'z eus bet klasket marc'hañ kavlec'h NFS ar "
-"servijer:\n"
+"C'hoarvezet ez eus ur c'hammad pa'z eus bet klasket marc'hañ kavlec'h NFS ar servijer:\n"
 "\n"
 "Fazi ar servijer NFS: %s"
 
@@ -418,14 +399,11 @@ msgstr "Roit chomlec'h IP an urzhiataer kevatal PLIP."
 
 #. TXT_NO_PCMCIA
 #, fuzzy
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"Ar spletad krugoù PCMCIA en implij n'eo ket bet naouaet ent emgefreek. "
-"Diuzit gant an dorn"
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "Ar spletad krugoù PCMCIA en implij n'eo ket bet naouaet ent emgefreek. Diuzit gant an dorn"
 
 #. TXT_FOUND_PCMCIA
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "Found PCMCIA chipset \"%s\".\n"
 "\n"
@@ -436,7 +414,7 @@ msgstr ""
 "Ebarzhit an arventennoù (mar bez) evit ar molladoù PCMCIA "
 
 #. TXT_PCMCIA_PARAMS
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter specific parameters for chipset \"%s\"."
 msgstr "Ebarzhit an arventennoù (mar bez) evit ar c'hrugoù \"%s\""
 
@@ -472,8 +450,7 @@ msgstr ""
 "\n"
 "lañser » Loc'hañ ar staliadur / ar reizhiad «\n"
 "\n"
-"A-raok gallout kuitaat Linuxrc e vo ret deoc'h marteze kargañ sturioù "
-"periantel (molladoù)."
+"A-raok gallout kuitaat Linuxrc e vo ret deoc'h marteze kargañ sturioù periantel (molladoù)."
 
 #. TXT_NO_CTRLC
 #, fuzzy
@@ -516,12 +493,8 @@ msgstr "C'hoant ho peus bremañ da adloc'hañ ho reizhiad?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Staliet eo bet ar reizhiad diazez. Loc'het e vo bremañ ar reizhiad-se evit "
-"peurechuiñ ar staliadur."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Staliet eo bet ar reizhiad diazez. Loc'het e vo bremañ ar reizhiad-se evit peurechuiñ ar staliadur."
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
@@ -555,14 +528,11 @@ msgstr "Pladennoù kalet / CD-ROM"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Gant hoc'h urzhiataer ez eus gwall nebeut a vemor greiz!\n"
 "\n"
-"A-raok talvoudañ ar c'hemennad-mañ ha luskañ YaST, e rankit mont d'al letrin "
-"2(pouezit war ALT-F2), neuze keflugnit hagweredekait gant an dorn ar vemor "
-"disloañ!"
+"A-raok talvoudañ ar c'hemennad-mañ ha luskañ YaST, e rankit mont d'al letrin 2(pouezit war ALT-F2), neuze keflugnit hagweredekait gant an dorn ar vemor disloañ!"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -597,12 +567,8 @@ msgstr ""
 
 #. TXT_ENTER_ROOTIMAGE
 #, fuzzy
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Erspizit treug hag anv ar restr a fell deoc'h kargañ evel reizhiad restroù "
-"gwrizienn war ar bladenn c'halloudel (RAM)."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Erspizit treug hag anv ar restr a fell deoc'h kargañ evel reizhiad restroù gwrizienn war ar bladenn c'halloudel (RAM)."
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
@@ -657,15 +623,14 @@ msgid "Asking name server..."
 msgstr "Atersiñ ar servijer envel..."
 
 #. TXT_HOST_NOT_FOUND
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found."
 msgstr "Dianav eo an urzhiataer %s!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr ""
-"Kefluniet eo ho rouedad dija. Fellout a ra deoc'h mirout ar c'hefluniad-mañ?"
+msgstr "Kefluniet eo ho rouedad dija. Fellout a ra deoc'h mirout ar c'hefluniad-mañ?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -681,7 +646,7 @@ msgstr ""
 "Kargit ur mollad azas."
 
 #. TXT_ALREADY_FOUND
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "A %s was already found in your system.\n"
 msgstr "Kavet ez eus bet dija en ho reizhiad ur %s!\n"
 
@@ -699,9 +664,7 @@ msgstr ""
 #. TXT_ENTER_FTPUSER
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
-msgstr ""
-"Enankit an anv arveriad ma fell deoc'h ober gantañ evit tizhout ar servijer "
-"FTP"
+msgstr "Enankit an anv arveriad ma fell deoc'h ober gantañ evit tizhout ar servijer FTP"
 
 #. TXT_ENTER_FTPPASSWD
 #, fuzzy
@@ -724,23 +687,17 @@ msgid "Use an FTP proxy?"
 msgstr "Fellout a ra deoc'h ober gant ur proksi FTP?"
 
 #. TXT_NOMEM_FTP
-#, fuzzy, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"Re nebeut a vemor greiz a zo gant hoc'h urzhiataerevit ur staliadur dre FTP! "
-"(%d MB da vihanañ)"
+#, c-format,fuzzy
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Re nebeut a vemor greiz a zo gant hoc'h urzhiataerevit ur staliadur dre FTP! (%d MB da vihanañ)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Sevenet e vez peurvuiañ ur staliadur FTP dre FTP dizanv. Bez' e c'hellit "
-"ivez, ma karit, enankañ un anv arveriad hag ur ger-tremen.\n"
+"Sevenet e vez peurvuiañ ur staliadur FTP dre FTP dizanv. Bez' e c'hellit ivez, ma karit, enankañ un anv arveriad hag ur ger-tremen.\n"
 "Fellout a ra deoc'h hen ober?"
 
 #. TXT_MORE_MODULES
@@ -758,7 +715,7 @@ msgid "Enter the port number on which the NFS server is running."
 msgstr "Enankit niverenn ar porzh arveriet gant ar servijer NFS"
 
 #. TXT_INSERT_CD
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Make sure that CD number %d is in your drive."
 msgstr "Diogelit emañ  en ho lenner ar CD niverenn %d!"
 
@@ -797,8 +754,7 @@ msgstr "Enankit chomlec'h IP ar servijer NFS."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 
@@ -811,9 +767,7 @@ msgid "Enter your password on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr ""
 
 #. TXT_SMB_TRYING_MOUNT
@@ -865,7 +819,7 @@ msgid "Choose the network protocol."
 msgstr "Diuzit an doare rouedad a fell deoc'h arverañ evit ar staliañ."
 
 #. TXT_INPUT_NETSERVER
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the IP address of the %s server."
 msgstr "Enankit chomlec'h IP ar servijer NFS."
 
@@ -880,7 +834,7 @@ msgid "Network"
 msgstr ""
 
 #. TXT_LOAD_MODULES
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Load %s Modules"
 msgstr "Dilemel ar molladoù karget"
 
@@ -934,9 +888,7 @@ msgstr ""
 #. TXT_LOW_MEMORY2
 #, fuzzy
 msgid "Your computer does not have enough memory to run YaST."
-msgstr ""
-"Re nebeut a vemor greiz a zo gant hoc'h urzhiataerevit ur staliadur dre FTP! "
-"(%d MB da vihanañ)"
+msgstr "Re nebeut a vemor greiz a zo gant hoc'h urzhiataerevit ur staliadur dre FTP! (%d MB da vihanañ)"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -954,14 +906,12 @@ msgstr ""
 "(da skouer /dev/sda1)"
 
 #. TXT_ENTER_USER
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
-"Enankit an anv arveriad ma fell deoc'h ober gantañ evit tizhout ar servijer "
-"FTP"
+msgstr "Enankit an anv arveriad ma fell deoc'h ober gantañ evit tizhout ar servijer FTP"
 
 #. TXT_ENTER_PASSWORD
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the password for the %s server."
 msgstr "Enankit ho ker-tremen war ar servijer FTP"
 
@@ -971,12 +921,12 @@ msgid "Use a %s proxy?"
 msgstr ""
 
 #. TXT_ENTER_PROXY
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the address of the %s proxy."
 msgstr "Enankit chomlec'h ar proksi FTP"
 
 #. TXT_ENTER_PROXYPORT
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the port of the %s proxy."
 msgstr "Erspizit porzh ar proksi FTP"
 
@@ -1006,8 +956,7 @@ msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 
@@ -1020,11 +969,9 @@ msgid "Show Driver Updates"
 msgstr ""
 
 #. TXT_INPUT_NAMED1
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the IP of name server %u or press ESC."
-msgstr ""
-"Enankit chomlec'h IP ho servijer envel. Ma ne fell ket deoc'h ober gant ur "
-"servijer envel, pouezit war ACHAP."
+msgstr "Enankit chomlec'h IP ho servijer envel. Ma ne fell ket deoc'h ober gant ur servijer envel, pouezit war ACHAP."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -1038,9 +985,7 @@ msgstr ""
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr ""
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -1212,7 +1157,9 @@ msgstr ""
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
+msgid ""
+"\n"
+"This %s is broken."
 msgstr ""
 
 #. TXT_SLP_SOURCE
@@ -1292,4 +1239,3 @@ msgstr ""
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
-

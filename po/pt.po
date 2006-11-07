@@ -7,15 +7,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pt\n"
-"PO-Revision-Date: 2005-08-06 01:12+0100\n"
-"Last-Translator: Elisio Andre Martins Catana <eacatana@netvisao.pt>\n"
+"Project-Id-Version: linuxrc.pt\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2006-10-10 09:57+0100\n"
+"Last-Translator: \n"
 "Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10\n"
-"POT-Creation-Date: \n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -35,35 +35,35 @@ msgstr "Não"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Select the language."
-msgstr "Escolha a Linguagem."
+msgstr "Seleccione o idioma."
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr "Monitor a Cores"
+msgstr "Monitor colorido"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
-msgstr "Monitor Monocromático"
+msgstr "Monitor monocromático"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
-msgstr "Seleccione o tipo de monitor."
+msgstr "Selecione o tipo de exibição."
 
 #. TXT_MENU_LANG
 msgid "Language"
-msgstr "Linguagem"
+msgstr "Língua"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Módulos do Kernel (Drivers de Hardware)"
+msgstr "Módulos Kernel (Drivers de Hardware)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
-msgstr "Iniciar a Instalaçăo ou o Sistema"
+msgstr "Iniciar Instalação ou Sistema"
 
 #. TXT_MENU_INFO
 msgid "System Information"
-msgstr "Informaçőes do Sistema"
+msgstr "Informação do Sistema"
 
 #. TXT_HDR_MAIN
 msgid "Main Menu"
@@ -71,7 +71,7 @@ msgstr "Menu Principal"
 
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr "Configuraçőes"
+msgstr "Definições"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
@@ -79,11 +79,11 @@ msgstr "Monitor"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Layout do Teclado"
+msgstr "Mapa do teclado"
 
 #. TXT_LOAD_NET
 msgid "Load Network Card Modules"
-msgstr "Carregar Modulo Placa de Rede"
+msgstr "Carregar Módulos de Placa de Rede"
 
 #. TXT_SHOW_MODULES
 msgid "Show Loaded Modules"
@@ -95,7 +95,7 @@ msgstr "Carregar Módulos Automaticamente"
 
 #. TXT_DEL_MODULES
 msgid "Unload Modules"
-msgstr "Descarregar Modulos"
+msgstr "Descarregar Módulos"
 
 #. TXT_TRY_TO_LOAD
 #, c-format
@@ -104,19 +104,19 @@ msgid ""
 "\n"
 "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Tentando carregar o modulo \"%s\"...\n"
+"A tentar carregar módulo \"%s\"...\n"
 "\n"
-"Enquanto o módulo está a ser carregado, é possível ver as mensagens do kernel na consola virtual 4 (ALT-F4). Utiliza ALT-F1 para voltar a este menu."
+"Enquanto esta a carregar os modulos, pode ver as mensagens de kernel na console virtual 4 (ALT-F4). Utilize ALT-F1 para voltar a este menu."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "O Modulo \"%s\" foi carregado com sucesso."
+msgstr "Módulo \"%s\" carregado com sucesso."
 
 #. TXT_LOAD_FAILED
 #, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "Falha ao carregar o módulo \"%s\"."
+msgstr "Falha ao carregar módulo \"%s\"."
 
 #. TXT_CDROM
 msgid "CD-ROM"
@@ -132,7 +132,7 @@ msgstr "Disco Rígido"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr "Começar a Instalaçăo ou Actualização"
+msgstr "Iniciar Instalação ou Actualização"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
@@ -144,12 +144,12 @@ msgstr "Carregar Sistema de Recuperação via NFS"
 
 #. TXT_BOOT_SYSTEM
 msgid "Boot Installed System"
-msgstr "Arrancar com Sistema Instalado"
+msgstr "Arrancar Sistema Instalado"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "A procurar a imagem \"%s\"..."
+msgstr "A procurar imagem \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
@@ -157,13 +157,13 @@ msgid ""
 "\n"
 "Check the directory specification."
 msgstr ""
-"Não foi possível encontrar a imagem.\n"
+"Impossível encontrar a imagem.\n"
 "\n"
-"Verifique o directorio especificada."
+"Verifique a especificação da directória."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
-msgstr "Mensagens de Kernel"
+msgstr "Mensagens do Kernel"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -203,23 +203,23 @@ msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Insert the disk and press ENTER."
-msgstr "Introduza o disco e pressione ENTER."
+msgstr "Insira o disco e pressione ENTER."
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
-msgstr "Erro na leitura da disquete."
+msgstr "Erro ao ler da disquete."
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Introduza a partiçao de root (ex. /dev/sda3)"
+msgstr "Digite a partição de raiz (por exemplo, /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device."
-msgstr "Dispositivo root invalido."
+msgstr "Dispositivo raiz inválido."
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr "Entrada Inválida."
+msgstr "Entrada inválida."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
@@ -227,15 +227,15 @@ msgstr "Introduza o endereço IP."
 
 #. TXT_INPUT_NETMASK
 msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
-msgstr "Introduza a mascara da rede. Para uma Classe C normal, é normal utilizar 255.255.255.0."
+msgstr "Introduza a máscara de rede. Para uma rede classe C  normal, geralmente é 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
 msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
-msgstr "Se necessita uma gateway para aceder ao exterior,introduza o endereço IP da gateway. Caso contrario, introduza o IP local."
+msgstr "Se for necessária uma gateway para alcançar o servidor, introduza o endereço IP da gateway. Se não precisar de gateway, introduza o endereço IP local."
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Introduza o endereço de IP do servidor de nomes. Se não utilizar um servidor de nomes, pressione ESC."
+msgstr "Introduza o endereço IP do servidor de nomes. Se não utiulizar um servidor de nomes, pressione ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -246,7 +246,7 @@ msgid ""
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Foram apurados os seguintes dados:\n"
+"Os seguintes dados foram recuperados:\n"
 "\n"
 "Endereço IP: %s\n"
 "Nome: %s\n"
@@ -254,24 +254,24 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
-msgstr "Ocorreu um erro durante a configuração de rede. Provavelmente a sua placa de rede não foi reconhecida pelo kernel."
+msgstr "Ocorreu um erro durante a configuração da rede. A placa de rede provavelmente não foi reconhecida pelo kernel."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
-msgstr "Introduza o endereço IP do servidor de NFS."
+msgstr "Introduza o endereço IP do servidor NFS."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Enter the IP address of the FTP server."
-msgstr "Introduza o endereço IP do servidor de FTP."
+msgstr "Introduza o endereço IP do servidor FTP."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
-msgstr "Introduza o directório no servidor."
+msgstr "Introduza o diretório no servidor."
 
 #. TXT_ENTER_PARAMS
 #, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr "Introduza os parametros para \"%s\"."
+msgstr "Introduza os parâmetros para \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -280,7 +280,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"A Tentar montar o directório\n"
+"A tentar montar o diretório \n"
 "\n"
 "\"%s:%s\"..."
 
@@ -291,21 +291,21 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Ocorreu um erro ao tentar montar o directório NFS.\n"
+"Ocorreu um erro ao tentar montar o diretório NFS.\n"
 "\n"
-"Razão apontado pelo servidor: %s"
+"Motivo dado pelo servidor: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"Por favor escolha um esquema de teclado.\n"
-"Com o YaST poderá escolher esquemas de teclado adicionais."
+"Escolha um mapa de teclado.\n"
+"O YaST fornecerá posteriormente tabelas de teclado adicionais."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
-msgstr "Escolha o modulo a ser descarregado."
+msgstr "Escolha o módulo a ser descarregado."
 
 #. TXT_NO_MODULES
 msgid "No modules currently loaded."
@@ -314,23 +314,23 @@ msgstr "Não existem módulos carregados actualmente."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "A testar (%s)...      "
+msgstr "Auto-verificação (%s)...     "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
-msgstr "Procurar por adaptadores SCSI adicionais?"
+msgstr "Procurar adaptadores de host SCSI adicionais?"
 
 #. TXT_WANT_MORE_NET
 msgid "Search for additional network cards?"
-msgstr "Procurar por placas de rede adicionais?"
+msgstr "Procurar placas de rede adicionais?"
 
 #. TXT_WANT_MORE_CDROM
 msgid "Search for additional CD-ROM drives?"
-msgstr "Procurar por drives de CD-ROM adicionais?"
+msgstr "Procurar unidades de CD-ROM adicionais?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "placa de rede ethernet"
+msgstr "Placa de rede Ethernet"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
@@ -338,11 +338,11 @@ msgstr "Porta paralela"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "Placa de rede token ring"
+msgstr "Placa de rede Token Ring"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "Placa de rede arcnet"
+msgstr "Placa de rede Arcnet"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
@@ -358,11 +358,11 @@ msgstr "Escolha o dispositivo de rede."
 
 #. TXT_INPUT_PLIP_IP
 msgid "Enter the IP address of the PLIP partner."
-msgstr "Introduza o endereço IP correspondente ao par do PLIP."
+msgstr "Introduza o endereço IP do parceiro PLIP."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "O chipset PCMCIA não pode ser detectado automaticamente. Especifique-o manualmente."
+msgstr "O chipset PCMCIA não pôde ser detectado automaticamente. Especifique-o manualmente."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -371,26 +371,26 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Encontrado hardware PCMCIA \"%s\".\n"
+"Chipset PCMCIA encontrado %s.\n"
 "\n"
-"Introduza os parâmetros base para os módulos PCMCIA."
+"Introduza os parâmetros para os módulos do core PCMCIA."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Introduza os parametros específicos para o chipset \"%s\"."
+msgstr "Introduza os parâmetros específicos para o chipset \"%s\"."
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "A iniciar o gestor de placas..."
+msgstr "A iniciar gestor de placas...enciador de placas..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "Os serviços da placa PCMCIA foram iniciados com sucesso."
+msgstr "O serviço PCMCIA iniciada com sucesso."
 
 #. TXT_PCMCIA_FAIL
 msgid "Start of PCMCIA card services failed."
-msgstr "A inicialização dos serviços da placa PCMCIA falharam."
+msgstr "Falha ao iniciar os serviços da placa PCMCIA."
 
 #. TXT_PCMCIA_ALREADY
 msgid "PCMCIA card services already running."
@@ -404,19 +404,19 @@ msgid ""
 "\n"
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Pode sair do Linuxrc apenas através de\n"
+"Apenas pode deixar o Linuxrc através de \n"
 "\n"
-"\"Iniciar Instalação ou sistema\"\n"
+"Iniciar Instalação ou Sistema\n"
 "\n"
-"Pode ser necessário carregar alguns drives (módulos) para suportar o Hardware."
+"Pode ter que carregar alguns drivers (módulos) para suportar o hardware."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Não é possível sair do Linuxrc com <Ctrl-C>."
+msgstr "Impossível sair de Linuxrc com <Ctrl-C>."
 
 #. TXT_REMOVE_DISK
 msgid "Remove the disk from the drive now."
-msgstr "Remova a diskette da drive agora."
+msgstr "Remova o disco da unidade agora."
 
 #. TXT_EXAMPLE_PAR
 msgid ""
@@ -430,7 +430,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr "Escolha qual a origem do dispositivo."
+msgstr "Escolha o media de origem."
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -446,11 +446,11 @@ msgstr "Reiniciar o sistema agora?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
-msgstr "O sistema base foi instalado com sucesso. Este novo sistema será reiniciado de forma a serem finalizadas as definições."
+msgstr "O sistema base foi instalado com sucesso. O novo sistema instalado será iniciado para confirmar a instalação."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Introduza a partição do disco rígido (ex. /dev/sda1)"
+msgstr "Introduza a partição do disco rígido (por exemplo, /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
@@ -458,7 +458,7 @@ msgstr "Não foi possível montar a partição especificada."
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
-msgstr "Por Favor introduza o directório de origem."
+msgstr "Introduza o diretório de origem."
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
@@ -474,13 +474,13 @@ msgid ""
 "\n"
 "Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"O computador possui pouca memória.\n"
+"O computador tem pouca memória.\n"
 "\n"
-"Antes de aceitar esta mensagem, deve mudar para a consola virtual 2 (pressione ALT-F2) para criar e activando activar algum espaço swap."
+"Antes de confirmar esta mensagem, alterne para a consola virtual 2 (pressione ALT-F2) para criar e activar algum espaço na partição swap."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
-msgstr "Animaçao"
+msgstr "Animação"
 
 #. TXT_ASK_EXPLODE
 msgid "Use animated windows?"
@@ -488,27 +488,27 @@ msgstr "Utilizar janelas animadas?"
 
 #. TXT_NO_DRIVES
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Nenhuma drive de disco rigido ou CD-Rom foi ainda detectada."
+msgstr "Nenhuma unidade de disco rígido ou CD-ROM detectada."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Debug (avançado)"
+msgstr "Debug (Avançadas)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Carregar Imagem de Root para RAM Disk"
+msgstr "Carregar Imagem Raiz no Disco RAM"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr "Introduzir Imagem Root"
+msgstr "Introduza Imagem de Root"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
-msgstr "Deve a imagem de root ser carregada para o RAM disk?"
+msgstr "Carregar a imagem de root para o disco RAM?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
-msgstr "Introduza o caminho e nome do ficheiro a carregar para o RAM disk como sistema de ficheiros de raiz."
+msgstr "Introduza o caminho e o nome do ficheiro a ser carregado para o disco RAM como sistema de ficheiros root."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -520,44 +520,44 @@ msgstr "Sistema de Instalação"
 
 #. TXT_ENTER_INST_SYS
 msgid "Enter the directory that contains the installation system."
-msgstr "Introduza o directório que contém o sistema de instalação."
+msgstr "Introduza o diretório que contém o sistema de instalação."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
-msgstr "Nenhuma informação disponível."
+msgstr "Informações não disponíveis."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "A preparar a instalação..."
+msgstr "Preparação da instalação..."
 
 #. TXT_START_DEMO
 msgid "Start Live CD"
-msgstr "Iniciar Live CD"
+msgstr "Iniciar Live-CD"
 
 #. TXT_INSERT_LIVECD
 msgid "Insert the Live CD."
-msgstr "Introduza o Live CD."
+msgstr "Introduza o Live CD.Live."
 
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
-msgstr "Sair ou Reiniciar"
+msgstr "Sair ou Reinicializar"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
-msgstr "A procurar o ficheiro de info..."
+msgstr "A procurar ficheiro de informação...Pesquisando arquivo de informações..."
 
 #. TXT_NFSPORT
 msgid "Specify the NFS port."
-msgstr "Especifique a porta de NFS."
+msgstr "Especifique a porta NFS."
 
 #. TXT_ASKING_NAMED
 msgid "Asking name server..."
-msgstr "A perguntar ao servidor de nomes..."
+msgstr "A perguntar nome do servidor..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
 msgid "Host %s was not found."
-msgstr "O equipamente %s não foi encontrado."
+msgstr "O computador %s não foi encontrado."
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Keep this configuration?"
@@ -572,13 +572,13 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Não foi encontrado nenhum dispositivo de rede.\n"
-"Carregue um modulo de rede primeiro."
+"Nenhum dispositivo de rede encontrado.\n"
+"Carregar um módulo de rede primeiro."
 
 #. TXT_ALREADY_FOUND
 #, c-format
 msgid "A %s was already found in your system.\n"
-msgstr "Um %s já foi detectado no sistema\n"
+msgstr "Um %s já foi encontrado no sistema.\n"
 
 #. TXT_ERROR_FTP
 #, c-format
@@ -587,42 +587,42 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Erro na tentativa de acesso ao servidor de FTP:\n"
+"Erro ao aceder ao servidor FTP:\n"
 "\n"
 "%s"
 
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr "Introduza o nome de utilizador com o qual pretende aceder ao servidor de FTP."
+msgstr "Introduza o nome do utilizador com o qual vai aceder ao servidor FTP."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
-msgstr "Introduza a palavra passe para a conta de FTP."
+msgstr "Introduza a palavra passe da conta do utiliazador FTP."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "Introduza o endereço do Proxy de FTP."
+msgstr "Introduza o endereço do proxy FTP."
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "Introduza a porta do Proxy de FTP."
+msgstr "Introduza a porta do proxy FTP."
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
-msgstr "Utilizar um Proxy de FTP?"
+msgstr "Utilizar proxy FTP?"
 
 #. TXT_NOMEM_FTP
 #, c-format
 msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
-msgstr "O computador não tem memória RAM suficiente para uma instalação via FTP (são necessários %d MB RAM)."
+msgstr "O computador não tem RAM suficiente para instalar via FTP (%d MB de RAM necessários)."
 
 #. TXT_ANONYM_FTP
 msgid ""
 "Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normalmente uma instalação por FTP é em modo de utilizador anónimo. Também é possível especificar um nome de utilizador e sua password.\n"
-"Utilizar um nome de utilizador e palavra passe?"
+"Geralmente, é feita uma instalação FTP via FTP anônimo. É possível especificar um nome de usuário e uma palavra passe para acederr ao servidor FTP.\n"
+"Utilizar nome de utilizador e senha?"
 
 #. TXT_MORE_MODULES
 msgid "-- More Modules --"
@@ -630,16 +630,16 @@ msgstr "-- Mais Módulos --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "Initializando a porta paralela..."
+msgstr "A Inicializar porta paralela..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
-msgstr "Introduza o número da porta na qual esta a ser executado o servidor de NFS."
+msgstr "Digite o número da porta na qual o servidor NFS está em execução.sendo executado."
 
 #. TXT_INSERT_CD
 #, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "Certifique-se que o número de CD %d está na drive."
+msgstr "Certifique-se de que o CD %d está na unidade."
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
@@ -647,15 +647,15 @@ msgstr "Ejectar CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp Time-Out"
-msgstr "Tempo de Excesso (Time-Out) para o Bootp"
+msgstr "Tempo de espera de Bootp"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for bootp."
-msgstr "Introduza o valor do tempo de excesso(time-out) para o bootp."
+msgstr "Introduza o tempo de espera para bootp."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "ligação canal a canal"
+msgstr "Ligação canal a canal"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -667,7 +667,7 @@ msgstr "Ligação IUCV"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "canal ligado a router cisco"
+msgstr "router cisco ligado ao canal"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
@@ -678,12 +678,12 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Se deseja aceder a uma partilha como convidado, é necessário especificar o nome de utilizador, palavra passe e\n"
-"grupo de trabalho. Aceder à partilha como convidado?"
+"Se quiser aceder a uma partilha como convidado, não precisa especificar um nome de utilizador, uma palavra passe e um grupo de trabalho.\n"
+"Aceder a uma partilha como guest?"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
-msgstr "Introduza o nome de utilizador no servido SMB."
+msgstr "Introduza o nome de utilizador no servidor SMB."
 
 #. TXT_SMB_ENTER_PASSWORD
 msgid "Enter your password on the SMB server."
@@ -691,7 +691,7 @@ msgstr "Introduza a palavra passe no servidor SMB."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
-msgstr "Introduza o grupo de trabalho. Se não é necessário especificar um grupo de trabalho, deixe o campo vazio."
+msgstr "Introduza o grupo de trabalho. Se não necessitar especificar um grupo de trabalho, deixe o campo vazio."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -702,13 +702,13 @@ msgid ""
 msgstr ""
 "A tentar montar a partilha\n"
 "\n"
-"\"//%s/%s\""
+"//%s/%s"
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr "Configuração automática através de %s?"
+msgstr "Configuração automática via %s?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
@@ -720,7 +720,7 @@ msgstr "A enviar pedido %s..."
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "A configuração %s falhou."
+msgstr "Falhou a configuração %s."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
@@ -733,11 +733,11 @@ msgstr "Introduza o disco com os módulos."
 #. TXT_MODDISK1
 #, c-format
 msgid "Insert modules disk %d."
-msgstr "Introduza o disco com módulos %d."
+msgstr "Introduza o disco com os módulos %d."
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr "Procurar instruções para criar em boot/README em CD1 ou DVD1."
+msgstr "Localizar instruções para criar em boot/README no CD1 ou DVD1."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
@@ -761,7 +761,7 @@ msgstr "Rede"
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
-msgstr "Carregar %s Módulo"
+msgstr "Carregar Módulos %s"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
@@ -769,13 +769,13 @@ msgstr "Carregar Módulos do Sistema de Ficheiros"
 
 #. TXT_LOAD_OTHER
 msgid "Load Unknown Modules"
-msgstr "Carregar Módulo Desconhecidos"
+msgstr "Carregar Módulos Desconhecidos"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr "Ficheiro de sistena %s encontrado."
+msgstr "Sistema de ficheiros %s encontrado."
 
 #. TXT_CONTINUE
 msgid "Continue"
@@ -787,7 +787,7 @@ msgstr "Interromper"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "Não foram encontrados módulos novos."
+msgstr "Nenhum módulo novo encontrado."
 
 #. TXT_CHOOSE_PARTITION
 msgid "Choose the hard disk partition."
@@ -795,7 +795,7 @@ msgstr "Escolha a partição do disco rígido."
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Choose the root partition."
-msgstr "Escolha a partição de raiz."
+msgstr "Escolha a partição raiz."
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
@@ -803,7 +803,7 @@ msgstr "Escolha a partição de swap."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Não tem memória suficiente para carregar os dados todos."
+msgstr "Não existe memória suficiente para carregar todos os dados."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
@@ -811,25 +811,25 @@ msgstr "O computador não tem memória suficiente para executar o YaST."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Para continuar, activar apenas espaço swap."
+msgstr "Para continuar, é necessário activar algum espaço na partição swap."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Erro ao activar o espaço swap."
+msgstr "Erro ao activar espaço na swap."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Introduza a partição swap (ex: /dev/sda2)"
+msgstr "Introduza a partição swap (por exemplo, /dev/sda2)"
 
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "Introduza o nome de utilizador com o qual pretende aceder ao servidor %s."
+msgstr "Introduza o nome do utilizador com o qual pretende aceder ao servidor %s."
 
 #. TXT_ENTER_PASSWORD
 #, c-format
 msgid "Enter the password for the %s server."
-msgstr "Introduza a palavra passe para o servidor %s."
+msgstr "Introduza a palavra passe do servidor %s."
 
 #. TXT_WANT_PROXY
 #, c-format
@@ -839,12 +839,12 @@ msgstr "Utilizar o proxy %s?"
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Introduza o endereço para o proxy %s."
+msgstr "Introduza o endereço do proxy %s."
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "Introdua o porto para o proxy %s."
+msgstr "Introduza a porta do proxy %s."
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -860,7 +860,7 @@ msgstr "Activar ou Desactivar Modo SSH"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
-msgstr "Iniciar SSH para a instalação em modo de Texto?"
+msgstr "Iniciar SSH para Instalar Texto?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."
@@ -875,50 +875,51 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"O sistema base foi instalado com sucesso. O computador deve ser reiniciado. Remova todos os media de instalação (CD-ROM, Disquete).\n"
-"Não remova a disquete se o gestor de arranque estiver instalado nela."
+"O sistema base foi instalado com sucesso. O computador necessita ser reinicializado. Remova todos os media de instalação (CD-ROM, disquete).\n"
+"Não remova a disquete se o gestor de arranque estiver ai instalado."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Adicionar Actualização de Driver"
+msgstr "Adicionar Actualização do Driver"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Mostrar Actualização do Driver"
+msgstr "Mostrar Actualizações do Driver"
 
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Introduza o IP do nome do servidor %u ou seleccione ESC."
+msgstr "Introduza o IP do servidor de nomes %u ou pressione ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"Introduza a palavra passe temporária.\n"
-"Será pedido que modifique esta palavra passe na primeira vez que entrar como root."
+"Introduza a palavra passe temporária para root.\n"
+"Deverá mudar esta palavra passe ao autenticar-se com o utilizador root."
 
 #. TXT_REBOOT
 msgid "Reboot"
-msgstr "Reiniciar"
+msgstr "Reinicializar"
 
 #. TXT_NO_RAM
 #, c-format
 msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
-msgstr "O computador não tem memória RAM suficiente para a instalação de %s. São necessários pelo menos %d MB."
+msgstr "O computador não tem RAM suficiente para a instalação de %s. Precisa de pelo menos %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
+#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "A palavra passe é demasiado curta (deve ter pelo menos 8 caracteres)."
+msgstr "A palavra passe é muito curta (deve ter pelo menos 5 caracteres)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr "Introduza o endereço IP do equipamento onde está a executar o servidor X11."
+msgstr "Introduza o endereço IP do computador onde é executado o servidor X11."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Por favor, seleccione o tipo de dispositivo de rede."
+msgstr "Por favor, selecione o tipo de dispositivo de rede."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the VM peer to connect to."
@@ -926,7 +927,7 @@ msgstr "Por favor, introduza o nome (ID do utilizador) do par VM a ligar."
 
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"
-msgstr "Channel To Channel (CTC)"
+msgstr "CTC (Channel To Channel - Canal a Canal)"
 
 #. TXT_390NET_ESCON
 msgid "ESCON"
@@ -946,7 +947,7 @@ msgstr "Endereço do dispositivo para o canal de leitura"
 
 #. TXT_CTC_CHANNEL_WRITE
 msgid "Device address for write channel"
-msgstr "Endereço do dispositivo para o canal de escrita"
+msgstr "Endereço do dispositivo para o canal de gravação"
 
 #. TXT_CTC_CHANNEL_DATA
 msgid "Device address for data channel"
@@ -954,7 +955,7 @@ msgstr "Endereço do dispositivo para o canal de dados"
 
 #. TXT_CHOOSE_CTC_PROTOCOL
 msgid "Select protocol for this CTC device."
-msgstr "Seleccione o protocolo para o dispositivo CTC."
+msgstr "Seleccione o protocolo para este dispositivo CTC."
 
 #. TXT_CTC_PROT_COMPAT
 msgid "Compatibility mode (default)"
@@ -962,27 +963,27 @@ msgstr "Modo de compatibilidade (pré definido)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
-msgstr "Modo Avançado"
+msgstr "Modo Extended"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Modo de compatibilidade para pares OS/390 e Z/OS"
+msgstr "Modo de compatibilidade com peers OS/390 e z/OS"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
-msgstr "Nome do porto a utilizar"
+msgstr "Portname a utilizar"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
-msgstr "Nome completo do equipamento qualificado"
+msgstr "Nome complecto do computador"
 
 #. TXT_OSA_PORTNO
 msgid "Enter the relative port number"
-msgstr "Introduza o número relativo do porto"
+msgstr "Introduza o número relativo da porta"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
-msgstr "Verificar a instalação CD-ROM/DVD"
+msgstr "Verificar CD-ROM/DVD de Instalação"
 
 # turn the computer off
 #. TXT_POWER_OFF
@@ -991,32 +992,32 @@ msgstr "Desligar"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Falha no acesso ao media com a Actualização do Driver."
+msgstr "Falha no acesso ao media de Actualização do Driver."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "A ler Actualização dos Driver's..."
+msgstr "A lêr a Actualização do Driver..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Não foi encontrado nenhuma Actualização para o Driver"
+msgstr "Nenhuma Actualização Nova do Driver encontrada"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Actualizações de Driver's adicionados"
+msgstr "Actualizações do Driver Adicionadas"
 
 # shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr "Actualização do Driver correcta"
+msgstr "Actualização do Driver ok"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Por favor, escolha o media para a actualização do driver."
+msgstr "Por favor escolha o media com a Actualização do Driver."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Por favor, introduza o dispositivo de Acualização do Driver."
+msgstr "Introduza o dispositivo de Actualização do Driver."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -1024,15 +1025,15 @@ msgstr "Nome de dispositivo inválido."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
-msgstr "A procurar drives de CD-ROM..."
+msgstr "A procurar unidade de CD-ROM..."
 
 #. TXT_NO_CDROM
 msgid "No CD-ROM drives found."
-msgstr "Nenhuma drive de CD-ROM encontrada."
+msgstr "Nenhuma unidade de CD-ROM encontrada."
 
 #. TXT_SEARCH_FLOPPY
 msgid "Looking for floppy disks..."
-msgstr "A procurar disquetes..."
+msgstr "A procurar drive de disquetes..."
 
 #. TXT_NO_FLOPPY
 msgid "No floppy disk found."
@@ -1041,38 +1042,38 @@ msgstr "Nenhuma disquete encontrada."
 # heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr "Lista de Actualização de Drivers"
+msgstr "Lista de Actualização do Driver"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Nenhuma Actualização para os Driver's até agora."
+msgstr "Nenhuma Actualização do Driver encontrada até agora."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
-msgstr "Introduza o CD-ROM ou DVD de instalação."
+msgstr "Introduza o CD-ROM ou DVD de Instalação."
 
 #. TXT_NO_CD_DVD
 msgid "No CD-ROM or DVD found."
-msgstr "Não foi encontrado nenhum CD ou DVD."
+msgstr "Nenhum CD-ROM ou DVD encontrado."
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
-msgstr "O %s não é um CD-ROM."
+msgstr "Não é um CD-ROM %s."
 
 #. TXT_CD_CHECK_OK
 msgid "No errors found."
-msgstr "Não foram encontrado erros."
+msgstr "Nenhum erro encontrado."
 
 #. TXT_CD_MD5_FAILED
 msgid "Checksum wrong."
-msgstr "Checksum errado."
+msgstr "Checksum incorreto."
 
 #. TXT_CD_READ_FAILED
 #, c-format
 msgid "Error reading sector %u."
-msgstr "Erro ao ler o sector %u."
+msgstr "Erro ao ler sector %u."
 
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
@@ -1082,15 +1083,15 @@ msgid ""
 "This %s is broken."
 msgstr ""
 "\n"
-"O %s está estragado."
+"O %s está partido."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
-msgstr "Escolha uma fonte para a instalação"
+msgstr "Escolha uma origem de instalação"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr "Não é um nome de equipamento completamente qualificado."
+msgstr "Não é um nome do computador complecto."
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
@@ -1103,7 +1104,7 @@ msgstr "Hipersocket"
 # power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr "Deseja parar o sistema agora?"
+msgstr "Deseja desligar o sistema agora?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
@@ -1127,16 +1128,16 @@ msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr "Por favor, escolha a interface de bus CCW."
+msgstr "Escolha a interface de barramento CCW."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "Por favor, escolha o media."
+msgstr "Escolha o media físico."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr "A Carregar Módulos"
+msgstr "A Carregar Módulos "
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
@@ -1146,19 +1147,18 @@ msgstr "A Carregar Sistema de Instalação"
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr "A carregar Fontes Adicionais"
+msgstr "A Carregar Fontes Adicionais"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr "A carregar Actualização do Driver"
+msgstr "A Carregar Actualização do Driver"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr "A carregar Sistema de Recuperação"
+msgstr "A Carregar Sistema de Recuperação"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
-

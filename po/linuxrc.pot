@@ -94,10 +94,9 @@ msgstr ""
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 
 #. TXT_LOAD_SUCCESSFUL
@@ -145,7 +144,8 @@ msgstr ""
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
 
@@ -214,38 +214,29 @@ msgid "Enter your IP address."
 msgstr ""
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
 msgstr ""
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
 msgstr ""
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
 msgstr ""
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
 msgstr ""
 
 #. TXT_INPUT_SERVER
@@ -267,20 +258,24 @@ msgstr ""
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
 msgstr ""
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
 
 #. TXT_DELETE_MODULE
@@ -297,9 +292,7 @@ msgid "Autoprobing (%s)...      "
 msgstr ""
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
+msgid "Search for additional SCSI host adaptors?"
 msgstr ""
 
 #. TXT_WANT_MORE_NET
@@ -343,16 +336,15 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr ""
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr ""
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
 
 #. TXT_PCMCIA_PARAMS
@@ -378,10 +370,11 @@ msgstr ""
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
 
 #. TXT_NO_CTRLC
@@ -393,7 +386,10 @@ msgid "Remove the disk from the drive now."
 msgstr ""
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
+msgid ""
+"\n"
+"\n"
+"Example: "
 msgstr ""
 
 #. TXT_CHOOSE_SOURCE
@@ -413,10 +409,7 @@ msgid "Reboot the system now?"
 msgstr ""
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr ""
 
 #. TXT_ENTER_PARTITION
@@ -441,10 +434,9 @@ msgstr ""
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 
 #. TXT_ASK_ANIMATE
@@ -456,9 +448,7 @@ msgid "Use animated windows?"
 msgstr ""
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr ""
 
 #. TXT_MENU_EXPERT
@@ -474,14 +464,11 @@ msgid "Enter Root Image"
 msgstr ""
 
 #. TXT_ASK_RI_FORCE
-msgid ""
-"Should the root image be loaded into the RAM disk?"
+msgid "Should the root image be loaded into the RAM disk?"
 msgstr ""
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr ""
 
 #. TXT_NOT_IMPLEMENTED
@@ -493,9 +480,7 @@ msgid "Installation System"
 msgstr ""
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
+msgid "Enter the directory that contains the installation system."
 msgstr ""
 
 #. TXT_NO_INFO_AVAIL
@@ -536,9 +521,7 @@ msgid "Host %s was not found."
 msgstr ""
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
+msgid "Your network is already configured. Keep this configuration?"
 msgstr ""
 
 #. TXT_ASK_BREAK
@@ -547,8 +530,8 @@ msgstr ""
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
 
 #. TXT_ALREADY_FOUND
@@ -558,13 +541,14 @@ msgstr ""
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
 msgstr ""
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
+msgid "Enter the user name with which to access the FTP server."
 msgstr ""
 
 #. TXT_ENTER_FTPPASSWD
@@ -585,16 +569,12 @@ msgstr ""
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr ""
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
 
@@ -607,9 +587,7 @@ msgid "Initializing parallel port..."
 msgstr ""
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
+msgid "Enter the port number on which the NFS server is running."
 msgstr ""
 
 #. TXT_INSERT_CD
@@ -651,8 +629,7 @@ msgstr ""
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 
@@ -665,15 +642,15 @@ msgid "Enter your password on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr ""
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
 msgstr ""
 
 # %s is either BOOTP or DHCP
@@ -846,11 +823,8 @@ msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -869,8 +843,7 @@ msgstr ""
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr ""
 
 #. TXT_REBOOT
@@ -879,9 +852,7 @@ msgstr ""
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr ""
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -1053,7 +1024,9 @@ msgstr ""
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
+msgid ""
+"\n"
+"This %s is broken."
 msgstr ""
 
 #. TXT_SLP_SOURCE
@@ -1133,4 +1106,3 @@ msgstr ""
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
-

@@ -8,14 +8,14 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: cs\n"
-"PO-Revision-Date: 2005-07-31 18:35+0200\n"
+"Project-Id-Version: linuxrc.cs\n"
+"PO-Revision-Date: 2006-10-27 12:37+0200\n"
 "Last-Translator: Klara Cihlarova <koty@seznam.cz>\n"
 "Language-Team: Czech <suse@suse.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.1\n"
+"X-Generator: KBabel 1.11.2\n"
 "Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
@@ -103,8 +103,7 @@ msgstr "Odstranění modulů"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Zkouším zavést modul \"%s\"...\n"
 "\n"
@@ -228,28 +227,16 @@ msgid "Enter your IP address."
 msgstr "Zadejte vaši IP adresu"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Zadejte vaši síťovou masku. Pro běžnou síť třídy C je to obvykle "
-"255.255.255.0"
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Zadejte vaši síťovou masku. Pro běžnou síť třídy C je to obvykle 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Pokud potřebujete bránu pro přístup k serveru, zadejte IP adresu této "
-"brány. Pokud nepotřebujete bránu, zadejte vaši vlastní IP adresu."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Pokud potřebujete bránu pro přístup k serveru, zadejte IP adresu této brány. Pokud nepotřebujete bránu, zadejte vaši vlastní IP adresu."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Zadejte IP adresu vašeho name serveru. Pokud nepoužíváte name server, "
-"stiskněte ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Zadejte IP adresu vašeho name serveru. Pokud nepoužíváte name server, stiskněte ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -267,12 +254,8 @@ msgstr ""
 "Doména: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Během konfigurace sítě došlo k chybě. Jádro systému nejspíše nerozpoznalo "
-"vaši síťovou kartu."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Během konfigurace sítě došlo k chybě. Jádro systému nejspíše nerozpoznalo vaši síťovou kartu."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -463,12 +446,8 @@ msgid "Reboot the system now?"
 msgstr "Chcete váš systém nyní restartovat?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Základní systém byl úspěšně nainstalován. Tento nově nainstalovaný systém "
-"bude spuštěn, aby bylo možné dokončit instalaci."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Základní systém byl úspěšně nainstalován. Tento nově nainstalovaný systém bude spuštěn, aby bylo možné dokončit instalaci."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -494,13 +473,11 @@ msgstr "Disky nebo CD mechaniky"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Váš počítač má extrémně málo operační paměti!\n"
 "\n"
-"Než potvrdíte tento dialog, přepněte se na druhou konzoli (stiskem ALT-F2) a "
-"aktivujte dodatečně velký odkladový (swap) oddíl."
+"Než potvrdíte tento dialog, přepněte se na druhou konzoli (stiskem ALT-F2) a aktivujte dodatečně velký odkladový (swap) oddíl."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -531,12 +508,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Má se kořenový obraz zavést do ramdisku?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Zadejte cestu a jméno souboru, který chcete nahrát na ramdisk jako "
-"kořenový souborový systém."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Zadejte cestu a jméno souboru, který chcete nahrát na ramdisk jako kořenový souborový systém."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -641,21 +614,15 @@ msgstr "Chcete použít FTP proxy?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"Váš počítač nemá dostatek paměti pro instalaci přes FTP (je vyžadováno min. "
-"%d MB RAM)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Váš počítač nemá dostatek paměti pro instalaci přes FTP (je vyžadováno min. %d MB RAM)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normálně je FTP instalace prováděna přes anonymní FTP. Máte však možnost "
-"specifikovat uživatelské jméno a heslo na FTP serveru.\n"
+"Normálně je FTP instalace prováděna přes anonymní FTP. Máte však možnost specifikovat uživatelské jméno a heslo na FTP serveru.\n"
 "Přejete si tuto možnost?"
 
 #. TXT_MORE_MODULES
@@ -709,12 +676,10 @@ msgstr "Napište sdílené jméno na SMB serveru."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Když chcete přistupovat jako host,nemusíte specifikovat uživatelské jméno, "
-"heslo a skupinu.\n"
+"Když chcete přistupovat jako host,nemusíte specifikovat uživatelské jméno, heslo a skupinu.\n"
 "Chcete přistupovat jako host?"
 
 #. TXT_SMB_ENTER_USER
@@ -726,9 +691,7 @@ msgid "Enter your password on the SMB server."
 msgstr "Uveďte své heslo na SMB serveru."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr "Uveďte svou skupinu. Jestli nemusíte skupinu uvádět, nechte pole prázdné."
 
 #. TXT_SMB_TRYING_MOUNT
@@ -912,12 +875,10 @@ msgstr "Vložte své dočasné SSH heslo."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Základní systém byl úspěšně instalován. Počítač se nyní restartuje . Vyjměte "
-"všechna instalační média (CD, disketu).\n"
+"Základní systém byl úspěšně instalován. Počítač se nyní restartuje . Vyjměte všechna instalační média (CD, disketu).\n"
 "V případě, že je na disketě zavaděč, nechte disketu v mechanice."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -947,12 +908,8 @@ msgstr "Restartovat"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
-msgstr ""
-"Váš počítač má pro instalaci %s málo paměti. "
-"Minimální velikost RAM pro instalaci je %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Váš počítač má pro instalaci %s málo paměti. Minimální velikost RAM pro instalaci je %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
@@ -1123,8 +1080,12 @@ msgstr "Chyba při čtení sektoru %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\n%s je poškozen."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"%s je poškozen."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1202,5 +1163,4 @@ msgstr "Zavádí se záchranný systém"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
-
+msgstr "Povolit podporu 2. vrstvy OSI?"

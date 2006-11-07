@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2006-10-26 13:53:21+CEST\n"
+"Last-Translator: ro <i18n@suse.de>\n"
 "Language-Team: Romanian <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,7 +13,7 @@ msgstr ""
 
 #. TXT_OK
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -101,25 +101,23 @@ msgid "Unload Modules"
 msgstr "Dezinstalarea modulelor"
 
 #. TXT_TRY_TO_LOAD
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Incarcand modulul \"%s\"...\n"
 "\n"
-"In timp ce se incarca se pot vizualiza mesajele kernelului pe a 4-a consola "
-"virtuala (ALT-F4)"
+"In timp ce se incarca se pot vizualiza mesajele kernelului pe a 4-a consola virtuala (ALT-F4)"
 
 #. TXT_LOAD_SUCCESSFUL
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Module \"%s\" loaded successfully."
 msgstr "Modulul \"%s\" a fost incarcat cu succes!"
 
 #. TXT_LOAD_FAILED
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Failed to load module \"%s\"."
 msgstr "Esec la incarcarea moduluilui \"%s\"!"
 
@@ -133,7 +131,7 @@ msgstr "Discheta"
 
 #. TXT_HARDDISK
 msgid "Hard Disk"
-msgstr ""
+msgstr "Hard Disc"
 
 #. TXT_START_INSTALL
 #, fuzzy
@@ -245,31 +243,21 @@ msgstr "Introduceti adresa IP"
 
 #. TXT_INPUT_NETMASK
 #, fuzzy
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Introduceti netmask-ul. Pentru o adresa IP de clasa C este de obicei "
-"255.255.255.0"
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Introduceti netmask-ul. Pentru o adresa IP de clasa C este de obicei 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
 #, fuzzy
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Daca aveti nevoie de gateway pentru a ajunge la server, introduceti-i IP-"
-"ulDaca nu, introduceti-va propria adresa IP."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Daca aveti nevoie de gateway pentru a ajunge la server, introduceti-i IP-ulDaca nu, introduceti-va propria adresa IP."
 
 #. TXT_INPUT_NAMED
 #, fuzzy
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
 msgstr "Introduceti adresa name-serverului.  Daca nu aveti unul, tastati ESC."
 
 #. TXT_FOUND_HOST
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "The following data has been retrieved:\n"
 "\n"
@@ -285,12 +273,8 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 #, fuzzy
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"A aparut o eroare la configurarea retelei. Probabil placa de retea nu a fost "
-"recunoscuta de kernel"
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "A aparut o eroare la configurarea retelei. Probabil placa de retea nu a fost recunoscuta de kernel"
 
 #. TXT_INPUT_SERVER
 #, fuzzy
@@ -308,7 +292,7 @@ msgid "Enter the directory on the server."
 msgstr "Introduceti numele directorului de pe server."
 
 #. TXT_ENTER_PARAMS
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter parameters for \"%s\"."
 msgstr "Introduceti parametrii pentru \"%s\"."
 
@@ -324,7 +308,7 @@ msgstr ""
 "\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "An error occurred while trying to mount the NFS directory.\n"
 "\n"
@@ -408,13 +392,11 @@ msgstr "Introduceti adresa IP a partenerului PLIP."
 
 #. TXT_NO_PCMCIA
 #, fuzzy
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"Chipsetul PCMCIA n-a fost detectat automat! Va rog sa-l specificati manual."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "Chipsetul PCMCIA n-a fost detectat automat! Va rog sa-l specificati manual."
 
 #. TXT_FOUND_PCMCIA
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid ""
 "Found PCMCIA chipset \"%s\".\n"
 "\n"
@@ -425,7 +407,7 @@ msgstr ""
 "Introduceti parametrii pentru modulele PCMCIA"
 
 #. TXT_PCMCIA_PARAMS
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter specific parameters for chipset \"%s\"."
 msgstr "Introduceti parametrii specifici pentru chipset \"%s\""
 
@@ -461,8 +443,7 @@ msgstr ""
 "\n"
 "ť Pornirea instalarii / sistemului Ť\n"
 "\n"
-"Pentru a putea incepe, s-ar putea sa aveti nevoie sa incarcati cateva "
-"drivere (module) pentru hardware-ul dvs."
+"Pentru a putea incepe, s-ar putea sa aveti nevoie sa incarcati cateva drivere (module) pentru hardware-ul dvs."
 
 #. TXT_NO_CTRLC
 #, fuzzy
@@ -505,12 +486,8 @@ msgstr "Doriti sa rebootati sistemul acum?"
 
 #. TXT_INSTALL_SUCCESS
 #, fuzzy
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Sistemul de baza a fost instalat cu succes. Elva fi pornit acum pentru a "
-"termina instalarea "
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Sistemul de baza a fost instalat cu succes. Elva fi pornit acum pentru a termina instalarea "
 
 #. TXT_ENTER_PARTITION
 #, fuzzy
@@ -542,13 +519,11 @@ msgstr "Harddisk-uri / CD-ROM-uri"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Calculatorul dumneavoastra are foarte putina memorie!\n"
 "\n"
-"Inainte de a confirma acest mesaj treceti pe a 2-a consola virtuala (tastati "
-"ALT-F2), creati si activati memoria swap"
+"Inainte de a confirma acest mesaj treceti pe a 2-a consola virtuala (tastati ALT-F2), creati si activati memoria swap"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -583,12 +558,8 @@ msgstr ""
 
 #. TXT_ENTER_ROOTIMAGE
 #, fuzzy
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Introduceti calea si numele fisierului care doriti sa  fie incarcat in RAM "
-"disk ca imaginea principaluluisistem de fisiere"
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Introduceti calea si numele fisierului care doriti sa  fie incarcat in RAM disk ca imaginea principaluluisistem de fisiere"
 
 #. TXT_NOT_IMPLEMENTED
 #, fuzzy
@@ -643,16 +614,14 @@ msgid "Asking name server..."
 msgstr "Intreband nameserver-ul..."
 
 #. TXT_HOST_NOT_FOUND
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Host %s was not found."
 msgstr "Masina %s e necunoscuta!"
 
 #. TXT_NET_CONFIGURED
 #, fuzzy
 msgid "Your network is already configured. Keep this configuration?"
-msgstr ""
-"Reteaua dumneavoastra a fost deja configurata. Doriti sa pastrati aceasta "
-"configurare?"
+msgstr "Reteaua dumneavoastra a fost deja configurata. Doriti sa pastrati aceasta configurare?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -668,7 +637,7 @@ msgstr ""
 " Incarcati mai intai modulul de retea."
 
 #. TXT_ALREADY_FOUND
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "A %s was already found in your system.\n"
 msgstr "Un %s a fost deja gasit in sistemul dumneavoastra!\n"
 
@@ -686,8 +655,7 @@ msgstr ""
 #. TXT_ENTER_FTPUSER
 #, fuzzy
 msgid "Enter the user name with which to access the FTP server."
-msgstr ""
-"Introduceti numele utilizatorului sub care doriti sa accesati serverul de FTP"
+msgstr "Introduceti numele utilizatorului sub care doriti sa accesati serverul de FTP"
 
 #. TXT_ENTER_FTPPASSWD
 #, fuzzy
@@ -710,23 +678,17 @@ msgid "Use an FTP proxy?"
 msgstr "Doriti sa folositi un proxy FTP?"
 
 #. TXT_NOMEM_FTP
-#, fuzzy, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"Calculatorul dumneavoastra nu are destula memorie pentru instalarea via FTP! "
-"(minimum %d MB RAM)"
+#, c-format,fuzzy
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Calculatorul dumneavoastra nu are destula memorie pentru instalarea via FTP! (minimum %d MB RAM)"
 
 #. TXT_ANONYM_FTP
 #, fuzzy
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"In mod normal o instalare prin FTP se face via anonymous FTP. Exista si "
-"posibilitatea specificarii unui utilizator si a parolei acestuia.\n"
+"In mod normal o instalare prin FTP se face via anonymous FTP. Exista si posibilitatea specificarii unui utilizator si a parolei acestuia.\n"
 "Doriti acest lucru?"
 
 #. TXT_MORE_MODULES
@@ -744,7 +706,7 @@ msgid "Enter the port number on which the NFS server is running."
 msgstr "Introduceti portul la care ruleaza serverul NFS "
 
 #. TXT_INSERT_CD
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Make sure that CD number %d is in your drive."
 msgstr "Verificaţi dacă CD-ul cu numărul %d e în CD-ROM!"
 
@@ -785,8 +747,7 @@ msgstr "Introduceti adresa IP a serverului NFS."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 
@@ -799,9 +760,7 @@ msgid "Enter your password on the SMB server."
 msgstr ""
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr ""
 
 #. TXT_SMB_TRYING_MOUNT
@@ -853,7 +812,7 @@ msgid "Choose the network protocol."
 msgstr "Alegeti dispozitivul de retea."
 
 #. TXT_INPUT_NETSERVER
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the IP address of the %s server."
 msgstr "Introduceti adresa IP a serverului NFS."
 
@@ -868,7 +827,7 @@ msgid "Network"
 msgstr ""
 
 #. TXT_LOAD_MODULES
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Load %s Modules"
 msgstr "Dezinstalarea modulelor"
 
@@ -889,7 +848,7 @@ msgstr ""
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr ""
+msgstr "Continuă"
 
 #. TXT_ABORT
 msgid "Abort"
@@ -920,9 +879,7 @@ msgstr ""
 #. TXT_LOW_MEMORY2
 #, fuzzy
 msgid "Your computer does not have enough memory to run YaST."
-msgstr ""
-"Calculatorul dumneavoastra nu are destula memorie pentru instalarea via FTP! "
-"(minimum %d MB RAM)"
+msgstr "Calculatorul dumneavoastra nu are destula memorie pentru instalarea via FTP! (minimum %d MB RAM)"
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -938,13 +895,12 @@ msgid "Enter the swap partition (e.g., /dev/sda2)"
 msgstr "Introduceti partitia pentru harddisk (ex. /dev/sda1)"
 
 #. TXT_ENTER_USER
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
-"Introduceti numele utilizatorului sub care doriti sa accesati serverul de FTP"
+msgstr "Introduceti numele utilizatorului sub care doriti sa accesati serverul de FTP"
 
 #. TXT_ENTER_PASSWORD
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the password for the %s server."
 msgstr "Introduceti parola utilizatorului de pe serverul de FTP"
 
@@ -954,12 +910,12 @@ msgid "Use a %s proxy?"
 msgstr ""
 
 #. TXT_ENTER_PROXY
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the address of the %s proxy."
 msgstr "Introduceti adresa serverului proxy de FTP"
 
 #. TXT_ENTER_PROXYPORT
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the port of the %s proxy."
 msgstr "Introduceti portul  proxyului FTP"
 
@@ -989,8 +945,7 @@ msgstr ""
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 
@@ -1003,7 +958,7 @@ msgid "Show Driver Updates"
 msgstr ""
 
 #. TXT_INPUT_NAMED1
-#, fuzzy, c-format
+#, c-format,fuzzy
 msgid "Enter the IP of name server %u or press ESC."
 msgstr "Introduceti adresa name-serverului.  Daca nu aveti unul, tastati ESC."
 
@@ -1015,13 +970,11 @@ msgstr ""
 
 #. TXT_REBOOT
 msgid "Reboot"
-msgstr ""
+msgstr "Restartează"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr ""
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -1193,7 +1146,9 @@ msgstr ""
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
+msgid ""
+"\n"
+"This %s is broken."
 msgstr ""
 
 #. TXT_SLP_SOURCE
@@ -1273,4 +1228,3 @@ msgstr ""
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
-

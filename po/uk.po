@@ -6,14 +6,14 @@
 # Ivan Petrouchtchak <ivanpetrouchtchak@yahoo.com>, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: uk\n"
-"PO-Revision-Date: 2006-02-04 12:01-0700\n"
+"Project-Id-Version: linuxrc.uk\n"
+"PO-Revision-Date: 2006-11-06 01:03-0800\n"
 "Last-Translator: Ivan Petrouchtchak <ivanpetrouchtchak@yahoo.com>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11\n"
+"X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
@@ -99,15 +99,13 @@ msgstr "Вилучити модулі"
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Спроба завантаження модуля \"%s\"...\n\n"
-"Під час завантаження, можливо, ви захочете спостерігати за "
-"повідомленнями ядра на віртуальній консолі 4 (ALT-F4). "
-"Скористайтесь ALT-F1, щоб знов повернутись до цього меню."
+"Спроба завантаження модуля \"%s\"...\n"
+"\n"
+"Під час завантаження, можливо, ви захочете спостерігати за повідомленнями ядра на віртуальній консолі 4 (ALT-F4). Скористайтесь ALT-F1, щоб знов повернутись до цього меню."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -154,10 +152,12 @@ msgstr "Пошук штампа \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
-"Не вдається знайти штамп.\n\n"
+"Не вдається знайти штамп.\n"
+"\n"
 "Перевірте правильність каталогу."
 
 #. TXT_INFO_KERNEL
@@ -225,45 +225,35 @@ msgid "Enter your IP address."
 msgstr "Введіть вашу адресу IP."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
 msgstr "Введіть вашу мережну маску. Для звичайної мережі класу C, зазвичай, це 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
 msgstr "Якщо для зв'язку з сервером необхідний шлюз, введіть адресу IP шлюзу. Якщо вам шлюз не потрібний, то введіть вашу адресу IP."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
 msgstr "Введіть адресу IP вашого сервера назв. Якщо ви не використовуєте сервер назв, натисніть ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Отримано наступні дані:\n\n"
+"Отримано наступні дані:\n"
+"\n"
 "Адреса IP: %s\n"
 "Назва: %s\n"
 "Домен: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
-msgstr ""
-"Під час налаштування мережі трапилась помилка. "
-"Можливо, ядро не змогло розпізнати вашу мережну плату."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Під час налаштування мережі трапилась помилка. Можливо, ядро не змогло розпізнати вашу мережну плату."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -284,21 +274,33 @@ msgstr "введіть параметри для \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
-msgstr "Спроба змонтувати каталог\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Спроба змонтувати каталог\n"
+"\n"
+"\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
-msgstr "Трапилась помилка під час монтування каталогу NFS.\n\nПричина, дана сервером: %s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
+msgstr ""
+"Трапилась помилка під час монтування каталогу NFS.\n"
+"\n"
+"Причина, дана сервером: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
-msgstr "Виберіть карту клавіатури.\nПізніше, YaST запропонує додаткові таблиці клавіатури."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
+msgstr ""
+"Виберіть карту клавіатури.\n"
+"Пізніше, YaST запропонує додаткові таблиці клавіатури."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -314,9 +316,7 @@ msgid "Autoprobing (%s)...      "
 msgstr "Автозондування (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Хочете шукати за додатковими адаптерами вузлів SCSI?"
 
 #. TXT_WANT_MORE_NET
@@ -360,17 +360,19 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Введіть адресу IP вашого партнера PLIP."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr "Не вдається автоматично виявити набір мікросхем PCMCIA. Вкажіть його самі."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
-msgstr "Знайдено набір мікросхем PCMCIA \"%s\".\n\nВведіть параметри для модулів серцевини PCMCIA."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
+msgstr ""
+"Знайдено набір мікросхем PCMCIA \"%s\".\n"
+"\n"
+"Введіть параметри для модулів серцевини PCMCIA."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
@@ -395,13 +397,16 @@ msgstr "Служби плати PCMCIA вже запущено."
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Ви можете вийти з Linuxrc тільки через \n\n"
-"\"Запустити встановлення або систему\"\n\n"
+"Ви можете вийти з Linuxrc тільки через \n"
+"\n"
+"\"Запустити встановлення або систему\"\n"
+"\n"
 "Можливо, необхідно буде завантажити деякі драйвери (модулі) для підтримки вашого обладнання."
 
 #. TXT_NO_CTRLC
@@ -413,8 +418,14 @@ msgid "Remove the disk from the drive now."
 msgstr "Вийміть диск з приводу."
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
-msgstr "\n\nПриклад: "
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Приклад: "
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
@@ -433,10 +444,7 @@ msgid "Reboot the system now?"
 msgstr "Перезавантажити систему вже?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr "Базову систему було успішно встановлено. Тепер цю ново-встановлену систему буде запущено, щоб закінчити встановлення."
 
 #. TXT_ENTER_PARTITION
@@ -461,14 +469,13 @@ msgstr "Жорсткі диски та пристрої CD-ROM"
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Ваш комп'ютер має надзвичайно мало пам'яті.\n\n"
-"Перш ніж ви підтвердите це повідомлення, перейдіть у віртуальну консоль "
-"2 (натисніть ALT-F2), щоб створити та активувати на диску місце для свопінгу."
+"Ваш комп'ютер має надзвичайно мало пам'яті.\n"
+"\n"
+"Перш ніж ви підтвердите це повідомлення, перейдіть у віртуальну консоль 2 (натисніть ALT-F2), щоб створити та активувати на диску місце для свопінгу."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -479,9 +486,7 @@ msgid "Use animated windows?"
 msgstr "Використовувати анімовані вікна?"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Не виявлено жодних жорстких дисків та приводів CD-ROM."
 
 #. TXT_MENU_EXPERT
@@ -501,9 +506,7 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Завантажити кореневий штамп в RAM-диск?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr "Введіть назву та шлях до файла для завантаження в RAM-диск як кореневу файлову систему."
 
 #. TXT_NOT_IMPLEMENTED
@@ -515,9 +518,7 @@ msgid "Installation System"
 msgstr "Встановлена система"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
+msgid "Enter the directory that contains the installation system."
 msgstr "Введіть каталог, в якому міститься встановлена система."
 
 #. TXT_NO_INFO_AVAIL
@@ -558,12 +559,8 @@ msgid "Host %s was not found."
 msgstr "Вузол %s не знайдено."
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
-msgstr ""
-"Ваша мережа вже налаштована. "
-"Залишити цю конфігурацію?"
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "Ваша мережа вже налаштована. Залишити цю конфігурацію?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -571,9 +568,11 @@ msgstr "Припинити?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
-msgstr "Не знайдено жодного мережного пристрою.\nСпочатку завантажте мережний модуль."
+"No network device found.\n"
+"Load a network module first."
+msgstr ""
+"Не знайдено жодного мережного пристрою.\n"
+"Спочатку завантажте мережний модуль."
 
 #. TXT_ALREADY_FOUND
 #, c-format
@@ -582,13 +581,17 @@ msgstr "%s вже було знайдено у вашій системі.\n"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
-msgstr "Помилка при зв'язку з сервером FTP:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Помилка при зв'язку з сервером FTP:\n"
+"\n"
+"%s"
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
+msgid "Enter the user name with which to access the FTP server."
 msgstr "Введіть ім'я користувача для доступу до сервера FTP."
 
 #. TXT_ENTER_FTPPASSWD
@@ -609,16 +612,12 @@ msgstr "Використовувати проксі FTP?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr "Ваш комп'ютер не має достатньо RAM для встановлення через FTP (необхідно мати %d МБ RAM)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
 "Зазвичай, встановлення з FTP проводиться через анонімний FTP. Також, можна вказати ім'я користувача та пароль для доступу до сервера FTP.\n"
@@ -633,9 +632,7 @@ msgid "Initializing parallel port..."
 msgstr "Започаткування паралельного порту..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Введіть номер порту, який використовується сервером NFS."
 
 #. TXT_INSERT_CD
@@ -677,12 +674,10 @@ msgstr "Введіть назву спільного ресурсу на сер�
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Якщо ви хочете мати доступ до спільного ресурсу як гість,"
-"ви не мусите вказувати ім'я користувача, пароль та робочу групу.\n"
+"Якщо ви хочете мати доступ до спільного ресурсу як гість,ви не мусите вказувати ім'я користувача, пароль та робочу групу.\n"
 "З'єднатись з ресурсом як гість?"
 
 #. TXT_SMB_ENTER_USER
@@ -694,19 +689,19 @@ msgid "Enter your password on the SMB server."
 msgstr "Введіть ваш пароль на сервері SMB."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
-msgstr ""
-"Введіть вашу робочу групу."
-"Якщо немає потреби вказувати робочу групу,"
-"залиште поле порожнім."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Введіть вашу робочу групу.Якщо немає потреби вказувати робочу групу,залиште поле порожнім."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr "Спроба змонтувати спільний ресурс\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
+msgstr ""
+"Спроба змонтувати спільний ресурс\n"
+"\n"
+"\"//%s/%s\""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -878,11 +873,8 @@ msgstr "Введіть ваш тимчасовий пароль SSH."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 "Базову систему було успішно встановлено. Тепер ваш комп'ютер необхідно перезапустити. Вийміть носій встановлення (КД, DVD, дискету).\n"
 "Не виймайте дискету, якщо на неї було встановлено завантажувач."
@@ -903,8 +895,7 @@ msgstr "Введіть IP сервера назв %u або натисніть E
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr ""
 "введіть тимчасовий пароль адміністратора (root).\n"
 "Ви будете змушені змінити цей пароль при першому вході в систему як root."
@@ -915,9 +906,7 @@ msgstr "Перезавантажити комп'ютер"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr "Ваш комп'ютер не має достатньо RAM для встановлення %s. Необхідно мати принаймні %d МБ."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -1089,8 +1078,12 @@ msgstr "Помилка читання сектора %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\n%s пошкоджено."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"%s пошкоджено."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1168,5 +1161,4 @@ msgstr "Завантаження системи порятунку"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
-
+msgstr "Увімкнути підтримку OSI Layer 2?"

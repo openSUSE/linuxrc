@@ -1,4 +1,4 @@
-# translation of de.po to 
+# translation of de.po to
 # translation of de.po to German
 # German translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
@@ -6,18 +6,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: de\n"
-"PO-Revision-Date: 2005-03-11 18:30+0100\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2006-11-03 12:03\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.9\n"
 
 #. TXT_OK
 msgid "OK"
-msgstr "Ok"
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -73,7 +72,7 @@ msgstr "Einstellungen"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr "Bildschirm"
+msgstr "Anzeigen"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
@@ -100,13 +99,11 @@ msgstr "Module deaktivieren"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Versuch, das Modul \"%s\" zu laden...\n"
 "\n"
-"Während des Ladens können Sie die Kernelmeldungen auf der virtuellen Konsole "
-"4 (ALT-F4) beobachten. Mit ALT-F1 kommen Sie wieder in dieses Menü zurück."
+"Während des Ladens können Sie die Kernelmeldungen auf der virtuellen Konsole 4 (ALT-F4) beobachten. Mit ALT-F1 kommen Sie wieder in dieses Menü zurück."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -226,29 +223,16 @@ msgid "Enter your IP address."
 msgstr "Geben Sie Ihre IP-Adresse ein."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Geben Sie Ihre Netzmaske ein. Für ein normales Class-C-Netzwerk lautet sie "
-"üblicherweise 255.255.255.0"
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Geben Sie Ihre Netzmaske ein. Für ein normales Class-C-Netzwerk lautet sie üblicherweise 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Geben Sie die Adresse Ihres Gateways ein, sofern Sie einen benötigen, um den "
-"Server ansprechen zu können. Ansonsten geben Sie einfach Ihre eigene IP-"
-"Adresse an."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Geben Sie die Adresse Ihres Gateways ein, sofern Sie einen benötigen, um den Server ansprechen zu können. Ansonsten geben Sie einfach Ihre eigene IP-Adresse an."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Geben Sie die IP-Adresse Ihres Nameservers ein. Wenn Sie keinen Nameserver "
-"verwenden, drücken Sie ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Geben Sie die IP-Adresse Ihres Nameservers ein. Wenn Sie keinen Nameserver verwenden, drücken Sie ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -266,12 +250,8 @@ msgstr ""
 "Domain: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Beim Konfigurieren des Netzwerks ist ein Fehler aufgetreten. Möglicherweise "
-"wurde Ihre Netzwerkkarte nicht vom Kernel erkannt."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Beim Konfigurieren des Netzwerks ist ein Fehler aufgetreten. Möglicherweise wurde Ihre Netzwerkkarte nicht vom Kernel erkannt."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -380,11 +360,8 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Geben Sie die IP-Adresse des PLIP-Partners ein."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"Der verwendete PCMCIA Chipsatz konnte nicht automatisch ermittelt werden. "
-"Nehmen Sie eine manuelle Auswahl vor."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "Der verwendete PCMCIA Chipsatz konnte nicht automatisch ermittelt werden. Nehmen Sie eine manuelle Auswahl vor."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -430,8 +407,7 @@ msgstr ""
 "\n"
 "\"Installation / System starten\"\n"
 "\n"
-"verlassen werden. Damit dies möglich ist, müssen Sie eventuell vorher "
-"Hardware-Treiber (Module) laden."
+"verlassen werden. Damit dies möglich ist, müssen Sie eventuell vorher Hardware-Treiber (Module) laden."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -468,12 +444,8 @@ msgid "Reboot the system now?"
 msgstr "Möchten Sie das System nun neu starten?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Das Basissystem wurde erfolgreich installiert. Dieses neu installierte "
-"System wird nun gestartet, um die Installation abzuschließen."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Das Basissystem wurde erfolgreich installiert. Dieses neu installierte System wird nun gestartet, um die Installation abzuschließen."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -499,13 +471,11 @@ msgstr "Festplatten / CD-ROMs"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Ihr Rechner verfügt über extrem wenig Hauptspeicher!\n"
 "\n"
-"Bevor Sie diese Meldung bestätigen, müssen Sie auf die virtuelle Konsole 2 "
-"wechseln (drücken Sie ALT-F2) und Swap-Speicher einrichten und aktivieren."
+"Bevor Sie diese Meldung bestätigen, müssen Sie auf die virtuelle Konsole 2 wechseln (drücken Sie ALT-F2) und Swap-Speicher einrichten und aktivieren."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -536,12 +506,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Soll das Root-Image in die RAM Disk geladen werden?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Geben Sie Pfad und Namen der Datei ein, die Sie als Root-Dateisystem in die "
-"RAM-Disk laden möchten."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Geben Sie Pfad und Namen der Datei ein, die Sie als Root-Dateisystem in die RAM-Disk laden möchten."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -594,9 +560,7 @@ msgstr "Rechner %s ist unbekannt."
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Keep this configuration?"
-msgstr ""
-"Ihr Netzwerk ist bereits konfiguriert. Möchten Sie die Konfiguration "
-"beibehalten?"
+msgstr "Ihr Netzwerk ist bereits konfiguriert. Möchten Sie die Konfiguration beibehalten?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -628,9 +592,7 @@ msgstr ""
 
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr ""
-"Geben Sie den Benutzernamen ein, unter dem Sie auf den FTP-Server zugreifen "
-"möchten"
+msgstr "Geben Sie den Benutzernamen ein, unter dem Sie auf den FTP-Server zugreifen möchten"
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -650,22 +612,15 @@ msgstr "Möchten Sie einen FTP Proxy verwenden?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"Für eine Installation via FTP hat Ihr Rechner nicht genügend RAM. (mind. %d "
-"MB RAM erforderlich)"
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Für eine Installation via FTP hat Ihr Rechner nicht genügend RAM. (mind. %d MB RAM erforderlich)"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normalerweise erfolgt eine FTP-Installation via anonymem FTP. Sie haben "
-"jedoch auch die Möglichkeit, einen Benutzernamen und ein Passwort "
-"anzugeben.\n"
+"Normalerweise erfolgt eine FTP-Installation via anonymem FTP. Sie haben jedoch auch die Möglichkeit, einen Benutzernamen und ein Passwort anzugeben.\n"
 "Möchten Sie dies tun?"
 
 #. TXT_MORE_MODULES
@@ -719,12 +674,10 @@ msgstr "Geben Sie den Namen des Share auf dem SMB-Server ein."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Wollen Sie auf das Share als 'Gast' zugreifen, müssen Sie keinen "
-"Benutzernamen, kein Passwort und keine Arbeitsgruppe angeben.\n"
+"Wollen Sie auf das Share als 'Gast' zugreifen, müssen Sie keinen Benutzernamen, kein Passwort und keine Arbeitsgruppe angeben.\n"
 "Wollen Sie auf das Share als 'Gast' zugreifen?"
 
 #. TXT_SMB_ENTER_USER
@@ -736,12 +689,8 @@ msgid "Enter your password on the SMB server."
 msgstr "Geben Sie Ihr Passwort auf dem SMB-Server ein."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
-msgstr ""
-"Geben Sie Ihre Arbeitsgruppe ein. Falls Sie keine Arbeitsgruppe angeben "
-"müssen, dann belassen Sie das Feld leer."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Geben Sie Ihre Arbeitsgruppe ein. Falls Sie keine Arbeitsgruppe angeben müssen, dann belassen Sie das Feld leer."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -787,9 +736,7 @@ msgstr "Legen Sie die Moduldiskette %d ein."
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr ""
-"Sie finden eine Anleitung zum Erstellen dieser Diskette in boot/LIESMICH auf "
-"der CD1 oder DVD1."
+msgstr "Sie finden eine Anleitung zum Erstellen dieser Diskette in boot/LIESMICH auf der CD1 oder DVD1."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
@@ -832,7 +779,7 @@ msgstr "%s-Dateisystem gefunden."
 
 #. TXT_CONTINUE
 msgid "Continue"
-msgstr "Weiter"
+msgstr "Fortfahren"
 
 #. TXT_ABORT
 msgid "Abort"
@@ -877,9 +824,7 @@ msgstr "Geben Sie die Swap-Partition an (z.B. /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
-"Geben Sie den Benutzernamen ein, unter dem Sie auf den %s-Server zugreifen "
-"möchten."
+msgstr "Geben Sie den Benutzernamen ein, unter dem Sie auf den %s-Server zugreifen möchten."
 
 #. TXT_ENTER_PASSWORD
 #, c-format
@@ -927,15 +872,11 @@ msgstr "Geben Sie Ihr temporäres SSH-Passwort ein."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Das Basissystem wurde erfolgreich installiert. Ihr Rechner muss nun neu "
-"gestartet werden. Entfernen Sie dazu alle Installationsmedien (CD-ROM, "
-"Floppy).\n"
-"Entfernen Sie die Floppy nicht, wenn der Bootmanager darauf installiert "
-"wurde."
+"Das Basissystem wurde erfolgreich installiert. Ihr Rechner muss nun neu gestartet werden. Entfernen Sie dazu alle Installationsmedien (CD-ROM, Floppy).\n"
+"Entfernen Sie die Floppy nicht, wenn der Bootmanager darauf installiert wurde."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
@@ -956,8 +897,7 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Geben Sie das temporäre Root-Passwort ein.\n"
-"Bei der ersten Anmeldung als Benutzer Root werden Sie aufgefordert, dieses "
-"Passwort zu ändern."
+"Bei der ersten Anmeldung als Benutzer Root werden Sie aufgefordert, dieses Passwort zu ändern."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -965,12 +905,8 @@ msgstr "Neustart"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
-msgstr ""
-"Auf Ihrem Rechner ist nicht genügend RAM für die Installation von %s. Sie "
-"benötigen mindestens %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Auf Ihrem Rechner ist nicht genügend RAM für die Installation von %s. Sie benötigen mindestens %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
@@ -978,8 +914,7 @@ msgstr "Das Passwort ist zu kurz (es muss mindestens 8 Zeichen enthalten)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr ""
-"Geben Sie die IP-Adresse des Rechners ein, auf dem der X11-Server läuft."
+msgstr "Geben Sie die IP-Adresse des Rechners ein, auf dem der X11-Server läuft."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
@@ -1222,7 +1157,7 @@ msgstr "Treiberaktualisierung wird geladen"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Rettungssystem wird geladen"
+
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
-
+msgstr "OSI-Schicht-2-Unterstützung aktivieren?"

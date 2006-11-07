@@ -99,10 +99,9 @@ msgstr "Разтоварване на модулите"
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Опит за зареждане на модула \"%s\"...\n"
 "\n"
@@ -153,7 +152,8 @@ msgstr "Търсене на образ \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
 "Не мога да намеря образ.\n"
@@ -225,33 +225,22 @@ msgid "Enter your IP address."
 msgstr "Въведете Вашия IP адрес."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
 msgstr "Въведете мрежова маска. За нормална С клас мрежа, обикновено е 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
-msgstr ""
-"Ако се нуждаете от шлюз (gateway) за достъп до сървъра, "
-"въведете IP адреса му. Ако не се нуждаете от такъв, "
-"въведете своя IP адрес."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Ако се нуждаете от шлюз (gateway) за достъп до сървъра, въведете IP адреса му. Ако не се нуждаете от такъв, въведете своя IP адрес."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
-msgstr ""
-"Задайте IP адреса на DNS сървъра. "
-"Ако не използвате DNS сървър, натиснете ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Задайте IP адреса на DNS сървъра. Ако не използвате DNS сървър, натиснете ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
@@ -263,10 +252,7 @@ msgstr ""
 "Домен: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
 msgstr "По време на мрежовата настройка е възникнала грешка. Вероятно Вашата карта не била разпозната от ядрото."
 
 #. TXT_INPUT_SERVER
@@ -288,7 +274,10 @@ msgstr "Въведете параметри за \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
 msgstr ""
 "Опит за монтиране на директорията\n"
 "\n"
@@ -297,8 +286,9 @@ msgstr ""
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
 "Възникнала е грешка по време на опита за монтиране на\n"
 "NFS директорията.\n"
@@ -307,8 +297,8 @@ msgstr ""
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
 "Изберете клавиатурна подредба.\n"
 "YaST ще Ви предложи допълнителни клавиатурни таблици по-късно."
@@ -327,9 +317,7 @@ msgid "Autoprobing (%s)...      "
 msgstr "Автоматично пробване (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Желаете ли да потърсите допълнителни SCSI хост адаптери?"
 
 #. TXT_WANT_MORE_NET
@@ -373,18 +361,15 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Въведете IP адрес на PLIP партньора."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
-msgstr ""
-"PCMCIA чипсетът не бе намерен автоматично! "
-"Моля, задайте го ръчно."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "PCMCIA чипсетът не бе намерен автоматично! Моля, задайте го ръчно."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
 "Намерен е PCMCIA чипсет \"%s\".\n"
 "\n"
@@ -413,10 +398,11 @@ msgstr "Услугите за PCMCIA карти вече работят."
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
 "Можете да напуснете Linuxrc само през\n"
 "\n"
@@ -433,7 +419,10 @@ msgid "Remove the disk from the drive now."
 msgstr "Сега извадете диска от устройството."
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
+msgid ""
+"\n"
+"\n"
+"Example: "
 msgstr ""
 "\n"
 "\n"
@@ -456,14 +445,8 @@ msgid "Reboot the system now?"
 msgstr "Желаете ли да рестартирате сега системата?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
-msgstr ""
-"Основната система беше инсталирана успешно. "
-"Новоинсталираната система ще бъде "
-"заредена за да се довърши останалата инсталацията."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Основната система беше инсталирана успешно. Новоинсталираната система ще бъде заредена за да се довърши останалата инсталацията."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -487,15 +470,13 @@ msgstr "Твърди дискове или CD-ROM устройства"
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Вашият компютър има твърде малко памет.\n"
 "\n"
-"Преди да потвърдите това съобщение трябва да превключите "
-"на виртуална конзола 2 (ALT-F2) за да създадете и активирате swap пространство."
+"Преди да потвърдите това съобщение трябва да превключите на виртуална конзола 2 (ALT-F2) за да създадете и активирате swap пространство."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -506,9 +487,7 @@ msgid "Use animated windows?"
 msgstr "Желаете ли да се използват анимирани прозорци?"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Досега не бяха открити твърди дискове или CD-ROM устройства."
 
 #. TXT_MENU_EXPERT
@@ -528,12 +507,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Желаете ли да заредите образа на корена в RAM диска?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
-msgstr ""
-"Въведете пътя и името на файл за зареждане в RAM "
-"диска като файлова система на корена."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Въведете пътя и името на файл за зареждане в RAM диска като файлова система на корена."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -544,9 +519,7 @@ msgid "Installation System"
 msgstr "Инсталационна система"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
+msgid "Enter the directory that contains the installation system."
 msgstr "Въведете директорията съдържаща инсталационната система."
 
 #. TXT_NO_INFO_AVAIL
@@ -587,12 +560,8 @@ msgid "Host %s was not found."
 msgstr "Хостът %s не бе открит."
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
-msgstr ""
-"Вашата мрежа вече е настроена."
-"Желаете ли да запазите тази настройка?"
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "Вашата мрежа вече е настроена.Желаете ли да запазите тази настройка?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -600,8 +569,8 @@ msgstr "Прекъсване?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
 "Не бе открито мрежово устройство.\n"
 "Първо заредете модулите."
@@ -613,16 +582,17 @@ msgstr "%s вече е намерено на Вашата система.\n"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
 msgstr ""
 "Грешка при свързването с FTP сървъра:\n"
 "\n"
 "%s"
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
+msgid "Enter the user name with which to access the FTP server."
 msgstr "Въведете потребителското име за достъп до FTP сървъра."
 
 #. TXT_ENTER_FTPPASSWD
@@ -643,24 +613,15 @@ msgstr "Желаете ли да използвате FTP прокси?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
-msgstr ""
-"Вашият компютър няма достатъчно RAM "
-"за инсталация по FTP "
-"(необходими са %d MB RAM)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Вашият компютър няма достатъчно RAM за инсталация по FTP (необходими са %d MB RAM)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Обикновено FTP инсталацията се осъществява чрез "
-"анонимно FTP. Възможно е да се въведе потребителско "
-"име и парола за достъп до FTP сървъра.\n"
+"Обикновено FTP инсталацията се осъществява чрез анонимно FTP. Възможно е да се въведе потребителско име и парола за достъп до FTP сървъра.\n"
 "Желаете ли да използвате потребителско име и парола?"
 
 #. TXT_MORE_MODULES
@@ -672,9 +633,7 @@ msgid "Initializing parallel port..."
 msgstr "Инициализация на паралелния порт..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Въведете номера на порта, на който работи NFS сървъра."
 
 #. TXT_INSERT_CD
@@ -716,12 +675,10 @@ msgstr "Въведете името на споделения ресурс на 
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Ако искате достъп до поделения ресурс като guest, "
-"не е нужно да въвеждате потребителско име, парола и работна група.\n"
+"Ако искате достъп до поделения ресурс като guest, не е нужно да въвеждате потребителско име, парола и работна група.\n"
 "Желаете ли да използвате guest?"
 
 #. TXT_SMB_ENTER_USER
@@ -733,17 +690,15 @@ msgid "Enter your password on the SMB server."
 msgstr "Въведете парола за SMB сървъра."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
-msgstr ""
-"Въведете Вашата работната група. "
-"Ако не е необходимо - оставете полето празно."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Въведете Вашата работната група. Ако не е необходимо - оставете полето празно."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
 msgstr ""
 "Опит за монтиране на ресурса\n"
 "\n"
@@ -919,15 +874,10 @@ msgstr "Въведете Вашата временна SSH парола."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Основната система беше инсталирана успешно. "
-"Сега Вашата машина трябва да се рестартира. "
-"Извадете всички инсталационни носители (CD-ROM, дискети).\n"
+"Основната система беше инсталирана успешно. Сега Вашата машина трябва да се рестартира. Извадете всички инсталационни носители (CD-ROM, дискети).\n"
 "Не махайте дискетата ако менажера за зареждане е инсталиран на нея."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -946,8 +896,7 @@ msgstr "Въведете IP на DNS сървъра %u или натиснете
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr ""
 "Въведете временна root парола.\n"
 "Ще трябва да смените тази парола по време на първото влизане на потребителя."
@@ -958,16 +907,13 @@ msgstr "Рестартиране"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
-msgstr ""
-"Вашият компютър няма достатъчно RAM за инсталацията на %s. "
-"Необходими са поне %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Вашият компютър няма достатъчно RAM за инсталацията на %s. Необходими са поне %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
+#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Паролата е прекалено къса (трябва да има поне 8 символа)."
+msgstr "Паролата е прекалено къса (трябва да има поне 5 символа)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1134,8 +1080,12 @@ msgstr "Грешка при четенето на сектор %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\nТова %s е повредено."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Това %s е повредено."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1214,4 +1164,3 @@ msgstr "Зареждане на спасителната система"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
-

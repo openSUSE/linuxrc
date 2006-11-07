@@ -3,16 +3,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Linuxrc\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-23 15:06+0100\n"
-"PO-Revision-Date: 2004-09-28 14:50+0200\n"
-"Last-Translator: Craig Jeffares <cjeffares@novell.com>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2006-11-03 13:52\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
@@ -64,7 +61,7 @@ msgstr "システム情報"
 
 #. TXT_HDR_MAIN
 msgid "Main Menu"
-msgstr "メインメニュー"
+msgstr "メインメニュー "
 
 #. TXT_SETTINGS
 msgid "Settings"
@@ -72,7 +69,7 @@ msgstr "設定"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr "ディスプレイ"
+msgstr "表示"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
@@ -99,14 +96,11 @@ msgstr "モジュールをアンロードする"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "モジュール\"%s\"をロードしています...\n"
 "\n"
-"ロード中、<Alt>キーを押しながら<F4>キーを押すと、仮想コンソール4でカーネル"
-"メッセージを監視できます。 このメニューに戻るには、<Alt>キーを押しながら<F1>"
-"キーを押します。"
+"ロード中、<Alt>キーを押しながら<F4>キーを押すと、仮想コンソール4でカーネルメッセージを監視できます。 このメニューに戻るには、<Alt>キーを押しながら<F1>キーを押します。"
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -226,29 +220,16 @@ msgid "Enter your IP address."
 msgstr "IPアドレスを入力してください。"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"ネットマスクを入力してください。 一般的なクラスCネットワークの場合、ネットマ"
-"スクは通常「255.255.255.0」です。"
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "ネットマスクを入力してください。 一般的なクラスCネットワークの場合、ネットマスクは通常「255.255.255.0」です。"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"サーバに接続するためにゲートウェイが必要な場合、そのゲートウェイのIPアドレス"
-"を入力してください。 ゲートウェイが不要な場合は、自分のコンピュータのIPアドレ"
-"スを入力してください。"
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "サーバに接続するためにゲートウェイが必要な場合、そのゲートウェイのIPアドレスを入力してください。 ゲートウェイが不要な場合は、自分のコンピュータのIPアドレスを入力してください。"
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"ネームサーバのIPアドレスを入力してください。 ネームサーバを使用しない場合は、"
-"<ESC>キーを押してください。"
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "ネームサーバのIPアドレスを入力してください。 ネームサーバを使用しない場合は、<ESC>キーを押してください。"
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -266,12 +247,8 @@ msgstr ""
 "ドメイン: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"ネットワーク環境を設定する処理で、エラーが発生しました。 ネットワークカードが"
-"カーネルによって認識されなかった可能性があります。"
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "ネットワーク環境を設定する処理で、エラーが発生しました。 ネットワークカードがカーネルによって認識されなかった可能性があります。"
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -378,11 +355,8 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "PLIPの通信相手のIPアドレスを入力してください。"
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"PCMCIAチップセットが自動検出されませんでした。 PCMCIAチップセットを直接指定し"
-"てください。"
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "PCMCIAチップセットが自動検出されませんでした。 PCMCIAチップセットを直接指定してください。"
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -428,13 +402,11 @@ msgstr ""
 "\n"
 "［インストール処理またはシステムを開始する］を使用する必要があります。\n"
 "\n"
-"場合によっては、ハードウェア用のドライバ(モジュール)をロードする必要がありま"
-"す。"
+"場合によっては、ハードウェア用のドライバ(モジュール)をロードする必要があります。"
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr ""
-"<Ctrl>キーを押しながら<C>キーを押しても、linuxrcを終了することはできません。"
+msgstr "<Ctrl>キーを押しながら<C>キーを押しても、linuxrcを終了することはできません。"
 
 #. TXT_REMOVE_DISK
 msgid "Remove the disk from the drive now."
@@ -467,12 +439,8 @@ msgid "Reboot the system now?"
 msgstr "システムを今すぐ再起動しますか?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"ベースシステムがインストールされました。 この新規にインストールしたシステムが"
-"すぐに起動されます。これによって、インストールが完了します。"
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "ベースシステムがインストールされました。 この新規にインストールしたシステムがすぐに起動されます。これによって、インストールが完了します。"
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -498,13 +466,11 @@ msgstr "ハードディスクまたはCD-ROM"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "コンピュータのメモリ容量が少なすぎます。\n"
 "\n"
-"このメッセージに応答する前に、<Alt>キーを押しながら<F2>キーを押して仮想コン"
-"ソール2に切り替え、スワップ領域を作成して有効にする必要があります。"
+"このメッセージに応答する前に、<Alt>キーを押しながら<F2>キーを押して仮想コンソール2に切り替え、スワップ領域を作成して有効にする必要があります。"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -535,12 +501,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "ルートイメージをRAMディスクにロードしますか?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"ルートファイルシステムとしてRAMディスクにロードするファイルの、パスと名前を入"
-"力してください。"
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "ルートファイルシステムとしてRAMディスクにロードするファイルの、パスと名前を入力してください。"
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -645,21 +607,15 @@ msgstr "FTPプロキシサーバを使用しますか?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"RAM容量が不足しているため、FTPを使用したインストールを実行できません(%dMBの"
-"RAMが必要)。"
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "RAM容量が不足しているため、FTPを使用したインストールを実行できません(%dMBのRAMが必要)。"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"FTPを使用してインストールする場合、通常はanonymous FTPを使用します。 FTPサー"
-"バにアクセスする際に使用する、ユーザ名とパスワードを指定できます。\n"
+"FTPを使用してインストールする場合、通常はanonymous FTPを使用します。 FTPサーバにアクセスする際に使用する、ユーザ名とパスワードを指定できます。\n"
 "ユーザ名とパスワードを使用しますか?"
 
 #. TXT_MORE_MODULES
@@ -713,12 +669,10 @@ msgstr "SMBサーバ上の共有名を入力してください。"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"共有にguestとしてアクセスする場合、ユーザ名、パスワード、およびワークグループ"
-"を指定する必要はありません。\n"
+"共有にguestとしてアクセスする場合、ユーザ名、パスワード、およびワークグループを指定する必要はありません。\n"
 "共有にguestとしてアクセスしますか?"
 
 #. TXT_SMB_ENTER_USER
@@ -730,12 +684,8 @@ msgid "Enter your password on the SMB server."
 msgstr "SMBサーバに対するパスワードを入力してください。"
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
-msgstr ""
-"ワークグループを入力してください。ワークグループを指定する必要がない場合は、"
-"このフィールドを空のままにしておいてください。"
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "ワークグループを入力してください。ワークグループを指定する必要がない場合は、このフィールドを空のままにしておいてください。"
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -781,8 +731,7 @@ msgstr "モジュールディスク%dを挿入してください。"
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr ""
-"CD-ROM1またはDVD1のboot/READMEに記載されている、作成指示を確認してください。"
+msgstr "CD-ROM1またはDVD1のboot/READMEに記載されている、作成指示を確認してください。"
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
@@ -830,7 +779,7 @@ msgstr "続行する"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "中止する"
+msgstr "中止"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
@@ -919,15 +868,11 @@ msgstr "SSHの一時パスワードを入力してください。"
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"ベースシステムがインストールされました。 今すぐコンピュータを再起動する必要が"
-"あります。 ドライブに挿入されているインストール用メディア(CD-ROM、フロッピー"
-"ディスク)をすべて取り出してください。\n"
-"ただし、ブートマネージャをフロッピーディスクにインストールした場合は、フロッ"
-"ピーディスクを取り出さないでください。"
+"ベースシステムがインストールされました。 今すぐコンピュータを再起動する必要があります。 ドライブに挿入されているインストール用メディア(CD-ROM、フロッピーディスク)をすべて取り出してください。\n"
+"ただし、ブートマネージャをフロッピーディスクにインストールした場合は、フロッピーディスクを取り出さないでください。"
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
@@ -940,8 +885,7 @@ msgstr "ドライバアップデートを表示する"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr ""
-"ネームサーバ%uのIPアドレスを入力するか、または<ESC>キーを押してください。"
+msgstr "ネームサーバ%uのIPアドレスを入力するか、または<ESC>キーを押してください。"
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -949,24 +893,20 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "ルートの一時パスワードを入力してください。\n"
-"ルートユーザとして初めてログインしたとき、このパスワードを変更するよう要求さ"
-"れます。"
+"ルートユーザとして初めてログインしたとき、このパスワードを変更するよう要求されます。"
 
 #. TXT_REBOOT
 msgid "Reboot"
-msgstr "再起動する"
+msgstr "再起動"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
-msgstr ""
-"RAM容量が少ないため、%sをインストールできません。 %dMB以上の容量が必要です。"
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "RAM容量が少ないため、%sをインストールできません。 %dMB以上の容量が必要です。"
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "パスワードの文字数が少なすぎます。5文字以上にしてください。"
+msgstr "パスワードの文字数が少なすぎます。8文字以上にしてください。"
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1043,7 +983,7 @@ msgstr "インストール用CD-ROM/DVDを確認する"
 # turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
-msgstr "電源をオフにする"
+msgstr "電源オフ"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
@@ -1163,62 +1103,57 @@ msgstr "システムを今すぐ停止しますか?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2またはOSAエクスプレス"
 
 #. TXT_OSA_ETH
-#, fuzzy
 msgid "Ethernet"
-msgstr "OSA Ethernet"
+msgstr "イーサネット"
 
 #. TXT_OSA_TR
-#, fuzzy
 msgid "Token Ring"
-msgstr "OSAトークンリング(LCS)"
+msgstr "トークンリング"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
-#, fuzzy
 msgid "Please choose the CCW bus interface."
-msgstr "ドライバアップデートメディアを選択してください。"
+msgstr "CCWバスインタフェースを選択してください。"
 
 #. TXT_CHOOSE_OSA_MEDIUM
-#, fuzzy
 msgid "Please choose the physical medium."
-msgstr "ドライバアップデートメディアを選択してください。"
+msgstr "物理メディアを選択してください。"
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "モジュールをロード中"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "インストールシステムをロード中"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "追加フォントをロード中"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "ドライバ更新をロード中"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "救済システムをロード中"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
-
+msgstr "OSIレイヤ2サポートを有効にしますか？"

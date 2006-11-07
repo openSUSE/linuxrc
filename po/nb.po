@@ -8,14 +8,14 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: nb\n"
-"PO-Revision-Date: 2005-08-13 12:48+0200\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2006-11-03 20:46+0100\n"
 "Last-Translator: Olav Pettershagen <olav.pet@online.no>\n"
 "Language-Team:  <nb@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.2\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -98,22 +98,23 @@ msgid "Unload Modules"
 msgstr "Fjern lastede moduler"
 
 #. TXT_TRY_TO_LOAD
+#, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Forsøker å laste modulen \"%s\"...\n\n"
-"Under lastingen vil du kanskje følge med på meldinger "
-"fra kjernen på virtuell konsoll 4 (ALT-F4). Bruk ALT-F1 "
-"for å gå tilbake til denne menyen."
+"Forsøker å laste modulen \"%s\"...\n"
+"\n"
+"Under lastingen vil du kanskje følge med på meldinger fra kjernen på virtuell konsoll 4 (ALT-F4). Bruk ALT-F1 for å gå tilbake til denne menyen."
 
 #. TXT_LOAD_SUCCESSFUL
+#, c-format
 msgid "Module \"%s\" loaded successfully."
 msgstr "Modulen \"%s\" er lastet."
 
 #. TXT_LOAD_FAILED
+#, c-format
 msgid "Failed to load module \"%s\"."
 msgstr "Kunne ikke laste modulen \"%s\"."
 
@@ -146,15 +147,18 @@ msgid "Boot Installed System"
 msgstr "Start installert system"
 
 #. TXT_SEARCH_FOR_RI
+#, c-format
 msgid "Searching for image \"%s\"..."
 msgstr "Søker etter diskbildet \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
-"Kan ikke finne diskbilde.\n\n"
+"Kan ikke finne diskbilde.\n"
+"\n"
 "Kontroller om riktig katalog er angitt."
 
 #. TXT_INFO_KERNEL
@@ -222,52 +226,35 @@ msgid "Enter your IP address."
 msgstr "Angi IP-adressen."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
-msgstr ""
-"Angi nettverksmasken. For et normalt klasse C-"
-"nettverk er dette vanligvis 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Angi nettverksmasken. For et normalt klasse C-nettverk er dette vanligvis 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
-msgstr ""
-"Hvis du trenger en systemport for å kommunisere med serveren, "
-"angi IP-adressen til systemporten. Hvis du ikke"
-"trenger noen systemport, kan du angi din egen IP-adresse"
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Hvis du trenger en systemport for å kommunisere med serveren, angi IP-adressen til systemporten. Hvis du ikketrenger noen systemport, kan du angi din egen IP-adresse"
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
-msgstr ""
-"Angi IP-adressen til navneserveren din. Trykk "
-"ESC hvis du ikke bruker noen navneserver."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Angi IP-adressen til navneserveren din. Trykk ESC hvis du ikke bruker noen navneserver."
 
 #. TXT_FOUND_HOST
+#, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Følgende informasjon er hentet:\n\n"
+"Følgende informasjon er hentet:\n"
+"\n"
 "IP-adresse: %s\n"
 "Navn: %s\n"
 "Domene: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
-msgstr ""
-"Det oppstod en feil under konfigurasjon av nettverket. "
-"Nettverkskortet ble sannsynligvis ikke registrert av "
-"kjernen."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Det oppstod en feil under konfigurasjon av nettverket. Nettverkskortet ble sannsynligvis ikke registrert av kjernen."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -282,26 +269,39 @@ msgid "Enter the directory on the server."
 msgstr "Angi katalogen på serveren."
 
 #. TXT_ENTER_PARAMS
+#, c-format
 msgid "Enter parameters for \"%s\"."
 msgstr "Angi parametere for \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
-msgstr "Forsøker å montere katalogen\n\n\"%s:%s\"..."
+#, c-format
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Forsøker å montere katalogen\n"
+"\n"
+"\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
+#, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
-"Det oppstod en feil under forsøket på å montere NFS-"
-"katalogen.\n\nServeren angir følgende årsak: %s"
+"Det oppstod en feil under forsøket på å montere NFS-katalogen.\n"
+"\n"
+"Serveren angir følgende årsak: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
-msgstr "Velg et tastaturoppsett.\nYaST vil tilby flere tastaturoppsett senere."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
+msgstr ""
+"Velg et tastaturoppsett.\n"
+"YaST vil tilby flere tastaturoppsett senere."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -312,16 +312,13 @@ msgid "No modules currently loaded."
 msgstr "Ingen moduler er lastet."
 
 #. TXT_AUTO_RUNNING
+#, c-format
 msgid "Autoprobing (%s)...      "
 msgstr "Automatisk søk (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
-msgstr ""
-"Vil du søke etter flere SCSI-"
-"adaptere på maskinen?"
+msgid "Search for additional SCSI host adaptors?"
+msgstr "Vil du søke etter flere SCSI-adaptere på maskinen?"
 
 #. TXT_WANT_MORE_NET
 msgid "Search for additional network cards?"
@@ -364,22 +361,22 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Angi IP-adressen til PLIP-partneren."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
-msgstr ""
-"PCMCIA-brikkesettet ble ikke funnet"
-"automatisk. Spesifiser manuelt."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "PCMCIA-brikkesettet ble ikke funnetautomatisk. Spesifiser manuelt."
 
 #. TXT_FOUND_PCMCIA
+#, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
-"PCMCIA-brikkesettet  \"%s\" funnet.\n\nAngi "
-"parametere for PCMCIA-kjernemodulene."
+"PCMCIA-brikkesettet  \"%s\" funnet.\n"
+"\n"
+"Angi parametere for PCMCIA-kjernemodulene."
 
 #. TXT_PCMCIA_PARAMS
+#, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
 msgstr "Angi spesifikke parametere for brikkesettet \"%s\"."
 
@@ -401,15 +398,17 @@ msgstr "PCMCIA-korttjenester er allerede aktivert."
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Du kan bare avslutte Linuxrc via \n\n"
-"\"Start Installasjon eller system\"\n\n"
-"Det kan hende at du må laste noen "
-"drivere (moduler) som støtter maskinvaren din."
+"Du kan bare avslutte Linuxrc via \n"
+"\n"
+"\"Start Installasjon eller system\"\n"
+"\n"
+"Det kan hende at du må laste noen drivere (moduler) som støtter maskinvaren din."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -420,8 +419,14 @@ msgid "Remove the disk from the drive now."
 msgstr "Ta ut mediet fra stasjonen nå."
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
-msgstr "\n\nEksempel: "
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Eksempel: "
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
@@ -440,14 +445,8 @@ msgid "Reboot the system now?"
 msgstr "Vil du starte systemet på nytt nå?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
-msgstr ""
-"Grunnsystemet er installert. Dette "
-"nyinstallerte systemet vil nå bli startet for å "
-"fullføre resten av installasjonen."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Grunnsystemet er installert. Dette nyinstallerte systemet vil nå bli startet for å fullføre resten av installasjonen."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -471,15 +470,13 @@ msgstr "Harddisker eller CD-ROMer"
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Datamaskinen har svært lite minne.\n\n"
-"Før du bekrefter denne meldingen, må du bytte til "
-"virtuell konsoll 2 (trykk ALT-F2) for å opprette og "
-"aktivere mer veksleminne."
+"Datamaskinen har svært lite minne.\n"
+"\n"
+"Før du bekrefter denne meldingen, må du bytte til virtuell konsoll 2 (trykk ALT-F2) for å opprette og aktivere mer veksleminne."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -490,9 +487,7 @@ msgid "Use animated windows?"
 msgstr "Vil du bruke animerte vinduer?"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Ingen harddisker eller CD-ROM-stasjoner er funnet foreløpig."
 
 #. TXT_MENU_EXPERT
@@ -512,12 +507,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Skal rotdiskbildet lastes inn i RAM-disken?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
-msgstr ""
-"Angi stien og navnet til filen som skal "
-"lastes inn i RAM-disken som rotfilsystem."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Angi stien og navnet til filen som skal lastes inn i RAM-disken som rotfilsystem."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -528,12 +519,8 @@ msgid "Installation System"
 msgstr "Installasjonssystem"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
-msgstr ""
-"Angi katalogen som inneholder "
-"installasjonssystemet."
+msgid "Enter the directory that contains the installation system."
+msgstr "Angi katalogen som inneholder installasjonssystemet."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -568,16 +555,13 @@ msgid "Asking name server..."
 msgstr "Spør navneserveren..."
 
 #. TXT_HOST_NOT_FOUND
+#, c-format
 msgid "Host %s was not found."
 msgstr "Vertsmaskinen %s ble ikke funnet."
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
-msgstr ""
-"Nettverket er allerede konfigurert. "
-"Vil du beholde denne konfigurasjonen?"
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "Nettverket er allerede konfigurert. Vil du beholde denne konfigurasjonen?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -585,27 +569,31 @@ msgstr "Vil du avbryte?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
+"No network device found.\n"
+"Load a network module first."
 msgstr ""
-"Ingen nettverksenheter funnet.\nLast en nettverksmodul "
-"først."
+"Ingen nettverksenheter funnet.\n"
+"Last en nettverksmodul først."
 
 #. TXT_ALREADY_FOUND
+#, c-format
 msgid "A %s was already found in your system.\n"
 msgstr "En %s finnes fra før i systemet.\n"
 
 #. TXT_ERROR_FTP
-msgid "Error while accessing the FTP server:\n\n%s"
-msgstr "Feil ved tilkobling til FTP server:\n\n%s"
+#, c-format
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Feil ved tilkobling til FTP server:\n"
+"\n"
+"%s"
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
-msgstr ""
-"Angi brukernavnet for "
-"tilgang til FTP-serveren."
+msgid "Enter the user name with which to access the FTP server."
+msgstr "Angi brukernavnet for tilgang til FTP-serveren."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -624,23 +612,16 @@ msgid "Use an FTP proxy?"
 msgstr "Vil du bruke en FTP-mellomserver?"
 
 #. TXT_NOMEM_FTP
-msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
-msgstr ""
-"Datamaskinen har ikke nok RAM for installasjon "
-"via FTP (%d MB RAM kreves)."
+#, c-format
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Datamaskinen har ikke nok RAM for installasjon via FTP (%d MB RAM kreves)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"En FTP-installasjon utføres vanligvis via "
-"anonym FTP. Det er mulig å angi "
-"brukernavn og passord for å få tilgang til FTP-serveren.\n"
+"En FTP-installasjon utføres vanligvis via anonym FTP. Det er mulig å angi brukernavn og passord for å få tilgang til FTP-serveren.\n"
 "Vil du angi brukernavn og passord?"
 
 #. TXT_MORE_MODULES
@@ -652,14 +633,11 @@ msgid "Initializing parallel port..."
 msgstr "Initialiserer parallellport..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
-msgstr ""
-"Angi portnummeret som NFS-serveren "
-"benytter."
+msgid "Enter the port number on which the NFS server is running."
+msgstr "Angi portnummeret som NFS-serveren benytter."
 
 #. TXT_INSERT_CD
+#, c-format
 msgid "Make sure that CD number %d is in your drive."
 msgstr "Kontroller at CD nummer %d sitter i stasjonen."
 
@@ -697,12 +675,10 @@ msgstr "Angi navnet på den delte ressursen på SMB-serveren."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Hvis du vil ha gjestetilgang til den delte ressursen,"
-"trenger du ikke å angi brukernavn, passord og arbeidsgruppe.\n"
+"Hvis du vil ha gjestetilgang til den delte ressursen,trenger du ikke å angi brukernavn, passord og arbeidsgruppe.\n"
 "Vil du ha gjestetilgang til delt ressurs?"
 
 #. TXT_SMB_ENTER_USER
@@ -714,31 +690,35 @@ msgid "Enter your password on the SMB server."
 msgstr "Angi passordet for SMB-serveren."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
-msgstr ""
-"Angi arbeidsgruppen."
-"Hvis du ikke trenger å spesifisere noen arbeidsgruppe,"
-"kan du la feltet være tomt."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Angi arbeidsgruppen.Hvis du ikke trenger å spesifisere noen arbeidsgruppe,kan du la feltet være tomt."
 
 #. TXT_SMB_TRYING_MOUNT
-msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr "Forsøker å montere den delte ressursen\n\n\"//%s/%s\""
+#, c-format
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
+msgstr ""
+"Forsøker å montere den delte ressursen\n"
+"\n"
+"\"//%s/%s\""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
+#, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Automatisk konfigurasjon via %s?"
 
 # %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
+#, c-format
 msgid "Sending %s request..."
 msgstr "Sender %s-forespørsel..."
 
 # %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
+#, c-format
 msgid "%s configuration failed."
 msgstr "%s-konfigurasjonen mislyktes."
 
@@ -751,6 +731,7 @@ msgid "Insert a modules disk."
 msgstr "Sett inn en moduldiskett."
 
 #. TXT_MODDISK1
+#, c-format
 msgid "Insert modules disk %d."
 msgstr "Sett inn moduldisketten %d."
 
@@ -764,11 +745,13 @@ msgstr "Velg nettverksprotokoll."
 
 # %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
+#, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "Angi IP-adressen til %s-serveren."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
+#, c-format
 msgid "Trying to connect to the %s server..."
 msgstr "Forsøker å koble til %s-serveren..."
 
@@ -778,6 +761,7 @@ msgstr "Nettverk"
 
 # %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
+#, c-format
 msgid "Load %s Modules"
 msgstr "Last %s-moduler"
 
@@ -791,6 +775,7 @@ msgstr "Last ukjente moduler"
 
 # %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
+#, c-format
 msgid "%s file system found."
 msgstr "%s-filsystem funnet."
 
@@ -839,22 +824,27 @@ msgid "Enter the swap partition (e.g., /dev/sda2)"
 msgstr "Angi veksleminnepartisjonen (f.eks. /dev/sda2)"
 
 #. TXT_ENTER_USER
+#, c-format
 msgid "Enter the user name with which to access the %s server."
 msgstr "Angi brukernavnet for tilgang til %s-serveren."
 
 #. TXT_ENTER_PASSWORD
+#, c-format
 msgid "Enter the password for the %s server."
 msgstr "Angi passordet for %s-serveren."
 
 #. TXT_WANT_PROXY
+#, c-format
 msgid "Use a %s proxy?"
 msgstr "Bruk en %s-mellomserver?"
 
 #. TXT_ENTER_PROXY
+#, c-format
 msgid "Enter the address of the %s proxy."
 msgstr "Angi adressen til %s-mellomserveren."
 
 #. TXT_ENTER_PROXYPORT
+#, c-format
 msgid "Enter the port of the %s proxy."
 msgstr "Angi porten for %s-mellomserveren."
 
@@ -884,15 +874,10 @@ msgstr "Angi det midlertidige SSH-passordet."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Grunnsystemet er installert. Maskinen "
-"må nå startes på nytt. "
-"Fjern alle installasjonsmedier (CD-ROM, diskett).\n"
+"Grunnsystemet er installert. Maskinen må nå startes på nytt. Fjern alle installasjonsmedier (CD-ROM, diskett).\n"
 "Ikke fjern disketten hvis oppstartslasteren er installert på den."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -904,30 +889,26 @@ msgid "Show Driver Updates"
 msgstr "Vis driveroppgraderinger"
 
 #. TXT_INPUT_NAMED1
+#, c-format
 msgid "Enter the IP of name server %u or press ESC."
 msgstr "Angi IP-adressen til navneserveren %u eller trykk på ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr ""
 "Angi det midlertidige rotpassordet.\n"
-"Du vil bli bedt om å endre dette passordet "
-"første gang du logger inn som rot."
+"Du vil bli bedt om å endre dette passordet første gang du logger inn som rot."
 
 #. TXT_REBOOT
 msgid "Reboot"
 msgstr "Start på nytt"
 
 #. TXT_NO_RAM
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
-msgstr ""
-"Datamaskinen har ikke nok RAM for installasjon av %s. "
-"Du trenger minst %d MB."
+#, c-format
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Datamaskinen har ikke nok RAM for installasjon av %s. Du trenger minst %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
@@ -1078,6 +1059,7 @@ msgstr "Ingen CD-ROM eller DVD funnet."
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
+#, c-format
 msgid "This is not a %s CD-ROM."
 msgstr "Dette er ikke en %s-CD-ROM."
 
@@ -1090,13 +1072,19 @@ msgid "Checksum wrong."
 msgstr "Feil kontrollsum."
 
 #. TXT_CD_READ_FAILED
+#, c-format
 msgid "Error reading sector %u."
 msgstr "Feil under lesing av sektor %u."
 
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
-msgid "\nThis %s is broken."
-msgstr "\nFeil på %s."
+#, c-format
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Feil på %s."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1174,5 +1162,4 @@ msgstr "Laster redningssystem"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
-
+msgstr "Vil du aktivere &Layer 2-støtte?"

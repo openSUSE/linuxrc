@@ -3,16 +3,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kpowersave\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-23 15:06+0100\n"
-"PO-Revision-Date: 2004-09-28 14:50+0200\n"
-"Last-Translator: Craig Jeffares <cjeffares@novell.com>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2006-11-02 14:21\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
@@ -99,13 +96,11 @@ msgstr "卸载模块"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "正在尝试装载模块\"%s\"...\n"
 "\n"
-"在装载期间，可能需要观察虚拟控制台 4 (ALT-F4) 上的内核讯息。 使用 ALT-F1 来切"
-"换回此菜单。"
+"在装载期间，可能需要观察虚拟控制台 4 (ALT-F4) 上的内核讯息。 使用 ALT-F1 来切换回此菜单。"
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -225,23 +220,15 @@ msgid "Enter your IP address."
 msgstr "输入您的 IP 地址。"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
 msgstr "输入您的网络掩码。 对于常规 C 类网络，网络掩码通常是 255.255.255.0。"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"如果需要一个网关来连接到服务器，请输入这个网关的 IP 地址。 如果不需要网关，请"
-"输入您自己的 IP 地址。"
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "如果需要一个网关来连接到服务器，请输入这个网关的 IP 地址。 如果不需要网关，请输入您自己的 IP 地址。"
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
 msgstr "输入您的名称服务器的 IP 地址。 如果不使用名称服务器，请按 ESC 键。"
 
 #. TXT_FOUND_HOST
@@ -260,9 +247,7 @@ msgstr ""
 "域：%s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
 msgstr "在网络配置期间出错。 内核可能不能识别您的网卡。"
 
 #. TXT_INPUT_SERVER
@@ -370,8 +355,7 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "输入 PLIP 合作伙伴的 IP 地址。"
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr "无法自动检测到 PCMCIA 芯片组。 请手工指定。"
 
 #. TXT_FOUND_PCMCIA
@@ -455,9 +439,7 @@ msgid "Reboot the system now?"
 msgstr "是否现在重引导系统？"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr "已成功安装基础系统。 现在将启动这个新安装的系统来提交安装。"
 
 #. TXT_ENTER_PARTITION
@@ -484,13 +466,11 @@ msgstr "硬盘或 CD-ROM"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "您的计算机内存严重不足。\n"
 "\n"
-"在确认此讯息之前，必须切换到虚拟控制台 2（按 ALT-F2）来创建并激活一些交换空"
-"间。"
+"在确认此讯息之前，必须切换到虚拟控制台 2（按 ALT-F2）来创建并激活一些交换空间。"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -521,9 +501,7 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "是否应将根映像装载到 RAM 磁盘中？"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr "输入要装载到作为根文件系统的 RAM 磁盘的文件的路径和名称。"
 
 #. TXT_NOT_IMPLEMENTED
@@ -629,15 +607,12 @@ msgstr "是否使用 FTP 代理？"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr "您的计算机没有足够的 RAM 以通过 FTP 进行安装（需要 %d MB RAM）。"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
 "通常通过匿名 FTP 来执行 FTP 安装。 可以为 FTP 服务器访问指定用户名和口令。\n"
@@ -694,8 +669,7 @@ msgstr "在 SMB 服务器上输入共享名。"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 "如果要以 GUEST 身份访问共享，则不需要指定用户名、口令和工作组。\n"
@@ -710,9 +684,7 @@ msgid "Enter your password on the SMB server."
 msgstr "在 SMB 服务器上输入您的口令。"
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr "输入您的工作组。如果不需要指定工作组，请将此字段留空。"
 
 #. TXT_SMB_TRYING_MOUNT
@@ -896,12 +868,10 @@ msgstr "输入您的临时 SSH 口令。"
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"已成功安装基础系统。 现在必须重引导您的计算机。 取出所有安装媒体（CD-ROM 或软"
-"盘）。\n"
+"已成功安装基础系统。 现在必须重引导您的计算机。 取出所有安装媒体（CD-ROM 或软盘）。\n"
 "如果引导管理器安装在软盘上，请不要取出软盘。"
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -931,9 +901,7 @@ msgstr "重引导"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr "您的计算机 RAM 不足，无法安装 %s。至少需要 %d MB。"
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -1135,62 +1103,57 @@ msgstr "是否要立即暂停系统？"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 或 OSA Express"
 
 #. TXT_OSA_ETH
-#, fuzzy
 msgid "Ethernet"
-msgstr "OSA Ethernet"
+msgstr "以太网"
 
 #. TXT_OSA_TR
-#, fuzzy
 msgid "Token Ring"
-msgstr "OSA 令牌环 (LCS)"
+msgstr "令牌环"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
-#, fuzzy
 msgid "Please choose the CCW bus interface."
-msgstr "请选择驱动程序更新媒体。"
+msgstr "请选择 CCW 总线接口。"
 
 #. TXT_CHOOSE_OSA_MEDIUM
-#, fuzzy
 msgid "Please choose the physical medium."
-msgstr "请选择驱动程序更新媒体。"
+msgstr "请选择物理媒体。"
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "正在装载模块"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "正在装载安装系统"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "正在装载附加字体"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "正在装载驱动程序更新"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "正在装载救援系统"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
-
+msgstr "是否启用 OSI 第 2 层支持？"
