@@ -473,7 +473,7 @@ msgid ""
 "\n"
 "Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Váš počítač má extrémne málo pamäti!\n"
+"Váš počítač má extrémne málo pamäte!\n"
 "\n"
 "Pred potvrdením tejto správy sa musíte prepnúť na virtuálnu konzolu 2 (stlačením ALT-F2) vytvoriť a aktivovať nejaký priestor pre swap."
 
@@ -800,23 +800,23 @@ msgstr "Vyberte oddiel pre koreňový priečinok."
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
-msgstr "Vyberte oddiel pre swap."
+msgstr "Vyberte diskový oddiel pre swap."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Pre načítanie všetkých dát nie je dosť pamäti."
+msgstr "Pre načítanie všetkých dát nie je dostatok pamäte."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
-msgstr "Váš počítač nemá dosť pamäti pre spustenie YaST-u."
+msgstr "Váš počítač nemá dosť pamäte pre spustenie YaST-u."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Aby ste mohli pokračovať, musíte aktivovať nejaký priestor swap."
+msgstr "Aby ste mohli pokračovať, musíte aktivovať nejaký swapovací oddiel na disku."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Chyba pri aktivácii priestoru swap."
+msgstr "Chyba pri aktivácii swapovacieho oddielu."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
@@ -865,11 +865,11 @@ msgstr "Spustiť SSH pre textovú inštaláciu?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."
-msgstr "Prosím, zadajte vaše heslo VNC."
+msgstr "Prosím, zadajte vaše VNC heslo."
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr "Prosím, zadajte vaše dočasné heslo SSH."
+msgstr "Prosím, zadajte vaše dočasné SSH heslo."
 
 #. TXT_DO_REBOOT
 msgid ""

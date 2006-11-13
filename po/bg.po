@@ -18,7 +18,7 @@ msgstr ""
 
 #. TXT_OK
 msgid "OK"
-msgstr "OK"
+msgstr "Добре"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -34,7 +34,7 @@ msgstr "Не"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Select the language."
-msgstr "Избор на език."
+msgstr "Изборете на език."
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
@@ -911,9 +911,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Вашият компютър няма достатъчно RAM за инсталацията на %s. Необходими са поне %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Паролата е прекалено къса (трябва да има поне 5 символа)."
+msgstr "Паролата е прекалено къса (трябва да има поне 8 символа)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1163,4 +1162,4 @@ msgstr "Зареждане на спасителната система"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Желаете ли да разрешите поддържка за OSI слой 2?"

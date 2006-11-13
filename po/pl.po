@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2006-10-15 23:10+0200\n"
-"Last-Translator: Łukasz Suchenek <drottnar@oaza.pl>\n"
-"Language-Team: Polish <pl@li.org>\n"
+"PO-Revision-Date: 2006-11-10 10:26+0100\n"
+"Last-Translator: wadim dziedzic <nikdo@aviary.pl>\n"
+"Language-Team: Polski <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -908,9 +908,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Komputer ten nie ma wystarczającej ilości pamięci RAM do instalacji %s. Wymagane jest co najmniej %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Hasło za krótkie (musi mieć co najmniej 5 znaków)."
+msgstr "Hasło jest za krótkie (musi mieć co najmniej 8 znaków)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1160,4 +1159,4 @@ msgstr "Wczytywanie systemu awaryjnego"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Włączyć obsługę drugiej warstwy OSI?"
