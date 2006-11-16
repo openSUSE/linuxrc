@@ -22,7 +22,35 @@ static inline int slpgetw(unsigned char *p)
   return p[0] << 8 | p[1];
 }
 
+static int slpsend(int s,  unsigned char *buf, int buflen, struct sockaddr_in *peer, int tcp)
+{
+  int l;
+  if (tcp)
+    {
+      if (connect(s, peer, sizeof(*peer)))
+	return -1;
+      while (buflen)
+	{
+	  l = write(s, buf, buflen);
+	  if (l <= 0 || l > buflen)
+	    return -1;
+	  buf += l;
+	  buflen -= l;
+	}
+    }
+  else
+    {
+      l = sendto(s, buf, buflen, 0, (struct sockaddr *)peer, sizeof(*peer));
+      if (l == -1)
+	perror("sendto");
+      if (l != buflen)
+	return -1;
+    }
+  return 0;
+}
 
+/* returns: -2 on timeout, -1 on error, 0 for a bad msg,
+   #bytes if a good msg was received */
 static int slprecv(int s, unsigned char *buf, int buflen, struct sockaddr_in *peer)
 {
   fd_set fdset;
@@ -44,14 +72,31 @@ static int slprecv(int s, unsigned char *buf, int buflen, struct sockaddr_in *pe
   if (l2 == 0)
     return -2;
   pesal = sizeof(*peer);
-  l2 = recvfrom(s, buf, 16, MSG_PEEK, (struct sockaddr *)peer, &pesal);
+  if (peer)
+    l2 = recvfrom(s, buf, 16, MSG_PEEK, (struct sockaddr *)peer, &pesal);
+  else
+    l2 = recv(s, buf, 16, MSG_PEEK);
   if (l2 <= 0)
     return 0;
   if (l2 >= 16)
     l2 = buf[2] << 16 | buf[3] << 8 | buf[4];
   if (l2 > buflen)
     l2 = buflen;
-  l2 = recvfrom(s, buf, l2, 0, (struct sockaddr *)peer, &pesal);
+  if (peer)
+    l2 = recvfrom(s, buf, l2, 0, (struct sockaddr *)peer, &pesal);
+  else
+    {
+      char *bp = buf;
+      int l4 = l2;
+      while(l4)
+	{
+	  l3 = read(s, bp, l4);
+	  if (l3 <= 0 || l3 > l4)
+	    return 0;
+	  bp += l3;
+	  l4 -= l3;
+	}
+    }
   if (l2 <= 16)
     return 0;
   l3 = buf[2] << 16 | buf[3] << 8 | buf[4];
@@ -63,14 +108,12 @@ static int slprecv(int s, unsigned char *buf, int buflen, struct sockaddr_in *pe
 char *
 slp_get_descr(struct sockaddr_in *peer, unsigned char *url, int urllen)
 {
-  int tries;
   int s, l, l2, l3;
   int xid, al;
   char *d;
   unsigned char sendbuf[8000];
   unsigned char recvbuf[8000];
   unsigned char *bp, *end;
-  struct sockaddr_in dummy;
 
   xid = nextxid;
   if (++nextxid == 65536)
@@ -98,68 +141,51 @@ slp_get_descr(struct sockaddr_in *peer, unsigned char *url, int urllen)
   l = bp - sendbuf;
   sendbuf[3] = l >> 8;
   sendbuf[4] = l & 255;
-  s = socket(PF_INET, SOCK_DGRAM, 0);
+  s = socket(PF_INET, SOCK_STREAM, 0);
   if (s == -1)
     return 0;
-  for (tries = 0; tries < 3; tries++)
+  if (slpsend(s, sendbuf, l, peer, 1))
     {
-      l2 = sendto(s, sendbuf, l, 0, (struct sockaddr *)peer, sizeof(*peer));
-      if (l2 != l)
-	{
-	  perror("sendto");
-	  close(s);
-	  return 0;
-	}
-      for (;;)
-	{
-	  l2 = slprecv(s, recvbuf, sizeof(recvbuf), &dummy);
-	  if (l2 == -1)
-	    {
-	      close(s);
-	      return 0;
-	    }
-	  if (l2 == -2)
-	    break;
-	  if (l2 == 0)
-	    continue;
-	  end = recvbuf + l2;
-	  if (recvbuf[0] != 2)
-	    continue;
-	  if (recvbuf[1] != 7)	/* AttrRply */
-	    continue;
-	  if (slpgetw(recvbuf + 10) != xid)
-	    continue;
-	  close(s);
-	  bp = recvbuf + 12;
-	  l3 = slpgetw(bp);
-	  bp += l3 + 2;
-	  if (bp + 4 > end)
-	    return 0;
-	  if (slpgetw(bp))		/* error code */
-	    return 0;
-	  al = slpgetw(bp + 2);
-	  bp += 4;
-	  if (bp + al > end)
-	    return 0;
-	  if (al < 14 || strncasecmp(bp, "(description=", 13))
-	    return 0;
-	  d = malloc(al - 14 + 1);
-	  if (d == 0)
-	    return 0;
-	  memcpy(d, bp + 13, al - 14);
-	  d[al - 14] = 0;
-	  return d;
-	}
+      close(s);
+      return 0;
     }
+  l2 = slprecv(s, recvbuf, sizeof(recvbuf), 0);
   close(s);
-  return 0;
+  if (l2 <= 0)
+    return 0;
+  end = recvbuf + l2;
+  if (recvbuf[0] != 2)
+    return 0;
+  if (recvbuf[1] != 7)	/* AttrRply */
+    return 0;
+  if (slpgetw(recvbuf + 10) != xid)
+    return 0;
+  bp = recvbuf + 12;
+  l3 = slpgetw(bp);
+  bp += l3 + 2;
+  if (bp + 4 > end)
+    return 0;
+  if (slpgetw(bp))		/* error code */
+    return 0;
+  al = slpgetw(bp + 2);
+  bp += 4;
+  if (bp + al > end)
+    return 0;
+  if (al < 14 || strncasecmp(bp, "(description=", 13))
+    return 0;
+  d = malloc(al - 14 + 1);
+  if (d == 0)
+    return 0;
+  memcpy(d, bp + 13, al - 14);
+  d[al - 14] = 0;
+  return d;
 }
 
 int
 slp_get_install()
 {
   unsigned char sendbuf[8000];
-  unsigned char recvbuf[8000];
+  unsigned char recvbuf[80000];
   unsigned char *bp, *end;
   int xid, l, s, l2, l3, ec, comma, ulen, i, acnt;
   struct sockaddr_in mysa;
@@ -250,10 +276,8 @@ slp_get_install()
     }
   for (tries = 0; tries < 3; tries++)
     {
-      l2 = sendto(s, sendbuf, l, 0, (struct sockaddr *)&mcsa, sizeof(mcsa));
-      if (l2 != l)
+      if (slpsend(s, sendbuf, l, &mcsa, 0))
 	{
-	  perror("sendto");
 	  close(s);
 	  return 1;
 	}
@@ -269,7 +293,6 @@ slp_get_install()
 	    break;
 	  if (l2 == 0)
 	   continue;
-	  end = recvbuf + l2;
 	  if (recvbuf[0] != 2)
 	    continue;
 	  if (recvbuf[1] != 2)	/* SrvRply */
@@ -278,6 +301,47 @@ slp_get_install()
 	    continue;
 
 	  iaddr = inet_ntoa(pesa.sin_addr);
+	  end = recvbuf + l2;
+
+	  /* check if we already saw that answer */
+	  l2 = slpgetw(sendbuf + 16);
+	  l3 = strlen(iaddr);
+	  bp = sendbuf + 18;
+	  while (l2)
+	    {
+	      if (l2 >= l3 && strncmp(bp, iaddr, l3) == 0 && (l2 == l3 || bp[l3] == ','))
+		break;
+	      while (l2)
+		{
+		  l2--;
+		  if (*bp++ == ',')
+		    break;
+		}
+	    }
+	  if (l2)
+	    continue;	/* saw it, ignore answer as it is a dup */
+
+	  if (recvbuf[5] & 0x80)	/* OVERFLOW? */
+	    {
+	      /* redo request with tcp and unicast */
+	      int s2;
+	      s2 = socket(PF_INET, SOCK_STREAM, 0);
+	      if (s2 != 0 && slpsend(s2, sendbuf, l, &pesa, 1) == 0)
+		{
+		  l2 = slprecv(s2, recvbuf, sizeof(recvbuf), 0);
+		  close(s2);
+		  if (l2 <= 0)
+		    continue;
+		}
+	      if (recvbuf[0] != 2)
+		continue;
+	      if (recvbuf[1] != 2)	/* SrvRply */
+		continue;
+	      if (slpgetw(recvbuf + 10) != xid)
+		continue;
+	      end = recvbuf + l2;
+	    }
+
 	  l3 = strlen(iaddr);
 	  comma = sendbuf[16] != 0 || sendbuf[17] != 0;
 	  if (l + l3 + comma <= sizeof(sendbuf))

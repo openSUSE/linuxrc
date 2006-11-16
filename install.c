@@ -800,7 +800,11 @@ int inst_start_install()
     if(config.inst_ramdisk < 0) return -1;
 
     if(config.rescue) {
+      inst_umount();
+
       root_set_root(config.ramdisk[config.inst_ramdisk].dev);
+
+      util_debugwait("rescue system loaded");
 
       return 0;
     }
@@ -924,7 +928,7 @@ int inst_start_rescue()
 
   config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(TXT_LOADING_RESCUE));
 
-  inst_umount();	// what for???
+  inst_umount();
 
   if(config.inst_ramdisk >= 0) {
     root_set_root(config.ramdisk[config.inst_ramdisk].dev);

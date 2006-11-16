@@ -575,7 +575,7 @@ int auto2_net_dev1(hd_t *hd)
 
   config.net.configured = nc_static;
 
-  if(hd->is.wlan) wlan_setup();
+  if(hd->is.wlan && wlan_setup()) return 1;
 
   /* do bootp if there's some indication that a net install is intended
    * but some data are still missing

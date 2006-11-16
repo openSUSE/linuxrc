@@ -186,6 +186,7 @@ void info_show_hardware()
   hd_hw_item_t hw_items[] = { hw_cdrom, hw_disk, 0 };
   hd_res_t *res;
   static char *geo_type_str[] = { "Physical", "Logical", "BIOS EDD", "BIOS Legacy" };
+  uint64_t size;
 
   hd_data = calloc(1, sizeof *hd_data);
 
@@ -226,11 +227,12 @@ void info_show_hardware()
         case res_size:
           if(res->size.unit == size_unit_sectors && res->size.val1) {
             sprintf(buf, "  Size: %"PRIu64" sectors", res->size.val1);
-            if(res->size.val1 >= (1 << 21)) {
-              sprintf(buf + strlen(buf), " (%"PRIu64" GB)", ((res->size.val1 >> 20) + 1) >> 1);
+            size = (res->size.val1 * res->size.val2 + 512*1024) >> 20;
+            if(size >= 1024) {
+              sprintf(buf + strlen(buf), " (%"PRIu64" GB)", (size + 512) >> 10);
             }
-            else if(res->size.val1 >= (1 << 11)) {
-              sprintf(buf + strlen(buf), " (%"PRIu64" MB)", ((res->size.val1 >> 10) + 1) >> 1);
+            else if(size) {
+              sprintf(buf + strlen(buf), " (%"PRIu64" MB)", size);
             }
             slist_append_str(&sl0, buf);
           }
