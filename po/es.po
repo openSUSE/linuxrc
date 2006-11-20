@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-02 14:07\n"
+"PO-Revision-Date: 2006-11-20 10:07\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -310,7 +310,7 @@ msgstr "No hay módulos cargados actualmente."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Autodetectando (%s)...   "
+msgstr "Autodetectando (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -968,7 +968,7 @@ msgstr "Modo extendido"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Modo de compatibilidad para conectores (peers) OS/390 y z/OS "
+msgstr "Modo de compatibilidad para conectores (peers) OS/390 y z/OS"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"

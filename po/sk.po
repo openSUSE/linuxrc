@@ -7,14 +7,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
-"PO-Revision-Date: 2005-03-08 23:32+0100\n"
-"Last-Translator: Andrej Kacian <andrej@kacian.sk>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2006-11-16 11:47+0100\n"
+"Last-Translator: Ladislav Michnovič <lmichnovic@suse.cz>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10\n"
-"Plural-Forms:  nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #. TXT_OK
 msgid "OK"
@@ -54,7 +55,7 @@ msgstr "Jazyk"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Moduly jadra (ovládače hardware)"
+msgstr "Moduly jadra (ovládače hardvéru)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
@@ -407,7 +408,7 @@ msgstr ""
 "\n"
 "\"Štart inštalácie/systému\"\n"
 "\n"
-"Aby ste to mohli urobiť , možno bude nutné načítať niektoré ovládače (moduly) pre podporu vášho hardware."
+"Aby ste to mohli urobiť , možno bude nutné načítať niektoré ovládače (moduly) pre podporu vášho hardvéru."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -910,9 +911,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Váš počítač nemá dostatok pamäte pre inštaláciu %s. Potrebujete aspoň %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Heslo je príliš krátke (musí byť aspoň 5 znakov dlhé)."
+msgstr "Heslo je príliš krátke (musí obsahovať aspoň 5 znakov)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1109,57 +1109,57 @@ msgstr "Chcete teraz vypnúť počítač?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 alebo OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Prosím, vyberte rozhranie CCW zbernice."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Prosím, zvoľte fyzické médium."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Nahrávam moduly"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Nahrávam systém s inštaláciou"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Nahrávam prídavné fonty"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Nahrávam aktualizovaný ovládač"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "Nahrávam záchranný systém"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Zapnúť podporu pre OSI vrstvu 2?"

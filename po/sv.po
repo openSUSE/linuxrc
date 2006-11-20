@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-10-22 12:56+0200\n"
+"PO-Revision-Date: 2006-11-16 19:04+0100\n"
 "Last-Translator: Mattias Newzella <newzella@linux.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -908,9 +908,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Datorn har inte tillräckligt med RAM för installationen av %s. Du behöver minst %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Lösenordet är för kort (måste ha minst 5 tecken)."
+msgstr "Lösenordet är för kort (måste ha minst 8 tecken)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -942,19 +941,16 @@ msgid "Hipersockets"
 msgstr "Hipersockets"
 
 #. TXT_CTC_CHANNEL_READ
-#, fuzzy
 msgid "Device address for read channel"
-msgstr "Enhet adress för läst kanal"
+msgstr "Enhetsadress för läskanal"
 
 #. TXT_CTC_CHANNEL_WRITE
-#, fuzzy
 msgid "Device address for write channel"
-msgstr "Enhet adress för skriv kanal"
+msgstr "Enhetsadress för skrivkanal"
 
 #. TXT_CTC_CHANNEL_DATA
-#, fuzzy
 msgid "Device address for data channel"
-msgstr "Enhet adress för kanal"
+msgstr "Enhetsadress för datakanal"
 
 #. TXT_CHOOSE_CTC_PROTOCOL
 msgid "Select protocol for this CTC device."
@@ -981,9 +977,8 @@ msgid "Fully qualified hostname"
 msgstr "Fullständigt kvalificerat datornamn"
 
 #. TXT_OSA_PORTNO
-#, fuzzy
 msgid "Enter the relative port number"
-msgstr "Enter port nummer"
+msgstr "Ange relativt portnummer"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
@@ -1004,20 +999,17 @@ msgid "Reading Driver Update..."
 msgstr "Läser drivrutinsuppdateringar..."
 
 #. TXT_DUD_NOTFOUND
-#, fuzzy
 msgid "No new Driver Updates found"
-msgstr "Nej ny Drivrutin Uppdateringar"
+msgstr "Inga nya drivrutinsuppdateringar hittades"
 
 #. TXT_DUD_ADDED
-#, fuzzy
 msgid "Driver Updates added"
-msgstr "Drivrutin Uppdateringar"
+msgstr "Drivrutinsuppdateringar tillagda"
 
 # shown if driver update succeeded
 #. TXT_DUD_OK
-#, fuzzy
 msgid "Driver Update ok"
-msgstr "Drivrutin Uppdatera ok"
+msgstr "Drivrutinsuppdatering OK"
 
 #. TXT_DUD_SELECT
 #, fuzzy
@@ -1051,14 +1043,12 @@ msgstr "Ingen diskettenhet hittad."
 
 # heading for a listing of updates
 #. TXT_DUD_LIST
-#, fuzzy
 msgid "Driver Update list"
-msgstr "Drivrutin Uppdatera lista"
+msgstr "Lista över drivrutinsuppdateringar"
 
 #. TXT_DUD_NOT_YET
-#, fuzzy
 msgid "No Driver Updates so far."
-msgstr "Nej Drivrutin Uppdateringar."
+msgstr "Inga drivrutinsuppdateringar ännu."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1164,7 +1154,7 @@ msgstr "Laddar ytterligare teckensnitt"
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Laddar drivrutinsuppdatering"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE

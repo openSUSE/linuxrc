@@ -1745,6 +1745,11 @@ void file_write_install_inf(char *dir)
 
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);
 
+  if(config.module.broken) {
+    file_write_str(f, key_brokenmodules, s = slist_join(",", config.module.broken));
+    free(s);
+  }
+
 #if 0
   {
     char *s;

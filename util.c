@@ -2922,6 +2922,34 @@ slist_t *slist_split(char del, char *text)
 }
 
 
+char *slist_join(char *del, slist_t *str)
+{
+  char *s;
+  slist_t *str0;
+  int len = 0, del_len = 0;
+
+  if(del) del_len = strlen(del);
+
+  for(str0 = str; str0; str0 = str0->next) {
+    if(str0->key) len += strlen(str0->key);
+    if(str0->next) len += del_len;
+  }
+
+  if(!len) return NULL;
+
+  len++;
+
+  s = calloc(len,1);
+
+  for(; str; str = str->next) {
+    if(str->key) strcat(s, str->key);
+    if(str->next && del) strcat(s, del);
+  }
+
+  return s;
+}
+
+
 /*
  * Clear 'inet' und add 'name' to it.
  *

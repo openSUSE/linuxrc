@@ -361,7 +361,7 @@ msgstr "Nessun modulo è attualmente caricato."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Rilevamento automatico (%s)...    "
+msgstr "Rilevamento automatico (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -591,7 +591,7 @@ msgstr "Esci e riavvia"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
-msgstr "Tentativo di rilevamento del file info.. "
+msgstr "Tentativo di rilevamento del file info..."
 
 #. TXT_NFSPORT
 msgid "Specify the NFS port."
@@ -1207,4 +1207,4 @@ msgstr "Caricamento sistema di salvataggio"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr "Abilitare il supporto per OSI Livello 2? "
+msgstr "Abilitare il supporto per OSI Livello 2?"

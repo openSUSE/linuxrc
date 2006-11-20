@@ -1,3 +1,7 @@
+20/11/2006:	v2.1.16
+	- write module blacklist to install.inf (#221815)
+	- translations updated
+
 16/11/2006:	v2.1.15
 	- something with slp (#185483)
 	- fixed disk size info (#221153)
