@@ -2302,6 +2302,10 @@ int wlan_auth_cb(dia_item_t di)
       fprintf(stderr, "%s\n", buf);
       system_log(buf);
 
+      strprintf(&buf, "iwconfig %s key off", config.net.device);
+      fprintf(stderr, "%s\n", buf);
+      system_log(buf);
+
       rc = 0;
       break;
 

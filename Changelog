@@ -1,3 +1,5 @@
+	- run 'iwconfig <interface> key off' for open wlan connections (#222491)
+
 20/11/2006:	v2.1.16
 	- write module blacklist to install.inf (#221815)
 	- translations updated
