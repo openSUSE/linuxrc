@@ -1,3 +1,5 @@
+	- write TERM to install.inf (#192052)
+
 20/6/2006:	v2.0.46
 	- s390: make CTC mode dialog wider (bug #186563)
 

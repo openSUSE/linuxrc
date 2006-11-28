@@ -1763,6 +1763,7 @@ void file_write_install_inf(char *dir)
 
   file_write_num(f, key_startshell, config.startshell);
 
+  file_write_str(f, key_term, config.term ?: config.serial ? "screen" : "linux");
 
   file_free_file(ft0);
 
