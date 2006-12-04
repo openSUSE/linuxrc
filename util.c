@@ -4374,7 +4374,7 @@ int util_get_sysfs_int_attr(char* attr, int *retval)
   int i, fd;
   char buf[1024];
 
-  if((fd = open(buf, O_RDONLY)) < 0) return -1;
+  if((fd = open(attr, O_RDONLY)) < 0) return -1;
 
   i = read(fd, buf, sizeof buf - 1);
 

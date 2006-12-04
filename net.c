@@ -69,6 +69,7 @@ static int  net_is_ptp_im = FALSE;
 static int net_activate(void);
 #if defined(__s390__) || defined(__s390x__)
 int net_activate_s390_devs(void);
+int net_activate_s390_devs_ex(hd_t* hd, char** device);
 #endif
 static void net_setup_nameserver(void);
 
@@ -166,15 +167,6 @@ int net_config()
   ) {
     return 0;
   }
-
-#if defined(__s390__) || defined(__s390x__)
-  /* bring up network devices, write hwcfg */
-  while(net_activate_s390_devs()) {
-    /* failed; switch to manual mode, repeat */
-    config.manual=1;
-    if(!config.win) util_disp_init();
-  }
-#endif
 
   if(net_choose_device()) return -1;
 
@@ -1029,6 +1021,11 @@ int net_choose_device()
   if(config.net.device_given) return 0;
 
   if(config.manual >= 2) {
+#if defined(__s390__) || defined(__s390x__)
+    /* bring up network devices, write hwcfg */
+    while(net_activate_s390_devs()) {}
+#endif
+
     /* re-read - just in case... */
     util_update_netdevice_list(NULL, 1);
 
@@ -1077,12 +1074,47 @@ int net_choose_device()
       if(hd->unix_dev_name) {
         item_devs[item_cnt] = strdup(hd->unix_dev_name);
       }
+#if defined(__s390__) || defined(__s390x__)
+      {
+        int lcss = -1;
+        int ccw = -1;
+        hd_res_t* r;
+        char* annotation = 0;
+        
+        if(hd->detail && hd->detail->ccw.data)
+          lcss = hd->detail->ccw.data->lcss;
+        
+        for(r = hd->res; r; r = r->next) {
+          if(r->any.type == res_io) {
+            ccw = (int) r->io.base;
+          }
+        }
+        if ( ccw == -1 ) {
+          /* IUCV device */
+          if(hd->rom_id) strprintf(&annotation, "(%s)", hd->rom_id);
+          else strprintf(&annotation, "");
+        }
+        else {
+          strprintf(&annotation, "(%1x.%1x.%04x)", lcss >> 8, lcss & 0xf, ccw);
+        }
+        
+        if(hd->unix_dev_name) {
+          strprintf(items + item_cnt++, "%*s : %s %s", -width, hd->unix_dev_name, hd->model,
+            annotation);
+        }
+        else {
+          strprintf(items + item_cnt++, "%s %s", hd->model, annotation);
+        }
+        free(annotation);
+      }
+#else
       if(hd->unix_dev_name) {
         strprintf(items + item_cnt++, "%*s : %s", -width, hd->unix_dev_name, hd->model);
       }
       else {
         strprintf(items + item_cnt++, "%s", hd->model);
       }
+#endif
     }
   }
 
@@ -1098,8 +1130,15 @@ int net_choose_device()
   }
 
   if(choice > 0 && !item_devs[choice - 1]) {
-    dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
-    choice = -1;
+#if defined(__s390__) || defined(__s390x__)
+    net_activate_s390_devs_ex(item_hds[choice - 1], &item_devs[choice - 1]);
+    if(!item_devs[choice - 1]) {
+#endif
+      dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
+      choice = -1;
+#if defined(__s390__) || defined(__s390x__)
+    }
+#endif
   }
 
   if(choice > 0) {
@@ -1820,6 +1859,29 @@ static int net_s390_getrwchans()
   return 0;
 }
 
+static int net_s390_getrwchans_ex(hd_t* hd)
+{
+  int rc;
+
+  if(config.hwp.readchan == 0) {
+    int lcss = hd->detail->ccw.data->lcss;
+    int ccw = -1;
+    hd_res_t* r;
+    for(r = hd->res; r; r = r->next) {
+      if(r->any.type == res_io) {
+        ccw = (int) r->io.base;
+      }
+    }
+    if(ccw != -1) strprintf(&config.hwp.readchan, "%1x.%1x.%04x", lcss >> 8, lcss & 0xf, ccw);
+  }
+
+  IFNOTAUTO(config.hwp.readchan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
+  if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
+  IFNOTAUTO(config.hwp.writechan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
+  if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
+  return 0;
+}
+
 /* group CCW channels */
 static int net_s390_group_chans(int num, char* driver)
 {
@@ -1922,7 +1984,9 @@ static int net_s390_put_online(char* channel)
       return 1;
   sprintf(path,"/sys/bus/ccwgroup/devices/%s/online",channel);
   if((rc=util_set_sysfs_attr(path,"1"))) return rc;
-  if((rc=util_get_sysfs_int_attr(path,&online))) return rc;
+  rc=util_get_sysfs_int_attr(path,&online);
+  fprintf(stderr,"grmtob: %d/%d\n",rc,online);
+  if(rc) return rc;
   if (online == 0)
       return 1;
   return 0;
@@ -2172,6 +2236,266 @@ int net_activate_s390_devs(void)
   return 0;
 }
 
+/* find the network device name for a CCW group */
+int net_s390_get_ifname(char* channel, char** device)
+{
+  char path[100];
+  DIR* d;
+  struct dirent* e;
+  sprintf(path, "/sys/bus/ccwgroup/devices/%s", channel);
+  d = opendir(path);
+  if(!d) return -1;
+  while((e = readdir(d))) {
+    if(!strncmp(e->d_name, "net:", 4)) {
+      fprintf(stderr, "ccwgroup %s has network IF %s\n", channel, e->d_name + 4);
+      strprintf(device, e->d_name + 4);
+      closedir(d);
+      return 0;
+    }
+  }
+  closedir(d);
+  fprintf(stderr, "no network IF found for channel group %s\n", channel);
+  return -1;
+}
+
+int net_activate_s390_devs_ex(hd_t* hd, char** device)
+{
+  int rc;
+  char buf[100];
+  char hwcfg_name[40];
+
+  switch(hd->sub_class.id) {
+  case 0x89:	/* OSA2 */
+    config.hwp.type = di_390net_osa;
+    config.hwp.interface = di_osa_lcs;
+    break;
+  case 0x86:	/* OSA Express */
+    config.hwp.type = di_390net_osa;
+    config.hwp.interface = di_osa_qdio;
+    break;
+  case 0x90:	/* IUCV */
+    config.hwp.type = di_390net_iucv;
+    break;
+  case 0x87:	/* HSI */
+    config.hwp.type = di_390net_hsi;
+    config.hwp.interface = di_osa_qdio;
+    config.hwp.medium = di_osa_eth;
+    break;
+  case 0x88:	/* CTC */
+    config.hwp.type = di_390net_ctc;
+    break;
+  case 0x8f:	/* ESCON */
+    config.hwp.type = di_390net_escon;
+    break;
+  default:
+    return -1;
+  }
+  
+  /* hwcfg parms common to all devices */
+  config.hwp.startmode="auto";
+  config.hwp.module_options="";
+  config.hwp.module_unload="yes";
+  
+  switch(config.hwp.type)
+  {
+  case di_390net_iucv:
+    IFNOTAUTO(config.hwp.userid)
+      if((rc=dia_input2_chopspace(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
+
+    mod_modprobe("netiucv",NULL);	// FIXME: error handling
+
+    if((rc=util_set_sysfs_attr("/sys/bus/iucv/drivers/netiucv/connection",config.hwp.userid))) return rc;
+
+    sprintf(hwcfg_name,"static-iucv-id-%s",config.hwp.userid);
+    config.hwp.module="netiucv";
+    config.hwp.scriptup="hwup-iucv";
+    
+    /* bold assumption */
+    strprintf(device, "iucv0");
+    
+    break;
+
+  case di_390net_ctc:
+  case di_390net_escon:
+    mod_modprobe("ctc",NULL);	// FIXME: error handling
+
+    net_list_s390_devs("cu3088",0);	// FIXME: filter CTC/ESCON devices
+
+    if((rc=net_s390_getrwchans_ex(hd))) return rc;
+    
+    /* ask for CTC protocol */
+    dia_item_t protocols[] = {
+      di_ctc_compat,
+      di_ctc_ext,
+      di_ctc_zos390,
+      di_none
+    };
+    if(config.hwp.protocol)
+      switch(config.hwp.protocol)
+      {
+      case 0+1:	rc=di_ctc_compat; break;
+      case 1+1: rc=di_ctc_ext; break;
+      case 3+1: rc=di_ctc_zos390; break;
+      default: return -1;
+      }
+    else rc=0;    
+    IFNOTAUTO(config.hwp.protocol)
+    {
+      rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 50, 0, protocols, rc);
+      switch(rc)
+      {
+      case di_ctc_compat: config.hwp.protocol=0+1; break;
+      case di_ctc_ext: config.hwp.protocol=1+1; break;
+      case di_ctc_zos390: config.hwp.protocol=3+1; break;
+      default: return -1;
+      }
+    }
+
+    if((rc=net_s390_group_chans(2,"ctc"))) return rc;
+
+    /* set protocol */
+    if ((rc=net_s390_ctc_protocol(config.hwp.protocol-1))) return rc;
+    
+    if((rc=net_s390_put_online(config.hwp.readchan))) {
+	fprintf(stderr,"Could not activate device\n");
+	return rc;
+    }
+    net_s390_set_config_ccwdev();
+    sprintf(hwcfg_name, "ctc-bus-ccw-%s",config.hwp.readchan);
+    config.hwp.module="ctc";
+    config.hwp.scriptup_ccwgroup="hwup-ctc";
+    config.hwp.ccw_chan_num=2;
+    strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
+    
+    net_s390_get_ifname(config.hwp.readchan, device);
+    
+    break;
+    
+  case di_390net_osa:
+  case di_390net_hsi:
+    if(config.hwp.type != di_390net_hsi)
+    {
+      /* ask for TR/ETH */
+
+      dia_item_t media[] = {
+        di_osa_eth,
+        di_osa_tr,
+        di_none
+      };
+
+      IFNOTAUTO(config.hwp.medium)
+      {
+        rc = dia_menu2(txt_get(TXT_CHOOSE_OSA_MEDIUM), 33, 0, media, config.hwp.medium?:di_osa_eth);
+        if(rc == -1) return rc;
+        config.hwp.medium=rc;
+      }
+      else
+        rc=config.hwp.medium;
+    }
+
+    if(config.hwp.interface == di_osa_qdio)
+    {
+      mod_modprobe("qeth",NULL);	// FIXME: error handling
+
+      net_list_s390_devs("qeth", config.hwp.type == di_390net_hsi ? 5 : 1);
+
+      if((rc=net_s390_getrwchans_ex(hd))) return rc;
+      IFNOTAUTO(config.hwp.datachan)
+        if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
+      if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
+
+      if (config.hwp.type != di_390net_hsi) {
+	  IFNOTAUTO(config.hwp.portname)
+	  {
+	      if((rc=dia_input2_chopspace(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
+	      // FIXME: warn about problems related to empty portnames
+	  }
+      }
+      
+      if(config.hwp.medium == di_osa_eth && config.hwp.type != di_390net_hsi)
+      {
+        IFNOTAUTO(config.hwp.layer2)
+        {
+          config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
+        }
+      }
+      
+      if((rc=net_s390_group_chans(3,"qeth"))) return rc;
+
+      if((rc=net_s390_qdio_portname(config.hwp.portname))) return rc;
+      
+      if(config.hwp.layer2 == 2) if((rc=net_s390_enable_layer2(1))) return rc;
+
+      if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
+      
+      sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
+      config.hwp.module="qeth";
+      net_s390_set_config_ccwdev();
+      config.hwp.scriptup_ccwgroup="hwup-qeth";
+      strprintf(&config.hwp.ccw_chan_ids,"%s %s %s",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
+      config.hwp.ccw_chan_num=3;
+    }
+    else	/* LCS */
+    {
+      mod_modprobe("lcs",NULL);	// FIXME: error handling
+      
+      net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
+      
+      if((rc=net_s390_getrwchans_ex(hd))) return rc;
+      
+      IFNOTAUTO(config.hwp.portname)
+        if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
+
+      if((rc=net_s390_group_chans(2,"lcs"))) return rc;
+      
+      /* set port number */
+      if((rc=net_s390_lcs_portno(config.hwp.portname))) return rc;
+      
+      if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
+      
+      net_s390_set_config_ccwdev();
+      sprintf(hwcfg_name, "lcs-bus-ccw-%s",config.hwp.readchan);
+      config.hwp.module="lcs";
+      config.hwp.scriptup_ccwgroup="hwup-lcs";
+      config.hwp.ccw_chan_num=2;
+      strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
+    }
+    
+    net_s390_get_ifname(config.hwp.readchan, device);
+    
+    break;
+    
+  default:
+    return -1;
+  }
+  
+  /* write hwcfg file */
+  if (mkdir("/etc/sysconfig/hardware", (mode_t)0755) && errno != EEXIST)
+    return -1;
+  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
+  FILE* fp=fopen(buf,"w");
+  if(!fp) return -1;
+# define HWE(var,string) if(config.hwp.var) fprintf(fp, #string "=\"%s\"\n",config.hwp.var);
+  HWE(startmode,STARTMODE)
+  HWE(module,MODULE)
+  HWE(module_options,MODULE_OPTIONS)
+  HWE(module_unload,MODULE_UNLOAD)
+  HWE(scriptup,SCRIPTUP)
+  HWE(scriptup_ccw,SCRIPTUP_ccw)
+  HWE(scriptup_ccwgroup,SCRIPTUP_ccwgroup)
+  HWE(scriptdown,SCRIPTDOWN)
+  HWE(ccw_chan_ids,CCW_CHAN_IDS)
+  if(config.hwp.ccw_chan_num) fprintf(fp,"CCW_CHAN_NUM=\"%d\"\n",config.hwp.ccw_chan_num);
+  if(config.hwp.protocol) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",config.hwp.protocol-1);
+  HWE(portname,CCW_CHAN_MODE)
+  if(config.hwp.layer2) fprintf(fp,"QETH_LAYER2_SUPPORT=\"%d\"\n",config.hwp.layer2 - 1);
+# undef HWE
+  fclose(fp);
+  
+  //net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
+
+  return 0;
+}
 #endif
 
 

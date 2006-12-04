@@ -1,3 +1,5 @@
+	- make s390 net config work again
+
 21/11/2006:	v2.1.17
 	- run 'iwconfig <interface> key off' for open wlan connections (#222491)
 
