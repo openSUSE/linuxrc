@@ -1,6 +1,7 @@
 5/12/2006:	v2.0.47
 	- write TERM to install.inf (#192052)
 	- info file can be on any media (#56845)
+	- accept 'BOOTIF' as alias to 'netdevice' (feat. #301394)
 
 20/6/2006:	v2.0.46
 	- s390: make CTC mode dialog wider (bug #186563)

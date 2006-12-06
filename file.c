@@ -91,6 +91,7 @@ static struct {
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
   { key_serverdir,      "Serverdir",      kf_cfg + kf_cmd                },
   { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
+  { key_netdevice,      "BOOTIF",         kf_cfg + kf_cmd                },
   { key_livesrc,        "LiveSRC",        kf_cfg + kf_cmd                },
   { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
   { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
