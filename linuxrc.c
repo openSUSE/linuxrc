@@ -1058,7 +1058,7 @@ void lxrc_init()
   }
 
   /* file_read_info() is called in auto2_init(), too */
-  if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
+  if(!config.info.loaded && !config.hwcheck && !config.had_segv && !config.info.file) file_read_info();
 
   set_activate_language(config.language);
 

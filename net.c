@@ -838,7 +838,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
     memcpy (&mount_server_ri, &server_ri, sizeof (struct sockaddr_in));
 
     memset (&mount_data_ri, 0, sizeof (struct nfs_mount_data));
-//    mount_data_ri.flags = NFS_MOUNT_NONLM;
+    mount_data_ri.flags = NFS_MOUNT_NONLM;
     if(config.net.nfs_tcp) {
       mount_data_ri.flags = NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM;
     }

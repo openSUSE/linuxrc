@@ -298,6 +298,7 @@ static struct {
   { "slp",       inst_slp           },
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
+  { "disk",      inst_hd            },
   { "cdrom",     inst_cdrom         },
   { "cifs",      inst_smb           },
 #if defined(__s390__) || defined(__s390x__)

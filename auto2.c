@@ -118,7 +118,7 @@ void auto2_scan_hardware(char *log_file)
   FILE *f = NULL;
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int j, ju, k, with_usb;
+  int i, j, ju, k, with_usb;
   slist_t *usb_modules = NULL;
   int storage_loaded = 0;
 
@@ -312,6 +312,28 @@ void auto2_scan_hardware(char *log_file)
       break;
   }
 #endif
+
+  if(config.info.add_cmdline) {
+    file_read_info_file("cmdline", kf_cmd);
+  }
+
+  if(config.info.file) {
+    load_network_mods();
+
+    fprintf(stderr, "Looking for info file: %s\n", config.info.file);
+    if(hd_data->progress) printf("\r%64s\r", "");
+    printf("Reading info file:\n  %s ...", config.info.file);
+    fflush(stdout);
+    i = get_url(config.info.file, "/download/info");
+    printf("%s\n", i ? " failed" : " ok");
+    if(!i) {
+      fprintf(stderr, "Parsing info file: %s\n", config.info.file);
+      file_read_info_file("file:/download/info", kf_cfg);
+    }
+    else {
+      fprintf(stderr, "Info file not found: %s\n", config.info.file);
+    }
+  }
 
   if(log_file && (f = fopen(log_file, "w+"))) {
 
@@ -793,7 +815,7 @@ int auto2_init()
     fprintf(stderr, "There seems to be no floppy disk.\n");
   }
 
-  if(!config.hwcheck) {
+  if(!config.hwcheck && !config.info.file) {
     file_read_info();
     util_debugwait("got info file");
   }

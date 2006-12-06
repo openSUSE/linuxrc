@@ -4731,3 +4731,273 @@ int util_process_running(char *name)
   return de ? 1 : 0;
 }
 
+
+/*
+ *
+ */
+int get_url(char *src_url, char *dst)
+{
+  url_t *url;
+  int err = 1, i, j, fd_in, fd_out;
+  hd_data_t *hd_data;
+  hd_t *hd;
+  char *dir = NULL, *dir2 = NULL, *file;
+  char buf[0x1000];
+  hd_hw_item_t hw_item;
+  char *dev, *module, *type;
+  instmode_t instmode_save;
+  inet_t server_save;
+
+  if(!src_url || !dst) return err;
+
+  url = parse_url(src_url);
+  if(!url || !url->scheme) return err;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  switch(url->scheme) {
+    case inst_file:
+      if(util_check_exist(url->dir) == 'r') {
+        char *argv[3];
+
+        unlink(dst);
+        argv[1] = url->dir;
+        argv[2] = dst;
+        util_cp_main(3, argv);
+
+        err = 0;
+      }
+      break;
+
+    case inst_cdrom:
+    case inst_dvd:
+    case inst_floppy:
+    case inst_hd:
+      switch(url->scheme) {
+        case inst_cdrom:
+        case inst_dvd:
+          hw_item = hw_cdrom;
+          break;
+        case inst_floppy:
+          hw_item = hw_floppy;
+          break;
+        default:
+          hw_item = hw_block;
+      }
+
+      for(hd = hd_list(hd_data, hw_item, 1, NULL); hd && err; hd = hd->next) {
+        /* no block devs with partitions */
+        if(hd->child_ids || !hd->unix_dev_name) continue;
+
+        dev = long_dev(url->server);
+
+        if(
+          url->server &&
+          strcmp(hd->unix_dev_name, dev) &&
+          !search_str_list(hd->unix_dev_names, dev)
+        ) continue;
+
+        dev = hd->unix_dev_name;
+
+        fprintf(stderr, "disk: trying to mount: %s\n", dev);
+
+        /* load fs module if necessary */
+        type = util_fstype(dev, &module);
+        if(module) mod_modprobe(module, NULL);
+        if(!type || !strcmp(type, "swap")) continue;
+
+        i = util_mount_ro(dev, "/mnt");
+        if(i) {
+          fprintf(stderr, "disk: %s: mount failed\n", dev);
+          continue;
+        }
+        else {
+          fprintf(stderr, "disk: %s: mount ok\n", dev);
+        }
+
+        strprintf(&dir, "/mnt/%s", url->dir);
+
+        if(util_check_exist(dir) == 'r') {
+          char *argv[3];
+
+          unlink(dst);
+          argv[1] = dir;
+          argv[2] = dst;
+          util_cp_main(3, argv);
+
+          err = 0;
+          fprintf(stderr, "disk: %s::%s: got info file\n", dev, url->dir);
+        }
+        else {
+          fprintf(stderr, "disk: %s::%s: file not found\n", dev, url->dir);
+        }
+
+        umount("/mnt");
+      }
+      break;
+
+    case inst_ftp:
+    case inst_tftp:
+    case inst_http:
+    case inst_nfs:
+    case inst_smb:
+      if(config.net.configured == nc_none) {
+        if((net_config_mask() & 3) == 3) {    /* we have ip & netmask */
+          config.net.configured = nc_static;
+          /* looks a bit weird, but we need it here for net_activate_ns() */
+          if(!config.net.device) {
+            util_update_netdevice_list(NULL, 1);
+            if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+          }
+          if(net_activate_ns()) {
+            fprintf(stderr, "%s: net activation failed\n", config.net.device);
+            config.net.configured = nc_none;
+          }
+        }
+
+        if(config.net.configured == nc_none) {
+          net_config();
+        }
+      }
+
+      if(config.net.configured == nc_none) {
+        fprintf(stderr, "no configured network interface\n");
+        break;
+      }
+
+      fprintf(stderr, "using %s\n", config.net.device);
+
+      instmode_save = config.instmode;
+
+      config.instmode = url->scheme;
+
+      str_copy(&dir, url->dir ?: "");
+
+      server_save = config.net.server;
+      memset(&config.net.server, 0, sizeof config.net.server);
+
+      name2inet(&config.net.server, url->server);
+
+      switch(url->scheme) {
+        case inst_ftp:
+        case inst_tftp:
+        case inst_http:
+          fd_in = net_open(dir);
+          if(fd_in >= 0) {
+            fprintf(stderr, "net_open: \"%s\" ok\n", dir);
+            fd_out = open("/xxx.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if(fd_out >= 0) {
+              do {
+                i = net_read(fd_in, buf, sizeof buf);
+                j = 0;
+                if(i > 0) j = write(fd_out, buf, i);
+              }  
+              while(i > 0 && j > 0);
+              close(fd_out);
+              if(!(i < 0 || j < 0)) {
+                unlink(dst);
+                rename("/xxx.tmp", dst);
+                err = 0;
+              }
+            }
+            net_close(fd_in);
+          }
+          else {
+            fprintf(stderr, "net_open: \"%s\": %s\n", dir, config.net.error);
+          }
+          break;
+
+        case inst_nfs:
+          str_copy(&dir, url->dir);
+          file = dir ? strrchr(dir, '/') : dir;
+          if(file && *file == '/') *file++ = 0;
+          if(file) {
+            fprintf(stderr, "nfs: trying to mount %s:%s\n", config.net.server.name, dir ?: "");
+            i = net_mount_nfs("/mnt", &config.net.server, dir);
+            if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", i);
+            if(!i) {
+              strprintf(&dir2, "/mnt/%s", file);
+
+              if(util_check_exist(dir2) == 'r') {
+                char *argv[3];
+
+                unlink(dst);
+                argv[1] = dir2;
+                argv[2] = dst;
+                util_cp_main(3, argv);
+
+                err = 0;
+                fprintf(stderr, "nfs: %s::%s: got info file\n", config.net.server.name, url->dir);
+              }
+              else {
+                fprintf(stderr, "nfs: %s::%s: file not found\n", config.net.server.name, url->dir);
+              }
+            }
+            umount("/mnt");
+          }
+          break;
+
+        case inst_smb:
+          if(url->dir && url->share) {
+            fprintf(stderr, "smb: trying to mount //%s/%s\n", config.net.server.name, url->share);
+            i = net_mount_smb("/mnt", &config.net.server, url->share, url->user, url->password, url->domain);
+            if(!i) {
+              strprintf(&dir, "/mnt/%s", url->dir);
+
+              if(util_check_exist(dir) == 'r') {
+                char *argv[3];
+
+                unlink(dst);
+                argv[1] = dir;
+                argv[2] = dst;
+                util_cp_main(3, argv);
+
+                err = 0;
+                fprintf(stderr, "smb: %s: got info file\n", url->dir);
+              }
+              else {
+                fprintf(stderr, "smb: %s: file not found\n", url->dir);
+              }
+            }
+            else {
+              switch(i) {
+                case -3:
+                  fprintf(stderr, "smb: network setup failed\n");
+                  break;
+
+                case -2:
+                  fprintf(stderr, "smb: smb/cifs not supported\n");
+                  break;
+
+                default:    /* -1 */
+                  fprintf(stderr, "smb: mount failed\n");
+              }
+            }
+            umount("/mnt");
+          }
+          break;
+
+        default:
+          break;
+      }
+
+      config.net.server = server_save;
+
+      config.instmode = instmode_save;
+
+      break;
+
+    default:
+      break;
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  free(dir);
+  free(dir2);
+
+  return err;
+}
+
+

@@ -419,7 +419,7 @@ void get_screen_size(int fd)
   write(fd, term_init, strlen(term_init));
   fsync(fd);
 
-  buf[buf_len = 0];
+  buf[buf_len = 0] = 0;
 
   FD_ZERO(&set);
   FD_SET(fd, &set);
