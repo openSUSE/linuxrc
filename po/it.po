@@ -1208,3 +1208,7 @@ msgstr "Caricamento sistema di salvataggio"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Abilitare il supporto per OSI Livello 2?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

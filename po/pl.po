@@ -1160,3 +1160,7 @@ msgstr "Wczytywanie systemu awaryjnego"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Włączyć obsługę drugiej warstwy OSI?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

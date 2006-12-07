@@ -1075,7 +1075,12 @@ int net_choose_device()
         item_devs[item_cnt] = strdup(hd->unix_dev_name);
       }
 #if defined(__s390__) || defined(__s390x__)
-      {
+#define MAX_NET_DEVICES_SHOWN 20
+      if(item_cnt > MAX_NET_DEVICES_SHOWN) {
+        item_hds[item_cnt] = NULL;
+        strprintf(items + item_cnt++, txt_get(TXT_MANUAL_NETDEV_PARAMS));
+        break;
+      } else {
         int lcss = -1;
         int ccw = -1;
         hd_res_t* r;
@@ -1148,7 +1153,7 @@ int net_choose_device()
     if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
     if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
 
-    if(item_hds) {
+    if(item_hds && item_hds[choice - 1]) {
       hd = item_hds[choice - 1];
       if(hd->is.wlan) {
         if(wlan_setup()) choice = -1;
@@ -1781,6 +1786,7 @@ void if_down(char *dev)
 
 void net_list_s390_devs(char* driver, int model)
 {
+#if 0	/* unnecessary with new interface */
   char buf[4<<10];	/* good enough for ca. 240 devices */
   char tmp[256];
   DIR* driv;
@@ -1800,7 +1806,7 @@ void net_list_s390_devs(char* driver, int model)
     util_read_and_chop(tmp, tmp);
     if(model && strtol(tmp+5,NULL,16)!=model) continue;
     bp+=sprintf(bp,"%s ",devs->d_name);
-    bp+=sprintf(bp,"%s",tmp);	/* attribute contains a LF */
+    bp+=sprintf(bp,"%s\n",tmp);	/* attribute contains a LF */
     count++;
     if(count % 100 == 0)	/* avoid buffer overruns with many devices */
     {
@@ -1811,6 +1817,7 @@ void net_list_s390_devs(char* driver, int model)
   }
   closedir(driv);
   if(buf[0]) dia_message(buf,MSGTYPE_INFO);
+#endif
 }
 
 int net_check_ccw_address(char* addr)
@@ -1872,10 +1879,12 @@ static int net_s390_getrwchans_ex(hd_t* hd)
   return 0;
 }
 
+#if 0 /* currently unused */
 static int net_s390_getrwchans()
 {
   return net_s390_getrwchans_ex(NULL);
 }
+#endif
 
 /* group CCW channels */
 static int net_s390_group_chans(int num, char* driver)
@@ -2092,7 +2101,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   case di_390net_escon:
     mod_modprobe("ctc",NULL);	// FIXME: error handling
 
-    net_list_s390_devs("cu3088",0);	// FIXME: filter CTC/ESCON devices
+    if(!hd) net_list_s390_devs("cu3088",0);	// FIXME: filter CTC/ESCON devices
 
     if((rc=net_s390_getrwchans_ex(hd))) return rc;
     
@@ -2193,7 +2202,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     {
       mod_modprobe("qeth",NULL);	// FIXME: error handling
 
-      net_list_s390_devs("qeth", config.hwp.type == di_390net_hsi ? 5 : 1);
+      if(!hd) net_list_s390_devs("qeth", config.hwp.type == di_390net_hsi ? 5 : 1);
 
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       IFNOTAUTO(config.hwp.datachan)
@@ -2235,7 +2244,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     {
       mod_modprobe("lcs",NULL);	// FIXME: error handling
       
-      net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
+      if(!hd) net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
       
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       

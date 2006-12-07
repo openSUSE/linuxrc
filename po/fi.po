@@ -1160,3 +1160,7 @@ msgstr "Ladataan korjausjärjestelmä"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Ota käyttöön OSI Layer 2 tuki?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

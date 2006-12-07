@@ -1157,3 +1157,7 @@ msgstr "Carregando Sistema de Resgate"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Habilitar suporte da Camada 2 de OSI?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

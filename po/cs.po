@@ -1164,3 +1164,7 @@ msgstr "Zavádí se záchranný systém"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Povolit podporu 2. vrstvy OSI?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

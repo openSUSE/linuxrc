@@ -1337,3 +1337,7 @@ msgstr "Chargement du système de secours"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Activer la prise en charge de la couche 2 de OSI ?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

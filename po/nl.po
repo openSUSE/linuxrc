@@ -1161,3 +1161,7 @@ msgstr "Reddingssysteem laden"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Ondersteuning voor OSI Layer 2 activeren?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

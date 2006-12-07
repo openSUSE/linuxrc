@@ -1157,3 +1157,7 @@ msgstr "正在載入救援系統"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "啟用 OSI 第二層支援？"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

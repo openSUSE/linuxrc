@@ -1166,3 +1166,7 @@ msgstr "Mentőrendszer betöltése"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Engedélyezi az OSI Layer 2 támogatást?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+

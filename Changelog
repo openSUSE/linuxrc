@@ -1,3 +1,6 @@
+	- s390: fix device list, then disable it (should not be necessary
+	  any more)
+	- s390: limit number of network interfaces displayed
 	- s390: clean up cut-and-paste programming
 	- make s390 net config work again
 

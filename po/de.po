@@ -1161,3 +1161,7 @@ msgstr "Rettungssystem wird geladen"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "OSI-Schicht-2-Unterstützung aktivieren?"
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+
