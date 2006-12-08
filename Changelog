@@ -1,3 +1,6 @@
+8/12/2006:	v2.0.48
+	- changed tftp to bind to different port for each connection (#187745)
+
 6/12/2006:	v2.0.47
 	- write TERM to install.inf (#192052)
 	- info file can be on any media (#56845)
