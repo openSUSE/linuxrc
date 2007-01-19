@@ -4,6 +4,7 @@
 	- s390: clean up cut-and-paste programming
 	- make s390 net config work again
 	- more ip address checks (#229297)
+	- aborting some dialogs changed config values (#229878)
 
 21/11/2006:	v2.1.17
 	- run 'iwconfig <interface> key off' for open wlan connections (#222491)

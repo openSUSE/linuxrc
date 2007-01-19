@@ -627,32 +627,36 @@ int set_expert_cb(dia_item_t di)
 
     case di_expert_dhcp:
       rc = dia_yesno(txt_get(TXT_DHCP_VS_BOOTP), config.net.use_dhcp ? YES : NO);
-      config.net.use_dhcp = rc == YES ? 1 : 0;
+      if(rc != ESCAPE) config.net.use_dhcp = rc == YES ? 1 : 0;
       break;
 
     case di_expert_vnc:
       rc = dia_yesno(txt_get(TXT_VNC_YES_NO), config.vnc ? YES : NO);
-      if((config.vnc = rc == YES ? 1 : 0)) {
-        config.net.do_setup |= DS_VNC;
-      }
-      else {
-        config.net.do_setup &= ~DS_VNC;
+      if(rc != ESCAPE) {
+        if((config.vnc = rc == YES ? 1 : 0)) {
+          config.net.do_setup |= DS_VNC;
+        }
+        else {
+          config.net.do_setup &= ~DS_VNC;
+        }
       }
       break;
 
     case di_expert_usessh:
       rc = dia_yesno(txt_get(TXT_SSH_YES_NO), config.usessh ? YES : NO);
-      if((config.usessh = rc == YES ? 1 : 0)) {
-        config.net.do_setup |= DS_SSH;
-      }
-      else {
-        config.net.do_setup &= ~DS_SSH;
+      if(rc != ESCAPE) {
+        if((config.usessh = rc == YES ? 1 : 0)) {
+          config.net.do_setup |= DS_SSH;
+        }
+        else {
+          config.net.do_setup &= ~DS_SSH;
+        }
       }
       break;
 
     case di_expert_startshell:
       rc = dia_yesno("Start shell before and after YaST?", config.startshell ? YES : NO);
-      config.startshell = rc == YES ? 1 : 0;
+      if(rc != ESCAPE) config.startshell = rc == YES ? 1 : 0;
       break;
 
     case di_expert_slp:
