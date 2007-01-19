@@ -1,3 +1,6 @@
+19/1/2007:	v2.0.50
+	- aborting some dialogs changed config values (#229878)
+
 19/1/2007:	v2.0.49
 	- more ip address checks (#229297)
 
