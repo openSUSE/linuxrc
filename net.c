@@ -553,6 +553,7 @@ int net_check_address (char *input_tv, struct in_addr *address_prr, int *net_bit
     unsigned char *end_pci;
     int            i_ii;
     unsigned char *address_pci;
+    unsigned u;
 
 
     address_pci = (unsigned char *) address_prr;
@@ -584,22 +585,30 @@ int net_check_address (char *input_tv, struct in_addr *address_prr, int *net_bit
     if (!end_pci)
         return (-1);
     *end_pci = 0;
-    address_pci [0] = (unsigned char) atoi (start_pci);
+    u = atoi(start_pci);
+    if(u > 255) return -1;
+    address_pci[0] = u;
 
     start_pci = end_pci + 1;
     end_pci = strchr (start_pci, '.');
     if (!end_pci)
         return (-1);
     *end_pci = 0;
-    address_pci [1] = (unsigned char) atoi (start_pci);
+    u = atoi(start_pci);
+    if(u > 255) return -1;
+    address_pci[1] = u;
 
     start_pci = end_pci + 1;
     end_pci = strchr (start_pci, '.');
     if (!end_pci)
         return (-1);
     *end_pci = 0;
-    address_pci [2] = (unsigned char) atoi (start_pci);
-    address_pci [3] = (unsigned char) atoi (end_pci + 1);
+    u = atoi(start_pci);
+    if(u > 255) return -1;
+    address_pci[2] = u;
+    u = atoi(end_pci + 1);
+    if(u > 255) return -1;
+    address_pci[3] = u;
 
     return (0);
     }
