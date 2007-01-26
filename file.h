@@ -46,7 +46,7 @@ typedef enum {
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
   key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies,
   key_dhcpcd, key_layer2, key_wlan_essid, key_wlan_auth, key_wlan_key_ascii,
-  key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len
+  key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname
 } file_key_t;
 
 typedef enum {

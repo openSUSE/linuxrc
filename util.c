@@ -4082,6 +4082,7 @@ void get_net_unique_id()
     }
     if((hd_card = hd_get_device_by_idx(hd_data, hd->attached_to))) {
       str_copy(&config.net.unique_id, hd_card->unique_id);
+      str_copy(&config.net.cardname, hd_card->model);
     }
   }
 

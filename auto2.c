@@ -39,7 +39,7 @@ static void auto2_user_netconfig(void);
 static int auto2_harddisk_dev(void);
 static int auto2_cdrom_dev(void);
 static int auto2_net_dev(hd_t **);
-static int auto2_net_dev1(hd_t *hd);
+static int auto2_net_dev1(hd_t *hd, hd_t *hd_card);
 static int driver_is_active(hd_t *hd);
 static void auto2_progress(char *pos, char *msg);
 static void get_zen_config(void);
@@ -500,7 +500,7 @@ int auto2_net_dev(hd_t **hd0)
     hd_card = hd_get_device_by_idx(hd_data, hd->attached_to);
     if(hd_card && hd_card->is.wlan) hd->is.wlan = 1;
 
-    if(!auto2_net_dev1(hd)) {
+    if(!auto2_net_dev1(hd, hd_card)) {
       err = 0;
       break;
     }
@@ -520,7 +520,7 @@ int auto2_net_dev(hd_t **hd0)
  *   0: ok
  *   1: failed
  */
-int auto2_net_dev1(hd_t *hd)
+int auto2_net_dev1(hd_t *hd, hd_t *hd_card)
 {
   int i /*, link */;
   char *device, *hwaddr = NULL;
@@ -570,6 +570,7 @@ int auto2_net_dev1(hd_t *hd)
 
   str_copy(&config.net.device, device);
   str_copy(&config.net.hwaddr, hwaddr);
+  if(hd_card) str_copy(&config.net.cardname, hd_card->model);
 
   net_setup_localhost();
 

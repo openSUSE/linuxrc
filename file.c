@@ -268,7 +268,8 @@ static struct {
   { key_wlan_key_ascii, "WlanKeyAscii",   kf_cfg + kf_cmd                },
   { key_wlan_key_hex,   "WlanKeyHex",     kf_cfg + kf_cmd                },
   { key_wlan_key_pass,  "WlanKeyPass",    kf_cfg + kf_cmd                },
-  { key_wlan_key_len,   "WlanKeyLen",     kf_cfg + kf_cmd                }
+  { key_wlan_key_len,   "WlanKeyLen",     kf_cfg + kf_cmd                },
+  { key_netcardname,    "NetCardName",    kf_none                        }
 };
 
 static struct {
@@ -1649,6 +1650,7 @@ void file_write_install_inf(char *dir)
     if(config.manual < 2) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
+    file_write_str(f, key_netcardname, config.net.cardname);
     file_write_str(f, key_ethtool, config.net.ethtool_used);
     file_write_inet(f, key_ip, &config.net.hostname);
     if(config.net.realhostname) {
