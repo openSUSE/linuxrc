@@ -1213,3 +1213,7 @@ msgstr "Cargando sistema de rescate"
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
 
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

@@ -536,6 +536,7 @@ typedef struct {
     int interface;
     int medium;
     int layer2;
+    char* osahwaddr;
   } hwp;
   
 #endif

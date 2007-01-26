@@ -1215,3 +1215,7 @@ msgstr "Зареждане на спасителната система"
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
 
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

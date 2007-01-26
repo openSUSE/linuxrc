@@ -1856,6 +1856,9 @@ static int net_s390_enable_layer2(int enable)
     return util_set_sysfs_attr(devpath,value);
 }
 
+#include <netinet/ether.h>
+#include <dirent.h>
+
 /* put device online */
 static int net_s390_put_online(char* channel)
 {
@@ -1872,6 +1875,52 @@ static int net_s390_put_online(char* channel)
   if((rc=util_get_sysfs_int_attr(path,&online))) return rc;
   if (online == 0)
       return 1;
+      
+  if(config.hwp.osahwaddr) {
+    struct ifreq ifr;
+    struct ether_addr* ea;
+    int skfd;
+    DIR* d;
+    struct dirent* de;
+    
+    /* fill in interface name (max IFNAMSIZ) */
+    sprintf(path, "/sys/bus/ccwgroup/devices/%s", channel);
+    if(!(d = opendir(path))) {
+      perror("opendir");
+      return 1;
+    }
+    strcpy(ifr.ifr_name, "0nil");
+    while((de = readdir(d))) {
+      if(strncmp(de->d_name, "net:", 4) == 0) {
+        strcpy(ifr.ifr_name, de->d_name + 4);
+        break;
+      }
+    }
+    closedir(d);
+    if(strcmp(ifr.ifr_name, "0nil") == 0) {
+      fprintf(stderr,"Unable to find interface name for channel group %s.\n", channel);
+      return 1;
+    }
+    
+    if((skfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) {
+      perror("socket");
+      return 1;
+    }
+    
+    /* convert MAC address to binary */
+    ea = ether_aton(config.hwp.osahwaddr);
+    memcpy((void*) &ifr.ifr_hwaddr.sa_data[0], ea, ETHER_ADDR_LEN);
+    
+    //ifr.ifr_hwaddr.sa_len = ETHER_ADDR_LEN
+    ifr.ifr_hwaddr.sa_family = AF_UNIX;
+    
+    if(ioctl(skfd, SIOCSIFHWADDR, &ifr) < 0) {
+      fprintf(stderr, "SIOCSIFHWADDR: %s\n", strerror(errno));
+      close(skfd);
+      return 1;
+    }
+    close(skfd);
+  }
   return 0;
 }
 
@@ -2041,6 +2090,11 @@ int net_activate_s390_devs(void)
         IFNOTAUTO(config.hwp.layer2)
         {
           config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
+        }
+        if(config.hwp.layer2) {
+          IFNOTAUTO(config.hwp.osahwaddr) {
+             dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
+          }
         }
       }
       

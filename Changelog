@@ -1,3 +1,7 @@
+26/1/2007:	v2.0.51
+	- s390: added OSA MAC address parameter ("OSAHWAddr") + config code
+	  (bug #168492)
+
 19/1/2007:	v2.0.50
 	- aborting some dialogs changed config values (#229878)
 
