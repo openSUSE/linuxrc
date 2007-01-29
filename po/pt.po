@@ -909,8 +909,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "O computador não tem memória RAM suficiente para a instalação de %s. São necessários pelo menos %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
-msgstr "A palavra passe é demasiado curta (deve ter pelo menos 5 caracteres)."
+msgid "Password is too short (must have at least 6 characters)."
+msgstr "A palavra passe é demasiado curta (deve ter pelo menos 6 caracteres)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."

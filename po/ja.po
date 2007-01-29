@@ -965,7 +965,7 @@ msgstr ""
 "RAM容量が少ないため、%sをインストールできません。 %dMB以上の容量が必要です。"
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
+msgid "Password is too short (must have at least 6 characters)."
 msgstr "パスワードの文字数が少なすぎます。5文字以上にしてください。"
 
 #. TXT_XSERVER_IP

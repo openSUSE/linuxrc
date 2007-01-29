@@ -961,8 +961,8 @@ msgstr ""
 "Necesita al menos %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
-msgstr "La contraseña es demasiado corta (debe tener al menos 5 caracteres)."
+msgid "Password is too short (must have at least 6 characters)."
+msgstr "La contraseña es demasiado corta (debe tener al menos 6 caracteres)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."

@@ -94,11 +94,11 @@ void net_ask_password()
 {
   int win_old = config.win;
 
-  if(config.vnc && (!config.net.vncpassword || strlen(config.net.vncpassword) < 5)) {
+  if(config.vnc && (!config.net.vncpassword || strlen(config.net.vncpassword) < 6)) {
     if(!config.win) util_disp_init();
     for(;;) {
       if(dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1)) break;
-      if(config.net.vncpassword && strlen(config.net.vncpassword) >= 5) break;
+      if(config.net.vncpassword && strlen(config.net.vncpassword) >= 6) break;
       dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
     }
   }

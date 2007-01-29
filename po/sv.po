@@ -962,7 +962,7 @@ msgstr "för av s Du vid Mibyte."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 #, fuzzy
-msgid "Password is too short (must have at least 5 characters)."
+msgid "Password is too short (must have at least 6 characters)."
 msgstr "Lösenord är short vid."
 
 #. TXT_XSERVER_IP

@@ -956,8 +956,8 @@ msgstr ""
 "Χρειάζεστε τουλάχιστον %d ΜΒ."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
-msgstr "Ο κωδικός πρόσβασης είναι πολύ σύντομος (πρέπει να έχει τουλάχιστον 5 χαρακτήρες)."
+msgid "Password is too short (must have at least 6 characters)."
+msgstr "Ο κωδικός πρόσβασης είναι πολύ σύντομος (πρέπει να έχει τουλάχιστον 6 χαρακτήρες)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."

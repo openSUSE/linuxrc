@@ -913,8 +913,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "A számítógépében nincs elegendő RAM a(z) %s telepítéséhez. Legalább %d MB szükséges."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-msgid "Password is too short (must have at least 5 characters)."
-msgstr "A jelszó túl rövid (legalább 5 karakterből kell állnia)."
+msgid "Password is too short (must have at least 6 characters)."
+msgstr "A jelszó túl rövid (legalább 6 karakterből kell állnia)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
