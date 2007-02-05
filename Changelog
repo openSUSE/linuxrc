@@ -1,3 +1,6 @@
+5/2/2007:	v2.0.54
+	- added 'netretry' option to aid debugging network problems (#236646)
+
 5/2/2007:	v2.0.53
 	- read iSCSI BIOS tables (#221206)
 

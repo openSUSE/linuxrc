@@ -46,7 +46,7 @@ typedef enum {
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
   key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies,
   key_dhcpcd, key_layer2, key_osahwaddr, key_ibft_hwaddr, key_ibft_ipaddr,
-  key_ibft_netmask, key_ibft_gateway, key_ibft_dns
+  key_ibft_netmask, key_ibft_gateway, key_ibft_dns, key_net_retry
 } file_key_t;
 
 typedef enum {

@@ -103,6 +103,7 @@ static char *read_symlink(char *name);
 static void scsi_rename_devices(void);
 static void scsi_rename_onedevice(char **dev);
 
+static int _net_open(char *filename);
 
 static int skip_spaces(unsigned char **str);
 static int word_size(unsigned char *str, int *width, int *enc_len);
@@ -1355,6 +1356,11 @@ void util_status_info()
     s, config.net.bootp_timeout, t, config.net.dhcp_timeout, config.net.tftp_timeout
   );
   slist_append_str(&sl0, buf);
+
+  if(config.net.retry) {
+    sprintf(buf, "max connection retries: %d", config.net.retry);
+    slist_append_str(&sl0, buf);
+  }
 
   if(config.net.nfs_port || config.net.bootp_wait) {
     *buf = 0;
@@ -3271,11 +3277,27 @@ void net_read_cleanup()
   config.cache.size = config.cache.cnt = 0;
 }
 
+
 /*
- * return a file handle or, if 'filename' is NULL just check if
- # we can connect to the ftp server
+ * return a file handle or, if 'filename' is NULL just check if we can
+ * connect to the server
  */
 int net_open(char *filename)
+{
+  int fd = -1, cnt;
+
+  for(cnt = -1; cnt < config.net.retry; cnt++) {
+    if(cnt != -1) sleep(2);
+    fd = _net_open(filename);
+    if(config.debug) fprintf(stderr, "%2d: net_open(%s) = %d\n", cnt + 1, filename, fd);
+    if(fd >= 0) break;
+  }
+
+  return fd;
+}
+
+
+int _net_open(char *filename)
 {
   int fd = -1, len = 0;
   char *user, *password;
