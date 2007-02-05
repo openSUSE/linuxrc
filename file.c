@@ -269,7 +269,12 @@ static struct {
   { key_wlan_key_hex,   "WlanKeyHex",     kf_cfg + kf_cmd                },
   { key_wlan_key_pass,  "WlanKeyPass",    kf_cfg + kf_cmd                },
   { key_wlan_key_len,   "WlanKeyLen",     kf_cfg + kf_cmd                },
-  { key_netcardname,    "NetCardName",    kf_none                        }
+  { key_netcardname,    "NetCardName",    kf_none                        },
+  { key_ibft_hwaddr,    "iSCSI_INITIATOR_HWADDR",   kf_ibft              },
+  { key_ibft_ipaddr,    "iSCSI_INITIATOR_IPADDR",   kf_ibft              },
+  { key_ibft_netmask,   "iSCSI_INITIATOR_NETMASK",  kf_ibft              },
+  { key_ibft_gateway,   "iSCSI_INITIATOR_GATEWAY",  kf_ibft              },
+  { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              }
 };
 
 static struct {

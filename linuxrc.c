@@ -913,6 +913,8 @@ void lxrc_init()
 
   info_init();
 
+  read_iscsi_ibft();
+
   printf("Loading basic drivers...");
   fflush(stdout);
   mod_init(1);

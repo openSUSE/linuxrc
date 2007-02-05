@@ -155,3 +155,5 @@ int util_process_running(char *name);
 int system_log(char *cmd);
 int get_url(char *src_url, char *dst);
 
+void read_iscsi_ibft(void);
+
