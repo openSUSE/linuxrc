@@ -45,7 +45,8 @@ typedef enum {
   key_instsys_id, key_initrd_id, key_instsys_complain, key_nfstcp,
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
   key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies,
-  key_dhcpcd, key_layer2, key_osahwaddr,
+  key_dhcpcd, key_layer2, key_osahwaddr, key_ibft_hwaddr, key_ibft_ipaddr,
+  key_ibft_netmask, key_ibft_gateway, key_ibft_dns
 } file_key_t;
 
 typedef enum {
@@ -57,7 +58,8 @@ typedef enum {
   kf_dhcp = 1 << 4,		/* dhcp info file */
   kf_mem = 1 << 5,		/* /proc/meminfo */
   kf_boot = 1 << 6,		/* things the boot loader used */
-  kf_cmd1 = 1 << 7		/* between cmd_early and start of hw detection */
+  kf_cmd1 = 1 << 7,		/* between cmd_early and start of hw detection */
+  kf_ibft = 1 << 8		/* ibft values (iSCSI BIOS) */
 } file_key_flag_t;
 
 typedef struct file_s {

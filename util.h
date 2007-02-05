@@ -155,3 +155,5 @@ char *get_translation(slist_t *trans, char *locale);
 int util_process_running(char *name);
 int get_url(char *src_url, char *dst);
 
+void read_iscsi_ibft(void);
+

@@ -265,7 +265,12 @@ static struct {
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
   { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
-  { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                }
+  { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                },
+  { key_ibft_hwaddr,    "iSCSI_INITIATOR_HWADDR",   kf_ibft              },
+  { key_ibft_ipaddr,    "iSCSI_INITIATOR_IPADDR",   kf_ibft              },
+  { key_ibft_netmask,   "iSCSI_INITIATOR_NETMASK",  kf_ibft              },
+  { key_ibft_gateway,   "iSCSI_INITIATOR_GATEWAY",  kf_ibft              },
+  { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              }
 };
 
 static struct {

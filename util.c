@@ -5001,3 +5001,58 @@ int get_url(char *src_url, char *dst)
 }
 
 
+void read_iscsi_ibft()
+{
+  file_t *f0, *f;
+
+  if(!util_check_exist("/sbin/fwparam_ibft")) return;
+
+  system("/sbin/fwparam_ibft -b >/var/log/ibft");
+
+  f0 = file_read_file("/var/log/ibft", kf_ibft);
+
+  if(config.debug) {
+    if(f0) {
+      fprintf(stderr, "ibft values:\n");
+      for(f = f0; f; f = f->next) {
+        fprintf(stderr, "  %s=%s\n", f->key_str, f->value);
+      }
+    }
+    else {
+      fprintf(stderr, "no ibft\n");
+    }
+  }
+
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+      case key_ibft_hwaddr:
+        str_copy(&config.net.device, f->value);
+        config.net.device_given = 1;
+        break;
+
+      case key_ibft_ipaddr:
+        name2inet(&config.net.hostname, f->value);
+        net_check_address2(&config.net.hostname, 0);
+        break;
+
+      case key_ibft_netmask:
+        name2inet(&config.net.netmask, f->value);
+        net_check_address2(&config.net.netmask, 0);
+        break;
+
+      case key_ibft_gateway:
+        name2inet(&config.net.gateway, f->value);
+        net_check_address2(&config.net.gateway, 0);
+        break;
+
+      case key_ibft_dns:
+        name2inet(&config.net.nameserver[0], f->value);
+        net_check_address2(&config.net.nameserver[0], 0);
+        break;
+
+      default:
+        break;
+    }
+  }
+}
+
