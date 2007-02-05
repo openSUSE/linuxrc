@@ -274,7 +274,8 @@ static struct {
   { key_ibft_ipaddr,    "iSCSI_INITIATOR_IPADDR",   kf_ibft              },
   { key_ibft_netmask,   "iSCSI_INITIATOR_NETMASK",  kf_ibft              },
   { key_ibft_gateway,   "iSCSI_INITIATOR_GATEWAY",  kf_ibft              },
-  { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              }
+  { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              },
+  { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1450,6 +1451,10 @@ void file_do_info(file_t *f0)
 
       case key_wlan_auth:
         if(f->is.numeric) config.net.wlan.auth = f->nvalue;
+        break;
+
+      case key_net_retry:
+        if(f->is.numeric) config.net.retry = f->nvalue;
         break;
 
       default:

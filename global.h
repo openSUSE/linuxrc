@@ -482,6 +482,7 @@ typedef struct {
     int ifup_wait;		/* wait this time (in s) after network setup */
     int nfs_rsize;		/* nfs rsize mount option */
     int nfs_wsize;		/* nfs wsize mount option */
+    int retry;			/* max retry count for network connections */
     inet_t netmask;
     inet_t network;
     inet_t broadcast;
