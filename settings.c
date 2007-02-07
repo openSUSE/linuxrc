@@ -129,7 +129,7 @@ static language_t set_languages_arm [] =
 
 #ifdef TRANS_ko
 // currently a fake
-{ lang_ko, "Korean", "us", SMALL_FONT, UNI_FONT, 0, 0, "ko_KR", 1 },
+{ lang_ko, "Korean", "us", SMALL_FONT, UNI_FONT, 0, 0, "ko_KR", 0 },
 #endif
 
 #ifdef TRANS_hu
