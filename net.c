@@ -2091,7 +2091,7 @@ int net_activate_s390_devs(void)
         {
           config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
         }
-        if(config.hwp.layer2) {
+        if(config.hwp.layer2 == 2) {
           IFNOTAUTO(config.hwp.osahwaddr) {
              dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
           }
