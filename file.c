@@ -1651,6 +1651,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
 #if defined(__s390__) || defined(__s390x__)
     if(config.hwp.osahwaddr) file_write_str(f, key_osahwaddr, config.hwp.osahwaddr);
+    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2 - 1);
 #endif
     file_write_str(f, key_ethtool, config.net.ethtool_used);
     file_write_inet(f, key_ip, &config.net.hostname);

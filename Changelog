@@ -1,3 +1,6 @@
+13/2/2007:	v2.0.56
+	- s390: write Layer2 flag to install.inf
+
 8/2/2007:	v2.0.55
 	- s390: don't ask for MAC address if not Layer 2
 
