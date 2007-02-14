@@ -1,4 +1,4 @@
-# translation of de.po to 
+# translation of de.po to
 # translation of de.po to German
 # German translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
@@ -6,18 +6,20 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: de\n"
-"PO-Revision-Date: 2005-03-11 18:30+0100\n"
+"Project-Id-Version: @PACKAGE@\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-07-27 16:23+0200\n"
+"PO-Revision-Date: 2005-03-09 13:54+0100\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.9\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
-msgstr "Ok"
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -1222,6 +1224,7 @@ msgstr "Treiberaktualisierung wird geladen"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Rettungssystem wird geladen"
+
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
@@ -1229,4 +1232,3 @@ msgstr ""
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr ""
-

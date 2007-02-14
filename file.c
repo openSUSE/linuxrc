@@ -91,7 +91,6 @@ static struct {
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
   { key_serverdir,      "Serverdir",      kf_cfg + kf_cmd                },
   { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
-  { key_netdevice,      "BOOTIF",         kf_cfg + kf_cmd                },
   { key_livesrc,        "LiveSRC",        kf_cfg + kf_cmd                },
   { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
   { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
@@ -271,7 +270,8 @@ static struct {
   { key_ibft_netmask,   "iSCSI_INITIATOR_NETMASK",  kf_ibft              },
   { key_ibft_gateway,   "iSCSI_INITIATOR_GATEWAY",  kf_ibft              },
   { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              },
-  { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                }
+  { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                },
+  { key_bootif,         "BOOTIF",         kf_cmd                         }
 };
 
 static struct {
@@ -1446,6 +1446,14 @@ void file_do_info(file_t *f0)
         
       case key_net_retry:
         if(f->is.numeric) config.net.retry = f->nvalue;
+        break;
+
+      case key_bootif:
+        if(strlen(f->value) > 3) {
+          str_copy(&config.net.device, f->value + 3);
+          for(s = config.net.device; *s; s++) if(*s == '-') *s = ':';
+          config.net.device_given = 1;
+        }
         break;
 
       default:
