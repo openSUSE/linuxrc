@@ -1876,7 +1876,7 @@ static int net_s390_put_online(char* channel)
   if (online == 0)
       return 1;
       
-  if(config.hwp.osahwaddr) {
+  if(config.hwp.osahwaddr && strlen(config.hwp.osahwaddr) > 0) {
     struct ifreq ifr;
     struct ether_addr* ea;
     int skfd;
@@ -1908,7 +1908,10 @@ static int net_s390_put_online(char* channel)
     }
     
     /* convert MAC address to binary */
-    ea = ether_aton(config.hwp.osahwaddr);
+    if((ea = ether_aton(config.hwp.osahwaddr)) == NULL) {
+      fprintf(stderr,"MAC address invalid: %s\n", config.hwp.osahwaddr);
+      return 1;
+    }
     memcpy((void*) &ifr.ifr_hwaddr.sa_data[0], ea, ETHER_ADDR_LEN);
     
     //ifr.ifr_hwaddr.sa_len = ETHER_ADDR_LEN
