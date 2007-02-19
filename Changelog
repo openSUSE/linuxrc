@@ -1,3 +1,6 @@
+19/2/2007:	v2.0.58
+	- mls: bad tftp response overwrites the request (#242892)
+
 16/2/2007:	v2.0.57
 	- s390: handle invalid MAC addresses (including empty ones)
 	  properly (bug #243795)

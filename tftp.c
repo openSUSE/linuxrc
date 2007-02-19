@@ -23,12 +23,14 @@ int len;
   struct sockaddr_in osa;
   struct timeval tv;
   socklen_t osl;
+  unsigned char sendbuf[4 + 512];
 
   tftp->buf[0] = code >> 8;
   tftp->buf[1] = code;
+  memcpy(sendbuf, tftp->buf, len);
   for (retry = 0; retry < tftp->timo * 5; retry++)
     {
-      if ((r = sendto(tftp->s, tftp->buf, len, 0, (struct sockaddr *)&tftp->sa, sizeof(tftp->sa))) == -1)
+      if ((r = sendto(tftp->s, sendbuf, len, 0, (struct sockaddr *)&tftp->sa, sizeof(tftp->sa))) == -1)
 	{
 	  sprintf(tftp->buf, "sendto: %s", strerror(errno));
 	  return -1;
