@@ -534,7 +534,7 @@ int auto2_net_dev1(hd_t *hd)
   ) return 1;
 
   /* net_stop() - just in case */
-  net_stop();
+  if(!getenv("PXEBOOT")) net_stop();
 
   fprintf(stderr, "Trying to activate %s\n", device);
 

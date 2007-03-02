@@ -1,3 +1,6 @@
+2/3/2007:	v2.0.59
+	- work around problem with too early DHCP releases (#221865)
+
 19/2/2007:	v2.0.58
 	- mls: bad tftp response overwrites the request (#242892)
 
