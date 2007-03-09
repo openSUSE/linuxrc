@@ -97,14 +97,13 @@ msgstr "Poista moduulit käytöstä"
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Yritetään ottaa käyttöön moduulia \"%s\"...\n\n"
-"Käyttöönoton aikana voit seurata ytimen viestejä virtuaalikonsolissa 4 (ALT-F4). Käytä ALT-F1 "
-"palataksesi takaisin tähän valikkoon."
+"Yritetään ottaa käyttöön moduulia \"%s\"...\n"
+"\n"
+"Käyttöönoton aikana voit seurata ytimen viestejä virtuaalikonsolissa 4 (ALT-F4). Käytä ALT-F1 palataksesi takaisin tähän valikkoon."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -151,10 +150,12 @@ msgstr "Etsitään levykuvaa \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
-"Levykuvaa ei löytynyt.\n\n"
+"Levykuvaa ei löytynyt.\n"
+"\n"
 "Tarkista hakemiston määritys."
 
 #. TXT_INFO_KERNEL
@@ -222,51 +223,35 @@ msgid "Enter your IP address."
 msgstr "Anna IP-osoitteesi."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
-msgstr ""
-"Anna verkonpeite. Normaalissa C-luokan verkossa "
-"se on yleensä 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Anna verkonpeite. Normaalissa C-luokan verkossa se on yleensä 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
-msgstr ""
-"Jos tarvitset yhdyskäytävää tavoittaaksesi palvelimen, "
-"anna yhdyskäytävän IP-osoite. Jos et tarvitse yhdyskäytävää, anna oma IP-osoitteesi."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Jos tarvitset yhdyskäytävää tavoittaaksesi palvelimen, anna yhdyskäytävän IP-osoite. Jos et tarvitse yhdyskäytävää, anna oma IP-osoitteesi."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
-msgstr ""
-"Anna nimipalvelimesi IP-osoite. Jos "
-"et käytä nimipalvelinta, paina ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Anna nimipalvelimesi IP-osoite. Jos et käytä nimipalvelinta, paina ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Seuraavat tiedot kerättiin:\n\n"
+"Seuraavat tiedot kerättiin:\n"
+"\n"
 "IP-osoite: %s\n"
 "Nimi: %s\n"
 "Toimialue: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
-msgstr ""
-"Tapahtui virhe verkonmäärityksen aikana. "
-"Ydin ei oletettavasti tunnistanut verkkokorttiasi."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Tapahtui virhe verkonmäärityksen aikana. Ydin ei oletettavasti tunnistanut verkkokorttiasi."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -287,21 +272,33 @@ msgstr "Anna \"%s\" parametrit."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
-msgstr "Yritetään liittää hakemistoa\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Yritetään liittää hakemistoa\n"
+"\n"
+"\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
-msgstr "Tapahtui virhe yritettäessä liittää NFS-hakemistoa.\n\nPalvelimen palauttama syy:%s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
+msgstr ""
+"Tapahtui virhe yritettäessä liittää NFS-hakemistoa.\n"
+"\n"
+"Palvelimen palauttama syy:%s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
-msgstr "Valitse näppäimistökartta.\nYaST tarjoaa lisää näppäimistökarttoja myöhemmin."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
+msgstr ""
+"Valitse näppäimistökartta.\n"
+"YaST tarjoaa lisää näppäimistökarttoja myöhemmin."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -317,9 +314,7 @@ msgid "Autoprobing (%s)...      "
 msgstr "Automaattinen tunnistus (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Etsitäänkö lisättyjä SCSI-ohjaimia?"
 
 #. TXT_WANT_MORE_NET
@@ -363,21 +358,19 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Anna PLIP-kumppanin IP-osoite."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
-msgstr ""
-"PCMCIA-piirisarjaa ei voitu tunnistaa "
-"automaattisesti. Määritä se käsin."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "PCMCIA-piirisarjaa ei voitu tunnistaa automaattisesti. Määritä se käsin."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
-"Löytyi PCMCIA-piirisarja \"%s\".\n\nAnna "
-"parametrit PCMCIA ydinmoduuleille."
+"Löytyi PCMCIA-piirisarja \"%s\".\n"
+"\n"
+"Anna parametrit PCMCIA ydinmoduuleille."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
@@ -402,13 +395,16 @@ msgstr "PCMCIA-kortin palvelut ovat jo käynnissä."
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Voit lopettaa Linuxrc:n vain \n\n"
-"\"Käynnistä asennus tai järjestelmä\" kautta.\n\n"
+"Voit lopettaa Linuxrc:n vain \n"
+"\n"
+"\"Käynnistä asennus tai järjestelmä\" kautta.\n"
+"\n"
 "Sinun täytyy ehkä ladata muutamia ohjaimia (moduuleja) laitteistosi tukemiseksi."
 
 #. TXT_NO_CTRLC
@@ -420,8 +416,14 @@ msgid "Remove the disk from the drive now."
 msgstr "Poista levy asemasta nyt."
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
-msgstr "\n\nEsimerkiksi: "
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Esimerkiksi: "
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
@@ -440,10 +442,7 @@ msgid "Reboot the system now?"
 msgstr "Käynnistetäänkö järjestelmä uudelleen?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr "Perusjärjestelmä asennettiin onnistuneesti. Tämä asennettu järjestelmä käynnistetään nyt asennuksen suorittamiseksi."
 
 #. TXT_ENTER_PARTITION
@@ -468,14 +467,13 @@ msgstr "Kiintolevyt tai CD-ROMit"
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Tietokoneessasi on erittäin vähän muistia.\n\n"
-"Ennen tämän viestin kuittaamista, sinun tulisi vaihtaa "
-"virtuaalikonsoliin 2 (paina ALT-F2) luodaksesi ja ottaaksesi käyttöön swap-tilaa."
+"Tietokoneessasi on erittäin vähän muistia.\n"
+"\n"
+"Ennen tämän viestin kuittaamista, sinun tulisi vaihtaa virtuaalikonsoliin 2 (paina ALT-F2) luodaksesi ja ottaaksesi käyttöön swap-tilaa."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -486,9 +484,7 @@ msgid "Use animated windows?"
 msgstr "Käytä animoituja ikkunoita?"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Kiintolevyä tai CD-ROM-asemaa ei tähän mennessä ole löytynyt."
 
 #. TXT_MENU_EXPERT
@@ -508,9 +504,7 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Tulisiko juuri-levykuva ladata RAM-levylle?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr "Anna RAM-levylle juuritiedostojärjestelmäksi ladattavan tiedoston polku ja nimi."
 
 #. TXT_NOT_IMPLEMENTED
@@ -522,9 +516,7 @@ msgid "Installation System"
 msgstr "Asennusjärjestelmä"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
+msgid "Enter the directory that contains the installation system."
 msgstr "Anna hakemisto joka sisältää asennusjärjestelmän."
 
 #. TXT_NO_INFO_AVAIL
@@ -565,12 +557,8 @@ msgid "Host %s was not found."
 msgstr "Konetta %s ei löydetty."
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
-msgstr ""
-"Verkkosi on jo määritetty. "
-"Pidetäänkö tämä määritys?"
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "Verkkosi on jo määritetty. Pidetäänkö tämä määritys?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -578,9 +566,11 @@ msgstr "Keskeytä?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
-msgstr "Verkkolaitetta ei löytynyt.\nLataa verkkomoduuli ensin."
+"No network device found.\n"
+"Load a network module first."
+msgstr ""
+"Verkkolaitetta ei löytynyt.\n"
+"Lataa verkkomoduuli ensin."
 
 #. TXT_ALREADY_FOUND
 #, c-format
@@ -589,13 +579,17 @@ msgstr "%s on jo löydetty järjestelmästäsi.\n"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
-msgstr "Virhe otettaessa yhteyttä FTP-palvelimeen:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Virhe otettaessa yhteyttä FTP-palvelimeen:\n"
+"\n"
+"%s"
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
+msgid "Enter the user name with which to access the FTP server."
 msgstr "Anna käyttäjätunnus jolla otetaan yhteyttä FTP-palvelimeen."
 
 #. TXT_ENTER_FTPPASSWD
@@ -616,16 +610,12 @@ msgstr "Käytä FTP-välityspalvelinta?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr "Tietokoneessasi ei ole tarpeeksi keskusmuistia asennukseen FTP:n kautta (%d Mt RAM-muistia vaaditaan)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
 "Yleensä FTP-asennus suoritetaan anonyymin FTP:n kautta. On mahdollista määrittää käyttäjätunnus ja salasana FTP-palvelimen yhteydelle.\n"
@@ -640,9 +630,7 @@ msgid "Initializing parallel port..."
 msgstr "Valmistellaan rinnakkaisporttia..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Anna porttinumero, jossa NFS-palvelinta suoritetaan."
 
 #. TXT_INSERT_CD
@@ -684,12 +672,10 @@ msgstr "Anna jaon nimi SMB-palvelimella."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Jos haluat pääsyn jakoon vieras-tilillä,"
-"sinun ei tarvitse määrittää käyttäjätunnusta, salasanaa ja työryhmää.\n"
+"Jos haluat pääsyn jakoon vieras-tilillä,sinun ei tarvitse määrittää käyttäjätunnusta, salasanaa ja työryhmää.\n"
 "Yhdistetäänkö jakoon vieraana?"
 
 #. TXT_SMB_ENTER_USER
@@ -701,19 +687,19 @@ msgid "Enter your password on the SMB server."
 msgstr "Anna salasanasi SMB-palvelimelle."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
-msgstr ""
-"Anna työryhmäsi."
-"Jos sinun ei tarvitse määrittää työryhmää,"
-"jätä kenttä tyhjäksi."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Anna työryhmäsi.Jos sinun ei tarvitse määrittää työryhmää,jätä kenttä tyhjäksi."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr "Yritetään liittää jakoa\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
+msgstr ""
+"Yritetään liittää jakoa\n"
+"\n"
+"\"//%s/%s\""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -885,14 +871,10 @@ msgstr "Anna väliaikainen SSH-salasanasi."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Perusjärjestelmä asennettiin onnistuneesti. Tietokoneesi täytyy uudelleen käynnistää. "
-"Poista kaikki asennusmediat (CD-ROM, levyke).\n"
+"Perusjärjestelmä asennettiin onnistuneesti. Tietokoneesi täytyy uudelleen käynnistää. Poista kaikki asennusmediat (CD-ROM, levyke).\n"
 "Älä poista levykettä, jos käynnistyslatain on asennettu sille."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -911,12 +893,10 @@ msgstr "Anna nimipalvelimen %u IP-osoite tai paina ESC."
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr ""
 "Anna väliaikainen pääkäyttäjän salasana.\n"
-"Sinua vaaditaan vaihtamaan tämä salasana "
-"ensimmäisessä pääkäyttäjän kirjautumisessa."
+"Sinua vaaditaan vaihtamaan tämä salasana ensimmäisessä pääkäyttäjän kirjautumisessa."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -924,16 +904,13 @@ msgstr "Uudelleen käynnistys"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
-msgstr ""
-"Tietokoneessasi ei ole tarpeeksi keskusmuistia %s asennukseen. "
-"Tarvitset vähintään %d Mt muistia."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Tietokoneessasi ei ole tarpeeksi keskusmuistia %s asennukseen. Tarvitset vähintään %d Mt muistia."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
+#, fuzzy
 msgid "Password is too short (must have at least 6 characters)."
-msgstr "Salasana on liian lyhyt (täytyy olla vähintään 6 merkkiä)."
+msgstr "Salasana on liian lyhyt (täytyy olla vähintään 5 merkkiä)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1100,8 +1077,12 @@ msgstr "Virhe luettaessa sektoria %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\nTämä %s-levy on rikki."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Tämä %s-levy on rikki."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1179,9 +1160,9 @@ msgstr "Ladataan korjausjärjestelmä"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Ota käyttöön OSI Layer 2 tuki?"
 
 #. TXT_HWADDR
+#, fuzzy
 msgid "MAC address"
-msgstr ""
-
+msgstr "MAC-osoite"

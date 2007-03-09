@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
-"Last-Translator: Craig Jeffares <cjeffares@novell.com>\n"
+"PO-Revision-Date: 2006-05-17 17:14\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -96,13 +96,11 @@ msgstr "卸載模組"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "嘗試載入模組「%s」...\n"
 "\n"
-"在載入期間，您可能想要觀看虛擬主控台 4 上的核心訊息 (按 ALT-F4)。使用 ALT-F1 "
-"以切換回此功能表。"
+"在載入期間，您可能想要觀看虛擬主控台 4 上的核心訊息 (按 ALT-F4)。使用 ALT-F1 以切換回此功能表。"
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -222,23 +220,15 @@ msgid "Enter your IP address."
 msgstr "輸入您的 IP 位址。"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
 msgstr "輸入您的網路遮罩。對於一般類別 C 的網路，此項目通常為 255.255.255.0。"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"如果您需要閘道以進入伺服器，請輸入閘道的 IP 位址。如果您不需要閘道，請輸入您"
-"自己的 IP 位址。"
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "如果您需要閘道以進入伺服器，請輸入閘道的 IP 位址。如果您不需要閘道，請輸入您自己的 IP 位址。"
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
 msgstr "輸入您名稱伺服器的 IP 位址。如果您不使用名稱伺服器，請按 ESC。"
 
 #. TXT_FOUND_HOST
@@ -257,9 +247,7 @@ msgstr ""
 "領域：%s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
 msgstr "設定網路組態期間發生錯誤。核心可能無法辨識您的網路卡。"
 
 #. TXT_INPUT_SERVER
@@ -367,8 +355,7 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "輸入 PLIP 夥伴的 IP 位址。"
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
 msgstr "無法自動偵測 PCMCIA晶片組。請手動指定它。"
 
 #. TXT_FOUND_PCMCIA
@@ -452,9 +439,7 @@ msgid "Reboot the system now?"
 msgstr "要現在重新開機？"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr "基本系統已成功安裝。這個新安裝的系統現在將會啟動以確認安裝。"
 
 #. TXT_ENTER_PARTITION
@@ -481,13 +466,11 @@ msgstr "硬碟或 CD-ROM"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "您電腦的記憶體非常小。\n"
 "\n"
-"在您收到此訊息之前，您必須切換至虛擬主控台 2 (按 ALT-F2) 以建立並啟用某些交換"
-"空間。"
+"在您收到此訊息之前，您必須切換至虛擬主控台 2 (按 ALT-F2) 以建立並啟用某些交換空間。"
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -518,9 +501,7 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "要將根影像載入至 RAM 磁碟嗎？"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr "輸入要載入 RAM 磁碟檔案的路徑與名稱，以做為根檔案系統。"
 
 #. TXT_NOT_IMPLEMENTED
@@ -626,19 +607,15 @@ msgstr "使用 FTP proxy？"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr "您的電腦沒有足夠的 RAM 以透過 FTP 進行安裝 (需要 %d MB RAM)。"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"通常 FTP 安裝要透過匿名 FTP 來執行。可以指定存取 FTP 伺服器的使用者名稱與密"
-"碼。\n"
+"通常 FTP 安裝要透過匿名 FTP 來執行。可以指定存取 FTP 伺服器的使用者名稱與密碼。\n"
 "要使用使用者名稱與密碼嗎？"
 
 #. TXT_MORE_MODULES
@@ -647,7 +624,7 @@ msgstr "-- 更多模組 --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "起始化並列埠..."
+msgstr "啟始化並列埠..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
@@ -692,8 +669,7 @@ msgstr "輸入 SMB 伺服器上的共用名稱。"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 "如果您想要以訪客身份存取共用項目，您不必指定使用者名稱、密碼及工作群組。\n"
@@ -708,9 +684,7 @@ msgid "Enter your password on the SMB server."
 msgstr "輸入您在 SMB 伺服器上的密碼。"
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr "輸入您的工作群組。如果您不必指定工作群組，請保留此欄位為空白。"
 
 #. TXT_SMB_TRYING_MOUNT
@@ -894,12 +868,10 @@ msgstr "輸入您的暫存 SSH 密碼。"
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"基本系統已成功安裝。您的機器現在必須重新開機。移除所有安裝媒體 (CD-ROM，磁"
-"片)。\n"
+"基本系統已成功安裝。您的機器現在必須重新開機。移除所有安裝媒體 (CD-ROM，磁片)。\n"
 "如果開機管理員安裝在磁片上，請不要移除磁片。"
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -929,14 +901,12 @@ msgstr "重新開機"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr "您的電腦沒有足夠的 RAM 來安裝 %s。 您至少需要 %d MB。"
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 6 characters)."
-msgstr "密碼太短 (必須至少有 6 個字元)。"
+msgstr "密碼太短 (至少必須有 6 個字元)。"
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1133,66 +1103,61 @@ msgstr "現在要停止系統？"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 或 OSA Express"
 
 #. TXT_OSA_ETH
-#, fuzzy
 msgid "Ethernet"
-msgstr "OSA 乙太網路"
+msgstr "乙太網路"
 
 #. TXT_OSA_TR
-#, fuzzy
 msgid "Token Ring"
-msgstr "OSA 記號環 (LCS)"
+msgstr "記號環"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
-#, fuzzy
 msgid "Please choose the CCW bus interface."
-msgstr "請選擇「驅動程式更新」媒體。"
+msgstr "請選擇 CCW 匯流排介面。"
 
 #. TXT_CHOOSE_OSA_MEDIUM
-#, fuzzy
 msgid "Please choose the physical medium."
-msgstr "請選擇「驅動程式更新」媒體。"
+msgstr "請選擇實體媒體。"
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "正在載入模組"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "正在載入安裝系統"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "正在載入其他字型"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "正在載入驅動程式更新"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "正在載入救援系統"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "啟用 OSI 第二層支援？"
 
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "MAC 位址"

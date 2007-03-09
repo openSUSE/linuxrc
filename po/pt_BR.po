@@ -96,13 +96,11 @@ msgstr "Descarregar Módulos"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Tentando carregar módulo %s...\n"
 "\n"
-"Durante o carregamento, você pode ver as mensagens de kernel no console "
-"virtual 4 (ALT-F4). Use ALT-F1 para voltar a este menu."
+"Durante o carregamento, você pode ver as mensagens de kernel no console virtual 4 (ALT-F4). Use ALT-F1 para voltar a este menu."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -222,28 +220,16 @@ msgid "Enter your IP address."
 msgstr "Digite o endereço IP."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Digite sua máscara de rede. Para uma rede C de classe normal, geralmente é "
-"255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Digite sua máscara de rede. Para uma rede C de classe normal, geralmente é 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Se precisar de um gateway para alcançar o servidor, digite o endereço IP do "
-"gateway. Se não precisar de gateway, digite seu próprio endereço IP."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Se precisar de um gateway para alcançar o servidor, digite o endereço IP do gateway. Se não precisar de gateway, digite seu próprio endereço IP."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Digite o endereço IP de seu servidor de nomes. Se você não usa um servidor "
-"de nomes, pressione ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Digite o endereço IP de seu servidor de nomes. Se você não usa um servidor de nomes, pressione ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -261,12 +247,8 @@ msgstr ""
 "Domínio: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Ocorreu um erro durante a configuração da rede. Sua placa de rede "
-"provavelmente não foi reconhecida pelo kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Ocorreu um erro durante a configuração da rede. Sua placa de rede provavelmente não foi reconhecida pelo kernel."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -375,11 +357,8 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Informe o endereço IP do parceiro PLIP."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"O chipset PCMCIA não pôde ser detectado automaticamente. Especifique-o "
-"manualmente."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "O chipset PCMCIA não pôde ser detectado automaticamente. Especifique-o manualmente."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -425,8 +404,7 @@ msgstr ""
 "\n"
 "Iniciar Instalação ou Sistema\n"
 "\n"
-"Você pode ter que carregar alguns drivers (módulos) para suportar seu "
-"hardware."
+"Você pode ter que carregar alguns drivers (módulos) para suportar seu hardware."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -463,12 +441,8 @@ msgid "Reboot the system now?"
 msgstr "Reinicializar o sistema agora?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"O sistema básico foi instalado com êxito. Este novo sistema instalado será "
-"iniciado para confirmar a instalação."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "O sistema básico foi instalado com êxito. Este novo sistema instalado será iniciado para confirmar a instalação."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -494,13 +468,11 @@ msgstr "Discos Rígidos ou CD-ROMs"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Seu computador tem pouca memória.\n"
 "\n"
-"Antes de confirmar esta mensagem, alterne para o console virtual 2 "
-"(pressione ALT-F2) para criar e ativar algum espaço de troca."
+"Antes de confirmar esta mensagem, alterne para o console virtual 2 (pressione ALT-F2) para criar e ativar algum espaço de troca."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -531,12 +503,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Carregar a imagem raiz no disco RAM?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Digite o caminho e o nome do arquivo a ser carregado no disco RAM como "
-"sistema de arquivos raiz."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Digite o caminho e o nome do arquivo a ser carregado no disco RAM como sistema de arquivos raiz."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -641,21 +609,15 @@ msgstr "Usar proxy FTP?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"O computador não tem RAM suficiente para instalar via FTP (%d MB de RAM "
-"necessários)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "O computador não tem RAM suficiente para instalar via FTP (%d MB de RAM necessários)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Geralmente, é feita uma instalação FTP via FTP anônimo. É possível "
-"especificar um nome de usuário e uma senha para o acesso do servidor FTP.\n"
+"Geralmente, é feita uma instalação FTP via FTP anônimo. É possível especificar um nome de usuário e uma senha para o acesso do servidor FTP.\n"
 "Usar nome de usuário e senha?"
 
 #. TXT_MORE_MODULES
@@ -709,12 +671,10 @@ msgstr "Digite o nome de compartilhamento no servidor SMB."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Se quiser acessar o compartilhamento como convidado, você não precisa "
-"especificar um nome de usuário, uma senha e um grupo de trabalho.\n"
+"Se quiser acessar o compartilhamento como convidado, você não precisa especificar um nome de usuário, uma senha e um grupo de trabalho.\n"
 "Acessar compartilhamento como convidado?"
 
 #. TXT_SMB_ENTER_USER
@@ -726,12 +686,8 @@ msgid "Enter your password on the SMB server."
 msgstr "Digite a senha no servidor SMB."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
-msgstr ""
-"Digite o grupo de trabalho. Se não precisar especificar um grupo de "
-"trabalho, deixe o campo vazio."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Digite o grupo de trabalho. Se não precisar especificar um grupo de trabalho, deixe o campo vazio."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -912,14 +868,11 @@ msgstr "Digite sua senha SSH temporária."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"O sistema básico foi instalado com êxito. Sua máquina precisa ser "
-"reinicializada. Remova toda a mídia de instalação (CD-ROM, disquete).\n"
-"Não remova o disquete se o gerenciador de inicialização estiver instalado "
-"nele."
+"O sistema básico foi instalado com êxito. Sua máquina precisa ser reinicializada. Remova toda a mídia de instalação (CD-ROM, disquete).\n"
+"Não remova o disquete se o gerenciador de inicialização estiver instalado nele."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
@@ -948,12 +901,8 @@ msgstr "Reinicializar"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
-msgstr ""
-"Seu computador não tem RAM suficiente para a instalação de %s. Você precisa "
-"de pelo menos %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Seu computador não tem RAM suficiente para a instalação de %s. Você precisa de pelo menos %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 6 characters)."
@@ -981,9 +930,7 @@ msgstr "ESCON"
 
 #. TXT_390NET_IUCV
 msgid "Inter-User Communication Vehicle (IUCV)"
-msgstr ""
-"IUCV (Inter User Communication Vehicle - Veículo de Comunicação entre "
-"Usuários)"
+msgstr "IUCV (Inter User Communication Vehicle - Veículo de Comunicação entre Usuários)"
 
 #. TXT_390NET_HSI
 msgid "Hipersockets"
@@ -1206,11 +1153,11 @@ msgstr "Carregando Atualização de Driver"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Carregando Sistema de Resgate"
+
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Habilitar suporte da Camada 2 de OSI?"
 
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Endereço MAC"

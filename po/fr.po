@@ -1,4 +1,4 @@
-# translation of fr.po to 
+# translation of fr.po to
 # translation of linuxrc.po to français
 # translation of fr.po to français
 # French translations for linuxrc.
@@ -123,13 +123,11 @@ msgstr "Décharger les modules"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Tentative de charger le module \"%s\"...\n"
 "\n"
-"Pendant le chargement, vous pouvez visualiser les messages du noyau sur la "
-"console virtuelle 4 (ALT-F4). Utilisez ALT-F1 pour revenir au menu."
+"Pendant le chargement, vous pouvez visualiser les messages du noyau sur la console virtuelle 4 (ALT-F4). Utilisez ALT-F1 pour revenir au menu."
 
 # TLABEL linuxrc_2002_03_29_0036__21
 #. TXT_LOAD_SUCCESSFUL
@@ -277,30 +275,18 @@ msgstr "Entrez votre adresse IP."
 
 # TLABEL linuxrc_2002_03_29_0036__49
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Entrez votre masque réseau. Pour un réseau normal classe C, c'est "
-"habituellement 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Entrez votre masque réseau. Pour un réseau normal classe C, c'est habituellement 255.255.255.0."
 
 # TLABEL linuxrc_2002_03_29_0036__50
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Entrez l'adresse IP de votre passerelle s'il vous en faut une pour pouvoir "
-"accéder au serveur. Sinon entrez simplement votre propre adresse IP."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Entrez l'adresse IP de votre passerelle s'il vous en faut une pour pouvoir accéder au serveur. Sinon entrez simplement votre propre adresse IP."
 
 # TLABEL linuxrc_2002_03_29_0036__51
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Entrez l'adresse IP de votre serveur de noms. Si vous n'utilisez pas de "
-"serveur de noms, appuyez sur ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Entrez l'adresse IP de votre serveur de noms. Si vous n'utilisez pas de serveur de noms, appuyez sur ESC."
 
 # TLABEL linuxrc_2002_03_29_0036__52
 #. TXT_FOUND_HOST
@@ -320,12 +306,8 @@ msgstr ""
 
 # TLABEL linuxrc_2002_03_29_0036__53
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
-msgstr ""
-"Erreur pendant la configuration du réseau. Votre carte réseau n'a "
-"probablement pas été reconnue par le noyau."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Erreur pendant la configuration du réseau. Votre carte réseau n'a probablement pas été reconnue par le noyau."
 
 # TLABEL linuxrc_2002_03_29_0036__54
 #. TXT_INPUT_SERVER
@@ -456,11 +438,8 @@ msgstr "Entrez l'adresse IP de la machine PLIP partenaire."
 
 # TLABEL linuxrc_2002_03_29_0036__75
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr ""
-"Impossible de détecter automatiquement le jeu de puces PCMCIA. Spécifiez-le "
-"manuellement."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "Impossible de détecter automatiquement le jeu de puces PCMCIA. Spécifiez-le manuellement."
 
 # TLABEL linuxrc_2002_03_29_0036__76
 #. TXT_FOUND_PCMCIA
@@ -513,8 +492,7 @@ msgstr ""
 "\n"
 "\"Démarrer l'installation ou le système\"\n"
 "\n"
-"Vous devrez éventuellement charger quelques pilotes (modules) pour la prise "
-"en charge de votre matériel."
+"Vous devrez éventuellement charger quelques pilotes (modules) pour la prise en charge de votre matériel."
 
 # TLABEL linuxrc_2002_03_29_0036__83
 #. TXT_NO_CTRLC
@@ -559,12 +537,8 @@ msgstr "Redémarrer le système maintenant ?"
 
 # TLABEL linuxrc_2002_03_29_0036__91
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
-msgstr ""
-"Le système de base a été installé avec succès. Ce système nouvellement "
-"installé est maintenant démarré pour terminer l'installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Le système de base a été installé avec succès. Ce système nouvellement installé est maintenant démarré pour terminer l'installation."
 
 # TLABEL linuxrc_2002_03_29_0036__92
 #. TXT_ENTER_PARTITION
@@ -596,13 +570,11 @@ msgstr "Disques durs ou CD-ROM"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Votre machine a extrêmement peu de mémoire.\n"
 "\n"
-"Avant de confirmer ce message, vous devez passer à la console virtuelle 2 "
-"(pressez ALT-F2) pour créer et activer un peu d'espace swap."
+"Avant de confirmer ce message, vous devez passer à la console virtuelle 2 (pressez ALT-F2) pour créer et activer un peu d'espace swap."
 
 # TLABEL linuxrc_2002_03_29_0036__98
 #. TXT_ASK_ANIMATE
@@ -639,12 +611,8 @@ msgstr "L'image root doit-elle être chargée dans le disque RAM ?"
 
 # TLABEL linuxrc_2002_03_29_0036__105
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
-msgstr ""
-"Entrez le chemin et le nom du fichier que vous voulez charger comme système "
-"de fichiers racine dans le disque RAM."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Entrez le chemin et le nom du fichier que vous voulez charger comme système de fichiers racine dans le disque RAM."
 
 # TLABEL linuxrc_2002_03_29_0036__106
 #. TXT_NOT_IMPLEMENTED
@@ -710,8 +678,7 @@ msgstr "L'hôte %s n'a pas été trouvé."
 # TLABEL linuxrc_2002_03_29_0036__118
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Keep this configuration?"
-msgstr ""
-"Votre réseau est déjà configuré. Voulez-vous conserver la configuration ?"
+msgstr "Votre réseau est déjà configuré. Voulez-vous conserver la configuration ?"
 
 # TLABEL linuxrc_2002_03_29_0036__167
 #. TXT_ASK_BREAK
@@ -748,8 +715,7 @@ msgstr ""
 # TLABEL linuxrc_2002_03_29_0036__123
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr ""
-"Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP."
+msgstr "Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur FTP."
 
 # TLABEL linuxrc_2002_03_29_0036__124
 #. TXT_ENTER_FTPPASSWD
@@ -774,23 +740,16 @@ msgstr "Voulez-vous utiliser un proxy FTP ?"
 # TLABEL linuxrc_2002_03_29_0036__128
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
-msgstr ""
-"Votre machine n'a pas assez de RAM pour une installation via FTP (%d Mo de "
-"RAM sont nécessaires)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Votre machine n'a pas assez de RAM pour une installation via FTP (%d Mo de RAM sont nécessaires)."
 
 # TLABEL linuxrc_2002_03_29_0036__129
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Normalement, une installation FTP se déroule via FTP anonyme. Il est "
-"cependant possible de spécifier un nom d'utilisateur et un mot de passe pour "
-"l'accès au serveur FTP.\n"
+"Normalement, une installation FTP se déroule via FTP anonyme. Il est cependant possible de spécifier un nom d'utilisateur et un mot de passe pour l'accès au serveur FTP.\n"
 "Voulez-vous le utiliser un nom d'utilisateur et un mot de passe ?"
 
 # TLABEL linuxrc_2002_03_29_0036__130
@@ -857,12 +816,10 @@ msgstr "Entrez le nom du partage sur le serveur SMB."
 # TLABEL linuxrc_2002_03_29_0036__146
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Si vous voulez accéder au partage en tant qu'invité,vous n'avez pas à "
-"spécifier de nom d'utilisateur, de mot de passe ni de groupe de travail.\n"
+"Si vous voulez accéder au partage en tant qu'invité,vous n'avez pas à spécifier de nom d'utilisateur, de mot de passe ni de groupe de travail.\n"
 "Voulez-vous accéder au partage en tant qu'invité ?"
 
 # TLABEL linuxrc_2002_03_29_0036__147
@@ -877,12 +834,8 @@ msgstr "Entrez votre mot de passe sur le serveur SMB."
 
 # TLABEL linuxrc_2002_03_29_0036__149
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
-msgstr ""
-"Entrez votre groupe de travail.Si vous n'avez pas à spécifier de groupe de "
-"travail,laissez ce champ vide."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Entrez votre groupe de travail.Si vous n'avez pas à spécifier de groupe de travail,laissez ce champ vide."
 
 # TLABEL linuxrc_2002_03_29_0036__150
 #. TXT_SMB_TRYING_MOUNT
@@ -915,7 +868,7 @@ msgstr "Envoi d'une requête %s..."
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "la configuration de %s a échoué."
+msgstr "La configuration de %s a échoué."
 
 # TLABEL linuxrc_2002_03_29_0036__154
 #. TXT_DHCP_VS_BOOTP
@@ -936,9 +889,7 @@ msgstr "Insérez la disquette de modules %d."
 # TLABEL linuxrc_2002_03_29_0036__157
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr ""
-"Vous trouverez des instructions pour la créer dans boot/README sur le CD1 ou "
-"le DVD1."
+msgstr "Vous trouverez des instructions pour la créer dans boot/README sur le CD1 ou le DVD1."
 
 # TLABEL linuxrc_2002_03_29_0036__158
 #. TXT_CHOOSE_NETSOURCE
@@ -950,7 +901,7 @@ msgstr "Choisissez le protocole réseau."
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Entrez l'adresse IP sur le serveur %s."
+msgstr "Entrez l'adresse IP du serveur %s."
 
 # TLABEL linuxrc_2002_03_29_0036__160
 # %s is FTP or HTTP
@@ -1047,8 +998,7 @@ msgstr "Entrez le nom de la partition d'échange (swap) (par exemple /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr ""
-"Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur %s."
+msgstr "Entrez le nom d'utilisateur sous lequel vous voulez accéder au serveur %s."
 
 # TLABEL linuxrc_2002_03_29_0036__159
 # %s is NFS, FTP, HTTP or SMB
@@ -1100,12 +1050,10 @@ msgstr "Entrez votre mot de passe SSH temporaire."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Le système de base a été installé avec succès. Votre machine doit maintenant "
-"être réamorcée. Enlevez tous les supports d'installation (CD, disquette).\n"
+"Le système de base a été installé avec succès. Votre machine doit maintenant être réamorcée. Enlevez tous les supports d'installation (CD, disquette).\n"
 "N'enlevez pas la disquette si le chargeur d'amorçage a été installé dessus."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -1128,8 +1076,7 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Entrez le mot de passe root temporaire.\n"
-"Vous devrez changer ce mot de passe lors de la connexion initiale de "
-"l'utilisateur root."
+"Vous devrez changer ce mot de passe lors de la connexion initiale de l'utilisateur root."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -1137,17 +1084,12 @@ msgstr "Réamorcer"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
-msgstr ""
-"Votre ordinateur n'ont pas assez de RAM pour l'installation de %s. Vous "
-"nécessitez au moins %d Mo."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "Votre ordinateur n'ont pas assez de RAM pour l'installation de %s. Vous nécessitez au moins %d Mo."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 6 characters)."
-msgstr ""
-"Le mot de passe est trop court (il doit contenir au moins 6 caractères)."
+msgstr "Le mot de passe est trop court (il doit comporter au moins six caractères)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1394,11 +1336,11 @@ msgstr "Chargement de la mise à jour des pilotes"
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Chargement du système de secours"
+
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Activer la prise en charge de la couche 2 de OSI ?"
 
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Adresse MAC"

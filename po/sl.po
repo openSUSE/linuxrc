@@ -100,13 +100,11 @@ msgstr "Odstrani module"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Poizkus nalaganja modula \"%s\"...\n"
 "\n"
-"Med nalaganjem lahko preklopite na navidezno konzolo 4 (ALT+F4) za pregled "
-"sporočil jedra. Za vrnitev na trenutno konzolo, pritisnite ALT-F1."
+"Med nalaganjem lahko preklopite na navidezno konzolo 4 (ALT+F4) za pregled sporočil jedra. Za vrnitev na trenutno konzolo, pritisnite ALT-F1."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -226,28 +224,16 @@ msgid "Enter your IP address."
 msgstr "Vnesite vaš IP naslov."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
-msgstr ""
-"Vnesite vašo omrežno masko. Za običajna C omrežja, je omrežna maska "
-"255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Vnesite vašo omrežno masko. Za običajna C omrežja, je omrežna maska 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
-msgstr ""
-"Če za dostop do strežnika uporabljate prehod (gateway), vnesite IP naslov prehoda."
-"Če ne potrebujete prehoda, vnesite IP naslov vašega računalnika."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Če za dostop do strežnika uporabljate prehod (gateway), vnesite IP naslov prehoda.Če ne potrebujete prehoda, vnesite IP naslov vašega računalnika."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
-msgstr ""
-"Vnesite IP naslov vašega imenskega strežnika. Če imenskega strežnika "
-"ne uporabljate, pritisnite ECS."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Vnesite IP naslov vašega imenskega strežnika. Če imenskega strežnika ne uporabljate, pritisnite ECS."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -265,9 +251,7 @@ msgstr ""
 "Domena: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
 msgstr "Med prilagoditvijo omrežnih nastavitev je prišlo do napake. V večini primerov to pomeni, da jedro ni prepoznalo vaše omrežne kartice."
 
 #. TXT_INPUT_SERVER
@@ -459,9 +443,7 @@ msgid "Reboot the system now?"
 msgstr "Ponovni zagon sistema?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr "Osnovi sistem je bil uspešno nameščen. Z zagonom na novo nameščenega sistema se bo namestitev nadaljevala."
 
 #. TXT_ENTER_PARTITION
@@ -488,8 +470,7 @@ msgstr "Trdi diski ali CD-ROMi"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "Vaš računalnik ima zelo malo pomnilnika.\n"
 "\n"
@@ -524,9 +505,7 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Želite, da se glavna slika (root image) naloži v pomnilniški disk?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr "Vnesite pot in ime do datoteke, ki se bo naložila na pomnilniški disk kot glavna slika."
 
 #. TXT_NOT_IMPLEMENTED
@@ -632,15 +611,12 @@ msgstr "Želite uporabiti FTP posrednika (proxy)?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr "Vaš računalnik nima dovolj pomnilnika za namestitev preko FTP (zahteva se najmanj %d MB pomnilnika)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
 "Navadno se namestitev preko FTP naredi z uporabo anonimne prijave (anonymous FTP), vendar je možno vpisati uporabniško ime in geslo za dostop do FTP strežnika.\n"
@@ -697,8 +673,7 @@ msgstr "Vnesite vir v skupni rabi na SMB strežniku."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 "Če želite dostopati do vira v skupni rabi kot gost, vam ni potrebno vnesti uporabniškega imena, gesla in delovne skupine. \n"
@@ -713,9 +688,7 @@ msgid "Enter your password on the SMB server."
 msgstr "Vnesite vaše geslo na SMB strežniku."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr "Vnesite vašo delovno skupino. Če ne želite določiti delovne skupine, pustite polje prazno."
 
 #. TXT_SMB_TRYING_MOUNT
@@ -899,8 +872,7 @@ msgstr "Vnesite vaše začasno SSH geslo."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 "Osnovni sistem je bil uspešno nameščen in vaš računalnik je potrebno ponovno zagnati. Iz enot odstranite vse namestitvene medije (CD-ROM, floppy).\n"
@@ -933,14 +905,13 @@ msgstr "Ponovni zagon"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. You need "
-"at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr "Vaš računalnik nima dovolj pomnilnika za namestitev %s. Imeti morate najmanj %d MB pomnilnika."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
+#, fuzzy
 msgid "Password is too short (must have at least 6 characters)."
-msgstr "Geslo je prekratko (imeti mora najmanj 6 znakov)."
+msgstr "Geslo je prekratko (imeti mora najmanj 5 znakov)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1189,6 +1160,6 @@ msgid "Enable OSI Layer 2 support?"
 msgstr ""
 
 #. TXT_HWADDR
+#, fuzzy
 msgid "MAC address"
-msgstr ""
-
+msgstr "Lasten naslov"

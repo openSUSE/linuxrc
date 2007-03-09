@@ -1,4 +1,4 @@
-# translation of pl.po to 
+# translation of pl.po to
 # Polish translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
 # Wojciech Kapusta <wojciech@aviary.pl>, 2006.
@@ -6,8 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
-"PO-Revision-Date: 2006-03-22 17:51+0100\n"
-"Last-Translator: Wojciech Kapusta <wojciech@aviary.pl>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-02-28 21:03+0100\n"
+"Last-Translator: Marek Stepien <marcoos@aviary.pl>\n"
 "Language-Team:  <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,7 +57,7 @@ msgstr "Moduły jądra (sterowniki sprzętu)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
-msgstr "Rozpoczęcie instalacji albo uruchomienie systemu"
+msgstr "Instalacja albo uruchomienie systemu"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -99,8 +100,7 @@ msgstr "Usuń moduły"
 msgid ""
 "Trying to load module \"%s\"...\n"
 "\n"
-"During loading, you may want to watch the kernel messages on virtual console "
-"4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
 "Próba wczytania modułu \"%s\" ...\n"
 "\n"
@@ -130,19 +130,19 @@ msgstr "Dysk twardy"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr "Uruchomienie instalacji albo aktualizacji"
+msgstr "Instalacja albo aktualizacja"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
-msgstr "Uruchomienie systemu awaryjnego"
+msgstr "Systemu awaryjny"
 
 #. TXT_LOAD_RS_NFS
 msgid "Load Rescue System via NFS"
-msgstr "Uruchomienie systemu awaryjnego przez NFS"
+msgstr "System awaryjny przez NFS"
 
 #. TXT_BOOT_SYSTEM
 msgid "Boot Installed System"
-msgstr "Uruchomienie zainstalowanego systemu"
+msgstr "Start zainstalowanego systemu"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
@@ -224,21 +224,15 @@ msgid "Enter your IP address."
 msgstr "Proszę podać adres IP"
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C network, this is usually "
-"255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
 msgstr "Proszę podać maskę sieci. Dla zwyczajnej sieci klasy C będzie to: 255.255.255.0"
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, enter the IP address of the "
-"gateway. If you do not need a gateway, enter your own IP address."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
 msgstr "Proszę podać adres bramy, jeśli jest ona niezbędna do nawiązania komunikacji z serwerem. Jeśli nie, należy podać adres IP."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If you do not use a name server, "
-"press ESC."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
 msgstr "Proszę podać adres IP serwera nazw (DNS). Jeśli serwer nazw nie ma być używany, należy nacisnąć ESC."
 
 #. TXT_FOUND_HOST
@@ -257,9 +251,7 @@ msgstr ""
 "Domena: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. Your network card "
-"probably was not recognized by the kernel."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
 msgstr "Błąd w czasie konfiguracji sieci. Karta sieciowa prawdopodobnie nie została prawidłowo rozpoznana przez jądro systemu."
 
 #. TXT_INPUT_SERVER
@@ -412,7 +404,7 @@ msgid ""
 msgstr ""
 "Linuxrc można opuścić jedynie poprzez opcję\n"
 "\n"
-"menu \"Rozpoczęcie instalacji lub uruchomienie systemu\"\n"
+"menu \"Instalacja lub uruchomienie systemu\"\n"
 "\n"
 "Może być konieczne wczytanie sterowników (modułów) do obsługi sprzętu."
 
@@ -451,9 +443,7 @@ msgid "Reboot the system now?"
 msgstr "Czy uruchomić teraz system ponownie?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This newly installed system "
-"will now be started to commit the installation."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
 msgstr "System podstawowy został pomyślnie zainstalowany. Teraz zostanie on uruchomiony w celu ostatecznego zakończenia instalacji."
 
 #. TXT_ENTER_PARTITION
@@ -480,8 +470,7 @@ msgstr "Dyski twarde / płyty CD"
 msgid ""
 "Your computer has extremely little memory.\n"
 "\n"
-"Before you acknowledge this message, you must switch to virtual console 2 "
-"(press ALT-F2) to create and activate some swap space."
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
 "W komputerze tym jest bardzo mało pamięci.\n"
 "\n"
@@ -501,7 +490,7 @@ msgstr "Nie wykryto dysków twardych ani napędów płyt CD"
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Debugowanie (dla zaawansowanych)"
+msgstr "Debug (zaawansowane)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
@@ -516,9 +505,7 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Czy wczytać do RAM-dysku obraz głównego systemu plików?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to load into the RAM disk as the root "
-"file system."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
 msgstr "Proszę podać nazwę pliku (i ścieżkę), który należy wczytać do RAM-dysku jako system plików root."
 
 #. TXT_NOT_IMPLEMENTED
@@ -551,7 +538,7 @@ msgstr "Proszę umieścić płytę Live-CD w napędzie"
 
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
-msgstr "Proszę wyjść z systemu albo uruchomić go ponownie"
+msgstr "Koniec lub ponowne uruchomienie"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
@@ -624,15 +611,12 @@ msgstr "Czy skorzystać z proxy FTP?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install via FTP (%d MB RAM "
-"required)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
 msgstr "Komputer ten ma za mało pamięci RAM na instalację przez FTP (wymagane: %d MB)"
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via anonymous FTP. It is possible "
-"to specify a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
 "Instalację przez FTP przeprowadza się korzystając z anonimowego FTP. Można jednak podać nazwę użytkownika i hasło.\n"
@@ -657,7 +641,7 @@ msgstr "Proszę się upewnić, że w napędzie jest płyta CD nr %d."
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr "Wysuń CD"
+msgstr "Wysunięcie CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp Time-Out"
@@ -689,8 +673,7 @@ msgstr "Proszę podać nazwę udziału na serwerze SMB"
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,you do not need to specify user "
-"name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
 "Jeśli ma być zapewniona możliwość dostępu do udziału jako gość, nie trzeba podawać nazwy użytkownika, hasła i grupy roboczej.\n"
@@ -705,9 +688,7 @@ msgid "Enter your password on the SMB server."
 msgstr "Proszę podać hasło na serwerze SMB"
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup.If you do not need to specify a workgroup,leave the "
-"field empty."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
 msgstr "Proszę podać grupę roboczą. Jeśli nie ma takiej potrzeby, proszę pozostawić puste pole"
 
 #. TXT_SMB_TRYING_MOUNT
@@ -889,8 +870,7 @@ msgstr "Proszę podać tymczasowe hasło SSH."
 
 #. TXT_DO_REBOOT
 msgid ""
-"The base system was successfully installed. Your machine must now be "
-"rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 "System podstawowy został pomyślnie zainstalowany. Nastąpi teraz ponowne uruchomienie systemu. Proszę usunąć wszystkie nośniki instalacyjne (płyty CD/DVD, dyskietki). \n"
@@ -907,14 +887,14 @@ msgstr "Pokaż aktualizacje sterowników"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Proszę podać adres IP serwera nazw %u albo naciśnąć ESC."
+msgstr "Proszę podać adres IP serwera nazw %u albo nacisnąć ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"Proszę podać tymczasowe hasło adminstratora. \n"
+"Proszę podać tymczasowe hasło administratora. \n"
 "Będzie trzeba je zmienić przy pierwszym zalogowaniu jako root."
 
 #. TXT_REBOOT
@@ -923,9 +903,7 @@ msgstr "Uruchom komputer ponownie"
 
 #. TXT_NO_RAM
 #, c-format
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr "Komputer ten nie ma wystarczającej ilości pamięci RAM do instalacji %s. Wymagane jest co najmniej %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -1002,12 +980,12 @@ msgstr "Proszę podać względny numer portu"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
-msgstr "Zweryfikuj instalacyjną płytę CD/DVD"
+msgstr "Weryfikacja instalacyjnego CD/DVD"
 
 # turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
-msgstr "Wyłącz"
+msgstr "Wyłączenie systemu"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
@@ -1097,8 +1075,12 @@ msgstr "Błąd odczytu sektora %u."
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
-msgid "\nThis %s is broken."
-msgstr "\n %s jest uszkodzony."
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+" %s jest uszkodzony."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1176,9 +1158,8 @@ msgstr "Wczytywanie systemu awaryjnego"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Włączyć obsługę drugiej warstwy OSI?"
 
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Adres MAC"

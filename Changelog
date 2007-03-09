@@ -1,3 +1,6 @@
+9/3/2007:	v2.0.61
+	- translations updated
+
 7/3/2007:	v2.0.60
 	- added netsetup=dhcp,all option to try all network interfaces
 	  for dhcp (#249046)

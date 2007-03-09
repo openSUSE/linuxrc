@@ -97,15 +97,13 @@ msgstr "Ladda ur moduler"
 #. TXT_TRY_TO_LOAD
 #, c-format
 msgid ""
-"Trying to load module \"%s\"...\n\n"
-"During loading, you may want to watch the kernel "
-"messages on virtual console 4 (ALT-F4). Use ALT-F1 "
-"to switch back to this menu."
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Försöker ladda modul \"%s\"...\n\n"
-"Vid laddningen kanske du vill titta på meddelanden "
-"från kärnan på den virtuella konsollen 4 (ALT+F4). Använd ALT+F1 "
-"för att växla tillbaka till den här menyn."
+"Försöker ladda modul \"%s\"...\n"
+"\n"
+"Vid laddningen kanske du vill titta på meddelanden från kärnan på den virtuella konsollen 4 (ALT+F4). Använd ALT+F1 för att växla tillbaka till den här menyn."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -152,10 +150,12 @@ msgstr "Söker efter avbild \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
-"Cannot find the image.\n\n"
+"Cannot find the image.\n"
+"\n"
 "Check the directory specification."
 msgstr ""
-"Kan inte hitta avbilden.\n\n"
+"Kan inte hitta avbilden.\n"
+"\n"
 "Kontrollera katalogspecificeringen."
 
 #. TXT_INFO_KERNEL
@@ -223,53 +223,35 @@ msgid "Enter your IP address."
 msgstr "Ange IP-adress."
 
 #. TXT_INPUT_NETMASK
-msgid ""
-"Enter your netmask. For a normal class C "
-"network, this is usually 255.255.255.0."
-msgstr ""
-"Ange nätmask. För vanliga C-klassnätverk "
-"är detta vanligtvis 255.255.255.0."
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Ange nätmask. För vanliga C-klassnätverk är detta vanligtvis 255.255.255.0."
 
 #. TXT_INPUT_GATEWAY
-msgid ""
-"If you need a gateway to reach the server, "
-"enter the IP address of the gateway. If you do not "
-"need a gateway, enter your own IP address."
-msgstr ""
-"Om du behöver en gateway för att nå servern, ange "
-"dess IP-adress. Om du inte behöver en "
-"gateway, ange din egna IP-adress."
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "Om du behöver en gateway för att nå servern, ange dess IP-adress. Om du inte behöver en gateway, ange din egna IP-adress."
 
 #. TXT_INPUT_NAMED
-msgid ""
-"Enter the IP address of your name server. If "
-"you do not use a name server, press ESC."
-msgstr ""
-"Ange din namnservers IP-adress. Om du "
-"inte använder en namnserver, tryck på Esc."
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Ange din namnservers IP-adress. Om du inte använder en namnserver, tryck på Esc."
 
 #. TXT_FOUND_HOST
 #, c-format
 msgid ""
-"The following data has been retrieved:\n\n"
+"The following data has been retrieved:\n"
+"\n"
 "IP address: %s\n"
 "Name: %s\n"
 "Domain: %s"
 msgstr ""
-"Följande data har hämtats:\n\n"
+"Följande data har hämtats:\n"
+"\n"
 "IP-adress: %s\n"
 "Namn: %s\n"
 "Domän: %s"
 
 #. TXT_ERROR_CONF_NET
-msgid ""
-"An error occurred during the network configuration. "
-"Your network card probably was not recognized by "
-"the kernel."
-msgstr ""
-"Ett fel uppstod när nätverket skulle ställas in. "
-"Ditt nätverkskort identifierades antagligen inte av "
-"kärnan."
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "Ett fel uppstod när nätverket skulle ställas in. Ditt nätverkskort identifierades antagligen inte av kärnan."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -290,25 +272,33 @@ msgstr "Ange parametrar för \"%s\"."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
-msgid "Trying to mount the directory\n\n\"%s:%s\"..."
-msgstr "Försöker montera katalogen\n\n\"%s:%s\"..."
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Försöker montera katalogen\n"
+"\n"
+"\"%s:%s\"..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
 msgid ""
-"An error occurred while trying to mount the NFS "
-"directory.\n\nReason given by server: %s"
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
 msgstr ""
-"Ett fel uppstod när NFS-katalogen skulle "
-"monteras.\n\nAnledning enligt server: %s"
+"Ett fel uppstod när NFS-katalogen skulle monteras.\n"
+"\n"
+"Anledning enligt server: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
-"Choose a keyboard map.\nYaST will offer "
-"additional keyboard tables later."
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
 msgstr ""
-"Välj tangentbordslayout.\nYaST kommer att erbjuda "
-"dig ytterligare tangentbordslayouter senare."
+"Välj tangentbordslayout.\n"
+"YaST kommer att erbjuda dig ytterligare tangentbordslayouter senare."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -324,9 +314,7 @@ msgid "Autoprobing (%s)...      "
 msgstr "Undersöker (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
-msgid ""
-"Search for additional SCSI host "
-"adaptors?"
+msgid "Search for additional SCSI host adaptors?"
 msgstr "Vill du söka efter ytterligare SCSI-kort?"
 
 #. TXT_WANT_MORE_NET
@@ -370,21 +358,19 @@ msgid "Enter the IP address of the PLIP partner."
 msgstr "Ange PLIP-partnerns IP-adress."
 
 #. TXT_NO_PCMCIA
-msgid ""
-"The PCMCIA chipset could not be detected"
-"automatically. Specify it manually."
-msgstr ""
-"PCMCIA-kretsuppsättningen kunde inte identifieras"
-"automatiskt. Du måste ange manuellt."
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "PCMCIA-kretsuppsättningen kunde inte identifierasautomatiskt. Du måste ange manuellt."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
 msgid ""
-"Found PCMCIA chipset \"%s\".\n\nEnter "
-"parameters for PCMCIA core modules."
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
 msgstr ""
-"Hittade PCMCIA-kretsuppsättningen \"%s\".\n\nAnge "
-"parametrar för PCMCIA-kärnmoduler."
+"Hittade PCMCIA-kretsuppsättningen \"%s\".\n"
+"\n"
+"Ange parametrar för PCMCIA-kärnmoduler."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
@@ -409,15 +395,17 @@ msgstr "PCMCIA-korttjänsten är redan startad."
 
 #. TXT_NO_LXRC_END
 msgid ""
-"You can leave Linuxrc only via \n\n"
-"\"Start Installation or System\"\n\n"
-"You may need to load some "
-"drivers (modules) to support your hardware."
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
 msgstr ""
-"Du kan endast avsluta Linuxrc via menyposten\n\n"
-"\"Starta installation/system\".\n\n"
-"För att kunna göra detta behöver du eventuellt "
-"ladda vissa drivrutiner (moduler) för att få stöd för hårdvaran."
+"Du kan endast avsluta Linuxrc via menyposten\n"
+"\n"
+"\"Starta installation/system\".\n"
+"\n"
+"För att kunna göra detta behöver du eventuellt ladda vissa drivrutiner (moduler) för att få stöd för hårdvaran."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -428,8 +416,14 @@ msgid "Remove the disk from the drive now."
 msgstr "Ta bort disken från enheten nu."
 
 #. TXT_EXAMPLE_PAR
-msgid "\n\nExample: "
-msgstr "\n\nExempel: "
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Exempel: "
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
@@ -448,14 +442,8 @@ msgid "Reboot the system now?"
 msgstr "Starta om nu?"
 
 #. TXT_INSTALL_SUCCESS
-msgid ""
-"The base system has been successfully installed. This "
-"newly installed system will now be started to "
-"commit the installation."
-msgstr ""
-"Bassystemet har installerats. Det installerade systemet "
-"kommer nu att startas för att slutföra "
-"installationen."
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Bassystemet har installerats. Det installerade systemet kommer nu att startas för att slutföra installationen."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -479,15 +467,13 @@ msgstr "Hårddiskar/cd-rom"
 
 #. TXT_LITTLE_MEM
 msgid ""
-"Your computer has extremely little memory.\n\n"
-"Before you acknowledge this message, you must switch to "
-"virtual console 2 (press ALT-F2) to create and "
-"activate some swap space."
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Datorn har extremt lite minne.\n\n"
-"Innan du bekräftar det här meddelandet måste du "
-"växla till den virtuella konsollen 2 (tryck ALT+F2) för att skapa "
-"och aktivera växlingsutrymme."
+"Datorn har extremt lite minne.\n"
+"\n"
+"Innan du bekräftar det här meddelandet måste du växla till den virtuella konsollen 2 (tryck ALT+F2) för att skapa och aktivera växlingsutrymme."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -498,9 +484,7 @@ msgid "Use animated windows?"
 msgstr "Använda animerade fönster?"
 
 #. TXT_NO_DRIVES
-msgid ""
-"No hard disks or CD-ROM drives have been detected so "
-"far."
+msgid "No hard disks or CD-ROM drives have been detected so far."
 msgstr "Inga hårddiskar eller cd-romenheter har hittats hittills."
 
 #. TXT_MENU_EXPERT
@@ -520,12 +504,8 @@ msgid "Should the root image be loaded into the RAM disk?"
 msgstr "Vill du att rotavbilden ska laddas till ram-disken?"
 
 #. TXT_ENTER_ROOTIMAGE
-msgid ""
-"Enter the path and name of the file to "
-"load into the RAM disk as the root file system."
-msgstr ""
-"Ange sökvägen och namnet på filen som du vill ska "
-"laddas till ram-disken som rotfilsystemet."
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Ange sökvägen och namnet på filen som du vill ska laddas till ram-disken som rotfilsystemet."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
@@ -536,9 +516,7 @@ msgid "Installation System"
 msgstr "Installationssystem"
 
 #. TXT_ENTER_INST_SYS
-msgid ""
-"Enter the directory that contains the "
-"installation system."
+msgid "Enter the directory that contains the installation system."
 msgstr "Ange katalogen som innehåller installationssystemet."
 
 #. TXT_NO_INFO_AVAIL
@@ -579,12 +557,8 @@ msgid "Host %s was not found."
 msgstr "Datorn %s hittades inte."
 
 #. TXT_NET_CONFIGURED
-msgid ""
-"Your network is already configured. "
-"Keep this configuration?"
-msgstr ""
-"Nätverket är redan inställt. Vill du behålla den "
-"inställningen?"
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "Nätverket är redan inställt. Vill du behålla den inställningen?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -592,9 +566,11 @@ msgstr "Avbryt?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
-"No network device found.\nLoad a network module "
-"first."
-msgstr "Inga nätverksenheter hittades.\nLadda en nätverksmodul först."
+"No network device found.\n"
+"Load a network module first."
+msgstr ""
+"Inga nätverksenheter hittades.\n"
+"Ladda en nätverksmodul först."
 
 #. TXT_ALREADY_FOUND
 #, c-format
@@ -603,16 +579,18 @@ msgstr "Ett %s har redan hittats i systemet.\n"
 
 #. TXT_ERROR_FTP
 #, c-format
-msgid "Error while accessing the FTP server:\n\n%s"
-msgstr "Fel uppstod vid åtkomst till FTP-server:\n\n%s"
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Fel uppstod vid åtkomst till FTP-server:\n"
+"\n"
+"%s"
 
 #. TXT_ENTER_FTPUSER
-msgid ""
-"Enter the user name with which to "
-"access the FTP server."
-msgstr ""
-"Ange under vilket användarnamn du vill komma åt "
-"FTP-servern."
+msgid "Enter the user name with which to access the FTP server."
+msgstr "Ange under vilket användarnamn du vill komma åt FTP-servern."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -632,23 +610,15 @@ msgstr "Vill du använda en FTP-proxy?"
 
 #. TXT_NOMEM_FTP
 #, c-format
-msgid ""
-"Your computer does not have enough RAM to install "
-"via FTP (%d MB RAM required)."
-msgstr ""
-"Datorn har inte tillräckligt med minne för att installera "
-"via FTP. (%d MB ram krävs)."
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "Datorn har inte tillräckligt med minne för att installera via FTP. (%d MB ram krävs)."
 
 #. TXT_ANONYM_FTP
 msgid ""
-"Usually an FTP installation is performed via "
-"anonymous FTP. It is possible to specify "
-"a user name and password for the FTP server access.\n"
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Vanligtvis utförs FTP-installationer via "
-"anonym FTP. Det är trots allt möjligt att ange "
-"ett användarnamn och lösenord för åtkomst till FTP-servern.\n"
+"Vanligtvis utförs FTP-installationer via anonym FTP. Det är trots allt möjligt att ange ett användarnamn och lösenord för åtkomst till FTP-servern.\n"
 "Vill du göra det?"
 
 #. TXT_MORE_MODULES
@@ -660,9 +630,7 @@ msgid "Initializing parallel port..."
 msgstr "Initierar parallellport..."
 
 #. TXT_ENTER_NFSPORT
-msgid ""
-"Enter the port number on which the NFS server "
-"is running."
+msgid "Enter the port number on which the NFS server is running."
 msgstr "Ange portnumret på vilken NFS-servern körs."
 
 #. TXT_INSERT_CD
@@ -704,12 +672,10 @@ msgstr "Ange utdelningsnamnet på SMB-servern."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
-"If you want to access the share as guest,"
-"you do not need to specify user name, password, and workgroup.\n"
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Om du vill komma åt utdelningen som gäst "
-"behöver du inte ange användarnamn, lösenord och arbetsgrupp.\n"
+"Om du vill komma åt utdelningen som gäst behöver du inte ange användarnamn, lösenord och arbetsgrupp.\n"
 "Vill du komma åt utdelningen som gäst?"
 
 #. TXT_SMB_ENTER_USER
@@ -721,19 +687,19 @@ msgid "Enter your password on the SMB server."
 msgstr "Ange ditt lösenord på SMB-servern."
 
 #. TXT_SMB_ENTER_WORKGROUP
-msgid ""
-"Enter your workgroup."
-"If you do not need to specify a workgroup,"
-"leave the field empty."
-msgstr ""
-"Ange din arbetsgrupp."
-"Om du inte behöver ange en arbetsgrupp,"
-"lämna fältet tomt."
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Ange din arbetsgrupp.Om du inte behöver ange en arbetsgrupp,lämna fältet tomt."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
-msgid "Trying to mount the share\n\n\"//%s/%s\""
-msgstr "Försöker montera utdelningen\n\n\"//%s/%s\""
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
+msgstr ""
+"Försöker montera utdelningen\n"
+"\n"
+"\"//%s/%s\""
 
 # %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -855,32 +821,27 @@ msgid "Enter the swap partition (e.g., /dev/sda2)"
 msgstr "Ange växlingspartitionen (t ex /dev/sda2)"
 
 #. TXT_ENTER_USER
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Enter the user name with which to access the %s server."
 msgstr "Enter användare namn med till s server."
 
 #. TXT_ENTER_PASSWORD
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Enter the password for the %s server."
 msgstr "Enter lösenord för s server."
 
 #. TXT_WANT_PROXY
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Use a %s proxy?"
 msgstr "Använd a s?"
 
 #. TXT_ENTER_PROXY
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Enter the address of the %s proxy."
 msgstr "Enter adress av s."
 
 #. TXT_ENTER_PROXYPORT
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Enter the port of the %s proxy."
 msgstr "Enter port av s."
 
@@ -917,11 +878,8 @@ msgstr "Enter SSH lösenord."
 #. TXT_DO_REBOOT
 #, fuzzy
 msgid ""
-"The base system was successfully installed. Your "
-"machine must now be rebooted. "
-"Remove all installation media (CD-ROM, floppy).\n"
-"Do not remove the floppy disk if the boot manager "
-"was installed on it."
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
 msgstr "bas nu Ta bort alla media Cd disk stövel hanterare på."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -935,8 +893,7 @@ msgid "Show Driver Updates"
 msgstr "Visa Drivrutin Uppdateringar"
 
 #. TXT_INPUT_NAMED1
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Enter the IP of name server %u or press ESC."
 msgstr "Enter IP av namn server u eller tryck."
 
@@ -944,8 +901,7 @@ msgstr "Enter IP av namn server u eller tryck."
 #, fuzzy
 msgid ""
 "Enter temporary root password.\n"
-"You will be required to change this password "
-"on initial root user login."
+"You will be required to change this password on initial root user login."
 msgstr "Enter rot lösenord till ändring lösenord på rot användare inloggning."
 
 #. TXT_REBOOT
@@ -953,11 +909,8 @@ msgid "Reboot"
 msgstr "Starta om"
 
 #. TXT_NO_RAM
-#, c-format
-#, fuzzy
-msgid ""
-"Your computer does not have enough RAM for the installation of %s. "
-"You need at least %d MB."
+#, c-format,fuzzy
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
 msgstr "för av s Du vid Mibyte."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
@@ -996,7 +949,7 @@ msgstr "Användare IUCV"
 
 #. TXT_390NET_HSI
 msgid "Hipersockets"
-msgstr ""
+msgstr "Hipersockets"
 
 #. TXT_CTC_CHANNEL_READ
 #, fuzzy
@@ -1141,8 +1094,7 @@ msgstr "Nej Cd eller Dvd."
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "This is not a %s CD-ROM."
 msgstr "är a s Cd."
 
@@ -1157,16 +1109,16 @@ msgid "Checksum wrong."
 msgstr "Kontrollsumma."
 
 #. TXT_CD_READ_FAILED
-#, c-format
-#, fuzzy
+#, c-format,fuzzy
 msgid "Error reading sector %u."
 msgstr "Fel sektor u."
 
 # %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
-#, c-format
-#, fuzzy
-msgid "\nThis %s is broken."
+#, c-format,fuzzy
+msgid ""
+"\n"
+"This %s is broken."
 msgstr "s är."
 
 #. TXT_SLP_SOURCE
@@ -1180,75 +1132,75 @@ msgstr ""
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
-msgstr ""
+msgstr "Det här är inte en giltig CCW-adress."
 
 #. TXT_NET_HSI
 msgid "Hipersocket"
-msgstr ""
+msgstr "Hipersocket"
 
 # power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr ""
+msgstr "Vill du stänga av datorn nu?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
-msgstr ""
+msgstr "OSA-2 eller OSA Express"
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
+msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr ""
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
-msgstr ""
+msgstr "LCS"
 
 #. TXT_OSA_QDIO
 msgid "QDIO"
-msgstr ""
+msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr ""
+msgstr "Välj CCW-bussgränssnittet."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr ""
+msgstr "Välj det fysiska mediat."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr ""
+msgstr "Laddar moduler"
 
 # progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr ""
+msgstr "Laddar installationssystem"
 
 # progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr ""
+msgstr "Laddar ytterligare teckensnitt"
 
 # progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr ""
+msgstr "Laddar drivrutinsuppdatering"
 
 # progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr ""
+msgstr "Laddar räddningssystem"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
 
 #. TXT_HWADDR
+#, fuzzy
 msgid "MAC address"
-msgstr ""
-
+msgstr "MAC-adress"
