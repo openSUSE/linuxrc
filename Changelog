@@ -1,3 +1,7 @@
+7/3/2007:	v2.0.60
+	- added netsetup=dhcp,all option to try all network interfaces
+	  for dhcp (#249046)
+
 2/3/2007:	v2.0.59
 	- work around problem with too early DHCP releases (#221865)
 
