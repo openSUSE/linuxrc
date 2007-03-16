@@ -1,5 +1,11 @@
+16/3/2007:	v2.1.23
 	- accept 'BOOTIF' as alias to 'netdevice'
 	- mls: bad tftp response overwrites the request (#242892)
+	- added netsetup=dhcp,all option to try all network interfaces
+	  for dhcp (#249046)
+	- work around problem with too early DHCP releases (#221865)
+	- don't ask for keymap when starting rescue system
+	  on serial console (#255344)
 
 9/2/2007:	v2.1.22
 	- Korean no longer requires extra font

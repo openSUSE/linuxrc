@@ -1216,6 +1216,7 @@ void file_do_info(file_t *f0)
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
             else if(!strcmp(s, "netmask")) i = NS_NETMASK;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
+            else if(!strcmp(s, "all")) i = NS_ALLIFS;
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
               i = NS_NAMESERVER;
               t = s + sizeof "nameserver" - 1;
@@ -1231,7 +1232,10 @@ void file_do_info(file_t *f0)
                 sizeof config.net.nameserver / sizeof *config.net.nameserver :
                 u;
             }
-            if(i) {
+            if(i == NS_ALLIFS) {
+              config.net.all_ifs = *sl->key == '-' ? 0 : 1;
+            }
+            else if(i) {
               if(*sl->key == '-') {
                 config.net.setup &= ~i;
               }

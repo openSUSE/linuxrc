@@ -544,7 +544,7 @@ int auto2_net_dev1(hd_t *hd, hd_t *hd_card)
   ) return 1;
 
   /* net_stop() - just in case */
-  net_stop();
+  if(!getenv("PXEBOOT")) net_stop();
 
   fprintf(stderr, "Trying to activate %s\n", device);
 
@@ -779,6 +779,7 @@ int auto2_init()
 void auto2_user_netconfig()
 {
   int win_old;
+  slist_t *sl;
 
   if(!config.net.do_setup) return;
 
@@ -796,9 +797,41 @@ void auto2_user_netconfig()
   }
 
   if(config.net.configured == nc_none || config.net.do_setup) {
-    if(!(win_old = config.win)) util_disp_init();
-    net_config();
-    if(!win_old) util_disp_done();
+    if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
+      util_update_netdevice_list(NULL, 1);
+
+      config.net.configured = nc_none;
+
+      for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
+        str_copy(&config.net.device, sl->key);
+
+        printf(
+          "Sending %s request to %s...\n",
+          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+        );
+        fflush(stdout);
+        fprintf(stderr,
+          "Sending %s request to %s... ",
+          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+        );
+        config.net.use_dhcp ? net_dhcp() : net_bootp();
+        if(
+          !config.net.hostname.ok ||
+          !config.net.netmask.ok ||
+          !config.net.broadcast.ok
+        ) {
+          fprintf(stderr, "no/incomplete answer.\n");
+        }
+        else {
+          fprintf(stderr, "ok.\n");
+          config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+        }
+      }
+    } else {
+      if(!(win_old = config.win)) util_disp_init();
+      net_config();
+      if(!win_old) util_disp_done();
+    }
   }
 
   if(config.net.configured == nc_none) {

@@ -231,6 +231,7 @@ typedef enum {
 #define NS_NETMASK		(1 << 3)
 #define NS_GATEWAY		(1 << 4)
 #define NS_NAMESERVER		(1 << 5)
+#define NS_ALLIFS		(1 << 6)
 
 #define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER)
 
@@ -460,6 +461,7 @@ typedef struct {
     unsigned is_configured:1;	/* set if network is configured */
     unsigned nfs_tcp:1;		/* use TCP for NFS */
     unsigned keep:1;		/* keep network interface up */
+    unsigned all_ifs:1;		/* try all interfaces */
     unsigned do_setup;		/* do network setup */
     unsigned setup;		/* bitmask: do these network setup things */
     char *device;		/* currently used device */

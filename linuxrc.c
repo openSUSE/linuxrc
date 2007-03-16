@@ -256,7 +256,7 @@ int main(int argc, char **argv, char **env)
     err = inst_start_demo();
   }
   else if(!config.manual) {
-    if(config.rescue) {
+    if(config.rescue && !config.serial) {
       int win_old = 1;
 
       if(

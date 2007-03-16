@@ -1219,6 +1219,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
   add_flag(&sl0, buf, config.zen, "zen");
   add_flag(&sl0, buf, config.has_pcmcia, "pcmcia");
+  add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
