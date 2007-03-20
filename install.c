@@ -791,13 +791,16 @@ int inst_start_install()
 
   if(config.manual) {
     if((rc = inst_choose_source())) return rc;
-#if defined(__s390__) || defined(__s390x__)
-    if((rc = inst_choose_display())) return rc;
-#endif
   }
   else {
     fprintf(stderr, "going for automatic install\n");
   }
+  
+#if defined(__s390__) || defined(__s390x__)
+  if(config.manual || (config.net.setup & NS_DISPLAY))
+    if((rc = inst_choose_display())) return rc;
+#endif
+  
 
   str_copy(&config.instsys, NULL);
   str_copy(&config.instsys2, NULL);
