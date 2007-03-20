@@ -1217,6 +1217,9 @@ void file_do_info(file_t *f0)
             else if(!strcmp(s, "netmask")) i = NS_NETMASK;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
             else if(!strcmp(s, "all")) i = NS_ALLIFS;
+#if defined(__s390__) || defined(__s390x__)
+            else if(!strcmp(s, "display")) i = NS_DISPLAY;
+#endif
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
               i = NS_NAMESERVER;
               t = s + sizeof "nameserver" - 1;

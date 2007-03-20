@@ -232,8 +232,13 @@ typedef enum {
 #define NS_GATEWAY		(1 << 4)
 #define NS_NAMESERVER		(1 << 5)
 #define NS_ALLIFS		(1 << 6)
+#define NS_DISPLAY		(1 << 7)
 
+#if defined(__s390__) || defined(__s390x__)
+#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER | NS_DISPLAY)
+#else
 #define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER)
+#endif
 
 #define SPLASH_10	NULL
 #define SPLASH_20	"rlchange B"
