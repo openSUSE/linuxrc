@@ -424,6 +424,36 @@ fstype(const char *device) {
 		    type = "swap";
     }
 
+    /* if nothing worked, have a second go at vfat */
+    if(!type) {
+      unsigned char data[512];
+      struct fat_super_block *fatsb = (struct fat_super_block *) data;
+
+      if(
+        lseek(fd, 0, SEEK_SET) != 0 ||
+        read(fd, data, sizeof data) != sizeof data
+      ) goto io_error;
+
+      if(
+        data[0x1fe] == 0x55 &&
+        data[0x1ff] == 0xaa &&
+        data[0x0b] == 0 &&	/* bytes per sector, bits 0-7 */
+        (
+          (	/* FAT12/16 */
+            data[0x26] == 0x29 && (
+              !strncmp(fatsb->s_fs, "FAT12   ", 8) ||
+              !strncmp(fatsb->s_fs, "FAT16   ", 8)
+            )
+          ) ||
+          (	/* FAT32 */
+            data[0x42] == 0x29 &&
+            !strncmp(fatsb->s_fs2, "FAT32   ", 8)
+          )
+        )
+      )
+      type = "vfat";
+    }
+
     close (fd);
     return(type);
 

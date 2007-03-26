@@ -1,3 +1,6 @@
+26/3/2007:	v2.0.64
+	- better vfat fs detection (#257117)
+
 20/3/2007:	v2.0.63
 	- s390: ask for installation display when netsetup=1 (bug #253695)
 
