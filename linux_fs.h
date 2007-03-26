@@ -51,6 +51,7 @@ struct ext_super_block {
 #define EXT2_PRE_02B_MAGIC  0xEF51
 #define EXT2_SUPER_MAGIC    0xEF53
 #define EXT3_FEATURE_COMPAT_HAS_JOURNAL 0x0004
+#define EXT4_FEATURE_INCOMPAT_EXTENTS   0x0040 /* extents support */
 struct ext2_super_block {
 	u_char 	s_dummy1[56];
 	u_char 	s_magic[2];

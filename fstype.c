@@ -166,6 +166,7 @@ fstype(const char *device) {
 	struct fat_super_block fatsb;
 	struct xfs_super_block xfsb;
 	struct cramfs_super_block cramfssb;
+	unsigned char data[512];
     } xsb;
 #ifdef ALL_TYPES
     struct ufs_super_block ufssb;
@@ -223,24 +224,24 @@ fstype(const char *device) {
 	 else if(cramfsmagic(xsb.cramfssb) == CRAMFS_SUPER_MAGIC ||
 	 	 cramfsmagic(xsb.cramfssb) == CRAMFS_SUPER_MAGIC_BIG)
 	      type = "cramfs";
-	 else if ((!strncmp(xsb.fatsb.s_os, "MSDOS", 5) ||
-		   !strncmp(xsb.fatsb.s_os, "MSWIN", 5) ||
-		   !strncmp(xsb.fatsb.s_os, "MTOOL", 5) ||
-		   !strncmp(xsb.fatsb.s_os, "IBM", 3) ||
-		   !strncmp(xsb.fatsb.s_os, "DRDOS", 5) ||
-		   !strncmp(xsb.fatsb.s_os, "SUSE", 4) ||
-		   !strncmp(xsb.fatsb.s_os, "mkdosfs", 7) ||
-		   !strncmp(xsb.fatsb.s_os, "kmkdosfs", 8) ||
-		   !strncmp(xsb.fatsb.s_os, "FreeDOS", 7) ||
-		   !strncmp(xsb.fatsb.s_os, "FDOS", 4) ||
-		   !strncmp(xsb.fatsb.s_os, "SYSLINUX", 8) ||
-		   /* Michal Svec: created by fdformat, old msdos utility for
-		      formatting large (1.7) floppy disks. */
-		   !strncmp(xsb.fatsb.s_os, "CH-FOR18", 8))
-		  && (!strncmp(xsb.fatsb.s_fs, "FAT12   ", 8) ||
-		      !strncmp(xsb.fatsb.s_fs, "FAT16   ", 8) ||
-		      !strncmp(xsb.fatsb.s_fs2, "FAT32   ", 8)))
-	      type = "vfat";	/* only guessing - might as well be fat or umsdos */
+	 else if(
+                xsb.data[0x1fe] == 0x55 &&
+                xsb.data[0x1ff] == 0xaa &&
+                xsb.data[0x0b] == 0 &&	/* bytes per sector, bits 0-7 */
+                (
+                  (	/* FAT12/16 */
+                    xsb.data[0x26] == 0x29 && (
+                      !strncmp(xsb.fatsb.s_fs, "FAT12   ", 8) ||
+                      !strncmp(xsb.fatsb.s_fs, "FAT16   ", 8)
+                    )
+                  ) ||
+                  (	/* FAT32 */
+                    xsb.data[0x42] == 0x29 &&
+                    !strncmp(xsb.fatsb.s_fs2, "FAT32   ", 8)
+                  )
+                )
+              )
+              type = "vfat";
     }
 
     if(!type) {
@@ -267,6 +268,9 @@ fstype(const char *device) {
 #endif
 
     if (!type) {
+        unsigned ntype = 0;
+        char *type_str[] = { "ext2", "ext3", "ext4dev" };
+
 	/* block 1 */
 	if (lseek(fd, 1024, SEEK_SET) != 1024 ||
 	    read(fd, (char *) &sb, sizeof(sb)) != sizeof(sb))
@@ -278,13 +282,20 @@ fstype(const char *device) {
 	if (ext2magic(sb.e2s) == EXT2_SUPER_MAGIC ||
 	    ext2magic(sb.e2s) == EXT2_PRE_02B_MAGIC ||
 	    ext2magic(sb.e2s) == swapped(EXT2_SUPER_MAGIC)) {
-		type = "ext2";
+		ntype = 2;
 
 	     /* maybe even ext3? */
 	     if ((assemble4le(sb.e2s.s_feature_compat)
 		  & EXT3_FEATURE_COMPAT_HAS_JOURNAL) &&
 		 assemble4le(sb.e2s.s_journal_inum) != 0)
-		     type = "ext3";
+		     ntype = 3;
+
+	     /* maybe ext4 */
+	     if((assemble4le(sb.e2s.s_feature_incompat)
+		  & EXT4_FEATURE_INCOMPAT_EXTENTS) && ntype == 3)
+		     ntype = 4;
+
+             if(ntype) type = type_str[ntype - 2];
 	}
 
 	else if (minixmagic(sb.ms) == MINIX_SUPER_MAGIC ||
