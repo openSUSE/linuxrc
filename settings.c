@@ -62,7 +62,7 @@ static language_t set_languages_arm [] =
 {
 #ifdef TRANS_ar
 // currently a fake
-{ lang_ar, "Arabic", "us", SMALL_FONT, UNI_FONT, 0, 0, "ar", 0 },
+{ lang_ar, "Arabic", "us", SMALL_FONT, UNI_FONT, 0, 0, "ar_EG", 0 },
 #endif
 
 #ifdef TRANS_bn
