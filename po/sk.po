@@ -7,6 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
+"POT-Creation-Date: \n"
 "PO-Revision-Date: 2007-03-02 21:37+0100\n"
 "Last-Translator: Ladislav Michnovič <lmichnovic@suse.cz>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
@@ -15,7 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 & n<=4) ? 1 : 2;\n"
-"POT-Creation-Date: \n"
 "X-Poedit-Language: Slovak\n"
 
 #. TXT_OK

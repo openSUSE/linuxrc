@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc-da\n"
 "PO-Revision-Date: 2005-08-13 19:43+0200\n"
-"Last-Translator: Martin Møller <martin@martinm-76.dk>\n"
-"Language-Team: Dansk <da@li.org>\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -909,9 +909,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Din computer har ikke hukommelse nok til at installere %s. Du skal have mindst %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 6 characters)."
-msgstr "Din adgangskode er for kort (den skal være mindt 5 tegn lang)."
+msgstr "Adgangskoden er for kort (den skal indeholde mindst 6 tegn)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1164,6 +1163,5 @@ msgid "Enable OSI Layer 2 support?"
 msgstr "Aktivér OSI Layer 2-understøttelse?"
 
 #. TXT_HWADDR
-#, fuzzy
 msgid "MAC address"
 msgstr "MAC-adresse"

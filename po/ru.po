@@ -902,9 +902,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Ваш компьютер не имеет достаточно RAM для установки %s. Вам необходимо как минимум %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 6 characters)."
-msgstr "Пароль слишком короткий (должен иметь хотя бы  5 знаков)."
+msgstr "Слишком короткий пароль (минимальная длина 6 знаков)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1157,6 +1156,5 @@ msgid "Enable OSI Layer 2 support?"
 msgstr "Включить поддержку OSI Layer 2 ?"
 
 #. TXT_HWADDR
-#, fuzzy
 msgid "MAC address"
-msgstr "MAC адрес"
+msgstr "MAC-адрес"
