@@ -797,7 +797,7 @@ int inst_start_install()
   }
   
 #if defined(__s390__) || defined(__s390x__)
-  if(config.manual || (config.net.setup & NS_DISPLAY))
+  if(config.manual || ( (config.net.setup & NS_DISPLAY) && (config.net.do_setup & DS_SETUP) ))
     if((rc = inst_choose_display())) return rc;
 #endif
   

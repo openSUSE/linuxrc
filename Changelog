@@ -1,3 +1,7 @@
+16/4/2007:	v2.0.67
+	- s390: only ask for installation display if network setup has been
+	  turned on manually (bug #264561)
+
 2/4/2007:	v2.0.66
 	- translations updated
 
