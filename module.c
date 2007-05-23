@@ -195,7 +195,7 @@ void mod_init(int autoload)
   sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
 
-  if(autoload) {
+  if(autoload && !config.test) {
     for(ml = config.module.list; ml; ml = ml->next) {
       if(ml->type == 0 /* 'autoload' section */ && ml->autoload) {
         mod_modprobe(ml->name, ml->param);

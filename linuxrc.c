@@ -275,6 +275,12 @@ int main(int argc, char **argv, char **env)
 
   if(err) {
     util_disp_init();
+
+#if 0
+    extern int ask_for_swap(int size, char *msg);
+    ask_for_swap(-1, "Foo Bar");
+#endif
+
     lxrc_main_menu();
   }
 
@@ -756,6 +762,7 @@ void lxrc_init()
   config.mountpoint.live = strdup("/mounts/live");
   config.mountpoint.update = strdup("/mounts/update");
   config.mountpoint.instdata = strdup("/var/adm/mount");
+  config.mountpoint.swap = strdup("/mounts/swap");
 
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
   config.update.dst = strdup("/update");
@@ -794,6 +801,8 @@ void lxrc_init()
   config.memory.min_yast =       40 * 1024;
   config.memory.min_modules =    64 * 1024;
   config.memory.load_image =    200 * 1024;
+
+  config.swap_file_size = 1024;		/* 1024 MB */
 
   if(util_check_exist("/sbin/mount.smbfs")) {
     str_copy(&config.net.cifs.binary, "/sbin/mount.smbfs");

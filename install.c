@@ -49,6 +49,9 @@
 #include "auto2.h"
 #include "fstype.h"
 
+#ifndef MNT_DETACH
+#define MNT_DETACH	(1 << 1)
+#endif
 
 static char  inst_rootimage_tm [MAX_FILENAME];
 
@@ -521,57 +524,202 @@ int inst_mount_cdrom(int show_err)
 }
 
 
+/*
+ * build a partition list
+ */
 int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_input)
 {
-  int i, item_cnt, rc;
+  int i, j, rc, item_cnt, item_cnt1, item_cnt2, item_cnt3;
   char **items, **values;
+  char **items1, **values1;
+  char **items2, **values2;
+  char **items3, **values3;
   char *type;
   slist_t *sl;
-  char buf[256];
-  int found = 0;
-  static int last_item = 0;
+  char buf[256], *dev;
+  int found = 0, item_mk_part = 0, item_mk_file = 0;
   char *s, *tmp = NULL;
+  static char *last_part = NULL;
+  int last_item, last_found, last_item1 = 0, last_item2 = 0, last_item3 = 0;
+  char *module;
 
   util_update_disk_list(NULL, 1);
   util_update_swap_list();
 
   for(i = 0, sl = config.partitions; sl; sl = sl->next) i++;
 
-  /* just max values, actual lists might be shorter */
-  items = calloc(i + 2, sizeof *items);
-  values = calloc(i + 2, sizeof *values);
+  /*
+   * Just max values, actual lists might be shorter.
+   * list1: swap, list2: with fs or empty, list3: with fs
+   */
+  items1 = calloc(i + 4, sizeof *items1);
+  values1 = calloc(i + 4, sizeof *values1);
+  items2 = calloc(i + 4, sizeof *items2);
+  values2 = calloc(i + 4, sizeof *values2);
+  items3 = calloc(i + 4, sizeof *items3);
+  values3 = calloc(i + 4, sizeof *values3);
 
-  for(item_cnt = 0, sl = config.partitions; sl; sl = sl->next) {
+  for(item_cnt1 = item_cnt2 = item_cnt3 = 0, sl = config.partitions; sl; sl = sl->next) {
     if(
-      sl->key &&
-      !slist_getentry(config.swaps, sl->key)		/* don't show active swaps */
+      sl->key && !slist_getentry(config.swaps, sl->key)		/* don't show active swaps */
     ) {
-      sprintf(buf, "/dev/%s", sl->key);
-      type = fstype(buf);
-      if(type && (!strcmp(type, "swap") ^ !swap)) {
-        if(*partition && !strcmp(sl->key, *partition)) found = 1;
-        sprintf(buf, "%-12s : %s", sl->key, type);
-        values[item_cnt] = strdup(sl->key);
-        items[item_cnt++] = strdup(buf);
+      if(blk_size(long_dev(sl->key)) < (128 << 10)) continue;
+
+      if(*partition && !strcmp(sl->key, *partition)) found = 1;
+      last_found = last_part && !strcmp(sl->key, last_part) ? 1 : 0;
+
+      sprintf(buf, "%s (%s)", sl->key, blk_ident(long_dev(sl->key)));
+
+      type = fstype(long_dev(sl->key));
+
+      if(type && !strcmp(type, "swap")) {
+        values1[item_cnt1] = strdup(sl->key);
+        items1[item_cnt1++] = strdup(buf);
+        if(last_found) last_item1 = item_cnt1;
+      }
+      else if(type || swap) {
+        values2[item_cnt2] = strdup(sl->key);
+        items2[item_cnt2++] = strdup(buf);
+        if(last_found) last_item2 = item_cnt2;
+        if(type) {
+          values3[item_cnt3] = strdup(sl->key);
+          items3[item_cnt3++] = strdup(buf);
+          if(last_found) last_item3 = item_cnt3;
+        }
       }
     }
   }
 
-  if(*partition && !found && item_cnt) {
-    sprintf(buf, "/dev/%s", *partition);
-    type = fstype(buf);
-    sprintf(buf, "%-12s : %s", *partition, type ?: "");
-    values[item_cnt] = strdup(*partition);
-    items[item_cnt++] = strdup(buf);
+  if(*partition && !found) {
+    sprintf(buf, "%s (%s)", *partition, blk_ident(long_dev(*partition)));
+    values2[item_cnt2] = strdup(*partition);
+    items2[item_cnt2++] = strdup(buf);
+  }
+
+  if(swap) {
+    values1[item_cnt1] = NULL;
+    items1[item_cnt1++] = strdup("create swap partition");
+    item_mk_part = item_cnt1;
+    if(config.swap_file_size) {
+      values1[item_cnt1] = NULL;
+      items1[item_cnt1++] = strdup("create swap file");
+      item_mk_file = item_cnt1;
+    }
+  }
+
+  if(swap) {
+    item_cnt = item_cnt1;
+    items = items1;
+    values = values1;
+    last_item = last_item1;
+  }
+  else {
+    item_cnt = item_cnt3;
+    items = items3;
+    values = values3;
+    last_item = last_item3;
   }
 
   rc = 1;
   if(item_cnt) {
     i = dia_list(txt_menu, 32, NULL, items, last_item, align_left);
-    if(i > 0) {
-      last_item = i;
+
+    if(i == 0) rc = -1;
+
+    if(i > 0 && values[i - 1]) {
+      str_copy(&last_part, values[i - 1]);
       str_copy(partition, values[i - 1]);
       rc = 0;
+    }
+
+    if(i == item_mk_part) {
+      do {
+        i = dia_list("create a swap partition", 32, NULL, items2, last_item2, align_left);
+        if(i > 0 && values2[i - 1]) {
+          str_copy(&last_part, values2[i - 1]);
+          dev = long_dev(values2[i - 1]);
+          sprintf(buf, "/sbin/mkswap %s >/dev/null 2>&1", dev);
+          fprintf(stderr, "mkswap %s\n", dev);
+          if(!system(buf)) {
+            fprintf(stderr, "swapon %s\n", dev);
+            if(swapon(dev, 0)) {
+              fprintf(stderr, "swapon: ");
+              perror(dev);
+              dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+            }
+            else {
+              rc = 0;
+            }
+          }
+          else {
+            dia_message("mkswap failed", MSGTYPE_ERROR);
+          }
+        }
+      }
+      while(rc && i);
+    }
+    else if(i == item_mk_file) {
+      do {
+        i = dia_list("select partition for swap file", 32, NULL, items3, last_item3, align_left);
+        if(i > 0 && values3[i - 1]) {
+          str_copy(&last_part, values3[i - 1]);
+          dev = long_dev(values3[i - 1]);
+          util_fstype(dev, &module);
+          if(module) mod_modprobe(module, NULL);
+          j = util_mount_rw(dev, config.mountpoint.swap);
+          if(j) {
+            dia_message("mount failed", MSGTYPE_ERROR);
+          }
+          else {
+            char *tmp, file[256];
+            int fd;
+            window_t win;
+            unsigned swap_size = config.swap_file_size << 4;	/* in 64k chunks */
+
+            sprintf(file, "%s/suseswap.img", config.mountpoint.swap);
+
+            tmp = calloc(1, 1 << 16);
+
+            fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if(fd >= 0) {
+              sprintf(buf, "creating swap file (%u MB)", config.swap_file_size);
+              dia_info(&win, buf);
+              for(j = 0; j < swap_size; j++) {
+                if(write(fd, tmp, 1 << 16) != 1 << 16) break;
+              }
+              fsync(fd);
+              close(fd);
+              win_close(&win);
+            }
+            free(tmp);
+
+            if(j != swap_size) {
+              dia_message("failed to create swapfile", MSGTYPE_ERROR);
+            }
+            else {
+              sprintf(buf, "/sbin/mkswap %s >/dev/null 2>&1", file);
+              fprintf(stderr, "mkswap %s\n", file);
+              if(!system(buf)) {
+                fprintf(stderr, "swapon %s\n", file);
+                if(swapon(file, 0)) {
+                  fprintf(stderr, "swapon: ");
+                  perror(file);
+                  dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+                }
+                else {
+                  umount2(config.mountpoint.swap, MNT_DETACH);
+                  rc = 0;
+                }
+              }
+              else {
+                dia_message("mkswap failed", MSGTYPE_ERROR);
+              }
+            }
+            if(rc) util_umount(config.mountpoint.swap);
+          }
+        }
+      }
+      while(rc && i);
     }
   }
   else {
@@ -585,9 +733,17 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
     }
   }
 
-  for(i = 0; i < item_cnt; i++) { free(items[i]); free(values[i]); }
-  free(items);
-  free(values);
+  for(i = 0; i < item_cnt1; i++) { free(items1[i]); free(values1[i]); }
+  free(items1);
+  free(values1);
+  for(i = 0; i < item_cnt2; i++) { free(items2[i]); free(values2[i]); }
+  free(items2);
+  free(values2);
+  for(i = 0; i < item_cnt3; i++) { free(items3[i]); free(values3[i]); }
+  free(items3);
+  free(values3);
+
+  // fprintf(stderr, "rc = %d\n", rc);
 
   return rc;
 }
@@ -1133,7 +1289,7 @@ int inst_execute_yast()
   util_free_mem();
   if(config.addswap) {
     i = ask_for_swap(
-      config.memory.min_yast_text - config.memory.min_free,
+      config.addswap == -2 ? -1 : config.memory.min_yast_text - config.memory.min_free,
       txt_get(TXT_LOW_MEMORY2)
     );
   }

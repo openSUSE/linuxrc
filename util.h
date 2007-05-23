@@ -157,3 +157,7 @@ int get_url(char *src_url, char *dst);
 
 void read_iscsi_ibft(void);
 
+char *blk_size_str(char *dev);
+uint64_t blk_size(char *dev);
+char *blk_ident(char *dev);
+

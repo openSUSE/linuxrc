@@ -193,52 +193,42 @@ int ramdisk_mount(int rd, char *dir)
  */
 int ask_for_swap(int size, char *msg)
 {
-  int i, did_init = 0;
-  char tmp[256];
+  int i, j, did_init = 0;
   char *partition = NULL;
-  char *argv[] = { NULL, tmp };
+  char *argv[] = { NULL, NULL };
 
-  if(config.memory.current >= config.memory.min_free + size) return 0;
+  if(size >= 0 && config.memory.current >= config.memory.min_free + size) return 0;
 
   if(!config.win) {
     util_disp_init();
     did_init = 1;
   }
-  sprintf(tmp, "%s\n\n%s", msg, txt_get(TXT_ADD_SWAP));
-  i = dia_contabort(tmp, YES);
-  util_free_mem();
-  if(i != YES) {
-    if(did_init) util_disp_done();
-    return -1;
-  }
 
-  if(config.memory.current >= config.memory.min_free + size) {
-    if(did_init) util_disp_done();
-    return 0;
-  }
+#if 0
+  // sprintf(tmp, "%s\n\n%s", msg, txt_get(TXT_ADD_SWAP));
+#endif
 
   do {
-    if(inst_choose_partition(&partition, 1, txt_get(TXT_CHOOSE_SWAP), txt_get(TXT_ENTER_SWAP))) {
-      i = -1;
-      break;
-    }
-
-    if(partition) {
-      sprintf(tmp, "/dev/%s", partition);
+    j = inst_choose_partition(&partition, 1, txt_get(TXT_ADD_SWAP), txt_get(TXT_ENTER_SWAP));
+    
+    if(j == 0 && partition) {
+      argv[1] = long_dev(partition);
+      fprintf(stderr, "swapon %s\n", argv[1]);
       i = util_swapon_main(2, argv);
       if(i) {
         dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+        j = 1;
       }
     }
     util_free_mem();
   }
-  while(i);
+  while(j > 0);
 
   str_copy(&partition, NULL);
 
   if(did_init) util_disp_done();
 
-  return i;
+  return j;
 }
 
 

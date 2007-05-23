@@ -11,6 +11,8 @@
 #include <netinet/in.h>
 #include <inttypes.h>
 
+#include <blkid/blkid.h>
+
 #include "tftp.h"
 #include "po/text_langids.h"
 #include "text.h"
@@ -278,7 +280,7 @@ typedef struct {
   unsigned usessh:1;		/* ssh mode */
   unsigned pivotroot:1;		/* use pivotroot system call */
   unsigned testpivotroot:1;	/* test pivotroot */
-  unsigned addswap:1;		/* offer to add swap if yast needs it */
+  int addswap;			/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
   unsigned netstop:1;		/* shut down network iface at end */
@@ -362,6 +364,11 @@ typedef struct {
   int kbd_fd;			/* fd for console */
   slist_t *ethtool;		/* ethtool options */
   slist_t *cd1texts;		/* text for requesting next product cd */
+  unsigned swap_file_size;	/* swap file size in MB */
+
+  struct {			/* libblkid related things */
+    blkid_cache cache;
+  } blkid;
 
   struct {
     char *dir;			/* driver update source dir */
@@ -456,6 +463,7 @@ typedef struct {
     char *instsys2;
     char *live;
     char *update;
+    char *swap;
   } mountpoint;
 
   struct {

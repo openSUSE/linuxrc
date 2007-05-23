@@ -8,7 +8,7 @@
 
 #define __LIBRARY__
 
-#define _GNU_SOURCE	/* stat64 */
+#define _GNU_SOURCE	/* stat64, asprintf */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1162,6 +1162,9 @@ void util_status_info()
     "RAM size (MB): total %u, min %u",
     config.memory.ram, config.memory.ram_min
   );
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf, "swap file size: %u MB", config.swap_file_size);
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
@@ -5019,5 +5022,81 @@ void read_iscsi_ibft()
         break;
     }
   }
+}
+
+
+char *blk_ident(char *dev)
+{
+  char *type, *label, *size;
+  static char *id = NULL;
+
+  if(id) {
+    free(id);
+    id = NULL;
+  }
+
+  if(!dev) return id;
+
+  if(!config.blkid.cache) blkid_get_cache(&config.blkid.cache, "/dev/null");
+
+  type = blkid_get_tag_value(config.blkid.cache, "TYPE", dev);
+  label = blkid_get_tag_value(config.blkid.cache, "LABEL", dev);
+  size = blk_size_str(dev);
+
+  if(!size) return id;
+
+  asprintf(&id, "%s, %s%s%s", size, type ?: "no fs", label ? ", " : "", label ?: "");
+
+  free(type);
+  free(label);
+
+  return id;
+}
+
+
+char *blk_size_str(char *dev)
+{
+  uint64_t size;
+  static char *s = NULL, unit;
+
+  if(s) {
+    free(s);
+    s = NULL;
+  }
+
+  size = blk_size(dev);
+
+  unit = 'k';
+  if(size >= (1000 << 10)) { unit = 'M'; size >>= 10; }
+  if(size >= (1000 << 10)) { unit = 'G'; size >>= 10; }
+  if(size >= (1000 << 10)) { unit = 'T'; size >>= 10; }
+  if(size >= (1000 << 10)) { unit = 'P'; size >>= 10; }
+  if(size >= (1000 << 10)) { unit = 'E'; size >>= 10; }
+  if(size >= (1000 << 10)) { unit = 'Z'; size >>= 10; }
+  if(size >= (1000 << 10)) { unit = 'Y'; size >>= 10; }
+
+  if(size >= 10 * (1 << 10)) {
+    size = (size + 512) >> 10;
+    asprintf(&s, "%u %cB", (unsigned) size, unit);
+  }
+  else {
+    size = ((10 * size) + 512) >> 10;
+    asprintf(&s, "%u.%u %cB", ((unsigned) size) / 10, ((unsigned) size) % 10, unit);
+  }
+  
+  return s;
+}
+
+
+uint64_t blk_size(char *dev)
+{
+  int fd;
+  blkid_loff_t size;
+
+  fd = open(dev, O_RDONLY | O_NONBLOCK);
+  size = fd >= 0 ? blkid_get_dev_size(fd) : 0;
+  close(fd);
+
+  return size >= 0 ? size : 0;
 }
 
