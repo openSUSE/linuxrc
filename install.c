@@ -622,7 +622,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
 
   rc = 1;
   if(item_cnt) {
-    i = dia_list(txt_menu, 32, NULL, items, last_item, align_left);
+    i = dia_list(txt_menu, 36, NULL, items, last_item, align_left);
 
     if(i == 0) rc = -1;
 
@@ -634,7 +634,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
 
     if(i == item_mk_part) {
       do {
-        i = dia_list("create a swap partition", 32, NULL, items2, last_item2, align_left);
+        i = dia_list("create a swap partition", 36, NULL, items2, last_item2, align_left);
         if(i > 0 && values2[i - 1]) {
           str_copy(&last_part, values2[i - 1]);
           dev = long_dev(values2[i - 1]);
@@ -660,7 +660,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
     }
     else if(i == item_mk_file) {
       do {
-        i = dia_list("select partition for swap file", 32, NULL, items3, last_item3, align_left);
+        i = dia_list("select partition for swap file", 36, NULL, items3, last_item3, align_left);
         if(i > 0 && values3[i - 1]) {
           str_copy(&last_part, values3[i - 1]);
           dev = long_dev(values3[i - 1]);
@@ -674,22 +674,23 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
             char *tmp, file[256];
             int fd;
             window_t win;
-            unsigned swap_size = config.swap_file_size << 4;	/* in 64k chunks */
+            unsigned swap_size = config.swap_file_size << (20 - 18);	/* in 256k chunks */
 
             sprintf(file, "%s/suseswap.img", config.mountpoint.swap);
 
-            tmp = calloc(1, 1 << 16);
+            tmp = calloc(1, 1 << 18);
 
             fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             if(fd >= 0) {
-              sprintf(buf, "creating swap file (%u MB)", config.swap_file_size);
-              dia_info(&win, buf);
+              sprintf(buf, "creating swap file 'suseswap.img' (%u MB)", config.swap_file_size);
+              dia_status_on(&win, buf);
               for(j = 0; j < swap_size; j++) {
-                if(write(fd, tmp, 1 << 16) != 1 << 16) break;
+                if(write(fd, tmp, 1 << 18) != 1 << 18) break;
+                fsync(fd);
+                dia_status(&win, (j + 1) * 100 / swap_size);
               }
-              fsync(fd);
               close(fd);
-              win_close(&win);
+              dia_status_off(&win);
             }
             free(tmp);
 
@@ -1288,10 +1289,7 @@ int inst_execute_yast()
   i = 0;
   util_free_mem();
   if(config.addswap) {
-    i = ask_for_swap(
-      config.addswap == -2 ? -1 : config.memory.min_yast_text - config.memory.min_free,
-      txt_get(TXT_LOW_MEMORY2)
-    );
+    i = ask_for_swap(-1, txt_get(TXT_LOW_MEMORY2));
   }
 
   if(i == -1) {

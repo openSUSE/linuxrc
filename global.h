@@ -280,7 +280,7 @@ typedef struct {
   unsigned usessh:1;		/* ssh mode */
   unsigned pivotroot:1;		/* use pivotroot system call */
   unsigned testpivotroot:1;	/* test pivotroot */
-  int addswap;			/* offer to add swap if yast needs it */
+  unsigned addswap:1;		/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
   unsigned netstop:1;		/* shut down network iface at end */
