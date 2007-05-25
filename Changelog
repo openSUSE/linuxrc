@@ -1,3 +1,8 @@
+25/5/2007:	v2.1.26
+	- cleanup: removed MemYaSTText & MemModules options
+	- 'addswap' works again
+	- added warning before we format a paritition
+
 23/5/2007:	v2.1.25
 	- withiscsi=1 now implies netsetup=1 (#271420)
 	- rewrote swap space dialog: it can create swap partitions

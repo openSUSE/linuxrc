@@ -918,9 +918,6 @@ int util_chk_driver_update(char *dir, char *loc)
 
   if(!dir || !loc || !config.tmpfs || !config.update.dir) return 0;
 
-  /* never delete module dir */
-  config.memory.min_modules = 0;
-
   strprintf(&drv_src, "%s%s", dir, config.update.dir);
 
   if(util_check_exist(drv_src) == 'd') {
@@ -1150,9 +1147,8 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory limits: min %d, yast %d/%d, modules %d, image %d",
-    config.memory.min_free, config.memory.min_yast, config.memory.min_yast_text,
-    config.memory.min_modules, config.memory.load_image
+    "memory limits: min %d, yast %d, image %d",
+    config.memory.min_free, config.memory.min_yast, config.memory.load_image
   );
   slist_append_str(&sl0, buf);
 

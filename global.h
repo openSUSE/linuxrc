@@ -280,7 +280,7 @@ typedef struct {
   unsigned usessh:1;		/* ssh mode */
   unsigned pivotroot:1;		/* use pivotroot system call */
   unsigned testpivotroot:1;	/* test pivotroot */
-  unsigned addswap:1;		/* offer to add swap if yast needs it */
+  unsigned addswap:2;		/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
   unsigned netstop:1;		/* shut down network iface at end */
@@ -438,9 +438,7 @@ typedef struct {
     int free_swap;		/* free swap */
     int current;		/* currently free memory */
     int min_free;		/* don't let it drop below this */
-    int min_modules;		/* remove modules before starting yast, if it drops below this */
     int min_yast;		/* minimum for yast */
-    int min_yast_text;		/* minimum for yast in text mode */
     int load_image;		/* _load_ rootimage, if we have at least that much */
     int ram;			/* ram size in MB */
     int ram_min;		/* min required memory (ram size) needed for install in MB */

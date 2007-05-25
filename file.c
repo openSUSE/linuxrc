@@ -143,8 +143,6 @@ static struct {
   { key_swapfree,       "SwapFree",       kf_mem                         },
   { key_memlimit,       "MemLimit",       kf_cfg + kf_cmd                },
   { key_memyast,        "MemYaST",        kf_cfg + kf_cmd                },
-  { key_memyasttext,    "MemYaSTText",    kf_cfg + kf_cmd                },
-  { key_memmodules,     "MemModules",     kf_cfg + kf_cmd                },
   { key_memloadimage,   "MemLoadImage",   kf_cfg + kf_cmd                },
   { key_info,           "Info",           kf_cmd_early                   },
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
@@ -807,14 +805,6 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.memory.min_yast = f->nvalue;
         break;
 
-      case key_memyasttext:
-        if(f->is.numeric) config.memory.min_yast_text = f->nvalue;
-        break;
-
-      case key_memmodules:
-        if(f->is.numeric) config.memory.min_modules = f->nvalue;
-        break;
-
       case key_memloadimage:
         if(f->is.numeric) {
           config.memory.load_image = f->nvalue;
@@ -962,7 +952,8 @@ void file_do_info(file_t *f0)
       case key_addswap:
         if(f->is.numeric) {
           if(f->nvalue <= 0) {
-            config.addswap = f->nvalue;
+            /* 0 -1 -2 > 0 2 1 */
+            config.addswap = (3 + f->nvalue) % 3;
           }
           else {
             util_update_disk_list(NULL, 1);

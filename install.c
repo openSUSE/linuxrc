@@ -638,21 +638,28 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
         if(i > 0 && values2[i - 1]) {
           str_copy(&last_part, values2[i - 1]);
           dev = long_dev(values2[i - 1]);
-          sprintf(buf, "/sbin/mkswap %s >/dev/null 2>&1", dev);
-          fprintf(stderr, "mkswap %s\n", dev);
-          if(!system(buf)) {
-            fprintf(stderr, "swapon %s\n", dev);
-            if(swapon(dev, 0)) {
-              fprintf(stderr, "swapon: ");
-              perror(dev);
-              dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+          sprintf(buf, "Warning: all data on %s will be deleted!", dev);
+          j = dia_contabort(buf, NO);
+          if(j == YES) {
+            sprintf(buf, "/sbin/mkswap %s >/dev/null 2>&1", dev);
+            fprintf(stderr, "mkswap %s\n", dev);
+            if(!system(buf)) {
+              fprintf(stderr, "swapon %s\n", dev);
+              if(swapon(dev, 0)) {
+                fprintf(stderr, "swapon: ");
+                perror(dev);
+                dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+              }
+              else {
+                rc = 0;
+              }
             }
             else {
-              rc = 0;
+              dia_message("mkswap failed", MSGTYPE_ERROR);
             }
           }
           else {
-            dia_message("mkswap failed", MSGTYPE_ERROR);
+            rc = 1;
           }
         }
       }
@@ -1110,14 +1117,6 @@ int add_instsys()
 
   mod_free_modules();
 
-  util_free_mem();
-  if(config.memory.current - config.memory.free_swap < config.memory.min_modules) {
-    putenv("REMOVE_MODULES=1");
-  }
-  else {
-    unsetenv("REMOVE_MODULES");
-  }
-
   setenv("INSTSYS", config.instsys, 1);
 
   setenv("TERM", config.term ?: config.serial ? "screen" : "linux", 1);
@@ -1289,7 +1288,10 @@ int inst_execute_yast()
   i = 0;
   util_free_mem();
   if(config.addswap) {
-    i = ask_for_swap(-1, txt_get(TXT_LOW_MEMORY2));
+    i = ask_for_swap(
+      config.addswap == 2 ? -1 : config.memory.min_yast - config.memory.min_free,
+      txt_get(TXT_LOW_MEMORY2)
+    );
   }
 
   if(i == -1) {
@@ -1298,15 +1300,6 @@ int inst_execute_yast()
   }
 
   util_free_mem();
-  if(config.addswap && config.memory.current < config.memory.min_yast) {
-    config.textmode = 1;
-    file_write_install_inf("");
-  }
-
-  if(i) {
-    inst_yast_done();
-    return -1;
-  }
 
   if(!config.test && config.usessh && config.net.sshpassword) {
     if((f = popen("/usr/sbin/chpasswd", "w"))) {
