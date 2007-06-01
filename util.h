@@ -69,7 +69,6 @@ extern int  util_kill_main         (int argc, char **argv);
 extern int  util_killall_main      (int argc, char **argv);
 extern int  util_bootpc_main       (int argc, char **argv);
 extern int  util_wget_main         (int argc, char **argv);
-extern int  util_fstype_main       (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int flags);
 extern char *util_process_name     (pid_t pid);
 extern char *util_process_cmdline  (pid_t pid);

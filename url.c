@@ -44,6 +44,7 @@ void url_read(url_data_t *url_data)
   int i;
   FILE *f;
   char *buf, *s;
+  sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);;
 
   c_handle = curl_easy_init();
   // fprintf(stderr, "curl handle = %p\n", c_handle);
@@ -97,12 +98,13 @@ void url_read(url_data_t *url_data)
           if(!url_data->err) strcpy(url_data->err_buf, s);
           free(buf);
         }
-        url_data->err = 101;
+        url_data->err = 103;
+        snprintf(url_data->err_buf, url_data->err_buf_len, "gzip: command terminated");
       }
       // fprintf(stderr, "close = %d\n", i);
     }
     else {
-      if(i && !url_data->err) url_data->err = 101;
+      if(i && !url_data->err) url_data->err = 104;
     }
   }
 
@@ -120,6 +122,8 @@ void url_read(url_data_t *url_data)
   }
 
   curl_easy_cleanup(c_handle);
+
+  signal(SIGPIPE, old_sigpipe);
 }
 
 
@@ -458,6 +462,8 @@ url2_t *url_free(url2_t *url)
 
 url_data_t *url_data_new()
 {
+  static int curl_init = 0;
+  int err;
   url_data_t *url_data = calloc(1, sizeof *url_data);
 
   url_data->err_buf_len = CURL_ERROR_SIZE;
@@ -468,6 +474,12 @@ url_data_t *url_data_new()
   url_data->buf.len = 0;
 
   url_data->pipe_fd = -1;
+
+  if(!curl_init) {
+    curl_init = 1;
+    err = curl_global_init(CURL_GLOBAL_ALL);
+    if(err) fprintf(stderr, "curl init = %d\n", err);
+  }
 
   return url_data;
 }
@@ -485,6 +497,12 @@ void url_data_free(url_data_t *url_data)
   free(url_data->buf.data);
 
   free(url_data);
+}
+
+
+void url_cleanup()
+{
+  curl_global_cleanup();
 }
 
 

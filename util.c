@@ -70,8 +70,11 @@
 #include "mkdevs.h"
 #include "scsi_rename.h"
 #include "utf8.h"
+#include "url.h"
 
 #define LED_TIME     50000
+
+static int wget_update(url_data_t *url_data);
 
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
@@ -3490,79 +3493,41 @@ int net_read(int fd, char *buf, int len)
 
 int util_wget_main(int argc, char **argv)
 {
-  url_t *url;
-  int i, j, fd = -1;
-  unsigned char buf[0x1000];
-  char *s;
+  url_data_t *url_data;
 
   argv++; argc--;
 
-  if(argc != 1) return fprintf(stderr, "usage: wget url\n"), 1;
+  if(argc != 2) return fprintf(stderr, "usage: wget url file\n"), 1;
 
-  url = parse_url(*argv);
+  url_data = url_data_new();
 
-  if(!url || !url->scheme) return fprintf(stderr, "invalid url\n"), 2;
+  url_data->url = url_set(argv[0]);
+  url_data->file_name = strdup(argv[1]);
 
-  set_instmode(url->scheme);
+  url_data->progress = wget_update;
 
-  config.net.tftp_timeout = 10;
-  
-  config.net.port = url->port;
-  str_copy(&config.serverdir, url->dir);
-  str_copy(&config.net.user, url->user);
-  str_copy(&config.net.password, url->password);
-  if(config.insttype == inst_net) {
-    name2inet(&config.net.server, url->server);
+  url_read(url_data);
 
-    if((s = getenv("proxy"))) {
-      url = parse_url(s);
-      if(url) {
-        config.net.proxyproto = inst_http;
-        if(url->server) name2inet(&config.net.proxy, url->server);
-        if(url->scheme) config.net.proxyproto = url->scheme;
-        if(url->port) config.net.proxyport = url->port;
-        // fprintf(stderr, "using proxy %s://%s:%d\n", get_instmode_name(config.net.proxyproto), config.net.proxy.name, config.net.proxyport);
-      }
-    }
+  fprintf(stderr, "\n");
 
-    fd = net_open(config.serverdir);
-  }
+  if(url_data->err) fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
 
-  if(fd < 0) {
-    util_print_net_error();
-    return 1;
-  }
+  url_data_free(url_data);
 
-  do {
-    i = net_read(fd, buf, sizeof buf);
-    j = 0;
-    if(i > 0) {
-      j = write(1, buf, i);
-    }
-  }  
-  while(i > 0 && j > 0);
-
-  if(i < 0) {
-    perror(config.serverdir);
-  }
-
-  net_close(fd);
+  url_cleanup();
 
   return 0;
 }
 
 
-int util_fstype_main(int argc, char **argv)
+int wget_update(url_data_t *url_data)
 {
-  char *s;
-
-  argv++; argc--;
-
-  if(argc != 1) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
-
-  s = fstype(*argv);
-
-  printf("%s: %s\n", *argv, s ?: "unknown fs");
+  fprintf(stderr,
+    "progress: %9u/%u - %9u/%u (%.2f%%)\r",
+    url_data->p_now, url_data->p_total,
+    url_data->zp_now, url_data->zp_total,
+    url_data->p_total ? (double) url_data->p_now / url_data->p_total * 100 : 0
+  );
 
   return 0;
 }

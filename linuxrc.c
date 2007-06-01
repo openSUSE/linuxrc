@@ -124,7 +124,6 @@ static struct {
   { "raidautorun", util_raidautorun_main },
   { "free",        util_free_main        },
   { "wget",        util_wget_main        },
-  { "fstype",      util_fstype_main      },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
   { "hotplug",     hotplug_main		 },
