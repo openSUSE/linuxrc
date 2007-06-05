@@ -74,6 +74,17 @@
 
 #define LED_TIME     50000
 
+typedef struct {
+  instmode_t scheme;
+  char *server;
+  char *share;
+  char *dir;
+  char *user;
+  char *password;
+  char *domain;
+  unsigned port;
+} url1_t;
+
 static int wget_progress(url_data_t *url_data);
 
 static void show_lsof_info(FILE *f, unsigned pid);
@@ -110,6 +121,8 @@ static int _net_open(char *filename);
 
 static int skip_spaces(unsigned char **str);
 static int word_size(unsigned char *str, int *width, int *enc_len);
+
+static url1_t *parse_url(char *str);
 
 void util_redirect_kmsg()
 {
@@ -3028,9 +3041,9 @@ file:/blub/blubber
 
 #endif
 
-url_t *parse_url(char *str)
+url1_t *parse_url(char *str)
 {
-  static url_t url = {};
+  static url1_t url = {};
   char *s, *s0, *s1;
   unsigned u;
   int scheme = -1, i, ok;
@@ -4666,7 +4679,7 @@ int system_log(char *cmd)
  */
 int get_url(char *src_url, char *dst)
 {
-  url_t *url;
+  url1_t *url;
   int err = 1, i, j, fd_in, fd_out;
   hd_data_t *hd_data;
   hd_t *hd;

@@ -157,18 +157,6 @@ typedef struct {
 } inet_t;
 
 
-typedef struct {
-  instmode_t scheme;
-  char *server;
-  char *share;
-  char *dir;
-  char *user;
-  char *password;
-  char *domain;
-  unsigned port;
-} url_t;
-
-
 typedef struct module2_s {
   struct module2_s *next;
   char *name;		/* module name */
@@ -205,13 +193,31 @@ typedef enum {
   nc_none, nc_static, nc_bootp, nc_dhcp
 } net_config_t;
 
+
 typedef enum {
   wa_none, wa_open, wa_wep_open, wa_wep_resticted, wa_wpa
 } wlan_auth_t;
 
+
 typedef enum {
   kt_ascii, kt_hex, kt_pass
 } key_type_t;
+
+
+typedef struct {
+  char *str;
+  instmode_t scheme;
+  char *server;
+  char *share;
+  char *path;
+  char *user;
+  char *password;
+  char *domain;
+  char *device;
+  unsigned port;
+  slist_t *query;
+} url_t;
+
 
 /* > 100 and <= 1000 */
 #define MAX_UPDATES		1000
@@ -365,6 +371,11 @@ typedef struct {
   slist_t *ethtool;		/* ethtool options */
   slist_t *cd1texts;		/* text for requesting next product cd */
   unsigned swap_file_size;	/* swap file size in MB */
+
+  struct {
+    url_t *install;		/* install url */
+    url_t *autoyast;		/* autoyast url */
+  } url;
 
   struct {			/* libblkid related things */
     blkid_cache cache;

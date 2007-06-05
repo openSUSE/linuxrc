@@ -287,9 +287,9 @@ int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal,
  * disk: path = [device/]path
  */
 
-url2_t *url_set(char *str)
+url_t *url_set(char *str)
 {
-  url2_t *url = calloc(1, sizeof *url);
+  url_t *url = calloc(1, sizeof *url);
   char *s0, *s1, *s2;
   char *tmp = NULL;
   int i;
@@ -428,7 +428,7 @@ url2_t *url_set(char *str)
 
       if(stat(tmp, &sbuf)) break;
       if(S_ISBLK(sbuf.st_mode)) {
-        url->dev = strdup(short_dev(tmp));
+        url->device = strdup(short_dev(tmp));
         free(url->path);
         url->path = s0 ? strdup(s0 + 1) : NULL;
       }
@@ -438,6 +438,11 @@ url2_t *url_set(char *str)
 
     free(tmp);
     tmp = NULL;
+  }
+
+  if((sl = slist_getentry(url->query, "device"))) {
+    s0 = short_dev(sl->value);
+    str_copy(&url->device, *s0 ? s0 : NULL);
   }
 
   fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
@@ -453,18 +458,18 @@ url2_t *url_set(char *str)
     fprintf(stderr, "\n");
   }
 
-  if(url->share || url->domain || url->dev) {
+  if(url->share || url->domain || url->device) {
     i = 0;
     if(url->share) fprintf(stderr, "%c share = \"%s\"", i++ ? ',' : ' ', url->share);
     if(url->domain) fprintf(stderr, "%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
-    if(url->dev) fprintf(stderr, "%c dev = \"%s\"", i++ ? ',' : ' ', url->dev);
+    if(url->device) fprintf(stderr, "%c device = \"%s\"", i++ ? ',' : ' ', url->device);
     fprintf(stderr, "\n");
   }
 
   if(url->query) {
     fprintf(stderr, "  query:\n");
     for(sl = url->query; sl; sl = sl->next) {
-      fprintf(stderr, "    %s = %s\n", sl->key, sl->value);
+      fprintf(stderr, "    %s = \"%s\"\n", sl->key, sl->value);
     }
   }
 
@@ -472,7 +477,7 @@ url2_t *url_set(char *str)
 }
 
 
-url2_t *url_free(url2_t *url)
+url_t *url_free(url_t *url)
 {
   if(url) {
     free(url->str);
@@ -482,7 +487,7 @@ url2_t *url_free(url2_t *url)
     free(url->user);
     free(url->password);
     free(url->domain);
-    free(url->dev);
+    free(url->device);
 
     slist_free(url->query);
 

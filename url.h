@@ -1,19 +1,5 @@
-typedef struct {
-  char *str;
-  instmode_t scheme;
-  char *server;
-  char *share;
-  char *path;
-  char *user;
-  char *password;
-  char *domain;
-  char *dev;
-  unsigned port;
-  slist_t *query;
-} url2_t;
-
 typedef struct url_data_s {
-  url2_t *url;
+  url_t *url;
   char *file_name;
   FILE *f;
   int err;
@@ -39,8 +25,8 @@ typedef struct url_data_s {
 } url_data_t;
 
 void url_read(url_data_t *url_data);
-url2_t *url_set(char *str);
-url2_t *url_free(url2_t *url);
+url_t *url_set(char *str);
+url_t *url_free(url_t *url);
 void url_cleanup(void);
 url_data_t *url_data_new(void);
 void url_data_free(url_data_t *url_data);

@@ -36,6 +36,7 @@
 #include "display.h"
 #include "fstype.h"
 #include "keyboard.h"
+#include "url.h"
 
 #define YAST_INF_FILE		"/etc/yast.inf"
 #define INSTALL_INF_FILE	"/etc/install.inf"
@@ -617,7 +618,6 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
 void file_do_info(file_t *f0)
 {
   file_t *f;
-  url_t *url;
   int i, is_xml = 0;
   char buf[256], *s, *t;
   slist_t *sl, *sl0;
@@ -863,31 +863,36 @@ void file_do_info(file_t *f0)
           config.activate_storage = 1;
           config.activate_network = 1;
         }
-        url = parse_url(f->value);
-        if(url && url->scheme) {
-          set_instmode(url->scheme);
-          if(url->port) config.net.port = url->port;
 
-          if(config.instmode == inst_slp) {
-            str_copy(&config.slp.proto, url->server && *url->server ? url->server : NULL);
-            str_copy(&config.slp.key, url->dir && *url->dir && strcmp(url->dir, "/") ? url->dir : NULL);
+        url_free(config.url.install);
+        config.url.install = url_set(f->value);
+
+        if(config.url.install->scheme) {
+          set_instmode(config.url.install->scheme);
+          if(config.url.install->port) config.net.port = config.url.install->port;
+
+          if(config.url.install->scheme == inst_slp) {
+            str_copy(&config.slp.key, config.url.install->path);
+            if((sl = slist_getentry(config.url.install->query, "proto"))) {
+              str_copy(&config.slp.proto, sl->value);
+            }
             str_copy(&config.serverdir, "/");		/* necessary - believe me */
           }
           else {
-            str_copy(&config.serverdir, url->dir);
-            str_copy(&config.net.user, url->user);
-            str_copy(&config.net.password, url->password);
-            str_copy(&config.net.share, url->share);
-            str_copy(&config.net.workgroup, url->domain);
+            str_copy(&config.serverdir, config.url.install->path);
+            str_copy(&config.net.user, config.url.install->user);
+            str_copy(&config.net.password, config.url.install->password);
+            str_copy(&config.net.share, config.url.install->share);
+            str_copy(&config.net.workgroup, config.url.install->domain);
 
             if(config.insttype == inst_net) {
-              name2inet(&config.net.server, url->server);
+              name2inet(&config.net.server, config.url.install->server);
             }
-            else if(config.insttype == inst_cdrom && url->server) {
-              str_copy(&config.cdromdev, url->server);
+            else if(config.insttype == inst_cdrom && config.url.install->device) {
+              str_copy(&config.cdromdev, config.url.install->device);
             }
-            else if(config.insttype == inst_hd && url->server) {
-              str_copy(&config.partition, url->server);
+            else if(config.insttype == inst_hd && config.url.install->device) {
+              str_copy(&config.partition, config.url.install->device);
             }
           }
         }
@@ -896,9 +901,9 @@ void file_do_info(file_t *f0)
       case key_autoyast:
         str_copy(&config.autoyast, *f->value ? f->value : "default");
         config.manual = 0;
-        if(!config.instmode) {
-          url = parse_url(config.autoyast);
-          if(url && url->scheme) set_instmode(url->scheme);
+        config.url.autoyast = url_set(f->value);
+        if(!config.instmode && config.url.autoyast->scheme) {
+          set_instmode(config.url.autoyast->scheme);
         }
         break;
 

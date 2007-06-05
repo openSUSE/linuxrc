@@ -90,7 +90,6 @@ int util_detach_loop(char *dev);
 void name2inet(inet_t *inet, char *name);
 void s_addr2inet(inet_t *inet, unsigned long s_addr);
 char *inet2print(inet_t *inet);
-url_t *parse_url(char *str);
 void str_copy(char **dst, char *src);
 void strprintf(char **buf, char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void set_instmode(instmode_t instmode);
