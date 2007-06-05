@@ -74,7 +74,7 @@
 
 #define LED_TIME     50000
 
-static int wget_update(url_data_t *url_data);
+static int wget_progress(url_data_t *url_data);
 
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
@@ -3504,7 +3504,7 @@ int util_wget_main(int argc, char **argv)
   url_data->url = url_set(argv[0]);
   url_data->file_name = strdup(argv[1]);
 
-  url_data->progress = wget_update;
+  url_data->progress = wget_progress;
 
   url_read(url_data);
 
@@ -3520,7 +3520,7 @@ int util_wget_main(int argc, char **argv)
 }
 
 
-int wget_update(url_data_t *url_data)
+int wget_progress(url_data_t *url_data)
 {
   fprintf(stderr,
     "progress: %9u/%u - %9u/%u (%.2f%%)\r",

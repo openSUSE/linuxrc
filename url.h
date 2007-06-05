@@ -9,7 +9,7 @@ typedef struct {
   char *domain;
   char *dev;
   unsigned port;
-  char *query;
+  slist_t *query;
 } url2_t;
 
 typedef struct url_data_s {

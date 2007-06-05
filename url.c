@@ -295,6 +295,7 @@ url2_t *url_set(char *str)
   int i;
   unsigned u;
   struct stat sbuf;
+  slist_t *sl;
 
   if(!str) return url;
 
@@ -320,7 +321,13 @@ url2_t *url_set(char *str)
 
       if((s1 = strchr(s0, '?'))) {
         *s1++ = 0;
-        url->query = strdup(s1);
+        url->query = slist_split('&', s1);
+        for(sl = url->query; sl; sl = sl->next) {
+          if((s2 = strchr(sl->key, '='))) {
+            *s2++ = 0;
+            sl->value = strdup(s2);
+          }
+        }
       }
 
       url->path = strdup(*s0 == '/' ? s0 + 1 : s0);
@@ -433,16 +440,33 @@ url2_t *url_set(char *str)
     tmp = NULL;
   }
 
-  fprintf(stderr,
-    "  scheme = %s (%d), server = \"%s\", port = %u, path = \"%s\"\n"
-    "  user = \"%s\", password = \"%s\"\n"
-    "  share = \"%s\", domain = \"%s\", device = \"%s\"\n"
-    "  query = \"%s\"\n",
-    get_instmode_name(url->scheme), url->scheme, url->server, url->port, url->path,
-    url->user, url->password,
-    url->share, url->domain, url->dev,
-    url->query
-  );
+  fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
+  if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
+  if(url->port) fprintf(stderr, ", port = %u", url->port);
+  if(url->path) fprintf(stderr, ", path = \"%s\"", url->path);
+  fprintf(stderr, "\n");
+
+  if(url->user || url->password) {
+    i = 0;
+    if(url->user) fprintf(stderr, "%c user = \"%s\"", i++ ? ',' : ' ', url->user);
+    if(url->password) fprintf(stderr, "%c password = \"%s\"", i++ ? ',' : ' ', url->password);
+    fprintf(stderr, "\n");
+  }
+
+  if(url->share || url->domain || url->dev) {
+    i = 0;
+    if(url->share) fprintf(stderr, "%c share = \"%s\"", i++ ? ',' : ' ', url->share);
+    if(url->domain) fprintf(stderr, "%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
+    if(url->dev) fprintf(stderr, "%c dev = \"%s\"", i++ ? ',' : ' ', url->dev);
+    fprintf(stderr, "\n");
+  }
+
+  if(url->query) {
+    fprintf(stderr, "  query:\n");
+    for(sl = url->query; sl; sl = sl->next) {
+      fprintf(stderr, "    %s = %s\n", sl->key, sl->value);
+    }
+  }
 
   return url;
 }
@@ -452,6 +476,15 @@ url2_t *url_free(url2_t *url)
 {
   if(url) {
     free(url->str);
+    free(url->server);
+    free(url->share);
+    free(url->path);
+    free(url->user);
+    free(url->password);
+    free(url->domain);
+    free(url->dev);
+
+    slist_free(url->query);
 
     free(url);
   }
