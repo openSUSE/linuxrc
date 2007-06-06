@@ -1964,15 +1964,16 @@ int do_mount_nfs()
   int rc, file_type = 0;
   window_t win;
   char *buf = NULL, *serverdir = NULL, *file = NULL;
+  char *path;
 
   str_copy(&config.serverpath, NULL);
   str_copy(&config.serverfile, NULL);
 
-  util_truncate_dir(config.serverdir);
+  path = config.serverdir && *config.serverdir ? config.serverdir : "/";
 
   strprintf(&buf,
     config.win ? txt_get(TXT_TRY_NFS_MOUNT) : "nfs: trying to mount %s:%s\n" ,
-    config.net.server.name, config.serverdir ?: ""
+    config.net.server.name, path
   );
 
   if(config.win) {
@@ -1985,12 +1986,12 @@ int do_mount_nfs()
   fprintf(stderr, "Starting portmap.\n");
   system("portmap");
 
-  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
+  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, path);
 
   if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", rc);
 
-  if(rc == ENOTDIR && config.serverdir) {
-    str_copy(&serverdir, config.serverdir);
+  if(rc == ENOTDIR) {
+    str_copy(&serverdir, path);
 
     if((file = strrchr(serverdir, '/')) && file != serverdir && file[1]) {
       *file++ = 0;

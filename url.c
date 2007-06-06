@@ -440,11 +440,32 @@ url_t *url_set(char *str)
     tmp = NULL;
   }
 
+  /* ensure leading "/" if mountable */
+  if(
+    url->scheme == inst_file ||
+    url->scheme == inst_cdrom ||
+    url->scheme == inst_dvd ||
+    url->scheme == inst_floppy ||
+    url->scheme == inst_hd ||
+    url->scheme == inst_nfs ||
+    url->scheme == inst_smb
+  ) {
+    if(url->path) {
+      if(*url->path != '/') {
+        strprintf(&url->path, "/%s", url->path);
+      }
+    }
+    else {
+      url->path = strdup("/");
+    }
+  }
+
   if((sl = slist_getentry(url->query, "device"))) {
     s0 = short_dev(sl->value);
     str_copy(&url->device, *s0 ? s0 : NULL);
   }
 
+  fprintf(stderr, "url = %s\n", url->str);
   fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
   if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
   if(url->port) fprintf(stderr, ", port = %u", url->port);
