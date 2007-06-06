@@ -528,14 +528,6 @@ msgstr "Informacij ni na voljo."
 msgid "Preparing installation..."
 msgstr "Priprava namestitve..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Zagon Live CDja"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Vstavite Live CD."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Izhod ali ponovni zagon"

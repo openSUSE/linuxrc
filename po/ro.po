@@ -584,15 +584,6 @@ msgstr "Nici o informatie disponibila."
 msgid "Preparing installation..."
 msgstr "Pregatind instalarea..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Porneste Live CD"
-
-#. TXT_INSERT_LIVECD
-#, fuzzy
-msgid "Insert the Live CD."
-msgstr "Introduceti Live CD."
-
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"

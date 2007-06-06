@@ -42,7 +42,6 @@
 #define INSTALL_INF_FILE	"/etc/install.inf"
 #define MTAB_FILE		"/etc/mtab"
 #define CMDLINE_FILE		"/proc/cmdline"
-#define LIVE_CONF_FILE		"/etc/liveeval.conf"
 
 // #define DEBUG_FILE
 
@@ -75,7 +74,6 @@ static struct {
 } keywords[] = {
   { key_none,           "",               kf_none                        },
   { key_root,           "Root",           kf_yast + kf_boot              },
-  { key_live,           "live",           kf_cfg + kf_cmd                },
   { key_keytable,       "Keytable",       kf_cfg + kf_cmd + kf_yast      },
   { key_language,       "Language",       kf_cfg + kf_cmd + kf_yast      },
   { key_language,       "lang",           kf_cfg + kf_cmd                },
@@ -92,7 +90,6 @@ static struct {
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
   { key_serverdir,      "Serverdir",      kf_cfg + kf_cmd                },
   { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
-  { key_livesrc,        "LiveSRC",        kf_cfg + kf_cmd                },
   { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
   { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
   { key_forcerootimage, "ForceRootimage", kf_cfg + kf_cmd                },
@@ -105,7 +102,6 @@ static struct {
   { key_ptphost,        "Pointopoint",    kf_cfg + kf_cmd                },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
-  { key_demo,           "Demo",           kf_none                        },	/* obsolete */
   { key_reboot,         "Reboot",         kf_none                        },	/* drop it? */
   { key_floppydisk,     "Floppydisk",     kf_none                        },	/* ??? */
   { key_keyboard,       "Keyboard",       kf_none                        },
@@ -204,7 +200,6 @@ static struct {
   { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_lxrcdebug,      "LinuxrcDebug",   kf_cfg + kf_cmd + kf_cmd_early },
   { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
-  { key_liveconfig,     "LiveConfig",     kf_cfg + kf_cmd                },
   { key_updatename,     "UpdateName",     kf_cfg + kf_cmd                },
   { key_updatestyle,    "UpdateStyle",    kf_cfg + kf_cmd                },
   { key_updateid,       "UpdateID",       kf_cfg                         },
@@ -729,12 +724,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_livesrc:
-        strncpy(livesrc_tg, f->value, sizeof livesrc_tg);
-        livesrc_tg[sizeof livesrc_tg - 1] = 0;
-        if(config.serverdir) set_instmode(inst_nfs);
-        break;
-
       case key_bootpwait:
         if(f->is.numeric) config.net.bootp_wait = f->nvalue;
         break;
@@ -972,13 +961,8 @@ void file_do_info(file_t *f0)
                     char *argv[2] = { };
 
                     argv[1] = buf;
-                    if(config.demo) {
-                      slist_append_str(&config.live.useswap, buf + sizeof "/dev/" - 1);
-                    }
-                    else {
-                      fprintf(stderr, "swapon %s\n", buf);
-                      util_swapon_main(2, argv);
-                    }
+                    fprintf(stderr, "swapon %s\n", buf);
+                    util_swapon_main(2, argv);
                     break;
                   }
                 }
@@ -996,13 +980,8 @@ void file_do_info(file_t *f0)
           t = fstype(s);
           if(t && !strcmp(t, "swap")) {
             argv[1] = s;
-            if(config.demo) {
-              slist_append_str(&config.live.useswap, s + sizeof "/dev/" - 1);
-            }
-            else {
-              fprintf(stderr, "swapon %s\n", s);
-              util_swapon_main(2, argv);
-            }
+            fprintf(stderr, "swapon %s\n", s);
+            util_swapon_main(2, argv);
           }
         }
         break;
@@ -1137,32 +1116,6 @@ void file_do_info(file_t *f0)
         if(slist_getentry(config.linuxrc, "nocmdline")) config.info.add_cmdline = 0;
         /* ###### still needed? */
         if(slist_getentry(config.linuxrc, "reboot")) reboot_ig = 1;
-        break;
-
-      case key_live:
-        slist_append(&config.live.args, sl = slist_split(',', f->value));
-        if(
-          slist_getentry(config.live.args, "new") ||
-          slist_getentry(config.live.args, "clean")
-        ) {
-          config.live.newconfig = 1;
-        }
-        if(slist_getentry(config.live.args, "nodisk")) {
-          config.live.newconfig = 1;
-          config.live.nodisk = 1;
-        }
-        if(slist_getentry(sl, "autopart")) config.live.autopart = 1;
-        if(slist_getentry(sl, "-autopart")) config.live.autopart = 0;
-        if(slist_getentry(sl, "autoswap")) config.live.autoswap = 1;
-        if(slist_getentry(sl, "-autoswap")) config.live.autoswap = 0;
-        break;
-
-      case key_liveconfig:
-        if(*f->value) {
-          config.demo = 1;
-          config.activate_storage = 1;
-          str_copy(&config.live.cfg, f->value);
-        }
         break;
 
       case key_kernel_pcmcia:
@@ -1747,7 +1700,6 @@ void file_write_install_inf(char *dir)
   file_write_modparms(f);
 
   file_write_num(f, key_manual, config.manual);
-  file_write_num(f, key_demo, config.demo);
 
   if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
 
@@ -2233,36 +2185,6 @@ void file_dump_mlist(module_t *ml)
 }
 
 #endif
-
-
-void file_write_live_config(char *dir)
-{
-  FILE *f;
-  char file_name[256];
-  slist_t *sl;
-
-  strcat(strcpy(file_name, dir), LIVE_CONF_FILE);
-
-  if(!(f = fopen(file_name, "w"))) {
-    fprintf(stderr, "Cannot open live info file\n");
-    return;
-  }
-
-  if(config.live.args) {
-    fprintf(f, "%s=", file_key2str(key_live));
-    for(sl = config.live.args; sl; sl = sl->next) {
-      fprintf(f, "%s%c", sl->key, sl->next ? ',' : '\n');
-    }
-  }
-  fprintf(f, "liveconfig=%s\n", config.live.cfg);
-  fprintf(f, "l_new=%s\n", config.live.newconfig ? "1" : "");
-  fprintf(f, "l_nodisk=%s\n", config.live.nodisk ? "1" : "");
-  fprintf(f, "l_swapfile=%s\n", config.live.swapfile ? "1" : "");
-  fprintf(f, "l_swappart=%s\n", config.live.useswap ? config.live.useswap->key : "");
-  fprintf(f, "l_partition=%s\n", config.partition ?: "");
-
-  fclose(f);
-}
 
 
 void add_driver(char *str)

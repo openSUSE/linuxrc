@@ -491,14 +491,6 @@ msgstr ""
 msgid "Preparing installation..."
 msgstr ""
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr ""
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr ""
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr ""

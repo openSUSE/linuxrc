@@ -1211,7 +1211,6 @@ void util_status_info()
   add_flag(&sl0, buf, config.manual, "manual");
   add_flag(&sl0, buf, config.initramfs, "ramfs");
   add_flag(&sl0, buf, config.rescue, "rescue");
-  add_flag(&sl0, buf, config.demo, "demo");
   add_flag(&sl0, buf, config.vnc, "vnc");
   add_flag(&sl0, buf, config.usessh, "usessh");
   add_flag(&sl0, buf, config.textmode, "textmode");
@@ -1450,9 +1449,6 @@ void util_status_info()
   }
 
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
-  slist_append_str(&sl0, buf);
-
-  sprintf(buf, "evalimage = \"%s\"", config.live.image);
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "installdir = \"%s\"", config.installdir);
@@ -3948,7 +3944,6 @@ void util_set_product_dir(char *prod)
   str_copy(&config.rootimage, "/boot/root");
 #endif
   str_copy(&config.rescueimage, "/boot/rescue");
-  str_copy(&config.live.image, "/boot/liveeval");
 }
 
 

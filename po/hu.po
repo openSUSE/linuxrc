@@ -531,14 +531,6 @@ msgstr "Nincs elérhető információ."
 msgid "Preparing installation..."
 msgstr "Telepítés előkészítése ..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Live CD indítása"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Helyezze be a Live CD-t."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Kilépés vagy újraindítás"

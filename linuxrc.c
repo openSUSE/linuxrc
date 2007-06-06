@@ -251,10 +251,7 @@ int main(int argc, char **argv, char **env)
     if(!win_old) util_disp_done();
   }
 
-  if(config.demo) {
-    err = inst_start_demo();
-  }
-  else if(!config.manual) {
+  if(!config.manual) {
     if(config.rescue && !config.serial) {
       int win_old = 1;
 
@@ -347,7 +344,7 @@ void lxrc_change_root()
 
   if(config.test) return;
 
-  new_mp = config.demo ? ".mnt" : "mnt";
+  new_mp = "mnt";
 
   umount("/mnt");
   util_mount_ro(config.new_root, "/mnt");
@@ -758,7 +755,6 @@ void lxrc_init()
   config.mountpoint.extra = strdup("/mounts/extra");
   config.mountpoint.instsys = strdup("/mounts/instsys");
   config.mountpoint.instsys2 = strdup("/mounts/instsys2");
-  config.mountpoint.live = strdup("/mounts/live");
   config.mountpoint.update = strdup("/mounts/update");
   config.mountpoint.instdata = strdup("/var/adm/mount");
   config.mountpoint.swap = strdup("/mounts/swap");
@@ -1017,7 +1013,7 @@ void lxrc_init()
 
       i = 0;
       j = 1;
-      if(config.insttype == inst_cdrom && cdrom_drives && !config.demo) {
+      if(config.insttype == inst_cdrom && cdrom_drives) {
         char *s = get_translation(config.cd1texts, current_language()->locale);
         char *buf = NULL;
 
@@ -1038,9 +1034,7 @@ void lxrc_init()
         if(j) {
           sprintf(buf, "Could not find the %s ", config.product);
           if(config.insttype == inst_cdrom) {
-            sprintf(buf + strlen(buf),
-              "%s CD.", config.demo ? "LiveEval" : "Installation"
-            );
+            sprintf(buf + strlen(buf), "Installation CD.");
           }
           else {
             strcat(buf, "Installation Source.");

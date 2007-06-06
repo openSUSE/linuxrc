@@ -524,14 +524,6 @@ msgstr "情報を取得できませんでした。"
 msgid "Preparing installation..."
 msgstr "インストールの準備をしています..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Live CDを起動する"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Live CDを挿入してください。"
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "終了または再起動する"

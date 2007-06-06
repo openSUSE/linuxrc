@@ -534,14 +534,6 @@ msgstr "Δεν υπάρχει διαθέσιμη πληροφορία."
 msgid "Preparing installation..."
 msgstr "Προετοιμασία εγκατάστασης..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Εκκίνηση του Live CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Εισάγετε το Live CD."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Έξοδος ή Επανεκκίνηση"

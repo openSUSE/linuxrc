@@ -530,14 +530,6 @@ msgstr "Nie sú dostupné žiadne informácie."
 msgid "Preparing installation..."
 msgstr "Pripravujem inštaláciu..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Spustiť Live CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Vložte Live CD."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Koniec/Reštart"

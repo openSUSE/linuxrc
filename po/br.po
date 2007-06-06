@@ -593,15 +593,6 @@ msgstr "N'eus ket tu da gaout titouroù."
 msgid "Preparing installation..."
 msgstr "O prientiñ ar staliadur..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Loc'hañ ar CD-ROM mod diskouez"
-
-#. TXT_INSERT_LIVECD
-#, fuzzy
-msgid "Insert the Live CD."
-msgstr "Ensoc'hit ar CD mod bev."
-
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"

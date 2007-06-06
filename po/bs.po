@@ -586,15 +586,6 @@ msgstr "Nema dostupnih informacija."
 msgid "Preparing installation..."
 msgstr "Pripremam instalaciju..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Pokreni Live CD"
-
-#. TXT_INSERT_LIVECD
-#, fuzzy
-msgid "Insert the Live CD."
-msgstr "Ubacite Live CD."
-
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"

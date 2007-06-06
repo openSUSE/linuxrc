@@ -527,14 +527,6 @@ msgstr "Tietoja ei saatavilla."
 msgid "Preparing installation..."
 msgstr "Valmistellaan asennusta..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Käynnistä Live CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Syötä Live CD."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Lopeta tai käynnistä uudelleen"

@@ -269,7 +269,6 @@ typedef struct {
   unsigned initramfs:1;		/* initramfs mode */
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
-  unsigned demo:1;		/* start live cd */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   unsigned extramount:1;	/* mountpoints.extra is in use */
   unsigned instdata_mounted:1;	/* install data are mounted */
@@ -401,20 +400,6 @@ typedef struct {
   } update;
 
   struct {
-    char *image;		/* "/boot/liveeval" */
-    char *cfg;			/* live config file */
-    slist_t *args;		/* 'live' cmdline args, splitted */
-    slist_t *useswap;		/* swap partitions to use */
-    slist_t *swaps;		/* swap partitions found */
-    slist_t *partitions;	/* live eval partitions */
-    unsigned newconfig:1;	/* ignore existing config */
-    unsigned nodisk:1;		/* don't save to disk */
-    unsigned swapfile:1;	/* use swap file */
-    unsigned autopart:1;	/* use first suitable partition, if any */
-    unsigned autoswap:1;	/* use first suitable swap, if any */
-  } live;
-
-  struct {
     char *buf;
     unsigned size;
     unsigned cnt;
@@ -470,7 +455,6 @@ typedef struct {
     char *instdata;
     char *instsys;
     char *instsys2;
-    char *live;
     char *update;
     char *swap;
   } mountpoint;
@@ -597,6 +581,5 @@ extern int             reboot_ig;
 extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;
-extern char            livesrc_tg[16];
 extern int             cdrom_drives;
 extern int             has_modprobe;

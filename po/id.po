@@ -583,15 +583,6 @@ msgstr "Tak ada informasi yang tersedia."
 msgid "Preparing installation..."
 msgstr "Mempersiapkan instalasi..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Memulai Live CD"
-
-#. TXT_INSERT_LIVECD
-#, fuzzy
-msgid "Insert the Live CD."
-msgstr "Harap masukkan Live CD."
-
 #. TXT_END_REBOOT
 #, fuzzy
 msgid "Exit or Reboot"

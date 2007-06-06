@@ -529,14 +529,6 @@ msgstr "Keine Informationen verfügbar."
 msgid "Preparing installation..."
 msgstr "Installation wird vorbereitet..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Live-CD starten"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Legen Sie die Live-CD ein."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Verlassen oder Neustart"

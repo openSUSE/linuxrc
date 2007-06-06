@@ -7,13 +7,13 @@
  */
 
 typedef enum {
-  key_none, key_root, key_live, key_keytable, key_language, key_rebootmsg,
+  key_none, key_root, key_keytable, key_language, key_rebootmsg,
   key_insmod, key_display, key_ip, key_netmask, key_gateway, key_server,
   key_nameserver, key_broadcast, key_network, key_partition, key_serverdir,
-  key_netdevice, key_livesrc, key_bootpwait, key_bootptimeout,
+  key_netdevice, key_bootpwait, key_bootptimeout,
   key_forcerootimage, key_rebootwait, key_sourcemounted, key_cdrom,
   key_pcmcia, key_haspcmcia, key_console, key_ptphost, key_domain,
-  key_manual, key_demo, key_reboot, key_floppydisk, key_keyboard,
+  key_manual, key_reboot, key_floppydisk, key_keyboard,
   key_yast2update, key_textmode, key_yast2color, key_bootdisk, key_disks,
   key_username, key_password, key_workdomain, key_alias, key_options,
   key_initrdmodules, key_locale, key_font, key_screenmap, key_fontmagic,
@@ -33,7 +33,7 @@ typedef enum {
   key_productdir, key_linuxrcstderr, key_comment, key_kbdtimeout,
   key_brokenmodules, key_testpivotroot, key_scsibeforeusb, key_hostip,
   key_linemode, key_moduledelay, key_updatedir, key_scsirename,
-  key_doscsirename, key_lxrcdebug, key_kernel_pcmcia, key_liveconfig,
+  key_doscsirename, key_lxrcdebug, key_kernel_pcmcia,
   key_updatename, key_updatestyle, key_updateid,
   key_updateask, key_initrd, key_vga, key_bootimage, key_ramdisksize,
   key_suse, key_showopts, key_nosshkey, key_startshell, key_y2debug, key_ro,
@@ -95,7 +95,6 @@ int file_sym2num(char *sym);
 char *file_num2sym(char *base_sym, int num);
 file_t *file_parse_buffer(char *buf, file_key_flag_t flags);
 void file_do_info(file_t *f0);
-void file_write_live_config(char *dir);
 void get_ide_options(void);
 slist_t *file_parse_xmllike(char *name, char *tag);
 

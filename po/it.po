@@ -577,14 +577,6 @@ msgstr "Nessuna informazione disponibile."
 msgid "Preparing installation..."
 msgstr "Preparazione dell'installazione in corso..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Lancia Live-CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Inserite il Live-CD."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Esci e riavvia"

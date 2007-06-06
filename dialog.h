@@ -42,7 +42,6 @@ typedef enum {
   di_expert_slp,
 
   di_inst_install,
-  di_inst_demo,
   di_inst_system,
   di_inst_rescue,
   di_inst_update_add,

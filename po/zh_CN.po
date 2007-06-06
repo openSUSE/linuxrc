@@ -524,14 +524,6 @@ msgstr "没有可用信息。"
 msgid "Preparing installation..."
 msgstr "正在准备安装..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "启动 Live CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "插入 Live CD。"
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "退出或重引导"

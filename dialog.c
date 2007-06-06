@@ -62,7 +62,6 @@ struct {
   { di_expert_slp,          0, "Get SLP Info"    },
 
   { di_inst_install,     TXT_START_INSTALL,       },
-  { di_inst_demo,        TXT_START_DEMO,          },
   { di_inst_system,      TXT_BOOT_SYSTEM,         },
   { di_inst_rescue,      TXT_START_RESCUE,        },
   { di_inst_update_add,  TXT_ADD_DRIVER_UPDATE,   },

@@ -530,14 +530,6 @@ msgstr "Ingen informasjon tilgjengelig."
 msgid "Preparing installation..."
 msgstr "Forbereder installasjon..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Start Live CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Sett inn Live CDen."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Avslutt eller start på nytt"

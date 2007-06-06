@@ -636,16 +636,6 @@ msgstr "Aucune information disponible."
 msgid "Preparing installation..."
 msgstr "Préparation de l'installation..."
 
-# TLABEL linuxrc_2002_03_29_0036__111
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Démarrer le CD live"
-
-# TLABEL linuxrc_2002_03_29_0036__112
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Insérer le CD live."
-
 # TLABEL linuxrc_2002_03_29_0036__113
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"

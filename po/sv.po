@@ -527,14 +527,6 @@ msgstr "Ingen information tillgänglig."
 msgid "Preparing installation..."
 msgstr "Förbereder installation..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Starta live-cd"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Lägg i live-cd:n."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Avsluta eller starta om"

@@ -529,14 +529,6 @@ msgstr "Інформація недоступна."
 msgid "Preparing installation..."
 msgstr "Підготувати встановлення..."
 
-#. TXT_START_DEMO
-msgid "Start Live CD"
-msgstr "Запустити Live CD"
-
-#. TXT_INSERT_LIVECD
-msgid "Insert the Live CD."
-msgstr "Вставте Live CD."
-
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
 msgstr "Вихід або Перезавантаження"

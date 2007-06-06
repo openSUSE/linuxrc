@@ -34,6 +34,5 @@ char            *usb_mods_ig = NULL;
 char            xkbmodel_tg [20] = "";
 unsigned        yast2_color_ig = 0;
 int             reboot_wait_ig = FALSE;
-char            livesrc_tg[16] = "";
 int             cdrom_drives = 0;
 int             has_modprobe = 0;

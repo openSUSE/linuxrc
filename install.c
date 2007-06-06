@@ -81,9 +81,6 @@ static int   inst_do_tftp             (void);
 static int choose_dud(char **dev);
 static void  inst_swapoff             (void);
 static void get_file(char *src, char *dst);
-static void eval_find_config(void);
-static int eval_configure(void);
-static void live_show_state(void);
 static void read_install_files(void);
 
 static dia_item_t di_inst_menu_last = di_none;
@@ -93,96 +90,16 @@ static dia_item_t di_inst_choose_netsource_last = di_none;
 static dia_item_t di_inst_choose_display_last = di_none;
 #endif
 
-int inst_start_demo()
-{
-  int rc, win_old;
-  char buf[256];
-  FILE *f;
-
-  if(config.manual) {
-    if(config.instmode == inst_nfs) {
-      rc = inst_mount_nfs();
-    }
-    else {
-      dia_message(txt_get(TXT_INSERT_LIVECD), MSGTYPE_INFOENTER);
-      rc = inst_mount_cdrom(1);
-    }
-
-    if(rc) return rc;
-  }
-  else {
-    if(config.ask_language || config.ask_keytable) {
-      if(!(win_old = config.win)) util_disp_init();
-      if(config.ask_language) set_choose_language();
-      util_print_banner();
-      if(config.ask_keytable) set_choose_keytable(1);
-      if(!win_old) util_disp_done();
-    }
-  }
-
-  sprintf(buf, "%s/%s", config.mountpoint.instdata, config.live.image);
-
-  if(!util_check_exist(buf)) {
-    util_disp_init();
-    dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-    inst_umount();
-    return -1;
-  }
-
-  config.inst_ramdisk = load_image(buf, config.instmode, "Loading Live Image");
-
-  inst_umount();	// what for???, cf. inst_start_rescue()
-
-  if(config.inst_ramdisk < 0) return -1;
-
-  root_set_root(config.ramdisk[config.inst_ramdisk].dev);
-
-  eval_find_config();
-  if(eval_configure()) return -1;
-
-  rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.live);
-  if(!rc) mount(0, config.mountpoint.live, 0, MS_MGC_VAL | MS_REMOUNT, 0);
-
-  file_write_install_inf(config.mountpoint.live);
-  file_write_live_config(config.mountpoint.live);
-
-  sprintf(buf, "%s/%s", config.mountpoint.live, "etc/fstab");
-  f = fopen(buf, "a");
-
-  if(config.instmode == inst_nfs && !*livesrc_tg) {
-    sprintf(buf, "%s:%s /S.u.S.E. nfs ro,nolock 0 0\n",
-      inet_ntoa(config.net.server.ip),
-      config.serverdir ?: ""
-    );
-  }
-  else {
-    sprintf(buf, "/dev/%s /S.u.S.E. %s ro 0 0\n",
-      *livesrc_tg ? livesrc_tg : config.cdrom,
-      *livesrc_tg ? "auto" : "iso9660"
-    );
-  }
-
-  fprintf(f, buf);
-  fclose(f);
-
-  util_umount(config.mountpoint.live);
-
-  return 0;
-}
-
 
 int inst_menu()
 {
   dia_item_t di;
   dia_item_t items[] = {
     di_inst_install,
-    di_inst_demo,
     di_inst_system,
     di_inst_rescue,
     di_none
   };
-
-  items[config.demo ? 0 : 1] = di_skip;
 
   /* hope this is correct... */
   config.net.do_setup = 0;
@@ -214,11 +131,6 @@ int inst_menu_cb(dia_item_t di)
       * Back to main menu.
       */
       rc = -1;
-      break;
-
-    case di_inst_demo:
-      error = inst_start_demo();
-      if(config.redraw_menu) rc = -1;
       break;
 
     case di_inst_system:
@@ -882,7 +794,7 @@ int inst_check_instsys()
       if(config.rescue || util_check_exist(buf) != 'd') {
         strprintf(&buf, "%s%s",
           config.mountpoint.instdata,
-          config.demo ? config.live.image : config.rescue ? config.rescueimage : config.rootimage
+          config.rescue ? config.rescueimage : config.rootimage
         );
       }
 
@@ -2038,248 +1950,6 @@ void get_file(char *src, char *dst)
       util_cp_main(3, argv);
     }
   }
-}
-
-
-void eval_find_config()
-{
-  hd_data_t *hd_data;
-  hd_t *hd, *hd1;
-  char *type, buf[256], buf2[256], *module;
-  struct statfs statfs_buf;
-  unsigned u0, u1;
-  int cfg_found = 0, len = 0;
-  slist_t *sl;
-
-  if(config.live.nodisk) return;
-
-  printf(config.live.newconfig ? "Checking partitions...\n" : "Looking for LiveEval config...\n");
-
-  hd_data = calloc(1, sizeof *hd_data);
-
-  hd = hd_list(hd_data, hw_partition, 1, NULL);
-
-  for(hd1 = hd; hd1; hd1 = hd1->next) {
-    if(
-      !hd1->unix_dev_name ||
-      strncmp(hd1->unix_dev_name, "/dev/", sizeof "/dev/" - 1)
-    ) continue;
-    type = util_fstype(hd1->unix_dev_name, &module);
-    if(!type || !strcmp(type, "ntfs")) continue;
-    if(len) printf("\r%*s\r", len, "");
-    len = printf("%s: %s", hd1->unix_dev_name, type);
-    fflush(stdout);
-
-    if(!strcmp(type, "swap")) {
-      slist_append_str(&config.live.swaps, hd1->unix_dev_name + sizeof "/dev/" - 1);
-    }
-    else {
-      mod_modprobe(module, NULL);
-      if(!util_mount_ro(hd1->unix_dev_name, config.mountpoint.live)) {
-        sprintf(buf, "%s/%s", config.mountpoint.live, config.live.cfg);
-        if(util_check_exist(buf)) {
-          if(!config.partition) {
-            str_copy(&config.partition, hd1->unix_dev_name + sizeof "/dev/" - 1);
-          }
-          if(!config.live.newconfig) cfg_found = 1;
-        }
-        if(!statfs(config.mountpoint.live, &statfs_buf)) {
-          u0 = ((uint64_t) statfs_buf.f_bsize * statfs_buf.f_blocks) >> 20;
-          u1 = ((uint64_t) statfs_buf.f_bsize * statfs_buf.f_bfree) >> 20;
-          if(u1 >= 256) {
-            sprintf(buf2,
-              "%s, %u%cB (%u%cB free)",
-              type,
-              u0 >= 10240 ? u0 >> 10 : u0,
-              u0 >= 10240 ? 'G' : 'M',
-              u1 >= 10240 ? u1 >> 10 : u1,
-              u1 >= 10240 ? 'G' : 'M'
-            );
-            sl = slist_append_str(&config.live.partitions, hd1->unix_dev_name + sizeof "/dev/" - 1);
-            str_copy(&sl->value, buf2);
-          }
-        }
-        util_umount(config.mountpoint.live);
-      }
-    }
-    if(cfg_found) break;
-  }
-
-  if(!cfg_found) config.live.newconfig = 1;
-
-  if(len) printf("\r%*s\r", len, "");
-
-  hd_free_hd_data(hd_data);
-  free(hd_data);
-}
-
-
-int eval_configure()
-{
-  int win_old = 1, cnt, i, j, width, pwidth;
-  slist_t *sl;
-  char **items, *s, buf[256];
-
-  if(config.live.autopart && !config.partition) {
-    if(config.live.partitions) {
-      str_copy(&config.partition, config.live.partitions->key);
-    }
-    else {
-      config.live.nodisk = 1;
-    }
-  }
-
-  if(config.live.autoswap && !config.live.nodisk && !config.live.useswap) {
-    if(config.live.swaps) {
-      slist_append_str(&config.live.useswap, config.live.swaps->key);
-    }
-    else {
-      config.live.swapfile = 1;
-    }
-  }
-
-  live_show_state();
-
-  for(cnt = 0, pwidth = 4, sl = config.live.partitions; sl; sl = sl->next) {
-    j = strlen(sl->key);
-    if(j > pwidth) pwidth = j;
-    cnt++;
-  }
-
-  if(!config.live.nodisk && !config.partition) {
-    if(!cnt) {
-      if(!(win_old = config.win)) util_disp_init();
-      dia_message("Sorry, no partition found, your config data will not be saved.", MSGTYPE_INFO);
-      if(!win_old) util_disp_done();
-      config.live.nodisk = 1;
-      config.live.newconfig = 1;
-      str_copy(&config.partition, NULL);
-      return 0;
-    }
-    else {
-      if(!(win_old = config.win)) util_disp_init();
-
-      items = calloc(cnt + 2, sizeof *items);
-
-      s = "don't save config data";
-      str_copy(&items[0], s);
-      width = strlen(s) + 1;
-
-      for(i = 1, sl = config.live.partitions; sl; sl = sl->next) {
-        j = sprintf(buf, "%-*s: %s", pwidth, sl->key, sl->value);
-        if(j > width) width = j;
-        str_copy(&items[i++], buf);
-      }
-
-      j = dia_list("Where do you want config data to be saved?", width + 1, NULL, items, 2, align_left);
-
-      for(i = 0; i < cnt + 1; i++) { free(items[i]); }
-      free(items);
-
-      if(j >= 2) {
-        for(i = 2, sl = config.live.partitions; sl; sl = sl->next, i++) {
-          if(i == j) {
-            str_copy(&config.partition, sl->key);
-          }
-        }
-      }
-      else {
-        config.live.newconfig = 1;
-        str_copy(&config.partition, NULL);
-      }
-    }
-  }
-
-  if(
-    config.live.newconfig &&
-    !config.live.nodisk &&
-    !config.live.useswap &&
-    (config.live.swaps || config.partition)
-  ) {
-    if(!config.win && !(win_old = config.win)) util_disp_init();
-
-    for(cnt = 0, sl = config.live.swaps; sl; sl = sl->next) cnt++;
-
-    items = calloc(cnt + 3, sizeof *items);
-
-    s = "no swap space";
-    str_copy(&items[0], s);
-    width = strlen(s) + 1;
-
-    s = "create swapfile";
-    str_copy(&items[1], s);
-    i = strlen(s) + 1;
-    if(i > width) width = i;
-
-    for(i = 2, sl = config.live.swaps; sl; sl = sl->next) {
-      j = sprintf(buf, "%s", sl->key);
-      if(j > width) width = j;
-      str_copy(&items[i++], buf);
-    }
-
-    j = dia_list(
-      "Do you want to use swap space?",
-      width + 1, NULL, items,
-      config.partition ? cnt ? 3 : 2 : 1,
-      align_left
-    );
-
-    for(i = 0; i < cnt + 2; i++) { free(items[i]); }
-    free(items);
-
-    if(j >= 3) {
-      for(i = 3, sl = config.live.swaps; sl; sl = sl->next, i++) {
-        if(i == j) {
-          slist_append_str(&config.live.useswap, sl->key);
-        }
-      }
-    }
-    else if(j == 2) {
-      config.live.swapfile = 1;
-    }
-  }
-
-  if(!config.partition) config.live.nodisk = 1;
-
-  if(!win_old) util_disp_done();
-
-  live_show_state();
-
-  return 0;
-}
-
-
-void live_show_state()
-{
-  slist_t *sl;
-
-  if(!config.debug) return;
-
-  printf("\n");
-
-  printf(
-    "newconfig = %u, nodisk = %u, swapfile = %u, autopart = %u, autoswap = %u\n",
-    config.live.newconfig, config.live.nodisk, config.live.swapfile,
-    config.live.autopart, config.live.autoswap
-  );
-
-  if(config.partition) {
-    printf("partition = %s\n", config.partition);
-  }
-
-  for(sl = config.live.swaps; sl; sl = sl->next) {
-    printf("swap found: %s\n", sl->key);
-  }
-
-  for(sl = config.live.useswap; sl; sl = sl->next) {
-    printf("swap to use: %s\n", sl->key);
-  }
-
-  for(sl = config.live.partitions; sl; sl = sl->next) {
-    printf("%s: %s\n", sl->key, sl->value);
-  }
-
-  getchar();
 }
 
 
