@@ -1234,6 +1234,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.zen, "zen");
   add_flag(&sl0, buf, config.has_pcmcia, "pcmcia");
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
+  add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
@@ -3557,7 +3558,10 @@ char *util_fstype(char *dev, char **module)
   if(!type) return NULL;
 
   if(module) {
-    if(!strcmp(type, "cpio")) {
+    if(
+      !strcmp(type, "cpio") ||
+      (config.ntfs_3g && !strcmp(type, "ntfs"))
+    ) {
       *module = NULL;
     }
     else {
@@ -3631,7 +3635,7 @@ int util_detach_loop(char *dev)
 
 int util_mount(char *dev, char *dir, unsigned long flags)
 {
-  char *type, *loop_dev;
+  char *type, *loop_dev, *cmd = NULL;
   int err = -1;
   struct stat64 sbuf;
 
@@ -3699,7 +3703,12 @@ int util_mount(char *dev, char *dir, unsigned long flags)
     dev = loop_dev;
   }
 
-  if(type) {
+  if(config.ntfs_3g && !strcmp(type, "ntfs")) {
+    asprintf(&cmd, "/bin/mount -t ntfs-3g%s %s %s", (flags & MS_RDONLY) ? " -oro" : "", dev, dir);
+    err = system(cmd);
+    free(cmd);
+  }
+  else if(type) {
     err = mount(dev, dir, type, flags, 0);
     if(err && config.run_as_linuxrc) {
       fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));

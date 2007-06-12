@@ -272,6 +272,7 @@ static struct {
   { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                },
   { key_bootif,         "BOOTIF",         kf_cmd                         },
   { key_swap_size,      "SwapSize",       kf_cfg + kf_cmd                },
+  { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1429,6 +1430,10 @@ void file_do_info(file_t *f0)
 
       case key_swap_size:
         if(f->is.numeric) config.swap_file_size = f->nvalue;
+        break;
+
+      case key_ntfs_3g:
+        if(f->is.numeric) config.ntfs_3g = f->nvalue;
         break;
 
       default:

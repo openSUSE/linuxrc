@@ -310,6 +310,7 @@ typedef struct {
   unsigned zombies:1;		/* keep zombies around */
   unsigned installfilesread:1;	/* already got install files */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
+  unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
