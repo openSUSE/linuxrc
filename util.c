@@ -3507,9 +3507,14 @@ int util_wget_main(int argc, char **argv)
 
   argv++; argc--;
 
-  if(argc != 2) return fprintf(stderr, "usage: wget url file\n"), 1;
-
   url_data = url_data_new();
+
+  if(argc && !strcmp(*argv, "-z")) {
+    url_data->unzip = 1;
+    argv++; argc--;
+  }
+
+  if(argc != 2) return fprintf(stderr, "usage: wget url file\n"), 1;
 
   url_data->url = url_set(argv[0]);
   url_data->file_name = strdup(argv[1]);

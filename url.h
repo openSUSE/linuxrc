@@ -13,6 +13,7 @@ typedef struct url_data_s {
   unsigned gzip:1;
   unsigned cramfs:1;
   unsigned file_opened:1;
+  unsigned unzip:1;
   int pipe_fd;
   char *orig_name;
   unsigned image_size;

@@ -158,6 +158,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
     url_data->buf.len >= 11
   ) {
     if(
+      url_data->unzip &&
       url_data->buf.data[0] == 0x1f &&
       url_data->buf.data[1] == 0x8b
     ) {
@@ -334,8 +335,11 @@ url_t *url_set(char *str)
     }
   }
   else {
-    url->scheme = inst_file;
-    url->path = strdup(str);
+    url->scheme = file_sym2num(str);
+    if(!url->scheme) {
+      url->scheme = inst_file;
+      url->path = strdup(str);
+    }
   }
 
   free(str);
