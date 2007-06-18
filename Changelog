@@ -1,3 +1,6 @@
+	- resolv.conf not written when netsetup=dhcp,all was used (#284469)
+	- allow multiple nameservers (#284469)
+
 12/6/2007:	v2.1.27
 	- use libcurl, part 1
 	- removed ancient livecd code
