@@ -558,7 +558,8 @@ void lxrc_end()
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs", "udevd"
+    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs", "udevd",
+    "mount.ntfs-3g"
   };
   int i;
 
