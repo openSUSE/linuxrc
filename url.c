@@ -335,9 +335,13 @@ url_t *url_set(char *str)
     }
   }
   else {
-    url->scheme = file_sym2num(str);
-    if(!url->scheme) {
-      url->scheme = inst_file;
+    // FIXME: should always be 'rel'
+    i = file_sym2num(str);
+    if(i >= 0) {
+      url->scheme = i;
+    }
+    else if(i == -1) {
+      url->scheme = inst_rel;
       url->path = strdup(str);
     }
   }
@@ -469,6 +473,37 @@ url_t *url_set(char *str)
     str_copy(&url->device, *s0 ? s0 : NULL);
   }
 
+  if((sl = slist_getentry(url->query, "instsys"))) {
+    str_copy(&url->instsys, sl->value);
+  }
+
+  if((sl = slist_getentry(url->query, "proxy"))) {
+    str_copy(&url->proxy, sl->value);
+  }
+
+  if(
+    url->scheme == inst_file ||
+    url->scheme == inst_nfs ||
+    url->scheme == inst_smb ||
+    url->scheme == inst_cdrom ||
+    url->scheme == inst_floppy ||
+    url->scheme == inst_hd ||
+    url->scheme == inst_dvd ||
+    url->scheme == inst_exec
+    ) {
+    url->is.mountable = 1;
+  }
+
+  if(
+    url->scheme == inst_nfs ||
+    url->scheme == inst_ftp ||
+    url->scheme == inst_smb ||
+    url->scheme == inst_http ||
+    url->scheme == inst_tftp
+    ) {
+    url->is.network = 1;
+  }
+
   fprintf(stderr, "url = %s\n", url->str);
   fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
   if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
@@ -490,6 +525,12 @@ url_t *url_set(char *str)
     if(url->device) fprintf(stderr, "%c device = \"%s\"", i++ ? ',' : ' ', url->device);
     fprintf(stderr, "\n");
   }
+
+  fprintf(stderr, "  network = %u, mountable = %u\n", url->is.network, url->is.mountable);
+
+  if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
+
+  if(url->proxy) fprintf(stderr, "  proxy = %s\n", url->proxy);
 
   if(url->query) {
     fprintf(stderr, "  query:\n");
@@ -513,6 +554,7 @@ url_t *url_free(url_t *url)
     free(url->password);
     free(url->domain);
     free(url->device);
+    free(url->proxy);
 
     slist_free(url->query);
 

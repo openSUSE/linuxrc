@@ -306,6 +306,7 @@ static struct {
   { "net",       inst_net           },
   { "slp",       inst_slp           },
   { "exec",      inst_exec          },
+  { "rel",       inst_rel           },
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
   { "disk",      inst_hd            },

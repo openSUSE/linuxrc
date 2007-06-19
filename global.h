@@ -129,7 +129,8 @@ typedef struct {
 typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
-  inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec
+  inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
+  inst_rel
 } instmode_t;
 
 
@@ -214,8 +215,14 @@ typedef struct {
   char *password;
   char *domain;
   char *device;
+  char *instsys;
+  char *proxy;
   unsigned port;
   slist_t *query;
+  struct {
+    unsigned network:1;
+    unsigned mountable:1;
+  } is;
 } url_t;
 
 
