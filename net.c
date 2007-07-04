@@ -2088,7 +2088,7 @@ int net_activate_s390_devs(void)
 	  }
       }
       
-      if(config.hwp.medium == di_osa_eth)
+      if(config.hwp.medium == di_osa_eth && di != di_390net_hsi)
       {
         IFNOTAUTO(config.hwp.layer2)
         {
