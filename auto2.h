@@ -1,6 +1,6 @@
 int auto2_mount_cdrom(char *device);
 int auto2_mount_harddisk(char *dev);
-void auto2_scan_hardware(char *log_file);
+void auto2_scan_hardware(void);
 int auto2_init(void);
 char *auto2_serial_console(void);
 int auto2_find_install_medium(void);

@@ -412,6 +412,7 @@ url_t *url_set(char *str)
   /* disk/cdrom: allow path to begin with device name */
   if(
     (
+      url->scheme == inst_disk ||
       url->scheme == inst_cdrom ||
       url->scheme == inst_dvd ||
       url->scheme == inst_floppy ||
@@ -455,6 +456,7 @@ url_t *url_set(char *str)
     url->scheme == inst_dvd ||
     url->scheme == inst_floppy ||
     url->scheme == inst_hd ||
+    url->scheme == inst_disk ||
     url->scheme == inst_nfs ||
     url->scheme == inst_smb
   ) {
@@ -488,6 +490,7 @@ url_t *url_set(char *str)
     url->scheme == inst_cdrom ||
     url->scheme == inst_floppy ||
     url->scheme == inst_hd ||
+    url->scheme == inst_disk ||
     url->scheme == inst_dvd ||
     url->scheme == inst_exec
     ) {
@@ -502,6 +505,13 @@ url_t *url_set(char *str)
     url->scheme == inst_tftp
     ) {
     url->is.network = 1;
+  }
+
+  if(
+    url->scheme == inst_cdrom ||
+    url->scheme == inst_dvd
+    ) {
+    url->is.cdrom = 1;
   }
 
   fprintf(stderr, "url = %s\n", url->str);
@@ -555,6 +565,9 @@ url_t *url_free(url_t *url)
     free(url->domain);
     free(url->device);
     free(url->proxy);
+    free(url->used_device);
+    free(url->mount);
+    free(url->tmp_mount);
 
     slist_free(url->query);
 
@@ -610,4 +623,24 @@ void url_cleanup()
   curl_global_cleanup();
 }
 
+
+/*
+ * Mount url to dir; if dir is NULL, assign temporary mountpoint.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ *   sets url->used_device, url->mount, url->tmp_mount (if ok)
+ */
+int url_mount(url_t *url, char *dir)
+{
+  int err = 0;
+
+  if(!url || !url->scheme) return 1;
+
+  update_device_list(0);
+
+
+  return 0;
+}
 

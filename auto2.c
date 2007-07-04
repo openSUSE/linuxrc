@@ -14,8 +14,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <hd.h>
-
 #include "global.h"
 #include "linuxrc.h"
 #include "text.h"
@@ -33,11 +31,11 @@
 #include "install.h"
 #include "auto2.h"
 #include "settings.h"
+#include "url.h"
 
-
+static int auto2_mount_disk(char *dev);
+static int auto2_find_install_disk(void);
 static void auto2_user_netconfig(void);
-static int auto2_harddisk_dev(void);
-static int auto2_cdrom_dev(void);
 static int auto2_net_dev(hd_t **);
 static int auto2_net_dev1(hd_t *hd, hd_t *hd_card);
 static int driver_is_active(hd_t *hd);
@@ -45,73 +43,15 @@ static void auto2_progress(char *pos, char *msg);
 static void get_zen_config(void);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 
-/*
- * mount a detected suse-cdrom at config.mountpoint.instdata and run inst_check_instsys()
- *
- * return 0 on success
- */
-int auto2_mount_cdrom(char *device)
-{
-  int rc;
-
-  set_instmode(inst_cdrom);
-
-  if(config.cdid && strstr(config.cdid, "-DVD-")) set_instmode(inst_dvd);
-
-  rc = do_mount_disk(device, 0);
-
-  if(!rc) {
-    if((rc = inst_check_instsys())) {
-      fprintf(stderr, "disk: %s: not a %s install medium.\n", device, config.product);
-      inst_umount();
-    } else {
-      str_copy(&config.cdrom, short_dev(device));
-    }
-  }
-  else {
-    fprintf(stderr, "disk: %s: no filesystem\n", device);
-  }
-
-  if(rc) set_instmode(inst_cdrom);
-
-  return rc;
-}
-
-
-int auto2_mount_harddisk(char *dev)
-{
-  int rc = 0;
-
-  set_instmode(inst_hd);
-
-  if(do_mount_disk(dev, 1)) return 1;
-
-  if((rc = inst_check_instsys())) {
-    fprintf(stderr, "disk: %s::%s is not an installation source\n", dev, config.serverdir);
-  }
-  else {
-    fprintf(stderr, "disk: using %s::%s\n", dev, config.serverdir);
-  }
-
-  if(rc) {
-    fprintf(stderr, "disk: %s: no install data found\n", dev);
-    inst_umount();
-  }
-
-  util_do_driver_updates();
-
-  return rc;
-}
-
 
 /*
- * probe for installed hardware
+ * Probe for installed hardware.
  *
- * if log_file != NULL -> write hardware info to this file
+ * return:
+ *   - must set config.url.install
  */
-void auto2_scan_hardware(char *log_file)
+void auto2_scan_hardware()
 {
-  FILE *f = NULL;
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
   int i, ju, k;
@@ -123,13 +63,9 @@ void auto2_scan_hardware(char *log_file)
   };
 
   hd_data = calloc(1, sizeof *hd_data);
-  hd_data->flags.nowpa = 1;
-
-  hd_set_probe_feature(hd_data, log_file ? pr_default : pr_lxrc);
-  hd_clear_probe_feature(hd_data, pr_parallel);
 
 #if !defined(__s390__) && !defined(__s390x__)
-  if(!log_file && config.debug) hd_data->progress = auto2_progress;
+  if(config.debug) hd_data->progress = auto2_progress;
 #endif
 
   fprintf(stderr, "Starting hardware detection...\n");
@@ -158,7 +94,7 @@ void auto2_scan_hardware(char *log_file)
     storage_loaded = 1;
   }
 
-  if((hd_pcmcia = hd_list(hd_data, hw_pcmcia_ctrl, 0, NULL))) {
+  if((hd_pcmcia = hd_list(hd_data, hw_pcmcia_ctrl, 0, NULL)) && !config.test) {
     printf("Activating pcmcia devices...");
     fflush(stdout);
 
@@ -186,7 +122,7 @@ void auto2_scan_hardware(char *log_file)
     fflush(stdout);
   }
 
-  if((hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL))) {
+  if((hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL)) && !config.test) {
     printf("Activating usb devices...");
     fflush(stdout);
 
@@ -228,17 +164,15 @@ void auto2_scan_hardware(char *log_file)
     if(config.usbwait > 0) sleep(config.usbwait);
     // hd_list(hd_data, hw_usb, 1, NULL);
 
-    printf(" ok\n"); fflush(stdout);
-#if !defined(__s390__) && !defined(__s390x__)
-    if(!log_file) hd_data->progress = auto2_progress;
-#endif
+    printf(" ok\n");
+    fflush(stdout);
   }
 
-  hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL);
-
-  if(hd_fw) {
+  if((hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL)) && !config.test) {
     printf("Activating ieee1394 devices...");
     fflush(stdout);
+
+    hd_data->progress = NULL;
 
     config.module.delay += 3;
 
@@ -270,6 +204,10 @@ void auto2_scan_hardware(char *log_file)
       }
     }
   }
+
+#if !defined(__s390__) && !defined(__s390x__)
+  if(config.debug) hd_data->progress = auto2_progress;
+#endif
 
   hd_sys = hd_list(hd_data, hw_sys, 0, NULL);
 
@@ -331,136 +269,110 @@ void auto2_scan_hardware(char *log_file)
     }
   }
 
-  if(log_file && (f = fopen(log_file, "w+"))) {
-
-    if((hd_data->debug & HD_DEB_SHOW_LOG) && hd_data->log) {
-      fprintf(f,
-        "============ start debug info ============\n%s=========== end debug info ============\n",
-        hd_data->log
-      );
-    }
-
-    for(hd = hd_data->hd; hd; hd = hd->next) hd_dump_entry(hd_data, hd, f);
-    fclose(f);
-  }
-
   hd_free_hd_data(hd_data);
   free(hd_data);
+
+  update_device_list(1);
+
+  if(!config.url.install) config.url.install = url_set("cd:/");
+}
+
+
+/*
+ * Look for install source on block device 'dev' and mount it.
+ *
+ * return:
+ *   0: ok
+ *   1: error
+ */
+int auto2_mount_disk(char *dev)
+{
+  int err = 0;
+
+  if(do_mount_disk(dev, 1)) return 1;
+
+  if((err = inst_check_instsys())) {
+    fprintf(stderr, "disk: %s::%s is not an installation source\n", dev, config.serverdir);
+  }
+  else {
+    fprintf(stderr, "disk: using %s::%s\n", dev, config.serverdir);
+  }
+
+  if(err) {
+    fprintf(stderr, "disk: %s: no install data found\n", dev);
+    inst_umount();
+  }
+
+  util_do_driver_updates();
+
+  return err;
 }
 
 
 /*
  * Look for a block device with install source and mount it.
  *
- * Returns:
- *    0: ok, device was mounted
- *    1: no device found
- *   >1: device found, but continue search
- *
+ * return:
+ *   0: ok, device was mounted
+ *   1: no device found
  */
-
-extern str_list_t *search_str_list(str_list_t *sl, char *str);	/* libhd function */
-
-int auto2_harddisk_dev()
+int auto2_find_install_disk()
 {
-  int i = 1;
+  int err = 1;
   hd_data_t *hd_data;
   hd_t *hd;
+  hd_hw_item_t hw_item = hw_block;
+
+  url_mount(config.url.install, "/mnt");
+
+  getchar(); lxrc_end(); exit(0);
 
   hd_data = calloc(1, sizeof *hd_data);
 
-  for(hd = hd_list(hd_data, hw_block, 1, NULL); hd; hd = hd->next) {
+  switch(config.url.install->scheme) {
+    case inst_cdrom:
+      hw_item = hw_cdrom;
+      break;
+
+    case inst_floppy:
+      hw_item = hw_floppy;
+      break;
+
+    default:
+      break;
+  }
+
+  for(hd = hd_list(hd_data, hw_item, 1, NULL); hd; hd = hd->next) {
     if(
-      hd_is_hw_class(hd, hw_floppy) ||		/* no floppies */
-      hd_is_hw_class(hd, hw_cdrom) ||		/* no cd-roms */
-      hd->child_ids ||				/* no block devs with partitions */
+      (
+        config.url.install->scheme == inst_hd &&
+        (					/* hd means: */
+          hd_is_hw_class(hd, hw_floppy) ||	/*  - not a floppy */
+          hd_is_hw_class(hd, hw_cdrom) ||	/*  - not a cdrom */
+          hd->child_ids				/*  - has no partitions */
+        )
+      ) ||
       !hd->unix_dev_name
     ) continue;
 
     if(
-      config.partition &&
-      strcmp(hd->unix_dev_name, long_dev(config.partition)) &&
-      !search_str_list(hd->unix_dev_names, long_dev(config.partition))
+      config.url.install->device &&
+      strcmp(hd->unix_dev_name, long_dev(config.url.install->device)) &&
+      !search_str_list(hd->unix_dev_names, long_dev(config.url.install->device))
     ) continue;
 
     fprintf(stderr, "disk: trying to mount: %s\n", hd->unix_dev_name);
 
-    i = auto2_mount_harddisk(hd->unix_dev_name) ? config.partition ? 1 : 2 : 0;
-
-    if(i == 0) {
-      str_copy(&config.partition, short_dev(hd->unix_dev_name));
-    }
-
-    if(i == 0) break;
-  }
-
-  hd_free_hd_data(hd_data);
-  free(hd_data);
-
-  return i;
-}
-
-
-/*
- * Look for a SuSE CD and mount it.
- *
- * Returns:
- *    0: OK, CD was mounted
- *    1: no CD found
- *   >1: CD found, but contiune the search
- *
- */
-int auto2_cdrom_dev()
-{
-  int i = 1;
-  hd_t *hd;
-  cdrom_info_t *ci;
-  char buf[256];
-  hd_data_t *hd_data;
-
-  if(config.cdromdev) {
-    sprintf(buf, "/dev/%s", config.cdromdev);
-    i = auto2_mount_cdrom(buf) ? 1 : 0;
-    return i;
-  }
-
-  hd_data = calloc(1, sizeof *hd_data);
-
-  for(hd = hd_list(hd_data, hw_cdrom, 1, NULL); hd; hd = hd->next) {
-    fprintf(stderr, "disk: trying to mount %s\n", hd->unix_dev_name);
-    
-    cdrom_drives++;
-
-    if(
-      hd->unix_dev_name &&
-      hd->detail &&
-      hd->detail->type == hd_detail_cdrom
-    ) {
-      ci = hd->detail->cdrom.data;
-
-      if(config.cdrom) {
-        i = 0;
-      }
-      else {
-        if(ci->iso9660.ok && ci->iso9660.volume) {
-          fprintf(stderr, "disk: media found in %s\n", hd->unix_dev_name);
-          str_copy(&config.cdid, ci->iso9660.volume);
-          if(ci->iso9660.application) str_copy(&config.cdid, ci->iso9660.application);
-          /* CD found -> try to mount it */
-          i = auto2_mount_cdrom(hd->unix_dev_name) ? 2 : 0;
-        }
-      }
-
-      if(config.update.ask && i == 0) i = 3;
-
-      if(i == 0) break;
+    if(!(err = auto2_mount_disk(hd->unix_dev_name))) {
+      str_copy(&config.url.install->used_device, short_dev(hd->unix_dev_name));
+      break;
     }
   }
 
   hd_free_hd_data(hd_data);
   free(hd_data);
 
-  return i;
+  return err;
 }
 
 
@@ -739,8 +651,6 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
 /*
  * Checks if autoinstall is possible.
  *
- * First, try to find a CDROM; then go for a network device.
- *
  * called from linuxrc.c
  *
  */
@@ -748,7 +658,7 @@ int auto2_init()
 {
   int i, win_old;
 
-  auto2_scan_hardware(NULL);
+  auto2_scan_hardware();
 
   util_splash_bar(40, SPLASH_40);
 
@@ -848,56 +758,40 @@ void auto2_user_netconfig()
 }
 
 /*
- * mmj@suse.de - first check if we're running automated harddisk install 
- * 
- * Look for a SuSE CD or NFS source.
+ * Look for install medium.
+ *
+ * return:
+ *   0: not found
+ *   1: ok
  */
 int auto2_find_install_medium()
 {
-  int i;
   hd_t *hd_devs = NULL;
 
-  if(config.instmode == inst_exec) {
+  if(!config.url.install || !config.url.install->scheme) return 0;
+
+  /* no need to mount anything */
+  if(config.url.install->scheme == inst_exec) {
     auto2_user_netconfig();
-    return TRUE;
+
+    return 1;
   }
 
-  if(config.instmode == inst_cdrom || !config.instmode) {
-    set_instmode(inst_cdrom);
-
-    str_copy(&config.cdrom, NULL);
-
-    util_debugwait("CD?");
-
-    fprintf(stderr, "Looking for a %s CD...\n", config.product);
-    if(!(i = auto2_cdrom_dev())) {
+  /* local disk */
+  if(
+    config.url.install->is.mountable &&
+    !config.url.install->is.network
+  ) {
+    fprintf(stderr, "looking for a %s disk\n", config.product);
+    if(!auto2_find_install_disk()) {
       auto2_user_netconfig();
-      return TRUE;
+
+      return 1;
     }
 
-    if(config.cdrom) {
-      auto2_user_netconfig();
-      return TRUE;
-    }
+    fprintf(stderr, "no %s disk found\n", config.product);
 
-    util_debugwait("Nothing found");
-
-    return FALSE;
-  }
-
-  if(config.instmode == inst_hd) {
-
-    util_debugwait("HD?");
-
-    fprintf(stderr, "Looking for a %s hard disk...\n", config.product);
-    if(!(i = auto2_harddisk_dev())) {
-      auto2_user_netconfig();
-      return TRUE;
-    }
-
-    util_debugwait("Nothing found");
-
-    return FALSE;
+    return 0;
   }
 
   if(net_config_mask() || config.insttype == inst_net) {

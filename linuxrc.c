@@ -749,8 +749,11 @@ void lxrc_init()
   /* add cmdline to info file */
   config.info.add_cmdline = 1;
 
-  /* make it configurable? */
-  config.module.dir = strdup("/modules");
+  config.module.dir = strdup(config.test ? "/tmp/modules" : "/modules");
+
+  /* must end with '/' */
+  config.mountpoint.base = strdup(config.test ? "/tmp/mounts/" : "/mounts/");
+
   config.mountpoint.floppy = strdup("/mounts/floppy");
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
@@ -809,7 +812,7 @@ void lxrc_init()
   }
 
   /* make auto mode default */
-  if(config.test || config.had_segv) {
+  if(config.had_segv) {
     config.manual = 1;
   }
 
@@ -853,7 +856,7 @@ void lxrc_init()
   if(config.staticdevices) {
     util_mkdevs();
   }
-  else {
+  else if(!config.test) {
     fprintf(stderr, "Starting udev... ");
     fflush(stderr);
     system("/bin/myudevstart >/dev/null 2>&1");

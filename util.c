@@ -49,8 +49,6 @@
 #include <linux/loop.h>
 #undef dev_t
 
-#include <hd.h>
-
 #include "global.h"
 #include "display.h"
 #include "util.h"
@@ -713,7 +711,7 @@ int util_umount(char *dir)
 
   file_free_file(f0);
 
-  if(!i && strstr(dir, "/mounts/") == dir) {
+  if(!i && strstr(dir, config.mountpoint.base) == dir) {
     rmdir(dir);
   }
 
@@ -3646,7 +3644,7 @@ int util_mount(char *dev, char *dir, unsigned long flags)
 
   if(!dev || !dir) return -1;
 
-  if(strstr(dir, "/mounts/") == dir && stat64(dir, &sbuf)) {
+  if(strstr(dir, config.mountpoint.base) == dir && stat64(dir, &sbuf)) {
     mkdir(dir, 0755);
   }
 
@@ -3773,8 +3771,6 @@ void util_update_netdevice_list(char *module, int add)
   file_free_file(f0);
 }
 
-
-extern str_list_t *search_str_list(str_list_t *sl, char *str);
 
 int util_update_disk_list(char *module, int add)
 {
@@ -4063,7 +4059,6 @@ void util_mkdevs()
 }
 
 
-extern str_list_t *add_str_list(str_list_t **sl, char *str);
 /*
  * Get unique id & hw address for network device.
  *
@@ -5082,4 +5077,42 @@ uint64_t blk_size(char *dev)
 
   return size >= 0 ? size : 0;
 }
+
+
+/*
+ * Update device list in config.hd_data (if udev got new events).
+ */
+void update_device_list(int force)
+{
+  static time_t last_time;
+  struct stat sbuf;
+
+  hd_hw_item_t hw_items[] = {
+    hw_block, hw_network_ctrl, hw_network
+  };
+
+  if(!config.hd_data) force = 1;
+
+  if(stat("/dev/.udev/uevent_seqnum", &sbuf)) {
+    force = 1;
+  }
+  else if(last_time != sbuf.st_mtime) {
+    last_time = sbuf.st_mtime;
+    force = 1;
+  }
+
+  if(!force) return;
+
+  if(config.hd_data) {
+    hd_free_hd_data(config.hd_data);
+    free(config.hd_data);
+  }
+
+  config.hd_data = calloc(1, sizeof *config.hd_data);
+
+  if(config.debug) fprintf(stderr, "rescanning devices\n");
+
+  hd_list2(config.hd_data, hw_items, 1);
+}
+
 

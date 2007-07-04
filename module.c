@@ -641,10 +641,6 @@ void mod_load_module_manual(char *module, int show)
   }
   else {
     mod_insmod(ml->name, s);
-    i = mod_is_loaded(ml->name);
-    if(!i) {
-      util_beep(FALSE);
-    }
   }
 }
 
@@ -663,7 +659,7 @@ int mod_insmod(char *module, char *param)
 
   if(config.debug) fprintf(stderr, "mod_insmod(\"%s\", \"%s\")\n", module, param);
 
-  if(!module) return 0;
+  if(!module || config.test) return 0;
 
   if(mod_is_loaded(module)) return 0;
 

@@ -13,6 +13,10 @@
 
 #include <blkid/blkid.h>
 
+#include <hd.h>
+extern str_list_t *search_str_list(str_list_t *sl, char *str);
+extern str_list_t *add_str_list(str_list_t **sl, char *str);
+
 #include "tftp.h"
 #include "po/text_langids.h"
 #include "text.h"
@@ -130,7 +134,7 @@ typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
-  inst_rel
+  inst_rel, inst_disk
 } instmode_t;
 
 
@@ -217,11 +221,17 @@ typedef struct {
   char *device;
   char *instsys;
   char *proxy;
+  char *used_device;
+  char *mount;
+  char *tmp_mount;
   unsigned port;
   slist_t *query;
   struct {
     unsigned network:1;
     unsigned mountable:1;
+    unsigned cdrom:1;
+    unsigned dvd:1;
+    unsigned disk:1;
   } is;
 } url_t;
 
@@ -379,6 +389,8 @@ typedef struct {
   slist_t *cd1texts;		/* text for requesting next product cd */
   unsigned swap_file_size;	/* swap file size in MB */
 
+  hd_data_t *hd_data;		/* device list */
+
   struct {
     url_t *install;		/* install url */
     url_t *autoyast;		/* autoyast url */
@@ -465,6 +477,7 @@ typedef struct {
     char *instsys2;
     char *update;
     char *swap;
+    char *base;
   } mountpoint;
 
   struct {
