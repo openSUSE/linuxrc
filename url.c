@@ -861,6 +861,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst)
 
 /*
  * Find repository (and mount at 'dir' if possbile).
+ * Mount instsys, too, if it is a relative url.
  *
  * return:
  *   0: ok
