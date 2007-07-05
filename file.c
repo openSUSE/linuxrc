@@ -862,6 +862,11 @@ void file_do_info(file_t *f0)
         url_free(config.url.install);
         config.url.install = url_set(f->value);
 
+        if(config.url.install->instsys) {
+          url_free(config.url.instsys);
+          config.url.instsys = url_set(config.url.install->instsys);
+        }
+
         if(config.url.install->scheme) {
           set_instmode(config.url.install->scheme);
           if(config.url.install->port) config.net.port = config.url.install->port;

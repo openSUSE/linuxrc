@@ -753,14 +753,16 @@ void lxrc_init()
   /* must end with '/' */
   config.mountpoint.base = strdup(config.test ? "/tmp/mounts/" : "/mounts/");
 
+  strprintf(&config.mountpoint.instsys, "%sinstsys", config.mountpoint.base);
+  strprintf(&config.mountpoint.swap, "%sswap", config.mountpoint.base);
+
+  config.mountpoint.update = strdup("/mounts/update");
   config.mountpoint.floppy = strdup("/mounts/floppy");
   config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
   config.mountpoint.extra = strdup("/mounts/extra");
-  config.mountpoint.instsys = strdup("/mounts/instsys");
   config.mountpoint.instsys2 = strdup("/mounts/instsys2");
-  config.mountpoint.update = strdup("/mounts/update");
+
   config.mountpoint.instdata = strdup("/var/adm/mount");
-  config.mountpoint.swap = strdup("/mounts/swap");
 
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
   config.update.dst = strdup("/update");

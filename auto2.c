@@ -48,7 +48,7 @@ static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
  * Probe for installed hardware.
  *
  * return:
- *   - must set config.url.install
+ *   - must set config.url.install & config.url.instsys
  */
 void auto2_scan_hardware()
 {
@@ -275,6 +275,7 @@ void auto2_scan_hardware()
   update_device_list(1);
 
   if(!config.url.install) config.url.install = url_set("cd:/");
+  if(!config.url.instsys) config.url.instsys = url_set(config.rootimage);
 }
 
 

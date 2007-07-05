@@ -545,6 +545,13 @@ void util_truncate_dir(char *dir)
 }
 
 
+/*
+ * Check whether 'file' exists and return file type.
+ *
+ * return:
+ *   0: does not exists
+ *   'r', 'd', 'b', 1: type (1: other)
+ */
 int util_check_exist(char *file)
 {
   struct stat64 sbuf;
@@ -556,6 +563,28 @@ int util_check_exist(char *file)
   if(S_ISBLK(sbuf.st_mode)) return 'b';
 
   return 1;
+}
+
+
+/*
+ * Check whether 'dir/file' exists and return file type.
+ *
+ * return:
+ *   0: does not exists
+ *   'r', 'd', 'b', 1: type (1: other)
+ */
+int util_check_exist2(char *dir, char *file)
+{
+  char *buf = NULL;
+  int type;
+
+  if(!dir || !file) return 0;
+
+  strprintf(&buf, "%s/%s", dir, file);
+  type = util_check_exist(buf);
+  str_copy(&buf, NULL);
+
+  return type;
 }
 
 
@@ -5146,4 +5175,38 @@ char *new_mountpoint()
   return buf;
 }
 
+
+/*
+ * Copy 'src_dir/src_file' to 'dst'.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int util_copy_file(char *src_dir, char *src_file, char *dst)
+{
+  int err = 0;
+  char *buf = NULL, *argv[3];
+
+  if(!src_dir || !src_file || !dst) return 1;
+
+  strprintf(&buf, "%s/%s", src_dir, src_file);
+
+  if(util_check_exist(buf) == 'r') {
+    unlink(dst);
+    argv[1] = buf;
+    argv[2] = dst;
+    if(util_cp_main(3, argv)) {
+      unlink(dst);
+      err = 1;
+    }
+  }
+  else {
+    err = 1;
+  }
+
+  str_copy(&buf, NULL);
+
+  return err;
+}
 

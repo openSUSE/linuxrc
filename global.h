@@ -396,6 +396,7 @@ typedef struct {
   struct {
     url_t *install;		/* install url */
     url_t *autoyast;		/* autoyast url */
+    url_t *instsys;		/* instsys url */
   } url;
 
   struct {			/* libblkid related things */

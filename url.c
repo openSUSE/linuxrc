@@ -829,7 +829,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
 /*
  * Read file 'src' relative to 'url' and write it to 'dst'. If 'dir' is set,
- * mount 'url' to 'dir'.
+ * mount 'url' at 'dir'.
  *
  * return:
  *   0: ok
@@ -838,20 +838,12 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 int url_read_file(url_t *url, char *dir, char *src, char *dst)
 {
   int err = 0;
-  char *buf = NULL, *argv[3];
 
   int test_file_exists(url_t *url)
   {
-    int ok;
-    char *buf = NULL;
-
     if(!url || !url->mount) return 0;
 
-    strprintf(&buf, "%s/%s", url->mount, src);
-    ok = util_check_exist(buf) == 'r' ? 1 : 0;
-    str_copy(&buf, NULL);
-
-    return ok;
+    return util_check_exist2(url->mount, src) == 'r' ? 1 : 0;
   }
 
   if(!src || !dst) return 1;
@@ -861,22 +853,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst)
     (err = url_mount(url, dir, test_file_exists))
   ) return err;
 
-  strprintf(&buf, "%s/%s", url->mount, src);
-
-  if(util_check_exist(buf) == 'r') {
-    unlink(dst);
-    argv[1] = buf;
-    argv[2] = dst;
-    if(util_cp_main(3, argv)) {
-      unlink(dst);
-      err = 1;
-    }
-  }
-  else {
-    err = 1;
-  }
-
-  str_copy(&buf, NULL);
+  err = util_copy_file(url->mount, src, dst);
 
   return err;
 }

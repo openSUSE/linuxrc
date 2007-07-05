@@ -26,7 +26,8 @@ extern void util_update_kernellog  (void);
 extern void util_print_banner      (void);
 extern void util_beep              (int  success_iv);
 extern void util_truncate_dir      (char *dir_tr);
-extern int  util_check_exist       (char *filename_tv);
+extern int  util_check_exist(char *file);
+extern int  util_check_exist2(char *dir, char *file);
 extern int  util_check_break       (void);
 extern void util_print_net_error   (void);
 extern int  util_free_ramdisk      (char *ramdisk_dev_tv);
@@ -161,4 +162,5 @@ uint64_t blk_size(char *dev);
 char *blk_ident(char *dev);
 void update_device_list(int force);
 char *new_mountpoint(void);
+int util_copy_file(char *src_dir, char *src_file, char *dst);
 
