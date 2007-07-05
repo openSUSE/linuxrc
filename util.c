@@ -753,6 +753,7 @@ void util_umount_all()
   int i;
   char *buf = NULL;
 
+  url_umount(config.url.instsys);
   url_umount(config.url.install);
 
   for(i = config.mountpoint.cnt; i-- > 0;) {
@@ -5209,4 +5210,32 @@ int util_copy_file(char *src_dir, char *src_file, char *dst)
 
   return err;
 }
+
+
+/*
+ * Return new download image name.
+ */
+char *new_download()
+{
+  static char *buf = NULL;
+
+  strprintf(&buf, "%s/image_%04u", config.download.base, config.download.cnt++);
+
+  return buf;
+}
+
+
+void util_clear_downloads()
+{
+  int i;
+  char *buf = NULL;
+
+  for(i = config.download.cnt; i-- > 0;) {
+    strprintf(&buf, "%s/image_%04u", config.download.base, i);
+    if(util_check_exist(buf)) unlink(buf);
+  }
+
+  str_copy(&buf, NULL);
+}
+
 

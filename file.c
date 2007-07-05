@@ -747,7 +747,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_forcerootimage:
-        force_ri_ig = f->nvalue;
+        config.download.instsys = force_ri_ig = f->nvalue;
         break;
 
       case key_rebootwait:

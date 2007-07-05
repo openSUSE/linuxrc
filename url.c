@@ -859,3 +859,58 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst)
 }
 
 
+/*
+ * Find repository (and mount at 'dir' if possbile).
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int url_find_repo(url_t *url, char *dir)
+{
+  int err = 0;
+
+  /*
+   * 0: failed, 1: ok, 2: ok but continue search
+   */
+  int test_is_repo(url_t *url)
+  {
+    int ok = 0;
+    char *buf = NULL;
+
+    if(
+      !url ||
+      !url->mount ||
+      !config.url.instsys ||
+      !config.url.instsys->scheme
+    ) return 0;
+
+    if(util_check_exist2(url->mount, "/content") != 'r') return 0;
+    if(util_copy_file(url->mount, "/content", "/tmp/content")) return 0;
+
+    if(config.url.instsys->scheme != inst_rel) return 1;
+
+    if(!util_check_exist2(url->mount, config.url.instsys->path)) return 0;
+
+    // if(!config.download.instsys) { }
+
+    strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
+    ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
+    str_copy(&buf, NULL);
+
+    if(ok) str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
+
+    return ok;
+  }
+
+  if(
+    !url->mount &&
+    (err = url_mount(url, dir, test_is_repo))
+  ) return err;
+
+  fprintf(stderr, "repo = %d\n", err);
+
+  return err;
+}
+
+

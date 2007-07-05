@@ -290,7 +290,7 @@ int auto2_find_install_disk()
 {
   int err;
 
-  err = url_read_file(config.url.install, NULL, "/content", "/tmp/content");
+  err = url_find_repo(config.url.install, "/mnt");
 
   LXRC_WAIT
 

@@ -163,4 +163,6 @@ char *blk_ident(char *dev);
 void update_device_list(int force);
 char *new_mountpoint(void);
 int util_copy_file(char *src_dir, char *src_file, char *dst);
+char *new_download(void);
+void util_clear_downloads(void);
 

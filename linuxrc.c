@@ -764,6 +764,9 @@ void lxrc_init()
 
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
+  config.download.base = strdup(config.test ? "/tmp/download" : "/download");
+  mkdir(config.download.base, 0755);
+
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
   config.update.dst = strdup("/update");
 
@@ -887,7 +890,7 @@ void lxrc_init()
     config.memory.min_free = config.memory.free;
   }
 
-  force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
+  config.download.instsys = force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
 
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");

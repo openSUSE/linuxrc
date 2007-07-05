@@ -485,6 +485,12 @@ typedef struct {
   } mountpoint;
 
   struct {
+    unsigned cnt;		/* download counter */
+    unsigned instsys:1;		/* download instsys */
+    char *base;			/* base dir for downloads */
+  } download;
+
+  struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned device_given:1;	/* netdevice explicity set in info file */
