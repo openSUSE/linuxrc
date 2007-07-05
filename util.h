@@ -35,6 +35,7 @@ extern int  util_cd1_boot          (void);
 extern void util_disp_init         (void);
 extern void util_disp_done         (void);
 extern int  util_umount            (char *mountpoint);
+void util_umount_all(void);
 extern int  util_eject_cdrom       (char *dev);
 extern int  util_chk_driver_update (char *dir, char *loc);
 extern void util_do_driver_updates (void);
@@ -159,4 +160,5 @@ char *blk_size_str(char *dev);
 uint64_t blk_size(char *dev);
 char *blk_ident(char *dev);
 void update_device_list(int force);
+char *new_mountpoint(void);
 

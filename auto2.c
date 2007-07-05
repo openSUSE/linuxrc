@@ -13,6 +13,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/utsname.h>
 
 #include "global.h"
 #include "linuxrc.h"
@@ -33,7 +34,6 @@
 #include "settings.h"
 #include "url.h"
 
-static int auto2_mount_disk(char *dev);
 static int auto2_find_install_disk(void);
 static void auto2_user_netconfig(void);
 static int auto2_net_dev(hd_t **);
@@ -279,37 +279,6 @@ void auto2_scan_hardware()
 
 
 /*
- * Look for install source on block device 'dev' and mount it.
- *
- * return:
- *   0: ok
- *   1: error
- */
-int auto2_mount_disk(char *dev)
-{
-  int err = 0;
-
-  if(do_mount_disk(dev, 1)) return 1;
-
-  if((err = inst_check_instsys())) {
-    fprintf(stderr, "disk: %s::%s is not an installation source\n", dev, config.serverdir);
-  }
-  else {
-    fprintf(stderr, "disk: using %s::%s\n", dev, config.serverdir);
-  }
-
-  if(err) {
-    fprintf(stderr, "disk: %s: no install data found\n", dev);
-    inst_umount();
-  }
-
-  util_do_driver_updates();
-
-  return err;
-}
-
-
-/*
  * Look for a block device with install source and mount it.
  *
  * return:
@@ -318,59 +287,11 @@ int auto2_mount_disk(char *dev)
  */
 int auto2_find_install_disk()
 {
-  int err = 1;
-  hd_data_t *hd_data;
-  hd_t *hd;
-  hd_hw_item_t hw_item = hw_block;
+  int err;
 
-  url_mount(config.url.install, "/mnt");
+  err = url_read_file(config.url.install, NULL, "/content", "/tmp/content");
 
-  getchar(); lxrc_end(); exit(0);
-
-  hd_data = calloc(1, sizeof *hd_data);
-
-  switch(config.url.install->scheme) {
-    case inst_cdrom:
-      hw_item = hw_cdrom;
-      break;
-
-    case inst_floppy:
-      hw_item = hw_floppy;
-      break;
-
-    default:
-      break;
-  }
-
-  for(hd = hd_list(hd_data, hw_item, 1, NULL); hd; hd = hd->next) {
-    if(
-      (
-        config.url.install->scheme == inst_hd &&
-        (					/* hd means: */
-          hd_is_hw_class(hd, hw_floppy) ||	/*  - not a floppy */
-          hd_is_hw_class(hd, hw_cdrom) ||	/*  - not a cdrom */
-          hd->child_ids				/*  - has no partitions */
-        )
-      ) ||
-      !hd->unix_dev_name
-    ) continue;
-
-    if(
-      config.url.install->device &&
-      strcmp(hd->unix_dev_name, long_dev(config.url.install->device)) &&
-      !search_str_list(hd->unix_dev_names, long_dev(config.url.install->device))
-    ) continue;
-
-    fprintf(stderr, "disk: trying to mount: %s\n", hd->unix_dev_name);
-
-    if(!(err = auto2_mount_disk(hd->unix_dev_name))) {
-      str_copy(&config.url.install->used_device, short_dev(hd->unix_dev_name));
-      break;
-    }
-  }
-
-  hd_free_hd_data(hd_data);
-  free(hd_data);
+  LXRC_WAIT
 
   return err;
 }

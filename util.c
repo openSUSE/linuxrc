@@ -718,6 +718,23 @@ int util_umount(char *dir)
   return i;
 }
 
+
+void util_umount_all()
+{
+  int i;
+  char *buf = NULL;
+
+  url_umount(config.url.install);
+
+  for(i = config.mountpoint.cnt; i-- > 0;) {
+    strprintf(&buf, "%smp_%04u", config.mountpoint.base, i);
+    if(util_check_exist(buf)) util_umount(buf);
+  }
+
+  str_copy(&buf, NULL);
+}
+
+
 int _util_eject_cdrom(char *dev)
 {
   int fd;
@@ -5103,6 +5120,8 @@ void update_device_list(int force)
 
   if(!force) return;
 
+  fprintf(stderr, "%sscanning devices\n", config.hd_data ? "re" : "");
+
   if(config.hd_data) {
     hd_free_hd_data(config.hd_data);
     free(config.hd_data);
@@ -5110,9 +5129,21 @@ void update_device_list(int force)
 
   config.hd_data = calloc(1, sizeof *config.hd_data);
 
-  if(config.debug) fprintf(stderr, "rescanning devices\n");
-
   hd_list2(config.hd_data, hw_items, 1);
+}
+
+
+/*
+ * Create new tmp mountpoint.
+ */
+char *new_mountpoint()
+{
+  static char *buf = NULL;
+
+  strprintf(&buf, "%smp_%04u", config.mountpoint.base, config.mountpoint.cnt++);
+  mkdir(buf, 0755);
+
+  return buf;
 }
 
 

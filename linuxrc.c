@@ -519,8 +519,7 @@ void lxrc_end()
 /*    reboot (RB_ENABLE_CAD); */
   mod_free_modules();
 
-  util_umount(config.mountpoint.extra);
-  util_umount(config.mountpoint.instdata);
+  util_umount_all();
 
   lxrc_set_modprobe("/sbin/modprobe");
   lxrc_set_bdflush(40);

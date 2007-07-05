@@ -62,6 +62,8 @@ extern str_list_t *add_str_list(str_list_t **sl, char *str);
 
 #define  LXRC_DEBUG
 
+#define LXRC_WAIT if(printf("?"), getchar() == 'q') { lxrc_end(); exit(0); }
+
 #ifdef LXRC_DEBUG
 # define deb_wait if(config.debugwait) printf("%s:%d: Press a key...\n", __func__, __LINE__), getchar()
 # define deb_msg(a) fprintf(stderr, "%s:%u %s\n", __func__, __LINE__, a)
@@ -227,11 +229,11 @@ typedef struct {
   unsigned port;
   slist_t *query;
   struct {
-    unsigned network:1;
-    unsigned mountable:1;
-    unsigned cdrom:1;
-    unsigned dvd:1;
-    unsigned disk:1;
+    unsigned network:1;		/* scheme needs network */
+    unsigned mountable:1;	/* scheme is mountable */
+    unsigned cdrom:1;		/* device is cdrom */
+    unsigned disk:1;		/* device is disk */
+    unsigned file:1;		/* path points to file (not to directory) */
   } is;
 } url_t;
 
@@ -469,6 +471,7 @@ typedef struct {
   } ramdisk[6];			/* /dev/ram2 .. /dev/ram7 */
 
   struct {			/* mountpoints */
+    unsigned cnt;		/* mp counter */
     char *floppy;
     char *ramdisk2;
     char *extra;
