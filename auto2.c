@@ -805,7 +805,6 @@ void load_network_mods()
   hd_clear_probe_feature(hd_data, pr_parallel);
   hd_list(hd_data, hw_network_ctrl, 1, NULL);
 
-  config.activate_network = 1;
   load_drivers(hd_data, hw_network_ctrl);
 
   hd_free_hd_data(hd_data);

@@ -1267,8 +1267,6 @@ void util_status_info()
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
-  add_flag(&sl0, buf, config.activate_storage, "act_storage");
-  add_flag(&sl0, buf, config.activate_network, "act_net");
   add_flag(&sl0, buf, config.pivotroot, "pivotroot");
   add_flag(&sl0, buf, config.addswap, "addswap");
   add_flag(&sl0, buf, config.splash, "splash");

@@ -232,7 +232,7 @@ typedef struct {
     unsigned network:1;		/* scheme needs network */
     unsigned mountable:1;	/* scheme is mountable */
     unsigned cdrom:1;		/* device is cdrom */
-    unsigned disk:1;		/* device is disk */
+//    unsigned disk:1;		/* device is disk */
     unsigned file:1;		/* path points to file (not to directory) */
   } is;
 } url_t;
@@ -296,8 +296,6 @@ typedef struct {
   unsigned linemode:1;		/* line mode */
   unsigned ask_language:1;	/* let use choose language  */
   unsigned ask_keytable:1;	/* let user choose keytable */
-  unsigned activate_storage:1;	/* load all storage modules */
-  unsigned activate_network:1;	/* load all network modules */
   unsigned nopcmcia:1;		/* don't start pcmcia automatically */
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
@@ -487,6 +485,7 @@ typedef struct {
   struct {
     unsigned cnt;		/* download counter */
     unsigned instsys:1;		/* download instsys */
+    unsigned instsys_set:1;	/* the above was explicitly set */
     char *base;			/* base dir for downloads */
   } download;
 
@@ -602,7 +601,6 @@ extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
 extern int             cpu_ig;
-extern int             force_ri_ig;
 extern char            ppcd_tg [10];
 extern int             has_floppy_ig;
 extern int             reboot_ig;

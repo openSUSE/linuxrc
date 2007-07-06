@@ -520,6 +520,7 @@ void lxrc_end()
   mod_free_modules();
 
   util_umount_all();
+  util_clear_downloads();
 
   lxrc_set_modprobe("/sbin/modprobe");
   lxrc_set_bdflush(40);
@@ -796,7 +797,6 @@ void lxrc_init()
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
-  config.activate_storage = 1;		/* together with scsi_rename */
 
   // default memory limits
   config.memory.min_free =       12 * 1024;
@@ -890,7 +890,9 @@ void lxrc_init()
     config.memory.min_free = config.memory.free;
   }
 
-  config.download.instsys = force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
+  if(!config.download.instsys_set) {
+    config.download.instsys = config.memory.free > config.memory.load_image ? 1 : 0;
+  }
 
   if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");

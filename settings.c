@@ -595,11 +595,12 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_expert_forceroot:
-      rc = dia_yesno(txt_get(TXT_ASK_RI_FORCE), force_ri_ig == TRUE ? YES : NO);
+      rc = dia_yesno(txt_get(TXT_ASK_RI_FORCE), config.download.instsys ? YES : NO);
+      config.download.instsys_set = 1;
       if(rc == YES)
-        force_ri_ig = TRUE;
+        config.download.instsys = 1;
       else if(rc == NO)
-        force_ri_ig = FALSE;
+        config.download.instsys = 0;
       break;
 
     case di_expert_rootimage:

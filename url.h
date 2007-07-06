@@ -14,6 +14,9 @@ typedef struct url_data_s {
   unsigned cramfs:1;
   unsigned file_opened:1;
   unsigned unzip:1;
+  unsigned label_shown:1;
+  char *label;
+  int percent;
   int pipe_fd;
   char *orig_name;
   unsigned image_size;

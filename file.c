@@ -93,6 +93,7 @@ static struct {
   { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
   { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
   { key_forcerootimage, "ForceRootimage", kf_cfg + kf_cmd                },
+  { key_forcerootimage, "LoadImage",      kf_cfg + kf_cmd                },
   { key_rebootwait,     "WaitReboot",     kf_cfg + kf_cmd                },	/* drop it? */
   { key_sourcemounted,  "Sourcemounted",  kf_none                        },
   { key_cdrom,          "Cdrom",          kf_none                        },
@@ -747,7 +748,8 @@ void file_do_info(file_t *f0)
         break;
 
       case key_forcerootimage:
-        config.download.instsys = force_ri_ig = f->nvalue;
+        config.download.instsys = f->nvalue;
+        config.download.instsys_set = 1;
         break;
 
       case key_rebootwait:
@@ -803,7 +805,9 @@ void file_do_info(file_t *f0)
       case key_memloadimage:
         if(f->is.numeric) {
           config.memory.load_image = f->nvalue;
-          force_ri_ig = config.memory.free > config.memory.load_image ? 1 : 0;
+          if(!config.download.instsys_set) {
+            config.download.instsys = config.memory.free > config.memory.load_image ? 1 : 0;
+          }
         }
         break;
 
@@ -852,12 +856,7 @@ void file_do_info(file_t *f0)
 
       case key_rescue:
       case key_install:
-        i = f->is.numeric ? f->nvalue : 1;
-        if(f->key == key_rescue) config.rescue = i;
-        if(config.rescue) {
-          config.activate_storage = 1;
-          config.activate_network = 1;
-        }
+        config.rescue = f->key == key_rescue ? 1 : 0;
 
         url_free(config.url.install);
         config.url.install = url_set(f->value);
@@ -867,6 +866,7 @@ void file_do_info(file_t *f0)
           config.url.instsys = url_set(config.url.install->instsys);
         }
 
+#if 0
         if(config.url.install->scheme) {
           set_instmode(config.url.install->scheme);
           if(config.url.install->port) config.net.port = config.url.install->port;
@@ -896,6 +896,7 @@ void file_do_info(file_t *f0)
             }
           }
         }
+#endif
         break;
 
       case key_autoyast:
@@ -914,7 +915,6 @@ void file_do_info(file_t *f0)
       case key_vnc:
         if(f->is.numeric) config.vnc = f->nvalue;
         if(config.vnc) {
-          config.activate_network = 1;
           config.net.do_setup |= DS_VNC;
         }
         break;
@@ -922,7 +922,6 @@ void file_do_info(file_t *f0)
       case key_usessh:
         if(f->is.numeric) config.usessh = f->nvalue;
         if(config.usessh) {
-          config.activate_network = 1;
           config.net.do_setup |= DS_SSH;
         }
         break;
@@ -1105,9 +1104,6 @@ void file_do_info(file_t *f0)
 
       case key_scsirename:
         if(f->is.numeric) config.scsi_rename = f->nvalue;
-        if(config.scsi_rename) {
-          config.activate_storage = 1;
-        }
         break;
 
       case key_doscsirename:

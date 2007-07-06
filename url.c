@@ -39,6 +39,7 @@ static size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 static int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
 static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
+static int url_progress(url_data_t *url_data);
 
 
 void url_read(url_data_t *url_data)
@@ -595,6 +596,7 @@ url_data_t *url_data_new()
   url_data->buf.len = 0;
 
   url_data->pipe_fd = -1;
+  url_data->percent = -1;
 
   if(!curl_init) {
     curl_init = 1;
@@ -616,6 +618,7 @@ void url_data_free(url_data_t *url_data)
   free(url_data->orig_name);
   free(url_data->tmp_file);
   free(url_data->buf.data);
+  free(url_data->label);
 
   free(url_data);
 }
@@ -859,6 +862,19 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst)
 }
 
 
+int wget_progress(url_data_t *url_data)
+{
+  fprintf(stderr,
+    "progress: %9u/%u - %9u/%u (%.2f%%)\r",
+    url_data->p_now, url_data->p_total,
+    url_data->zp_now, url_data->zp_total,
+    url_data->p_total ? (double) url_data->p_now / url_data->p_total * 100 : 0
+  );
+
+  return 0;
+}
+
+
 /*
  * Find repository (and mount at 'dir' if possbile).
  * Mount instsys, too, if it is a relative url.
@@ -878,6 +894,7 @@ int url_find_repo(url_t *url, char *dir)
   {
     int ok = 0;
     char *buf = NULL;
+    url_data_t *url_data;
 
     if(
       !url ||
@@ -893,10 +910,38 @@ int url_find_repo(url_t *url, char *dir)
 
     if(!util_check_exist2(url->mount, config.url.instsys->path)) return 0;
 
-    // if(!config.download.instsys) { }
-
     strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
-    ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
+
+    if(
+      !config.download.instsys &&
+      !config.rescue &&
+      util_is_mountable(buf)
+    ) {
+      ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
+    }
+    else {
+      url_data = url_data_new();
+      url_data->unzip = 1;
+      strprintf(&buf, "file:%s/%s", url->mount, config.url.instsys->path);
+
+      url_data->url = url_set(buf);
+      url_data->file_name = strdup(new_download());
+      url_data->label = strdup(txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
+
+      url_data->progress = url_progress;
+
+      url_read(url_data);
+      printf("\n"); fflush(stdout);
+
+      if(url_data->err) {
+        fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+      }
+      else {
+        ok = util_mount_ro(url_data->file_name, config.mountpoint.instsys) ? 0 : 1;
+      }
+      url_data_free(url_data);
+    }
+
     str_copy(&buf, NULL);
 
     if(ok) str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
@@ -912,6 +957,59 @@ int url_find_repo(url_t *url, char *dir)
   fprintf(stderr, "repo = %d\n", err);
 
   return err;
+}
+
+
+int url_progress(url_data_t *url_data)
+{
+  int percent = -1;
+  char *buf = NULL;
+
+  if(url_data->p_total) {
+    percent = (100 * (uint64_t) url_data->p_now) / url_data->p_total;
+  }
+  else if(url_data->zp_total) {
+    percent = (100 * (uint64_t) url_data->zp_now) / url_data->zp_total;
+  }
+
+  if(percent > 100) percent = 100;
+
+  percent = -1;
+
+  if(!url_data->label_shown) {
+    if(percent >= 0) {
+      strprintf(&buf,
+        "%s (%u kB) -     ",
+        url_data->label ?: "loading",
+        ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
+      );
+    }
+    else {
+      strprintf(&buf, "%s -          ", url_data->label ?: "loading");
+    }
+    printf("%s", buf);
+    url_data->label_shown = 1;
+  }
+
+  if(percent >= 0) {
+    if(percent != url_data->percent) {
+      printf("\x08\x08\x08\x08%3d%%", percent);
+      url_data->percent = percent;
+    }
+  }
+  else {
+    percent = (url_data->zp_now ?: url_data->p_now) >> 10;
+    if(percent > url_data->percent + 100 || url_data->flush) {
+      printf("\x08\x08\x08\x08\x08\x08\x08\x08\x08%6u kB", percent);
+      url_data->percent = percent;
+    }
+  }
+
+  fflush(stdout);
+
+  str_copy(&buf, NULL);
+
+  return 0;
 }
 
 

@@ -799,7 +799,7 @@ int inst_check_instsys()
       }
 
       if(
-        (config.rescue || force_ri_ig || !util_is_mountable(buf)) &&
+        (config.rescue || !util_is_mountable(buf)) &&
         util_check_exist(buf) != 'd'
       ) {
         config.use_ramdisk = 1;
