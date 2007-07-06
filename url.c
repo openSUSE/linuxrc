@@ -954,8 +954,6 @@ int url_find_repo(url_t *url, char *dir)
     (err = url_mount(url, dir, test_is_repo))
   ) return err;
 
-  fprintf(stderr, "repo = %d\n", err);
-
   return err;
 }
 
@@ -973,8 +971,6 @@ int url_progress(url_data_t *url_data)
   }
 
   if(percent > 100) percent = 100;
-
-  percent = -1;
 
   if(!url_data->label_shown) {
     if(percent >= 0) {
