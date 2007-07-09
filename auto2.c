@@ -898,11 +898,19 @@ void auto2_user_netconfig()
           fprintf(stderr, "no/incomplete answer.\n");
         }
         else {
-          fprintf(stderr, "ok.\n");
           config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+
+          if(net_activate_ns()) {
+            fprintf(stderr, "%s: net activation failed\n", config.net.device);
+            config.net.configured = nc_none;
+          }
+          else {
+            fprintf(stderr, "%s: ok\n", config.net.device);
+          }
         }
       }
-    } else {
+    }
+    else {
       if(!(win_old = config.win)) util_disp_init();
       net_config();
       if(!win_old) util_disp_done();

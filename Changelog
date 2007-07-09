@@ -1,3 +1,7 @@
+9/7/2007:	v2.0.69
+	- resolv.conf not written when netsetup=dhcp,all was used (#284469)
+	- allow multiple nameservers (#284469)
+
 4/7/2007:	v2.0.68
 	- s390: disable layer 2 question for HSI devices (bug #178323)
 

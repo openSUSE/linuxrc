@@ -1482,6 +1482,7 @@ int net_dhcp()
   char cmd[256], file[256], *s;
   file_t *f0, *f;
   window_t win;
+  slist_t *sl0, *sl;
 
   if(config.net.dhcp_active || config.net.keep) return 0;
 
@@ -1566,9 +1567,12 @@ int net_dhcp()
 #endif
 
       case key_dns:
-        if((s = strchr(f->value, ','))) *s = 0;
-        name2inet(&config.net.nameserver[0], f->value);
-        net_check_address2(&config.net.nameserver[0], 0);
+        for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
+          name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
+          net_check_address2(&config.net.nameserver[config.net.nameservers], 0);
+          if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
+        }
+        slist_free(sl0);
         break;
 
       default:
