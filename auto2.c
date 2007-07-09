@@ -293,15 +293,10 @@ int auto2_find_install_disk()
 
   err = url_find_repo(config.url.install, config.mountpoint.instdata);
 
-  if(err) {
-    fprintf(stderr, "no repository found\n");
-    return err;
-  }
+  if(err) return err;
 
   if(!config.url.instsys->mount) {
     err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
-
-    if(err) fprintf(stderr, "no inst-sys found\n");
   }
 
   LXRC_WAIT

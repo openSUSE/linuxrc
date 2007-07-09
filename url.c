@@ -639,18 +639,26 @@ int url_progress(url_data_t *url_data)
   if(percent > 100) percent = 100;
 
   if(!url_data->label_shown) {
+    char *label = NULL;
+
+    str_copy(&label, url_data->label);
+
+    if(!label) strprintf(&label, "Loading %s", url_print(url_data->url));
+
     if(percent >= 0) {
       strprintf(&buf,
         "%s (%u kB) -     ",
-        url_data->label ?: "loading",
+        label,
         ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
       );
     }
     else {
-      strprintf(&buf, "%s -          ", url_data->label ?: "loading");
+      strprintf(&buf, "%s -          ", label);
     }
     printf("%s", buf);
     url_data->label_shown = 1;
+
+    str_copy(&label, NULL);
   }
 
   if(percent >= 0) {
@@ -714,6 +722,8 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   char *module, *type, *path = NULL, *buf = NULL;
   url_data_t *url_data;
 
+  fprintf(stderr, "url mount: trying %s\n", url_print(url));
+
   if(
     !url ||
     !url->scheme ||
@@ -768,6 +778,8 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
       url_data->url = url_set(buf);
       url_data->file_name = strdup(new_download());
       url_data->progress = url_progress;
+      strprintf(&url_data->label, "Loading %s", url_print(url));
+      fprintf(stderr, "loading %s --> %s\n", url_print(url), url_data->file_name);
       url_read(url_data);
       printf("\n"); fflush(stdout);
 
@@ -795,7 +807,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   }
 
   if(!ok) {
-    fprintf(stderr, "disk: %s: mount failed\n", path);
+    fprintf(stderr, "url mount: %s failed\n", url_print(url));
 
     util_umount(url->mount);
     util_umount(url->tmp_mount);
@@ -804,7 +816,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->mount, NULL);
   }
   else {
-    fprintf(stderr, "disk: %s: mount ok\n", url->used_device ?: url->path);
+    fprintf(stderr, "url mount: %s @ %s\n", url_print(url), url->mount);
   }
 
   str_copy(&path, NULL);
@@ -989,6 +1001,8 @@ int url_find_repo(url_t *url, char *dir)
 
       url_data->progress = url_progress;
 
+      fprintf(stderr, "loading %s --> %s\n", url_print(url_data->url), url_data->file_name);
+
       url_read(url_data);
       printf("\n"); fflush(stdout);
 
@@ -1008,10 +1022,17 @@ int url_find_repo(url_t *url, char *dir)
     return ok;
   }
 
-  if(
-    !url->mount &&
-    (err = url_mount(url, dir, test_is_repo))
-  ) return err;
+  fprintf(stderr, "repository: looking for %s\n", url_print(url));
+
+  if(!url->mount) err = url_mount(url, dir, test_is_repo);
+
+  if(err) {
+    fprintf(stderr, "repository: not found\n");
+  }
+  else {
+    fprintf(stderr, "repository: using %s @ %s\n", url_print(url), url->mount);
+  }
+
 
   return err;
 }
@@ -1041,6 +1062,39 @@ int url_find_instsys(url_t *url, char *dir)
   err = url_mount(url, dir, NULL);
 
   return err;
+}
+
+
+/*
+ * Print url to string.
+ *
+ * scheme://domain;user:password@server:port/path?query
+ */
+char *url_print(url_t *url)
+{
+  static char *buf = NULL;
+
+  str_copy(&buf, NULL);
+  if(!url) return buf;
+
+  strprintf(&buf, "%s:", get_instmode_name(url->scheme));
+
+  if(url->domain || url->user || url->password || url->server || url->port) {
+    strprintf(&buf, "%s//", buf);
+    if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
+    if(url->user) strprintf(&buf, "%s%s", buf, url->user);
+    if(url->password) strprintf(&buf, "%s:******", buf);
+    if(url->user || url->password) strprintf(&buf, "%s@", buf);
+    if(url->server) strprintf(&buf, "%s%s", buf, url->server);
+    if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
+  }
+
+  if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
+  if(url->path) strprintf(&buf, "%s/%s", buf, *url->path == '/' ? url->path + 1 : url->path);
+
+  if(url->used_device) strprintf(&buf, "%s?device=%s", buf, short_dev(url->used_device));
+
+  return buf;
 }
 
 
