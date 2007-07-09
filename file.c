@@ -695,7 +695,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_nameserver:
-        for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
+        for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
           net_check_address2(&config.net.nameserver[config.net.nameservers], 0);
           if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;

@@ -862,19 +862,6 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst)
 }
 
 
-int wget_progress(url_data_t *url_data)
-{
-  fprintf(stderr,
-    "progress: %9u/%u - %9u/%u (%.2f%%)\r",
-    url_data->p_now, url_data->p_total,
-    url_data->zp_now, url_data->zp_total,
-    url_data->p_total ? (double) url_data->p_now / url_data->p_total * 100 : 0
-  );
-
-  return 0;
-}
-
-
 /*
  * Find repository (and mount at 'dir' if possbile).
  * Mount instsys, too, if it is a relative url.
@@ -958,6 +945,9 @@ int url_find_repo(url_t *url, char *dir)
 }
 
 
+/*
+ * default progress indicator
+ */
 int url_progress(url_data_t *url_data)
 {
   int percent = -1;
