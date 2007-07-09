@@ -276,6 +276,7 @@ void auto2_scan_hardware()
 
   if(!config.url.install) config.url.install = url_set("cd:/");
   if(!config.url.instsys) config.url.instsys = url_set(config.rootimage);
+  // if(!config.url.instsys2) config.url.instsys2 = url_set(config.rootimage2);
 }
 
 
@@ -290,7 +291,18 @@ int auto2_find_install_disk()
 {
   int err;
 
-  err = url_find_repo(config.url.install, "/mnt");
+  err = url_find_repo(config.url.install, config.mountpoint.instdata);
+
+  if(err) {
+    fprintf(stderr, "no repository found\n");
+    return err;
+  }
+
+  if(!config.url.instsys->mount) {
+    err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
+
+    if(err) fprintf(stderr, "no inst-sys found\n");
+  }
 
   LXRC_WAIT
 

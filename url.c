@@ -453,27 +453,6 @@ url_t *url_set(char *str)
     tmp = NULL;
   }
 
-  /* ensure leading "/" if mountable */
-  if(
-    url->scheme == inst_file ||
-    url->scheme == inst_cdrom ||
-    url->scheme == inst_dvd ||
-    url->scheme == inst_floppy ||
-    url->scheme == inst_hd ||
-    url->scheme == inst_disk ||
-    url->scheme == inst_nfs ||
-    url->scheme == inst_smb
-  ) {
-    if(url->path) {
-      if(*url->path != '/') {
-        strprintf(&url->path, "/%s", url->path);
-      }
-    }
-    else {
-      url->path = strdup("/");
-    }
-  }
-
   if((sl = slist_getentry(url->query, "device"))) {
     s0 = short_dev(sl->value);
     str_copy(&url->device, *s0 ? s0 : NULL);
@@ -516,6 +495,18 @@ url_t *url_set(char *str)
     url->scheme == inst_dvd
     ) {
     url->is.cdrom = 1;
+  }
+
+  /* ensure leading "/" if mountable */
+  if(url->is.mountable) {
+    if(url->path) {
+      if(*url->path != '/') {
+        strprintf(&url->path, "/%s", url->path);
+      }
+    }
+    else {
+      url->path = strdup("/");
+    }
   }
 
   fprintf(stderr, "url = %s\n", url->str);
@@ -630,6 +621,63 @@ void url_cleanup()
 }
 
 
+/*
+ * default progress indicator
+ */
+int url_progress(url_data_t *url_data)
+{
+  int percent = -1;
+  char *buf = NULL;
+
+  if(url_data->p_total) {
+    percent = (100 * (uint64_t) url_data->p_now) / url_data->p_total;
+  }
+  else if(url_data->zp_total) {
+    percent = (100 * (uint64_t) url_data->zp_now) / url_data->zp_total;
+  }
+
+  if(percent > 100) percent = 100;
+
+  if(!url_data->label_shown) {
+    if(percent >= 0) {
+      strprintf(&buf,
+        "%s (%u kB) -     ",
+        url_data->label ?: "loading",
+        ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
+      );
+    }
+    else {
+      strprintf(&buf, "%s -          ", url_data->label ?: "loading");
+    }
+    printf("%s", buf);
+    url_data->label_shown = 1;
+  }
+
+  if(percent >= 0) {
+    if(percent != url_data->percent) {
+      printf("\x08\x08\x08\x08%3d%%", percent);
+      url_data->percent = percent;
+    }
+  }
+  else {
+    percent = (url_data->zp_now ?: url_data->p_now) >> 10;
+    if(percent > url_data->percent + 100 || url_data->flush) {
+      printf("\x08\x08\x08\x08\x08\x08\x08\x08\x08%6u kB", percent);
+      url_data->percent = percent;
+    }
+  }
+
+  fflush(stdout);
+
+  str_copy(&buf, NULL);
+
+  return 0;
+}
+
+
+/*
+ * Unmounts volumes used by 'url'.
+ */
 void url_umount(url_t *url)
 {
   if(!url) return;
@@ -663,7 +711,8 @@ void url_umount(url_t *url)
 int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 {
   int ok = 0, file_type;
-  char *module, *type, *path = NULL;
+  char *module, *type, *path = NULL, *buf = NULL;
+  url_data_t *url_data;
 
   if(
     !url ||
@@ -708,11 +757,34 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
   file_type = util_check_exist(path);
 
-  if(file_type && file_type == 'f') url->is.file = 1;
+  if(file_type && (file_type == 'r' || file_type == 'b')) url->is.file = 1;
 
   if(file_type) {
     str_copy(&url->mount, dir ?: new_mountpoint());
-    ok = util_mount_ro(path, url->mount) ? 0 : 1;
+    if(url->is.file && (url->download || !util_is_mountable(path))) {
+      url_data = url_data_new();
+      url_data->unzip = 1;
+      strprintf(&buf, "file:%s", path);
+      url_data->url = url_set(buf);
+      url_data->file_name = strdup(new_download());
+      url_data->progress = url_progress;
+      url_read(url_data);
+      printf("\n"); fflush(stdout);
+
+      if(url_data->err) {
+        fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+      }
+      else {
+        ok = util_mount_ro(url_data->file_name, url->mount) ? 0 : 1;
+      }
+      if(!ok) unlink(url_data->file_name);
+
+      url_data_free(url_data);
+      str_copy(&buf, NULL);
+    }
+    else {
+      ok = util_mount_ro(path, url->mount) ? 0 : 1;
+    }
   }
   else {
     ok = 0;
@@ -946,56 +1018,29 @@ int url_find_repo(url_t *url, char *dir)
 
 
 /*
- * default progress indicator
+ * Find instsys (and mount at 'dir' if possbile).
+ *
+ * return:
+ *   0: ok
+ *   1: failed
  */
-int url_progress(url_data_t *url_data)
+int url_find_instsys(url_t *url, char *dir)
 {
-  int percent = -1;
-  char *buf = NULL;
+  int err = 0;
 
-  if(url_data->p_total) {
-    percent = (100 * (uint64_t) url_data->p_now) / url_data->p_total;
-  }
-  else if(url_data->zp_total) {
-    percent = (100 * (uint64_t) url_data->zp_now) / url_data->zp_total;
-  }
+  if(
+    !url ||
+    !url->scheme ||
+    url->scheme == inst_rel ||
+    !url->path
+  ) return 1;
 
-  if(percent > 100) percent = 100;
+  if(!url->is.mountable) return 1;
 
-  if(!url_data->label_shown) {
-    if(percent >= 0) {
-      strprintf(&buf,
-        "%s (%u kB) -     ",
-        url_data->label ?: "loading",
-        ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
-      );
-    }
-    else {
-      strprintf(&buf, "%s -          ", url_data->label ?: "loading");
-    }
-    printf("%s", buf);
-    url_data->label_shown = 1;
-  }
+  if(config.download.instsys || config.rescue) url->download = 1;
+  err = url_mount(url, dir, NULL);
 
-  if(percent >= 0) {
-    if(percent != url_data->percent) {
-      printf("\x08\x08\x08\x08%3d%%", percent);
-      url_data->percent = percent;
-    }
-  }
-  else {
-    percent = (url_data->zp_now ?: url_data->p_now) >> 10;
-    if(percent > url_data->percent + 100 || url_data->flush) {
-      printf("\x08\x08\x08\x08\x08\x08\x08\x08\x08%6u kB", percent);
-      url_data->percent = percent;
-    }
-  }
-
-  fflush(stdout);
-
-  str_copy(&buf, NULL);
-
-  return 0;
+  return err;
 }
 
 

@@ -5217,7 +5217,7 @@ char *new_download()
 {
   static char *buf = NULL;
 
-  strprintf(&buf, "%s/image_%04u", config.download.base, config.download.cnt++);
+  strprintf(&buf, "%s/file_%04u", config.download.base, config.download.cnt++);
 
   return buf;
 }
@@ -5229,7 +5229,7 @@ void util_clear_downloads()
   char *buf = NULL;
 
   for(i = config.download.cnt; i-- > 0;) {
-    strprintf(&buf, "%s/image_%04u", config.download.base, i);
+    strprintf(&buf, "%s/file_%04u", config.download.base, i);
     if(util_check_exist(buf)) unlink(buf);
   }
 

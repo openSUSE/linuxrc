@@ -38,4 +38,5 @@ void url_umount(url_t *url);
 int url_mount(url_t *url, char *dir, int (*test_func)(url_t *));
 int url_read_file(url_t *url, char *dir, char *src, char *dst);
 int url_find_repo(url_t *url, char *dir);
+int url_find_instsys(url_t *url, char *dir);
 

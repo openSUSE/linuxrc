@@ -228,6 +228,7 @@ typedef struct {
   char *tmp_mount;
   unsigned port;
   slist_t *query;
+  unsigned download:1;		/* force download */
   struct {
     unsigned network:1;		/* scheme needs network */
     unsigned mountable:1;	/* scheme is mountable */
