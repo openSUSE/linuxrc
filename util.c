@@ -711,7 +711,7 @@ int util_umount(char *dir)
   file_t *f0, *f;
   struct stat sbuf;
 
-  if(!dir) return -1;
+  if(!dir) return 0;
 
   if(stat(dir, &sbuf)) return -1;
 
@@ -5133,7 +5133,7 @@ void update_device_list(int force)
   struct stat sbuf;
 
   hd_hw_item_t hw_items[] = {
-    hw_block, hw_network_ctrl, hw_network
+    hw_block, hw_network_ctrl, hw_network, 0
   };
 
   if(!config.hd_data) force = 1;

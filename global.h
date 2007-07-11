@@ -223,7 +223,6 @@ typedef struct {
   char *device;
   char *instsys;
   char *proxy;
-  char *used_device;
   char *mount;
   char *tmp_mount;
   unsigned port;
@@ -233,9 +232,13 @@ typedef struct {
     unsigned network:1;		/* scheme needs network */
     unsigned mountable:1;	/* scheme is mountable */
     unsigned cdrom:1;		/* device is cdrom */
-//    unsigned disk:1;		/* device is disk */
     unsigned file:1;		/* path points to file (not to directory) */
   } is;
+  struct {
+    char *device;
+    char *hwaddr;
+    char *model;
+  } used;
 } url_t;
 
 

@@ -35,17 +35,52 @@
 #include "url.h"
 
 static int auto2_find_install_disk(void);
+static int auto2_find_install_server(void);
 static void auto2_user_netconfig(void);
-static int auto2_net_dev(hd_t **);
-static int auto2_net_dev1(hd_t *hd, hd_t *hd_card);
 static int driver_is_active(hd_t *hd);
+static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 static void auto2_progress(char *pos, char *msg);
 static void get_zen_config(void);
-static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 
 
 /*
- * Probe for installed hardware.
+ * Initializes hardware and looks for repository/inst-sys.
+ *
+ * return:
+ *   0: not found
+ *   1: ok
+ */
+int auto2_init()
+{
+  int ok, win_old;
+
+  auto2_scan_hardware();
+
+  util_splash_bar(40, SPLASH_40);
+
+  if(config.update.ask && !config.update.shown) {
+    if(!(win_old = config.win)) util_disp_init();
+    if(config.update.name_list) {
+      dia_show_lines2("Driver Updates added", config.update.name_list, 64);
+    }
+    while(!inst_update_cd());
+    if(!win_old) util_disp_done();
+  }
+
+  if(config.zen) get_zen_config();
+
+  ok = auto2_find_install_medium();
+
+  LXRC_WAIT
+
+  util_splash_bar(50, SPLASH_50);
+
+  return ok;
+}
+
+
+/*
+ * Initializes hardware.
  *
  * return:
  *   - must set config.url.install & config.url.instsys
@@ -299,12 +334,108 @@ int auto2_find_install_disk()
     err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
   }
 
+  return err;
+}
+
+
+/*
+ * Look for a network server with install source (and mount, if possible).
+ *
+ * return:
+ *   0: ok, server was mounted
+ *   1: no server found
+ */
+int auto2_find_install_server()
+{
+  int err;
+
+  err = url_find_repo(config.url.install, config.mountpoint.instdata);
+
   LXRC_WAIT
+
+  if(err) return err;
+
+  if(!config.url.instsys->mount) {
+    err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
+  }
 
   return err;
 }
 
 
+/*
+ * Look for install medium.
+ *
+ * return:
+ *   0: not found
+ *   1: ok
+ */
+int auto2_find_install_medium()
+{
+  if(!config.url.install || !config.url.install->scheme) return 0;
+
+  /* no need to mount anything */
+  if(config.url.install->scheme == inst_exec) {
+    auto2_user_netconfig();
+
+    return 1;
+  }
+
+  /* local disk */
+  if(
+    config.url.install->is.mountable &&
+    !config.url.install->is.network
+  ) {
+    if(!auto2_find_install_disk()) {
+      auto2_user_netconfig();
+
+      return 1;
+    }
+
+    fprintf(stderr, "no %s disk found\n", config.product);
+
+    return 0;
+  }
+
+  /* network server */
+  if(config.url.install->is.network /* WHY? || net_config_mask() */) {
+
+#if defined(__s390__) || defined(__s390x__)
+    static int as3d = 0;
+  
+    if(!as3d) {
+      as3d = 1;
+      if(net_activate_s390_devs()) return 0;
+    }
+#endif
+
+    if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
+
+    s_addr2inet(
+      &config.net.broadcast,
+      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+    );
+
+#if 0
+    fprintf(stderr, "hostname:   %s\n", inet2print(&config.net.hostname));
+    fprintf(stderr, "netmask:    %s\n", inet2print(&config.net.netmask));
+    fprintf(stderr, "broadcast:  %s\n", inet2print(&config.net.broadcast));
+    fprintf(stderr, "gateway:    %s\n", inet2print(&config.net.gateway));
+    fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
+    fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
+#endif
+
+    if(!auto2_find_install_server()) return 1;
+
+    // if(!auto2_net_dev(&hd_devs)) return 1;
+
+  }
+
+  return 0;
+}
+
+
+#if 0
 /*
  * Look for a NFS/FTP server as install source.
  *
@@ -498,6 +629,83 @@ int auto2_net_dev1(hd_t *hd, hd_t *hd_card)
 }
 
 
+#endif
+
+/*
+ * Let user enter network config data.
+ */
+void auto2_user_netconfig()
+{
+  int win_old;
+  slist_t *sl;
+
+  if(!config.net.do_setup) return;
+
+  if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
+    config.net.configured = nc_static;
+    /* looks a bit weird, but we need it here for net_activate_ns() */
+    if(!config.net.device) {
+      util_update_netdevice_list(NULL, 1);
+      if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+    }
+    if(net_activate_ns()) {
+      fprintf(stderr, "net activation failed\n");
+      config.net.configured = nc_none;
+    }
+  }
+
+  if(config.net.configured == nc_none || config.net.do_setup) {
+    if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
+      util_update_netdevice_list(NULL, 1);
+
+      config.net.configured = nc_none;
+
+      for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
+        str_copy(&config.net.device, sl->key);
+
+        printf(
+          "Sending %s request to %s...\n",
+          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+        );
+        fflush(stdout);
+        fprintf(stderr,
+          "Sending %s request to %s... ",
+          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+        );
+        config.net.use_dhcp ? net_dhcp() : net_bootp();
+        if(
+          !config.net.hostname.ok ||
+          !config.net.netmask.ok ||
+          !config.net.broadcast.ok
+        ) {
+          fprintf(stderr, "no/incomplete answer.\n");
+        }
+        else {
+          config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+
+          if(net_activate_ns()) {
+            fprintf(stderr, "%s: net activation failed\n", config.net.device);
+            config.net.configured = nc_none;
+          }
+          else {
+            fprintf(stderr, "%s: ok\n", config.net.device);
+          }
+        }
+      }
+    }
+    else {
+      if(!(win_old = config.win)) util_disp_init();
+      net_config();
+      if(!win_old) util_disp_done();
+    }
+  }
+
+  if(config.net.configured == nc_none) {
+    config.vnc = config.usessh = 0;
+  }
+}
+
+
 int driver_is_active(hd_t *hd)
 {
   driver_info_t *di;
@@ -577,233 +785,6 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
 }
 
 
-/*
- * Checks if autoinstall is possible.
- *
- * called from linuxrc.c
- *
- */
-int auto2_init()
-{
-  int i, win_old;
-
-  auto2_scan_hardware();
-
-  util_splash_bar(40, SPLASH_40);
-
-  if(config.update.ask && !config.update.shown) {
-    if(!(win_old = config.win)) util_disp_init();
-    if(config.update.name_list) {
-      dia_show_lines2("Driver Updates added", config.update.name_list, 64);
-    }
-    while(!inst_update_cd());
-    if(!win_old) util_disp_done();
-  }
-
-  if(config.zen) get_zen_config();
-
-  util_debugwait("starting search for inst-sys");
-
-  i = auto2_find_install_medium();
-
-  util_splash_bar(50, SPLASH_50);
-
-  return i;
-}
-
-
-/*
- * Let user enter network config data.
- */
-void auto2_user_netconfig()
-{
-  int win_old;
-  slist_t *sl;
-
-  if(!config.net.do_setup) return;
-
-  if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
-    config.net.configured = nc_static;
-    /* looks a bit weird, but we need it here for net_activate_ns() */
-    if(!config.net.device) {
-      util_update_netdevice_list(NULL, 1);
-      if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
-    }
-    if(net_activate_ns()) {
-      fprintf(stderr, "net activation failed\n");
-      config.net.configured = nc_none;
-    }
-  }
-
-  if(config.net.configured == nc_none || config.net.do_setup) {
-    if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
-      util_update_netdevice_list(NULL, 1);
-
-      config.net.configured = nc_none;
-
-      for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
-        str_copy(&config.net.device, sl->key);
-
-        printf(
-          "Sending %s request to %s...\n",
-          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
-        );
-        fflush(stdout);
-        fprintf(stderr,
-          "Sending %s request to %s... ",
-          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
-        );
-        config.net.use_dhcp ? net_dhcp() : net_bootp();
-        if(
-          !config.net.hostname.ok ||
-          !config.net.netmask.ok ||
-          !config.net.broadcast.ok
-        ) {
-          fprintf(stderr, "no/incomplete answer.\n");
-        }
-        else {
-          config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
-
-          if(net_activate_ns()) {
-            fprintf(stderr, "%s: net activation failed\n", config.net.device);
-            config.net.configured = nc_none;
-          }
-          else {
-            fprintf(stderr, "%s: ok\n", config.net.device);
-          }
-        }
-      }
-    }
-    else {
-      if(!(win_old = config.win)) util_disp_init();
-      net_config();
-      if(!win_old) util_disp_done();
-    }
-  }
-
-  if(config.net.configured == nc_none) {
-    config.vnc = config.usessh = 0;
-  }
-}
-
-/*
- * Look for install medium.
- *
- * return:
- *   0: not found
- *   1: ok
- */
-int auto2_find_install_medium()
-{
-  hd_t *hd_devs = NULL;
-
-  if(!config.url.install || !config.url.install->scheme) return 0;
-
-  /* no need to mount anything */
-  if(config.url.install->scheme == inst_exec) {
-    auto2_user_netconfig();
-
-    return 1;
-  }
-
-  /* local disk */
-  if(
-    config.url.install->is.mountable &&
-    !config.url.install->is.network
-  ) {
-    fprintf(stderr, "looking for a %s disk\n", config.product);
-    if(!auto2_find_install_disk()) {
-      auto2_user_netconfig();
-
-      return 1;
-    }
-
-    fprintf(stderr, "no %s disk found\n", config.product);
-
-    return 0;
-  }
-
-  if(net_config_mask() || config.insttype == inst_net) {
-
-    util_debugwait("Net?");
-
-    if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
-
-    s_addr2inet(
-      &config.net.broadcast,
-      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-    );
-
-    fprintf(stderr, "hostname:   %s\n", inet2print(&config.net.hostname));
-    fprintf(stderr, "netmask:    %s\n", inet2print(&config.net.netmask));
-    fprintf(stderr, "broadcast:  %s\n", inet2print(&config.net.broadcast));
-    fprintf(stderr, "gateway:    %s\n", inet2print(&config.net.gateway));
-    fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
-    fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
-
-    fprintf(stderr, "Looking for a network server...\n");
-    if(!auto2_net_dev(&hd_devs)) return TRUE;
-
-  }
-
-  util_debugwait("Nothing found");
-
-  return FALSE;
-}
-
-
-char *auto2_serial_console()
-{
-  static char *console = NULL;
-  hd_data_t *hd_data;
-  hd_t *hd;
-
-  hd_data = calloc(1, sizeof *hd_data);
-
-  hd = hd_list(hd_data, hw_keyboard, 1, NULL);
-
-  for(; hd; hd = hd->next) {
-    if(
-      hd->base_class.id == bc_keyboard &&
-      hd->sub_class.id == sc_keyboard_console
-    ) {
-      if(hd->unix_dev_name) {
-        strprintf(&console, "%s", short_dev(hd->unix_dev_name));
-
-        if(
-          hd->res &&
-          hd->res->baud.type == res_baud &&
-          hd->res->baud.speed
-        ) {
-          strprintf(&console, "%s,%u", console, hd->res->baud.speed);
-          if(hd->res->baud.parity && hd->res->baud.bits) {
-            strprintf(&console, "%s%c%u", console, hd->res->baud.parity, hd->res->baud.bits);
-          }
-        }
-      }
-      else {
-        strprintf(&console, "console");
-      }
-
-      break;
-    }
-  }
-
-  hd_free_hd_data(hd_data);
-  free(hd_data);
-
-  return console;
-}
-
-
-void auto2_progress(char *pos, char *msg)
-{
-  printf("\r%64s\r", "");
-  printf("> %s: %s", pos, msg);
-  fflush(stdout);
-}
-
-
 void load_network_mods()
 {
   hd_data_t *hd_data;
@@ -856,6 +837,58 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
     }
     activate_driver(hd_data, hd, NULL, 1);
   }
+}
+
+
+void auto2_progress(char *pos, char *msg)
+{
+  printf("\r%64s\r", "");
+  printf("> %s: %s", pos, msg);
+  fflush(stdout);
+}
+
+
+char *auto2_serial_console()
+{
+  static char *console = NULL;
+  hd_data_t *hd_data;
+  hd_t *hd;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  hd = hd_list(hd_data, hw_keyboard, 1, NULL);
+
+  for(; hd; hd = hd->next) {
+    if(
+      hd->base_class.id == bc_keyboard &&
+      hd->sub_class.id == sc_keyboard_console
+    ) {
+      if(hd->unix_dev_name) {
+        strprintf(&console, "%s", short_dev(hd->unix_dev_name));
+
+        if(
+          hd->res &&
+          hd->res->baud.type == res_baud &&
+          hd->res->baud.speed
+        ) {
+          strprintf(&console, "%s,%u", console, hd->res->baud.speed);
+          if(hd->res->baud.parity && hd->res->baud.bits) {
+            strprintf(&console, "%s%c%u", console, hd->res->baud.parity, hd->res->baud.bits);
+          }
+        }
+      }
+      else {
+        strprintf(&console, "console");
+      }
+
+      break;
+    }
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  return console;
 }
 
 

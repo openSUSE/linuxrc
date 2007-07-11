@@ -560,9 +560,12 @@ url_t *url_free(url_t *url)
     free(url->domain);
     free(url->device);
     free(url->proxy);
-    free(url->used_device);
     free(url->mount);
     free(url->tmp_mount);
+
+    free(url->used.device);
+    free(url->used.hwaddr);
+    free(url->used.model);
 
     slist_free(url->query);
 
@@ -707,7 +710,7 @@ void url_umount(url_t *url)
  *   1: ok
  *   2: ok, but continue search
  *
- * url->used_device must be set
+ * url->used.device must be set
  * 
  * return:
  *   0: failed
@@ -723,18 +726,19 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   url_data_t *url_data;
 
   fprintf(stderr, "url mount: trying %s\n", url_print(url));
+  if(url->used.model) fprintf(stderr, "  model: %s\n", url->used.model);
 
   if(
     !url ||
     !url->scheme ||
     !url->path ||
-    !url->is.mountable ||
-    (!url->used_device && url->scheme != inst_file)
+    !url->is.mountable ||	// ************
+    (!url->used.device && url->scheme != inst_file)
   ) return 0;
 
   /* load fs module if necessary */
-  if(url->used_device) {
-    type = util_fstype(url->used_device, &module);
+  if(url->used.device && !url->is.network) {
+    type = util_fstype(url->used.device, &module);
     if(module) mod_modprobe(module, NULL);
     if(!type || !strcmp(type, "swap")) return 0;
   }
@@ -745,10 +749,10 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
   /* we might need an extra mountpoint */
   if(url->scheme != inst_file && strcmp(url->path, "/")) {
-    ok = util_mount_ro(url->used_device, url->tmp_mount = new_mountpoint()) ? 0 : 1;
+    ok = util_mount_ro(url->used.device, url->tmp_mount = new_mountpoint()) ? 0 : 1;
 
     if(!ok) {
-      fprintf(stderr, "disk: %s: mount failed\n", url->used_device);
+      fprintf(stderr, "disk: %s: mount failed\n", url->used.device);
       str_copy(&url->tmp_mount, NULL);
 
       return ok;
@@ -762,7 +766,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     strprintf(&path, "%s%s", url->tmp_mount, url->path);
   }
   else {
-    str_copy(&path, url->used_device);
+    str_copy(&path, url->used.device);
   }
 
   file_type = util_check_exist(path);
@@ -828,12 +832,12 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 /*
  * Mount url to dir; if dir is NULL, assign temporary mountpoint.
  *
- * If url->used_device is not set, try all appropriate devices.
+ * If url->used.device is not set, try all appropriate devices.
  *
  * return:
  *   0: ok
  *   1: failed
- *   sets url->used_device, url->mount, url->tmp_mount (if ok)
+ *   sets url->used.device, url->mount, url->tmp_mount (if ok)
  *
  * *** Note: inverse return value compared to url_mount_disk(). ***
  */
@@ -841,7 +845,9 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 {
   int err = 0, ok, found;
   hd_t *hd;
-  hd_hw_item_t hw_item = hw_block;
+  hd_res_t *res;
+  char *hwaddr;
+  hd_hw_item_t hw_item = hw_network_ctrl;
 
   if(!url || !url->scheme) return 1;
 
@@ -849,29 +855,37 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
   if(!config.hd_data) return 1;
 
-  if(url->used_device) fprintf(stderr, "disk: trying to mount: %s\n", url->used_device);
-
   if(
     url->scheme == inst_file ||
-    url->used_device
+    url->used.device
   ) {
     return url_mount_disk(url, dir, test_func) ? 0 : 1;
   }
 
-  switch(url->scheme) {
-    case inst_cdrom:
-      hw_item = hw_cdrom;
-      break;
+  if(!url->is.network) {
+    switch(url->scheme) {
+      case inst_cdrom:
+        hw_item = hw_cdrom;
+        break;
 
-    case inst_floppy:
-      hw_item = hw_floppy;
-      break;
+      case inst_floppy:
+        hw_item = hw_floppy;
+        break;
 
-    default:
-      break;
+      default:
+        hw_item = hw_block;
+        break;
+    }
   }
 
   for(found = 0, hd = hd_list(config.hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
+    for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+      if(res->any.type == res_hwaddr) {
+        hwaddr = res->hwaddr.addr;
+        break;
+      }
+    }
+
     if(
       (
         url->scheme == inst_hd &&
@@ -886,11 +900,13 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
     if(
       url->device &&
-      strcmp(hd->unix_dev_name, long_dev(url->device)) &&
+      !match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url->device) &&
       !search_str_list(hd->unix_dev_names, long_dev(url->device))
     ) continue;
 
-    str_copy(&url->used_device, hd->unix_dev_name);
+    str_copy(&url->used.device, hd->unix_dev_name);
+    str_copy(&url->used.model, hd->model);
+    str_copy(&url->used.hwaddr, hwaddr);
 
     if((ok = url_mount_disk(url, dir, test_func))) {
       found++;
@@ -903,12 +919,18 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   }
 
   /* should not happen, but anyway: device name was not in our list */
-  if(!err && !found && !url->used_device && url->device) {
-    str_copy(&url->used_device, long_dev(url->device));
+  if(!err && !found && !url->used.device && url->device) {
+    str_copy(&url->used.device, long_dev(url->device));
+    str_copy(&url->used.model, NULL);
+    str_copy(&url->used.hwaddr, NULL);
     err = url_mount_disk(url, dir, test_func) ? 0 : 1;
   }
 
-  if(err) str_copy(&url->used_device, NULL);
+  if(err) {
+    str_copy(&url->used.device, NULL);
+    str_copy(&url->used.model, NULL);
+    str_copy(&url->used.hwaddr, NULL);
+  }
 
   return found ? 0 : err;
 }
@@ -1024,7 +1046,7 @@ int url_find_repo(url_t *url, char *dir)
 
   fprintf(stderr, "repository: looking for %s\n", url_print(url));
 
-  if(!url->mount) err = url_mount(url, dir, test_is_repo);
+  err = url_mount(url, dir, test_is_repo);
 
   if(err) {
     fprintf(stderr, "repository: not found\n");
@@ -1073,6 +1095,7 @@ int url_find_instsys(url_t *url, char *dir)
 char *url_print(url_t *url)
 {
   static char *buf = NULL;
+  int q = 0;
 
   str_copy(&buf, NULL);
   if(!url) return buf;
@@ -1092,7 +1115,13 @@ char *url_print(url_t *url)
   if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
   if(url->path) strprintf(&buf, "%s/%s", buf, *url->path == '/' ? url->path + 1 : url->path);
 
-  if(url->used_device) strprintf(&buf, "%s?device=%s", buf, short_dev(url->used_device));
+  if(url->used.device) {
+    strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
+  }
+
+  if(url->used.hwaddr) {
+    strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
+  }
 
   return buf;
 }
