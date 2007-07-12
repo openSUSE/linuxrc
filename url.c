@@ -749,7 +749,8 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
   /* we might need an extra mountpoint */
   if(url->scheme != inst_file && strcmp(url->path, "/")) {
-    ok = util_mount_ro(url->used.device, url->tmp_mount = new_mountpoint()) ? 0 : 1;
+    str_copy(&url->tmp_mount, new_mountpoint());
+    ok = util_mount_ro(url->used.device, url->tmp_mount) ? 0 : 1;
 
     if(!ok) {
       fprintf(stderr, "disk: %s: mount failed\n", url->used.device);
