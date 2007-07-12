@@ -1597,19 +1597,6 @@ void file_write_install_inf(char *dir)
     }
   }
 
-  if(*ppcd_tg) {
-    fprintf(f, "post-install paride insmod %s\n", ppcd_tg);
-    fprintf(f, "pre-remove paride rmmod %s\n", ppcd_tg);
-  }
-
-#if 0
-#if WITH_PCMCIA
-  if(pcmcia_chip_ig == 1 || pcmcia_chip_ig == 2) {
-    file_write_str(f, key_pcmcia, pcmcia_driver(pcmcia_chip_ig));
-  }
-#endif
-#endif
-
   file_write_num(f, key_haspcmcia, config.has_pcmcia);
 
   file_write_num(f, key_nopcmcia, config.nopcmcia);

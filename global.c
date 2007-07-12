@@ -25,7 +25,6 @@ char           *kernellog_tg = "/etc/kernellog";
 char           *lastlog_tg = "/etc/lastlog";
 char           *bootmsg_tg = "/var/log/boot.msg";
 int             cpu_ig = 0;
-char            ppcd_tg [10];
 int             has_floppy_ig = TRUE;
 int             reboot_ig;
 int             usb_ig = 0;

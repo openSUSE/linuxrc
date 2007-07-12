@@ -605,7 +605,6 @@ extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
 extern int             cpu_ig;
-extern char            ppcd_tg [10];
 extern int             has_floppy_ig;
 extern int             reboot_ig;
 extern int             usb_ig;
