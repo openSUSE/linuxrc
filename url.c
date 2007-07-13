@@ -40,6 +40,7 @@ static int url_progress_cb(void *clientp, double dltotal, double dlnow, double u
 
 static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
 static int url_progress(url_data_t *url_data);
+static int url_setup_device(url_t *url);
 
 
 void url_read(url_data_t *url_data)
@@ -722,7 +723,7 @@ void url_umount(url_t *url)
 int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 {
   int ok = 0, file_type;
-  char *module, *type, *path = NULL, *buf = NULL;
+  char *path = NULL, *buf = NULL;
   url_data_t *url_data;
 
   fprintf(stderr, "url mount: trying %s\n", url_print(url));
@@ -736,38 +737,52 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     (!url->used.device && url->scheme != inst_file)
   ) return 0;
 
-  /* load fs module if necessary */
-  if(url->used.device && !url->is.network) {
-    type = util_fstype(url->used.device, &module);
-    if(module) mod_modprobe(module, NULL);
-    if(!type || !strcmp(type, "swap")) return 0;
-  }
-
   url_umount(url);
   str_copy(&url->tmp_mount, NULL);
   str_copy(&url->mount, NULL);
 
-  /* we might need an extra mountpoint */
-  if(url->scheme != inst_file && strcmp(url->path, "/")) {
-    str_copy(&url->tmp_mount, new_mountpoint());
-    ok = util_mount_ro(url->used.device, url->tmp_mount) ? 0 : 1;
+  if(!url_setup_device(url)) return 0;
 
-    if(!ok) {
-      fprintf(stderr, "disk: %s: mount failed\n", url->used.device);
-      str_copy(&url->tmp_mount, NULL);
+  if(!url->is.network) {
+    /* local device */
 
-      return ok;
+    /* we might need an extra mountpoint */
+    if(url->scheme != inst_file && strcmp(url->path, "/")) {
+      str_copy(&url->tmp_mount, new_mountpoint());
+      ok = util_mount_ro(url->used.device, url->tmp_mount) ? 0 : 1;
+
+      if(!ok) {
+        fprintf(stderr, "disk: %s: mount failed\n", url->used.device);
+        str_copy(&url->tmp_mount, NULL);
+
+        return ok;
+      }
+    }
+
+    if(url->scheme == inst_file) {
+      str_copy(&path, url->path);
+    }
+    else if(url->tmp_mount) {
+      strprintf(&path, "%s%s", url->tmp_mount, url->path);
+    }
+    else {
+      str_copy(&path, url->used.device);
     }
   }
-
-  if(url->scheme == inst_file) {
-    str_copy(&path, url->path);
-  }
-  else if(url->tmp_mount) {
-    strprintf(&path, "%s%s", url->tmp_mount, url->path);
-  }
   else {
-    str_copy(&path, url->used.device);
+    /* network device */
+
+    switch(url->scheme) {
+      case inst_nfs:
+        break;
+
+      case inst_smb:
+        break;
+
+      default:
+        break;
+    }
+
   }
 
   file_type = util_check_exist(path);
@@ -1125,6 +1140,47 @@ char *url_print(url_t *url)
   }
 
   return buf;
+}
+
+
+/*
+ * Load fs module or setup network interface.
+ *
+ * return:
+ *   0: failed
+ *   1: ok
+ */
+int url_setup_device(url_t *url)
+{
+  int ok = 0;
+  char *module, *type;
+
+  if(!url || !url->used.device) return 0;
+
+  if(!url->is.network) {
+    /* load fs module if necessary */
+
+    type = util_fstype(url->used.device, &module);
+    if(module) mod_modprobe(module, NULL);
+    if(type && strcmp(type, "swap")) ok = 1;
+  }
+  else {
+    /* setup interface */
+
+    if(
+      !strncmp(url->used.device, "lo", sizeof "lo" - 1) ||
+      !strncmp(url->used.device, "sit", sizeof "sit" - 1)
+    ) return 0;
+
+
+
+
+    ok = 1;
+
+  }
+
+
+  return ok;
 }
 
 
