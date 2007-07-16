@@ -1234,6 +1234,19 @@ int url_setup_device(url_t *url)
       fprintf(stderr, "%s activated\n", url->used.device);
     }
 
+#if 0
+    while(config.instmode == inst_slp) {
+      extern int slp_get_install(void);
+      if(slp_get_install()) {
+        fprintf(stderr, "SLP failed\n");
+
+        return 0;
+      }
+    }
+#endif
+
+    net_ask_password();
+
     name2inet(&url->used.server, url->server);
 
     if(net_check_address2(&url->used.server, 1)) {
@@ -1253,19 +1266,6 @@ int url_setup_device(url_t *url)
         fprintf(stderr, "nameserver %d: %s\n", i, inet2print(&config.net.nameserver[i]));
       }
     }
-
-#if 0
-    while(config.instmode == inst_slp) {
-      extern int slp_get_install(void);
-      if(slp_get_install()) {
-        fprintf(stderr, "SLP failed\n");
-
-        return 0;
-      }
-    }
-#endif
-
-    net_ask_password();
 
     ok = 1;
   }
