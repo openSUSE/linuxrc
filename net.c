@@ -1591,7 +1591,11 @@ int net_dhcp()
 
   if(config.net.dhcp_active || config.net.keep) return 0;
 
-  if(config.test) return 0;
+  if(config.test) {
+    config.net.dhcp_active = 1;
+
+    return 0;
+  }
 
   if(config.win) {
     sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");

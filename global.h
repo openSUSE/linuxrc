@@ -233,11 +233,13 @@ typedef struct {
     unsigned mountable:1;	/* scheme is mountable */
     unsigned cdrom:1;		/* device is cdrom */
     unsigned file:1;		/* path points to file (not to directory) */
+    unsigned wlan:1;		/* wlan interface */
   } is;
   struct {
     char *device;
     char *hwaddr;
     char *model;
+    inet_t server;
   } used;
 } url_t;
 

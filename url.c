@@ -17,6 +17,7 @@
 #include "file.h"
 #include "util.h"
 #include "module.h"
+#include "net.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -567,6 +568,7 @@ url_t *url_free(url_t *url)
     free(url->used.device);
     free(url->used.hwaddr);
     free(url->used.model);
+    free(url->used.server.name);
 
     slist_free(url->query);
 
@@ -727,7 +729,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   url_data_t *url_data;
 
   fprintf(stderr, "url mount: trying %s\n", url_print(url));
-  if(url->used.model) fprintf(stderr, "  model: %s\n", url->used.model);
+  if(url->used.model) fprintf(stderr, "model: %s\n", url->used.model);
 
   if(
     !url ||
@@ -923,6 +925,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->used.device, hd->unix_dev_name);
     str_copy(&url->used.model, hd->model);
     str_copy(&url->used.hwaddr, hwaddr);
+
+    url->is.wlan = hd->is.wlan;
 
     if((ok = url_mount_disk(url, dir, test_func))) {
       found++;
@@ -1152,10 +1156,14 @@ char *url_print(url_t *url)
  */
 int url_setup_device(url_t *url)
 {
-  int ok = 0;
+  int ok = 0, i;
   char *module, *type;
 
-  if(!url || !url->used.device) return 0;
+  if(!url) return 0;
+
+  if(url->scheme == inst_file) return 1;
+
+  if(!url->used.device) return 0;
 
   if(!url->is.network) {
     /* load fs module if necessary */
@@ -1172,11 +1180,94 @@ int url_setup_device(url_t *url)
       !strncmp(url->used.device, "sit", sizeof "sit" - 1)
     ) return 0;
 
+    /* if(!getenv("PXEBOOT")) */ net_stop();
 
+    config.net.configured = nc_none;
 
+    fprintf(stderr, "interface setup: %s\n", url->used.device);
+
+    if(url->is.wlan && wlan_setup()) return 0;
+
+    config.net.configured = nc_static;
+
+    /* we need at least ip & netmask for static network config */
+    if((net_config_mask() & 3) != 3) {
+      printf(
+        "Sending %s request to %s...\n",
+        config.net.use_dhcp ? "DHCP" : "BOOTP",
+        url->used.device
+      );
+      fflush(stdout);
+      fprintf(stderr,
+        "sending %s request to %s... ",
+        config.net.use_dhcp ? "DHCP" : "BOOTP",
+        url->used.device
+      );
+
+      config.net.use_dhcp ? net_dhcp() : net_bootp();
+
+      if(
+        !config.test &&
+        (
+          !config.net.hostname.ok ||
+          !config.net.netmask.ok ||
+          !config.net.broadcast.ok
+        )
+      ) {
+        fprintf(stderr, "no/incomplete answer.\n");
+        config.net.configured = nc_none;
+
+        return 0;
+      }
+      fprintf(stderr, "ok.\n");
+
+      config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+    }
+
+    if(net_activate_ns()) {
+      fprintf(stderr, "network setup failed\n");
+      config.net.configured = nc_none;
+
+      return 0;
+    }
+    else {
+      fprintf(stderr, "%s activated\n", url->used.device);
+    }
+
+    name2inet(&url->used.server, url->server);
+
+    if(net_check_address2(&url->used.server, 1)) {
+      fprintf(stderr, "invalid server address: %s\n", url->used.server.name);
+      config.net.configured = nc_none;
+
+      return 0;
+    }
+
+    fprintf(stderr, "hostip: %s/", inet2print(&config.net.hostname));
+    fprintf(stderr, "%s\n", inet2print(&config.net.netmask));
+    if(config.net.gateway.ok) {
+      fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));
+    }
+    for(i = 0; i < sizeof config.net.nameserver / sizeof *config.net.nameserver; i++) {
+      if(config.net.nameserver[i].ok) {
+        fprintf(stderr, "nameserver %d: %s\n", i, inet2print(&config.net.nameserver[i]));
+      }
+    }
+
+#if 0
+    while(config.instmode == inst_slp) {
+      extern int slp_get_install(void);
+      if(slp_get_install()) {
+        fprintf(stderr, "SLP failed\n");
+
+        return 0;
+      }
+    }
+#endif
+
+    net_ask_password();
 
     ok = 1;
-
   }
 
 
