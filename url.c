@@ -1157,7 +1157,7 @@ char *url_print(url_t *url)
 int url_setup_device(url_t *url)
 {
   int ok = 0, i;
-  char *module, *type;
+  char *module, *type, *s;
 
   if(!url) return 0;
 
@@ -1256,8 +1256,10 @@ int url_setup_device(url_t *url)
       return 0;
     }
 
-    fprintf(stderr, "hostip: %s/", inet2print(&config.net.hostname));
-    fprintf(stderr, "%s\n", inet2print(&config.net.netmask));
+    s = inet2print(&config.net.hostname);
+    fprintf(stderr, "hostip: %s/", *s ? s : "<no ip>");
+    s = inet2print(&config.net.netmask);
+    fprintf(stderr, "%s\n", *s ? s : "<no netmask>");
     if(config.net.gateway.ok) {
       fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));
     }
