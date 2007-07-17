@@ -779,7 +779,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         str_copy(&url->mount, dir ?: new_mountpoint());
         err = net_mount_nfs(url->mount, &url->used.server, url->path);
         fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
-        if(err == ENOTDIR) {
+        if(err == ENOTDIR || err == ENOENT) {
           str_copy(&url->mount, NULL);
           str_copy(&buf, url->path);
 
