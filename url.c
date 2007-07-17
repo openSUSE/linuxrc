@@ -724,8 +724,8 @@ void url_umount(url_t *url)
  */
 int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 {
-  int ok = 0, file_type;
-  char *path = NULL, *buf = NULL;
+  int ok = 0, file_type, err = 0;
+  char *path = NULL, *buf = NULL, *s;
   url_data_t *url_data;
 
   fprintf(stderr, "url mount: trying %s\n", url_print(url));
@@ -776,6 +776,31 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
     switch(url->scheme) {
       case inst_nfs:
+        str_copy(&url->mount, dir ?: new_mountpoint());
+        err = net_mount_nfs(url->mount, &url->used.server, url->path);
+        fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
+        if(err == ENOTDIR) {
+          str_copy(&url->mount, NULL);
+          str_copy(&buf, url->path);
+
+          if((s = strrchr(buf, '/')) && s != buf && s[1]) {
+            *s++ = 0;
+            str_copy(&url->tmp_mount, new_mountpoint());
+            err = net_mount_nfs(url->tmp_mount, &url->used.server, buf);
+            if(err) {
+              fprintf(stderr, "nfs: %s: mount failed\n", url->used.device);
+              str_copy(&url->tmp_mount, NULL);
+            }
+            else {
+              strprintf(&path, "%s/%s", url->tmp_mount, s);
+            }
+          }
+
+          str_copy(&buf, NULL);
+        }
+        else if(!err) {
+          str_copy(&path, url->mount);
+        }
         break;
 
       case inst_smb:
@@ -787,41 +812,49 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
   }
 
-  file_type = util_check_exist(path);
+  if(!err) {
+    file_type = util_check_exist(path);
 
-  if(file_type && (file_type == 'r' || file_type == 'b')) url->is.file = 1;
+    if(file_type && (file_type == 'r' || file_type == 'b')) url->is.file = 1;
 
-  if(file_type) {
-    str_copy(&url->mount, dir ?: new_mountpoint());
-    if(url->is.file && (url->download || !util_is_mountable(path))) {
-      url_data = url_data_new();
-      url_data->unzip = 1;
-      strprintf(&buf, "file:%s", path);
-      url_data->url = url_set(buf);
-      url_data->file_name = strdup(new_download());
-      url_data->progress = url_progress;
-      strprintf(&url_data->label, "Loading %s", url_print(url));
-      fprintf(stderr, "loading %s --> %s\n", url_print(url), url_data->file_name);
-      url_read(url_data);
-      printf("\n"); fflush(stdout);
+    if(file_type) {
+      if(url->is.file && (url->download || !util_is_mountable(path))) {
+        str_copy(&url->mount, dir ?: new_mountpoint());
+        url_data = url_data_new();
+        url_data->unzip = 1;
+        strprintf(&buf, "file:%s", path);
+        url_data->url = url_set(buf);
+        url_data->file_name = strdup(new_download());
+        url_data->progress = url_progress;
+        strprintf(&url_data->label, "Loading %s", url_print(url));
+        fprintf(stderr, "loading %s --> %s\n", url_print(url), url_data->file_name);
+        url_read(url_data);
+        printf("\n"); fflush(stdout);
 
-      if(url_data->err) {
-        fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+        if(url_data->err) {
+          fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+        }
+        else {
+          ok = util_mount_ro(url_data->file_name, url->mount) ? 0 : 1;
+        }
+        if(!ok) unlink(url_data->file_name);
+
+        url_data_free(url_data);
+        str_copy(&buf, NULL);
       }
       else {
-        ok = util_mount_ro(url_data->file_name, url->mount) ? 0 : 1;
+        if(!url->mount) {
+          str_copy(&url->mount, dir ?: new_mountpoint());
+          ok = util_mount_ro(path, url->mount) ? 0 : 1;
+        }
+        else {
+          ok = 1;
+        }
       }
-      if(!ok) unlink(url_data->file_name);
-
-      url_data_free(url_data);
-      str_copy(&buf, NULL);
     }
     else {
-      ok = util_mount_ro(path, url->mount) ? 0 : 1;
+      ok = 0;
     }
-  }
-  else {
-    ok = 0;
   }
 
   if(ok && test_func && !(ok = test_func(url))) {
