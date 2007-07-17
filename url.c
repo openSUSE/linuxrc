@@ -804,6 +804,28 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         break;
 
       case inst_smb:
+        if(strcmp(url->path, "/")) {
+          str_copy(&url->tmp_mount, new_mountpoint());
+          s = url->tmp_mount;
+        }
+        else {
+          str_copy(&url->mount, dir ?: new_mountpoint());
+          s = url->mount;
+        }
+        err = net_mount_smb(s, &url->used.server, url->share, url->user, url->password, url->domain);
+        fprintf(stderr, "smb: %s -> %s (%d)\n", url->share, s, err);
+        if(err) {
+          str_copy(&url->tmp_mount, NULL);
+          str_copy(&url->mount, NULL);
+        }
+        else {
+          if(url->mount) {
+            str_copy(&path, url->mount);
+          }
+          else {
+            strprintf(&path, "%s%s", url->tmp_mount, url->path);
+          }
+        }
         break;
 
       default:
