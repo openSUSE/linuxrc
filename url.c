@@ -510,38 +510,42 @@ url_t *url_set(char *str)
     }
   }
 
-  fprintf(stderr, "url = %s\n", url->str);
-  fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
-  if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
-  if(url->port) fprintf(stderr, ", port = %u", url->port);
-  if(url->path) fprintf(stderr, ", path = \"%s\"", url->path);
-  fprintf(stderr, "\n");
+  if(config.debug >= 1) {
+    fprintf(stderr, "url = %s\n", url->str);
+    if(config.debug >= 2) {
+      fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
+      if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
+      if(url->port) fprintf(stderr, ", port = %u", url->port);
+      if(url->path) fprintf(stderr, ", path = \"%s\"", url->path);
+      fprintf(stderr, "\n");
 
-  if(url->user || url->password) {
-    i = 0;
-    if(url->user) fprintf(stderr, "%c user = \"%s\"", i++ ? ',' : ' ', url->user);
-    if(url->password) fprintf(stderr, "%c password = \"%s\"", i++ ? ',' : ' ', url->password);
-    fprintf(stderr, "\n");
-  }
+      if(url->user || url->password) {
+        i = 0;
+        if(url->user) fprintf(stderr, "%c user = \"%s\"", i++ ? ',' : ' ', url->user);
+        if(url->password) fprintf(stderr, "%c password = \"%s\"", i++ ? ',' : ' ', url->password);
+        fprintf(stderr, "\n");
+      }
 
-  if(url->share || url->domain || url->device) {
-    i = 0;
-    if(url->share) fprintf(stderr, "%c share = \"%s\"", i++ ? ',' : ' ', url->share);
-    if(url->domain) fprintf(stderr, "%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
-    if(url->device) fprintf(stderr, "%c device = \"%s\"", i++ ? ',' : ' ', url->device);
-    fprintf(stderr, "\n");
-  }
+      if(url->share || url->domain || url->device) {
+        i = 0;
+        if(url->share) fprintf(stderr, "%c share = \"%s\"", i++ ? ',' : ' ', url->share);
+        if(url->domain) fprintf(stderr, "%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
+        if(url->device) fprintf(stderr, "%c device = \"%s\"", i++ ? ',' : ' ', url->device);
+        fprintf(stderr, "\n");
+      }
 
-  fprintf(stderr, "  network = %u, mountable = %u\n", url->is.network, url->is.mountable);
+      fprintf(stderr, "  network = %u, mountable = %u\n", url->is.network, url->is.mountable);
 
-  if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
+      if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
 
-  if(url->proxy) fprintf(stderr, "  proxy = %s\n", url->proxy);
+      if(url->proxy) fprintf(stderr, "  proxy = %s\n", url->proxy);
 
-  if(url->query) {
-    fprintf(stderr, "  query:\n");
-    for(sl = url->query; sl; sl = sl->next) {
-      fprintf(stderr, "    %s = \"%s\"\n", sl->key, sl->value);
+      if(url->query) {
+        fprintf(stderr, "  query:\n");
+        for(sl = url->query; sl; sl = sl->next) {
+          fprintf(stderr, "    %s = \"%s\"\n", sl->key, sl->value);
+        }
+      }
     }
   }
 
@@ -725,7 +729,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 {
   int ok = 0, file_type, err = 0;
   char *path = NULL, *buf = NULL, *s;
-  url_data_t *url_data;
+  url_t *tmp_url;
 
   fprintf(stderr, "url mount: trying %s\n", url_print(url, 0));
   if(url->used.model) fprintf(stderr, "model: %s\n", url->used.model);
@@ -845,28 +849,24 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
       if(file_type) {
         if(url->is.file && (url->download || !util_is_mountable(path))) {
+
           str_copy(&url->mount, dir ?: new_mountpoint());
-          url_data = url_data_new();
-          url_data->unzip = 1;
-          strprintf(&buf, "file:%s", path);
-          url_data->url = url_set(buf);
-          url_data->file_name = strdup(new_download());
-          url_data->progress = url_progress;
-          strprintf(&url_data->label, "Loading %s", url_print(url, 0));
-          fprintf(stderr, "loading %s -> %s\n", url_print(url, 0), url_data->file_name);
-          url_read(url_data);
-          printf("\n"); fflush(stdout);
 
-          if(url_data->err) {
-            fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
-          }
-          else {
-            ok = util_mount_ro(url_data->file_name, url->mount) ? 0 : 1;
-          }
-          if(!ok) unlink(url_data->file_name);
+          tmp_url = url_set("file:/");
 
-          url_data_free(url_data);
-          str_copy(&buf, NULL);
+          ok = url_read_file(tmp_url,
+            NULL,
+            path,
+            s = strdup(new_download()),
+            NULL,
+            URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+          ) ? 0 : 1;
+
+          if(ok) ok = util_mount_ro(s, url->mount) ? 0 : 1;
+          if(!ok) unlink(s);
+
+          free(s);
+          url_free(tmp_url);
         }
         else {
           if(!url->mount) {
@@ -1034,7 +1034,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
 
   int test_and_copy(url_t *url)
   {
-    int ok = 0, new_url = 0;
+    int ok = 0, new_url = 0, i;
     char *old_path, *buf = NULL;
     url_data_t *url_data;
 
@@ -1054,7 +1054,12 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     old_path = url->path;
     url->path = NULL;
 
-    strprintf(&url->path, "%s/%s", old_path, *src == '/' ? src + 1 : src);
+    i = strlen(old_path);
+    strprintf(&url->path, "%s%s%s",
+      old_path,
+      (i && old_path[i - 1] == '/') || !*src ? "" : "/",
+      *src == '/' ? src + 1 : src
+    );
     str_copy(&buf, url_print(url, 1));
     url_data->url = url_set(buf);
 
@@ -1103,7 +1108,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     url_free(url);
   }
   else {
-    if(url->is.mountable) {
+    if(url->is.mountable && url->scheme != inst_file) {
       err = url_mount(url, dir, test_and_copy);
     }
     else {
@@ -1207,6 +1212,7 @@ int url_find_repo(url_t *url, char *dir)
 int url_find_instsys(url_t *url, char *dir)
 {
   int err = 0;
+  char *file_name;
 
   if(
     !url ||
@@ -1215,10 +1221,25 @@ int url_find_instsys(url_t *url, char *dir)
     !url->path
   ) return 1;
 
-  if(!url->is.mountable) return 1;
-
   if(config.download.instsys || config.rescue) url->download = 1;
-  err = url_mount(url, dir, NULL);
+  if(url->is.mountable) {
+    err = url_mount(url, dir, NULL);
+  }
+  else {
+    err = url_read_file(url,
+      NULL,
+      "",
+      file_name = strdup(new_download()),
+      txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
+      URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+    );
+
+    if(!err) err = util_mount_ro(file_name, config.mountpoint.instsys);
+
+    if(!err) str_copy(&url->mount, config.mountpoint.instsys);
+
+    free(file_name);
+  }
 
   return err;
 }

@@ -34,8 +34,7 @@
 #include "settings.h"
 #include "url.h"
 
-static int auto2_find_install_disk(void);
-static int auto2_find_install_server(void);
+static int auto2_find_repo(void);
 static void auto2_user_netconfig(void);
 static int driver_is_active(hd_t *hd);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
@@ -316,42 +315,18 @@ void auto2_scan_hardware()
 
 
 /*
- * Look for a block device with install source and mount it.
+ * Look for a block device/network server with install source (and mount it,
+ * if possible).
  *
  * return:
- *   0: ok, device was mounted
- *   1: no device found
+ *   0: ok, repository found
+ *   1: no repository
  */
-int auto2_find_install_disk()
+int auto2_find_repo()
 {
   int err;
 
   err = url_find_repo(config.url.install, config.mountpoint.instdata);
-
-  if(err) return err;
-
-  if(!config.url.instsys->mount) {
-    err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
-  }
-
-  return err;
-}
-
-
-/*
- * Look for a network server with install source (and mount, if possible).
- *
- * return:
- *   0: ok, server was mounted
- *   1: no server found
- */
-int auto2_find_install_server()
-{
-  int err;
-
-  err = url_find_repo(config.url.install, config.mountpoint.instdata);
-
-  LXRC_WAIT
 
   if(err) return err;
 
@@ -381,25 +356,7 @@ int auto2_find_install_medium()
     return 1;
   }
 
-  /* local disk */
-  if(
-    config.url.install->is.mountable &&
-    !config.url.install->is.network
-  ) {
-    if(!auto2_find_install_disk()) {
-      auto2_user_netconfig();
-
-      return 1;
-    }
-
-    fprintf(stderr, "no %s disk found\n", config.product);
-
-    return 0;
-  }
-
-  /* network server */
-  if(config.url.install->is.network /* WHY? || net_config_mask() */) {
-
+  if(config.url.install->is.network) {
 #if defined(__s390__) || defined(__s390x__)
     static int as3d = 0;
   
@@ -415,21 +372,14 @@ int auto2_find_install_medium()
       &config.net.broadcast,
       config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
     );
-
-#if 0
-    fprintf(stderr, "hostname:   %s\n", inet2print(&config.net.hostname));
-    fprintf(stderr, "netmask:    %s\n", inet2print(&config.net.netmask));
-    fprintf(stderr, "broadcast:  %s\n", inet2print(&config.net.broadcast));
-    fprintf(stderr, "gateway:    %s\n", inet2print(&config.net.gateway));
-    fprintf(stderr, "server:     %s\n", inet2print(&config.net.server));
-    fprintf(stderr, "nameserver: %s\n", inet2print(&config.net.nameserver[0]));
-#endif
-
-    if(!auto2_find_install_server()) return 1;
-
-    // if(!auto2_net_dev(&hd_devs)) return 1;
-
   }
+  else {
+    auto2_user_netconfig();
+  }
+
+  if(!auto2_find_repo()) return 1;
+
+  fprintf(stderr, "no %s repository found\n", config.product);
 
   return 0;
 }
