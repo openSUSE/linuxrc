@@ -399,7 +399,6 @@ url_t *url_set(char *str)
   }  
 
   /* unescape strings */
-  /* FIXME: --> ftp? */
   {
     char **str[] = {
       &url->server, &url->share, &url->path, &url->user,
@@ -649,7 +648,7 @@ int url_progress(url_data_t *url_data)
 
     str_copy(&label, url_data->label);
 
-    if(!label) strprintf(&label, "Loading %s", url_print(url_data->url));
+    if(!label) strprintf(&label, "Loading %s", url_print(url_data->url, 0));
 
     if(percent >= 0) {
       strprintf(&buf,
@@ -728,14 +727,13 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   char *path = NULL, *buf = NULL, *s;
   url_data_t *url_data;
 
-  fprintf(stderr, "url mount: trying %s\n", url_print(url));
+  fprintf(stderr, "url mount: trying %s\n", url_print(url, 0));
   if(url->used.model) fprintf(stderr, "model: %s\n", url->used.model);
 
   if(
     !url ||
     !url->scheme ||
     !url->path ||
-    !url->is.mountable ||	// ************
     (!url->used.device && url->scheme != inst_file)
   ) return 0;
 
@@ -828,54 +826,64 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         }
         break;
 
+      case inst_http:
+      case inst_ftp:
+        break;
+
       default:
+        fprintf(stderr, "%s: unsupported scheme\n", get_instmode_name(url->scheme));
+        err = 1;
         break;
     }
-
   }
 
   if(!err) {
-    file_type = util_check_exist(path);
+    if(url->is.mountable) {
+      file_type = util_check_exist(path);
 
-    if(file_type && (file_type == 'r' || file_type == 'b')) url->is.file = 1;
+      if(file_type && (file_type == 'r' || file_type == 'b')) url->is.file = 1;
 
-    if(file_type) {
-      if(url->is.file && (url->download || !util_is_mountable(path))) {
-        str_copy(&url->mount, dir ?: new_mountpoint());
-        url_data = url_data_new();
-        url_data->unzip = 1;
-        strprintf(&buf, "file:%s", path);
-        url_data->url = url_set(buf);
-        url_data->file_name = strdup(new_download());
-        url_data->progress = url_progress;
-        strprintf(&url_data->label, "Loading %s", url_print(url));
-        fprintf(stderr, "loading %s --> %s\n", url_print(url), url_data->file_name);
-        url_read(url_data);
-        printf("\n"); fflush(stdout);
+      if(file_type) {
+        if(url->is.file && (url->download || !util_is_mountable(path))) {
+          str_copy(&url->mount, dir ?: new_mountpoint());
+          url_data = url_data_new();
+          url_data->unzip = 1;
+          strprintf(&buf, "file:%s", path);
+          url_data->url = url_set(buf);
+          url_data->file_name = strdup(new_download());
+          url_data->progress = url_progress;
+          strprintf(&url_data->label, "Loading %s", url_print(url, 0));
+          fprintf(stderr, "loading %s -> %s\n", url_print(url, 0), url_data->file_name);
+          url_read(url_data);
+          printf("\n"); fflush(stdout);
 
-        if(url_data->err) {
-          fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+          if(url_data->err) {
+            fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+          }
+          else {
+            ok = util_mount_ro(url_data->file_name, url->mount) ? 0 : 1;
+          }
+          if(!ok) unlink(url_data->file_name);
+
+          url_data_free(url_data);
+          str_copy(&buf, NULL);
         }
         else {
-          ok = util_mount_ro(url_data->file_name, url->mount) ? 0 : 1;
+          if(!url->mount) {
+            str_copy(&url->mount, dir ?: new_mountpoint());
+            ok = util_mount_ro(path, url->mount) ? 0 : 1;
+          }
+          else {
+            ok = 1;
+          }
         }
-        if(!ok) unlink(url_data->file_name);
-
-        url_data_free(url_data);
-        str_copy(&buf, NULL);
       }
       else {
-        if(!url->mount) {
-          str_copy(&url->mount, dir ?: new_mountpoint());
-          ok = util_mount_ro(path, url->mount) ? 0 : 1;
-        }
-        else {
-          ok = 1;
-        }
+        ok = 0;
       }
     }
     else {
-      ok = 0;
+      ok = 1;
     }
   }
 
@@ -884,7 +892,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   }
 
   if(!ok) {
-    fprintf(stderr, "url mount: %s failed\n", url_print(url));
+    fprintf(stderr, "url mount: %s failed\n", url_print(url, 0));
 
     util_umount(url->mount);
     util_umount(url->tmp_mount);
@@ -893,7 +901,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->mount, NULL);
   }
   else {
-    fprintf(stderr, "url mount: %s @ %s\n", url_print(url), url->mount);
+    fprintf(stderr, "url mount: %s @ %s\n", url_print(url, 0), url->mount);
   }
 
   str_copy(&path, NULL);
@@ -1013,31 +1021,95 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
 /*
  * Read file 'src' relative to 'url' and write it to 'dst'. If 'dir' is set,
- * mount 'url' at 'dir'.
+ * mount 'url' at 'dir' if necessary.
  *
  * return:
  *   0: ok
  *   1: failed
  */
-int url_read_file(url_t *url, char *dir, char *src, char *dst)
+int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
 {
   int err = 0;
+  char *buf1 = NULL;
 
-  int test_file_exists(url_t *url)
+  int test_and_copy(url_t *url)
   {
-    if(!url || !url->mount) return 0;
+    int ok = 0, new_url = 0;
+    char *old_path, *buf = NULL;
+    url_data_t *url_data;
 
-    return util_check_exist2(url->mount, src) == 'r' ? 1 : 0;
+    if(!url) return 0;
+
+    if(url->is.mountable && url->scheme != inst_file) {
+      if(!url->mount) return 0;
+      ok = util_check_exist2(url->mount, src) == 'r' ? 1 : 0;
+      if(!ok) return ok;
+      strprintf(&buf, "file:%s", url->mount);
+      url = url_set(buf);
+      new_url = 1;
+    }
+
+    url_data = url_data_new();
+
+    old_path = url->path;
+    url->path = NULL;
+
+    strprintf(&url->path, "%s/%s", old_path, *src == '/' ? src + 1 : src);
+    str_copy(&buf, url_print(url, 1));
+    url_data->url = url_set(buf);
+
+    free(url->path);
+    url->path = old_path;
+
+    url_data->file_name = strdup(dst);
+
+    if((flags & URL_FLAG_UNZIP)) url_data->unzip = 1;
+    if((flags & URL_FLAG_PROGRESS)) url_data->progress = url_progress;
+    str_copy(&url_data->label, label);
+
+    fprintf(stderr, "loading %s -> %s\n", url_print(url_data->url, 0), url_data->file_name);
+
+    url_read(url_data);
+    if(url_data->progress) printf("\n");
+    fflush(stdout);
+
+    if(url_data->err) {
+      if(url_data->progress) {
+        printf("error %d: %s\n", url_data->err, url_data->err_buf);
+        fflush(stdout);
+      }
+      fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+    }
+    else {
+      ok = 1;
+    }
+
+    str_copy(&buf, NULL);
+
+    if(new_url) url_free(url);
+
+    url_data_free(url_data);
+
+    return ok;
   }
 
   if(!src || !dst) return 1;
 
-  if(
-    !url->mount &&
-    (err = url_mount(url, dir, test_file_exists))
-  ) return err;
-
-  err = util_copy_file(url->mount, src, dst);
+  if(url->mount) {
+    strprintf(&buf1, "file:%s", url->mount);
+    url = url_set(buf1);
+    err = test_and_copy(url) ? 0 : 1;
+    str_copy(&buf1, NULL);
+    url_free(url);
+  }
+  else {
+    if(url->is.mountable) {
+      err = url_mount(url, dir, test_and_copy);
+    }
+    else {
+      err = test_and_copy(url) ? 0 : 1;
+    }
+  }
 
   return err;
 }
@@ -1061,55 +1133,46 @@ int url_find_repo(url_t *url, char *dir)
   int test_is_repo(url_t *url)
   {
     int ok = 0;
-    char *buf = NULL;
-    url_data_t *url_data;
+    char *buf = NULL, *file_name;
 
     if(
       !url ||
-      !url->mount ||
+      (!url->mount && url->is.mountable) ||
       !config.url.instsys ||
       !config.url.instsys->scheme
     ) return 0;
 
-    if(util_check_exist2(url->mount, "/content") != 'r') return 0;
-    if(util_copy_file(url->mount, "/content", "/tmp/content")) return 0;
+    if(url_read_file(url, NULL, "/content", "/tmp/content", NULL, URL_FLAG_PROGRESS)) return 0;
 
     if(config.url.instsys->scheme != inst_rel) return 1;
 
-    if(!util_check_exist2(url->mount, config.url.instsys->path)) return 0;
+    if(
+      url->is.mountable &&
+      !util_check_exist2(url->mount, config.url.instsys->path)
+    ) return 0;
 
-    strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
+    if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
 
     if(
       !config.download.instsys &&
       !config.rescue &&
+      url->is.mountable &&
       util_is_mountable(buf)
     ) {
       ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
     }
     else {
-      url_data = url_data_new();
-      url_data->unzip = 1;
-      strprintf(&buf, "file:%s/%s", url->mount, config.url.instsys->path);
-
-      url_data->url = url_set(buf);
-      url_data->file_name = strdup(new_download());
-      url_data->label = strdup(txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
-
-      url_data->progress = url_progress;
-
-      fprintf(stderr, "loading %s --> %s\n", url_print(url_data->url), url_data->file_name);
-
-      url_read(url_data);
-      printf("\n"); fflush(stdout);
-
-      if(url_data->err) {
-        fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+      if(!url_read_file(url,
+        NULL,
+        config.url.instsys->path,
+        file_name = strdup(new_download()),
+        txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
+        URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+      )) {
+        ok = util_mount_ro(file_name, config.mountpoint.instsys) ? 0 : 1;
       }
-      else {
-        ok = util_mount_ro(url_data->file_name, config.mountpoint.instsys) ? 0 : 1;
-      }
-      url_data_free(url_data);
+
+      free(file_name);
     }
 
     str_copy(&buf, NULL);
@@ -1119,7 +1182,7 @@ int url_find_repo(url_t *url, char *dir)
     return ok;
   }
 
-  fprintf(stderr, "repository: looking for %s\n", url_print(url));
+  fprintf(stderr, "repository: looking for %s\n", url_print(url, 0));
 
   err = url_mount(url, dir, test_is_repo);
 
@@ -1127,9 +1190,8 @@ int url_find_repo(url_t *url, char *dir)
     fprintf(stderr, "repository: not found\n");
   }
   else {
-    fprintf(stderr, "repository: using %s @ %s\n", url_print(url), url->mount);
+    fprintf(stderr, "repository: using %s @ %s\n", url_print(url, 0), url->mount);
   }
-
 
   return err;
 }
@@ -1167,9 +1229,9 @@ int url_find_instsys(url_t *url, char *dir)
  *
  * scheme://domain;user:password@server:port/path?query
  */
-char *url_print(url_t *url)
+char *url_print(url_t *url, int format)
 {
-  static char *buf = NULL;
+  static char *buf = NULL, *s;
   int q = 0;
 
   str_copy(&buf, NULL);
@@ -1180,22 +1242,43 @@ char *url_print(url_t *url)
   if(url->domain || url->user || url->password || url->server || url->port) {
     strprintf(&buf, "%s//", buf);
     if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
-    if(url->user) strprintf(&buf, "%s%s", buf, url->user);
-    if(url->password) strprintf(&buf, "%s:******", buf);
+    if(url->user) {
+      s = curl_easy_escape(NULL, url->user, 0);
+      strprintf(&buf, "%s%s", buf, s);
+      curl_free(s);
+    }
+    if(url->password) {
+      if(format == 0) {
+        strprintf(&buf, "%s:***", buf);
+      }
+      else {
+        s = curl_easy_escape(NULL, url->password, 0);
+        strprintf(&buf, "%s:%s", buf, s);
+        curl_free(s);
+      }
+    }
     if(url->user || url->password) strprintf(&buf, "%s@", buf);
     if(url->server) strprintf(&buf, "%s%s", buf, url->server);
     if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
   }
 
   if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
-  if(url->path) strprintf(&buf, "%s/%s", buf, *url->path == '/' ? url->path + 1 : url->path);
-
-  if(url->used.device) {
-    strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
+  if(url->path) {
+    strprintf(&buf, "%s/%s%s",
+      buf,
+      url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
+      *url->path == '/' ? url->path + 1 : url->path
+    );
   }
 
-  if(url->used.hwaddr) {
-    strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
+  if(format == 0) {
+    if(url->used.device) {
+      strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
+    }
+
+    if(url->used.hwaddr) {
+      strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
+    }
   }
 
   return buf;
@@ -1231,6 +1314,14 @@ int url_setup_device(url_t *url)
     /* setup interface */
 
     if(
+      config.net.configured &&
+      config.net.device &&
+      !strcmp(url->used.device, config.net.device)
+    ) {
+      return 1;
+    }
+
+    if(
       !strncmp(url->used.device, "lo", sizeof "lo" - 1) ||
       !strncmp(url->used.device, "sit", sizeof "sit" - 1)
     ) return 0;
@@ -1238,6 +1329,7 @@ int url_setup_device(url_t *url)
     /* if(!getenv("PXEBOOT")) */ net_stop();
 
     config.net.configured = nc_none;
+    str_copy(&config.net.device, NULL);
 
     fprintf(stderr, "interface setup: %s\n", url->used.device);
 
@@ -1288,6 +1380,8 @@ int url_setup_device(url_t *url)
     else {
       fprintf(stderr, "%s activated\n", url->used.device);
     }
+
+    str_copy(&config.net.device, url->used.device);
 
 #if 0
     while(config.instmode == inst_slp) {

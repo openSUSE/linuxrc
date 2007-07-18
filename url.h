@@ -28,6 +28,9 @@ typedef struct url_data_s {
   int (*progress)(struct url_data_s *);
 } url_data_t;
 
+#define URL_FLAG_UNZIP		1
+#define URL_FLAG_PROGRESS	2
+
 void url_read(url_data_t *url_data);
 url_t *url_set(char *str);
 url_t *url_free(url_t *url);
@@ -36,8 +39,8 @@ url_data_t *url_data_new(void);
 void url_data_free(url_data_t *url_data);
 void url_umount(url_t *url);
 int url_mount(url_t *url, char *dir, int (*test_func)(url_t *));
-int url_read_file(url_t *url, char *dir, char *src, char *dst);
+int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
 int url_find_repo(url_t *url, char *dir);
 int url_find_instsys(url_t *url, char *dir);
-char *url_print(url_t *url);
+char *url_print(url_t *url, int format);
 
