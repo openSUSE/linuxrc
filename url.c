@@ -901,7 +901,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->mount, NULL);
   }
   else {
-    fprintf(stderr, "url mount: %s @ %s\n", url_print(url, 0), url->mount);
+    fprintf(stderr, "url mount: %s", url_print(url, 0));
+    if(url->mount) fprintf(stderr, " @ %s", url->mount);
+    fprintf(stderr, "\n");
   }
 
   str_copy(&path, NULL);
@@ -1147,7 +1149,7 @@ int url_find_repo(url_t *url, char *dir)
       !config.url.instsys->scheme
     ) return 0;
 
-    if(url_read_file(url, NULL, "/content", "/tmp/content", NULL, URL_FLAG_PROGRESS)) return 0;
+    if(url_read_file(url, NULL, "/content", "/content", NULL, URL_FLAG_PROGRESS)) return 0;
 
     if(config.url.instsys->scheme != inst_rel) return 1;
 
@@ -1195,7 +1197,9 @@ int url_find_repo(url_t *url, char *dir)
     fprintf(stderr, "repository: not found\n");
   }
   else {
-    fprintf(stderr, "repository: using %s @ %s\n", url_print(url, 0), url->mount);
+    fprintf(stderr, "repository: using %s", url_print(url, 0));
+    if(url->mount) fprintf(stderr, " @ %s", url->mount);
+    fprintf(stderr, "\n");
   }
 
   return err;
@@ -1297,7 +1301,7 @@ char *url_print(url_t *url, int format)
       strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
     }
 
-    if(url->used.hwaddr) {
+    if(config.debug >= 2 && url->used.hwaddr) {
       strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
     }
   }
@@ -1350,9 +1354,10 @@ int url_setup_device(url_t *url)
     /* if(!getenv("PXEBOOT")) */ net_stop();
 
     config.net.configured = nc_none;
-    str_copy(&config.net.device, NULL);
 
     fprintf(stderr, "interface setup: %s\n", url->used.device);
+
+    str_copy(&config.net.device, url->used.device);
 
     if(url->is.wlan && wlan_setup()) return 0;
 
@@ -1402,8 +1407,6 @@ int url_setup_device(url_t *url)
       fprintf(stderr, "%s activated\n", url->used.device);
     }
 
-    str_copy(&config.net.device, url->used.device);
-
 #if 0
     while(config.instmode == inst_slp) {
       extern int slp_get_install(void);
@@ -1428,7 +1431,7 @@ int url_setup_device(url_t *url)
 
     s = inet2print(&config.net.hostname);
     fprintf(stderr, "hostip: %s/", *s ? s : "<no ip>");
-    s = inet2print(&config.net.netmask);
+    s = inetmask2print(&config.net.netmask);
     fprintf(stderr, "%s\n", *s ? s : "<no netmask>");
     if(config.net.gateway.ok) {
       fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));

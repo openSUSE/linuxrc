@@ -3074,6 +3074,30 @@ char *inet2print(inet_t *inet)
 }
 
 
+char *inetmask2print(inet_t *inet)
+{
+  static char buf[32];
+  int i, j;
+  uint32_t m1, m0;
+
+  *buf = 0;
+
+  if(!inet || (!inet->name && !inet->ok)) return buf;
+
+  m0 = m1 = htonl(inet->ip.s_addr);
+
+  for(i = 0; i < 32 && !(m0 & 1); i++) m0 >>= 1;
+  for(j = 0; j < 32 && (m1 & 0x80000000); j++) m1 <<= 1;
+
+  if(i + j == 32) {
+    sprintf(buf, "%d", j);
+    return buf;
+  }
+
+  return inet2print(inet);
+}
+
+
 #if 0
 
 ftp://flup:flup1@ftp.zap:21/pub/suse
