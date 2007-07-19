@@ -18,6 +18,7 @@
 #include "util.h"
 #include "module.h"
 #include "net.h"
+#include "slp.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -482,6 +483,7 @@ url_t *url_set(char *str)
   }
 
   if(
+    url->scheme == inst_slp ||
     url->scheme == inst_nfs ||
     url->scheme == inst_ftp ||
     url->scheme == inst_smb ||
@@ -1321,6 +1323,7 @@ int url_setup_device(url_t *url)
 {
   int ok = 0, i;
   char *module, *type, *s;
+  url_t *tmp_url;
 
   if(!url) return 0;
 
@@ -1407,16 +1410,33 @@ int url_setup_device(url_t *url)
       fprintf(stderr, "%s activated\n", url->used.device);
     }
 
-#if 0
-    while(config.instmode == inst_slp) {
-      extern int slp_get_install(void);
-      if(slp_get_install()) {
-        fprintf(stderr, "SLP failed\n");
+    if(url->scheme == inst_slp) {
+      tmp_url = url_set(slp_get_install(url));
+      if(!tmp_url->scheme) {
+        fprintf(stderr, "%s: SLP failed\n", url->used.device);
+        url_free(tmp_url);
 
         return 0;
       }
+
+      url->scheme = tmp_url->scheme;
+      url->port = tmp_url->port;
+      str_copy(&url->str, tmp_url->str);
+      str_copy(&url->path, tmp_url->path);
+      str_copy(&url->server, tmp_url->server);
+      str_copy(&url->share, tmp_url->share);
+      str_copy(&url->path, tmp_url->path);
+      str_copy(&url->user, tmp_url->user);
+      str_copy(&url->password, tmp_url->password);
+      str_copy(&url->domain, tmp_url->domain);
+      str_copy(&url->device, tmp_url->device);
+      str_copy(&url->instsys, tmp_url->instsys);
+      str_copy(&url->proxy, tmp_url->proxy);
+
+      url_free(tmp_url);
+
+      fprintf(stderr, "slp: using %s\n", url_print(url, 0));
     }
-#endif
 
     net_ask_password();
 

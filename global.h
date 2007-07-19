@@ -564,11 +564,6 @@ typedef struct {
     } wlan;
   } net;
 
-  struct {
-    char *proto;		/* protocol we want (ftp, nfs, ...) */
-    char *key;			/* key to match against description */
-  } slp;
-
 #if defined(__s390__) || defined(__s390x__)
   /* hwcfg file parameters */
   struct {

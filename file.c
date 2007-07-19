@@ -865,38 +865,6 @@ void file_do_info(file_t *f0)
           url_free(config.url.instsys);
           config.url.instsys = url_set(config.url.install->instsys);
         }
-
-#if 0
-        if(config.url.install->scheme) {
-          set_instmode(config.url.install->scheme);
-          if(config.url.install->port) config.net.port = config.url.install->port;
-
-          if(config.url.install->scheme == inst_slp) {
-            str_copy(&config.slp.key, config.url.install->path);
-            if((sl = slist_getentry(config.url.install->query, "proto"))) {
-              str_copy(&config.slp.proto, sl->value);
-            }
-            str_copy(&config.serverdir, "/");		/* necessary - believe me */
-          }
-          else {
-            str_copy(&config.serverdir, config.url.install->path);
-            str_copy(&config.net.user, config.url.install->user);
-            str_copy(&config.net.password, config.url.install->password);
-            str_copy(&config.net.share, config.url.install->share);
-            str_copy(&config.net.workgroup, config.url.install->domain);
-
-            if(config.insttype == inst_net) {
-              name2inet(&config.net.server, config.url.install->server);
-            }
-            else if(config.insttype == inst_cdrom && config.url.install->device) {
-              str_copy(&config.cdromdev, config.url.install->device);
-            }
-            else if(config.insttype == inst_hd && config.url.install->device) {
-              str_copy(&config.partition, config.url.install->device);
-            }
-          }
-        }
-#endif
         break;
 
       case key_autoyast:

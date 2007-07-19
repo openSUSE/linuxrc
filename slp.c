@@ -14,6 +14,7 @@
 #include "file.h"
 #include "dialog.h"
 #include "util.h"
+#include "slp.h"
 
 static int nextxid = 1;
 
@@ -181,29 +182,28 @@ slp_get_descr(struct sockaddr_in *peer, unsigned char *url, int urllen)
   return d;
 }
 
-int
-slp_get_install()
+char *slp_get_install(url_t *url)
 {
   unsigned char sendbuf[8000];
   unsigned char recvbuf[80000];
-  unsigned char *bp, *end;
-  int xid, l, s, l2, l3, ec, comma, ulen, i, acnt;
+  unsigned char *bp, *end, *service, service_key[256];
+  int xid, l, s, l2, l3, ec, comma, ulen, i, acnt, service_key_len;
   struct sockaddr_in mysa;
   struct sockaddr_in mcsa;
   struct sockaddr_in pesa;
   int tries;
-  char urlbuf[256];
+  static char urlbuf[256];
   char *iaddr, *d;
   char **urls = 0;
   char **descs = 0;
   char **ambg = 0;
   int urlcnt = 0;
   int win_old;
-  file_t *f;
   unsigned char *origurl;
   int origurllen;
   struct utsname utsname;
   char *key = NULL;
+  slist_t *sl;
 
   mysa.sin_family = AF_INET;
   mysa.sin_port = 0;
@@ -230,10 +230,17 @@ slp_get_install()
   bp = sendbuf + 16;
   *bp++ = 0;
   *bp++ = 0;	/* prlistlen */
-  memcpy(bp, "\000\024service:install.suse", 20 + 2);
-  bp += 20 + 2;
+  memcpy(bp, "\000\024service:", sizeof "\000\024service:" - 1);
+  bp += sizeof "\000\024service:" - 1;
+  sl = slist_getentry(url->query, "service");
+  service = sl ? sl->value : "install.suse";
+  memcpy(bp, service, strlen(service));
+  bp += strlen(service);
   memcpy(bp, "\000\007default", 7 + 2);
   bp += 7 + 2;
+
+  sprintf(service_key, "service:%s:", service);
+  service_key_len = strlen(service_key);
 
   if (uname(&utsname))
     {
@@ -261,25 +268,25 @@ slp_get_install()
   if (s == -1)
     {
       perror("socket");
-      return 1;
+      return NULL;
     }
   if (fcntl(s, F_SETFL, O_NONBLOCK))
     {
       perror("fcntl O_NONBLOCK");
-      return 1;
+      return NULL;
     }
   if (setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, (char *)&mysa.sin_addr, sizeof(mysa.sin_addr)))
     {
       perror("setsockopt IP_MULTICAST_IF");
       close(s);
-      return 1;
+      return NULL;
     }
   for (tries = 0; tries < 3; tries++)
     {
       if (slpsend(s, sendbuf, l, &mcsa, 0))
 	{
 	  close(s);
-	  return 1;
+	  return NULL;
 	}
       for (;;)
 	{
@@ -287,7 +294,7 @@ slp_get_install()
 	  if (l2 == -1)
 	    {
 	      close(s);
-	      return 1;
+	      return NULL;
 	    }
 	  if (l2 == -2)
 	    break;
@@ -377,10 +384,10 @@ slp_get_install()
 		break;
 	      origurl = bp;
 	      origurllen = ulen;
-	      if (ulen > 21 && !strncasecmp(bp, "service:install.suse:", 21))
+	      if (ulen > service_key_len && !strncasecmp(bp, service_key, service_key_len))
 		{
-		  bp += 21;
-		  ulen -= 21;
+		  bp += service_key_len;
+		  ulen -= service_key_len;
 		}
 	      /* 8: room for install= */
 	      if (ulen > sizeof(urlbuf) - 1 - 8)
@@ -412,7 +419,7 @@ slp_get_install()
 		  if (!urls || !descs)
 		    {
 		      close(s);
-		      return 1;
+		      return NULL;
 		    }
 		  d = slp_get_descr(&pesa, origurl, origurllen);
 		  if (!d)
@@ -438,18 +445,19 @@ slp_get_install()
   if (urlcnt == 0)
     {
       fprintf(stderr, "SLP: no installation source found\n");
-      return 1;
+      return NULL;
     }
   ambg = malloc((urlcnt + 1) * sizeof(char **));
   if (!ambg)
-    return 1;
+    return NULL;
   win_old = config.win;
   set_activate_language(config.language);
   if(!config.win) util_disp_init();
   *urlbuf = 0;
   for (;;)
     {
-      if(config.slp.key) strprintf(&key, "*%s*", config.slp.key);
+      sl = slist_getentry(url->query, "descr");
+      str_copy(&key, sl ? sl->value : NULL);
 
       while(1) {
         for(i = acnt = 0; i < urlcnt; i++) {
@@ -468,11 +476,12 @@ slp_get_install()
 	break;
       d = ambg[i - 1];
 
-      str_copy(&key, config.slp.proto);
+      sl = slist_getentry(url->query, "url");
+      str_copy(&key, sl ? sl->value : NULL);
 
       while(1) {
         for(i = acnt = 0; i < urlcnt; i++) {
-          if(key && strncasecmp(urls[i], key, strlen(key))) continue;
+          if(key && fnmatch(key, urls[i], FNM_CASEFOLD)) continue;
           if(!strcmp(descs[i], d)) {
             ambg[acnt++] = urls[i];
           }
@@ -488,7 +497,7 @@ slp_get_install()
 
       if (i > 0 && i - 1 < acnt)
 	{
-	  sprintf(urlbuf, "install=%s", ambg[i - 1]);
+          strcpy(urlbuf, ambg[i - 1]);
 	  break;
 	}
     }
@@ -502,10 +511,8 @@ slp_get_install()
   free(urls);
   free(ambg);
   if (!*urlbuf)
-    return 1;
-  f = file_parse_buffer(urlbuf, kf_cfg + kf_cmd);
-  file_do_info(f);
-  file_free_file(f);
-  return 0;
+    return NULL;
+
+  return urlbuf;
 }
 

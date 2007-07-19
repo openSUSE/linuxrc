@@ -20,8 +20,9 @@
 #include "keyboard.h"
 #include "dialog.h"
 #include "file.h"
+#include "slp.h"
+#include "url.h"
 
-extern int slp_get_install(void);
 
 #define UNI_FONT	"linuxrc2-16.psfu"
 #define SMALL_FONT	"linuxrc-16.psfu"
@@ -580,8 +581,9 @@ void set_expert()
  */
 int set_expert_cb(dia_item_t di)
 {
-  char tmp[MAX_FILENAME];
+  char tmp[MAX_FILENAME], *s;
   int rc;
+  url_t *url;
 
   di_set_expert_last = di;
 
@@ -661,17 +663,22 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_expert_slp:
-      if(config.instmode != inst_slp) {
-        config.instmode = inst_slp;
-        str_copy(&config.slp.proto, NULL);
-        str_copy(&config.slp.key, NULL);
-      }
-      while(config.instmode == inst_slp) {
-        if(slp_get_install()) {
-          dia_message("SLP failed", MSGTYPE_ERROR);
-          break;
+      url = url_set("slp:");
+      s = slp_get_install(url);
+      url_free(url);
+      rc = 1;
+      if(s) {
+        url = url_set(s);
+        if(url->scheme) {
+          url_free(config.url.install);
+          config.url.install = url;
+          rc = 0;
+        }
+        else {
+          url_free(url);
         }
       }
+      if(rc) dia_message("SLP failed", MSGTYPE_ERROR);
       break;
 
     default:
