@@ -45,6 +45,8 @@ static void get_zen_config(void);
 /*
  * Initializes hardware and looks for repository/inst-sys.
  *
+ * If ok, the instsys (and repo, if possible) are mounted.
+ *
  * return:
  *   0: not found
  *   1: ok

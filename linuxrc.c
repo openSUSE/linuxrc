@@ -846,7 +846,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2006 SUSE Linux Products GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2007 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
@@ -1013,54 +1013,49 @@ void lxrc_init()
     }
   }
 
-  if(!config.manual) {
-    if(auto2_init()) {
-      config.manual = 0;	/* ###### does it make sense? */
-    } else {
-      fprintf(stderr, "Automatic setup not possible.\n");
+  net_setup_localhost();
 
-      util_disp_init();
+  if(!config.manual && !auto2_init()) {
+    fprintf(stderr, "Automatic setup not possible.\n");
 
-      i = 0;
-      j = 1;
-      if(config.insttype == inst_cdrom && cdrom_drives) {
-        char *s = get_translation(config.cd1texts, current_language()->locale);
-        char *buf = NULL;
+    util_disp_init();
 
-        strprintf(&buf, s ?: txt_get(TXT_INSERT_CD), 1);
-        do {
-          j = dia_okcancel(buf, YES) == YES ? 1 : 0;
-          if(j) {
-            i = auto2_find_install_medium();
-          }
-        } while(!i && j);
+    i = 0;
+    j = 1;
+    if(config.insttype == inst_cdrom && cdrom_drives) {
+      char *s = get_translation(config.cd1texts, current_language()->locale);
+      char *buf = NULL;
 
-        free(buf);
-      }
-
-      if(!i) {
-        config.rescue = 0;
-        config.manual |= 1;
+      strprintf(&buf, s ?: txt_get(TXT_INSERT_CD), 1);
+      do {
+        j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
-          sprintf(buf, "Could not find the %s ", config.product);
-          if(config.insttype == inst_cdrom) {
-            sprintf(buf + strlen(buf), "Installation CD.");
-          }
-          else {
-            strcat(buf, "Installation Source.");
-          }
-          strcat(buf, "\n\nActivating manual setup program.\n");
-          dia_message(buf, MSGTYPE_ERROR);
+          i = auto2_find_install_medium();
         }
-      }
-      else {
-        util_disp_done();
+      } while(!i && j);
+
+      free(buf);
+    }
+
+    if(!i) {
+      config.rescue = 0;
+      config.manual |= 1;
+      if(j) {
+        sprintf(buf, "Could not find the %s ", config.product);
+        if(config.insttype == inst_cdrom) {
+          sprintf(buf + strlen(buf), "Installation CD.");
+        }
+        else {
+          strcat(buf, "Installation Source.");
+        }
+        strcat(buf, "\n\nActivating manual setup program.\n");
+        dia_message(buf, MSGTYPE_ERROR);
       }
     }
+    else {
+      util_disp_done();
+    }
   }
-
-  /* file_read_info() is called in auto2_init(), too */
-  // if(!config.info.loaded && !config.had_segv) file_read_info();
 
   set_activate_language(config.language);
 
@@ -1099,8 +1094,6 @@ void lxrc_init()
   }
 
   util_update_kernellog();
-
-  net_setup_localhost();
 
 #if !(defined(__PPC__) || defined(__sparc__))
   if(config.manual || reboot_wait_ig) {

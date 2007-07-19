@@ -1290,7 +1290,7 @@ char *url_print(url_t *url, int format)
   }
 
   if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
-  if(url->path) {
+  if(url->path && (url->scheme != inst_slp || *url->path)) {
     strprintf(&buf, "%s/%s%s",
       buf,
       url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
