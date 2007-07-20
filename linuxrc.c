@@ -1030,7 +1030,7 @@ void lxrc_init()
       do {
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
-          i = auto2_find_install_medium();
+          i = auto2_find_repo();
         }
       } while(!i && j);
 

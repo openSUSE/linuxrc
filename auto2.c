@@ -34,12 +34,10 @@
 #include "settings.h"
 #include "url.h"
 
-static int auto2_find_repo(void);
 static void auto2_user_netconfig(void);
 static int driver_is_active(hd_t *hd);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 static void auto2_progress(char *pos, char *msg);
-static void get_zen_config(void);
 static void auto2_read_repo_files(url_t *url);
 
 
@@ -69,9 +67,7 @@ int auto2_init()
     if(!win_old) util_disp_done();
   }
 
-  if(config.zen) get_zen_config();
-
-  ok = auto2_find_install_medium();
+  ok = auto2_find_repo();
 
   LXRC_WAIT
 
@@ -293,10 +289,12 @@ void auto2_scan_hardware()
 
   update_device_list(1);
 
+  /* read command line parameters (2nd time) */
   if(config.info.add_cmdline) {
     file_read_info_file("cmdline", kf_cmd);
   }
 
+  /* load & parse info files */
   for(sl = config.info.file; sl; sl = sl->next) {
     fprintf(stderr, "info file: %s\n", sl->key);
     printf("Reading info file: %s\n", sl->key);
@@ -311,6 +309,7 @@ void auto2_scan_hardware()
     }
   }
 
+  /* set default repository */
   if(!config.url.install) config.url.install = url_set("cd:/");
   if(!config.url.instsys) config.url.instsys = url_set(config.rootimage);
   // if(!config.url.instsys2) config.url.instsys2 = url_set(config.rootimage2);
@@ -322,34 +321,13 @@ void auto2_scan_hardware()
  * if possible).
  *
  * return:
- *   0: ok, repository found
- *   1: no repository
+ *   0: not found
+ *   1: ok
  */
 int auto2_find_repo()
 {
   int err;
 
-  err = url_find_repo(config.url.install, config.mountpoint.instdata);
-
-  if(err) return err;
-
-  if(!config.url.instsys->mount) {
-    err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
-  }
-
-  return err;
-}
-
-
-/*
- * Look for install medium.
- *
- * return:
- *   0: not found
- *   1: ok
- */
-int auto2_find_install_medium()
-{
   if(!config.url.install || !config.url.install->scheme) return 0;
 
   /* no need to mount anything */
@@ -359,6 +337,10 @@ int auto2_find_install_medium()
     return 1;
   }
 
+  /*
+   * - do some s390 preparations
+   * - ineractive network setup, if asked for
+   */
   if(config.url.install->is.network) {
 #if defined(__s390__) || defined(__s390x__)
     static int as3d = 0;
@@ -380,13 +362,21 @@ int auto2_find_install_medium()
     auto2_user_netconfig();
   }
 
-  if(auto2_find_repo()) {
+  /* now go and look for repo */
+  err = url_find_repo(config.url.install, config.mountpoint.instdata);
+
+  /* if instsys is not a relative url, load it here */
+  if(!err && !config.url.instsys->mount) {
+    err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
+  }
+
+  if(err) {
     fprintf(stderr, "no %s repository found\n", config.product);
     return 0;
   }
 
+  /* get some files for lazy yast */
   auto2_read_repo_files(config.url.install);
-
 
 
   return 1;
@@ -468,6 +458,13 @@ void auto2_user_netconfig()
 }
 
 
+/*
+ * Check if any driver for that device is active.
+ *
+ * return:
+ *   0: no
+ *   1: yes (or no driver needed)
+ */
 int driver_is_active(hd_t *hd)
 {
   driver_info_t *di;
@@ -484,7 +481,10 @@ int driver_is_active(hd_t *hd)
 
 /*
  * Activate device driver.
- * Returns 1 if it worked, else 0.
+ *
+ * return:
+ *   0: failed
+ *   1: ok
  */
 int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_modules)
 {
@@ -602,6 +602,9 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
 }
 
 
+/*
+ * Default progress indicator for hardware probing.
+ */
 void auto2_progress(char *pos, char *msg)
 {
   printf("\r%64s\r", "");
@@ -654,58 +657,9 @@ char *auto2_serial_console()
 }
 
 
-void get_zen_config()
-{
-  static char *zen_mp = "/mounts/zen";
-  char *cfg = NULL;
-  slist_t *sl, sl0 = { };
-  int cfg_ok = 0;
-
-  if(!config.zenconfig) return;
-
-  strprintf(&cfg, "%s/%s", zen_mp, config.zenconfig);
-
-  printf("Looking for ZENworks config");
-  fflush(stdout);
-
-  sl = config.cdroms;
-
-  if(config.cdromdev) {
-    sl0.key = config.cdromdev;
-    sl0.next = sl;
-    sl = &sl0;
-  }
-
-  if(config.insttype == inst_hd && config.partition) {
-    sl0.key = config.partition;
-    sl0.next = NULL;
-    sl = &sl0;
-  }
-
-  for(; !cfg_ok && sl; sl = sl->next) {
-    if(util_mount_ro(long_dev(sl->key), zen_mp)) continue;
-    if(util_check_exist(cfg) == 'r') {
-      char *argv[3];
-      unlink("/settings.txt");
-      argv[1] = cfg;
-      argv[2] = "/";
-      util_cp_main(3, argv);
-      cfg_ok = 1;
-      fprintf(stderr, "copied %s:%s\n", sl->key, config.zenconfig);
-      if(config.zen == 2) {
-        file_read_info_file("file:/settings.txt", kf_cfg);
-        fprintf(stderr, "read /settings.txt\n");
-      }
-    }
-    util_umount(zen_mp);
-  }
-  
-  printf(cfg_ok ? " - got it\n" : " - not found\n");
-
-  free(cfg);
-}
-
-
+/*
+ * Do special pcmcia startup things.
+ */
 void pcmcia_socket_startup()
 {
   char buf[256];
