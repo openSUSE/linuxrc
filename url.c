@@ -41,7 +41,7 @@ static size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 static int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
 static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
-static int url_progress(url_data_t *url_data);
+static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
 
 
@@ -72,6 +72,8 @@ void url_read(url_data_t *url_data)
 
   url_data->err = curl_easy_setopt(c_handle, CURLOPT_URL, url_data->url->str);
   // fprintf(stderr, "curl opt url = %d\n", url_data->err);
+
+  if(url_data->progress) url_data->progress(url_data, 0);
 
   if(!url_data->err) {
     i = curl_easy_perform(c_handle);
@@ -127,6 +129,8 @@ void url_read(url_data_t *url_data)
     memcpy(url_data->err_buf, url_data->curl_err_buf, url_data->err_buf_len);
     *url_data->curl_err_buf = 0;
   }
+
+  if(url_data->progress) url_data->progress(url_data, 2);
 
   curl_easy_cleanup(c_handle);
 
@@ -270,7 +274,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 
   if(url_data->p_total || url_data->zp_total) {
     if(url_data->progress) {
-      if(url_data->progress(url_data) && !url_data->err) url_data->err = 102;
+      if(url_data->progress(url_data, 1) && !url_data->err) url_data->err = 102;
     }
   }
 
@@ -284,7 +288,7 @@ int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal,
 
   if(!url_data->p_total) url_data->p_total = dltotal;
 
-  return url_data->progress ? url_data->progress(url_data) : 0;
+  return url_data->progress ? url_data->progress(url_data, 1) : 0;
 }
 
 
@@ -633,12 +637,48 @@ void url_cleanup()
 
 
 /*
- * default progress indicator
+ * Default progress indicator.
+ *   stage: 0 = init, 1 = update, 2 = done
+ *
+ * return:
+ *   0: ok
+ *   1: abort download
  */
-int url_progress(url_data_t *url_data)
+int url_progress(url_data_t *url_data, int stage)
 {
   int percent = -1;
   char *buf = NULL;
+
+  /* init */
+  if(stage == 0) {
+    if(url_data->label) {
+      printf("%s", url_data->label);
+    }
+    else {
+      printf("Loading %s", url_print(url_data->url, 0));
+    }
+
+    fflush(stdout);
+
+    return 0;
+  }
+
+  /* done */
+  if(stage == 2) {
+    if(url_data->err) {
+      printf(" - failed\n");
+      if(config.debug) printf("error %d: %s\n", url_data->err, url_data->err_buf);
+    }
+    else {
+      printf("\n");
+    }
+
+    fflush(stdout);
+
+    return 0;
+  }
+
+  /* update */
 
   if(url_data->p_total) {
     percent = (100 * (uint64_t) url_data->p_now) / url_data->p_total;
@@ -650,26 +690,17 @@ int url_progress(url_data_t *url_data)
   if(percent > 100) percent = 100;
 
   if(!url_data->label_shown) {
-    char *label = NULL;
-
-    str_copy(&label, url_data->label);
-
-    if(!label) strprintf(&label, "Loading %s", url_print(url_data->url, 0));
-
     if(percent >= 0) {
       strprintf(&buf,
-        "%s (%u kB) -     ",
-        label,
+        " (%u kB) -     ",
         ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
       );
     }
     else {
-      strprintf(&buf, "%s -          ", label);
+      strprintf(&buf, " -          ");
     }
     printf("%s", buf);
     url_data->label_shown = 1;
-
-    str_copy(&label, NULL);
   }
 
   if(percent >= 0) {
@@ -1043,7 +1074,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
 {
   int err = 0;
-  char *buf1 = NULL;
+  char *buf1 = NULL, *s, *t;
 
   int test_and_copy(url_t *url)
   {
@@ -1088,14 +1119,8 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     fprintf(stderr, "loading %s -> %s\n", url_print(url_data->url, 0), url_data->file_name);
 
     url_read(url_data);
-    if(url_data->progress) printf("\n");
-    fflush(stdout);
 
     if(url_data->err) {
-      if(url_data->progress) {
-        printf("error %d: %s\n", url_data->err, url_data->err_buf);
-        fflush(stdout);
-      }
       fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
     }
     else {
@@ -1111,7 +1136,25 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     return ok;
   }
 
-  if(!src || !dst) return 1;
+  if(!dst) return 1;
+  unlink(dst);
+
+  if(!src) return 1;
+
+  /* create missing directories */
+  str_copy(&buf1, dst);
+  for(s = buf1; (t = strchr(s, '/')) && !err; s = t + 1) {
+    *t = 0;
+    if(*buf1 && util_check_exist(buf1) != 'd') err = mkdir(buf1, 0755);
+    *t = '/';
+  }
+  str_copy(&buf1, NULL);
+
+  if(err) {
+    fprintf(stderr, "url read: %s: failed to create directories\n", dst);
+
+    return 1;
+  }
 
   if(url->mount) {
     strprintf(&buf1, "file:%s", url->mount);

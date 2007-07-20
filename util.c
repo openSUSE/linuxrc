@@ -83,7 +83,7 @@ typedef struct {
   unsigned port;
 } url1_t;
 
-static int wget_progress(url_data_t *url_data);
+static int wget_progress(url_data_t *url_data, int stage);
 
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
@@ -3597,9 +3597,9 @@ int util_wget_main(int argc, char **argv)
 }
 
 
-int wget_progress(url_data_t *url_data)
+int wget_progress(url_data_t *url_data, int stage)
 {
-  fprintf(stderr,
+  if(stage == 1) fprintf(stderr,
     "progress: %9u/%u - %9u/%u (%.2f%%)\r",
     url_data->p_now, url_data->p_total,
     url_data->zp_now, url_data->zp_total,

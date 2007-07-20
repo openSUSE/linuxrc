@@ -40,6 +40,7 @@ static int driver_is_active(hd_t *hd);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 static void auto2_progress(char *pos, char *msg);
 static void get_zen_config(void);
+static void auto2_read_repo_files(url_t *url);
 
 
 /*
@@ -379,11 +380,16 @@ int auto2_find_install_medium()
     auto2_user_netconfig();
   }
 
-  if(!auto2_find_repo()) return 1;
+  if(auto2_find_repo()) {
+    fprintf(stderr, "no %s repository found\n", config.product);
+    return 0;
+  }
 
-  fprintf(stderr, "no %s repository found\n", config.product);
+  auto2_read_repo_files(config.url.install);
 
-  return 0;
+
+
+  return 1;
 }
 
 
@@ -730,6 +736,42 @@ void pcmcia_socket_startup()
     }
     closedir(d);
   }
+}
+
+
+/*
+ * Get various files from repositrory for yast's convenience.
+ */
+void auto2_read_repo_files(url_t *url)
+{
+  int i;
+  file_t *f0, *f;
+  char *dst = NULL, *file_list = NULL;
+  static char *default_list[][2] = {
+    { "/media.1/info.txt", "/info.txt" },
+    { "/media.1/license.zip", "/license.zip" },
+    { "/part.info", "/part.info" },
+    { "/control.xml", "/control.xml" }
+  };
+
+  url_read_file(url, NULL, "/media.1/installfiles", file_list = new_download(), NULL, URL_FLAG_PROGRESS);
+
+  if((f0 = file_read_file(file_list, kf_none))) {
+    for(f = f0; f; f = f->next) {
+      strprintf(&dst, "/%s/%s", f->value, *f->key_str == '/' ? f->key_str + 1 : f->key_str);
+      url_read_file(url, NULL, f->key_str, dst, NULL, URL_FLAG_PROGRESS);
+    }
+  }
+  else {
+    for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
+      url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, URL_FLAG_PROGRESS);
+    }
+  }
+
+  file_free_file(f0);
+
+  str_copy(&dst, NULL);
+  str_copy(&file_list, NULL);
 }
 
 

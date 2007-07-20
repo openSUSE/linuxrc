@@ -263,7 +263,7 @@ int main(int argc, char **argv, char **env)
       if(!win_old) util_disp_done();
       
     }
-    err = inst_start_install();
+    err = inst_start_install_auto();
   }
   else {
     err = 99;

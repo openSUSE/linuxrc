@@ -25,7 +25,7 @@ typedef struct url_data_s {
     unsigned len, max;
     unsigned char *data;
   } buf;
-  int (*progress)(struct url_data_s *);
+  int (*progress)(struct url_data_s *, int);
 } url_data_t;
 
 #define URL_FLAG_UNZIP		1
