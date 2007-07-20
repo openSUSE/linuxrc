@@ -734,7 +734,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   url_t *tmp_url;
 
   fprintf(stderr, "url mount: trying %s\n", url_print(url, 0));
-  if(url->used.model) fprintf(stderr, "model: %s\n", url->used.model);
+  if(url->used.model) fprintf(stderr, "(%s)\n", url->used.model);
 
   if(
     !url ||
@@ -928,11 +928,12 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
  */
 int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 {
-  int err = 0, ok, found;
+  int err = 0, ok, found, matched;
   hd_t *hd;
   hd_res_t *res;
   char *hwaddr;
   hd_hw_item_t hw_item = hw_network_ctrl;
+  str_list_t *sl;
 
   if(!url || !url->scheme) return 1;
 
@@ -983,15 +984,23 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
       !hd->unix_dev_name
     ) continue;
 
-    if(
-      url->device &&
-      !match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url->device) &&
-      !search_str_list(hd->unix_dev_names, long_dev(url->device))
-    ) continue;
+    matched = url->device ? match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url->device) : 1;
+
+    for(sl = hd->unix_dev_names; !matched && sl; sl = sl->next) {
+      matched = match_netdevice(short_dev(sl->str), NULL, url->device);
+    }
+
+    if(!matched) continue;
 
     str_copy(&url->used.device, hd->unix_dev_name);
-    str_copy(&url->used.model, hd->model);
     str_copy(&url->used.hwaddr, hwaddr);
+
+    if(hd->model && !strcmp(hd->model, "Partition")) {
+      strprintf(&url->used.model, "%s: %s", hd->model, blk_ident(url->used.device));
+    }
+    else {
+      str_copy(&url->used.model, hd->model);
+    }
 
     url->is.wlan = hd->is.wlan;
 
