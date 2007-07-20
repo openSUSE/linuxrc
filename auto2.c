@@ -320,7 +320,7 @@ void auto2_scan_hardware()
  * Look for a block device/network server with install source (and mount it,
  * if possible).
  *
- * Looks for driverupdates in repository, too.
+ * Handles driverupdates in repository, too.
  *
  * return:
  *   0: not found
