@@ -840,55 +840,27 @@ int inst_check_instsys()
 }
 
 
+/*
+ * Start YaST.
+ *
+ * return:
+ *   0: ok
+ *   1: err
+ */
 int inst_start_install_auto()
 {
-  int i, rc, update_rd;
-  char *buf = NULL;
-  url_t *url = config.url.install;
+  int err = 0;
 
 #if defined(__s390__) || defined(__s390x__)
   if((config.net.setup & NS_DISPLAY))
-    if((rc = inst_choose_display())) return rc;
+    if((err = inst_choose_display())) return err;
 #endif
   
-  if(url->scheme == inst_exec) {
-    util_splash_bar(60, SPLASH_60);
-    return inst_execute_yast();
-  }
-
-  /* look for driver update image; load and apply it */
-  i = 1;
-  if(
-    config.instmode == inst_ftp ||
-    config.instmode == inst_http ||
-    config.instmode == inst_tftp
-  ) {
-    strprintf(&buf, "%s/driverupdate", config.serverdir ?: "");
-  }
-  else {
-    strprintf(&buf, "%s/driverupdate", config.mountpoint.instdata);
-    /* look for it in advance */
-    i = util_check_exist(buf);
-  }
-
-  if(i) {
-    config.noerrors = 1;
-    update_rd = load_image(buf, config.instmode, txt_get(TXT_LOADING_UPDATE));
-    config.noerrors = 0;
-
-    if(update_rd >= 0) {
-      i = ramdisk_mount(update_rd, config.mountpoint.update);
-      if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(config.instmode));
-      ramdisk_free(update_rd);
-      if(!i) util_do_driver_updates();
-    }
-  }
-
-  free(buf);
-
   util_splash_bar(60, SPLASH_60);
 
-  return inst_execute_yast();
+  err = inst_execute_yast();
+
+  return err;
 }
 
 

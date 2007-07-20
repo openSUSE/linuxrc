@@ -559,6 +559,67 @@ url_t *url_set(char *str)
 }
 
 
+/*
+ * Print url to string.
+ *
+ * scheme://domain;user:password@server:port/path?query
+ */
+char *url_print(url_t *url, int format)
+{
+  static char *buf = NULL, *s;
+  int q = 0;
+
+  str_copy(&buf, NULL);
+  if(!url) return buf;
+
+  strprintf(&buf, "%s:", get_instmode_name(url->scheme));
+
+  if(url->domain || url->user || url->password || url->server || url->port) {
+    strprintf(&buf, "%s//", buf);
+    if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
+    if(url->user) {
+      s = curl_easy_escape(NULL, url->user, 0);
+      strprintf(&buf, "%s%s", buf, s);
+      curl_free(s);
+    }
+    if(url->password) {
+      if(format == 0) {
+        strprintf(&buf, "%s:***", buf);
+      }
+      else {
+        s = curl_easy_escape(NULL, url->password, 0);
+        strprintf(&buf, "%s:%s", buf, s);
+        curl_free(s);
+      }
+    }
+    if(url->user || url->password) strprintf(&buf, "%s@", buf);
+    if(url->server) strprintf(&buf, "%s%s", buf, url->server);
+    if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
+  }
+
+  if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
+  if(url->path && (url->scheme != inst_slp || *url->path)) {
+    strprintf(&buf, "%s/%s%s",
+      buf,
+      url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
+      *url->path == '/' ? url->path + 1 : url->path
+    );
+  }
+
+  if(format == 0) {
+    if(url->used.device) {
+      strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
+    }
+
+    if(config.debug >= 2 && url->used.hwaddr) {
+      strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
+    }
+  }
+
+  return buf;
+}
+
+
 url_t *url_free(url_t *url)
 {
   if(url) {
@@ -1311,67 +1372,6 @@ int url_find_instsys(url_t *url, char *dir)
   }
 
   return err;
-}
-
-
-/*
- * Print url to string.
- *
- * scheme://domain;user:password@server:port/path?query
- */
-char *url_print(url_t *url, int format)
-{
-  static char *buf = NULL, *s;
-  int q = 0;
-
-  str_copy(&buf, NULL);
-  if(!url) return buf;
-
-  strprintf(&buf, "%s:", get_instmode_name(url->scheme));
-
-  if(url->domain || url->user || url->password || url->server || url->port) {
-    strprintf(&buf, "%s//", buf);
-    if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
-    if(url->user) {
-      s = curl_easy_escape(NULL, url->user, 0);
-      strprintf(&buf, "%s%s", buf, s);
-      curl_free(s);
-    }
-    if(url->password) {
-      if(format == 0) {
-        strprintf(&buf, "%s:***", buf);
-      }
-      else {
-        s = curl_easy_escape(NULL, url->password, 0);
-        strprintf(&buf, "%s:%s", buf, s);
-        curl_free(s);
-      }
-    }
-    if(url->user || url->password) strprintf(&buf, "%s@", buf);
-    if(url->server) strprintf(&buf, "%s%s", buf, url->server);
-    if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
-  }
-
-  if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
-  if(url->path && (url->scheme != inst_slp || *url->path)) {
-    strprintf(&buf, "%s/%s%s",
-      buf,
-      url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
-      *url->path == '/' ? url->path + 1 : url->path
-    );
-  }
-
-  if(format == 0) {
-    if(url->used.device) {
-      strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
-    }
-
-    if(config.debug >= 2 && url->used.hwaddr) {
-      strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
-    }
-  }
-
-  return buf;
 }
 
 

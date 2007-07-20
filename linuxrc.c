@@ -750,26 +750,24 @@ void lxrc_init()
   config.info.add_cmdline = 1;
 
   config.module.dir = strdup(config.test ? "/tmp/modules" : "/modules");
+  config.update.dst = strdup(config.test ? "/tmp/update" : "/update");
+
+  config.download.base = strdup(config.test ? "/tmp/download" : "/download");
+  mkdir(config.download.base, 0755);
 
   /* must end with '/' */
   config.mountpoint.base = strdup(config.test ? "/tmp/mounts/" : "/mounts/");
 
   strprintf(&config.mountpoint.instsys, "%sinstsys", config.mountpoint.base);
   strprintf(&config.mountpoint.swap, "%sswap", config.mountpoint.base);
-
-  config.mountpoint.update = strdup("/mounts/update");
-  config.mountpoint.floppy = strdup("/mounts/floppy");
-  config.mountpoint.ramdisk2 = strdup("/mounts/ramdisk2");
-  config.mountpoint.extra = strdup("/mounts/extra");
-  config.mountpoint.instsys2 = strdup("/mounts/instsys2");
+  strprintf(&config.mountpoint.update, "%supdate", config.mountpoint.base);
 
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.download.base = strdup(config.test ? "/tmp/download" : "/download");
-  mkdir(config.download.base, 0755);
+  config.mountpoint.extra = strdup("/mounts/extra");
+  config.mountpoint.instsys2 = strdup("/mounts/instsys2");
 
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
-  config.update.dst = strdup("/update");
 
   config.update.map = calloc(1, MAX_UPDATES);
 

@@ -320,6 +320,8 @@ void auto2_scan_hardware()
  * Look for a block device/network server with install source (and mount it,
  * if possible).
  *
+ * Looks for driverupdates in repository, too.
+ *
  * return:
  *   0: not found
  *   1: ok
@@ -327,6 +329,7 @@ void auto2_scan_hardware()
 int auto2_find_repo()
 {
   int err;
+  char *file_name;
 
   if(!config.url.install || !config.url.install->scheme) return 0;
 
@@ -377,6 +380,35 @@ int auto2_find_repo()
 
   /* get some files for lazy yast */
   auto2_read_repo_files(config.url.install);
+
+  /* check for driver updates */
+
+  /* first, look for 'driverupdate' archive */
+  err = url_read_file(
+    config.url.install,
+    NULL,
+    "driverupdate",
+    file_name = strdup(new_download()),
+    txt_get(TXT_LOADING_UPDATE),
+    URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+  );
+
+  fprintf(stderr, "err = %d\n", err);
+
+  if(!err) err = util_mount_ro(file_name, config.mountpoint.update);
+
+  if(!err) util_chk_driver_update(config.mountpoint.update, get_instmode_name(config.url.install->scheme));
+
+  util_umount(config.mountpoint.update);
+  free(file_name);
+
+  if(!err) util_do_driver_updates();
+
+  /* then, look for unpacked version */
+  if(config.url.install->mount) {
+    util_chk_driver_update(config.url.install->mount, get_instmode_name(config.url.install->scheme));
+    util_do_driver_updates();
+  }
 
 
   return 1;
@@ -708,7 +740,7 @@ void auto2_read_repo_files(url_t *url)
     { "/control.xml", "/control.xml" }
   };
 
-  url_read_file(url, NULL, "/media.1/installfiles", file_list = new_download(), NULL, URL_FLAG_PROGRESS);
+  url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
 
   if((f0 = file_read_file(file_list, kf_none))) {
     for(f = f0; f; f = f->next) {

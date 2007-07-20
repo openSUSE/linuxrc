@@ -819,7 +819,6 @@ void add_driver_update(char *dir, char *loc)
   /* create destination, if missing */
   if(util_check_exist(config.update.dst) != 'd') {
     if(mkdir(config.update.dst, 0755)) return;
-    // if(mount("tmpfs", config.update.dst, "tmpfs", 0, 0)) return;
   }
 
   str_copy(&config.update.id, NULL);
@@ -964,20 +963,20 @@ int cmp_dir_entry_s(const void *p0, const void *p1)
 
 
 /*
- * Check for a valid driver update directory below <dir>; copy the
- * necessary stuff into a ramdisk and mount it at /update.
+ * Check for a valid driver update directory below <dir>; copy the files
+ * to /update.
  *
  * Note: you must call util_do_driver_updates() to actuall apply
  * the update.
  */
-int util_chk_driver_update(char *dir, char *loc)
+void util_chk_driver_update(char *dir, char *loc)
 {
   char *drv_src = NULL, *dud_loc = NULL, *s;
   slist_t *sl0 = NULL, *sl;
   struct dirent *de;
   DIR *d;
 
-  if(!dir || !loc || !config.tmpfs || !config.update.dir) return 0;
+  if(!dir || !loc || !config.tmpfs || !config.update.dir) return;
 
   strprintf(&drv_src, "%s%s", dir, config.update.dir);
 
@@ -1010,8 +1009,6 @@ int util_chk_driver_update(char *dir, char *loc)
 
   free(drv_src);
   free(dud_loc);
-
-  return 0;
 }
 
 

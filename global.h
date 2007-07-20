@@ -476,8 +476,6 @@ typedef struct {
 
   struct {			/* mountpoints */
     unsigned cnt;		/* mp counter */
-    char *floppy;
-    char *ramdisk2;
     char *extra;
     char *instdata;
     char *instsys;
