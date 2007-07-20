@@ -351,8 +351,7 @@ typedef struct {
   char *instsys;		/* installation system mount point */
   char *instsys2;		/* extra installation system mount point */
   struct {
-    char *file;			/* 'info' file name */
-    char *loaded;		/* actual 'info' file that was loaded */
+    slist_t *file;		/* 'info' file name */
     unsigned add_cmdline:1;	/* parse cmdline, too */
   } info;
   char *autoyast;		/* yast autoinstall parameter */

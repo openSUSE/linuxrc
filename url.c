@@ -1005,7 +1005,10 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
     if(
       (
-        url->scheme == inst_hd &&
+        (
+          url->scheme == inst_hd ||
+          url->scheme == inst_disk
+        ) &&
         (					/* hd means: */
           hd_is_hw_class(hd, hw_floppy) ||	/*  - not a floppy */
           hd_is_hw_class(hd, hw_cdrom) ||	/*  - not a cdrom */
@@ -1073,7 +1076,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
  */
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
 {
-  int err = 0;
+  int err = 0, free_src = 0;
   char *buf1 = NULL, *s, *t;
 
   int test_and_copy(url_t *url)
@@ -1139,8 +1142,6 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   if(!dst) return 1;
   unlink(dst);
 
-  if(!src) return 1;
-
   /* create missing directories */
   str_copy(&buf1, dst);
   for(s = buf1; (t = strchr(s, '/')) && !err; s = t + 1) {
@@ -1154,6 +1155,14 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     fprintf(stderr, "url read: %s: failed to create directories\n", dst);
 
     return 1;
+  }
+
+  if(!src && url->mount) return 1;
+
+  if(!src) {
+    str_copy(&src, url->path);
+    str_copy(&url->path, url->is.mountable ? "/" : "");
+    free_src = 1;
   }
 
   if(url->mount) {
@@ -1171,6 +1180,8 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
       err = test_and_copy(url) ? 0 : 1;
     }
   }
+
+  if(free_src) str_copy(&src, NULL);
 
   return err;
 }
@@ -1286,7 +1297,7 @@ int url_find_instsys(url_t *url, char *dir)
   else {
     err = url_read_file(url,
       NULL,
-      "",
+      NULL,
       file_name = strdup(new_download()),
       txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
       URL_FLAG_PROGRESS + URL_FLAG_UNZIP

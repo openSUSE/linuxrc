@@ -85,7 +85,6 @@ void file_write_num(FILE *f, file_key_t key, int num);
 void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num);
 
 void file_write_install_inf(char *dir);
-int file_read_info(void);
 char *file_read_info_file(char *file, file_key_flag_t flags);
 int file_read_yast_inf(void);
 file_t *file_get_cmdline(file_key_t key);

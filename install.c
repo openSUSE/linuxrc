@@ -856,41 +856,6 @@ int inst_start_install_auto()
     return inst_execute_yast();
   }
 
-  /* load some extra files, if they exist */
-
-  if(!config.zen) {
-    /* inly if we did not already read them in inst_check_instsys() */
-    if(!config.installfilesread) {
-      read_install_files();
-      if(!config.installfilesread) {
-        get_file("/content", "/content");
-        get_file("/media.1/info.txt", "/info.txt");
-        get_file("/media.1/license.zip", "/license.zip");
-        get_file("/part.info", "/part.info");
-        get_file("/control.xml", "/control.xml");
-      }
-    }
-  }
-  else if(
-    config.zenconfig &&
-    config.insttype != inst_hd &&
-    config.insttype != inst_cdrom
-  ) {
-    strprintf(&buf, "/%s", config.zenconfig);
-    get_file(buf, "/settings.txt");
-    if(config.zen == 2) {
-      file_read_info_file("file:/settings.txt", kf_cfg);
-      fprintf(stderr, "read /settings.txt\n");
-    }
-  }
-
-#if 0
-  ???
-
-  /* remove it if not needed, might be a leftover from an earlier install attempt */
-  if(config.insttype == inst_net) unlink("/" SP_FILE);
-#endif
-
   /* look for driver update image; load and apply it */
   i = 1;
   if(

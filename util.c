@@ -1288,15 +1288,6 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
-  s = config.info.loaded;
-  if(!s) s = "";
-  t = config.info.add_cmdline ? "cmdline" : "";
-  if(!*s || !strcmp(s, t)) { s = t; t = ""; }
-  sprintf(buf, "info = ");
-  if(*s) sprintf(buf + strlen(buf), "%s", s);
-  if(*t) sprintf(buf + strlen(buf), ", %s", t);
-  slist_append_str(&sl0, buf);
-
   strcpy(buf, "net devices = (");
   for(i = 0, sl = config.net.devices; sl; sl = sl->next) {
     if(!sl->key) continue;
@@ -3570,6 +3561,11 @@ int util_wget_main(int argc, char **argv)
   argv++; argc--;
 
   url_data = url_data_new();
+
+  if(argc && !strcmp(*argv, "-v")) {
+    config.debug = 2;
+    argv++; argc--;
+  }
 
   if(argc && !strcmp(*argv, "-z")) {
     url_data->unzip = 1;

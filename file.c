@@ -142,7 +142,7 @@ static struct {
   { key_memlimit,       "MemLimit",       kf_cfg + kf_cmd                },
   { key_memyast,        "MemYaST",        kf_cfg + kf_cmd                },
   { key_memloadimage,   "MemLoadImage",   kf_cfg + kf_cmd                },
-  { key_info,           "Info",           kf_cmd_early                   },
+  { key_info,           "Info",           kf_cfg + kf_cmd_early          },
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
   { key_proxyport,      "ProxyPort",      kf_cfg + kf_cmd                },
   { key_proxyproto,     "ProxyProto",     kf_cfg + kf_cmd                },
@@ -536,53 +536,6 @@ void file_free_file(file_t *file)
 }
 
 
-int file_read_info()
-{
-  window_t win_ri;
-  char *file = NULL, *s;
-
-  if(config.win) {
-    dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
-  }
-  else {
-    printf("%s", txt_get(TXT_SEARCH_INFOFILE));
-    fflush(stdout);
-    config.linebreak = 1;
-  }
-
-  if(!config.info.file || !strcmp(config.info.file, "default")) {
-    file = file_read_info_file("floppy:/info", kf_cfg);
-    if(!file) file = file_read_info_file("file:/info", kf_cfg);
-  }
-  else {
-    file = file_read_info_file(config.info.file, kf_cfg);
-  }
-
-  if(config.info.add_cmdline) {
-    s = file_read_info_file("cmdline", kf_cmd);
-    if(!file) file = s;
-  }
-
-  if(config.win) {
-    win_close(&win_ri);
-  }
-  else {
-    if(config.linebreak) {
-      printf("\n");
-      config.linebreak = 0;
-    }
-  }
-
-  if(file) {
-    fprintf(stderr, "got info from %s\n", file);
-  }
-
-  config.info.loaded = strdup(file ?: "");
-
-  return file ? 0 : 1;
-}
-
-
 char *file_read_info_file(char *file, file_key_flag_t flags)
 {
   file_t *f0 = NULL;
@@ -877,7 +830,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_info:
-        str_copy(&config.info.file, *f->value ? f->value : "default");
+        if(*f->value) slist_append_str(&config.info.file, f->value);
         break;
 
       case key_vnc:

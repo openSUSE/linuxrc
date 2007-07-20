@@ -91,13 +91,14 @@ void auto2_scan_hardware()
 {
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int i, ju, k;
-  slist_t *usb_modules = NULL;
+  int ju, k, err;
+  slist_t *usb_modules = NULL, *sl;
   int storage_loaded = 0, max_wait;
   hd_data_t *hd_data;
   hd_hw_item_t hw_items[] = {
     hw_storage_ctrl, hw_network_ctrl, hw_hotplug_ctrl, hw_sys, 0
   };
+  url_t *url;
 
   hd_data = calloc(1, sizeof *hd_data);
 
@@ -287,29 +288,28 @@ void auto2_scan_hardware()
   if(!storage_loaded) load_drivers(hd_data, hw_storage_ctrl);
   load_drivers(hd_data, hw_network_ctrl);
 
-  if(config.info.add_cmdline) {
-    file_read_info_file("cmdline", kf_cmd);
-  }
-
-  if(config.info.file) {
-    fprintf(stderr, "Looking for info file: %s\n", config.info.file);
-    printf("Reading info file:\n  %s ...", config.info.file);
-    fflush(stdout);
-    i = get_url(config.info.file, "/download/info");
-    printf("%s\n", i ? " failed" : " ok");
-    if(!i) {
-      fprintf(stderr, "Parsing info file: %s\n", config.info.file);
-      file_read_info_file("file:/download/info", kf_cfg);
-    }
-    else {
-      fprintf(stderr, "Info file not found: %s\n", config.info.file);
-    }
-  }
-
   hd_free_hd_data(hd_data);
   free(hd_data);
 
   update_device_list(1);
+
+  if(config.info.add_cmdline) {
+    file_read_info_file("cmdline", kf_cmd);
+  }
+
+  for(sl = config.info.file; sl; sl = sl->next) {
+    fprintf(stderr, "info file: %s\n", sl->key);
+    printf("Reading info file: %s\n", sl->key);
+    fflush(stdout);
+    url = url_set(sl->key);
+    err = url_read_file(url, NULL, NULL, "/info", NULL, URL_FLAG_PROGRESS);
+    url_umount(url);
+    url_free(url);
+    if(!err) {
+      fprintf(stderr, "parsing info file: %s\n", sl->key);
+      file_read_info_file("file:/info", kf_cfg);
+    }
+  }
 
   if(!config.url.install) config.url.install = url_set("cd:/");
   if(!config.url.instsys) config.url.instsys = url_set(config.rootimage);
