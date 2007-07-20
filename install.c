@@ -858,6 +858,8 @@ int inst_start_install_auto()
   
   util_splash_bar(60, SPLASH_60);
 
+  LXRC_WAIT
+
   err = inst_execute_yast();
 
   return err;

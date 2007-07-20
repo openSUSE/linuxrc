@@ -69,8 +69,6 @@ int auto2_init()
 
   ok = auto2_find_repo();
 
-  LXRC_WAIT
-
   util_splash_bar(50, SPLASH_50);
 
   return ok;
@@ -329,6 +327,7 @@ void auto2_scan_hardware()
 int auto2_find_repo()
 {
   int err;
+  unsigned dud_count;
   char *file_name;
 
   if(!config.url.install || !config.url.install->scheme) return 0;
@@ -383,6 +382,8 @@ int auto2_find_repo()
 
   /* check for driver updates */
 
+  dud_count = config.update.count;
+
   /* first, look for 'driverupdate' archive */
   err = url_read_file(
     config.url.install,
@@ -392,8 +393,6 @@ int auto2_find_repo()
     txt_get(TXT_LOADING_UPDATE),
     URL_FLAG_PROGRESS + URL_FLAG_UNZIP
   );
-
-  fprintf(stderr, "err = %d\n", err);
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update);
 
@@ -410,6 +409,10 @@ int auto2_find_repo()
     util_do_driver_updates();
   }
 
+  if(dud_count == config.update.count) {
+    fprintf(stderr, "No new driver updates found.\n");
+    printf("No new driver updates found.\n");
+  }
 
   return 1;
 }
