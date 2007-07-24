@@ -1165,9 +1165,12 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     i = strlen(old_path);
     strprintf(&url->path, "%s%s%s",
       old_path,
-      (i && old_path[i - 1] == '/') || !*src ? "" : "/",
-      *src == '/' ? src + 1 : src
+      (i && old_path[i - 1] == '/') || !*old_path || !*src || *src == '/' ? "" : "/",
+      strcmp(src, "/") ? src : ""
     );
+
+    if(config.debug >= 3) fprintf(stderr, "path: \"%s\" + \"%s\" = \"%s\"\n", old_path, src, url->path);
+
     str_copy(&buf, url_print(url, 1));
     url_data->url = url_set(buf);
 
@@ -1221,8 +1224,16 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   if(!src && url->mount) return 1;
 
   if(!src) {
-    str_copy(&src, url->path);
-    str_copy(&url->path, url->is.mountable ? "/" : "");
+    if(url->scheme == inst_nfs) {
+      s = strrchr(url->path, '/');
+      if(!s) return 1;
+      str_copy(&src, s + 1);
+      *s = 0;
+    }
+    else {
+      str_copy(&src, url->path);
+      str_copy(&url->path, url->is.mountable ? "/" : "");
+    }
     free_src = 1;
   }
 

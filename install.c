@@ -762,7 +762,6 @@ int inst_check_instsys()
     case inst_nfs:
     case inst_smb:
       config.use_ramdisk = 0;
-      config.instdata_mounted = 1;
 
       read_install_files();
 
@@ -812,7 +811,6 @@ int inst_check_instsys()
     case inst_http:
     case inst_tftp:
       config.use_ramdisk = 1;
-      config.instdata_mounted = 0;
 
       sprintf(inst_rootimage_tm, "%s%s",
         config.serverdir ?: "",
@@ -861,6 +859,18 @@ int inst_start_install_auto()
   LXRC_WAIT
 
   err = inst_execute_yast();
+
+  util_umount_all();
+  util_clear_downloads();
+
+  if(!err) {
+    err = inst_commit_install();
+    if(err) {
+      config.rescue = 0;
+      config.manual |= 1;
+      util_disp_init();
+    }
+  }
 
   return err;
 }
@@ -1045,17 +1055,22 @@ int inst_start_rescue()
 }
 
 
+/*
+ * Prepare instsys.
+ *
+ * return:
+ *   0: ok
+ *   1: error
+ */
 int add_instsys()
 {
-  char link_source[MAX_FILENAME], buf[256];
-  int rc = 0;
-  struct dirent *de;
-  DIR *d;
+  char buf[256];
+  int err = 0;
   char *argv[3] = { };
 
-  mod_free_modules();
+  if(!config.url.instsys->mount) return 1;
 
-  setenv("INSTSYS", config.instsys, 1);
+  setenv("INSTSYS", config.url.instsys->mount, 1);
 
   setenv("TERM", config.term ?: config.serial ? "screen" : "linux", 1);
 
@@ -1063,7 +1078,7 @@ int add_instsys()
 
   setenv("YAST_DEBUG", "/debug/yast.debug", 1);
 
-  sprintf(buf, "file:%s/.instsys.config", config.mountpoint.instsys);
+  sprintf(buf, "file:%s/.instsys.config", config.url.instsys->mount);
   file_read_info_file(buf, kf_cfg);
 
   file_write_install_inf("");
@@ -1090,7 +1105,7 @@ int add_instsys()
         "Sorry, this will not work.",
         MSGTYPE_ERROR
       );
-      rc = 1;
+      err = 1;
     }
     if(!win) util_disp_done();
   }
@@ -1123,51 +1138,15 @@ int add_instsys()
   }
 
   if(!config.test) {
-    // file_write_mtab();
+    // fake mtab
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
-
-    /*
-     * In these cases, part of the "/suse" tree is in the installation
-     * system. We add some symlinks needed by YaST2 to make it available
-     * below config.mountpoint.instdata.
-     */
-    if(
-      config.instmode == inst_ftp ||
-      config.instmode == inst_tftp ||
-      config.instmode == inst_http
-    ) {
-      if((d = opendir(config.mountpoint.instsys))) {
-        while((de = readdir(d))) {
-          if(
-            strstr(de->d_name, ".S.u.S.E") == de->d_name ||
-            !strcmp(de->d_name, config.product_dir)
-          ) {
-            sprintf(buf, "%s/%s", config.mountpoint.instdata, de->d_name);
-            unlink(buf);
-            if(!util_check_exist(buf)) {
-              sprintf(link_source, "%s/%s", config.mountpoint.instsys, de->d_name);
-              symlink(link_source, buf);
-            }
-          }
-        }
-        closedir(d);
-      }
-    }
   }
 
-  if(config.instsys) {
-    argv[1] = config.instsys;
-    argv[2] = "/";
-    util_lndir_main(3, argv);
-  }
+  argv[1] = config.url.instsys->mount;
+  argv[2] = "/";
+  util_lndir_main(3, argv);
 
-  if(config.instsys2) {
-    argv[1] = config.instsys2;
-    argv[2] = "/";
-    util_lndir_main(3, argv);
-  }
-
-  return rc;
+  return err;
 }
 
 
@@ -1175,6 +1154,8 @@ void inst_yast_done()
 {
   int count;
   char *buf = NULL;
+
+  if(config.test) return;
 
   lxrc_set_modprobe("/etc/nothing");
 
@@ -1186,23 +1167,6 @@ void inst_yast_done()
   }
 
   str_copy(&buf, NULL);
-
-  inst_umount();
-
-  util_debugwait("going to umount inst-sys");
-
-  /* wait a bit */
-  for(count = 5; inst_umount() == EBUSY && count--;) sleep(1);
-
-  util_debugwait("inst-sys umount done");
-
-  ramdisk_free(config.inst2_ramdisk);
-  config.inst2_ramdisk = -1;
-
-  ramdisk_free(config.inst_ramdisk);
-  config.inst_ramdisk = -1;
-
-  find_shell();
 }
 
 
@@ -1249,10 +1213,8 @@ int inst_execute_yast()
   /* start shells only _after_ the swap dialog */
   if(!config.test && !config.noshell) {
     util_start_shell("/dev/tty2", "/bin/bash", 3);
-    if(config.memory.current >= config.memory.min_yast) {
-      util_start_shell("/dev/tty5", "/bin/bash", 3);
-      util_start_shell("/dev/tty6", "/bin/bash", 3);
-    }
+    util_start_shell("/dev/tty5", "/bin/bash", 3);
+    util_start_shell("/dev/tty6", "/bin/bash", 3);
   }
 
   disp_set_color(COL_WHITE, COL_BLACK);
@@ -1262,8 +1224,10 @@ int inst_execute_yast()
 
   str_copy(&setupcmd, config.setupcmd);
 
-  if(config.instmode == inst_exec && config.serverdir && *config.serverdir) {
-    strprintf(&setupcmd, "setctsid `showconsole` %s", config.serverdir);
+  if(config.url.install->scheme == inst_exec) {
+    strprintf(&setupcmd, "setctsid `showconsole` %s",
+      *config.url.install->path ? config.url.install->path : "/bin/sh"
+    );
   }
 
   fprintf(stderr, "starting %s\n", setupcmd);
@@ -1375,19 +1339,17 @@ int inst_execute_yast()
     rc = -1;
   }
 
-  if(!rc) {
-    rc = inst_commit_install();
-    if(rc) {
-      config.rescue = 0;
-      config.manual |= 1;
-      util_disp_init();
-    }
-  }
-
   return rc;
 }
 
 
+/*
+ * If we should reboot, do it.
+ *
+ * return:
+ *   0: ok (only in test mode, obviously)
+ *   1: failed
+ */
 int inst_commit_install()
 {
   int err = 0;

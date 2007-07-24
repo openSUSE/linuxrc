@@ -517,7 +517,6 @@ void lxrc_end()
   if(!config.linemode) printf("\033[9;15]");
 
 /*    reboot (RB_ENABLE_CAD); */
-  mod_free_modules();
 
   util_umount_all();
   util_clear_downloads();
@@ -836,7 +835,6 @@ void lxrc_init()
   }
 
   config.inst_ramdisk = -1;
-  config.module.ramdisk = -1;
 
   file_read_info_file("file:/linuxrc.config", kf_cfg);
 

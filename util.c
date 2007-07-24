@@ -83,8 +83,6 @@ typedef struct {
   unsigned port;
 } url1_t;
 
-static int wget_progress(url_data_t *url_data, int stage);
-
 static void show_lsof_info(FILE *f, unsigned pid);
 static void show_ps_info(FILE *f, unsigned pid);
 
@@ -740,9 +738,7 @@ int util_umount(char *dir)
 
   file_free_file(f0);
 
-  if(!i && strstr(dir, config.mountpoint.base) == dir) {
-    rmdir(dir);
-  }
+  if(strstr(dir, config.mountpoint.base) == dir) rmdir(dir);
 
   return i;
 }
@@ -3553,51 +3549,35 @@ int net_read(int fd, char *buf, int len)
 
 int util_wget_main(int argc, char **argv)
 {
-  url_data_t *url_data;
+  url_t *url;
+  unsigned flags = URL_FLAG_PROGRESS;
+  int err;
+
+  config.test = 1;
+
+  config.download.base = strdup("/tmp/download");
+  mkdir(config.download.base, 0755);
+  config.mountpoint.base = strdup("/tmp/mounts/");
+
+  str_copy(&config.net.cifs.binary, "/sbin/mount.cifs");
 
   argv++; argc--;
 
-  url_data = url_data_new();
-
-  if(argc && !strcmp(*argv, "-v")) {
-    config.debug = 2;
-    argv++; argc--;
-  }
-
-  if(argc && !strcmp(*argv, "-z")) {
-    url_data->unzip = 1;
-    argv++; argc--;
-  }
+  while(
+    (argc && !strcmp(*argv, "-v") && (config.debug++, argc--, argv++)) ||
+    (argc && !strcmp(*argv, "-z") && (flags += URL_FLAG_UNZIP, argc--, argv++))
+  );
 
   if(argc != 2) return fprintf(stderr, "usage: wget url file\n"), 1;
 
-  url_data->url = url_set(argv[0]);
-  url_data->file_name = strdup(argv[1]);
+  url = url_set(argv[0]);
 
-  url_data->progress = wget_progress;
+  err = url_read_file(url, NULL, NULL, argv[1], NULL, flags);
 
-  url_read(url_data);
-
-  fprintf(stderr, "\n");
-
-  if(url_data->err) fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
-
-  url_data_free(url_data);
+  url_umount(url);
+  url_free(url);
 
   url_cleanup();
-
-  return 0;
-}
-
-
-int wget_progress(url_data_t *url_data, int stage)
-{
-  if(stage == 1) fprintf(stderr,
-    "progress: %9u/%u - %9u/%u (%.2f%%)\r",
-    url_data->p_now, url_data->p_total,
-    url_data->zp_now, url_data->zp_total,
-    url_data->p_total ? (double) url_data->p_now / url_data->p_total * 100 : 0
-  );
 
   return 0;
 }

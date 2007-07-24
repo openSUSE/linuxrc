@@ -171,15 +171,6 @@ int mod_copy_modules(char *src_dir, int doit)
 }
 
 
-void mod_free_modules()
-{
-  if(config.module.ramdisk >= 0) {
-    ramdisk_free(config.module.ramdisk);
-    config.module.ramdisk = -1;
-  }
-}
-
-
 /*
  * openprom, nvram
  */

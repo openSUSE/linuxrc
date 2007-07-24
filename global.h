@@ -296,7 +296,6 @@ typedef struct {
   unsigned rescue:1;		/* start rescue system */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
   unsigned extramount:1;	/* mountpoints.extra is in use */
-  unsigned instdata_mounted:1;	/* install data are mounted */
   unsigned textmode:1;		/* start yast2 in text mode */
   unsigned debugwait:1;		/* pop up dialogs at some critical points */
   unsigned linemode:1;		/* line mode */
@@ -444,7 +443,6 @@ typedef struct {
     int fs_type;		/* dto. */
     slist_t *input_params;	/* history for module loading dialog */
     slist_t *used_params;	/* parameters that were used for insmod */
-    int ramdisk;		/* ramdisk used for modules */
     slist_t *broken;		/* list of modules that must not be loaded */
     slist_t *initrd;		/* extra modules for initrd */
     unsigned keep_usb_storage:1;	/* don't unload usb-storage */

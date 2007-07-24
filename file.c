@@ -1491,6 +1491,9 @@ void file_write_install_inf(char *dir)
   slist_t *sl;
   file_t *ft0, *ft;
   int i;
+  url_t *url = config.url.install;
+
+  if(!url) return;
 
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
@@ -1499,17 +1502,22 @@ void file_write_install_inf(char *dir)
     return;
   }
 
+  file_write_num(f, key_manual, config.manual);
+
   set_write_info(f);
-
-  file_write_num(f, key_sourcemounted, config.instdata_mounted);
-
-  file_write_sym(f, key_display, "Undef", config.color);
 
   if(config.keymap && config.manual) {
     file_write_str(f, key_keytable, config.keymap);
   }
 
-  file_write_str(f, key_cdrom, config.cdrom);
+  file_write_sym(f, key_display, "Undef", config.color);
+
+  file_write_num(f, key_haspcmcia, config.has_pcmcia);
+
+  file_write_num(f, key_nopcmcia, config.nopcmcia);
+
+  file_write_str(f, key_console, config.serial);
+
   if(config.net.do_setup && config.net.device) {
     for(sl = config.net.devices; sl; sl = sl->next) {
       if(sl->key && sl->value) {
@@ -1518,19 +1526,16 @@ void file_write_install_inf(char *dir)
     }
   }
 
-  file_write_num(f, key_haspcmcia, config.has_pcmcia);
+  file_write_num(f, key_sourcemounted, url->mount ? 1 : 0);
 
-  file_write_num(f, key_nopcmcia, config.nopcmcia);
+  fprintf(f, "SourceType: %s\n", url->is.file ? "file" : "dir");
 
-  file_write_str(f, key_console, config.serial);
+  file_write_str(f, key_instmode, get_instmode_name(url->scheme));
 
-  file_write_str(f, key_instmode,
-    get_instmode_name(config.instmode_extra == inst_dvd ? config.instmode_extra : config.instmode)
-  );
-
-  if(config.insttype == inst_hd) {
-    file_write_str(f, key_partition, config.partition);
-    file_write_str(f, key_serverdir, config.serverdir);
+  if(url->is.mountable && !url->is.network) {
+    if(url->is.cdrom) file_write_str(f, key_cdrom, url->used.device);
+    file_write_str(f, key_partition, url->used.device);
+    file_write_str(f, key_serverdir, url->path);
   }
 
   if(config.net.do_setup) {
@@ -1599,7 +1604,7 @@ void file_write_install_inf(char *dir)
     file_write_num(f, key_proxyport, config.net.proxyport);
     file_write_str(f,
       key_proxyproto,
-      get_instmode_name(config.net.proxyproto ?: config.instmode)
+      get_instmode_name(config.net.proxyproto ?: inst_http)
     );
   }
 
@@ -1608,17 +1613,7 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_password, config.net.password);
   file_write_str(f, key_workdomain, config.net.workgroup);
 
-  fprintf(f, "SourceType: %s\n", config.sourcetype ? "file" : "dir");
-
-#if 0
-  if(config.serverpath && config.serverfile) {
-    fprintf(f, "ServerPath: %s\nServerFile: %s\n", config.serverpath, config.serverfile);
-  }
-#endif
-
   file_write_modparms(f);
-
-  file_write_num(f, key_manual, config.manual);
 
   if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
 
@@ -1653,20 +1648,6 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_brokenmodules, s = slist_join(",", config.module.broken));
     free(s);
   }
-
-#if 0
-  {
-    char *s;
-    int boot_disk;
-
-    fflush(f);	/* really necessary! */
-    s = auto2_disk_list(&boot_disk);
-    if(*s) {
-      file_write_num(f, key_bootdisk, boot_disk ? 1 : 0);
-      file_write_str(f, key_disks, s);
-    }
-  }
-#endif
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 

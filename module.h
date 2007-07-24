@@ -8,7 +8,6 @@
 
 int        mod_get_type(char *type_name);
 int        mod_check_modules(char *type_name);
-void       mod_free_modules(void);
 void       mod_init(int autoload);
 module_t  *mod_get_entry(char *name);
 void       mod_menu(void);
