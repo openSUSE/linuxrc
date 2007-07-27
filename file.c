@@ -1495,6 +1495,8 @@ void file_write_install_inf(char *dir)
 
   if(!url) return;
 
+  util_update_meminfo();
+
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
   if(!(f = fopen(file_name, "w"))) {
@@ -1532,17 +1534,26 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_instmode, get_instmode_name(url->scheme));
 
+  if(url->used.device) fprintf(f, "Device: %s\n", short_dev(url->used.device));
+
   if(url->is.mountable && !url->is.network) {
-    if(url->is.cdrom) file_write_str(f, key_cdrom, url->used.device);
-    file_write_str(f, key_partition, url->used.device);
-    file_write_str(f, key_serverdir, url->path);
+    if(url->is.cdrom) file_write_str(f, key_cdrom, short_dev(url->used.device));
+    file_write_str(f, key_partition, short_dev(url->used.device));
   }
 
-  if(config.net.do_setup) {
-    s = NULL;
+  if(url->used.server.ok) {
+    file_write_inet(f, key_server, &url->used.server);
+    file_write_inet_both(f, key_server, &url->used.server);
+  }
+  if(url->port) file_write_num(f, key_port, url->port);
+  file_write_str(f, key_serverdir, url->path);
+  file_write_str(f, key_username, url->user);
+  file_write_str(f, key_password, url->password);
+  file_write_str(f, key_smbshare, url->share);
+  file_write_str(f, key_workdomain, url->domain);
+
+  if(config.net.configured != nc_none) {
     switch(config.net.configured) {
-      case nc_none:
-        break;
       case nc_static:
         s = "static";
         break;
@@ -1552,10 +1563,13 @@ void file_write_install_inf(char *dir)
       case nc_dhcp:
         s = "dhcp";
         break;
+      default:
+        s = NULL;
+        break;
     }
     file_write_str(f, key_netconfig, s);
     file_write_str(f, key_netdevice, config.net.device);
-    if(config.manual < 2) get_net_unique_id();
+    if(config.manual == 1) get_net_unique_id();
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
     file_write_str(f, key_netcardname, config.net.cardname);
@@ -1581,17 +1595,10 @@ void file_write_install_inf(char *dir)
       if(i) { sprintf(buf, "%s%d", s, i + 1); s = buf; }
       file_write_inet_str(f, s, &config.net.nameserver[i]);
     }
-    file_write_inet(f, key_server, &config.net.server);
-    file_write_inet_both(f, key_server, &config.net.server);
-    file_write_str(f, key_serverdir, config.serverdir);
     file_write_str(f, key_domain, config.net.domain);
-    file_write_str(f, key_smbshare, config.net.share);
   }
 
-  if(config.net.port) {
-    file_write_num(f, key_port, config.net.port);
-  }
-
+#if 0
   if(
     config.net.proxyport &&
     (
@@ -1607,42 +1614,34 @@ void file_write_install_inf(char *dir)
       get_instmode_name(config.net.proxyproto ?: inst_http)
     );
   }
-
-  file_write_str(f, key_loghost, config.loghost);
-  file_write_str(f, key_username, config.net.user);
-  file_write_str(f, key_password, config.net.password);
-  file_write_str(f, key_workdomain, config.net.workgroup);
+#endif
 
   file_write_modparms(f);
 
+  file_write_str(f, key_loghost, config.loghost);
   if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
-
   file_write_num(f, key_keyboard, 1);	/* we always have one - what's the point ??? */
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
-
   file_write_num(f, key_textmode, config.textmode);
-
   file_write_str(f, key_autoyast, config.autoyast);
-
-  util_update_meminfo();
   file_write_num(f, key_memfree, config.memory.current);
-
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
   file_write_inet(f, key_displayip, &config.net.displayip);
   file_write_inet(f, key_ptphost, &config.net.ptphost);
   file_write_num(f, key_usessh, config.usessh);
+  if(yast2_color_ig) fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
+  if(config.noshell) file_write_num(f, key_noshell, config.noshell);
+  file_write_str(f, key_initrd_id, config.initrd_id);
+  file_write_str(f, key_instsys_id, config.instsys_id);
+  file_write_num(f, key_withiscsi, config.withiscsi);
+  file_write_num(f, key_startshell, config.startshell);
+
   if(
     config.rootpassword &&
     strcmp(config.rootpassword, "ask")
   ) file_write_str(f, key_rootpassword, config.rootpassword);
-
-  if(yast2_color_ig) {
-    fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
-  }
-
-  if(config.noshell) file_write_num(f, key_noshell, config.noshell);
 
   if(config.module.broken) {
     file_write_str(f, key_brokenmodules, s = slist_join(",", config.module.broken));
@@ -1658,14 +1657,6 @@ void file_write_install_inf(char *dir)
     }
   }
   if(i) fprintf(f, "\n");
-
-  file_write_str(f, key_initrd_id, config.initrd_id);
-  file_write_str(f, key_instsys_id, config.instsys_id);
-
-  file_write_num(f, key_withiscsi, config.withiscsi);
-
-  file_write_num(f, key_startshell, config.startshell);
-
 
   file_free_file(ft0);
 

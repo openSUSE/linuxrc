@@ -856,8 +856,6 @@ int inst_start_install_auto()
   
   util_splash_bar(60, SPLASH_60);
 
-  LXRC_WAIT
-
   err = inst_execute_yast();
 
   util_umount_all();
@@ -1140,11 +1138,11 @@ int add_instsys()
   if(!config.test) {
     // fake mtab
     system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
-  }
 
-  argv[1] = config.url.instsys->mount;
-  argv[2] = "/";
-  util_lndir_main(3, argv);
+    argv[1] = config.url.instsys->mount;
+    argv[2] = "/";
+    util_lndir_main(3, argv);
+  }
 
   return err;
 }
@@ -1231,6 +1229,8 @@ int inst_execute_yast()
   }
 
   fprintf(stderr, "starting %s\n", setupcmd);
+
+  LXRC_WAIT
 
   kbd_end(1);
   util_notty();

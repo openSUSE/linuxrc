@@ -1,5 +1,6 @@
-
 ***  Do not submit to autobuild, linuxrc does not work!  ***
+
+-> requires: libblkid-devel
 
 	- resolv.conf not written when netsetup=dhcp,all was used (#284469)
 	- allow multiple nameservers (#284469)

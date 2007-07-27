@@ -638,6 +638,7 @@ url_t *url_free(url_t *url)
     free(url->used.device);
     free(url->used.hwaddr);
     free(url->used.model);
+    free(url->used.unique_id);
     free(url->used.server.name);
 
     slist_free(url->query);
@@ -939,10 +940,13 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     if(url->is.mountable) {
       file_type = util_check_exist(path);
 
-      if(file_type && (file_type == 'r' || file_type == 'b')) url->is.file = 1;
+      if(file_type == 'r') url->is.file = 1;
 
       if(file_type) {
-        if(url->is.file && (url->download || !util_is_mountable(path))) {
+        if(
+          (file_type == 'r' || file_type == 'b') &&
+          (url->download || !util_is_mountable(path))
+        ) {
 
           str_copy(&url->mount, dir ?: new_mountpoint());
 
@@ -1087,6 +1091,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
     if(!matched) continue;
 
+    str_copy(&url->used.unique_id, hd->unique_id);
     str_copy(&url->used.device, hd->unix_dev_name);
     str_copy(&url->used.hwaddr, hwaddr);
 
@@ -1114,6 +1119,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->used.device, long_dev(url->device));
     str_copy(&url->used.model, NULL);
     str_copy(&url->used.hwaddr, NULL);
+    str_copy(&url->used.unique_id, NULL);
     err = url_mount_disk(url, dir, test_func) ? 0 : 1;
   }
 
@@ -1121,6 +1127,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->used.device, NULL);
     str_copy(&url->used.model, NULL);
     str_copy(&url->used.hwaddr, NULL);
+    str_copy(&url->used.unique_id, NULL);
   }
 
   return found ? 0 : err;
@@ -1435,6 +1442,9 @@ int url_setup_device(url_t *url)
     fprintf(stderr, "interface setup: %s\n", url->used.device);
 
     str_copy(&config.net.device, url->used.device);
+    str_copy(&config.net.hwaddr, url->used.hwaddr);
+    str_copy(&config.net.cardname, url->used.model);
+    str_copy(&config.net.unique_id, url->used.unique_id);
 
     if(url->is.wlan && wlan_setup()) return 0;
 

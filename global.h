@@ -239,6 +239,7 @@ typedef struct {
     char *device;
     char *hwaddr;
     char *model;
+    char *unique_id;
     inet_t server;
   } used;
 } url_t;
