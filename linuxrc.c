@@ -55,8 +55,6 @@
 #define SIGNAL_ARGS	int signum, struct sigcontext scp
 #endif
 
-#define pivot_root(a, b) syscall(SYS_pivot_root, a, b)
-
 #ifndef MS_MOVE
 #define MS_MOVE		(1 << 13)
 #endif
