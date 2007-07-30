@@ -1247,7 +1247,6 @@ void util_status_info()
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
   add_flag(&sl0, buf, config.manual, "manual");
-  add_flag(&sl0, buf, config.initramfs, "ramfs");
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.vnc, "vnc");
   add_flag(&sl0, buf, config.usessh, "usessh");
@@ -1260,7 +1259,6 @@ void util_status_info()
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
-  add_flag(&sl0, buf, config.pivotroot, "pivotroot");
   add_flag(&sl0, buf, config.addswap, "addswap");
   add_flag(&sl0, buf, config.splash, "splash");
   add_flag(&sl0, buf, config.noshell, "noshell");

@@ -62,7 +62,7 @@ extern str_list_t *add_str_list(str_list_t **sl, char *str);
 
 #define  LXRC_DEBUG
 
-#define LXRC_WAIT if(printf("?"), getchar() == 'q') { lxrc_end(); exit(0); }
+#define LXRC_WAIT if(config.debugwait) if(printf("?"), getchar() == 'q') { lxrc_end(); exit(0); }
 
 #ifdef LXRC_DEBUG
 # define deb_wait if(config.debugwait) printf("%s:%d: Press a key...\n", __func__, __LINE__), getchar()
@@ -292,7 +292,6 @@ typedef struct {
   unsigned forceinsmod:1;	/* use 'insmod -f' if set */
   unsigned tmpfs:1;		/* we're using tmpfs for / */
   unsigned run_as_linuxrc:1;	/* set if we really are linuxrc */
-  unsigned initramfs:1;		/* initramfs mode */
   unsigned test:1;		/* we are in test mode */
   unsigned rescue:1;		/* start rescue system */
   unsigned shell_started:1;	/* there is a shell running on /dev/tty9 */
@@ -306,8 +305,6 @@ typedef struct {
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
   unsigned usessh:1;		/* ssh mode */
-  unsigned pivotroot:1;		/* use pivotroot system call */
-  unsigned testpivotroot:1;	/* test pivotroot */
   unsigned addswap:2;		/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */

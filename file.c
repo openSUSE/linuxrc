@@ -167,7 +167,6 @@ static struct {
   { key_vncpassword,    "VNCPassword",    kf_cfg + kf_cmd                },
   { key_displayip,	"Display_IP",     kf_cfg + kf_cmd		 },
   { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },
-  { key_usepivotroot,   "UsePivotRoot",   kf_cfg + kf_cmd                },
   { key_term,           "TERM",           kf_cfg + kf_cmd                },
   { key_addswap,        "AddSwap",        kf_cfg + kf_cmd                },
   { key_aborted,        "Aborted",        kf_yast                        },
@@ -190,7 +189,6 @@ static struct {
   { key_comment,        "#",              kf_cfg                         },
   { key_kbdtimeout,     "KBDTimeout",     kf_cfg + kf_cmd                },
   { key_brokenmodules,  "BrokenModules",  kf_cfg + kf_cmd + kf_cmd_early },
-  { key_testpivotroot,  "_TestPivotRoot", kf_cfg + kf_cmd                },
   { key_scsibeforeusb,  "SCSIBeforeUSB",  kf_cfg + kf_cmd + kf_cmd_early },
   { key_hostip,         "HostIP",         kf_cfg + kf_cmd                },
   { key_linemode,       "Linemode",       kf_cfg + kf_cmd + kf_cmd_early },
@@ -808,6 +806,11 @@ void file_do_info(file_t *f0)
         break;
 
       case key_rescue:
+        if(f->is.numeric) {
+          config.rescue = f->nvalue;
+          break;
+        }
+
       case key_install:
         config.rescue = f->key == key_rescue ? 1 : 0;
 
@@ -860,14 +863,6 @@ void file_do_info(file_t *f0)
       case key_sshpassword:
         str_copy(&config.net.sshpassword, *f->value ? f->value : NULL);
 	/* do not enable ssh nor network ... this is done with usessh=1 */
-        break;
-
-      case key_usepivotroot:
-        if(f->is.numeric) config.pivotroot = f->nvalue;
-        break;
-
-      case key_testpivotroot:
-        if(f->is.numeric) config.testpivotroot = f->nvalue;
         break;
 
       case key_term:
@@ -1392,7 +1387,7 @@ int file_read_yast_inf()
     switch(f->key) {
       case key_root:
         root = 1;
-        if(!f->is.numeric) root_set_root(f->value);
+        if(!f->is.numeric) str_copy(&config.new_root, f->value);
         reboot_ig = f->nvalue;
         break;
 

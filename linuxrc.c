@@ -74,13 +74,11 @@ static void lxrc_check_console (void);
 static void lxrc_set_bdflush   (int percent_iv);
 static int do_not_kill         (char *name);
 static void lxrc_change_root   (void);
-static void lxrc_change_root2  (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 
 extern char **environ;
 static void lxrc_movetotmpfs(void);
-static void lxrc_movetotmpfs2(void);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
@@ -156,8 +154,6 @@ int main(int argc, char **argv, char **env)
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
 
-  if(!strcmp(prog, "init")) config.initramfs = 1;
-
   str_copy(&config.console, "/dev/console");
   str_copy(&config.stderr_name, "/dev/tty3");
 
@@ -210,31 +206,16 @@ int main(int argc, char **argv, char **env)
 
       // fprintf(stderr, "free: %d, %d, %d\n", config.memory.free, config.tmpfs, tmpfs_opt);
 
-      if(!config.initramfs) {
-        if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
-          lxrc_movetotmpfs();	/* does not return if successful */
-        }
-        config.tmpfs = 0;
+      if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
+        lxrc_movetotmpfs();	/* does not return if successful */
       }
-      else {
-        if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
-          lxrc_movetotmpfs2();	/* does not return if successful */
-        }
-        config.tmpfs = 0;
-      }
+      config.tmpfs = 0;
 
       if(!config.serial && config.debugwait) {
         util_start_shell("/dev/tty9", "/bin/lsh", 1);
         config.shell_started = 1;
       }
       deb_wait;
-    }
-    else {
-      // umount and release /oldroot
-      if(!config.initramfs) {
-        umount("/oldroot");
-        util_free_ramdisk("/dev/ram0");
-      }
     }
   }
 
@@ -339,91 +320,72 @@ void lxrc_halt()
 
 void lxrc_change_root()
 {
-  int i;
-  char *new_mp;
-
-  if(config.test) return;
-
-  new_mp = "mnt";
-
-  umount("/mnt");
-  util_mount_ro(config.new_root, "/mnt");
-  chdir("/mnt");
-
-  if(!pivot_root(".", new_mp)) {
-    fprintf(stderr, "pivot_root ok\n");
-    for(i = config.testpivotroot ? 3 : 0; i < 20 ; i++) close(i);
-    chroot(".");
-    if(config.testpivotroot) {
-      freopen(config.console, "r", stdin);
-      freopen(config.console, "a", stdout);
-      freopen(config.console, "a", stderr);
-      execl("/bin/sh", "sh", NULL);
-    }
-    else {
-      execl("/bin/umount", "umount", "/mnt", NULL);
-    }
-  }
-  else {
-    chdir("/");
-    umount("/mnt");
-    fprintf(stderr, "pivot_root failed\n");
-    deb_wait;
-  }
-}
-
-
-void lxrc_change_root2()
-{
   int fd;
+  char *buf = NULL, *sbuf = NULL, *mp = "/mnt";
 
   if(config.test) return;
 
-  fprintf(stderr, "starting %s\n", config.new_root);
+  umount(mp);
 
-  umount("/mnt");
-  if(config.rescue) {
-    if(util_mount_rw(config.new_root, "/mnt")) {
-      util_mount_ro(config.new_root, "/mnt");
-    }
-    fd = open("/mnt/tmp/xxx", O_WRONLY|O_CREAT, 0644);
+  if(
+    config.rescue &&
+    config.url.instsys &&
+    (mp = config.url.instsys->mount)
+  ) {
+    fprintf(stderr, "starting rescue\n");
+    mount(0, mp, 0, MS_REMOUNT, 0);
+
+    /* check if it's writable... */
+    strprintf(&buf, "%s/xxx", mp);
+    fd = open(buf, O_WRONLY|O_CREAT, 0644);
     if(fd >= 0) {
       close(fd);
-      unlink("/mnt/tmp/xxx");
-
-      // config_rescue("/mnt");
+      unlink(buf);
     }
     else {
-      util_mount_ro(config.new_root, "/mnt/mnt");
+      /* ... no, it's not - make some directories rw */
+      strprintf(&buf, "%s/mnt", mp);
+      mount(mp, buf, "none", MS_BIND, 0);
 
-      mount("tmpfs", "/mnt/tmp", "tmpfs", 0, "size=0,nr_inodes=0");
-      chmod("/mnt/tmp", 01777);
+      strprintf(&buf, "%s/tmp", mp);
+      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
+      chmod(buf, 01777);
 
-      mount("tmpfs", "/mnt/var", "tmpfs", 0, "size=0,nr_inodes=0");
-      util_do_cp("/mnt/mnt/var", "/mnt/var");
-      chmod("/mnt/var", 0755);
+      strprintf(&buf, "%s/var", mp);
+      strprintf(&sbuf, "%s/mnt/var", mp);
+      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
+      util_do_cp(sbuf, buf);
+      chmod(buf, 0755);
 
-      mount("tmpfs", "/mnt/etc", "tmpfs", 0, "size=0,nr_inodes=0");
-      util_do_cp("/mnt/mnt/etc", "/mnt/etc");
-      chmod("/mnt/etc", 0755);
+      strprintf(&buf, "%s/etc", mp);
+      strprintf(&sbuf, "%s/mnt/etc", mp);
+      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
+      util_do_cp(sbuf, buf);
+      chmod(buf, 0755);
 
-      mount("tmpfs", "/mnt/dev", "tmpfs", 0, "size=0,nr_inodes=0");
-      util_do_cp("/mnt/mnt/dev", "/mnt/dev");
-      util_do_cp("/dev", "/mnt/dev");
-      chmod("/mnt/dev", 0755);
+      strprintf(&buf, "%s/dev", mp);
+      strprintf(&sbuf, "%s/mnt/dev", mp);
+      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
+      util_do_cp(sbuf, buf);
+      util_do_cp("/dev", buf);
+      chmod(buf, 0755);
 
-      // config_rescue("/mnt");
-
-      umount("/mnt/mnt");
+      strprintf(&buf, "%s/mnt", mp);
+      umount(buf);
     }
+    // config_rescue(mp);
   }
-  else{
-    util_mount_ro(config.new_root, "/mnt");
-  }
-  chdir("/mnt");
+  else if(config.new_root) {
+    fprintf(stderr, "starting %s\n", config.new_root);
 
-  if(config.rescue && util_check_exist("/mnt/lib/modules") == 'd') {
-    mount("/lib/modules", "/mnt/lib/modules", "none", MS_BIND, 0);
+    util_mount_ro(config.new_root, mp);
+  }
+
+  chdir(mp);
+
+  strprintf(&buf, "%s/lib/modules", mp);
+  if(config.rescue && util_check_exist(buf) == 'd') {
+    mount("/lib/modules", buf, "none", MS_BIND, 0);
   }
 
   mount(".", "/", NULL, MS_MOVE, NULL);
@@ -434,7 +396,7 @@ void lxrc_change_root2()
   perror("init failed\n");
 
   chdir("/");
-  umount("/mnt");
+  umount(mp);
   fprintf(stderr, "system start failed\n");
 
   deb_wait;
@@ -442,10 +404,10 @@ void lxrc_change_root2()
 
 
 /*
- * Copy root tree into a tmpfs tree, pivot_root() there and
- * exec() the new linuxrc.
+ * Copy root tree into a tmpfs tree, make it '/' and exec() the new
+ * linuxrc.
  */
-void lxrc_movetotmpfs2()
+void lxrc_movetotmpfs()
 {
   int i;
   char *newroot = "/.newroot";
@@ -516,11 +478,6 @@ void lxrc_end()
   /* screen saver on */
   if(!config.linemode) printf("\033[9;15]");
 
-/*    reboot (RB_ENABLE_CAD); */
-
-  util_umount_all();
-  util_clear_downloads();
-
   lxrc_set_modprobe("/sbin/modprobe");
   lxrc_set_bdflush(40);
 
@@ -529,7 +486,8 @@ void lxrc_end()
   util_debugwait("leaving now");
 
   if(!config.test) {
-    if(config.new_root && (config.pivotroot || config.initramfs)) {
+    if(config.new_root) {
+      // really ???
       // tell kernel root is /dev/ram0, prevents remount after initrd
       if(!(f = fopen ("/proc/sys/kernel/real-root-dev", "w"))) return;
       fprintf(f, "256\n");
@@ -542,12 +500,11 @@ void lxrc_end()
     util_umount("/proc");
   }
 
-  disp_cursor_on ();
-  kbd_end (1);
-  disp_end ();
+  disp_cursor_on();
+  kbd_end(1);
+  disp_end();
 
-  if(config.new_root && config.initramfs) lxrc_change_root2();
-  if(config.new_root && config.pivotroot) lxrc_change_root();
+  lxrc_change_root();
 }
 
 /*
@@ -685,7 +642,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
     state[0] = config.win ? '1' : '0';
     state[1] = 0;
     kbd_end(1);		/* restore terminal settings */
-    execl(*config.argv, config.initramfs ? "init" : "linuxrc", "segv", addr, state, NULL);
+    execl(*config.argv, "init", "segv", addr, state, NULL);
   }
 
   /* stop here */
@@ -1237,63 +1194,6 @@ static void lxrc_set_bdflush (int percent_iv)
     fprintf (fd_pri, "%d", percent_iv);
     fclose (fd_pri);
     }
-
-
-/*
- * Copy root tree into a tmpfs tree, pivot_root() there and
- * exec() the new linuxrc.
- */
-void lxrc_movetotmpfs()
-{
-  int i;
-  char *newroot = "/newroot";
-
-  fprintf(stderr, "Moving into tmpfs...");
-  i = mkdir(newroot, 0755);
-  if(i) {
-    perror(newroot);
-    return;
-  }
-
-  i = mount("tmpfs", newroot, "tmpfs", 0, "nr_inodes=30720");
-  if(i) {
-    perror(newroot);
-    return;
-  }
-
-  i = util_do_cp("/", newroot);
-  if(i) {
-    fprintf(stderr, "copy failed: %d\n", i);
-    return;
-  }
-
-  fprintf(stderr, " done.\n");
-
-  i = chdir(newroot);
-  if(i) {
-    perror(newroot);
-    return;
-  }
-
-  i = mkdir("oldroot", 0755);
-  if(i) {
-    perror("oldroot");
-    return;
-  }
-
-  if(!syscall(SYS_pivot_root, ".", "oldroot")) {
-    for(i = 0; i < 20; i++) close(i);
-    chroot(".");
-    open("/dev/console", O_RDWR);
-    dup(0);
-    dup(0);
-    execve("/linuxrc", config.argv, environ);
-    perror("/linuxrc");
-  }
-  else {
-    fprintf(stderr, "Oops, pivot_root failed\n");
-  }
-}
 
 
 #if SWISS_ARMY_KNIFE

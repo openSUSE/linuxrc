@@ -48,6 +48,7 @@
 #include "settings.h"
 #include "auto2.h"
 #include "fstype.h"
+#include "url.h"
 
 #ifndef MNT_DETACH
 #define MNT_DETACH	(1 << 1)
@@ -849,12 +850,21 @@ int inst_start_install_auto()
 {
   int err = 0;
 
+  util_splash_bar(60, SPLASH_60);
+
+  if(config.rescue) {
+    /* get rid of repo */
+    url_umount(config.url.install);
+
+    return 0;
+  }
+
 #if defined(__s390__) || defined(__s390x__)
   if((config.net.setup & NS_DISPLAY))
     if((err = inst_choose_display())) return err;
 #endif
   
-  util_splash_bar(60, SPLASH_60);
+  LXRC_WAIT
 
   err = inst_execute_yast();
 
