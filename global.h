@@ -62,7 +62,7 @@ extern str_list_t *add_str_list(str_list_t **sl, char *str);
 
 #define  LXRC_DEBUG
 
-#define LXRC_WAIT if(config.debugwait) if(printf("?"), getchar() == 'q') { lxrc_end(); exit(0); }
+#define LXRC_WAIT if(config.debugwait) if(printf("?"), getchar() == 'q') { util_umount_all(); util_clear_downloads(); lxrc_end(); exit(0); }
 
 #ifdef LXRC_DEBUG
 # define deb_wait if(config.debugwait) printf("%s:%d: Press a key...\n", __func__, __LINE__), getchar()
@@ -397,6 +397,7 @@ typedef struct {
     url_t *install;		/* install url */
     url_t *autoyast;		/* autoyast url */
     url_t *instsys;		/* instsys url */
+    url_t *proxy;		/* proxy url */
   } url;
 
   struct {			/* libblkid related things */

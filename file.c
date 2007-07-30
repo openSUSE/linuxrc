@@ -144,8 +144,6 @@ static struct {
   { key_memloadimage,   "MemLoadImage",   kf_cfg + kf_cmd                },
   { key_info,           "Info",           kf_cfg + kf_cmd_early          },
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
-  { key_proxyport,      "ProxyPort",      kf_cfg + kf_cmd                },
-  { key_proxyproto,     "ProxyProto",     kf_cfg + kf_cmd                },
   { key_usedhcp,        "UseDHCP",        kf_cfg + kf_cmd                },
   { key_nfsport,        "NFSPort",        kf_cfg + kf_cmd                },
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
@@ -655,16 +653,12 @@ void file_do_info(file_t *f0)
         break;
 
       case key_proxy:
-        name2inet(&config.net.proxy, f->value);
-        net_check_address2(&config.net.proxy, 0);
-        break;
-
-      case key_proxyport:
-        if(f->is.numeric) config.net.proxyport = f->nvalue;
-        break;
-
-      case key_proxyproto:
-        if(f->is.numeric) config.net.proxyproto = f->nvalue;
+        url_free(config.url.proxy);
+        config.url.proxy = url_set(f->value);
+        if(config.url.proxy->scheme == inst_rel) {
+          str_copy(&config.url.proxy->server, config.url.proxy->path);
+          str_copy(&config.url.proxy->path, NULL);
+        }
         break;
 
       case key_partition:
@@ -1593,23 +1587,14 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_domain, config.net.domain);
   }
 
-#if 0
-  if(
-    config.net.proxyport &&
-    (
-      config.instmode == inst_ftp ||
-      config.instmode == inst_http ||
-      config.instmode == inst_tftp
-    )
-  ) {
-    file_write_inet(f, key_proxy, &config.net.proxy);
-    file_write_num(f, key_proxyport, config.net.proxyport);
-    file_write_str(f,
-      key_proxyproto,
-      get_instmode_name(config.net.proxyproto ?: inst_http)
-    );
+  if(config.url.proxy) {
+    if(config.url.proxy->used.server.ok) {
+      file_write_inet(f, key_proxy, &config.url.proxy->used.server);
+    }
+    fprintf(f, "ProxyPort: %u\n", config.net.proxyport);
+    fprintf(f, "ProxyProto: http\n");
+    fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
   }
-#endif
 
   file_write_modparms(f);
 

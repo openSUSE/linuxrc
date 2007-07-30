@@ -50,7 +50,7 @@ void url_read(url_data_t *url_data)
   CURL *c_handle;
   int i;
   FILE *f;
-  char *buf, *s;
+  char *buf, *s, *proxy_url = NULL;
   sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);;
 
   c_handle = curl_easy_init();
@@ -72,6 +72,20 @@ void url_read(url_data_t *url_data)
 
   url_data->err = curl_easy_setopt(c_handle, CURLOPT_URL, url_data->url->str);
   // fprintf(stderr, "curl opt url = %d\n", url_data->err);
+
+  str_copy(&proxy_url, url_print(config.url.proxy, 1));
+  if(proxy_url) {
+    name2inet(&config.url.proxy->used.server, config.url.proxy->server);
+    if(net_check_address2(&config.url.proxy->used.server, 1)) {
+      snprintf(url_data->err_buf, url_data->err_buf_len, "invalid proxy address: %s", config.url.proxy->used.server.name);
+      fprintf(stderr, "%s\n", url_data->err_buf);
+      url_data->err = 105;
+    }
+    else {
+      curl_easy_setopt(c_handle, CURLOPT_PROXY, proxy_url);
+      if(config.debug >= 2) fprintf(stderr, "proxy: %s\n", proxy_url);
+    }
+  }
 
   if(url_data->progress) url_data->progress(url_data, 0);
 
@@ -133,6 +147,8 @@ void url_read(url_data_t *url_data)
   if(url_data->progress) url_data->progress(url_data, 2);
 
   curl_easy_cleanup(c_handle);
+
+  str_copy(&proxy_url, NULL);
 
   signal(SIGPIPE, old_sigpipe);
 }
