@@ -472,7 +472,7 @@ file_t *file_read_file(char *name, file_key_flag_t flags)
   char *s, *t, *t1;
   file_t *ft0 = NULL, **ft = &ft0, *prev = NULL;
 
-  if(!(f = fopen(name, "r"))) return NULL;
+  if(!name || !(f = fopen(name, "r"))) return NULL;
 
   while(fgets(buf, sizeof buf, f)) {
     for(s = buf; *s && isspace(*s); s++);
@@ -656,8 +656,9 @@ void file_do_info(file_t *f0)
         url_free(config.url.proxy);
         config.url.proxy = url_set(f->value);
         if(config.url.proxy->scheme == inst_rel) {
-          str_copy(&config.url.proxy->server, config.url.proxy->path);
-          str_copy(&config.url.proxy->path, NULL);
+          sprintf(buf, "http://%s", f->value);
+          url_free(config.url.proxy);
+          config.url.proxy = url_set(buf);
         }
         break;
 

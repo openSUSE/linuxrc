@@ -738,12 +738,11 @@ void auto2_read_repo_files(url_t *url)
   char *dst = NULL, *file_list = NULL;
   static char *default_list[][2] = {
     { "/media.1/info.txt", "/info.txt" },
-    { "/media.1/license.zip", "/license.zip" },
     { "/part.info", "/part.info" },
     { "/control.xml", "/control.xml" }
   };
 
-  url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
+  // url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
 
   if((f0 = file_read_file(file_list, kf_none))) {
     for(f = f0; f; f = f->next) {
