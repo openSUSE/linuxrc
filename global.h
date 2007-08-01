@@ -389,7 +389,7 @@ typedef struct {
   slist_t *ethtool;		/* ethtool options */
   slist_t *cd1texts;		/* text for requesting next product cd */
   unsigned swap_file_size;	/* swap file size in MB */
-
+  window_t progress_win;	/* download status window */
   hd_data_t *hd_data;		/* device list */
 
   struct {

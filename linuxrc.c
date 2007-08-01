@@ -966,6 +966,8 @@ void lxrc_init()
 
   net_setup_localhost();
 
+  if(config.manual) file_read_info_file("cmdline", kf_cmd);
+
   if(!config.manual && !auto2_init()) {
     fprintf(stderr, "Automatic setup not possible.\n");
 
@@ -1007,8 +1009,6 @@ void lxrc_init()
       util_disp_done();
     }
   }
-
-  file_read_info_file("cmdline", kf_cmd);
 
   set_activate_language(config.language);
 

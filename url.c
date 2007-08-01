@@ -19,6 +19,7 @@
 #include "module.h"
 #include "net.h"
 #include "slp.h"
+#include "dialog.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -725,34 +726,48 @@ void url_cleanup()
  */
 int url_progress(url_data_t *url_data, int stage)
 {
-  int percent = -1;
+  int percent = -1, with_win;
   char *buf = NULL;
+
+  with_win = config.win && !config.linemode;
 
   /* init */
   if(stage == 0) {
-    if(url_data->label) {
-      printf("%s", url_data->label);
-    }
-    else {
-      printf("Loading %s", url_print(url_data->url, 0));
-    }
+    if(!with_win) {
+      if(url_data->label) {
+        strprintf(&buf, "%s", url_data->label);
+      }
+      else {
+        strprintf(&buf, "Loading %s", url_print(url_data->url, 0));
+      }
 
-    fflush(stdout);
+      printf("%s", buf);
+      fflush(stdout);
+    }
 
     return 0;
   }
 
   /* done */
   if(stage == 2) {
-    if(url_data->err) {
-      printf(" - failed\n");
-      if(config.debug) printf("error %d: %s\n", url_data->err, url_data->err_buf);
+    if(with_win) {
+      dia_status_off(&config.progress_win);
+      if(url_data->err) {
+        strprintf(&buf, "error %d: %s\n", url_data->err, url_data->err_buf);
+        dia_message(buf, MSGTYPE_ERROR);
+      }
     }
     else {
-      printf("\n");
-    }
+      if(url_data->err) {
+        printf(" - failed\n");
+        if(config.debug) printf("error %d: %s\n", url_data->err, url_data->err_buf);
+      }
+      else {
+        printf("\n");
+      }
 
-    fflush(stdout);
+      fflush(stdout);
+    }
 
     return 0;
   }
@@ -769,22 +784,48 @@ int url_progress(url_data_t *url_data, int stage)
   if(percent > 100) percent = 100;
 
   if(!url_data->label_shown) {
-    if(percent >= 0) {
-      strprintf(&buf,
-        " (%u kB) -     ",
-        ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
-      );
+
+    if(with_win) {
+      if(url_data->label) {
+        strprintf(&buf, "%s", url_data->label);
+      }
+      else {
+        strprintf(&buf, "Loading %s", url_print(url_data->url, 0));
+      }
+      if(percent >= 0) {
+        strprintf(&buf, "%s (%u kB)",
+          buf,
+          ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
+        );
+      }
+
+      dia_status_on(&config.progress_win, buf);
     }
     else {
-      strprintf(&buf, " -          ");
+      if(percent >= 0) {
+        strprintf(&buf,
+          " (%u kB) -     ",
+          ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
+        );
+      }
+      else {
+        strprintf(&buf, " -          ");
+      }
+      printf("%s", buf);
     }
-    printf("%s", buf);
+
     url_data->label_shown = 1;
   }
 
   if(percent >= 0) {
     if(percent != url_data->percent) {
-      printf("\x08\x08\x08\x08%3d%%", percent);
+      if(with_win) {
+        dia_status(&config.progress_win, percent);
+      }
+      else {
+        printf("\x08\x08\x08\x08%3d%%", percent);
+      }
+
       url_data->percent = percent;
     }
   }

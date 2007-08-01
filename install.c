@@ -695,7 +695,7 @@ int inst_mount_harddisk()
     str_copy(&config.url.install->path, path);
     str_copy(&config.url.install->used.device, long_dev(device));
 
-    err = auto2_find_repo();
+    err = auto2_find_repo() ? 0 : 1;
   } while(err);
 
   str_copy(&device, NULL);
