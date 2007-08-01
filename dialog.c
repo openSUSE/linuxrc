@@ -52,7 +52,6 @@ struct {
   { di_expert_animate,      TXT_ASK_ANIMATE,     },
   { di_expert_forceroot,    TXT_FORCE_ROOTIMAGE, },
   { di_expert_rootimage,    TXT_NEW_ROOTIMAGE,   },
-  { di_expert_instsys,      TXT_NEW_INST_SYS,    },
   { di_expert_nfsport,      TXT_NFSPORT,         },
   { di_expert_bootptimeout, TXT_BOOTP_TIMEOUT,   },
   { di_expert_dhcp,         0, "DHCP/BOOTP"      },

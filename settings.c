@@ -554,7 +554,6 @@ void set_expert()
     di_expert_animate,
     di_expert_forceroot,
     di_expert_rootimage,
-    di_expert_instsys,
     di_expert_nfsport,
     di_expert_bootptimeout,
     di_expert_dhcp,
@@ -607,10 +606,6 @@ int set_expert_cb(dia_item_t di)
 
     case di_expert_rootimage:
       rc = dia_input2(txt_get(TXT_ENTER_ROOTIMAGE), &config.rootimage, 30, 0);
-      break;
-
-    case di_expert_instsys:
-      rc = dia_input2(txt_get(TXT_ENTER_INST_SYS), &config.installdir, 30, 0);
       break;
 
     case di_expert_nfsport:

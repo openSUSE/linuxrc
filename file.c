@@ -156,7 +156,6 @@ static struct {
   { key_rescue,         "Rescue",         kf_cfg + kf_cmd                },
   { key_rootimage,      "RootImage",      kf_cfg + kf_cmd                },
   { key_rescueimage,    "RescueImage",    kf_cfg + kf_cmd                },
-  { key_installdir,     "InstallDir",     kf_cfg + kf_cmd                },
   { key_nopcmcia,       "NoPCMCIA",       kf_cfg + kf_cmd                },	/* kf_cmd_early? */
   { key_vnc,            "VNC",            kf_cfg + kf_cmd                },
   { key_vnc,            "UseVNC",         kf_cfg + kf_cmd                },
@@ -797,10 +796,6 @@ void file_do_info(file_t *f0)
 
       case key_rescueimage:
         str_copy(&config.rescueimage, f->value);
-        break;
-
-      case key_installdir:
-        str_copy(&config.installdir, f->value);
         break;
 
       case key_rescue:

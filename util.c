@@ -1474,9 +1474,6 @@ void util_status_info()
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "installdir = \"%s\"", config.installdir);
-  slist_append_str(&sl0, buf);
-
   sprintf(buf, "setup command = \"%s\"", config.setupcmd);
   slist_append_str(&sl0, buf);
 
@@ -3972,25 +3969,15 @@ void util_set_stderr(char *name)
 
 void util_set_product_dir(char *prod)
 {
-  if(!prod | !*prod) return;
+  struct utsname ubuf;
+  char *arch = "";
 
-  str_copy(&config.product_dir, prod);
+  if(prod && *prod) str_copy(&config.product_dir, prod);
 
-  str_copy(&config.installdir, "/boot/inst-sys");
-#if defined(__sparc__)
-  {
-     struct utsname buf;
+  if(!uname(&ubuf)) arch = ubuf.machine;
 
-     uname (&buf);
-     if (strcmp (buf.machine, "sparc64") == 0)
-	str_copy(&config.rootimage, "/boot/root64");
-     else
-	str_copy(&config.rootimage, "/boot/root");
-  }
-#else
-  str_copy(&config.rootimage, "/boot/root");
-#endif
-  str_copy(&config.rescueimage, "/boot/rescue");
+  strprintf(&config.rootimage, "boot/%s/root", arch);
+  strprintf(&config.rescueimage, "boot/%s/rescue", arch);
 }
 
 

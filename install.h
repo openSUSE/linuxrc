@@ -6,8 +6,7 @@
  *
  */
 
-int inst_menu          (void);
-int inst_check_instsys (void);
+int inst_menu(void);
 int inst_start_install(void);
 int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_input);
 int inst_umount (void);

@@ -367,9 +367,8 @@ typedef struct {
   int inst_ramdisk;		/* ramdisk with instsys */
   int inst2_ramdisk;		/* ramdisk with extra instsys */
   char *new_root;		/* root device to boot */
-  char *installdir;		/* "/boot/inst-sys" */
-  char *rootimage;		/* "/boot/root" */
-  char *rescueimage;		/* "/boot/rescue" */
+  char *rootimage;		/* "boot/<arch>/root" */
+  char *rescueimage;		/* "boot/<arch>/rescue" */
   char *rootimage2;		/* additional root image */
   char *term;			/* TERM var */
   char *cdid;			/* set if we found a install CD */

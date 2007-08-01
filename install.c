@@ -56,7 +56,7 @@
 
 static char  inst_rootimage_tm [MAX_FILENAME];
 
-static int   inst_mount_harddisk      (void);
+static int inst_mount_harddisk(void);
 static int   inst_try_cdrom           (char *device_tv);
 static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
@@ -81,8 +81,6 @@ static int   inst_get_proxysetup      (void);
 static int   inst_do_tftp             (void);
 static int choose_dud(char **dev);
 static void  inst_swapoff             (void);
-static void get_file(char *src, char *dst);
-static void read_install_files(void);
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
@@ -238,12 +236,7 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
   }
 
-  if(!error) {
-    error = inst_check_instsys();
-    if(error) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-  }
-
-  if(error) inst_umount();
+  if(error) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
 
   return error ? 1 : 0;
 }
@@ -374,12 +367,7 @@ int inst_choose_source_cb(dia_item_t di)
       break;
   }
 
-  if(!err && di != di_source_cdrom) {
-    err = inst_check_instsys();
-    if(err) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-  }
-
-  if(err) inst_umount();
+  if(err) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
 
   return err ? 1 : 0;
 }
@@ -387,20 +375,6 @@ int inst_choose_source_cb(dia_item_t di)
 
 int inst_try_cdrom(char *dev)
 {
-  int rc, win_old = config.win;
-
-  config.win = 0;
-
-  rc = do_mount_disk(long_dev(dev), 0);
-
-  config.win = win_old;
-
-  if(rc) return 1;
-
-  if(inst_check_instsys()) {
-    inst_umount();
-    return 2;
-  }
 
   return 0;
 }
@@ -784,95 +758,6 @@ int inst_mount_smb()
   }
 
   return do_mount_smb();
-}
-
-
-int inst_check_instsys()
-{
-  char *buf = NULL;
-  int update_rd, i;
-
-  config.installfilesread = 0;
-
-  switch(config.instmode) {
-    case inst_hd:
-    case inst_cdrom:
-    case inst_nfs:
-    case inst_smb:
-      config.use_ramdisk = 0;
-
-      read_install_files();
-
-      if(!config.installfilesread) {
-        if(!util_check_exist("/" SP_FILE)) get_file("/" SP_FILE, "/" SP_FILE);
-        if(!util_check_exist("/" TEXTS_FILE)) get_file("/media.1/" TEXTS_FILE, "/" TEXTS_FILE);
-      }
-
-      if(util_check_exist("/" TEXTS_FILE)) {
-        config.cd1texts = file_parse_xmllike("/" TEXTS_FILE, "text");
-      }
-
-      util_chk_driver_update(config.mountpoint.instdata, get_instmode_name(config.instmode));
-
-      strprintf(&buf, "%s/driverupdate", config.mountpoint.instdata);
-      if(util_check_exist(buf) == 'r') {
-        update_rd = load_image(buf, inst_file, txt_get(TXT_LOADING_UPDATE));
-
-        if(update_rd >= 0) {
-          i = ramdisk_mount(update_rd, config.mountpoint.update);
-          if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(inst_file));
-          ramdisk_free(update_rd);
-        }
-      }
-
-      util_do_driver_updates();
-
-      strprintf(&buf, "%s%s", config.mountpoint.instdata, config.installdir);
-      if(config.rescue || util_check_exist(buf) != 'd') {
-        strprintf(&buf, "%s%s",
-          config.mountpoint.instdata,
-          config.rescue ? config.rescueimage : config.rootimage
-        );
-      }
-
-      if(
-        (config.rescue || !util_is_mountable(buf)) &&
-        util_check_exist(buf) != 'd'
-      ) {
-        config.use_ramdisk = 1;
-      }
-      strcpy(inst_rootimage_tm, buf);
-      
-      break;
-
-    case inst_ftp:
-    case inst_http:
-    case inst_tftp:
-      config.use_ramdisk = 1;
-
-      sprintf(inst_rootimage_tm, "%s%s",
-        config.serverdir ?: "",
-        config.rescue ? config.rescueimage : config.rootimage
-      );
-      break;
-
-    default:
-      break;
-  }
-
-  free(buf);
-
-  if(
-    config.instmode != inst_ftp &&
-    config.instmode != inst_http &&
-    config.instmode != inst_tftp &&
-    config.use_ramdisk &&
-    !util_check_exist(inst_rootimage_tm)
-  ) {
-    return -1;
-  }
-
-  return 0;
 }
 
 
@@ -1791,59 +1676,6 @@ void inst_swapoff()
 }
 
 
-void get_file(char *src, char *dst)
-{
-  char buf[0x1000];
-  char fname[256];
-  int i, j, fd_in, fd_out;
-
-  if(config.debug) fprintf(stderr, "get_file: src = %s, dst = %s\n", src, dst);
-
-  if(
-    config.instmode == inst_ftp ||
-    config.instmode == inst_http ||
-    config.instmode == inst_tftp
-  ) {
-    sprintf(fname, "%s%s", config.serverdir ?: "", src);
-    fd_in = net_open(fname);
-    if(fd_in >= 0) {
-      fd_out = open("/xxx.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-      if(fd_out >= 0) {
-        do {
-          i = net_read(fd_in, buf, sizeof buf);
-          j = 0;
-          if(i > 0) j = write(fd_out, buf, i);
-        }  
-        while(i > 0 && j > 0);
-        close(fd_out);
-        if(!(i < 0 || j < 0)) {
-          unlink(dst);
-          rename("/xxx.tmp", dst);
-        }
-      }
-      net_close(fd_in);
-    }
-  }
-  else if(
-    config.instmode == inst_hd ||
-    config.instmode == inst_cdrom ||
-    config.instmode == inst_nfs ||
-    config.instmode == inst_smb
-  ) {
-    /* simply copy file */
-    sprintf(fname, "%s%s", config.mountpoint.instdata, src);
-    if(util_check_exist(fname)) {
-      char *argv[3];
-
-      unlink(dst);
-      argv[1] = fname;
-      argv[2] = dst;
-      util_cp_main(3, argv);
-    }
-  }
-}
-
-
 /*
  * Mount nfs install source.
  *
@@ -2087,38 +1919,4 @@ int do_mount_disk(char *dev, int disk_type)
   return rc;
 }
 
-
-void read_install_files()
-{
-  file_t *f0, *f;
-  char *dst = NULL, *dst_dir, *s, *t;
-
-  unlink("/" INSTALL_FILE_LIST);
-  get_file("/media.1/" INSTALL_FILE_LIST, "/" INSTALL_FILE_LIST);
-
-  if(!(f0 = file_read_file("/" INSTALL_FILE_LIST, kf_none))) return;
-
-  config.installfilesread = 1;
-
-  for(f = f0; f; f = f->next) {
-    dst_dir = f->value;
-    if(*dst_dir == '/') dst_dir++;
-    s = strrchr(f->key_str, '/');
-    s = s ? s + 1 : f->key_str;
-    strprintf(&dst, "/%s/%s", dst_dir, s);
-
-    for(s = dst_dir; (t = strchr(s, '/')); s = t + 1) {
-      *t = 0;
-      if(*dst_dir) mkdir(dst_dir, 0755);
-      *t = '/';
-    }
-    mkdir(dst_dir, 0755);
-    unlink(dst);
-    get_file(f->key_str, dst);
-  }
-
-  file_free_file(f0);
-
-  str_copy(&dst, NULL);
-}
 
