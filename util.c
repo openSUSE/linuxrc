@@ -3974,7 +3974,10 @@ void util_set_product_dir(char *prod)
 
   if(prod && *prod) str_copy(&config.product_dir, prod);
 
-  if(!uname(&ubuf)) arch = ubuf.machine;
+  if(!uname(&ubuf)) {
+    arch = ubuf.machine;
+    if(arch[0] == 'i' && arch[2] == '8' && arch[3] == '6' && !arch[4]) arch = "i386";
+  }
 
   strprintf(&config.rootimage, "boot/%s/root", arch);
   strprintf(&config.rescueimage, "boot/%s/rescue", arch);

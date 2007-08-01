@@ -391,7 +391,7 @@ int auto2_find_repo()
     "driverupdate",
     file_name = strdup(new_download()),
     txt_get(TXT_LOADING_UPDATE),
-    URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+    URL_FLAG_UNZIP /* + URL_FLAG_PROGRESS */
   );
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update);
@@ -411,7 +411,7 @@ int auto2_find_repo()
 
   if(dud_count == config.update.count) {
     fprintf(stderr, "No new driver updates found.\n");
-    printf("No new driver updates found.\n");
+    // printf("No new driver updates found.\n");
   }
 
   return 1;
@@ -747,12 +747,12 @@ void auto2_read_repo_files(url_t *url)
   if((f0 = file_read_file(file_list, kf_none))) {
     for(f = f0; f; f = f->next) {
       strprintf(&dst, "/%s/%s", f->value, *f->key_str == '/' ? f->key_str + 1 : f->key_str);
-      url_read_file(url, NULL, f->key_str, dst, NULL, URL_FLAG_PROGRESS);
+      url_read_file(url, NULL, f->key_str, dst, NULL, 0 /* + URL_FLAG_PROGRESS */);
     }
   }
   else {
     for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
-      url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, URL_FLAG_PROGRESS);
+      url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, 0 /* + URL_FLAG_PROGRESS */);
     }
   }
 
