@@ -20,6 +20,7 @@
 #include "net.h"
 #include "slp.h"
 #include "dialog.h"
+#include "display.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -784,7 +785,6 @@ int url_progress(url_data_t *url_data, int stage)
   if(percent > 100) percent = 100;
 
   if(!url_data->label_shown) {
-
     if(with_win) {
       if(url_data->label) {
         strprintf(&buf, "%s", url_data->label);
@@ -832,7 +832,17 @@ int url_progress(url_data_t *url_data, int stage)
   else {
     percent = (url_data->zp_now ?: url_data->p_now) >> 10;
     if(percent > url_data->percent + 100 || url_data->flush) {
-      printf("\x08\x08\x08\x08\x08\x08\x08\x08\x08%6u kB", percent);
+      if(with_win) {
+        strprintf(&buf, "%6u kB", percent);
+        disp_gotoxy(
+          (config.progress_win.x_left + config.progress_win.x_right)/2 - 3,
+          config.progress_win.y_right - 2
+        );
+        disp_write_string(buf);
+      }
+      else {
+        printf("\x08\x08\x08\x08\x08\x08\x08\x08\x08%6u kB", percent);
+      }
       url_data->percent = percent;
     }
   }

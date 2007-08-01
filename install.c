@@ -367,7 +367,7 @@ int inst_choose_source_cb(dia_item_t di)
       break;
   }
 
-  if(err) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+  if(err) dia_message("No repository found", MSGTYPE_ERROR);
 
   return err ? 1 : 0;
 }
@@ -683,12 +683,10 @@ int inst_mount_harddisk()
     str_copy(&path, config.url.install->path);
   }
 
-  do {
-    if(inst_choose_partition(&device, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION))) err = 1;
-    if(!err && dia_input2(txt_get(TXT_ENTER_HD_DIR), &path, 30, 0)) err = 1;
+  if(inst_choose_partition(&device, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION))) err = 1;
+  if(!err && dia_input2(txt_get(TXT_ENTER_HD_DIR), &path, 30, 0)) err = 1;
 
-    if(err) break;
-
+  if(!err) {
     url_free(config.url.install);
     config.url.install = url_set("hd:");
     str_copy(&config.url.install->device, device);
@@ -696,7 +694,7 @@ int inst_mount_harddisk()
     str_copy(&config.url.install->used.device, long_dev(device));
 
     err = auto2_find_repo() ? 0 : 1;
-  } while(err);
+  }
 
   str_copy(&device, NULL);
   str_copy(&path, NULL);
