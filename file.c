@@ -655,7 +655,10 @@ void file_do_info(file_t *f0)
       case key_proxy:
         url_free(config.url.proxy);
         config.url.proxy = url_set(f->value);
-        if(config.url.proxy->scheme == inst_rel) {
+        if(
+          config.url.proxy->scheme == inst_none ||
+          config.url.proxy->scheme == inst_rel
+        ) {
           sprintf(buf, "http://%s", f->value);
           url_free(config.url.proxy);
           config.url.proxy = url_set(buf);

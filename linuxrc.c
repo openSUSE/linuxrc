@@ -242,7 +242,7 @@ int main(int argc, char **argv, char **env)
       if(!win_old) util_disp_done();
       
     }
-    err = inst_start_install_auto();
+    err = inst_start_install();
   }
   else {
     err = 99;
@@ -1007,6 +1007,8 @@ void lxrc_init()
       util_disp_done();
     }
   }
+
+  file_read_info_file("cmdline", kf_cmd);
 
   set_activate_language(config.language);
 

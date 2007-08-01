@@ -333,7 +333,8 @@ url_t *url_set(char *str)
   if((s1 = strchr(s0, ':'))) {
     *s1++ = 0;
 
-    url->scheme = file_sym2num(s0);
+    i = file_sym2num(s0);
+    url->scheme = i >= 0 ? i : inst_none;
 
     if(url->scheme) {
       s0 = s1;
@@ -535,7 +536,7 @@ url_t *url_set(char *str)
   if(config.debug >= 1) {
     fprintf(stderr, "url = %s\n", url->str);
     if(config.debug >= 2) {
-      fprintf(stderr, "  scheme = %s", get_instmode_name(url->scheme));
+      fprintf(stderr, "  scheme = %s (%d)", get_instmode_name(url->scheme), url->scheme);
       if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
       if(url->port) fprintf(stderr, ", port = %u", url->port);
       if(url->path) fprintf(stderr, ", path = \"%s\"", url->path);
@@ -1309,7 +1310,7 @@ int url_find_repo(url_t *url, char *dir)
       !config.url.instsys->scheme
     ) return 0;
 
-    if(url_read_file(url, NULL, "/content", "/content", NULL, URL_FLAG_PROGRESS)) return 0;
+    if(url_read_file(url, NULL, "/content", "/content", NULL, 0)) return 0;
 
     if(config.url.instsys->scheme != inst_rel) return 1;
 

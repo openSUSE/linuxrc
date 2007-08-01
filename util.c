@@ -1232,16 +1232,6 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf,
-    "instmode = %s%s%s [%s], net_config_mask = 0x%x",
-    get_instmode_name(config.instmode),
-    config.instmode == config.instmode_extra ? "" : "/",
-    config.instmode == config.instmode_extra ? "" : get_instmode_name(config.instmode_extra),
-    get_instmode_name(config.insttype),
-    net_config_mask()
-  );
-  slist_append_str(&sl0, buf);
-
   sprintf(buf, "flags = ");
   add_flag(&sl0, buf, config.debug, "debug");
   add_flag(&sl0, buf, config.test, "test");
@@ -1271,8 +1261,23 @@ void util_status_info()
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
   if(*buf) slist_append_str(&sl0, buf);
 
+  sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
+  slist_append_str(&sl0, buf);
+
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
   slist_append_str(&sl0, buf);
+
+  if((s = url_print(config.url.install, 0))) {
+    slist_append_str(&sl0, "install url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
+
+  if((s = url_print(config.url.instsys, 0))) {
+    slist_append_str(&sl0, "instsys url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
 
   if(config.autoyast) {
     sprintf(buf, "autoyast = %s", config.autoyast);
@@ -1318,14 +1323,11 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "proxy = %s", inet2print(&config.net.proxy));
-  if(config.net.proxyport) {
-    sprintf(buf + strlen(buf), ", proxyport = %d", config.net.proxyport);
+  if((s = url_print(config.url.proxy, 0))) {
+    slist_append_str(&sl0, "proxy url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
   }
-  if(config.net.proxyproto) {
-    sprintf(buf + strlen(buf), ", proxyproto = %s", get_instmode_name(config.net.proxyproto));
-  }
-  slist_append_str(&sl0, buf);
 
   sprintf(buf, "server = %s", inet2print(&config.net.server));
   slist_append_str(&sl0, buf);

@@ -301,6 +301,13 @@ int inst_choose_display_cb(dia_item_t di)
 #endif
 
 
+/*
+ * Ask for repo location.
+ *
+ * return:
+ *   0: ok
+ *   1: abort
+ */
 int inst_choose_source()
 {
   dia_item_t di;
@@ -311,20 +318,27 @@ int inst_choose_source()
     di_none
   };
 
-  inst_umount();
-
   if(di_inst_choose_source_last == di_none) {
-    if(config.insttype == inst_net) di_inst_choose_source_last = di_source_net;
-    if(config.instmode == inst_hd) di_inst_choose_source_last = di_source_hd;
+    di_inst_choose_source_last = di_source_cdrom;
+    if(config.url.install) {
+      if(config.url.install->is.network) {
+        di_inst_choose_source_last = di_source_net;
+      }
+      else if(!config.url.install->is.cdrom) {
+        di_inst_choose_source_last = di_source_hd;
+      }
+    }
   }
 
   di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
 
-  return di == di_none ? -1 : 0;
+  return di == di_none ? 1 : 0;
 }
 
 
 /*
+ * Repo location menu.
+ *
  * return values:
  * -1    : abort (aka ESC)
  *  0    : ok
@@ -332,7 +346,7 @@ int inst_choose_source()
  */
 int inst_choose_source_cb(dia_item_t di)
 {
-  int error = FALSE;
+  int err = 0;
   char tmp[200];
 
   di_inst_choose_source_last = di;
@@ -340,34 +354,34 @@ int inst_choose_source_cb(dia_item_t di)
   switch(di) {
     case di_source_cdrom:
       str_copy(&config.serverdir, NULL);
-      error = inst_mount_cdrom(0);
-      if(error) {
+      err = inst_mount_cdrom(0);
+      if(err) {
         sprintf(tmp, txt_get(TXT_INSERT_CD), 1);
         dia_message(tmp, MSGTYPE_INFOENTER);
-        error = inst_mount_cdrom(1);
+        err = inst_mount_cdrom(1);
       }
       break;
 
     case di_source_net:
-      error = inst_choose_netsource();
+      err = inst_choose_netsource();
       break;
 
     case di_source_hd:
-      error = inst_mount_harddisk();
+      err = inst_mount_harddisk();
       break;
 
     default:
       break;
   }
 
-  if(!error && di != di_source_cdrom) {
-    error = inst_check_instsys();
-    if(error) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+  if(!err && di != di_source_cdrom) {
+    err = inst_check_instsys();
+    if(err) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
   }
 
-  if(error) inst_umount();
+  if(err) inst_umount();
 
-  return error ? 1 : 0;
+  return err ? 1 : 0;
 }
 
 
@@ -670,27 +684,50 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
 }
 
 
+/*
+ * Select and mount disk repo.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
 int inst_mount_harddisk()
 {
-  int rc = 0;
+  int err = 0;
+  char *device = NULL, *path = NULL;
 
-  set_instmode(inst_hd);
+  if(config.net.do_setup && net_config()) return 1;
 
-  if(config.net.do_setup && (rc = net_config())) return rc;
+  if(
+    config.url.install &&
+    (
+      config.url.install->scheme == inst_disk ||
+      config.url.install->scheme == inst_hd
+    )
+  ) {
+    str_copy(&device, config.url.install->device);
+    str_copy(&path, config.url.install->path);
+  }
 
   do {
-    if((rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION)))) return rc;
-    if((rc = dia_input2(txt_get(TXT_ENTER_HD_DIR), &config.serverdir, 30, 0))) return rc;
+    if(inst_choose_partition(&device, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION))) err = 1;
+    if(!err && dia_input2(txt_get(TXT_ENTER_HD_DIR), &path, 30, 0)) err = 1;
 
-    if(config.partition) {
-      rc = do_mount_disk(long_dev(config.partition), 1);
-    }
-    else {
-      rc = -1;
-    }
-  } while(rc);
+    if(err) break;
 
-  return 0;
+    url_free(config.url.install);
+    config.url.install = url_set("hd:");
+    str_copy(&config.url.install->device, device);
+    str_copy(&config.url.install->path, path);
+    str_copy(&config.url.install->used.device, long_dev(device));
+
+    err = auto2_find_repo();
+  } while(err);
+
+  str_copy(&device, NULL);
+  str_copy(&path, NULL);
+
+  return err;
 }
 
 
@@ -846,12 +883,24 @@ int inst_check_instsys()
  *   0: ok
  *   1: err
  */
-int inst_start_install_auto()
+int inst_start_install()
 {
   int err = 0;
 
   util_splash_bar(60, SPLASH_60);
 
+  if(config.manual) {
+    util_umount_all();
+    util_clear_downloads();
+
+    url_free(config.url.instsys);
+    config.url.instsys = url_set(config.rescue ? config.rescueimage : config.rootimage);
+
+    if(inst_choose_source()) return 1;
+  }
+
+  LXRC_WAIT
+  
   if(config.rescue) {
     /* get rid of repo */
     url_umount(config.url.install);
@@ -860,8 +909,10 @@ int inst_start_install_auto()
   }
 
 #if defined(__s390__) || defined(__s390x__)
-  if((config.net.setup & NS_DISPLAY))
-    if((err = inst_choose_display())) return err;
+  if(
+    (config.net.setup & NS_DISPLAY) &&
+    inst_choose_display()
+  ) return 1;
 #endif
   
   LXRC_WAIT
@@ -881,164 +932,6 @@ int inst_start_install_auto()
   }
 
   return err;
-}
-
-
-int inst_start_install()
-{
-  int i, rc, update_rd;
-  char *buf = NULL;
-
-  if(
-    !config.rootimage2 &&
-    current_language()->xfonts
-  ) {
-    str_copy(&config.rootimage2, ".fonts");
-  }
-
-  if(config.manual) {
-    if((rc = inst_choose_source())) return rc;
-  }
-  else {
-    fprintf(stderr, "going for automatic install\n");
-  }
-  
-#if defined(__s390__) || defined(__s390x__)
-  if(config.manual || (config.net.setup & NS_DISPLAY))
-    if((rc = inst_choose_display())) return rc;
-#endif
-  
-
-  str_copy(&config.instsys, NULL);
-  str_copy(&config.instsys2, NULL);
-
-  if(config.instmode == inst_exec) {
-    util_splash_bar(60, SPLASH_60);
-    return inst_execute_yast();
-  }
-
-  if(config.use_ramdisk) {
-    config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
-    // maybe: inst_umount(); ???
-    if(config.inst_ramdisk < 0) return -1;
-
-    if(config.rescue) {
-      inst_umount();
-
-      root_set_root(config.ramdisk[config.inst_ramdisk].dev);
-
-      util_debugwait("rescue system loaded");
-
-      return 0;
-    }
-
-    rc = ramdisk_mount(config.inst_ramdisk, config.mountpoint.instsys);
-    if(rc) return rc;
-    str_copy(&config.instsys, config.mountpoint.instsys);
-
-    if(config.rootimage2) {
-      strprintf(&buf, "%s%s", inst_rootimage_tm, config.rootimage2);
-      config.noerrors = 1;
-      config.inst2_ramdisk = load_image(buf, config.instmode, txt_get(TXT_LOADING_FONTS));
-      config.noerrors = 0;
-      if(config.inst2_ramdisk >= 0) {
-        if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
-          str_copy(&config.instsys2, config.mountpoint.instsys2);
-        }
-      }
-    }
-  }
-  else if(util_check_exist(inst_rootimage_tm) != 'd') {
-    rc = util_mount_ro(inst_rootimage_tm, config.mountpoint.instsys);
-    if(rc) return rc;
-    str_copy(&config.instsys, config.mountpoint.instsys);
-
-    if(config.rootimage2) {
-      strprintf(&buf, "%s%s", inst_rootimage_tm, config.rootimage2);
-      if(!util_mount_ro(buf, config.mountpoint.instsys2)) {
-        str_copy(&config.instsys2, config.mountpoint.instsys2);
-      }
-      else {
-        config.noerrors = 1;
-        config.inst2_ramdisk = load_image(buf, config.instmode, txt_get(TXT_LOADING_FONTS));
-        config.noerrors = 0;
-        if(config.inst2_ramdisk >= 0) {
-          if(!ramdisk_mount(config.inst2_ramdisk, config.mountpoint.instsys2)) {
-            str_copy(&config.instsys2, config.mountpoint.instsys2);
-          }
-        }
-      }
-    }
-  }
-  else {
-    strprintf(&buf, "%s%s", config.mountpoint.instdata, config.installdir);
-    str_copy(&config.instsys, buf);
-  }
-
-  /* load some extra files, if they exist */
-
-  if(!config.zen) {
-    /* inly if we did not already read them in inst_check_instsys() */
-    if(!config.installfilesread) {
-      read_install_files();
-      if(!config.installfilesread) {
-        get_file("/content", "/content");
-        get_file("/media.1/info.txt", "/info.txt");
-        get_file("/media.1/license.zip", "/license.zip");
-        get_file("/part.info", "/part.info");
-        get_file("/control.xml", "/control.xml");
-      }
-    }
-  }
-  else if(
-    config.zenconfig &&
-    config.insttype != inst_hd &&
-    config.insttype != inst_cdrom
-  ) {
-    strprintf(&buf, "/%s", config.zenconfig);
-    get_file(buf, "/settings.txt");
-    if(config.zen == 2) {
-      file_read_info_file("file:/settings.txt", kf_cfg);
-      fprintf(stderr, "read /settings.txt\n");
-    }
-  }
-
-  /* remove it if not needed, might be a leftover from an earlier install attempt */
-  if(config.insttype == inst_net) unlink("/" SP_FILE);
-
-  /* look for driver update image; load and apply it */
-  i = 1;
-  if(
-    config.instmode == inst_ftp ||
-    config.instmode == inst_http ||
-    config.instmode == inst_tftp
-  ) {
-    strprintf(&buf, "%s/driverupdate", config.serverdir ?: "");
-  }
-  else {
-    strprintf(&buf, "%s/driverupdate", config.mountpoint.instdata);
-    /* look for it in advance */
-    i = util_check_exist(buf);
-  }
-
-  if(i) {
-    config.noerrors = 1;
-    update_rd = load_image(buf, config.instmode, txt_get(TXT_LOADING_UPDATE));
-    config.noerrors = 0;
-
-    if(update_rd >= 0) {
-      i = ramdisk_mount(update_rd, config.mountpoint.update);
-      if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(config.instmode));
-      ramdisk_free(update_rd);
-      if(!i) util_do_driver_updates();
-    }
-  }
-
-  free(buf);
-
-  util_splash_bar(60, SPLASH_60);
-
-  return inst_execute_yast();
 }
 
 
@@ -1385,7 +1278,7 @@ int inst_commit_install()
       reboot(RB_AUTOBOOT);
 #endif
     }
-    err = -1;
+    err = 1;
   }
 
   return err;
