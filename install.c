@@ -54,13 +54,9 @@
 #define MNT_DETACH	(1 << 1)
 #endif
 
-static char  inst_rootimage_tm [MAX_FILENAME];
-
+static int inst_mount_cdrom(void);
 static int inst_mount_harddisk(void);
-static int   inst_try_cdrom           (char *device_tv);
-static int   inst_mount_cdrom         (int show_err);
 static int   inst_mount_nfs           (void);
-static int   inst_start_rescue        (void);
 static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
@@ -90,6 +86,13 @@ static dia_item_t di_inst_choose_display_last = di_none;
 #endif
 
 
+/*
+ * Menu: install, system start, rescue
+ *
+ * return values:
+ *   0 : ok
+ *   1 : abort
+ */
 int inst_menu()
 {
   dia_item_t di;
@@ -111,34 +114,29 @@ int inst_menu()
 
 /*
  * return values:
- * -1    : abort (aka ESC)
- *  0    : ok
- *  other: stay in menu
+ *   -1    : abort (aka ESC)
+ *    0    : ok
+ *    other: stay in menu
  */
 int inst_menu_cb(dia_item_t di)
 {
-  int error = 0;
-  int rc = 1;
+  int err = 0;
 
   di_inst_menu_last = di;
 
   switch(di) {
     case di_inst_install:
       config.rescue = 0;
-      error = inst_start_install();
-     /*
-      * Back to main menu.
-      */
-      rc = -1;
+      err = inst_start_install();
       break;
 
     case di_inst_system:
-      error = root_boot_system();
+      err = root_boot_system();
       break;
 
     case di_inst_rescue:
       config.rescue = 1;
-      error = inst_start_rescue();
+      err = inst_start_install();
       break;
 
     default:
@@ -147,12 +145,17 @@ int inst_menu_cb(dia_item_t di)
 
   config.redraw_menu = 0;
 
-  if(!error) rc = 0;
-
-  return rc;
+  return err ? 1 : 0;
 }
 
 
+/*
+ * Menu: network protocol
+ *
+ * return values:
+ *   0 : ok
+ *   1 : error
+ */
 int inst_choose_netsource()
 {
   dia_item_t di;
@@ -164,8 +167,6 @@ int inst_choose_netsource()
     di_netsource_tftp,
     di_none
   };
-
-  inst_umount();
 
   if(!(config.test || config.net.cifs.binary)) items[3] = di_skip;
 
@@ -195,7 +196,7 @@ int inst_choose_netsource()
 
   di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
-  return di == di_none ? -1 : 0;
+  return di == di_none ? 1 : 0;
 }
 
 
@@ -339,24 +340,17 @@ int inst_choose_source()
  */
 int inst_choose_source_cb(dia_item_t di)
 {
-  int err = 0;
-  char tmp[200];
+  int err = 0, rc = 0;
 
   di_inst_choose_source_last = di;
 
   switch(di) {
     case di_source_cdrom:
-      str_copy(&config.serverdir, NULL);
-      err = inst_mount_cdrom(0);
-      if(err) {
-        sprintf(tmp, txt_get(TXT_INSERT_CD), 1);
-        dia_message(tmp, MSGTYPE_INFOENTER);
-        err = inst_mount_cdrom(1);
-      }
+      err = inst_mount_cdrom();
       break;
 
     case di_source_net:
-      err = inst_choose_netsource();
+      rc = inst_choose_netsource();
       break;
 
     case di_source_hd:
@@ -367,58 +361,9 @@ int inst_choose_source_cb(dia_item_t di)
       break;
   }
 
-  if(err) dia_message("No repository found", MSGTYPE_ERROR);
-
-  return err ? 1 : 0;
-}
-
-
-int inst_try_cdrom(char *dev)
-{
-
-  return 0;
-}
-
-
-int inst_mount_cdrom(int show_err)
-{
-  int rc;
-  slist_t *sl;
-  window_t win;
-
-  if(config.instmode_extra == inst_cdwithnet) {
-    rc = net_config();
-  }
-  else {
-    set_instmode(inst_cdrom);
-
-    if(config.net.do_setup && (rc = net_config())) return rc;
-  }
-
-  dia_info(&win, txt_get(TXT_TRY_CD_MOUNT));
-
-  rc = 1;
-
-  if(config.cdrom) rc = inst_try_cdrom(config.cdrom);
-
-  if(rc) {
-    if(config.cdromdev) rc = inst_try_cdrom(config.cdromdev);
-    if(rc) {
-      for(sl = config.cdroms; sl; sl = sl->next) {
-        if(!(rc = inst_try_cdrom(sl->key))) {
-          str_copy(&config.cdrom, sl->key);
-          break;
-        }
-      }
-    }
-  }
-
-  win_close(&win);
-
-  if(rc) {
-    if(show_err) {
-      dia_message(txt_get(rc == 2 ? TXT_RI_NOT_FOUND : TXT_ERROR_CD_MOUNT), MSGTYPE_ERROR);
-     }
+  if(err) {
+    dia_message("No repository found", MSGTYPE_ERROR);
+    rc = 1;
   }
 
   return rc;
@@ -659,6 +604,40 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
 
 
 /*
+ * Select and mount cdrom repo.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int inst_mount_cdrom()
+{
+  int err = 0;
+  char *device = NULL;
+
+  if(config.net.do_setup && net_config()) return 1;
+
+  if(
+    config.url.install &&
+    config.url.install->scheme == inst_cdrom
+  ) {
+    str_copy(&device, config.url.install->device);
+  }
+
+  url_free(config.url.install);
+  config.url.install = url_set("cd:");
+  str_copy(&config.url.install->device, device);
+  str_copy(&config.url.install->used.device, long_dev(device));
+
+  err = auto2_find_repo() ? 0 : 1;
+
+  str_copy(&device, NULL);
+
+  return err;
+}
+
+
+/*
  * Select and mount disk repo.
  *
  * return:
@@ -798,8 +777,6 @@ int inst_start_install()
   ) return 1;
 #endif
   
-  LXRC_WAIT
-
   err = inst_execute_yast();
 
   util_umount_all();
@@ -815,27 +792,6 @@ int inst_start_install()
   }
 
   return err;
-}
-
-
-/* we might as well just use inst_start_install() instead... */
-int inst_start_rescue()
-{
-  int rc;
-
-  if((rc = inst_choose_source())) return rc;
-
-  config.inst_ramdisk = load_image(inst_rootimage_tm, config.instmode, txt_get(TXT_LOADING_RESCUE));
-
-  inst_umount();
-
-  if(config.inst_ramdisk >= 0) {
-    root_set_root(config.ramdisk[config.inst_ramdisk].dev);
-  }
-
-  util_debugwait("rescue system loaded");
-
-  return config.inst_ramdisk < 0 ? -1 : 0;
 }
 
 
