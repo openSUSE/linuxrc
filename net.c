@@ -233,13 +233,13 @@ void net_stop()
   if(config.net.keep) return;
 
   if(config.test) {
-    config.net.is_configured = 0;
+    config.net.is_configured = nc_none;
     return;
   }
 
   if(config.net.dhcp_active) {
     net_dhcp_stop();
-    config.net.is_configured = 0;
+    config.net.is_configured = nc_none;
   }
 
   if(!config.net.is_configured) return;
@@ -257,7 +257,7 @@ void net_stop()
 
   slist_free(sl0);
 
-  config.net.is_configured = 0;
+  config.net.is_configured = nc_none;
 }
 
 
@@ -394,14 +394,20 @@ int net_activate()
     struct sockaddr_in  sockaddr_ri;
     int                 error_ii = FALSE;
 
-    if(config.test || !config.net.ifconfig || config.net.dhcp_active || config.net.keep) return 0;
+    if(!config.net.ifconfig || config.net.dhcp_active || config.net.keep) return 0;
+
+    if(config.test) {
+      config.net.is_configured = nc_static;
+
+      return 0;
+    }
 
     if(!config.net.device) {
       fprintf(stderr, "net_activate: no network interface!\n");
       return 1;
     }
 
-    config.net.is_configured = 0;
+    config.net.is_configured = nc_none;
 
     net_apply_ethtool(config.net.device, config.net.hwaddr);
 
@@ -532,7 +538,7 @@ int net_activate()
   close(socket_ii);
 
   if(!error_ii) {
-    config.net.is_configured = 1;
+    config.net.is_configured = nc_static;
     if(config.net.ifup_wait) sleep(config.net.ifup_wait);
   }
 

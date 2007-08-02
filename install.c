@@ -54,9 +54,13 @@
 #define MNT_DETACH	(1 << 1)
 #endif
 
-static int inst_mount_cdrom(void);
-static int inst_mount_harddisk(void);
-static int   inst_mount_nfs           (void);
+static int inst_do_cdrom(void);
+static int inst_do_harddisk(void);
+int inst_do_network(instmode_t scheme);
+static int inst_do_smb(void);
+static int inst_do_ftp(void);
+static int inst_do_http(void);
+static int inst_do_tftp(void);
 static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
@@ -70,11 +74,7 @@ static int   inst_choose_display_cb   (dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
-static int   inst_mount_smb           (void);
-static int   inst_do_ftp              (void);
-static int   inst_do_http             (void);
 static int   inst_get_proxysetup      (void);
-static int   inst_do_tftp             (void);
 static int choose_dud(char **dev);
 static void  inst_swapoff             (void);
 
@@ -208,38 +208,38 @@ int inst_choose_netsource()
  */
 int inst_choose_netsource_cb(dia_item_t di)
 {
-  int error = FALSE;
+  int err = 0;
 
   di_inst_choose_netsource_last = di;
 
   switch(di) {
     case di_netsource_nfs:
-      error = inst_mount_nfs();
+      err = inst_do_network(inst_nfs);
       break;
 
     case di_netsource_smb:
-      error = inst_mount_smb();
+      err = inst_do_smb();
       break;
 
     case di_netsource_ftp:
-      error = inst_do_ftp();
+      err = inst_do_ftp();
       break;
 
     case di_netsource_http:
-      error = inst_do_http();
+      err = inst_do_http();
       break;
 
     case di_netsource_tftp:
-      error = inst_do_tftp();
+      err = inst_do_tftp();
       break;
 
     default:
       break;
   }
 
-  if(error) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
+  if(err) dia_message("No repository found", MSGTYPE_ERROR);
 
-  return error ? 1 : 0;
+  return err ? 1 : 0;
 }
 
 #if defined(__s390__) || defined(__s390x__)  
@@ -346,7 +346,7 @@ int inst_choose_source_cb(dia_item_t di)
 
   switch(di) {
     case di_source_cdrom:
-      err = inst_mount_cdrom();
+      err = inst_do_cdrom();
       break;
 
     case di_source_net:
@@ -354,7 +354,7 @@ int inst_choose_source_cb(dia_item_t di)
       break;
 
     case di_source_hd:
-      err = inst_mount_harddisk();
+      err = inst_do_harddisk();
       break;
 
     default:
@@ -610,7 +610,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
  *   0: ok
  *   1: failed
  */
-int inst_mount_cdrom()
+int inst_do_cdrom()
 {
   int err = 0;
   char *device = NULL;
@@ -644,7 +644,7 @@ int inst_mount_cdrom()
  *   0: ok
  *   1: failed
  */
-int inst_mount_harddisk()
+int inst_do_harddisk()
 {
   int err = 0;
   char *device = NULL, *path = NULL;
@@ -682,25 +682,72 @@ int inst_mount_harddisk()
 }
 
 
-int inst_mount_nfs()
+/*
+ * Select and mount network repo.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int inst_do_network(instmode_t scheme)
 {
-  int rc;
-  char text[256];
+  int i, err = 0;
+  char *buf = NULL, *path = NULL,
+    *share = NULL, *domain = NULL, *user = NULL, *password = NULL;
+  char **to_free[] = {
+    &buf, &path, &share, &domain, &user, &password
+  };
+  inet_t server = {};
 
-  set_instmode(inst_nfs);
+  if(net_config()) return 1;
 
-  if((rc = net_config())) return rc;
-
-  if(config.win) {	/* ###### check really needed? */
-    sprintf(text, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(text, &config.net.server, 1))) return rc;
-    if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
+  if(config.url.install) {
+    str_copy(&path, config.url.install->path);
+    name2inet(&server, config.url.install->server);
+    str_copy(&share, config.url.install->share);
+    str_copy(&domain, config.url.install->domain);
+    str_copy(&user, config.url.install->user);
+    str_copy(&password, config.url.install->password);
   }
-  return do_mount_nfs();
+
+  strprintf(&buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(scheme));
+  if(net_get_address(buf, &server, 1)) err = 1;
+  if(!err && dia_input2(txt_get(TXT_INPUT_DIR), &path, 30, 0)) err = 1;
+
+  if(!err) {
+    url_free(config.url.install);
+
+    strprintf(&buf, "%s://%s", get_instmode_name_up(scheme), server.name);
+    config.url.install = url_set(buf);
+
+    memcpy(&config.url.install->used.server, &server, sizeof config.url.install->used.server);
+    memset(&server, 0, sizeof server);
+
+    str_copy(&config.url.install->device, config.net.device);
+    str_copy(&config.url.install->used.device, config.net.device);
+
+    str_copy(&config.url.install->path, path);
+
+    if(scheme == inst_smb) {
+      str_copy(&config.url.install->share, share);
+      str_copy(&config.url.install->domain, domain);
+    }
+
+    if(scheme == inst_http || scheme == inst_ftp || scheme == inst_smb) {
+      str_copy(&config.url.install->user, user);
+      str_copy(&config.url.install->password, password);
+    }
+
+    err = auto2_find_repo() ? 0 : 1;
+  }
+
+  for(i = 0; i < sizeof to_free / sizeof *to_free; i++) str_copy(*to_free, NULL);
+
+  return err;
 }
 
 
-int inst_mount_smb()
+int inst_do_smb()
 {
   int rc;
   char buf[256];
@@ -735,6 +782,115 @@ int inst_mount_smb()
   }
 
   return do_mount_smb();
+}
+
+
+int inst_do_ftp()
+{
+  int rc;
+  window_t win;
+  char buf[256];
+
+  set_instmode(inst_ftp);
+
+  if((rc = net_config())) return rc;
+
+  do {
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
+    if((rc = inst_get_proxysetup())) return rc;
+
+    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
+    dia_info(&win, buf);
+    rc = net_open(NULL);
+    win_close(&win);
+
+    if(rc < 0) {
+      util_print_net_error();
+    }
+    else {
+      rc = 0;
+    }
+  }
+  while(rc);
+
+  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
+  util_truncate_dir(config.serverdir);
+
+  return 0;
+}
+
+
+int inst_do_http()
+{
+  int rc;
+  window_t win;
+  char buf[256];
+
+  set_instmode(inst_http);
+
+  if((rc = net_config())) return rc;
+
+  do {
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
+    if((rc = inst_get_proxysetup())) return rc;
+
+    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
+    dia_info(&win, buf);
+    rc = net_open(NULL);
+    win_close(&win);
+
+    if(rc < 0) {
+      util_print_net_error();
+    }
+    else {
+      rc = 0;
+    }
+  }
+  while(rc);
+
+  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
+  util_truncate_dir(config.serverdir);
+
+  return 0;
+}
+
+
+int inst_do_tftp()
+{
+  int rc;
+  window_t win;
+  char buf[256];
+
+  set_instmode(inst_tftp);
+
+  config.net.proxyport = 0;
+
+  if((rc = net_config())) return rc;
+
+  do {
+    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
+    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
+
+    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
+    dia_info(&win, buf);
+    rc = net_open(NULL);
+    win_close(&win);
+
+    if(rc < 0) {
+      util_print_net_error();
+    }
+    else {
+      rc = 0;
+    }
+  }
+  while(rc);
+
+  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
+  util_truncate_dir(config.serverdir);
+
+  return 0;
 }
 
 
@@ -1144,78 +1300,6 @@ int inst_umount()
 }
 
 
-int inst_do_ftp()
-{
-  int rc;
-  window_t win;
-  char buf[256];
-
-  set_instmode(inst_ftp);
-
-  if((rc = net_config())) return rc;
-
-  do {
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-    if((rc = inst_get_proxysetup())) return rc;
-
-    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
-    dia_info(&win, buf);
-    rc = net_open(NULL);
-    win_close(&win);
-
-    if(rc < 0) {
-      util_print_net_error();
-    }
-    else {
-      rc = 0;
-    }
-  }
-  while(rc);
-
-  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
-  util_truncate_dir(config.serverdir);
-
-  return 0;
-}
-
-
-int inst_do_http()
-{
-  int rc;
-  window_t win;
-  char buf[256];
-
-  set_instmode(inst_http);
-
-  if((rc = net_config())) return rc;
-
-  do {
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-    if((rc = inst_get_proxysetup())) return rc;
-
-    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
-    dia_info(&win, buf);
-    rc = net_open(NULL);
-    win_close(&win);
-
-    if(rc < 0) {
-      util_print_net_error();
-    }
-    else {
-      rc = 0;
-    }
-  }
-  while(rc);
-
-  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
-  util_truncate_dir(config.serverdir);
-
-  return 0;
-}
-
-
 int inst_get_proxysetup()
 {
   int rc;
@@ -1276,43 +1360,6 @@ int inst_get_proxysetup()
     name2inet(&config.net.proxy, "");
     config.net.proxyport = 0;
   }
-
-  return 0;
-}
-
-
-int inst_do_tftp()
-{
-  int rc;
-  window_t win;
-  char buf[256];
-
-  set_instmode(inst_tftp);
-
-  config.net.proxyport = 0;
-
-  if((rc = net_config())) return rc;
-
-  do {
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-
-    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
-    dia_info(&win, buf);
-    rc = net_open(NULL);
-    win_close(&win);
-
-    if(rc < 0) {
-      util_print_net_error();
-    }
-    else {
-      rc = 0;
-    }
-  }
-  while(rc);
-
-  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
-  util_truncate_dir(config.serverdir);
 
   return 0;
 }
@@ -1803,67 +1850,6 @@ int do_mount_smb()
   }
   else {
     fprintf(stderr, "smb: mount ok\n");
-  }
-
-  if(!rc) config.sourcetype = file_type == 'r' ? 1 : 0;
-
-  str_copy(&buf, NULL);
-
-  return rc;
-}
-
-
-/*
- * Mount disk install source.
- *
- * If config.serverdir points to a file, loop-mount file.
- *
- * disk_type: 0 = cd, 1 = hd (only used for error message)
- */
-int do_mount_disk(char *dev, int disk_type)
-{
-  int rc = 0, file_type = 0;
-  char *buf = NULL, *module, *type;
-  char *dir;
-
-  util_truncate_dir(config.serverdir);
-
-  dir = config.serverdir;
-  if(!dir || !*dir || !strcmp(dir, "/")) dir = NULL;
-
-  /* load fs module if necessary */
-  type = util_fstype(dev, &module);
-  if(module) mod_modprobe(module, NULL);
-
-  if(!type || !strcmp(type, "swap")) rc = -1;
-
-  mkdir(config.mountpoint.extra, 0755);
-
-  if(!rc) {
-    rc = util_mount_ro(dev, dir ? config.mountpoint.extra : config.mountpoint.instdata);
-  }
-
-  if(rc) {
-    fprintf(stderr, "disk: %s: mount failed\n", dev);
-    if(config.win) dia_message(txt_get(disk_type ? TXT_ERROR_HD_MOUNT : TXT_ERROR_CD_MOUNT), MSGTYPE_ERROR);
-  }
-  else {
-    if(dir) {
-      config.extramount = 1;
-      strprintf(&buf, "%s/%s", config.mountpoint.extra, dir);
-      file_type = util_check_exist(buf);
-      rc = file_type ? util_mount_ro(buf, config.mountpoint.instdata) : -1;
-
-      if(rc) {
-        fprintf(stderr, "disk: %s: not found\n", dir);
-        if(config.win) dia_message(txt_get(TXT_RI_NOT_FOUND), MSGTYPE_ERROR);
-        inst_umount();
-      }
-    }
-
-    if(!rc) {
-      fprintf(stderr, "disk: %s: mount ok\n", dev);
-    }
   }
 
   if(!rc) config.sourcetype = file_type == 'r' ? 1 : 0;
