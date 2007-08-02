@@ -43,7 +43,6 @@
 #include "linuxrc.h"
 #include "auto2.h"
 #include "lsh.h"
-#include "multiple_info.h"
 #include "mkdevs.h"
 #include "scsi_rename.h"
 #include "hotplug.h"
@@ -85,7 +84,6 @@ static void lxrc_makelinks(char *name);
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
 int rmmod_main(int argc, char **argv);
-int smbmnt_main(int argc, char **argv);
 
 static struct {
   char *name;
@@ -96,7 +94,6 @@ static struct {
   { "mkdevs",      mkdevs_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
-  { "smbmnt",      smbmnt_main           },
   { "mount",       util_mount_main       },
   { "umount",      util_umount_main      },
   { "cat",         util_cat_main         },
@@ -116,7 +113,6 @@ static struct {
   { "bootpc",      util_bootpc_main      },
   { "swapon",      util_swapon_main      },
   { "swapoff",     util_swapoff_main     },
-  { "freeramdisk", util_freeramdisk_main },
   { "raidautorun", util_raidautorun_main },
   { "free",        util_free_main        },
   { "wget",        util_wget_main        },

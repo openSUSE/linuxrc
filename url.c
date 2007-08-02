@@ -77,6 +77,7 @@ void url_read(url_data_t *url_data)
 
   str_copy(&proxy_url, url_print(config.url.proxy, 1));
   if(proxy_url) {
+    if(config.debug >= 2) fprintf(stderr, "using proxy %s\n", proxy_url);
     name2inet(&config.url.proxy->used.server, config.url.proxy->server);
     if(net_check_address2(&config.url.proxy->used.server, 1)) {
       snprintf(url_data->err_buf, url_data->err_buf_len, "invalid proxy address: %s", config.url.proxy->used.server.name);

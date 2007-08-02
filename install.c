@@ -43,7 +43,6 @@
 #include "keyboard.h"
 #include "file.h"
 #include "info.h"
-#include "ftp.h"
 #include "install.h"
 #include "settings.h"
 #include "auto2.h"
@@ -57,10 +56,6 @@
 static int inst_do_cdrom(void);
 static int inst_do_harddisk(void);
 int inst_do_network(instmode_t scheme);
-static int inst_do_smb(void);
-static int inst_do_ftp(void);
-static int inst_do_http(void);
-static int inst_do_tftp(void);
 static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
@@ -74,7 +69,6 @@ static int   inst_choose_display_cb   (dia_item_t di);
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
-static int   inst_get_proxysetup      (void);
 static int choose_dud(char **dev);
 static void  inst_swapoff             (void);
 
@@ -218,19 +212,19 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
 
     case di_netsource_smb:
-      err = inst_do_smb();
+      err = inst_do_network(inst_smb);
       break;
 
     case di_netsource_ftp:
-      err = inst_do_ftp();
+      err = inst_do_network(inst_ftp);
       break;
 
     case di_netsource_http:
-      err = inst_do_http();
+      err = inst_do_network(inst_http);
       break;
 
     case di_netsource_tftp:
-      err = inst_do_tftp();
+      err = inst_do_network(inst_tftp);
       break;
 
     default:
@@ -691,16 +685,20 @@ int inst_do_harddisk()
  */
 int inst_do_network(instmode_t scheme)
 {
-  int i, err = 0;
-  char *buf = NULL, *path = NULL,
-    *share = NULL, *domain = NULL, *user = NULL, *password = NULL;
+  int i, err = 0, proxy_port = 0;
+  unsigned u;
+  char *s;
+  char *buf = NULL, *buf2 = NULL, *path = NULL, *share = NULL, *domain = NULL,
+    *user = NULL, *password = NULL, *proxy_user = NULL, *proxy_password = NULL;
   char **to_free[] = {
-    &buf, &path, &share, &domain, &user, &password
+    &buf, &buf2, &path, &share, &domain, &user, &password, &proxy_user, &proxy_password
   };
-  inet_t server = {};
+  inet_t server = {}, proxy = {};
 
+  /* setup network */
   if(net_config()) return 1;
 
+  /* get current values */
   if(config.url.install) {
     str_copy(&path, config.url.install->path);
     name2inet(&server, config.url.install->server);
@@ -710,14 +708,151 @@ int inst_do_network(instmode_t scheme)
     str_copy(&password, config.url.install->password);
   }
 
+  /* server name */
   strprintf(&buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(scheme));
   if(net_get_address(buf, &server, 1)) err = 1;
+
+  /* proxy setup */
+  if(!err && (scheme == inst_http || scheme == inst_ftp)) {
+
+    /* get current proxy values*/
+    if(config.url.proxy) {
+      proxy_port = config.url.proxy->port;
+      name2inet(&proxy, config.url.proxy->server);
+      str_copy(&proxy_user, config.url.proxy->user);
+      str_copy(&proxy_password, config.url.proxy->password);
+    }
+
+    strprintf(&buf, txt_get(TXT_WANT_PROXY), get_instmode_name_up(inst_http));
+    i = dia_yesno(buf, NO);
+    if(i == ESCAPE) {
+      err = 1;
+    }
+    else if(i == YES) {
+      /* new proxy */
+      strprintf(&buf, txt_get(TXT_ENTER_PROXY), get_instmode_name_up(inst_http));
+      if(net_get_address(buf, &proxy, 1)) err = 1;
+
+      if(!err) {
+        strprintf(&buf2, "%u", proxy_port);
+        strprintf(&buf, txt_get(TXT_ENTER_PROXYPORT), get_instmode_name_up(inst_http));
+        if(dia_input2(buf, &buf2, 6, 0)) err = 1;
+        if(!err) {
+          u = strtoul(buf2, &s, 0);
+          if(*s) {
+            dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+            err = 1;
+          }
+          else {
+            proxy_port = u;
+          }
+        }
+      }
+
+      /* proxy user, password */
+      if(!err) {
+        i = dia_yesno("Do you need a username and password to access the proxy?", NO);
+
+        if(i == ESCAPE) {
+          err = 1;
+        }
+        else {
+          if(i == NO) {
+            str_copy(&proxy_user, NULL);
+            str_copy(&proxy_password, NULL);
+          }
+          else {
+            strprintf(&buf, txt_get(TXT_ENTER_USER), "proxy");
+            strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), "proxy");
+            if(
+              dia_input2(buf, &proxy_user, 20, 0) ||
+              dia_input2(buf2, &proxy_password, 20, 1)
+            ) err = 1;
+          }
+        }
+      }
+    }
+    else {
+      name2inet(&proxy, "");
+    }
+
+    /* set new proxy values */
+    if(!err) {
+      url_free(config.url.proxy);
+      config.url.proxy = NULL;
+
+      if(proxy.name) {
+        strprintf(&buf, "http://%s", proxy.name);
+        config.url.proxy = url_set(buf);
+
+        str_copy(&config.url.proxy->user, proxy_user);
+        str_copy(&config.url.proxy->password, proxy_password);
+        config.url.proxy->port = proxy_port;
+      }
+    }
+  }
+
+  /* smb share */
+  if(!err && scheme == inst_smb && dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &share, 30, 0)) err = 1;
+
+  /* path */
   if(!err && dia_input2(txt_get(TXT_INPUT_DIR), &path, 30, 0)) err = 1;
 
+  /* user, password */
+  if(!err && (scheme == inst_http || scheme == inst_ftp)) {
+    strprintf(&buf,
+      "Do you need a username and password to access the %s server?",
+      get_instmode_name_up(scheme)
+    );
+    i = dia_yesno(buf, NO);
+
+    if(i == ESCAPE) {
+      err = 1;
+    }
+    else {
+      if(i == NO) {
+        str_copy(&user, NULL);
+        str_copy(&password, NULL);
+      }
+      else {
+        strprintf(&buf, txt_get(TXT_ENTER_USER), get_instmode_name_up(scheme));
+        strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), get_instmode_name_up(scheme));
+        if(
+          dia_input2(buf, &user, 20, 0) ||
+          dia_input2(buf2, &password, 20, 1)
+        ) err = 1;
+      }
+    }
+  }
+
+  /* smb user, password, workgroup */
+  if(!err && scheme == inst_smb) {
+    i = dia_yesno(txt_get(TXT_SMB_GUEST_LOGIN), YES);
+
+    if(i == ESCAPE) {
+      err = 1;
+    }
+    else {
+      if(i == YES) {
+        str_copy(&user, NULL);
+        str_copy(&password, NULL);
+        str_copy(&domain, NULL);
+      }
+      else {
+        if(
+          dia_input2(txt_get(TXT_SMB_ENTER_USER), &user, 20, 0) ||
+          dia_input2(txt_get(TXT_SMB_ENTER_PASSWORD), &password, 20, 1) ||
+          dia_input2(txt_get(TXT_SMB_ENTER_WORKGROUP), &domain, 20, 0)
+        ) err = 1;
+      }
+    }
+  }
+
+  /* set new values */
   if(!err) {
     url_free(config.url.install);
 
-    strprintf(&buf, "%s://%s", get_instmode_name_up(scheme), server.name);
+    strprintf(&buf, "%s://%s", get_instmode_name(scheme), server.name);
     config.url.install = url_set(buf);
 
     memcpy(&config.url.install->used.server, &server, sizeof config.url.install->used.server);
@@ -741,156 +876,12 @@ int inst_do_network(instmode_t scheme)
     err = auto2_find_repo() ? 0 : 1;
   }
 
+  /* free variables */
   for(i = 0; i < sizeof to_free / sizeof *to_free; i++) str_copy(*to_free, NULL);
+  name2inet(&server, "");
+  name2inet(&proxy, "");
 
   return err;
-}
-
-
-int inst_do_smb()
-{
-  int rc;
-  char buf[256];
-
-  set_instmode(inst_smb);
-
-  if((rc = net_config())) return rc;
-
-  if(config.win) {	/* ###### check really needed? */
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-    if((rc = dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &config.net.share, 30, 0))) return rc;
-    if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
-  }
-
-  rc = dia_yesno(txt_get(TXT_SMB_GUEST_LOGIN), YES);
-
-  if(rc == ESCAPE) {
-    return -1;
-  }
-  else {
-    if(rc == YES) {
-      str_copy(&config.net.user, NULL);
-      str_copy(&config.net.password, NULL);
-      str_copy(&config.net.workgroup, NULL);
-    }
-    else {
-      if((rc = dia_input2(txt_get(TXT_SMB_ENTER_USER), &config.net.user, 20, 0))) return rc;
-      if((rc = dia_input2(txt_get(TXT_SMB_ENTER_PASSWORD), &config.net.password, 20, 1))) return rc;
-      if((rc = dia_input2(txt_get(TXT_SMB_ENTER_WORKGROUP), &config.net.workgroup, 20, 0))) return rc;
-    }
-  }
-
-  return do_mount_smb();
-}
-
-
-int inst_do_ftp()
-{
-  int rc;
-  window_t win;
-  char buf[256];
-
-  set_instmode(inst_ftp);
-
-  if((rc = net_config())) return rc;
-
-  do {
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-    if((rc = inst_get_proxysetup())) return rc;
-
-    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
-    dia_info(&win, buf);
-    rc = net_open(NULL);
-    win_close(&win);
-
-    if(rc < 0) {
-      util_print_net_error();
-    }
-    else {
-      rc = 0;
-    }
-  }
-  while(rc);
-
-  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
-  util_truncate_dir(config.serverdir);
-
-  return 0;
-}
-
-
-int inst_do_http()
-{
-  int rc;
-  window_t win;
-  char buf[256];
-
-  set_instmode(inst_http);
-
-  if((rc = net_config())) return rc;
-
-  do {
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-    if((rc = inst_get_proxysetup())) return rc;
-
-    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
-    dia_info(&win, buf);
-    rc = net_open(NULL);
-    win_close(&win);
-
-    if(rc < 0) {
-      util_print_net_error();
-    }
-    else {
-      rc = 0;
-    }
-  }
-  while(rc);
-
-  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
-  util_truncate_dir(config.serverdir);
-
-  return 0;
-}
-
-
-int inst_do_tftp()
-{
-  int rc;
-  window_t win;
-  char buf[256];
-
-  set_instmode(inst_tftp);
-
-  config.net.proxyport = 0;
-
-  if((rc = net_config())) return rc;
-
-  do {
-    sprintf(buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
-    if((rc = net_get_address(buf, &config.net.server, 1))) return rc;
-
-    sprintf(buf, txt_get(TXT_TRY_REACH_SERVER), get_instmode_name_up(config.instmode));
-    dia_info(&win, buf);
-    rc = net_open(NULL);
-    win_close(&win);
-
-    if(rc < 0) {
-      util_print_net_error();
-    }
-    else {
-      rc = 0;
-    }
-  }
-  while(rc);
-
-  if(dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0)) return -1;
-  util_truncate_dir(config.serverdir);
-
-  return 0;
 }
 
 
@@ -1280,91 +1271,6 @@ int inst_commit_install()
 }
 
 
-int inst_umount()
-{
-  int i = 0, j;
-
-  j = util_umount(config.mountpoint.instsys);
-  if(j == EBUSY) i = EBUSY;
-
-  j = util_umount(config.mountpoint.instdata);
-  if(j == EBUSY) i = EBUSY;
-
-  if(config.extramount) {
-    j = util_umount(config.mountpoint.extra);
-    if(j == EBUSY) i = EBUSY;
-    config.extramount = 0;
-  }
-
-  return i;
-}
-
-
-int inst_get_proxysetup()
-{
-  int rc;
-  char *s, tmp[256], buf[256];
-  unsigned u;
-
-  if(config.instmode == inst_ftp) {
-    if(config.instmode == inst_ftp) {
-      strcpy(buf, txt_get(TXT_ANONYM_FTP));
-    }
-    else {
-      sprintf(buf,
-        "Do you need a username and password to access the %s server?",
-        get_instmode_name_up(config.instmode)
-      );
-    }
-    rc = dia_yesno(buf, NO);
-    if(rc == ESCAPE) return -1;
-
-    if(rc == NO) {
-      str_copy(&config.net.user, NULL);
-      str_copy(&config.net.password, NULL);
-    }
-    else {
-      sprintf(buf, txt_get(TXT_ENTER_USER), get_instmode_name_up(config.instmode));
-      if((rc = dia_input2(buf, &config.net.user, 20, 0))) return rc;
-      sprintf(buf, txt_get(TXT_ENTER_PASSWORD), get_instmode_name_up(config.instmode));
-      if((rc = dia_input2(buf, &config.net.password, 20, 1))) return rc;
-    }
-  }
-
-  sprintf(buf, txt_get(TXT_WANT_PROXY), get_instmode_name_up(config.net.proxyproto));
-  rc = dia_yesno(buf, NO);
-  if(rc == ESCAPE) return -1;
-
-  if(rc == YES) {
-    sprintf(buf, txt_get(TXT_ENTER_PROXY), get_instmode_name_up(config.net.proxyproto));
-    if((rc = net_get_address(buf, &config.net.proxy, 1))) return rc;
-
-    *tmp = 0;
-    if(config.net.proxyport) sprintf(tmp, "%u", config.net.proxyport);
-
-    do {
-      sprintf(buf, txt_get(TXT_ENTER_PROXYPORT), get_instmode_name_up(config.net.proxyproto));
-      rc = dia_input(buf, tmp, 6, 6, 0);
-      if(rc) return rc;
-      u = strtoul(tmp, &s, 0);
-      if(*s) {
-        rc = -1;
-        dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
-      }
-    }
-    while(rc);
-
-    config.net.proxyport = u;
-  }
-  else {
-    name2inet(&config.net.proxy, "");
-    config.net.proxyport = 0;
-  }
-
-  return 0;
-}
-
-
 /*
  * Ask for and apply driver update.
  *
@@ -1374,12 +1280,17 @@ int inst_get_proxysetup()
  */
 int inst_update_cd()
 {
+#if 0
   int i, update_rd;
   char *dev, *buf = NULL, *argv[3], *module;
   unsigned old_count;
   slist_t **names;
   window_t win;
+#endif
 
+  dia_message("Sorry, not working yet.", MSGTYPE_ERROR);
+
+#if 0
   config.update.shown = 1;
 
   if(choose_dud(&dev)) return 1;
@@ -1444,6 +1355,7 @@ int inst_update_cd()
   }
 
   free(buf);
+#endif
 
   return 0;
 }
@@ -1675,188 +1587,4 @@ void inst_swapoff()
     swapoff(buf);
   }
 }
-
-
-/*
- * Mount nfs install source.
- *
- * If config.serverdir points to a file, mount one level higher and
- * loop-mount the file.
- */
-int do_mount_nfs()
-{
-  int rc, file_type = 0;
-  window_t win;
-  char *buf = NULL, *serverdir = NULL, *file = NULL;
-  char *path;
-
-  str_copy(&config.serverpath, NULL);
-  str_copy(&config.serverfile, NULL);
-
-  path = config.serverdir && *config.serverdir ? config.serverdir : "/";
-
-  strprintf(&buf,
-    config.win ? txt_get(TXT_TRY_NFS_MOUNT) : "nfs: trying to mount %s:%s\n" ,
-    config.net.server.name, path
-  );
-
-  if(config.win) {
-    dia_info(&win, buf);
-  }
-  else {
-    fprintf(stderr, "%s", buf);
-  }
-
-  fprintf(stderr, "Starting portmap.\n");
-  system("portmap");
-
-  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, path);
-
-  if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", rc);
-
-  if(rc == ENOTDIR) {
-    str_copy(&serverdir, path);
-
-    if((file = strrchr(serverdir, '/')) && file != serverdir && file[1]) {
-      *file++ = 0;
-      mkdir(config.mountpoint.extra, 0755);
-
-      fprintf(stderr, "nfs: trying to mount %s:%s\n", config.net.server.name, serverdir);
-
-      rc = net_mount_nfs(config.mountpoint.extra, &config.net.server, serverdir);
-
-      if(config.debug) fprintf(stderr, "nfs: err #2 = %d\n", rc);
-    }
-  }
-
-  if(file && !rc) {
-    config.extramount = 1;
-
-    strprintf(&buf, "%s/%s", config.mountpoint.extra, file);
-    rc = util_mount_ro(buf, config.mountpoint.instdata);
-
-    fprintf(stderr, "nfs: err #3 = %d\n", rc);
-
-    if(rc) {
-      fprintf(stderr, "nfs: %s: not found\n", file);
-      inst_umount();
-      rc = 2;
-    }
-    else {
-      file_type = 1;
-      str_copy(&config.serverpath, serverdir);
-      str_copy(&config.serverfile, file);
-    }
-  }
-
-  str_copy(&serverdir, NULL);
-
-  if(config.debug) fprintf(stderr, "nfs: err #4 = %d\n", rc);
-
-  /* rc = -1 --> error was shown in net_mount_nfs() */
-  if(rc == -2) {
-    fprintf(stderr, "network setup failed\n");
-    if(config.win) dia_message("Network setup failed", MSGTYPE_ERROR);
-  }
-  else if(rc > 0) {
-    strprintf(&buf, "nfs: mount failed: %s", strerror(rc));
-
-    fprintf(stderr, "%s\n", buf);
-    if(config.win) dia_message(buf, MSGTYPE_ERROR);
-  }
-
-  if(config.win) {
-    win_close(&win);
-  }
-
-  if(!rc) {
-    fprintf(stderr, "nfs: mount ok\n");
-    config.sourcetype = file_type;
-  }
-
-  str_copy(&buf, NULL);
-
-  return rc;
-}
-
-
-/*
- * Mount smb install source.
- *
- * If config.serverdir points to a file, loop-mount the file.
- */
-int do_mount_smb()
-{
-  int rc, file_type = 0;
-  window_t win;
-  char *buf = NULL;
-
-  util_truncate_dir(config.serverdir);
-
-  strprintf(&buf,
-    config.win ? txt_get(TXT_SMB_TRYING_MOUNT) : "smb: trying to mount //%s/%s\n" ,
-    config.net.server.name, config.net.share
-  );
-
-  if(config.win) {
-    dia_info(&win, buf);
-  }
-  else {
-    fprintf(stderr, "%s", buf);
-  }
-
-  mkdir(config.mountpoint.extra, 0755);
-
-  rc = net_mount_smb(config.mountpoint.extra,
-    &config.net.server, config.net.share,
-    config.net.user, config.net.password, config.net.workgroup
-  );
-
-  if(!rc) {
-    config.extramount = 1;
-    strprintf(&buf, "%s/%s", config.mountpoint.extra, config.serverdir);
-    if((file_type = util_check_exist(buf))) {
-      rc = util_mount_ro(buf, config.mountpoint.instdata);
-    }
-    else {
-      fprintf(stderr, "smb: %s: not found\n", config.serverdir);
-      rc = -1;
-    }
-  }
-
-  switch(rc) {
-    case 0:
-      break;
-
-    case -3:
-      fprintf(stderr, "smb: network setup failed\n");
-      if(config.win) dia_message("Network setup failed", MSGTYPE_ERROR);
-      break;
-
-    case -2:
-      fprintf(stderr, "smb: smb/cifs not supported\n");
-      if(config.win) dia_message("SMB/CIFS not supported", MSGTYPE_ERROR);
-      break;
-
-    default:	/* -1 */
-      fprintf(stderr, "smb: mount failed\n");
-      if(config.win) dia_message("SMB/CIFS mount failed", MSGTYPE_ERROR);
-  }
-
-  if(config.win) win_close(&win);
-
-  if(rc) {
-    inst_umount();
-  }
-  else {
-    fprintf(stderr, "smb: mount ok\n");
-  }
-
-  if(!rc) config.sourcetype = file_type == 'r' ? 1 : 0;
-
-  str_copy(&buf, NULL);
-
-  return rc;
-}
-
 

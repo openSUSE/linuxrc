@@ -28,7 +28,6 @@
 #include "keyboard.h"
 #include "file.h"
 #include "info.h"
-#include "ftp.h"
 #include "install.h"
 #include "auto2.h"
 #include "settings.h"

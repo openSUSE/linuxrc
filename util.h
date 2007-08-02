@@ -29,9 +29,6 @@ extern void util_truncate_dir      (char *dir_tr);
 extern int  util_check_exist(char *file);
 extern int  util_check_exist2(char *dir, char *file);
 extern int  util_check_break       (void);
-extern void util_print_net_error   (void);
-extern int  util_free_ramdisk      (char *ramdisk_dev_tv);
-extern int  util_cd1_boot          (void);
 
 extern void util_disp_init         (void);
 extern void util_disp_done         (void);
@@ -61,7 +58,6 @@ extern int  util_mv_main           (int argc, char **argv);
 extern int  util_ln_main           (int argc, char **argv);
 extern int  util_swapon_main       (int argc, char **argv);
 extern int  util_swapoff_main      (int argc, char **argv);
-extern int  util_freeramdisk_main  (int argc, char **argv);
 extern int  util_lsmod_main        (int argc, char **argv);
 extern int  util_raidautorun_main  (int argc, char **argv);
 extern int  util_free_main         (int argc, char **argv);
@@ -98,10 +94,6 @@ void strprintf(char **buf, char *format, ...) __attribute__ ((format (printf, 2,
 void set_instmode(instmode_t instmode);
 char *get_instmode_name(instmode_t instmode);
 char *get_instmode_name_up(instmode_t instmode);
-
-int net_open(char *filename);
-void net_close(int fd);
-int net_read(int fd, char *buf, int len);
 
 void util_free_mem(void);
 void util_update_meminfo(void);
@@ -144,7 +136,6 @@ char *print_driverid(driver_t *drv, int with_0x);
 int apply_driverid(driver_t *drv);
 void store_driverid(driver_t *drv);
 
-char *url_decode(char *str);
 int match_netdevice(char *device, char *hwaddr, char *key);
 
 char* util_chop_lf(char* str);
@@ -154,7 +145,6 @@ char *get_translation(slist_t *trans, char *locale);
 int util_process_running(char *name);
 
 int system_log(char *cmd);
-int get_url(char *src_url, char *dst);
 
 void read_iscsi_ibft(void);
 
