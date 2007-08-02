@@ -91,7 +91,6 @@ char *inet2print(inet_t *inet);
 char *inetmask2print(inet_t *inet);
 void str_copy(char **dst, char *src);
 void strprintf(char **buf, char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void set_instmode(instmode_t instmode);
 char *get_instmode_name(instmode_t instmode);
 char *get_instmode_name_up(instmode_t instmode);
 

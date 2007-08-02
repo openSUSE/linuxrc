@@ -1420,7 +1420,6 @@ int net_input_data()
  *  config.net.nameserver
  *  config.net.domain
  *  config.net.server
- *  config.serverdir
  * 
  * config.net.bootp_wait: delay between interface setup & bootp request
  * config.net.device: interface
@@ -1504,33 +1503,6 @@ int net_bootp()
     config.net.domain = strdup(s);
   }
 
-#if 0
-  s = getenv("BOOTP_ROOT_PATH");
-  if(!s) s = getenv("BOOTP_BOOTFILE");
-
-  if(s && *s) {
-    s = strdup(s);
-
-    fprintf(stderr, "bootp root: \"%s\"\n", s);
-
-    if((t = strchr(s, ':'))) {
-      *t++ = 0;
-    }
-    else {
-      t = s;
-    }
-
-    if(*t && !config.serverdir) config.serverdir = strdup(t);
-
-    if(t != s && !config.net.server.name) {
-      name2inet(&config.net.server, s);
-      net_check_address2(&config.net.server, 0);
-    }
-
-    free(s);
-  }
-#endif
-
   if(!config.net.server.name) {
     name2inet(&config.net.server, getenv("BOOTP_SERVER"));
     net_check_address2(&config.net.server, 0);
@@ -1586,7 +1558,6 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
  *  config.net.domain
  *  config.net.nameserver
  *  config.net.server
- *  config.serverdir
  */
 int net_dhcp()
 {
@@ -1675,9 +1646,6 @@ int net_dhcp()
 #if 0
       case key_rootpath:
       case key_bootfile:
-        if(*f->value && !config.serverdir) {
-          str_copy(&config.serverdir, f->value);
-        }
         break;
 #endif
 
@@ -1745,7 +1713,6 @@ unsigned net_config_mask()
   if(config.net.gateway.ok) u |= 4;
   if(config.net.server.name) u |= 8;
   if(config.net.nameserver[0].ok) u |= 0x10;
-  if(config.serverdir) u |= 0x20;
 
   return u;
 }

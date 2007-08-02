@@ -714,14 +714,9 @@ void lxrc_init()
 
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.mountpoint.extra = strdup("/mounts/extra");
-  config.mountpoint.instsys2 = strdup("/mounts/instsys2");
-
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
 
   config.update.map = calloc(1, MAX_UPDATES);
-
-  config.zenconfig = strdup("settings.txt");
 
   util_set_product_dir("suse");
 
@@ -771,21 +766,6 @@ void lxrc_init()
 #if defined(__s390__) || defined(__s390x__)
   config.initrd_has_ldso = 1;
 #endif
-
-  if(config.tmpfs && util_check_exist("/download") == 'd') {
-    for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
-      sprintf(buf, "/download/image%d", i);
-      str_copy(&config.ramdisk[i].dev, buf);
-    }
-  }
-  else {
-    for(i = 0; i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
-      sprintf(buf, "/dev/ram%d", i + 2);
-      str_copy(&config.ramdisk[i].dev, buf);
-    }
-  }
-
-  config.inst_ramdisk = -1;
 
   file_read_info_file("file:/linuxrc.config", kf_cfg);
 
@@ -841,7 +821,6 @@ void lxrc_init()
     config.download.instsys = config.memory.free > config.memory.load_image ? 1 : 0;
   }
 
-  if(util_check_exist("/sbin/modprobe")) has_modprobe = 1;
   lxrc_set_modprobe("/etc/nothing");
   lxrc_set_bdflush(5);
 
@@ -971,7 +950,8 @@ void lxrc_init()
 
     i = 0;
     j = 1;
-    if(config.insttype == inst_cdrom && cdrom_drives) {
+#if 0
+    if(config.insttype == inst_cdrom) {
       char *s = get_translation(config.cd1texts, current_language()->locale);
       char *buf = NULL;
 
@@ -985,18 +965,14 @@ void lxrc_init()
 
       free(buf);
     }
+#endif
 
     if(!i) {
       config.rescue = 0;
       config.manual |= 1;
       if(j) {
         sprintf(buf, "Could not find the %s ", config.product);
-        if(config.insttype == inst_cdrom) {
-          sprintf(buf + strlen(buf), "Installation CD.");
-        }
-        else {
-          strcat(buf, "Installation Source.");
-        }
+        strcat(buf, "Installation Source.");
         strcat(buf, "\n\nActivating manual setup program.\n");
         dia_message(buf, MSGTYPE_ERROR);
       }
@@ -1152,7 +1128,7 @@ void lxrc_set_modprobe(char *prog)
   FILE *f;
 
   /* do nothing if we have a modprobe */
-  if (has_modprobe || config.test) return;
+  if(config.test) return;
 
   if((f = fopen("/proc/sys/kernel/modprobe", "w"))) {
     fprintf(f, "%s\n", prog);

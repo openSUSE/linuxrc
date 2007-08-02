@@ -164,8 +164,8 @@ int inst_choose_netsource()
 
   if(!(config.test || config.net.cifs.binary)) items[3] = di_skip;
 
-  if(di_inst_choose_netsource_last == di_none) {
-    switch(config.instmode) {
+  if(di_inst_choose_netsource_last == di_none && config.url.install) {
+    switch(config.url.install->scheme) {
       case inst_ftp:
         di_inst_choose_netsource_last = di_netsource_ftp;
         break;

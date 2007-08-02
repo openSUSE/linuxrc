@@ -331,8 +331,6 @@ typedef struct {
   unsigned installfilesread:1;	/* already got install files */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
-  unsigned zen;			/* zenworks mode */
-  char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */
   unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
@@ -343,10 +341,7 @@ typedef struct {
   slist_t *cdroms;		/* list of cdroms, without '/dev/' */
   char *cdrom;			/* currently used cdrom, without '/dev/' */
   slist_t *swaps;		/* swap partitions, without '/dev/' */
-  char *floppydev;		/* floppy device specified via config file (no '/dev/') */
   char *cdromdev;		/* cdrom device specified via config file (no '/dev/') */
-  char *instsys;		/* installation system mount point */
-  char *instsys2;		/* extra installation system mount point */
   struct {
     slist_t *file;		/* 'info' file name */
     unsigned add_cmdline:1;	/* parse cmdline, too */
@@ -357,15 +352,7 @@ typedef struct {
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
-  char *serverdir;		/* install base directory on server */
   unsigned sourcetype:1;	/* 0: directory, 1: file */
-  char *serverfile;		/* file below serverdir (eg. some ISO) */
-  char *serverpath;		/* path to serverfile */
-  instmode_t insttype;		/* install type (cdrom, network, etc. )*/
-  instmode_t instmode;		/* ftp, nfs, smb, etc. */
-  instmode_t instmode_extra;	/* for the stranger things... */
-  int inst_ramdisk;		/* ramdisk with instsys */
-  int inst2_ramdisk;		/* ramdisk with extra instsys */
   char *new_root;		/* root device to boot */
   char *rootimage;		/* "boot/<arch>/root" */
   char *rescueimage;		/* "boot/<arch>/rescue" */
@@ -462,20 +449,10 @@ typedef struct {
     int ram_min;		/* min required memory (ram size) needed for install in MB */
   } memory;
 
-  struct {
-    char *dev;			/* device name */
-    char *mountpoint;		/* mountpoint, if any */
-    int inuse:1;		/* currently in use */
-    int fd;			/* file descriptor while it is open */
-    int size;			/* current size in kB */
-  } ramdisk[6];			/* /dev/ram2 .. /dev/ram7 */
-
   struct {			/* mountpoints */
     unsigned cnt;		/* mp counter */
-    char *extra;
     char *instdata;
     char *instsys;
-    char *instsys2;
     char *update;
     char *swap;
     char *base;
@@ -502,10 +479,8 @@ typedef struct {
     char *device;		/* currently used device */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
-    int ftp_sock;		/* used internally by ftp code */
     struct tftp tftp;		/* used by tftp code */
     int file_length;		/* length of currently retrieved file */
-    char *error;		/* ftp/http/tftp error message, if any */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
     unsigned proxyport;		/* proxy port */
@@ -594,14 +569,7 @@ extern colorset_t     *colors_prg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
-extern int             cpu_ig;
-extern int             has_floppy_ig;
-extern int             reboot_ig;
-extern int             usb_ig;
-extern char            *usb_mods_ig;
 extern int             reboot_ig;
 extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;
-extern int             cdrom_drives;
-extern int             has_modprobe;

@@ -1175,7 +1175,6 @@ void util_status_info()
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
-  add_flag(&sl0, buf, config.zen, "zen");
   add_flag(&sl0, buf, config.has_pcmcia, "pcmcia");
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
@@ -1249,33 +1248,8 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "server = %s", inet2print(&config.net.server));
-  slist_append_str(&sl0, buf);
-
   sprintf(buf, "ptp host = %s", inet2print(&config.net.ptphost));
   slist_append_str(&sl0, buf);
-
-  if(config.serverdir) {
-    sprintf(buf, "server dir = %s", config.serverdir);
-    slist_append_str(&sl0, buf);
-  }
-
-  if(config.net.share) {
-    sprintf(buf, "share = %s", config.net.share);
-    slist_append_str(&sl0, buf);
-  }
-
-  if(config.net.workgroup) {
-    sprintf(buf, "workgroup = %s", config.net.workgroup);
-    slist_append_str(&sl0, buf);
-  }
-
-  if(config.net.user || config.net.password) {
-    *buf = 0;
-    if(config.net.user) sprintf(buf, "user = %s", config.net.user);
-    sprintf(buf + strlen(buf), "%spassword = %s", *buf ? ", " : "", config.net.password);
-    slist_append_str(&sl0, buf);
-  }
 
   if(config.net.vncpassword) {
     sprintf(buf, "vncpassword = %s", config.net.vncpassword);
@@ -1378,11 +1352,6 @@ void util_status_info()
   sprintf(buf, "stderr = \"%s\"", config.stderr_name);
   slist_append_str(&sl0, buf);
 
-  if(config.instsys) {
-    sprintf(buf, "instsys = \"%s\"", config.instsys);
-    slist_append_str(&sl0, buf);
-  }
-
   sprintf(buf, "rootimage = \"%s\"", config.rootimage);
   slist_append_str(&sl0, buf);
 
@@ -1457,21 +1426,6 @@ void util_status_info()
       i = config.partition && !strcmp(sl->key, config.partition) ? 1 : 0;
       sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
       if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
-      slist_append_str(&sl0, buf);
-    }
-  }
-
-  sprintf(buf, "inst_ramdisk = %d", config.inst_ramdisk);
-  slist_append_str(&sl0, buf);
-
-  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
-    if(config.ramdisk[i].inuse) {
-      sprintf(buf, "ramdisk %s: %d kB",
-        config.ramdisk[i].dev, (config.ramdisk[i].size + 1023) >> 10
-      );
-      if(config.ramdisk[i].mountpoint) {
-        sprintf(buf + strlen(buf), " mounted at \"%s\"", config.ramdisk[i].mountpoint);
-      }
       slist_append_str(&sl0, buf);
     }
   }
@@ -2588,12 +2542,9 @@ void util_free_mem()
 
 void util_update_meminfo()
 {
-  int i;
   int rd_mem = 0;
 
-  for(i = 0; (unsigned) i < sizeof config.ramdisk / sizeof *config.ramdisk; i++) {
-    if(config.ramdisk[i].inuse) rd_mem += config.ramdisk[i].size;
-  }
+  // FIXME: do something with download files ???
 
   config.memory.current = config.memory.free - (rd_mem >> 10);
 }
@@ -3014,47 +2965,6 @@ void strprintf(char **buf, char *format, ...)
   if(*buf) free(*buf);
 
   *buf = strcpy(malloc(strlen(sbuf) + 1), sbuf);
-}
-
-
-void set_instmode(instmode_t instmode)
-{
-  config.instmode_extra = config.instmode = instmode;
-
-  switch(instmode) {
-    case inst_cdrom:
-    case inst_cdwithnet:
-    case inst_dvd:
-      config.insttype = inst_cdrom;
-      config.instmode = inst_cdrom;
-      break;
-
-    case inst_hd:
-    case inst_file:
-      config.insttype = inst_hd;
-      break;
-
-    case inst_floppy:
-      config.insttype = inst_floppy;
-      break;
-
-    case inst_none:
-    case inst_exec:
-      config.insttype = inst_none;
-      break;
-
-    default:
-      config.insttype = inst_net;
-      config.net.do_setup |= DS_INSTALL;
-      if(!(config.net.do_setup & DS_SETUP)) config.net.setup = NS_DEFAULT;
-  }
-
-  if(
-    (instmode == inst_ftp || instmode == inst_http) &&
-    !config.net.proxyproto
-  ) {
-    config.net.proxyproto = inst_http;
-  }
 }
 
 

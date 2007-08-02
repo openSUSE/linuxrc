@@ -88,7 +88,7 @@ static struct {
   { key_broadcast,      "Broadcast",      kf_cfg + kf_cmd + kf_dhcp      },
   { key_network,        "Network",        kf_cfg + kf_cmd + kf_dhcp      },
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
-  { key_serverdir,      "Serverdir",      kf_cfg + kf_cmd                },
+  { key_serverdir,      "Serverdir",      kf_none                        },
   { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
   { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
   { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
@@ -132,7 +132,7 @@ static struct {
   { key_rootpath,       "RootPath",       kf_dhcp                        },
   { key_bootfile,       "BootFile",       kf_dhcp                        },
   { key_install,        "Install",        kf_cfg + kf_cmd                },
-  { key_instmode,       "InstMode",       kf_cfg + kf_cmd                },
+  { key_instmode,       "InstMode",       kf_none                        },
   { key_memtotal,       "MemTotal",       kf_mem                         },
   { key_memfree,        "MemFree",        kf_mem                         },
   { key_buffers,        "Buffers",        kf_mem                         },
@@ -176,7 +176,6 @@ static struct {
   { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
   { key_netconfig,      "NetConfig",      kf_none                        },
   { key_noshell,        "NoShell",        kf_cfg + kf_cmd + kf_cmd_early },
-  { key_floppydevice,   "FloppyDevice",   kf_cfg + kf_cmd                },
   { key_cdromdevice,    "CDROMDevice",    kf_cfg + kf_cmd                },
   { key_consoledevice,  "ConsoleDevice",  kf_cfg + kf_cmd                },
   { key_product,        "Product",        kf_cfg + kf_cmd                },
@@ -236,8 +235,6 @@ static struct {
   { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
   { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
   { key_moduledisks,    "ModuleDisks",    kf_cfg + kf_cmd                },
-  { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
-  { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_port,           "Port",           kf_none                        },
   { key_smbshare,       "Share",          kf_none                        },
   { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                },
@@ -606,10 +603,6 @@ void file_do_info(file_t *f0)
         str_copy(&config.keymap, *f->value ? f->value : NULL);
         break;
 
-      case key_instmode:
-        if(f->is.numeric) set_instmode(f->nvalue);
-        break;
-
       case key_hostip:
         name2inet(&config.net.hostname, f->value);
         net_check_address2(&config.net.hostname, 0);
@@ -666,10 +659,6 @@ void file_do_info(file_t *f0)
 
       case key_partition:
         if(*f->value) str_copy(&config.partition, f->value);
-        break;
-
-      case key_serverdir:
-        if(*f->value) str_copy(&config.serverdir, f->value);
         break;
 
       case key_netdevice:
@@ -820,9 +809,6 @@ void file_do_info(file_t *f0)
         str_copy(&config.autoyast, *f->value ? f->value : "default");
         config.manual = 0;
         config.url.autoyast = url_set(f->value);
-        if(!config.instmode && config.url.autoyast->scheme) {
-          set_instmode(config.url.autoyast->scheme);
-        }
         break;
 
       case key_info:
@@ -935,20 +921,6 @@ void file_do_info(file_t *f0)
 
       case key_noshell:
         if(f->is.numeric) config.noshell = f->nvalue;
-        break;
-
-      case key_floppydevice:
-#if 0
-        str_copy(
-          &config.floppydev,
-          strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
-        );
-        config.floppy_probed = 1;
-        config.floppies = 1;
-        config.floppy = 0;
-        sprintf(buf, "/dev/%s", config.floppydev);
-        str_copy(&config.floppy_dev[0], buf);
-#endif
         break;
 
       case key_cdromdevice:
@@ -1178,14 +1150,6 @@ void file_do_info(file_t *f0)
 
       case key_moduledisks:
         if(f->is.numeric) config.module.disks = f->nvalue;
-        break;
-
-      case key_zen:
-        if(f->is.numeric) config.zen = f->nvalue;
-        break;
-
-      case key_zenconfig:
-        if(*f->value) str_copy(&config.zenconfig, f->value);
         break;
 
       case key_rootimage2:

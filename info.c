@@ -130,6 +130,7 @@ void info_init (void)
     char               dummy_ti [20];
     char              *tmp_pci;
     uint64_t           memory_ig;
+    int cpu_ig = 0;
 
 
     line_ti [sizeof (line_ti) - 1] = 0;
