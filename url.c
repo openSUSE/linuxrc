@@ -1531,7 +1531,7 @@ int url_find_instsys(url_t *url, char *dir)
 int url_setup_device(url_t *url)
 {
   int ok = 0, i;
-  char *module, *type, *s;
+  char *type, *s;
   url_t *tmp_url;
 
   if(!url) return 0;
@@ -1543,8 +1543,7 @@ int url_setup_device(url_t *url)
   if(!url->is.network) {
     /* load fs module if necessary */
 
-    type = util_fstype(url->used.device, &module);
-    if(module) mod_modprobe(module, NULL);
+    type = util_fstype(url->used.device, NULL);
     if(type && strcmp(type, "swap")) ok = 1;
   }
   else {

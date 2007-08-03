@@ -3140,13 +3140,17 @@ int util_detach_loop(char *dev)
 
 int util_mount(char *dev, char *dir, unsigned long flags)
 {
-  char *type, *loop_dev, *cmd = NULL;
+  char *type, *loop_dev, *cmd = NULL, *module;
   int err = -1;
   struct stat64 sbuf;
 
   if(!dev || !dir) return -1;
 
-  if(strstr(dir, config.mountpoint.base) == dir && stat64(dir, &sbuf)) {
+  if(
+    config.mountpoint.base &&
+    strstr(dir, config.mountpoint.base) == dir &&
+    stat64(dir, &sbuf)
+  ) {
     mkdir(dir, 0755);
   }
 
@@ -3168,7 +3172,8 @@ int util_mount(char *dev, char *dir, unsigned long flags)
     return -1;
   }
 
-  type = util_fstype(dev, NULL);
+  type = util_fstype(dev, &module);
+  if(module) mod_modprobe(module, NULL);
 
   if(type && !strcmp(type, "cpio")) {
     char *buf = NULL;
