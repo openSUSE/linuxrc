@@ -132,6 +132,7 @@ static struct {
   { key_rootpath,       "RootPath",       kf_dhcp                        },
   { key_bootfile,       "BootFile",       kf_dhcp                        },
   { key_install,        "Install",        kf_cfg + kf_cmd                },
+  { key_instsys,        "InstSys",        kf_cfg + kf_cmd                },
   { key_instmode,       "InstMode",       kf_none                        },
   { key_memtotal,       "MemTotal",       kf_mem                         },
   { key_memfree,        "MemFree",        kf_mem                         },
@@ -803,6 +804,10 @@ void file_do_info(file_t *f0)
           url_free(config.url.instsys);
           config.url.instsys = url_set(config.url.install->instsys);
         }
+        break;
+
+      case key_instsys:
+        str_copy(&config.url.instsys_default, *f->value ? f->value : NULL);
         break;
 
       case key_autoyast:

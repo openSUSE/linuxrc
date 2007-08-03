@@ -308,8 +308,15 @@ void auto2_scan_hardware()
 
   /* set default repository */
   if(!config.url.install) config.url.install = url_set("cd:/");
-  if(!config.url.instsys) config.url.instsys = url_set(config.rescue ? config.rescueimage : config.rootimage);
-  // if(!config.url.instsys2) config.url.instsys2 = url_set(config.rootimage2);
+  if(!config.url.instsys) {
+    config.url.instsys = url_set(config.url.instsys_default ?: config.rescue ? config.rescueimage : config.rootimage);
+  }
+  if(!config.url.instsys2) {
+    config.url.instsys2 = url_set(url_print(config.url.instsys, 2));
+    if(config.url.instsys2->path) {
+      strprintf(&config.url.instsys2->path, "%s.fonts", config.url.instsys2->path);
+    }
+  }
 }
 
 

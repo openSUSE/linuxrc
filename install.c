@@ -1031,6 +1031,12 @@ int add_instsys()
     argv[1] = config.url.instsys->mount;
     argv[2] = "/";
     util_lndir_main(3, argv);
+
+    if(config.url.instsys2 && config.url.instsys2->mount) {
+      argv[1] = config.url.instsys2->mount;
+      argv[2] = "/";
+      util_lndir_main(3, argv);
+    }
   }
 
   return err;

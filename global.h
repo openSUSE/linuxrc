@@ -380,9 +380,11 @@ typedef struct {
   hd_data_t *hd_data;		/* device list */
 
   struct {
+    char *instsys_default;	/* default instsys url */
     url_t *install;		/* install url */
-    url_t *autoyast;		/* autoyast url */
     url_t *instsys;		/* instsys url */
+    url_t *instsys2;		/* instsys2 url (fonts) */
+    url_t *autoyast;		/* autoyast url */
     url_t *proxy;		/* proxy url */
   } url;
 

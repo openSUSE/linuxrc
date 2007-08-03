@@ -669,6 +669,7 @@ void util_umount_all()
   int i;
   char *buf = NULL;
 
+  url_umount(config.url.instsys2);
   url_umount(config.url.instsys);
   url_umount(config.url.install);
 
@@ -1194,6 +1195,12 @@ void util_status_info()
 
   if((s = url_print(config.url.instsys, 0))) {
     slist_append_str(&sl0, "instsys url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
+
+  if((s = url_print(config.url.instsys2, 0))) {
+    slist_append_str(&sl0, "instsys2 url:");
     sprintf(buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }

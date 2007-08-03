@@ -583,6 +583,11 @@ url_t *url_set(char *str)
  * Print url to string.
  *
  * scheme://domain;user:password@server:port/path?query
+ *
+ * format:
+ *   0: for logging
+ *   1: without query part
+ *   2: with device
  */
 char *url_print(url_t *url, int format)
 {
@@ -603,14 +608,9 @@ char *url_print(url_t *url, int format)
       curl_free(s);
     }
     if(url->password) {
-      if(format == 0) {
-        strprintf(&buf, "%s:***", buf);
-      }
-      else {
-        s = curl_easy_escape(NULL, url->password, 0);
-        strprintf(&buf, "%s:%s", buf, s);
-        curl_free(s);
-      }
+      s = curl_easy_escape(NULL, url->password, 0);
+      strprintf(&buf, "%s:%s", buf, s);
+      curl_free(s);
     }
     if(url->user || url->password) strprintf(&buf, "%s@", buf);
     if(url->server) strprintf(&buf, "%s%s", buf, url->server);
@@ -626,11 +626,13 @@ char *url_print(url_t *url, int format)
     );
   }
 
-  if(format == 0) {
-    if(url->used.device) {
-      strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(url->used.device));
+  if(format == 0 || format == 2) {
+    if((s = url->used.device) || (s = url->device)) {
+      strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(s));
     }
+  }
 
+  if(format == 0) {
     if(config.debug >= 2 && url->used.hwaddr) {
       strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
     }
@@ -1354,6 +1356,7 @@ int url_find_repo(url_t *url, char *dir)
   {
     int ok = 0;
     char *buf = NULL, *file_name;
+    int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
 
     if(
       !url ||
@@ -1395,9 +1398,38 @@ int url_find_repo(url_t *url, char *dir)
       free(file_name);
     }
 
-    str_copy(&buf, NULL);
+    if(ok) {
+      str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
 
-    if(ok) str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
+      if(get_instsys2) {
+        str_copy(&config.url.instsys2->mount, new_mountpoint());
+        if(
+          !config.download.instsys &&
+          !config.rescue &&
+          url->is.mountable &&
+          util_is_mountable(buf)
+        ) {
+          ok = util_mount_ro(buf, config.url.instsys2->mount) ? 0 : 1;
+        }
+        else {
+          if(!url_read_file(url,
+            NULL,
+            config.url.instsys2->path,
+            file_name = strdup(new_download()),
+            txt_get(TXT_LOADING_FONTS),
+            URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+          )) {
+            ok = util_mount_ro(file_name, config.url.instsys2->mount) ? 0 : 1;
+          }
+
+          free(file_name);
+        }
+
+        if(!ok) str_copy(&config.url.instsys2->mount, NULL);
+      }
+    }
+
+    str_copy(&buf, NULL);
 
     return ok;
   }
