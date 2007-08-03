@@ -3025,6 +3025,22 @@ int util_wget_main(int argc, char **argv)
 }
 
 
+int util_fstype_main(int argc, char **argv)
+{
+  char *s;
+
+  argv++; argc--;
+
+  if(argc != 1) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
+
+  s = fstype(*argv);
+
+  printf("%s: %s\n", *argv, s ?: "unknown fs");
+
+  return 0;
+}
+
+
 /*
  * Return fs name. If we have to load a module first, return it in *module.
  */

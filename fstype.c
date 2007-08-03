@@ -254,6 +254,7 @@ fstype(const char *device) {
 
       buf[sizeof buf - 1] = 0;
       if(!strcmp(buf, "070701")) type = "cpio";
+      else if(!memcmp(buf, "hsqs", 4) || !memcmp(buf, "sqsh", 4)) type = "squashfs";
     }
 
 #ifdef ALL_TYPES
