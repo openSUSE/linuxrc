@@ -1462,6 +1462,7 @@ int url_find_instsys(url_t *url, char *dir)
 {
   int err = 0;
   char *file_name;
+  int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
 
   if(
     !url ||
@@ -1483,11 +1484,37 @@ int url_find_instsys(url_t *url, char *dir)
       URL_FLAG_PROGRESS + URL_FLAG_UNZIP
     );
 
-    if(!err) err = util_mount_ro(file_name, config.mountpoint.instsys);
+    if(!err) err = util_mount_ro(file_name, dir);
 
-    if(!err) str_copy(&url->mount, config.mountpoint.instsys);
+    if(!err) str_copy(&url->mount, dir);
 
     free(file_name);
+  }
+
+  if(!err && get_instsys2) {
+    url = config.url.instsys2;
+    dir = strdup(new_mountpoint());
+
+    if(url->is.mountable) {
+      err = url_mount(url, dir, NULL);
+    }
+    else {
+      err = url_read_file(url,
+        NULL,
+        NULL,
+        file_name = strdup(new_download()),
+        txt_get(TXT_LOADING_FONTS),
+        URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+      );
+
+      if(!err) err = util_mount_ro(file_name, dir);
+
+      if(!err) str_copy(&url->mount, dir);
+
+      free(file_name);
+    }
+
+    free(dir);
   }
 
   return err;
