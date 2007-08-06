@@ -267,6 +267,8 @@ static struct {
   { key_bootif,         "BOOTIF",         kf_cmd                         },
   { key_swap_size,      "SwapSize",       kf_cfg + kf_cmd                },
   { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_sha1,           "META",           kf_cfg + kf_cont               },
+  { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1318,6 +1320,21 @@ void file_do_info(file_t *f0)
 
       case key_ntfs_3g:
         if(f->is.numeric) config.ntfs_3g = f->nvalue;
+        break;
+
+      case key_sha1:
+        if(*f->value) {
+          sl0 = slist_split(' ', f->value);
+          if(sl0->key && sl0->next && sl0->next->next && !strcasecmp(sl0->key, "sha1")) {
+            sl = slist_append_str(&config.sha1, sl0->next->key);
+            sl->value = strdup(sl0->next->next->key);
+          }
+          slist_free(sl0);
+        }
+        break;
+
+      case key_insecure:
+        if(f->is.numeric && f->nvalue) config.secure = 0;
         break;
 
       default:

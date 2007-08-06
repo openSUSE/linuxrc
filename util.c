@@ -1179,6 +1179,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.has_pcmcia, "pcmcia");
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
+  add_flag(&sl0, buf, config.secure, "secure");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
@@ -1447,6 +1448,15 @@ void util_status_info()
         drv->sysfs_name ?: "",
         drv->used
       );
+      slist_append_str(&sl0, buf);
+    }
+  }
+
+  if(config.sha1) {
+    strcpy(buf, "sha1 sums:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.sha1; sl; sl = sl->next) {
+      sprintf(buf, "  %s %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }

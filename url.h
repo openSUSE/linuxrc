@@ -1,3 +1,5 @@
+#include "sha1.h"
+
 typedef struct url_data_s {
   url_t *url;
   char *file_name;
@@ -26,6 +28,8 @@ typedef struct url_data_s {
     unsigned char *data;
   } buf;
   int (*progress)(struct url_data_s *, int);
+  struct sha1_ctx sha1_ctx;
+  char *sha1;
 } url_data_t;
 
 #define URL_FLAG_UNZIP		1

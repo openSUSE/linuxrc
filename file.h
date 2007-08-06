@@ -45,7 +45,8 @@ typedef enum {
   key_layer2, key_wlan_essid, key_wlan_auth, key_wlan_key_ascii,
   key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname,
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
-  key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g
+  key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g,
+  key_sha1, key_insecure
 } file_key_t;
 
 typedef enum {
@@ -58,7 +59,8 @@ typedef enum {
   kf_mem = 1 << 5,		/* /proc/meminfo */
   kf_boot = 1 << 6,		/* things the boot loader used */
   kf_cmd1 = 1 << 7,		/* between cmd_early and start of hw detection */
-  kf_ibft = 1 << 8		/* ibft values (iSCSI BIOS) */
+  kf_ibft = 1 << 8,		/* ibft values (iSCSI BIOS) */
+  kf_cont = 1 << 9		/* 'content' file */
 } file_key_flag_t;
 
 typedef struct file_s {

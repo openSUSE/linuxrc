@@ -1,3 +1,7 @@
+6/8/2007:	v3.0.1
+	- made ntfs-3g default
+	- check sha1sum of all downloaded files (feat. 302195)
+
 2/8/2007:	v3.0.0
 	- resolv.conf not written when netsetup=dhcp,all was used (#284469)
 	- allow multiple nameservers (#284469)

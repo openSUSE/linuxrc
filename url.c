@@ -1,5 +1,16 @@
 #define _GNU_SOURCE	/* strnlen */
 
+/*
+
+known issues:
+
+- slp: path = NULL does not work - why?
+- wget file:/xxx fails - becomes file://xxx at some point
+- nfs: uses temp moutpoint if instsys is directory - why? (it's not necessary)
+
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -53,7 +64,10 @@ void url_read(url_data_t *url_data)
   int i;
   FILE *f;
   char *buf, *s, *proxy_url = NULL;
-  sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);;
+  sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);
+  unsigned char sha1[20];
+
+  sha1_init_ctx(&url_data->sha1_ctx);
 
   c_handle = curl_easy_init();
   // fprintf(stderr, "curl handle = %p\n", c_handle);
@@ -154,6 +168,15 @@ void url_read(url_data_t *url_data)
   str_copy(&proxy_url, NULL);
 
   signal(SIGPIPE, old_sigpipe);
+
+  if(!url_data->err) {
+    memset(sha1, 0, 16);
+    sha1_finish_ctx(&url_data->sha1_ctx, sha1);
+    url_data->sha1 = calloc(2 * sizeof sha1 + 1, 1);
+    for(i = 0; i < sizeof sha1; i++) {
+      sprintf(url_data->sha1 + 2 * i, "%02x", sha1[i]);
+    }
+  }
 }
 
 
@@ -173,6 +196,8 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 #endif
 
   z1 = size * nmemb;
+
+  if(z1) sha1_process_bytes(buffer, z1, &url_data->sha1_ctx);
 
   if(url_data->buf.len < url_data->buf.max && z1) {
     z2 = url_data->buf.max - url_data->buf.len;
@@ -370,6 +395,7 @@ url_t *url_set(char *str)
     i = file_sym2num(str);
     if(i >= 0) {
       url->scheme = i;
+      url->path = strdup("");
     }
     else if(i == -1) {
       url->scheme = inst_rel;
@@ -488,10 +514,6 @@ url_t *url_set(char *str)
     str_copy(&url->instsys, sl->value);
   }
 
-  if((sl = slist_getentry(url->query, "proxy"))) {
-    str_copy(&url->proxy, sl->value);
-  }
-
   if(
     url->scheme == inst_file ||
     url->scheme == inst_nfs ||
@@ -563,8 +585,6 @@ url_t *url_set(char *str)
       fprintf(stderr, "  network = %u, mountable = %u\n", url->is.network, url->is.mountable);
 
       if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
-
-      if(url->proxy) fprintf(stderr, "  proxy = %s\n", url->proxy);
 
       if(url->query) {
         fprintf(stderr, "  query:\n");
@@ -653,7 +673,6 @@ url_t *url_free(url_t *url)
     free(url->password);
     free(url->domain);
     free(url->device);
-    free(url->proxy);
     free(url->mount);
     free(url->tmp_mount);
 
@@ -709,6 +728,7 @@ void url_data_free(url_data_t *url_data)
   free(url_data->tmp_file);
   free(url_data->buf.data);
   free(url_data->label);
+  free(url_data->sha1);
 
   free(url_data);
 }
@@ -1220,9 +1240,10 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
 
   int test_and_copy(url_t *url)
   {
-    int ok = 0, new_url = 0, i;
+    int ok = 0, new_url = 0, i, j;
     char *old_path, *buf = NULL;
     url_data_t *url_data;
+    slist_t *sl;
 
     if(!url) return 0;
 
@@ -1270,6 +1291,21 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     }
     else {
       ok = 1;
+      if(config.secure) {
+        ok = 0;
+        fprintf(stderr, "sha1 %s\n", url_data->sha1);
+        sl = slist_getentry(config.sha1, url_data->sha1);
+        if(sl && url_data->url->path) {
+          i = strlen(sl->value);
+          j = strlen(url_data->url->path);
+          if(i <= j && !strcmp(url_data->url->path + j - i, sl->value)) ok = 1;
+        }
+        if(!ok) {
+          fprintf(stderr, "sha1 check failed\n");
+          config.sha1_failed = 1;
+          ok = 1;
+        }
+      }
     }
 
     str_copy(&buf, NULL);
@@ -1354,7 +1390,7 @@ int url_find_repo(url_t *url, char *dir)
    */
   int test_is_repo(url_t *url)
   {
-    int ok = 0;
+    int ok = 0, i;
     char *buf = NULL, *file_name;
     int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
 
@@ -1365,7 +1401,25 @@ int url_find_repo(url_t *url, char *dir)
       !config.url.instsys->scheme
     ) return 0;
 
+    config.sha1 = slist_free(config.sha1);
+
     if(url_read_file(url, NULL, "/content", "/content", NULL, 0)) return 0;
+
+    if(config.secure) {
+      if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, 0)) return 0;
+      str_copy(&buf, "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify /content.asc >/dev/null");
+      if(config.debug < 2) strprintf(&buf, " 2>&1");
+      i = system(buf);
+      if(i) {
+        fprintf(stderr, "signature check failed\n");
+        config.sig_failed = 1;
+      }
+      else {
+        config.sha1_failed = 0;
+        fprintf(stderr, "signature check ok\n");
+      }
+      file_read_info_file("file:/content", kf_cont);
+    }
 
     if(config.url.instsys->scheme != inst_rel) return 1;
 
@@ -1642,7 +1696,6 @@ int url_setup_device(url_t *url)
       str_copy(&url->domain, tmp_url->domain);
       str_copy(&url->device, tmp_url->device);
       str_copy(&url->instsys, tmp_url->instsys);
-      str_copy(&url->proxy, tmp_url->proxy);
 
       url_free(tmp_url);
 

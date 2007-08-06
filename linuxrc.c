@@ -738,6 +738,8 @@ void lxrc_init()
   config.escdelay = 100;	/* 100 ms */
   config.utf8 = 1;
   config.kbd_fd = -1;
+  config.ntfs_3g = 1;
+  config.secure = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;

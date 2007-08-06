@@ -222,7 +222,6 @@ typedef struct {
   char *domain;
   char *device;
   char *instsys;
-  char *proxy;
   char *mount;
   char *tmp_mount;
   unsigned port;
@@ -331,6 +330,9 @@ typedef struct {
   unsigned installfilesread:1;	/* already got install files */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
+  unsigned secure:1;		/* secure mode (check sha1 of all downloaded files) */
+  unsigned sha1_failed:1;	/* sha1 check failed */
+  unsigned sig_failed:1;	/* 'content' signature check failed */
   unsigned xxx;			/* xxx */
   unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
@@ -378,6 +380,7 @@ typedef struct {
   unsigned swap_file_size;	/* swap file size in MB */
   window_t progress_win;	/* download status window */
   hd_data_t *hd_data;		/* device list */
+  slist_t *sha1;		/* sha1sum list */
 
   struct {
     char *instsys_default;	/* default instsys url */

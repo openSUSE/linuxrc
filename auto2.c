@@ -332,9 +332,12 @@ void auto2_scan_hardware()
  */
 int auto2_find_repo()
 {
-  int err;
+  int err, win, i;
   unsigned dud_count;
   char *file_name;
+
+  config.sig_failed = 0;
+  config.sha1_failed = 0;
 
   if(!config.url.install || !config.url.install->scheme) return 0;
 
@@ -378,13 +381,32 @@ int auto2_find_repo()
     err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
   }
 
+  /* get some files for lazy yast */
+  if(!err) auto2_read_repo_files(config.url.install);
+
+  if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
+    if(!(win = config.win)) util_disp_init();
+    i = dia_okcancel(
+      "Sorry, repository failed checksum test.\n\n"
+      "If you really trust your repository, you may continue in an insecure mode.",
+      NO
+    );
+    if(!win) util_disp_done();
+    if(i == YES) {
+      config.secure = 0;
+    }
+    else {
+      err = 1;
+      url_umount(config.url.instsys2);
+      url_umount(config.url.instsys);
+      url_umount(config.url.install);
+    }
+  }
+
   if(err) {
     fprintf(stderr, "no %s repository found\n", config.product);
     return 0;
   }
-
-  /* get some files for lazy yast */
-  auto2_read_repo_files(config.url.install);
 
   /* check for driver updates */
 
