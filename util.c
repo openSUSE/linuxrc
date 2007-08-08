@@ -3462,6 +3462,8 @@ void util_set_product_dir(char *prod)
     if(arch[0] == 'i' && arch[2] == '8' && arch[3] == '6' && !arch[4]) arch = "i386";
   }
 
+  if(!strcmp(arch, "ppc64")) arch = "ppc";
+
   strprintf(&config.rootimage, "boot/%s/root", arch);
   strprintf(&config.rescueimage, "boot/%s/rescue", arch);
 }

@@ -1,3 +1,6 @@
+8/8/2007:	v3.0.3
+	- map ppc64 -> ppc (#298348)
+
 8/8/2007:	v3.0.2
 	- new key for sha1 checksums
 
