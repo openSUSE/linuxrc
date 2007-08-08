@@ -267,7 +267,7 @@ static struct {
   { key_bootif,         "BOOTIF",         kf_cmd                         },
   { key_swap_size,      "SwapSize",       kf_cfg + kf_cmd                },
   { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
-  { key_sha1,           "META",           kf_cfg + kf_cont               },
+  { key_sha1,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
 };
 
