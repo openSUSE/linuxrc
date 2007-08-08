@@ -3073,6 +3073,9 @@ char *util_fstype(char *dev, char **module)
   if(!type) return NULL;
 
   if(module) {
+    /* iso9660 is special */
+    if(*module && !strcmp(*module, "iso9660")) *module = "isofs";
+
     if(
       !strcmp(type, "cpio") ||
       (config.ntfs_3g && !strcmp(type, "ntfs"))
@@ -3466,6 +3469,11 @@ void util_set_product_dir(char *prod)
 
   strprintf(&config.rootimage, "boot/%s/root", arch);
   strprintf(&config.rescueimage, "boot/%s/rescue", arch);
+
+  if(!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
+    strprintf(&config.kexec_kernel, "boot/%s/loader/linux", arch);
+    strprintf(&config.kexec_initrd, "boot/%s/loader/initrd", arch);
+  }
 }
 
 

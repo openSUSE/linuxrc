@@ -38,7 +38,7 @@ typedef enum {
   key_rootpassword, key_loghost, key_escdelay, key_minmem, key_updateprio,
   key_instnetdev, key_iucvpeer, key_portname, key_readchan, key_writechan,
   key_datachan, key_ctcprotocol, key_netwait, key_newid, key_moduledisks,
-  key_port, key_smbshare, key_rootimage2, key_xxx, key_instsys_id,
+  key_port, key_smbshare, key_rootimage2, key_instsys_id,
   key_initrd_id, key_instsys_complain, key_nfstcp, key_osamedium,
   key_osainterface, key_dud_complain, key_dud_expected, key_staticdevices,
   key_withiscsi, key_ethtool, key_listen, key_zombies, key_dhcpcd,
@@ -46,7 +46,7 @@ typedef enum {
   key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname,
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
   key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g,
-  key_sha1, key_insecure
+  key_sha1, key_insecure, key_kexec
 } file_key_t;
 
 typedef enum {

@@ -38,6 +38,7 @@ static int driver_is_active(hd_t *hd);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_files(url_t *url);
+static void auto2_kexec(url_t *url);
 
 
 /*
@@ -375,6 +376,12 @@ int auto2_find_repo()
 
   /* now go and look for repo */
   err = url_find_repo(config.url.install, config.mountpoint.instdata);
+
+  if(!err && config.kexec) {
+    auto2_kexec(config.url.install);
+    fprintf(stderr, "kexec failed\n");
+    return 0;
+  }
 
   /* if instsys is not a relative url, load it here */
   if(!err && !config.url.instsys->mount) {
@@ -766,6 +773,7 @@ void auto2_read_repo_files(url_t *url)
   char *dst = NULL, *file_list = NULL;
   static char *default_list[][2] = {
     { "/media.1/info.txt", "/info.txt" },
+    { "/media.1/license.tar.gz", "/license.tar.gz" },
     { "/part.info", "/part.info" },
     { "/control.xml", "/control.xml" }
   };
@@ -790,4 +798,71 @@ void auto2_read_repo_files(url_t *url)
   str_copy(&file_list, NULL);
 }
 
+
+/*
+ * Download new kernel & initrd and run kexec.
+ *
+ * Does not return if successful.
+ */
+void auto2_kexec(url_t *url)
+{
+  char *kernel, *initrd, *buf = NULL, *cmdline = NULL;
+  FILE *f;
+  int i, win, err = 0;
+
+  if(!config.kexec_kernel || !config.kexec_initrd) {
+    fprintf(stderr, "no kernel and initrd for kexec specified\n");
+    return;
+  }
+
+  kernel = strdup(new_download());
+  initrd = strdup(new_download());
+
+  err = url_read_file(url, NULL, config.kexec_kernel, kernel, NULL, URL_FLAG_PROGRESS);
+  if(!err) err = url_read_file(url, NULL, config.kexec_initrd, initrd, NULL, URL_FLAG_PROGRESS);
+
+  if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
+    if(!(win = config.win)) util_disp_init();
+    i = dia_okcancel(
+      "Sorry, repository failed checksum test.\n\n"
+      "If you really trust your repository, you may continue in an insecure mode.",
+      NO
+    );
+    if(!win) util_disp_done();
+    if(i == YES) {
+      config.secure = 0;
+    }
+    else {
+      err = 1;
+      url_umount(config.url.instsys2);
+      url_umount(config.url.instsys);
+      url_umount(config.url.install);
+    }
+  }
+
+  if(!err) {
+    cmdline = calloc(1024, 1);
+    if((f = fopen("/proc/cmdline", "r"))) {
+      if(!fread(cmdline, 1, 1023, f)) *cmdline = 0;
+      fclose(f);
+    }
+
+    sync();
+
+    strprintf(&buf, "kexec -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
+    fprintf(stderr, "%s\n", buf);
+    system(buf);
+
+    util_umount_all();
+
+    sync();
+
+    system("kexec -e");
+  }
+
+  free(kernel);
+  free(initrd);
+  free(buf);
+  free(cmdline);
+}
 

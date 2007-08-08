@@ -333,7 +333,7 @@ typedef struct {
   unsigned secure:1;		/* secure mode (check sha1 of all downloaded files) */
   unsigned sha1_failed:1;	/* sha1 check failed */
   unsigned sig_failed:1;	/* 'content' signature check failed */
-  unsigned xxx;			/* xxx */
+  unsigned kexec:1;		/* kexec to kernel & initrd from repo */
   unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
@@ -381,6 +381,8 @@ typedef struct {
   window_t progress_win;	/* download status window */
   hd_data_t *hd_data;		/* device list */
   slist_t *sha1;		/* sha1sum list */
+  char *kexec_kernel;		/* kernel image for kexec */
+  char *kexec_initrd;		/* initrd image for kexec */
 
   struct {
     char *instsys_default;	/* default instsys url */

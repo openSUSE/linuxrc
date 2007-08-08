@@ -1421,7 +1421,7 @@ int url_find_repo(url_t *url, char *dir)
       file_read_info_file("file:/content", kf_cont);
     }
 
-    if(config.url.instsys->scheme != inst_rel) return 1;
+    if(config.url.instsys->scheme != inst_rel || config.kexec) return 1;
 
     if(
       url->is.mountable &&

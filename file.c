@@ -239,7 +239,6 @@ static struct {
   { key_port,           "Port",           kf_none                        },
   { key_smbshare,       "Share",          kf_none                        },
   { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                },
-  { key_xxx,            "xxx",            kf_cfg + kf_cmd + kf_cmd_early },
   { key_instsys_id,     "InstsysID",      kf_cfg + kf_cmd                },
   { key_initrd_id,      "InitrdID",       kf_cfg + kf_cmd                },
   { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd             },
@@ -269,6 +268,7 @@ static struct {
   { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_sha1,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1175,10 +1175,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_xxx:
-        if(f->is.numeric) config.xxx = f->nvalue;
-        break;
-
       case key_instsys_complain:
         if(f->is.numeric) config.instsys_complain = f->nvalue;
         break;
@@ -1335,6 +1331,10 @@ void file_do_info(file_t *f0)
 
       case key_insecure:
         if(f->is.numeric && f->nvalue) config.secure = 0;
+        break;
+
+      case key_kexec:
+        if(f->is.numeric) config.kexec = f->nvalue;
         break;
 
       default:
