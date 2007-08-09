@@ -158,17 +158,6 @@ msgstr "Bootarea unui sistem instalat"
 msgid "Searching for image \"%s\"..."
 msgstr "Cautand imaginea kernelului \"%s\"..."
 
-#. TXT_RI_NOT_FOUND
-#, fuzzy
-msgid ""
-"Cannot find the image.\n"
-"\n"
-"Check the directory specification."
-msgstr ""
-"Nu gasesc imaginea kernelului!\n"
-"\n"
-"Verificati directorul specificat!"
-
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
@@ -565,16 +554,6 @@ msgstr "Introduceti calea si numele fisierului care doriti sa  fie incarcat in R
 #, fuzzy
 msgid "Not yet implemented."
 msgstr "Inca nu a fost implementat!"
-
-#. TXT_NEW_INST_SYS
-#, fuzzy
-msgid "Installation System"
-msgstr "Instalarea sistemului"
-
-#. TXT_ENTER_INST_SYS
-#, fuzzy
-msgid "Enter the directory that contains the installation system."
-msgstr "Introduceti directorul care contine sistemul de instalat."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -1221,5 +1200,29 @@ msgid "Enable OSI Layer 2 support?"
 msgstr ""
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
+msgstr ""
+
+#. dialog box if install repository is missing
+#. TXT_NO_REPO
+msgid "No repository found."
+msgstr ""
+
+#. a web proxy
+#. TXT_USER_PW_PROXY
+msgid "Do you need a username and password to access the proxy?"
+msgstr ""
+
+#. ftp or http server
+#. TXT_USER_PW_SERVER
+#, c-format
+msgid "Do you need a username and password to access the %s server?"
+msgstr ""
+
+#. our installation repository
+#. TXT_INSECURE_REPO
+msgid ""
+"Sorry, repository failed checksum test.\n"
+"\n"
+"If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
 

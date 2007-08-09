@@ -145,16 +145,6 @@ msgstr "將已安裝的系統開機"
 msgid "Searching for image \"%s\"..."
 msgstr "正在搜尋影像「%s」..."
 
-#. TXT_RI_NOT_FOUND
-msgid ""
-"Cannot find the image.\n"
-"\n"
-"Check the directory specification."
-msgstr ""
-"找不到影像。\n"
-"\n"
-"請檢查目錄設定。"
-
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
 msgstr "核心訊息"
@@ -507,14 +497,6 @@ msgstr "輸入要載入 RAM 磁碟檔案的路徑與名稱，以做為根檔案�
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
 msgstr "尚未執行。"
-
-#. TXT_NEW_INST_SYS
-msgid "Installation System"
-msgstr "安裝系統"
-
-#. TXT_ENTER_INST_SYS
-msgid "Enter the directory that contains the installation system."
-msgstr "輸入包含安裝系統的目錄。"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -1151,5 +1133,29 @@ msgid "Enable OSI Layer 2 support?"
 msgstr "啟用 OSI 第二層支援？"
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
+msgstr ""
+
+#. dialog box if install repository is missing
+#. TXT_NO_REPO
+msgid "No repository found."
+msgstr ""
+
+#. a web proxy
+#. TXT_USER_PW_PROXY
+msgid "Do you need a username and password to access the proxy?"
+msgstr ""
+
+#. ftp or http server
+#. TXT_USER_PW_SERVER
+#, c-format
+msgid "Do you need a username and password to access the %s server?"
+msgstr ""
+
+#. our installation repository
+#. TXT_INSECURE_REPO
+msgid ""
+"Sorry, repository failed checksum test.\n"
+"\n"
+"If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
 

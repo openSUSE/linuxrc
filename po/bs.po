@@ -160,17 +160,6 @@ msgstr "Pokreni instalirani sistem"
 msgid "Searching for image \"%s\"..."
 msgstr "Tražim 'image' \"%s\"..."
 
-#. TXT_RI_NOT_FOUND
-#, fuzzy
-msgid ""
-"Cannot find the image.\n"
-"\n"
-"Check the directory specification."
-msgstr ""
-"Ne mogu pronaći 'image'!\n"
-"\n"
-"Provjerite kako ste upisali direktorij!"
-
 #. TXT_INFO_KERNEL
 #, fuzzy
 msgid "Kernel Messages"
@@ -567,16 +556,6 @@ msgstr "Unesite putanju i naziv datoteke koja će biti učitana u RAM disk kao r
 #, fuzzy
 msgid "Not yet implemented."
 msgstr "Još nije implementirano!"
-
-#. TXT_NEW_INST_SYS
-#, fuzzy
-msgid "Installation System"
-msgstr "Instalacioni sistem"
-
-#. TXT_ENTER_INST_SYS
-#, fuzzy
-msgid "Enter the directory that contains the installation system."
-msgstr "Unesite direktorij koji sadrži instalacioni sistem."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -1240,5 +1219,29 @@ msgid "Enable OSI Layer 2 support?"
 msgstr ""
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
+msgstr ""
+
+#. dialog box if install repository is missing
+#. TXT_NO_REPO
+msgid "No repository found."
+msgstr ""
+
+#. a web proxy
+#. TXT_USER_PW_PROXY
+msgid "Do you need a username and password to access the proxy?"
+msgstr ""
+
+#. ftp or http server
+#. TXT_USER_PW_SERVER
+#, c-format
+msgid "Do you need a username and password to access the %s server?"
+msgstr ""
+
+#. our installation repository
+#. TXT_INSECURE_REPO
+msgid ""
+"Sorry, repository failed checksum test.\n"
+"\n"
+"If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
 

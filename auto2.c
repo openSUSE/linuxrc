@@ -393,11 +393,7 @@ int auto2_find_repo()
 
   if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
     if(!(win = config.win)) util_disp_init();
-    i = dia_okcancel(
-      "Sorry, repository failed checksum test.\n\n"
-      "If you really trust your repository, you may continue in an insecure mode.",
-      NO
-    );
+    i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
     if(!win) util_disp_done();
     if(i == YES) {
       config.secure = 0;
@@ -823,11 +819,7 @@ void auto2_kexec(url_t *url)
 
   if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
     if(!(win = config.win)) util_disp_init();
-    i = dia_okcancel(
-      "Sorry, repository failed checksum test.\n\n"
-      "If you really trust your repository, you may continue in an insecure mode.",
-      NO
-    );
+    i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
     if(!win) util_disp_done();
     if(i == YES) {
       config.secure = 0;

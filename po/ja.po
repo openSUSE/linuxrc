@@ -145,16 +145,6 @@ msgstr "インストールしたシステムをブートする"
 msgid "Searching for image \"%s\"..."
 msgstr "画像\"%s\"を検索しています..."
 
-#. TXT_RI_NOT_FOUND
-msgid ""
-"Cannot find the image.\n"
-"\n"
-"Check the directory specification."
-msgstr ""
-"画像が見つかりませんでした。\n"
-"\n"
-"ディレクトリの指定が正しいかどうかを確認してください。"
-
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
 msgstr "カーネルメッセージ"
@@ -507,14 +497,6 @@ msgstr "ルートファイルシステムとしてRAMディスクにロードす
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
 msgstr "まだ実装されていません。"
-
-#. TXT_NEW_INST_SYS
-msgid "Installation System"
-msgstr "インストールシステム"
-
-#. TXT_ENTER_INST_SYS
-msgid "Enter the directory that contains the installation system."
-msgstr "インストールシステムが存在するディレクトリを入力してください。"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -1151,5 +1133,29 @@ msgid "Enable OSI Layer 2 support?"
 msgstr "OSIレイヤ2サポートを有効にしますか？"
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
+msgstr ""
+
+#. dialog box if install repository is missing
+#. TXT_NO_REPO
+msgid "No repository found."
+msgstr ""
+
+#. a web proxy
+#. TXT_USER_PW_PROXY
+msgid "Do you need a username and password to access the proxy?"
+msgstr ""
+
+#. ftp or http server
+#. TXT_USER_PW_SERVER
+#, c-format
+msgid "Do you need a username and password to access the %s server?"
+msgstr ""
+
+#. our installation repository
+#. TXT_INSECURE_REPO
+msgid ""
+"Sorry, repository failed checksum test.\n"
+"\n"
+"If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
 

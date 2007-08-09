@@ -231,7 +231,7 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
   }
 
-  if(err) dia_message("No repository found", MSGTYPE_ERROR);
+  if(err) dia_message(txt_get(TXT_NO_REPO), MSGTYPE_ERROR);
 
   return err ? 1 : 0;
 }
@@ -356,7 +356,7 @@ int inst_choose_source_cb(dia_item_t di)
   }
 
   if(err) {
-    dia_message("No repository found", MSGTYPE_ERROR);
+    dia_message(txt_get(TXT_NO_REPO), MSGTYPE_ERROR);
     rc = 1;
   }
 
@@ -751,7 +751,7 @@ int inst_do_network(instmode_t scheme)
 
       /* proxy user, password */
       if(!err) {
-        i = dia_yesno("Do you need a username and password to access the proxy?", NO);
+        i = dia_yesno(txt_get(TXT_USER_PW_PROXY), NO);
 
         if(i == ESCAPE) {
           err = 1;
@@ -801,7 +801,7 @@ int inst_do_network(instmode_t scheme)
   /* user, password */
   if(!err && (scheme == inst_http || scheme == inst_ftp)) {
     strprintf(&buf,
-      "Do you need a username and password to access the %s server?",
+      txt_get(TXT_USER_PW_SERVER),
       get_instmode_name_up(scheme)
     );
     i = dia_yesno(buf, NO);

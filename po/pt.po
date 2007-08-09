@@ -151,16 +151,6 @@ msgstr "Arrancar Sistema Instalado"
 msgid "Searching for image \"%s\"..."
 msgstr "A procurar imagem \"%s\"..."
 
-#. TXT_RI_NOT_FOUND
-msgid ""
-"Cannot find the image.\n"
-"\n"
-"Check the directory specification."
-msgstr ""
-"Impossível encontrar a imagem.\n"
-"\n"
-"Verifique a especificação da directória."
-
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
 msgstr "Mensagens do Kernel"
@@ -513,14 +503,6 @@ msgstr "Introduza o caminho e o nome do ficheiro a ser carregado para o disco RA
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
 msgstr "Ainda não implementado."
-
-#. TXT_NEW_INST_SYS
-msgid "Installation System"
-msgstr "Sistema de Instalação"
-
-#. TXT_ENTER_INST_SYS
-msgid "Enter the directory that contains the installation system."
-msgstr "Introduza o diretório que contém o sistema de instalação."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -1156,5 +1138,29 @@ msgid "Enable OSI Layer 2 support?"
 msgstr ""
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
+msgstr ""
+
+#. dialog box if install repository is missing
+#. TXT_NO_REPO
+msgid "No repository found."
+msgstr ""
+
+#. a web proxy
+#. TXT_USER_PW_PROXY
+msgid "Do you need a username and password to access the proxy?"
+msgstr ""
+
+#. ftp or http server
+#. TXT_USER_PW_SERVER
+#, c-format
+msgid "Do you need a username and password to access the %s server?"
+msgstr ""
+
+#. our installation repository
+#. TXT_INSECURE_REPO
+msgid ""
+"Sorry, repository failed checksum test.\n"
+"\n"
+"If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
 
