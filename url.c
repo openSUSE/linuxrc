@@ -1240,7 +1240,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
 
   int test_and_copy(url_t *url)
   {
-    int ok = 0, new_url = 0, i, j;
+    int ok = 0, new_url = 0, i, j, k;
     char *old_path, *buf = NULL;
     url_data_t *url_data;
     slist_t *sl;
@@ -1292,18 +1292,25 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     else {
       ok = 1;
       if(config.secure) {
-        ok = 0;
         fprintf(stderr, "sha1 %s\n", url_data->sha1);
-        sl = slist_getentry(config.sha1, url_data->sha1);
-        if(sl && url_data->url->path) {
-          i = strlen(sl->value);
-          j = strlen(url_data->url->path);
-          if(i <= j && !strcmp(url_data->url->path + j - i, sl->value)) ok = 1;
+        if((flags & URL_FLAG_NOSHA1)) {
+          fprintf(stderr, "sha1 not checked\n");
         }
-        if(!ok) {
-          fprintf(stderr, "sha1 check failed\n");
-          config.sha1_failed = 1;
-          ok = 1;
+        else {
+          k = 0;
+          sl = slist_getentry(config.sha1, url_data->sha1);
+          if(sl && url_data->url->path) {
+            i = strlen(sl->value);
+            j = strlen(url_data->url->path);
+            if(i <= j && !strcmp(url_data->url->path + j - i, sl->value)) k = 1;
+          }
+          if(k) {
+            fprintf(stderr, "sha1 ok\n");
+          }
+          else {
+            fprintf(stderr, "sha1 check failed\n");
+            config.sha1_failed = 1;
+          }
         }
       }
     }
@@ -1403,10 +1410,10 @@ int url_find_repo(url_t *url, char *dir)
 
     config.sha1 = slist_free(config.sha1);
 
-    if(url_read_file(url, NULL, "/content", "/content", NULL, 0)) return 0;
+    if(url_read_file(url, NULL, "/content", "/content", NULL, URL_FLAG_NOSHA1)) return 0;
 
     if(config.secure) {
-      if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, 0)) return 0;
+      if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, URL_FLAG_NOSHA1)) return 0;
       str_copy(&buf, "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify /content.asc >/dev/null");
       if(config.debug < 2) strprintf(&buf, " 2>&1");
       i = system(buf);
@@ -1416,7 +1423,7 @@ int url_find_repo(url_t *url, char *dir)
       }
       else {
         config.sha1_failed = 0;
-        fprintf(stderr, "signature check ok\n");
+        fprintf(stderr, "signature ok\n");
       }
       file_read_info_file("file:/content", kf_cont);
     }
@@ -1426,7 +1433,11 @@ int url_find_repo(url_t *url, char *dir)
     if(
       url->is.mountable &&
       !util_check_exist2(url->mount, config.url.instsys->path)
-    ) return 0;
+    ) {
+      fprintf(stderr, "instsys missing: %s\n", config.url.instsys->path);
+
+      return 0;
+    }
 
     if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
 
@@ -1437,6 +1448,7 @@ int url_find_repo(url_t *url, char *dir)
       util_is_mountable(buf)
     ) {
       ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
+      if(!ok) fprintf(stderr, "instsys mount failed: %s\n", config.url.instsys->path);
     }
     else {
       if(!url_read_file(url,
@@ -1447,6 +1459,7 @@ int url_find_repo(url_t *url, char *dir)
         URL_FLAG_PROGRESS + URL_FLAG_UNZIP
       )) {
         ok = util_mount_ro(file_name, config.mountpoint.instsys) ? 0 : 1;
+        if(!ok) fprintf(stderr, "instsys mount failed: %s\n", config.url.instsys->path);
       }
 
       free(file_name);

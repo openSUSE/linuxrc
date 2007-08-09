@@ -34,6 +34,7 @@ typedef struct url_data_s {
 
 #define URL_FLAG_UNZIP		1
 #define URL_FLAG_PROGRESS	2
+#define URL_FLAG_NOSHA1		4
 
 void url_read(url_data_t *url_data);
 url_t *url_set(char *str);

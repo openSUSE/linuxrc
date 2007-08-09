@@ -1,8 +1,10 @@
 8/8/2007:	v3.0.4
 	- module for iso9660 is isofs (#298345)
-	- download mmedia.1/license.tar.gz (#298342)
+	- download license.tar.gz (#298342)
 	- removed xxx option
 	- added kexec=1 option (feat. 301806)
+	- don't check sha1 of 'content'
+	- some more log messages
 
 8/8/2007:	v3.0.3
 	- map ppc64 -> ppc (#298348)
