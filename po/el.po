@@ -701,19 +701,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Αυτόματη ρύθμιση μέσω %s;"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "Αποστολή αίτησης %s ..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -745,7 +745,7 @@ msgstr "Παρακαλώ επιλέξτε το πρωτόκολλο δικτύο
 msgid "Enter the IP address of the %s server."
 msgstr "Εισάγετε τη διεύθυνση IP του διακομιστή %s."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -768,7 +768,7 @@ msgstr "Φόρτωση Μονάδων Σύστηματος Αρχείων"
 msgid "Load Unknown Modules"
 msgstr "Φόρτωση Άγνωστων Μονάδων"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -982,7 +982,7 @@ msgstr "Εισάγετε τον αριθμό σχετικής πύλης."
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Επαλήθευση του CD-ROM/DVD εγκατάστασης"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Τερματισμός"
@@ -1003,7 +1003,7 @@ msgstr "Δεν βρέθηκαν νέες Ενημερώσεις Οδηγών"
 msgid "Driver Updates added"
 msgstr "Προστέθηκε Ενημέρωση Οδηγού "
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Η Ενημέρωση Οδηγού έγινε"
@@ -1036,7 +1036,7 @@ msgstr "Αναζήτηση για οδηγούς δισκέτας..."
 msgid "No floppy disk found."
 msgstr "Δεν βρέθηκαν οδηγοί δισκέτας."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Λίστα Ενημερωμένων Οδηγών"
@@ -1053,7 +1053,7 @@ msgstr "Εισάγετε το CD-ROM ή DVD της εγκατάστασης."
 msgid "No CD-ROM or DVD found."
 msgstr "Δεν βρέθηκε κανένα CD-ROM ή DVD."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1072,7 +1072,7 @@ msgstr "Λάθος Άθροισμα Ελέγχου."
 msgid "Error reading sector %u."
 msgstr "Σφάλμα κατά την ανάγνωση του τομέα %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1098,7 +1098,7 @@ msgstr "Αυτή δεν είναι μια έγκυρη διεύθυνση CCW."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Θέλετε να απενεργοποιήσετε το σύστημα τώρα;"
@@ -1131,27 +1131,27 @@ msgstr "Παρακαλώ επιλέξτε την διασύνδεση διαύλ
 msgid "Please choose the physical medium."
 msgstr "Παρακαλώ επιλέξτε το φυσικό μέσο"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Φόρτωση Μονάδων"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Φόρτωση Συστήματος Εγκατάστασης"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Φόρτωση Επιπρόσθετων Γραμματοσειρών"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "Φόρτωση Ενημέρωση Οδηγού"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Φόρτωση Συστήματος Διάσωσης"

@@ -1,57 +1,5 @@
-# translation of it.po to
-# translation of it.po to
-# translation of it.po to
-# translation of it.po to
-# translation of it.po to
-# translation of it.po to
 # Italian translations for linuxrc.
 # Copyright (C) 2001 SuSE GmbH.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
 # , 2005.
 #
 msgid ""
@@ -743,19 +691,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Configurazione automatica tramite %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "Sto inviando richiesta %s..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -787,7 +735,7 @@ msgstr "Selezionate il protocollo di rete."
 msgid "Enter the IP address of the %s server."
 msgstr "Indicate l'indirizzo IP del server %s."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -810,7 +758,7 @@ msgstr "Carica moduli del file system"
 msgid "Load Unknown Modules"
 msgstr "Caricare moduli sconosciuti"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -1023,7 +971,7 @@ msgstr "Immettete il relativo numero di porta"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Controllate il CD/DVD di installazione"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Spegnimento"
@@ -1044,7 +992,7 @@ msgstr "Non sono stati rilevati nuovi aggiornamenti driver"
 msgid "Driver Updates added"
 msgstr "Aggiornamenti driver aggiunti"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Aggiornamento driver ok"
@@ -1077,7 +1025,7 @@ msgstr "Tentativo di rilevare dischetti in corso..."
 msgid "No floppy disk found."
 msgstr "Non è stato rilevato alcun dischetto."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Elenco aggiornamenti driver"
@@ -1094,7 +1042,7 @@ msgstr "Inserite CD-Rom o DVD di installazione."
 msgid "No CD-ROM or DVD found."
 msgstr "Non è stato rilevato alcun CD-Rom o DVD."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1113,7 +1061,7 @@ msgstr "Somma di controllo errata."
 msgid "Error reading sector %u."
 msgstr "Si è verificato un errore nella lettura del settore %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1139,7 +1087,7 @@ msgstr "Indirizzo CCW non valido."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Volete fermare il sistema adesso?"
@@ -1172,27 +1120,27 @@ msgstr "Scegliere l'interfaccia del bus CCW."
 msgid "Please choose the physical medium."
 msgstr "Scegliere il supporto fisico."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Caricamento moduli"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Caricamento sistema di installazione"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Caricamento font aggiuntivi"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "Caricamento aggiornamento driver"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Caricamento sistema di salvataggio"

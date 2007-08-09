@@ -692,19 +692,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Автоматическая конфигурация через %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "Посылается %s запрос..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -736,7 +736,7 @@ msgstr "Выберите сетевой протокол."
 msgid "Enter the IP address of the %s server."
 msgstr "Введите IP-адрес %s сервера."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -759,7 +759,7 @@ msgstr "Закрузка модулей файловой системы"
 msgid "Load Unknown Modules"
 msgstr "Загрузка неизвестных модулей"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -972,7 +972,7 @@ msgstr "Введите относительный номер порта"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Проверить установочный CD-ROM/DVD"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Выключить"
@@ -993,7 +993,7 @@ msgstr "Новые обновления драйвера не найдены"
 msgid "Driver Updates added"
 msgstr "Обновления драйвера добавлены"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Обновление драйвера ОК"
@@ -1026,7 +1026,7 @@ msgstr "Поиск дискеты..."
 msgid "No floppy disk found."
 msgstr "Дискета не найдена."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Список обновляемых драйверов"
@@ -1043,7 +1043,7 @@ msgstr "Вставьте установочный CD-ROM или DVD."
 msgid "No CD-ROM or DVD found."
 msgstr "Не найден CD-ROM или DVD."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1062,7 +1062,7 @@ msgstr "Неверная контрольная сумма."
 msgid "Error reading sector %u."
 msgstr "Ошибка чтения сектора %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1088,7 +1088,7 @@ msgstr "Это неверный CCW адрес."
 msgid "Hipersocket"
 msgstr "Гиперсокет"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Вы хотите сейчас остановить систему?"
@@ -1121,27 +1121,27 @@ msgstr "Пожалуйста выберите интерфейс шины CCW."
 msgid "Please choose the physical medium."
 msgstr "Пожалуйста выберите физический носитель."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Загружаются модули"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Загружается система установки"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Загружаются дополнительный шрифты"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "загружается обновляемые драйвера"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Загружается спасательная система"

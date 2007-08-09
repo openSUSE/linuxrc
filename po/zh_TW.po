@@ -690,19 +690,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "要透過 %s 自動設定組態嗎？"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "正在傳送 %s 要求..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -729,13 +729,13 @@ msgstr "在 CD1 或 DVD1 的 boot/README 中尋找有關建立它的說明。"
 msgid "Choose the network protocol."
 msgstr "選擇網路協定。"
 
-# %s is NFS, FTP, HTTP or SMB
+#. %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "輸入 %s 伺服器的 IP 位址。"
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -745,7 +745,7 @@ msgstr "嘗試連線至 %s 伺服器中..."
 msgid "Network"
 msgstr "網路"
 
-# %s is e.g. SCSI, CD-ROM, USB
+#. %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
@@ -759,7 +759,7 @@ msgstr "載入檔案系統模組"
 msgid "Load Unknown Modules"
 msgstr "載入未知的模組"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -972,7 +972,7 @@ msgstr "輸入相關的埠號"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "確認安裝 CD-ROM/DVD"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "關閉電源"
@@ -993,7 +993,7 @@ msgstr "找不到新的「驅動程式更新」"
 msgid "Driver Updates added"
 msgstr "「驅動程式更新」已新增"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "「驅動程式更新」已完成"
@@ -1026,7 +1026,7 @@ msgstr "正在尋找磁片..."
 msgid "No floppy disk found."
 msgstr "找不到磁片。"
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "「驅動程式更新」清單"
@@ -1043,7 +1043,7 @@ msgstr "插入安裝 CD-ROM 或 DVD。"
 msgid "No CD-ROM or DVD found."
 msgstr "找不到 CD-ROM 或 DVD。"
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1062,7 +1062,7 @@ msgstr "檢查總數錯誤。"
 msgid "Error reading sector %u."
 msgstr "讀取磁區 %u 錯誤。"
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1088,7 +1088,7 @@ msgstr "這不是有效的 CCW 位址。"
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "現在要停止系統？"
@@ -1121,27 +1121,27 @@ msgstr "請選擇 CCW 匯流排介面。"
 msgid "Please choose the physical medium."
 msgstr "請選擇實體媒體。"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "正在載入模組"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "正在載入安裝系統"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "正在載入其他字型"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "正在載入驅動程式更新"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "正在載入救援系統"

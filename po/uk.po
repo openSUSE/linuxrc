@@ -695,19 +695,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Автоматичне налаштування через %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "Надсилання запиту %s..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -734,13 +734,13 @@ msgstr "Інструкція для його створення знаходит
 msgid "Choose the network protocol."
 msgstr "Виберіть мережний протокол."
 
-# %s is NFS, FTP, HTTP or SMB
+#. %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "Введіть адресу IP сервера %s."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -750,7 +750,7 @@ msgstr "Спроба з'єднатися з сервером %s..."
 msgid "Network"
 msgstr "Мережа"
 
-# %s is e.g. SCSI, CD-ROM, USB
+#. %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
@@ -764,7 +764,7 @@ msgstr "Завантажити модулі файлової системи"
 msgid "Load Unknown Modules"
 msgstr "Завантажити невідомі модулі"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -977,7 +977,7 @@ msgstr "Введіть відносний номер порту"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Перевірити інсталяційний КД/DVD"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Вимкнути живлення"
@@ -998,7 +998,7 @@ msgstr "Не знайдено нових оновлень драйверів"
 msgid "Driver Updates added"
 msgstr "Додано оновлення драйверів"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Оновлення драйверів гаразд"
@@ -1031,7 +1031,7 @@ msgstr "Пошук дискет..."
 msgid "No floppy disk found."
 msgstr "Не знайдено жодної дискети."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Список оновлень драйверів"
@@ -1048,7 +1048,7 @@ msgstr "Вставте інсталяційний КД або DVD."
 msgid "No CD-ROM or DVD found."
 msgstr "Не знайдено жодного КД або DVD."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1067,7 +1067,7 @@ msgstr "Не вірна контрольна сума."
 msgid "Error reading sector %u."
 msgstr "Помилка читання сектора %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1093,7 +1093,7 @@ msgstr "Це не є чинна адреса CCW."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Хочете зараз вимкнути систему?"
@@ -1126,27 +1126,27 @@ msgstr "Будь ласка, виберіть інтерфейс шини CCW."
 msgid "Please choose the physical medium."
 msgstr "Будь ласка, виберіть фізичний носій."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Завантаження модулів"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Завантаження системи встановлення"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Завантаження додаткових шрифтів"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "Завантаження оновлення драйверів"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Завантаження системи порятунку"

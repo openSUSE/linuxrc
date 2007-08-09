@@ -697,19 +697,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Chcete automaticky konfigurovat přes %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "Odesílám %s požadavek..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -736,13 +736,13 @@ msgstr "Návod na vytvoření naleznete na CD1 nebo DVD1 v adresáři boot/READM
 msgid "Choose the network protocol."
 msgstr "Zvolte síťový protokol."
 
-# %s is NFS, FTP, HTTP or SMB
+#. %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "Zadejte IP adresu %s serveru."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -752,7 +752,7 @@ msgstr "Pokouším se připojit %s server..."
 msgid "Network"
 msgstr "Síť"
 
-# %s is e.g. SCSI, CD-ROM, USB
+#. %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
@@ -766,7 +766,7 @@ msgstr "Nahrát moduly souborového systému"
 msgid "Load Unknown Modules"
 msgstr "Nahrát neznámé moduly"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -979,7 +979,7 @@ msgstr "Zadejte relativní číslo portu"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Ověřit instalační CD/DVD"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Vypnout"
@@ -1000,7 +1000,7 @@ msgstr "Nebyla nalezena žádná aktualizace ovladače"
 msgid "Driver Updates added"
 msgstr "Aktualizace ovladače provedena"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Aktualizace ovladače ok"
@@ -1033,7 +1033,7 @@ msgstr "Vyhledávám disketové mechaniky..."
 msgid "No floppy disk found."
 msgstr "Nebyla nalezena žádná disketová mechanika."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Seznam aktualizací ovladačů"
@@ -1050,7 +1050,7 @@ msgstr "Vložte instalační CD nebo DVD."
 msgid "No CD-ROM or DVD found."
 msgstr "CD nebo DVD nebylo nalezeno."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1069,7 +1069,7 @@ msgstr "Chybný kontrolní součet."
 msgid "Error reading sector %u."
 msgstr "Chyba při čtení sektoru %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1095,7 +1095,7 @@ msgstr "Toto není platná CCW adresa."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Chcete systém nyní vypnout?"
@@ -1128,27 +1128,27 @@ msgstr "Zvolte prosím rozhraní CCW sběrnice."
 msgid "Please choose the physical medium."
 msgstr "Zvolte prosím fyzické médium."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Zavádí se moduly"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Zavádí se instalační systém"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Zavádí se doplňující písma"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "Zavádí se update ovladače"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Zavádí se záchranný systém"

@@ -1,3 +1,6 @@
+9/8/2007:	v3.0.5
+	- updated po files
+
 8/8/2007:	v3.0.4
 	- module for iso9660 is isofs (#298345)
 	- download license.tar.gz (#298342)

@@ -696,19 +696,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Automatische configuratie via %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "%s verzoek wordt verzonden..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -740,7 +740,7 @@ msgstr "Selecteer het netwerk protocol."
 msgid "Enter the IP address of the %s server."
 msgstr "Geef het IP-adres van de %s server op."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -763,7 +763,7 @@ msgstr "Bestandssysteem modules laden"
 msgid "Load Unknown Modules"
 msgstr "Onbekende modules laden"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -976,7 +976,7 @@ msgstr "Geef het relatieve poortnummer op"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Installatie CD-ROM/DVD controle"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Power uit"
@@ -997,7 +997,7 @@ msgstr "Geen nieuwe stuurprogramma-updates gevonden"
 msgid "Driver Updates added"
 msgstr "Stuurprogramma-updates toegevoegd"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Stuurprogramma-update gelukt"
@@ -1030,7 +1030,7 @@ msgstr "De diskettes worden opgezocht..."
 msgid "No floppy disk found."
 msgstr "Geen diskette gevonden."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Lijst met stuurprogramma-updates"
@@ -1047,7 +1047,7 @@ msgstr "Plaats installatie CD-ROM of DVD."
 msgid "No CD-ROM or DVD found."
 msgstr "Geen CD-ROM of DVD gevonden."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1066,7 +1066,7 @@ msgstr "Foutieve checksum."
 msgid "Error reading sector %u."
 msgstr "Fout opgetreden tijdens het lezen van sector %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1092,7 +1092,7 @@ msgstr "Dit is geen geldig CCW adres."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Wilt u nu het systeem stoppen?"
@@ -1125,27 +1125,27 @@ msgstr "Kies de CCW bus-interface."
 msgid "Please choose the physical medium."
 msgstr "Kies het fysieke medium."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Modules laden"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Installatiesysteem laden"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Aanvullende lettertypen laden"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "Stuurprogramma-update laden"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Reddingssysteem laden"

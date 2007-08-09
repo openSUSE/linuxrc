@@ -694,19 +694,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Samodejna prilagoditev preko %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "Pošiljanje zahteve %s..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -733,13 +733,13 @@ msgstr "Navodila za izdelavo so shranjena v datoteki boot/README na CD1 ali DVD1
 msgid "Choose the network protocol."
 msgstr "Izberite omrežni protokol."
 
-# %s is NFS, FTP, HTTP or SMB
+#. %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "Vnesite IP naslov %s strežnika."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -749,7 +749,7 @@ msgstr "Poizkus povezave na %s strežnik..."
 msgid "Network"
 msgstr "Omrežje"
 
-# %s is e.g. SCSI, CD-ROM, USB
+#. %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
@@ -763,7 +763,7 @@ msgstr "Naloži module datotečnega sistema"
 msgid "Load Unknown Modules"
 msgstr "Naloži neznane module"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -977,7 +977,7 @@ msgstr "Vnesite relativno številko vrat"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Preveri namestitvene CD-ROM/DVD"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Zaustavitev sistema"
@@ -998,7 +998,7 @@ msgstr "Posodobitev gonilnika ni."
 msgid "Driver Updates added"
 msgstr "Dodane posodobitve gonilnika"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Vse v redu s posodobitvijo gonilnika"
@@ -1031,7 +1031,7 @@ msgstr "Iskanje disketnih enot..."
 msgid "No floppy disk found."
 msgstr "Ni disketnih enot."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Seznam posodobitev gonilnika"
@@ -1048,7 +1048,7 @@ msgstr "Vstavite namestitveni CD-ROM ali DVD."
 msgid "No CD-ROM or DVD found."
 msgstr "Ni CD-ROMa ali DVDja."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1067,7 +1067,7 @@ msgstr "Napačna preizkusna vsota (checksum)."
 msgid "Error reading sector %u."
 msgstr "Napaka pri branju odseka %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1085,7 +1085,7 @@ msgstr "Izberite izvor namestitve"
 msgid "This is not a valid fully qualified hostname."
 msgstr "Niste vnesli celotnega imena gostitelja."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
 msgstr "To ni veljaven CCW naslov."
@@ -1134,7 +1134,7 @@ msgstr "Nalaganje modulov"
 msgid "Loading Installation System"
 msgstr "Nalaganje nameščenega sistema"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "Nalaganje dodatnih pisav"

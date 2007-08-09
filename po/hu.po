@@ -697,19 +697,19 @@ msgstr ""
 "\n"
 "\"//%s/%s\" kiajánlást"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Automatikus konfiguráció a(z) %s-n keresztül?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "A %s kérés küldése ..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -736,13 +736,13 @@ msgstr "Az első CD-n vagy DVD-n a boot/README fájlban talál információt arr
 msgid "Choose the network protocol."
 msgstr "Válasszon hálózati protokollt."
 
-# %s is NFS, FTP, HTTP or SMB
+#. %s is NFS, FTP, HTTP or SMB
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
 msgstr "Adja meg a(z) %s kiszolgáló IP-címét."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -752,7 +752,7 @@ msgstr "Kapcsolódás a(z) %s kiszolgálóhoz ..."
 msgid "Network"
 msgstr "Hálózat"
 
-# %s is e.g. SCSI, CD-ROM, USB
+#. %s is e.g. SCSI, CD-ROM, USB
 #. TXT_LOAD_MODULES
 #, c-format
 msgid "Load %s Modules"
@@ -766,7 +766,7 @@ msgstr "A fájlrendszermodulok betöltése"
 msgid "Load Unknown Modules"
 msgstr "Ismeretlen modulok betöltése"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -821,7 +821,7 @@ msgstr "Adja meg a merevlemez partíciót (pl. /dev/sda2)"
 msgid "Enter the user name with which to access the %s server."
 msgstr "Adja meg azt a felhasználó nevet, amellyel el kívánja érni a(z) %s kiszolgálót."
 
-# %s is NFS, FTP, HTTP or SMB
+#. %s is NFS, FTP, HTTP or SMB
 #. TXT_ENTER_PASSWORD
 #, c-format
 msgid "Enter the password for the %s server."
@@ -980,7 +980,7 @@ msgstr "Adja meg a relatív portszámot"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Telepítő CD-ROM/DVD ellenőrzése"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Kikapcsolás"
@@ -1001,7 +1001,7 @@ msgstr "Új Illesztőprogram-frissítés nem található"
 msgid "Driver Updates added"
 msgstr "Illesztőprogram-frissítések hozzáadva"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Illesztőprogram-frissítés OK"
@@ -1034,7 +1034,7 @@ msgstr "Floppy lemezek keresése..."
 msgid "No floppy disk found."
 msgstr "Floppy lemez nem található."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Illesztőprogram-frissítési lista"
@@ -1051,7 +1051,7 @@ msgstr "Helyezze be a telepítő CD-ROM-ot vagy DVD-t."
 msgid "No CD-ROM or DVD found."
 msgstr "CD-ROM vagy DVD nem található."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1070,7 +1070,7 @@ msgstr "Ellenőrzőösszeg hibás."
 msgid "Error reading sector %u."
 msgstr "Hiba a(z) %u. szektor olvasása közben."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1088,7 +1088,7 @@ msgstr "Telepítési forrás kiválasztása"
 msgid "This is not a valid fully qualified hostname."
 msgstr "Ez nem egy teljes képzésű minősített gépnév."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
 msgstr "Ez nem egy érvényes CCW-cím."
@@ -1097,7 +1097,7 @@ msgstr "Ez nem egy érvényes CCW-cím."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Kívánja most leállítani a rendszert?"
@@ -1130,27 +1130,27 @@ msgstr "Válassza ki a CCW busz csatolóját."
 msgid "Please choose the physical medium."
 msgstr "Válassza ki a fizikai közeget."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "Modulok betöltése"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "Telepítőrendszer betöltése"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "További betűkészletek betöltése"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "Illesztőprogram-frissítés betöltése"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "Mentőrendszer betöltése"

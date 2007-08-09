@@ -769,19 +769,19 @@ msgid ""
 "\"//%s/%s\""
 msgstr ""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr ""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr ""
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -814,7 +814,7 @@ msgstr "Diuzit an doare rouedad a fell deoc'h arverañ evit ar staliañ."
 msgid "Enter the IP address of the %s server."
 msgstr "Enankit chomlec'h IP ar servijer NFS."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -838,7 +838,7 @@ msgstr ""
 msgid "Load Unknown Modules"
 msgstr "Kargadur sturier ar rouedad"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -1055,7 +1055,7 @@ msgstr ""
 msgid "Verify Installation CD-ROM/DVD"
 msgstr ""
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr ""
@@ -1076,7 +1076,7 @@ msgstr ""
 msgid "Driver Updates added"
 msgstr ""
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr ""
@@ -1109,7 +1109,7 @@ msgstr ""
 msgid "No floppy disk found."
 msgstr ""
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr ""
@@ -1126,7 +1126,7 @@ msgstr ""
 msgid "No CD-ROM or DVD found."
 msgstr ""
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1145,7 +1145,7 @@ msgstr ""
 msgid "Error reading sector %u."
 msgstr ""
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1169,7 +1169,7 @@ msgstr ""
 msgid "Hipersocket"
 msgstr ""
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr ""
@@ -1202,27 +1202,27 @@ msgstr ""
 msgid "Please choose the physical medium."
 msgstr ""
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr ""
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr ""
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr ""
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr ""
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr ""

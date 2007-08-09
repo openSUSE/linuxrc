@@ -696,19 +696,19 @@ msgstr ""
 "\n"
 "//%s/%s"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
 msgstr "Configuração automática via %s?"
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
 msgstr "A enviar pedido %s..."
 
-# %s is either BOOTP or DHCP
+#. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
@@ -740,7 +740,7 @@ msgstr "Escolha o protocolo de rede."
 msgid "Enter the IP address of the %s server."
 msgstr "Introduza o endereço IP do servidor %s."
 
-# %s is FTP or HTTP
+#. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
@@ -763,7 +763,7 @@ msgstr "Carregar Módulos do Sistema de Ficheiros"
 msgid "Load Unknown Modules"
 msgstr "Carregar Módulos Desconhecidos"
 
-# %s is e.g. ext3 or reiserfs
+#. %s is e.g. ext3 or reiserfs
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
@@ -977,7 +977,7 @@ msgstr "Introduza o número relativo da porta"
 msgid "Verify Installation CD-ROM/DVD"
 msgstr "Verificar CD-ROM/DVD de Instalação"
 
-# turn the computer off
+#. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
 msgstr "Desligar"
@@ -998,7 +998,7 @@ msgstr "Nenhuma Actualização Nova do Driver encontrada"
 msgid "Driver Updates added"
 msgstr "Actualizações do Driver Adicionadas"
 
-# shown if driver update succeeded
+#. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
 msgstr "Actualização do Driver ok"
@@ -1031,7 +1031,7 @@ msgstr "A procurar drive de disquetes..."
 msgid "No floppy disk found."
 msgstr "Nenhuma disquete encontrada."
 
-# heading for a listing of updates
+#. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
 msgstr "Lista de Actualização do Driver"
@@ -1048,7 +1048,7 @@ msgstr "Introduza o CD-ROM ou DVD de Instalação."
 msgid "No CD-ROM or DVD found."
 msgstr "Nenhum CD-ROM ou DVD encontrado."
 
-# e.g 'not a SUSE LINUX CD-ROM'
+#. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
@@ -1067,7 +1067,7 @@ msgstr "Checksum incorreto."
 msgid "Error reading sector %u."
 msgstr "Erro ao ler sector %u."
 
-# %s is CD-ROM or DVD
+#. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
 msgid ""
@@ -1093,7 +1093,7 @@ msgstr "Não é um endereço CCW válido."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
-# power-off message
+#. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
 msgstr "Deseja desligar o sistema agora?"
@@ -1126,27 +1126,27 @@ msgstr "Escolha a interface de barramento CCW."
 msgid "Please choose the physical medium."
 msgstr "Escolha o media físico."
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
 msgstr "A Carregar Módulos "
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
 msgstr "A Carregar Sistema de Instalação"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
 msgstr "A Carregar Fontes Adicionais"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
 msgstr "A Carregar Actualização do Driver"
 
-# progress indicator label
+#. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
 msgstr "A Carregar Sistema de Recuperação"

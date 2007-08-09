@@ -16,7 +16,7 @@ $id =~ s/^TXT_//;
 
 $_ = join '', @texts;
 
-push @l, "# $comment\n" if $comment;
+push @l, "#. $comment\n" if $comment;
 push @l, "#. TXT_$id\n";
 push @l, "#, c-format\n" if /%/;
 
