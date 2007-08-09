@@ -773,7 +773,7 @@ void auto2_read_repo_files(url_t *url)
   char *dst = NULL, *file_list = NULL;
   static char *default_list[][2] = {
     { "/media.1/info.txt", "/info.txt" },
-    { "/media.1/license.tar.gz", "/license.tar.gz" },
+    { "/license.tar.gz", "/license.tar.gz" },
     { "/part.info", "/part.info" },
     { "/control.xml", "/control.xml" }
   };
