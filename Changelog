@@ -1,3 +1,5 @@
+	- fix nfs mount (#216392)
+
 9/8/2007:	v3.0.5
 	- updated po files
 

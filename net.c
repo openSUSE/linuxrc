@@ -835,6 +835,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
     struct fhstatus        status_ri;
     char                   tmp_ti [1024];
     char                  *opts_pci;
+  int i;
 
   if(net_check_address2(server, 1)) return -2;
 
@@ -844,16 +845,16 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
     memset (&server_ri, 0, sizeof (struct sockaddr_in));
     server_ri.sin_family = AF_INET;
     server_ri.sin_addr.s_addr = server->ip.s_addr;
-    memcpy (&mount_server_ri, &server_ri, sizeof (struct sockaddr_in));
-
-    memset (&mount_data_ri, 0, sizeof (struct nfs_mount_data));
-//    mount_data_ri.flags = NFS_MOUNT_NONLM;
+    memcpy(&mount_server_ri, &server_ri, sizeof (struct sockaddr_in));
+    memset(&mount_data_ri, 0, sizeof (struct nfs_mount_data));
     if(config.net.nfs_tcp) {
       mount_data_ri.flags = NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM;
     }
+    else {
+      mount_data_ri.flags = NFS_MOUNT_NONLM;
+    }
     mount_data_ri.rsize = config.net.nfs_rsize;
     mount_data_ri.wsize = config.net.nfs_wsize;
-    mount_data_ri.timeo = 70;
     mount_data_ri.retrans = 3;
     mount_data_ri.acregmin = 3;
     mount_data_ri.acregmax = 60;
@@ -862,43 +863,22 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
     mount_data_ri.namlen = NAME_MAX;
     mount_data_ri.version = NFS_MOUNT_VERSION;
 
-    mount_server_ri.sin_port = htons (0);
-    socket_ii = RPC_ANYSOCK;
-#if 0
-    mount_client_pri = clnttcp_create (&mount_server_ri, MOUNTPROG, MOUNTVERS,
-                                       &socket_ii, 0, 0);
-#else
-    mount_client_pri = NULL;
-#endif
+    /* two tries */
+    for(i = 0, mount_client_pri = NULL; i < 2 && !mount_client_pri; i++) {
+      if(i) sleep(2);
+      mount_data_ri.timeo = 7;
+      mount_server_ri.sin_port = htons(0);
+      socket_ii = RPC_ANYSOCK;
+      timeout_ri.tv_sec = 3;
+      timeout_ri.tv_usec = 0;
+      mount_client_pri = clntudp_create(&mount_server_ri, MOUNTPROG, MOUNTVERS, timeout_ri, &socket_ii);
+    }
 
-    if (!mount_client_pri)
-        {
-	mount_data_ri.timeo = 7;
-        mount_server_ri.sin_port = htons (0);
-        socket_ii = RPC_ANYSOCK;
-        timeout_ri.tv_sec = 3;
-        timeout_ri.tv_usec = 0;
-        mount_client_pri = clntudp_create (&mount_server_ri, MOUNTPROG,
-                                           MOUNTVERS, timeout_ri, &socket_ii);
-        }
+    if(!mount_client_pri) {
+      net_show_error((enum nfs_stat) -1);
 
-    if (!mount_client_pri)
-        {
-        sleep(2);
-
-	mount_data_ri.timeo = 7;
-        mount_server_ri.sin_port = htons (0);
-        socket_ii = RPC_ANYSOCK;
-        timeout_ri.tv_sec = 3;
-        timeout_ri.tv_usec = 0;
-        mount_client_pri = clntudp_create (&mount_server_ri, MOUNTPROG,
-                                           MOUNTVERS, timeout_ri, &socket_ii);
-        if (!mount_client_pri)
-            {
-            net_show_error ((enum nfs_stat) -1);
-            return (-1);
-            }
-        }
+      return -1;
+    }
 
     mount_client_pri->cl_auth = authunix_create_default ();
     timeout_ri.tv_sec = 20;
