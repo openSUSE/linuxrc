@@ -6,8 +6,6 @@
  *
  */
 
-#define WITH_NFS
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -77,9 +75,8 @@ static void net_setup_nameserver(void);
 static int net_choose_device(void);
 static int net_input_data(void);
 #endif
-#ifdef WITH_NFS
 static void net_show_error(enum nfs_stat status_rv);
-#endif
+static int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, int flags);
 
 static void if_down(char *dev);
 static int wlan_auth_cb(dia_item_t di);
@@ -774,7 +771,6 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
 }
 
 
-#ifdef WITH_NFS
 int xdr_dirpath (XDR *xdrs, dirpath *objp)
     {
     if (!xdr_string(xdrs, objp, MNTPATHLEN))
@@ -809,9 +805,7 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
 /*
  * Mount NFS volume.
  *
- * Return:
- *      0: ok
- *   != 0: error code
+ * Tries v3 first, then v2.
  *
  * mountpoint: mount point
  * server: server address
@@ -820,153 +814,165 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
  * config.net.nfs_rsize: read size
  * config.net.nfs_wsize: write size
  * config.net.nfs_port: NFS port
+ *
+ * return:
+ *      0: ok
+ *   != 0: error code
+ *
  */
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
 {
-    struct sockaddr_in     server_ri;
-    struct sockaddr_in     mount_server_ri;
-    struct nfs_mount_data  mount_data_ri;
-    int                    socket_ii;
-    int                    fsock_ii;
-    int                    port_ii;
-    CLIENT                *mount_client_pri;
-    struct timeval         timeout_ri;
-    int                    rc_ii;
-    struct fhstatus        status_ri;
-    char                   tmp_ti [1024];
-    char                  *opts_pci;
-  int i;
+  int err;
+
+  /* first, v3 with tcp */
+  err = _net_mount_nfs(mountpoint, server, hostdir, NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM);
+
+  /* if that doesn't work, try v2, with udp */
+  if(err == EPROTONOSUPPORT) {
+    err = _net_mount_nfs(mountpoint, server, hostdir, NFS_MOUNT_NONLM);
+  }
+
+  return err;
+}
+
+
+/*
+ * Mount NFS volume.
+ *
+ * Similar to net_mount_nfs() but lets you specify NFS mount flags.
+ *
+ * mountpoint: mount point
+ * server: server address
+ * hostdir: directory on server
+ * flags: NFS mount flags
+ *
+ * config.net.nfs_rsize: read size
+ * config.net.nfs_wsize: write size
+ * config.net.nfs_port: NFS port
+ *
+ * return:
+ *      0: ok
+ *   != 0: error code
+ *
+ */
+int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, int flags)
+{
+  struct sockaddr_in server_in, mount_server_in;
+  struct nfs_mount_data mount_data;
+  CLIENT *client;
+  int sock, fsock, port, err, i;
+  struct timeval tv;
+  struct fhstatus fhs;
+  char *buf = NULL;
 
   if(net_check_address2(server, 1)) return -2;
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
 
-    memset (&server_ri, 0, sizeof (struct sockaddr_in));
-    server_ri.sin_family = AF_INET;
-    server_ri.sin_addr.s_addr = server->ip.s_addr;
-    memcpy(&mount_server_ri, &server_ri, sizeof (struct sockaddr_in));
-    memset(&mount_data_ri, 0, sizeof (struct nfs_mount_data));
-    if(config.net.nfs_tcp) {
-      mount_data_ri.flags = NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM;
-    }
-    else {
-      mount_data_ri.flags = NFS_MOUNT_NONLM;
-    }
-    mount_data_ri.rsize = config.net.nfs_rsize;
-    mount_data_ri.wsize = config.net.nfs_wsize;
-    mount_data_ri.retrans = 3;
-    mount_data_ri.acregmin = 3;
-    mount_data_ri.acregmax = 60;
-    mount_data_ri.acdirmin = 30;
-    mount_data_ri.acdirmax = 60;
-    mount_data_ri.namlen = NAME_MAX;
-    mount_data_ri.version = NFS_MOUNT_VERSION;
+  memset(&server_in, 0, sizeof server_in);
+  server_in.sin_family = AF_INET;
+  server_in.sin_addr.s_addr = server->ip.s_addr;
+  memcpy(&mount_server_in, &server_in, sizeof mount_server_in);
+  memset(&mount_data, 0, sizeof mount_data);
+  mount_data.flags = flags;
+  mount_data.rsize = config.net.nfs_rsize;
+  mount_data.wsize = config.net.nfs_wsize;
+  mount_data.retrans = 3;
+  mount_data.acregmin = 3;
+  mount_data.acregmax = 60;
+  mount_data.acdirmin = 30;
+  mount_data.acdirmax = 60;
+  mount_data.namlen = NAME_MAX;
+  mount_data.version = NFS_MOUNT_VERSION;
 
-    /* two tries */
-    for(i = 0, mount_client_pri = NULL; i < 2 && !mount_client_pri; i++) {
-      if(i) sleep(2);
-      mount_data_ri.timeo = 7;
-      mount_server_ri.sin_port = htons(0);
-      socket_ii = RPC_ANYSOCK;
-      timeout_ri.tv_sec = 3;
-      timeout_ri.tv_usec = 0;
-      mount_client_pri = clntudp_create(&mount_server_ri, MOUNTPROG, MOUNTVERS, timeout_ri, &socket_ii);
-    }
+  /* two tries */
+  for(i = 0, client = NULL; i < 2 && !client; i++) {
+    if(i) sleep(2);
+    mount_data.timeo = 7;
+    mount_server_in.sin_port = htons(0);
+    sock = RPC_ANYSOCK;
+    tv.tv_sec = 3;
+    tv.tv_usec = 0;
+    client = clntudp_create(&mount_server_in, MOUNTPROG, MOUNTVERS, tv, &sock);
+  }
 
-    if(!mount_client_pri) {
-      net_show_error((enum nfs_stat) -1);
+  if(!client) {
+    net_show_error(-1);
 
-      return -1;
-    }
+    return -1;
+  }
 
-    mount_client_pri->cl_auth = authunix_create_default ();
-    timeout_ri.tv_sec = 20;
-    timeout_ri.tv_usec = 0;
+  client->cl_auth = authunix_create_default();
+  tv.tv_sec = 20;
+  tv.tv_usec = 0;
 
-    rc_ii = clnt_call (mount_client_pri, MOUNTPROC_MNT,
-                       (xdrproc_t) xdr_dirpath, (caddr_t) &hostdir,
-                       (xdrproc_t) xdr_fhstatus, (caddr_t) &status_ri,
-                       timeout_ri);
-    if (rc_ii)
-        {
-        net_show_error ((enum nfs_stat) -1);
-        return (-1);
-        }
+  err = clnt_call(client, MOUNTPROC_MNT,
+    (xdrproc_t) xdr_dirpath, (caddr_t) &hostdir,
+    (xdrproc_t) xdr_fhstatus, (caddr_t) &fhs,
+    tv
+  );
 
-    if (status_ri.fhs_status)
-        {
-        net_show_error (status_ri.fhs_status);
-        return (-1);
-        }
+  if(err) {
+    net_show_error(-1);
+    return -1;
+  }
 
-    memcpy ((char *) &mount_data_ri.root.data,
-            (char *) status_ri.fhstatus_u.fhs_fhandle,
-            NFS_FHSIZE);
-    mount_data_ri.root.size = NFS_FHSIZE;
-    memcpy(&mount_data_ri.old_root.data,
-	   (char *) status_ri.fhstatus_u.fhs_fhandle,
-	   NFS_FHSIZE);
+  if(fhs.fhs_status) {
+    net_show_error(fhs.fhs_status);
 
-    fsock_ii = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (fsock_ii < 0)
-        {
-        net_show_error ((enum nfs_stat) -1);
-        return (-1);
-        }
+    return -1;
+  }
 
-    if (bindresvport (fsock_ii, 0) < 0)
-        {
-        net_show_error ((enum nfs_stat) -1);
-        return (-1);
-        }
+  memcpy(&mount_data.root.data, fhs.fhstatus_u.fhs_fhandle, NFS_FHSIZE);
+  mount_data.root.size = NFS_FHSIZE;
 
-    if (config.net.nfs_port)
-        {
-        fprintf (stderr, "Using specified port %d\n", config.net.nfs_port);
-        port_ii = config.net.nfs_port;
-        }
-    else
-        {
-        server_ri.sin_port = PMAPPORT;
-        port_ii = pmap_getport (&server_ri, NFS_PROGRAM, NFS_VERSION, IPPROTO_UDP);
-        if (!port_ii)
-            port_ii = NFS_PORT;
-        }
+  memcpy(&mount_data.old_root.data, fhs.fhstatus_u.fhs_fhandle, NFS_FHSIZE);
 
-    server_ri.sin_port = htons (port_ii);
+  fsock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  if(fsock < 0) {
+    net_show_error(-1);
+    
+    return -1;
+  }
 
-    mount_data_ri.fd = fsock_ii;
-    memcpy ((char *) &mount_data_ri.addr, (char *) &server_ri,
-            sizeof (mount_data_ri.addr));
-    strncpy (mount_data_ri.hostname, inet_ntoa(server->ip),
-             sizeof (mount_data_ri.hostname));
+  if(bindresvport(fsock, 0) < 0) {
+    net_show_error(-1);
 
-    auth_destroy (mount_client_pri->cl_auth);
-    clnt_destroy (mount_client_pri);
-    close (socket_ii);
+    return -1;
+  }
 
-    sprintf (tmp_ti, "%s:%s", inet_ntoa(server->ip), hostdir);
-    opts_pci = (char *) &mount_data_ri;
-    rc_ii = mount (tmp_ti, mountpoint, "nfs", MS_RDONLY | MS_MGC_VAL, opts_pci);
+  if(config.net.nfs_port) {
+    fprintf(stderr, "nfs: using specified port %d\n", config.net.nfs_port);
+    port = config.net.nfs_port;
+  }
+  else {
+    server_in.sin_port = PMAPPORT;
+    port = pmap_getport(&server_in, NFS_PROGRAM, NFS_VERSION, IPPROTO_UDP);
+    if(!port) port = NFS_PORT;
+  }
 
-    if(rc_ii == -1) return errno;
+  server_in.sin_port = htons(port);
 
-  return rc_ii;
+  mount_data.fd = fsock;
+  memcpy(&mount_data.addr, &server_in, sizeof mount_data.addr);
+
+  strncpy(mount_data.hostname, inet_ntoa(server->ip), sizeof mount_data.hostname);
+
+  auth_destroy(client->cl_auth);
+  clnt_destroy(client);
+  close(sock);
+
+  strprintf(&buf, "%s:%s", inet_ntoa(server->ip), hostdir);
+
+  err = mount(buf, mountpoint, "nfs", MS_RDONLY | MS_MGC_VAL, &mount_data);
+
+  free(buf);
+
+  if(err == -1) return errno;
+
+  return err;
 }
-
-#else
-
-
-/*
- * Dummy if we don't support NFS.
- */
-int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir);
-{
-  return -1;
-}
-
-#endif	/* WITH_NFS */
 
 
 #if NETWORK_CONFIG
@@ -1174,7 +1180,6 @@ int net_choose_device()
 #endif
 
 
-#ifdef WITH_NFS
 /*
  * Show NFS error messages.
  *
@@ -1237,7 +1242,6 @@ static void net_show_error(enum nfs_stat status_rv)
     fprintf(stderr, "%s\n", tmp);
   }
 }
-#endif
 
 
 /*
