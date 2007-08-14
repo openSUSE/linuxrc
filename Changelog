@@ -1,5 +1,5 @@
 14/8/2007:	v3.0.6
-	- fix nfs mount (#216392)
+	- fix nfs mount, nfs_tcp option gone (#216392)
 	- fixed network setup bug
 	- instsys was not found if it's a directory & a relative url was used
 
