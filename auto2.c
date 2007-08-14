@@ -386,6 +386,7 @@ int auto2_find_repo()
   /* if instsys is not a relative url, load it here */
   if(!err && !config.url.instsys->mount) {
     err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
+    if(err) url_umount(config.url.install);
   }
 
   /* get some files for lazy yast */

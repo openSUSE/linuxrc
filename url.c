@@ -56,6 +56,7 @@ static int url_progress_cb(void *clientp, double dltotal, double dlnow, double u
 static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
 static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
+static int url_setup_interface(url_t *url);
 
 
 void url_read(url_data_t *url_data)
@@ -965,8 +966,12 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     switch(url->scheme) {
       case inst_nfs:
         str_copy(&url->mount, dir ?: new_mountpoint());
+
+        if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
+
         err = net_mount_nfs(url->mount, &url->used.server, url->path);
         fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
+
         if(err == ENOTDIR || err == ENOENT) {
           str_copy(&url->mount, NULL);
           str_copy(&buf, url->path);
@@ -974,7 +979,12 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
           if((s = strrchr(buf, '/')) && s != buf && s[1]) {
             *s++ = 0;
             str_copy(&url->tmp_mount, new_mountpoint());
+
+            if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
+
             err = net_mount_nfs(url->tmp_mount, &url->used.server, buf);
+            fprintf(stderr, "nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
+    
             if(err) {
               fprintf(stderr, "nfs: %s: mount failed\n", url->used.device);
               str_copy(&url->tmp_mount, NULL);
@@ -1000,6 +1010,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
           str_copy(&url->mount, dir ?: new_mountpoint());
           s = url->mount;
         }
+
+        if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
+
         err = net_mount_smb(s, &url->used.server, url->share, url->user, url->password, url->domain);
         fprintf(stderr, "smb: %s -> %s (%d)\n", url->share, s, err);
         if(err) {
@@ -1597,9 +1610,8 @@ int url_find_instsys(url_t *url, char *dir)
  */
 int url_setup_device(url_t *url)
 {
-  int ok = 0, i;
-  char *type, *s;
-  url_t *tmp_url;
+  int ok = 0;
+  char *type;
 
   if(!url) return 0;
 
@@ -1614,136 +1626,154 @@ int url_setup_device(url_t *url)
     if(type && strcmp(type, "swap")) ok = 1;
   }
   else {
-    /* setup interface */
+    ok = url_setup_interface(url);
 
-    if(
-      config.net.configured &&
-      config.net.device &&
-      !strcmp(url->used.device, config.net.device)
-    ) {
-      return 1;
-    }
+    if(ok) {
+      name2inet(&url->used.server, url->server);
 
-    if(
-      !strncmp(url->used.device, "lo", sizeof "lo" - 1) ||
-      !strncmp(url->used.device, "sit", sizeof "sit" - 1)
-    ) return 0;
-
-    /* if(!getenv("PXEBOOT")) */ net_stop();
-
-    config.net.configured = nc_none;
-
-    fprintf(stderr, "interface setup: %s\n", url->used.device);
-
-    str_copy(&config.net.device, url->used.device);
-    str_copy(&config.net.hwaddr, url->used.hwaddr);
-    str_copy(&config.net.cardname, url->used.model);
-    str_copy(&config.net.unique_id, url->used.unique_id);
-
-    if(url->is.wlan && wlan_setup()) return 0;
-
-    config.net.configured = nc_static;
-
-    /* we need at least ip & netmask for static network config */
-    if((net_config_mask() & 3) != 3) {
-      printf(
-        "Sending %s request to %s...\n",
-        config.net.use_dhcp ? "DHCP" : "BOOTP",
-        url->used.device
-      );
-      fflush(stdout);
-      fprintf(stderr,
-        "sending %s request to %s... ",
-        config.net.use_dhcp ? "DHCP" : "BOOTP",
-        url->used.device
-      );
-
-      config.net.use_dhcp ? net_dhcp() : net_bootp();
-
-      if(
-        !config.test &&
-        (
-          !config.net.hostname.ok ||
-          !config.net.netmask.ok ||
-          !config.net.broadcast.ok
-        )
-      ) {
-        fprintf(stderr, "no/incomplete answer.\n");
+      if(net_check_address2(&url->used.server, 1)) {
+        fprintf(stderr, "invalid server address: %s\n", url->used.server.name);
         config.net.configured = nc_none;
 
-        return 0;
-      }
-      fprintf(stderr, "ok.\n");
-
-      config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
-    }
-
-    if(net_activate_ns()) {
-      fprintf(stderr, "network setup failed\n");
-      config.net.configured = nc_none;
-
-      return 0;
-    }
-    else {
-      fprintf(stderr, "%s activated\n", url->used.device);
-    }
-
-    if(url->scheme == inst_slp) {
-      tmp_url = url_set(slp_get_install(url));
-      if(!tmp_url->scheme) {
-        fprintf(stderr, "%s: SLP failed\n", url->used.device);
-        url_free(tmp_url);
-
-        return 0;
-      }
-
-      url->scheme = tmp_url->scheme;
-      url->port = tmp_url->port;
-      str_copy(&url->str, tmp_url->str);
-      str_copy(&url->path, tmp_url->path);
-      str_copy(&url->server, tmp_url->server);
-      str_copy(&url->share, tmp_url->share);
-      str_copy(&url->path, tmp_url->path);
-      str_copy(&url->user, tmp_url->user);
-      str_copy(&url->password, tmp_url->password);
-      str_copy(&url->domain, tmp_url->domain);
-      str_copy(&url->device, tmp_url->device);
-      str_copy(&url->instsys, tmp_url->instsys);
-
-      url_free(tmp_url);
-
-      fprintf(stderr, "slp: using %s\n", url_print(url, 0));
-    }
-
-    net_ask_password();
-
-    name2inet(&url->used.server, url->server);
-
-    if(net_check_address2(&url->used.server, 1)) {
-      fprintf(stderr, "invalid server address: %s\n", url->used.server.name);
-      config.net.configured = nc_none;
-
-      return 0;
-    }
-
-    s = inet2print(&config.net.hostname);
-    fprintf(stderr, "hostip: %s/", *s ? s : "<no ip>");
-    s = inetmask2print(&config.net.netmask);
-    fprintf(stderr, "%s\n", *s ? s : "<no netmask>");
-    if(config.net.gateway.ok) {
-      fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));
-    }
-    for(i = 0; i < sizeof config.net.nameserver / sizeof *config.net.nameserver; i++) {
-      if(config.net.nameserver[i].ok) {
-        fprintf(stderr, "nameserver %d: %s\n", i, inet2print(&config.net.nameserver[i]));
+        ok = 0;
       }
     }
-
-    ok = 1;
   }
 
-
   return ok;
+}
+
+
+/*
+ * Setup network interface.
+ *
+ * return:
+ *   0: failed
+ *   1: ok
+ */
+int url_setup_interface(url_t *url)
+{
+  int i;
+  char *s;
+  url_t *tmp_url;
+
+  /* setup interface */
+
+  if(
+    config.net.configured &&
+    config.net.device &&
+    !strcmp(url->used.device, config.net.device)
+  ) {
+    return 1;
+  }
+
+  if(
+    !strncmp(url->used.device, "lo", sizeof "lo" - 1) ||
+    !strncmp(url->used.device, "sit", sizeof "sit" - 1)
+  ) return 0;
+
+  /* if(!getenv("PXEBOOT")) */ net_stop();
+
+  config.net.configured = nc_none;
+
+  fprintf(stderr, "interface setup: %s\n", url->used.device);
+
+  str_copy(&config.net.device, url->used.device);
+  str_copy(&config.net.hwaddr, url->used.hwaddr);
+  str_copy(&config.net.cardname, url->used.model);
+  str_copy(&config.net.unique_id, url->used.unique_id);
+
+  if(url->is.wlan && wlan_setup()) return 0;
+
+  config.net.configured = nc_static;
+
+  /* we need at least ip & netmask for static network config */
+  if((net_config_mask() & 3) != 3) {
+    printf(
+      "Sending %s request to %s...\n",
+      config.net.use_dhcp ? "DHCP" : "BOOTP",
+      url->used.device
+    );
+    fflush(stdout);
+    fprintf(stderr,
+      "sending %s request to %s... ",
+      config.net.use_dhcp ? "DHCP" : "BOOTP",
+      url->used.device
+    );
+
+    config.net.use_dhcp ? net_dhcp() : net_bootp();
+
+    if(
+      !config.test &&
+      (
+        !config.net.hostname.ok ||
+        !config.net.netmask.ok ||
+        !config.net.broadcast.ok
+      )
+    ) {
+      fprintf(stderr, "no/incomplete answer.\n");
+      config.net.configured = nc_none;
+
+      return 0;
+    }
+    fprintf(stderr, "ok.\n");
+
+    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+  }
+
+  if(net_activate_ns()) {
+    fprintf(stderr, "network setup failed\n");
+    config.net.configured = nc_none;
+
+    return 0;
+  }
+  else {
+    fprintf(stderr, "%s activated\n", url->used.device);
+  }
+
+  if(url->scheme == inst_slp) {
+    tmp_url = url_set(slp_get_install(url));
+    if(!tmp_url->scheme) {
+      fprintf(stderr, "%s: SLP failed\n", url->used.device);
+      url_free(tmp_url);
+
+      return 0;
+    }
+
+    url->scheme = tmp_url->scheme;
+    url->port = tmp_url->port;
+    str_copy(&url->str, tmp_url->str);
+    str_copy(&url->path, tmp_url->path);
+    str_copy(&url->server, tmp_url->server);
+    str_copy(&url->share, tmp_url->share);
+    str_copy(&url->path, tmp_url->path);
+    str_copy(&url->user, tmp_url->user);
+    str_copy(&url->password, tmp_url->password);
+    str_copy(&url->domain, tmp_url->domain);
+    str_copy(&url->device, tmp_url->device);
+    str_copy(&url->instsys, tmp_url->instsys);
+
+    url_free(tmp_url);
+
+    fprintf(stderr, "slp: using %s\n", url_print(url, 0));
+  }
+
+  net_ask_password();
+
+  s = inet2print(&config.net.hostname);
+  fprintf(stderr, "hostip: %s/", *s ? s : "<no ip>");
+  s = inetmask2print(&config.net.netmask);
+  fprintf(stderr, "%s\n", *s ? s : "<no netmask>");
+  if(config.net.gateway.ok) {
+    fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));
+  }
+  for(i = 0; i < sizeof config.net.nameserver / sizeof *config.net.nameserver; i++) {
+    if(config.net.nameserver[i].ok) {
+      fprintf(stderr, "nameserver %d: %s\n", i, inet2print(&config.net.nameserver[i]));
+    }
+  }
+
+  return 1;
 }
 
 

@@ -1,4 +1,6 @@
+14/8/2007:	v3.0.6
 	- fix nfs mount (#216392)
+	- fixed some network setup bugs (nfs, smb)
 
 9/8/2007:	v3.0.5
 	- updated po files
