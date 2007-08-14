@@ -3226,7 +3226,7 @@ int util_mount(char *dev, char *dir, unsigned long flags)
     dev = loop_dev;
   }
 
-  if(config.ntfs_3g && !strcmp(type, "ntfs")) {
+  if(config.ntfs_3g && type && !strcmp(type, "ntfs")) {
     asprintf(&cmd, "/bin/mount -t ntfs-3g%s %s %s", (flags & MS_RDONLY) ? " -oro" : "", dev, dir);
     err = system(cmd);
     free(cmd);
@@ -3388,6 +3388,8 @@ void util_update_swap_list()
 int util_is_mountable(char *file)
 {
   int i, compressed = 0;
+
+  if(util_check_exist(file) == 'd') return 1;
 
   i = util_fileinfo(file, NULL, &compressed);
 

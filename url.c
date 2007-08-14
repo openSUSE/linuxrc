@@ -1455,11 +1455,13 @@ int url_find_repo(url_t *url, char *dir)
     if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
 
     if(
-      !config.download.instsys &&
-      !config.rescue &&
       url->is.mountable &&
-      util_is_mountable(buf)
+      util_is_mountable(buf) &&
+      !config.rescue &&
+      (!config.download.instsys || util_check_exist(buf) == 'd')
     ) {
+      fprintf(stderr, "mount %s -> %s\n", buf, config.mountpoint.instsys);
+
       ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
       if(!ok) fprintf(stderr, "instsys mount failed: %s\n", config.url.instsys->path);
     }
@@ -1484,10 +1486,10 @@ int url_find_repo(url_t *url, char *dir)
       if(get_instsys2) {
         str_copy(&config.url.instsys2->mount, new_mountpoint());
         if(
-          !config.download.instsys &&
-          !config.rescue &&
           url->is.mountable &&
-          util_is_mountable(buf)
+          util_is_mountable(buf) &&
+          !config.rescue &&
+          (!config.download.instsys || util_check_exist(buf) == 'd')
         ) {
           ok = util_mount_ro(buf, config.url.instsys2->mount) ? 0 : 1;
         }

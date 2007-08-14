@@ -1,6 +1,7 @@
 14/8/2007:	v3.0.6
 	- fix nfs mount (#216392)
-	- fixed some network setup bugs (nfs, smb)
+	- fixed network setup bug
+	- instsys was not found if it's a directory & a relative url was used
 
 9/8/2007:	v3.0.5
 	- updated po files
