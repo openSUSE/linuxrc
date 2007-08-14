@@ -172,7 +172,6 @@ static struct {
   { key_usbwait,        "USBWait",        kf_cfg + kf_cmd + kf_cmd_early },
   { key_nfsrsize,       "NFS.RSize",      kf_cfg + kf_cmd                },
   { key_nfswsize,       "NFS.WSize",      kf_cfg + kf_cmd                },
-  { key_nfstcp,         "NFS.TCP",        kf_cfg + kf_cmd                },
   { key_setupcmd,       "SetupCmd",       kf_cfg + kf_cmd                },
   { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
   { key_netconfig,      "NetConfig",      kf_none                        },
@@ -912,10 +911,6 @@ void file_do_info(file_t *f0)
 
       case key_nfswsize:
         if(f->is.numeric) config.net.nfs_wsize = f->nvalue;
-        break;
-
-      case key_nfstcp:
-        if(f->is.numeric) config.net.nfs_tcp = f->nvalue;
         break;
 
       case key_setupcmd:
