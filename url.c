@@ -969,7 +969,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
         if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
 
-        err = net_mount_nfs(url->mount, &url->used.server, url->path);
+        err = net_mount_nfs(url->mount, &url->used.server, url->path, url->port);
         fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
 
         if(err == ENOTDIR || err == ENOENT) {
@@ -982,7 +982,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
             if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
 
-            err = net_mount_nfs(url->tmp_mount, &url->used.server, buf);
+            err = net_mount_nfs(url->tmp_mount, &url->used.server, buf, url->port);
             fprintf(stderr, "nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
     
             if(err) {

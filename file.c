@@ -146,7 +146,6 @@ static struct {
   { key_info,           "Info",           kf_cfg + kf_cmd_early          },
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
   { key_usedhcp,        "UseDHCP",        kf_cfg + kf_cmd                },
-  { key_nfsport,        "NFSPort",        kf_cfg + kf_cmd                },
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
   { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
   { key_tmpfs,          "_TmpFS",         kf_cmd                         },
@@ -727,10 +726,6 @@ void file_do_info(file_t *f0)
         else {
           if(!*f->value) config.net.use_dhcp = 1;
         }
-        break;
-
-      case key_nfsport:
-        if(f->is.numeric) config.net.nfs_port = f->nvalue;
         break;
 
       case key_memlimit:
@@ -1571,7 +1566,7 @@ void file_write_install_inf(char *dir)
     if(config.url.proxy->used.server.ok) {
       file_write_inet(f, key_proxy, &config.url.proxy->used.server);
     }
-    fprintf(f, "ProxyPort: %u\n", config.net.proxyport);
+    if(config.url.proxy->port) fprintf(f, "ProxyPort: %u\n", config.url.proxy->port);
     fprintf(f, "ProxyProto: http\n");
     fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
   }

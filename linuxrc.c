@@ -974,7 +974,7 @@ void lxrc_init()
       config.manual |= 1;
       if(j) {
         sprintf(buf, "Could not find the %s ", config.product);
-        strcat(buf, "Installation Source.");
+        strcat(buf, "Repository.");
         strcat(buf, "\n\nActivating manual setup program.\n");
         dia_message(buf, MSGTYPE_ERROR);
       }

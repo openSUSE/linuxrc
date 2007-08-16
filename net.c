@@ -54,6 +54,7 @@
 #include "file.h"
 #include "module.h"
 #include "hotplug.h"
+#include "url.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -76,7 +77,7 @@ static int net_choose_device(void);
 static int net_input_data(void);
 #endif
 static void net_show_error(enum nfs_stat status_rv);
-static int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, int flags);
+static int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags);
 
 static void if_down(char *dev);
 static int wlan_auth_cb(dia_item_t di);
@@ -813,23 +814,22 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
  *
  * config.net.nfs_rsize: read size
  * config.net.nfs_wsize: write size
- * config.net.nfs_port: NFS port
  *
  * return:
  *      0: ok
  *   != 0: error code
  *
  */
-int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
+int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port)
 {
   int err;
 
   /* first, v3 with tcp */
-  err = _net_mount_nfs(mountpoint, server, hostdir, NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM);
+  err = _net_mount_nfs(mountpoint, server, hostdir, port, NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM);
 
   /* if that doesn't work, try v2, with udp */
   if(err == EPROTONOSUPPORT) {
-    err = _net_mount_nfs(mountpoint, server, hostdir, NFS_MOUNT_NONLM);
+    err = _net_mount_nfs(mountpoint, server, hostdir, port, NFS_MOUNT_NONLM);
   }
 
   return err;
@@ -848,19 +848,18 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir)
  *
  * config.net.nfs_rsize: read size
  * config.net.nfs_wsize: write size
- * config.net.nfs_port: NFS port
  *
  * return:
  *      0: ok
  *   != 0: error code
  *
  */
-int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, int flags)
+int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags)
 {
   struct sockaddr_in server_in, mount_server_in;
   struct nfs_mount_data mount_data;
   CLIENT *client;
-  int sock, fsock, port, err, i;
+  int sock, fsock, err, i;
   struct timeval tv;
   struct fhstatus fhs;
   char *buf = NULL;
@@ -942,11 +941,7 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, int flags)
     return -1;
   }
 
-  if(config.net.nfs_port) {
-    fprintf(stderr, "nfs: using specified port %d\n", config.net.nfs_port);
-    port = config.net.nfs_port;
-  }
-  else {
+  if(!port) {
     server_in.sin_port = PMAPPORT;
     port = pmap_getport(&server_in, NFS_PROGRAM, NFS_VERSION, IPPROTO_UDP);
     if(!port) port = NFS_PORT;
@@ -1512,20 +1507,84 @@ int net_bootp()
  */
 int net_get_address(char *text, inet_t *inet, int do_dns)
 {
-  int rc;
+  int err = 0;
   char input[256];
 
   *input = 0;
   if(inet->name) strcpy(input, inet->name);
 
   do {
-    if((rc = dia_input(text, input, sizeof input - 1, 16, 0))) return rc;
+    if((err = dia_input(text, input, sizeof input - 1, 16, 0))) break;
     name2inet(inet, input);
-    rc = net_check_address2(inet, do_dns);
-    if(rc) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
-  } while(rc);
+    err = net_check_address2(inet, do_dns);
+    if(err) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+  } while(err);
 
-  return 0;
+  return err;
+}
+
+
+/*
+ * Ask user for some network address.
+ * (Used for netmasks, too.)
+ *
+ * Either numeric or dns resolved.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error or abort
+ *
+ * Note: expects window mode.
+ */
+int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **password, unsigned *port)
+{
+  int err = 0;
+  unsigned n_port = 0;
+  char *input = NULL, *buf = NULL, *n_user = NULL, *n_password = NULL;
+  url_t *url;
+
+  str_copy(&input, inet->name);
+
+  do {
+    if((err = dia_input2(text, &input, 16, 0))) break;
+    if(input) {
+      if((user || password || port) && strchr(input, ':')) {
+        strprintf(&buf, "http://%s", input);
+        url = url_set(buf);
+        if(url->server) {
+          name2inet(inet, url->server);
+          n_port = url->port;
+          str_copy(&n_user, url->user);
+          str_copy(&n_password, url->password);
+        }
+        else {
+          err = 1;
+        }
+        url_free(url);
+      }
+      else {
+        name2inet(inet, input);
+      }
+      if(!err) err = net_check_address2(inet, do_dns);
+    }
+    else {
+      err = 1;
+    }
+    if(err) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+  } while(err);
+
+  if(!err) {
+    if(port) *port = n_port;
+    if(user) str_copy(user, n_user);
+    if(password) str_copy(password, n_password);
+  }
+
+  str_copy(&input, NULL);
+  str_copy(&buf, NULL);
+  str_copy(&n_user, NULL);
+  str_copy(&n_password, NULL);
+
+  return err;
 }
 
 

@@ -489,10 +489,6 @@ typedef struct {
     int file_length;		/* length of currently retrieved file */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
-    unsigned proxyport;		/* proxy port */
-    unsigned port;		/* port */
-    instmode_t proxyproto;	/* http or ftp */
-    int nfs_port;		/* nfs port */
     int bootp_timeout;		/* various timeout values (in s) */
     int dhcp_timeout;
     int tftp_timeout;

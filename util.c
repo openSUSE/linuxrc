@@ -1205,6 +1205,12 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
+  if((s = url_print(config.url.proxy, 0))) {
+    slist_append_str(&sl0, "proxy url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
+
   if(config.autoyast) {
     sprintf(buf, "autoyast = %s", config.autoyast);
     slist_append_str(&sl0, buf);
@@ -1246,12 +1252,6 @@ void util_status_info()
 
   for(i = 0; i < config.net.nameservers; i++) {
     sprintf(buf, "nameserver%d = %s", i + 1, inet2print(&config.net.nameserver[i]));
-    slist_append_str(&sl0, buf);
-  }
-
-  if((s = url_print(config.url.proxy, 0))) {
-    slist_append_str(&sl0, "proxy url:");
-    sprintf(buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
@@ -1310,16 +1310,8 @@ void util_status_info()
     slist_append_str(&sl0, buf);
   }
 
-  if(config.net.nfs_port || config.net.bootp_wait) {
-    *buf = 0;
-    if(config.net.nfs_port) sprintf(buf, "nfs port = %d", config.net.nfs_port);
-    if(config.net.bootp_wait) {
-      sprintf(buf + strlen(buf),
-        "%sbootp wait = %d",
-        config.net.nfs_port ? ", " : "",
-        config.net.bootp_wait
-      );
-    }
+  if(config.net.bootp_wait) {
+    sprintf(buf, "bootp wait = %d", config.net.bootp_wait);
     slist_append_str(&sl0, buf);
   }
 
@@ -2027,7 +2019,7 @@ int util_mount_main(int argc, char **argv)
   *srv_dir++ = 0;
 
   str_copy(&inet.name, dev);
-  i = net_mount_nfs(dir, &inet, srv_dir);
+  i = net_mount_nfs(dir, &inet, srv_dir, 0);
 
   if(i && errno) {
     i = errno;

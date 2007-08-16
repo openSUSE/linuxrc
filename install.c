@@ -685,13 +685,15 @@ int inst_do_harddisk()
  */
 int inst_do_network(instmode_t scheme)
 {
-  int i, err = 0, proxy_port = 0;
+  int i, err = 0, port = 0, n_port = 0, proxy_port = 0;
   unsigned u;
   char *s;
   char *buf = NULL, *buf2 = NULL, *path = NULL, *share = NULL, *domain = NULL,
-    *user = NULL, *password = NULL, *proxy_user = NULL, *proxy_password = NULL;
+    *user = NULL, *password = NULL, *proxy_user = NULL, *proxy_password = NULL,
+    *n_user = NULL, *n_password = NULL;
   char **to_free[] = {
-    &buf, &buf2, &path, &share, &domain, &user, &password, &proxy_user, &proxy_password
+    &buf, &buf2, &path, &share, &domain, &user, &password, &proxy_user, &proxy_password,
+    &n_user, &n_password
   };
   inet_t server = {}, proxy = {};
 
@@ -706,91 +708,13 @@ int inst_do_network(instmode_t scheme)
     str_copy(&domain, config.url.install->domain);
     str_copy(&user, config.url.install->user);
     str_copy(&password, config.url.install->password);
+    port = config.url.install->port;
   }
 
   /* server name */
   strprintf(&buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(scheme));
-  if(net_get_address(buf, &server, 1)) err = 1;
-
-  /* proxy setup */
-  if(!err && (scheme == inst_http || scheme == inst_ftp)) {
-
-    /* get current proxy values*/
-    if(config.url.proxy) {
-      proxy_port = config.url.proxy->port;
-      name2inet(&proxy, config.url.proxy->server);
-      str_copy(&proxy_user, config.url.proxy->user);
-      str_copy(&proxy_password, config.url.proxy->password);
-    }
-
-    strprintf(&buf, txt_get(TXT_WANT_PROXY), get_instmode_name_up(inst_http));
-    i = dia_yesno(buf, NO);
-    if(i == ESCAPE) {
-      err = 1;
-    }
-    else if(i == YES) {
-      /* new proxy */
-      strprintf(&buf, txt_get(TXT_ENTER_PROXY), get_instmode_name_up(inst_http));
-      if(net_get_address(buf, &proxy, 1)) err = 1;
-
-      if(!err) {
-        strprintf(&buf2, "%u", proxy_port);
-        strprintf(&buf, txt_get(TXT_ENTER_PROXYPORT), get_instmode_name_up(inst_http));
-        if(dia_input2(buf, &buf2, 6, 0)) err = 1;
-        if(!err) {
-          u = strtoul(buf2, &s, 0);
-          if(*s) {
-            dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
-            err = 1;
-          }
-          else {
-            proxy_port = u;
-          }
-        }
-      }
-
-      /* proxy user, password */
-      if(!err) {
-        i = dia_yesno(txt_get(TXT_USER_PW_PROXY), NO);
-
-        if(i == ESCAPE) {
-          err = 1;
-        }
-        else {
-          if(i == NO) {
-            str_copy(&proxy_user, NULL);
-            str_copy(&proxy_password, NULL);
-          }
-          else {
-            strprintf(&buf, txt_get(TXT_ENTER_USER), "proxy");
-            strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), "proxy");
-            if(
-              dia_input2(buf, &proxy_user, 20, 0) ||
-              dia_input2(buf2, &proxy_password, 20, 1)
-            ) err = 1;
-          }
-        }
-      }
-    }
-    else {
-      name2inet(&proxy, "");
-    }
-
-    /* set new proxy values */
-    if(!err) {
-      url_free(config.url.proxy);
-      config.url.proxy = NULL;
-
-      if(proxy.name) {
-        strprintf(&buf, "http://%s", proxy.name);
-        config.url.proxy = url_set(buf);
-
-        str_copy(&config.url.proxy->user, proxy_user);
-        str_copy(&config.url.proxy->password, proxy_password);
-        config.url.proxy->port = proxy_port;
-      }
-    }
-  }
+  if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
+  if(!err && n_port) port = n_port;
 
   /* smb share */
   if(!err && scheme == inst_smb && dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &share, 30, 0)) err = 1;
@@ -800,28 +724,34 @@ int inst_do_network(instmode_t scheme)
 
   /* user, password */
   if(!err && (scheme == inst_http || scheme == inst_ftp)) {
-    strprintf(&buf,
-      txt_get(TXT_USER_PW_SERVER),
-      get_instmode_name_up(scheme)
-    );
-    i = dia_yesno(buf, NO);
+    if(!n_user) {
+      strprintf(&buf,
+        txt_get(TXT_USER_PW_SERVER),
+        get_instmode_name_up(scheme)
+      );
+      i = dia_yesno(buf, NO);
 
-    if(i == ESCAPE) {
-      err = 1;
-    }
-    else {
-      if(i == NO) {
-        str_copy(&user, NULL);
-        str_copy(&password, NULL);
+      if(i == ESCAPE) {
+        err = 1;
       }
       else {
-        strprintf(&buf, txt_get(TXT_ENTER_USER), get_instmode_name_up(scheme));
-        strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), get_instmode_name_up(scheme));
-        if(
-          dia_input2(buf, &user, 20, 0) ||
-          dia_input2(buf2, &password, 20, 1)
-        ) err = 1;
+        if(i == NO) {
+          str_copy(&user, NULL);
+          str_copy(&password, NULL);
+        }
+        else {
+          strprintf(&buf, txt_get(TXT_ENTER_USER), get_instmode_name_up(scheme));
+          strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), get_instmode_name_up(scheme));
+          if(
+            dia_input2(buf, &user, 20, 0) ||
+            dia_input2(buf2, &password, 20, 1)
+          ) err = 1;
+        }
       }
+    }
+    else {
+      str_copy(&user, n_user);
+      str_copy(&password, n_password);
     }
   }
 
@@ -848,6 +778,97 @@ int inst_do_network(instmode_t scheme)
     }
   }
 
+  /* proxy setup */
+  if(!err && (scheme == inst_http || scheme == inst_ftp)) {
+
+    /* get current proxy values*/
+    if(config.url.proxy) {
+      proxy_port = config.url.proxy->port;
+      name2inet(&proxy, config.url.proxy->server);
+      str_copy(&proxy_user, config.url.proxy->user);
+      str_copy(&proxy_password, config.url.proxy->password);
+    }
+
+    strprintf(&buf, txt_get(TXT_WANT_PROXY), get_instmode_name_up(inst_http));
+    i = dia_yesno(buf, NO);
+    if(i == ESCAPE) {
+      err = 1;
+    }
+    else if(i == YES) {
+      /* new proxy */
+      strprintf(&buf, txt_get(TXT_ENTER_PROXY), get_instmode_name_up(inst_http));
+      if(net_get_address2(buf, &proxy, 1, &n_user, &n_password, &n_port)) err = 1;
+
+      if(!err) {
+        if(!n_port) {
+          strprintf(&buf2, "%u", proxy_port);
+          strprintf(&buf, txt_get(TXT_ENTER_PROXYPORT), get_instmode_name_up(inst_http));
+          if(dia_input2(buf, &buf2, 6, 0)) err = 1;
+          if(!err) {
+            u = strtoul(buf2, &s, 0);
+            if(*s) {
+              dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+              err = 1;
+            }
+            else {
+              proxy_port = u;
+            }
+          }
+        }
+        else {
+          proxy_port = n_port;
+        }
+      }
+
+      /* proxy user, password */
+      if(!err) {
+        if(!n_user) {
+          i = dia_yesno(txt_get(TXT_USER_PW_PROXY), NO);
+
+          if(i == ESCAPE) {
+            err = 1;
+          }
+          else {
+            if(i == NO) {
+              str_copy(&proxy_user, NULL);
+              str_copy(&proxy_password, NULL);
+            }
+            else {
+              strprintf(&buf, txt_get(TXT_ENTER_USER), "proxy");
+              strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), "proxy");
+              if(
+                dia_input2(buf, &proxy_user, 20, 0) ||
+                dia_input2(buf2, &proxy_password, 20, 1)
+              ) err = 1;
+            }
+          }
+        }
+        else {
+          str_copy(&proxy_user, n_user);
+          str_copy(&proxy_password, n_password);
+        }
+      }
+    }
+    else {
+      name2inet(&proxy, "");
+    }
+
+    /* set new proxy values */
+    if(!err) {
+      url_free(config.url.proxy);
+      config.url.proxy = NULL;
+
+      if(proxy.name) {
+        strprintf(&buf, "http://%s", proxy.name);
+        config.url.proxy = url_set(buf);
+
+        str_copy(&config.url.proxy->user, proxy_user);
+        str_copy(&config.url.proxy->password, proxy_password);
+        config.url.proxy->port = proxy_port;
+      }
+    }
+  }
+
   /* set new values */
   if(!err) {
     url_free(config.url.install);
@@ -857,6 +878,8 @@ int inst_do_network(instmode_t scheme)
 
     memcpy(&config.url.install->used.server, &server, sizeof config.url.install->used.server);
     memset(&server, 0, sizeof server);
+
+    config.url.install->port = port;
 
     str_copy(&config.url.install->device, config.net.device);
     str_copy(&config.url.install->used.device, config.net.device);

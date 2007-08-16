@@ -32,7 +32,6 @@ typedef enum {
   di_expert_animate,
   di_expert_forceroot,
   di_expert_rootimage,
-  di_expert_nfsport,
   di_expert_bootptimeout,
   di_expert_dhcp,
   di_expert_vnc,
