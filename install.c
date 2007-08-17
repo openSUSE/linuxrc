@@ -1093,14 +1093,15 @@ void inst_yast_done()
 
 int inst_execute_yast()
 {
-  int i, rc;
+  int i, err = 0;
   char *setupcmd = NULL;
   FILE *f;
 
-  rc = add_instsys();
-  if(rc) {
+  if(config.url.install->scheme != inst_exec) err = add_instsys();
+  if(err) {
     inst_yast_done();
-    return rc;
+
+    return err;
   }
 
   if(!config.test) {
@@ -1159,11 +1160,11 @@ int inst_execute_yast()
   util_notty();
 
   if(config.test) {
-    rc = system("/bin/bash 2>&1");
+    err = system("/bin/bash 2>&1");
   }
   else {
     if(config.zombies) {
-      rc = system(setupcmd);
+      err = system(setupcmd);
     }
     else {
       pid_t pid, inst_pid;
@@ -1173,8 +1174,8 @@ int inst_execute_yast()
       if(inst_pid) {
         // fprintf(stderr, "%d: inst_pid = %d\n", getpid(), inst_pid);
 
-        while((pid = waitpid(-1, &rc, 0))) {
-          // fprintf(stderr, "%d: chld(%d) = %d\n", getpid(), pid, rc);
+        while((pid = waitpid(-1, &err, 0))) {
+          // fprintf(stderr, "%d: chld(%d) = %d\n", getpid(), pid, err);
           if(pid == inst_pid) {
             // fprintf(stderr, "%d: last chld\n", getpid());
             break;
@@ -1185,21 +1186,21 @@ int inst_execute_yast()
       }
       else {
         // fprintf(stderr, "%d: system()\n", getpid());
-        rc = system(setupcmd);
-        // fprintf(stderr, "%d: exit(%d)\n", getpid(), rc);
-        exit(WEXITSTATUS(rc));
+        err = system(setupcmd);
+        // fprintf(stderr, "%d: exit(%d)\n", getpid(), err);
+        exit(WEXITSTATUS(err));
       }
 
-      // fprintf(stderr, "%d: back, rc = %d\n", getpid(), rc);
+      // fprintf(stderr, "%d: back, err = %d\n", getpid(), err);
     }
   }
 
-  if(rc) {
-    if(rc == -1) {
-      rc = errno;
+  if(err) {
+    if(err == -1) {
+      err = errno;
     }
-    else if(WIFEXITED(rc)) {
-      rc = WEXITSTATUS(rc);
+    else if(WIFEXITED(err)) {
+      err = WEXITSTATUS(err);
     }
   }
 
@@ -1219,7 +1220,7 @@ int inst_execute_yast()
 
   if(config.splash && config.textmode) system("echo 1 >/proc/splash");
 
-  fprintf(stderr, "install program exit code is %d\n", rc);
+  fprintf(stderr, "install program exit code is %d\n", err);
 
   /* Redraw erverything and go back to the main menu. */
   config.redraw_menu = 1;
@@ -1231,19 +1232,19 @@ int inst_execute_yast()
   util_debugwait("going to read yast.inf");
 
   i = file_read_yast_inf();
-  if(!rc) rc = i;
+  if(!err) err = i;
 
   disp_cursor_off();
   kbd_reset();
 
-  if(rc || config.aborted) {
+  if(err || config.aborted) {
     config.rescue = 0;
     config.manual |= 1;
   }
 
   if(config.manual) util_disp_init();
 
-  if(rc && config.win) {
+  if(err && config.win) {
     dia_message(txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
   }
 
@@ -1259,10 +1260,10 @@ int inst_execute_yast()
 
   if(config.aborted) {
     config.aborted = 0;
-    rc = -1;
+    err = -1;
   }
 
-  return rc;
+  return err;
 }
 
 

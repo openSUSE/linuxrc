@@ -1,6 +1,6 @@
 17/8/2007:	v3.0.8
 	- changed usb module loading (#223450)
-	- fixed 'file' scheme
+	- fixed 'file' & 'exec' schemes
 
 16/8/2007:	v3.0.7
 	- really write proxy port (#300177)
