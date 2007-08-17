@@ -5,11 +5,8 @@
 known issues:
 
 - slp: path = NULL does not work - why?
-- wget file:/xxx fails - becomes file://xxx at some point
-- nfs: uses temp moutpoint if instsys is directory - why? (it's not necessary)
 
  */
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1274,12 +1271,14 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     old_path = url->path;
     url->path = NULL;
 
+    /* there is probably an easier way... */
     i = strlen(old_path);
     strprintf(&url->path, "%s%s%s",
       old_path,
       (i && old_path[i - 1] == '/') || !*old_path || !*src || *src == '/' ? "" : "/",
       strcmp(src, "/") ? src : ""
     );
+    if(url->path[0] == '/' && url->path[1] == '/') str_copy(&url->path, url->path + 1);
 
     if(config.debug >= 3) fprintf(stderr, "path: \"%s\" + \"%s\" = \"%s\"\n", old_path, src, url->path);
 
