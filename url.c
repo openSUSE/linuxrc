@@ -1337,7 +1337,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   }
 
   if(!dst) return 1;
-  unlink(dst);
+  if(!(flags & URL_FLAG_NOUNLINK)) unlink(dst);
 
   /* create missing directories */
   str_copy(&buf1, dst);

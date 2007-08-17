@@ -3000,7 +3000,7 @@ char *get_instmode_name_up(instmode_t instmode)
 int util_wget_main(int argc, char **argv)
 {
   url_t *url;
-  unsigned flags = URL_FLAG_PROGRESS;
+  unsigned flags = URL_FLAG_PROGRESS + URL_FLAG_NOUNLINK;
   char *label = NULL;
   int err;
 
@@ -3009,6 +3009,7 @@ int util_wget_main(int argc, char **argv)
   config.download.base = strdup("/tmp/download");
   mkdir(config.download.base, 0755);
   config.mountpoint.base = strdup("/tmp/mounts/");
+  mkdir("/tmp/mounts", 0755);
 
   str_copy(&config.net.cifs.binary, "/sbin/mount.cifs");
 
