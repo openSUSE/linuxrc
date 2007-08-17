@@ -85,7 +85,7 @@ void auto2_scan_hardware()
 {
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int ju, k, err;
+  int ju, err;
   slist_t *usb_modules = NULL, *sl;
   int storage_loaded = 0, max_wait;
   hd_data_t *hd_data;
@@ -177,15 +177,10 @@ void auto2_scan_hardware()
     for(hd = hd_usb; hd; hd = hd->next) activate_driver(hd_data, hd, &usb_modules, 0);
     hd_usb = hd_free_hd_list(hd_usb);
 
+    /* might be useful anyway */
     mod_modprobe("input", NULL);
     mod_modprobe("usbhid", NULL);
     mod_modprobe("keybdev", NULL);
-
-    config.module.delay -= 1;
-
-    k = mount("usbfs", "/proc/bus/usb", "usbfs", 0, 0);
-    if(config.usbwait > 0) sleep(config.usbwait);
-
     mod_modprobe("usb-storage", NULL);
 
     max_wait = 50;
@@ -193,11 +188,16 @@ void auto2_scan_hardware()
       sleep(1);
     } while(max_wait-- && util_process_running("usb-stor-scan"));
 
-    if(config.usbwait > 0) sleep(config.usbwait);
-    // hd_list(hd_data, hw_usb, 1, NULL);
+    sleep(config.usbwait + 1);
+
+    hd_list(hd_data, hw_usb, 1, NULL);
 
     printf(" ok\n");
     fflush(stdout);
+
+    load_drivers(hd_data, hw_usb);
+
+    config.module.delay -= 1;
   }
 
   if((hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL)) && !config.test) {
@@ -638,7 +638,10 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
   for(hd = hd_list(hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
     hd_add_driver_data(hd_data, hd);
     i = 0;
-    if((di = hd->driver_info)) {
+    if(
+      (di = hd->driver_info) &&
+      !(hd_is_hw_class(hd, hw_usb) && hd_is_hw_class(hd, hw_hub))
+    ) {
       for(di = hd->driver_info; di; di = di->next) {
         if(
           di->any.type == di_module &&
