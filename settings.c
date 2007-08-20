@@ -61,26 +61,16 @@ struct {
 #define LANG_DEFAULT lang_en
 static language_t set_languages_arm [] =
 {
-#ifdef TRANS_ar
-// currently a fake
-{ lang_ar, "Arabic", "us", SMALL_FONT, UNI_FONT, 0, 0, "ar", 0 },
-#endif
-
-#ifdef TRANS_bn
-// currently a fake
-{ lang_bn, "Bengali", "us", SMALL_FONT, UNI_FONT, 0, 0, "bn_BD", 0 },
-#endif
-
-#ifdef TRANS_bs
-{ lang_bs, "Bosnia", "us", SMALL_FONT, UNI_FONT, 1, 1, "bs_BA", 0 },
+#ifdef TRANS_af
+{ lang_af, "Afrikaans", "us", SMALL_FONT, UNI_FONT, 0, 0, "af_ZA", 0 },
 #endif
 
 #ifdef TRANS_bg
 { lang_bg, "Български", "us", SMALL_FONT, UNI_FONT, 0, 0, "bg_BG", 0 },
 #endif
 
-#ifdef TRANS_br
-{ lang_br, "Brezhoneg", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", 0 },
+#ifdef TRANS_ca
+{ lang_ca, "Català", "us", SMALL_FONT, UNI_FONT, 0, 0, "ca_ES", 0 },
 #endif
 
 #ifdef TRANS_cs
@@ -111,26 +101,12 @@ static language_t set_languages_arm [] =
 { lang_el, "Ελληνικά", "gr", SMALL_FONT, UNI_FONT, 1, 1, "el_GR", 0 },
 #endif
 
-#ifdef TRANS_id
-{ lang_id, "Indonesia", "us", SMALL_FONT, UNI_FONT, 0, 1, "id_ID", 0 },
-#endif
-
 #ifdef TRANS_it
 { lang_it, "Italiano", "it", SMALL_FONT, UNI_FONT, 0, 0, "it_IT", 0 },
 #endif
 
-#ifdef TRANS_he
-// currently a fake
-{ lang_he, "תירבע", "us", SMALL_FONT, UNI_FONT, 0, 0, "he_IL", 0 },
-#endif
-
 #ifdef TRANS_ja
 { lang_ja, "Japanese", "jp106", SMALL_FONT, UNI_FONT, 0, 0, "ja_JP", 1 },
-#endif
-
-#ifdef TRANS_ko
-// currently a fake
-{ lang_ko, "Korean", "us", SMALL_FONT, UNI_FONT, 0, 0, "ko_KR", 0 },
 #endif
 
 #ifdef TRANS_hu
@@ -157,10 +133,6 @@ static language_t set_languages_arm [] =
 { lang_pt_BR, "Português Brasileiro", "br-abnt2", SMALL_FONT, UNI_FONT, 0, 1, "pt_BR", 0 },
 #endif
 
-#ifdef TRANS_ro
-{ lang_ro, "Romanian", "us", SMALL_FONT, UNI_FONT, 1, 1, "ro_RO", 0 },
-#endif
-
 #ifdef TRANS_ru
 { lang_ru, "Русский", "ru1", SMALL_FONT, UNI_FONT, 1, 1, "ru_RU", 0 },
 #endif
@@ -185,12 +157,20 @@ static language_t set_languages_arm [] =
 { lang_sv, "Svenska", "sv-latin1", SMALL_FONT, UNI_FONT, 0, 1, "sv_SE", 0 },
 #endif
 
+#ifdef TRANS_zh_TW
+{ lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
+#endif
+
 #ifdef TRANS_uk
 { lang_uk, "Українська", "us", SMALL_FONT, UNI_FONT, 0, 1, "uk_UA", 0 },
 #endif
 
-#ifdef TRANS_zh_TW
-{ lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
+#ifdef TRANS_xh
+{ lang_xh, "isiXhosa", "us", SMALL_FONT, UNI_FONT, 0, 0, "xh_ZA", 0 },
+#endif
+
+#ifdef TRANS_zu
+{ lang_zu, "isiZulu", "us", SMALL_FONT, UNI_FONT, 0, 0, "zu_ZA", 0 },
 #endif
 
 // dummy for unknown language, must be last entry

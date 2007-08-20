@@ -54,7 +54,6 @@ char *txt_get (enum textid_t id_iv)
       !config.serial &&
       !config.test && (
         config.language == lang_ja ||
-        config.language == lang_ko ||
         config.language == lang_zh_CN ||
         config.language == lang_zh_TW
       )
