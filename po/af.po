@@ -1,0 +1,1161 @@
+# LANGUAGE translations for linuxrc.
+# Copyright (C) 2005 SUSE Linux Products GmbH
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2007-07-28 12:00+0200\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TXT_OK
+msgid "OK"
+msgstr "Goed"
+
+#. TXT_CANCEL
+msgid "Back"
+msgstr "Terug"
+
+#. TXT_YES
+msgid "Yes"
+msgstr "Ja"
+
+#. TXT_NO
+msgid "No"
+msgstr "Nee"
+
+#. TXT_CHOOSE_LANGUAGE
+msgid "Select the language."
+msgstr "Kies die taal."
+
+#. TXT_COLOR_DISPLAY
+msgid "Color display"
+msgstr "Kleurskerm"
+
+#. TXT_MONO_DISPLAY
+msgid "Monochrome display"
+msgstr "Monokroomskerm"
+
+#. TXT_CHOOSE_DISPLAY
+msgid "Select the display type."
+msgstr "Kies die skermsoort."
+
+#. TXT_MENU_LANG
+msgid "Language"
+msgstr "Taal"
+
+#. TXT_MENU_MODULES
+msgid "Kernel Modules (Hardware Drivers)"
+msgstr "Kernmodules (hardeware-aandrywers)"
+
+#. TXT_MENU_START
+msgid "Start Installation or System"
+msgstr "Begin installasie of stelsel"
+
+#. TXT_MENU_INFO
+msgid "System Information"
+msgstr "Stelselinligting"
+
+#. TXT_HDR_MAIN
+msgid "Main Menu"
+msgstr "Hoofkieslys"
+
+#. TXT_SETTINGS
+msgid "Settings"
+msgstr "Instellings"
+
+#. TXT_MENU_DISPLAY
+msgid "Display"
+msgstr "Skerm"
+
+#. TXT_MENU_KEYMAP
+msgid "Keymap"
+msgstr "Sleutelbinding"
+
+#. TXT_LOAD_NET
+msgid "Load Network Card Modules"
+msgstr "Laai netwerkkaartmodules"
+
+#. TXT_SHOW_MODULES
+msgid "Show Loaded Modules"
+msgstr "Toon gelaaide modules"
+
+#. TXT_AUTO_LOAD
+msgid "Load Modules Automatically"
+msgstr "Laai modules outomaties"
+
+#. TXT_DEL_MODULES
+msgid "Unload Modules"
+msgstr "Ontlaai modules"
+
+#. TXT_TRY_TO_LOAD
+#, c-format
+msgid ""
+"Trying to load module \"%s\"...\n"
+"\n"
+"During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
+msgstr ""
+"Probeer om module \"%s\"... te laai.\n"
+"\n"
+"Tydens laai-aksie wil u dalk kyk na die kernboodskappe op skynkonsole 4 (ALT-F4). Gebruik ALT-F1 om terug te skakel na hierdie kieslys."
+
+#. TXT_LOAD_SUCCESSFUL
+#, c-format
+msgid "Module \"%s\" loaded successfully."
+msgstr "Module \"%s\" suksesvol gelaai."
+
+#. TXT_LOAD_FAILED
+#, c-format
+msgid "Failed to load module \"%s\"."
+msgstr "Misluk om module \"%s\" te laai."
+
+#. TXT_CDROM
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#. TXT_FLOPPY
+msgid "Floppy"
+msgstr "Slapskyf"
+
+#. TXT_HARDDISK
+msgid "Hard Disk"
+msgstr "Harde skyf"
+
+#. TXT_START_INSTALL
+msgid "Start Installation or Update"
+msgstr "Begin installasie of bywerking"
+
+#. TXT_START_RESCUE
+msgid "Start Rescue System"
+msgstr "Begin reddingstelsel"
+
+#. TXT_LOAD_RS_NFS
+msgid "Load Rescue System via NFS"
+msgstr "Laai reddingstelsel via NFS"
+
+#. TXT_BOOT_SYSTEM
+msgid "Boot Installed System"
+msgstr "Selflaai-geïnstalleerde stelsel"
+
+#. TXT_SEARCH_FOR_RI
+#, c-format
+msgid "Searching for image \"%s\"..."
+msgstr "Soek na afbeelding \"%s\"..."
+
+#. TXT_INFO_KERNEL
+msgid "Kernel Messages"
+msgstr "Kernboodskappe"
+
+#. TXT_INFO_CPU
+msgid "Processor"
+msgstr "Verwerker"
+
+#. TXT_INFO_DEVICES
+msgid "Devices"
+msgstr "Toestelle"
+
+#. TXT_INFO_NETDEV
+msgid "Network Cards"
+msgstr "Netwerkkaarte"
+
+#. TXT_INFO_DMA
+msgid "DMA"
+msgstr "DMA"
+
+#. TXT_INFO_IRQS
+msgid "Interrupts"
+msgstr "Onderbrekers"
+
+#. TXT_INFO_IOPORTS
+msgid "I/O Ports"
+msgstr "I/O-poorte"
+
+#. TXT_INFO_MEM
+msgid "Memory"
+msgstr "Geheue"
+
+#. TXT_INFO_MODULES
+msgid "Modules"
+msgstr "Modules"
+
+#. TXT_INFO_PCI
+msgid "PCI"
+msgstr "PCI"
+
+#. TXT_INSERT_DISK
+msgid "Insert the disk and press ENTER."
+msgstr "Sit die skyf in en druk ENTER."
+
+#. TXT_ERROR_READ_DISK
+msgid "Error reading from floppy disk."
+msgstr "Fout met lees vanaf slapskyf."
+
+#. TXT_ENTER_ROOT_FS
+msgid "Enter your root partition (e.g., /dev/sda3)"
+msgstr "Voer u wortelpartisie (bv. /dev/sda3) in"
+
+#. TXT_INVALID_ROOT_FS
+msgid "Invalid root device."
+msgstr "Ongeldige stamtoestel."
+
+#. TXT_INVALID_INPUT
+msgid "Invalid input."
+msgstr "Ongeldige inset."
+
+#. TXT_INPUT_IPADDR
+msgid "Enter your IP address."
+msgstr "Voer u IP-adres in."
+
+#. TXT_INPUT_NETMASK
+msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
+msgstr "Voer u netmasker in. Vir ’n gewone klas C-netwerk is dit gewoonlik 255.255.255.0."
+
+#. TXT_INPUT_GATEWAY
+msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
+msgstr "As u ’n deurgang benodig om die bediener te bereik, voer die IP-adres van die deurgang in. As u nie ’n deurgang benodig nie, voer u eie IP-adres in."
+
+#. TXT_INPUT_NAMED
+msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
+msgstr "Voer die IP-adres van u naambediener in. As u nie ’n naambediener gebruik nie, druk ESC."
+
+#. TXT_FOUND_HOST
+#, c-format
+msgid ""
+"The following data has been retrieved:\n"
+"\n"
+"IP address: %s\n"
+"Name: %s\n"
+"Domain: %s"
+msgstr ""
+"Die volgende data is herwin:\n"
+"\n"
+"IP-adres: %s\n"
+" Naam: %s\n"
+" Domein: %s"
+
+#. TXT_ERROR_CONF_NET
+msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
+msgstr "’n Fout het voorgekom tydens die netwerkkonfigurasie.  U netwerkkaart is waarskynlik nie deur die kern herken nie."
+
+#. TXT_INPUT_SERVER
+msgid "Enter the IP address of the NFS server."
+msgstr "Voer die IP-adres van die NFS-bediener in."
+
+#. TXT_INPUT_FTPSERVER
+msgid "Enter the IP address of the FTP server."
+msgstr "Voer die IP-adres van die FTP-bediener in."
+
+#. TXT_INPUT_DIR
+msgid "Enter the directory on the server."
+msgstr "Voer die gids op die bediener in."
+
+#. TXT_ENTER_PARAMS
+#, c-format
+msgid "Enter parameters for \"%s\"."
+msgstr "Voer parameters vir \"%s\" in."
+
+#. TXT_TRY_NFS_MOUNT
+#, c-format
+msgid ""
+"Trying to mount the directory\n"
+"\n"
+"\"%s:%s\"..."
+msgstr ""
+"Probeer om die gids te heg\n"
+"\n"
+"\"%s:%s\"..."
+
+#. TXT_ERROR_NFSMOUNT
+#, c-format
+msgid ""
+"An error occurred while trying to mount the NFS directory.\n"
+"\n"
+"Reason given by server: %s"
+msgstr ""
+"’n Fout het voorgekom tydens poging om die NFS-gids te heg.\n"
+"\n"
+"Rede deur bediener verskaf: %s"
+
+#. TXT_CHOOSE_KEYMAP
+msgid ""
+"Choose a keyboard map.\n"
+"YaST will offer additional keyboard tables later."
+msgstr ""
+"Kies ’n sleutelbordkaart.\n"
+"YaST sal later bykomende sleutelbordtabelle aanbied."
+
+#. TXT_DELETE_MODULE
+msgid "Choose the module to unload."
+msgstr "Kies die module wat ontlaai moet word."
+
+#. TXT_NO_MODULES
+msgid "No modules currently loaded."
+msgstr "Geen modules is tans gelaai nie."
+
+#. TXT_AUTO_RUNNING
+#, c-format
+msgid "Autoprobing (%s)...      "
+msgstr "Outo-ondersoek (%s) ..."
+
+#. TXT_WANT_MORE_SCSI
+msgid "Search for additional SCSI host adaptors?"
+msgstr "Soek na bykomende SCSI-gasheerpasstukke?"
+
+#. TXT_WANT_MORE_NET
+msgid "Search for additional network cards?"
+msgstr "Soek na bykomende netwerkkaarte?"
+
+#. TXT_WANT_MORE_CDROM
+msgid "Search for additional CD-ROM drives?"
+msgstr "Soek na bykomende CD-ROM-aandrywers?"
+
+#. TXT_NET_ETH0
+msgid "ethernet network card"
+msgstr "ethernetnetwerkkaart"
+
+#. TXT_NET_PLIP
+msgid "parallel port"
+msgstr "parallelpoort"
+
+#. TXT_NET_TR0
+msgid "token ring network card"
+msgstr "kentekenring-netwerkkaart"
+
+#. TXT_NET_ARC0
+msgid "arcnet network card"
+msgstr "arcnet-netwerkkaart"
+
+#. TXT_NET_FDDI
+msgid "FDDI network card"
+msgstr "FDDI-netwerkkaart"
+
+#. TXT_NET_HIPPI
+msgid "HIPPI network card"
+msgstr "HIPPI-netwerkkaart"
+
+#. TXT_CHOOSE_NET
+msgid "Choose the network device."
+msgstr "Kies die netwerktoestel."
+
+#. TXT_INPUT_PLIP_IP
+msgid "Enter the IP address of the PLIP partner."
+msgstr "Voer die IP-adres van die PLIP-vennoot in."
+
+#. TXT_NO_PCMCIA
+msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
+msgstr "Die PCMCIA-vlokkiestel kon nie outomaties bespeur word nie. Spesifiseer dit met die hand."
+
+#. TXT_FOUND_PCMCIA
+#, c-format
+msgid ""
+"Found PCMCIA chipset \"%s\".\n"
+"\n"
+"Enter parameters for PCMCIA core modules."
+msgstr ""
+"PCMCIA-vlokkiestel \"%s\" gevind. \n"
+"\n"
+"Voer parameters vir PCMCIA-kernmodules in."
+
+#. TXT_PCMCIA_PARAMS
+#, c-format
+msgid "Enter specific parameters for chipset \"%s\"."
+msgstr "Voer spesifieke parameters vir vlokkiestel \"%s\" in."
+
+#. TXT_START_CARDMGR
+msgid "Starting card manager..."
+msgstr "Begin van kaartbestuurder ..."
+
+#. TXT_PCMCIA_SUCCESS
+msgid "Successfully started PCMCIA card services."
+msgstr "PCMCIA-kaartdienste is suksesvol begin."
+
+#. TXT_PCMCIA_FAIL
+msgid "Start of PCMCIA card services failed."
+msgstr "Begin van PCMCIA-kaartdienste het misluk."
+
+#. TXT_PCMCIA_ALREADY
+msgid "PCMCIA card services already running."
+msgstr "PCMCIA-kaartdienste loop reeds."
+
+#. TXT_NO_LXRC_END
+msgid ""
+"You can leave Linuxrc only via \n"
+"\n"
+"\"Start Installation or System\"\n"
+"\n"
+"You may need to load some drivers (modules) to support your hardware."
+msgstr ""
+"U kan Linuxrc slegs verlaat via \n"
+"\n"
+"\"Begin installasie of stelsel\"\n"
+"\n"
+" U moet dalk sommige aandrywers (modules) laai om u hardeware te ondersteun."
+
+#. TXT_NO_CTRLC
+msgid "You cannot exit Linuxrc with <Ctrl-C>."
+msgstr "U kan nie by Linuxrc uitgaan met <Ctrl-C> nie."
+
+#. TXT_REMOVE_DISK
+msgid "Remove the disk from the drive now."
+msgstr "Haal die skyf nou uit die aandrywer."
+
+#. TXT_EXAMPLE_PAR
+msgid ""
+"\n"
+"\n"
+"Example: "
+msgstr ""
+"\n"
+"\n"
+"Voorbeeld:"
+
+#. TXT_CHOOSE_SOURCE
+msgid "Choose the source medium."
+msgstr "Kies die bronmedium."
+
+#. TXT_TRY_CD_MOUNT
+msgid "Trying to mount the CD-ROM..."
+msgstr "Probeer om die CD-ROM te heg ..."
+
+#. TXT_ERROR_CD_MOUNT
+msgid "Unable to mount the CD-ROM."
+msgstr "Kan die CD-ROM nie heg nie ..."
+
+#. TXT_ASK_REBOOT
+msgid "Reboot the system now?"
+msgstr "Herselflaai die stelsel nou?"
+
+#. TXT_INSTALL_SUCCESS
+msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
+msgstr "Die basisstelsel is suksesvol geïnstalleer. Hierdie nuut-geïnstalleerde stelsel sal nou begin word ten einde die installasie te doen."
+
+#. TXT_ENTER_PARTITION
+msgid "Enter the hard disk partition (e.g., /dev/sda1)"
+msgstr "Voer die hardeskryfpartisie (bv. /dev/sda1) in"
+
+#. TXT_ERROR_HD_MOUNT
+msgid "Could not mount the specified partition."
+msgstr "Kon die gespesifiseerde partisie nie heg nie."
+
+#. TXT_ENTER_HD_DIR
+msgid "Enter the source directory."
+msgstr "Voer die brongids in."
+
+#. TXT_ERROR_INSTALL
+msgid "An error occurred during the installation."
+msgstr "’n Fout het  tydens die installasie voorgekom."
+
+#. TXT_DRIVES
+msgid "Hard Disks or CD-ROMs"
+msgstr "Harde skywe of CD-ROM’s"
+
+#. TXT_LITTLE_MEM
+msgid ""
+"Your computer has extremely little memory.\n"
+"\n"
+"Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
+msgstr ""
+"U rekenaar het uiters min geheue.\n"
+"\n"
+"Voordat u hierdie boodskap erken, moet u oorskakel na skynkonsole 2 (druk ALT-F2) om omruilspasie te skep en om daarvan te aktiveer."
+
+#. TXT_ASK_ANIMATE
+msgid "Animation"
+msgstr "Animasie"
+
+#. TXT_ASK_EXPLODE
+msgid "Use animated windows?"
+msgstr "Gebruik geanimeerde vensters?"
+
+#. TXT_NO_DRIVES
+msgid "No hard disks or CD-ROM drives have been detected so far."
+msgstr "Geen harde skywe of CD-ROM-aandrywers is tot dusver bespeur nie."
+
+#. TXT_MENU_EXPERT
+msgid "Debug (expert)"
+msgstr "Ontfout (kundige)"
+
+#. TXT_FORCE_ROOTIMAGE
+msgid "Load Root Image into RAM Disk"
+msgstr "Laai stamafbeelding in RAM-skyf"
+
+#. TXT_NEW_ROOTIMAGE
+msgid "Enter Root Image"
+msgstr "Voer stamafbeelding in"
+
+#. TXT_ASK_RI_FORCE
+msgid "Should the root image be loaded into the RAM disk?"
+msgstr "Behoort die stamafbeelding in die RAM-skyf gelaai te word?"
+
+#. TXT_ENTER_ROOTIMAGE
+msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
+msgstr "Voer die pad en naam van die lêer in om as die stamlêerstelsel in die RAM-skyf te laai."
+
+#. TXT_NOT_IMPLEMENTED
+msgid "Not yet implemented."
+msgstr "Nog nie geïmplementeer nie."
+
+#. TXT_NO_INFO_AVAIL
+msgid "No information available."
+msgstr "Geen inligting beskikbaar nie."
+
+#. TXT_PREPARE_INST
+msgid "Preparing installation..."
+msgstr "Berei installasie voor ..."
+
+#. TXT_END_REBOOT
+msgid "Exit or Reboot"
+msgstr "Gaan uit of herselflaai"
+
+#. TXT_SEARCH_INFOFILE
+msgid "Searching for info file..."
+msgstr "Soek na inligtingslêer ..."
+
+#. TXT_NFSPORT
+msgid "Specify the NFS port."
+msgstr "Spesifiseer die NFS-poort."
+
+#. TXT_ASKING_NAMED
+msgid "Asking name server..."
+msgstr "Vra van naambediener ..."
+
+#. TXT_HOST_NOT_FOUND
+#, c-format
+msgid "Host %s was not found."
+msgstr "Gasheer %s is nie gevind nie."
+
+#. TXT_NET_CONFIGURED
+msgid "Your network is already configured. Keep this configuration?"
+msgstr "U netwerk is reeds gekonfigureer.  Hou hierdie konfigurasie?"
+
+#. TXT_ASK_BREAK
+msgid "Abort?"
+msgstr "Staak?"
+
+#. TXT_NO_NETDEVICE
+msgid ""
+"No network device found.\n"
+"Load a network module first."
+msgstr ""
+"Geen netwerktoestel gevind nie.\n"
+"Laai eers ’n netwerkmodule."
+
+#. TXT_ALREADY_FOUND
+#, c-format
+msgid "A %s was already found in your system.\n"
+msgstr "’n %s is reeds in u stelsel gevind.\n"
+
+#. TXT_ERROR_FTP
+#, c-format
+msgid ""
+"Error while accessing the FTP server:\n"
+"\n"
+"%s"
+msgstr ""
+"Fout tydens verkryging van toegang tot die FTP-bediener:\n"
+"\n"
+"%s"
+
+#. TXT_ENTER_FTPUSER
+msgid "Enter the user name with which to access the FTP server."
+msgstr "Voer die gebruikernaam waarmee toegang tot die FTP-bediener verkry word, in."
+
+#. TXT_ENTER_FTPPASSWD
+msgid "Enter the password for the FTP user account."
+msgstr "Voer die wagwoord vir die FTP-gebruikerrekening in."
+
+#. TXT_ENTER_FTPPROXY
+msgid "Enter the address of the FTP proxy."
+msgstr "Voer die adres van die FTP-volmag in."
+
+#. TXT_ENTER_FTPPORT
+msgid "Enter the port of the FTP proxy."
+msgstr "Voer die poort van die FTP-volmag in."
+
+#. TXT_WANT_FTPPROXY
+msgid "Use an FTP proxy?"
+msgstr "Gebruik ’n FTP-volmag?"
+
+#. TXT_NOMEM_FTP
+#, c-format
+msgid "Your computer does not have enough RAM to install via FTP (%d MB RAM required)."
+msgstr "U rekenaar het nie genoeg RAM om via FTP (%d MB RAM vereis) te installeer nie."
+
+#. TXT_ANONYM_FTP
+msgid ""
+"Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
+"Use a user name and password?"
+msgstr ""
+"Gewoonlik word ’n FTP-installasie via naamlose FTP uitgevoer. Dit is moontlik om ’n gebruikernaam en wagwoord vir die FTP-bedienertoegang te spesifiseer.\n"
+" Gebruik ’n gebruikernaam en wagwoord?"
+
+#. TXT_MORE_MODULES
+msgid "-- More Modules --"
+msgstr "-- Meer modules --"
+
+#. TXT_INIT_PARPORT
+msgid "Initializing parallel port..."
+msgstr "Inisialiseer parallelpoort ..."
+
+#. TXT_ENTER_NFSPORT
+msgid "Enter the port number on which the NFS server is running."
+msgstr "Voer die poortnommer waarop die NFS-bediener loop, in."
+
+#. TXT_INSERT_CD
+#, c-format
+msgid "Make sure that CD number %d is in your drive."
+msgstr "Maak seker dat CD nommer %d in u aandrywer is."
+
+#. TXT_EJECT_CD
+msgid "Eject CD"
+msgstr "Werp CD uit"
+
+#. TXT_BOOTP_TIMEOUT
+msgid "Bootp Time-Out"
+msgstr "Selflaaip-afsnytyd"
+
+#. TXT_ENTER_BOOTP_TIMEOUT
+msgid "Enter the time-out value for bootp."
+msgstr "Voer die afsnytydwaarde vir selflaaip in."
+
+#. TXT_NET_CTC
+msgid "channel to channel connection"
+msgstr "kanaal tot kanaalverbinding"
+
+#. TXT_NET_ESCON
+msgid "ESCON connection"
+msgstr "ESCON-verbinding"
+
+#. TXT_NET_IUCV
+msgid "IUCV connection"
+msgstr "IUCV-verbinding"
+
+#. TXT_NET_CLAW
+msgid "channel attached cisco router"
+msgstr "kanaliseer aangehegte cisco-herleier"
+
+#. TXT_SMB_ENTER_SHARE
+msgid "Enter the share name on the SMB server."
+msgstr "Voer die gedeeldenaam op die SMB-bediener in."
+
+#. TXT_SMB_GUEST_LOGIN
+msgid ""
+"If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
+"Access the share as guest?"
+msgstr ""
+"Indien u as gas toegang wil verkry tot die gedeelde, hoef u nie gebruikernaam, wagwoord en werkgroep te spesifiseer nie.\n"
+" Verkry as gas toegang tot die gedeelde?"
+
+#. TXT_SMB_ENTER_USER
+msgid "Enter your user name on the SMB server."
+msgstr "Voer u gebruikernaam op die SMB-bediener in."
+
+#. TXT_SMB_ENTER_PASSWORD
+msgid "Enter your password on the SMB server."
+msgstr "Voer u wagwoord op die SMB-bediener in."
+
+#. TXT_SMB_ENTER_WORKGROUP
+msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
+msgstr "Voer u werkgroep in. As u nie nodig het om ’n werkgroep te spesifiseer nie, laat die veld leeg."
+
+#. TXT_SMB_TRYING_MOUNT
+#, c-format
+msgid ""
+"Trying to mount the share\n"
+"\n"
+"\"//%s/%s\""
+msgstr ""
+"Probeer om die gedeelde te heg\n"
+"\n"
+"\"//%s/%s\""
+
+#. %s is either BOOTP or DHCP
+#. TXT_ASK_DHCP
+#, c-format
+msgid "Automatic configuration via %s?"
+msgstr "Outomatiese konfigurasie via %s?"
+
+#. %s is either BOOTP or DHCP
+#. TXT_SEND_DHCP
+#, c-format
+msgid "Sending %s request..."
+msgstr "Stuur van %s versoek ..."
+
+#. %s is either BOOTP or DHCP
+#. TXT_ERROR_DHCP
+#, c-format
+msgid "%s configuration failed."
+msgstr "%s konfigurasie het misluk."
+
+#. TXT_DHCP_VS_BOOTP
+msgid "Use DHCP instead of BOOTP?"
+msgstr "Gebruik DHCP in plaas van BOOTP?"
+
+#. TXT_MODDISK0
+msgid "Insert a modules disk."
+msgstr "Sit ’n moduleskyf in."
+
+#. TXT_MODDISK1
+#, c-format
+msgid "Insert modules disk %d."
+msgstr "Sit ’n moduleskyf %d in."
+
+#. TXT_MODDISK2
+msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
+msgstr "Vind instruksies om dit in selflaai/LEESMY op CD1 of DVD1 te skep."
+
+#. TXT_CHOOSE_NETSOURCE
+msgid "Choose the network protocol."
+msgstr "Kies die netwerkprotokol."
+
+#. %s is NFS, FTP, HTTP or SMB
+#. TXT_INPUT_NETSERVER
+#, c-format
+msgid "Enter the IP address of the %s server."
+msgstr "Voer die IP-adres van die %s bediener in."
+
+#. %s is FTP or HTTP
+#. TXT_TRY_REACH_SERVER
+#, c-format
+msgid "Trying to connect to the %s server..."
+msgstr "Probeer om met die %s bediener te verbind ..."
+
+#. TXT_NET
+msgid "Network"
+msgstr "Netwerk"
+
+#. %s is e.g. SCSI, CD-ROM, USB
+#. TXT_LOAD_MODULES
+#, c-format
+msgid "Load %s Modules"
+msgstr "Laai %s modules"
+
+#. TXT_LOAD_FS
+msgid "Load File System Modules"
+msgstr "Laai lêerstelselmodules ..."
+
+#. TXT_LOAD_OTHER
+msgid "Load Unknown Modules"
+msgstr "Laai onbekende modules"
+
+#. %s is e.g. ext3 or reiserfs
+#. TXT_FILE_SYSTEM
+#, c-format
+msgid "%s file system found."
+msgstr "%s lêerstelsel gevind."
+
+#. TXT_CONTINUE
+msgid "Continue"
+msgstr "Gaan voort"
+
+#. TXT_ABORT
+msgid "Abort"
+msgstr "Staak"
+
+#. TXT_NO_NEW_MODULES
+msgid "No new modules found."
+msgstr "Geen nuwe modules gevind nie."
+
+#. TXT_CHOOSE_PARTITION
+msgid "Choose the hard disk partition."
+msgstr "Kies die hardeskyfpartisie."
+
+#. TXT_CHOOSE_ROOT_FS
+msgid "Choose the root partition."
+msgstr "Kies die wortelpartisie."
+
+#. TXT_CHOOSE_SWAP
+msgid "Choose the swap partition."
+msgstr "Kies die omruilpartisie."
+
+#. TXT_LOW_MEMORY1
+msgid "There is not enough memory to load all data."
+msgstr "Daar is nie genoeg geheue om al die data te laai nie."
+
+#. TXT_LOW_MEMORY2
+msgid "Your computer does not have enough memory to run YaST."
+msgstr "U rekenaar het nie genoeg geheue om YaST te laat loop nie."
+
+#. TXT_ADD_SWAP
+msgid "To continue, activate some swap space."
+msgstr "Om voort te gaan, aktiveer van die omruilspasie."
+
+#. TXT_ERROR_SWAP
+msgid "Error activating swap space."
+msgstr "Fout met aktiveer van omruilspasie."
+
+#. TXT_ENTER_SWAP
+msgid "Enter the swap partition (e.g., /dev/sda2)"
+msgstr "Voer die omruilpartisie (bv. /dev/sda2) in"
+
+#. TXT_ENTER_USER
+#, c-format
+msgid "Enter the user name with which to access the %s server."
+msgstr "Voer die gebruikernaam waarmee toegang tot die %s bediener verkry moet word, in."
+
+#. TXT_ENTER_PASSWORD
+#, c-format
+msgid "Enter the password for the %s server."
+msgstr "Voer die wagwoord vir die %s bediener in."
+
+#. TXT_WANT_PROXY
+#, c-format
+msgid "Use a %s proxy?"
+msgstr "Gebruik ’n %s volmag?"
+
+#. TXT_ENTER_PROXY
+#, c-format
+msgid "Enter the address of the %s proxy."
+msgstr "Voer die adres van die %s volmag in."
+
+#. TXT_ENTER_PROXYPORT
+#, c-format
+msgid "Enter the port of the %s proxy."
+msgstr "Voer die poort van die %s volmag in."
+
+#. TXT_VNC_SWITCH
+msgid "VNC Enable or Disable"
+msgstr "VNC ontsper of versper"
+
+#. TXT_VNC_YES_NO
+msgid "Use VNC for install?"
+msgstr "Gebruik VNC vir installeer?"
+
+#. TXT_SSH_SWITCH
+msgid "Enable or Disable SSH Mode"
+msgstr "Ontsper of versper SSH-modus"
+
+#. TXT_SSH_YES_NO
+msgid "Start SSH for Text Install?"
+msgstr "Begin SSH vir teksinstallasie?"
+
+#. TXT_VNC_PASSWORD
+msgid "Enter your VNC password."
+msgstr "Voer u VNC-wagwoord in."
+
+#. TXT_SSH_PASSWORD
+msgid "Enter your temporary SSH password."
+msgstr "Voer u tydelike SSH-wagwoord in."
+
+#. TXT_DO_REBOOT
+msgid ""
+"The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+"Do not remove the floppy disk if the boot manager was installed on it."
+msgstr ""
+"Die basisstelsel is suksesvol geïnstalleer. U masjien moet nou weer geselflaai word.  Verwyder alle installasiemedia (CD-ROM, slapskyf).\n"
+" Moenie die slapskyf verwyder as die selflaaibestuurder daarop geïnstalleer is nie."
+
+#. TXT_ADD_DRIVER_UPDATE
+msgid "Add Driver Update"
+msgstr "Voeg aandrywerbywerking by"
+
+#. TXT_SHOW_DRIVER_UPDATES
+msgid "Show Driver Updates"
+msgstr "Toon aandrywerbywerkings"
+
+#. TXT_INPUT_NAMED1
+#, c-format
+msgid "Enter the IP of name server %u or press ESC."
+msgstr "Voer die IP- of naambediener %u in of druk ESC."
+
+#. TXT_ROOT_PASSWORD
+msgid ""
+"Enter temporary root password.\n"
+"You will be required to change this password on initial root user login."
+msgstr ""
+"Voer tydelike stamwagwoord in.\n"
+" Daar sal van u vereis word om hierdie wagwoord op die aanvanklike stamgebruikeraantekening te wysig."
+
+#. TXT_REBOOT
+msgid "Reboot"
+msgstr "Herselflaai"
+
+#. TXT_NO_RAM
+#, c-format
+msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
+msgstr "U rekenaar het nie genoeg RAM vir die installasie van %s nie.  U benodig ten minste %d MG."
+
+#. TXT_VNC_PASSWORD_TOO_SHORT
+msgid "Password is too short (must have at least 8 characters)."
+msgstr ""
+
+#. TXT_XSERVER_IP
+msgid "Enter the IP address of the host running the X11 server."
+msgstr "Voer die IP-adres van die gasheer wat die X11-bediener laat loop, in."
+
+#. TXT_CHOOSE_390NET
+msgid "Please select the type of your network device."
+msgstr "Kies asseblief u netwerktoestel se soort."
+
+#. TXT_IUCV_PEER
+msgid "Please enter the name (user ID) of the target VM guest."
+msgstr "Voer asseblief die naam (gebruiker-ID) van die teiken-VM-gas in."
+
+#. TXT_390NET_CTC
+msgid "Channel To Channel (CTC)"
+msgstr "Kanaal-tot-kanaal-netwerk (CTC, Channel-to-Channel)"
+
+#. TXT_390NET_ESCON
+msgid "ESCON"
+msgstr "ESCON"
+
+#. TXT_390NET_IUCV
+msgid "Inter-User Communication Vehicle (IUCV)"
+msgstr "Intergebruiker-kommunikasietuig (IUCV, Inter-User Communication Vehicle)"
+
+#. TXT_390NET_HSI
+msgid "Hipersockets"
+msgstr "Hipersokke"
+
+#. TXT_CTC_CHANNEL_READ
+msgid "Device address for read channel"
+msgstr "Toesteladres vir leeskanaal"
+
+#. TXT_CTC_CHANNEL_WRITE
+msgid "Device address for write channel"
+msgstr "Toesteladres vir skryfkanaal"
+
+#. TXT_CTC_CHANNEL_DATA
+msgid "Device address for data channel"
+msgstr "Toesteladres vir datakanaal"
+
+#. TXT_CHOOSE_CTC_PROTOCOL
+msgid "Select protocol for this CTC device."
+msgstr "Kies protokol vir hierdie CTC-toestel."
+
+#. TXT_CTC_PROT_COMPAT
+msgid "Compatibility mode (default)"
+msgstr "Versoenbaarheidsmodus (verstek)"
+
+#. TXT_CTC_PROT_EXT
+msgid "Extended mode"
+msgstr "Uitgebreide modus"
+
+#. TXT_CTC_PROT_ZOS390
+msgid "Compatibility mode for OS/390 and z/OS peers"
+msgstr "Versoenbaarheidsmodus met OS/390- en z/OS-eweknie"
+
+#. TXT_QETH_PORTNAME
+msgid "Portname to use"
+msgstr "Poortnaam om te gebruik"
+
+#. TXT_HOSTNAME
+msgid "Fully qualified hostname"
+msgstr "Ten volle gekwalifiseerde gasheernaam"
+
+#. TXT_OSA_PORTNO
+msgid "Enter the relative port number"
+msgstr "Voer die relatiewe poortnommer in"
+
+#. TXT_CHECK_CD
+msgid "Verify Installation CD-ROM/DVD"
+msgstr "Bevestig installasie-CD-ROM/DVD"
+
+#. turn the computer off
+#. TXT_POWER_OFF
+msgid "Power off"
+msgstr "Krag af"
+
+#. TXT_DUD_FAIL
+msgid "Failed to access Driver Update medium."
+msgstr "Misluk om toegang tot aandrywerbywerkingmedium te verkry."
+
+#. TXT_DUD_READ
+msgid "Reading Driver Update..."
+msgstr "Lees van aandrywerbywerking ..."
+
+#. TXT_DUD_NOTFOUND
+msgid "No new Driver Updates found"
+msgstr "Geen nuwe aandrywerbywerkings gevind nie"
+
+#. TXT_DUD_ADDED
+msgid "Driver Updates added"
+msgstr "Aandrywerbywerkings bygevoeg"
+
+#. shown if driver update succeeded
+#. TXT_DUD_OK
+msgid "Driver Update ok"
+msgstr "Aandrywerbywerking goed"
+
+#. TXT_DUD_SELECT
+msgid "Please choose the Driver Update medium."
+msgstr "Kies asseblief die aandrywerbywerkingmedium."
+
+#. TXT_DUD_DEVICE
+msgid "Please enter the Driver Update device."
+msgstr "Voer asseblief die aandrywerbywerkingmedium in."
+
+#. TXT_DUD_INVALID_DEVICE
+msgid "Invalid device name."
+msgstr "Ongeldige toestelnaam."
+
+#. TXT_SEARCH_CDROM
+msgid "Looking for CD-ROM drives..."
+msgstr "Soek na CD-ROM-aandrywers ..."
+
+#. TXT_NO_CDROM
+msgid "No CD-ROM drives found."
+msgstr "Geen CD-ROM-aandrywers gevind nie."
+
+#. TXT_SEARCH_FLOPPY
+msgid "Looking for floppy disks..."
+msgstr "Soek na slapskywe ..."
+
+#. TXT_NO_FLOPPY
+msgid "No floppy disk found."
+msgstr "Geen slapskywe gevind nie."
+
+#. heading for a listing of updates
+#. TXT_DUD_LIST
+msgid "Driver Update list"
+msgstr "Aandrywerbywerkingslys"
+
+#. TXT_DUD_NOT_YET
+msgid "No Driver Updates so far."
+msgstr "Tot dusver geen aandrywerbywerkings nie."
+
+#. TXT_INSERT_CD_DVD
+msgid "Insert Installation CD-ROM or DVD."
+msgstr "Sit installasie-CD-ROM of -DVD in"
+
+#. TXT_NO_CD_DVD
+msgid "No CD-ROM or DVD found."
+msgstr "Geen CD-ROM of DVD gevind nie."
+
+#. e.g 'not a SUSE LINUX CD-ROM'
+#. TXT_WRONG_CD
+#, c-format
+msgid "This is not a %s CD-ROM."
+msgstr "Dit is nie ’n %s CD-ROM nie."
+
+#. TXT_CD_CHECK_OK
+msgid "No errors found."
+msgstr "Geen foute gevind nie."
+
+#. TXT_CD_MD5_FAILED
+msgid "Checksum wrong."
+msgstr "Nagaansom verkeerd."
+
+#. TXT_CD_READ_FAILED
+#, c-format
+msgid "Error reading sector %u."
+msgstr "Fout tydens lees van sektor %u."
+
+#. %s is CD-ROM or DVD
+#. TXT_CD_BROKEN
+#, c-format
+msgid ""
+"\n"
+"This %s is broken."
+msgstr ""
+"\n"
+"Hierdie %s is stukkend."
+
+#. TXT_SLP_SOURCE
+msgid "Choose an installation source"
+msgstr "Kies ’n installasiebron"
+
+#. TXT_INVALID_FQHOSTNAME
+msgid "This is not a valid fully qualified hostname."
+msgstr "Dit is nie ’n geldige, ten volle gekwalifiseerde gasheernaam nie."
+
+#. TXT_INVALID_CCW_ADDRESS
+msgid "This is not a valid CCW address."
+msgstr "Dit is nie ’n geldige CCW-adres nie."
+
+#. TXT_NET_HSI
+msgid "Hipersocket"
+msgstr "Hipersok"
+
+#. power-off message
+#. TXT_HALT
+msgid "Do you want to halt the system now?"
+msgstr "Wil u die stelsel nou stop?"
+
+#. TXT_390NET_OSA
+msgid "OSA-2 or OSA Express"
+msgstr "OSA-2 of OSA Express"
+
+#. TXT_OSA_ETH
+msgid "Ethernet"
+msgstr "Ethernet"
+
+#. TXT_OSA_TR
+msgid "Token Ring"
+msgstr "Kentekenring"
+
+#. TXT_OSA_LCS
+msgid "LCS"
+msgstr "LCS"
+
+#. TXT_OSA_QDIO
+msgid "QDIO"
+msgstr "QDIO"
+
+#. TXT_CHOOSE_OSA_INTERFACE
+msgid "Please choose the CCW bus interface."
+msgstr "Kies asseblief die CCW-buskoppelvlak."
+
+#. TXT_CHOOSE_OSA_MEDIUM
+msgid "Please choose the physical medium."
+msgstr "Kies asseblief die fisiese medium."
+
+#. progress indicator label
+#. TXT_LOADING_MODULES
+msgid "Loading Modules"
+msgstr "Laai van modules"
+
+#. progress indicator label
+#. TXT_LOADING_INSTSYS
+msgid "Loading Installation System"
+msgstr "Laai van installasiestelsel"
+
+#. progress indicator label
+#. TXT_LOADING_FONTS
+msgid "Loading Additional Fonts"
+msgstr "Laai van bykomende lettertipes"
+
+#. progress indicator label
+#. TXT_LOADING_UPDATE
+msgid "Loading Driver Update"
+msgstr "Laai van aandrywerbywerking"
+
+#. progress indicator label
+#. TXT_LOADING_RESCUE
+msgid "Loading Rescue System"
+msgstr "Laai van reddingstelsel"
+
+#. TXT_ENABLE_LAYER2
+msgid "Enable OSI Layer 2 support?"
+msgstr "Ontsper OSI-Laag 2-ondersteuning?"
+
+#. TXT_MANUAL_NETDEV_PARAMS
+msgid "Enter network device parameters manually"
+msgstr ""
+
+#. dialog box if install repository is missing
+#. TXT_NO_REPO
+msgid "No repository found."
+msgstr ""
+
+#. a web proxy
+#. TXT_USER_PW_PROXY
+msgid "Do you need a username and password to access the proxy?"
+msgstr ""
+
+#. ftp or http server
+#. TXT_USER_PW_SERVER
+#, c-format
+msgid "Do you need a username and password to access the %s server?"
+msgstr ""
+
+#. our installation repository
+#. TXT_INSECURE_REPO
+msgid ""
+"Sorry, repository failed checksum test.\n"
+"\n"
+"If you really trust your repository, you may continue in an insecure mode."
+msgstr ""
