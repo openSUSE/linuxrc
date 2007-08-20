@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2006-11-16 11:47+0100\n"
+"PO-Revision-Date: 2007-03-02 21:37+0100\n"
 "Last-Translator: Ladislav Michnovič <lmichnovic@suse.cz>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Poedit-Language: Slovak\n"
 
 #. TXT_OK
 msgid "OK"
@@ -775,11 +776,11 @@ msgstr "Vyberte oddiel pre koreňový priečinok."
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
-msgstr "Vyberte diskový oddiel pre swap."
+msgstr "Vyberte oddiel pre swap."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Pre načítanie všetkých dát nie je dostatok pamäte."
+msgstr "Pre načítanie všetkých dát nie je dosť pamäte."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
@@ -787,11 +788,11 @@ msgstr "Váš počítač nemá dosť pamäte pre spustenie YaST-u."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Aby ste mohli pokračovať, musíte aktivovať nejaký swapovací oddiel na disku."
+msgstr "Aby ste mohli pokračovať, musíte aktivovať nejaký priestor swap."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Chyba pri aktivácii swapovacieho oddielu."
+msgstr "Chyba pri aktivácii priestoru swap."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
@@ -840,11 +841,11 @@ msgstr "Spustiť SSH pre textovú inštaláciu?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."
-msgstr "Prosím, zadajte vaše VNC heslo."
+msgstr "Prosím, zadajte vaše heslo VNC."
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr "Prosím, zadajte vaše dočasné SSH heslo."
+msgstr "Prosím, zadajte vaše dočasné heslo SSH."
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -1137,6 +1138,7 @@ msgstr "Nahrávam záchranný systém"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Zapnúť podporu pre OSI vrstvu 2?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
 msgstr ""
@@ -1164,4 +1166,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-

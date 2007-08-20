@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-02 14:23\n"
+"PO-Revision-Date: 2006-05-17 17:14\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 
 #. TXT_OK
 msgid "OK"
-msgstr "確認"
+msgstr "確定"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -73,7 +73,7 @@ msgstr "顯示"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Keymap"
+msgstr "鍵盤配置"
 
 #. TXT_LOAD_NET
 msgid "Load Network Card Modules"
@@ -100,7 +100,7 @@ msgid ""
 msgstr ""
 "嘗試載入模組「%s」...\n"
 "\n"
-"在載入期間，您可能想要觀看虛擬主控台 4 上的核心訊息 (按 ALT-F4)。使用 ALT-F1 以切換回此功能表。"
+"在載入期間，您可能想要觀看虛擬主控台 4 上的核心訊息 (按 ALT-F4)。使用 ALT-F1 以切換回此選單。"
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -155,7 +155,7 @@ msgstr "處理器"
 
 #. TXT_INFO_DEVICES
 msgid "Devices"
-msgstr "裝置"
+msgstr "設備"
 
 #. TXT_INFO_NETDEV
 msgid "Network Cards"
@@ -284,8 +284,8 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"選擇一個鍵盤映射。\n"
-"YaST 稍後將會提供附加的鍵盤表。"
+"選擇一個鍵盤配置。\n"
+"YaST 稍後將會提供其他附加的鍵盤表。"
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -298,7 +298,7 @@ msgstr "目前沒有載入的模組。"
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "正在自動查探 (%s)...      "
+msgstr "正在自動偵測 (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -318,7 +318,7 @@ msgstr "乙太網路卡"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "並列埠"
+msgstr "平行埠"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
@@ -430,7 +430,7 @@ msgstr "要現在重新開機？"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
-msgstr "基本系統已成功安裝。這個新安裝的系統現在將會啟動以確認安裝。"
+msgstr "基本系統已成功安裝。這個新安裝的系統現在將要啟動以執行安裝。"
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -496,7 +496,7 @@ msgstr "輸入要載入 RAM 磁碟檔案的路徑與名稱，以做為根檔案�
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
-msgstr "尚未執行。"
+msgstr "尚未完成。"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -598,7 +598,7 @@ msgstr "-- 更多模組 --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "啟始化並列埠..."
+msgstr "啟始化平行埠..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
@@ -623,7 +623,7 @@ msgstr "輸入 bootp 的逾時值."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "通道間的連線"
+msgstr "channel to channel connection"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -635,7 +635,7 @@ msgstr "IUCV 連線"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "附加 cisco 路由器的通道"
+msgstr "channel attached cisco router"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
@@ -838,7 +838,7 @@ msgstr "輸入您的 VNC 密碼。"
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr "輸入您的暫存 SSH 密碼。"
+msgstr "輸入您的暫時 SSH 密碼。"
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -859,14 +859,14 @@ msgstr "顯示「驅動程式更新」"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "輸入名稱伺服器 %u 的 IP 或按 ESC。"
+msgstr "輸入名稱伺服器 %u 的 IP 位址或按 ESC。"
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"輸入暫存 root 密碼。\n"
+"輸入暫時 root 密碼。\n"
 "您需要在第一次以 root 使用者登入後變更此密碼。"
 
 #. TXT_REBOOT
@@ -1131,25 +1131,25 @@ msgstr "正在載入救援系統"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "啟用 OSI 第二層支援？"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "請手動輸入網路設備的參數"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "沒有發現套件庫。"
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "您需要使用者名稱和密碼來存取這個代理嗎？"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
-#, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "您需要使用者名稱和密碼來存取這個 %s 伺服器嗎？"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1158,4 +1158,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"抱歉，套件庫無法通過 ckecksum 測試。\n"
+"\n"
+"如果您確實相信您的套件庫，您可以使用不安全模式繼續。"

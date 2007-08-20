@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc.uk\n"
-"PO-Revision-Date: 2006-11-06 01:03-0800\n"
+"PO-Revision-Date: 2007-08-14 23:21-0700\n"
 "Last-Translator: Ivan Petrouchtchak <ivanpetrouchtchak@yahoo.com>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
@@ -1136,25 +1136,26 @@ msgstr "Завантаження системи порятунку"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Увімкнути підтримку OSI Layer 2?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Введіть параметри мережного пристрою вручну"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Не знайдено жодного сховища."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Чи потрібні ім'я користувача і пароль для доступу до проксі?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Чи потрібні ім'я користувача і пароль для доступу до сервера %s?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1163,4 +1164,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Вибачте, сховище не пройшло перевірку контрольної суми.\n"
+"\n"
+"Якщо ви дійсно довіряєте цьому сховищу, можете продовжити в незабезпеченому режимі."

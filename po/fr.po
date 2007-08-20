@@ -9,18 +9,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-02 14:16\n"
+"Project-Id-Version: fr\n"
+"PO-Revision-Date: 2005-03-09 12:25+0100\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9\n"
 
 #. TLABEL linuxrc_2002_03_29_0036__0
 #. TXT_OK
 msgid "OK"
-msgstr "Valider"
+msgstr "OK"
 
 #. TLABEL linuxrc_2002_03_29_0036__1
 #. TXT_CANCEL
@@ -64,7 +65,7 @@ msgstr "Langue"
 #. TLABEL linuxrc_2002_03_29_0036__9
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Modules du kernel (pilotes matériel)"
+msgstr "Modules du noyau (pilotes matériel)"
 
 #. TLABEL linuxrc_2002_03_29_0036__10
 #. TXT_MENU_START
@@ -84,12 +85,12 @@ msgstr "Menu principal"
 #. TLABEL linuxrc_2002_03_29_0036__13
 #. TXT_SETTINGS
 msgid "Settings"
-msgstr "Paramètres"
+msgstr "Configuration"
 
 #. TLABEL linuxrc_2002_03_29_0036__14
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr "Affichage"
+msgstr "Écran"
 
 #. TLABEL linuxrc_2002_03_29_0036__15
 #. TXT_MENU_KEYMAP
@@ -104,7 +105,7 @@ msgstr "Charger les modules de la carte réseau"
 #. TLABEL linuxrc_2002_03_29_0036__17
 #. TXT_SHOW_MODULES
 msgid "Show Loaded Modules"
-msgstr "Afficher les modules chargés"
+msgstr "Affichr les modules chargés"
 
 #. TLABEL linuxrc_2002_03_29_0036__18
 #. TXT_AUTO_LOAD
@@ -124,9 +125,9 @@ msgid ""
 "\n"
 "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Tentative de chargement du module \"%s\"...\n"
+"Tentative de charger le module \"%s\"...\n"
 "\n"
-"Pendant le chargement, vous pouvez visualiser les messages du kernel sur la console virtuelle 4 (ALT-F4). Utilisez ALT-F1 pour revenir au menu."
+"Pendant le chargement, vous pouvez visualiser les messages du noyau sur la console virtuelle 4 (ALT-F4). Utilisez ALT-F1 pour revenir au menu."
 
 #. TLABEL linuxrc_2002_03_29_0036__21
 #. TXT_LOAD_SUCCESSFUL
@@ -184,7 +185,7 @@ msgstr "Recherche de l'image \"%s\"..."
 #. TLABEL linuxrc_2002_03_29_0036__33
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
-msgstr "Messages du kernel"
+msgstr "Messages du noyau"
 
 #. TLABEL linuxrc_2002_03_29_0036__34
 #. TXT_INFO_CPU
@@ -295,7 +296,7 @@ msgstr ""
 #. TLABEL linuxrc_2002_03_29_0036__53
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
-msgstr "Erreur pendant la configuration du réseau. Votre carte réseau n'a probablement pas été reconnue par le kernel."
+msgstr "Erreur pendant la configuration du réseau. Votre carte réseau n'a probablement pas été reconnue par le noyau."
 
 #. TLABEL linuxrc_2002_03_29_0036__54
 #. TXT_INPUT_SERVER
@@ -326,9 +327,11 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Tentative de montage du répertoire\n"
+"Tentative de monter le répertoire\n"
 "\n"
-"\"%s:%s\"..."
+"\"%s:%s\"\n"
+"\n"
+"... "
 
 #. TLABEL linuxrc_2002_03_29_0036__59
 #. TXT_ERROR_NFSMOUNT
@@ -338,7 +341,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Erreur lors de la tentative de montage du répertoire NFS.\n"
+"Erreur lors de la tentative de monter le répertoire NFS.\n"
 "\n"
 "Cause, indiquée par le serveur : %s"
 
@@ -365,7 +368,7 @@ msgstr "Aucun module chargé actuellement."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Détection automatique (%s)...      "
+msgstr "Détection automatique (%s)...    "
 
 #. TLABEL linuxrc_2002_03_29_0036__64
 #. TXT_WANT_MORE_SCSI
@@ -437,7 +440,7 @@ msgid ""
 msgstr ""
 "Jeu de puces PCMCIA \"%s\" détecté.\n"
 "\n"
-"Entrez les paramètres pour les modules core PCMCIA."
+"Entrez les paramètres pour les modules core PCMCIA "
 
 #. TLABEL linuxrc_2002_03_29_0036__77
 #. TXT_PCMCIA_PARAMS
@@ -509,7 +512,7 @@ msgstr "Sélectionnez le support source."
 #. TLABEL linuxrc_2002_03_29_0036__87
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Tentative de montage du CD-ROM..."
+msgstr "Tentative de monter le CD-ROM..."
 
 #. TLABEL linuxrc_2002_03_29_0036__88
 #. TXT_ERROR_CD_MOUNT
@@ -785,7 +788,7 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Si vous voulez accéder au partage en tant qu'invité, vous n'avez pas à spécifier de nom d'utilisateur, de mot de passe ni de groupe de travail.\n"
+"Si vous voulez accéder au partage en tant qu'invité,vous n'avez pas à spécifier de nom d'utilisateur, de mot de passe ni de groupe de travail.\n"
 "Voulez-vous accéder au partage en tant qu'invité ?"
 
 #. TLABEL linuxrc_2002_03_29_0036__147
@@ -801,7 +804,7 @@ msgstr "Entrez votre mot de passe sur le serveur SMB."
 #. TLABEL linuxrc_2002_03_29_0036__149
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
-msgstr "Entrez votre groupe de travail. Si vous n'avez pas à spécifier de groupe de travail, laissez ce champ vide."
+msgstr "Entrez votre groupe de travail.Si vous n'avez pas à spécifier de groupe de travail,laissez ce champ vide."
 
 #. TLABEL linuxrc_2002_03_29_0036__150
 #. TXT_SMB_TRYING_MOUNT
@@ -811,7 +814,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Tentative de montage du partage\n"
+"Tentative de monter le partage\n"
 "\n"
 "\"//%s/%s\""
 
@@ -1051,7 +1054,7 @@ msgstr "Réamorcer"
 #. TXT_NO_RAM
 #, c-format
 msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
-msgstr "Votre ordinateur n'a pas assez de RAM pour l'installation de %s. Vous avez besoin d'au moins %d Mo."
+msgstr "Votre ordinateur n'ont pas assez de RAM pour l'installation de %s. Vous nécessitez au moins %d Mo."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
@@ -1132,7 +1135,7 @@ msgstr "Vérifier le CD-ROM/DVD d'installation"
 #. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
-msgstr "Arrêt"
+msgstr "Arrêter"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
@@ -1227,7 +1230,7 @@ msgid ""
 "This %s is broken."
 msgstr ""
 "\n"
-"%s défectueux."
+"Ce %s est abimé."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1306,6 +1309,7 @@ msgstr "Chargement du système de secours"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Activer la prise en charge de la couche 2 de OSI ?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
 msgstr ""
@@ -1333,4 +1337,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-

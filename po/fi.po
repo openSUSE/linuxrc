@@ -5,10 +5,10 @@
 # Jyri Palokangas <jmp@netti.fi>, 2005, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-10-31 20:33+0200\n"
-"Last-Translator: Ari Österholm <ari.osterholm@nbl.fi>\n"
-"Language-Team:  <fi@li.org>\n"
+"Project-Id-Version: linuxrc.fi\n"
+"PO-Revision-Date: 2007-08-10 17:02+0300\n"
+"Last-Translator: Jyri Palokangas <jmp@opensuse.fi>\n"
+"Language-Team: Suomi <fi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -44,7 +44,7 @@ msgstr "Mustavalkonäyttö"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
-msgstr "Valitse näytön tyyppi."
+msgstr "Valitse näytöntyyppi."
 
 #. TXT_MENU_LANG
 msgid "Language"
@@ -463,7 +463,7 @@ msgid ""
 msgstr ""
 "Tietokoneessasi on erittäin vähän muistia.\n"
 "\n"
-"Ennen tämän viestin kuittaamista, sinun tulisi vaihtaa virtuaalikonsoliin 2 (paina ALT-F2) luodaksesi ja ottaaksesi käyttöön swap-tila."
+"Ennen tämän viestin kuittaamista, sinun tulisi vaihtaa virtuaalikonsoliin 2 (paina ALT-F2) luodaksesi ja ottaaksesi käyttöön swap-tilaa."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -738,7 +738,7 @@ msgstr "Lataa %s moduulit"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
-msgstr "Lataa tiedostojärjestelmämoduulit"
+msgstr "Lataa tiedostojärjestelmä-moduulit"
 
 #. TXT_LOAD_OTHER
 msgid "Load Unknown Modules"
@@ -788,7 +788,7 @@ msgstr "Jatkaaksesi ota swap-tila käyttöön."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Virhe otettaessa swap-tila käyttöön."
+msgstr "Virhe otettaessa swap-tilaa käyttöön."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
@@ -1134,25 +1134,26 @@ msgstr "Ladataan korjausjärjestelmä"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Ota käyttöön OSI Layer 2 tuki?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Anna verkkolaitteen parametrit käsin"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Asennuslähteitä ei löytynyt."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Tarvitsetko käyttäjätunnuksen ja salasanan välityspalvelimen käyttöä varten?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Tarvitsetko käyttäjätunnuksen ja salasanan käyttääksesi %s palvelinta?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1161,4 +1162,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Asennuslähteen tarkistussumman testaus epäonnistui.\n"
+"\n"
+"Jos luotat asennuslähteeseen, voit jatkaa turvaamattomassa tilassa.."

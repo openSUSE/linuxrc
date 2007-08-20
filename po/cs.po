@@ -8,15 +8,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.cs\n"
-"PO-Revision-Date: 2006-10-27 12:37+0200\n"
-"Last-Translator: Klara Cihlarova <koty@seznam.cz>\n"
-"Language-Team: Czech <suse@suse.cz>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2007-08-14 17:20+0200\n"
+"Last-Translator: Jakub Friedl\n"
+"Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.2\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1138,25 +1138,26 @@ msgstr "Zavádí se záchranný systém"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Povolit podporu 2. vrstvy OSI?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Zadejte parametry síťového zařízení ručně"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Nenalezen žádný repozitář"
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Potřebujete pro přístup k proxy uživatelské jméno a heslo?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Potřebujete pro přístup k serveru %s uživatelské jméno a heslo?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1165,4 +1166,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Kontrolní součet repozitáře nebyl úspěšný.\n"
+"\n"
+"Pokud repozitáři skutečně důvěřujete, můžete pokračovat v nezabezpečeném režimu."

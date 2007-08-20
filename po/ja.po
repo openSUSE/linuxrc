@@ -3,13 +3,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-03 13:52\n"
+"Project-Id-Version: Linuxrc\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-02-23 15:06+0100\n"
+"PO-Revision-Date: 2006-06-16 14:06\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
@@ -61,7 +64,7 @@ msgstr "システム情報"
 
 #. TXT_HDR_MAIN
 msgid "Main Menu"
-msgstr "メインメニュー "
+msgstr "メインメニュー"
 
 #. TXT_SETTINGS
 msgid "Settings"
@@ -69,7 +72,7 @@ msgstr "設定"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr "表示"
+msgstr "ディスプレイ"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
@@ -753,7 +756,7 @@ msgstr "続行する"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "中止"
+msgstr "中止する"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
@@ -871,7 +874,7 @@ msgstr ""
 
 #. TXT_REBOOT
 msgid "Reboot"
-msgstr "再起動"
+msgstr "再起動する"
 
 #. TXT_NO_RAM
 #, c-format
@@ -957,7 +960,7 @@ msgstr "インストール用CD-ROM/DVDを確認する"
 #. turn the computer off
 #. TXT_POWER_OFF
 msgid "Power off"
-msgstr "電源オフ"
+msgstr "電源をオフにする"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
@@ -1131,6 +1134,7 @@ msgstr "救済システムをロード中"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "OSIレイヤ2サポートを有効にしますか？"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
 msgstr ""
@@ -1158,4 +1162,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-

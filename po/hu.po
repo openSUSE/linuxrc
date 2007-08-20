@@ -8,15 +8,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
+"Project-Id-Version: linuxrc.hu\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2006-11-16 17:34+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2007-08-10 18:20+0200\n"
+"Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
 "Language-Team:  <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -194,7 +195,7 @@ msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Insert the disk and press ENTER."
-msgstr "Helyezze be a lemezt, majd nyomja meg az ENTER-t."
+msgstr "Kérem helyezze be a lemezt, majd nyomja meg az ENTER-t."
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
@@ -226,7 +227,7 @@ msgstr "Ha átjárón keresztül éri el a kiszolgálót, akkor adja meg az átj
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Adja meg a névkiszolgálót IP-címét. Ha nem használ névkiszolgálót, nyomja meg az ESC billentyűt."
+msgstr "Kérem adja meg a névkiszolgálót IP-címét. Ha nem használ névkiszolgálót, nyomja meg az ESC billentyűt."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -241,7 +242,7 @@ msgstr ""
 "\n"
 "IP-cím: %s\n"
 "Név: %s\n"
-"Domén: %s"
+"Tartomány: %s"
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
@@ -364,7 +365,7 @@ msgid ""
 msgstr ""
 "Találtam egy \"%s\" PCMCIA chipkészletet.\n"
 "\n"
-"Adja meg a PCMCIA alapmodul paramétereit."
+"Kérem adja meg a PCMCIA alapmodul paramétereit."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
@@ -1140,25 +1141,26 @@ msgstr "Mentőrendszer betöltése"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Engedélyezi az OSI Layer 2 támogatást?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Adja meg a hálózati eszköz paramétereit"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Nem található telepítési forrás."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Szüksége van felhasználói névre és jelszóra a proxy eléréséhez?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Szüksége van felhasználói névre és jelszóra a(z) %s kiszolgáló eléréséhez?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1167,4 +1169,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"A telepítési forrás ellenőrző összegének ellenőrzése sikertelen.\n"
+"\n"
+"Amennyiben a telepítési forrást valóban megbízhatónak tartja, folytathatja a munkát nem megbízható módban."

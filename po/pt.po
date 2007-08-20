@@ -7,11 +7,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.pt\n"
+"Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2006-10-10 09:57+0100\n"
-"Last-Translator: \n"
-"Language-Team:  <en@li.org>\n"
+"PO-Revision-Date: 2007-08-10 18:06+0100\n"
+"Last-Translator: Carlos Gonçalves <carlos@pinguix.com>\n"
+"Language-Team: Portuguese <opensuse-pt@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,7 +23,7 @@ msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
-msgstr "Atrás"
+msgstr "Retroceder"
 
 #. TXT_YES
 msgid "Yes"
@@ -35,11 +35,11 @@ msgstr "Não"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Select the language."
-msgstr "Seleccione o idioma."
+msgstr "Seleccionar o idioma."
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
-msgstr "Monitor colorido"
+msgstr "Monitor a cores"
 
 #. TXT_MONO_DISPLAY
 msgid "Monochrome display"
@@ -47,11 +47,11 @@ msgstr "Monitor monocromático"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
-msgstr "Selecione o tipo de exibição."
+msgstr "Seleccione o tipo de ecrã."
 
 #. TXT_MENU_LANG
 msgid "Language"
-msgstr "Língua"
+msgstr "Idioma"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
@@ -256,7 +256,7 @@ msgstr "Introduza o endereço IP do servidor FTP."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
-msgstr "Introduza o diretório no servidor."
+msgstr "Introduza o directório no servidor."
 
 #. TXT_ENTER_PARAMS
 #, c-format
@@ -270,7 +270,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"A tentar montar o diretório \n"
+"A tentar montar o directório \n"
 "\n"
 "\"%s:%s\"..."
 
@@ -281,7 +281,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Ocorreu um erro ao tentar montar o diretório NFS.\n"
+"Ocorreu um erro ao tentar montar o directório NFS.\n"
 "\n"
 "Motivo dado pelo servidor: %s"
 
@@ -420,7 +420,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr "Escolha o media de origem."
+msgstr "Escolha o suporte de origem."
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -448,7 +448,7 @@ msgstr "Não foi possível montar a partição especificada."
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
-msgstr "Introduza o diretório de origem."
+msgstr "Introduza o directório de origem."
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
@@ -518,7 +518,7 @@ msgstr "Sair ou Reinicializar"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
-msgstr "A procurar ficheiro de informação...Pesquisando arquivo de informações..."
+msgstr "A procurar ficheiro de informação..."
 
 #. TXT_NFSPORT
 msgid "Specify the NFS port."
@@ -571,7 +571,7 @@ msgstr "Introduza o nome do utilizador com o qual vai aceder ao servidor FTP."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
-msgstr "Introduza a palavra passe da conta do utiliazador FTP."
+msgstr "Introduza a palavra passe da conta do utilizador FTP."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
@@ -595,7 +595,7 @@ msgid ""
 "Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Geralmente, é feita uma instalação FTP via FTP anônimo. É possível especificar um nome de usuário e uma palavra passe para acederr ao servidor FTP.\n"
+"Geralmente, é feita uma instalação FTP via FTP anónimo. É possível especificar um nome de utilizador e uma palavra passe para aceder ao servidor FTP.\n"
 "Utilizar nome de utilizador e senha?"
 
 #. TXT_MORE_MODULES
@@ -621,7 +621,7 @@ msgstr "Ejectar CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp Time-Out"
-msgstr "Tempo de espera de Bootp"
+msgstr "Tempo de espera de bootp"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for bootp."
@@ -652,8 +652,8 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Se quiser aceder a uma partilha como convidado, não precisa especificar um nome de utilizador, uma palavra passe e um grupo de trabalho.\n"
-"Aceder a uma partilha como guest?"
+"Se pretender aceder a uma partilha como convidado, não precisa especificar um nome de utilizador, uma palavra passe e um grupo de trabalho.\n"
+"Aceder a uma partilha como convidado?"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
@@ -849,7 +849,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"O sistema base foi instalado com sucesso. O computador necessita ser reinicializado. Remova todos os media de instalação (CD-ROM, disquete).\n"
+"O sistema base foi instalado com sucesso. O computador necessita ser reinicializado. Remova todos os suportes de instalação (CD-ROM, disquete).\n"
 "Não remova a disquete se o gestor de arranque estiver ai instalado."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -883,9 +883,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "O computador não tem RAM suficiente para a instalação de %s. Precisa de pelo menos %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "A palavra passe é muito curta (deve ter pelo menos 5 caracteres)."
+msgstr "A palavra passe é muito curta (deve ter pelo menos 8 caracteres)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -893,7 +892,7 @@ msgstr "Introduza o endereço IP do computador onde é executado o servidor X11.
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Por favor, selecione o tipo de dispositivo de rede."
+msgstr "Por favor, seleccione o tipo de dispositivo de rede."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the VM peer to connect to."
@@ -949,7 +948,7 @@ msgstr "Portname a utilizar"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
-msgstr "Nome complecto do computador"
+msgstr "Nome completo do computador"
 
 #. TXT_OSA_PORTNO
 msgid "Enter the relative port number"
@@ -966,11 +965,11 @@ msgstr "Desligar"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Falha no acesso ao media de Actualização do Driver."
+msgstr "Falha no acesso ao suporte de Actualização do Driver."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "A lêr a Actualização do Driver..."
+msgstr "A ler a Actualização do Driver..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
@@ -987,7 +986,7 @@ msgstr "Actualização do Driver ok"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Por favor escolha o media com a Actualização do Driver."
+msgstr "Por favor escolha o suporte com a Actualização do Driver."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
@@ -1042,7 +1041,7 @@ msgstr "Nenhum erro encontrado."
 
 #. TXT_CD_MD5_FAILED
 msgid "Checksum wrong."
-msgstr "Checksum incorreto."
+msgstr "Checksum errado."
 
 #. TXT_CD_READ_FAILED
 #, c-format
@@ -1106,7 +1105,7 @@ msgstr "Escolha a interface de barramento CCW."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "Escolha o media físico."
+msgstr "Escolha o suporte físico."
 
 #. progress indicator label
 #. TXT_LOADING_MODULES
@@ -1135,26 +1134,27 @@ msgstr "A Carregar Sistema de Recuperação"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Activar suporte para OSI Layer 2?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Digite manualmente os parâmetros do dispositivo de rede"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Nenhum repositório encontrado."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Necessita de um nome de utilizador e palavra passe para aceder ao 'proxy'?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Necessita de um nome de utilizador e palavra passe para aceder ao servidor %s?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1163,4 +1163,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Desculpe, o teste de checksum do repositório falhou.\n"
+"\n"
+"Se realmente confiar no repositório, poderá continuar em um modo inseguro."

@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-03 20:46+0100\n"
+"PO-Revision-Date: 2007-08-11 13:57+0200\n"
 "Last-Translator: Olav Pettershagen <olav.pet@online.no>\n"
 "Language-Team:  <nb@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr "Nei"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Select the language."
-msgstr "Velg språk"
+msgstr "Velg språk."
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
@@ -47,7 +47,7 @@ msgstr "Svart/hvitt-skjerm"
 
 #. TXT_CHOOSE_DISPLAY
 msgid "Select the display type."
-msgstr "Velg skjermtype"
+msgstr "Velg skjermtype."
 
 #. TXT_MENU_LANG
 msgid "Language"
@@ -197,7 +197,7 @@ msgstr "Sett inn disketten og trykk ENTER."
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
-msgstr "Feil ved lesing fra diskett"
+msgstr "Feil ved lesing fra diskett."
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
@@ -221,11 +221,11 @@ msgstr "Angi nettverksmasken. For et normalt klasse C-nettverk er dette vanligvi
 
 #. TXT_INPUT_GATEWAY
 msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
-msgstr "Hvis du trenger en systemport for å kommunisere med serveren, angi IP-adressen til systemporten. Hvis du ikketrenger noen systemport, kan du angi din egen IP-adresse"
+msgstr "Hvis du trenger en systemport for å kommunisere med tjeneren, angi IP-adressen til systemporten. Hvis du ikketrenger noen systemport, kan du angi din egen IP-adresse."
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Angi IP-adressen til navneserveren din. Trykk ESC hvis du ikke bruker noen navneserver."
+msgstr "Angi IP-adressen til navnetjeneren din. Trykk ESC hvis du ikke bruker noen navnetjener."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -248,15 +248,15 @@ msgstr "Det oppstod en feil under konfigurasjon av nettverket. Nettverkskortet b
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
-msgstr "Angi IP-adressen til NFS-serveren."
+msgstr "Angi IP-adressen til NFS-tjeneren."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Enter the IP address of the FTP server."
-msgstr "Angi IP-adressen til FTP-serveren."
+msgstr "Angi IP-adressen til FTP-tjeneren."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
-msgstr "Angi katalogen på serveren."
+msgstr "Angi katalogen på tjeneren."
 
 #. TXT_ENTER_PARAMS
 #, c-format
@@ -456,7 +456,7 @@ msgstr "Det oppstod en feil under installasjonen."
 
 #. TXT_DRIVES
 msgid "Hard Disks or CD-ROMs"
-msgstr "Harddisker eller CD-ROMer"
+msgstr "Harddisker eller CD-ROM-er"
 
 #. TXT_LITTLE_MEM
 msgid ""
@@ -526,7 +526,7 @@ msgstr "Angi NFS porten."
 
 #. TXT_ASKING_NAMED
 msgid "Asking name server..."
-msgstr "Spør navneserveren..."
+msgstr "Spør navnetjeneren..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
@@ -561,13 +561,13 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Feil ved tilkobling til FTP server:\n"
+"Feil ved tilkobling til FTP tjener:\n"
 "\n"
 "%s"
 
 #. TXT_ENTER_FTPUSER
 msgid "Enter the user name with which to access the FTP server."
-msgstr "Angi brukernavnet for tilgang til FTP-serveren."
+msgstr "Angi brukernavnet for tilgang til FTP-tjeneren."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
@@ -575,15 +575,15 @@ msgstr "Angi passordet for FTP-brukerkontoen."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "Angi adressen til FTP-mellomserveren."
+msgstr "Angi adressen til FTP-mellomtjeneren."
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "Angi porten for FTP-mellomserveren."
+msgstr "Angi porten for FTP-mellomtjeneren."
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
-msgstr "Vil du bruke en FTP-mellomserver?"
+msgstr "Vil du bruke en FTP-mellomtjener?"
 
 #. TXT_NOMEM_FTP
 #, c-format
@@ -595,7 +595,7 @@ msgid ""
 "Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"En FTP-installasjon utføres vanligvis via anonym FTP. Det er mulig å angi brukernavn og passord for å få tilgang til FTP-serveren.\n"
+"En FTP-installasjon utføres vanligvis via anonym FTP. Det er mulig å angi brukernavn og passord for å få tilgang til FTP-tjeneren.\n"
 "Vil du angi brukernavn og passord?"
 
 #. TXT_MORE_MODULES
@@ -608,7 +608,7 @@ msgstr "Initialiserer parallellport..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
-msgstr "Angi portnummeret som NFS-serveren benytter."
+msgstr "Angi portnummeret som NFS-tjeneren benytter."
 
 #. TXT_INSERT_CD
 #, c-format
@@ -645,7 +645,7 @@ msgstr "kanal tilknyttet cisco-ruter"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
-msgstr "Angi navnet på den delte ressursen på SMB-serveren."
+msgstr "Angi navnet på den delte ressursen på SMB-tjeneren."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
@@ -657,11 +657,11 @@ msgstr ""
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
-msgstr "Angi brukernavnet for SMB-serveren."
+msgstr "Angi brukernavnet for SMB-tjeneren."
 
 #. TXT_SMB_ENTER_PASSWORD
 msgid "Enter your password on the SMB server."
-msgstr "Angi passordet for SMB-serveren."
+msgstr "Angi passordet for SMB-tjeneren."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
@@ -721,13 +721,13 @@ msgstr "Velg nettverksprotokoll."
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Angi IP-adressen til %s-serveren."
+msgstr "Angi IP-adressen til %s-tjeneren."
 
 #. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr "Forsøker å koble til %s-serveren..."
+msgstr "Forsøker å koble til %s-tjeneren..."
 
 #. TXT_NET
 msgid "Network"
@@ -763,7 +763,7 @@ msgstr "Avbryt"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "Ingen nye moduler funnet"
+msgstr "Ingen nye moduler funnet."
 
 #. TXT_CHOOSE_PARTITION
 msgid "Choose the hard disk partition."
@@ -800,27 +800,27 @@ msgstr "Angi veksleminnepartisjonen (f.eks. /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "Angi brukernavnet for tilgang til %s-serveren."
+msgstr "Angi brukernavnet for tilgang til %s-tjeneren."
 
 #. TXT_ENTER_PASSWORD
 #, c-format
 msgid "Enter the password for the %s server."
-msgstr "Angi passordet for %s-serveren."
+msgstr "Angi passordet for %s-tjeneren."
 
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Use a %s proxy?"
-msgstr "Bruk en %s-mellomserver?"
+msgstr "Bruk en %s-mellomtjener?"
 
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Angi adressen til %s-mellomserveren."
+msgstr "Angi adressen til %s-mellomtjeneren."
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "Angi porten for %s-mellomserveren."
+msgstr "Angi porten for %s-mellomtjeneren."
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -865,7 +865,7 @@ msgstr "Vis driveroppgraderinger"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Angi IP-adressen til navneserveren %u eller trykk på ESC."
+msgstr "Angi IP-adressen til navnetjeneren %u eller trykk på ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -890,7 +890,7 @@ msgstr "Passordet er for kort (må minst bestå av 8 tegn)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr "Angi IP-adressen til vertsmaskinen som kjører X11-serveren."
+msgstr "Angi IP-adressen til vertsmaskinen som kjører X11-tjeneren."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
@@ -967,7 +967,7 @@ msgstr "Slå av"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Ingen tilgang til driveroppgraderingsmedium"
+msgstr "Ingen tilgang til driveroppgraderingsmedium."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
@@ -1025,7 +1025,7 @@ msgstr "Ingen driveroppgraderinger foreløpig."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
-msgstr "Sett inn installasjons-CD-ROMen eller -DVDen."
+msgstr "Sett inn installasjons-CD-ROM-en eller -DVD-en."
 
 #. TXT_NO_CD_DVD
 msgid "No CD-ROM or DVD found."
@@ -1136,26 +1136,27 @@ msgstr "Laster redningssystem"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr "Vil du aktivere &Layer 2-støtte?"
+msgstr "Vil du aktivere Layer 2-støtte?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Angi parametere til nettverksheten manuelt"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Ingen arkiver ble ikke funnet."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Trenger du et brukernavn og et passord for å få tilgang til mellomtjeneren?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Trenger du et brukernavn og et passord for å få tilgang til %s-tjeneren."
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1164,4 +1165,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Kontrollsumtesten for arkivet mislyktes.\n"
+"\n"
+"Hvis du stoler på dette arkivet, kan du fortsette i usikker modus."

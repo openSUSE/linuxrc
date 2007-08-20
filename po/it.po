@@ -4,13 +4,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-03 15:41\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
+"Project-Id-Version: it\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-08-10 15:12+0100\n"
+"Last-Translator: Alberto Passalacqua <alberto.passalacqua@tin.it>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
@@ -70,7 +72,7 @@ msgstr "Impostazioni"
 
 #. TXT_MENU_DISPLAY
 msgid "Display"
-msgstr "Visualizzazione"
+msgstr "Schermo"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
@@ -115,7 +117,7 @@ msgstr "Impossibile caricare il modulo \"%s\"."
 
 #. TXT_CDROM
 msgid "CD-ROM"
-msgstr "CD-ROM"
+msgstr "CD-Rom"
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -299,7 +301,7 @@ msgstr "Nessun modulo è attualmente caricato."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Rilevamento automatico (%s)...      "
+msgstr "Rilevamento automatico (%s)...    "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -513,7 +515,7 @@ msgstr "Esci e riavvia"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
-msgstr "Tentativo di rilevamento del file info..."
+msgstr "Tentativo di rilevamento del file info.. "
 
 #. TXT_NFSPORT
 msgid "Specify the NFS port."
@@ -1129,26 +1131,27 @@ msgstr "Caricamento sistema di salvataggio"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr "Abilitare il supporto per OSI Livello 2?"
+msgstr "Abilitare il supporto per OSI Livello 2? "
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Introdurre i parametri del dispositivo di rete manualmente"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Nessuna sorgente di installazione è stata trovata."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Sono necessari un nome utente e una password per accedere al proxy?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Sono necessari un nome utente e una password per accedere al server %s?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1157,4 +1160,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Spiacente, la verifica del checksum della sorgente di installazione è falliton.\n"
+"\n"
+"Se si è sicuri dell'affidabilità della sorgente di installazione, è possibile continuare in modalità non sicura."

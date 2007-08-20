@@ -1137,6 +1137,7 @@ msgstr "Зареждане на спасителната система"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Желаете ли да разрешите поддържка за OSI слой 2?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
 msgstr ""
@@ -1164,4 +1165,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-

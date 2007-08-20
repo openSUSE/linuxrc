@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-11-16 19:04+0100\n"
+"PO-Revision-Date: 2007-08-11 10:04+0200\n"
 "Last-Translator: Mattias Newzella <newzella@linux.se>\n"
-"Language-Team: Swedish <sv@li.org>\n"
+"Language-Team:  <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -797,59 +797,59 @@ msgstr "Ange växlingspartitionen (t ex /dev/sda2)"
 #. TXT_ENTER_USER
 #, c-format
 msgid "Enter the user name with which to access the %s server."
-msgstr "Ange användarnamnet som ska användas för åtkomst till server %s."
+msgstr "Ange under vilket användarnamn du vill komma åt %s-servern."
 
 #. TXT_ENTER_PASSWORD
 #, c-format
 msgid "Enter the password for the %s server."
-msgstr "Ange lösenord för servern %s."
+msgstr "Ange lösenordet för %s-servern."
 
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Use a %s proxy?"
-msgstr "Använda en %s-proxy?"
+msgstr "Vill du använda en %s-proxy?"
 
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Ange adressen för %s-proxyn."
+msgstr "Ange adressen för %s-proxy."
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "Ange porten för %s-proxyn."
+msgstr "Ange porten för %s-proxy."
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
-msgstr "Aktivera eller Inaktivera VNC"
+msgstr "Aktivera eller inaktivera VNC"
 
 #. TXT_VNC_YES_NO
 msgid "Use VNC for install?"
-msgstr "Använda VNC för installation?"
+msgstr "Vill du använda VNC för installation?"
 
 #. TXT_SSH_SWITCH
 msgid "Enable or Disable SSH Mode"
-msgstr "Aktivera eller inaktivera SSH-läge"
+msgstr "Aktivera eller inaktivera SSH-läget"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
-msgstr "Starta SSH för textinstallation?"
+msgstr "Vill du starta SSH för textinstallation?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."
-msgstr "Ange ditt VNC-lösenord."
+msgstr "Ange lösenordet för VNC."
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr "Ange ditt temporära SSH-lösenord."
+msgstr "Ange det temporära SSH-lösenordet."
 
 #. TXT_DO_REBOOT
 msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Grundsystemet har nu installerats. Datorn kommer nu att startas om. Ta bort all installationsmedia (cd-rom, diskett).\n"
-"Ta inte ur disketten om starthanteraren installerades på den."
+"Bassystemet har installerats. Datorn måste nu startas om. Ta bort alla installationsmedia (cd-rom, diskett).\n"
+" Ta inte bort disketten om starthanteraren har installerats på den."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
@@ -862,15 +862,15 @@ msgstr "Visa drivrutinsuppdateringar"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Ange IP på namnservern %u eller tryck på Esc."
+msgstr "Ange IP-numret för namnservern %u eller tryck på ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"Ange ett temporärt root-lösenord.\n"
-"Du kommer att få byta detta lösenord vid den första root-inloggningen."
+"Ange det temporära root-lösenordet.\n"
+"Du måste ändra det här lösenordet första gången root-användaren loggar in."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -879,7 +879,7 @@ msgstr "Starta om"
 #. TXT_NO_RAM
 #, c-format
 msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
-msgstr "Datorn har inte tillräckligt med RAM för installationen av %s. Du behöver minst %d MB."
+msgstr "Datorn har inte tillräckligt med RAM-minne för installation av %s. Du behöver minst %d MB."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
@@ -887,11 +887,11 @@ msgstr "Lösenordet är för kort (måste ha minst 8 tecken)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr "Ange IP-adress på datorn som kör X11-servern."
+msgstr "Ange IP-adressen för värddatorn som kör X11-servern."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Välj typ av nätverksenhet."
+msgstr "Ange typen för din nätverksenhet."
 
 #. TXT_IUCV_PEER
 #, fuzzy
@@ -900,7 +900,7 @@ msgstr "Snälla namn användare ID av."
 
 #. TXT_390NET_CTC
 msgid "Channel To Channel (CTC)"
-msgstr "Channel To Channel (CTC)"
+msgstr "CTC (channel to channel)"
 
 #. TXT_390NET_ESCON
 msgid "ESCON"
@@ -908,7 +908,7 @@ msgstr "ESCON"
 
 #. TXT_390NET_IUCV
 msgid "Inter-User Communication Vehicle (IUCV)"
-msgstr "Inter-User Communication Vehicle (IUCV)"
+msgstr "IUCV (Inter-User Communication Vehicle)"
 
 #. TXT_390NET_HSI
 msgid "Hipersockets"
@@ -928,11 +928,11 @@ msgstr "Enhetsadress för datakanal"
 
 #. TXT_CHOOSE_CTC_PROTOCOL
 msgid "Select protocol for this CTC device."
-msgstr "Välj protokoll för den här CTC-enheten."
+msgstr "Ange protokoll för den här CTC-enheten."
 
 #. TXT_CTC_PROT_COMPAT
 msgid "Compatibility mode (default)"
-msgstr "Kompatibilitetsläge (standard)"
+msgstr "Kompabilitetsläge (standard)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
@@ -940,23 +940,23 @@ msgstr "Utökat läge"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Kompatibilitetsläge för OS/390- och z/OS-motparter"
+msgstr "Kompabilitetsläge för OS/390- och z/OS-motparter"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
-msgstr "Portnamn att använda"
+msgstr "Portnamn som ska användas"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
-msgstr "Fullständigt kvalificerat datornamn"
+msgstr "Fullständigt värddatornamn"
 
 #. TXT_OSA_PORTNO
 msgid "Enter the relative port number"
-msgstr "Ange relativt portnummer"
+msgstr "Ange det relativa portnumret"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
-msgstr "Verifiera installations-cd-rom/dvd"
+msgstr "Verifiering av installations-cd/dvd-skivan"
 
 #. turn the computer off
 #. TXT_POWER_OFF
@@ -964,21 +964,20 @@ msgid "Power off"
 msgstr "Stäng av"
 
 #. TXT_DUD_FAIL
-#, fuzzy
 msgid "Failed to access Driver Update medium."
-msgstr "Misslyckades till Drivrutin Uppdatera mellan."
+msgstr "Det gick inte att komma åt mediet för drivrutinsuppdatering."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "Läser drivrutinsuppdateringar..."
+msgstr "Läser drivrutinsuppdatering..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Inga nya drivrutinsuppdateringar hittades"
+msgstr "Det gick inte att hitta några nya drivrutinsuppdateringar"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Drivrutinsuppdateringar tillagda"
+msgstr "Drivrutinsuppdateringar har lagts till"
 
 #. shown if driver update succeeded
 #. TXT_DUD_OK
@@ -986,34 +985,32 @@ msgid "Driver Update ok"
 msgstr "Drivrutinsuppdatering OK"
 
 #. TXT_DUD_SELECT
-#, fuzzy
 msgid "Please choose the Driver Update medium."
-msgstr "Snälla Drivrutin Uppdatera mellan."
+msgstr "Välj medium för drivrutinsuppdateringen."
 
 #. TXT_DUD_DEVICE
-#, fuzzy
 msgid "Please enter the Driver Update device."
-msgstr "Snälla Drivrutin Uppdatera."
+msgstr "Ange enhet för drivrutinsuppdateringen."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
-msgstr "Ogiltigt enhetsnamn."
+msgstr "Enhetsnamnet är ogiltigt."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
-msgstr "Letar efter cd-rom-enheter..."
+msgstr "Söker efter cd-rom-enheter..."
 
 #. TXT_NO_CDROM
 msgid "No CD-ROM drives found."
-msgstr "Inga cd-rom-enheter hittades."
+msgstr "Det gick inte att hitta några cd-rom-enheter."
 
 #. TXT_SEARCH_FLOPPY
 msgid "Looking for floppy disks..."
-msgstr "Letar efter diskettenhet..."
+msgstr "Söker efter disketter...."
 
 #. TXT_NO_FLOPPY
 msgid "No floppy disk found."
-msgstr "Ingen diskettenhet hittad."
+msgstr "Det gick inte att hitta någon diskett."
 
 #. heading for a listing of updates
 #. TXT_DUD_LIST
@@ -1022,34 +1019,34 @@ msgstr "Lista över drivrutinsuppdateringar"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Inga drivrutinsuppdateringar ännu."
+msgstr "Inga drivrutinsuppdateringar hittills."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
-msgstr "Lägg i installations-cd-rom eller dvd."
+msgstr "Lägg i installations-cd/dvd-skivan."
 
 #. TXT_NO_CD_DVD
 msgid "No CD-ROM or DVD found."
-msgstr "Ingen cd eller dvd hittad."
+msgstr "Det gick inte att hitta någon cd eller dvd."
 
 #. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
-msgstr "Det här är inte en %s cd-rom."
+msgstr "Det här är inte en %s-cd-skiva."
 
 #. TXT_CD_CHECK_OK
 msgid "No errors found."
-msgstr "Inga fel hittade."
+msgstr "Inga fel hittades."
 
 #. TXT_CD_MD5_FAILED
 msgid "Checksum wrong."
-msgstr "Kontrollsumman stämmer inte"
+msgstr "Kontrollsumman är fel."
 
 #. TXT_CD_READ_FAILED
 #, c-format
 msgid "Error reading sector %u."
-msgstr "Fel vid läsning av sektor %u."
+msgstr "Ett fel uppstod vid läsning av sektor %u."
 
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
@@ -1059,7 +1056,7 @@ msgid ""
 "This %s is broken."
 msgstr ""
 "\n"
-"Den här %s är trasig."
+"Denna %s är skadad."
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
@@ -1067,7 +1064,7 @@ msgstr "Välj en installationskälla"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr ""
+msgstr "Det här är inte ett giltigt fullständigt värdnamn."
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
@@ -1137,26 +1134,27 @@ msgstr "Laddar räddningssystem"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Vill du aktivera stöd för OSI-lager 2?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Ange parametrar för nätverksenheter manuellt"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Arkivet hittades inte."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Behöver du ett användarnamn och lösenord för att använda proxyn?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Behöver du ett användarnamn och lösenord för att komma åt %s-servern?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1165,4 +1163,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
+"Misslyckades med att testa arkivets kontrollsumma.\n"
+"\n"
+"Om du litar på arkivet kan du fortsätta i osäkert läge."

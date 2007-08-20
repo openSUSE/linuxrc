@@ -6,15 +6,15 @@
 # nagelezen tot 120
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.nl\n"
-"PO-Revision-Date: 2006-11-07 17:31+0100\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2007-08-11 22:05+0200\n"
 "Last-Translator: Rinse de Vries <rinsedevries@kde.nl>\n"
-"Language-Team: Dutch <kde-i18n-nl@kde.org>\n"
+"Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms:  nplurals=2; plural=n != 1;\n"
 
 #. TXT_OK
 msgid "OK"
@@ -131,7 +131,7 @@ msgstr "Harde schijf"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr "Installatie of update starten"
+msgstr "Installatie of opwaardering starten"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
@@ -466,7 +466,7 @@ msgid ""
 msgstr ""
 "Uw computer beschikt over erg weinig geheugen.\n"
 "\n"
-"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op ALT-F2) om enige swapruimte te maken en te activeren."
+"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op ALT-F2) om enige wisselgeheugenruimte (swap) te maken en te activeren."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -773,7 +773,7 @@ msgstr "Selecteer de root partitie."
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
-msgstr "Selecteer de swap partitie."
+msgstr "Selecteer de partitie voor het wisselgeheugen."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
@@ -785,15 +785,15 @@ msgstr "Uw computer heeft niet genoeg geheugen om YaST te kunnen opstarten."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Activeer enige swapruimte om door te kunnen gaan."
+msgstr "Activeer enige wisselgeheugenruimte (swap) om door te kunnen gaan."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Fout opgetreden tijdens het activeren van de swapruimte."
+msgstr "Fout opgetreden tijdens het activeren van de wisselgeheugenruimte."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Geef de swap partitie op (bijv: /dev/sda2)"
+msgstr "Geef de partitie voor het wisselgeheugen op (bijv: /dev/sda2)"
 
 #. TXT_ENTER_USER
 #, c-format
@@ -854,11 +854,11 @@ msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Stuurprogramma-update toevoegen"
+msgstr "Stuurprogramma-opwaardering toevoegen"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Stuurprogramma-updates weergeven"
+msgstr "Stuurprogramma-opwaardering weergeven"
 
 #. TXT_INPUT_NAMED1
 #, c-format
@@ -892,7 +892,7 @@ msgstr "Geef het IP-adres van de host, met daarop de werkende X11 server, op."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Selecteer uw type netwerk apparaat aub."
+msgstr "Selecteer uw type netwerk apparaat a.u.b.."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the target VM guest."
@@ -965,32 +965,32 @@ msgstr "Power uit"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Kon geen toegang tot het medium met stuurprogramma-update krijgen."
+msgstr "Kon geen toegang tot het medium met stuurprogramma-opwaardering krijgen."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "Stuurprogramma-update wordt gelezen..."
+msgstr "Stuurprogramma-opwaardering wordt gelezen..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Geen nieuwe stuurprogramma-updates gevonden"
+msgstr "Geen nieuwe stuurprogramma-opwaardering gevonden"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Stuurprogramma-updates toegevoegd"
+msgstr "Stuurprogramma-opwaardering toegevoegd"
 
 #. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr "Stuurprogramma-update gelukt"
+msgstr "Stuurprogramma-opwaardering gelukt"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Kies het medium met de stuurprogramma-update."
+msgstr "Kies het medium met de stuurprogramma-opwaardering."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Geef het apparaat met stuurprogramma-update op."
+msgstr "Geef het apparaat met stuurprogramma-opwaardering op."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -1015,11 +1015,11 @@ msgstr "Geen diskette gevonden."
 #. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr "Lijst met stuurprogramma-updates"
+msgstr "Lijst met stuurprogramma-opwaarderingen"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Momenteel zijn er geen stuurprogramma-updates."
+msgstr "Momenteel zijn er geen stuurprogramma-opwaarderingen."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1125,7 +1125,7 @@ msgstr "Aanvullende lettertypen laden"
 #. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr "Stuurprogramma-update laden"
+msgstr "Stuurprogramma-opwaardering laden"
 
 #. progress indicator label
 #. TXT_LOADING_RESCUE
@@ -1135,9 +1135,10 @@ msgstr "Reddingssysteem laden"
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr "Ondersteuning voor OSI Layer 2 activeren?"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Voer de apparaatparameters handmatig in"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
@@ -1162,4 +1163,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-

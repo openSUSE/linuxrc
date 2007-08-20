@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-10-26 13:52:39+CEST\n"
+"PO-Revision-Date: 2007-01-03 15:37:27+CET\n"
 "Last-Translator: ko <i18n@suse.de>\n"
 "Language-Team: ko <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 
 #. TXT_OK
 msgid "OK"
-msgstr ""
+msgstr "확인"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -119,7 +119,7 @@ msgstr ""
 
 #. TXT_HARDDISK
 msgid "Hard Disk"
-msgstr ""
+msgstr "하드디스크"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
@@ -1083,6 +1083,7 @@ msgstr ""
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
 msgstr ""
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
 msgstr ""
@@ -1110,4 +1111,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-

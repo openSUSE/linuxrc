@@ -12,14 +12,14 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: el\n"
-"PO-Revision-Date: 2005-08-25 18:30+0300\n"
-"Last-Translator: Hellenic SuSE Translation Team <hstg@billg.gr>\n"
-"Language-Team: Hellenic-Ελληνικά-Greek <hstg@billg.gr>\n"
+"Project-Id-Version: linuxrc.el\n"
+"PO-Revision-Date: 2007-02-27 20:36+0200\n"
+"Last-Translator: Kostas Boukouvalas <quantis@hellug.gr>\n"
+"Language-Team: Greek <i18ngr@lists.hellug.gr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -888,9 +888,8 @@ msgid "Your computer does not have enough RAM for the installation of %s. You ne
 msgstr "Ο υπολογιστής σας δεν έχει αρκετή μνήμη RAM για την εγκατάσταση του %s. Χρειάζεστε τουλάχιστον %d ΜΒ."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
-#, fuzzy
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Ο κωδικός πρόσβασης είναι πολύ σύντομος (πρέπει να έχει τουλάχιστον 5 χαρακτήρες)."
+msgstr "Το συνθηματικό είναι πολύ μικρό (θα πρέπει να γράψετε τουλάχιστον 8 χαρακτήρες)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1140,7 +1139,8 @@ msgstr "Φόρτωση Συστήματος Διάσωσης"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
-msgstr ""
+msgstr "Ενεργοποίηση υποστήριξης OSI Layer 2;"
+
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
 msgstr ""
@@ -1168,4 +1168,3 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-
