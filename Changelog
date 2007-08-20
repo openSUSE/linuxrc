@@ -1,3 +1,6 @@
+20/8/2007:	v3.0.9
+	- support downloading >2GB images
+
 17/8/2007:	v3.0.8
 	- changed usb module loading (#223450)
 	- fixed 'file' & 'exec' schemes

@@ -260,7 +260,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
         url_data->tmp_file = strdup("/tmp/foo_XXXXXX");
         tmp = mkstemp(url_data->tmp_file);
         if(tmp > 0) {
-          fd = open(url_data->file_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+          fd = open(url_data->file_name, O_LARGEFILE | O_WRONLY | O_CREAT | O_TRUNC, 0644);
           if(fd >= 0) {
             fd1 = dup(1);
             fd2 = dup(2);
