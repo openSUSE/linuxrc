@@ -634,6 +634,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
   hd_t *hd;
   driver_info_t *di;
   int i, active;
+  char *mods;
 
   for(hd = hd_list(hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
     hd_add_driver_data(hd_data, hd);
@@ -650,16 +651,30 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
         ) {
           if(!i) printf("%s\n", hd->model);
           if(hd->driver_module) {
-            active = !mod_cmp(hd->driver_module, di->module.names->str);
+            active =
+              !mod_cmp(hd->driver_module, di->module.names->str) ||
+              (
+                di->module.names->next &&
+                !mod_cmp(hd->driver_module, di->module.names->next->str)
+              );
           }
           else {
-            active = di->module.active || hd_module_is_active(hd_data, di->module.names->str);
+            active = di->module.active ||
+              (
+                hd_module_is_active(hd_data, di->module.names->str) &&
+                (
+                  !di->module.names->next ||
+                  hd_module_is_active(hd_data, di->module.names->next->str)
+                )
+              );
           }
+          mods = hd_join("+", di->module.names);
           printf("%s %s%s",
             i++ ? "," : "  drivers:",
-            di->module.names->str,
+            mods,
             active ? "*" : ""
           );
+          free(mods);
         }
       }
       if(i) {

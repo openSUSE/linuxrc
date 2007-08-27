@@ -1,3 +1,6 @@
+27/8/2007:	v3.0.10
+	- better handle situations with more than one module to load (#304134)
+
 20/8/2007:	v3.0.9
 	- support downloading >2GB images
 	- added new translations
