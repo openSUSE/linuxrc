@@ -791,8 +791,6 @@ void file_do_info(file_t *f0)
         }
 
       case key_install:
-        config.rescue = f->key == key_rescue ? 1 : 0;
-
         url_free(config.url.install);
         config.url.install = url_set(f->value);
 
