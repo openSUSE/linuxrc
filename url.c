@@ -1247,6 +1247,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
 {
   int err = 0, free_src = 0;
   char *buf1 = NULL, *s, *t;
+  int keep_mounted = 0, real_err = 0;
 
   int test_and_copy(url_t *url)
   {
@@ -1260,7 +1261,11 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     if(url->is.mountable && url->scheme != inst_file) {
       if(!url->mount) return 0;
       ok = util_check_exist2(url->mount, src) == 'r' ? 1 : 0;
-      if(!ok) return ok;
+      if(!ok) {
+        real_err = 1;
+
+        return keep_mounted ? 1 : 0;
+      }
       strprintf(&buf, "file:%s", url->mount);
       url = url_set(buf);
       new_url = 1;
@@ -1379,7 +1384,9 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   }
   else {
     if(url->is.mountable && url->scheme != inst_file) {
+      keep_mounted = flags & URL_FLAG_KEEP_MOUNTED;
       err = url_mount(url, dir, test_and_copy);
+      if(keep_mounted && !err) err = real_err;
     }
     else {
       err = test_and_copy(url) ? 0 : 1;

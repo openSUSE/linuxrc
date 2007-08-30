@@ -1315,82 +1315,22 @@ int inst_commit_install()
  */
 int inst_update_cd()
 {
-#if 0
-  int i, update_rd;
-  char *dev, *buf = NULL, *argv[3], *module;
-  unsigned old_count;
-  slist_t **names;
-  window_t win;
-#endif
+  char *dev;
+  url_t *url;
 
-  dia_message("Sorry, not working yet.", MSGTYPE_ERROR);
-
-#if 0
   config.update.shown = 1;
 
   if(choose_dud(&dev)) return 1;
 
   if(!dev) return 0;
 
-  util_fstype(long_dev(dev), &module);
-  if(module) mod_modprobe(module, NULL);
+  url = url_set("disk:/");
+  url->device = strdup(short_dev(dev));
 
-  /* ok, mount it */
-  i = util_mount_ro(long_dev(dev), config.mountpoint.update);
+  auto2_driverupdate(url);
 
-  if(i) {
-    dia_message(txt_get(TXT_DUD_FAIL), MSGTYPE_ERROR);
-    return 0;
-  }
-
-  old_count = config.update.count;
-
-  /* point at list end */
-  for(names = &config.update.name_list; *names; names = &(*names)->next);
-
-  dia_info(&win, txt_get(TXT_DUD_READ));
-
-  strprintf(&buf, "%s/%s", config.mountpoint.update, SP_FILE);
-
-  if(util_check_exist(buf) == 'r' && !util_check_exist("/" SP_FILE)) {
-    argv[1] = buf;
-    argv[2] = "/";
-    util_cp_main(3, argv);
-  }
-
-  util_chk_driver_update(config.mountpoint.update, dev);
-
-  strprintf(&buf, "%s/driverupdate", config.mountpoint.update);
-  if(util_check_exist(buf) == 'r') {
-    update_rd = load_image(buf, inst_file, txt_get(TXT_LOADING_UPDATE));
-
-    if(update_rd >= 0) {
-      i = ramdisk_mount(update_rd, config.mountpoint.update);
-      if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(inst_file));
-      ramdisk_free(update_rd);
-    }
-  }
-
-  util_umount(config.mountpoint.update);
-
-  util_do_driver_updates();
-
-  win_close(&win);
-
-  if(old_count == config.update.count) {
-    dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
-  }
-  else {
-    if(*names) {
-      dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
-    }
-    else {
-      dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
-    }
-  }
-
-  free(buf);
-#endif
+  url_umount(url);
+  url_free(url);
 
   return 0;
 }
@@ -1438,7 +1378,7 @@ int choose_dud(char **dev)
   }
 
   /* just max values, actual lists might be shorter */
-  items = calloc(i + 1+ 2, sizeof *items);
+  items = calloc(i + 1 + 2, sizeof *items);
   values = calloc(i + 1 + 2, sizeof *values);
 
   item_cnt = 0;

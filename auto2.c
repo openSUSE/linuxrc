@@ -334,8 +334,6 @@ void auto2_scan_hardware()
 int auto2_find_repo()
 {
   int err, win, i;
-  unsigned dud_count;
-  char *file_name;
 
   config.sig_failed = 0;
   config.sha1_failed = 0;
@@ -412,39 +410,7 @@ int auto2_find_repo()
     return 0;
   }
 
-  /* check for driver updates */
-
-  dud_count = config.update.count;
-
-  /* first, look for 'driverupdate' archive */
-  err = url_read_file(
-    config.url.install,
-    NULL,
-    "driverupdate",
-    file_name = strdup(new_download()),
-    txt_get(TXT_LOADING_UPDATE),
-    URL_FLAG_UNZIP /* + URL_FLAG_PROGRESS */
-  );
-
-  if(!err) err = util_mount_ro(file_name, config.mountpoint.update);
-
-  if(!err) util_chk_driver_update(config.mountpoint.update, get_instmode_name(config.url.install->scheme));
-
-  util_umount(config.mountpoint.update);
-  free(file_name);
-
-  if(!err) util_do_driver_updates();
-
-  /* then, look for unpacked version */
-  if(config.url.install->mount) {
-    util_chk_driver_update(config.url.install->mount, get_instmode_name(config.url.install->scheme));
-    util_do_driver_updates();
-  }
-
-  if(dud_count == config.update.count) {
-    fprintf(stderr, "No new driver updates found.\n");
-    // printf("No new driver updates found.\n");
-  }
+  auto2_driverupdate(config.url.install);
 
   return 1;
 }
@@ -876,4 +842,68 @@ void auto2_kexec(url_t *url)
   free(buf);
   free(cmdline);
 }
+
+
+/*
+ * Check for driver updates.
+ */
+void auto2_driverupdate(url_t *url)
+{
+  unsigned dud_count;
+  char *file_name;
+  slist_t **names;
+  int err = 0;
+  window_t win;
+
+  dud_count = config.update.count;
+
+  /* point at list end */
+  for(names = &config.update.name_list; *names; names = &(*names)->next);
+
+  if(config.win) dia_info(&win, txt_get(TXT_DUD_READ));
+
+  /* first, look for 'driverupdate' archive */
+  err = url_read_file(
+    url,
+    NULL,
+    "driverupdate",
+    file_name = strdup(new_download()),
+    txt_get(TXT_LOADING_UPDATE),
+    URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED
+  );
+
+  if(!err) err = util_mount_ro(file_name, config.mountpoint.update);
+
+  if(!err) util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
+
+  util_umount(config.mountpoint.update);
+
+  unlink(file_name);
+
+  free(file_name);
+
+  if(!err) util_do_driver_updates();
+
+  /* then, look for unpacked version */
+  if(url->mount) {
+    util_chk_driver_update(url->mount, get_instmode_name(url->scheme));
+    util_do_driver_updates();
+  }
+
+  if(config.win) win_close(&win);
+
+  if(dud_count == config.update.count) {
+    fprintf(stderr, "No new driver updates found.\n");
+    if(config.win) dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
+  }
+  else {
+    if(*names) {
+      if(config.win) dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+    }
+    else {
+      if(config.win) dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+    }
+  }  
+}
+
 

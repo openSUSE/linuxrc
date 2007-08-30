@@ -5,3 +5,4 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
 void load_network_mods(void);
 char *auto2_serial_console(void);
 void pcmcia_socket_startup(void);
+void auto2_driverupdate(url_t *url);

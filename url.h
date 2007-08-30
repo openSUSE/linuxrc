@@ -32,10 +32,11 @@ typedef struct url_data_s {
   char *sha1;
 } url_data_t;
 
-#define URL_FLAG_UNZIP		1
-#define URL_FLAG_PROGRESS	2
-#define URL_FLAG_NOSHA1		4
-#define URL_FLAG_NOUNLINK	8
+#define URL_FLAG_UNZIP		(1 << 0)
+#define URL_FLAG_PROGRESS	(1 << 1)
+#define URL_FLAG_NOSHA1		(1 << 2)
+#define URL_FLAG_NOUNLINK	(1 << 3)
+#define URL_FLAG_KEEP_MOUNTED	(1 << 4)
 
 void url_read(url_data_t *url_data);
 url_t *url_set(char *str);
