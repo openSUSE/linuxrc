@@ -267,6 +267,7 @@ static struct {
   { key_sha1,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
+  { key_nisdomain,      "NISDomain",      kf_dhcp                        },
 };
 
 static struct {
@@ -320,7 +321,7 @@ static struct {
   { "open",      wa_open            },
   { "wep",       wa_wep_open        },
   { "wep_o",     wa_wep_open        },
-  { "wep_r",     wa_wep_resticted   },
+  { "wep_r",     wa_wep_restricted  },
   { "wpa",       wa_wpa             },
 };
 
@@ -1325,6 +1326,10 @@ void file_do_info(file_t *f0)
         if(f->is.numeric) config.kexec = f->nvalue;
         break;
 
+      case key_nisdomain:
+        str_copy(&config.net.nisdomain, f->value);
+        break;
+
       default:
         break;
     }
@@ -1558,6 +1563,35 @@ void file_write_install_inf(char *dir)
       file_write_inet_str(f, s, &config.net.nameserver[i]);
     }
     file_write_str(f, key_domain, config.net.domain);
+    file_write_str(f, key_nisdomain, config.net.nisdomain);
+
+    file_write_str(f, key_wlan_essid, config.net.wlan.essid);
+    switch(config.net.wlan.auth) {
+      case wa_open:
+        s = "open";
+        break;
+      case wa_wep_open:
+        s = "wep_open";
+        break;
+      case wa_wep_restricted:
+        s = "wep_restricted";
+        break;
+      case wa_wpa:
+        s = "wpa";
+        break;
+      default:
+        s = NULL;
+        break;
+    }
+    file_write_str(f, key_wlan_auth, s);
+    if(config.net.wlan.key) {
+      fprintf(f, "WlanKey: %s\n", config.net.wlan.key);
+      fprintf(f, "WlanKeyType: %s\n",
+        config.net.wlan.key_type == kt_pass ? "password" : config.net.wlan.key_type == kt_hex ? "hex" : "ascii"
+      );
+      if(config.net.wlan.key_len) file_write_num(f, key_wlan_key_len, config.net.wlan.key_len);
+    }
+
   }
 
   if(config.url.proxy) {

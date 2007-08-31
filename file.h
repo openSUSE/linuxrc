@@ -46,7 +46,7 @@ typedef enum {
   key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname,
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
   key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g,
-  key_sha1, key_insecure, key_kexec
+  key_sha1, key_insecure, key_kexec, key_nisdomain
 } file_key_t;
 
 typedef enum {

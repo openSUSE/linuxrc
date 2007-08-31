@@ -203,7 +203,7 @@ typedef enum {
 
 
 typedef enum {
-  wa_none, wa_open, wa_wep_open, wa_wep_resticted, wa_wpa
+  wa_none, wa_open, wa_wep_open, wa_wep_restricted, wa_wpa
 } wlan_auth_t;
 
 

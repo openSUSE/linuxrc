@@ -1599,6 +1599,7 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
  *  config.net.broadcast
  *  config.net.gateway
  *  config.net.domain
+ *  config.net.nisdomain
  *  config.net.nameserver
  *  config.net.server
  */
@@ -1673,10 +1674,7 @@ int net_dhcp()
         break;
 
       case key_domain:
-        if(*f->value) {
-          if(config.net.domain) free(config.net.domain);
-          config.net.domain = strdup(f->value);
-        }
+        if(*f->value) str_copy(&config.net.domain, f->value);
         break;
 
       case key_dhcpsiaddr:
@@ -1699,6 +1697,10 @@ int net_dhcp()
           if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
         }
         slist_free(sl0);
+        break;
+
+      case key_nisdomain:
+        if(*f->value) str_copy(&config.net.nisdomain, f->value);
         break;
 
       default:
@@ -2393,7 +2395,7 @@ int wlan_setup()
       di = di_wlan_wep_o;
       break;
 
-    case wa_wep_resticted:
+    case wa_wep_restricted:
       di = di_wlan_wep_r;
       break;
 
@@ -2475,7 +2477,7 @@ int wlan_auth_cb(dia_item_t di)
       wep_mode = 1;
 
     case di_wlan_wep_r:
-      config.net.wlan.auth = wep_mode ? wa_wep_open : wa_wep_resticted;
+      config.net.wlan.auth = wep_mode ? wa_wep_open : wa_wep_restricted;
 
       if(config.manual || !config.net.wlan.essid) {
         if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
