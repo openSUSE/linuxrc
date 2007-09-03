@@ -1297,6 +1297,9 @@ void get_zen_config()
   printf("Looking for ZENworks config");
   fflush(stdout);
 
+  load_storage_mods();
+  util_update_cdrom_list();
+
   sl = config.cdroms;
 
   if(config.cdromdev) {
