@@ -268,6 +268,7 @@ static struct {
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
   { key_nisdomain,      "NISDomain",      kf_dhcp                        },
+  { key_nomodprobe,     "nomodprobe",     kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -567,6 +568,7 @@ void file_do_info(file_t *f0)
   char buf[256], *s, *t;
   slist_t *sl, *sl0;
   unsigned u;
+  FILE *w;
 
   /* maybe it's an AutoYaST XML file */
   for(f = f0; f; f = f->next) {
@@ -955,6 +957,14 @@ void file_do_info(file_t *f0)
       case key_brokenmodules:
         slist_free(config.module.broken);
         config.module.broken = slist_split(',', f->value);
+        if(config.module.broken && !config.test) {
+          if((w = fopen("/etc/modprobe.d/blacklist", "w"))) {
+            for(sl = config.module.broken; sl; sl = sl->next) {
+              if(sl->key) fprintf(w, "blacklist %s\n", sl->key);
+            }
+            fclose(w);
+          }
+        }
         break;
 
       case key_initrdmodules:
@@ -1328,6 +1338,10 @@ void file_do_info(file_t *f0)
 
       case key_nisdomain:
         str_copy(&config.net.nisdomain, f->value);
+        break;
+
+      case key_nomodprobe:
+        if(f->is.numeric) config.nomodprobe = f->nvalue;
         break;
 
       default:

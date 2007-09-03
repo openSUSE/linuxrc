@@ -1130,7 +1130,7 @@ void lxrc_set_modprobe(char *prog)
   FILE *f;
 
   /* do nothing if we have a modprobe */
-  if(config.test) return;
+  if(config.test || !config.nomodprobe) return;
 
   if((f = fopen("/proc/sys/kernel/modprobe", "w"))) {
     fprintf(f, "%s\n", prog);

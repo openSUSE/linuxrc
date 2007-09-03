@@ -335,6 +335,7 @@ typedef struct {
   unsigned sha1_failed:1;	/* sha1 check failed */
   unsigned sig_failed:1;	/* 'content' signature check failed */
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */
+  unsigned nomodprobe:1;	/* disable modprobe */
   unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
