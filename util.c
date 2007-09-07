@@ -1422,7 +1422,7 @@ void util_status_info()
     slist_append_str(&sl0, buf);
     for(sl = config.partitions; sl; sl = sl->next) {
       if(!sl->key) continue;
-      i = config.partition && !strcmp(sl->key, config.partition) ? 1 : 0;
+      i = config.device && !strcmp(sl->key, config.device) ? 1 : 0;
       sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
       if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
       slist_append_str(&sl0, buf);
@@ -4185,8 +4185,7 @@ void read_iscsi_ibft()
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_ibft_hwaddr:
-        str_copy(&config.net.device, f->value);
-        config.net.device_given = 1;
+        str_copy(&config.netdevice, f->value);
         break;
 
       case key_ibft_ipaddr:

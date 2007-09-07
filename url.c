@@ -1131,6 +1131,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   char *hwaddr;
   hd_hw_item_t hw_item = hw_network_ctrl;
   str_list_t *sl;
+  char *url_device;
 
   if(!url || !url->scheme) return 1;
 
@@ -1161,6 +1162,9 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     }
   }
 
+  url_device = url->device;
+  if(!url_device) url_device = url->is.network ? config.netdevice : config.device;
+
   for(found = 0, hd = hd_list(config.hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
@@ -1184,10 +1188,10 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
       !hd->unix_dev_name
     ) continue;
 
-    matched = url->device ? match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url->device) : 1;
+    matched = url_device ? match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url_device) : 1;
 
     for(sl = hd->unix_dev_names; !matched && sl; sl = sl->next) {
-      matched = match_netdevice(short_dev(sl->str), NULL, url->device);
+      matched = match_netdevice(short_dev(sl->str), NULL, url_device);
     }
 
     if(!matched) continue;
@@ -1216,8 +1220,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   }
 
   /* should not happen, but anyway: device name was not in our list */
-  if(!err && !found && !url->used.device && url->device) {
-    str_copy(&url->used.device, long_dev(url->device));
+  if(!err && !found && !url->used.device && url_device) {
+    str_copy(&url->used.device, long_dev(url_device));
     str_copy(&url->used.model, NULL);
     str_copy(&url->used.hwaddr, NULL);
     str_copy(&url->used.unique_id, NULL);

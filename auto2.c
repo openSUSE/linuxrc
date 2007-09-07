@@ -429,6 +429,7 @@ void auto2_user_netconfig()
   if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
     config.net.configured = nc_static;
     /* looks a bit weird, but we need it here for net_activate_ns() */
+    if(!config.net.device) str_copy(&config.net.device, config.netdevice);
     if(!config.net.device) {
       util_update_netdevice_list(NULL, 1);
       if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);

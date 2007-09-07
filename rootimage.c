@@ -144,9 +144,9 @@ int root_boot_system()
   char buf[256], root[64];
 
   do {
-    rc = inst_choose_partition(&config.partition, 0, txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
-    if(rc || !config.partition) return -1;
-    sprintf(root, "/dev/%s", config.partition);
+    rc = inst_choose_partition(&config.device, 0, txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
+    if(rc || !config.device) return -1;
+    sprintf(root, "/dev/%s", config.device);
 
     if((type = util_fstype(root, &module))) {
       if(module && config.module.dir) {

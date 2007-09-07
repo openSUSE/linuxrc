@@ -385,6 +385,8 @@ typedef struct {
   slist_t *sha1;		/* sha1sum list */
   char *kexec_kernel;		/* kernel image for kexec */
   char *kexec_initrd;		/* initrd image for kexec */
+  char *device;			/* local device to use */
+  char *netdevice;		/* network interface to use */
 
   struct {
     char *instsys_default;	/* default instsys url */
@@ -477,7 +479,6 @@ typedef struct {
   struct {
     unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
-    unsigned device_given:1;	/* netdevice explicity set in info file */
     unsigned ifconfig:1;	/* setup network interface */
     unsigned is_configured:1;	/* set if network is configured */
     unsigned keep:1;		/* keep network interface up */

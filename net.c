@@ -983,7 +983,6 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned por
  * Global vars changed:
  *  config.net.device
  *
- * config.net.device_given: do nothing if != 0
  */
 int net_choose_device()
 {
@@ -1014,7 +1013,11 @@ int net_choose_device()
   hd_t *hd, *hd_cards;
   hd_t **item_hds = NULL;
     
-  if(config.net.device_given) return 0;
+  if(config.netdevice) {
+    str_copy(&config.net.device, config.netdevice);
+
+    return 0;
+  }
 
   if(config.manual >= 2) {
 #if defined(__s390__) || defined(__s390x__)

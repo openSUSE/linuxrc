@@ -175,7 +175,7 @@ static struct {
   { key_setupnetif,     "SetupNetIF",     kf_cfg + kf_cmd                },
   { key_netconfig,      "NetConfig",      kf_none                        },
   { key_noshell,        "NoShell",        kf_cfg + kf_cmd + kf_cmd_early },
-  { key_cdromdevice,    "CDROMDevice",    kf_cfg + kf_cmd                },
+  { key_device,         "CDROMDevice",    kf_cfg + kf_cmd                },
   { key_consoledevice,  "ConsoleDevice",  kf_cfg + kf_cmd                },
   { key_product,        "Product",        kf_cfg + kf_cmd                },
   { key_productdir,     "ProductDir",     kf_cfg + kf_cmd                },
@@ -269,6 +269,7 @@ static struct {
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
   { key_nisdomain,      "NISDomain",      kf_dhcp                        },
   { key_nomodprobe,     "nomodprobe",     kf_cfg + kf_cmd_early          },
+  { key_device,         "Device",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -661,17 +662,6 @@ void file_do_info(file_t *f0)
         }
         break;
 
-      case key_partition:
-        if(*f->value) str_copy(&config.partition, f->value);
-        break;
-
-      case key_netdevice:
-        if(*f->value) {
-          str_copy(&config.net.device, f->value);
-          config.net.device_given = 1;
-        }
-        break;
-
       case key_bootpwait:
         if(f->is.numeric) config.net.bootp_wait = f->nvalue;
         break;
@@ -919,13 +909,6 @@ void file_do_info(file_t *f0)
 
       case key_noshell:
         if(f->is.numeric) config.noshell = f->nvalue;
-        break;
-
-      case key_cdromdevice:
-        str_copy(
-          &config.cdromdev,
-          strstr(f->value, "/dev/") == f->value ? f->value + sizeof "/dev/" - 1 : *f->value ? f->value : NULL
-        );
         break;
 
       case key_consoledevice:
@@ -1303,9 +1286,8 @@ void file_do_info(file_t *f0)
 
       case key_bootif:
         if(strlen(f->value) > 3) {
-          str_copy(&config.net.device, f->value + 3);
-          for(s = config.net.device; *s; s++) if(*s == '-') *s = ':';
-          config.net.device_given = 1;
+          str_copy(&config.netdevice, f->value + 3);
+          for(s = config.netdevice; *s; s++) if(*s == '-') *s = ':';
         }
         break;
 
@@ -1342,6 +1324,15 @@ void file_do_info(file_t *f0)
 
       case key_nomodprobe:
         if(f->is.numeric) config.nomodprobe = f->nvalue;
+        break;
+
+      case key_netdevice:
+        str_copy(&config.netdevice, short_dev(*f->value ? f->value : NULL));
+        break;
+
+      case key_partition:
+      case key_device:
+        str_copy(&config.device, short_dev(*f->value ? f->value : NULL));
         break;
 
       default:
@@ -2235,6 +2226,8 @@ int activate_network()
   if(config.net.configured != nc_none || config.test) return 1;
 
   load_network_mods();
+
+  if(!config.net.device) str_copy(&config.net.device, config.netdevice);
 
   if(!config.net.device) {
     util_update_netdevice_list(NULL, 1);

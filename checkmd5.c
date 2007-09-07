@@ -39,28 +39,26 @@ window_t win;
 void md5_verify()
 {
   int i;
-  slist_t *sl;
   char buf[256];
+  hd_t *hd;
 
-  if(dia_message(txt_get(TXT_INSERT_CD_DVD), MSGTYPE_INFO)) return;
+  update_device_list(0);
 
-  get_info(long_dev(config.cdrom));
+  iso.err = 1;
 
-  if(iso.err) {
-    get_info(long_dev(config.cdromdev));
-    if(!iso.err) str_copy(&config.cdrom, config.cdromdev);
+  for(hd = hd_list(config.hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+    if(hd->is.notready) continue;
+    get_info(hd->unix_dev_name);
+    if(!iso.err) break;
   }
 
   if(iso.err) {
-    util_update_cdrom_list();
-    for(sl = config.cdroms; sl; sl = sl->next) {
-      if(config.cdrom && !strcmp(config.cdrom, sl->key)) continue;
-      if(config.cdromdev && !strcmp(config.cdromdev, sl->key)) continue;
-      get_info(long_dev(sl->key));
-      if(!iso.err) {
-        str_copy(&config.cdrom, sl->key);
-        break;
-      }
+    if(dia_message(txt_get(TXT_INSERT_CD_DVD), MSGTYPE_INFO)) return;
+
+    for(hd = hd_list(config.hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+      if(hd->is.notready) continue;
+      get_info(hd->unix_dev_name);
+      if(!iso.err) break;
     }
   }
 
@@ -88,7 +86,7 @@ void md5_verify()
     return;
   }
 
-  do_md5(long_dev(config.cdrom));
+  do_md5(hd->unix_dev_name);
 
   if(iso.err_ofs) {
     fprintf(stderr, "  err: sector %u\n", iso.err_ofs >> 1);

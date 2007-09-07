@@ -27,7 +27,7 @@ typedef enum {
   key_sshpassword, key_term, key_addswap, key_aborted, key_netstop,
   key_exec, key_usbwait, key_nfsrsize, key_nfswsize, key_setupcmd,
   key_setupnetif, key_netconfig, key_usessh, key_noshell, key_hwdetect,
-  key_cdromdevice, key_consoledevice, key_product, key_productdir,
+  key_consoledevice, key_product, key_productdir,
   key_linuxrcstderr, key_comment, key_kbdtimeout, key_brokenmodules,
   key_scsibeforeusb, key_hostip, key_linemode, key_moduledelay,
   key_updatedir, key_scsirename, key_doscsirename, key_lxrcdebug,
@@ -46,7 +46,7 @@ typedef enum {
   key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname,
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
   key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g,
-  key_sha1, key_insecure, key_kexec, key_nisdomain, key_nomodprobe
+  key_sha1, key_insecure, key_kexec, key_nisdomain, key_nomodprobe, key_device
 } file_key_t;
 
 typedef enum {
