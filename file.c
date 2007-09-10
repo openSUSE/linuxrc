@@ -1509,7 +1509,7 @@ void file_write_install_inf(char *dir)
   if(url->used.device) fprintf(f, "Device: %s\n", short_dev(url->used.device));
 
   if(url->is.mountable && !url->is.network) {
-    if(url->is.cdrom) file_write_str(f, key_cdrom, short_dev(url->used.device));
+    file_write_str(f, key_cdrom, short_dev(url->used.device));
     file_write_str(f, key_partition, short_dev(url->used.device));
   }
 

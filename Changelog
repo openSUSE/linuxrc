@@ -1,3 +1,6 @@
+10/9/2007:	v3.0.16
+	- always write 'cdrom' entry to install.inf (#305495)
+
 7/9/2007:	v3.0.15
 	- 'netdevice' option is back (#304268)
 	- added 'device' option (replaces 'partition' and 'cdromdev')
