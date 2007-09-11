@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-03-02 21:37+0100\n"
+"PO-Revision-Date: 2007-08-22 17:37+0100\n"
 "Last-Translator: Ladislav Michnovič <lmichnovic@suse.cz>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -1141,23 +1141,23 @@ msgstr "Zapnúť podporu pre OSI vrstvu 2?"
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Zadajte sieťové zariadenie ručne"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Nebol nájdený žiaden repozitár."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Vyžaduje váš proxy server prihlasovacie meno a heslo pre povolenie prístupu?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Vyžaduje server %s zadanie prihlasovacieho mena a hesla pre povolenie prístupu?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1166,3 +1166,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
+"Ľutujeme, ale zlyhala kontrola kontrolného súčtu repozitára.\n"
+"\n"
+"Ak naozaj dôverujete repozitáru, môžete pokračovať, ale nie je to bezpečné."

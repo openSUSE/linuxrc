@@ -524,7 +524,7 @@ msgstr "Обращение к серверу имен..."
 #. TXT_HOST_NOT_FOUND
 #, c-format
 msgid "Host %s was not found."
-msgstr "Хост %s не найден."
+msgstr "Узел %s не найден."
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Keep this configuration?"
@@ -881,7 +881,7 @@ msgstr "Пароль слишком короткий (должен иметь х
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr "Введите IP адрсе хоста на котором запущен сервер X11."
+msgstr "Введите IP адрес узла на котором запущен сервер X11."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
@@ -941,7 +941,7 @@ msgstr "Имя используемого порта"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
-msgstr "Полное имя хоста"
+msgstr "Полное имя узла"
 
 #. TXT_OSA_PORTNO
 msgid "Enter the relative port number"
@@ -1057,7 +1057,7 @@ msgstr "Выберите источник установки"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr "Это не верное полное имя хост."
+msgstr "Это не верное полное имя узла."
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."

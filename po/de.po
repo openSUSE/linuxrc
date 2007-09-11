@@ -6,16 +6,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: @PACKAGE@\n"
+"Project-Id-Version: linuxrc.de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-07-27 16:23+0200\n"
-"PO-Revision-Date: 2005-03-09 13:54+0100\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"PO-Revision-Date: 2007-08-23 22:37+0200\n"
+"Last-Translator: Michael Skiba <michael@michael-skiba.de>\n"
+"Language-Team: Deutsch <i18n@suse.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1141,23 +1142,23 @@ msgstr "OSI-Schicht-2-Unterstützung aktivieren?"
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Netzwerkgerät Parameter manuell eingeben"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Keine Installationsquelle gefunden."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Benötigen Sie einen Benutzernamen und ein Passwort um auf den Proxy zuzugreifen?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Benötigen Sie einen Benutzernamen und ein Passwort um auf den %s-Server zuzugreifen?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1166,3 +1167,6 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
+"Leider ist der Prüfsummentest der Installationsquelle Fehlgeschlagen.\n"
+"\n"
+"Falls Sie der Installationsquelle wirklich vertrauen, können Sie in einem unsicheren Modus fortfahren."
