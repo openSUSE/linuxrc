@@ -70,7 +70,6 @@ static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
 static int choose_dud(char **dev);
-static void  inst_swapoff             (void);
 
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
@@ -937,7 +936,7 @@ int inst_start_install()
   }
 
   LXRC_WAIT
-  
+
   if(config.rescue) {
     /* get rid of repo */
     url_umount(config.url.install);
@@ -1253,9 +1252,6 @@ int inst_execute_yast()
     mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
   }
 
-  /* turn off swap */
-  inst_swapoff();
-
   inst_yast_done();
 
   if(config.aborted) {
@@ -1546,20 +1542,4 @@ int choose_dud(char **dev)
   return err;
 }
 
-
-void inst_swapoff()
-{
-  slist_t *sl;
-  char buf[64];
-
-  util_update_swap_list();
-
-  if(config.test) return;
-
-  for(sl = config.swaps; sl; sl = sl->next) {
-    sprintf(buf, "/dev/%s", sl->key);
-    fprintf(stderr, "swapoff %s\n", buf);
-    swapoff(buf);
-  }
-}
 

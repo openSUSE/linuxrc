@@ -3042,11 +3042,13 @@ int util_fstype_main(int argc, char **argv)
 
   argv++; argc--;
 
-  if(argc != 1) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
+  if(!argc) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
 
-  s = fstype(*argv);
-
-  printf("%s: %s\n", *argv, s ?: "unknown fs");
+  while(argc--) {
+    s = fstype(*argv);
+    printf("%s: %s\n", *argv, s ?: "unknown fs");
+    argv++;
+  }
 
   return 0;
 }

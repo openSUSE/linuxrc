@@ -42,6 +42,8 @@
 #include "linux_fs.h"
 #include "fstype.h"
 
+#include "global.h"
+
 #define ALL_TYPES
 
 #define SIZE(a) (sizeof(a)/sizeof(a[0]))
@@ -192,8 +194,12 @@ fstype(const char *device) {
       return 0;
 
     fd = open(device, O_RDONLY | O_LARGEFILE);
-    if (fd < 0)
+    /* try harder */
+    if (fd < 0 && errno == ENOMEDIUM) fd = open(device, O_RDONLY | O_LARGEFILE);
+    if (fd < 0) {
+      if(config.debug) perror(device);
       return 0;
+    }
 
     /* do seeks and reads in disk order, otherwise a very short
        partition may cause a failure because of read error */

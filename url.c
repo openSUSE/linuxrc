@@ -1226,16 +1226,17 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->used.hwaddr, NULL);
     str_copy(&url->used.unique_id, NULL);
     err = url_mount_disk(url, dir, test_func) ? 0 : 1;
+    if(!err) found = 1;
   }
 
-  if(err) {
+  if(!found) {
     str_copy(&url->used.device, NULL);
     str_copy(&url->used.model, NULL);
     str_copy(&url->used.hwaddr, NULL);
     str_copy(&url->used.unique_id, NULL);
   }
 
-  return found ? 0 : err;
+  return found ? 0 : 1;
 }
 
 
