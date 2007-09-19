@@ -471,7 +471,7 @@ char *slp_get_install(url_t *url)
         str_copy(&key, NULL);
       }
 
-      i = acnt == 1 && !config.manual ? 1 : dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
+      i = acnt == 1 && !config.manual ? 1 : dia_list(txt_get(TXT_SLP_SOURCE), 70, NULL, ambg, 0, align_center);
       if (i <= 0 || i > acnt)
 	break;
       d = ambg[i - 1];
@@ -493,7 +493,7 @@ char *slp_get_install(url_t *url)
 
       if(acnt == 0) break;
 
-      i = acnt == 1 ? 1 : dia_list(txt_get(TXT_SLP_SOURCE), 60, NULL, ambg, 0, align_center);
+      i = acnt == 1 ? 1 : dia_list(txt_get(TXT_SLP_SOURCE), 70, NULL, ambg, 0, align_center);
 
       if (i > 0 && i - 1 < acnt)
 	{

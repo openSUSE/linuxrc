@@ -1,5 +1,6 @@
 19/9/2007:	v3.0.19
 	- correct sha1 endianness (#326258)
+	- make slp window wider
 
 13/9/2007:	v3.0.18
 	- don't turn off swap (#308121)

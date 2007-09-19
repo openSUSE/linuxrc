@@ -484,8 +484,8 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
     if (width_ii < MIN_WIN_SIZE)
         width_ii = MIN_WIN_SIZE;
 
-    if (width_ii > max_x_ig - 16)
-        width_ii = max_x_ig - 16;
+    if (width_ii > max_x_ig - 4)
+        width_ii = max_x_ig - 4;
 
     nr_lines_ii = util_format_txt (head_tv, lines_ati, width_ii - 4);
 
