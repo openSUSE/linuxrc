@@ -335,6 +335,10 @@ void util_free_items (item_t items_arr [], int nr_iv)
     }
 
 
+/*
+ * FIXME: can't get >32-bit sizes, but the size feature is currently not
+ * used, so it doesn't matter. -> Remove size parameter later.
+ */
 int util_fileinfo(char *file_name, int *size, int *compressed)
 {
   unsigned char buf[4];
@@ -344,7 +348,7 @@ int util_fileinfo(char *file_name, int *size, int *compressed)
   if(size) *size = 0;
   if(compressed) *compressed = 0;
 
-  if(!(fd = open(file_name, O_RDONLY))) return -1;
+  if(!(fd = open(file_name, O_RDONLY | O_LARGEFILE))) return -1;
 
   if(read(fd, buf, 2) != 2) {
     close(fd);
