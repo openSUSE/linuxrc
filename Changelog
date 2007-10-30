@@ -1,3 +1,6 @@
+30/10/2007:	v3.0.21
+	- reactivate media change code
+
 24/9/2007:	v3.0.20
 	- fix 32-bit filesize issue (#310893)
 

@@ -952,8 +952,12 @@ void lxrc_init()
 
     i = 0;
     j = 1;
-#if 0
-    if(config.insttype == inst_cdrom) {
+#if 1
+    if(util_check_exist("/nextmedia") == 'r') {
+      config.cd1texts = file_parse_xmllike("/nextmedia", "text");  
+    }
+
+    if(config.url.install && config.url.install->is.cdrom) {
       char *s = get_translation(config.cd1texts, current_language()->locale);
       char *buf = NULL;
 
@@ -961,6 +965,7 @@ void lxrc_init()
       do {
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
+          config.manual = 0;
           i = auto2_find_repo();
         }
       } while(!i && j);
