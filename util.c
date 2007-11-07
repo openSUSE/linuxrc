@@ -127,6 +127,9 @@ void util_redirect_kmsg()
   if(!config.serial && (fd = open(config.console, O_RDONLY))) {
     ioctl(fd, TIOCLINUX, &newvt);
     close(fd);
+    /* 'create' console 4 */
+    fd = open("/dev/tty4", O_RDWR);
+    close(fd);
   }
 }
 

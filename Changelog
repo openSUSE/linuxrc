@@ -1,4 +1,8 @@
-***  this is *not* 10.3  ***
+7/11/2007:	v3.0.21
+	- fix parsing of 'rescue' parameter
+	- reactivate media change code
+	- redirect kernel messages to tty4 earlier, so we don't watch udev
+	  at work
 
 24/9/2007:	v3.0.20
 	- fix 32-bit filesize issue (#310893)

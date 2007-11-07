@@ -895,14 +895,14 @@ void auto2_driverupdate(url_t *url)
 
   if(dud_count == config.update.count) {
     fprintf(stderr, "No new driver updates found.\n");
-    if(config.win) dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
+    if(config.win && config.manual) dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
   }
   else {
     if(*names) {
-      if(config.win) dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+      if(config.win && config.manual) dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
     }
     else {
-      if(config.win) dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+      if(config.win && config.manual) dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
     }
   }  
 }

@@ -782,6 +782,9 @@ void file_do_info(file_t *f0)
           config.rescue = f->nvalue;
           break;
         }
+        else {
+          config.rescue = 1;
+        }
 
       case key_install:
         url_free(config.url.install);
