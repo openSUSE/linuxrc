@@ -1584,6 +1584,7 @@ int net_dhcp()
 
   if(f0) {
     config.net.dhcp_active = 1;
+    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
   }
   else {
     if(config.win) {
