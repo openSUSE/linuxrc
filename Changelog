@@ -1,3 +1,6 @@
+8/1/2008:	v3.1.0
+	- new install.inf entries: RepoURL & InstsysURL
+
 7/11/2007:	v3.0.22
 	- apply 'netwait' to dhcp, too (#335648)
 

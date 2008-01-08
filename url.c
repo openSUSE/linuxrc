@@ -606,6 +606,7 @@ url_t *url_set(char *str)
  *   0: for logging
  *   1: without query part
  *   2: with device
+ *   3: like 2, but remove 'rel:' scheme
  */
 char *url_print(url_t *url, int format)
 {
@@ -615,7 +616,12 @@ char *url_print(url_t *url, int format)
   str_copy(&buf, NULL);
   if(!url) return buf;
 
-  strprintf(&buf, "%s:", get_instmode_name(url->scheme));
+  if(format != 3 || url->scheme != inst_rel) {
+    strprintf(&buf, "%s:", get_instmode_name(url->scheme));
+  }
+  else {
+    str_copy(&buf, "");
+  }
 
   if(url->domain || url->user || url->password || url->server || url->port) {
     strprintf(&buf, "%s//", buf);
@@ -644,7 +650,7 @@ char *url_print(url_t *url, int format)
     );
   }
 
-  if(format == 0 || format == 2) {
+  if(format == 0 || format == 2 || format == 3) {
     if((s = url->used.device) || (s = url->device)) {
       strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', short_dev(s));
     }
@@ -655,6 +661,8 @@ char *url_print(url_t *url, int format)
       strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
     }
   }
+
+  if(format == 3 && *buf == '/') buf++;
 
   return buf;
 }

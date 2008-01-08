@@ -1507,6 +1507,9 @@ void file_write_install_inf(char *dir)
 
   fprintf(f, "SourceType: %s\n", url->is.file ? "file" : "dir");
 
+  fprintf(f, "RepoURL: %s\n", url_print(url, 3));
+  fprintf(f, "InstsysURL: %s\n", url_print(config.url.instsys, 3));
+
   file_write_str(f, key_instmode, get_instmode_name(url->scheme));
 
   if(url->used.device) fprintf(f, "Device: %s\n", short_dev(url->used.device));
