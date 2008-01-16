@@ -54,6 +54,10 @@ static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
 static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
 static int url_setup_interface(url_t *url);
+static void url_parse_instsys_config(char *file);
+static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
+static void url_build_instsys_list(char *instsys);
+static char *url_instsys_config(char *path);
 
 
 void url_read(url_data_t *url_data)
@@ -1429,9 +1433,11 @@ int url_find_repo(url_t *url, char *dir)
    */
   int test_is_repo(url_t *url)
   {
-    int ok = 0, i;
-    char *buf = NULL, *file_name;
+    int ok = 0, i, opt;
+    char *buf = NULL, *file_name, *s;
     int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
+    char *instsys_config;
+    slist_t *sl;
 
     if(
       !url ||
@@ -1462,13 +1468,49 @@ int url_find_repo(url_t *url, char *dir)
 
     if(config.url.instsys->scheme != inst_rel || config.kexec) return 1;
 
-    if(
-      url->is.mountable &&
-      !util_check_exist2(url->mount, config.url.instsys->path)
-    ) {
-      fprintf(stderr, "instsys missing: %s\n", config.url.instsys->path);
+    instsys_config = url_instsys_config(config.url.instsys->path);
 
-      return 0;
+    file_name = NULL;
+
+    if(url->is.mountable) {
+      if(util_check_exist2(url->mount, instsys_config)) {
+        strprintf(&file_name, "%s/%s", url->mount, instsys_config);
+      }
+    }
+    else {
+      if(url_read_file(url,
+        NULL,
+        instsys_config,
+        file_name = strdup(new_download()),
+        NULL,
+        URL_FLAG_NOSHA1
+      )) {
+        free(file_name);
+        file_name = NULL;
+      }
+    }
+
+    url_parse_instsys_config(file_name);
+
+    free(file_name);
+
+    url_build_instsys_list(config.url.instsys->path);
+
+    if(url->is.mountable) {
+      for(sl = config.url.instsys_list; sl; sl = sl->next) {
+        s = sl->key;
+        opt = 0;
+        if(*s == '?') { s++; opt = 1; }
+        if(!util_check_exist2(url->mount, s)) {
+          if(opt) {
+            fprintf(stderr, "instsys missing: %s (optional)\n", s);
+          }
+          else {
+            fprintf(stderr, "instsys missing: %s\n", s);
+            return 0;
+          }
+        }
+      }
     }
 
     if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
@@ -1502,6 +1544,7 @@ int url_find_repo(url_t *url, char *dir)
     if(ok) {
       str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
 
+#if 0
       if(get_instsys2) {
         str_copy(&config.url.instsys2->mount, new_mountpoint());
         if(
@@ -1528,6 +1571,7 @@ int url_find_repo(url_t *url, char *dir)
 
         if(!ok) str_copy(&config.url.instsys2->mount, NULL);
       }
+#endif
     }
 
     str_copy(&buf, NULL);
@@ -1795,6 +1839,167 @@ int url_setup_interface(url_t *url)
   }
 
   return 1;
+}
+
+
+void url_parse_instsys_config(char *file)
+{
+  file_t *f0, *f;
+  slist_t *sl;
+
+  if(!file) return;
+
+  config.url.instsys_deps = slist_free(config.url.instsys_deps);
+
+  f0 = file_read_file(file, kf_none);
+  for(f = f0; f; f = f->next) {
+    if(
+      f->key_str &&
+      *f->key_str &&
+      *f->key_str != '#' &&
+      !slist_getentry(config.url.instsys_deps, f->key_str)
+    ) {
+      sl = slist_append_str(&config.url.instsys_deps, f->key_str);
+      str_copy(&sl->value, f->value);
+    }
+  }
+  file_free_file(f0);
+
+  if(config.debug) {
+    fprintf(stderr, "instsys deps:\n");
+    for(sl = config.url.instsys_deps; sl; sl = sl->next) {
+      fprintf(stderr, "  %s: %s\n", sl->key, sl->value);
+    }
+  }
+}
+
+
+slist_t *url_instsys_lookup(char *key, slist_t **sl_ll)
+{
+  slist_t *sl0 = NULL, *sl1, *sl2, *sl;
+  int opt = 0;
+  char *s, *lkey = NULL;
+
+  if(!key) return NULL;
+
+  /* make it long enough */
+  lkey = calloc(1, strlen(key) + 32);
+
+  if(*key == '?') {
+    opt = 1;
+    key++;
+  }
+
+  if((s = strstr(key, "<lang>"))) {
+    memcpy(lkey, key, s - key);
+    strcat(lkey, current_language()->locale);
+    strcat(lkey, s + sizeof "<lang>" - 1);
+  }
+  else {
+    strcpy(lkey, key);
+  }
+
+  if(!slist_getentry(*sl_ll, lkey)) {
+    if((sl = slist_getentry(config.url.instsys_deps, lkey))) {
+      sl2 = slist_split(' ', sl->value);
+      for(sl = sl2; sl; sl = sl->next) {
+        sl1 = slist_new();
+        strprintf(&sl1->key, "%s%s", opt && *sl->key != '?' ? "?" : "", sl->key);
+        slist_append(&sl0, sl1);
+      }
+      slist_free(sl2);
+    }
+    else {
+      sl0 = slist_new();
+      strprintf(&sl0->key, "%s%s", opt ? "?" : "", lkey);
+    }
+
+    slist_append_str(sl_ll, lkey);
+  }
+
+  free(lkey);
+
+  return sl0;
+}
+
+
+void url_build_instsys_list(char *image)
+{
+  char *s, *base = NULL, *name = NULL, *buf = NULL;
+  slist_t *sl, *sl1, *sl2, *sl_ll = NULL, *list = NULL;
+
+  if(!image) return;
+
+  str_copy(&base, image);
+  s = strrchr(base, '/');
+  s = s ? s + 1 : base;
+  str_copy(&name, s);
+  *s = 0;
+
+  config.url.instsys_list = slist_free(config.url.instsys_list);
+
+  list = url_instsys_lookup(name, &sl_ll);
+
+  for(sl = list; sl; sl = sl->next) {
+    sl1 = url_instsys_lookup(sl->key, &sl_ll);
+    if(!sl1) continue;
+    sl2 = sl->next;
+    str_copy(&sl->key, NULL);
+    sl->next = sl1;
+    slist_append(&list, sl2);
+  }
+
+  for(sl = list; sl; sl = sl->next) {
+    if(!sl->key) continue;
+    s = sl->key;
+    if(*s == '?') s++;
+    strprintf(&buf, "?%s", s);
+    if(
+      !slist_getentry(config.url.instsys_list, s) &&
+      !slist_getentry(config.url.instsys_list, buf)
+    ) {
+      slist_append_str(&config.url.instsys_list, sl->key);
+    }
+  }
+
+  for(sl = config.url.instsys_list; sl; sl = sl->next) {
+    s = sl->key;
+    if(*s == '?') s++;
+    strprintf(&sl->key, "%s%s%s", s == sl->key ? "" : "?", base, s);
+  }
+
+  if(config.debug) {
+    fprintf(stderr, "instsys list:\n");
+    for(sl = config.url.instsys_list; sl; sl = sl->next) {
+      fprintf(stderr, "  %s\n", sl->key);
+    }
+  }
+
+  free(base);
+  free(name);
+  free(buf);
+
+  slist_free(sl_ll);
+  slist_free(list);
+}
+
+
+char *url_instsys_config(char *path)
+{
+  static char *config = NULL;
+  char *s;
+
+  if(!path) return NULL;
+
+  str_copy(&config, NULL);
+
+  config = calloc(1, strlen(path) + sizeof "config");
+
+  strcpy(config, path);
+  s = strrchr(config, '/');
+  strcpy(s ? s + 1 : config, "config");
+
+  return config;
 }
 
 

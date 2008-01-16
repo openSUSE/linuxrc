@@ -390,6 +390,8 @@ typedef struct {
 
   struct {
     char *instsys_default;	/* default instsys url */
+    slist_t *instsys_deps;	/* instsys dependencies */
+    slist_t *instsys_list;	/* instsys list */
     url_t *install;		/* install url */
     url_t *instsys;		/* instsys url */
     url_t *instsys2;		/* instsys2 url (fonts) */

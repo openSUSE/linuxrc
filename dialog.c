@@ -1464,6 +1464,8 @@ void dia_handle_ctrlc (void)
 	}
       }
       if(i == -42) {
+        util_umount_all();
+        util_clear_downloads();
 	lxrc_end();
 	exit(0);
       }
