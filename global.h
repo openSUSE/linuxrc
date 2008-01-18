@@ -394,7 +394,6 @@ typedef struct {
     slist_t *instsys_list;	/* instsys list */
     url_t *install;		/* install url */
     url_t *instsys;		/* instsys url */
-    url_t *instsys2;		/* instsys2 url (fonts) */
     url_t *autoyast;		/* autoyast url */
     url_t *proxy;		/* proxy url */
   } url;

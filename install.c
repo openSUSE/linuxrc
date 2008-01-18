@@ -925,12 +925,7 @@ int inst_start_install()
     util_clear_downloads();
 
     url_free(config.url.instsys);
-    url_free(config.url.instsys2);
     config.url.instsys = url_set(config.rescue ? config.rescueimage : config.rootimage);
-    config.url.instsys2 = url_set(url_print(config.url.instsys, 2));
-    if(config.url.instsys2->path) {
-      strprintf(&config.url.instsys2->path, "%s.fonts", config.url.instsys2->path);
-    }
 
     if(inst_choose_source()) return 1;
   }
@@ -1058,12 +1053,6 @@ int add_instsys()
     argv[1] = config.url.instsys->mount;
     argv[2] = "/";
     util_lndir_main(3, argv);
-
-    if(config.url.instsys2 && config.url.instsys2->mount) {
-      argv[1] = config.url.instsys2->mount;
-      argv[2] = "/";
-      util_lndir_main(3, argv);
-    }
   }
 
   return err;

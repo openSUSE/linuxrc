@@ -18,6 +18,7 @@ known issues:
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mount.h>
 
 #include <curl/curl.h>
 
@@ -1439,7 +1440,6 @@ int url_find_repo(url_t *url, char *dir)
   {
     int ok = 0, i, opt, parts, part;
     char *buf = NULL, *buf2 = NULL, *file_name, *s;
-    int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
     char *instsys_config;
     slist_t *sl;
 
@@ -1577,34 +1577,18 @@ int url_find_repo(url_t *url, char *dir)
     if(ok) {
       str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
 
-#if 0
-      if(get_instsys2) {
-        str_copy(&config.url.instsys2->mount, new_mountpoint());
-        if(
-          url->is.mountable &&
-          util_is_mountable(buf) &&
-          !config.rescue &&
-          (!config.download.instsys || util_check_exist(buf) == 'd')
-        ) {
-          ok = util_mount_ro(buf, config.url.instsys2->mount) ? 0 : 1;
-        }
-        else {
-          if(!url_read_file(url,
-            NULL,
-            config.url.instsys2->path,
-            file_name = strdup(new_download()),
-            txt_get(TXT_LOADING_FONTS),
-            URL_FLAG_PROGRESS + URL_FLAG_UNZIP
-          )) {
-            ok = util_mount_ro(file_name, config.url.instsys2->mount) ? 0 : 1;
-          }
+      if(parts > 1) {
+        char *argv[3] = { };
 
-          free(file_name);
-        }
+        mkdir(config.url.instsys->mount, 0755);
+        mount("tmpfs", config.url.instsys->mount, "tmpfs", 0, "size=0,nr_inodes=0");
 
-        if(!ok) str_copy(&config.url.instsys2->mount, NULL);
+        for(sl = config.url.instsys_list; sl; sl = sl->next) {
+          argv[1] = sl->value;
+          argv[2] = config.url.instsys->mount;
+          util_lndir_main(3, argv);
+        }
       }
-#endif
     }
 
     str_copy(&buf, NULL);
@@ -1641,7 +1625,6 @@ int url_find_instsys(url_t *url, char *dir)
 {
   int err = 0;
   char *file_name;
-  int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
 
   if(
     !url ||
@@ -1670,6 +1653,7 @@ int url_find_instsys(url_t *url, char *dir)
     free(file_name);
   }
 
+#if 0
   if(!err && get_instsys2) {
     url = config.url.instsys2;
     dir = strdup(new_mountpoint());
@@ -1695,6 +1679,7 @@ int url_find_instsys(url_t *url, char *dir)
 
     free(dir);
   }
+#endif
 
   return err;
 }
