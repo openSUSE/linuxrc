@@ -62,115 +62,115 @@ struct {
 static language_t set_languages_arm [] =
 {
 #ifdef TRANS_af
-{ lang_af, "Afrikaans", "us", SMALL_FONT, UNI_FONT, 0, 0, "af_ZA", 0 },
+{ lang_af, "Afrikaans", "us", SMALL_FONT, UNI_FONT, 0, 0, "af_ZA", "af", 0 },
 #endif
 
 #ifdef TRANS_bg
-{ lang_bg, "Български", "us", SMALL_FONT, UNI_FONT, 0, 0, "bg_BG", 0 },
+{ lang_bg, "Български", "us", SMALL_FONT, UNI_FONT, 0, 0, "bg_BG", "bg", 0 },
 #endif
 
 #ifdef TRANS_ca
-{ lang_ca, "Català", "us", SMALL_FONT, UNI_FONT, 0, 0, "ca_ES", 0 },
+{ lang_ca, "Català", "us", SMALL_FONT, UNI_FONT, 0, 0, "ca_ES", "ca", 0 },
 #endif
 
 #ifdef TRANS_cs
-{ lang_cs, "Čeština", "cz-us-qwertz", SMALL_FONT, UNI_FONT, 1, 1, "cs_CZ", 0 },
+{ lang_cs, "Čeština", "cz-us-qwertz", SMALL_FONT, UNI_FONT, 1, 1, "cs_CZ", "cs", 0 },
 #endif
 
 #ifdef TRANS_da
-{ lang_da, "Dansk", "dk", SMALL_FONT, UNI_FONT, 0, 0, "da_DK", 0 },
+{ lang_da, "Dansk", "dk", SMALL_FONT, UNI_FONT, 0, 0, "da_DK", "da", 0 },
 #endif
 
 #ifdef TRANS_de
-{ lang_de, "Deutsch", "de-lat1-nd", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", 0 },
+{ lang_de, "Deutsch", "de-lat1-nd", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", "de", 0 },
 #endif
 
 #ifdef TRANS_en
-{ lang_en, "English", "us", SMALL_FONT, UNI_FONT, 0, 0, "en_US", 0 },
+{ lang_en, "English", "us", SMALL_FONT, UNI_FONT, 0, 0, "en_US", "en_US", 0 },
 #endif
 
 #ifdef TRANS_es
-{ lang_es, "Español", "es", SMALL_FONT, UNI_FONT, 0, 1, "es_ES", 0 },
+{ lang_es, "Español", "es", SMALL_FONT, UNI_FONT, 0, 1, "es_ES", "es", 0 },
 #endif
 
 #ifdef TRANS_fr
-{ lang_fr, "Français", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", 0 },
+{ lang_fr, "Français", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", "fr", 0 },
 #endif
 
 #ifdef TRANS_el
-{ lang_el, "Ελληνικά", "gr", SMALL_FONT, UNI_FONT, 1, 1, "el_GR", 0 },
+{ lang_el, "Ελληνικά", "gr", SMALL_FONT, UNI_FONT, 1, 1, "el_GR", "el", 0 },
 #endif
 
 #ifdef TRANS_it
-{ lang_it, "Italiano", "it", SMALL_FONT, UNI_FONT, 0, 0, "it_IT", 0 },
+{ lang_it, "Italiano", "it", SMALL_FONT, UNI_FONT, 0, 0, "it_IT", "it", 0 },
 #endif
 
 #ifdef TRANS_ja
-{ lang_ja, "Japanese", "jp106", SMALL_FONT, UNI_FONT, 0, 0, "ja_JP", 1 },
+{ lang_ja, "Japanese", "jp106", SMALL_FONT, UNI_FONT, 0, 0, "ja_JP", "ja", 1 },
 #endif
 
 #ifdef TRANS_hu
-{ lang_hu, "Magyar", "hu", SMALL_FONT, UNI_FONT, 1, 1, "hu_HU", 0 },
+{ lang_hu, "Magyar", "hu", SMALL_FONT, UNI_FONT, 1, 1, "hu_HU", "hu", 0 },
 #endif
 
 #ifdef TRANS_nl
-{ lang_nl, "Nederlands", "us", SMALL_FONT, UNI_FONT, 0, 1, "nl_NL", 0 },
+{ lang_nl, "Nederlands", "us", SMALL_FONT, UNI_FONT, 0, 1, "nl_NL", "nl", 0 },
 #endif
 
 #ifdef TRANS_nb
-{ lang_nb, "Norsk", "no-latin1", SMALL_FONT, UNI_FONT, 0, 1, "nb_NO", 0 },
+{ lang_nb, "Norsk", "no-latin1", SMALL_FONT, UNI_FONT, 0, 1, "nb_NO", "nb", 0 },
 #endif
 
 #ifdef TRANS_pl
-{ lang_pl, "Polski", "Pl02", SMALL_FONT, UNI_FONT, 1, 1, "pl_PL", 0 },
+{ lang_pl, "Polski", "Pl02", SMALL_FONT, UNI_FONT, 1, 1, "pl_PL", "pl", 0 },
 #endif
 
 #ifdef TRANS_pt
-{ lang_pt, "Português", "pt-latin1", SMALL_FONT, UNI_FONT, 0, 1, "pt_PT", 0 },
+{ lang_pt, "Português", "pt-latin1", SMALL_FONT, UNI_FONT, 0, 1, "pt_PT", "pt", 0 },
 #endif
 
 #ifdef TRANS_pt_BR
-{ lang_pt_BR, "Português Brasileiro", "br-abnt2", SMALL_FONT, UNI_FONT, 0, 1, "pt_BR", 0 },
+{ lang_pt_BR, "Português Brasileiro", "br-abnt2", SMALL_FONT, UNI_FONT, 0, 1, "pt_BR", "pt_BR", 0 },
 #endif
 
 #ifdef TRANS_ru
-{ lang_ru, "Русский", "ru1", SMALL_FONT, UNI_FONT, 1, 1, "ru_RU", 0 },
+{ lang_ru, "Русский", "ru1", SMALL_FONT, UNI_FONT, 1, 1, "ru_RU", "ru", 0 },
 #endif
 
 #ifdef TRANS_zh_CN
-{ lang_zh_CN, "Simplified Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_CN", 1 },
+{ lang_zh_CN, "Simplified Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_CN", "zh_CN", 1 },
 #endif
 
 #ifdef TRANS_sk
-{ lang_sk, "Slovenčina", "sk-qwerty", SMALL_FONT, UNI_FONT, 1, 1, "sk_SK", 0 },
+{ lang_sk, "Slovenčina", "sk-qwerty", SMALL_FONT, UNI_FONT, 1, 1, "sk_SK", "sk", 0 },
 #endif
 
 #ifdef TRANS_sl
-{ lang_sl, "Slovenščina", "slovene", SMALL_FONT, UNI_FONT, 1, 1, "sl_SI", 0 },
+{ lang_sl, "Slovenščina", "slovene", SMALL_FONT, UNI_FONT, 1, 1, "sl_SI", "sl", 0 },
 #endif
 
 #ifdef TRANS_fi
-{ lang_fi, "Suomi", "fi-latin1", SMALL_FONT, UNI_FONT, 0, 1, "fi_FI", 0 },
+{ lang_fi, "Suomi", "fi-latin1", SMALL_FONT, UNI_FONT, 0, 1, "fi_FI", "fi", 0 },
 #endif
 
 #ifdef TRANS_sv
-{ lang_sv, "Svenska", "sv-latin1", SMALL_FONT, UNI_FONT, 0, 1, "sv_SE", 0 },
+{ lang_sv, "Svenska", "sv-latin1", SMALL_FONT, UNI_FONT, 0, 1, "sv_SE", "sv", 0 },
 #endif
 
 #ifdef TRANS_zh_TW
-{ lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", 1 },
+{ lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", "zh_TW", 1 },
 #endif
 
 #ifdef TRANS_uk
-{ lang_uk, "Українська", "us", SMALL_FONT, UNI_FONT, 0, 1, "uk_UA", 0 },
+{ lang_uk, "Українська", "us", SMALL_FONT, UNI_FONT, 0, 1, "uk_UA", "uk", 0 },
 #endif
 
 #ifdef TRANS_xh
-{ lang_xh, "isiXhosa", "us", SMALL_FONT, UNI_FONT, 0, 0, "xh_ZA", 0 },
+{ lang_xh, "isiXhosa", "us", SMALL_FONT, UNI_FONT, 0, 0, "xh_ZA", "xh", 0 },
 #endif
 
 #ifdef TRANS_zu
-{ lang_zu, "isiZulu", "us", SMALL_FONT, UNI_FONT, 0, 0, "zu_ZA", 0 },
+{ lang_zu, "isiZulu", "us", SMALL_FONT, UNI_FONT, 0, 0, "zu_ZA", "zu", 0 },
 #endif
 
 // dummy for unknown language, must be last entry

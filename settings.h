@@ -18,7 +18,8 @@ typedef struct {
   int usermap;	// redundant, will drop it later -- snwint
   int write_info;
   char *locale;
-  int xfonts;	/* needs extra xfonts */
+  char *trans_id;	/* instsys translation image suffix */
+  int xfonts;		/* needs extra xfonts */
 } language_t;
 
 typedef struct {

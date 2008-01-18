@@ -786,15 +786,18 @@ int url_progress(url_data_t *url_data, int stage)
   if(stage == 2) {
     if(with_win) {
       dia_status_off(&config.progress_win);
-      if(url_data->err) {
+      if(url_data->err && !url_data->optional) {
         strprintf(&buf, "error %d: %s\n", url_data->err, url_data->err_buf);
         dia_message(buf, MSGTYPE_ERROR);
       }
     }
     else {
       if(url_data->err) {
-        printf(" - failed\n");
-        if(config.debug) printf("error %d: %s\n", url_data->err, url_data->err_buf);
+        printf("%s - %s\n",
+          url_data->label_shown && !url_data->percent >= 0 ? "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" : "",
+          url_data->optional ? "missing (optional)" : "failed"
+        );
+        if(config.debug && !url_data->optional) printf("error %d: %s\n", url_data->err, url_data->err_buf);
       }
       else {
         printf("\n");
@@ -1312,6 +1315,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
 
     url_data->file_name = strdup(dst);
 
+    if((flags & URL_FLAG_OPTIONAL)) url_data->optional = 1;
     if((flags & URL_FLAG_UNZIP)) url_data->unzip = 1;
     if((flags & URL_FLAG_PROGRESS)) url_data->progress = url_progress;
     str_copy(&url_data->label, label);
@@ -1321,7 +1325,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     url_read(url_data);
 
     if(url_data->err) {
-      fprintf(stderr, "error %d: %s\n", url_data->err, url_data->err_buf);
+      fprintf(stderr, "error %d: %s%s\n", url_data->err, url_data->err_buf, url_data->optional ? " (ignored)" : "");
     }
     else {
       ok = 1;
@@ -1433,8 +1437,8 @@ int url_find_repo(url_t *url, char *dir)
    */
   int test_is_repo(url_t *url)
   {
-    int ok = 0, i, opt;
-    char *buf = NULL, *file_name, *s;
+    int ok = 0, i, opt, parts, part;
+    char *buf = NULL, *buf2 = NULL, *file_name, *s;
     int get_instsys2 = config.url.instsys2 && !config.rescue && current_language()->xfonts;
     char *instsys_config;
     slist_t *sl;
@@ -1498,9 +1502,7 @@ int url_find_repo(url_t *url, char *dir)
 
     if(url->is.mountable) {
       for(sl = config.url.instsys_list; sl; sl = sl->next) {
-        s = sl->key;
-        opt = 0;
-        if(*s == '?') { s++; opt = 1; }
+        opt = *(s = sl->key) == '?' && s++;
         if(!util_check_exist2(url->mount, s)) {
           if(opt) {
             fprintf(stderr, "instsys missing: %s (optional)\n", s);
@@ -1513,32 +1515,63 @@ int url_find_repo(url_t *url, char *dir)
       }
     }
 
-    if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, config.url.instsys->path);
+    for(parts = 0, sl = config.url.instsys_list; sl; sl = sl->next) parts++;
 
-    if(
-      url->is.mountable &&
-      util_is_mountable(buf) &&
-      !config.rescue &&
-      (!config.download.instsys || util_check_exist(buf) == 'd')
-    ) {
-      fprintf(stderr, "mount %s -> %s\n", buf, config.mountpoint.instsys);
+    for(ok = 1, part = 1, sl = config.url.instsys_list; ok && sl; sl = sl->next, part++) {
+      opt = *(s = sl->key) == '?' && s++;
 
-      ok = util_mount_ro(buf, config.mountpoint.instsys) ? 0 : 1;
-      if(!ok) fprintf(stderr, "instsys mount failed: %s\n", config.url.instsys->path);
-    }
-    else {
-      if(!url_read_file(url,
-        NULL,
-        config.url.instsys->path,
-        file_name = strdup(new_download()),
-        txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
-        URL_FLAG_PROGRESS + URL_FLAG_UNZIP
-      )) {
-        ok = util_mount_ro(file_name, config.mountpoint.instsys) ? 0 : 1;
-        if(!ok) fprintf(stderr, "instsys mount failed: %s\n", config.url.instsys->path);
+      if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, s);
+
+      sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
+
+      if(
+        url->is.mountable &&
+        (util_is_mountable(buf) || !util_check_exist(buf)) &&
+        !config.rescue &&
+        (!config.download.instsys || util_check_exist(buf) == 'd')
+      ) {
+        if(!util_check_exist(buf) && opt) {
+          fprintf(stderr, "mount %s -> %s failed (ignored)\n", buf, sl->value);
+        }
+        else {
+          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+
+          i = util_mount_ro(buf, sl->value) ? 0 : 1;
+          ok &= i;
+          if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        }
       }
+      else {
+        if(parts > 1) {
+          strprintf(&buf2, "%s, %s %d/%d",
+            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
+            "part", part, parts
+          );
+        }
+        else {
+          str_copy(&buf2, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
+        }
 
-      free(file_name);
+        if(!url_read_file(url,
+          NULL,
+          s,
+          file_name = strdup(new_download()),
+          buf2,
+          URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
+        )) {
+          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+
+          i = util_mount_ro(file_name, sl->value) ? 0 : 1;
+          ok &= i;
+          if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        }
+        else {
+          fprintf(stderr, "download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
+          if(!opt) ok = 0;
+        }
+
+        free(file_name);
+      }
     }
 
     if(ok) {
@@ -1575,6 +1608,7 @@ int url_find_repo(url_t *url, char *dir)
     }
 
     str_copy(&buf, NULL);
+    str_copy(&buf2, NULL);
 
     return ok;
   }
@@ -1892,7 +1926,7 @@ slist_t *url_instsys_lookup(char *key, slist_t **sl_ll)
 
   if((s = strstr(key, "<lang>"))) {
     memcpy(lkey, key, s - key);
-    strcat(lkey, current_language()->locale);
+    strcat(lkey, current_language()->trans_id);
     strcat(lkey, s + sizeof "<lang>" - 1);
   }
   else {

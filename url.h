@@ -17,6 +17,7 @@ typedef struct url_data_s {
   unsigned file_opened:1;
   unsigned unzip:1;
   unsigned label_shown:1;
+  unsigned optional:1;
   char *label;
   int percent;
   int pipe_fd;
@@ -37,6 +38,7 @@ typedef struct url_data_s {
 #define URL_FLAG_NOSHA1		(1 << 2)
 #define URL_FLAG_NOUNLINK	(1 << 3)
 #define URL_FLAG_KEEP_MOUNTED	(1 << 4)
+#define URL_FLAG_OPTIONAL	(1 << 5)
 
 void url_read(url_data_t *url_data);
 url_t *url_set(char *str);
