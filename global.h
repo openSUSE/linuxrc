@@ -296,6 +296,7 @@ typedef struct {
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
   unsigned zombies:1;		/* keep zombies around */
+  unsigned forceip:1;           /* do not check for duplicate IP address */
   unsigned installfilesread:1;	/* already got install files */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */

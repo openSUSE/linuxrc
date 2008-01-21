@@ -1165,3 +1165,8 @@ msgstr "Vill du aktivera stöd för OSI-lager 2?"
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr "MAC-adress"
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

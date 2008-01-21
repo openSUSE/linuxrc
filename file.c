@@ -264,6 +264,7 @@ static struct {
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
   { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
+  { key_forceip,        "forceip",        kf_cfg + kf_cmd                },
   { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                },
   { key_ibft_hwaddr,    "iSCSI_INITIATOR_HWADDR",   kf_ibft              },
   { key_ibft_ipaddr,    "iSCSI_INITIATOR_IPADDR",   kf_ibft              },
@@ -1449,6 +1450,10 @@ void file_do_info(file_t *f0)
 
       case key_zombies:
         if(f->is.numeric) config.zombies = f->nvalue;
+        break;
+
+      case key_forceip:
+        if(f->is.numeric) config.forceip = f->nvalue;
         break;
 
       case key_dhcpcd:

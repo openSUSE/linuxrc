@@ -1168,3 +1168,8 @@ msgstr "OSI-Schicht-2-Unterstützung aktivieren?"
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr "MAC-Adresse"
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

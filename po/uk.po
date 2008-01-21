@@ -1168,3 +1168,8 @@ msgstr "Увімкнути підтримку OSI Layer 2?"
 #, fuzzy
 msgid "MAC address"
 msgstr "Адреса MAC"
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

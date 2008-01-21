@@ -1167,3 +1167,8 @@ msgstr ""
 #, fuzzy
 msgid "MAC address"
 msgstr "endereço mac"
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

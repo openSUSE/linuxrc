@@ -44,7 +44,7 @@ typedef enum {
   key_zen, key_zenconfig, key_port, key_smbshare, key_rootimage2, key_xxx,
   key_instsys_id, key_initrd_id, key_instsys_complain, key_nfstcp,
   key_osamedium, key_osainterface, key_dud_complain, key_dud_expected,
-  key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies,
+  key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies, key_forceip,
   key_dhcpcd, key_layer2, key_osahwaddr, key_ibft_hwaddr, key_ibft_ipaddr,
   key_ibft_netmask, key_ibft_gateway, key_ibft_dns, key_net_retry, key_bootif
 } file_key_t;
