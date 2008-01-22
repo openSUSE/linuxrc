@@ -1867,7 +1867,6 @@ void util_start_shell(char *tty, char *shell, int flags)
   char *s, *args[] = { NULL, NULL, NULL };
   char *env[] = {
     NULL,	/* TERM */
-    NULL,	/* INSTSYS */
     "LANG=en_US.UTF-8",
     "PS1=\\w # ",
     "HOME=/",
@@ -1881,7 +1880,6 @@ void util_start_shell(char *tty, char *shell, int flags)
   if((flags & 2)) args[1] = "-l";
 
   strprintf(env + 0, "TERM=%s", getenv("TERM") ?: "linux");
-  strprintf(env + 1, "INSTSYS=%s", getenv("INSTSYS") ?: "");
 
   if(!fork()) {
     for(fd = 0; fd < 20; fd++) close(fd);
@@ -3684,7 +3682,10 @@ int make_links(char *src, char *dst)
       sprintf(src2, "%s/%s", src, de->d_name);
       sprintf(dst2, "%s/%s", dst, de->d_name);
 
-      if(is_dir(src2) && !is_link(src2)) {
+      // fprintf(stderr, "?: %s -> %s\n", src2, dst2);
+
+      /* Why on earth '&& !is_link(src2)'??? */
+      if(is_dir(src2) /* && !is_link(src2) */) {
         /* add directory */
 
         // fprintf(stderr, "dir: %s -> %s\n", src2, dst2);

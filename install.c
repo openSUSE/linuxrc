@@ -979,8 +979,6 @@ int add_instsys()
 
   if(!config.url.instsys->mount) return 1;
 
-  setenv("INSTSYS", config.url.instsys->mount, 1);
-
   setenv("TERM", config.term ?: config.serial ? "screen" : "linux", 1);
 
   setenv("ESCDELAY", config.serial ? "1100" : "10", 1);
