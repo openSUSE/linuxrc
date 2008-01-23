@@ -899,12 +899,17 @@ void url_umount(url_t *url)
 {
   if(!url) return;
 
+  // FIXME: this is wrong!
+
   if(!util_umount(url->mount)) {
-    str_copy(&url->mount, NULL);
+    if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->mount);
   }
+  str_copy(&url->mount, NULL);
+
   if(util_umount(url->tmp_mount)) {
-    str_copy(&url->tmp_mount, NULL);
+    if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->tmp_mount);
   }
+  str_copy(&url->tmp_mount, NULL);
 }
 
 
@@ -1522,7 +1527,8 @@ int url_find_repo(url_t *url, char *dir)
 
       if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, s);
 
-      sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
+      // sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
+      sl->value = strdup(new_mountpoint());
 
       if(
         url->is.mountable &&
@@ -1576,19 +1582,7 @@ int url_find_repo(url_t *url, char *dir)
 
     if(ok) {
       str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
-
-      if(parts > 1) {
-        char *argv[3] = { };
-
-        mkdir(config.url.instsys->mount, 0755);
-        mount("tmpfs", config.url.instsys->mount, "tmpfs", 0, "size=0,nr_inodes=0");
-
-        for(sl = config.url.instsys_list; sl; sl = sl->next) {
-          argv[1] = sl->value;
-          argv[2] = config.url.instsys->mount;
-          util_lndir_main(3, argv);
-        }
-      }
+      mkdir(config.url.instsys->mount, 0755);
     }
 
     str_copy(&buf, NULL);

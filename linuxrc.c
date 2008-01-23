@@ -315,8 +315,15 @@ void lxrc_halt()
 
 void lxrc_change_root()
 {
-  int fd;
-  char *buf = NULL, *sbuf = NULL, *mp = "/mnt";
+  char *buf = NULL, *mp = "/mnt", **s;
+  slist_t *sl;
+  char *argv[3] = { };
+  char *dirs[] = {
+    "boot", "dev", "etc", "home", "lib", "lib/firmware", "lib/modules",
+    "media", "mounts", "mounts/initrd", "mnt", "proc", "sys", "tmp",
+    "usr", "usr/lib", "usr/lib/microcode", "var",
+    NULL
+  };
 
   if(config.test) return;
 
@@ -330,44 +337,30 @@ void lxrc_change_root()
     fprintf(stderr, "starting rescue\n");
     mount(0, mp, 0, MS_REMOUNT, 0);
 
-    /* check if it's writable... */
-    strprintf(&buf, "%s/xxx", mp);
-    fd = open(buf, O_WRONLY|O_CREAT, 0644);
-    if(fd >= 0) {
-      close(fd);
-      unlink(buf);
+    for(s = dirs; *s; s++) {
+      strprintf(&buf, "%s/%s", mp, *s);
+      mkdir(buf, 0755);
+      fprintf(stderr, "mkdir %s\n", buf);
+      if(!strcmp(*s, "tmp")) chmod(buf, 01777);
     }
-    else {
-      /* ... no, it's not - make some directories rw */
-      strprintf(&buf, "%s/mnt", mp);
-      mount(mp, buf, "none", MS_BIND, 0);
 
-      strprintf(&buf, "%s/tmp", mp);
-      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
-      chmod(buf, 01777);
+    strprintf(&buf, "%s/lib/modules", mp);
+    mount("/lib/modules", buf, "none", MS_BIND, 0);
 
-      strprintf(&buf, "%s/var", mp);
-      strprintf(&sbuf, "%s/mnt/var", mp);
-      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
-      util_do_cp(sbuf, buf);
-      chmod(buf, 0755);
+    strprintf(&buf, "%s/mounts/initrd", mp);
+    mount("/", buf, "none", MS_BIND, 0);
 
-      strprintf(&buf, "%s/etc", mp);
-      strprintf(&sbuf, "%s/mnt/etc", mp);
-      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
-      util_do_cp(sbuf, buf);
-      chmod(buf, 0755);
-
+    for(sl = config.url.instsys_list; sl; sl = sl->next) {
+      argv[1] = sl->value;
+      argv[2] = mp;
+      util_lndir_main(3, argv);
+      strprintf(&buf, "%s%s", mp, sl->value);
+      mkdir(buf, 0755);
+      mount(sl->value, buf, "none", MS_BIND, 0);
       strprintf(&buf, "%s/dev", mp);
-      strprintf(&sbuf, "%s/mnt/dev", mp);
-      mount("tmpfs", buf, "tmpfs", 0, "size=0,nr_inodes=0");
-      util_do_cp(sbuf, buf);
-      util_do_cp("/dev", buf);
-      chmod(buf, 0755);
-
-      strprintf(&buf, "%s/mnt", mp);
-      umount(buf);
+      mount("/dev", buf, "none", MS_BIND, 0);
     }
+
     // config_rescue(mp);
   }
   else if(config.new_root) {
@@ -378,13 +371,14 @@ void lxrc_change_root()
 
   chdir(mp);
 
-  strprintf(&buf, "%s/lib/modules", mp);
-  if(config.rescue && util_check_exist(buf) == 'd') {
-    mount("/lib/modules", buf, "none", MS_BIND, 0);
-  }
-
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
+
+  if(config.rescue) {
+    system("/mounts/initrd/bin/prepare_rescue");
+
+    // system("PS1='\\w # ' /bin/bash 2>&1");
+  }
 
   execl("/sbin/init", "init", NULL);
 

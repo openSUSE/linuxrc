@@ -976,6 +976,7 @@ int add_instsys()
   char buf[256];
   int err = 0;
   char *argv[3] = { };
+  slist_t *sl;
 
   if(!config.url.instsys->mount) return 1;
 
@@ -985,8 +986,18 @@ int add_instsys()
 
   setenv("YAST_DEBUG", "/debug/yast.debug", 1);
 
-  sprintf(buf, "file:%s/.instsys.config", config.url.instsys->mount);
-  file_read_info_file(buf, kf_cfg);
+  if(!config.test) {
+    // fake mtab
+    system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
+
+    for(sl = config.url.instsys_list; sl; sl = sl->next) {
+      argv[1] = sl->value;
+      argv[2] = "/";
+      util_lndir_main(3, argv);
+    }
+  }
+
+  file_read_info_file("/.instsys.config", kf_cfg);
 
   file_write_install_inf("");
 
@@ -1042,15 +1053,6 @@ int add_instsys()
 
       if(!win) util_disp_done();
     }
-  }
-
-  if(!config.test) {
-    // fake mtab
-    system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
-
-    argv[1] = config.url.instsys->mount;
-    argv[2] = "/";
-    util_lndir_main(3, argv);
   }
 
   return err;
