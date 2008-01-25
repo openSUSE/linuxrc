@@ -270,6 +270,7 @@ static struct {
   { key_nisdomain,      "NISDomain",      kf_dhcp                        },
   { key_nomodprobe,     "nomodprobe",     kf_cfg + kf_cmd_early          },
   { key_device,         "Device",         kf_cfg + kf_cmd                },
+  { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1336,6 +1337,17 @@ void file_do_info(file_t *f0)
       case key_partition:
       case key_device:
         str_copy(&config.device, short_dev(*f->value ? f->value : NULL));
+        break;
+
+      case key_nomdns:
+        if(f->is.numeric && f->nvalue) {
+          FILE *w;
+
+          if((w = fopen("/etc/host.conf", "a"))) {
+            fprintf(w, "mdns off\n");
+            fclose(w);
+          }
+        }
         break;
 
       default:

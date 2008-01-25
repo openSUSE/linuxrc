@@ -1,3 +1,6 @@
+	- support root/rescue to be split into several separate images
+	- add 'nomdns' option to turn off MDNS usage (#349467)
+
 8/1/2008:	v3.1.0
 	- new install.inf entries: RepoURL & InstsysURL
 

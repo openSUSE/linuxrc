@@ -1617,8 +1617,10 @@ int url_find_repo(url_t *url, char *dir)
  */
 int url_find_instsys(url_t *url, char *dir)
 {
-  int err = 0;
-  char *file_name;
+  int opt, part, parts, ok, i;
+  char *file_name, *instsys_config, *s;
+  char *buf = NULL, *buf2 = NULL;
+  slist_t *sl;
 
   if(
     !url ||
@@ -1628,54 +1630,123 @@ int url_find_instsys(url_t *url, char *dir)
   ) return 1;
 
   if(config.download.instsys || config.rescue) url->download = 1;
+
+  // FIXME: needs rewrite!
+
+
+  instsys_config = url_instsys_config(url->path);
+
+  file_name = NULL;
+
   if(url->is.mountable) {
-    err = url_mount(url, dir, NULL);
+    if(util_check_exist2(url->mount, instsys_config)) {
+      strprintf(&file_name, "%s/%s", url->mount, instsys_config);
+    }
   }
   else {
-    err = url_read_file(url,
+    if(url_read_file(url,
       NULL,
-      NULL,
+      instsys_config,
       file_name = strdup(new_download()),
-      txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
-      URL_FLAG_PROGRESS + URL_FLAG_UNZIP
-    );
-
-    if(!err) err = util_mount_ro(file_name, dir);
-
-    if(!err) str_copy(&url->mount, dir);
-
-    free(file_name);
+      NULL,
+      URL_FLAG_NOSHA1
+    )) {
+      free(file_name);
+      file_name = NULL;
+    }
   }
 
-#if 0
-  if(!err && get_instsys2) {
-    url = config.url.instsys2;
-    dir = strdup(new_mountpoint());
+  url_parse_instsys_config(file_name);
 
-    if(url->is.mountable) {
-      err = url_mount(url, dir, NULL);
+  free(file_name);
+
+  url_build_instsys_list(config.url.instsys->path);
+
+  if(url->is.mountable) {
+    for(sl = config.url.instsys_list; sl; sl = sl->next) {
+      opt = *(s = sl->key) == '?' && s++;
+      if(!util_check_exist2(url->mount, s)) {
+        if(opt) {
+          fprintf(stderr, "instsys missing: %s (optional)\n", s);
+        }
+        else {
+          fprintf(stderr, "instsys missing: %s\n", s);
+
+          return 1;
+        }
+      }
+    }
+  }
+
+  for(parts = 0, sl = config.url.instsys_list; sl; sl = sl->next) parts++;
+
+  for(ok = 1, part = 1, sl = config.url.instsys_list; ok && sl; sl = sl->next, part++) {
+    opt = *(s = sl->key) == '?' && s++;
+
+    if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, s);
+
+    // sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
+    sl->value = strdup(new_mountpoint());
+
+    if(
+      url->is.mountable &&
+      (util_is_mountable(buf) || !util_check_exist(buf)) &&
+      !config.rescue &&
+      (!config.download.instsys || util_check_exist(buf) == 'd')
+    ) {
+      if(!util_check_exist(buf) && opt) {
+        fprintf(stderr, "mount %s -> %s failed (ignored)\n", buf, sl->value);
+      }
+      else {
+        fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+
+        i = util_mount_ro(buf, sl->value) ? 0 : 1;
+        ok &= i;
+        if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+      }
     }
     else {
-      err = url_read_file(url,
+      if(parts > 1) {
+        strprintf(&buf2, "%s, %s %d/%d",
+          txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
+          "part", part, parts
+        );
+      }
+      else {
+        str_copy(&buf2, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
+      }
+
+      if(!url_read_file(url,
         NULL,
-        NULL,
+        s,
         file_name = strdup(new_download()),
-        txt_get(TXT_LOADING_FONTS),
-        URL_FLAG_PROGRESS + URL_FLAG_UNZIP
-      );
+        buf2,
+        URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
+      )) {
+        fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
 
-      if(!err) err = util_mount_ro(file_name, dir);
-
-      if(!err) str_copy(&url->mount, dir);
+        i = util_mount_ro(file_name, sl->value) ? 0 : 1;
+        ok &= i;
+        if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+      }
+      else {
+        fprintf(stderr, "download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
+        if(!opt) ok = 0;
+      }
 
       free(file_name);
     }
-
-    free(dir);
   }
-#endif
 
-  return err;
+  if(ok) {
+    str_copy(&config.url.instsys->mount, config.mountpoint.instsys);
+    mkdir(config.url.instsys->mount, 0755);
+  }
+
+  str_copy(&buf, NULL);
+  str_copy(&buf2, NULL);
+
+  return ok ? 0 : 1;
 }
 
 
