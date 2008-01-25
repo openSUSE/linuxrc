@@ -1,3 +1,6 @@
+25/1/2008:	v2.0.72
+	- add 'nomdns' option to turn of MDNS usage (#349467)
+
 21/01/2008:	v2.0.71
 	- when doing a network install, check if the IP address of the machine
 	  to be installed is already in use by another machine (#302027).

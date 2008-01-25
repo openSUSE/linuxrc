@@ -272,7 +272,8 @@ static struct {
   { key_ibft_gateway,   "iSCSI_INITIATOR_GATEWAY",  kf_ibft              },
   { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              },
   { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                },
-  { key_bootif,         "BOOTIF",         kf_cmd                         }
+  { key_bootif,         "BOOTIF",         kf_cmd                         },
+  { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1469,6 +1470,17 @@ void file_do_info(file_t *f0)
           str_copy(&config.net.device, f->value + 3);
           for(s = config.net.device; *s; s++) if(*s == '-') *s = ':';
           config.net.device_given = 1;
+        }
+        break;
+
+      case key_nomdns:
+        if(f->is.numeric && f->nvalue) {
+          FILE *w;
+
+          if((w = fopen("/etc/host.conf", "a"))) {
+            fprintf(w, "mdns off\n");
+            fclose(w);
+          }
         }
         break;
 
