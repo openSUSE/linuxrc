@@ -319,9 +319,9 @@ void lxrc_change_root()
   slist_t *sl;
   char *argv[3] = { };
   char *dirs[] = {
-    "boot", "dev", "etc", "home", "lib", "lib/firmware", "lib/modules",
-    "media", "mounts", "mounts/initrd", "mnt", "proc", "sys", "tmp",
-    "usr", "usr/lib", "usr/lib/microcode", "var",
+    "bin", "boot", "etc", "home", "lib", "lib/firmware",
+    "media", "mounts", "mounts/initrd", "mnt", "proc", "sbin",
+    "sys", "tmp", "usr", "usr/lib", "usr/lib/microcode", "var",
     NULL
   };
 
@@ -335,8 +335,8 @@ void lxrc_change_root()
     (mp = config.url.instsys->mount)
   ) {
     fprintf(stderr, "starting rescue\n");
-    mount(0, mp, 0, MS_REMOUNT, 0);
 
+    // first, some directories
     for(s = dirs; *s; s++) {
       strprintf(&buf, "%s/%s", mp, *s);
       mkdir(buf, 0755);
@@ -344,21 +344,31 @@ void lxrc_change_root()
       if(!strcmp(*s, "tmp")) chmod(buf, 01777);
     }
 
+    // move module tree
     strprintf(&buf, "%s/lib/modules", mp);
-    mount("/lib/modules", buf, "none", MS_BIND, 0);
+    rename("/lib/modules", buf);
 
+    // add devices
+    strprintf(&buf, "%s/dev", mp);
+    rename("/dev", buf);
+
+    // keep initrd available
     strprintf(&buf, "%s/mounts/initrd", mp);
     mount("/", buf, "none", MS_BIND, 0);
 
+    // add rescue images
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
       argv[1] = sl->value;
       argv[2] = mp;
       util_lndir_main(3, argv);
+    }
+
+    // move image mountpoints
+    for(sl = config.url.instsys_list; sl; sl = sl->next) {
       strprintf(&buf, "%s%s", mp, sl->value);
       mkdir(buf, 0755);
       mount(sl->value, buf, "none", MS_BIND, 0);
-      strprintf(&buf, "%s/dev", mp);
-      mount("/dev", buf, "none", MS_BIND, 0);
+      umount(sl->value);
     }
 
     // config_rescue(mp);
@@ -378,6 +388,11 @@ void lxrc_change_root()
     system("/mounts/initrd/bin/prepare_rescue");
 
     // system("PS1='\\w # ' /bin/bash 2>&1");
+
+    if(!config.debug) {
+      umount("/mounts/initrd");
+      rmdir("/mounts/initrd");
+    }
   }
 
   execl("/sbin/init", "init", NULL);
@@ -769,7 +784,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2007 SUSE Linux Products GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2008 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
