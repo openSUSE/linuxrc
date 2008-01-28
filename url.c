@@ -30,6 +30,7 @@ known issues:
 #include "slp.h"
 #include "dialog.h"
 #include "display.h"
+#include "linuxrc.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -59,6 +60,7 @@ static void url_parse_instsys_config(char *file);
 static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
 static void url_build_instsys_list(char *instsys);
 static char *url_instsys_config(char *path);
+static char *url_instsys_base(char *path);
 
 
 void url_read(url_data_t *url_data)
@@ -1618,8 +1620,8 @@ int url_find_repo(url_t *url, char *dir)
 int url_find_instsys(url_t *url, char *dir)
 {
   int opt, part, parts, ok, i;
-  char *file_name, *instsys_config, *s;
-  char *buf = NULL, *buf2 = NULL;
+  char *s;
+  char *file_name = NULL, *buf = NULL, *buf2 = NULL, *url_path = NULL;
   slist_t *sl;
 
   if(
@@ -1631,38 +1633,38 @@ int url_find_instsys(url_t *url, char *dir)
 
   if(config.download.instsys || config.rescue) url->download = 1;
 
-  // FIXME: needs rewrite!
+  str_copy(&url_path, url->path);
 
+  str_copy(&url->path, url_instsys_base(url->path));
 
-  instsys_config = url_instsys_config(url->path);
-
-  file_name = NULL;
-
-  if(url->is.mountable) {
-    if(util_check_exist2(url->mount, instsys_config)) {
-      strprintf(&file_name, "%s/%s", url->mount, instsys_config);
-    }
-  }
-  else {
-    if(url_read_file(url,
+  if(
+    url_read_file(url,
       NULL,
-      instsys_config,
+      "/config",
       file_name = strdup(new_download()),
       NULL,
-      URL_FLAG_NOSHA1
-    )) {
-      free(file_name);
-      file_name = NULL;
+      URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED
+    )
+  ) {
+    // fprintf(stderr, "XXX %d %s\n", url->is.mountable, url->mount);
+    if(!(url->is.mountable && url->mount)) {
+      str_copy(&url->path, url_path);
     }
+
+    str_copy(&file_name, NULL);
   }
 
   url_parse_instsys_config(file_name);
 
-  free(file_name);
+  str_copy(&file_name, NULL);
 
-  url_build_instsys_list(config.url.instsys->path);
+  s = url_path + strlen(url->path);
+  if(*s == '/') s++;
+  url_build_instsys_list(s);
 
-  if(url->is.mountable) {
+  ok = 1;
+
+  if(url->is.mountable && url->mount) {
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
       opt = *(s = sl->key) == '?' && s++;
       if(!util_check_exist2(url->mount, s)) {
@@ -1671,70 +1673,75 @@ int url_find_instsys(url_t *url, char *dir)
         }
         else {
           fprintf(stderr, "instsys missing: %s\n", s);
+          ok = 0;
 
-          return 1;
+          break;
         }
       }
     }
   }
 
-  for(parts = 0, sl = config.url.instsys_list; sl; sl = sl->next) parts++;
+  LXRC_WAIT
 
-  for(ok = 1, part = 1, sl = config.url.instsys_list; ok && sl; sl = sl->next, part++) {
-    opt = *(s = sl->key) == '?' && s++;
+  if(ok) {
+    for(parts = 0, sl = config.url.instsys_list; sl; sl = sl->next) parts++;
 
-    if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, s);
+    for(part = 1, sl = config.url.instsys_list; ok && sl; sl = sl->next, part++) {
+      opt = *(s = sl->key) == '?' && s++;
 
-    // sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
-    sl->value = strdup(new_mountpoint());
+      if(url->is.mountable) strprintf(&buf, "%s/%s", url->mount, s);
 
-    if(
-      url->is.mountable &&
-      (util_is_mountable(buf) || !util_check_exist(buf)) &&
-      !config.rescue &&
-      (!config.download.instsys || util_check_exist(buf) == 'd')
-    ) {
-      if(!util_check_exist(buf) && opt) {
-        fprintf(stderr, "mount %s -> %s failed (ignored)\n", buf, sl->value);
+      // sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
+      sl->value = strdup(new_mountpoint());
+
+      if(
+        url->is.mountable &&
+        (util_is_mountable(buf) || !util_check_exist(buf)) &&
+        !config.rescue &&
+        (!config.download.instsys || util_check_exist(buf) == 'd')
+      ) {
+        if(!util_check_exist(buf) && opt) {
+          fprintf(stderr, "mount %s -> %s failed (ignored)\n", buf, sl->value);
+        }
+        else {
+          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+
+          i = util_mount_ro(buf, sl->value) ? 0 : 1;
+          ok &= i;
+          if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        }
       }
       else {
-        fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+        if(parts > 1) {
+          strprintf(&buf2, "%s, %s %d/%d",
+            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
+            "part", part, parts
+          );
+        }
+        else {
+          str_copy(&buf2, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
+        }
 
-        i = util_mount_ro(buf, sl->value) ? 0 : 1;
-        ok &= i;
-        if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
-      }
-    }
-    else {
-      if(parts > 1) {
-        strprintf(&buf2, "%s, %s %d/%d",
-          txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
-          "part", part, parts
-        );
-      }
-      else {
-        str_copy(&buf2, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
-      }
+        if(!url_read_file(url,
+          NULL,
+          s,
+          file_name = strdup(new_download()),
+          buf2,
+          URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
+        )) {
+          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
 
-      if(!url_read_file(url,
-        NULL,
-        s,
-        file_name = strdup(new_download()),
-        buf2,
-        URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
-      )) {
-        fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+          i = util_mount_ro(file_name, sl->value) ? 0 : 1;
+          ok &= i;
+          if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        }
+        else {
+          fprintf(stderr, "download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
+          if(!opt) ok = 0;
+        }
 
-        i = util_mount_ro(file_name, sl->value) ? 0 : 1;
-        ok &= i;
-        if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        str_copy(&file_name, NULL);
       }
-      else {
-        fprintf(stderr, "download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
-        if(!opt) ok = 0;
-      }
-
-      free(file_name);
     }
   }
 
@@ -1745,6 +1752,9 @@ int url_find_instsys(url_t *url, char *dir)
 
   str_copy(&buf, NULL);
   str_copy(&buf2, NULL);
+
+  str_copy(&url->path, NULL);
+  url->path = url_path;
 
   return ok ? 0 : 1;
 }
@@ -1931,9 +1941,9 @@ void url_parse_instsys_config(char *file)
   file_t *f0, *f;
   slist_t *sl;
 
-  if(!file) return;
-
   config.url.instsys_deps = slist_free(config.url.instsys_deps);
+
+  if(!file) return;
 
   f0 = file_read_file(file, kf_none);
   for(f = f0; f; f = f->next) {
@@ -2084,6 +2094,22 @@ char *url_instsys_config(char *path)
   strcpy(s ? s + 1 : config, "config");
 
   return config;
+}
+
+
+char *url_instsys_base(char *path)
+{
+  static char *base = NULL;
+  char *s;
+
+  if(!path) return NULL;
+
+  str_copy(&base, path);
+
+  s = strrchr(base, '/');
+  if(s) *s = 0;
+
+  return base;
 }
 
 

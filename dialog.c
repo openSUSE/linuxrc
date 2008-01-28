@@ -276,6 +276,7 @@ int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
 	  printf("2) %s\n", button1_txt);
 	  printf("\n> ");fflush(stdout);
 	  current_ii = dia_readnum();
+	  if(current_ii == -'x') dia_handle_ctrlc();
 	  if (current_ii < 0 || current_ii > 2)
 	    continue;
 	  return current_ii - 1;
