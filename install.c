@@ -930,8 +930,6 @@ int inst_start_install()
     if(inst_choose_source()) return 1;
   }
 
-  LXRC_WAIT
-
   if(config.rescue) {
     /* get rid of repo */
     url_umount(config.url.install);
@@ -1217,7 +1215,7 @@ int inst_execute_yast()
   sync();
   fprintf(stderr, " ok\n");
 
-  util_debugwait("going to read yast.inf");
+  LXRC_WAIT
 
   i = file_read_yast_inf();
   if(!err) err = i;

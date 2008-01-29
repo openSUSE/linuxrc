@@ -620,7 +620,11 @@ char *url_print(url_t *url, int format)
   static char *buf = NULL, *s;
   int q = 0;
 
+  // printf("start buf = %p\n", buf);
+  // LXRC_WAIT
+
   str_copy(&buf, NULL);
+
   if(!url) return buf;
 
   if(format != 3 || url->scheme != inst_rel) {
@@ -669,9 +673,14 @@ char *url_print(url_t *url, int format)
     }
   }
 
-  if(format == 3 && *buf == '/') buf++;
+  s = buf;
 
-  return buf;
+  if(format == 3 && *s == '/') s++;
+
+  // printf("end buf = %p\n", buf);
+  // LXRC_WAIT
+
+  return s;
 }
 
 
@@ -903,12 +912,12 @@ void url_umount(url_t *url)
 
   // FIXME: this is wrong!
 
-  if(!util_umount(url->mount)) {
+  if(url->mount && !util_umount(url->mount)) {
     if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->mount);
   }
   str_copy(&url->mount, NULL);
 
-  if(util_umount(url->tmp_mount)) {
+  if(url->tmp_mount && util_umount(url->tmp_mount)) {
     if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->tmp_mount);
   }
   str_copy(&url->tmp_mount, NULL);
@@ -1328,6 +1337,12 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     if((flags & URL_FLAG_PROGRESS)) url_data->progress = url_progress;
     str_copy(&url_data->label, label);
 
+#if 0
+    if(url_data->url->is.network) {
+      url_setup_device(url_data->url);
+    }
+#endif
+
     fprintf(stderr, "loading %s -> %s\n", url_print(url_data->url, 0), url_data->file_name);
 
     url_read(url_data);
@@ -1567,7 +1582,7 @@ int url_find_repo(url_t *url, char *dir)
           buf2,
           URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
         )) {
-          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+          fprintf(stderr, "mount %s -> %s\n", file_name, sl->value);
 
           i = util_mount_ro(file_name, sl->value) ? 0 : 1;
           ok &= i;
@@ -1681,8 +1696,6 @@ int url_find_instsys(url_t *url, char *dir)
     }
   }
 
-  LXRC_WAIT
-
   if(ok) {
     for(parts = 0, sl = config.url.instsys_list; sl; sl = sl->next) parts++;
 
@@ -1724,12 +1737,12 @@ int url_find_instsys(url_t *url, char *dir)
 
         if(!url_read_file(url,
           NULL,
-          s,
+          *s ? s : NULL,
           file_name = strdup(new_download()),
           buf2,
           URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
         )) {
-          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+          fprintf(stderr, "mount %s -> %s\n", file_name, sl->value);
 
           i = util_mount_ro(file_name, sl->value) ? 0 : 1;
           ok &= i;
@@ -1772,11 +1785,15 @@ int url_setup_device(url_t *url)
   int ok = 0;
   char *type;
 
+  // fprintf(stderr, "*** url_setup_device(%s)\n", url_print(url, 0));
+
   if(!url) return 0;
 
   if(url->scheme == inst_file) return 1;
 
   if(!url->used.device) return 0;
+
+  // fprintf(stderr, "*** url_setup_device(dev = %s)\n", url->used.device);
 
   if(!url->is.network) {
     /* load fs module if necessary */
@@ -1816,6 +1833,8 @@ int url_setup_interface(url_t *url)
   char *s;
   url_t *tmp_url;
 
+  // fprintf(stderr, "*** url_setup_interface(dev = %s)\n", url->used.device);
+
   /* setup interface */
 
   if(
@@ -1823,6 +1842,8 @@ int url_setup_interface(url_t *url)
     config.net.device &&
     !strcmp(url->used.device, config.net.device)
   ) {
+    // fprintf(stderr, "*** url_setup_interface(dev = %s): already up\n", url->used.device);
+
     return 1;
   }
 

@@ -108,7 +108,6 @@ int util_update_disk_list(char *module, int add);
 void util_update_cdrom_list(void);
 void util_update_swap_list(void);
 int util_is_mountable(char *file);
-void util_debugwait(char *msg);
 void util_set_serial_console(char *str);
 void util_set_stderr(char *name);
 void util_set_product_dir(char *prod);

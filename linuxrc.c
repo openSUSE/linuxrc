@@ -210,7 +210,7 @@ int main(int argc, char **argv, char **env)
         util_start_shell("/dev/tty9", "/bin/lsh", 1);
         config.shell_started = 1;
       }
-      deb_wait;
+      LXRC_WAIT
     }
   }
 
@@ -403,7 +403,7 @@ void lxrc_change_root()
   umount(mp);
   fprintf(stderr, "system start failed\n");
 
-  deb_wait;
+  LXRC_WAIT
 }
 
 
@@ -465,11 +465,12 @@ void lxrc_end()
   FILE *f;
 
   if(config.netstop) {
-    util_debugwait("shut down network");
+    LXRC_WAIT
+
     net_stop();
   }
 
-  util_debugwait("kill remaining procs");
+  LXRC_WAIT
 
   lxrc_killall(1);
 
@@ -485,9 +486,7 @@ void lxrc_end()
   lxrc_set_modprobe("/sbin/modprobe");
   lxrc_set_bdflush(40);
 
-  deb_str(config.new_root);
-
-  util_debugwait("leaving now");
+  LXRC_WAIT
 
   if(!config.test) {
     if(config.new_root) {

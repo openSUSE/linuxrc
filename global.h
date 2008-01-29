@@ -61,21 +61,7 @@ extern char *hd_join(char *del, str_list_t *str);
 #define BUTTON_SIZE_LARGE	10
 #define STATUS_SIZE		50
 
-#define  LXRC_DEBUG
-
-#define LXRC_WAIT if(config.debugwait) if(printf("?"), getchar() == 'q') { util_umount_all(); util_clear_downloads(); lxrc_end(); exit(0); }
-
-#ifdef LXRC_DEBUG
-# define deb_wait if(config.debugwait) printf("%s:%d: Press a key...\n", __func__, __LINE__), getchar()
-# define deb_msg(a) fprintf(stderr, "%s:%u %s\n", __func__, __LINE__, a)
-# define deb_str(a) fprintf(stderr, "%s:%u " #a " = \"%s\"\n", __func__, __LINE__, a)
-# define deb_int(a) fprintf(stderr, "%s:%u " #a " = %d\n", __func__, __LINE__, a)
-#else
-# define deb_wait
-# define deb_msg(a)
-# define deb_str(a)
-# define deb_int(a)
-#endif
+#define LXRC_WAIT if(config.debugwait) if(printf(__FILE__ "(%d) ?", __LINE__), getchar() == 'q') { util_umount_all(); util_clear_downloads(); lxrc_end(); exit(0); }
 
 #define RAMDISK_2  "/dev/ram2"
 

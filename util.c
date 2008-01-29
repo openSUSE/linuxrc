@@ -3391,18 +3391,6 @@ int util_is_mountable(char *file)
 }
 
 
-void util_debugwait(char *msg)
-{
-#ifdef LXRC_DEBUG
-  if(config.debugwait) {
-    int win_old;
-    if(!(win_old = config.win)) util_disp_init();
-    dia_message(msg ?: "hi", MSGTYPE_INFO);
-    if(!win_old) util_disp_done();
-  }
-#endif
-}
-
 void util_set_serial_console(char *str)
 {
   slist_t *sl;
@@ -3732,8 +3720,11 @@ int make_links(char *src, char *dst)
           if((err = make_links(src2, dst2))) continue;
         }
         else if(!is_there(dst2)) {
-          if(symlink(src2, dst2)) {
-            perror(src2);
+          unlink(dst2);
+          s = src2;
+          if(is_link(src2)) s = read_symlink(src2);
+          if(symlink(s, dst2)) {
+            perror(s);
             err = 7;
             continue;
           }
