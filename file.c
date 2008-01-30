@@ -988,7 +988,15 @@ void file_do_info(file_t *f0)
         break;
 
       case key_lxrcdebug:
-        if(f->is.numeric) config.debug = f->nvalue;
+        sl0 = slist_split(',', f->value);
+        for(sl = sl0; sl; sl = sl->next) {
+          if(*sl->key) {
+            u = strtoul(sl->key, &t, 0);
+            if(!*t) config.debug = u;
+          }
+          if(!strcmp(sl->key, "wait")) config.debugwait = 1;
+        }
+        slist_free(sl0);
         break;
 
       case key_linuxrc:
@@ -1079,7 +1087,7 @@ void file_do_info(file_t *f0)
             }
           }
 
-          slist_free(sl);
+          slist_free(sl0);
         }
         if(!config.net.setup) config.net.do_setup = 0;
         break;

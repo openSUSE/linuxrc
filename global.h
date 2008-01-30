@@ -61,7 +61,7 @@ extern char *hd_join(char *del, str_list_t *str);
 #define BUTTON_SIZE_LARGE	10
 #define STATUS_SIZE		50
 
-#define LXRC_WAIT if(config.debugwait) if(printf(__FILE__ "(%d) ?", __LINE__), getchar() == 'q') { util_umount_all(); util_clear_downloads(); lxrc_end(); exit(0); }
+#define LXRC_WAIT util_wait(__FILE__, __LINE__);
 
 #define RAMDISK_2  "/dev/ram2"
 

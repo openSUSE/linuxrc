@@ -1,5 +1,8 @@
+30/1/2008:	v3.1.1
 	- support root/rescue to be split into several separate images
 	- add 'nomdns' option to turn off MDNS usage (#349467)
+	- linuxrc.debug accepts 'wait'
+	- fixed segfault when restating installation
 
 8/1/2008:	v3.1.0
 	- new install.inf entries: RepoURL & InstsysURL

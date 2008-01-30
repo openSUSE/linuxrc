@@ -67,6 +67,7 @@
 #include "scsi_rename.h"
 #include "utf8.h"
 #include "url.h"
+#include "linuxrc.h"
 
 #define LED_TIME     50000
 
@@ -4397,4 +4398,41 @@ void util_clear_downloads()
   str_copy(&buf, NULL);
 }
 
+
+void util_wait(const char *file, int line)
+{
+  if(!config.debugwait) return;
+
+  printf("%s(%d) ?", file, line);
+
+  switch(getchar()) {
+    case 'q':
+      util_umount_all();
+      util_clear_downloads();
+      config.debugwait = 0;
+      lxrc_end();
+      exit(0);
+      break;
+
+    case 's':
+      kbd_end(0);
+      if(config.win) disp_cursor_on();
+      if(!config.linemode) {
+        printf("\033c");
+        if(config.utf8) printf("\033%%G");
+        fflush(stdout);
+      }
+
+      system("PS1='\\w # ' /bin/bash 2>&1");
+
+      kbd_init(0);
+      if(config.win) {
+        disp_cursor_off();
+        if(!config.linemode) disp_restore_screen();
+      }
+
+    default:
+      break;
+  }
+}
 

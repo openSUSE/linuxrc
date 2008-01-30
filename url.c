@@ -30,7 +30,6 @@ known issues:
 #include "slp.h"
 #include "dialog.h"
 #include "display.h"
-#include "linuxrc.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -1509,7 +1508,7 @@ int url_find_repo(url_t *url, char *dir)
         instsys_config,
         file_name = strdup(new_download()),
         NULL,
-        URL_FLAG_NOSHA1
+        0
       )) {
         free(file_name);
         file_name = NULL;
@@ -1566,9 +1565,8 @@ int url_find_repo(url_t *url, char *dir)
       }
       else {
         if(parts > 1) {
-          strprintf(&buf2, "%s, %s %d/%d",
-            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
-            "part", part, parts
+          strprintf(&buf2, "%s (%d/%d)",
+            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS), part, parts
           );
         }
         else {
@@ -1658,7 +1656,7 @@ int url_find_instsys(url_t *url, char *dir)
       "/config",
       file_name = strdup(new_download()),
       NULL,
-      URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED
+      URL_FLAG_KEEP_MOUNTED
     )
   ) {
     // fprintf(stderr, "XXX %d %s\n", url->is.mountable, url->mount);
@@ -1726,9 +1724,8 @@ int url_find_instsys(url_t *url, char *dir)
       }
       else {
         if(parts > 1) {
-          strprintf(&buf2, "%s, %s %d/%d",
-            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS),
-            "part", part, parts
+          strprintf(&buf2, "%s (%d/%d)",
+            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS), part, parts
           );
         }
         else {
