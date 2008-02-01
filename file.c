@@ -271,6 +271,8 @@ static struct {
   { key_nomodprobe,     "nomodprobe",     kf_cfg + kf_cmd_early          },
   { key_device,         "Device",         kf_cfg + kf_cmd                },
   { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
+  { key_yepurl,         "yepurl",         kf_cfg + kf_cmd                },
+  { key_yepcert,        "yepcert",        kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1358,6 +1360,14 @@ void file_do_info(file_t *f0)
         }
         break;
 
+      case key_yepurl:
+        str_copy(&config.yepurl, f->value);
+        break;
+
+      case key_yepcert:
+        str_copy(&config.yepcert, f->value);
+        break;
+
       default:
         break;
     }
@@ -1704,6 +1714,9 @@ void file_write_modparms(FILE *f)
       }
     }
   }
+
+  file_write_str(f, key_yepurl, config.yepurl);
+  file_write_str(f, key_yepcert, config.yepcert);
 
   file_free_file(ft0);
 
