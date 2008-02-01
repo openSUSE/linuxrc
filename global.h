@@ -323,6 +323,8 @@ typedef struct {
     unsigned add_cmdline:1;	/* parse cmdline, too */
   } info;
   char *autoyast;		/* yast autoinstall parameter */
+  char *yepurl;			/* just pass it to yast */
+  char *yepcert;		/* just pass it to yast */
   slist_t *linuxrc;		/* 'linuxrc' parameters */
   char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */

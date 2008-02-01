@@ -1,3 +1,6 @@
+1/2/2008:	v2.0.73
+	- pass 'yepurl'&  'yepcert' options to yast (fate #303335)
+
 25/1/2008:	v2.0.72
 	- add 'nomdns' option to turn of MDNS usage (#349467)
 

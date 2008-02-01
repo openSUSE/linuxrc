@@ -273,7 +273,9 @@ static struct {
   { key_ibft_dns,       "iSCSI_INITIATOR_DNSADDR1", kf_ibft              },
   { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                },
   { key_bootif,         "BOOTIF",         kf_cmd                         },
-  { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                }
+  { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
+  { key_yepurl,         "yepurl",         kf_cfg + kf_cmd                },
+  { key_yepcert,        "yepcert",        kf_cfg + kf_cmd                }
 };
 
 static struct {
@@ -1484,6 +1486,14 @@ void file_do_info(file_t *f0)
         }
         break;
 
+      case key_yepurl:
+        str_copy(&config.yepurl, f->value);
+        break;
+
+      case key_yepcert:
+        str_copy(&config.yepcert, f->value);
+        break;
+
       default:
         break;
     }
@@ -1820,6 +1830,9 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_startshell, config.startshell);
 
   file_write_str(f, key_term, config.term ?: config.serial ? "screen" : "linux");
+
+  file_write_str(f, key_yepurl, config.yepurl);
+  file_write_str(f, key_yepcert, config.yepcert);
 
   file_free_file(ft0);
 
