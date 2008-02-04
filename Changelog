@@ -1,3 +1,6 @@
+4/2/2008.	v3.1.5
+	- mediacheck: only if we install from cd
+
 4/2/2008:	v3.1.4
 	- when parameter "mediacheck" is set to 1, perform check of the installation
 	  media (fate #302993). When problems are found, fall into manual mode.

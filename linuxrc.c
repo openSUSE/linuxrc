@@ -227,8 +227,17 @@ int main(int argc, char **argv, char **env)
     if(!win_old) util_disp_done();
   }
 
-  if(config.mediacheck)
+  if(
+    config.mediacheck &&
+    config.url.install &&
+    config.url.install->is.cdrom
+  ) {
+    int win_old;
+
+    if(!(win_old = config.win)) util_disp_init();
     md5_verify();
+    if(!win_old) util_disp_done();
+  }
 
   if(!config.manual) {
     if(config.rescue && !config.serial) {
