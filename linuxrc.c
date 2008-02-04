@@ -2,7 +2,7 @@
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
  *
- * Copyright (c) 1996-2004  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
  *
  */
 
@@ -226,6 +226,9 @@ int main(int argc, char **argv, char **env)
     dia_input2(txt_get(TXT_ROOT_PASSWORD), &config.rootpassword, 20, 1);
     if(!win_old) util_disp_done();
   }
+
+  if(config.mediacheck)
+    md5_verify();
 
   if(!config.manual) {
     if(config.rescue && !config.serial) {

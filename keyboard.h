@@ -2,7 +2,7 @@
  *
  * keyboard.h    Header file for keyboard.c
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
@@ -65,4 +65,5 @@ extern int   kbd_getch        (int wait_iv);
 extern void  kbd_clear_buffer (void);
 extern void  kbd_switch_tty   (int tty_iv);
 extern void  kbd_echo_off     (void);
+extern int   kbd_getch_old    (int);
 void kbd_unimode(void);

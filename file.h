@@ -47,7 +47,7 @@ typedef enum {
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
   key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g,
   key_sha1, key_insecure, key_kexec, key_nisdomain, key_nomodprobe, key_device,
-  key_nomdns, key_yepurl, key_yepcert
+  key_nomdns, key_yepurl, key_yepcert, key_mediacheck
 } file_key_t;
 
 typedef enum {

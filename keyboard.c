@@ -2,7 +2,7 @@
  *
  * keyboard.c    Keyboard handling
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
@@ -368,6 +368,70 @@ void kbd_echo_off (void)
 	tios = kbd_tio_rm;
 	tios.c_lflag &= ~ECHO;
 	tcsetattr (config.kbd_fd, TCSAFLUSH, &tios);
+    }
+
+int kbd_getch_old (int wait_iv)
+    {
+#define KBD_ESC_DELAY     25000
+#define KEY_FUNC         0x0800
+    char  keypress_ci;
+    char  tmp_ci;
+    int   i_ii;
+
+
+    keypress_ci = 0;
+    do
+        {
+        kbd_set_timeout (KBD_TIMEOUT);
+        read (config.kbd_fd, &keypress_ci, 1);
+        kbd_del_timeout ();
+        }
+    while (!keypress_ci && wait_iv);
+
+    if (!keypress_ci)
+        return (0);
+
+    if (keypress_ci != KEY_ESC)
+        return ((int) keypress_ci);
+
+    kbd_set_timeout (KBD_ESC_DELAY);
+
+    read (config.kbd_fd, &keypress_ci, 1);
+    if (kbd_timeout_im)
+        return ((int) KEY_ESC);
+    else
+        kbd_del_timeout ();
+
+    if (keypress_ci != 91)
+        return (0);
+
+    read (config.kbd_fd, &keypress_ci, 1);
+    if (keypress_ci == (KEY_UP    & 0xff)  ||
+        keypress_ci == (KEY_DOWN  & 0xff)  ||
+        keypress_ci == (KEY_RIGHT & 0xff)  ||
+        keypress_ci == (KEY_LEFT  & 0xff))
+        return (((int) keypress_ci) | KEY_SPECIAL);
+    
+    i_ii = 0;
+    kbd_set_timeout (KBD_ESC_DELAY);
+
+    do
+        {
+        tmp_ci = keypress_ci;
+        read (config.kbd_fd, &keypress_ci, 1);
+        i_ii++;
+        }
+    while (!kbd_timeout_im && keypress_ci != 126);
+
+    kbd_del_timeout ();
+
+    if (keypress_ci != 126)
+        return (0);
+
+    if (i_ii == 2)
+        return (((int) tmp_ci) | KEY_SPECIAL | KEY_FUNC);
+    else
+        return (((int) tmp_ci) | KEY_SPECIAL);
     }
 
 

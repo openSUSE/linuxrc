@@ -11,6 +11,7 @@
 #include "dialog.h"
 #include "util.h"
 #include "md5.h"
+#include "keyboard.h"
 
 static void do_md5(char *file);
 static void get_info(char *file);
@@ -64,6 +65,7 @@ void md5_verify()
 
   if(iso.err) {
     dia_message(txt_get(TXT_NO_CD_DVD), MSGTYPE_ERROR);
+    config.manual=1;
     return;
   }
 
@@ -83,6 +85,7 @@ void md5_verify()
   if(!*iso.app_id || !iso.got_old_md5 || iso.pad >= iso.size) {
     sprintf(buf, txt_get(TXT_WRONG_CD), config.product);
     dia_message(buf, MSGTYPE_ERROR);
+    config.manual=1;
     return;
   }
 
@@ -123,6 +126,7 @@ void md5_verify()
     }
     sprintf(buf + strlen(buf), txt_get(TXT_CD_BROKEN), *iso.media_type == 'C' ? "CD-ROM" : iso.media_type);
     dia_message(buf, MSGTYPE_ERROR);
+    config.manual=1;
   }
 
 }
@@ -172,6 +176,18 @@ void do_md5(char *file)
     md5_process_block(buffer, sizeof buffer, &ctx);
 
     update_progress((chunk + 1) * (sizeof buffer >> 10));
+
+    if (kbd_getch_old (FALSE) == KEY_ESC) {
+       md5_finish_ctx(&ctx, iso.md5);
+       md5_finish_ctx(&full_ctx, iso.full_md5);
+       dia_status_off(&win);
+       iso.got_md5 = 0;
+       iso.got_old_md5 = 0;
+       iso.md5_ok = 0;
+       iso.err_ofs = 0;
+       close(fd);
+       return;
+    }
   }
 
   if(!err && last_size) {

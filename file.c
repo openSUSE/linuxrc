@@ -274,6 +274,7 @@ static struct {
   { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
   { key_yepurl,         "yepurl",         kf_cfg + kf_cmd                },
   { key_yepcert,        "yepcert",        kf_cfg + kf_cmd                },
+  { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1262,6 +1263,10 @@ void file_do_info(file_t *f0)
 
       case key_zombies:
         if(f->is.numeric) config.zombies = f->nvalue;
+        break;
+
+      case key_mediacheck:
+        if(f->is.numeric) config.mediacheck = f->nvalue;
         break;
 
       case key_forceip:
