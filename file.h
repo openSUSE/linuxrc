@@ -41,7 +41,7 @@ typedef enum {
   key_port, key_smbshare, key_rootimage2, key_instsys_id,
   key_initrd_id, key_instsys_complain, key_osamedium,
   key_osainterface, key_dud_complain, key_dud_expected, key_staticdevices,
-  key_withiscsi, key_ethtool, key_listen, key_zombies, key_dhcpcd,
+  key_withiscsi, key_ethtool, key_listen, key_zombies, key_dhcpcd, key_forceip,
   key_layer2, key_wlan_essid, key_wlan_auth, key_wlan_key_ascii,
   key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname,
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,

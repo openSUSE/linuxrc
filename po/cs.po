@@ -1169,3 +1169,8 @@ msgstr ""
 "Kontrolní součet repozitáře nebyl úspěšný.\n"
 "\n"
 "Pokud repozitáři skutečně důvěřujete, můžete pokračovat v nezabezpečeném režimu."
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

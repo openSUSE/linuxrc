@@ -1166,3 +1166,8 @@ msgstr ""
 "Helaas, installatiebron kwam niet door de controlesomtest.\n"
 "\n"
 "Als u deze bron echt vertrouwd, dan kunt u doorgaan in een onveilige modus."
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

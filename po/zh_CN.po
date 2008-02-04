@@ -1165,3 +1165,8 @@ msgstr ""
 "抱歉，安装源完整性测试失败。\n"
 "\n"
 "如果您确信您的安装源可靠，可以在不安全模式下继续。"
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

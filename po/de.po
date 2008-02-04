@@ -1170,3 +1170,8 @@ msgstr ""
 "Leider ist der Prüfsummentest der Installationsquelle Fehlgeschlagen.\n"
 "\n"
 "Falls Sie der Installationsquelle wirklich vertrauen, können Sie in einem unsicheren Modus fortfahren."
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+

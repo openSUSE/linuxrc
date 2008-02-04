@@ -314,6 +314,7 @@ typedef struct {
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
   unsigned zombies:1;		/* keep zombies around */
+  unsigned forceip:1;		/* do not check for duplicate IP address */
   unsigned installfilesread:1;	/* already got install files */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */

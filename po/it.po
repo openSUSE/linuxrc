@@ -1163,3 +1163,8 @@ msgstr ""
 "Spiacente, la verifica del checksum della sorgente di installazione è falliton.\n"
 "\n"
 "Se si è sicuri dell'affidabilità della sorgente di installazione, è possibile continuare in modalità non sicura."
+#. TXT_IP_ADDRESS_IN_USE
+#, c-format
+msgid "IP address %s is already in use by another machine!"
+msgstr ""
+
