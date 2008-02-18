@@ -1393,6 +1393,10 @@ void file_do_info(file_t *f0)
 
       case key_withiscsi:
         if(f->is.numeric) config.withiscsi = f->nvalue;
+        if(config.withiscsi && !config.net.do_setup) {
+          config.net.do_setup |= DS_SETUP;
+          config.net.setup = NS_DEFAULT;
+        }
         break;
 
       case key_startshell:
