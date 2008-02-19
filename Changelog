@@ -1,3 +1,6 @@
+18/2/2008:	v3.1.6
+	- fix segfault when selecting an unknown language (#360867)
+
 4/2/2008:	v3.1.5
 	- mediacheck: only if we install from cd
 

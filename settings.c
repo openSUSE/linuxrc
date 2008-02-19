@@ -315,6 +315,7 @@ enum langid_t set_langidbyname(char *name)
   for(i = 0; i < NR_LANGUAGES; i++) {
     if(set_languages_arm[i].id == lang_dummy) {
       str_copy(&set_languages_arm[i].locale, name);
+      str_copy(&set_languages_arm[i].trans_id, name);
       return lang_dummy;
     }
   }
