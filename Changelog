@@ -1,3 +1,6 @@
+25/2/2008:	v3.1.7
+	- unmount all discs in case YaST could not do it itself (fate #302647)
+
 18/2/2008:	v3.1.6
 	- fix segfault when selecting an unknown language (#360867)
 

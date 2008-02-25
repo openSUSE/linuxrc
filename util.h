@@ -2,7 +2,7 @@
  *
  * util.h        Header file for util.c
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
@@ -71,6 +71,7 @@ extern int  util_fstype_main       (int argc, char **argv);
 extern void util_start_shell       (char *tty, char *shell, int flags);
 extern char *util_process_name     (pid_t pid);
 extern char *util_process_cmdline  (pid_t pid);
+extern void util_umount_all_devices (void);
 
 slist_t *slist_new(void);
 slist_t *slist_free(slist_t *sl);

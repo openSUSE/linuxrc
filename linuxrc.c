@@ -512,6 +512,8 @@ void lxrc_end()
     util_umount("/dev/pts");
     util_umount("/sys");
     util_umount("/proc/bus/usb");
+    if (!config.rescue)
+        util_umount_all_devices ();
     util_umount("/proc");
   }
 

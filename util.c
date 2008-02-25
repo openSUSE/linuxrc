@@ -2,7 +2,7 @@
  *
  * util.c        Utility functions for linuxrc
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG (mantel@suse.de)
  *
  */
 
@@ -4436,3 +4436,47 @@ void util_wait(const char *file, int line)
   }
 }
 
+void util_umount_all_devices ()
+    {
+    FILE *fd;
+    char buffer [1000];
+    char dir [1000];
+    char *dirs [1000];
+    int  nr_dirs = 0;
+    int  i, j;
+
+    fd = fopen ("/proc/mounts", "r");
+    if (fd)
+        {
+        while (fgets (buffer, sizeof (buffer), fd))
+            if (!strncmp (buffer, "/dev/", 5))
+                {
+                i = j = 0;
+                while (buffer [i] != ' ') i++;
+                i++;
+                while (buffer [i] != ' ') dir [j++] = buffer [i++];
+                dir [j] = 0;
+                dirs [nr_dirs++] = strdup (dir);
+                }
+
+        fprintf (stderr, "Trying to unmount %d directories:\n", --nr_dirs);
+
+        /* we need to unmount in reverse order */
+
+        do
+            {
+            if (dirs [nr_dirs])
+                {
+                if (dirs [nr_dirs][1])
+		    {
+		    fprintf (stderr, "Unmounting %s...\n", dirs [nr_dirs]);
+		    umount (dirs [nr_dirs]);
+		    }
+		free (dirs [nr_dirs]);
+                }
+            }
+        while (nr_dirs--);
+       
+        (void) fclose (fd);
+        }
+    }
