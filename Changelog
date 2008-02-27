@@ -1,3 +1,6 @@
+27/2/2008:	v3.1.8
+	- support Y2GDB option (fate #302346)
+
 25/2/2008:	v3.1.7
 	- unmount all discs in case YaST could not do it itself (fate #302647)
 

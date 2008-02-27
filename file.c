@@ -275,6 +275,7 @@ static struct {
   { key_yepurl,         "yepurl",         kf_cfg + kf_cmd                },
   { key_yepcert,        "yepcert",        kf_cfg + kf_cmd                },
   { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd                },
+  { key_y2gdb,          "Y2GDB",          kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1378,6 +1379,10 @@ void file_do_info(file_t *f0)
         str_copy(&config.yepcert, f->value);
         break;
 
+      case key_y2gdb:
+        if(f->is.numeric) config.y2gdb = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1675,6 +1680,7 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_instsys_id, config.instsys_id);
   file_write_num(f, key_withiscsi, config.withiscsi);
   file_write_num(f, key_startshell, config.startshell);
+  file_write_num(f, key_y2gdb, config.y2gdb);
 
   if(
     config.rootpassword &&
