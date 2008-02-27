@@ -1,3 +1,6 @@
+27/2/2008:	v2.0.75
+	- yep is now smt
+
 18/2/2008:	v2.0.74
 	- withiscsi=1 now implies netsetup=1 (#271420, #360575)
 
