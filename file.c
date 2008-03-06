@@ -1838,6 +1838,8 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_yepurl, config.yepurl);
   file_write_str(f, key_yepcert, config.yepcert);
 
+  if(config.net.ifup_wait) fprintf(f, "ConnectWait: %d\n", config.net.ifup_wait);
+
   file_free_file(ft0);
 
   fclose(f);
