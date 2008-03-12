@@ -1162,14 +1162,32 @@ void file_do_info(file_t *f0)
         if(*f->value) str_copy(&config.rootimage2, f->value);
         break;
 
+      case key_none:
+        /* assume kernel module option if it can be parsed as 'module.option' */
+
+        s = strchr(f->unparsed, '.');
+        t = strchr(f->unparsed, ' ');
+        if(!s || (t && t < s)) break;	/* no spaces in module name */
+        str_copy(&f->value, f->unparsed);
+
+        /* continue with key_options */
+
       case key_options:
         if(*f->value) {
-          if((s = strchr(f->value, '='))) {
-            *s++ = 0;
+	  /* allow both module.param and module=param */
+	  s = f->value;
+	  strsep(&s, ".=");
+          if(s) {
             if(config.debug >= 2) fprintf(stderr, "options[%s] = \"%s\"\n", f->value, s);
-            sl = slist_add(&config.module.options, slist_new());
-            sl->key = strdup(f->value);
-            sl->value = strdup(s);
+	    sl = slist_getentry(config.module.options, f->value);
+	    if(!sl) {
+	      sl = slist_add(&config.module.options, slist_new());
+	      sl->key = strdup(f->value);
+	      sl->value = strdup(s);
+	    }
+	    else {
+	      strprintf(&sl->value, "%s %s", sl->value, s);
+	    }
           }
         }
         break;

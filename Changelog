@@ -1,4 +1,6 @@
+12/3/2008:	v3.1.9
 	- yep is now smt
+	- Tejun: allow module options to be passed simply as 'module.option'
 
 27/2/2008:	v3.1.8
 	- support Y2GDB option (fate #302346)
