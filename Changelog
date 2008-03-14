@@ -1,3 +1,8 @@
+14/3/2008:	v3.1.10
+	- fix segfault introduced recently (bnc #370849)
+	- better kexec support (with splash)
+	- reworked module option code to work properly
+
 12/3/2008:	v3.1.9
 	- yep is now smt
 	- Tejun: allow module options to be passed simply as 'module.option'

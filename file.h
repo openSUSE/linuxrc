@@ -93,7 +93,7 @@ module_t *file_read_modinfo(char *name);
 int file_sym2num(char *sym);
 char *file_num2sym(char *base_sym, int num);
 file_t *file_parse_buffer(char *buf, file_key_flag_t flags);
-void file_do_info(file_t *f0);
+void file_do_info(file_t *f0, file_key_flag_t flags);
 void get_ide_options(void);
 slist_t *file_parse_xmllike(char *name, char *tag);
 

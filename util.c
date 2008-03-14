@@ -1453,6 +1453,15 @@ void util_status_info()
     }
   }
 
+  if(config.module.options) {
+    strcpy(buf, "module options:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.module.options; sl; sl = sl->next) {
+      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
 
   slist_free(sl0);

@@ -378,6 +378,8 @@ typedef struct {
   char *kexec_initrd;		/* initrd image for kexec */
   char *device;			/* local device to use */
   char *netdevice;		/* network interface to use */
+  char *vga;			/* vga option */
+  int vga_mode;			/* vga mode number */
 
   struct {
     char *instsys_default;	/* default instsys url */

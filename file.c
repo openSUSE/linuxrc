@@ -115,7 +115,7 @@ static struct {
   { key_password,       "Password",       kf_cfg + kf_cmd                },
   { key_workdomain,     "WorkDomain",     kf_cfg + kf_cmd                },
   { key_alias,          "Alias",          kf_none                        },
-  { key_options,        "Options",        kf_cfg + kf_cmd + kf_cmd_early },
+  { key_options,        "Options",        kf_cfg + kf_cmd_early          },
   { key_initrdmodules,  "InitrdModules",  kf_cfg + kf_cmd                },
   { key_locale,         "Locale",         kf_none                        },
   { key_font,           "Font",           kf_none                        },
@@ -201,7 +201,7 @@ static struct {
   { key_updateask,      "DriverUpdate",   kf_cfg + kf_cmd                },
   { key_updateask,      "DUD",            kf_cfg + kf_cmd                },
   { key_initrd,         "Initrd",         kf_boot                        },
-  { key_vga,            "VGA",            kf_none                        },
+  { key_vga,            "VGA",            kf_cmd_early                   },
   { key_bootimage,      "BOOTIMAGE",      kf_boot                        },
   { key_ramdisksize,    "ramdisksize",    kf_boot                        },
   { key_suse,           "SuSE",           kf_boot                        },
@@ -560,7 +560,7 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
   file_dump_flist(f0);
 #endif
 
-  file_do_info(f0);
+  file_do_info(f0, flags);
 
   file_free_file(f0);
 
@@ -568,11 +568,11 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
 }
 
 
-void file_do_info(file_t *f0)
+void file_do_info(file_t *f0, file_key_flag_t flags)
 {
   file_t *f;
   int i, is_xml = 0;
-  char buf[256], *s, *t;
+  char buf[256], *s, *t, *s1;
   slist_t *sl, *sl0;
   unsigned u;
   FILE *w;
@@ -1165,10 +1165,21 @@ void file_do_info(file_t *f0)
       case key_none:
         /* assume kernel module option if it can be parsed as 'module.option' */
 
-        s = strchr(f->unparsed, '.');
-        t = strchr(f->unparsed, ' ');
-        if(!s || (t && t < s)) break;	/* no spaces in module name */
-        str_copy(&f->value, f->unparsed);
+        /* Note: f->unparsed is only set when we read from cmdline/argv *NOT* from files. */
+        if((flags & kf_cmd_early) && (s1 = f->unparsed)) {
+          i = strlen(f->unparsed);
+          if(s1[0] == '"' && s1[i - 1] == '"') {
+            s1[i - 1] = 0;
+            s1++;
+          }
+          s = strchr(s1, '.');
+          t = strchr(s1, ' ');
+          if(!s || (t && t < s)) break;	/* no spaces in module name */
+          str_copy(&f->value, s1);
+        }
+        else {
+          break;
+        }
 
         /* continue with key_options */
 
@@ -1178,7 +1189,6 @@ void file_do_info(file_t *f0)
 	  s = f->value;
 	  strsep(&s, ".=");
           if(s) {
-            if(config.debug >= 2) fprintf(stderr, "options[%s] = \"%s\"\n", f->value, s);
 	    sl = slist_getentry(config.module.options, f->value);
 	    if(!sl) {
 	      sl = slist_add(&config.module.options, slist_new());
@@ -1188,6 +1198,7 @@ void file_do_info(file_t *f0)
 	    else {
 	      strprintf(&sl->value, "%s %s", sl->value, s);
 	    }
+            if(config.debug >= 2) fprintf(stderr, "options[%s] = \"%s\"\n", sl->key, sl->value);
           }
         }
         break;
@@ -1399,6 +1410,11 @@ void file_do_info(file_t *f0)
 
       case key_y2gdb:
         if(f->is.numeric) config.y2gdb = f->nvalue;
+        break;
+
+      case key_vga:
+        str_copy(&config.vga, f->value);
+        if(f->is.numeric) config.vga_mode = f->nvalue;
         break;
 
       default:
@@ -1713,7 +1729,10 @@ void file_write_install_inf(char *dir)
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
   for(i = 0, ft = ft0; ft; ft = ft->next) {
-    if(ft->key == key_none) {
+    if(
+      ft->key == key_none ||
+      ft->key == key_vga
+    ) {
       fprintf(f, "%s%s", i ? " " : "Cmdline: ", ft->unparsed);
       i = 1;
     }

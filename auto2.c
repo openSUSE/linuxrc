@@ -38,6 +38,7 @@ static int driver_is_active(hd_t *hd);
 static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_files(url_t *url);
+static char *auto2_splash_name(void);
 static void auto2_kexec(url_t *url);
 
 
@@ -775,26 +776,99 @@ void auto2_read_repo_files(url_t *url)
 
 
 /*
+ * Return splash file name (or NULL if not appropriate).
+ */
+char *auto2_splash_name()
+{
+  unsigned width, height;
+  char *splash = NULL, *s;
+  FILE *f;
+
+  if(!config.kexec_initrd) return NULL;
+
+  f = fopen("/sys/devices/platform/vesafb.0/graphics/fb0/virtual_size", "r");
+  if(f) {
+    if(fscanf(f, "%u,%u", &width, &height) == 2) {
+      str_copy(&splash, config.kexec_initrd);
+      s = strrchr(splash, '/');
+      if(s) {
+        *s = 0;
+        strprintf(&splash, "%s/%04u%04u.spl", splash, width, height);
+      }
+      else {
+        str_copy(&splash, NULL);
+      }
+    }
+
+    fclose(f);
+  }
+
+  return splash;
+}
+
+
+/*
  * Download new kernel & initrd and run kexec.
  *
  * Does not return if successful.
  */
 void auto2_kexec(url_t *url)
 {
-  char *kernel, *initrd, *buf = NULL, *cmdline = NULL;
+  char *kernel, *initrd, *buf = NULL, *cmdline = NULL, *splash = NULL, *splash_name = NULL;
+  unsigned char file_buf[0x200];
   FILE *f;
   int i, win, err = 0;
+  unsigned vga_mode = 0;
 
   if(!config.kexec_kernel || !config.kexec_initrd) {
     fprintf(stderr, "no kernel and initrd for kexec specified\n");
     return;
   }
 
+  splash_name = auto2_splash_name();
+  if(config.debug) fprintf(stderr, "splash = %s\n", splash_name);
+
+#if defined(__i386__) || defined(__x86_64__)
+  if(config.vga) {
+    vga_mode = config.vga_mode;
+    if(config.debug) fprintf(stderr, "vga = 0x%04x\n", vga_mode);
+  }
+#endif
+
   kernel = strdup(new_download());
   initrd = strdup(new_download());
+  splash = strdup(new_download());
 
   err = url_read_file(url, NULL, config.kexec_kernel, kernel, NULL, URL_FLAG_PROGRESS);
   if(!err) err = url_read_file(url, NULL, config.kexec_initrd, initrd, NULL, URL_FLAG_PROGRESS);
+
+  if(!err && splash_name) {
+    err = url_read_file(url, NULL, splash_name, splash, NULL, URL_FLAG_PROGRESS);
+    if(!err) {
+      strprintf(&buf, "cat %s >>%s", splash, initrd);
+      system(buf);
+
+      if(vga_mode) {
+        f = fopen(kernel, "r+");
+        if(f) {
+          if(fread(file_buf, 1, 0x200, f) == 0x200) {
+            if(file_buf[0x1fe] == 0x55 && file_buf[0x1ff] == 0xaa) {
+              file_buf[0x1fa] = vga_mode;
+              file_buf[0x1fb] = vga_mode >> 8;
+              rewind(f);
+              if(fwrite(file_buf, 1, 0x200, f) == 0x200 && config.debug) {
+                fprintf(stderr, "video mode stored\n");
+              }
+            }
+          }
+          fclose(f);
+        }
+      }
+    }
+    else {
+      err = 0;
+    }
+  }
 
   if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
     if(!(win = config.win)) util_disp_init();
@@ -821,17 +895,19 @@ void auto2_kexec(url_t *url)
 
     strprintf(&buf, "kexec -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
     fprintf(stderr, "%s\n", buf);
-    system(buf);
 
-    util_umount_all();
-
-    sync();
-
-    system("kexec -e");
+    if(!config.test) {
+      system(buf);
+      util_umount_all();
+      sync();
+      system("kexec -e");
+    }
   }
 
   free(kernel);
   free(initrd);
+  free(splash);
+  free(splash_name);
   free(buf);
   free(cmdline);
 }

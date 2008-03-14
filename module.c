@@ -644,7 +644,7 @@ int mod_insmod(char *module, char *param)
   slist_t *sl;
   driver_t *drv;
 
-  if((!param || !*param) && (sl = slist_getentry(config.module.options, module))) {
+  if((sl = slist_getentry(config.module.options, module))) {
     param = sl->value;
   }
 
