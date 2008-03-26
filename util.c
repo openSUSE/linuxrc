@@ -3225,7 +3225,8 @@ int util_mount(char *dev, char *dir, unsigned long flags)
       return err;
     }
     else if(config.squash) {
-      strprintf(&buf, "mksquashfs %s %s -noappend >&2", dir, dev);
+      fprintf(stderr, "%s: converting to squashfs\n", dev);
+      strprintf(&buf, "mksquashfs %s %s -noappend >%s", dir, dev, config.debug ? "&2" : "/dev/null");
       err = system(buf);
       if(err && config.run_as_linuxrc) fprintf(stderr, "mount: mksquashfs failed\n");
       if(!err) {
