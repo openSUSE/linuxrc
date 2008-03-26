@@ -276,6 +276,7 @@ static struct {
   { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                },
   { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd                },
   { key_y2gdb,          "Y2GDB",          kf_cfg + kf_cmd                },
+  { key_squash,         "squash",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1415,6 +1416,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_vga:
         str_copy(&config.vga, f->value);
         if(f->is.numeric) config.vga_mode = f->nvalue;
+        break;
+
+      case key_squash:
+        if(f->is.numeric) config.squash = f->nvalue;
         break;
 
       default:

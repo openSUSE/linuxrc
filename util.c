@@ -3082,6 +3082,7 @@ char *util_fstype(char *dev, char **module)
 
     if(
       !strcmp(type, "cpio") ||
+      !strcmp(type, "rpm") ||
       (config.ntfs_3g && !strcmp(type, "ntfs"))
     ) {
       *module = NULL;
@@ -3192,8 +3193,12 @@ int util_mount(char *dev, char *dir, unsigned long flags)
   type = util_fstype(dev, &module);
   if(module) mod_modprobe(module, NULL);
 
-  if(type && !strcmp(type, "cpio")) {
+  if(
+    type &&
+    (!strcmp(type, "cpio") || !strcmp(type, "rpm"))
+  ) {
     char *buf = NULL;
+    char *msg;
 
     err = mount("tmpfs", dir, "tmpfs", 0, "size=0,nr_inodes=0");
     if(err) {
@@ -3201,14 +3206,32 @@ int util_mount(char *dev, char *dir, unsigned long flags)
       return err;
     }
 
-    strprintf(&buf, "cd %s ; cpio -i --quiet < %s", dir, dev);
+    if(!strcmp(type, "cpio")) {
+      strprintf(&buf, "cd %s ; cpio -i --quiet < %s", dir, dev);
+      msg = "cpio";
+    }
+    else {
+      strprintf(&buf, "cd %s ; rpm2cpio %s | cpio --quiet --sparse -dimu --no-absolute-filenames", dir, dev);
+      msg = "rpm unpacking";
+    }
+
     err = system(buf);
     free(buf);
+    buf = NULL;
 
     if(err) {
-      if(config.run_as_linuxrc) fprintf(stderr, "mount: cpio failed\n");
+      if(config.run_as_linuxrc) fprintf(stderr, "mount: %s failed\n", msg);
       umount(dir);
       return err;
+    }
+    else if(config.squash) {
+      strprintf(&buf, "mksquashfs %s %s -noappend >&2", dir, dev);
+      err = system(buf);
+      if(err && config.run_as_linuxrc) fprintf(stderr, "mount: mksquashfs failed\n");
+      if(!err) {
+        umount(dir);
+        err = util_mount(dev, dir, flags);
+      }
     }
 
     return err;

@@ -325,6 +325,7 @@ typedef struct {
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */
   unsigned nomodprobe:1;	/* disable modprobe */
   unsigned y2gdb:1;		/* pass to yast */
+  unsigned squash:1;		/* convert cpio/rpm to squashfs after download */
   unsigned withiscsi;		/* iSCSI parameter */
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
