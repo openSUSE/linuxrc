@@ -97,7 +97,7 @@ int root_check_root(char *root_string_tv)
 
   sprintf(buf, "/dev/%s", root_string_tv);
 
-  if(util_mount_ro(buf, config.mountpoint.instdata)) return -1;
+  if(util_mount_ro(buf, config.mountpoint.instdata, NULL)) return -1;
 
   sprintf(buf, "%s/etc/passwd", config.mountpoint.instdata);
   rc = util_check_exist(buf);

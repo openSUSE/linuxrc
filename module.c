@@ -601,7 +601,11 @@ void mod_load_module_manual(char *module, int show)
   window_t win;
   int i;
 
-  if(!(ml = mod_get_entry(module))) return;
+  if(!(ml = mod_get_entry(module))) {
+    mod_insmod(module, NULL);
+
+    return;
+  }
 
   if(!config.win) show = 0;
 

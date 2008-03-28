@@ -100,9 +100,9 @@ void util_free_mem(void);
 void util_update_meminfo(void);
 
 char *util_fstype(char *dev, char **module);
-int util_mount(char *dev, char *dir, unsigned long flags);
-int util_mount_ro(char *dev, char *dir);
-int util_mount_rw(char *dev, char *dir);
+int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list);
+int util_mount_ro(char *dev, char *dir, slist_t *file_list);
+int util_mount_rw(char *dev, char *dir, slist_t *file_list);
 
 void util_update_netdevice_list(char *module, int add);
 int util_update_disk_list(char *module, int add);

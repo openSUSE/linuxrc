@@ -1,3 +1,8 @@
+28/3/2008:	v3.1.12
+	- fix loading of modules without config
+	- can unpack only parts of cpio/rpm archives
+	  (add '?list=pattern1,pattern2,...' to url)
+
 26/3/2008:	v3.1.11
 	- support rpms as image files
 	- added option 'squash=1': convert downloaded files to squashfs images

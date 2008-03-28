@@ -2010,7 +2010,7 @@ int util_mount_main(int argc, char **argv)
   }
 
   if(notype) {
-    if(!util_mount(dev, dir, flags)) return 0;
+    if(!util_mount(dev, dir, flags, NULL)) return 0;
     if(errno) perror("mount");
     return 1;
   }
@@ -2854,7 +2854,7 @@ char *slist_join(char *del, slist_t *str)
 
   len++;
 
-  s = calloc(len,1);
+  s = calloc(len, 1);
 
   for(; str; str = str->next) {
     if(str->key) strcat(s, str->key);
@@ -3156,9 +3156,9 @@ int util_detach_loop(char *dev)
 }
 
 
-int util_mount(char *dev, char *dir, unsigned long flags)
+int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 {
-  char *type, *loop_dev, *cmd = NULL, *module;
+  char *type, *loop_dev, *cmd = NULL, *module, *tmp_dev, *cpio_opts = NULL, *s;
   int err = -1;
   struct stat64 sbuf;
 
@@ -3206,15 +3206,26 @@ int util_mount(char *dev, char *dir, unsigned long flags)
       return err;
     }
 
+    str_copy(&cpio_opts, "--quiet --sparse -dimu --no-absolute-filenames");
+
+    if(file_list) {
+      s = slist_join("' '", file_list);
+      strprintf(&cpio_opts, "%s '%s'", cpio_opts, s);
+      free(s);
+    }
+
     if(!strcmp(type, "cpio")) {
-      strprintf(&buf, "cd %s ; cpio -i --quiet < %s", dir, dev);
+      strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
       msg = "cpio";
     }
     else {
-      strprintf(&buf, "cd %s ; rpm2cpio %s | cpio --quiet --sparse -dimu --no-absolute-filenames", dir, dev);
+      strprintf(&buf, "cd %s ; rpm2cpio %s | cpio %s", dir, dev, cpio_opts);
       msg = "rpm unpacking";
     }
 
+    str_copy(&cpio_opts, NULL);
+
+    if(config.debug) fprintf(stderr, "%s\n", buf);
     err = system(buf);
     free(buf);
     buf = NULL;
@@ -3225,13 +3236,21 @@ int util_mount(char *dev, char *dir, unsigned long flags)
       return err;
     }
     else if(config.squash) {
-      fprintf(stderr, "%s: converting to squashfs\n", dev);
-      strprintf(&buf, "mksquashfs %s %s -noappend >%s", dir, dev, config.debug ? "&2" : "/dev/null");
+      tmp_dev = new_download();
+      fprintf(stderr, "%s -> %s: converting to squashfs\n", dev, tmp_dev);
+      // if we downloaded the file, overwrite it; else make a new copy
+      if(strncmp(dev, config.download.base, strlen(config.download.base))) {
+        tmp_dev = new_download();
+      }
+      else {
+        tmp_dev = dev;
+      }
+      strprintf(&buf, "mksquashfs %s %s -noappend >%s", dir, tmp_dev, config.debug ? "&2" : "/dev/null");
       err = system(buf);
       if(err && config.run_as_linuxrc) fprintf(stderr, "mount: mksquashfs failed\n");
       if(!err) {
         umount(dir);
-        err = util_mount(dev, dir, flags);
+        err = util_mount(tmp_dev, dir, flags, NULL);
       }
     }
 
@@ -3274,15 +3293,15 @@ int util_mount(char *dev, char *dir, unsigned long flags)
 }
 
 
-int util_mount_ro(char *dev, char *dir)
+int util_mount_ro(char *dev, char *dir, slist_t *file_list)
 {
-  return util_mount(dev, dir, MS_MGC_VAL | MS_RDONLY);
+  return util_mount(dev, dir, MS_MGC_VAL | MS_RDONLY, file_list);
 }
 
 
-int util_mount_rw(char *dev, char *dir)
+int util_mount_rw(char *dev, char *dir, slist_t *file_list)
 {
-  return util_mount(dev, dir, 0);
+  return util_mount(dev, dir, 0, file_list);
 }
 
 

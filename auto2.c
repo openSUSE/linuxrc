@@ -941,7 +941,7 @@ void auto2_driverupdate(url_t *url)
     URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED
   );
 
-  if(!err) err = util_mount_ro(file_name, config.mountpoint.update);
+  if(!err) err = util_mount_ro(file_name, config.mountpoint.update, NULL);
 
   if(!err) util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
 

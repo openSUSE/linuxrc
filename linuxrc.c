@@ -388,7 +388,7 @@ void lxrc_change_root()
   else if(config.new_root) {
     fprintf(stderr, "starting %s\n", config.new_root);
 
-    util_mount_ro(config.new_root, mp);
+    util_mount_ro(config.new_root, mp, NULL);
   }
 
   chdir(mp);

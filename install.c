@@ -512,7 +512,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
           dev = long_dev(values3[i - 1]);
           util_fstype(dev, &module);
           if(module) mod_modprobe(module, NULL);
-          j = util_mount_rw(dev, config.mountpoint.swap);
+          j = util_mount_rw(dev, config.mountpoint.swap, NULL);
           if(j) {
             dia_message("mount failed", MSGTYPE_ERROR);
           }
