@@ -433,9 +433,13 @@ int net_activate()
 	fprintf(stderr, "net_activate: %s\n", command);
 
 	if (rc) {
+	    int win_old = config.win;
+
 	    fprintf(stderr, "net_activate: address %s in use by another machine!\n", inet_ntoa(config.net.hostname.ip));
 	    sprintf(command, txt_get(TXT_IP_ADDRESS_IN_USE), inet_ntoa(config.net.hostname.ip));
+	    if(!config.win) util_disp_init();
 	    dia_message(command, MSGTYPE_ERROR);
+	    if(!win_old) util_disp_done();
 	    return 1;
 	}
     }
