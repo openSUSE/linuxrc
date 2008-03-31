@@ -1,3 +1,6 @@
+31/3/2008:	v2.0.77
+	- check for existing ip only if 'arping' is available (bnc #363423#c162, -> v2.0.71)
+
 6/3/2008:	v2.0.76
 	- store network setup delay value as 'ConnectWait' in install.inf (bnc #363423)
 
