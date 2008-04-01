@@ -1,3 +1,7 @@
+1/4/2008:	v2.0.78
+	- increase http header parser timeout (bnc #369304, bnc #192145)
+	- smt is now reg (or smt)
+
 31/3/2008:	v2.0.77
 	- check for existing ip only if 'arping' is available (bnc #363423#c162, -> v2.0.71)
 

@@ -116,7 +116,7 @@ int http_connect(inet_t *server, char *name, char *proto, inet_t *proxy, int ser
   struct addrinfo ask;
   int i, sock, port;
   char buf[0x1000];
-  int timeout = 60;
+  int timeout = 600;
   inet_t *host;
 
   memset(&ask, 0, sizeof ask);

@@ -274,6 +274,8 @@ static struct {
   { key_net_retry,      "NetRetry",       kf_cfg + kf_cmd                },
   { key_bootif,         "BOOTIF",         kf_cmd                         },
   { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
+  { key_yepurl,         "regurl",         kf_cfg + kf_cmd                },
+  { key_yepcert,        "regcert",        kf_cfg + kf_cmd                },
   { key_yepurl,         "smturl",         kf_cfg + kf_cmd                },
   { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                }
 };
