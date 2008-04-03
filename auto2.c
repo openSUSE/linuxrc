@@ -976,3 +976,69 @@ void auto2_driverupdate(url_t *url)
 }
 
 
+int auto2_extend_root(char *file)
+{
+  int err = 0;
+  char *argv[3] = { };
+  char *s;
+  slist_t *sl;
+
+  fprintf(stderr, "instsys extend: %s\n", file);
+
+  str_copy(&config.mountpoint.instdata, new_mountpoint());
+  str_copy(&config.mountpoint.instsys, new_mountpoint());
+
+  if(config.url.install) {
+    config.url.install->mount = config.url.install->tmp_mount = 0;
+  }
+
+  if(config.url.instsys) {
+    config.url.instsys->mount = config.url.instsys->tmp_mount = 0;
+  }
+
+  if(!config.url.instsys) {
+    fprintf(stderr, "no instsys\n");
+    err = 1;
+  }
+
+  if(config.url.instsys->scheme == inst_rel && !config.url.install) {
+    fprintf(stderr, "no repo\n");
+    err = 2;
+  }
+
+  if(err) return err;
+
+  s = url_instsys_base(config.url.instsys->path);
+  if(!s) return 3;
+
+  strprintf(&config.url.instsys->path, "%s/%s", s, file);
+
+  if(config.url.instsys->scheme == inst_rel) {
+    err = url_find_repo(config.url.install, config.mountpoint.instdata);
+  }
+
+  /* if instsys is not a relative url, load it here */
+  if(!err && !config.url.instsys->mount) {
+    err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
+  }
+
+  sync();
+
+  url_umount(config.url.install);
+  if(err) url_umount(config.url.instsys);
+
+  if(!err) {
+    for(sl = config.url.instsys_list; sl; sl = sl->next) {
+      fprintf(stderr, "integrating %s (%s)\n", sl->key, sl->value);
+      if(!config.test) {
+        argv[1] = sl->value;
+        argv[2] = "/";
+        util_lndir_main(3, argv);
+      }
+    }
+  }
+
+  return err;
+}
+
+

@@ -6,3 +6,4 @@ void load_network_mods(void);
 char *auto2_serial_console(void);
 void pcmcia_socket_startup(void);
 void auto2_driverupdate(url_t *url);
+int auto2_extend_root(char *file);

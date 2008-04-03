@@ -382,6 +382,7 @@ typedef struct {
   char *netdevice;		/* network interface to use */
   char *vga;			/* vga option */
   int vga_mode;			/* vga mode number */
+  slist_t *extend_list;		/* list of loaded instsys extensions */
 
   struct {
     char *instsys_default;	/* default instsys url */

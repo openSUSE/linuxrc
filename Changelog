@@ -1,3 +1,7 @@
+3/4/2008:	v3.1.13
+	- smt is now reg (or smt)
+	- implemented 'extend' command for downloading & integrating instsys parts
+
 28/3/2008:	v3.1.12
 	- fix loading of modules without config
 	- can unpack only parts of cpio/rpm archives

@@ -73,6 +73,7 @@ static int do_not_kill         (char *name);
 static void lxrc_change_root   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
+static void lxrc_usr1(int signum);
 
 extern char **environ;
 static void lxrc_movetotmpfs(void);
@@ -119,6 +120,7 @@ static struct {
   { "fstype",      util_fstype_main      },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
+  { "extend",      util_extend_main      },
   { "hotplug",     hotplug_main          },
   { "nothing",     util_nothing_main     }
 };
@@ -704,6 +706,8 @@ void lxrc_init()
   siginterrupt(SIGSEGV, 1);
   siginterrupt(SIGPIPE, 1);
   lxrc_catch_signal(0);
+  signal(SIGUSR1, lxrc_usr1);
+
 /*  reboot (RB_DISABLE_CAD); */
 
   umask(022);
@@ -761,6 +765,7 @@ void lxrc_init()
   config.kbd_fd = -1;
   config.ntfs_3g = 1;
   config.secure = 1;
+  config.squash = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
@@ -1260,5 +1265,58 @@ void config_rescue(char *mp)
 }
 
 #endif
+
+
+void lxrc_usr1(int signum)
+{
+  static unsigned extend_cnt = 0;
+  int i, err;
+  char *s, *t, buf[1024];
+  FILE *f;
+  slist_t *sl;
+
+  if(!rename("/tmp/extend.job", s = new_download())) {
+    *buf = 0;
+    f = fopen(s, "r");
+    if(f) {
+      if(!fgets(buf, sizeof buf, f)) *buf = 0;
+      if(*buf) {
+        t = buf + strlen(buf) - 1;
+        while(t > buf && isspace(*t)) *t-- = 0;
+      }
+      fclose(f);
+    }
+    unlink(s);
+    if(*buf) {
+      sl = slist_getentry(config.extend_list, buf);
+      if(!sl) slist_append_str(&config.extend_list, buf);
+      if(!fork()) {
+        for(i = 0; i < 256; i++) close(i);
+        open("/tmp/extend.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
+        dup(0);
+        dup(0);
+        setlinebuf(stderr);
+        config.download.cnt = 1000 + extend_cnt;
+        config.mountpoint.cnt = 1000 + extend_cnt;
+        if(!config.debug) config.debug = 1;
+        if(sl) {
+          fprintf(stderr, "instsys extend: %s\n%s: already integrated\n", buf, buf);
+          err = 0;
+        }
+        else {
+          err = auto2_extend_root(buf);
+        }
+        f = fopen("/tmp/extend.result", "w");
+        if(f) fprintf(f, "%d\n", err);
+        fclose(f);
+        exit(0);
+      }
+    }
+  }
+
+  extend_cnt += 10;
+
+  signal(SIGUSR1, lxrc_usr1);
+}
 
 

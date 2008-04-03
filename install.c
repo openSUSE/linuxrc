@@ -946,6 +946,8 @@ int inst_start_install()
   
   err = inst_execute_yast();
 
+  config.extend_list = slist_free(config.extend_list);
+
   util_umount_all();
   util_clear_downloads();
 
@@ -1171,6 +1173,8 @@ int inst_execute_yast()
         // fprintf(stderr, "%d: back from loop\n", getpid());
       }
       else {
+        signal(SIGUSR1, SIG_IGN);
+
         // fprintf(stderr, "%d: system()\n", getpid());
         err = system(setupcmd);
         // fprintf(stderr, "%d: exit(%d)\n", getpid(), err);

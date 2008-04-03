@@ -59,7 +59,6 @@ static void url_parse_instsys_config(char *file);
 static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
 static void url_build_instsys_list(char *instsys);
 static char *url_instsys_config(char *path);
-static char *url_instsys_base(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
 
@@ -924,7 +923,7 @@ void url_umount(url_t *url)
 
   // FIXME: this is wrong!
 
-  if(url->mount && !util_umount(url->mount)) {
+  if(url->mount && util_umount(url->mount)) {
     if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->mount);
   }
   str_copy(&url->mount, NULL);

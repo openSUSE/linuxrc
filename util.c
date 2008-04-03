@@ -3104,6 +3104,55 @@ char *util_fstype(char *dev, char **module)
 }
 
 
+int util_extend_main(int argc, char **argv)
+{
+  FILE *f;
+  int ready, err = 0;
+  char buf[1024];
+
+  argv++; argc--;
+
+  if(!argc) return fprintf(stderr, "usage: extend extension_name\n"), 1;
+
+  unlink("/tmp/extend.result");
+  f = fopen("/tmp/extend.job", "w");
+  if(f) {
+    fprintf(f, "%s\n", *argv);
+    fclose(f);
+
+    if(util_check_exist("/usr/src/packages") || getuid()) config.test = 1;
+
+    if(config.test) {
+      util_killall("linuxrc", SIGUSR1);
+    }
+    else {
+      if(kill(1, SIGUSR1)) err = 2;
+    }
+
+    if(!err) for(ready = 0; !ready ;) {
+      sleep(1);
+      f = fopen("/tmp/extend.result", "r");
+      if(f) {
+        ready = fscanf(f, "%d", &err) == 1;
+        fclose(f);
+      }
+    }
+  }
+  else {
+    err = 1;
+  }
+
+  f = fopen("/tmp/extend.log", "r");
+  if(f) {
+    while(fgets(buf, sizeof buf, f)) printf("%s", buf);
+    fclose(f);
+  }
+
+  printf("%s: extend %s\n", *argv, err ? "failed" : "ok");
+
+  return err;
+}
+
 
 /*
  * returns loop device used
@@ -3111,7 +3160,7 @@ char *util_fstype(char *dev, char **module)
 char *util_attach_loop(char *file, int ro)
 {
   struct loop_info loopinfo;
-  int fd, rc, i, device;
+  int fd, rc, i, device, ok = 0;
   static char buf[32];
 
   if((fd = open(file, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) < 0) {
@@ -3119,7 +3168,7 @@ char *util_attach_loop(char *file, int ro)
     return NULL;
   }
 
-  for(i = 0; i < 8; i++) {
+  for(i = 0; i < 64; i++) {
     sprintf(buf, "/dev/loop%d", i);
     if((device = open(buf, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) >= 0) {
       memset(&loopinfo, 0, sizeof loopinfo);
@@ -3127,13 +3176,16 @@ char *util_attach_loop(char *file, int ro)
       rc = ioctl(device, LOOP_SET_FD, fd);
       if(rc != -1) rc = ioctl(device, LOOP_SET_STATUS, &loopinfo);
       close(device);
-      if(rc != -1) break;
+      if(rc != -1) {
+        ok = 1;
+        break;
+      }
     }
   }
 
   close(fd);
 
-  return i < 8 ? buf : NULL;
+  return ok ? buf : NULL;
 }
 
 

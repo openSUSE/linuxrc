@@ -272,6 +272,8 @@ static struct {
   { key_nomodprobe,     "nomodprobe",     kf_cfg + kf_cmd_early          },
   { key_device,         "Device",         kf_cfg + kf_cmd                },
   { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
+  { key_yepurl,         "regurl",         kf_cfg + kf_cmd                },
+  { key_yepcert,        "regcert",        kf_cfg + kf_cmd                },
   { key_yepurl,         "smturl",         kf_cfg + kf_cmd                },
   { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                },
   { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd                },
