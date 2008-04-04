@@ -30,6 +30,8 @@
  *
  */
 
+#define _GNU_SOURCE	/* stat64 */
+
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
@@ -180,15 +182,15 @@ fstype(const char *device) {
     struct adfs_super_block adfssb;
     struct sysv_super_block svsb;
 #endif
-    struct stat statbuf;
+    struct stat64 statbuf;
 
     /* opening and reading an arbitrary unknown path can have
        undesired side effects - first check that `device' refers
        to a block device */
-    if (stat (device, &statbuf) || !(S_ISBLK(statbuf.st_mode) || S_ISREG(statbuf.st_mode)))
+    if (stat64 (device, &statbuf) || !(S_ISBLK(statbuf.st_mode) || S_ISREG(statbuf.st_mode)))
       return 0;
 
-    fd = open(device, O_RDONLY);
+    fd = open(device, O_RDONLY | O_LARGEFILE);
     if (fd < 0)
       return 0;
 

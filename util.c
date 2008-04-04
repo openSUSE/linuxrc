@@ -8,6 +8,8 @@
 
 #define __LIBRARY__
 
+#define _GNU_SOURCE	/* stat64 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -533,9 +535,9 @@ void util_truncate_dir(char *dir)
 
 int util_check_exist(char *file)
 {
-  struct stat sbuf;
+  struct stat64 sbuf;
 
-  if(stat(file, &sbuf)) return 0;
+  if(stat64(file, &sbuf)) return 0;
 
   if(S_ISREG(sbuf.st_mode)) return 'r';
   if(S_ISDIR(sbuf.st_mode)) return 'd';
@@ -2342,7 +2344,7 @@ int util_ls_main(int argc, char **argv)
   char *src;
   int i;
   char buf[0x100], c, *s, *t;
-  struct stat sbuf;
+  struct stat64 sbuf;
   struct dirent *de;
   DIR *d;
 
@@ -2368,7 +2370,7 @@ int util_ls_main(int argc, char **argv)
   while((de = readdir(d))) {
     if(full) {
       sprintf(buf, "%s/%s", src, de->d_name);
-      i = lstat(buf, &sbuf);
+      i = lstat64(buf, &sbuf);
       if(i) {
         printf("?????????  %s\n", de->d_name);
       }
@@ -2415,12 +2417,12 @@ int util_ls_main(int argc, char **argv)
           s += 4; s[12] = 0;
         }
 
-        printf("%s %4d %-8d %-8d %8ld %s %s",
+        printf("%s %4d %-8d %-8d %8lld %s %s",
           buf,
           (int) sbuf.st_nlink,
           (int) sbuf.st_uid,
           (int) sbuf.st_gid,
-          (long) sbuf.st_size,
+          (long long) sbuf.st_size,
           s,
           de->d_name
         );
@@ -3582,14 +3584,14 @@ char *util_attach_loop(char *file, int ro)
   int fd, rc, i, device;
   static char buf[32];
 
-  if((fd = open(file, ro ? O_RDONLY : O_RDWR)) < 0) {
+  if((fd = open(file, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) < 0) {
     perror(file);
     return NULL;
   }
 
   for(i = 0; i < 8; i++) {
     sprintf(buf, "/dev/loop%d", i);
-    if((device = open(buf, ro ? O_RDONLY : O_RDWR)) >= 0) {
+    if((device = open(buf, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) >= 0) {
       memset(&loopinfo, 0, sizeof loopinfo);
       strcpy(loopinfo.lo_name, file);
       rc = ioctl(device, LOOP_SET_FD, fd);
@@ -3609,7 +3611,7 @@ int util_detach_loop(char *dev)
 {
   int i, fd;
 
-  if((fd = open(dev, O_RDONLY)) < 0) {
+  if((fd = open(dev, O_RDONLY | O_LARGEFILE)) < 0) {
     if(config.debug) perror(dev);
     return -1;
   }
@@ -3628,15 +3630,15 @@ int util_mount(char *dev, char *dir, unsigned long flags)
 {
   char *type, *loop_dev;
   int err = -1;
-  struct stat sbuf;
+  struct stat64 sbuf;
 
   if(!dev || !dir) return -1;
 
-  if(strstr(dir, "/mounts/") == dir && stat(dir, &sbuf)) {
+  if(strstr(dir, "/mounts/") == dir && stat64(dir, &sbuf)) {
     mkdir(dir, 0755);
   }
 
-  if(stat(dev, &sbuf)) {
+  if(stat64(dev, &sbuf)) {
     fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
     return -1;
   }

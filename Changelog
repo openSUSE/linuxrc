@@ -1,3 +1,6 @@
+4/4/2008:	v2.0.79
+	- large file fixes (bnc #371883, backport of bnc #184448)
+
 1/4/2008:	v2.0.78
 	- increase http header parser timeout (bnc #369304, bnc #192145)
 	- smt is now reg (or smt)
