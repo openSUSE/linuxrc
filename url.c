@@ -1475,6 +1475,7 @@ int url_find_repo(url_t *url, char *dir)
     char *buf = NULL, *buf2 = NULL, *file_name, *s, *t;
     char *instsys_config;
     slist_t *sl, *file_list, *old_file_list;
+    FILE *f;
 
     if(
       !url ||
@@ -1483,53 +1484,57 @@ int url_find_repo(url_t *url, char *dir)
       !config.url.instsys->scheme
     ) return 0;
 
-    config.sha1 = slist_free(config.sha1);
+    if(!config.keepinstsysconfig) {
+      config.sha1 = slist_free(config.sha1);
 
-    if(url_read_file(url, NULL, "/content", "/content", NULL, URL_FLAG_NOSHA1)) return 0;
+      if(url_read_file(url, NULL, "/content", "/content", NULL, URL_FLAG_NOSHA1)) return 0;
 
-    if(config.secure) {
-      if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, URL_FLAG_NOSHA1)) return 0;
-      str_copy(&buf, "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify /content.asc >/dev/null");
-      if(config.debug < 2) strprintf(&buf, " 2>&1");
-      i = system(buf);
-      if(i) {
-        fprintf(stderr, "signature check failed\n");
-        config.sig_failed = 1;
+      if(config.secure) {
+        if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, URL_FLAG_NOSHA1)) return 0;
+        str_copy(&buf, "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify /content.asc >/dev/null");
+        if(config.debug < 2) strprintf(&buf, " 2>&1");
+        i = system(buf);
+        if(i) {
+          fprintf(stderr, "signature check failed\n");
+          config.sig_failed = 1;
+        }
+        else {
+          config.sha1_failed = 0;
+          fprintf(stderr, "signature ok\n");
+        }
+        file_read_info_file("file:/content", kf_cont);
       }
-      else {
-        config.sha1_failed = 0;
-        fprintf(stderr, "signature ok\n");
-      }
-      file_read_info_file("file:/content", kf_cont);
     }
 
     if(config.url.instsys->scheme != inst_rel || config.kexec) return 1;
 
-    instsys_config = url_instsys_config(config.url.instsys->path);
+    if(!config.keepinstsysconfig) {
+      instsys_config = url_instsys_config(config.url.instsys->path);
 
-    file_name = NULL;
+      file_name = NULL;
 
-    if(url->is.mountable) {
-      if(util_check_exist2(url->mount, instsys_config)) {
-        strprintf(&file_name, "%s/%s", url->mount, instsys_config);
+      if(url->is.mountable) {
+        if(util_check_exist2(url->mount, instsys_config)) {
+          strprintf(&file_name, "%s/%s", url->mount, instsys_config);
+        }
       }
-    }
-    else {
-      if(url_read_file(url,
-        NULL,
-        instsys_config,
-        file_name = strdup(new_download()),
-        NULL,
-        0
-      )) {
-        free(file_name);
-        file_name = NULL;
+      else {
+        if(url_read_file(url,
+          NULL,
+          instsys_config,
+          file_name = strdup(new_download()),
+          NULL,
+          0
+        )) {
+          free(file_name);
+          file_name = NULL;
+        }
       }
+
+      url_parse_instsys_config(file_name);
+
+      free(file_name);
     }
-
-    url_parse_instsys_config(file_name);
-
-    free(file_name);
 
     url_build_instsys_list(config.url.instsys->path);
 
@@ -1558,6 +1563,11 @@ int url_find_repo(url_t *url, char *dir)
       opt = *(s = sl->key) == '?' && s++;
       t = url_config_get_path(s);
       file_list = url_config_get_file_list(s);
+
+      if((f = fopen("/etc/instsys.parts", "a"))) {
+        fprintf(f, "%s\n", s);
+        fclose(f);
+      }
 
       old_file_list = url->file_list;
       url->file_list = file_list;
@@ -1661,6 +1671,7 @@ int url_find_instsys(url_t *url, char *dir)
   char *s, *t;
   char *file_name = NULL, *buf = NULL, *buf2 = NULL, *url_path = NULL;
   slist_t *sl, *file_list, *old_file_list;
+  FILE *f;
 
   if(
     !url ||
@@ -1675,24 +1686,26 @@ int url_find_instsys(url_t *url, char *dir)
 
   str_copy(&url->path, url_instsys_base(url->path));
 
-  if(
-    url_read_file(url,
-      NULL,
-      "/config",
-      file_name = strdup(new_download()),
-      NULL,
-      URL_FLAG_KEEP_MOUNTED
-    )
-  ) {
-    // fprintf(stderr, "XXX %d %s\n", url->is.mountable, url->mount);
-    if(!(url->is.mountable && url->mount)) {
-      str_copy(&url->path, url_path);
+  if(!config.keepinstsysconfig) {
+    if(
+      url_read_file(url,
+        NULL,
+        "/config",
+        file_name = strdup(new_download()),
+        NULL,
+        URL_FLAG_KEEP_MOUNTED
+      )
+    ) {
+      // fprintf(stderr, "XXX %d %s\n", url->is.mountable, url->mount);
+      if(!(url->is.mountable && url->mount)) {
+        str_copy(&url->path, url_path);
+      }
+
+      str_copy(&file_name, NULL);
     }
 
-    str_copy(&file_name, NULL);
+    url_parse_instsys_config(file_name);
   }
-
-  url_parse_instsys_config(file_name);
 
   str_copy(&file_name, NULL);
 
@@ -1730,6 +1743,11 @@ int url_find_instsys(url_t *url, char *dir)
       opt = *(s = sl->key) == '?' && s++;
       t = url_config_get_path(s);
       file_list = url_config_get_file_list(s);
+
+      if((f = fopen("/etc/instsys.parts", "a"))) {
+        fprintf(f, "%s\n", s);
+        fclose(f);
+      }
 
       old_file_list = url->file_list;
       url->file_list = file_list;
@@ -2075,8 +2093,10 @@ slist_t *url_instsys_lookup(char *key, slist_t **sl_ll)
 
 void url_build_instsys_list(char *image)
 {
-  char *s, *base = NULL, *name = NULL, *buf = NULL;
-  slist_t *sl, *sl1, *sl2, *sl_ll = NULL, *list = NULL;
+  char *s, *base = NULL, *name = NULL, *buf = NULL, parts_buf[0x1000];
+  slist_t *sl, *sl1, *sl2, *sl_ll = NULL, *list = NULL, *parts = NULL;
+  int i;
+  FILE *f;
 
   if(!image) return;
 
@@ -2118,6 +2138,25 @@ void url_build_instsys_list(char *image)
     strprintf(&sl->key, "%s%s%s", s == sl->key ? "" : "?", base, s);
   }
 
+  if((f = fopen("/etc/instsys.parts", "r"))) {
+    i = fread(parts_buf, 1, sizeof parts_buf - 1, f);
+    parts_buf[i > 0 ? i : 0] = 0;
+    fclose(f);
+    parts = slist_split('\n', parts_buf);
+  }
+
+  list = slist_free(list);
+
+  for(sl = config.url.instsys_list; sl; sl = sl->next) {
+    s = sl->key;
+    if(*s == '?') s++;
+    if(!slist_getentry(parts, s)) slist_append_str(&list, sl->key);
+  }
+
+  slist_free(config.url.instsys_list);
+  config.url.instsys_list = list;
+  list = NULL;
+
   if(config.debug) {
     fprintf(stderr, "instsys list:\n");
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
@@ -2130,7 +2169,6 @@ void url_build_instsys_list(char *image)
   free(buf);
 
   slist_free(sl_ll);
-  slist_free(list);
 }
 
 

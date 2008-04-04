@@ -1027,6 +1027,9 @@ int auto2_extend_root(char *file)
   url_umount(config.url.install);
   if(err) url_umount(config.url.instsys);
 
+  if(config.mountpoint.instdata) rmdir(config.mountpoint.instdata);
+  if(config.mountpoint.instsys) rmdir(config.mountpoint.instsys);
+
   if(!err) {
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
       fprintf(stderr, "integrating %s (%s)\n", sl->key, sl->value);

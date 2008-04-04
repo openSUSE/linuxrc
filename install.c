@@ -947,6 +947,7 @@ int inst_start_install()
   err = inst_execute_yast();
 
   config.extend_list = slist_free(config.extend_list);
+  unlink("/etc/instsys.parts");
 
   util_umount_all();
   util_clear_downloads();

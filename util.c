@@ -3289,7 +3289,6 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
     }
     else if(config.squash) {
       tmp_dev = new_download();
-      fprintf(stderr, "%s -> %s: converting to squashfs\n", dev, tmp_dev);
       // if we downloaded the file, overwrite it; else make a new copy
       if(strncmp(dev, config.download.base, strlen(config.download.base))) {
         tmp_dev = new_download();
@@ -3297,6 +3296,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       else {
         tmp_dev = dev;
       }
+      fprintf(stderr, "%s -> %s: converting to squashfs\n", dev, tmp_dev);
       strprintf(&buf, "mksquashfs %s %s -noappend >%s", dir, tmp_dev, config.debug ? "&2" : "/dev/null");
       err = system(buf);
       if(err && config.run_as_linuxrc) fprintf(stderr, "mount: mksquashfs failed\n");

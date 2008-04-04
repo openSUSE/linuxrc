@@ -1299,6 +1299,9 @@ void lxrc_usr1(int signum)
         config.download.cnt = 1000 + extend_cnt;
         config.mountpoint.cnt = 1000 + extend_cnt;
         if(!config.debug) config.debug = 1;
+
+        config.keepinstsysconfig = 1;
+
         if(sl) {
           fprintf(stderr, "instsys extend: %s\n%s: already integrated\n", buf, buf);
           err = 0;
