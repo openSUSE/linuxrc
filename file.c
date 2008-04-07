@@ -268,6 +268,7 @@ static struct {
   { key_sha1,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
+  { key_kexec_reboot,   "kexec_reboot",   kf_cfg + kf_cmd                },
   { key_nisdomain,      "NISDomain",      kf_dhcp                        },
   { key_nomodprobe,     "nomodprobe",     kf_cfg + kf_cmd_early          },
   { key_device,         "Device",         kf_cfg + kf_cmd                },
@@ -1424,6 +1425,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.squash = f->nvalue;
         break;
 
+      case key_kexec_reboot:
+        if(f->is.numeric) config.kexec_reboot = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1722,6 +1727,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_withiscsi, config.withiscsi);
   file_write_num(f, key_startshell, config.startshell);
   file_write_num(f, key_y2gdb, config.y2gdb);
+  file_write_num(f, key_kexec_reboot, config.kexec_reboot);
 
   if(
     config.rootpassword &&

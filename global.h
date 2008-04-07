@@ -324,6 +324,7 @@ typedef struct {
   unsigned sha1_failed:1;	/* sha1 check failed */
   unsigned sig_failed:1;	/* 'content' signature check failed */
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */
+  unsigned kexec_reboot:1;	/* kexec to installed system (just passed to yast) */
   unsigned nomodprobe:1;	/* disable modprobe */
   unsigned y2gdb:1;		/* pass to yast */
   unsigned squash:1;		/* convert cpio/rpm to squashfs after download */
