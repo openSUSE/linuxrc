@@ -1264,30 +1264,49 @@ int inst_execute_yast()
  */
 int inst_commit_install()
 {
-  int err = 0;
+  int err = 1;
 
-  if(reboot_ig == 2) {
-    reboot(RB_POWER_OFF);
-  }
-  else if(reboot_ig) {
+  switch(config.restart_method) {
+    case 1:	/* reboot */
+      if(config.rebootmsg){
+        disp_clear_screen();
+        util_disp_init();
+        dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
+      }
 
-    if(config.rebootmsg) {
-      disp_clear_screen();
-      util_disp_init();
-      dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
-    }
+      if(config.test) {
+        fprintf(stderr, "*** reboot ***\n");
+        break;
+      }
 
-    if(config.test) {
-      fprintf(stderr, "*** reboot ***\n");
-    }
-    else {
-#if	defined(__s390__) || defined(__s390x__)
+#if defined(__s390__) || defined(__s390x__)
       reboot(RB_POWER_OFF);
 #else
       reboot(RB_AUTOBOOT);
 #endif
-    }
-    err = 1;
+      break;
+
+    case 2:	/* power off */
+      if(config.test) {
+        fprintf(stderr, "*** power off ***\n");
+        break;
+      }
+
+      reboot(RB_POWER_OFF);
+      break;
+
+    case 3:	/* kexec */
+      if(config.test) {
+        fprintf(stderr, "*** kexec ***\n");
+        break;
+      }
+
+      system("kexec -e");
+      break;
+
+    default:	/* do nothing */
+      err = 0;
+      break;
   }
 
   return err;

@@ -298,6 +298,7 @@ static struct {
   { "Alt"  ,     3                  },
   { "Reboot",    1                  },
   { "Halt",      2                  },
+  { "kexec",     3                  },
   { "no scheme", inst_none          },
   { "file",      inst_file          },
   { "nfs",       inst_nfs           },
@@ -1012,8 +1013,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         slist_free(config.linuxrc);
         config.linuxrc = slist_split(',', f->value);
         if(slist_getentry(config.linuxrc, "nocmdline")) config.info.add_cmdline = 0;
+#if 0
         /* ###### still needed? */
-        if(slist_getentry(config.linuxrc, "reboot")) reboot_ig = 1;
+        if(slist_getentry(config.linuxrc, "reboot")) config.restart_method = 1;
+#endif
         break;
 
       case key_kernel_pcmcia:
@@ -1459,7 +1462,7 @@ int file_read_yast_inf()
       case key_root:
         root = 1;
         if(!f->is.numeric) str_copy(&config.new_root, f->value);
-        reboot_ig = f->nvalue;
+        config.restart_method = f->nvalue;
         break;
 
       case key_keytable:
@@ -1708,7 +1711,7 @@ void file_write_install_inf(char *dir)
   file_write_modparms(f);
 
   file_write_str(f, key_loghost, config.loghost);
-  if(reboot_ig) file_write_num(f, key_reboot, reboot_ig);
+  if(config.restart_method) file_write_num(f, key_reboot, config.restart_method);
   file_write_num(f, key_keyboard, 1);	/* we always have one - what's the point ??? */
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);

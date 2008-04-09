@@ -330,6 +330,7 @@ typedef struct {
   unsigned squash:1;		/* convert cpio/rpm to squashfs after download */
   unsigned keepinstsysconfig:1;	/* don't reload instsys config data */
   unsigned withiscsi;		/* iSCSI parameter */
+  unsigned restart_method;	/* 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
   slist_t *disks;		/* list of harddisk, without '/dev/' */
@@ -573,7 +574,6 @@ extern colorset_t     *colors_prg;
 extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
-extern int             reboot_ig;
 extern char            xkbmodel_tg [20];
 extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;
