@@ -1,3 +1,6 @@
+16/4/2008:	v3.1.17
+	- turn kexec_reboot on per default (bnc #380146)
+
 9/4/2008:	v3.1.16
 	- allow 'root: kexec' in /etc/yast.inf
 

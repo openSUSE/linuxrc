@@ -766,6 +766,7 @@ void lxrc_init()
   config.ntfs_3g = 1;
   config.secure = 1;
   config.squash = 1;
+  config.kexec_reboot = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
