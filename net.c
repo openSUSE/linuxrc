@@ -411,7 +411,7 @@ int net_activate()
 
     net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-    if (!config.forceip) {
+    if (!config.forceip && util_check_exist("/sbin/arping")) {
        sprintf(command, "ifconfig %s up", config.net.device);
        fprintf(stderr, "net_activate: %s\n", command);
        rc = system(command);

@@ -1,3 +1,5 @@
+	- check for existing ip only if 'arping' is available
+
 16/4/2008:	v3.1.17
 	- turn kexec_reboot on per default (bnc #380146)
 
