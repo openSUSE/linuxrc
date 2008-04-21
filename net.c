@@ -1022,6 +1022,7 @@ int net_choose_device()
   file_t *f0, *f;
   slist_t *sl;
   window_t win;
+  static int net_drivers_loaded = 0;
   static int last_item = 0;
   static struct {
     char *dev;
@@ -1050,10 +1051,11 @@ int net_choose_device()
     return 0;
   }
 
-  if(config.manual == 1) {
+  if(config.manual == 1 && !net_drivers_loaded) {
     dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS));
     load_network_mods();
     win_close(&win);
+    net_drivers_loaded = 1;
   }
 
   if(config.manual >= 2) {

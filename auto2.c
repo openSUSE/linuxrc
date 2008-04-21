@@ -521,6 +521,7 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
   slist_t *slm;
   int i, j, ok = 0;
   char buf[256];
+  FILE *msg = config.win ? stderr : stdout;
 
   if(!hd || driver_is_active(hd)) return 1;
 
@@ -547,8 +548,8 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
       ) {
         if(!hd_module_is_active(hd_data, sl1->str)) {
           if(show_modules && !slist_getentry(config.module.broken, sl1->str)) {
-            printf("%s %s", j++ ? "," : "  loading", sl1->str);
-            fflush(stdout);
+            fprintf(msg, "%s %s", j++ ? "," : "  loading", sl1->str);
+            fflush(msg);
           }
           di->module.modprobe ? mod_modprobe(sl1->str, sl2->str) : mod_insmod(sl1->str, sl2->str);
         }
@@ -569,7 +570,7 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
       }
     }
   }
-  if(j) printf("\n");
+  if(j) fprintf(msg, "\n");
 
   return ok;
 }
@@ -596,6 +597,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
   driver_info_t *di;
   int i, active;
   char *mods;
+  FILE *msg = config.win ? stderr : stdout;
 
   for(hd = hd_list(hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
     hd_add_driver_data(hd_data, hd);
@@ -610,7 +612,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
           di->module.names &&
           di->module.names->str
         ) {
-          if(!i) printf("%s\n", hd->model);
+          if(!i) fprintf(msg, "%s\n", hd->model);
           if(hd->driver_module) {
             active =
               !mod_cmp(hd->driver_module, di->module.names->str) ||
@@ -630,7 +632,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
               );
           }
           mods = hd_join("+", di->module.names);
-          printf("%s %s%s",
+          fprintf(msg, "%s %s%s",
             i++ ? "," : "  drivers:",
             mods,
             active ? "*" : ""
@@ -639,8 +641,8 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
         }
       }
       if(i) {
-        printf("\n");
-        fflush(stdout);
+        fprintf(msg, "\n");
+        fflush(msg);
       }
     }
     activate_driver(hd_data, hd, NULL, 1);
