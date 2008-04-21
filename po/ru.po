@@ -1159,8 +1159,12 @@ msgstr ""
 "Извините, неудалось проверить контрольную сумму репозаитария.\n"
 "\n"
 "Если вы действительно доверяете этому репозитарию, вы можете продолжить в небезопасном режиме."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

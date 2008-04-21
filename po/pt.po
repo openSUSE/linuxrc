@@ -1166,8 +1166,12 @@ msgstr ""
 "Desculpe, o teste de checksum do repositório falhou.\n"
 "\n"
 "Se realmente confiar no repositório, poderá continuar em um modo inseguro."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

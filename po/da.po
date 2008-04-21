@@ -1166,8 +1166,12 @@ msgstr ""
 "Beklager, softwarekilden fejlede checksum-test.\n"
 "\n"
 "Hvis du virkelig har tillid til softwarekilden kan du fortsætte i usikker tilstand."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

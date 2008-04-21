@@ -1169,8 +1169,12 @@ msgstr ""
 "Ľutujeme, ale zlyhala kontrola kontrolného súčtu repozitára.\n"
 "\n"
 "Ak naozaj dôverujete repozitáru, môžete pokračovať, ale nie je to bezpečné."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

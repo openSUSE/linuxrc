@@ -55,6 +55,7 @@
 #include "module.h"
 #include "hotplug.h"
 #include "url.h"
+#include "auto2.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -1020,6 +1021,7 @@ int net_choose_device()
   char *buf = NULL;
   file_t *f0, *f;
   slist_t *sl;
+  window_t win;
   static int last_item = 0;
   static struct {
     char *dev;
@@ -1046,6 +1048,12 @@ int net_choose_device()
     str_copy(&config.net.device, config.netdevice);
 
     return 0;
+  }
+
+  if(config.manual == 1) {
+    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS));
+    load_network_mods();
+    win_close(&win);
   }
 
   if(config.manual >= 2) {

@@ -1166,8 +1166,12 @@ msgstr ""
 "Misslyckades med att testa arkivets kontrollsumma.\n"
 "\n"
 "Om du litar på arkivet kan du fortsätta i osäkert läge."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

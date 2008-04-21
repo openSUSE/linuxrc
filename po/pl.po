@@ -1164,8 +1164,12 @@ msgstr ""
 "Test sumy kontrolnej repozytorium nie powiódł się.\n"
 "\n"
 "Jeśli repozytorium jest godne zaufania, istnieje możliwość kontynuowania pracy w trybie obniżonego bezpieczeństwa."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

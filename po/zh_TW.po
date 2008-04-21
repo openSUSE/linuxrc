@@ -1161,8 +1161,12 @@ msgstr ""
 "抱歉，套件庫無法通過 ckecksum 測試。\n"
 "\n"
 "如果您確實相信您的套件庫，您可以使用不安全模式繼續。"
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

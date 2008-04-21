@@ -1172,8 +1172,12 @@ msgstr ""
 "A telepítési forrás ellenőrzőösszegének ellenőrzése sikertelen.\n"
 "\n"
 "Amennyiben a telepítési forrást valóban megbízhatónak tartja, folytathatja a munkát nem megbízható módban."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

@@ -1168,8 +1168,12 @@ msgstr ""
 "Kontrollsumtesten for arkivet mislyktes.\n"
 "\n"
 "Hvis du stoler på dette arkivet, kan du fortsette i usikker modus."
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""
