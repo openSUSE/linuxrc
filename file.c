@@ -280,6 +280,7 @@ static struct {
   { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd                },
   { key_y2gdb,          "Y2GDB",          kf_cfg + kf_cmd                },
   { key_squash,         "squash",         kf_cfg + kf_cmd                },
+  { key_devbyid,        "devbyid",        kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1035,7 +1036,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_updateask:
-        if(f->is.numeric) config.update.ask = f->nvalue;
+        if(f->is.numeric) {
+          config.update.ask = f->nvalue;
+        }
+        else if(*f->value) {
+          slist_append_str(&config.update.urls, f->value);
+        }
         break;
 
       case key_loglevel:
@@ -1430,6 +1436,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_kexec_reboot:
         if(f->is.numeric) config.kexec_reboot = f->nvalue;
+        break;
+
+      case key_devbyid:
+        if(f->is.numeric) config.device_by_id = f->nvalue;
         break;
 
       default:

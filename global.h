@@ -329,6 +329,7 @@ typedef struct {
   unsigned y2gdb:1;		/* pass to yast */
   unsigned squash:1;		/* convert cpio/rpm to squashfs after download */
   unsigned keepinstsysconfig:1;	/* don't reload instsys config data */
+  unsigned device_by_id:1;	/* use /dev/disk/by-id device names */
   unsigned withiscsi;		/* iSCSI parameter */
   unsigned restart_method;	/* 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   char *instsys_id;		/* instsys id */
@@ -418,6 +419,7 @@ typedef struct {
     slist_t *name_list;		/* list of update names */
     slist_t **next_name;	/* points into name_list */
     slist_t *expected_name_list;	/* updates we must have */
+    slist_t *urls;		/* update sources */
   } update;
 
   struct {

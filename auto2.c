@@ -87,13 +87,14 @@ void auto2_scan_hardware()
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
   int ju, err;
-  slist_t *usb_modules = NULL, *sl;
+  slist_t *usb_modules = NULL, *sl, **names;
   int storage_loaded = 0, max_wait;
   hd_data_t *hd_data;
   hd_hw_item_t hw_items[] = {
     hw_storage_ctrl, hw_network_ctrl, hw_hotplug_ctrl, hw_sys, 0
   };
   url_t *url;
+  unsigned dud_count;
 
   hd_data = calloc(1, sizeof *hd_data);
 
@@ -299,14 +300,65 @@ void auto2_scan_hardware()
     printf("Reading info file: %s\n", sl->key);
     fflush(stdout);
     url = url_set(sl->key);
-    err = url_read_file(url, NULL, NULL, "/info", NULL, URL_FLAG_PROGRESS);
+    err = url_read_file(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS);
     url_umount(url);
     url_free(url);
     if(!err) {
       fprintf(stderr, "parsing info file: %s\n", sl->key);
-      file_read_info_file("file:/info", kf_cfg);
+      file_read_info_file("file:/download/info", kf_cfg);
     }
   }
+
+  /* load & run driverupdates */
+
+  dud_count = config.update.count;
+  /* point at list end */
+  for(names = &config.update.name_list; *names; names = &(*names)->next);
+
+  for(sl = config.update.urls; sl; sl = sl->next) {
+    fprintf(stderr, "dud url: %s\n", sl->key);
+    printf("Reading driver update: %s\n", sl->key);
+    fflush(stdout);
+    url = url_set(sl->key);
+    err = url_mount(url, config.mountpoint.update, NULL);
+    if(!err) {
+      util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
+    }
+    url_umount(url);
+    url_free(url);
+  }
+  util_do_driver_updates();
+
+  if(dud_count == config.update.count) {
+    fprintf(stderr, "No new driver updates found.\n");
+    if(config.win && config.manual) {
+      dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
+    }
+    else {
+      printf("No new driver updates found.\n");
+    }
+  }
+  else {
+    if(*names) {
+      if(config.win && config.manual) {
+        dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+      }
+      else {
+        printf("%s:\n", txt_get(TXT_DUD_ADDED));
+        for(sl = *names; sl; sl = sl->next) {
+          printf("  %s\n", sl->key);
+        }
+      }
+    }
+    else {
+      if(config.win && config.manual) {
+        dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+      }
+      else {
+        printf("%s\n", txt_get(TXT_DUD_OK));
+      }
+    }
+  }  
 
   /* set default repository */
   if(!config.url.install) config.url.install = url_set("cd:/");
@@ -817,7 +869,6 @@ char *auto2_splash_name()
 void auto2_kexec(url_t *url)
 {
   char *kernel, *initrd, *buf = NULL, *cmdline = NULL, *splash = NULL, *splash_name = NULL;
-  unsigned char file_buf[0x200];
   FILE *f;
   int i, win, err = 0;
   unsigned vga_mode = 0;
@@ -849,23 +900,6 @@ void auto2_kexec(url_t *url)
     if(!err) {
       strprintf(&buf, "cat %s >>%s", splash, initrd);
       system(buf);
-
-      if(vga_mode) {
-        f = fopen(kernel, "r+");
-        if(f) {
-          if(fread(file_buf, 1, 0x200, f) == 0x200) {
-            if(file_buf[0x1fe] == 0x55 && file_buf[0x1ff] == 0xaa) {
-              file_buf[0x1fa] = vga_mode;
-              file_buf[0x1fb] = vga_mode >> 8;
-              rewind(f);
-              if(fwrite(file_buf, 1, 0x200, f) == 0x200 && config.debug) {
-                fprintf(stderr, "video mode stored\n");
-              }
-            }
-          }
-          fclose(f);
-        }
-      }
     }
     else {
       err = 0;
