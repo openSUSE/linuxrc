@@ -1,3 +1,5 @@
+	- try wired network cards first (bnc #381283)
+
 23/4/2008:	v3.1.19
 	- downloaded 'info' file is now /download/info (bnc #333835)
 	- driver updates can be specified with dud=<url> (fate #302851, bnc #363650)

@@ -61,6 +61,7 @@ static void url_build_instsys_list(char *instsys);
 static char *url_instsys_config(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
+static hd_t *sort_a_bit(hd_t *hd_list);
 
 
 void url_read(url_data_t *url_data)
@@ -1208,7 +1209,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   url_device = url->device;
   if(!url_device) url_device = url->is.network ? config.netdevice : config.device;
 
-  for(found = 0, hd = hd_list(config.hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
+  for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_item, 0, NULL)); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
         hwaddr = res->hwaddr.addr;
@@ -2232,6 +2233,40 @@ slist_t *url_config_get_file_list(char *entry)
   }
 
   return sl;
+}
+
+
+/*
+ * Re-sort hardware list to make some people happy.
+ */
+hd_t *sort_a_bit(hd_t *hd_list)
+{
+  hd_t *hd;
+  unsigned hds = 0;
+
+  for(hd = hd_list; hd; hd = hd->next) hds++;
+
+  if(hds) {
+    hd_t *hd_array[hds + 1];
+    unsigned u = 0;
+
+    // put wlan cards last
+
+    for(hd = hd_list; hd; hd = hd->next) {
+      if(!hd->is.wlan) hd_array[u++] = hd;
+    }
+    for(hd = hd_list; hd; hd = hd->next) {
+      if(hd->is.wlan) hd_array[u++] = hd;
+    }
+
+    hd_array[hds] = NULL;
+
+    for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
+
+    hd_list = hd_array[0];
+  }
+
+  return hd_list;
 }
 
 
