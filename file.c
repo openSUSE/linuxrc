@@ -128,6 +128,7 @@ static struct {
   { key_ipaddr,         "IPAddr",         kf_dhcp                        },
   { key_hostname,       "Hostname",       kf_cfg + kf_cmd                },
   { key_dns,            "DNS",            kf_dhcp                        },
+  { key_dns,            "DNSSERVERS",     kf_dhcp                        },
   { key_dhcpsiaddr,     "DHCPSIAddr",     kf_dhcp                        },
   { key_rootpath,       "RootPath",       kf_dhcp                        },
   { key_bootfile,       "BootFile",       kf_dhcp                        },
