@@ -1710,7 +1710,7 @@ int net_dhcp()
         break;
 
       case key_gateway:
-        if((s = strchr(f->value, ','))) *s = 0;
+        if((s = strchr(f->value, ' '))) *s = 0;
         name2inet(&config.net.gateway, f->value);
         net_check_address2(&config.net.gateway, 0);
         break;
@@ -1733,7 +1733,7 @@ int net_dhcp()
 #endif
 
       case key_dns:
-        for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
+        for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
           net_check_address2(&config.net.nameserver[config.net.nameservers], 0);
           if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;

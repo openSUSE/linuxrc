@@ -1,3 +1,6 @@
+30/4/2008:	v3.1.21
+	- dhcpcd even changed /var/lib/dhcpcd/dhcpcd-*.info format
+
 24/4/2008:	v3.1.20
 	- try wired network cards first (bnc #381283)
 	- adapt to new dhcpcd

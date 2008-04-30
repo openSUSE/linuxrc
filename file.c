@@ -83,6 +83,7 @@ static struct {
   { key_ip,             "IP",             kf_none                        },
   { key_netmask,        "Netmask",        kf_cfg + kf_cmd + kf_dhcp      },
   { key_gateway,        "Gateway",        kf_cfg + kf_cmd + kf_dhcp      },
+  { key_gateway,        "Gateways",       kf_cfg + kf_cmd + kf_dhcp      },
   { key_server,         "Server",         kf_cfg + kf_cmd                },
   { key_nameserver,     "Nameserver",     kf_cfg + kf_cmd                },
   { key_broadcast,      "Broadcast",      kf_cfg + kf_cmd + kf_dhcp      },
@@ -102,6 +103,7 @@ static struct {
   { key_console,        "Console",        kf_none                        },
   { key_ptphost,        "Pointopoint",    kf_cfg + kf_cmd                },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
+  { key_domain,         "DNSDOMAIN",      kf_cfg + kf_cmd + kf_dhcp      },
   { key_manual,         "Manual",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_reboot,         "Reboot",         kf_none                        },	/* drop it? */
   { key_floppydisk,     "Floppydisk",     kf_none                        },	/* ??? */
