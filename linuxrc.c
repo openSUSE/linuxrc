@@ -229,18 +229,6 @@ int main(int argc, char **argv, char **env)
     if(!win_old) util_disp_done();
   }
 
-  if(
-    config.mediacheck &&
-    config.url.install &&
-    config.url.install->is.cdrom
-  ) {
-    int win_old;
-
-    if(!(win_old = config.win)) util_disp_init();
-    md5_verify();
-    if(!win_old) util_disp_done();
-  }
-
   if(!config.manual) {
     if(config.rescue && !config.serial) {
       int win_old = 1;
@@ -974,6 +962,15 @@ void lxrc_init()
   net_setup_localhost();
 
   if(config.manual) file_read_info_file("cmdline", kf_cmd);
+
+  if( config.mediacheck ) {
+    int win_old;
+
+    fprintf(stderr, "In mediacheck\n");
+    if(!(win_old = config.win)) util_disp_init();
+    md5_verify();
+    if(!win_old) util_disp_done();
+  }
 
   if(!config.manual && !auto2_init()) {
     fprintf(stderr, "Automatic setup not possible.\n");

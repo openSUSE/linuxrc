@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -148,7 +150,7 @@ void do_md5(char *file)
   unsigned last_size = ((iso.size - iso.pad) % (sizeof buffer >> 10)) << 10;
   char msg[256];
 
-  if((fd = open(file, O_RDONLY)) == -1) return;
+  if((fd = open(file, O_RDONLY | O_LARGEFILE)) == -1) return;
 
   sprintf(msg, "%s, %s%u", iso.app_id, iso.media_type, iso.media_nr ?: 1);
   dia_status_on(&win, msg);

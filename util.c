@@ -1186,6 +1186,7 @@ void util_status_info()
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
   add_flag(&sl0, buf, config.secure, "secure");
+  add_flag(&sl0, buf, config.mediacheck, "mediacheck");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());

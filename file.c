@@ -280,7 +280,7 @@ static struct {
   { key_yepcert,        "regcert",        kf_cfg + kf_cmd                },
   { key_yepurl,         "smturl",         kf_cfg + kf_cmd                },
   { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                },
-  { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd                },
+  { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd_early          },
   { key_y2gdb,          "Y2GDB",          kf_cfg + kf_cmd                },
   { key_squash,         "squash",         kf_cfg + kf_cmd                },
   { key_devbyid,        "devbyid",        kf_cfg + kf_cmd_early          },
