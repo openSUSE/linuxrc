@@ -284,6 +284,7 @@ static struct {
   { key_y2gdb,          "Y2GDB",          kf_cfg + kf_cmd                },
   { key_squash,         "squash",         kf_cfg + kf_cmd                },
   { key_devbyid,        "devbyid",        kf_cfg + kf_cmd_early          },
+  { key_braille,        "braille",        kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1445,6 +1446,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.device_by_id = f->nvalue;
         break;
 
+      case key_braille:
+        if(f->is.numeric) config.braille.check = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1753,6 +1758,11 @@ void file_write_install_inf(char *dir)
   if(config.module.broken) {
     file_write_str(f, key_brokenmodules, s = slist_join(",", config.module.broken));
     free(s);
+  }
+
+  if(config.braille.dev) {
+    fprintf(f, "Braille: %s\n", config.braille.type);
+    fprintf(f, "Brailledevice: %s\n", config.braille.dev);
   }
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);

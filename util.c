@@ -4585,3 +4585,80 @@ void util_umount_all_devices ()
         (void) fclose (fd);
         }
     }
+
+
+void run_braille()
+{
+  hd_t *hd, *hd1;
+  hd_data_t *hd_data = calloc(1, sizeof *hd_data);
+  char *cmd = NULL;
+  FILE *f;
+
+  printf("detecting braille devices...\n");
+  fprintf(stderr, "detecting braille devices...\n");
+
+  hd_data->debug = -1;
+
+  hd = hd_list(hd_data, hw_braille, 1, NULL);
+  // be persistent...
+  if(!hd) hd = hd_list(hd_data, hw_braille, 1, NULL);
+
+  if(config.debug) {
+    f = fopen("/var/log/braille.log", "w");
+    if(f) {
+      fprintf(f, "%s\n", hd_data->log);
+      for(hd1 = hd_data->hd; hd1; hd1 = hd1->next) {
+        hd_dump_entry(hd_data, hd1, f);
+      }
+      hd_dump_entry(hd_data, hd, f);
+      fclose(f);
+    }
+  }
+
+  for(; hd; hd = hd->next) {
+    if(
+      hd->base_class.id == bc_braille &&        /* is a braille display */
+      hd->unix_dev_name &&                      /* and has a device name */
+      hd->device.name
+    ) {
+      break;
+    }
+  }
+
+  if(hd) {
+    str_copy(&config.braille.dev, hd->unix_dev_name);
+    str_copy(&config.braille.type, hd->device.name);
+  }
+  else {
+    str_copy(&config.braille.dev, NULL);
+    str_copy(&config.braille.type, NULL);
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  if(config.braille.dev) {
+    printf("%s: %s\n", config.braille.dev, config.braille.type);
+    fprintf(stderr, "%s: %s\n", config.braille.dev, config.braille.type);
+
+    if(util_check_exist("/etc/suse-blinux.conf") == 'r') {
+      strprintf(&cmd,
+        "sed -i -e 's#^brlname=.*#brlname=%s#; s#^brlport=.*#brlport=%s#' /etc/suse-blinux.conf",
+        config.braille.type, config.braille.dev
+      );
+
+      if(config.debug) fprintf(stderr, "%s\n", cmd);
+      system(cmd);
+
+      str_copy(&cmd, NULL);
+
+      system("/etc/init.d/brld start >&2");
+      system("/etc/init.d/sbl start >&2");
+
+      str_copy(&config.setupcmd, "inst_setup yast");
+
+      LXRC_WAIT
+    }
+  }
+}
+

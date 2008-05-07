@@ -277,6 +277,8 @@ int net_setup_localhost()
     fprintf (stderr, "Setting up localhost...");
     fflush (stdout);
 
+    if(!util_check_exist("/etc/hosts")) system("echo 127.0.0.1 localhost >/etc/hosts");
+
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)
         return (socket_ii);

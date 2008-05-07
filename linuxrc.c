@@ -522,7 +522,7 @@ int do_not_kill(char *name)
 {
   static char *progs[] = {
     "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs", "udevd",
-    "mount.ntfs-3g"
+    "mount.ntfs-3g", "brld", "sbl"
   };
   int i;
 
@@ -896,7 +896,7 @@ void lxrc_init()
 
   /* get usb keyboard working */
   if(config.manual == 1 && !config.had_segv) util_load_usb();
-  
+
 #if defined(__s390__) || defined(__s390x__)
   /* activate boot FCP adapter */
   {
@@ -962,6 +962,8 @@ void lxrc_init()
   net_setup_localhost();
 
   if(config.manual) file_read_info_file("cmdline", kf_cmd);
+
+  if(config.braille.check) run_braille();
 
   if( config.mediacheck ) {
     int win_old;

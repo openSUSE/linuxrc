@@ -158,4 +158,5 @@ int util_copy_file(char *src_dir, char *src_file, char *dst);
 char *new_download(void);
 void util_clear_downloads(void);
 void util_wait(const char *file, int line);
+void run_braille(void);
 

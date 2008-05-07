@@ -1,3 +1,8 @@
+7/5/2008:	v3.1.22
+	- added option 'braille=1' to start braille support in linuxrc
+	- fix media check (bnc#385885)
+	- left align list of SLP installation sources
+
 30/4/2008:	v3.1.21
 	- dhcpcd even changed /var/lib/dhcpcd/dhcpcd-*.info format
 

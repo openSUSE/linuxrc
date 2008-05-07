@@ -332,6 +332,11 @@ typedef struct {
   unsigned device_by_id:1;	/* use /dev/disk/by-id device names */
   unsigned withiscsi;		/* iSCSI parameter */
   unsigned restart_method;	/* 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
+  struct {
+    unsigned check:1;		/* check for braille displays and start brld if found */
+    char *dev;			/* braille device */
+    char *type;			/* braille driver */
+  } braille;
   char *instsys_id;		/* instsys id */
   char *initrd_id;		/* initrd id */
   slist_t *disks;		/* list of harddisk, without '/dev/' */
