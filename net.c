@@ -844,8 +844,7 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
  * server: server address
  * hostdir: directory on server
  *
- * config.net.nfs_rsize: read size
- * config.net.nfs_wsize: write size
+ * config.net.nfs: nfs options
  *
  * return:
  *      0: ok
@@ -854,10 +853,13 @@ int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
  */
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port)
 {
-  int err;
+  int err, flags = NFS_MOUNT_NONLM;
+
+  if(!config.net.nfs.udp) flags |= NFS_MOUNT_TCP;
+  if(config.net.nfs.vers != 2) flags |= NFS_MOUNT_VER3;
 
   /* first, v3 with tcp */
-  err = _net_mount_nfs(mountpoint, server, hostdir, port, NFS_MOUNT_TCP | NFS_MOUNT_VER3 | NFS_MOUNT_NONLM);
+  err = _net_mount_nfs(mountpoint, server, hostdir, port, flags);
 
   /* if that doesn't work, try v2, with udp */
   if(err == EPROTONOSUPPORT) {
@@ -878,8 +880,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port
  * hostdir: directory on server
  * flags: NFS mount flags
  *
- * config.net.nfs_rsize: read size
- * config.net.nfs_wsize: write size
+ * config.net.nfs: nfs options
  *
  * return:
  *      0: ok
@@ -907,8 +908,8 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned por
   memcpy(&mount_server_in, &server_in, sizeof mount_server_in);
   memset(&mount_data, 0, sizeof mount_data);
   mount_data.flags = flags;
-  mount_data.rsize = config.net.nfs_rsize;
-  mount_data.wsize = config.net.nfs_wsize;
+  mount_data.rsize = config.net.nfs.rsize;
+  mount_data.wsize = config.net.nfs.wsize;
   mount_data.retrans = 3;
   mount_data.acregmin = 3;
   mount_data.acregmax = 60;

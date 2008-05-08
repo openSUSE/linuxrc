@@ -285,6 +285,7 @@ static struct {
   { key_squash,         "squash",         kf_cfg + kf_cmd                },
   { key_devbyid,        "devbyid",        kf_cfg + kf_cmd_early          },
   { key_braille,        "braille",        kf_cfg + kf_cmd_early          },
+  { key_nfsopts,        "nfs.opts",       kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -911,11 +912,11 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_nfsrsize:
-        if(f->is.numeric) config.net.nfs_rsize = f->nvalue;
+        if(f->is.numeric) config.net.nfs.rsize = f->nvalue;
         break;
 
       case key_nfswsize:
-        if(f->is.numeric) config.net.nfs_wsize = f->nvalue;
+        if(f->is.numeric) config.net.nfs.wsize = f->nvalue;
         break;
 
       case key_setupcmd:
@@ -1448,6 +1449,31 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_braille:
         if(f->is.numeric) config.braille.check = f->nvalue;
+        break;
+
+      case key_nfsopts:
+        if(*f->value) {
+          str_copy(&config.net.nfs.opts, f->value);
+          sl0 = slist_split(',', f->value);
+          for(sl = sl0; sl; sl = sl->next) {
+            if(sscanf(sl->key, "rsize=%u", &u) == 1) {
+              config.net.nfs.rsize = u;
+            }
+            else if(sscanf(sl->key, "wsize=%u", &u) == 1) {
+              config.net.nfs.wsize = u;
+            }
+            else if(sscanf(sl->key, "vers=%u", &u) == 1) {
+              config.net.nfs.vers = u;
+            }
+            else if(!strcmp(sl->key, "udp")) {
+              config.net.nfs.udp = 1;
+            }
+            else if(!strcmp(sl->key, "tcp")) {
+              config.net.nfs.udp = 0;
+            }
+          }
+          slist_free(sl0);
+        }
         break;
 
       default:

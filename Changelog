@@ -1,3 +1,5 @@
+	- added 'nfsops' option to pass nfs mount options
+
 7/5/2008:	v3.1.22
 	- added option 'braille=1' to start braille support in linuxrc
 	- fix media check (bnc#385885)

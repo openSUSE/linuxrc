@@ -504,8 +504,13 @@ typedef struct {
     int tftp_timeout;
     int bootp_wait;		/* wait this time (in s) after network setup before starting bootp */
     int ifup_wait;		/* wait this time (in s) after network setup */
-    int nfs_rsize;		/* nfs rsize mount option */
-    int nfs_wsize;		/* nfs wsize mount option */
+    struct {
+      char *opts;		/* mount options string */
+      unsigned rsize;		/* nfs rsize mount option */
+      unsigned wsize;		/* nfs wsize mount option */
+      unsigned udp:1;		/* udp instead of tcp */
+      unsigned vers;		/* nfs version (2 or 3) */
+    } nfs;
     int retry;			/* max retry count for network connections */
     inet_t netmask;
     inet_t network;
