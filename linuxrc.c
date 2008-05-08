@@ -933,6 +933,22 @@ void lxrc_init()
   }
 #endif
 
+#if defined(__powerpc__)
+#warning ps3vram
+  /* enable swap to videoram on PS3 */
+  {
+    char cmd[] = "s=/dev/mtdblock0;/sbin/swapoff $s;mkswap -L ps3_vram_swap $s&&swapon $s";
+
+    fprintf(stderr,"loading ps3vram and mtdblock\n");
+    mod_modprobe("ps3vram","");
+    mod_modprobe("mtdblock","");
+    if(!config.test && util_check_exist("/sys/block/mtdblock0")) {
+      fprintf(stderr,"executing %s\n",cmd);
+      system(cmd);
+    }
+  }
+#endif
+
   if(config.memory.ram_min && !config.had_segv) {
     int window = config.win, ram;
     char *msg = NULL;
