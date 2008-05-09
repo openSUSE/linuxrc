@@ -1,3 +1,6 @@
+9/5/2008:	v3.1.27
+	- ps3: use udevsettle
+
 9/5/2008:	v3.1.26
 	- added size parameter to util_read_and_chop()
 	- drop adfs detection

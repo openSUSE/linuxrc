@@ -943,7 +943,7 @@ void lxrc_init()
    * Also enable swap to videoram on PS3.
    */
   {
-    const char cmd[] = "s=/dev/mtdblock0;mkswap -L ps3_vram_swap $s&&swapon -p 42 $s";
+    const char cmd[] = "s=/dev/mtdblock0;udevsettle --timeout=3;mkswap -L ps3_vram_swap $s&&swapon -p 42 $s";
     char buf[16];
 
     if(util_read_and_chop("/proc/device-tree/model", buf, sizeof buf))
