@@ -1865,42 +1865,6 @@ void if_down(char *dev)
 
 #include <dirent.h>
 
-void net_list_s390_devs(char* driver, int model)
-{
-#if 0	/* unnecessary with new interface */
-  char buf[4<<10];	/* good enough for ca. 240 devices */
-  char tmp[256];
-  DIR* driv;
-  struct dirent* devs;
-  char* bp=&buf[0];
-  int count = 0;
-
-  strcpy(buf,"no devices found\n");
-
-  if(!config.manual) return;
-  
-  driv=opendir("/sys/bus/ccw/devices");
-  while((devs = readdir(driv)))
-  {
-    if(devs->d_type == DT_DIR) continue;
-    sprintf(tmp,"/sys/bus/ccw/devices/%s/cutype", devs->d_name);
-    util_read_and_chop(tmp, tmp);
-    if(model && strtol(tmp+5,NULL,16)!=model) continue;
-    bp+=sprintf(bp,"%s ",devs->d_name);
-    bp+=sprintf(bp,"%s\n",tmp);	/* attribute contains a LF */
-    count++;
-    if(count % 100 == 0)	/* avoid buffer overruns with many devices */
-    {
-      dia_message(buf, MSGTYPE_INFO);
-      bp = &buf[0];
-      buf[0] = 0;
-    }
-  }
-  closedir(driv);
-  if(buf[0]) dia_message(buf,MSGTYPE_INFO);
-#endif
-}
-
 int net_check_ccw_address(char* addr)
 {
   int i;
@@ -2182,8 +2146,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   case di_390net_escon:
     mod_modprobe("ctc",NULL);	// FIXME: error handling
 
-    if(!hd) net_list_s390_devs("cu3088",0);	// FIXME: filter CTC/ESCON devices
-
     if((rc=net_s390_getrwchans_ex(hd))) return rc;
     
     /* ask for CTC protocol */
@@ -2283,8 +2245,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     {
       mod_modprobe("qeth",NULL);	// FIXME: error handling
 
-      if(!hd) net_list_s390_devs("qeth", config.hwp.type == di_390net_hsi ? 5 : 1);
-
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       IFNOTAUTO(config.hwp.datachan)
         if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
@@ -2324,8 +2284,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     else	/* LCS */
     {
       mod_modprobe("lcs",NULL);	// FIXME: error handling
-      
-      if(!hd) net_list_s390_devs("cu3088",0);	// FIXME: filter LCS devices
       
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       

@@ -140,7 +140,7 @@ void store_driverid(driver_t *drv);
 int match_netdevice(char *device, char *hwaddr, char *key);
 
 char* util_chop_lf(char* str);
-int util_read_and_chop(char* path, char* dst);
+int util_read_and_chop(char* path, char* dst, int dst_size);
 
 char *get_translation(slist_t *trans, char *locale);
 int util_process_running(char *name);

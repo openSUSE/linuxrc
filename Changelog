@@ -1,3 +1,9 @@
+9/5/2008:	v3.1.26
+	- added size parameter to util_read_and_chop()
+	- drop adfs detection
+	- load ps3_gelic
+	- removed net_list_s390_devs()
+
 9/5/2008:	v3.1.25
 	- removed braille detection workaround
 	- translations updated

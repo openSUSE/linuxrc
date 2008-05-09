@@ -906,19 +906,19 @@ void lxrc_init()
     char lun[40];
     char cmd[200];
     
-    if(util_read_and_chop("/sys/firmware/ipl/ipl_type",ipl_type))
+    if(util_read_and_chop("/sys/firmware/ipl/ipl_type", ipl_type, sizeof ipl_type))
     {
       if(strcmp(ipl_type,"fcp")==0)
       {
         mod_modprobe("zfcp","");
-        if(util_read_and_chop("/sys/firmware/ipl/device",device))
+        if(util_read_and_chop("/sys/firmware/ipl/device", device, sizeof device))
         {
           sprintf(cmd,"/sbin/zfcp_host_configure %s 1",device);
           fprintf(stderr,"executing %s\n",cmd);
           if(!config.test) system(cmd);
-          if(util_read_and_chop("/sys/firmware/ipl/wwpn",wwpn))
+          if(util_read_and_chop("/sys/firmware/ipl/wwpn", wwpn, sizeof wwpn))
           {
-            if(util_read_and_chop("/sys/firmware/ipl/lun",lun))
+            if(util_read_and_chop("/sys/firmware/ipl/lun", lun, sizeof lun))
             {
               sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s 1",device,wwpn,lun);
               fprintf(stderr,"executing %s\n",cmd);
@@ -934,17 +934,32 @@ void lxrc_init()
 #endif
 
 #if defined(__powerpc__)
-#warning ps3vram
-  /* enable swap to videoram on PS3 */
+  /*
+   * The network interface on the PS3 uses the same MAC address for both
+   * eth0 and wlan0. hwinfo needs to know the kernel device name to distinguish
+   * between the two interfaces. Because the sysfs directory are only created
+   * if the driver is loaded, we force loading ps3_gelic because linuxrc would
+   * load it anyway if hwinfo would find a network card.
+   * Also enable swap to videoram on PS3.
+   */
   {
-    char cmd[] = "s=/dev/mtdblock0;/sbin/swapoff $s;mkswap -L ps3_vram_swap $s&&swapon $s";
+    const char cmd[] = "s=/dev/mtdblock0;mkswap -L ps3_vram_swap $s&&swapon -p 42 $s";
+    char buf[16];
 
-    fprintf(stderr,"loading ps3vram and mtdblock\n");
-    mod_modprobe("ps3vram","");
-    mod_modprobe("mtdblock","");
-    if(!config.test && util_check_exist("/sys/block/mtdblock0")) {
-      fprintf(stderr,"executing %s\n",cmd);
-      system(cmd);
+    if(util_read_and_chop("/proc/device-tree/model", buf, sizeof buf))
+    {
+      if(strcmp(buf,"SonyPS3")==0)
+      {
+        fprintf(stderr,"loading ps3vram, mtdblock and ps3_gelic\n");
+        mod_modprobe("ps3vram","");
+        mod_modprobe("mtdblock","");
+        mod_modprobe("ps3_gelic","");
+        if(!config.test && util_check_exist("/sys/block/mtdblock0"))
+        {
+          fprintf(stderr,"executing %s\n",cmd);
+          system(cmd);
+	}
+      }
     }
   }
 #endif

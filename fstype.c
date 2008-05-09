@@ -21,7 +21,7 @@
  * added Native Language Support
  *
  * 2000-12-01 Sepp Wijnands <mrrazz@garbage-coderz.net>
- * added probes for cramfs, hfs, hpfs and adfs.
+ * added probes for cramfs, hfs, hpfs.
  *
  * 2001-10-26 Tim Launchbury
  * added sysv magic.
@@ -91,7 +91,7 @@ assemble4le(unsigned char *p) {
 #if 0
 static char
 *magic_known[] = {
-	"adfs", "bfs", "cramfs", "ext", "ext2", "ext3",
+	"bfs", "cramfs", "ext", "ext2", "ext3",
 	"hfs", "hpfs", "iso9660", "jfs", "minix", "ntfs",
 	"qnx4", "reiserfs", "romfs", "swap", "sysv", "udf", "ufs",
 	"vxfs", "xfs", "xiafs"
@@ -124,22 +124,6 @@ may_be_swap(const char *s) {
 	return (strncmp(s-10, "SWAP-SPACE", 10) == 0 ||
 		strncmp(s-10, "SWAPSPACE2", 10) == 0);
 }
-
-#ifdef ALL_TYPES
-/* rather weak necessary condition */
-static int
-may_be_adfs(const u_char *s) {
-	u_char *p;
-	int sum;
-
-	p = (u_char *) s + 511;
-	sum = 0;
-	while(--p != s)
-		sum = (sum >> 8) + (sum & 0xff) + *p;
-
-	return (sum == p[511]);
-}
-#endif
 
 static int is_reiserfs_magic_string (struct reiserfs_super_block * rs)
 {
@@ -182,7 +166,6 @@ fstype(const char *device) {
 #ifdef ALL_TYPES
     struct hfs_super_block hfssb;
     struct hpfs_super_block hpfssb;
-    struct adfs_super_block adfssb;
     struct sysv_super_block svsb;
 #endif
     struct stat64 statbuf;
@@ -337,21 +320,6 @@ fstype(const char *device) {
             (swapped(hfsmagic(hfssb)) == HFS_SUPER_MAGIC &&
              hfsblksize(hfssb) == 0x200))
              type = "hfs";
-    }
-#endif
-
-#ifdef ALL_TYPES
-    if (!type) {
-	/* block 3 */
-        if (lseek(fd, 0xc00, SEEK_SET) != 0xc00
-            || read(fd, (char *) &adfssb, sizeof(adfssb)) != sizeof(adfssb))
-             goto io_error;
-
-	/* only a weak test */
-        if (may_be_adfs((u_char *) &adfssb)
-            && (adfsblksize(adfssb) >= 8 &&
-                adfsblksize(adfssb) <= 10))
-             type = "adfs";
     }
 #endif
 
