@@ -4,13 +4,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2007-08-27 17:41-0300\n"
-"Last-Translator: Luiz Fernando Ranghetti <elchevive68@gmail.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2008-05-08 21:58-0300\n"
+"Last-Translator: \n"
+"Language-Team: Brazilian Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: \n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -82,7 +83,7 @@ msgstr "Carregar Módulos de Placa de Rede"
 
 #. TXT_SHOW_MODULES
 msgid "Show Loaded Modules"
-msgstr "Mostrar Módulos Carregados"
+msgstr "Exibir Módulos Carregados"
 
 #. TXT_AUTO_LOAD
 msgid "Load Modules Automatically"
@@ -399,7 +400,7 @@ msgstr ""
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Impossível sair de Linuxrc com <Ctrl-C>."
+msgstr "Não foi possível sair do Linuxrc com <Ctrl-C>."
 
 #. TXT_REMOVE_DISK
 msgid "Remove the disk from the drive now."
@@ -425,7 +426,7 @@ msgstr "Tentativa de montar o CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 msgid "Unable to mount the CD-ROM."
-msgstr "Impossível montar o CD-ROM."
+msgstr "Não foi possível montar o CD-ROM."
 
 #. TXT_ASK_REBOOT
 msgid "Reboot the system now?"
@@ -441,7 +442,7 @@ msgstr "Digite a partição do disco rígido (por exemplo, /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
-msgstr "Impossível montar a partição especificada."
+msgstr "Não foi possível montar a partição especificada."
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
@@ -479,7 +480,7 @@ msgstr "Nenhuma unidade de disco rígido ou CD-ROM foi detectada até agora."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
-msgstr "Debug (Experte)"
+msgstr "Debug (avançado)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
@@ -536,7 +537,7 @@ msgstr "Sua rede já está configurada. Manter esta configuração?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
-msgstr "Interromper?"
+msgstr "Cancelar?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
@@ -618,7 +619,7 @@ msgstr "Ejetar CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp Time-Out"
-msgstr "Tempo de espera de Bootp"
+msgstr "Tempo de Espera do Bootp"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for bootp."
@@ -754,7 +755,7 @@ msgstr "Continuar"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "Interromper"
+msgstr "Cancelar"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
@@ -855,7 +856,7 @@ msgstr "Adicionar Atualização de Driver"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Mostrar Atualizações de Driver"
+msgstr "Exibir Atualizações de Driver"
 
 #. TXT_INPUT_NAMED1
 #, c-format
@@ -868,7 +869,7 @@ msgid ""
 "You will be required to change this password on initial root user login."
 msgstr ""
 "Digite a senha raiz temporária.\n"
-"Você deverá mudar essa senha ao efetuar login inicial como usuário raiz."
+"Você deverá alterar essa senha ao efetuar login inicial como usuário raiz."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -1038,7 +1039,7 @@ msgstr "Nenhum erro encontrado."
 
 #. TXT_CD_MD5_FAILED
 msgid "Checksum wrong."
-msgstr "Checksum incorreto."
+msgstr "Soma de verificação incorreta."
 
 #. TXT_CD_READ_FAILED
 #, c-format
@@ -1160,7 +1161,7 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-"Desculpe, o repositório falhou no teste do checksum.\n"
+"Desculpe, o repositório falhou no teste da soma de verificação.\n"
 "\n"
 "Se você realmente acredita neste repositório, você deve continuar em um modo inseguro."
 

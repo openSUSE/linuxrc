@@ -1148,6 +1148,7 @@ msgstr "您需要使用者名稱和密碼來存取這個代理嗎？"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
+#, c-format
 msgid "Do you need a username and password to access the %s server?"
 msgstr "您需要使用者名稱和密碼來存取這個 %s 伺服器嗎？"
 

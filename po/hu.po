@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc.hu\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-09-03 22:35+0200\n"
+"PO-Revision-Date: 2008-04-13 21:49+0200\n"
 "Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
 "Language-Team:  <hu@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -334,7 +334,7 @@ msgstr "Token Ring hálózati kártya"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "Arcnet hálózati kártya"
+msgstr "arcnet hálózati kártya"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
@@ -541,7 +541,7 @@ msgstr "A hálózat jelenleg be van állítva. Megtartja ezt a beállítást?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
-msgstr "Elvetés?"
+msgstr "Megszakítás?"
 
 #. TXT_NO_NETDEVICE
 msgid ""
@@ -623,7 +623,7 @@ msgstr "CD kiadása"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "Bootp Time-Out"
-msgstr "Bootp time-out"
+msgstr "Bootp időtúllépés"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for bootp."
@@ -761,7 +761,7 @@ msgstr "Folytatás"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "Elvetés"
+msgstr "Megszakítás"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
@@ -1111,7 +1111,7 @@ msgstr "Válassza ki a CCW busz csatolóját."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "Válassza ki a fizikai közeget."
+msgstr "Válassza ki a fizikai adathordozót."
 
 #. progress indicator label
 #. TXT_LOADING_MODULES

@@ -4600,8 +4600,6 @@ void run_braille()
   hd_data->debug = -1;
 
   hd = hd_list(hd_data, hw_braille, 1, NULL);
-  // be persistent...
-  if(!hd) hd = hd_list(hd_data, hw_braille, 1, NULL);
 
   if(config.debug) {
     f = fopen("/var/log/braille.log", "w");

@@ -9,9 +9,9 @@ msgstr ""
 "Project-Id-Version: linuxrc.de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-07-27 16:23+0200\n"
-"PO-Revision-Date: 2007-08-23 22:37+0200\n"
-"Last-Translator: Michael Skiba <michael@michael-skiba.de>\n"
-"Language-Team: Deutsch <i18n@suse.de>\n"
+"PO-Revision-Date: 2008-04-28 00:00+0200\n"
+"Last-Translator: Michael Skiba <trans@michael-skiba.de>\n"
+"Language-Team: German <opensuse-translation-de@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -150,7 +150,7 @@ msgstr "Installiertes System starten"
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Suche nach Image \"%s\"..."
+msgstr "Suche nach Abbild \"%s\"..."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
@@ -489,15 +489,15 @@ msgstr "Debug (Experte)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Root-Image in die RAM Disk laden"
+msgstr "Root-Abbild in die RAM Disk laden"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr "Root-Image eingeben"
+msgstr "Root-Abbild eingeben"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
-msgstr "Soll das Root-Image in die RAM Disk geladen werden?"
+msgstr "Soll das Root-Abbild in die RAM Disk geladen werden?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Enter the path and name of the file to load into the RAM disk as the root file system."

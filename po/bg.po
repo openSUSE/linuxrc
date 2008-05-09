@@ -8,7 +8,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: bg\n"
-"PO-Revision-Date: 2005-08-19 11:20+0300\n"
+"PO-Revision-Date: 2008-04-14 11:37+0200\n"
 "Last-Translator: Borislav Mitev <morbid_viper@tkzs.org>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1140,23 +1140,23 @@ msgstr "Желаете ли да разрешите поддържка за OSI 
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr ""
+msgstr "Въведете ръчно параметрите за мрежовото устройство"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr ""
+msgstr "Не са открити хранилища."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr ""
+msgstr "Необходими ли са ви потребителско име и парола за достъп до проксито?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr ""
+msgstr "Необходими ли са ви потребителско име и парола за достъп до %s сървъра?"
 
 #. our installation repository
 #. TXT_INSECURE_REPO
@@ -1165,6 +1165,9 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
+"За съжаление проверката на контролната сума за хранилището бе неуспешна.\n"
+"\n"
+"Ако наистина вярвате на това хранилище можете да продължите в несигурен режим."
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
