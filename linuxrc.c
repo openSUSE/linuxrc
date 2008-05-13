@@ -112,7 +112,7 @@ static struct {
   { "kill",        util_kill_main        },
   { "killall",     util_killall_main     },
   { "bootpc",      util_bootpc_main      },
-  { "swapon",      util_swapon_main      },
+//  { "swapon",      util_swapon_main      },
   { "swapoff",     util_swapoff_main     },
   { "raidautorun", util_raidautorun_main },
   { "free",        util_free_main        },
