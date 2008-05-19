@@ -941,6 +941,10 @@ void lxrc_init()
    * if the driver is loaded, we force loading ps3_gelic because linuxrc would
    * load it anyway if hwinfo would find a network card.
    * Also enable swap to videoram on PS3.
+   *
+   * On Pegasos2, mv643xx_eth will create several files in sysfs. Only one of
+   * them points to the real network interface. To keep the interface ordering
+   * stable, load 100MBit before 1000MBit.
    */
   {
     const char cmd[] = "s=/dev/mtdblock0;udevsettle --timeout=3;mkswap -L ps3_vram_swap $s&&swapon -p 42 $s";
@@ -959,6 +963,11 @@ void lxrc_init()
           fprintf(stderr,"executing %s\n",cmd);
           system(cmd);
 	}
+      } else if(strcmp(buf,"Pegasos2")==0)
+      {
+        fprintf(stderr,"preloading via-rhine, loading mv643xx_eth\n");
+        mod_modprobe("via-rhine","");
+        mod_modprobe("mv643xx_eth","");
       }
     }
   }

@@ -1,3 +1,8 @@
+19/5/2008:	v3.1.29
+	- on zSeries, no ESC key is available to cancel input.
+	  Use "+++" instead (bnc#388424)
+	- load mv643xx_eth (bnc #359867)
+
 13/5/2008:	v3.1.28
 	- ps3: use real 'swapon'
 
