@@ -1,3 +1,5 @@
+	- s390: switch from hwcfg to udev
+
 19/5/2008:	v3.1.29
 	- on zSeries, no ESC key is available to cancel input.
 	  Use "+++" instead (bnc#388424)

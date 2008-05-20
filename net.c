@@ -2081,6 +2081,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   int rc;
   char buf[100];
   char hwcfg_name[40];
+  char* chans[3] = { config.hwp.readchan, config.hwp.writechan, config.hwp.datachan };
+  char* chanlist[27];
 
   if(hd) switch(hd->sub_class.id) {
   case 0x89:	/* OSA2 */
@@ -2199,6 +2201,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     config.hwp.scriptup_ccwgroup="hwup-ctc";
     config.hwp.ccw_chan_num=2;
     strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
+    sprintf(chanlist, "%s,%s", config.hwp.readchan, config.hwp.writechan);
     
     if(device) net_s390_get_ifname(config.hwp.readchan, device);
     
@@ -2287,6 +2290,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       net_s390_set_config_ccwdev();
       config.hwp.scriptup_ccwgroup="hwup-qeth";
       strprintf(&config.hwp.ccw_chan_ids,"%s %s %s",config.hwp.readchan,config.hwp.writechan,config.hwp.datachan);
+      sprintf(chanlist, "%s,%s,%s", config.hwp.readchan, config.hwp.writechan, config.hwp.datachan);
       config.hwp.ccw_chan_num=3;
     }
     else	/* LCS */
@@ -2311,6 +2315,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       config.hwp.scriptup_ccwgroup="hwup-lcs";
       config.hwp.ccw_chan_num=2;
       strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
+      sprintf(chanlist, "%s,%s", config.hwp.readchan, config.hwp.writechan);
     }
     
     if(device) net_s390_get_ifname(config.hwp.readchan, device);
@@ -2322,26 +2327,57 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   }
   
   /* write hwcfg file */
-  if (mkdir("/etc/sysconfig/hardware", (mode_t)0755) && errno != EEXIST)
+  if (mkdir("/etc/udev/rules.d", (mode_t)0755) && errno != EEXIST)
     return -1;
-  sprintf(buf,"/etc/sysconfig/hardware/hwcfg-%s",hwcfg_name);
+  
+  sprintf(buf,"/etc/udev/rules.d/55-%s-",hwcfg_name);
+  if (config.hwp.type == di_390net_iucv)
+    sprintf(buf, "%s.rules", config.hwp.userid);
+  else
+    sprintf(buf, "%s.rules", config.hwp.readchan);
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
-# define HWE(var,string) if(config.hwp.var) fprintf(fp, #string "=\"%s\"\n",config.hwp.var);
-  HWE(startmode,STARTMODE)
-  HWE(module,MODULE)
-  HWE(module_options,MODULE_OPTIONS)
-  HWE(module_unload,MODULE_UNLOAD)
-  HWE(scriptup,SCRIPTUP)
-  HWE(scriptup_ccw,SCRIPTUP_ccw)
-  HWE(scriptup_ccwgroup,SCRIPTUP_ccwgroup)
-  HWE(scriptdown,SCRIPTDOWN)
-  HWE(ccw_chan_ids,CCW_CHAN_IDS)
-  if(config.hwp.ccw_chan_num) fprintf(fp,"CCW_CHAN_NUM=\"%d\"\n",config.hwp.ccw_chan_num);
-  if(config.hwp.protocol) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",config.hwp.protocol-1);
-  HWE(portname,CCW_CHAN_MODE)
-  if(config.hwp.layer2) fprintf(fp,"QETH_LAYER2_SUPPORT=\"%d\"\n",config.hwp.layer2 - 1);
-# undef HWE
+
+  if(config.hwp.type == di_390net_iucv) {
+    /* add netiucv to MODULES_LOADED_ON_BOOT */
+    if(mkdir("/etc/sysconfig", (mode_t)0755) && errno != EEXIST)
+      return -1;
+    FILE* fpk = fopen("/etc/sysconfig/kernel", "a");
+    if(!fpk) return -1;
+    fprintf(fpk, "MODULES_LOADED_ON_BOOT=\"$MODULES_LOADED_ON_BOOT netiucv\"\n");
+    fclose(fpk);
+    
+    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"drivers\", KERNEL==\"netiucv\", ATTR{connection}=\"%s\"\n",
+      config.hwp.userid);
+  }
+  else {
+    for(i = 0; i < config.hwp.ccw_chan_num; i++) {
+      fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccw\", KERNEL==\"%s\", RUN+=\"/sbin/modprobe --quiet %s\"\n",
+        chans[i] /* IUCV? */, config.hwp.module);
+    }
+    
+    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"drivers\", KERNEL==\"%s\", IMPORT{program}=\"collect %s %%k %s %s\"\n",
+      (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module,
+      config.hwp.readchan, config.hwp.ccw_chan_ids,
+      (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module);
+    
+    for(i = 0; i < config.hwp.ccw_chan_num; i++) {
+      fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccw\", KERNEL==\"%s\", IMPORT{program}=\"collect %s %%k %s %s\"\n",
+        chans[i], config.hwp.readchan, config.hwp.ccw_chan_ids,
+        (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module);
+    }
+
+    fprintf(fp, "TEST==\"[ccwgroup/%s]\", GOTO=\"%s-%s_end\"\n", config.hwp.readchan, config.hwp.module, config.hwp.readchan);
+    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccw\", ENV{COLLECT_%s}==\"0\", ATTR{[drivers/ccwgroup:%s]group}=\"%s\"\n",
+      config.hwp.readchan, config.hwp.module, chanlist);
+    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"drivers\", KERNEL==\"%s\", ENV{COLLECT_%s}==\"0\", ATTR{[drivers/ccwgroup:%s]group}=\"%s\"\n",
+      (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module,
+      config.hwp.readchan, config.hwp.module, chanlist);
+    fprintf(fp, "LABEL=\"%s-%s_end\"\n", config.hwp.module, config.hwp.readchan);
+    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccwgroup\", KERNEL==\"%s\", ATTR{online}=\"1\"\n",
+      config.hwp.readchan);
+  }
+      
   fclose(fp);
   
   //net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
