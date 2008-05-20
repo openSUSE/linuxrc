@@ -1288,6 +1288,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
  * Read file 'src' relative to 'url' and write it to 'dst'. If 'dir' is set,
  * mount 'url' at 'dir' if necessary.
  *
+ * Note: modifies url->path. (intentionally?)
+ *
  * return:
  *   0: ok
  *   1: failed

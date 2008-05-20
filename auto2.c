@@ -310,55 +310,79 @@ void auto2_scan_hardware()
   }
 
   /* load & run driverupdates */
+  if(config.update.urls) {
+    dud_count = config.update.count;
+    /* point at list end */
+    for(names = &config.update.name_list; *names; names = &(*names)->next);
 
-  dud_count = config.update.count;
-  /* point at list end */
-  for(names = &config.update.name_list; *names; names = &(*names)->next);
+    for(sl = config.update.urls; sl; sl = sl->next) {
+      fprintf(stderr, "dud url: %s\n", sl->key);
+      printf("Reading driver update: %s\n", sl->key);
+      fflush(stdout);
+      url = url_set(sl->key);
 
-  for(sl = config.update.urls; sl; sl = sl->next) {
-    fprintf(stderr, "dud url: %s\n", sl->key);
-    printf("Reading driver update: %s\n", sl->key);
-    fflush(stdout);
-    url = url_set(sl->key);
-    err = url_mount(url, config.mountpoint.update, NULL);
-    if(!err) {
-      util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
-    }
-    url_umount(url);
-    url_free(url);
-  }
-  util_do_driver_updates();
-
-  if(dud_count == config.update.count) {
-    fprintf(stderr, "No new driver updates found.\n");
-    if(config.win && config.manual) {
-      dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
-    }
-    else {
-      printf("No new driver updates found.\n");
-    }
-  }
-  else {
-    if(*names) {
-      if(config.win && config.manual) {
-        dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+      if(url->is.mountable) {
+        err = url_mount(url, config.mountpoint.update, NULL);
       }
       else {
-        printf("%s:\n", txt_get(TXT_DUD_ADDED));
-        for(sl = *names; sl; sl = sl->next) {
-          printf("  %s\n", sl->key);
+        char *file_name = strdup(new_download());
+        char *path1 = url->path ?: "", *path2 = NULL;
+
+        strprintf(&path2, "%s%sdriverupdate", path1, path1[0] == 0 || path1[strlen(path1) - 1] == '/' ? "" : "/");
+
+        err = url_read_file(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
+        if(err) {
+          str_copy(&url->path, path2);
+          err = url_read_file(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
+        }
+        fprintf(stderr, "err2 = %d\n", err);
+        LXRC_WAIT
+        if(!err) err = util_mount_ro(file_name, config.mountpoint.update, url->file_list) ? 1 : 0;
+
+        if(err) unlink(file_name);
+        free(file_name);
+
+        free(path2);
+      }
+      if(!err) {
+        util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
+      }
+      url_umount(url);
+      url_free(url);
+    }
+    util_do_driver_updates();
+
+    if(dud_count == config.update.count) {
+      fprintf(stderr, "No new driver updates found.\n");
+      if(config.win && config.manual) {
+        dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
+      }
+      else {
+        printf("No new driver updates found.\n");
+      }
+    }
+    else {
+      if(*names) {
+        if(config.win && config.manual) {
+          dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+        }
+        else {
+          printf("%s:\n", txt_get(TXT_DUD_ADDED));
+          for(sl = *names; sl; sl = sl->next) {
+            printf("  %s\n", sl->key);
+          }
         }
       }
-    }
-    else {
-      if(config.win && config.manual) {
-        dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
-      }
       else {
-        printf("%s\n", txt_get(TXT_DUD_OK));
+        if(config.win && config.manual) {
+          dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+        }
+        else {
+          printf("%s\n", txt_get(TXT_DUD_OK));
+        }
       }
-    }
-  }  
+    }  
+  }
 
   /* set default repository */
   if(!config.url.install) config.url.install = url_set("cd:/");

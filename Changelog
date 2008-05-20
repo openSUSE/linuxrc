@@ -1,3 +1,5 @@
+20/5/2008:	v3.1.30
+	- fix driverupdate loading
 	- s390: switch from hwcfg to udev
 
 19/5/2008:	v3.1.29
