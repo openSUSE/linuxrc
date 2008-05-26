@@ -7,14 +7,14 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: bg\n"
-"PO-Revision-Date: 2008-04-14 11:37+0200\n"
-"Last-Translator: Borislav Mitev <morbid_viper@tkzs.org>\n"
+"Project-Id-Version: linuxrc.bg\n"
+"PO-Revision-Date: 2008-05-19 23:09+0300\n"
+"Last-Translator: Velislav Varbanov <varbanov@bglinux.org>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1172,11 +1172,12 @@ msgstr ""
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP адреса %s вече се използва от друга машина!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Разпознаване и зареждане на мрежовите драйвери"
+
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
 msgstr ""
@@ -1185,4 +1186,3 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
-

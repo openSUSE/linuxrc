@@ -5,13 +5,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-05-08 21:58-0300\n"
-"Last-Translator: \n"
-"Language-Team: Brazilian Portuguese <pt@li.org>\n"
+"PO-Revision-Date: 2008-05-18 13:49-0300\n"
+"Last-Translator: Luiz Fernando Ranghetti <elchevive68@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <opensuse-pt@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1\n"
+"X-Poedit-Language: Portuguese\n"
+"X-Poedit-Country: BRAZIL\n"
+"X-Poedit-SourceCharset: utf-8\n"
 
 #. TXT_OK
 msgid "OK"
@@ -102,7 +106,7 @@ msgid ""
 msgstr ""
 "Tentando carregar módulo %s...\n"
 "\n"
-"Durante o carregamento, você pode ver as mensagens de kernel no console virtual 4 (ALT-F4). Use ALT-F1 para voltar a este menu."
+"Durante o carregamento, você pode ver as mensagens do kernel no console virtual 4 (ALT-F4). Use ALT-F1 para voltar a este menu."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -197,7 +201,7 @@ msgstr "Erro ao ler disquete."
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Digite sua partição raiz (por exemplo, /dev/sda3)"
+msgstr "Digite sua partição raiz (ex.: /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device."
@@ -438,7 +442,7 @@ msgstr "O sistema básico foi instalado com êxito. Este novo sistema instalado 
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Digite a partição do disco rígido (por exemplo, /dev/sda1)"
+msgstr "Digite a partição do disco rígido (ex.: /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
@@ -791,7 +795,7 @@ msgstr "Erro ao ativar espaço de troca."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Digite a partição de troca (por exemplo, /dev/sda2)"
+msgstr "Digite a partição de troca (ex.: /dev/sda2)"
 
 #. TXT_ENTER_USER
 #, c-format
@@ -868,8 +872,8 @@ msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"Digite a senha raiz temporária.\n"
-"Você deverá alterar essa senha ao efetuar login inicial como usuário raiz."
+"Digite a senha de root temporária.\n"
+"Você deverá alterar essa senha ao efetuar o login inicial como usuário root."
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -938,7 +942,7 @@ msgstr "Modo estendido"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Modo de compatibilidade com peers OS/390 e z/OS"
+msgstr "Modo de compatibilidade com pares OS/390 e z/OS"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
@@ -1161,18 +1165,19 @@ msgid ""
 "\n"
 "If you really trust your repository, you may continue in an insecure mode."
 msgstr ""
-"Desculpe, o repositório falhou no teste da soma de verificação.\n"
+"Desculpe, o repositório não passou no teste da soma de verificação.\n"
 "\n"
 "Se você realmente acredita neste repositório, você deve continuar em um modo inseguro."
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "O endereço IP %s já está em uso por outra máquina!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Detectando e carregando os drivers de rede"
+
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
 msgstr ""
@@ -1181,4 +1186,3 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
-

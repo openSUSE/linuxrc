@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc.hu\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-04-13 21:49+0200\n"
+"PO-Revision-Date: 2008-05-09 16:09+0200\n"
 "Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
 "Language-Team:  <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1176,11 +1176,12 @@ msgstr ""
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "A(z) %s IP-címet már egy másik számítógép használja!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Hálózati meghajtóprogram keresése és betöltése"
+
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
 msgstr ""
@@ -1189,4 +1190,3 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
-
