@@ -1,3 +1,7 @@
+27/5/2008:	v3.1.31
+	- try connected network cards first (bnc #394618)
+	- use dhcpcd --noipv4ll to avoid local link addresses (bnc #394618)
+
 20/5/2008:	v3.1.30
 	- fix driverupdate loading
 	- s390: switch from hwcfg to udev

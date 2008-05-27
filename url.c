@@ -62,6 +62,7 @@ static char *url_instsys_config(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
 static hd_t *sort_a_bit(hd_t *hd_list);
+static int link_detected(hd_t *hd);
 
 
 void url_read(url_data_t *url_data)
@@ -2252,7 +2253,19 @@ hd_t *sort_a_bit(hd_t *hd_list)
     hd_t *hd_array[hds + 1];
     unsigned u = 0;
 
-    // put wlan cards last
+    /* cards with link first */
+
+    for(hd = hd_list; hd; hd = hd->next) {
+      if(link_detected(hd)) hd_array[u++] = hd;
+    }
+    for(hd = hd_list; hd; hd = hd->next) {
+      if(!link_detected(hd)) hd_array[u++] = hd;
+    }
+    hd_array[hds] = NULL;
+    for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
+    hd_list = hd_array[0];
+
+    /* wlan cards last */
 
     for(hd = hd_list; hd; hd = hd->next) {
       if(!hd->is.wlan) hd_array[u++] = hd;
@@ -2260,15 +2273,24 @@ hd_t *sort_a_bit(hd_t *hd_list)
     for(hd = hd_list; hd; hd = hd->next) {
       if(hd->is.wlan) hd_array[u++] = hd;
     }
-
     hd_array[hds] = NULL;
-
     for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
-
     hd_list = hd_array[0];
   }
 
   return hd_list;
+}
+
+
+int link_detected(hd_t *hd)
+{
+  hd_res_t *res;
+
+  for(res = hd->res; res; res = res->next) {
+    if(res->any.type == res_link && res->link.state) return 1;
+  }
+
+  return 0;
 }
 
 

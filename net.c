@@ -1678,7 +1678,7 @@ int net_dhcp()
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-  strcpy(cmd, "dhcpcd");
+  strcpy(cmd, "dhcpcd --noipv4ll");
 
   if(config.net.dhcpcd) {
     sprintf(cmd + strlen(cmd), " %s", config.net.dhcpcd);
