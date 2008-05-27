@@ -1,6 +1,8 @@
 27/5/2008:	v3.1.31
 	- try connected network cards first (bnc #394618)
 	- use dhcpcd --noipv4ll to avoid local link addresses (bnc #394618)
+	- fix driverupdate loading (bnc #393082)
+	- load usb modules before starting braille detection
 
 20/5/2008:	v3.1.30
 	- fix driverupdate loading

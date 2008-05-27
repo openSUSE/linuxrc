@@ -49,6 +49,7 @@ void url_data_free(url_data_t *url_data);
 void url_umount(url_t *url);
 int url_mount(url_t *url, char *dir, int (*test_func)(url_t *));
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
+int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
 int url_find_repo(url_t *url, char *dir);
 int url_find_instsys(url_t *url, char *dir);
 char *url_print(url_t *url, int format);

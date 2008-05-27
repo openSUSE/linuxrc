@@ -4594,10 +4594,23 @@ void run_braille()
   char *cmd = NULL;
   FILE *f;
 
+  hd_data->debug = -1;
+
+  printf("Activating usb devices...\n");
+  fprintf(stderr, "Activating usb devices...\n");
+
+  /* braille dev might need usb modules */
+  util_load_usb();
+
+  sleep(config.usbwait + 1);
+
+  hd_list(hd_data, hw_usb, 1, NULL);
+  load_drivers(hd_data, hw_usb);
+
+  sleep(config.usbwait + 1);
+
   printf("detecting braille devices...\n");
   fprintf(stderr, "detecting braille devices...\n");
-
-  hd_data->debug = -1;
 
   hd = hd_list(hd_data, hw_braille, 1, NULL);
 

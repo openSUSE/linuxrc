@@ -1352,12 +1352,6 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     if((flags & URL_FLAG_PROGRESS)) url_data->progress = url_progress;
     str_copy(&url_data->label, label);
 
-#if 0
-    if(url_data->url->is.network) {
-      url_setup_device(url_data->url);
-    }
-#endif
-
     fprintf(stderr, "loading %s -> %s\n", url_print(url_data->url, 0), url_data->file_name);
 
     url_read(url_data);
@@ -1453,6 +1447,99 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   }
 
   if(free_src) str_copy(&src, NULL);
+
+  return err;
+}
+
+
+/*
+ * Like url_read_file() but setup network if necessary.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
+{
+  int err, found, matched;
+  hd_t *hd;
+  hd_res_t *res;
+  char *hwaddr;
+  str_list_t *sl;
+  char *url_device;
+
+  if(!url || !url->is.network || url->used.device) return url_read_file(url, dir, src, dst, label, flags);
+
+  LXRC_WAIT
+
+  if(config.net.configured) {
+    str_copy(&url->used.device, config.net.device);
+    str_copy(&url->used.hwaddr, config.net.hwaddr);
+    str_copy(&url->used.model, config.net.cardname);
+    str_copy(&url->used.unique_id, config.net.unique_id);
+
+    LXRC_WAIT
+
+  }
+  else {
+    update_device_list(0);
+
+    LXRC_WAIT
+
+    if(config.hd_data) {
+      url_device = url->device ?: config.netdevice;
+
+      for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_network_ctrl, 0, NULL)); hd; hd = hd->next) {
+        for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+          if(res->any.type == res_hwaddr) {
+            hwaddr = res->hwaddr.addr;
+            break;
+          }
+        }
+
+        if(!hd->unix_dev_name) continue;
+
+        matched = url_device ? match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url_device) : 1;
+
+        for(sl = hd->unix_dev_names; !matched && sl; sl = sl->next) {
+          matched = match_netdevice(short_dev(sl->str), NULL, url_device);
+        }
+
+        if(!matched) continue;
+
+        str_copy(&url->used.unique_id, hd->unique_id);
+        str_copy(&url->used.device, hd->unix_dev_name);
+        str_copy(&url->used.hwaddr, hwaddr);
+        str_copy(&url->used.model, hd->model);
+
+        url->is.wlan = hd->is.wlan;
+
+        url_setup_device(url);
+
+        if(!url_read_file(url, dir, src, dst, label, flags)) {
+          found++;
+          break;
+        }
+      }
+
+      if(!found) {
+        str_copy(&url->used.device, NULL);
+        str_copy(&url->used.model, NULL); 
+        str_copy(&url->used.hwaddr, NULL);
+        str_copy(&url->used.unique_id, NULL);
+      }
+
+      LXRC_WAIT
+ 
+      return found ? 0 : 1;
+    }
+  }
+
+  if(url->used.device) url_setup_device(url);
+
+  err = url_read_file(url, dir, src, dst, label, flags);
+
+  LXRC_WAIT
 
   return err;
 }

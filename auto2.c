@@ -35,7 +35,6 @@
 
 static void auto2_user_netconfig(void);
 static int driver_is_active(hd_t *hd);
-static void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_files(url_t *url);
 static char *auto2_splash_name(void);
@@ -300,7 +299,7 @@ void auto2_scan_hardware()
     printf("Reading info file: %s\n", sl->key);
     fflush(stdout);
     url = url_set(sl->key);
-    err = url_read_file(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS);
+    err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS);
     url_umount(url);
     url_free(url);
     if(!err) {
@@ -330,10 +329,10 @@ void auto2_scan_hardware()
 
         strprintf(&path2, "%s%sdriverupdate", path1, path1[0] == 0 || path1[strlen(path1) - 1] == '/' ? "" : "/");
 
-        err = url_read_file(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
+        err = url_read_file_anywhere(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
         if(err) {
           str_copy(&url->path, path2);
-          err = url_read_file(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
+          err = url_read_file_anywhere(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
         }
         fprintf(stderr, "err2 = %d\n", err);
         LXRC_WAIT
