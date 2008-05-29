@@ -1005,15 +1005,6 @@ void lxrc_init()
 
   if(config.braille.check) run_braille();
 
-  if( config.mediacheck ) {
-    int win_old;
-
-    fprintf(stderr, "In mediacheck\n");
-    if(!(win_old = config.win)) util_disp_init();
-    md5_verify();
-    if(!win_old) util_disp_done();
-  }
-
   if(!config.manual && !auto2_init()) {
     fprintf(stderr, "Automatic setup not possible.\n");
 

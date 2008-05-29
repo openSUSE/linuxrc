@@ -32,6 +32,7 @@
 #include "auto2.h"
 #include "settings.h"
 #include "url.h"
+#include "checkmd5.h"
 
 static void auto2_user_netconfig(void);
 static int driver_is_active(hd_t *hd);
@@ -58,14 +59,22 @@ int auto2_init()
 
   util_splash_bar(40, SPLASH_40);
 
+  win_old = config.win;
+
   if(config.update.ask && !config.update.shown) {
-    if(!(win_old = config.win)) util_disp_init();
+    if(!config.win) util_disp_init();
     if(config.update.name_list) {
       dia_show_lines2("Driver Updates added", config.update.name_list, 64);
     }
     while(!inst_update_cd());
-    if(!win_old) util_disp_done();
   }
+
+  if(config.mediacheck) {
+    if(!config.win) util_disp_init();
+    md5_verify();  
+  }
+
+  if(config.win && !win_old) util_disp_done();
 
   ok = auto2_find_repo();
 
