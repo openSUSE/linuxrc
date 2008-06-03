@@ -2354,7 +2354,7 @@ hd_t *sort_a_bit(hd_t *hd_list)
 
     /* wlan cards last */
 
-    for(hd = hd_list; hd; hd = hd->next) {
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(!hd->is.wlan) hd_array[u++] = hd;
     }
     for(hd = hd_list; hd; hd = hd->next) {
