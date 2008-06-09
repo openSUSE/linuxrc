@@ -2078,11 +2078,11 @@ int net_s390_get_ifname(char* channel, char** device)
 
 int net_activate_s390_devs_ex(hd_t* hd, char** device)
 {
-  int rc;
+  int rc, i;
   char buf[100];
   char hwcfg_name[40];
   char* chans[3] = { config.hwp.readchan, config.hwp.writechan, config.hwp.datachan };
-  char* chanlist[27];
+  char chanlist[27];
 
   if(hd) switch(hd->sub_class.id) {
   case 0x89:	/* OSA2 */
