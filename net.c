@@ -2332,9 +2332,11 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   
   sprintf(buf,"/etc/udev/rules.d/55-%s-",hwcfg_name);
   if (config.hwp.type == di_390net_iucv)
-    sprintf(buf, "%s.rules", config.hwp.userid);
+    strcat(buf, config.hwp.userid);
   else
-    sprintf(buf, "%s.rules", config.hwp.readchan);
+    strcat(buf, config.hwp.readchan);
+  strcat(buf, ".rules");
+  
   FILE* fp=fopen(buf,"w");
   if(!fp) return -1;
 

@@ -1,4 +1,4 @@
-	- s390: fixed typos
+	- s390: fixed typos etc.
 
 3/6/2008:	v3.1.33
 	- fixed evil bug in netcard sorting code (bnc #396749)
