@@ -1374,7 +1374,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
             j = strlen(url_data->url->path);
             if(i <= j && !strcmp(url_data->url->path + j - i, sl->value)) k = 1;
           }
-          if(k) {
+          if(sl) {	/* if(k) to verify filenames as well */
             fprintf(stderr, "sha1 ok\n");
           }
           else {
