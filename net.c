@@ -1339,7 +1339,7 @@ void net_setup_nameserver()
 
   if(config.test) return;
 
-  if((f = fopen("/etc/resolv.conf", "w"))) {
+  if(!config.net.ipv6 && (f = fopen("/etc/resolv.conf", "w"))) {
     for(u = 0; u < config.net.nameservers; u++) {
       if(config.net.nameserver[u].ok) {
         fprintf(f, "nameserver %s\n", config.net.nameserver[u].name);
@@ -1894,7 +1894,7 @@ int net_dhcp6()
 
   if(ok) {
     config.net.dhcp_active = 1;
-    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+    sleep(config.net.ifup_wait + 2);
   }
   else {
     if(config.win) {
@@ -1917,9 +1917,9 @@ void net_dhcp_stop()
 {
   if(!config.net.dhcp_active) return;
 
-//  system("dhcpcd -k");
   /* kill them all */
-  util_killall("dhcpcd", SIGHUP);
+  if(config.net.ipv4) util_killall("dhcpcd", SIGHUP);
+  if(config.net.ipv6) util_killall("dhcp6c", SIGHUP);
   /* give them some time */
   sleep(2);
 

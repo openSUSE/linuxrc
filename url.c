@@ -93,6 +93,10 @@ void url_read(url_data_t *url_data)
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSDATA, url_data);
   curl_easy_setopt(c_handle, CURLOPT_NOPROGRESS, 0);
 
+  if(config.net.ipv6) {
+    curl_easy_setopt(c_handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+  }
+
   url_data->err = curl_easy_setopt(c_handle, CURLOPT_URL, url_data->url->str);
   // fprintf(stderr, "curl opt url = %d\n", url_data->err);
 
@@ -1951,7 +1955,7 @@ int url_setup_device(url_t *url)
     if(ok) {
       name2inet(&url->used.server, url->server);
 
-      if(net_check_address2(&url->used.server, 1)) {
+      if(!config.net.ipv6 && net_check_address2(&url->used.server, 1)) {
         fprintf(stderr, "invalid server address: %s\n", url->used.server.name);
         config.net.configured = nc_none;
 

@@ -1703,7 +1703,7 @@ void file_write_install_inf(char *dir)
         s = "bootp";
         break;
       case nc_dhcp:
-        s = "dhcp";
+        s = config.net.ipv6 ? config.net.ipv4 ? "dhcp,dhcp6" : "dhcp6" : "dhcp";
         break;
       default:
         s = NULL;
@@ -1723,7 +1723,7 @@ void file_write_install_inf(char *dir)
     else {
       file_write_str(f, key_hostname, config.net.hostname.name);
     }
-    file_write_inet(f, key_broadcast, &config.net.broadcast);
+    if(config.net.ipv4) file_write_inet(f, key_broadcast, &config.net.broadcast);
     file_write_inet(f, key_network, &config.net.network);
     if(config.net.ptphost.ok) {
       file_write_inet(f, key_ptphost, &config.net.ptphost);
