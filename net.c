@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <fnmatch.h>
+#include <dirent.h>
 #include <rpc/rpc.h>
 #include <rpc/pmap_prot.h>
 #include <rpc/pmap_clnt.h>
@@ -84,6 +85,8 @@ static void if_down(char *dev);
 static int wlan_auth_cb(dia_item_t di);
 
 static dia_item_t di_wlan_auth_last = di_none;
+static int net_dhcp4(void);
+static int net_dhcp6(void);
 
 /*
  * Ask for VNC & SSH password, unless they have already been set.
@@ -1642,7 +1645,7 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
 
 
 /*
- * Start dhcp client and reads dhcp info.
+ * Start dhcp client and read dhcp info.
  *
  * Global vars changed:
  *  config.net.dhcp_active
@@ -1657,6 +1660,37 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
  *  config.net.server
  */
 int net_dhcp()
+{
+  unsigned active4, active = config.net.dhcp_active;
+
+  if(config.net.ipv4) net_dhcp4();
+
+  active4 = config.net.dhcp_active;
+  config.net.dhcp_active = active;
+
+  if(config.net.ipv6) net_dhcp6();
+  config.net.dhcp_active |= active4;
+
+  return config.net.dhcp_active ? 0 : 1;
+}
+
+
+/*
+ * Start dhcp client and read dhcp info.
+ *
+ * Global vars changed:
+ *  config.net.dhcp_active
+ *  config.net.hostname
+ *  config.net.netmask
+ *  config.net.network
+ *  config.net.broadcast
+ *  config.net.gateway
+ *  config.net.domain
+ *  config.net.nisdomain
+ *  config.net.nameserver
+ *  config.net.server
+ */
+int net_dhcp4()
 {
   char cmd[256], file[256], *s;
   file_t *f0, *f;
@@ -1775,6 +1809,99 @@ int net_dhcp()
   }
 
   file_free_file(f0);
+
+  return config.net.dhcp_active ? 0 : 1;
+}
+
+
+/*
+ * Start dhcp client and read dhcp info.
+ *
+ * Global vars changed:
+ *  config.net.dhcp_active
+ *  config.net.hostname
+ *  config.net.netmask
+ *  config.net.network
+ *  config.net.broadcast
+ *  config.net.gateway
+ *  config.net.domain
+ *  config.net.nisdomain
+ *  config.net.nameserver
+ *  config.net.server
+ */
+int net_dhcp6()
+{
+  char *cmd = NULL, *fname = NULL;
+  window_t win;
+  FILE *f;
+  DIR *dir;
+  struct dirent *de;
+  int ok = 0;
+  unsigned timeout = config.net.dhcp_timeout;
+  struct stat sbuf;
+
+  if(config.net.dhcp_active || config.net.keep) return 0;
+
+  if(config.test) {
+    config.net.dhcp_active = 1;
+
+    return 0;
+  }
+
+  if(config.win) {
+    sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP6");
+    dia_info(&win, cmd);
+  }
+
+  if(!config.net.ipv4) net_apply_ethtool(config.net.device, config.net.hwaddr);
+
+  system("/bin/rm -f /var/lib/dhcpv6/client6.leases*");
+
+  if((f = fopen("/etc/dhcp6c.conf", "w"))) {
+    fprintf(f,
+      "interface %s {\n  request domain-name-servers;\n  request domain-search-list;\n};\n",
+      config.net.device
+    );
+    fclose(f);
+  }
+
+  strprintf(&cmd, "dhcp6c %s", config.net.device);
+
+  system(cmd);
+
+  // now wait a bit
+  do {
+    sleep(1);
+
+    if((dir = opendir("/var/lib/dhcpv6"))) {
+      while((de = readdir(dir))) {
+        if(!strncmp(de->d_name, "client6.leases", sizeof "client6.leases" - 1)) {
+          strprintf(&fname, "/var/lib/dhcpv6/%s", de->d_name);
+          if(!stat(fname, &sbuf)) {
+            if(sbuf.st_size > 0) ok = 1;
+          }
+        }
+      }
+
+      closedir(dir);
+    }
+  } while(!ok && --timeout);
+
+  free(fname);
+  free(cmd);
+
+  if(config.win) win_close(&win);
+
+  if(ok) {
+    config.net.dhcp_active = 1;
+    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+  }
+  else {
+    if(config.win) {
+      sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP6");
+      dia_message(cmd, MSGTYPE_ERROR);
+    }
+  }
 
   return config.net.dhcp_active ? 0 : 1;
 }

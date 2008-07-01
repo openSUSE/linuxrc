@@ -286,6 +286,10 @@ static struct {
   { key_devbyid,        "devbyid",        kf_cfg + kf_cmd_early          },
   { key_braille,        "braille",        kf_cfg + kf_cmd_early          },
   { key_nfsopts,        "nfs.opts",       kf_cfg + kf_cmd                },
+  { key_ipv4,           "ipv4",           kf_cfg + kf_cmd + kf_cmd_early },
+  { key_ipv4only,       "ipv4only",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_ipv6,           "ipv6",           kf_cfg + kf_cmd + kf_cmd_early },
+  { key_ipv6only,       "ipv6only",       kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1473,6 +1477,28 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             }
           }
           slist_free(sl0);
+        }
+        break;
+
+      case key_ipv4:
+        if(f->is.numeric) config.net.ipv4 = f->nvalue;
+        break;
+
+      case key_ipv4only:
+        if(f->is.numeric) {
+          config.net.ipv4 = f->nvalue;
+          config.net.ipv6 = !config.net.ipv4;
+        }
+        break;
+
+      case key_ipv6:
+        if(f->is.numeric) config.net.ipv6 = f->nvalue;
+        break;
+
+      case key_ipv6only:
+        if(f->is.numeric) {
+          config.net.ipv6 = f->nvalue;
+          config.net.ipv4 = !config.net.ipv6;
         }
         break;
 

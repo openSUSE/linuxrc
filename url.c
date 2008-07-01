@@ -2015,13 +2015,13 @@ int url_setup_interface(url_t *url)
   if((net_config_mask() & 3) != 3) {
     printf(
       "Sending %s request to %s...\n",
-      config.net.use_dhcp ? "DHCP" : "BOOTP",
+      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
       url->used.device
     );
     fflush(stdout);
     fprintf(stderr,
       "sending %s request to %s... ",
-      config.net.use_dhcp ? "DHCP" : "BOOTP",
+      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
       url->used.device
     );
 
@@ -2029,6 +2029,7 @@ int url_setup_interface(url_t *url)
 
     if(
       !config.test &&
+      !config.net.ipv6 &&
       (
         !config.net.hostname.ok ||
         !config.net.netmask.ok ||
