@@ -106,7 +106,7 @@ void url_read(url_data_t *url_data)
   if(proxy_url) {
     if(config.debug >= 2) fprintf(stderr, "using proxy %s\n", proxy_url);
     name2inet(&config.url.proxy->used.server, config.url.proxy->server);
-    if(net_check_address2(&config.url.proxy->used.server, 1)) {
+    if(net_check_address(&config.url.proxy->used.server, 1)) {
       snprintf(url_data->err_buf, url_data->err_buf_len, "invalid proxy address: %s", config.url.proxy->used.server.name);
       fprintf(stderr, "%s\n", url_data->err_buf);
       url_data->err = 105;
@@ -437,7 +437,10 @@ url_t *url_set(char *str)
       s0 = s1;
     }
 
-    if((s1 = strchr(s0, ':'))) {
+    s1 = s0;
+    if(*s0 == '[') s1 = strchr(s0, ']') ?: s0;
+
+    if((s1 = strchr(s1, ':'))) {
       *s1++ = 0;
       if(*s1) {
         u = strtoul(s1, &s1, 0);
@@ -445,7 +448,15 @@ url_t *url_set(char *str)
       }
     }
 
-    url->server = strdup(s0);
+    s1 = s0 + strlen(s0);
+
+    if(*s0 == '[' && s1[-1] == ']') {
+      s1[-1] = 0;
+      url->server = strdup(s0 + 1);
+    }
+    else {
+      url->server = strdup(s0);
+    }
 
     free(tmp);
     tmp = NULL;
@@ -660,7 +671,14 @@ char *url_print(url_t *url, int format)
       curl_free(s);
     }
     if(url->user || url->password) strprintf(&buf, "%s@", buf);
-    if(url->server) strprintf(&buf, "%s%s", buf, url->server);
+    if(url->server) {
+      if(strchr(url->server, ':')) {
+        strprintf(&buf, "%s[%s]", buf, url->server);
+      }
+      else {
+        strprintf(&buf, "%s%s", buf, url->server);
+      }
+    }
     if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
   }
 
@@ -1955,7 +1973,7 @@ int url_setup_device(url_t *url)
     if(ok) {
       name2inet(&url->used.server, url->server);
 
-      if(!config.net.ipv6 && net_check_address2(&url->used.server, 1)) {
+      if(net_check_address(&url->used.server, 1)) {
         fprintf(stderr, "invalid server address: %s\n", url->used.server.name);
         config.net.configured = nc_none;
 

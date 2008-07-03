@@ -58,8 +58,9 @@ static void file_dump_mlist(module_t *ml);
 #endif
 
 static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
+static void file_write_inet2(FILE *f, file_key_t key, inet_t *inet);
 static void file_write_inet_str(FILE *f, char *name, inet_t *inet);
-static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
+// static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
 
 static void add_driver(char *str);
 static void parse_ethtool(slist_t *sl, char *str);
@@ -631,7 +632,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_hostip:
         name2inet(&config.net.hostname, f->value);
-        net_check_address2(&config.net.hostname, 0);
+        net_check_address(&config.net.hostname, 0);
         if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
           s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
         }
@@ -643,28 +644,28 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_netmask:
         name2inet(&config.net.netmask, f->value);
-        net_check_address2(&config.net.netmask, 0);
+        net_check_address(&config.net.netmask, 0);
         break;
 
       case key_gateway:
         name2inet(&config.net.gateway, f->value);
-        net_check_address2(&config.net.gateway, 0);
+        net_check_address(&config.net.gateway, 0);
         break;
 
       case key_ptphost:
         name2inet(&config.net.ptphost, f->value);
-        net_check_address2(&config.net.ptphost, 0);
+        net_check_address(&config.net.ptphost, 0);
         break;
       
       case key_server:
         name2inet(&config.net.server, f->value);
-        net_check_address2(&config.net.server, 0);
+        net_check_address(&config.net.server, 0);
         break;
 
       case key_nameserver:
         for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
-          net_check_address2(&config.net.nameserver[config.net.nameservers], 0);
+          net_check_address(&config.net.nameserver[config.net.nameservers], 0);
           if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
         }
         slist_free(sl0);
@@ -852,7 +853,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_displayip:
         name2inet(&config.net.displayip, f->value);
-        net_check_address2(&config.net.displayip, 0);
+        net_check_address(&config.net.displayip, 0);
         break;
                                       
       case key_sshpassword:
@@ -1596,6 +1597,37 @@ void file_write_inet(FILE *f, file_key_t key, inet_t *inet)
 }
 
 
+void file_write_inet2(FILE *f, file_key_t key, inet_t *inet)
+{
+  char *key_name = file_key2str(key);
+  const char *ip = NULL;
+  char buf[INET6_ADDRSTRLEN];
+
+  if(inet->name && *inet->name) {
+    ip = inet->name;
+  }
+  else if(inet->ok) {
+    if(inet->ipv6) {
+      ip = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
+    }
+    else {
+      ip = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
+    }
+  }
+
+  if(ip) fprintf(f, "%s: %s\n", key_name, ip);
+
+#if 0
+  ip = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
+  if(ip) fprintf(f, "%sIP: %s\n", key_name, ip);
+
+  ip = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
+  if(ip) fprintf(f, "%sIP6: %s\n", key_name, ip);
+#endif
+
+}
+
+
 void file_write_inet_str(FILE *f, char *name, inet_t *inet)
 {
   char *s = NULL;
@@ -1607,6 +1639,7 @@ void file_write_inet_str(FILE *f, char *name, inet_t *inet)
 }
 
 
+#if 0
 void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet)
 {
   char *key_name = file_key2str(key);
@@ -1621,6 +1654,7 @@ void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet)
     fprintf(f, "%sName: %s\n", key_name, inet->name);
   }
 }
+#endif
 
 
 void file_write_install_inf(char *dir)
@@ -1684,8 +1718,7 @@ void file_write_install_inf(char *dir)
   }
 
   if(url->used.server.ok) {
-    file_write_inet(f, key_server, &url->used.server);
-    file_write_inet_both(f, key_server, &url->used.server);
+    file_write_inet2(f, key_server, &url->used.server);
   }
   if(url->port) file_write_num(f, key_port, url->port);
   file_write_str(f, key_serverdir, url->path);

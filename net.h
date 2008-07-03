@@ -13,8 +13,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port
 int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup);
 void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup);
 void net_stop(void);
-int net_check_address(char *input_tv, struct in_addr *address_prr, int *net_bits);
-int net_check_address2(inet_t *inet, int do_dns);
+int net_check_address(inet_t *inet, int do_dns);
 int net_setup_localhost(void);
 int net_activate_ns(void);
 int net_activate_s390_devs(void);

@@ -4292,22 +4292,22 @@ void read_iscsi_ibft()
 
       case key_ibft_ipaddr:
         name2inet(&config.net.hostname, f->value);
-        net_check_address2(&config.net.hostname, 0);
+        net_check_address(&config.net.hostname, 0);
         break;
 
       case key_ibft_netmask:
         name2inet(&config.net.netmask, f->value);
-        net_check_address2(&config.net.netmask, 0);
+        net_check_address(&config.net.netmask, 0);
         break;
 
       case key_ibft_gateway:
         name2inet(&config.net.gateway, f->value);
-        net_check_address2(&config.net.gateway, 0);
+        net_check_address(&config.net.gateway, 0);
         break;
 
       case key_ibft_dns:
         name2inet(&config.net.nameserver[0], f->value);
-        net_check_address2(&config.net.nameserver[0], 0);
+        net_check_address(&config.net.nameserver[0], 0);
         break;
 
       default:

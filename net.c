@@ -208,7 +208,7 @@ int net_config()
     if(!config.test) return rc = -1;
   }
 
-  net_check_address2(&config.net.server, 1);
+  net_check_address(&config.net.server, 1);
 
 #endif
 
@@ -417,7 +417,7 @@ int net_activate()
 
     net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-    if (!config.forceip && util_check_exist("/sbin/arping")) {
+    if(config.net.ipv4 && !config.forceip && util_check_exist("/sbin/arping")) {
        sprintf(command, "ifconfig %s up", config.net.device);
        fprintf(stderr, "net_activate: %s\n", command);
        rc = system(command);
@@ -579,81 +579,12 @@ int net_activate()
 }
 
 
-int net_check_address (char *input_tv, struct in_addr *address_prr, int *net_bits)
-    {
-    unsigned char  tmp_ti [32];
-    unsigned char *start_pci;
-    unsigned char *end_pci;
-    int            i_ii;
-    unsigned char *address_pci;
-    unsigned u;
-
-
-    address_pci = (unsigned char *) address_prr;
-
-    strncpy (tmp_ti, input_tv, sizeof (tmp_ti));
-    tmp_ti [sizeof (tmp_ti) - 1] = 0;
-
-    *net_bits = -1;
-    if((start_pci = strrchr(tmp_ti, '/'))) {
-      *start_pci++ = 0;
-      i_ii = strtol(start_pci, (void *) &end_pci, 10);
-      if(start_pci != end_pci && !*end_pci && i_ii > 0 && i_ii <= 32) {
-        *net_bits = i_ii;
-      }
-      else {
-        return -1;
-      }
-    }
-
-    for (i_ii = 0; i_ii < (int) strlen (tmp_ti); i_ii++)
-        if (!isdigit (tmp_ti [i_ii]) && tmp_ti [i_ii] != '.')
-            return (-1);
-
-    if (!isdigit (tmp_ti [strlen (tmp_ti) - 1]))
-        return (-1);
-
-    start_pci = tmp_ti;
-    end_pci = strchr (tmp_ti, '.');
-    if (!end_pci)
-        return (-1);
-    *end_pci = 0;
-    u = atoi(start_pci);
-    if(u > 255) return -1;
-    address_pci[0] = u;
-
-    start_pci = end_pci + 1;
-    end_pci = strchr (start_pci, '.');
-    if (!end_pci)
-        return (-1);
-    *end_pci = 0;
-    u = atoi(start_pci);
-    if(u > 255) return -1;
-    address_pci[1] = u;
-
-    start_pci = end_pci + 1;
-    end_pci = strchr (start_pci, '.');
-    if (!end_pci)
-        return (-1);
-    *end_pci = 0;
-    u = atoi(start_pci);
-    if(u > 255) return -1;
-    address_pci[2] = u;
-    u = atoi(end_pci + 1);
-    if(u > 255) return -1;
-    address_pci[3] = u;
-
-    return (0);
-    }
-
-
-int net_check_address2(inet_t *inet, int do_dns)
+int net_check_address(inet_t *inet, int do_dns)
 {
   struct hostent *he = NULL;
-  struct in_addr iaddr;
   slist_t *sl;
-  int net_bits;
-  uint32_t u32;
+  char *s, *name = NULL, buf[INET6_ADDRSTRLEN];
+  int net_bits, is_ip = 0;
 
   if(!inet) return -1;
 
@@ -661,26 +592,38 @@ int net_check_address2(inet_t *inet, int do_dns)
 
   if(!inet->name || !*inet->name) return -1;
 
-  if(!net_check_address(inet->name, &iaddr, &net_bits)) {
-    inet->ok = 1;
-    inet->ip = iaddr;
+  inet->ok = 0;
 
-    if(net_bits >= 0) {
-      u32 = -(1 << (32 - net_bits));
-      inet->net.s_addr = htonl(u32);
+  name = strdup(inet->name);
+
+  if((s = strchr(name, '/'))) {
+    *s++ = 0;
+    net_bits = strtoul(s, &s, 0);
+    if(!*s && net_bits >= 0) {
+      inet->ok = 1;
+      inet->ip6_prefix = net_bits;
+
+      if(net_bits >= 0 && config.net.ipv4) {
+        inet->net.s_addr = htonl(-1 << (32 - net_bits));
+      }
     }
-  
-    str_copy(&inet->name, inet_ntoa(inet->ip));
-
-    return 0;
   }
 
-  for(sl = config.net.dns_cache; sl; sl = sl->next) {
-    if(sl->key && sl->value && !strcasecmp(sl->key, inet->name)) {
-      if(!net_check_address(sl->value, &iaddr, &net_bits)) {
-        inet->ok = 1;
-        inet->ip = iaddr;
-        return 0;
+  if(inet->ok) {
+    if(strchr(name, ':')) {
+      if(inet_pton(AF_INET6, name, &inet->ip6) > 0) {
+        inet->ipv6 = 1;
+        is_ip = 2;
+        s = (char *) inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
+        if(s) str_copy(&inet->name, s);
+      }
+    }
+    else {
+      if(inet_pton(AF_INET, name, &inet->ip) > 0) {
+        inet->ipv6 = 0;
+        is_ip = 1;
+        s = (char *) inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
+        if(s) str_copy(&inet->name, s);
       }
     }
   }
@@ -693,30 +636,79 @@ int net_check_address2(inet_t *inet, int do_dns)
       !config.test &&
       config.run_as_linuxrc)
   ) {
+    free(name);
+
     return -1;
   }
 
-  he = gethostbyname(inet->name);
+  if(!is_ip) {
+    for(sl = config.net.dns_cache; sl; sl = sl->next) {
+      if(sl->key && sl->value && !strcasecmp(sl->key, name)) {
+        if(!(is_ip & 2) && config.net.ipv6 && strchr(sl->value, ':')) {
+          if(inet_pton(AF_INET6, sl->value, &inet->ip6) > 0) is_ip |= 2;
+        }
 
-  if(!he) {
-    if(config.run_as_linuxrc) {
-      fprintf(stderr, "dns: what is \"%s\"?\n", inet->name);
+        if(!(is_ip & 1) && config.net.ipv4 && !strchr(sl->value, ':')) {
+          if(inet_pton(AF_INET, sl->value, &inet->ip) > 0) is_ip |= 1;
+        }
+      }
     }
-    return -1;
   }
 
-  inet->ok = 1;
-  inet->ip = *((struct in_addr *) *he->h_addr_list);
+  if(is_ip) inet->ok = 1;
 
-  sl = slist_add(&config.net.dns_cache, slist_new());
-  str_copy(&sl->key, inet->name);
-  str_copy(&sl->value, inet_ntoa(inet->ip));
+  if(!inet->ok) {
+    if(config.net.ipv6) {
+      if(!(he = gethostbyname2(name, AF_INET6))) {
+        if(config.run_as_linuxrc) {
+          fprintf(stderr, "dns6: what is \"%s\"?\n", name);
+        }
+      }
+      else {
+        inet->ok = 1;
+        inet->ipv6 = 1;
+        memcpy(&inet->ip6, *he->h_addr_list, he->h_length);
 
-  if(config.run_as_linuxrc) {
-    fprintf(stderr, "dns: %s is %s\n", inet->name, inet_ntoa(inet->ip));
+        s = (char *) inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
+        if(s) {
+          sl = slist_add(&config.net.dns_cache, slist_new());
+          str_copy(&sl->key, name);
+          str_copy(&sl->value, s);
+
+          if(config.run_as_linuxrc) {
+            fprintf(stderr, "dns6: %s is %s\n", name, s);
+          }
+        }
+      }
+    }
+
+    if(config.net.ipv4) {
+      if(!(he = gethostbyname2(name, AF_INET))) {
+        if(config.run_as_linuxrc) {
+          fprintf(stderr, "dns: what is \"%s\"?\n", name);
+        }
+      }
+      else {
+        inet->ok = 1;
+        memcpy(&inet->ip, *he->h_addr_list, he->h_length);
+
+        s = (char *) inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
+        if(s) {
+          sl = slist_add(&config.net.dns_cache, slist_new());
+          str_copy(&sl->key, name);
+          str_copy(&sl->value, s);
+
+          if(config.run_as_linuxrc) {
+            fprintf(stderr, "dns: %s is %s\n", name, s);
+          }
+        }
+      }
+    }
   }
 
-  return 0;
+  free(name);
+
+  return inet->ok ? 0 : -1;
 }
 
 
@@ -785,7 +777,7 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
 
   if(!config.net.cifs.binary) return -2;
 
-  if(net_check_address2(server, 1)) return -3;
+  if(net_check_address(server, 1)) return -3;
 
   if(!share) share = "";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
@@ -900,7 +892,7 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned por
   struct fhstatus fhs;
   char *buf = NULL;
 
-  if(net_check_address2(server, 1)) return -2;
+  if(net_check_address(server, 1)) return -2;
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
@@ -1511,24 +1503,24 @@ int net_bootp()
   }
 
   name2inet(&config.net.hostname, getenv("BOOTP_IPADDR"));
-  net_check_address2(&config.net.hostname, 0);
+  net_check_address(&config.net.hostname, 0);
 
   name2inet(&config.net.netmask, getenv("BOOTP_NETMASK"));
-  net_check_address2(&config.net.netmask, 0);
+  net_check_address(&config.net.netmask, 0);
 
   name2inet(&config.net.broadcast, getenv("BOOTP_BROADCAST"));
-  net_check_address2(&config.net.broadcast, 0);
+  net_check_address(&config.net.broadcast, 0);
 
   name2inet(&config.net.network, getenv("BOOTP_NETWORK"));
-  net_check_address2(&config.net.network, 0);
+  net_check_address(&config.net.network, 0);
 
   name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS"));
   name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS_1"));
-  net_check_address2(&config.net.gateway, 0);
+  net_check_address(&config.net.gateway, 0);
 
   name2inet(&config.net.nameserver[0], getenv("BOOTP_DNSSRVS"));
   name2inet(&config.net.nameserver[0], getenv("BOOTP_DNSSRVS_1"));
-  net_check_address2(&config.net.nameserver[0], 0);
+  net_check_address(&config.net.nameserver[0], 0);
 
   s = getenv("BOOTP_HOSTNAME");
   if(s && !config.net.hostname.name) config.net.hostname.name = strdup(s);
@@ -1540,7 +1532,7 @@ int net_bootp()
 
   if(!config.net.server.name) {
     name2inet(&config.net.server, getenv("BOOTP_SERVER"));
-    net_check_address2(&config.net.server, 0);
+    net_check_address(&config.net.server, 0);
   }
 
   net_stop();
@@ -1572,7 +1564,7 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
   do {
     if((err = dia_input(text, input, sizeof input - 1, 16, 0))) break;
     name2inet(inet, input);
-    err = net_check_address2(inet, do_dns);
+    err = net_check_address(inet, do_dns);
     if(err) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
   } while(err);
 
@@ -1621,7 +1613,7 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
       else {
         name2inet(inet, input);
       }
-      if(!err) err = net_check_address2(inet, do_dns);
+      if(!err) err = net_check_address(inet, do_dns);
     }
     else {
       err = 1;
@@ -1736,28 +1728,28 @@ int net_dhcp4()
     switch(f->key) {
       case key_ipaddr:
         name2inet(&config.net.hostname, f->value);
-        net_check_address2(&config.net.hostname, 0);
+        net_check_address(&config.net.hostname, 0);
         break;
 
       case key_netmask:
         name2inet(&config.net.netmask, f->value);
-        net_check_address2(&config.net.netmask, 0);
+        net_check_address(&config.net.netmask, 0);
         break;
 
       case key_network:
         name2inet(&config.net.network, f->value);
-        net_check_address2(&config.net.network, 0);
+        net_check_address(&config.net.network, 0);
         break;
 
       case key_broadcast:
         name2inet(&config.net.broadcast, f->value);
-        net_check_address2(&config.net.broadcast, 0);
+        net_check_address(&config.net.broadcast, 0);
         break;
 
       case key_gateway:
         if((s = strchr(f->value, ' '))) *s = 0;
         name2inet(&config.net.gateway, f->value);
-        net_check_address2(&config.net.gateway, 0);
+        net_check_address(&config.net.gateway, 0);
         break;
 
       case key_domain:
@@ -1767,7 +1759,7 @@ int net_dhcp4()
       case key_dhcpsiaddr:
         if(!config.net.server.name) {
           name2inet(&config.net.server, f->value);
-          net_check_address2(&config.net.server, 0);
+          net_check_address(&config.net.server, 0);
         }
         break;
 
@@ -1780,7 +1772,7 @@ int net_dhcp4()
       case key_dns:
         for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
-          net_check_address2(&config.net.nameserver[config.net.nameservers], 0);
+          net_check_address(&config.net.nameserver[config.net.nameservers], 0);
           if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
         }
         slist_free(sl0);
@@ -1865,6 +1857,8 @@ int net_dhcp6()
     fclose(f);
   }
 
+  unlink("/tmp/dhcp6c_update.done");
+
   strprintf(&cmd, "dhcp6c %s", config.net.device);
 
   system(cmd);
@@ -1887,6 +1881,12 @@ int net_dhcp6()
     }
   } while(!ok && --timeout);
 
+  while(ok && timeout--) {
+    sleep(1);
+
+    if(util_check_exist("/tmp/dhcp6c_update.done")) break;
+  } 
+
   free(fname);
   free(cmd);
 
@@ -1894,7 +1894,7 @@ int net_dhcp6()
 
   if(ok) {
     config.net.dhcp_active = 1;
-    sleep(config.net.ifup_wait + 2);
+    sleep(config.net.ifup_wait + 5);
   }
   else {
     if(config.win) {
