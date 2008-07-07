@@ -146,12 +146,12 @@ typedef struct slist_s {
 
 typedef struct {
   unsigned ok:1;		/* ip field is valid */
-  unsigned ipv6:1;		/* 0: ipv4, 1: ipv6 */
+  unsigned ipv4:1;		/* 1: valid ipv4 */
+  unsigned ipv6:1;		/* 1: valid ipv6 */
   struct in_addr ip;
-  struct in_addr net;
   struct in6_addr ip6;
-  // maybe:
-  unsigned ip6_prefix;		/* ipv6 prefix length */
+  struct in_addr net;
+  unsigned prefix;		/* network prefix length (if any) */
   char *name;
 } inet_t;
 

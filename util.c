@@ -2899,7 +2899,10 @@ void s_addr2inet(inet_t *inet, unsigned long s_addr)
   inet_new.ip.s_addr = s_addr;
   inet_new.name = strdup(inet_ntoa(inet_new.ip));
 
-  if(inet_new.name) inet_new.ok = 1;
+  if(inet_new.name) {
+    inet_new.ok = 1;
+    inet_new.ipv4 = 1;
+  }
 
   *inet = inet_new;
 }
@@ -2908,49 +2911,40 @@ void s_addr2inet(inet_t *inet, unsigned long s_addr)
 char *inet2print(inet_t *inet)
 {
   static char buf[256];
-  char *s;
+  const char *ip = NULL, *ip6 = NULL;
+  char ip_buf[INET_ADDRSTRLEN], ip6_buf[INET6_ADDRSTRLEN];
 
-  *buf = 0;
+  if(!inet || (!inet->name && !inet->ok)) return "(no ip)";
 
-  if(!inet || (!inet->name && !inet->ok)) return buf;
+  sprintf(buf, "%s", inet->name);
 
-  s = inet_ntoa(inet->ip);
+  if(inet->prefix) {
+    sprintf(buf + strlen(buf), "/%u", inet->prefix);
+  }
 
-  if(inet->name && s && !strcmp(s, inet->name)) s = NULL;
-  if(!inet->ok) s = "no ip";
-
-  sprintf(buf, "%s%s%s%s",
-    inet->name ? inet->name : "",
-    s ? " (" : "",
-    s ? s : "",
-    s ? ")" : ""
-  );
-
-  return buf;
-}
-
-
-char *inetmask2print(inet_t *inet)
-{
-  static char buf[32];
-  int i, j;
-  uint32_t m1, m0;
-
-  *buf = 0;
-
-  if(!inet || (!inet->name && !inet->ok)) return buf;
-
-  m0 = m1 = htonl(inet->ip.s_addr);
-
-  for(i = 0; i < 32 && !(m0 & 1); i++) m0 >>= 1;
-  for(j = 0; j < 32 && (m1 & 0x80000000); j++) m1 <<= 1;
-
-  if(i + j == 32) {
-    sprintf(buf, "%d", j);
+  if(!inet->ipv4 && !inet->ipv6) {
+    sprintf(buf + strlen(buf), " (no ip)");
     return buf;
   }
 
-  return inet2print(inet);
+  if(inet->ipv4) ip = inet_ntop(AF_INET, &inet->ip, ip_buf, sizeof ip_buf);
+  if(inet->ipv6) ip6 = inet_ntop(AF_INET6, &inet->ip6, ip6_buf, sizeof ip6_buf);
+
+  if(ip && ip6) {
+    sprintf(buf + strlen(buf), " (ip: %s, ip6: %s)", ip, ip6);
+  }
+  else if(ip) {
+    if(!inet->name || strcmp(inet->name, ip)) {
+      sprintf(buf + strlen(buf), " (ip: %s)", ip);
+    }
+  }
+  else if(ip6) {
+    if(!inet->name || strcmp(inet->name, ip6)) {
+      sprintf(buf + strlen(buf), " (ip6: %s)", ip6);
+    }
+  }
+
+  return buf;
 }
 
 

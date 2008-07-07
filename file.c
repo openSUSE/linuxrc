@@ -45,6 +45,11 @@
 
 // #define DEBUG_FILE
 
+#define INET_WRITE_IP		1
+#define INET_WRITE_IP_BOTH	2
+#define INET_WRITE_NAME_OR_IP	4
+#define INET_WRITE_PREFIX	8
+
 static char *file_key2str(file_key_t key);
 static file_key_t file_str2key(char *value, file_key_flag_t flags);
 static int sym2index(char *sym);
@@ -57,10 +62,8 @@ static void file_dump_flist(file_t *ft);
 static void file_dump_mlist(module_t *ml);
 #endif
 
-static void file_write_inet(FILE *f, file_key_t key, inet_t *inet);
-static void file_write_inet2(FILE *f, file_key_t key, inet_t *inet);
-static void file_write_inet_str(FILE *f, char *name, inet_t *inet);
-// static void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet);
+static void file_write_inet2(FILE *f, file_key_t key, inet_t *inet, unsigned what);
+static void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what);
 
 static void add_driver(char *str);
 static void parse_ethtool(slist_t *sl, char *str);
@@ -633,7 +636,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_hostip:
         name2inet(&config.net.hostname, f->value);
         net_check_address(&config.net.hostname, 0);
-        if(config.net.hostname.ok && config.net.hostname.net.s_addr) {
+        if(config.net.hostname.ipv4 && config.net.hostname.net.s_addr) {
           s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
         }
         break;
@@ -1591,70 +1594,41 @@ void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num)
 }
 
 
-void file_write_inet(FILE *f, file_key_t key, inet_t *inet)
+void file_write_inet2(FILE *f, file_key_t key, inet_t *inet, unsigned what)
 {
-  file_write_inet_str(f, file_key2str(key), inet);
+  file_write_inet2_str(f, file_key2str(key), inet, what);
 }
 
 
-void file_write_inet2(FILE *f, file_key_t key, inet_t *inet)
+void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what)
 {
-  char *key_name = file_key2str(key);
   const char *ip = NULL;
   char buf[INET6_ADDRSTRLEN];
+  char prefix[64];
 
-  if(inet->name && *inet->name) {
-    ip = inet->name;
+  *prefix = 0;
+  if(inet->prefix && (what & INET_WRITE_PREFIX)) sprintf(prefix, "/%u", inet->prefix);
+
+  if((what & INET_WRITE_NAME_OR_IP)) {
+    if(inet->name && *inet->name) ip = inet->name;
   }
-  else if(inet->ok) {
-    if(inet->ipv6) {
+
+  if(!ip) {
+    if(inet->ok && inet->ipv6 && config.net.ipv6) {
       ip = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
+      if(ip && (what & INET_WRITE_IP_BOTH)) {
+        fprintf(f, "%s6: %s%s\n", name, ip, prefix);
+        ip = NULL;
+      }
     }
-    else {
-      ip = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
-    }
   }
 
-  if(ip) fprintf(f, "%s: %s\n", key_name, ip);
-
-#if 0
-  ip = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
-  if(ip) fprintf(f, "%sIP: %s\n", key_name, ip);
-
-  ip = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
-  if(ip) fprintf(f, "%sIP6: %s\n", key_name, ip);
-#endif
-
-}
-
-
-void file_write_inet_str(FILE *f, char *name, inet_t *inet)
-{
-  char *s = NULL;
-
-  if(inet->ok) s = inet_ntoa(inet->ip);
-  if(!s) s = inet->name;
-
-  if(s) fprintf(f, "%s: %s\n", name, s);
-}
-
-
-#if 0
-void file_write_inet_both(FILE *f, file_key_t key, inet_t *inet)
-{
-  char *key_name = file_key2str(key);
-  char *ip = NULL;
-
-  if(inet->ok) {
-    ip = inet_ntoa(inet->ip);
-    fprintf(f, "%sIP: %s\n", key_name, ip);
+  if(!ip && inet->ok && inet->ipv4 && config.net.ipv4) {
+    ip = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
   }
 
-  if(inet->name && *inet->name && (!ip || strcmp(ip, inet->name))) {
-    fprintf(f, "%sName: %s\n", key_name, inet->name);
-  }
+  if(ip) fprintf(f, "%s: %s\n", name, ip);
 }
-#endif
 
 
 void file_write_install_inf(char *dir)
@@ -1718,7 +1692,7 @@ void file_write_install_inf(char *dir)
   }
 
   if(url->used.server.ok) {
-    file_write_inet2(f, key_server, &url->used.server);
+    file_write_inet2(f, key_server, &url->used.server, INET_WRITE_NAME_OR_IP);
   }
   if(url->port) file_write_num(f, key_port, url->port);
   file_write_str(f, key_serverdir, url->path);
@@ -1749,26 +1723,28 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
     file_write_str(f, key_netcardname, config.net.cardname);
     file_write_str(f, key_ethtool, config.net.ethtool_used);
-    file_write_inet(f, key_ip, &config.net.hostname);
+    file_write_inet2(f, key_ip, &config.net.hostname, INET_WRITE_IP_BOTH + INET_WRITE_PREFIX);
     if(config.net.realhostname) {
       file_write_str(f, key_hostname, config.net.realhostname);
     }
     else {
       file_write_str(f, key_hostname, config.net.hostname.name);
     }
-    if(config.net.ipv4) file_write_inet(f, key_broadcast, &config.net.broadcast);
-    file_write_inet(f, key_network, &config.net.network);
+    if(config.net.ipv4) {
+      file_write_inet2(f, key_broadcast, &config.net.broadcast, INET_WRITE_IP);
+      file_write_inet2(f, key_network, &config.net.network, INET_WRITE_IP);
+    }
     if(config.net.ptphost.ok) {
-      file_write_inet(f, key_ptphost, &config.net.ptphost);
+      file_write_inet2(f, key_ptphost, &config.net.ptphost, INET_WRITE_IP);
     }
     else {
-      file_write_inet(f, key_netmask, &config.net.netmask);
+      if(config.net.ipv4) file_write_inet2(f, key_netmask, &config.net.netmask, INET_WRITE_IP);
     }
-    file_write_inet(f, key_gateway, &config.net.gateway);
+    file_write_inet2(f, key_gateway, &config.net.gateway, INET_WRITE_IP);
     for(i = 0; i < config.net.nameservers; i++) {
       s = file_key2str(key_nameserver);
       if(i) { sprintf(buf, "%s%d", s, i + 1); s = buf; }
-      file_write_inet_str(f, s, &config.net.nameserver[i]);
+      file_write_inet2_str(f, s, &config.net.nameserver[i], INET_WRITE_IP);
     }
     file_write_str(f, key_domain, config.net.domain);
     file_write_str(f, key_nisdomain, config.net.nisdomain);
@@ -1804,7 +1780,7 @@ void file_write_install_inf(char *dir)
 
   if(config.url.proxy) {
     if(config.url.proxy->used.server.ok) {
-      file_write_inet(f, key_proxy, &config.url.proxy->used.server);
+      file_write_inet2(f, key_proxy, &config.url.proxy->used.server, INET_WRITE_NAME_OR_IP);
     }
     if(config.url.proxy->port) fprintf(f, "ProxyPort: %u\n", config.url.proxy->port);
     fprintf(f, "ProxyProto: http\n");
@@ -1823,8 +1799,8 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_memfree, config.memory.current);
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
-  file_write_inet(f, key_displayip, &config.net.displayip);
-  file_write_inet(f, key_ptphost, &config.net.ptphost);
+  file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
+  file_write_inet2(f, key_ptphost, &config.net.ptphost, INET_WRITE_IP);
   file_write_num(f, key_usessh, config.usessh);
   if(yast2_color_ig) fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);

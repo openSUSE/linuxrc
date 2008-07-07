@@ -260,13 +260,11 @@ int inst_choose_display()
  */
 int inst_choose_display_cb(dia_item_t di)
 {
-  int rc;
   di_inst_choose_display_last = di;
 
   switch(di) {
     case di_display_x11:
-      if((rc = net_get_address(txt_get(TXT_XSERVER_IP), &config.net.displayip, 1)))
-        return rc;
+      if(net_get_address(txt_get(TXT_XSERVER_IP), &config.net.displayip, 1)) return -1;
       break;
 
     case di_display_vnc:

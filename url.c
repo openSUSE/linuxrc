@@ -2107,10 +2107,7 @@ int url_setup_interface(url_t *url)
 
   net_ask_password();
 
-  s = inet2print(&config.net.hostname);
-  fprintf(stderr, "hostip: %s/", *s ? s : "<no ip>");
-  s = inetmask2print(&config.net.netmask);
-  fprintf(stderr, "%s\n", *s ? s : "<no netmask>");
+  fprintf(stderr, "hostip: %s\n", inet2print(&config.net.hostname));
   if(config.net.gateway.ok) {
     fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));
   }
