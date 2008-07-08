@@ -1996,7 +1996,6 @@ int url_setup_device(url_t *url)
 int url_setup_interface(url_t *url)
 {
   int i;
-  char *s;
   url_t *tmp_url;
 
   // fprintf(stderr, "*** url_setup_interface(dev = %s)\n", url->used.device);

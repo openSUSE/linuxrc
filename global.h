@@ -145,14 +145,15 @@ typedef struct slist_s {
 
 
 typedef struct {
-  unsigned ok:1;		/* ip field is valid */
+  unsigned ok:1;		/* at least ip or ip6 is valid */
   unsigned ipv4:1;		/* 1: valid ipv4 */
   unsigned ipv6:1;		/* 1: valid ipv6 */
-  struct in_addr ip;
-  struct in6_addr ip6;
-  struct in_addr net;
-  unsigned prefix;		/* network prefix length (if any) */
-  char *name;
+  struct in_addr ip;		/* v4 address */
+  struct in6_addr ip6;		/* v6 address */
+  struct in_addr net;		/* network mask based on prefix4 */
+  unsigned prefix4;		/* v4 network prefix length (if any) */
+  unsigned prefix6;		/* v6 network prefix length (if any) */
+  char *name;			/* hostname */
 } inet_t;
 
 
@@ -528,7 +529,6 @@ typedef struct {
     unsigned nameservers;	/* actual number of nameservers */
     inet_t proxy;
     inet_t hostname;
-    inet_t server;
     inet_t ptphost;
     char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */

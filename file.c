@@ -88,7 +88,7 @@ static struct {
   { key_netmask,        "Netmask",        kf_cfg + kf_cmd + kf_dhcp      },
   { key_gateway,        "Gateway",        kf_cfg + kf_cmd + kf_dhcp      },
   { key_gateway,        "Gateways",       kf_cfg + kf_cmd + kf_dhcp      },
-  { key_server,         "Server",         kf_cfg + kf_cmd                },
+  { key_server,         "Server",         kf_none                        },
   { key_nameserver,     "Nameserver",     kf_cfg + kf_cmd                },
   { key_broadcast,      "Broadcast",      kf_cfg + kf_cmd + kf_dhcp      },
   { key_network,        "Network",        kf_cfg + kf_cmd + kf_dhcp      },
@@ -660,11 +660,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         net_check_address(&config.net.ptphost, 0);
         break;
       
-      case key_server:
-        name2inet(&config.net.server, f->value);
-        net_check_address(&config.net.server, 0);
-        break;
-
       case key_nameserver:
         for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
@@ -1604,10 +1599,11 @@ void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what)
 {
   const char *ip = NULL;
   char buf[INET6_ADDRSTRLEN];
-  char prefix[64];
+  char prefix4[64], prefix6[64];
 
-  *prefix = 0;
-  if(inet->prefix && (what & INET_WRITE_PREFIX)) sprintf(prefix, "/%u", inet->prefix);
+  *prefix4 = *prefix6 = 0;
+  if(inet->prefix4 && (what & INET_WRITE_PREFIX)) sprintf(prefix4, "/%u", inet->prefix4);
+  if(inet->prefix6 && (what & INET_WRITE_PREFIX)) sprintf(prefix6, "/%u", inet->prefix6);
 
   if((what & INET_WRITE_NAME_OR_IP)) {
     if(inet->name && *inet->name) ip = inet->name;
@@ -1617,7 +1613,7 @@ void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what)
     if(inet->ok && inet->ipv6 && config.net.ipv6) {
       ip = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
       if(ip && (what & INET_WRITE_IP_BOTH)) {
-        fprintf(f, "%s6: %s%s\n", name, ip, prefix);
+        fprintf(f, "%s6: %s%s\n", name, ip, prefix6);
         ip = NULL;
       }
     }

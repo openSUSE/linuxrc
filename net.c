@@ -67,7 +67,8 @@ static int  net_is_ptp_im = FALSE;
 #  define NETWORK_CONFIG 1
 #endif
 
-static int net_activate(void);
+static int net_activate4(void);
+static int net_activate6(void);
 #if defined(__s390__) || defined(__s390x__)
 int net_activate_s390_devs(void);
 int net_activate_s390_devs_ex(hd_t* hd, char** device);
@@ -207,8 +208,6 @@ int net_config()
     config.net.configured = nc_none;
     if(!config.test) return rc = -1;
   }
-
-  net_check_address(&config.net.server, 1);
 
 #endif
 
@@ -364,20 +363,22 @@ int net_setup_localhost()
  */
 int net_activate_ns()
 {
-  int rc;
+  int err4 = 1, err6 = 1;
 
   if(config.net.keep) return 0;
 
-  rc = net_activate();
+  if(config.net.ipv4) err4 = net_activate4();
+  if(config.net.ipv6) err6 = net_activate6();
 
-  if(!rc) net_setup_nameserver();
+  if(!err4 || !err6) net_setup_nameserver();
 
-  return rc;
+  // at least one should have worked
+  return err4 && err6 ? 1 : 0;
 }
 
 
 /*
- * Setup network interface.
+ * Setup IPv4 network interface.
  *
  * Return:
  *      0: ok
@@ -390,7 +391,7 @@ int net_activate_ns()
  *
  * config.net.device: interface
  */
-int net_activate()
+int net_activate4()
 {
     int                 socket_ii;
     struct ifreq        interface_ri;
@@ -417,7 +418,7 @@ int net_activate()
 
     net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-    if(config.net.ipv4 && !config.forceip && util_check_exist("/sbin/arping")) {
+    if(!config.forceip && util_check_exist("/sbin/arping")) {
        sprintf(command, "ifconfig %s up", config.net.device);
        fprintf(stderr, "net_activate: %s\n", command);
        rc = system(command);
@@ -580,6 +581,96 @@ int net_activate()
 
 
 /*
+ * Setup IPv6 network interface.
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error code
+ *
+ * Global vars changed:
+ *  config.net.is_configured
+ *
+ * Does nothing if DHCP is active.
+ *
+ * config.net.device: interface
+ */
+int net_activate6()
+{
+  int err = 0, delay = config.net.ifup_wait + 5;
+  char *cmd = NULL, ip_buf[INET6_ADDRSTRLEN], buf1[512], buf2[512], c;
+  const char *ip;
+  FILE *f;
+  inet_t host6 = { };
+
+  if(!config.net.ifconfig || config.net.dhcp_active || config.net.keep) return 0;
+
+  if(config.test) {
+    config.net.is_configured = nc_static;
+
+    return 0;
+  }
+
+  if(!config.net.device) {
+    fprintf(stderr, "net_activate: no network interface!\n");
+    return 1;
+  }
+
+  config.net.is_configured = nc_none;
+
+  if(!config.net.ipv4) net_apply_ethtool(config.net.device, config.net.hwaddr);
+
+  strprintf(&cmd, "ip link set %s up", config.net.device);
+  err = system(cmd);
+
+  if(!err) {
+    if(
+      config.net.hostname.ok &&
+      config.net.hostname.ipv6 &&
+      (ip = inet_ntop(AF_INET6, &config.net.hostname.ip6, ip_buf, sizeof ip_buf))
+    ) {
+      strprintf(&cmd, "ip addr add %s/%u dev %s", ip, config.net.hostname.prefix6, config.net.device);
+      err = system(cmd);
+    }
+    else {
+      // wait for autoconfig
+      strprintf(&cmd, "ip -o addr show dev %s", config.net.device);
+
+      do {
+        sleep(1);
+
+        if((f = popen(cmd, "r"))) {
+          while(fgets(buf1, sizeof buf1, f)) {
+            if(sscanf(buf1, "%*d: %*s inet6 %511s scope global %c", buf2, &c) == 2) {
+              if(config.debug) fprintf(stderr, "ip6: %s\n", buf2);
+              name2inet(&host6, buf2);
+              net_check_address(&host6, 0);
+              if(host6.ok && host6.ipv6) {
+                config.net.hostname.ok = host6.ok;
+                config.net.hostname.ipv6 = host6.ipv6;
+                config.net.hostname.ip6 = host6.ip6;
+                config.net.hostname.prefix6 = host6.prefix6;
+                str_copy(&config.net.hostname.name, host6.name);
+              }
+              break;
+            }
+          }
+          pclose(f);
+        }
+
+      } while(--delay > 0 && f && !config.net.hostname.ok && !config.net.hostname.ipv6);
+    }
+  }
+
+  if(!err) {
+    config.net.is_configured = nc_static;
+    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+  }
+
+  return err;
+}
+
+
+/*
  * Parse inet->name for ipv4/ipv6 adress. If do_dns is set, try nameserver lookup.
  *
  * return:
@@ -591,7 +682,7 @@ int net_check_address(inet_t *inet, int do_dns)
   struct hostent *he = NULL;
   slist_t *sl;
   char *s, buf[INET6_ADDRSTRLEN];
-  int net_bits;
+  int net_bits = 0;
 
   if(!inet) return 1;
 
@@ -611,14 +702,7 @@ int net_check_address(inet_t *inet, int do_dns)
   if((s = strchr(inet->name, '/'))) {
     *s++ = 0;
     net_bits = strtoul(s, &s, 0);
-    if(!*s && net_bits >= 0) {
-      inet->prefix = net_bits;
-
-      if(net_bits >= 0 && config.net.ipv4) {
-        inet->net.s_addr = htonl(-1 << (32 - net_bits));
-      }
-    }
-    else {
+    if(*s || net_bits < 0) {
       inet->ok = 0;
     }
   }
@@ -629,6 +713,7 @@ int net_check_address(inet_t *inet, int do_dns)
         inet->ipv6 = 1;
         s = (char *) inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
         if(s) str_copy(&inet->name, s);
+        if(net_bits > 0) inet->prefix6 = net_bits;
       }
       else {
         inet->ok = 0;
@@ -639,6 +724,10 @@ int net_check_address(inet_t *inet, int do_dns)
         inet->ipv4 = 1;
         s = (char *) inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
         if(s) str_copy(&inet->name, s);
+        if(net_bits > 0) {
+          inet->prefix4 = net_bits;
+          inet->net.s_addr = htonl(-1 << (32 - net_bits));
+        }
       }
       else {
         inet->ok = 0;
@@ -1326,26 +1415,14 @@ void net_setup_nameserver()
 
   if(config.win && !config.net.dhcp_active) {
 
-    if(!config.net.nameserver[0].name && config.net.hostname.ok) {
-      s = inet_ntoa(config.net.hostname.ip);
-      config.net.nameserver[0].name = strdup(s ?: "");
-    }
-
     if((config.net.setup & NS_NAMESERVER)) {
       for(u = 0; u < config.net.nameservers; u++) {
         if(config.net.nameservers == 1) {
-#if defined(__s390__) || defined(__s390x__)
-          s = txt_get(TXT_INPUT_NAMED_S390);
-#else
-          s = txt_get(TXT_INPUT_NAMED);
-#endif
+          s = "Enter the IP address of your name server. Leave empty if you don't need one.";
+          if(config.linemode) s = "Enter the IP address of your name server. Leave empty or enter \"+++\" if you don't need one.";
         }
         else {
-#if defined(__s390__) || defined(__s390x__)
-           sprintf(buf, txt_get(TXT_INPUT_NAMED1_S390), u + 1);
-#else
-           sprintf(buf, txt_get(TXT_INPUT_NAMED1), u + 1);
-#endif
+           sprintf(buf, txt_get(config.linemode ? TXT_INPUT_NAMED1_S390 : TXT_INPUT_NAMED1), u + 1);
            s = buf;
         }
         if(net_get_address(s, &config.net.nameserver[u], 0)) break;
@@ -1355,12 +1432,14 @@ void net_setup_nameserver()
         config.net.nameserver[u].ok = 0;
       }
     }
-
   }
 
   if(config.test) return;
 
-  if(!config.net.ipv6 && (f = fopen("/etc/resolv.conf", "w"))) {
+  if(
+    !(config.net.ipv6 && config.net.dhcp_active) &&
+    (f = fopen("/etc/resolv.conf", "w"))
+  ) {
     for(u = 0; u < config.net.nameservers; u++) {
       if(config.net.nameserver[u].ok) {
         fprintf(f, "nameserver %s\n", config.net.nameserver[u].name);
@@ -1385,16 +1464,30 @@ void net_setup_nameserver()
  *  config.net.netmask
  *  config.net.ptphost
  *  config.net.gateway
- *  config.net.server
  *  config.net.broadcast
  *  config.net.network
  *  config.net.gateway
  */
 int net_input_data()
 {
+  inet_t host6 = {};
+
+  config.net.netmask.ok = 0;
 
   if((config.net.setup & NS_HOSTIP)) {
-    if(net_get_address(txt_get(TXT_INPUT_IPADDR), &config.net.hostname, 1)) return -1;
+    if(config.net.ipv4) {
+      if(net_get_address("Enter your IPv4 address.\n Example: 192.168.5.77/24", &config.net.hostname, 1)) return -1;
+    }
+    if(config.net.ipv6) {
+      if(net_get_address("Enter your IPv6 address (leave empty for autoconfig).\nExample: 2001:db8:75:fff::3/64", &host6, 1) == 2) return -1;
+      if(host6.ok && host6.ipv6) {
+        config.net.hostname.ok = host6.ok;
+        config.net.hostname.ipv6 = host6.ipv6;
+        config.net.hostname.ip6 = host6.ip6;
+        config.net.hostname.prefix6 = host6.prefix6;
+        if(!config.net.hostname.name) str_copy(&config.net.hostname.name, host6.name);
+      }
+    }
   }
 
   if(config.net.hostname.ipv4 && config.net.hostname.net.s_addr) {
@@ -1411,48 +1504,44 @@ int net_input_data()
     if(!config.net.gateway.name) {
       name2inet(&config.net.gateway, config.net.ptphost.name);
     }
-
-    if(!config.net.server.name) {
-      name2inet(&config.net.server, config.net.ptphost.name);
-    }
   }
   else {
     name2inet(&config.net.ptphost, "");
 
-    if(!config.net.gateway.name) {
-      name2inet(&config.net.gateway, config.net.hostname.name);
-    }
+    if(config.net.ipv4) {
+      if(!config.net.netmask.ok) {
+        char *s = inet_ntoa(config.net.hostname.ip);
 
-    if(!config.net.server.name) {
-      name2inet(&config.net.server, config.net.hostname.name);
-    }
+        name2inet(
+          &config.net.netmask,
+          strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0"
+        );
+      }
 
-    if(!config.net.netmask.ok) {
-      char *s = inet_ntoa(config.net.hostname.ip);
+      if(
+        !config.net.hostname.prefix4 &&
+        !config.net.netmask.ok &&
+        (config.net.setup & NS_NETMASK)
+      ) {
+        if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) return -1;
+      }
 
-      name2inet(
-        &config.net.netmask,
-        strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0"
-      );
-    }
-    if(config.net.hostname.ipv6 && (config.net.setup & NS_NETMASK)) {
-      if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) return -1;
-    }
+      if(config.net.hostname.ipv4) {
+        s_addr2inet(
+          &config.net.broadcast,
+          config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
+        );
 
-    if(config.net.hostname.ipv4) {
-      s_addr2inet(
-        &config.net.broadcast,
-        config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-      );
-
-      s_addr2inet(
-        &config.net.network,
-        config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
-      );
+        s_addr2inet(
+          &config.net.network,
+          config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
+        );
+      }
     }
 
     if((config.net.setup & NS_GATEWAY)) {
-      net_get_address(txt_get(TXT_INPUT_GATEWAY), &config.net.gateway, 1);
+      config.net.gateway.ok = 0;
+      if(net_get_address("Enter the IP address of the gateway. Leave empty if you don't need one.", &config.net.gateway, 1) == 2) return -1;
     }
   }
 
@@ -1477,7 +1566,6 @@ int net_input_data()
  *  config.net.gateway
  *  config.net.nameserver
  *  config.net.domain
- *  config.net.server
  * 
  * config.net.bootp_wait: delay between interface setup & bootp request
  * config.net.device: interface
@@ -1561,11 +1649,6 @@ int net_bootp()
     config.net.domain = strdup(s);
   }
 
-  if(!config.net.server.name) {
-    name2inet(&config.net.server, getenv("BOOTP_SERVER"));
-    net_check_address(&config.net.server, 0);
-  }
-
   net_stop();
 
   return 0;
@@ -1580,7 +1663,8 @@ int net_bootp()
  *
  * return:
  *   0: ok
- *   1: error or abort
+ *   1: empty input
+ *   2: error or abort
  *
  * Note: expects window mode.
  */
@@ -1589,12 +1673,19 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
   int err = 0;
 
   do {
-    if((err = dia_input2(text, &inet->name, 16, 0))) break;
-    err = net_check_address(inet, do_dns);
+    if(dia_input2(text, &inet->name, 32, 0)) {
+      err = 2;
+      break;
+    }
+    if(!inet->name) {
+      err = 1;
+      break;
+    }
+    if(net_check_address(inet, do_dns)) err = 2;
     if(err) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
   } while(err);
 
-  return err ? 1 : 0;
+  return err;
 }
 
 
@@ -1620,9 +1711,16 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
   str_copy(&input, inet->name);
 
   do {
-    if((err = dia_input2(text, &input, 16, 0))) break;
+    if((err = dia_input2(text, &input, 32, 0))) break;
     if(input) {
-      if((user || password || port) && strchr(input, ':')) {
+      if(
+        (user || password || port) &&
+        (
+          (strchr(input, ':') && !config.net.ipv6) || 
+          strchr(input, '@') ||
+          (strchr(input, '[') && strchr(input, ']'))
+        )
+      ) {
         strprintf(&buf, "http://%s", input);
         url = url_set(buf);
         if(url->server) {
@@ -1675,7 +1773,6 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
  *  config.net.domain
  *  config.net.nisdomain
  *  config.net.nameserver
- *  config.net.server
  */
 int net_dhcp()
 {
@@ -1706,7 +1803,6 @@ int net_dhcp()
  *  config.net.domain
  *  config.net.nisdomain
  *  config.net.nameserver
- *  config.net.server
  */
 int net_dhcp4()
 {
@@ -1782,13 +1878,6 @@ int net_dhcp4()
         if(*f->value) str_copy(&config.net.domain, f->value);
         break;
 
-      case key_dhcpsiaddr:
-        if(!config.net.server.name) {
-          name2inet(&config.net.server, f->value);
-          net_check_address(&config.net.server, 0);
-        }
-        break;
-
 #if 0
       case key_rootpath:
       case key_bootfile:
@@ -1845,7 +1934,6 @@ int net_dhcp4()
  *  config.net.domain
  *  config.net.nisdomain
  *  config.net.nameserver
- *  config.net.server
  */
 int net_dhcp6()
 {
@@ -1967,7 +2055,6 @@ unsigned net_config_mask()
   if(config.net.hostname.name) u |= 1;
   if(config.net.netmask.ok) u |= 2;
   if(config.net.gateway.ok) u |= 4;
-  if(config.net.server.name) u |= 8;
   if(config.net.nameserver[0].ok) u |= 0x10;
 
   return u;

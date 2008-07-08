@@ -956,6 +956,10 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 	if (i > 0 && txt_tv[i - 1] == '.')
 	  i--;
 	c = i = dia_printformatted(txt_tv, i, max_x_ig - 1, 0);
+	if(c) {
+	  putchar('\n');
+	  c = i = 0;
+	}
 	if (*input_tr)
 	  i += strlen(input_tr) + 3;
 	if (i > max_x_ig - fieldlen_iv - 2)

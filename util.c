@@ -2913,14 +2913,15 @@ char *inet2print(inet_t *inet)
   static char buf[256];
   const char *ip = NULL, *ip6 = NULL;
   char ip_buf[INET_ADDRSTRLEN], ip6_buf[INET6_ADDRSTRLEN];
+  char prefix4[64], prefix6[64];
 
   if(!inet || (!inet->name && !inet->ok)) return "(no ip)";
 
-  sprintf(buf, "%s", inet->name);
+  sprintf(buf, "%s", inet->name ?: "[no name]");
 
-  if(inet->prefix) {
-    sprintf(buf + strlen(buf), "/%u", inet->prefix);
-  }
+  *prefix4 = *prefix6 = 0;
+  if(inet->prefix4) sprintf(prefix4, "/%u", inet->prefix4);
+  if(inet->prefix6) sprintf(prefix6, "/%u", inet->prefix6);
 
   if(!inet->ipv4 && !inet->ipv6) {
     sprintf(buf + strlen(buf), " (no ip)");
@@ -2931,16 +2932,16 @@ char *inet2print(inet_t *inet)
   if(inet->ipv6) ip6 = inet_ntop(AF_INET6, &inet->ip6, ip6_buf, sizeof ip6_buf);
 
   if(ip && ip6) {
-    sprintf(buf + strlen(buf), " (ip: %s, ip6: %s)", ip, ip6);
+    sprintf(buf + strlen(buf), " (ip: %s%s, ip6: %s%s)", ip, prefix4, ip6, prefix6);
   }
   else if(ip) {
-    if(!inet->name || strcmp(inet->name, ip)) {
-      sprintf(buf + strlen(buf), " (ip: %s)", ip);
+    if(!inet->name || strcmp(inet->name, ip) || *prefix4) {
+      sprintf(buf + strlen(buf), " (ip: %s%s)", ip, prefix4);
     }
   }
   else if(ip6) {
-    if(!inet->name || strcmp(inet->name, ip6)) {
-      sprintf(buf + strlen(buf), " (ip6: %s)", ip6);
+    if(!inet->name || strcmp(inet->name, ip6) || *prefix6) {
+      sprintf(buf + strlen(buf), " (ip6: %s%s)", ip6, prefix6);
     }
   }
 

@@ -870,7 +870,12 @@ int inst_do_network(instmode_t scheme)
   if(!err) {
     url_free(config.url.install);
 
-    strprintf(&buf, "%s://%s", get_instmode_name(scheme), server.name);
+    if(server.name && strchr(server.name, ':')) {
+      strprintf(&buf, "%s://[%s]", get_instmode_name(scheme), server.name);
+    }
+    else {
+      strprintf(&buf, "%s://%s", get_instmode_name(scheme), server.name);
+    }
     config.url.install = url_set(buf);
 
     memcpy(&config.url.install->used.server, &server, sizeof config.url.install->used.server);
