@@ -1,5 +1,5 @@
-1/7/2008:	v3.2.0
-	- add ipv6 support
+8/7/2008:	v3.2.0
+	- basic ipv6 support
 
 10/6/2008:	v3.1.34
 	- don't check filenames when verifying SHA1 sum
