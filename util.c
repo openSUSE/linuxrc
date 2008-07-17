@@ -3552,7 +3552,9 @@ void util_set_product_dir(char *prod)
     if(arch[0] == 'i' && arch[2] == '8' && arch[3] == '6' && !arch[4]) arch = "i386";
   }
 
+#if defined(__powerpc__) && !defined(__powerpc64__)
   if(!strcmp(arch, "ppc64")) arch = "ppc";
+#endif
 
   strprintf(&config.rootimage, "boot/%s/root", arch);
   strprintf(&config.rescueimage, "boot/%s/rescue", arch);
