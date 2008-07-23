@@ -1302,10 +1302,11 @@ void config_rescue(char *mp)
 void lxrc_usr1(int signum)
 {
   static unsigned extend_cnt = 0;
-  int i, err;
-  char *s, *t, buf[1024];
+  int i, err = 0;
+  char *s, buf[1024];
   FILE *f;
-  slist_t *sl;
+  slist_t *sl = NULL, *sl_task = NULL;
+  char task = 0, *ext = NULL;
 
   if(!rename("/tmp/extend.job", s = new_download())) {
     *buf = 0;
@@ -1313,15 +1314,21 @@ void lxrc_usr1(int signum)
     if(f) {
       if(!fgets(buf, sizeof buf, f)) *buf = 0;
       if(*buf) {
-        t = buf + strlen(buf) - 1;
-        while(t > buf && isspace(*t)) *t-- = 0;
+        sl_task = slist_split(' ', buf);
+        task = *sl_task->key;
+        if(sl_task->next) ext = sl_task->next->key;
       }
       fclose(f);
     }
     unlink(s);
-    if(*buf) {
-      sl = slist_getentry(config.extend_list, buf);
-      if(!sl) slist_append_str(&config.extend_list, buf);
+    if((task == 'a' || task == 'r') && ext) {
+      sl = slist_getentry(config.extend_list, ext);
+      if(task == 'a' && !sl) {
+        slist_append_str(&config.extend_list, ext);
+      }
+      else if(task == 'r' && sl) {
+        str_copy(&sl->key, NULL);
+      }
       if(!fork()) {
         for(i = 0; i < 256; i++) close(i);
         open("/tmp/extend.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
@@ -1334,12 +1341,19 @@ void lxrc_usr1(int signum)
 
         config.keepinstsysconfig = 1;
 
-        if(sl) {
-          fprintf(stderr, "instsys extend: %s\n%s: already integrated\n", buf, buf);
+        if(task == 'a' && sl) {
+          fprintf(stderr, "instsys extend: add %s\n%s: already added\n", ext, ext);
           err = 0;
         }
-        else {
-          err = auto2_extend_root(buf);
+        else if(task == 'r' && !sl) {
+          fprintf(stderr, "instsys extend: remove %s\n%s: not there\n", ext, ext);
+          err = 0;
+        }
+        else if(task == 'a') {
+          err = auto2_add_extension(ext);
+        }
+        else if(task == 'r') {
+          err = auto2_remove_extension(ext);
         }
         f = fopen("/tmp/extend.result", "w");
         if(f) fprintf(f, "%d\n", err);
@@ -1348,6 +1362,8 @@ void lxrc_usr1(int signum)
       }
     }
   }
+
+  slist_free(sl_task);
 
   extend_cnt += 10;
 

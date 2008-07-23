@@ -1,3 +1,6 @@
+23/7/2008:	v3.2.2
+	- 'extend' can now add and remove inst-sys parts
+
 21/7/2008:	v3.2.1
 	- there is a real ppc64 now
 

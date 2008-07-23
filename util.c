@@ -3107,15 +3107,24 @@ int util_extend_main(int argc, char **argv)
   FILE *f;
   int ready, err = 0;
   char buf[1024];
+  char task = 'a';
 
   argv++; argc--;
 
-  if(!argc) return fprintf(stderr, "usage: extend extension_name\n"), 1;
+  if(argc && !strcmp(*argv, "-r")) {
+    task = 'r';
+    argv++;
+    argc--;
+  }
+
+  if(!argc || !strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
+    return fprintf(stderr, "Usage: extend [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
+  }
 
   unlink("/tmp/extend.result");
   f = fopen("/tmp/extend.job", "w");
   if(f) {
-    fprintf(f, "%s\n", *argv);
+    fprintf(f, "%c %s\n", task, *argv);
     fclose(f);
 
     if(util_check_exist("/usr/src/packages") || getuid()) config.test = 1;
@@ -3320,6 +3329,10 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       return -1;
     }
     if(config.run_as_linuxrc) fprintf(stderr, "mount: using %s\n", loop_dev);
+
+    // remove downloaded files immediately (so we don't have to cleanup after umount)
+    if(!strncmp(dev, config.download.base, strlen(config.download.base))) unlink(dev);
+
     dev = loop_dev;
   }
 

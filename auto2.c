@@ -1,3 +1,5 @@
+#define _GNU_SOURCE	/* getline */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -1044,14 +1046,14 @@ void auto2_driverupdate(url_t *url)
 }
 
 
-int auto2_extend_root(char *file)
+int auto2_add_extension(char *extension)
 {
   int err = 0;
   char *argv[3] = { };
   char *s;
   slist_t *sl;
 
-  fprintf(stderr, "instsys extend: %s\n", file);
+  fprintf(stderr, "instsys add extension: %s\n", extension);
 
   str_copy(&config.mountpoint.instdata, new_mountpoint());
   str_copy(&config.mountpoint.instsys, new_mountpoint());
@@ -1079,7 +1081,7 @@ int auto2_extend_root(char *file)
   s = url_instsys_base(config.url.instsys->path);
   if(!s) return 3;
 
-  strprintf(&config.url.instsys->path, "%s/%s", s, file);
+  strprintf(&config.url.instsys->path, "%s/%s", s, extension);
 
   if(config.url.instsys->scheme == inst_rel) {
     err = url_find_repo(config.url.install, config.mountpoint.instdata);
@@ -1108,6 +1110,51 @@ int auto2_extend_root(char *file)
       }
     }
   }
+
+  return err;
+}
+
+
+int auto2_remove_extension(char *extension)
+{
+  int err = 0;
+  char *s, *prefix, *path = NULL, *lbuf = NULL;
+  size_t lbuf_size = 0;
+  FILE *f, *w;
+  slist_t *sl0 = NULL, *sl;
+
+  fprintf(stderr, "instsys remove extension: %s\n", extension);
+
+  s = url_instsys_base(config.url.instsys->path);
+  if(!s) return 3;
+
+  strprintf(&path, "%s/%s", s, extension);
+
+  url_build_instsys_list(path, 0);
+
+  if((f = fopen("/etc/instsys.parts", "r"))) {
+    if((w = fopen("/etc/instsys.parts.tmp", "w"))) {
+      while(getline(&lbuf, &lbuf_size, f) > 0) {
+        sl0 = slist_split(' ', lbuf);
+        prefix = "";
+        if(*sl0->key != '#') {
+          if(slist_getentry(config.url.instsys_list, sl0->key)) {
+            prefix = "# ";
+            for(sl = sl0->next; sl; sl = sl->next) {
+              util_umount(sl->key);
+            }
+          }
+        }
+        fprintf(w, "%s%s", prefix, lbuf);
+      }
+      fclose(w);
+      rename("/etc/instsys.parts.tmp", "/etc/instsys.parts");
+    }
+    fclose(f);
+  }
+
+  slist_free(sl0);
+  free(path);
 
   return err;
 }

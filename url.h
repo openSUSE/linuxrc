@@ -54,4 +54,4 @@ int url_find_repo(url_t *url, char *dir);
 int url_find_instsys(url_t *url, char *dir);
 char *url_print(url_t *url, int format);
 char *url_instsys_base(char *path);
-
+void url_build_instsys_list(char *instsys, int read_list);

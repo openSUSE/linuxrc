@@ -1,4 +1,4 @@
-#define _GNU_SOURCE	/* strnlen */
+#define _GNU_SOURCE	/* strnlen, getline */
 
 /*
 
@@ -57,7 +57,6 @@ static int url_setup_device(url_t *url);
 static int url_setup_interface(url_t *url);
 static void url_parse_instsys_config(char *file);
 static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
-static void url_build_instsys_list(char *instsys);
 static char *url_instsys_config(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
@@ -1649,7 +1648,7 @@ int url_find_repo(url_t *url, char *dir)
       free(file_name);
     }
 
-    url_build_instsys_list(config.url.instsys->path);
+    url_build_instsys_list(config.url.instsys->path, 1);
 
     if(url->is.mountable) {
       for(sl = config.url.instsys_list; sl; sl = sl->next) {
@@ -1677,11 +1676,6 @@ int url_find_repo(url_t *url, char *dir)
       t = url_config_get_path(s);
       file_list = url_config_get_file_list(s);
 
-      if((f = fopen("/etc/instsys.parts", "a"))) {
-        fprintf(f, "%s\n", s);
-        fclose(f);
-      }
-
       old_file_list = url->file_list;
       url->file_list = file_list;
 
@@ -1689,6 +1683,11 @@ int url_find_repo(url_t *url, char *dir)
 
       // sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
       sl->value = strdup(new_mountpoint());
+
+      if((f = fopen("/etc/instsys.parts", "a"))) {
+        fprintf(f, "%s %s\n", s, sl->value);
+        fclose(f);
+      }
 
       if(
         url->is.mountable &&
@@ -1824,7 +1823,7 @@ int url_find_instsys(url_t *url, char *dir)
 
   s = url_path + strlen(url->path);
   if(*s == '/') s++;
-  url_build_instsys_list(s);
+  url_build_instsys_list(s, 1);
 
   ok = 1;
 
@@ -1857,11 +1856,6 @@ int url_find_instsys(url_t *url, char *dir)
       t = url_config_get_path(s);
       file_list = url_config_get_file_list(s);
 
-      if((f = fopen("/etc/instsys.parts", "a"))) {
-        fprintf(f, "%s\n", s);
-        fclose(f);
-      }
-
       old_file_list = url->file_list;
       url->file_list = file_list;
 
@@ -1869,6 +1863,11 @@ int url_find_instsys(url_t *url, char *dir)
 
       // sl->value = strdup(parts > 1 ? new_mountpoint() : config.mountpoint.instsys);
       sl->value = strdup(new_mountpoint());
+
+      if((f = fopen("/etc/instsys.parts", "a"))) {
+        fprintf(f, "%s %s\n", s, sl->value);
+        fclose(f);
+      }
 
       if(
         url->is.mountable &&
@@ -2201,11 +2200,11 @@ slist_t *url_instsys_lookup(char *key, slist_t **sl_ll)
 }
 
 
-void url_build_instsys_list(char *image)
+void url_build_instsys_list(char *image, int read_list)
 {
-  char *s, *base = NULL, *name = NULL, *buf = NULL, parts_buf[0x1000];
+  char *s, *base = NULL, *name = NULL, *buf = NULL, *lbuf = NULL;
   slist_t *sl, *sl1, *sl2, *sl_ll = NULL, *list = NULL, *parts = NULL;
-  int i;
+  size_t lbuf_size = 0;
   FILE *f;
 
   if(!image) return;
@@ -2248,11 +2247,14 @@ void url_build_instsys_list(char *image)
     strprintf(&sl->key, "%s%s%s", s == sl->key ? "" : "?", base, s);
   }
 
-  if((f = fopen("/etc/instsys.parts", "r"))) {
-    i = fread(parts_buf, 1, sizeof parts_buf - 1, f);
-    parts_buf[i > 0 ? i : 0] = 0;
+  if(read_list && (f = fopen("/etc/instsys.parts", "r"))) {
+    while(getline(&lbuf, &lbuf_size, f) > 0) {
+      sl = slist_split(' ', lbuf);
+      // fprintf(stderr, ">%s< >%s<\n", sl->key, lbuf);
+      if(*sl->key != '#') slist_append_str(&parts, sl->key);
+      sl = slist_free(sl);
+    }
     fclose(f);
-    parts = slist_split('\n', parts_buf);
   }
 
   list = slist_free(list);
@@ -2274,6 +2276,7 @@ void url_build_instsys_list(char *image)
     }
   }
 
+  free(lbuf);
   free(base);
   free(name);
   free(buf);
