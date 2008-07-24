@@ -3104,21 +3104,32 @@ char *util_fstype(char *dev, char **module)
 
 int util_extend_main(int argc, char **argv)
 {
-  FILE *f;
+  FILE *f, *w;
   int ready, err = 0;
   char buf[1024];
   char task = 'a';
+  struct { unsigned verbose:1; unsigned help:1; } opt = {};
 
   argv++; argc--;
 
-  if(argc && !strcmp(*argv, "-r")) {
-    task = 'r';
-    argv++;
-    argc--;
+  while(argc) {
+    if(!strcmp(*argv, "-r")) {
+      task = 'r';
+    }
+    else if(!strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
+      opt.help = 1;
+    }
+    else if(!strcmp(*argv, "-v")) {
+      opt.verbose = 1;
+    }
+    else {
+      break;
+    }
+    argv++; argc--;
   }
 
-  if(!argc || !strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
-    return fprintf(stderr, "Usage: extend [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
+  if(!argc || opt.help) {
+    return fprintf(stderr, "Usage: extend [-v] [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
   }
 
   unlink("/tmp/extend.result");
@@ -3151,7 +3162,12 @@ int util_extend_main(int argc, char **argv)
 
   f = fopen("/tmp/extend.log", "r");
   if(f) {
-    while(fgets(buf, sizeof buf, f)) printf("%s", buf);
+    w = fopen("/var/log/extend", "a");
+    while(fgets(buf, sizeof buf, f)) {
+      if(opt.verbose) printf("%s", buf);
+      if(w) fprintf(w, "%s", buf);
+    }
+    if(w) fclose(w);
     fclose(f);
   }
 
@@ -3304,7 +3320,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
         tmp_dev = dev;
       }
       fprintf(stderr, "%s -> %s: converting to squashfs\n", dev, tmp_dev);
-      strprintf(&buf, "mksquashfs %s %s -noappend >%s", dir, tmp_dev, config.debug ? "&2" : "/dev/null");
+      strprintf(&buf, "mksquashfs %s %s -noappend -no-progress >%s", dir, tmp_dev, config.debug ? "&2" : "/dev/null");
       err = system(buf);
       if(err && config.run_as_linuxrc) fprintf(stderr, "mount: mksquashfs failed\n");
       if(!err) {
