@@ -294,6 +294,8 @@ static struct {
   { key_ipv4only,       "ipv4only",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_ipv6,           "ipv6",           kf_cfg + kf_cmd + kf_cmd_early },
   { key_ipv6only,       "ipv6only",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_usesax2,        "UseSax2",        kf_cfg + kf_cmd                },
+  { key_usesax2,        "Sax2",           kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1501,6 +1503,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
+      case key_usesax2:
+        if(f->is.numeric) config.usesax2 = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1806,6 +1812,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_startshell, config.startshell);
   file_write_num(f, key_y2gdb, config.y2gdb);
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
+  file_write_num(f, key_usesax2, config.usesax2);
 
   if(
     config.rootpassword &&
