@@ -1876,7 +1876,8 @@ void free_hlink_list()
  */
 void util_start_shell(char *tty, char *shell, int flags)
 {
-  int fd;
+  int fd, i;
+  FILE *f;
   char *s, *args[] = { NULL, NULL, NULL };
   char *env[] = {
     NULL,	/* TERM */
@@ -1907,6 +1908,11 @@ void util_start_shell(char *tty, char *shell, int flags)
     if(config.utf8) {
       printf("\033%%G");
       fflush(stdout);
+    }
+
+    if((f = fopen("/etc/motd", "r"))) {
+      while((i = fgetc(f)) != EOF) putchar(i);
+      fclose(f);
     }
 
     execve(shell, args, (flags & 1) ? env : environ);
