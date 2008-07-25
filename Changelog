@@ -1,3 +1,6 @@
+25/7/2008:	v3.2.3
+	- support .init/.done scripts in extensions
+
 23/7/2008:	v3.2.2
 	- 'extend' can now add and remove inst-sys parts
 	- added 'sax2' option: use sax2 for inst-sys X11 config
