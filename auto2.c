@@ -1050,7 +1050,7 @@ int auto2_add_extension(char *extension)
 {
   int err = 0;
   char *argv[3] = { };
-  char *s;
+  char *s, *cmd = NULL;
   slist_t *sl;
 
   fprintf(stderr, "instsys add extension: %s\n", extension);
@@ -1107,6 +1107,11 @@ int auto2_add_extension(char *extension)
         argv[1] = sl->value;
         argv[2] = "/";
         util_lndir_main(3, argv);
+        if(util_check_exist2(sl->value, ".init") == 'r') {
+          strprintf(&cmd, "%s/.init %s", sl->value, sl->value);
+          system(cmd);
+          str_copy(&cmd, NULL);
+        }
       }
     }
   }
@@ -1118,7 +1123,7 @@ int auto2_add_extension(char *extension)
 int auto2_remove_extension(char *extension)
 {
   int err = 0;
-  char *s, *prefix, *path = NULL, *lbuf = NULL;
+  char *s, *prefix, *path = NULL, *lbuf = NULL, *cmd = NULL;
   size_t lbuf_size = 0;
   FILE *f, *w;
   slist_t *sl0 = NULL, *sl;
@@ -1141,6 +1146,11 @@ int auto2_remove_extension(char *extension)
           if(slist_getentry(config.url.instsys_list, sl0->key)) {
             prefix = "# ";
             for(sl = sl0->next; sl; sl = sl->next) {
+              if(util_check_exist2(sl->key, ".done") == 'r') {
+                strprintf(&cmd, "%s/.done %s", sl->key, sl->key);
+                system(cmd);
+                str_copy(&cmd, NULL);
+              }
               util_umount(sl->key);
             }
           }
