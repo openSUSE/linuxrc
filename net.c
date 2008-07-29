@@ -2304,16 +2304,14 @@ int net_s390_get_ifname(char* channel, char** device)
   char path[100];
   DIR* d;
   struct dirent* e;
-  sprintf(path, "/sys/bus/ccwgroup/devices/%s", channel);
+  sprintf(path, "/sys/bus/ccwgroup/devices/%s/net", channel);
   d = opendir(path);
   if(!d) return -1;
   while((e = readdir(d))) {
-    if(!strncmp(e->d_name, "net:", 4)) {
-      fprintf(stderr, "ccwgroup %s has network IF %s\n", channel, e->d_name + 4);
-      strprintf(device, e->d_name + 4);
-      closedir(d);
-      return 0;
-    }
+    fprintf(stderr, "ccwgroup %s has network IF %s\n", channel, e->d_name + 4);
+    strprintf(device, e->d_name);
+    closedir(d);
+    return 0;
   }
   closedir(d);
   fprintf(stderr, "no network IF found for channel group %s\n", channel);
@@ -2383,7 +2381,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     IFNOTAUTO(config.hwp.userid)
       if((rc=dia_input2_chopspace(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
 
-    mod_modprobe("netiucv",NULL);	// FIXME: error handling
+    if(mod_modprobe("netiucv",NULL)) {
+      dia_message("failed to load netiucv module",MSGTYPE_ERROR);
+      return -1;
+    }
 
     if((rc=util_set_sysfs_attr("/sys/bus/iucv/drivers/netiucv/connection",config.hwp.userid))) return rc;
 
@@ -2398,7 +2399,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 
   case di_390net_ctc:
   case di_390net_escon:
-    mod_modprobe("ctc",NULL);	// FIXME: error handling
+    if(mod_modprobe("ctcm",NULL)) {
+      dia_message("failed to load ctcm module",MSGTYPE_ERROR);
+      return -1;
+    }
 
     if((rc=net_s390_getrwchans_ex(hd))) return rc;
     
@@ -2441,7 +2445,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     }
     net_s390_set_config_ccwdev();
     sprintf(hwcfg_name, "ctc-bus-ccw-%s",config.hwp.readchan);
-    config.hwp.module="ctc";
+    config.hwp.module="ctcm";
     config.hwp.scriptup_ccwgroup="hwup-ctc";
     config.hwp.ccw_chan_num=2;
     strprintf(&config.hwp.ccw_chan_ids,"%s %s",config.hwp.readchan,config.hwp.writechan);
@@ -2498,7 +2502,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 
     if(config.hwp.interface == di_osa_qdio)
     {
-      mod_modprobe("qeth",NULL);	// FIXME: error handling
+      if(mod_modprobe("qeth",NULL)) {
+        dia_message("failed to load qeth module",MSGTYPE_ERROR);
+        return -1;
+      }
 
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       IFNOTAUTO(config.hwp.datachan)
@@ -2539,7 +2546,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     }
     else	/* LCS */
     {
-      mod_modprobe("lcs",NULL);	// FIXME: error handling
+      if(mod_modprobe("lcs",NULL)) {
+        dia_message("failed to load lcs module", MSGTYPE_ERROR);
+        return -1;
+      }
       
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       

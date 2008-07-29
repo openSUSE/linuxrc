@@ -1,3 +1,7 @@
+	- s390: fixed net_s390_get_ifname() for new sysfs layout
+	- s390: handle module loading errors
+	- s390: ctc module is now called ctcm
+
 25/7/2008:	v3.2.3
 	- support .init/.done scripts in extensions
 	- show motd when starting a shell
