@@ -2,7 +2,7 @@
  *
  * install.c           Handling of installation
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
@@ -1282,11 +1282,7 @@ int inst_commit_install()
         break;
       }
 
-#if defined(__s390__) || defined(__s390x__)
-      reboot(RB_POWER_OFF);
-#else
       reboot(RB_AUTOBOOT);
-#endif
       break;
 
     case 2:	/* power off */
