@@ -69,8 +69,8 @@ msgstr "Modules du noyau (pilotes matériel)"
 
 #. TLABEL linuxrc_2002_03_29_0036__10
 #. TXT_MENU_START
-msgid "Start Installation or System"
-msgstr "Démarrer l'installation ou le système"
+msgid "Start Installation"
+msgstr "Démarrer l'installation"
 
 #. TLABEL linuxrc_2002_03_29_0036__11
 #. TXT_MENU_INFO
@@ -749,13 +749,13 @@ msgstr "Éjecter le CD"
 
 #. TLABEL linuxrc_2002_03_29_0036__138
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
-msgstr "Délai pour Bootp"
+msgid "DHCP Time-Out"
+msgstr "Délai pour DHCP"
 
 #. TLABEL linuxrc_2002_03_29_0036__139
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
-msgstr "Spécifiez la valeur du délai pour bootp."
+msgid "Enter the time-out value for DHCP."
+msgstr "Spécifiez la valeur du délai pour DHCP."
 
 #. TLABEL linuxrc_2002_03_29_0036__141
 #. TXT_NET_CTC
@@ -1358,3 +1358,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+

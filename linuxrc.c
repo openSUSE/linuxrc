@@ -74,6 +74,8 @@ static void lxrc_change_root   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
 static void lxrc_usr1(int signum);
+static int  lxrc_exit_menu     (void);
+static int  lxrc_exit_cb       (dia_item_t di);
 
 extern char **environ;
 static void lxrc_movetotmpfs(void);
@@ -127,7 +129,6 @@ static struct {
 #endif
 
 static dia_item_t di_lxrc_main_menu_last;
-
 
 int main(int argc, char **argv, char **env)
 {
@@ -1099,14 +1100,10 @@ void lxrc_main_menu()
 {
   dia_item_t di;
   dia_item_t items[] = {
-    di_main_settings,
-    di_main_info,
-    di_main_modules,
     di_main_start,
-    di_main_verify,
-    di_main_eject,
-    di_main_reboot,
-    di_main_halt,
+    di_main_settings,
+    di_main_expert,
+    di_main_exit,
     di_none
   };
 
@@ -1115,7 +1112,7 @@ void lxrc_main_menu()
   di_lxrc_main_menu_last = di_main_start;
 
   for(;;) {
-    di = dia_menu2(txt_get(TXT_HDR_MAIN), 40, lxrc_main_cb, items, di_lxrc_main_menu_last);
+    di = dia_menu2(txt_get(TXT_HDR_MAIN), 38, lxrc_main_cb, items, di_lxrc_main_menu_last);
 
     if(di == di_none) {
       if(dia_message(txt_get(TXT_NO_LXRC_END), MSGTYPE_INFO) == -42) break;
@@ -1145,6 +1142,10 @@ int lxrc_main_cb(dia_item_t di)
   di_lxrc_main_menu_last = di;
 
   switch(di) {
+    case di_main_start:
+      rc = inst_menu();
+      break;
+
     case di_main_settings:
       rc = set_settings();
       if(rc == di_set_lang || rc == di_set_display)
@@ -1153,34 +1154,12 @@ int lxrc_main_cb(dia_item_t di)
         rc = 1;
       break;
 
-    case di_main_info:
-      info_menu();
+    case di_main_expert:
+      set_expert_menu();
       break;
 
-    case di_main_modules:
-      mod_menu();
-      break;
-
-    case di_main_start:
-      rc = inst_menu();
-      break;
-
-    case di_main_verify:
-      md5_verify();
-      rc = 1;
-      break;
-
-    case di_main_eject:
-      util_eject_cdrom(config.cdrom);
-      rc = 1;
-      break;
-
-    case di_main_reboot:
-      lxrc_reboot();
-      break;
-
-    case di_main_halt:
-      lxrc_halt();
+    case di_main_exit:
+      lxrc_exit_menu();
       break;
 
     default:
@@ -1190,6 +1169,34 @@ int lxrc_main_cb(dia_item_t di)
   return rc;
 }
 
+int lxrc_exit_menu()
+{
+  dia_item_t items[] = {
+    di_exit_reboot,
+    di_exit_halt,
+    di_none
+  };
+
+return dia_menu2(txt_get(TXT_END_REBOOT), 30, lxrc_exit_cb, items, 1);
+}
+
+int lxrc_exit_cb (dia_item_t di)
+{
+  switch(di) {
+    case di_exit_reboot:
+      lxrc_reboot();
+      break;
+
+    case di_exit_halt:
+      lxrc_halt();
+      break;
+
+    default:
+      break;
+    }
+
+return (1);
+}
 
 void lxrc_set_modprobe(char *prog)
 {

@@ -1,3 +1,7 @@
+07/08/2008
+	- re-organize menu structure
+	- offer new option "start shell" under "expert" (fate #303627)
+
 30/7/2008
 	- s390: we can do a reboot() on s390 now (fate #304940)
 

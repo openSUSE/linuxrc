@@ -52,7 +52,7 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr ""
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
+msgid "Start Installation"
 msgstr ""
 
 #. TXT_MENU_INFO
@@ -577,11 +577,11 @@ msgid "Eject CD"
 msgstr ""
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
+msgid "DHCP Time-Out"
 msgstr ""
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
+msgid "Enter the time-out value for DHCP."
 msgstr ""
 
 #. TXT_NET_CTC
@@ -1127,5 +1127,37 @@ msgstr ""
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr ""
+
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
 msgstr ""
 

@@ -5,7 +5,7 @@
  *
  * settings.h    Header file for settings.c
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
@@ -37,5 +37,6 @@ extern void set_activate_keymap (char *keymap);
 extern void set_choose_language (void);
 extern void set_write_info      (FILE *f);
 language_t *current_language    (void);
+extern void set_expert_menu     (void);
 
 #endif  /* _SETTINGS_H */

@@ -56,8 +56,8 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Moduli jedra (gonilniki strojne opreme)"
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
-msgstr "Začetek namestitve ali zagon sistema"
+msgid "Start Installation"
+msgstr "Začetek namestitve"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -618,12 +618,12 @@ msgid "Eject CD"
 msgstr "Izvrzi CD"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
-msgstr "Čas čakanja pri Bootp"
+msgid "DHCP Time-Out"
+msgstr "Čas čakanja pri DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
-msgstr "Vnesite vrednost za čas čakanja pri bootp."
+msgid "Enter the time-out value for DHCP."
+msgstr "Vnesite vrednost za čas čakanja pri DHCP."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -1178,3 +1178,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+

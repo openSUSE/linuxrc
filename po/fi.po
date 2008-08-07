@@ -56,8 +56,8 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Ydinmoduulit (laitteisto-ohjaimet)"
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
-msgstr "Käynnistä asennus tai järjestelmä"
+msgid "Start Installation"
+msgstr "Käynnistä asennus"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -618,12 +618,12 @@ msgid "Eject CD"
 msgstr "Poista CD"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
-msgstr "Bootp aikakatkaisu"
+msgid "DHCP Time-Out"
+msgstr "DHCP aikakatkaisu"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
-msgstr "Anna bootp:n aikakatkaisu arvo."
+msgid "Enter the time-out value for DHCP."
+msgstr "Anna DHCP:n aikakatkaisu arvo."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -1184,3 +1184,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+

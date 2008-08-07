@@ -52,8 +52,8 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Iimodyuli ze-Kernel (Abaqhubi Abaseqokobheni Lekhompyutha)"
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
-msgstr "Qalisa Ukuhlohla okanye Isixokelelwano"
+msgid "Start Installation"
+msgstr "Qalisa Ukuhlohla"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -611,11 +611,11 @@ msgid "Eject CD"
 msgstr "Khupha i-CD"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
+msgid "DHCP Time-Out"
 msgstr "Ixesha-Lokuphuma Lomiselo lwe-p"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
+msgid "Enter the time-out value for DHCP."
 msgstr "Ngenisa ixabiso lexesha-lokuphuma lomiselo lwe-p."
 
 #. TXT_NET_CTC
@@ -1174,3 +1174,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+

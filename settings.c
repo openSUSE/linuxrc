@@ -2,7 +2,7 @@
  *
  * settings.c    Settings for linuxrc
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2008  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
  *
  */
 
@@ -16,6 +16,9 @@
 #include "settings.h"
 #include "text.h"
 #include "util.h"
+#include "info.h"
+#include "module.h"
+#include "checkmd5.h"
 #include "display.h"
 #include "keyboard.h"
 #include "dialog.h"
@@ -277,7 +280,6 @@ static dia_item_t di_set_expert_last = di_none;
  */
 
 static int  set_settings_cb          (dia_item_t di);
-static void set_expert               (void);
 static int  set_expert_cb            (dia_item_t di);
 static int  set_get_current_language (enum langid_t lang);
 static void set_font(language_t *lang);
@@ -329,11 +331,19 @@ int set_settings()
     di_set_lang,
     di_set_display,
     di_set_keymap,
-    di_set_expert,
+    di_set_animate,
+    di_set_forceroot,
+    di_set_rootimage,
+    di_set_bootptimeout,
+    di_set_dhcp,
+    di_set_vnc,
+    di_set_usessh,
+    di_set_startshell,
+    di_set_slp,
     di_none
   };
 
-  return dia_menu2(txt_get(TXT_SETTINGS), 30, set_settings_cb, items, di_set_settings_last);
+  return dia_menu2(txt_get(TXT_SETTINGS), 40, set_settings_cb, items, di_set_settings_last);
 }
 
 
@@ -346,6 +356,8 @@ int set_settings()
 int set_settings_cb (dia_item_t di)
 {
   int rc = 0;
+  char tmp[MAX_FILENAME], *s;
+  url_t *url;
 
   di_set_settings_last = di;
 
@@ -364,8 +376,92 @@ int set_settings_cb (dia_item_t di)
       rc = 1;
       break;
 
-    case di_set_expert:
-      set_expert();
+    case di_set_animate:
+      rc = dia_yesno(txt_get(TXT_ASK_EXPLODE), config.explode_win ? YES : NO);
+      if(rc == YES)
+        config.explode_win = 1;
+      else if(rc == NO)
+        config.explode_win = 0;
+      rc = 1;
+      break;
+
+    case di_set_forceroot:
+      rc = dia_yesno(txt_get(TXT_ASK_RI_FORCE), config.download.instsys ? YES : NO);
+      config.download.instsys_set = 1;
+      if(rc == YES)
+        config.download.instsys = 1;
+      else if(rc == NO)
+        config.download.instsys = 0;
+      rc = 1;
+      break;
+
+    case di_set_rootimage:
+      (void) dia_input2(txt_get(TXT_ENTER_ROOTIMAGE), &config.rootimage, 30, 0);
+      rc = 1;
+      break;
+
+    case di_set_bootptimeout:
+      sprintf(tmp, "%d", config.net.bootp_timeout);
+      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4, 0);
+      if(!rc) config.net.bootp_timeout = atoi(tmp);
+      rc = 1;
+      break;
+
+    case di_set_dhcp:
+      rc = dia_yesno(txt_get(TXT_DHCP_VS_BOOTP), config.net.use_dhcp ? YES : NO);
+      if(rc != ESCAPE) config.net.use_dhcp = rc == YES ? 1 : 0;
+      rc = 1;
+      break;
+
+    case di_set_vnc:
+      rc = dia_yesno(txt_get(TXT_VNC_YES_NO), config.vnc ? YES : NO);
+      if(rc != ESCAPE) {
+        if((config.vnc = rc == YES ? 1 : 0)) {
+          config.net.do_setup |= DS_VNC;
+        }
+        else {
+          config.net.do_setup &= ~DS_VNC;
+        }
+      }
+      rc = 1;
+      break;
+
+    case di_set_usessh:
+      rc = dia_yesno(txt_get(TXT_SSH_YES_NO), config.usessh ? YES : NO);
+      if(rc != ESCAPE) {
+        if((config.usessh = rc == YES ? 1 : 0)) {
+          config.net.do_setup |= DS_SSH;
+        }
+        else {
+          config.net.do_setup &= ~DS_SSH;
+        }
+      }
+      rc = 1;
+      break;
+
+    case di_set_startshell:
+      rc = dia_yesno(txt_get(TXT_START_SHELL_YAST), config.startshell ? YES : NO);
+      if(rc != ESCAPE) config.startshell = rc == YES ? 1 : 0;
+      rc = 1;
+      break;
+
+    case di_set_slp:
+      url = url_set("slp:");
+      s = slp_get_install(url);
+      url_free(url);
+      rc = 1;
+      if(s) {
+        url = url_set(s);
+        if(url->scheme) {
+          url_free(config.url.install);
+          config.url.install = url;
+          rc = 0;
+        }
+        else {
+          url_free(url);
+        }
+      }
+      if(rc) dia_message("SLP failed", MSGTYPE_ERROR);
       rc = 1;
       break;
 
@@ -524,7 +620,7 @@ void set_choose_language()
 }
 
 
-void set_expert()
+void set_expert_menu()
 {
   char tmp[MAX_X];
   time_t t;
@@ -532,23 +628,21 @@ void set_expert()
 
   dia_item_t di;
   dia_item_t items[] = {
-    di_expert_animate,
-    di_expert_forceroot,
-    di_expert_rootimage,
-    di_expert_bootptimeout,
-    di_expert_dhcp,
-    di_expert_vnc,
-    di_expert_usessh,
-    di_expert_startshell,
-    di_expert_slp,
+    di_expert_info,
+    di_expert_modules,
+    di_expert_verify,
+    di_expert_eject,
+    di_extras_info,
+    di_extras_change,
+    di_extras_shell,
     di_none
   };
 
   t = time(NULL);
   gm = gmtime(&t);
-  sprintf(tmp, "%s -- Time: %02d:%02d", txt_get(TXT_MENU_EXPERT), gm->tm_hour, gm->tm_min);
+  sprintf(tmp, "%s -- Time: %02d:%02d", txt_get(TXT_EXPERT), gm->tm_hour, gm->tm_min);
 
-  di = dia_menu2(tmp, 32, set_expert_cb, items, di_set_expert_last);
+  di = dia_menu2(tmp, 42, set_expert_cb, items, di_set_expert_last);
 }
 
 
@@ -560,91 +654,61 @@ void set_expert()
  */
 int set_expert_cb(dia_item_t di)
 {
-  char tmp[MAX_FILENAME], *s;
-  int rc;
-  url_t *url;
+  int i;
+  static char s[64] = { };
+  file_t *f;
 
   di_set_expert_last = di;
 
   switch(di) {
-    case di_expert_animate:
-      rc = dia_yesno(txt_get(TXT_ASK_EXPLODE), config.explode_win ? YES : NO);
-      if(rc == YES)
-        config.explode_win = 1;
-      else if(rc == NO)
-        config.explode_win = 0;
+    case di_expert_info:
+      info_menu();
       break;
 
-    case di_expert_forceroot:
-      rc = dia_yesno(txt_get(TXT_ASK_RI_FORCE), config.download.instsys ? YES : NO);
-      config.download.instsys_set = 1;
-      if(rc == YES)
-        config.download.instsys = 1;
-      else if(rc == NO)
-        config.download.instsys = 0;
+    case di_expert_modules:
+      mod_menu();
       break;
 
-    case di_expert_rootimage:
-      rc = dia_input2(txt_get(TXT_ENTER_ROOTIMAGE), &config.rootimage, 30, 0);
+    case di_expert_verify:
+      md5_verify();
       break;
 
-    case di_expert_bootptimeout:
-      sprintf(tmp, "%d", config.net.bootp_timeout);
-      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4, 0);
-      if(!rc) config.net.bootp_timeout = atoi(tmp);
+    case di_expert_eject:
+      util_eject_cdrom(config.cdrom);
       break;
 
-    case di_expert_dhcp:
-      rc = dia_yesno(txt_get(TXT_DHCP_VS_BOOTP), config.net.use_dhcp ? YES : NO);
-      if(rc != ESCAPE) config.net.use_dhcp = rc == YES ? 1 : 0;
+    case di_extras_info:
+      util_status_info();
       break;
 
-    case di_expert_vnc:
-      rc = dia_yesno(txt_get(TXT_VNC_YES_NO), config.vnc ? YES : NO);
-      if(rc != ESCAPE) {
-        if((config.vnc = rc == YES ? 1 : 0)) {
-          config.net.do_setup |= DS_VNC;
+    case di_extras_change:
+        i = dia_input(txt_get(TXT_CHANGE_CONFIG), s, sizeof s - 1, 35, 0);
+        if(!i) {
+          f = file_parse_buffer(s, kf_cfg + kf_cmd + kf_cmd_early);
+          file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
+          file_free_file(f);
         }
-        else {
-          config.net.do_setup &= ~DS_VNC;
-        }
-      }
-      break;
+       break;
 
-    case di_expert_usessh:
-      rc = dia_yesno(txt_get(TXT_SSH_YES_NO), config.usessh ? YES : NO);
-      if(rc != ESCAPE) {
-        if((config.usessh = rc == YES ? 1 : 0)) {
-          config.net.do_setup |= DS_SSH;
+    case di_extras_shell:
+        kbd_end(0);
+        if(config.win) {
+          disp_cursor_on();
         }
-        else {
-          config.net.do_setup &= ~DS_SSH;
+        if(!config.linemode) {
+          printf("\033c");
+          if(config.utf8) printf("\033%%G");
+          fflush(stdout);
         }
-      }
-      break;
 
-    case di_expert_startshell:
-      rc = dia_yesno("Start shell before and after YaST?", config.startshell ? YES : NO);
-      if(rc != ESCAPE) config.startshell = rc == YES ? 1 : 0;
-      break;
+        // system(util_check_exist("/lbin/lsh") ? "/lbin/lsh 2>&1" : "/bin/sh 2>&1");
+        system("PS1='\\w # ' /bin/bash 2>&1");
 
-    case di_expert_slp:
-      url = url_set("slp:");
-      s = slp_get_install(url);
-      url_free(url);
-      rc = 1;
-      if(s) {
-        url = url_set(s);
-        if(url->scheme) {
-          url_free(config.url.install);
-          config.url.install = url;
-          rc = 0;
+        kbd_init(0);
+        if(config.win) {
+          disp_cursor_off();
+          if(!config.linemode) disp_restore_screen();
         }
-        else {
-          url_free(url);
-        }
-      }
-      if(rc) dia_message("SLP failed", MSGTYPE_ERROR);
       break;
 
     default:

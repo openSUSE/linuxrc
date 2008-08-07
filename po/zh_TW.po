@@ -53,7 +53,7 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr "核心模組 (硬體驅動程式)"
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
+msgid "Start Installation"
 msgstr "啟動安裝或系統"
 
 #. TXT_MENU_INFO
@@ -615,12 +615,12 @@ msgid "Eject CD"
 msgstr "退出 CD"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
-msgstr "Bootp 逾時"
+msgid "DHCP Time-Out"
+msgstr "DHCP 逾時"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
-msgstr "輸入 bootp 的逾時值."
+msgid "Enter the time-out value for DHCP."
+msgstr "輸入 DHCP 的逾時值."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -1181,3 +1181,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+

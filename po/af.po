@@ -52,8 +52,8 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Kernmodules (hardeware-aandrywers)"
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
-msgstr "Begin installasie of stelsel"
+msgid "Start Installation"
+msgstr "Begin installasie"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -614,11 +614,11 @@ msgid "Eject CD"
 msgstr "Werp CD uit"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
+msgid "DHCP Time-Out"
 msgstr "Selflaaip-afsnytyd"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
+msgid "Enter the time-out value for DHCP."
 msgstr "Voer die afsnytydwaarde vir selflaaip in."
 
 #. TXT_NET_CTC
@@ -1177,3 +1177,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+

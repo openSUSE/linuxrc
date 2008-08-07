@@ -54,8 +54,8 @@ msgid "Kernel Modules (Hardware Drivers)"
 msgstr "Модули ядра (драйверы оборудования)"
 
 #. TXT_MENU_START
-msgid "Start Installation or System"
-msgstr "Запустить установку или систему"
+msgid "Start Installation"
+msgstr "Запустить установку"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -613,12 +613,12 @@ msgid "Eject CD"
 msgstr "Выброс CD"
 
 #. TXT_BOOTP_TIMEOUT
-msgid "Bootp Time-Out"
-msgstr "Время ожидания Bootp"
+msgid "DHCP Time-Out"
+msgstr "Время ожидания DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
-msgid "Enter the time-out value for bootp."
-msgstr "Введите длительность периода ожидания для bootp."
+msgid "Enter the time-out value for DHCP."
+msgstr "Введите длительность периода ожидания для DHCP."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -1177,3 +1177,35 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+#. TXT_EXPERT
+msgid "Expert"
+msgstr ""
+
+#. TXT_START_SHELL_YAST
+msgid "Start shell before and after YaST?"
+msgstr ""
+
+#. TXT_START_SHELL
+msgid "Start shell"
+msgstr ""
+
+#. TXT_GET_SLP_INFO
+msgid "Get SLP info"
+msgstr ""
+
+#. TXT_SHOW_CONFIG
+msgid "Show config"
+msgstr ""
+
+#. TXT_CHANGE_CONFIG
+msgid "Change config"
+msgstr ""
+
+#. TXT_RUN_COMMAND
+msgid "Run command"
+msgstr ""
+
+#. TXT_QUIT_LINUXRC
+msgid "Quit linuxrc"
+msgstr ""
+
