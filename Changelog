@@ -1,3 +1,5 @@
+	- s390: use network config scripts instead of our own code
+
 07/08/2008
 	- re-organize menu structure
 	- offer new option "start shell" under "expert" (fate #303627)

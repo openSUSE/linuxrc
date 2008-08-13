@@ -2580,61 +2580,43 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     return -1;
   }
   
-  /* write hwcfg file */
-  if (mkdir("/etc/udev/rules.d", (mode_t)0755) && errno != EEXIST)
-    return -1;
-  
-  sprintf(buf,"/etc/udev/rules.d/55-%s-",hwcfg_name);
-  if (config.hwp.type == di_390net_iucv)
-    strcat(buf, config.hwp.userid);
-  else
-    strcat(buf, config.hwp.readchan);
-  strcat(buf, ".rules");
-  
-  FILE* fp=fopen(buf,"w");
-  if(!fp) return -1;
-
-  if(config.hwp.type == di_390net_iucv) {
-    /* add netiucv to MODULES_LOADED_ON_BOOT */
-    if(mkdir("/etc/sysconfig", (mode_t)0755) && errno != EEXIST)
+  char cmd[256];
+  switch(config.hwp.type) {
+    case di_390net_iucv:
+      /* add netiucv to MODULES_LOADED_ON_BOOT */
+      /* is this copied by YaST already? */
+      if(mkdir("/etc/sysconfig", (mode_t)0755) && errno != EEXIST)
+        return -1;
+      FILE* fpk = fopen("/etc/sysconfig/kernel", "a");
+      if(!fpk) return -1;
+      fprintf(fpk, "MODULES_LOADED_ON_BOOT=\"$MODULES_LOADED_ON_BOOT netiucv\"\n");
+      fclose(fpk);
+      sprintf(cmd, "iucv_configure %s 1", config.hwp.userid);
+      break;
+    case di_390net_ctc:
+    case di_390net_lcs:
+    case di_390net_escon:
+      if(config.hwp.protocol > 0)
+        sprintf(cmd, "ctc_configure %s %s 1 %d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
+      else
+        sprintf(cmd, "ctc_configure %s %s 1", config.hwp.readchan, config.hwp.writechan);
+      break;
+    case di_390net_hsi:
+    case di_390net_osa:
+      sprintf(cmd, "qeth_configure %s %s %s 1", config.hwp.readchan, config.hwp.writechan, config.hwp.datachan);
+      break;
+    default:
+      sprintf(cmd, "unknown s390 network type %d", config.hwp.type);
+      dia_message(cmd, MSGTYPE_ERROR);
       return -1;
-    FILE* fpk = fopen("/etc/sysconfig/kernel", "a");
-    if(!fpk) return -1;
-    fprintf(fpk, "MODULES_LOADED_ON_BOOT=\"$MODULES_LOADED_ON_BOOT netiucv\"\n");
-    fclose(fpk);
-    
-    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"drivers\", KERNEL==\"netiucv\", ATTR{connection}=\"%s\"\n",
-      config.hwp.userid);
+      break;
   }
-  else {
-    for(i = 0; i < config.hwp.ccw_chan_num; i++) {
-      fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccw\", KERNEL==\"%s\", RUN+=\"/sbin/modprobe --quiet %s\"\n",
-        chans[i] /* IUCV? */, config.hwp.module);
-    }
-    
-    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"drivers\", KERNEL==\"%s\", IMPORT{program}=\"collect %s %%k %s %s\"\n",
-      (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module,
-      config.hwp.readchan, config.hwp.ccw_chan_ids,
-      (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module);
-    
-    for(i = 0; i < config.hwp.ccw_chan_num; i++) {
-      fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccw\", KERNEL==\"%s\", IMPORT{program}=\"collect %s %%k %s %s\"\n",
-        chans[i], config.hwp.readchan, config.hwp.ccw_chan_ids,
-        (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module);
-    }
-
-    fprintf(fp, "TEST==\"[ccwgroup/%s]\", GOTO=\"%s-%s_end\"\n", config.hwp.readchan, config.hwp.module, config.hwp.readchan);
-    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccw\", ENV{COLLECT_%s}==\"0\", ATTR{[drivers/ccwgroup:%s]group}=\"%s\"\n",
-      config.hwp.readchan, config.hwp.module, chanlist);
-    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"drivers\", KERNEL==\"%s\", ENV{COLLECT_%s}==\"0\", ATTR{[drivers/ccwgroup:%s]group}=\"%s\"\n",
-      (config.hwp.type == di_390net_ctc || config.hwp.type == di_390net_lcs) ? "cu3088" : config.hwp.module,
-      config.hwp.readchan, config.hwp.module, chanlist);
-    fprintf(fp, "LABEL=\"%s-%s_end\"\n", config.hwp.module, config.hwp.readchan);
-    fprintf(fp, "ACTION==\"add\", SUBSYSTEM==\"ccwgroup\", KERNEL==\"%s\", ATTR{online}=\"1\"\n",
-      config.hwp.readchan);
+  rc = system(cmd);
+  if(rc) {
+    sprintf(cmd, "network configuration script failed (error code %d)", rc);
+    dia_message(cmd, MSGTYPE_ERROR);
+    return -1;
   }
-      
-  fclose(fp);
   
   //net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
 
