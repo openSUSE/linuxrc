@@ -108,40 +108,11 @@ int root_check_root(char *root_string_tv)
 }
 
 
-void root_set_root(char *dev)
-{
-  FILE  *f;
-  int root;
-  struct stat sbuf;
-
-  str_copy(&config.new_root, dev);
-
-  if(stat(dev, &sbuf) || !S_ISBLK(sbuf.st_mode)) {
-    fprintf(stderr, "new root: %s\n", config.new_root);
-    return;
-  }
-
-  root = (major(sbuf.st_rdev) << 8) + minor(sbuf.st_rdev);
-#if 0
-  root *= 0x10001;
-#endif
-
-  fprintf(stderr,
-    "new root: %s (major 0x%x, minor 0x%x)\n",
-    config.new_root, major(sbuf.st_rdev), minor(sbuf.st_rdev)
-  );
-
-  if(!(f = fopen ("/proc/sys/kernel/real-root-dev", "w"))) return;
-  fprintf(f, "%d\n", root);
-  fclose(f);
-}
-
-
 int root_boot_system()
 {
   int  rc;
   char *module, *type;
-  char buf[256], root[64];
+  char buf[256], root[256];
 
   do {
     rc = inst_choose_partition(&config.device, 0, txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
@@ -161,7 +132,7 @@ int root_boot_system()
   }
   while(rc);
 
-  root_set_root(root);
+  str_copy(&config.new_root, root);
 
   return 0;
 }

@@ -6,7 +6,6 @@
  *
  */
 
-extern void root_set_root       (char *root_tv);
 extern int  root_boot_system    (void);
 int ask_for_swap(int size, char *msg);
 

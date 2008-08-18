@@ -1,3 +1,6 @@
+18/8/2008:	v3.3.1
+	- 'boot installed system' no longer crashes
+
 18/8/2008:	v3.3.0
 	- s390: use network config scripts instead of our own code
 	- re-organize menu structure

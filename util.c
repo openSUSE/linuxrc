@@ -4598,6 +4598,10 @@ void util_umount_all_devices ()
                 dirs [nr_dirs++] = strdup (dir);
                 }
 
+        fclose (fd);
+
+        if (!nr_dirs) return;
+
         fprintf (stderr, "Trying to unmount %d directories:\n", --nr_dirs);
 
         /* we need to unmount in reverse order */
@@ -4615,8 +4619,6 @@ void util_umount_all_devices ()
                 }
             }
         while (nr_dirs--);
-       
-        (void) fclose (fd);
         }
     }
 
