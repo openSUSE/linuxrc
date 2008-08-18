@@ -1,13 +1,8 @@
+18/8/2008:	v3.3.0
 	- s390: use network config scripts instead of our own code
-
-07/08/2008
 	- re-organize menu structure
 	- offer new option "start shell" under "expert" (fate #303627)
-
-30/7/2008
 	- s390: we can do a reboot() on s390 now (fate #304940)
-
-29/7/2008
 	- s390: fixed net_s390_get_ifname() for new sysfs layout
 	- s390: handle module loading errors
 	- s390: ctc module is now called ctcm
