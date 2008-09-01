@@ -1081,7 +1081,7 @@ void add_flag(slist_t **sl, char *buf, int value, char *name)
 {
   int l;
 
-  if(!value) return;
+  if(value <= 0) return;
 
   if(!*buf) strcpy(buf, "  ");
   l = strlen(buf);
@@ -1189,6 +1189,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.mediacheck, "mediacheck");
   add_flag(&sl0, buf, config.net.ipv4, "ipv4");
   add_flag(&sl0, buf, config.net.ipv6, "ipv6");
+  add_flag(&sl0, buf, config.efi, "efi");
+  add_flag(&sl0, buf, config.efi_vars, "efivars");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
