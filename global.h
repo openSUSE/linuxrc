@@ -342,6 +342,7 @@ typedef struct {
   unsigned restart_method;	/* 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   unsigned efi_vars:1;		/* efi vars exist */
   int efi;			/* use efi; -1 = auto */
+  unsigned udev_mods:1;		/* let udev load modules */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */

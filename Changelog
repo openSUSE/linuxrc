@@ -1,6 +1,7 @@
 1/9/2008:	v3.3.2
 	- load 'efivars' module
 	- added 'efi' option
+	- added 'udev' & 'udev.mods' debug flags
 
 18/8/2008:	v3.3.1
 	- 'boot installed system' no longer crashes

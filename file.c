@@ -973,6 +973,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             }
             fclose(w);
           }
+          if((w = fopen("/etc/modprobe.d/noload", "w"))) {
+            for(sl = config.module.broken; sl; sl = sl->next) {
+              if(sl->key) fprintf(w, "install %s /bin/true\n", sl->key);
+            }
+            fclose(w);
+          }
         }
         break;
 
@@ -1014,9 +1020,21 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         for(sl = sl0; sl; sl = sl->next) {
           if(*sl->key) {
             u = strtoul(sl->key, &t, 0);
-            if(!*t) config.debug = u;
+            if(!*t) {
+              config.debug = u;
+            }
+            else {
+              s = sl->key;
+              i = 1;
+              if(*s == '+' || *s == '-') {
+                if(*s == '-') i = 0;
+                s++;
+              }
+              if(!strcmp(s, "wait")) config.debugwait = i;
+              else if(!strcmp(s, "udev")) config.staticdevices = i ^ 1;
+              else if(!strcmp(s, "udev.mods")) config.udev_mods = i;
+            }
           }
-          if(!strcmp(sl->key, "wait")) config.debugwait = 1;
         }
         slist_free(sl0);
         break;

@@ -758,6 +758,7 @@ void lxrc_init()
   config.squash = 1;
   config.kexec_reboot = 1;
   config.efi = -1;
+  config.udev_mods = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
@@ -806,6 +807,10 @@ void lxrc_init()
   file_read_info_file("cmdline", kf_cmd_early);
 
   util_redirect_kmsg();
+
+  if(!config.udev_mods) {
+    system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
+  }
 
   if(config.staticdevices) {
     util_mkdevs();

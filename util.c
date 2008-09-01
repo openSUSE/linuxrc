@@ -1191,6 +1191,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.net.ipv6, "ipv6");
   add_flag(&sl0, buf, config.efi, "efi");
   add_flag(&sl0, buf, config.efi_vars, "efivars");
+  add_flag(&sl0, buf, config.staticdevices ^ 1, "udev");
+  add_flag(&sl0, buf, config.udev_mods, "udev.mods");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
