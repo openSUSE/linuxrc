@@ -1,3 +1,5 @@
+	- s390: remove old network setup code
+
 1/9/2008:	v3.3.2
 	- load 'efivars' module
 	- added 'efi' option
