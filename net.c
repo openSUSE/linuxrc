@@ -2426,7 +2426,13 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       break;
     case di_390net_hsi:
     case di_390net_osa:
-      sprintf(cmd, "qeth_configure %s %s %s 1", config.hwp.readchan, config.hwp.writechan, config.hwp.datachan);
+      sprintf(cmd, "qeth_configure %s %s %s %s %s %s 1",
+        config.hwp.portname ? "-p" : "",
+        config.hwp.portname ? config.hwp.portname : "",
+        config.hwp.layer2 == 2 ? "-l" : "",
+        config.hwp.readchan,
+        config.hwp.writechan,
+        config.hwp.datachan);
       break;
     default:
       sprintf(cmd, "unknown s390 network type %d", config.hwp.type);
