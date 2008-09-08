@@ -62,6 +62,7 @@ static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
+static char *url_print_zypp(url_t *url);
 
 
 void url_read(url_data_t *url_data)
@@ -636,6 +637,7 @@ url_t *url_set(char *str)
  *   1: without query part
  *   2: with device
  *   3: like 2, but remove 'rel:' scheme
+ *   4: in zypp format
  */
 char *url_print(url_t *url, int format)
 {
@@ -648,6 +650,8 @@ char *url_print(url_t *url, int format)
   str_copy(&buf, NULL);
 
   if(!url) return buf;
+
+  if(format == 4) return url_print_zypp(url);
 
   if(format != 3 || url->scheme != inst_rel) {
     strprintf(&buf, "%s:", get_instmode_name(url->scheme));
@@ -714,6 +718,82 @@ char *url_print(url_t *url, int format)
   // LXRC_WAIT
 
   return s;
+}
+
+
+char *url_print_zypp(url_t *url)
+{
+  static char *buf = NULL, *s;
+  int q = 0, scheme;
+
+  // printf("start buf = %p\n", buf);
+  // LXRC_WAIT
+
+  str_copy(&buf, NULL);
+
+  scheme = url->scheme;
+
+  if(scheme == inst_disk) {
+    scheme = url->is.cdrom ? inst_cdrom : inst_hd;
+  }
+
+  if(
+    scheme != inst_hd ||
+    scheme != inst_cdrom ||
+    scheme != inst_file ||
+    scheme != inst_ftp ||
+    scheme != inst_http ||
+    scheme != inst_nfs ||
+    scheme != inst_smb ||
+    scheme != inst_tftp
+  ) return buf;
+
+  strprintf(&buf, "%s:", get_instmode_name(scheme));
+
+  if(url->domain || url->user || url->password || url->server || url->port) {
+    strprintf(&buf, "%s//", buf);
+    if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
+    if(url->user) {
+      s = curl_easy_escape(NULL, url->user, 0);
+      strprintf(&buf, "%s%s", buf, s);
+      curl_free(s);
+    }
+    if(url->password) {
+      s = curl_easy_escape(NULL, url->password, 0);
+      strprintf(&buf, "%s:%s", buf, s);
+      curl_free(s);
+    }
+    if(url->user || url->password) strprintf(&buf, "%s@", buf);
+    if(url->server) {
+      if(strchr(url->server, ':')) {
+        strprintf(&buf, "%s[%s]", buf, url->server);
+      }
+      else {
+        strprintf(&buf, "%s%s", buf, url->server);
+      }
+    }
+    if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
+  }
+
+  if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
+  if(url->path) {
+    strprintf(&buf, "%s/%s%s",
+      buf,
+      url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
+      *url->path == '/' ? url->path + 1 : url->path
+    );
+  }
+
+  if(url->scheme == inst_hd) {
+    if((s = url->used.device) || (s = url->device)) {
+      strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', long_dev(s));
+    }
+  }
+
+  // printf("end buf = %p\n", buf);
+  // LXRC_WAIT
+
+  return buf;
 }
 
 

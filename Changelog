@@ -1,5 +1,7 @@
+8/9/2008:	v3.3.3
 	- s390: remove old network setup code
 	- s390: pass layer2, portname to qeth_configure
+	- add ZyppRepoURL to install.inf (bnc #406162)
 
 1/9/2008:	v3.3.2
 	- load 'efivars' module
