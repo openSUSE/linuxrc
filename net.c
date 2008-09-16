@@ -1177,7 +1177,7 @@ int net_choose_device()
   if(config.manual >= 2) {
 #if defined(__s390__) || defined(__s390x__)
     /* bring up network devices, write hwcfg */
-    while(net_activate_s390_devs()) {}
+    if(net_activate_s390_devs()) return 1;
 #endif
 
     /* re-read - just in case... */

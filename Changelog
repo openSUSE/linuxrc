@@ -1,3 +1,6 @@
+	- s390: don't loop over net config, return error instead (prevents
+          inconsistency in workflow on error)
+
 15/9/2008:	v3.3.3
 	- s390: remove old network setup code
 	- s390: pass layer2, portname to qeth_configure
