@@ -1325,6 +1325,7 @@ void lxrc_usr1(int signum)
   FILE *f;
   slist_t *sl = NULL, *sl_task = NULL;
   char task = 0, *ext = NULL;
+  int extend_pid = 0;
 
   if(!rename("/tmp/extend.job", s = new_download())) {
     *buf = 0;
@@ -1333,8 +1334,11 @@ void lxrc_usr1(int signum)
       if(!fgets(buf, sizeof buf, f)) *buf = 0;
       if(*buf) {
         sl_task = slist_split(' ', buf);
-        task = *sl_task->key;
-        if(sl_task->next) ext = sl_task->next->key;
+        extend_pid = atoi(sl_task->key);
+        if(sl_task->next) {
+          task = *sl_task->next->key;
+          if(sl_task->next->next) ext = sl_task->next->next->key;
+        }
       }
       fclose(f);
     }
@@ -1376,6 +1380,7 @@ void lxrc_usr1(int signum)
         f = fopen("/tmp/extend.result", "w");
         if(f) fprintf(f, "%d\n", err);
         fclose(f);
+        if(extend_pid > 0) kill(extend_pid, SIGUSR1);
         exit(0);
       }
     }

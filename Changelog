@@ -1,5 +1,7 @@
+17/9/2008:	v3.3.4
 	- s390: don't loop over net config, return error instead (prevents
           inconsistency in workflow on error)
+	- make 'extend' a bit faster
 
 15/9/2008:	v3.3.3
 	- s390: remove old network setup code

@@ -3112,10 +3112,17 @@ char *util_fstype(char *dev, char **module)
 }
 
 
+static int extend_ready = 0;
+
+static void util_extend_usr1(int signum)
+{
+  extend_ready = 1;
+}
+
 int util_extend_main(int argc, char **argv)
 {
   FILE *f, *w;
-  int ready, err = 0;
+  int err = 0;
   char buf[1024];
   char task = 'a';
   struct { unsigned verbose:1; unsigned help:1; } opt = {};
@@ -3142,10 +3149,12 @@ int util_extend_main(int argc, char **argv)
     return fprintf(stderr, "Usage: extend [-v] [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
   }
 
+  signal(SIGUSR1, util_extend_usr1);
+
   unlink("/tmp/extend.result");
   f = fopen("/tmp/extend.job", "w");
   if(f) {
-    fprintf(f, "%c %s\n", task, *argv);
+    fprintf(f, "%d %c %s\n", (int) getpid(), task, *argv);
     fclose(f);
 
     if(util_check_exist("/usr/src/packages") || getuid()) config.test = 1;
@@ -3157,11 +3166,11 @@ int util_extend_main(int argc, char **argv)
       if(kill(1, SIGUSR1)) err = 2;
     }
 
-    if(!err) for(ready = 0; !ready ;) {
-      sleep(1);
-      f = fopen("/tmp/extend.result", "r");
-      if(f) {
-        ready = fscanf(f, "%d", &err) == 1;
+    if(!err) {
+      while(!extend_ready) { sleep(1); }
+
+      if((f = fopen("/tmp/extend.result", "r"))) {
+        fscanf(f, "%d", &err);
         fclose(f);
       }
     }
