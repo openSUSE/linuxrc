@@ -1177,6 +1177,7 @@ int net_choose_device()
   if(config.manual >= 2) {
 #if defined(__s390__) || defined(__s390x__)
     /* bring up network devices, write hwcfg */
+    fprintf(stderr, "activate s390 devs 1\n");
     if(net_activate_s390_devs()) return 1;
 #endif
 
@@ -1290,6 +1291,7 @@ int net_choose_device()
 
   if(choice > 0 && !item_devs[choice - 1]) {
 #if defined(__s390__) || defined(__s390x__)
+    fprintf(stderr, "activate s390 devs 2\n");
     net_activate_s390_devs_ex(item_hds[choice - 1], &item_devs[choice - 1]);
     if(!item_devs[choice - 1]) {
 #endif
@@ -2190,7 +2192,8 @@ int net_s390_get_ifname(char* channel, char** device)
   d = opendir(path);
   if(!d) return -1;
   while((e = readdir(d))) {
-    fprintf(stderr, "ccwgroup %s has network IF %s\n", channel, e->d_name + 4);
+    if(e->d_name[0] == '.') continue;
+    fprintf(stderr, "ccwgroup %s has network IF %s\n", channel, e->d_name);
     strprintf(device, e->d_name);
     closedir(d);
     return 0;

@@ -434,12 +434,7 @@ int auto2_find_repo()
    */
   if(config.url.install->is.network) {
 #if defined(__s390__) || defined(__s390x__)
-    static int as3d = 0;
-  
-    if(!as3d) {
-      as3d = 1;
-      if(net_activate_s390_devs()) return 0;
-    }
+    if(!config.net.is_configured && net_activate_s390_devs()) return 0;
 #endif
 
     if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
