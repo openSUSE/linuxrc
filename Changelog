@@ -1,3 +1,6 @@
+22/9/2008:	v3.3.6
+	- s390: added second port support for OSA 3/ATM (fate #304080)
+
 19/9/2008:	v3.3.5
 	- s390: fixed flaky net device name detection (bnc #427475)
 	- s390: don't ask for network parameters twice

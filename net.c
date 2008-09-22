@@ -2355,6 +2355,16 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       }
       else
         rc=config.hwp.medium;
+        
+      IFNOTAUTO(config.hwp.portno)
+      {
+        if(hd && hd->is.dualport)
+        {
+          char* port = NULL;
+          if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &port,2,0))) return rc;
+          config.hwp.portno = atoi(port) + 1;
+        }
+      }
     }
 
     if(config.hwp.interface == di_osa_qdio)
@@ -2407,6 +2417,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   }
   
   char cmd[256];
+  char* ccmd = cmd;
   switch(config.hwp.type) {
     case di_390net_iucv:
       /* add netiucv to MODULES_LOADED_ON_BOOT */
@@ -2429,7 +2440,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       break;
     case di_390net_hsi:
     case di_390net_osa:
-      sprintf(cmd, "qeth_configure %s %s %s %s %s %s 1",
+      ccmd += sprintf(ccmd, "qeth_configure ");
+      if(config.hwp.portno)
+        ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
+      ccmd += sprintf(ccmd, "%s %s %s %s %s %s 1",
         config.hwp.portname ? "-p" : "",
         config.hwp.portname ? config.hwp.portname : "",
         config.hwp.layer2 == 2 ? "-l" : "",

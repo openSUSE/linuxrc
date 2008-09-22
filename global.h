@@ -584,6 +584,7 @@ typedef struct {
     int interface;
     int medium;
     int layer2;
+    int portno;
   } hwp;
   
 #endif
