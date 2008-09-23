@@ -297,6 +297,7 @@ static struct {
   { key_usesax2,        "UseSax2",        kf_cfg + kf_cmd                },
   { key_usesax2,        "Sax2",           kf_cfg + kf_cmd                },
   { key_efi,            "EFI",            kf_cfg + kf_cmd                },
+  { key_supporturl,     "supporturl",     kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1530,6 +1531,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.efi = f->nvalue;
         break;
 
+      case key_supporturl:
+        str_copy(&config.supporturl, f->value);
+        break;
+
       default:
         break;
     }
@@ -1898,6 +1903,8 @@ void file_write_modparms(FILE *f)
 
   file_write_str(f, key_yepurl, config.yepurl);
   file_write_str(f, key_yepcert, config.yepcert);
+
+  file_write_str(f, key_supporturl, config.supporturl);
 
   file_free_file(ft0);
 

@@ -1,3 +1,6 @@
+23/9/2008:	v3.3.7
+	- added 'supporturl' option (fate #305180)
+
 22/9/2008:	v3.3.6
 	- s390: added second port support for OSA 3/ATM (fate #304080)
 
