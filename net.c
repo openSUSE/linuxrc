@@ -117,27 +117,6 @@ void net_ask_password()
   if(config.win && !win_old) util_disp_done();
 }
 
-void net_ask_hostname()
-{
-  char* dot;
-  int win_old = config.win;
-  if(!config.net.realhostname || !config.net.domain)
-  {
-    if(!config.win) util_disp_init();
-repeat:
-    dia_input2(txt_get(TXT_HOSTNAME), &config.net.realhostname, 20, 0);
-    dot=strstr(config.net.realhostname,".");	/* find first dot */
-    if(!dot)
-    {
-      dia_message(txt_get(TXT_INVALID_FQHOSTNAME), MSGTYPE_ERROR);
-      goto repeat;
-    }
-    str_copy(&config.net.domain,dot+1);	/* copy domain part */
-    *dot=0;	/* cut off domain */
-    if(config.win && !win_old) util_disp_done();
-  }
-}
-
 /*
  * Configure network. Ask for network config data if necessary.
  * Does either DHCP, BOOTP or calls net_activate_ns() to setup the interface.
@@ -2470,7 +2449,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     else
       net_s390_get_ifname(config.hwp.readchan, device);
   }
-  //net_ask_hostname();	/* not sure if this is the best place; ssh login does not work if the hostname is not correct */
 
   return 0;
 }

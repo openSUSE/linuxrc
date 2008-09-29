@@ -1,3 +1,5 @@
+	- removed net_ask_hostname() (bnc #423136)
+
 23/9/2008:	v3.3.7
 	- added 'supporturl' option (fate #305180)
 
