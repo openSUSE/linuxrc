@@ -1,4 +1,7 @@
+30/9/2008:	v3.3.8
 	- removed net_ask_hostname() (bnc #423136)
+	- don't completely trust user specified device name (bnc #429518)
+	- allow to correct an invalid ip (bnc #428287)
 
 23/9/2008:	v3.3.7
 	- added 'supporturl' option (fate #305180)

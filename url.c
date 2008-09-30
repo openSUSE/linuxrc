@@ -1365,8 +1365,13 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     }
   }
 
-  /* should not happen, but anyway: device name was not in our list */
-  if(!err && !found && !url->used.device && url_device) {
+  /*
+   * should not happen, but anyway: device name was not in our list
+   *
+   * - not for network interfaces (bnc #429518)
+   * - Maybe drop code completely?
+   */
+  if(!err && !found && !url->used.device && url_device && !url->is.network) {
     str_copy(&url->used.device, long_dev(url_device));
     str_copy(&url->used.model, NULL);
     str_copy(&url->used.hwaddr, NULL);

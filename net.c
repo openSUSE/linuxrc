@@ -1654,6 +1654,8 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
   int err = 0;
 
   do {
+    err = 0;
+
     if(dia_input2(text, &inet->name, 32, 0)) {
       err = 2;
       break;
