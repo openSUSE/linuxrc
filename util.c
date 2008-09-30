@@ -666,7 +666,7 @@ int util_umount(char *dir)
 
   file_free_file(f0);
 
-  if(strstr(dir, config.mountpoint.base) == dir) rmdir(dir);
+  if(config.mountpoint.base && strstr(dir, config.mountpoint.base) == dir) rmdir(dir);
 
   return i;
 }
