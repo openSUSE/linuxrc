@@ -1161,3 +1161,15 @@ msgstr ""
 msgid "Quit linuxrc"
 msgstr ""
 
+#. TXT_INPUT_DOMAIN
+msgid "Enter your search domains, separated by a space:"
+msgstr ""
+
+#. TXT_DOMAIN_ALPHANUMERIC
+msgid "Each domain must be a valid IP address."
+msgstr ""
+
+#. TXT_DOMAIN_TOOMANY
+msgid "Only up to six search domains are allowed."
+msgstr ""
+

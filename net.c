@@ -89,6 +89,9 @@ static dia_item_t di_wlan_auth_last = di_none;
 static int net_dhcp4(void);
 static int net_dhcp6(void);
 
+static void net_ask_domain(void);
+
+
 /*
  * Ask for VNC & SSH password, unless they have already been set.
  *
@@ -115,6 +118,56 @@ void net_ask_password()
   }
 
   if(config.win && !win_old) util_disp_done();
+}
+
+
+void net_ask_domain()
+{
+  char *tmp = NULL;
+  slist_t *sl0, *sl;
+  inet_t ip = { };
+  int err, ndomains;
+
+  str_copy(&tmp, config.net.domain);
+
+  do {
+    err = ndomains = 0;
+
+    dia_input2(txt_get(TXT_INPUT_DOMAIN), &tmp, 40, 0);  
+    if(!tmp) {
+      str_copy(&config.net.domain, NULL);
+      return;
+    }
+
+    sl0 = slist_split(' ', tmp);
+
+    for(sl = sl0; sl; sl = sl->next) {
+      if(++ndomains > 6) {
+        dia_message(txt_get(TXT_DOMAIN_TOOMANY), MSGTYPE_ERROR);
+        break;
+      }
+      str_copy(&ip.name, sl->key);
+      net_check_address(&ip, 0);
+      if(!ip.ok) {
+        dia_message(txt_get(TXT_DOMAIN_ALPHANUMERIC), MSGTYPE_ERROR);
+        break;
+      }
+    }
+
+    if(!sl) {
+      str_copy(&config.net.domain, NULL);
+      config.net.domain = slist_join(" ", sl0);
+    }
+    else {
+      err = 1;
+    }
+
+    slist_free(sl0);
+  }
+  while(err);
+
+  str_copy(&tmp, NULL);
+  str_copy(&ip.name, NULL);
 }
 
 /*
@@ -1524,6 +1577,8 @@ int net_input_data()
       config.net.gateway.ok = 0;
       if(net_get_address("Enter the IP address of the gateway. Leave empty if you don't need one.", &config.net.gateway, 1) == 2) return -1;
     }
+
+    if((config.net.setup & NS_NAMESERVER)) net_ask_domain();
   }
 
   return 0;
