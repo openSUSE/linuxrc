@@ -141,11 +141,6 @@ msgstr "Le module \"%s\" a été chargé correctement."
 msgid "Failed to load module \"%s\"."
 msgstr "Échec du chargement du module \"%s\"."
 
-#. TLABEL linuxrc_2002_03_29_0036__23
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TLABEL linuxrc_2002_03_29_0036__24
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -1400,5 +1395,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

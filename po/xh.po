@@ -112,10 +112,6 @@ msgstr "Imodyuli \"%s\" ilayishwe ngempumelelo."
 msgid "Failed to load module \"%s\"."
 msgstr "Kusilele ukulayishwa kwemodyulei \"%s\"."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "i-CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "i-Floppy"
@@ -1216,5 +1212,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

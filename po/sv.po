@@ -115,10 +115,6 @@ msgstr "Modulen \"%s\" laddades."
 msgid "Failed to load module \"%s\"."
 msgstr "Misslyckades med att ladda modulen \"%s\"."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "Cd-rom"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Diskett"
@@ -1226,5 +1222,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

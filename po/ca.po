@@ -115,10 +115,6 @@ msgstr "El mòdul \"%s\" s'ha carregat amb èxit."
 msgid "Failed to load module \"%s\"."
 msgstr "No s'ha pogut carregar el mòdul \"%s\"."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Disquet"
@@ -1222,5 +1218,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

@@ -119,10 +119,6 @@ msgstr "Modul \"%s\" byl úspěšně zaveden."
 msgid "Failed to load module \"%s\"."
 msgstr "Chyba při zavádění modulu \"%s\"."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD disk"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Disketa"
@@ -1229,5 +1225,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

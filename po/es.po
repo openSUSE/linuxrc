@@ -118,10 +118,6 @@ msgstr "El módulo \"%s\" se ha cargado correctamente."
 msgid "Failed to load module \"%s\"."
 msgstr "No ha sido posible cargar el módulo \"%s\"."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Disquete"
@@ -1230,5 +1226,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

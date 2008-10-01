@@ -117,10 +117,6 @@ msgstr "Модулът \"%s\" бе зареден успешно."
 msgid "Failed to load module \"%s\"."
 msgstr "Неуспешно зареждане на модула \"%s\"."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Дискета"
@@ -1228,5 +1224,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

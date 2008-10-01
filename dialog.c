@@ -67,7 +67,7 @@ struct {
   { di_inst_update_add,  TXT_ADD_DRIVER_UPDATE,   },
   { di_inst_update_show, TXT_SHOW_DRIVER_UPDATES, },
 
-  { di_source_cdrom,     TXT_CDROM,               },
+  { di_source_cdrom,     TXT_DVD,                 },
   { di_source_net,       TXT_NET,                 },
   { di_source_hd,        TXT_HARDDISK,            },
   { di_source_floppy,    TXT_FLOPPY,              },

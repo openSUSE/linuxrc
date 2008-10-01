@@ -109,10 +109,6 @@ msgstr ""
 msgid "Failed to load module \"%s\"."
 msgstr ""
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr ""
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr ""
@@ -1171,5 +1167,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

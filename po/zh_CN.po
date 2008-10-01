@@ -115,10 +115,6 @@ msgstr "已成功装载模块\"%s\"。"
 msgid "Failed to load module \"%s\"."
 msgstr "未能装载模块\"%s\"。"
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "软盘"
@@ -1225,5 +1221,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

@@ -113,10 +113,6 @@ msgstr "已成功載入模組「%s」。"
 msgid "Failed to load module \"%s\"."
 msgstr "載入模組「%s」失敗。"
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "磁片"
@@ -1223,5 +1219,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 

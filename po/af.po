@@ -112,10 +112,6 @@ msgstr "Module \"%s\" suksesvol gelaai."
 msgid "Failed to load module \"%s\"."
 msgstr "Misluk om module \"%s\" te laai."
 
-#. TXT_CDROM
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
 #. TXT_FLOPPY
 msgid "Floppy"
 msgstr "Slapskyf"
@@ -1219,5 +1215,9 @@ msgstr ""
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
+msgstr ""
+
+#. TXT_DVD
+msgid "DVD / CD-ROM"
 msgstr ""
 
