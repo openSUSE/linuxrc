@@ -1174,6 +1174,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
       case inst_http:
       case inst_ftp:
+      case inst_tftp:
         break;
 
       default:
