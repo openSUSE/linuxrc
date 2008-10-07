@@ -480,6 +480,8 @@ void get_screen_size(int fd)
   fd_set set;
   unsigned u1, u2;
 
+  if(fd < 0) return;
+
   write(fd, term_init, strlen(term_init));
   fsync(fd);
 

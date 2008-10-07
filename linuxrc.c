@@ -853,8 +853,10 @@ void lxrc_init()
   lxrc_set_bdflush(5);
 
   lxrc_check_console();
-  freopen(config.console, "r", stdin);
-  freopen(config.console, "a", stdout);
+  if(!config.test) {
+    freopen(config.console, "r", stdin);
+    freopen(config.console, "a", stdout);
+  }
 
   util_get_splash_status();
 

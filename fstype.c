@@ -398,7 +398,7 @@ fstype(const char *device) {
 	       on a new disk; warn her before she does mke2fs on it */
 	    int pagesize = getpagesize();
 	    int rd;
-	    char buf[32768];
+	    char buf[pagesize + 32768];
 
 	    rd = pagesize;
 	    if (rd < 8192)

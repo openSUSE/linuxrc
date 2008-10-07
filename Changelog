@@ -1,4 +1,6 @@
+7/10/2008:	v3.3.9
 	- cd-rom -> dvd (bnc #221760)
+	- fix segfault in fs type detection (bnc #429224)
 
 30/9/2008:	v3.3.8
 	- removed net_ask_hostname() (bnc #423136)
