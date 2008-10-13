@@ -921,6 +921,8 @@ int inst_start_install()
 {
   int err = 0;
 
+  LXRC_WAIT
+
   util_splash_bar(60, SPLASH_60);
 
   if(config.manual) {
@@ -1088,6 +1090,8 @@ int inst_execute_yast()
   int i, err = 0;
   char *setupcmd = NULL;
   FILE *f;
+
+  LXRC_WAIT
 
   if(config.url.install->scheme != inst_exec) err = add_instsys();
   if(err) {

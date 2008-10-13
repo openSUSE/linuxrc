@@ -1891,6 +1891,10 @@ int net_dhcp4()
         net_check_address(&config.net.hostname, 0);
         break;
 
+      case key_hostname:
+        str_copy(&config.net.realhostname, f->value);
+        break;
+
       case key_netmask:
         name2inet(&config.net.netmask, f->value);
         net_check_address(&config.net.netmask, 0);

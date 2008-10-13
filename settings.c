@@ -45,7 +45,7 @@ struct {
   { "be-latin1",    KM_L1  },
   { "br-abnt2",     KM_L1  },
   { "cz-us-qwertz", KM_L2  },
-  { "de-lat1-nd",   KM_L1  },
+  { "de-latin1-nodeadkeys",   KM_L1  },
   { "es",           KM_L1  },
   { "fr-latin1",    KM_L1  },
   { "gr",           KM_L7  },
@@ -85,7 +85,7 @@ static language_t set_languages_arm [] =
 #endif
 
 #ifdef TRANS_de
-{ lang_de, "Deutsch", "de-lat1-nd", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", "de", 0 },
+{ lang_de, "Deutsch", "de-latin1-nodeadkeys", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", "de", 0 },
 #endif
 
 #ifdef TRANS_en
@@ -187,7 +187,7 @@ static keymap_t set_keymaps_arm [] =
 { "Belgian",              "be-latin1"    },
 { "Ceske",                "cz-us-qwertz" },
 { "Dansk",                "dk"           },
-{ "Deutsch",              "de-lat1-nd"   },
+{ "Deutsch",              "de-latin1-nodeadkeys"   },
 { "English (UK)",         "uk"           },
 { "English (US)",         "us"           },
 { "Español",              "es"           },
@@ -215,7 +215,7 @@ static keymap_t set_keymaps_arm [] =
 {
 { "Ceske (PS/2)",                "cz-us-qwertz"    },
 { "Dansk (PS/2)",                "dk"              },
-{ "Deutsch (PS/2)",              "de-lat1-nd"      },
+{ "Deutsch (PS/2)",              "de-latin1-nodeadkeys"      },
 { "Deutsch (Sun Type5)",         "sunt5-de-latin1" },
 { "English/UK (PS/2)",           "uk"              },
 { "English/UK (Sun)",            "sunt5-uk"        },
@@ -534,7 +534,7 @@ void set_choose_keytable(int always_show)
 
   for(i = cnt = default_idx = 0; i < keymaps; i++) {
     sprintf(buf, "/usr/share/kbd/keymaps/%s.map", keymap[i].mapname);
-    if(config.test || util_check_exist(buf)) {
+    if(config.test || 1 /* util_check_exist(buf) */) {
       if(i == def_keymap_idx) default_idx = cnt;
       items[cnt++] = keymap[i].descr;
     }
@@ -586,7 +586,7 @@ void set_activate_keymap(char *keymap)
       sprintf(enc, " -c %s", s);
     }
     sprintf(cmd,
-      "loadkeys -q %s.map ; dumpkeys%s >/tmp/dk ; loadkeys -q --unicode </tmp/dk",
+      "loadkeys -q %s ; dumpkeys%s >/tmp/dk ; loadkeys -q --unicode </tmp/dk",
       keymap, enc
     );
     if(!config.test) {

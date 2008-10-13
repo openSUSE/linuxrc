@@ -1,3 +1,9 @@
+9/10/2008:	v3.3.10
+	- get hostname via dhcp (bnc #432560)
+	- keymap: rename de-lat1-nd -> de-latin1-nodeadkeys
+	- change keymap handling to work with original kbd package layout
+	- fix bug in lndir code
+
 7/10/2008:	v3.3.9
 	- cd-rom -> dvd (bnc #221760)
 	- fix segfault in fs type detection (bnc #429224)

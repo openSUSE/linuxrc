@@ -3812,7 +3812,7 @@ int make_links(char *src, char *dst)
   struct stat sbuf;
   struct utimbuf ubuf;
   char src2[0x400], dst2[0x400], tmp_dir[0x400], tmp_link[0x400], *tmp_s = NULL;
-  char *s;
+  char *s, *t;
   int err = 0;
 
   // fprintf(stderr, "make_links: %s -> %s\n", src, dst);
@@ -3825,7 +3825,38 @@ int make_links(char *src, char *dst)
 
       // fprintf(stderr, "?: %s -> %s\n", src2, dst2);
 
+#if 0
+
+> lndir /tmp/test/f2/{a,c}	// a + b -> c
+
+  drwxr-xr-x   f2
+  drwxr-xr-x   f2/a
+  drwxr-xr-x   f2/a/dir1
+  drwxr-xr-x   f2/a/dir1/dir2
+  -rw-r--r--   f2/a/dir1/dir2/file1
+  drwxr-xr-x   f2/b
+  drwxr-xr-x   f2/b/dir1
+  lrwxrwxrwx   f2/b/dir1/dir2 -> /tmp/test/f2/a/dir1/dir2
+  drwxr-xr-x   f2/c
+  drwxr-xr-x   f2/c/dir1
+  drwxr-xr-x   f2/c/dir1/dir2
+  lrwxrwxrwx   f2/c/dir1/dir2/file1 -> /tmp/test/f2/a/dir1/dir2/file1
+
+
+> lndir /tmp/test/f1/{a,b}	// a + b -> b
+
+  drwxr-xr-x   f1
+  drwxr-xr-x   f1/a
+  drwxr-xr-x   f1/a/dir1
+  lrwxrwxrwx   f1/a/link1 -> dir1
+  drwxr-xr-x   f1/b
+  drwxr-xr-x   f1/b/dir1
+  lrwxrwxrwx   f1/b/link1 -> dir1
+
+#endif
+
       /* Why on earth '&& !is_link(src2)'??? */
+      /* new try: && !relative_link() */
       if(is_dir(src2) /* && !is_link(src2) */) {
         /* add directory */
 
@@ -3848,7 +3879,10 @@ int make_links(char *src, char *dst)
               continue;
             }
             if(*s != '/') {
-              sprintf(tmp_link, "%s/%s", dst2, s);
+              strcpy(tmp_link, dst2);
+              t = strrchr(tmp_link, '/');
+              strcpy(t ? t + 1 : tmp_link, s);
+              // sprintf(tmp_link, "%s/%s", dst2, s);
               s = tmp_link;
             }
             if((err = make_links(s, tmp_dir))) continue;
