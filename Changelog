@@ -1,5 +1,6 @@
 14/10/2008:	v3.3.11
 	- initrd can have parts left in fs images (bnc #430140)
+	- fix signature check (bnc #435170)
 
 9/10/2008:	v3.3.10
 	- get hostname via dhcp (bnc #432560)

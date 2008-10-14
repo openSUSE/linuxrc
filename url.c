@@ -1690,7 +1690,7 @@ int url_find_repo(url_t *url, char *dir)
       if(config.secure) {
         if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, URL_FLAG_NOSHA1)) return 0;
         str_copy(&buf, "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify /content.asc >/dev/null");
-        if(config.debug < 2) strprintf(&buf, " 2>&1");
+        if(config.debug < 2) strprintf(&buf, "%s 2>&1", buf);
         i = system(buf);
         if(i) {
           fprintf(stderr, "signature check failed\n");
