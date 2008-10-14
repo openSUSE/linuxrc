@@ -1214,6 +1214,8 @@ int inst_execute_yast()
   kbd_init(0);
   util_notty();
 
+  lxrc_readd_parts();
+
   str_copy(&setupcmd, NULL);
 
   if(config.splash && config.textmode) system("echo 1 >/proc/splash");

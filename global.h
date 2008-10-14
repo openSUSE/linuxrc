@@ -481,6 +481,7 @@ typedef struct {
 
   struct {			/* mountpoints */
     unsigned cnt;		/* mp counter */
+    unsigned initrd_parts;	/* initrd parts counter */
     char *instdata;
     char *instsys;
     char *update;

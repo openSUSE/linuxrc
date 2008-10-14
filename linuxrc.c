@@ -79,6 +79,9 @@ static int  lxrc_exit_cb       (dia_item_t di);
 
 extern char **environ;
 static void lxrc_movetotmpfs(void);
+static int cmp_entry(slist_t *sl0, slist_t *sl1);
+static int cmp_entry_s(const void *p0, const void *p1);
+static void lxrc_add_parts(void);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
@@ -770,6 +773,8 @@ void lxrc_init()
 
   config.swap_file_size = 1024;		/* 1024 MB */
 
+  if(!config.had_segv) lxrc_add_parts();
+
   if(util_check_exist("/sbin/mount.smbfs")) {
     str_copy(&config.net.cifs.binary, "/sbin/mount.smbfs");
     str_copy(&config.net.cifs.module, "smbfs");
@@ -1393,6 +1398,83 @@ void lxrc_usr1(int signum)
   extend_cnt += 10;
 
   signal(SIGUSR1, lxrc_usr1);
+}
+
+
+int cmp_entry(slist_t *sl0, slist_t *sl1)
+{
+  return strcmp(sl0->key, sl1->key);
+}
+
+
+/* wrapper for qsort */
+int cmp_entry_s(const void *p0, const void *p1)
+{
+  slist_t **sl0, **sl1;
+
+  sl0 = (slist_t **) p0;
+  sl1 = (slist_t **) p1;
+
+  return cmp_entry(*sl0, *sl1);
+}
+
+
+void lxrc_add_parts()
+{
+  struct dirent *de;
+  DIR *d;
+  slist_t *sl0 = NULL, *sl;
+  char *mp = NULL, *argv[3] = { };
+  int insmod_done = 0;
+
+  if((d = opendir("/parts"))) {
+    while((de = readdir(d))) {
+      if(util_check_exist2("/parts", de->d_name) == 'r') {
+        sl = slist_append(&sl0, slist_new());
+        strprintf(&sl->key, "/parts/%s", de->d_name);
+      }
+    }
+    closedir(d);
+  }
+
+  sl0 = slist_sort(sl0, cmp_entry_s);
+
+  for(sl = sl0; sl; sl = sl->next) {
+    fprintf(stderr, "Integrating %s\n", sl->key);
+    if(!config.test) {
+      if(!insmod_done) {
+        insmod_done = 1;
+        system("/sbin/insmod /modules/loop.ko max_loop=64");
+      }
+      strprintf(&mp, "/parts/mp_%04u", config.mountpoint.initrd_parts++);
+      mkdir(mp, 0755);
+      util_mount_ro(sl->key, mp, NULL);
+      argv[1] = mp;
+      argv[2] = "/";
+      util_lndir_main(3, argv);
+    }
+  }
+
+  slist_free(sl0);
+  free(mp);
+}
+
+
+void lxrc_readd_parts()
+{
+  char *mp = NULL, *argv[3] = { };
+  unsigned u;
+
+  if(config.test) return;
+
+  for(u = 0; u < config.mountpoint.initrd_parts; u++) {
+    strprintf(&mp, "/parts/mp_%04u", u);
+    argv[1] = mp;
+    argv[2] = "/";
+    util_lndir_main(3, argv);
+  }
+
+  free(mp);
 }
 
 
