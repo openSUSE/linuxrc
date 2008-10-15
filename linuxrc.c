@@ -137,8 +137,6 @@ int main(int argc, char **argv, char **env)
 {
   char *prog;
   int err, i, j;
-  file_t *ft;
-  int tmpfs_opt = 0;
 
   prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
 
@@ -195,21 +193,17 @@ int main(int argc, char **argv, char **env)
     if(!util_check_exist("/oldroot")) {
       find_shell();
       mount("proc", "/proc", "proc", 0, 0);
-      ft = file_get_cmdline(key_tmpfs);
-      if(ft && ft->is.numeric) {
-        config.tmpfs = ft->nvalue;
-        tmpfs_opt = 1;
-      }
-      ft = file_get_cmdline(key_debugwait);
-      if(ft && ft->is.numeric) config.debugwait = ft->nvalue;
+      file_do_info(file_get_cmdline(key_tmpfs), kf_cmd + kf_cmd_early);
+      file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
       util_free_mem();
       umount("/proc");
 
-      // fprintf(stderr, "free: %d, %d, %d\n", config.memory.free, config.tmpfs, tmpfs_opt);
+      // fprintf(stderr, "free: %d, %d\n", config.memory.free, config.tmpfs);
 
-      if(config.tmpfs && (config.memory.free > 24 * 1024 || tmpfs_opt)) {
+      if(config.tmpfs && config.memory.free > 24 * 1024) {
         lxrc_movetotmpfs();	/* does not return if successful */
       }
+
       config.tmpfs = 0;
 
       if(!config.serial && config.debugwait) {
@@ -773,7 +767,13 @@ void lxrc_init()
 
   config.swap_file_size = 1024;		/* 1024 MB */
 
+  file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
+
+  LXRC_WAIT
+
   if(!config.had_segv) lxrc_add_parts();
+
+  LXRC_WAIT
 
   if(util_check_exist("/sbin/mount.smbfs")) {
     str_copy(&config.net.cifs.binary, "/sbin/mount.smbfs");

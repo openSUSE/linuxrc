@@ -1032,6 +1032,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
                 s++;
               }
               if(!strcmp(s, "wait")) config.debugwait = i;
+              else if(!strcmp(s, "tmpfs")) config.tmpfs = i;
               else if(!strcmp(s, "udev")) config.staticdevices = i ^ 1;
               else if(!strcmp(s, "udev.mods")) config.udev_mods = i;
             }
@@ -2066,13 +2067,21 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
  */
 file_t *file_get_cmdline(file_key_t key)
 {
-  static file_t *cmdline = NULL;
+  static file_t *cmdline = NULL, ft_buf;
   file_t *ft, *ft_ok = NULL;
+
+  memset(&ft_buf, 0, sizeof ft_buf);
 
   if(!cmdline) cmdline = file_read_cmdline(kf_cmd + kf_cmd_early);
 
   for(ft = cmdline; ft; ft = ft->next) {
     if(ft->key == key) ft_ok = ft;
+  }
+
+  if(ft_ok) {
+    memcpy(&ft_buf, ft_ok, sizeof ft_buf);
+    ft_ok = &ft_buf;
+    ft_ok->next = NULL;
   }
 
   return ft_ok;
