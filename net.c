@@ -147,11 +147,11 @@ void net_ask_domain()
         break;
       }
       str_copy(&ip.name, sl->key);
-      net_check_address(&ip, 0);
+/*      net_check_address(&ip, 0);
       if(!ip.ok) {
         dia_message(txt_get(TXT_DOMAIN_ALPHANUMERIC), MSGTYPE_ERROR);
         break;
-      }
+      } */
     }
 
     if(!sl) {
@@ -1468,6 +1468,8 @@ void net_setup_nameserver()
     }
   }
 
+  if((config.net.setup & NS_NAMESERVER)) net_ask_domain();
+
   if(config.test) return;
 
   if(
@@ -1578,7 +1580,6 @@ int net_input_data()
       if(net_get_address("Enter the IP address of the gateway. Leave empty if you don't need one.", &config.net.gateway, 1) == 2) return -1;
     }
 
-    if((config.net.setup & NS_NAMESERVER)) net_ask_domain();
   }
 
   return 0;
