@@ -1043,11 +1043,7 @@ void lxrc_init()
 
       strprintf(&buf, s ?: txt_get(TXT_INSERT_CD), 1);
       do {
-#if !(defined(__s390__) || defined(__s390x__))
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
-#else
-	j = 0;
-#endif
         if(j) {
           config.manual = 0;
           i = auto2_find_repo();
