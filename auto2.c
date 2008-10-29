@@ -466,6 +466,7 @@ int auto2_find_repo()
   /* get some files for lazy yast */
   if(!err) auto2_read_repo_files(config.url.install);
 
+#if 0
   if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
     if(!(win = config.win)) util_disp_init();
     i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
@@ -479,6 +480,7 @@ int auto2_find_repo()
       url_umount(config.url.install);
     }
   }
+#endif
 
   if(err) {
     fprintf(stderr, "no %s repository found\n", config.product);
@@ -840,13 +842,13 @@ void auto2_read_repo_files(url_t *url)
   // url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
 
   if((f0 = file_read_file(file_list, kf_none))) {
-    for(f = f0; f; f = f->next) {
+    for(f = f0; f && !config.sha1_failed; f = f->next) {
       strprintf(&dst, "/%s/%s", f->value, *f->key_str == '/' ? f->key_str + 1 : f->key_str);
       url_read_file(url, NULL, f->key_str, dst, NULL, 0 /* + URL_FLAG_PROGRESS */);
     }
   }
   else {
-    for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
+    for(i = 0; i < sizeof default_list / sizeof *default_list && !config.sha1_failed; i++) {
       url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, 0 /* + URL_FLAG_PROGRESS */);
     }
   }

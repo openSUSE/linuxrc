@@ -39,6 +39,7 @@ typedef struct url_data_s {
 #define URL_FLAG_NOUNLINK	(1 << 3)
 #define URL_FLAG_KEEP_MOUNTED	(1 << 4)
 #define URL_FLAG_OPTIONAL	(1 << 5)
+#define URL_FLAG_CHECK_SIG	(1 << 6)
 
 void url_read(url_data_t *url_data);
 url_t *url_set(char *str);

@@ -51,6 +51,7 @@ struct cramfs_super_block {
 static size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp);
 static int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
+static int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
 static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
 static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
@@ -1359,7 +1360,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     if((ok = url_mount_disk(url, dir, test_func))) {
       found++;
       if(hd_is_hw_class(hd, hw_cdrom)) url->is.cdrom = 1;
-      if(ok == 1) break;
+      if(ok == 1 || config.sig_failed || config.sha1_failed) break;
     }
     else {
       err = 1;
@@ -1404,13 +1405,98 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
  */
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
 {
+  int err, win, i;
+  char *src_sig = NULL, *dst_sig = NULL, *buf = NULL;
+
+  if(!(flags & URL_FLAG_CHECK_SIG)) return url_read_file_nosig(url, dir, src, dst, label, flags);
+
+  flags |= URL_FLAG_NOSHA1;
+
+  err = url_read_file_nosig(url, dir, src, dst, label, flags);
+
+  if(err) return err;
+
+  config.sig_failed = 0;
+
+  if(!config.secure) return err;
+
+  config.sig_failed = 1;
+
+  if(!src || !dst) return err;
+
+  strprintf(&src_sig, "%s.asc", src);
+  strprintf(&dst_sig, "%s.asc", dst);
+  strprintf(&buf,
+    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify %s >/dev/null%s",
+    dst_sig, config.debug < 2 ? " 2>&1" : ""
+  );
+
+  err = url_read_file_nosig(url, dir, src_sig, dst_sig, NULL, flags);
+
+  if(!err) {
+    if(system(buf)) {
+      fprintf(stderr, "%s: signature check failed\n", dst);
+      config.sig_failed = 2;
+    }
+    else {
+      fprintf(stderr, "%s: signature ok\n", dst);
+      config.sig_failed = 0;
+    }
+  }
+  else {
+    fprintf(stderr, "%s: no signature\n", dst);
+  }
+
+  if(config.sig_failed) {
+    strprintf(&buf,
+      "%s: %s\n\n%s",
+      dst,
+      config.sig_failed == 1 ? "file not signed" : "invalid signature",
+      config.sig_failed == 1 ? "If you really trust your repository, you may continue in an insecure mode." : "Installation aborted."
+    );
+    if(!(win = config.win)) util_disp_init();
+    if(config.sig_failed == 1) {
+      i = dia_okcancel(buf, NO);
+    }
+    else {
+      dia_message(buf, MSGTYPE_ERROR);
+      i = NO;
+    }
+    if(!win) util_disp_done();
+    if(i == YES) {
+      config.secure = 0;
+      config.sig_failed = 0;
+      err = 0;
+    }
+    else {
+      err = 1;
+    }
+  }
+
+  free(buf);
+  free(dst_sig);
+  free(src_sig);
+
+  return err;
+}
+
+
+/*
+ * Parameters as for url_read_file().
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
+{
   int err = 0, free_src = 0;
   char *buf1 = NULL, *s, *t;
   int keep_mounted = 0, real_err = 0;
 
   int test_and_copy(url_t *url)
   {
-    int ok = 0, new_url = 0, i, j, k;
+    int ok = 0, new_url = 0, i, j, k, win;
     char *old_path, *buf = NULL;
     url_data_t *url_data;
     slist_t *sl;
@@ -1487,6 +1573,22 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
           else {
             fprintf(stderr, "sha1 check failed\n");
             config.sha1_failed = 1;
+            strprintf(&buf,
+              "%s: %s\n\n%s",
+              url_print(url_data->url, 0),
+              "SHA1 sum wrong",
+              "If you really trust your repository, you may continue in an insecure mode."
+            );
+            if(!(win = config.win)) util_disp_init();
+            i = dia_okcancel(buf, NO);
+            if(!win) util_disp_done();
+            if(i == YES) {
+              config.secure = 0;
+              config.sha1_failed = 0;
+            }
+            else {
+              ok = 0;
+            }
           }
         }
       }
@@ -1684,22 +1786,15 @@ int url_find_repo(url_t *url, char *dir)
 
     if(!config.keepinstsysconfig) {
       config.sha1 = slist_free(config.sha1);
+      config.sha1_failed = 0;
 
-      if(url_read_file(url, NULL, "/content", "/content", NULL, URL_FLAG_NOSHA1)) return 0;
+      if(
+        url_read_file(url, NULL, "/content", "/content", NULL,
+          URL_FLAG_NOSHA1 + config.secure ? URL_FLAG_CHECK_SIG : 0
+        )
+      ) return 0;
 
-      if(config.secure) {
-        if(url_read_file(url, NULL, "/content.asc", "/content.asc", NULL, URL_FLAG_NOSHA1)) return 0;
-        str_copy(&buf, "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify /content.asc >/dev/null");
-        if(config.debug < 2) strprintf(&buf, "%s 2>&1", buf);
-        i = system(buf);
-        if(i) {
-          fprintf(stderr, "signature check failed\n");
-          config.sig_failed = 1;
-        }
-        else {
-          config.sha1_failed = 0;
-          fprintf(stderr, "signature ok\n");
-        }
+      if(!config.sig_failed) {
         file_read_info_file("file:/content", kf_cont);
       }
     }
@@ -1726,6 +1821,7 @@ int url_find_repo(url_t *url, char *dir)
         )) {
           free(file_name);
           file_name = NULL;
+          if(config.sha1_failed) return 1;
         }
       }
 

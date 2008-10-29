@@ -329,7 +329,7 @@ typedef struct {
   unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned secure:1;		/* secure mode (check sha1 of all downloaded files) */
   unsigned sha1_failed:1;	/* sha1 check failed */
-  unsigned sig_failed:1;	/* 'content' signature check failed */
+  unsigned sig_failed:2;	/* signature check failed (1: not signed, 2: wrong signature) */
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */
   unsigned kexec_reboot:1;	/* kexec to installed system (just passed to yast) */
   unsigned nomodprobe:1;	/* disable modprobe */
