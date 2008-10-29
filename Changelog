@@ -1,5 +1,8 @@
+	- disable PS3 vram swap for now as it causes trouble with FW 2.50
+
 23/10/2008:	v3.3.12
-	- remove bogus domain name check; enter search list after NS setup
+	- remove bogus domain name check (bnc #438043)
+	- enter search list after NS setup
 
 14/10/2008:	v3.3.11
 	- initrd can have parts in fs images (bnc #430140)
