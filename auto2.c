@@ -59,6 +59,8 @@ int auto2_init()
 
   auto2_scan_hardware();
 
+  if(config.sig_failed) return 0;
+
   util_splash_bar(40, SPLASH_40);
 
   win_old = config.win;
@@ -325,7 +327,7 @@ void auto2_scan_hardware()
     /* point at list end */
     for(names = &config.update.name_list; *names; names = &(*names)->next);
 
-    for(sl = config.update.urls; sl; sl = sl->next) {
+    for(sl = config.update.urls; sl && !config.sig_failed; sl = sl->next) {
       fprintf(stderr, "dud url: %s\n", sl->key);
       printf("Reading driver update: %s\n", sl->key);
       fflush(stdout);
@@ -342,13 +344,13 @@ void auto2_scan_hardware()
 
         err = url_read_file_anywhere(
           url, NULL, NULL, file_name, NULL,
-          URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + config.secure ? URL_FLAG_CHECK_SIG : 0
+          URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         );
-        if(err) {
+        if(err && !config.sig_failed) {
           str_copy(&url->path, path2);
           err = url_read_file_anywhere(
             url, NULL, NULL, file_name, NULL,
-            URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + config.secure ? URL_FLAG_CHECK_SIG : 0
+            URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
           );
         }
         fprintf(stderr, "err2 = %d\n", err);
@@ -495,7 +497,7 @@ int auto2_find_repo()
 
   auto2_driverupdate(config.url.install);
 
-  return 1;
+  return config.sig_failed ? 0: 1;
 }
 
 
@@ -1011,7 +1013,7 @@ void auto2_driverupdate(url_t *url)
     "driverupdate",
     file_name = strdup(new_download()),
     txt_get(TXT_LOADING_UPDATE),
-    URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED + config.secure ? URL_FLAG_CHECK_SIG : 0
+    URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED + (config.secure ? URL_FLAG_CHECK_SIG : 0)
   );
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update, NULL);

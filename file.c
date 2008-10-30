@@ -1409,7 +1409,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_insecure:
-        if(f->is.numeric && f->nvalue) config.secure = 0;
+        if(f->is.numeric && f->nvalue) {
+          config.secure = 0;
+          config.sha1_failed = config.sig_failed = 0;
+        }
         break;
 
       case key_kexec:
