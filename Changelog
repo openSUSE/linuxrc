@@ -1,6 +1,7 @@
 	- disable PS3 vram swap for now as it causes trouble with FW 2.50
 	- reworked signature & sha1 checks
 	- driverupdates need to be signed now
+	- search list dialog back to old place (bnc #439754)
 
 23/10/2008:	v3.3.12
 	- remove bogus domain name check (bnc #438043)

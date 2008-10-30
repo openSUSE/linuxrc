@@ -1468,8 +1468,6 @@ void net_setup_nameserver()
     }
   }
 
-  if((config.net.setup & NS_NAMESERVER)) net_ask_domain();
-
   if(config.test) return;
 
   if(
@@ -1580,6 +1578,7 @@ int net_input_data()
       if(net_get_address("Enter the IP address of the gateway. Leave empty if you don't need one.", &config.net.gateway, 1) == 2) return -1;
     }
 
+    if((config.net.setup & NS_NAMESERVER)) net_ask_domain();
   }
 
   return 0;
