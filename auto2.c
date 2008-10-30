@@ -340,10 +340,16 @@ void auto2_scan_hardware()
 
         strprintf(&path2, "%s%sdriverupdate", path1, path1[0] == 0 || path1[strlen(path1) - 1] == '/' ? "" : "/");
 
-        err = url_read_file_anywhere(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
+        err = url_read_file_anywhere(
+          url, NULL, NULL, file_name, NULL,
+          URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + config.secure ? URL_FLAG_CHECK_SIG : 0
+        );
         if(err) {
           str_copy(&url->path, path2);
-          err = url_read_file_anywhere(url, NULL, NULL, file_name, NULL, URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS);
+          err = url_read_file_anywhere(
+            url, NULL, NULL, file_name, NULL,
+            URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + config.secure ? URL_FLAG_CHECK_SIG : 0
+          );
         }
         fprintf(stderr, "err2 = %d\n", err);
         LXRC_WAIT
@@ -414,7 +420,7 @@ void auto2_scan_hardware()
  */
 int auto2_find_repo()
 {
-  int err, win, i;
+  int err;
 
   config.sig_failed = 0;
   config.sha1_failed = 0;
@@ -1005,7 +1011,7 @@ void auto2_driverupdate(url_t *url)
     "driverupdate",
     file_name = strdup(new_download()),
     txt_get(TXT_LOADING_UPDATE),
-    URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED
+    URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED + config.secure ? URL_FLAG_CHECK_SIG : 0
   );
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update, NULL);
