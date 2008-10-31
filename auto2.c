@@ -475,18 +475,9 @@ int auto2_find_repo()
   if(!err) auto2_read_repo_files(config.url.install);
 
 #if 0
-  if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
-    if(!(win = config.win)) util_disp_init();
-    i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
-    if(!win) util_disp_done();
-    if(i == YES) {
-      config.secure = 0;
-    }
-    else {
-      err = 1;
-      url_umount(config.url.instsys);
-      url_umount(config.url.install);
-    }
+  if(err && (config.sig_failed || config.sha1_failed)) {
+    url_umount(config.url.instsys);
+    url_umount(config.url.install);
   }
 #endif
 
@@ -909,7 +900,7 @@ void auto2_kexec(url_t *url)
 {
   char *kernel, *initrd, *buf = NULL, *cmdline = NULL, *splash = NULL, *splash_name = NULL;
   FILE *f;
-  int i, win, err = 0;
+  int err = 0;
   unsigned vga_mode = 0;
 
   if(!config.kexec_kernel || !config.kexec_initrd) {
@@ -945,6 +936,7 @@ void auto2_kexec(url_t *url)
     }
   }
 
+#if 0
   if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
     if(!(win = config.win)) util_disp_init();
     i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
@@ -958,6 +950,7 @@ void auto2_kexec(url_t *url)
       url_umount(config.url.install);
     }
   }
+#endif
 
   if(!err) {
     cmdline = calloc(1024, 1);

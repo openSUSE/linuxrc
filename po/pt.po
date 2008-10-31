@@ -1153,17 +1153,6 @@ msgstr "Necessita de um nome de utilizador e palavra passe para aceder ao 'proxy
 msgid "Do you need a username and password to access the %s server?"
 msgstr "Necessita de um nome de utilizador e palavra passe para aceder ao servidor %s?"
 
-#. our installation repository
-#. TXT_INSECURE_REPO
-msgid ""
-"Sorry, repository failed checksum test.\n"
-"\n"
-"If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
-"Desculpe, o teste de checksum do repositório falhou.\n"
-"\n"
-"Se realmente confiar no repositório, poderá continuar em um modo inseguro."
-
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
@@ -1227,5 +1216,28 @@ msgstr ""
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
+msgstr ""
+
+#. TXT_INSECURE_REPO2
+msgid "If you really trust your repository, you may continue in an insecure mode."
+msgstr ""
+
+#. message when check sum test failed
+#. TXT_SHA1_FAILED
+msgid "SHA1 sum wrong."
+msgstr ""
+
+#. TXT_INSTALL_ABORT
+msgid "Installation aborted."
+msgstr ""
+
+#. missing GPG signature
+#. TXT_NO_SIGNATURE
+msgid "File not signed."
+msgstr ""
+
+#. incorrect GPG signature
+#. TXT_INVALID_SIGNATURE
+msgid "Invalid signature."
 msgstr ""
 

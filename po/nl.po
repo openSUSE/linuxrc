@@ -1152,17 +1152,6 @@ msgstr "Hebt u een gebruikersnaam en wachtwoord nodig voor toegang tot de proxy?
 msgid "Do you need a username and password to access the %s server?"
 msgstr "Hebt u een gebruikersnaam en wachtwoord nodig voor toegang tot de %s-server?"
 
-#. our installation repository
-#. TXT_INSECURE_REPO
-msgid ""
-"Sorry, repository failed checksum test.\n"
-"\n"
-"If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
-"Helaas, installatiebron kwam niet door de controlesomtest.\n"
-"\n"
-"Als u deze bron echt vertrouwd, dan kunt u doorgaan in een onveilige modus."
-
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
@@ -1226,5 +1215,28 @@ msgstr ""
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
+msgstr ""
+
+#. TXT_INSECURE_REPO2
+msgid "If you really trust your repository, you may continue in an insecure mode."
+msgstr ""
+
+#. message when check sum test failed
+#. TXT_SHA1_FAILED
+msgid "SHA1 sum wrong."
+msgstr ""
+
+#. TXT_INSTALL_ABORT
+msgid "Installation aborted."
+msgstr ""
+
+#. missing GPG signature
+#. TXT_NO_SIGNATURE
+msgid "File not signed."
+msgstr ""
+
+#. incorrect GPG signature
+#. TXT_INVALID_SIGNATURE
+msgid "Invalid signature."
 msgstr ""
 

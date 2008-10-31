@@ -1155,17 +1155,6 @@ msgstr "Potřebujete pro přístup k proxy uživatelské jméno a heslo?"
 msgid "Do you need a username and password to access the %s server?"
 msgstr "Potřebujete pro přístup k serveru %s uživatelské jméno a heslo?"
 
-#. our installation repository
-#. TXT_INSECURE_REPO
-msgid ""
-"Sorry, repository failed checksum test.\n"
-"\n"
-"If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
-"Kontrolní součet repozitáře nebyl úspěšný.\n"
-"\n"
-"Pokud repozitáři skutečně důvěřujete, můžete pokračovat v nezabezpečeném režimu."
-
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
@@ -1229,5 +1218,28 @@ msgstr ""
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
+msgstr ""
+
+#. TXT_INSECURE_REPO2
+msgid "If you really trust your repository, you may continue in an insecure mode."
+msgstr ""
+
+#. message when check sum test failed
+#. TXT_SHA1_FAILED
+msgid "SHA1 sum wrong."
+msgstr ""
+
+#. TXT_INSTALL_ABORT
+msgid "Installation aborted."
+msgstr ""
+
+#. missing GPG signature
+#. TXT_NO_SIGNATURE
+msgid "File not signed."
+msgstr ""
+
+#. incorrect GPG signature
+#. TXT_INVALID_SIGNATURE
+msgid "Invalid signature."
 msgstr ""
 

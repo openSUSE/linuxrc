@@ -798,6 +798,26 @@ char *url_print_zypp(url_t *url)
 }
 
 
+char *url_print2(url_t *url, char *file)
+{
+  static char *buf = NULL, *s = "";
+  int i;
+
+  str_copy(&buf, url_print(url, 1));
+
+  if(!file) return buf;
+
+  i = strlen(buf);
+  if(i && buf[i - 1] == '/' && *file == '/') file++;
+
+  if(i && buf[i - 1] != '/' && *file != '/') s = "/";
+
+  strprintf(&buf, "%s%s%s", buf, s, file);
+
+  return buf;
+}
+
+
 url_t *url_free(url_t *url)
 {
   if(url) {
@@ -1406,13 +1426,19 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
 {
   int err, win, i;
-  char *src_sig = NULL, *dst_sig = NULL, *buf = NULL, *old_path = NULL;
-
-  if(!(flags & URL_FLAG_CHECK_SIG)) return url_read_file_nosig(url, dir, src, dst, label, flags);
-
-  flags |= URL_FLAG_NOSHA1;
+  char *src_sig = NULL, *dst_sig = NULL, *buf = NULL, *old_path = NULL, *s;
 
   str_copy(&old_path, url->path);
+
+  if(!(flags & URL_FLAG_CHECK_SIG)) {
+    err = url_read_file_nosig(url, dir, src, dst, label, flags);
+    str_copy(&url->path, old_path);
+    free(old_path);
+
+    return err;
+  }
+
+  flags |= URL_FLAG_NOSHA1;
 
   err = url_read_file_nosig(url, dir, src, dst, label, flags);
   str_copy(&url->path, old_path);
@@ -1451,26 +1477,28 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   err = url_read_file_nosig(url, dir, src_sig, dst_sig, NULL, flags);
   str_copy(&url->path, old_path);
 
+  s = url_print2(url, src);
+
   if(!err) {
     if(system(buf)) {
-      fprintf(stderr, "%s: signature check failed\n", url_print(url, 1));
+      fprintf(stderr, "%s: signature check failed\n", s);
       config.sig_failed = 2;
     }
     else {
-      fprintf(stderr, "%s: signature ok\n", url_print(url, 1));
+      fprintf(stderr, "%s: signature ok\n", s);
       config.sig_failed = 0;
     }
   }
   else {
-    fprintf(stderr, "%s: no signature\n", url_print(url, 1));
+    fprintf(stderr, "%s: no signature\n", s);
   }
 
   if(config.sig_failed) {
     strprintf(&buf,
       "%s: %s\n\n%s",
-      dst,
-      config.sig_failed == 1 ? "file not signed" : "invalid signature",
-      config.sig_failed == 1 ? "If you really trust your repository, you may continue in an insecure mode." : "Installation aborted."
+      s,
+      txt_get(config.sig_failed == 1 ? TXT_NO_SIGNATURE : TXT_INVALID_SIGNATURE),
+      txt_get(config.sig_failed == 1 ? TXT_INSECURE_REPO2 : TXT_INSTALL_ABORT)
     );
     if(!(win = config.win)) util_disp_init();
     if(config.sig_failed == 1) {
@@ -1594,9 +1622,9 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
             config.sha1_failed = 1;
             strprintf(&buf,
               "%s: %s\n\n%s",
-              url_print(url_data->url, 0),
-              "SHA1 sum wrong",
-              "If you really trust your repository, you may continue in an insecure mode."
+              url_print2(url_data->url, NULL),
+              txt_get(TXT_SHA1_FAILED),
+              txt_get(TXT_INSECURE_REPO2)
             );
             if(!(win = config.win)) util_disp_init();
             i = dia_okcancel(buf, NO);
