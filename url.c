@@ -1226,7 +1226,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             path,
             s = strdup(new_download()),
             NULL,
-            URL_FLAG_PROGRESS + URL_FLAG_UNZIP
+            URL_FLAG_PROGRESS + URL_FLAG_UNZIP + URL_FLAG_NOSHA1
           ) ? 0 : 1;
 
           if(ok) ok = util_mount_ro(s, url->mount, url->file_list) ? 0 : 1;
