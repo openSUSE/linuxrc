@@ -972,10 +972,6 @@ void lxrc_init()
 
     if(util_read_and_chop("/proc/device-tree/model", buf, sizeof buf))
     {
-  /*
-   * disable PS3 vram swap for now as it causes trouble with FW 2.50
-   */
-#if 0
       if(strcmp(buf,"SonyPS3")==0)
       {
         fprintf(stderr,"loading ps3vram, mtdblock and ps3_gelic\n");
@@ -988,8 +984,6 @@ void lxrc_init()
           system(cmd);
 	}
       } else if(strcmp(buf,"Pegasos2")==0)
-#endif
-      if(strcmp(buf,"Pegasos2")==0)
       {
         fprintf(stderr,"preloading via-rhine, loading mv643xx_eth\n");
         mod_modprobe("via-rhine","");

@@ -1,3 +1,6 @@
+7/11/2008:	v3.3.14
+	- revert ps3 patch (bnc #442227)
+
 31/10/2008:	v3.3.13
 	- disable PS3 vram swap for now as it causes trouble with FW 2.50
 	- reworked signature & sha1 checks (bnc #435679)
