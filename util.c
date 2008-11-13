@@ -893,19 +893,21 @@ int cmp_dir_entry_s(const void *p0, const void *p1)
  * Note: you must call util_do_driver_updates() to actuall apply
  * the update.
  */
-void util_chk_driver_update(char *dir, char *loc)
+int util_chk_driver_update(char *dir, char *loc)
 {
   char *drv_src = NULL, *dud_loc = NULL, *s;
   slist_t *sl0 = NULL, *sl;
   struct dirent *de;
   DIR *d;
+  int is_update = 0;
 
-  if(!dir || !loc || !config.tmpfs || !config.update.dir) return;
+  if(!dir || !loc || !config.tmpfs || !config.update.dir) return is_update;
 
   strprintf(&drv_src, "%s%s", dir, config.update.dir);
 
   if(util_check_exist(drv_src) == 'd') {
     strprintf(&dud_loc, "%s:%s", loc, config.update.dir);
+    is_update = 1;
     add_driver_update(drv_src, dud_loc);
   }
 
@@ -916,6 +918,7 @@ void util_chk_driver_update(char *dir, char *loc)
       if(!*s) {
         strprintf(&drv_src, "%s/%s%s", dir, de->d_name, config.update.dir);
         if(util_check_exist(drv_src) == 'd') {
+          is_update = 1;
           slist_append_str(&sl0, de->d_name);
         }
       }
@@ -933,6 +936,8 @@ void util_chk_driver_update(char *dir, char *loc)
 
   free(drv_src);
   free(dud_loc);
+
+  return is_update;
 }
 
 
@@ -3252,7 +3257,7 @@ int util_detach_loop(char *dev)
 
 int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 {
-  char *type, *loop_dev, *cmd = NULL, *module, *tmp_dev, *cpio_opts = NULL, *s;
+  char *type, *loop_dev, *cmd = NULL, *module, *tmp_dev, *cpio_opts = NULL, *s, *buf = NULL;
   int err = -1;
   struct stat64 sbuf;
 
@@ -3299,6 +3304,8 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       if(config.run_as_linuxrc) fprintf(stderr, "mount: tmpfs: %s\n", strerror(errno));
       return err;
     }
+
+    chmod(dir, 0755);
 
     str_copy(&cpio_opts, "--quiet --sparse -dimu --no-absolute-filenames");
 
@@ -3365,8 +3372,12 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
     }
     if(config.run_as_linuxrc) fprintf(stderr, "mount: using %s\n", loop_dev);
 
+    strprintf(&buf, "%s/file_", config.download.base);
+
     // remove downloaded files immediately (so we don't have to cleanup after umount)
-    if(!strncmp(dev, config.download.base, strlen(config.download.base))) unlink(dev);
+    if(!strncmp(dev, buf, strlen(buf))) unlink(dev);
+
+    str_copy(&buf, NULL);
 
     dev = loop_dev;
   }
@@ -4345,9 +4356,9 @@ void read_iscsi_ibft()
 {
   file_t *f0, *f;
 
-  if(!util_check_exist("/sbin/fwparam_ibft")) return;
+  if(!util_check_exist("/sbin/iscsiadm")) return;
 
-  system("/sbin/fwparam_ibft -b >/var/log/ibft");
+  system("/sbin/iscsiadm -m fw >/var/log/ibft");
 
   f0 = file_read_file("/var/log/ibft", kf_ibft);
 

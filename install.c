@@ -979,9 +979,8 @@ int inst_start_install()
  */
 int add_instsys()
 {
-  char buf[256];
-  int err = 0;
-  char *argv[3] = { };
+  char *buf = NULL, *argv[3] = { }, *mp;
+  int err = 0, i;
   slist_t *sl;
 
   if(!config.url.instsys->mount) return 1;
@@ -1000,6 +999,18 @@ int add_instsys()
       argv[1] = sl->value;
       argv[2] = "/";
       util_lndir_main(3, argv);
+    }
+  }
+
+  for(i = 0; i < config.update.ext_count; i++) {
+    mp = new_mountpoint();
+    strprintf(&buf, "%s/dud_%04u", config.download.base, i);
+    if(!util_mount_ro(buf, mp, 0)) {
+      if(!config.test) {
+        argv[1] = mp;
+        argv[2] = "/";
+        util_lndir_main(3, argv);
+      }
     }
   }
 
@@ -1048,7 +1059,7 @@ int add_instsys()
     if(sl) {
       if(!(win = config.win)) util_disp_init();
 
-      sprintf(buf,
+      strprintf(&buf,
         "The following driver update has not been applied:\n\n%s\n\n"
         "You can continue, but things will not work as expected.\n"
         "If you don't want to see this message, boot with 'updatecomplain=0'.",
@@ -1060,6 +1071,8 @@ int add_instsys()
       if(!win) util_disp_done();
     }
   }
+
+  str_copy(&buf, NULL);
 
   return err;
 }
@@ -1153,7 +1166,7 @@ int inst_execute_yast()
   LXRC_WAIT
 
   kbd_end(1);
-  util_notty();
+  if(!config.test) util_notty();
 
   if(config.test) {
     err = system("/bin/bash 2>&1");
@@ -1202,7 +1215,7 @@ int inst_execute_yast()
     }
   }
 
-  if(!config.listen) {
+  if(!config.test && !config.listen) {
     freopen(config.console, "r", stdin);
     freopen(config.console, "a", stdout);
     freopen(config.stderr_name, "a", stderr);

@@ -35,7 +35,7 @@ extern void util_disp_done         (void);
 extern int  util_umount            (char *mountpoint);
 void util_umount_all(void);
 extern int  util_eject_cdrom       (char *dev);
-void util_chk_driver_update(char *dir, char *loc);
+int util_chk_driver_update(char *dir, char *loc);
 extern void util_do_driver_updates (void);
 extern int show_driver_updates(void);
 extern void util_status_info       (void);

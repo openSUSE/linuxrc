@@ -1,3 +1,7 @@
+12/11/2008:	v3.3.16
+	- driverudates were sometimes not unmounted
+	- inst-sys/rescue can now be extended via 'dud' syntax
+
 11/11/2008:	v3.3.15
 	- s390: don't fall back to manual mode unless portno is actually needed
 	- s390: added portno parameter for autoinstall (fate #304080)

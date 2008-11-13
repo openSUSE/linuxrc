@@ -424,6 +424,7 @@ typedef struct {
     char *dst;			/* driver update destination dir */
     char *dev;			/* device recently used for updates (if any) */
     unsigned count;		/* driver update count */
+    unsigned ext_count;		/* driver update instsys extension count */
     unsigned next;		/* next driver update to do */
     unsigned style:1;		/* 0: new style, 1: old style */
     unsigned ask:1;		/* 1: ask for update disk */

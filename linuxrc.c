@@ -315,6 +315,7 @@ void lxrc_halt()
 
 void lxrc_change_root()
 {
+  int i;
   char *buf = NULL, *mp = "/mnt", **s;
   slist_t *sl;
   char *argv[3] = { };
@@ -335,6 +336,14 @@ void lxrc_change_root()
     (mp = config.url.instsys->mount)
   ) {
     fprintf(stderr, "starting rescue\n");
+
+    // add dud images
+    for(i = 0; i < config.update.ext_count; i++) {
+      sl = slist_add(&config.url.instsys_list, slist_new());
+      str_copy(&sl->value, new_mountpoint());
+      strprintf(&sl->key, "%s/dud_%04u", config.download.base, i);
+      util_mount_ro(sl->key, sl->value, NULL);
+    }
 
     // first, some directories
     for(s = dirs; *s; s++) {
