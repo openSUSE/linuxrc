@@ -2402,7 +2402,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         {
           char* port = NULL;
           if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &port,2,0))) return rc;
-          config.hwp.portno = atoi(port) + 1;
+          if(port) config.hwp.portno = atoi(port) + 1;
+          else config.hwp.portno = 0 + 1;
         }
       }
     }
