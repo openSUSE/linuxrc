@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc.uk\n"
-"PO-Revision-Date: 2008-05-09 19:14-0700\n"
+"PO-Revision-Date: 2008-08-17 16:42-0700\n"
 "Last-Translator: Ivan Petrouchtchak <fr.ivan@ukrainian-orthodox.org>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
@@ -200,11 +200,11 @@ msgstr "Вкажіть ваш кореневий розділ (напр., /dev/s
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device."
-msgstr "Не чинний кореневий пристрій."
+msgstr "Нечинний кореневий пристрій."
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr "Не чинний ввід."
+msgstr "Нечинний ввід."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
@@ -431,7 +431,7 @@ msgstr "Перезавантажити систему вже?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
-msgstr "Базову систему було успішно встановлено. Тепер цю ново-встановлену систему буде запущено, щоб закінчити встановлення."
+msgstr "Базову систему було успішно встановлено. Тепер цю нововстановлену систему буде запущено, щоб завершити встановлення."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -991,7 +991,7 @@ msgstr "Будь ласка, введіть пристрій оновлення 
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
-msgstr "Не чинна назва пристрою."
+msgstr "Нечинна назва пристрою."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
@@ -1086,7 +1086,7 @@ msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr "Кільцевидна мережа з естафетним доступом"
+msgstr "Кільцеподібна мережа з естафетним доступом"
 
 #. TXT_OSA_LCS
 msgid "LCS"
@@ -1164,12 +1164,13 @@ msgstr "Виявлення і завантаження мережних драй
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "Введіть адресу IP вашого сервера назв. Якщо ви не використовуєте сервер назв, просто введіть \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "Введіть IP сервера назв %u або введіть \"+++\", якщо немає."
+
 #. TXT_EXPERT
 msgid "Expert"
 msgstr ""
@@ -1240,4 +1241,3 @@ msgstr ""
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr ""
-

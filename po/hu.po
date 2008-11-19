@@ -8,11 +8,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.hu\n"
+"Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-05-09 16:09+0200\n"
+"PO-Revision-Date: 2008-11-06 11:06+0100\n"
 "Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
-"Language-Team:  <hu@li.org>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -57,7 +57,7 @@ msgstr "Nyelv"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Rendszermagmodulok (hardvermeghajtók)"
+msgstr "Kernelmodulok (hardver-illesztőprogramok)"
 
 #. TXT_MENU_START
 msgid "Start Installation"
@@ -108,7 +108,7 @@ msgid ""
 msgstr ""
 "Megpróbálom betölteni a(z) \"%s\" modult...\n"
 "\n"
-"A betöltés alatt a rendszermag üzenetei a 4-es virtuális konzolon (ALT-F4) tekinthetők meg. Ehhez a menühöz az ALT-F1 billentyűkombinációval lehet visszajutni."
+"A betöltés alatt a kernel üzenetei a 4-es virtuális konzolon (ALT-F4) tekinthetők meg. Ehhez a menühöz az ALT-F1 billentyűkombinációval lehet visszajutni."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -151,7 +151,7 @@ msgstr "A(z) \"%s\" képmás keresése..."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
-msgstr "Rendszermagüzenetek"
+msgstr "Kernelüzenetek"
 
 #. TXT_INFO_CPU
 msgid "Processor"
@@ -242,7 +242,7 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
-msgstr "Hiba lépett fel a hálózat beállítása közben. Valószínűleg a rendszermag nem ismerte fel a hálózati kártyát."
+msgstr "Hiba lépett fel a hálózat beállítása közben. Valószínűleg a kernel nem ismerte fel a hálózati kártyát."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -1165,16 +1165,17 @@ msgstr "A(z) %s IP-címet már egy másik számítógép használja!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr "Hálózati meghajtóprogram keresése és betöltése"
+msgstr "Hálózati illesztőprogram keresése és betöltése"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "Adja meg a névkiszolgáló IP-címét. Ha nem használ névkiszolgálót, csak adjon meg \"+++\" karaktereket."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "Adja meg a(z) %u névkiszolgáló IP-címét vagy írja be a \"+++\" karaktereket."
+
 #. TXT_EXPERT
 msgid "Expert"
 msgstr ""
@@ -1245,4 +1246,3 @@ msgstr ""
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr ""
-

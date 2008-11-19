@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: kpowersave\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-02-23 15:06+0100\n"
-"PO-Revision-Date: 2008-05-23 12:36+0800\n"
+"PO-Revision-Date: 2008-10-09 16:10+0800\n"
 "Last-Translator: Eric Shan <ericalways@gmail.com>\n"
 "Language-Team: Simplified Chinese\n"
 "MIME-Version: 1.0\n"
@@ -413,7 +413,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr "选择源媒体。"
+msgstr "选择源介质。"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -844,7 +844,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"已成功安装基础系统。 现在必须重引导您的计算机。 取出所有安装媒体（CD-ROM 或软盘）。\n"
+"已成功安装基础系统。 现在必须重引导您的计算机。 取出所有安装介质（CD-ROM 或软盘）。\n"
 "如果引导管理器安装在软盘上，请不要取出软盘。"
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -960,7 +960,7 @@ msgstr "关闭电源"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "未能访问驱动程序更新媒体。"
+msgstr "未能访问驱动程序更新介质。"
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
@@ -981,7 +981,7 @@ msgstr "已完成驱动程序更新"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "请选择驱动程序更新媒体。"
+msgstr "请选择驱动程序更新介质。"
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
@@ -1100,7 +1100,7 @@ msgstr "请选择 CCW 总线接口。"
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "请选择物理媒体。"
+msgstr "请选择物理介质。"
 
 #. progress indicator label
 #. TXT_LOADING_MODULES
@@ -1162,12 +1162,13 @@ msgstr "正在检测和加载网络驱动"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "输入您的名称服务器的 IP 地址。如果不使用名称服务器，请输入“+++”。"
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "输入名称服务器 %u 的 IP，无名称服务器就输入“+++”。"
+
 #. TXT_EXPERT
 msgid "Expert"
 msgstr ""
@@ -1238,4 +1239,3 @@ msgstr ""
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr ""
-

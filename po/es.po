@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-05-09 14:24-0300\n"
-"Last-Translator: Sergio Gabriel Teves <gabriel.sgt@gmail.com>\n"
+"PO-Revision-Date: 2008-09-27 13:32+0200\n"
+"Last-Translator: Camaleón <noelamac@gmail.com>\n"
 "Language-Team: Spanish <opensuse-translation-es@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -136,7 +136,7 @@ msgstr "Iniciar sistema de rescate"
 
 #. TXT_LOAD_RS_NFS
 msgid "Load Rescue System via NFS"
-msgstr "Cargar sistema de rescate ruta NFS"
+msgstr "Cargar sistema de rescate mediante NFS"
 
 #. TXT_BOOT_SYSTEM
 msgid "Boot Installed System"
@@ -344,7 +344,7 @@ msgstr "Elija el dispositivo de red."
 
 #. TXT_INPUT_PLIP_IP
 msgid "Enter the IP address of the PLIP partner."
-msgstr "Introduzca la direccción IP del conector PLIP."
+msgstr "Introduzca la dirección IP del conector PLIP."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
@@ -394,7 +394,7 @@ msgstr ""
 "\n"
 "\"Iniciar instalación o sistema\"\n"
 "\n"
-"Puede que necesite cargar algunos controladores (módulos) para soportar el harware."
+"Puede que necesite cargar algunos controladores (módulos) para soportar el hardware."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -514,7 +514,7 @@ msgstr "Salir o reiniciar"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
-msgstr "Buscando archivo de información (infofile)..."
+msgstr "Buscando archivo de información..."
 
 #. TXT_NFSPORT
 msgid "Specify the NFS port."
@@ -679,7 +679,7 @@ msgstr ""
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr "¿Configurar automaticamente via %s?"
+msgstr "¿Configurar automáticamente vía %s?"
 
 #. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
@@ -760,7 +760,7 @@ msgstr "Cancelar"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
-msgstr "No se encontraron mñodulos nuevos."
+msgstr "No se encontraron módulos nuevos."
 
 #. TXT_CHOOSE_PARTITION
 msgid "Choose the hard disk partition."
@@ -768,7 +768,7 @@ msgstr "Seleccione la partición del disco duro."
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Choose the root partition."
-msgstr "Seleccione la partición raiz (root)."
+msgstr "Seleccione la partición raíz (root)."
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
@@ -1089,7 +1089,7 @@ msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr "Token-Ring"
+msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"
@@ -1159,7 +1159,7 @@ msgstr "¿Necesita un nombre de usuario y contraseña para acceder al servidor %
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "La dirección IP %s esta siendo utilizada por otro equipo"
+msgstr "¡La dirección IP %s está siendo utilizada por otro equipo!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
@@ -1167,12 +1167,13 @@ msgstr "Detectando y cargando controladores de red"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "Introduzca la dirección IP del servidor de nombres. Si no utiliza un servidor de nombres, introduzca \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "Introduzca la dirección IP del servidor de nombres %u o \"+++\" para ninguno."
+
 #. TXT_EXPERT
 msgid "Expert"
 msgstr ""
@@ -1243,4 +1244,3 @@ msgstr ""
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr ""
-

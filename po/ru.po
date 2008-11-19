@@ -5,13 +5,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc.ru\n"
-"PO-Revision-Date: 2008-05-14 09:44+0400\n"
-"Last-Translator: Aleksey Osipov <aliks-os@yandex.ru>\n"
-"Language-Team: Russian <i18n@suse.org>\n"
+"POT-Creation-Date: 2008-05-26 18:49+0200\n"
+"PO-Revision-Date: 2008-11-11 20:49+0300\n"
+"Last-Translator: Alexander Melentiev <alex239@gmail.com>\n"
+"Language-Team: Russian <opensuse-translation-ru@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -79,7 +81,7 @@ msgstr "Раскладка клавиатуры"
 
 #. TXT_LOAD_NET
 msgid "Load Network Card Modules"
-msgstr "Загрузить модули сетевой платы"
+msgstr "Загрузить модули сетевой карты"
 
 #. TXT_SHOW_MODULES
 msgid "Show Loaded Modules"
@@ -102,7 +104,7 @@ msgid ""
 msgstr ""
 "Попытка загрузить модуль \"%s\"...\n"
 "\n"
-" При необходимости во время загрузки можно просматривать сообщения ядра в виртуальной консоли 4 (ALT-F4). Для возврата в это меню нажмите клавиши ALT-F1."
+"При необходимости во время загрузки можно просматривать сообщения ядра в виртуальной консоли 4 (ALT-F4). Для возврата в это меню нажмите клавиши ALT-F1."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -120,7 +122,7 @@ msgstr "Флоппи"
 
 #. TXT_HARDDISK
 msgid "Hard Disk"
-msgstr "Жесткий диск"
+msgstr "Жёсткий диск"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
@@ -141,7 +143,7 @@ msgstr "Загрузить установленную систему"
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Ищу образ \"%s\"..."
+msgstr "Поиск образа \"%s\"..."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
@@ -157,7 +159,7 @@ msgstr "Устройства"
 
 #. TXT_INFO_NETDEV
 msgid "Network Cards"
-msgstr "Сетевые платы"
+msgstr "Сетевые карты"
 
 #. TXT_INFO_DMA
 msgid "DMA"
@@ -181,7 +183,7 @@ msgstr "Модули"
 
 #. TXT_INFO_PCI
 msgid "PCI"
-msgstr "Шина PCI"
+msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Insert the disk and press ENTER."
@@ -201,7 +203,7 @@ msgstr "Неверное корневое устройство."
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr "Неверные введенные данные."
+msgstr "Неверные введённые данные."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
@@ -217,7 +219,7 @@ msgstr "Если для доступа к серверу используетс�
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Введите IP-адрес сервера имен. Если сервер имен не используется, нажмите клавишу ESC."
+msgstr "Введите IP-адрес сервера имён. Если сервер имён не используется, нажмите клавишу ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -236,7 +238,7 @@ msgstr ""
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
-msgstr "Во время настройки сети возникла ошибка. Вероятно, сетевая плата не была распознана ядром."
+msgstr "Во время настройки сети произошла ошибка. Вероятно, сетевая карта не была распознана ядром."
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
@@ -262,7 +264,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Пытаюсь смонтировать каталог\n"
+"Попытка смонтировать каталог\n"
 "\n"
 "\"%s:%s\"..."
 
@@ -275,13 +277,15 @@ msgid ""
 msgstr ""
 "Возникла ошибка при попытке монтирования NFS-каталога.\n"
 "\n"
-" Причина, указанная сервером: %s"
+"Причина, указанная сервером: %s"
 
 #. TXT_CHOOSE_KEYMAP
 msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
-msgstr "Укажите раскладку клавиатуры. Дополнительные раскладки клавиатуры будут предложены YaST позже."
+msgstr ""
+"Укажите раскладку клавиатуры.\n"
+"YaST предложит дополнительные раскладки клавиатуры позже."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -302,7 +306,7 @@ msgstr "Выполнить поиск дополнительных хост-ад
 
 #. TXT_WANT_MORE_NET
 msgid "Search for additional network cards?"
-msgstr "Выполнить поиск дополнительных сетевых плат?"
+msgstr "Выполнить поиск дополнительных сетевых карт?"
 
 #. TXT_WANT_MORE_CDROM
 msgid "Search for additional CD-ROM drives?"
@@ -310,7 +314,7 @@ msgstr "Выполнить поиск дополнительных привод�
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "сетевая плата ethernet"
+msgstr "сетевая карта ethernet"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
@@ -318,19 +322,19 @@ msgstr "параллельный порт"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "сетевая плата token ring"
+msgstr "сетевая карта token ring"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "сетевая плата arcnet"
+msgstr "сетевая карта arcnet"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "сетевая плата FDDI"
+msgstr "сетевая карта FDDI"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "сетевая плата HIPPI"
+msgstr "сетевая карта HIPPI"
 
 #. TXT_CHOOSE_NET
 msgid "Choose the network device."
@@ -342,7 +346,7 @@ msgstr "Введите IP-адрес партнера PLIP."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "Не удалось автоматически обнаружить набор микросхем PCMCIA. Укажите его вручную."
+msgstr "Не удалось автоматически обнаружить чипсет PCMCIA. Укажите его вручную."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -351,30 +355,30 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Найден набор микросхем PCMCIA \"%s\".\n"
+"Найден чипсет PCMCIA \"%s\".\n"
 "\n"
-" Укажите параметры для модулей ядра PCMCIA."
+"Укажите параметры для модулей ядра PCMCIA."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Укажите параметры для набора микросхем \"%s\"."
+msgstr "Укажите особые параметры для чипсета \"%s\"."
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "Запускаю менеджер карт..."
+msgstr "Запуск менеджера карт..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
-msgstr "Успешно запущены услуги PCMCIA карт."
+msgstr "Успешно запущены службы карты PCMCIA."
 
 #. TXT_PCMCIA_FAIL
 msgid "Start of PCMCIA card services failed."
-msgstr "Не удалось запустить службы платы PCMCIA."
+msgstr "Не удалось запустить службы карты PCMCIA."
 
 #. TXT_PCMCIA_ALREADY
 msgid "PCMCIA card services already running."
-msgstr "Службы платы PCMCIA уже запущены."
+msgstr "Службы карты PCMCIA уже запущены."
 
 #. TXT_NO_LXRC_END
 msgid ""
@@ -385,13 +389,14 @@ msgid ""
 "You may need to load some drivers (modules) to support your hardware."
 msgstr ""
 "Выйти из Linuxrc можно только с помощью команды n\n"
-" \"Запустить установку или систему\"\n"
-" \n"
-" Может потребоваться загрузка некоторых драйверов (модулей) для поддержки оборудования."
+"\n"
+"\"Запустить установку или систему\"\n"
+"\n"
+"Может потребоваться загрузка некоторых драйверов (модулей) для поддержки оборудования."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
-msgstr "Выйти из Linuxrc с помощью сочетания клавиш Ctrl-C нельзя."
+msgstr "Выйти из Linuxrc с помощью <Ctrl-C> нельзя."
 
 #. TXT_REMOVE_DISK
 msgid "Remove the disk from the drive now."
@@ -413,7 +418,7 @@ msgstr "Выберите носитель-источник."
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Пытаюсь смонтировать CD-ROM..."
+msgstr "Попытка смонтировать CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 msgid "Unable to mount the CD-ROM."
@@ -429,11 +434,11 @@ msgstr "Базовая система была успешно установле
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
-msgstr "Укажите раздел жесткого диска (например, /dev/sda1)"
+msgstr "Укажите раздел жёсткого диска (например, /dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
-msgstr "Не удалось смонтировать указанный раздел."
+msgstr "Невозможно смонтировать указанный раздел."
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
@@ -441,11 +446,11 @@ msgstr "Введите каталог источника."
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
-msgstr "Во время установки возникла ошибка."
+msgstr "Во время установки произошла ошибка."
 
 #. TXT_DRIVES
 msgid "Hard Disks or CD-ROMs"
-msgstr "Жесткие диски или CD-ROM"
+msgstr "Жёсткие диски или CD-ROMы"
 
 #. TXT_LITTLE_MEM
 msgid ""
@@ -455,7 +460,7 @@ msgid ""
 msgstr ""
 "На компьютере недостаточно памяти.\n"
 "\n"
-" Перед закрытием этого сообщения необходимо переключиться в виртуальную консоль 2 (клавиши ALT-F2), чтобы создать и активировать пространство для подкачки."
+"Перед закрытием этого сообщения необходимо переключиться в виртуальную консоль 2 (клавиши ALT-F2), чтобы создать и активировать пространство для подкачки."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -467,7 +472,7 @@ msgstr "Использовать анимированные окна?"
 
 #. TXT_NO_DRIVES
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Жесткие диски или приводы CD-ROM пока не обнаружены."
+msgstr "Жёсткие диски или приводы CD-ROM пока не обнаружены."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
@@ -475,23 +480,23 @@ msgstr "Отладка (для экспертов)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Загрузить корневой образ в виртуальный диск"
+msgstr "Загрузить корневой образ в RAM-диск"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr "Укажите корневой образ"
+msgstr "Введите корневой образ"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
-msgstr "Должен ли корневой образ быть загружен в RAM диск?"
+msgstr "Должен ли корневой образ быть загружен в RAM-диск?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
-msgstr "Введите путь и имя файла, который следует загрузить в виртуальный диск в качестве корневой файловой системы."
+msgstr "Введите путь и имя файла, который следует загрузить в RAM-диск в качестве корневой файловой системы."
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
-msgstr "Еще не реализовано."
+msgstr "Ещё не реализовано."
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -499,7 +504,7 @@ msgstr "Информация отсутствует."
 
 #. TXT_PREPARE_INST
 msgid "Preparing installation..."
-msgstr "Готовимся к установке..."
+msgstr "Подготовка к установке..."
 
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
@@ -515,7 +520,7 @@ msgstr "Укажите порт NFS."
 
 #. TXT_ASKING_NAMED
 msgid "Asking name server..."
-msgstr "Обращение к серверу имен..."
+msgstr "Обращение к серверу имён..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
@@ -560,7 +565,7 @@ msgstr "Введите имя пользователя для доступа к 
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
-msgstr "Введите пароль для учетной записи пользователя FTP."
+msgstr "Введите пароль для учётной записи пользователя FTP."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
@@ -585,7 +590,7 @@ msgid ""
 "Use a user name and password?"
 msgstr ""
 "Обычно FTP-установка выполняется через анонимное FTP-подключение. Однако можно указать имя пользователя и пароль для доступа к FTP-серверу.\n"
-" Использовать имя пользователя и пароль?"
+"Использовать имя пользователя и пароль?"
 
 #. TXT_MORE_MODULES
 msgid "-- More Modules --"
@@ -593,7 +598,7 @@ msgstr "-- Дополнительные модули --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "Инициализирую параллельный порт..."
+msgstr "Инициализация параллельного порта..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
@@ -641,16 +646,16 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Если вы хотите обратиться к общему ресурсу как гость, то вам не обязательно указывать имя пользователя, пароль и рабосую группу.\n"
+"Если вы хотите обратиться к общему ресурсу как гость, то вам не обязательно указывать имя пользователя, пароль и рабочую группу.\n"
 "Обратиться к ресурсу как гость?"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
-msgstr "Введите имя пользователя SMB сервера."
+msgstr "Введите ваше имя пользователя SMB-сервера."
 
 #. TXT_SMB_ENTER_PASSWORD
 msgid "Enter your password on the SMB server."
-msgstr "Введите ваш пароль SMB сервера.."
+msgstr "Введите ваш пароль SMB-сервера."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
@@ -663,7 +668,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Попытка примонтироваться к общему ресурсу\n"
+"Попытка примонтировать общий ресурс\n"
 "\n"
 "\"//%s/%s\""
 
@@ -671,19 +676,19 @@ msgstr ""
 #. TXT_ASK_DHCP
 #, c-format
 msgid "Automatic configuration via %s?"
-msgstr "Автоматическая конфигурация через %s?"
+msgstr "Автоматическая настройка через %s?"
 
 #. %s is either BOOTP or DHCP
 #. TXT_SEND_DHCP
 #, c-format
 msgid "Sending %s request..."
-msgstr "Посылается %s запрос..."
+msgstr "Посылка запроса %s..."
 
 #. %s is either BOOTP or DHCP
 #. TXT_ERROR_DHCP
 #, c-format
 msgid "%s configuration failed."
-msgstr "Не удалось сконфигурировать %s."
+msgstr "Не удалось настроить %s."
 
 #. TXT_DHCP_VS_BOOTP
 msgid "Use DHCP instead of BOOTP?"
@@ -691,12 +696,12 @@ msgstr "Использовать DHCP вместо BOOTP?"
 
 #. TXT_MODDISK0
 msgid "Insert a modules disk."
-msgstr "Вставьте диск модуля."
+msgstr "Вставьте диск модулей."
 
 #. TXT_MODDISK1
 #, c-format
 msgid "Insert modules disk %d."
-msgstr "Вставьте диск модуля %d."
+msgstr "Вставьте диск модулей %d."
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
@@ -715,7 +720,7 @@ msgstr "Введите IP-адрес сервера %s."
 #. TXT_TRY_REACH_SERVER
 #, c-format
 msgid "Trying to connect to the %s server..."
-msgstr "Попытка соединиться с %s сервером..."
+msgstr "Попытка соединиться с сервером %s..."
 
 #. TXT_NET
 msgid "Network"
@@ -728,7 +733,7 @@ msgstr "Загрузить модули %s"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
-msgstr "Закрузка модулей файловой системы"
+msgstr "Загрузить модули файловой системы"
 
 #. TXT_LOAD_OTHER
 msgid "Load Unknown Modules"
@@ -754,7 +759,7 @@ msgstr "Новые модули не найдены."
 
 #. TXT_CHOOSE_PARTITION
 msgid "Choose the hard disk partition."
-msgstr "Выберите раздел жесткого диска."
+msgstr "Выберите раздел жёсткого диска."
 
 #. TXT_CHOOSE_ROOT_FS
 msgid "Choose the root partition."
@@ -766,7 +771,7 @@ msgstr "Выберите раздел подкачки."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Недостаточно свободной памяти чтобы загрузить все данные."
+msgstr "Недостаточно свободной памяти, чтобы загрузить все данные."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
@@ -797,7 +802,7 @@ msgstr "Введите пароль для доступа к серверу %s."
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Use a %s proxy?"
-msgstr "Использовать %s прокси?"
+msgstr "Использовать прокси %s?"
 
 #. TXT_ENTER_PROXY
 #, c-format
@@ -811,7 +816,7 @@ msgstr "Введите порт прокси-сервера для %s."
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
-msgstr "VNC Включен или Выключен"
+msgstr "Включить или выключить VNC"
 
 #. TXT_VNC_YES_NO
 msgid "Use VNC for install?"
@@ -819,7 +824,7 @@ msgstr "Использовать VNC для установки?"
 
 #. TXT_SSH_SWITCH
 msgid "Enable or Disable SSH Mode"
-msgstr "Включить или Выключить SSH режим"
+msgstr "Включить или выключить режим SSH"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
@@ -827,11 +832,11 @@ msgstr "Запустить SSH для текстовой установки?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."
-msgstr "Введите ваш VNC пароль."
+msgstr "Введите ваш пароль VNC."
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr "Введите ваш временный SSH пароль."
+msgstr "Введите ваш временный пароль SSH."
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -839,11 +844,11 @@ msgid ""
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
 "Базовая система была успешно установлена. Ваша машина должна быть перезагружена. Выньте все носители (CD-ROM, дискеты).\n"
-"Не вытаскивайте дискету, если менеджер загрузки написан на нее."
+"Не вытаскивайте дискету, если менеджер загрузки был установлен на неё."
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Добавить обновляемый драйвер"
+msgstr "Добавить обновление драйвера"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
@@ -852,7 +857,7 @@ msgstr "Показать обновления драйвера"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Введите IP-адрес сервера имен %u или нажмите клавишу ESC."
+msgstr "Введите IP-адрес сервера имён %u или нажмите клавишу ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -869,19 +874,19 @@ msgstr "Перезагрузить"
 #. TXT_NO_RAM
 #, c-format
 msgid "Your computer does not have enough RAM for the installation of %s. You need at least %d MB."
-msgstr "Ваш компьютер не имеет достаточно RAM для установки %s. Вам необходимо как минимум %d MB."
+msgstr "Ваш компьютер не имеет достаточно RAM для установки %s. Вам необходимо как минимум %d МБ."
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Пароль слишком короткий (должен иметь хотя бы  8 знаков)."
+msgstr "Пароль слишком короткий (должен иметь хотя бы  8 символов)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
-msgstr "Введите IP адрес узла на котором запущен сервер X11."
+msgstr "Введите IP-адрес узла, на котором запущен сервер X11."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Пожалуйста выберите тип вашего сетевого устройства."
+msgstr "Пожалуйста, выберите тип вашего сетевого устройства."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the VM peer to connect to."
@@ -905,11 +910,11 @@ msgstr "Hipersockets"
 
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
-msgstr "Адрес устройства для чтения канала"
+msgstr "Адрес устройства для канала чтения"
 
 #. TXT_CTC_CHANNEL_WRITE
 msgid "Device address for write channel"
-msgstr "Адрес устройства для запись в канал"
+msgstr "Адрес устройства для канала записи"
 
 #. TXT_CTC_CHANNEL_DATA
 msgid "Device address for data channel"
@@ -917,11 +922,11 @@ msgstr "Адрес устройства для канала данных"
 
 #. TXT_CHOOSE_CTC_PROTOCOL
 msgid "Select protocol for this CTC device."
-msgstr "Выберите протокл для этого CTC устройства.."
+msgstr "Выберите протокол для этого устройства CTC."
 
 #. TXT_CTC_PROT_COMPAT
 msgid "Compatibility mode (default)"
-msgstr "Режим совмещения (по умолчанию)"
+msgstr "Режим совместимости (по умолчанию)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
@@ -929,11 +934,11 @@ msgstr "Расширенный режим"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Режим совместимости для каналов OS/390 и z/OS"
+msgstr "Режим совместимости для соединений OS/390 и z/OS"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
-msgstr "Имя используемого порта"
+msgstr "Используемое имя порта"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
@@ -954,32 +959,32 @@ msgstr "Отключить"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Не удалось получить доступ к носителю обновляемых драйверов."
+msgstr "Не удалось получить доступ к носителю обновлений драйверов."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "Читается обновляемые драйвера..."
+msgstr "Чтение обновлений драйверов..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Новые обновления драйвера не найдены"
+msgstr "Новые обновления драйверов не найдены"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Обновления драйвера добавлены"
+msgstr "Обновления драйверов добавлены"
 
 #. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr "Обновление драйвера ОК"
+msgstr "Обновления драйверов ОК"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Пожалуйста выберите носитель обновления драйверов."
+msgstr "Пожалуйста, выберите носитель обновлений драйверов."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Пожалуйста укажите устройство обновления драйверов."
+msgstr "Пожалуйста, укажите устройство обновлений драйверов."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -987,28 +992,28 @@ msgstr "Неверное имя устройства."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
-msgstr "Поиск CD-ROM приводов..."
+msgstr "Поиск приводов CD-ROM..."
 
 #. TXT_NO_CDROM
 msgid "No CD-ROM drives found."
-msgstr "Не найден привод CD-ROM."
+msgstr "Приводы CD-ROM не найдены ."
 
 #. TXT_SEARCH_FLOPPY
 msgid "Looking for floppy disks..."
-msgstr "Поиск дискеты..."
+msgstr "Поиск дискет..."
 
 #. TXT_NO_FLOPPY
 msgid "No floppy disk found."
-msgstr "Дискета не найдена."
+msgstr "Дискеты не найдены."
 
 #. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr "Список обновляемых драйверов"
+msgstr "Список обновлений драйверов"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Нет обновляемых драйверов"
+msgstr "Нет обновлений драйверов."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1022,7 +1027,7 @@ msgstr "Не найден CD-ROM или DVD."
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
-msgstr "Это не %s CD-ROM."
+msgstr "Это не CD-ROM %s."
 
 #. TXT_CD_CHECK_OK
 msgid "No errors found."
@@ -1053,20 +1058,20 @@ msgstr "Выберите источник установки"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
-msgstr "Это не верное полное имя узла."
+msgstr "Это неверное полное имя узла."
 
 #. TXT_INVALID_CCW_ADDRESS
 msgid "This is not a valid CCW address."
-msgstr "Это неверный CCW адрес."
+msgstr "Это неверный адрес CCW."
 
 #. TXT_NET_HSI
 msgid "Hipersocket"
-msgstr "Гиперсокет"
+msgstr "Hipersocket"
 
 #. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
-msgstr "Вы хотите сейчас остановить систему?"
+msgstr "Вы хотите остановить систему сейчас?"
 
 #. TXT_390NET_OSA
 msgid "OSA-2 or OSA Express"
@@ -1090,36 +1095,36 @@ msgstr "QDIO"
 
 #. TXT_CHOOSE_OSA_INTERFACE
 msgid "Please choose the CCW bus interface."
-msgstr "Пожалуйста выберите интерфейс шины CCW."
+msgstr "Пожалуйста, выберите интерфейс шины CCW."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "Пожалуйста выберите физический носитель."
+msgstr "Пожалуйста, выберите физический носитель."
 
 #. progress indicator label
 #. TXT_LOADING_MODULES
 msgid "Loading Modules"
-msgstr "Загружабтся модули"
+msgstr "Загрузка модулей"
 
 #. progress indicator label
 #. TXT_LOADING_INSTSYS
 msgid "Loading Installation System"
-msgstr "Загружается система установки"
+msgstr "Загрузка системы установки"
 
 #. progress indicator label
 #. TXT_LOADING_FONTS
 msgid "Loading Additional Fonts"
-msgstr "Загружаются дополнительный шрифты"
+msgstr "Загрузка дополнительных шрифтов"
 
 #. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr "загружается драйвер обновления"
+msgstr "Загрузка обновлений драйверов"
 
 #. progress indicator label
 #. TXT_LOADING_RESCUE
 msgid "Loading Rescue System"
-msgstr "Загружается спасательная система"
+msgstr "Загрузка спасательной системы"
 
 #. TXT_ENABLE_LAYER2
 msgid "Enable OSI Layer 2 support?"
@@ -1127,28 +1132,28 @@ msgstr "Включить поддержку OSI Layer 2 ?"
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr "Внесите вручную параметры сетевого устройства"
+msgstr "Введите параметры сетевого устройства вручную"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "Репозитарий ее найден."
+msgstr "Репозитории не найдены."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr "Для доступа к прокси серверу нужны имя пользователя и пароль?"
+msgstr "Вам нужны имя пользователя и пароль для доступа к прокси-серверу?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr "Для доступа  к серверу %s  нужны имя пользователя и пароль?"
+msgstr "Вам нужны имя пользователя и пароль для доступа к серверу %s?"
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "IP адрес %s уже используется другим компьютером!"
+msgstr "IP-адрес %s уже используется другим компьютером!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
@@ -1156,12 +1161,13 @@ msgstr "Обнаружение и загрузка сетевых драйвер
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "Введите IP-адрес сервера имён. Если сервер имён не используется, просто введите \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "Введите IP-адрес сервера имён %u или \"+++\", если его нет ."
+
 #. TXT_EXPERT
 msgid "Expert"
 msgstr ""
@@ -1232,4 +1238,3 @@ msgstr ""
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr ""
-

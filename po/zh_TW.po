@@ -1166,6 +1166,7 @@ msgstr ""
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
 msgstr ""
+
 #. TXT_EXPERT
 msgid "Expert"
 msgstr ""
@@ -1236,4 +1237,3 @@ msgstr ""
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr ""
-
