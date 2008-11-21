@@ -2396,9 +2396,9 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       else
         rc=config.hwp.medium;
         
-      IFNOTAUTO(config.hwp.portno)
+      if(hd && hd->is.dualport)
       {
-        if(hd && hd->is.dualport)
+        IFNOTAUTO(config.hwp.portno)
         {
           char* port = NULL;
           if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &port,2,0))) return rc;
