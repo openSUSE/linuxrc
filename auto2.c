@@ -98,7 +98,7 @@ void auto2_scan_hardware()
 {
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int ju, err, is_dud, dud_retry;
+  int ju, err, is_dud, dud_retry, dud_download;
   slist_t *usb_modules = NULL, *sl, **names;
   int storage_loaded = 0, max_wait;
   hd_data_t *hd_data;
@@ -333,7 +333,7 @@ void auto2_scan_hardware()
       fflush(stdout);
       url = url_set(sl->key);
 
-      dud_retry = 0;
+      dud_retry = dud_download = 0;
 
       if(url->is.mountable) {
         err = url_mount(url, config.mountpoint.update, NULL);
@@ -348,6 +348,9 @@ void auto2_scan_hardware()
           url, NULL, NULL, file_name, NULL,
           URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         );
+
+        if(!err) dud_download = 1;
+
         if(err && !config.sig_failed) {
           dud_retry = 1;
           str_copy(&url->path, path2);
@@ -372,7 +375,7 @@ void auto2_scan_hardware()
 
         LXRC_WAIT;
 
-        if(!is_dud && !dud_retry) {
+        if(!is_dud && !dud_retry && dud_download) {
           int i;
           char *s = url_print(url, 1);
 

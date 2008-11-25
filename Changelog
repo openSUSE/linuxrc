@@ -1,6 +1,10 @@
+25/11/2008:	v3.3.21
+	- accidentally copied usb disks into ram while searching for
+	  driver updates (bnc #448807)
+
 21/11/2008:	v3.3.20
 	- s390: fallback fix that should have made it into 3.3.15 somehow got
-          lost; re-added
+	  lost; re-added
 
 19/11/2008:	v3.3.19
 	- translations updated
