@@ -1,3 +1,6 @@
+26/11/2008:	v3.3.22
+	- keep parts of initrd for rescue system (bnc #437796)
+
 25/11/2008:	v3.3.21
 	- accidentally copied usb disks into ram while searching for
 	  driver updates (bnc #448807)

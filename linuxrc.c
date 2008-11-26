@@ -357,6 +357,10 @@ void lxrc_change_root()
     strprintf(&buf, "%s/lib/modules", mp);
     rename("/lib/modules", buf);
 
+    // move 'parts' tree
+    strprintf(&buf, "%s/parts", mp);
+    rename("/parts", buf);
+
     // add devices
     strprintf(&buf, "%s/dev", mp);
     rename("/dev", buf);
