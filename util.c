@@ -678,6 +678,7 @@ void util_umount_all()
   char *buf = NULL;
 
   url_umount(config.url.instsys);
+  sync(); /* umount seems to be racy; see bnc#443430 */
   url_umount(config.url.install);
 
   for(i = config.mountpoint.cnt; i-- > 0;) {

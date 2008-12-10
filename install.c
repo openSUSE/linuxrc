@@ -932,10 +932,10 @@ int inst_start_install()
     url_free(config.url.instsys);
     config.url.instsys = url_set(config.rescue ? config.rescueimage : config.rootimage);
 
-    if(inst_choose_source()) return 1;
+    if(inst_choose_source()) err = 1;
   }
 
-  if(config.rescue) {
+  if(! err && config.rescue) {
     /* get rid of repo */
     url_umount(config.url.install);
 
@@ -943,13 +943,13 @@ int inst_start_install()
   }
 
 #if defined(__s390__) || defined(__s390x__)
-  if(
+  if(!err &&
     (config.net.setup & NS_DISPLAY) &&
     inst_choose_display()
-  ) return 1;
+  ) err = 1;
 #endif
   
-  err = inst_execute_yast();
+  if(!err) err = inst_execute_yast();
 
   config.extend_list = slist_free(config.extend_list);
   unlink("/etc/instsys.parts");
