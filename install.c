@@ -97,7 +97,8 @@ int inst_menu()
   };
 
   /* hope this is correct... */
-  config.net.do_setup = 0;
+  /* ... apparently not: keep VNC & SSH settings (bnc #447433) */
+  config.net.do_setup &= DS_VNC | DS_SSH;
 
   di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
 
