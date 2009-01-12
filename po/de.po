@@ -6,17 +6,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.de\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-27 16:23+0200\n"
-"PO-Revision-Date: 2008-11-06 23:54+0100\n"
-"Last-Translator: Michael Skiba <trans@michael-skiba.de>\n"
-"Language-Team: German <opensuse-translation-de@opensuse.org>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-08 15:19\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -129,7 +125,7 @@ msgstr "Festplatte"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr "Installation/Aktualisierung starten"
+msgstr "Installation/Update starten"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
@@ -146,7 +142,7 @@ msgstr "Installiertes System starten"
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Suche nach Abbild \"%s\"..."
+msgstr "Suche nach Image \"%s\"..."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
@@ -485,15 +481,15 @@ msgstr "Debug (Experte)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Root-Abbild in die RAM Disk laden"
+msgstr "Root-Image in die RAM Disk laden"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr "Root-Abbild eingeben"
+msgstr "Root-Image eingeben"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
-msgstr "Soll das Root-Abbild in die RAM Disk geladen werden?"
+msgstr "Soll das Root-Image in die RAM Disk geladen werden?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
@@ -620,11 +616,11 @@ msgstr "CD auswerfen"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "Timeout für DHCP"
+msgstr "DHCP-Zeitüberschreitung"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "Geben Sie einen Timeout-Wert für DHCP ein."
+msgstr "Zeitüberschreitungswert für DHCP eingeben."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -854,11 +850,11 @@ msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Treiber-Aktualisierung hinzufügen"
+msgstr "Treiber-Update hinzufügen"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Treiber-Aktualisierungen anzeigen"
+msgstr "Treiber-Updates anzeigen"
 
 #. TXT_INPUT_NAMED1
 #, c-format
@@ -884,7 +880,7 @@ msgstr "Auf Ihrem Rechner ist nicht genügend RAM für die Installation von %s. 
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Das Passwort ist zu kurz (es muss mindestens 8 Zeichen enthalten)."
+msgstr "Passwort ist zu kurz (es muss mindestens 8 Zeichen enthalten)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -965,32 +961,32 @@ msgstr "Ausschalten"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Zugriff auf das Treiber-Aktualisierungs-Medium fehlgeschlagen"
+msgstr "Zugriff auf das Treiber-Update-Medium fehlgeschlagen"
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "Treiber-Aktualisierung wird eingelesen ..."
+msgstr "Treiber-Update wird gelesen..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Es wurden keine neuen Treiber-Aktualisierungen gefunden."
+msgstr "Es wurden keine neuen Treiber-Updates gefunden."
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Treiber-Aktualisierungen hinzugefügt"
+msgstr "Treiber-Updates hinzugefügt"
 
 #. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr "Treiber-Aktualisierung OK"
+msgstr "Treiber-Update OK"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Wählen Sie das Treiber-Aktualisierungs-Medium"
+msgstr "Wählen Sie das Treiber-Update-Medium"
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Geben Sie das Treiber-Aktualisierungs-Gerät ein."
+msgstr "Geben Sie das Treiber-Update-Gerät ein."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -1015,11 +1011,11 @@ msgstr "Es wurden keine Disketten gefunden."
 #. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr "Treiber-Aktualisierungs-Liste"
+msgstr "Treiber-Update-Liste"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Bisher keine Treiber-Aktualisierungen."
+msgstr "Keine Treiber-Updates bisher"
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1138,7 +1134,7 @@ msgstr "OSI-Schicht-2-Unterstützung aktivieren?"
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr "Netzwerkgerät Parameter manuell eingeben"
+msgstr "Netzwerkgerät-Parameter manuell eingeben"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
@@ -1148,31 +1144,31 @@ msgstr "Kein Repository gefunden."
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr "Benötigen Sie einen Benutzernamen und ein Passwort um auf den Proxy zuzugreifen?"
+msgstr "Sind für den Zugriff auf den Proxy ein Benutzername und ein Passwort erforderlich?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr "Benötigen Sie einen Benutzernamen und ein Passwort um auf den %s-Server zuzugreifen?"
+msgstr "Sind für den Zugriff auf den %s-Server ein Benutzername und ein Passwort erforderlich?"
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "IP-Adresse %s wird bereits von einer anderen Maschine benutzt!"
+msgstr "IP-Adresse '%s' wird bereits von einem anderen Computer verwendet!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr "Erkenne und lade Netzwerktreiber"
+msgstr "Netzwerktreiber werden ermittelt und geladen"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Geben Sie die IP-Adresse Ihres Name-Servers ein. Wenn Sie keinen Name-Serververwenden, dann nur \"+++\"."
+msgstr "Geben Sie die IP-Adresse Ihres Nameservers ein. Wenn Sie keinen Nameserver verwenden, geben Sie einfach \"+++\" ein."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "Geben Sie die IP-Adresse des Name-Servers %u oder \"+++\" für keine(n) ein."
+msgstr "Geben Sie IP-Adresse von Nameserver '%u' bzw. \"+++\" ein, wenn kein Nameserver verwendet wird."
 
 #. TXT_EXPERT
 msgid "Experte"
@@ -1208,39 +1204,39 @@ msgstr ""
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Suchdomänen durch Leerzeichen voneinander getrennt eingeben:"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Bei jeder Domäne muss es sich um eine gültige IP-Adresse handeln."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Es sind maximal sechs Suchdomänen zulässig."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD/CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Wenn Sie Ihr Repository als verbürgt erachten, können Sie im nicht sicheren Modus fortfahren."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "SHA1-Summe falsch."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Installation abgebrochen."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "Datei nicht signiert."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Ungültige Signatur."

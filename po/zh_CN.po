@@ -3,16 +3,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kpowersave\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-23 15:06+0100\n"
-"PO-Revision-Date: 2008-10-09 16:10+0800\n"
-"Last-Translator: Eric Shan <ericalways@gmail.com>\n"
-"Language-Team: Simplified Chinese\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-05 08:04\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3.1\n"
 
 #. TXT_OK
 msgid "OK"
@@ -56,7 +53,7 @@ msgstr "内核模块（硬件驱动程序）"
 
 #. TXT_MENU_START
 msgid "Start Installation"
-msgstr "启动安装或系统"
+msgstr "开始安装"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -345,7 +342,7 @@ msgstr "输入 PLIP 合作伙伴的 IP 地址。"
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "无法自动检测到 PCMCIA 芯片组。 请手工指定。"
+msgstr "无法自动检测到 PCMCIA 芯片组。 请手动指定。"
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -413,7 +410,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr "选择源介质。"
+msgstr "选择源媒体。"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -844,7 +841,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"已成功安装基础系统。 现在必须重引导您的计算机。 取出所有安装介质（CD-ROM 或软盘）。\n"
+"已成功安装基础系统。 现在必须重引导您的计算机。 取出所有安装媒体（CD-ROM 或软盘）。\n"
 "如果引导管理器安装在软盘上，请不要取出软盘。"
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -879,7 +876,7 @@ msgstr "您的计算机 RAM 不足，无法安装 %s。至少需要 %d MB。"
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "口令太短（必须至少为 8 个字符）。"
+msgstr "密码太短（必须至少为 8 个字符）。"
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -960,7 +957,7 @@ msgstr "关闭电源"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "未能访问驱动程序更新介质。"
+msgstr "未能访问驱动程序更新媒体。"
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
@@ -981,7 +978,7 @@ msgstr "已完成驱动程序更新"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "请选择驱动程序更新介质。"
+msgstr "请选择驱动程序更新媒体。"
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
@@ -1100,7 +1097,7 @@ msgstr "请选择 CCW 总线接口。"
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "请选择物理介质。"
+msgstr "请选择物理媒体。"
 
 #. progress indicator label
 #. TXT_LOADING_MODULES
@@ -1143,22 +1140,22 @@ msgstr "未发现安装源。"
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr "您是否需要用户名和密码来使用代理？"
+msgstr "您是否需要用户名和密码才能访问代理？"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr "访问 %s 服务器是否需要用户名和密码？"
+msgstr "您是否需要用户名和密码才能访问 %s 服务器？"
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "IP 地址 %s 已经被另外一台机器使用了！"
+msgstr "IP 地址 %s 已由另一台计算机占用！"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr "正在检测和加载网络驱动"
+msgstr "正在检测和装载网络驱动程序"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
@@ -1167,75 +1164,75 @@ msgstr "输入您的名称服务器的 IP 地址。如果不使用名称服务�
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "输入名称服务器 %u 的 IP，无名称服务器就输入“+++”。"
+msgstr "输入名称服务器 %u 的 IP，无名称服务器则输入“+++”。"
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "专家"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "在 YaST 之前和之后启动外壳？"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "启动外壳"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "获取 SLP 信息"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "显示配置"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "更改配置"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "运行命令"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "退出 linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "输入搜索域，用空格分开："
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "每个域必须都是有效的 IP 地址。"
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "最多只允许 6 个搜索域。"
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "如果您确实信任您的安装源，可以在不安全模式下继续。"
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "SHA1 和错误。"
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "安装中止。"
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "文件未签名。"
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "无效签名。"

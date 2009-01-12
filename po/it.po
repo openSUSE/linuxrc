@@ -5,14 +5,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-10-05 01:07+0200\n"
-"Last-Translator: Andrea Florio <andrea@opensuse.org>\n"
-"Language-Team: italian <opensuse-translation@opensuse.org>\n"
+"PO-Revision-Date: 2009-01-08 18:41\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -564,7 +562,7 @@ msgstr "Inserire il nome dell'utente con cui volete accedere al server FTP."
 
 #. TXT_ENTER_FTPPASSWD
 msgid "Enter the password for the FTP user account."
-msgstr "Inserire la password per l'user account FTP."
+msgstr "Inserire la password per l'user conto FTP."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
@@ -614,11 +612,11 @@ msgstr "Espelli CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "Tempo massimo DHCP"
+msgstr "Timeout DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "Inserite il valore di timeout per DHCP."
+msgstr "Immettere valore di timeout per DHCP."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -638,15 +636,15 @@ msgstr "Router cisco con collegamento channel"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
-msgstr "Indicate il nome della share sul server SMB."
+msgstr "Indicate il nome della condivisione sul server SMB."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Se volete accedere alla share come guest, specificate il nome dell'utente, password e gruppo di lavoro.\n"
-"Volete accedere alla share come guest?"
+"Se volete accedere alla condivisione come guest, specificate il nome dell'utente, password e gruppo di lavoro.\n"
+"Volete accedere alla condivisione come guest?"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
@@ -667,7 +665,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Sto tentando di eseguire il mount della share\n"
+"Sto tentando di eseguire il mount della condivisione\n"
 "\n"
 "\"//%s/%s\""
 
@@ -842,7 +840,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Il sistema di base è stato installato correttamente. Adesso dovete riavviare il vostro sistema. Estraete i media di installazione (CD-Rom, dischetto)\n"
+"Il sistema di base è stato installato correttamente. Adesso dovete riavviare il vostro sistema. Estraete i supporti di installazione (CD-Rom, dischetto)\n"
 "Non estraete il dischetto di boot, se vi è installato il boot manager."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -877,7 +875,7 @@ msgstr "Il vostro sistema non dispone di sufficiente RAM per installare %s. Sono
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Password troppo breve (deve essere composta almeno di 5 caratteri)."
+msgstr "Password troppo breve (deve essere composta da almeno 8 caratteri)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -925,7 +923,7 @@ msgstr "Selezionate il protocollo per questo dispositivo CTC."
 
 #. TXT_CTC_PROT_COMPAT
 msgid "Compatibility mode (default)"
-msgstr "Modo di compatibilità (default)"
+msgstr "Modo di compatibilità (impostazione predefinita)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
@@ -1131,28 +1129,28 @@ msgstr "Abilitare il supporto per OSI Livello 2? "
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr "Introdurre i parametri del dispositivo di rete manualmente"
+msgstr "Introdurre manualmente i parametri del dispositivo di rete"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "Nessuna sorgente di installazione è stata trovata."
+msgstr "Nessun archivio trovato."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr "Sono necessari un nome utente e una password per accedere al proxy?"
+msgstr "Per accedere al proxy sono necessari un nome utente e una password?"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr "Sono necessari un nome utente e una password per accedere al server %s?"
+msgstr "Per accedere al server %s sono necessari un nome utente e una password?"
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "L'indirizzo IP %s è gia in uso da parte di un'altra macchina!"
+msgstr "L'indirizzo IP %s è già utilizzato da un altro computer."
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
@@ -1160,80 +1158,80 @@ msgstr "Rilevamento e caricamento dei driver di rete"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Inserite l'indirizzo IP del vostro server dei nomi. Se non utilizzate alcun server dei nomi, inserite semplicemente \"+++\""
+msgstr "Immettere l'indirizzo IP del server dei nomi. Se non viene utilizzato alcun server dei nomi, inserire solo \"+++\""
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "Inserite l'indirizzo IP del vostro server dei nomi %u o \"+++\" se non ne avete."
+msgstr "Immettere l'indirizzo IP del server dei nomi %u o \"+++\" se non ne è presente uno."
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Esperto"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Avviare una shell prima e dopo YaST?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Avvia shell"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "Ottieni informazioni su SLP"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Mostra config"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Modifica config"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Esegui comando"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Esci da linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Immetti domini di ricerca, separati da uno spazio:"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Ciascun dominio deve avere un indirizzo IP valido."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Sono consentiti al massimo sei domini di ricerca."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Se si ritiene l'archivio attendibile, è possibile continuare in modalità non sicura."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "Somma SHA1 errata."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Installazione interrotta."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "File non firmato."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Firma non valida."

@@ -5,14 +5,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.sv\n"
-"PO-Revision-Date: 2008-11-08 10:50+0100\n"
-"Last-Translator: Jonas Björk <jonas@jonasbjork.net>\n"
-"Language-Team: Swedish <sv@li.org>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-08 11:46\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -56,7 +55,7 @@ msgstr "Kärnmoduler (hårdvarudrivrutiner)"
 
 #. TXT_MENU_START
 msgid "Start Installation"
-msgstr "Starta installation"
+msgstr "Starta installationen"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -614,7 +613,7 @@ msgstr "Mata ut cd"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "Tidsgräns för DHCP"
+msgstr "Timeout för DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
@@ -879,7 +878,7 @@ msgstr "Datorn har inte tillräckligt med RAM-minne för installation av %s. Du 
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Lösenordet är för kort (måste ha minst 8 tecken)."
+msgstr "Lösenordet är för kort (det måste innehålla minst 8 tecken)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1139,7 +1138,7 @@ msgstr "Ange parametrar för nätverksenheter manuellt"
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "Förrådet hittades inte."
+msgstr "Det gick inte att hitta något arkiv."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
@@ -1155,88 +1154,88 @@ msgstr "Behöver du ett användarnamn och lösenord för att komma åt %s-server
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "IP-adressen %s används redan av en annan maskin!"
+msgstr "IP-adressen %s används redan av en annan dator."
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr "Upptäcker och laddar drivrutiner för nätverk."
+msgstr "Identifierar och läser in nätverksdrivrutiner"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Ange din namnservers IP-adress. Om du inte använder en namnserver skriver du \"+++\"."
+msgstr "Ange namnserverns IP-adress. Om du inte använder någon namnserver skriver du bara \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "Ange IP-numret för namnservern %u eller ange \"+++\" för ingen."
+msgstr "Ange IP-adressen för namnservern %u eller +++ om du inte använder någon namnserver."
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Expert"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Starta skal före och efter YaST?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Starta skal"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "Hämta SLP-information"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Visa konfiguration"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Ändra konfiguration"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Kör kommando"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Avsluta linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Ange dina sökdomäner, avgränsade med blanksteg:"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Varje domän måste vara en giltig IP-adress."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Högst sex sökdomäner tillåts."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD/CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Om förvaringsplatsen är tillförlitlig kan du fortsätta i oskyddat läge."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "SHA1-summan är fel."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Installationen avbröts."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "Filen är inte signerad."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Ogiltig signatur."

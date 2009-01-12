@@ -1,3 +1,6 @@
+12/9/2009:	v3.3.24
+	- translations updated (bnc #445764)
+
 10/12/2008:	v3.3.23
 	- s390: clean up properly after failed installation attempt
 	  (bnc#443430)

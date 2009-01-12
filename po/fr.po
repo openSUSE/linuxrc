@@ -9,11 +9,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fr\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-08-07 11:30+0100\n"
-"Last-Translator: Guillaume GARDET <guillaume.gardet@free.fr>\n"
-"Language-Team: French Team <opensuse-fr@opensuse.org>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-07 15:47\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -324,9 +323,7 @@ msgid ""
 msgstr ""
 "Tentative de monter le répertoire\n"
 "\n"
-"\"%s:%s\"\n"
-"\n"
-"... "
+"\"%s:%s\"..."
 
 #. TLABEL linuxrc_2002_03_29_0036__59
 #. TXT_ERROR_NFSMOUNT
@@ -745,12 +742,12 @@ msgstr "Éjecter le CD"
 #. TLABEL linuxrc_2002_03_29_0036__138
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "Délai pour DHCP"
+msgstr "Timeout DHCP"
 
 #. TLABEL linuxrc_2002_03_29_0036__139
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "Spécifiez la valeur du délai pour DHCP."
+msgstr "Spécifiez la valeur de timeout pour DHCP."
 
 #. TLABEL linuxrc_2002_03_29_0036__141
 #. TXT_NET_CTC
@@ -901,7 +898,7 @@ msgstr "Charger des modules inconnus"
 #. TXT_FILE_SYSTEM
 #, c-format
 msgid "%s file system found."
-msgstr "Le système de fichier %s a été détecté."
+msgstr "Le système de fichiers %s a été détecté."
 
 #. TLABEL linuxrc_2002_03_29_0036__166
 #. TXT_CONTINUE
@@ -1061,7 +1058,7 @@ msgstr "Entrez l'adresse IP de l'hôte sur lequel fonctionne le serveur X11."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Veuillez sélectionner le type de votre périphérique réseau."
+msgstr "Sélectionnez le type de votre périphérique réseau."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the target VM guest."
@@ -1155,11 +1152,11 @@ msgstr "Mise à jour de pilote ok"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Veuillez choisir le support de la mise à jour du pilote."
+msgstr "Choisisssez le support de la mise à jour du pilote."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Veuillez entrer le périphérique de mise à jour du pilote."
+msgstr "Saisissez le périphérique de mise à jour du pilote."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -1345,71 +1342,71 @@ msgstr "Entrez l'adresse IP du serveur de noms %u ou \"+++\" pour aucun."
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Expert"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Démarrer un shell avant et après YaST ?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Démarrer le shell"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "Obtenir les infos SLP"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Afficher la config."
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Changer la config"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Exécuter une commande"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Quitter linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Entrer vos domaines de recherche, séparés par des espaces :"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Chaque domaine doit être une adresse IP valide."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Jusqu'à six domaines de recherche autorisés."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Si vous avez vraiment confiance en votre dépôt, vous pouvez continuer dans un mode non sécurisé."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "Somme SHA1 erronée."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Installation abandonnée."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "Fichier non signé."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Signature non valide."

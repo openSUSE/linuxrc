@@ -4,13 +4,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2008-05-10 09:18+0800\n"
-"Last-Translator: swyear <swyear@gmail.com>\n"
-"Language-Team: Chinese Traditional <zh@li.org>\n"
+"PO-Revision-Date: 2009-01-06 10:47\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -54,7 +53,7 @@ msgstr "核心模組 (硬體驅動程式)"
 
 #. TXT_MENU_START
 msgid "Start Installation"
-msgstr "啟動安裝或系統"
+msgstr "開始安裝"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -74,7 +73,7 @@ msgstr "顯示"
 
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "鍵盤配置"
+msgstr "Keymap"
 
 #. TXT_LOAD_NET
 msgid "Load Network Card Modules"
@@ -101,7 +100,7 @@ msgid ""
 msgstr ""
 "嘗試載入模組「%s」...\n"
 "\n"
-"在載入期間，您可能想要觀看虛擬主控台 4 上的核心訊息 (按 ALT-F4)。使用 ALT-F1 以切換回此選單。"
+"在載入期間，您可能想要觀看虛擬主控台 4 上的核心訊息 (按 ALT-F4)。使用 ALT-F1 以切換回此功能表。"
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -231,7 +230,7 @@ msgstr ""
 "\n"
 "IP 位址：%s\n"
 "名稱：%s\n"
-"領域：%s"
+"網域：%s"
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
@@ -281,8 +280,8 @@ msgid ""
 "Choose a keyboard map.\n"
 "YaST will offer additional keyboard tables later."
 msgstr ""
-"選擇一個鍵盤配置。\n"
-"YaST 稍後將會提供其他附加的鍵盤表。"
+"選擇一個鍵盤映射。\n"
+"YaST 稍後將會提供附加的鍵盤表。"
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -295,7 +294,7 @@ msgstr "目前沒有載入的模組。"
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "正在自動偵測 (%s)...      "
+msgstr "正在自動查探 (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -315,7 +314,7 @@ msgstr "乙太網路卡"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "平行埠"
+msgstr "並列埠"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
@@ -427,7 +426,7 @@ msgstr "要現在重新開機？"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
-msgstr "基本系統已成功安裝。這個新安裝的系統現在將要啟動以執行安裝。"
+msgstr "基本系統已成功安裝。這個新安裝的系統現在將會啟動以確認安裝。"
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -493,7 +492,7 @@ msgstr "輸入要載入 RAM 磁碟檔案的路徑與名稱，以做為根檔案�
 
 #. TXT_NOT_IMPLEMENTED
 msgid "Not yet implemented."
-msgstr "尚未完成。"
+msgstr "尚未執行。"
 
 #. TXT_NO_INFO_AVAIL
 msgid "No information available."
@@ -566,15 +565,15 @@ msgstr "輸入 FTP 使用者帳戶的密碼。"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "輸入 FTP proxy 的位址。"
+msgstr "輸入 FTP 代理的位址。"
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "輸入 FTP proxy 的埠。"
+msgstr "輸入 FTP 代理的埠。"
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
-msgstr "使用 FTP proxy？"
+msgstr "使用 FTP 代理？"
 
 #. TXT_NOMEM_FTP
 #, c-format
@@ -595,7 +594,7 @@ msgstr "-- 更多模組 --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "啟始化平行埠..."
+msgstr "啟始化並列埠..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
@@ -616,11 +615,11 @@ msgstr "DHCP 逾時"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "輸入 DHCP 的逾時值."
+msgstr "輸入 DHCP 的逾時值。"
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "channel to channel connection"
+msgstr "通道間的連線"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -632,7 +631,7 @@ msgstr "IUCV 連線"
 
 #. TXT_NET_CLAW
 msgid "channel attached cisco router"
-msgstr "channel attached cisco router"
+msgstr "附加 cisco 路由器的通道"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
@@ -801,17 +800,17 @@ msgstr "輸入 %s 伺服器的密碼。"
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Use a %s proxy?"
-msgstr "要使用 %s proxy 嗎？"
+msgstr "要使用 %s 代理嗎？"
 
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "輸入 %s proxy 的位址。"
+msgstr "輸入 %s 代理的位址。"
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "輸入 %s proxy 的埠。"
+msgstr "輸入 %s 代理的埠。"
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -835,7 +834,7 @@ msgstr "輸入您的 VNC 密碼。"
 
 #. TXT_SSH_PASSWORD
 msgid "Enter your temporary SSH password."
-msgstr "輸入您的暫時 SSH 密碼。"
+msgstr "輸入您的暫存 SSH 密碼。"
 
 #. TXT_DO_REBOOT
 msgid ""
@@ -856,15 +855,15 @@ msgstr "顯示「驅動程式更新」"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "輸入名稱伺服器 %u 的 IP 位址或按 ESC。"
+msgstr "輸入名稱伺服器 %u 的 IP 或按 ESC。"
 
 #. TXT_ROOT_PASSWORD
 msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"輸入暫時 root 密碼。\n"
-"您需要在第一次以 root 使用者登入後變更此密碼。"
+"輸入暫存根使用者密碼。\n"
+"您需要在第一次以根使用者登入後變更此密碼。"
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -877,7 +876,7 @@ msgstr "您的電腦沒有足夠的 RAM 來安裝 %s。 您至少需要 %d MB。
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "密碼太短 (必須至少有 8 個字元)。"
+msgstr "密碼太短 (必須至少包含 8 個字元)。"
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1131,23 +1130,23 @@ msgstr "啟用 OSI 第二層支援？"
 
 #. TXT_MANUAL_NETDEV_PARAMS
 msgid "Enter network device parameters manually"
-msgstr "請手動輸入網路設備的參數"
+msgstr "手動輸入網路設備的參數"
 
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "沒有發現套件庫。"
+msgstr "找不到儲存庫。"
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
 msgid "Do you need a username and password to access the proxy?"
-msgstr "您需要使用者名稱和密碼來存取這個代理嗎？"
+msgstr "您需要使用者名稱和密碼來存取此代理嗎？"
 
 #. ftp or http server
 #. TXT_USER_PW_SERVER
 #, c-format
 msgid "Do you need a username and password to access the %s server?"
-msgstr "您需要使用者名稱和密碼來存取這個 %s 伺服器嗎？"
+msgstr "您需要使用者名稱和密碼來存取此 %s 伺服器嗎？"
 
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
@@ -1156,84 +1155,84 @@ msgstr "IP 位址 %s 已經被其他機器使用！"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr "正在偵測及載入網路驅程式"
+msgstr "偵測及載入網路驅動程式"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "輸入名稱伺服器的 IP 位址。若不使用名稱伺服器，請按「+++」。"
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "輸入名稱伺服器 %u 的 IP 或按「+++」不提供 IP。"
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "專家"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "在 YaST 之前還是之後啟動外圍程序？"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "啟動外圍程式"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "獲取 SLP 資訊"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "顯示組態"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "變更組態"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "執行指令"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "結束 linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "輸入您的搜尋網域，以空格隔開︰"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "每個網域必須是一個有效的 IP 位址。"
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "最多僅允許輸入六個搜尋網域。"
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "如果確實信任您的儲存庫，您可能會在不安全的模式下繼續。"
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "SHA1 總數錯誤。"
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "安裝已中止。"
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "未簽署檔案。"
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "無效的簽章。"

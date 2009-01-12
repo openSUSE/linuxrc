@@ -8,16 +8,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
+"Project-Id-Version: linuxrc.hu\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-11-06 11:06+0100\n"
+"PO-Revision-Date: 2008-12-07 14:04+0100\n"
 "Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
-"Language-Team: Hungarian <hu@li.org>\n"
+"Language-Team:  <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -61,7 +61,7 @@ msgstr "Kernelmodulok (hardver-illesztőprogramok)"
 
 #. TXT_MENU_START
 msgid "Start Installation"
-msgstr "Telepítés megkezdése"
+msgstr "Telepítés indítása"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -623,7 +623,7 @@ msgstr "DHCP időtúllépés"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "Itt határozhatja meg, hogy hány másodpercig várjak DHCP-re."
+msgstr "Adja meg a DHCP időtúllépési értékét."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -1178,71 +1178,71 @@ msgstr "Adja meg a(z) %u névkiszolgáló IP-címét vagy írja be a \"+++\" kar
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Szakértői"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Elindítja a parancssort a YaST használata előtt és után?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Parancssor indítása"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "SLP információ lekérése"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Beállítások megjelenítése"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Beállítások módosítása"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Parancs futtatása"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Kilépés"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Adja meg a tartomány neveket vesszővel elválasztva:"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Minden tartománynak érvényes IP-címmel kell rendelkeznie."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Legfeljebb hat tartományt lehet megadni."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Amennyiben a telepítési forrást valóban megbízhatónak tartja, folytathatja a munkát nem megbízható módban."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "Az SHA1 sum hibás."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "A telepítés megszakítva."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "A fájl nincs aláírva."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Érvénytelen aláírás."
