@@ -1,3 +1,9 @@
+
+******  This is NOT sle11/11.1!  ******
+
+19/1/2009:	v3.3.26
+	- enable ZyppRepoURL (bnc #465820)
+
 12/1/2009:	v3.3.25
 	- keep VNC & SSH settings (bnc #447433)
 

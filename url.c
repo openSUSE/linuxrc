@@ -739,13 +739,13 @@ char *url_print_zypp(url_t *url)
   }
 
   if(
-    scheme != inst_hd ||
-    scheme != inst_cdrom ||
-    scheme != inst_file ||
-    scheme != inst_ftp ||
-    scheme != inst_http ||
-    scheme != inst_nfs ||
-    scheme != inst_smb ||
+    scheme != inst_hd &&
+    scheme != inst_cdrom &&
+    scheme != inst_file &&
+    scheme != inst_ftp &&
+    scheme != inst_http &&
+    scheme != inst_nfs &&
+    scheme != inst_smb &&
     scheme != inst_tftp
   ) return buf;
 
