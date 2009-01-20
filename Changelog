@@ -1,6 +1,9 @@
 
 ******  This is NOT sle11/11.1!  ******
 
+20/1/2009:	v3.3.27
+	- load edd before starting udev (bnc #465709)
+
 19/1/2009:	v3.3.26
 	- enable ZyppRepoURL (bnc #465820)
 
