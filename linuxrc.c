@@ -784,7 +784,13 @@ void lxrc_init()
 
   LXRC_WAIT
 
-  if(!config.had_segv) lxrc_add_parts();
+  if(!config.had_segv) {
+    lxrc_add_parts();
+    // we need edd for udev
+    if(util_check_exist("/modules/edd.ko")) {
+      system("/sbin/insmod /modules/edd.ko");
+    }
+  }
 
   LXRC_WAIT
 

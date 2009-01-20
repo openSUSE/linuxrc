@@ -1,3 +1,6 @@
+20/1/2009:	v3.3.26
+	- load edd before starting udev (bnc #465709)
+
 12/1/2009:	v3.3.25
 	- keep VNC & SSH settings (bnc #447433)
 
