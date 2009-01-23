@@ -239,17 +239,23 @@ int inst_choose_netsource_cb(dia_item_t di)
 #if defined(__s390__) || defined(__s390x__)  
 int inst_choose_display()
 {
-  dia_item_t di;
-  dia_item_t items[] = {
-    di_display_x11,
-    di_display_vnc,
-    di_display_ssh,
-    di_none
-  };
+  if(!config.manual && (config.net.displayip || config.vnc || config.usessh)) {
+    net_ask_password();
+    return 0;
+  }
+  else {
+    dia_item_t di;
+    dia_item_t items[] = {
+      di_display_x11,
+      di_display_vnc,
+      di_display_ssh,
+      di_none
+    };
 
-  di = dia_menu2(txt_get(TXT_CHOOSE_DISPLAY), 33, inst_choose_display_cb, items, di_inst_choose_display_last);
+    di = dia_menu2(txt_get(TXT_CHOOSE_DISPLAY), 33, inst_choose_display_cb, items, di_inst_choose_display_last);
 
-  return di == di_none ? -1 : 0;
+    return di == di_none ? -1 : 0;
+  }
 }
 
 
