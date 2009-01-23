@@ -1,6 +1,9 @@
 
 ******  This is NOT sle11/11.1!  ******
 
+23/1/2009:	v3.3.28
+	- do not ask for display type in auto mode (bnc #446458)
+
 20/1/2009:	v3.3.27
 	- load edd before starting udev (bnc #465709)
 
