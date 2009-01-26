@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-09 10:52\n"
+"PO-Revision-Date: 2009-01-23 10:24\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -208,7 +208,7 @@ msgstr "Neplatný vstup."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
-msgstr "Zadejte vaši IP adresu"
+msgstr "Zadejte svoji adresu IP"
 
 #. TXT_INPUT_NETMASK
 msgid "Enter your netmask. For a normal class C network, this is usually 255.255.255.0."
@@ -216,11 +216,11 @@ msgstr "Zadejte vaši síťovou masku. Pro běžnou síť třídy C je to obvykl
 
 #. TXT_INPUT_GATEWAY
 msgid "If you need a gateway to reach the server, enter the IP address of the gateway. If you do not need a gateway, enter your own IP address."
-msgstr "Pokud potřebujete bránu pro přístup k serveru, zadejte IP adresu této brány. Pokud nepotřebujete bránu, zadejte vaši vlastní IP adresu."
+msgstr "Pokud potřebujete bránu pro přístup k serveru, zadejte adresu IP této brány. Pokud nepotřebujete bránu, zadejte vaši vlastní adresu IP."
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Zadejte IP adresu vašeho name serveru. Pokud nepoužíváte name server, stiskněte ESC."
+msgstr "Zadejte adresu IP vašeho name serveru. Pokud nepoužíváte name server, stiskněte ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -233,7 +233,7 @@ msgid ""
 msgstr ""
 "Byly zjištěny následující údaje:\n"
 "\n"
-"IP adresa: %s\n"
+"Adresa IP: %s\n"
 "Jméno: %s\n"
 "Doména: %s"
 
@@ -243,11 +243,11 @@ msgstr "Během konfigurace sítě došlo k chybě. Jádro systému nejspíše ne
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
-msgstr "Zadejte IP adresu NFS serveru."
+msgstr "Zadejte adresu IP serveru NFS."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Enter the IP address of the FTP server."
-msgstr "Zadejte IP adresu FTP serveru."
+msgstr "Zadejte adresu IP serveru FTP."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
@@ -286,7 +286,7 @@ msgid ""
 "YaST will offer additional keyboard tables later."
 msgstr ""
 "Zadejte klávesovou mapu.\n"
-"YaST vám umožní doplnění další klávesové tabulky později."
+"Modul YaST vám umožní doplnění další klávesové tabulky později."
 
 #. TXT_DELETE_MODULE
 msgid "Choose the module to unload."
@@ -311,7 +311,7 @@ msgstr "Chcete vyhledat další síťové karty?"
 
 #. TXT_WANT_MORE_CDROM
 msgid "Search for additional CD-ROM drives?"
-msgstr "Chcete vyhledat další CD mechaniky?"
+msgstr "Chcete vyhledat další jednotky CD-ROM?"
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
@@ -419,11 +419,11 @@ msgstr "Vyberte zdrojové médium."
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "Pokouším se připojit CD mechaniku..."
+msgstr "Pokouším se připojit disk CD-ROM..."
 
 #. TXT_ERROR_CD_MOUNT
 msgid "Unable to mount the CD-ROM."
-msgstr "Nelze připojit CD mechaniku."
+msgstr "Disk CD-ROM nelze připojit."
 
 #. TXT_ASK_REBOOT
 msgid "Reboot the system now?"
@@ -451,7 +451,7 @@ msgstr "Objevila se chyba během instalace."
 
 #. TXT_DRIVES
 msgid "Hard Disks or CD-ROMs"
-msgstr "Disky nebo CD mechaniky"
+msgstr "Pevné disky nebo disky CD-ROM"
 
 #. TXT_LITTLE_MEM
 msgid ""
@@ -473,7 +473,7 @@ msgstr "Použít animovaná okna?"
 
 #. TXT_NO_DRIVES
 msgid "No hard disks or CD-ROM drives have been detected so far."
-msgstr "Nebyly detekovány žádné disky ani CD mechaniky."
+msgstr "Nebyly zjištěny žádné pevné disky ani jednotky CD-ROM."
 
 #. TXT_MENU_EXPERT
 msgid "Debug (expert)"
@@ -608,11 +608,11 @@ msgstr "Zadejte číslo portu, na kterém běží NFS server."
 #. TXT_INSERT_CD
 #, c-format
 msgid "Make sure that CD number %d is in your drive."
-msgstr "Ujistěte se, že máte v mechanice CD číslo %d."
+msgstr "Ujistěte se, že je v jednotce disk CD číslo %d."
 
 #. TXT_EJECT_CD
 msgid "Eject CD"
-msgstr "Vysunout CD"
+msgstr "Vysunout disk CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
@@ -706,7 +706,7 @@ msgstr "Vložte disk s moduly číslo %d."
 
 #. TXT_MODDISK2
 msgid "Find instructions for creating it in boot/README on CD1 or DVD1."
-msgstr "Návod na vytvoření naleznete na CD1 nebo DVD1 v adresáři boot/README."
+msgstr "Návod na vytvoření naleznete na disku CD1 nebo DVD1 v adresáři boot/README."
 
 #. TXT_CHOOSE_NETSOURCE
 msgid "Choose the network protocol."
@@ -716,7 +716,7 @@ msgstr "Zvolte síťový protokol."
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Zadejte IP adresu %s serveru."
+msgstr "Zadejte adresu IP serveru %s."
 
 #. %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -778,7 +778,7 @@ msgstr "Nemáte dostatek paměti pro nahrání všech dat."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
-msgstr "Počítač nemá dostatek operační paměti pro spuštění programu YaSTu."
+msgstr "Počítač nemá dostatek operační paměti pro spuštění programu YaST."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -846,7 +846,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Základní systém byl úspěšně instalován. Počítač se nyní restartuje . Vyjměte všechna instalační média (CD, disketu).\n"
+"Základní systém byl úspěšně instalován. Počítač se nyní restartuje . Vyjměte všechna instalační média (disk CD-ROM, disketu).\n"
 "V případě, že je na disketě zavaděč, nechte disketu v mechanice."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -860,7 +860,7 @@ msgstr "Zobrazit aktualizace ovladačů"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Zadejte IP adresu name serveru %u nebo stiskněte ESC."
+msgstr "Zadejte adresu IP name serveru %u nebo stiskněte ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -953,7 +953,7 @@ msgstr "Zadejte relativní číslo portu"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
-msgstr "Ověřit instalační CD/DVD"
+msgstr "Ověřit instalační disk CD-ROM/DVD"
 
 #. turn the computer off
 #. TXT_POWER_OFF
@@ -995,11 +995,11 @@ msgstr "Chybné jméno zařízení."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
-msgstr "Vyhledávám CD mechaniky..."
+msgstr "Vyhledávám jednotky CD-ROM..."
 
 #. TXT_NO_CDROM
 msgid "No CD-ROM drives found."
-msgstr "nebyla nalezena žádná CD mechanika."
+msgstr "nebyla nalezena žádná jednotka CD-ROM."
 
 #. TXT_SEARCH_FLOPPY
 msgid "Looking for floppy disks..."
@@ -1020,17 +1020,17 @@ msgstr "Žádné aktualizace ovladačů."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
-msgstr "Vložte instalační CD nebo DVD."
+msgstr "Vložte instalační disk CD nebo DVD."
 
 #. TXT_NO_CD_DVD
 msgid "No CD-ROM or DVD found."
-msgstr "CD nebo DVD nebylo nalezeno."
+msgstr "Disk CD nebo DVD nebyl nalezen."
 
 #. e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
 #, c-format
 msgid "This is not a %s CD-ROM."
-msgstr "CD není CD %s."
+msgstr "Toto není disk CD %s."
 
 #. TXT_CD_CHECK_OK
 msgid "No errors found."
@@ -1156,7 +1156,7 @@ msgstr "Potřebujete pro přístup k serveru %s uživatelské jméno a heslo?"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "IP adresu %s již používá jiný počítač!"
+msgstr "Adresu IP %s již používá jiný počítač!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
@@ -1164,12 +1164,12 @@ msgstr "Detekují se a zavádějí se síťové ovladače"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Zadejte IP adresu vašeho name serveru. Pokud nepoužíváte name server, pak vložte \"+++\"."
+msgstr "Zadejte adresu IP vašeho name serveru. Pokud nepoužíváte name server, pak vložte \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "Zadejte IP adresu name serveru %u nebo zadejte \"+++\"."
+msgstr "Zadejte adresu IP name serveru %u nebo zadejte \"+++\"."
 
 #. TXT_EXPERT
 msgid "Expert"
@@ -1177,7 +1177,7 @@ msgstr "Expertní"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr "Spustit příkazovou řádku před a po startu YaSTu?"
+msgstr "Spustit příkazovou řádku před a po startu programu YaST?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
@@ -1209,7 +1209,7 @@ msgstr "Zadejte vaše vyhledávací domény oddělené mezerou"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr "Každá doména musí být platná IP adresa"
+msgstr "Každá doména musí být platná adresa IP"
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
