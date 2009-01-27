@@ -1,6 +1,9 @@
 
 ******  This is NOT sle11/11.1!  ******
 
+27/1/2009:	v3.3.29
+	- correctly detect dhcp failure (bnc #406475)
+
 23/1/2009:	v3.3.28
 	- do not ask for display type in auto mode (bnc #446458)
 
