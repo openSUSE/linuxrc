@@ -635,6 +635,7 @@ void file_do_info(file_t *f0)
   char buf[256], *s, *t;
   slist_t *sl, *sl0;
   unsigned u;
+  FILE *w;
 
   /* maybe it's an AutoYaST XML file */
   for(f = f0; f; f = f->next) {
@@ -1112,6 +1113,21 @@ void file_do_info(file_t *f0)
       case key_brokenmodules:
         slist_free(config.module.broken);
         config.module.broken = slist_split(',', f->value);
+        if(config.module.broken && !config.test) {
+          if(!util_check_exist("/etc/modprobe.d")) mkdir("/etc/modprobe.d", 0755);
+          if((w = fopen("/etc/modprobe.d/blacklist", "w"))) {
+            for(sl = config.module.broken; sl; sl = sl->next) {
+              if(sl->key) fprintf(w, "blacklist %s\n", sl->key);
+            }
+            fclose(w);
+          }
+          if((w = fopen("/etc/modprobe.d/noload", "w"))) {
+            for(sl = config.module.broken; sl; sl = sl->next) {
+              if(sl->key) fprintf(w, "install %s /bin/true\n", sl->key);
+            }
+            fclose(w);
+          }
+        }
         break;
 
       case key_initrdmodules:

@@ -430,6 +430,22 @@ void lxrc_change_root2()
     mount("/lib/modules", "/mnt/lib/modules", "none", MS_BIND, 0);
   }
 
+  if(config.module.broken) {
+    char *files[] = { "/etc/modprobe.d/blacklist", "/etc/modprobe.d/noload" };
+    char *argv[3], *buf = NULL;
+    int i;
+
+    for(i = 0; i < sizeof files / sizeof *files; i++) {
+      strprintf(&buf, "/mnt%s", files[i]);
+      unlink(buf);
+      argv[1] = files[i];
+      argv[2] = buf;
+      util_cp_main(3, argv);
+    }
+
+    str_copy(&buf, NULL);
+  }
+
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
 
