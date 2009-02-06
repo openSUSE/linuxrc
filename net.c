@@ -44,6 +44,8 @@
 #define NFS_PORT 2049
 #endif
 
+#include <hd.h>
+
 #include "global.h"
 #include "text.h"
 #include "dialog.h"
@@ -54,6 +56,7 @@
 #include "file.h"
 #include "module.h"
 #include "hotplug.h"
+#include "auto2.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -1044,6 +1047,7 @@ int net_choose_device()
   char buf[MAX_X];
   file_t *f0, *f;
   slist_t *sl;
+  window_t win;
   static int last_item = 0;
   static struct {
     char *dev;
@@ -1064,6 +1068,12 @@ int net_choose_device()
   };
     
   if(config.net.device_given) return 0;
+
+  if(config.manual == 1) {
+    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS));
+    load_network_mods();
+    win_close(&win);
+  }
 
   /* re-read - just in case... */
   util_update_netdevice_list(NULL, 1);

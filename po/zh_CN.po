@@ -1164,8 +1164,12 @@ msgstr "是否启用 OSI 第 2 层支持？"
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr "MAC 地址"
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

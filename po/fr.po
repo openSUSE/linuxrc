@@ -1344,8 +1344,12 @@ msgstr "Activer la prise en charge de la couche 2 de OSI ?"
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr "Adresse MAC"
+
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
 msgstr ""
 
+#. TXT_LOAD_NETWORK_DRIVERS
+msgid "Detecting and loading network drivers"
+msgstr ""

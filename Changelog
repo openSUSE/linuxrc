@@ -1,3 +1,6 @@
+21/4/2008:	v2.0.80
+	- autoload network modules in manual mode (bnc #378731)
+
 4/4/2008:	v2.0.79
 	- large file fixes (bnc #371883, backport of bnc #184448)
 
