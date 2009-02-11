@@ -2459,6 +2459,12 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     return -1;
   }
   
+  /* some devices need a little time to come up;
+     this is only a problem in auto-install mode, because
+     otherwise querying the user for input delays things
+     enough for the device to settle; see bnc#473749 */
+  if (!config.manual) sleep(1);
+  
   char cmd[256];
   char* ccmd = cmd;
   switch(config.hwp.type) {

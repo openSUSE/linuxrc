@@ -1,6 +1,9 @@
 
 ******  This is NOT sle11/11.1!  ******
 
+11/2/2009:	v3.3.30
+	- s390: delay net IF setup in auto-install mode (bnc#473749)
+
 27/1/2009:	v3.3.29
 	- correctly detect dhcp failure (bnc #406475)
 
