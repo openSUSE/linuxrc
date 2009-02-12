@@ -1,165 +1,1618 @@
 <html>
-<head>
-<title>Linuxrc</title>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
+ <body>
 
-<body>
 <h1>Linuxrc</h1>
 
-Linuxrc is a program used for setting up the kernel for installation
-purposes. It allows the user to load modules and start an installed system, a
-rescue system, or an installation via YaST.
-<p>
-Linuxrc is designed to be as small as possible. All needed
-programs are linked directly into one binary, so there is no need for shared
-libraries in the initdisk.
-<p>
-NOTE: If you run Linuxrc on an installed system, it will work slightly
-differently as it tries not to destroy your installation. As a consequence, you
-cannot test all features this way.
+This document is a copy taken from <a href="http://en.opensuse.org/Linuxrc">http://en.opensuse.org/Linuxrc</a>.
 
-<h2>Passing Parameters to Linuxrc</h2>
-
-Unless Linuxrc is in manual mode, it will look for an 'info' file in these
-locations: <code>/info</code> on the floppy disk then, if that does not
-exist, <code>/info</code> in the initrd. After that, it parses the kernel
-command line for parameters. Change the 'info' file Linuxrc reads
-using the <code>info</code> command line parameter. If you do not want
-Linuxrc to read the kernel command line (for example, because you need to give a
-kernel parameter that is also recognized by Linuxrc), use
-<code>linuxrc=nocmdline</code>.
-<p>
-Independently from the above, Linuxrc always looks for and parses a file
-<code>/linuxrc.config</code>. Use this file to change default
-values, if needed. Generally, use the <code>info</code> file
-instead. <code>/linuxrc.config</code> is read before any 'info'
-file and even in manual mode.
-
-<h2>'info' File Format</h2>
-
-Lines starting with '<code>#</code>' are comments. Valid entries are in the
-format <code>key: value</code>.
-<code>value</code> extends to the end of the line and may contain spaces.
-<code>key</code> is case-insensitive.
-<p>
-You can use the same key and value pairs on the kernel command line using the
-syntax <code>key=value</code>
-Lines that do not have the format described above are ignored.
-<p>
-Valid keys are (values given are just examples):
+<p><br />
+<b>linuxrc</b> is a small program that runs before the actual installation program
+<a href="/YaST" title="YaST">YaST</a> is started.
+</p><p>It is responsible for the hardware setup and will search for an installation repository.
+To specify the repository location, use the <a href="#p_install" title="">install</a> option.
+</p><p>The use of linuxrc is not limited to the installation. You can also use it as a boot tool
+for an installed system and even for an independent RAM disk–based rescue system.
+</p>
+<table id='toc' class='toc'><tr><td><div id='toctitle'><h2>Contents</h2></div>
 <ul>
-  <li><code>Language: de_DE</code><br>
-  set the language<br>
-  <li><code>Keytable: de-lat1-nd</code><br>
-  load this keytable<br>
-  <li><code>Display: Color|Mono|Alt</code><br>
-  set the menu color scheme<br>
-  <li><code>Install: URL</code><br>
-  install from URL; examples:<br>
-  <ul>
-    <li><code>nfs://server/install/i386</code><br>
-    install from NFS server<br>
-    <li><code>ftp://server/install/i386/CD1</code><br>
-    install from FTP server
-    <li><code>ftp://user:whocares@server/install/i386/CD1</code><br>
-    install from FTP server using account 'user' with password 'whocares'<br>
-    <li><code>hd:/suse/i386</code><br>
-    install from hard disk<br>
-    <li><code>hd:/sda3/suse/i386</code><br>
-    like the last example, but do not search for a partition, just use sda3<br>
-  </ul>
-  Note: valid URL protocols are cd, hd, nfs, smb, ftp, http, tftp<br>
-  <li><code>InstMode: cd|hd|nfs|smb|ftp|http|tftp</code><br>
-  set installation mode<br>
-  <li><code>HostIP: 10.10.0.2</code><br>
-  the client IP address<br>
-  <li><code>Netmask: 255.255.0.0</code><br>
-  network mask<br>
-  <li><code>Gateway: 10.10.0.1</code><br>
-  gateway<br>
-  <li><code>Server: 10.10.0.1</code><br>
-  installation server address<br>
-  <li><code>Nameserver: 10.10.0.1</code><br>
-  name server<br>
-  <li><code>Proxy: 10.10.0.1</code><br>
-  proxy (either ftp or http)<br>
-  <li><code>ProxyPort: 10.10.0.1</code><br>
-  proxy port<br>
-  <li><code>Partition: hda1</code><br>
-  partition with install sources for hard disk install<br>
-  <li><code>Serverdir: /install/8.0-i386</code><br>
-  base directory of the installation sources<br>
-  <li><code>Netdevice: eth0</code><br>
-  network interface to use<br>
-  <li><code>BOOTPWait: 5</code><br>
-  sleep 5 seconds between network activation and starting bootp<br>
-  <li><code>BOOTPTimeout: 10</code><br>
-  10-second time-out for BOOTP requests<br>
-  <li><code>DHCPTimeout: 60</code><br>
-  60-second time-out for DHCP requests<br>
-  <li><code>TFTPTimeout: 10</code><br>
-  10-second time-out for TFTP connection<br>
-  <li><code>ForceRootimage: 0|1</code><br>
-  load the installation system into RAM disk<br>
-  <li><code>Textmode: 0|1</code><br>
-  start YaST in text mode<br>
-  <li><code>Username: name</code><br>
-  set user name (e.g., for FTP install)<br>
-  <li><code>Password: password</code><br>
-  set password (e.g., for FTP install)<br>
-  <li><code>WorkDomain: domain</code><br>
-  set work domain for SMB install<br>
-  <li><code>ForceInsmod: 0|1</code><br>
-  use '<code>-f</code>' option when running <code>insmod</code><br>
-  <li><code>DHCP: 0|1</code><br>
-  start DHCP daemon <strong>now</strong>, but see <code>UseDHCP</code><br>
-  <li><code>UseDHCP: 0|1</code><br>
-  use DHCP instead of BOOTP (DHCP is default)<br>
-  <li><code>MemLimit: 10000</code><br>
-  ask for swap if free memory drops below 10000 kB<br>
-  <li><code>MemYaST: 20000</code><br>
-  run YaST in text mode if free memory is below 20000 kB<br>
-  <li><code>MemYaSTText: 10000</code><br>
-  ask for swap before starting YaST if free memory is below 10000 kB<br>
-  <li><code>MemModules: 20000</code><br>
-  delete all modules before starting YaST if free memory is below 20000 kB<br>
-  <li><code>MemLoadImage: 50000</code><br>
-  load installation system into RAM disk if free memory is above 50000 kB<br>
-  <li><code>Manual: 0|1</code><br>
-  start Linuxrc in manual mode<br>
-  <li><code>NoPCMCIA: 0|1</code><br>
-  do not start card manager<br>
-  <li><code>Domain: zap.de</code><br>
-  set domain name (used for name server lookups)<br>
-  <li><code>RootImage: /suse/images/root</code><br>
-  installation system image<br>
-  <li><code>RescueImage: /suse/images/rescue</code><br>
-  rescue system image<br>
-  <li><code>InstallDir: /suse/inst-sys</code><br>
-  installation system<br>
-  <li><code>Rescue: 1|nfs://server/dir</code><br>
-  load rescue system; the URL variant specifies the location of the rescue image explicitly<br>
-  <li><code>AutoYaST: ftp://autoyastfile</code><br>
-  location of autoinstall file; activates autoinstall mode<br>
-  <li><code>VNC: 0|1</code><br>
-  set up VNC server<br>
-  <li><code>VNCPassword: password</code><br>
-  sets VNC server password<br>
-  <li><code>UseSSH: 0|1</code><br>
-  set up SSH server<br>
-  <li><code>SSHPassword: password</code><br>
-  sets SSH server password (this will not be the final root password)<br>
-  <li><code>AddSwap: 0|3|/dev/hda5</code><br>
-  if 0, never ask for swap; if the argument is a positive number <code>n</code>,
-  activate the <code>n</code>th swap partition; if the argument is a partition name,
-  activate this swap partition<br>
-  <li><code>Exec: command</code><br>
-  run <code>command</code><br>
-  <li><code>USBWait: 4</code><br>
-  wait 4 seconds after loading USB modules<br>
-  <li><code>Insmod: module params</code><br>
-  load this module<br>
+<li class='toclevel-1'><a href="#Passing_parameters"><span class="tocnumber">1</span> <span class="toctext">Passing parameters</span></a></li>
+<li class='toclevel-1'><a href="#Parameter_Reference"><span class="tocnumber">2</span> <span class="toctext">Parameter Reference</span></a></li>
+<li class='toclevel-1'><a href="#Special_parameters_for_S.2F390_and_zSeries"><span class="tocnumber">3</span> <span class="toctext">Special parameters for S/390 and zSeries</span></a></li>
+<li class='toclevel-1'><a href="#Special_parameters_not_handled_by_Linuxrc_itself"><span class="tocnumber">4</span> <span class="toctext">Special parameters not handled by Linuxrc itself</span></a></li>
 </ul>
+</td></tr></table>
+<p><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+</p>
+<a name="Passing_parameters"></a><h2>Passing parameters</h2>
+<p>linuxrc accepts parameters either by commandline or through configuration files.
+For this, pass the file location using the <a href="#p_info" title="">info</a> parameter.
+You can use this option several times - linuxrc will read all files.
+</p><p>linuxrc parameters are case-insensitive and you can add as many hyphens, underscores,
+or dots as you want.
+</p><p>The option argument can be put in doublequotes.
+</p><p>For example, the following are all equivalent:
+</p>
+<pre>SSHPassword=foo
+sshpassword="foo"
+ssh.password=foo
+ssh-password="foo"
+ssh_password=foo
+S.Shp-AsSw._.orD=foo
+</pre>
+<p>Parameters that are unknown to linuxrc but are of the form <i>foo.bar</i> are
+interpreted as options to kernel modules. See <a href="#p_options" title="">options</a> for
+details.
+</p>
+<a name="Parameter_Reference"></a><h2>Parameter Reference</h2>
+<p><span id="url_descr" />
+</p><p>Some parameters expect a URL as argument. Here is a short overview of the syntax.
+</p><p>Supported schemes:
+</p>
+<pre>cd (or cdrom)         # CD-ROM
+disk                  # any local disk device (CD-ROM, hard disk or floppy)
+file                  # local file
+floppy                # floppy (better use <i>disk</i>)
+ftp                   # ftp server
+hd (or harddisk)      # local hard disk
+http                  # http server
+nfs                   # nfs server
+slp                   # use SLP to get the real URL
+smb (or cifs)         # Windows share
+tftp                  # tftp server
+</pre>
+<p>General format:
+</p>
+<pre>scheme://domain;user:password@server:port/path?query
+</pre>
+<p>If <i>scheme:</i> is missing, a relative URL is assumed which is normally
+relative to the repository.
+</p><p>Don't forget the brackets if you enter a literal IPv6 address; e.g.:
+</p>
+<pre>http://[2001:db8:42:815::1]/some_dir
+</pre>
+<p>For <i>smb</i>/<i>cifs</i> <i>path</i> is preceded with the <i>share</i> name:
+</p>
+<pre>path = share/path
+</pre>
+<p><i>domain</i> is only for scheme <i>smb</i>/<i>cifs</i> and specifies the domain/workgroup
+of the user.
+</p><p>For references to local devices, using <i>cd</i>, <i>disk</i>, <i>floppy</i>, <i>hd</i>,
+<i>path</i> can optionally be preceded with the device name
+</p>
+<pre> path = device/path
+</pre>
+<p>For another way to specify the device, see below.
+</p><p><i>query</i> may be one or more of
+</p>
+<pre>device=device_pattern
+instsys=URL             # install parameter only
+service=slp_service     # slp scheme only
+descr=slp_descr         # slp scheme only
+url=slp_url             # slp scheme only
+</pre>
+<p>separated by '&amp;'.
+</p><p><span id="device_descr" />
+</p><p><i>device</i> specifies the device to use (linuxrc will normally try all devices
+in turn). You can use typical shell metacharacters here. Like:
+</p>
+<pre>install=cd:/?device=sr0                  # first CD-ROM
+install=cd:/sr0                          # alternative form
+install=cd:/dev/sr0                      # optionally add /dev
+install=hd:/?device=sdb*                 # any partition on 2nd hard disk
+install=hd:/?device=*label/foo           # partition with fs label 'foo'
+install=nfs://foo/bar?device=eth0        # works with network devices, too
+install=nfs://foo/bar?device=00:0e:0c:*  # matches MAC addresses, too
+</pre>
+<p><i>instsys</i> is only relevant for the <a href="#p_install" title="">install</a> parameter. Also, see
+<a href="#p_instsys" title="">instsys</a> option.
+</p><p><i>service</i>, <i>descr</i> and <i>url</i> are only useful for scheme <i>slp</i> and
+limit the list of URLs. Like:
+</p>
+<pre># get URL list via SLP
+install=slp:/
+# ... but only those with 'openSUSE' in the description
+install=slp:/?descr=*openSUSE*
+# ... and only ftp URLs
+install=slp:/?descr=*openSUSE*&amp;url=ftp:*
+</pre>
+<p>You will probably never need any parameter except <a href="#p_install" title="">install</a>.
+But in case you do, here is the complete list.
+</p><p><br />
+</p>
+<table border="1" cellpadding="5" cellspacing="0">
+<tr>
+<th> Parameter </th><th> Description
+</th></tr>
 
-</body>
+<tr>
+<td> AddSwap </td><td>
+<p>Tries to activate a <i>swap</i> partition. If set to 0, the system does not
+try to activate a <i>swap</i> partition. If set to a positive number, the
+partition corresponding to the number is activated as a swap partition. With a negative number, linuxrc will
+present you a dialog for selecting the swap partition or creating a swap file.
+Alternatively, specify the full device name of a partition.
+</p><p>Examples:
+</p>
+<pre> addswap=/dev/sda2
+ # '/dev/' is optional
+ addswap=sda2
+ # 5th swap partition
+ addswap=5
+ # never ask for swap (even if it might be a good idea)
+ addswap=0
+ # interactive
+ addswap=-1
+</pre>
+</td></tr>
+
+<tr>
+<td> Alias </td><td>
+</td></tr>
+
+<tr>
+<td> AutoYaST </td><td>
+<p>This parameter can be used to initiate an automatic installation using
+<a href="/Autoyast_installation_using_a_network_installation_source" title="Autoyast installation using a network installation source">AutoYaST</a>. The value must be a URL pointing to an AutoYaST installation
+profile. See parameter <i>Installation</i> for all possible formats. In some cases is good idea add also option netsetup=dhcp
+</p>
+<pre> Example:
+ AutoYast=<a href="ftp://autoyast_profile.xml" class='external free' title="ftp://autoyast profile.xml" rel="nofollow">ftp://autoyast_profile.xml</a>
+</pre>
+</td></tr>
+
+<tr>
+<td> BootDisk </td><td>
+</td></tr>
+
+<tr>
+<td> BootFile </td><td>
+</td></tr>
+
+<tr>
+<td> BOOTPTimeout </td><td>
+<p>Timeout for BOOTP requests in seconds.
+</p>
+</td></tr>
+
+<tr>
+<td> Bootpwait </td><td>
+<p><span id="p_bootpwait" />
+</p><p>Sets a delay between interface setup and bootp request in seconds.
+</p><p>Example:
+</p>
+<pre> BootpWait=10
+</pre>
+</td></tr>
+
+<tr>
+<td> Broadcast </td><td>
+<p>Broadcast IP address
+</p>
+<pre> Example:
+ Broadcast=10.10.255.255
+</pre>
+</td></tr>
+
+<tr>
+<td> BrokenModules </td><td>
+<p><span id="p_brokenmodules" />
+</p><p>Comma-separated list of modules that will not be loaded during initialization.
+</p><p>Note that it does not work cumulative. If you use this option
+several times, the last one will win. This allows you, for example,
+to clear this list in a driver update.
+</p><p>Example:
+</p>
+<pre>BrokenModules=ahci,ata_piix
+</pre>
+</td></tr>
+
+<tr>
+<td> CDROMDevice </td><td>
+<p>No longer supported. Use <a href="#p_device" title="">device</a> or <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> ConsoleDevice </td><td>
+<p>Console device name.
+</p>
+<pre> Example:
+ ConsoleDevice=/dev/tty9
+</pre>
+</td></tr>
+
+<tr>
+<td> Device </td><td>
+<p><span id="p_device" />
+</p><p>Specify the storage device to use when looking for a repository.
+See <a href="#device_descr" title="">device description</a> for allowed values.
+</p><p>Normally, this is not necessary. But if you really need this option, consider
+adding it to the URL of the <a href="#p_install" title="">Install</a> parameter.
+</p><p>Examples:
+</p>
+<pre>device=sr1        # 2nd CD-ROM drive
+device=sdc*       # partition on 3rd disk
+</pre>
+</td></tr>
+
+<tr>
+<td> Display </td><td>
+<p><i>windowed only</i>
+</p><p>Sets the linuxrc color scheme.
+</p>
+<ul><li> <i>1</i> - Monochromatic display [black/white]
+</li><li> <i>2</i> - VGA colors [blue/white] (default)
+</li><li> <i>3</i> - Alternative VGA colors [green/white]
+</li></ul>
+<p>Examples:
+</p>
+<pre>Display=3   # go greenish
+</pre>
+</td></tr>
+
+<tr>
+<td> Display_IP </td><td>
+<p>IP address of X server for remote installation via X11
+</p>
+<pre> Example:
+ Display_IP=10.10.1.57
+</pre>
+</td></tr>
+
+<tr>
+<td> DHCP </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> DHCPCD </td><td>
+<p><span id="p_dhcpcd" />
+</p><p>Additional options for <i>dhcpcd</i> (the DHCP client used by linuxrc).
+</p><p>Example:
+</p>
+<pre>dhcpcd=-B
+</pre>
+</td></tr>
+
+<tr>
+<td> DHCPTimeout </td><td>
+<p>Timeout for DHCP requests in seconds.
+</p><p>Example:
+</p>
+<pre>dhcptimeout=120
+</pre>
+</td></tr>
+
+<tr>
+<td> Domain </td><td>
+<p>Domain search path for DNS. Only useful for non-DHCP network config.
+</p><p>Example:
+</p>
+<pre>domain=opensuse.org
+</pre>
+</td></tr>
+
+<tr>
+<td> DoSCSIRename </td><td>
+<p>Reorder SCSI devices so that USB and Firewire devices come last. And do it <b>NOW</b>
+(that is, when the option is parsed).
+</p><p>Don't use this option.
+</p><p>Example:
+</p>
+<pre>doscsirename=1
+</pre>
+</td></tr>
+
+<tr>
+<td> DriverUpdate </td><td>
+<p><span id="p_driverupdate" />
+</p><p>Please use <a href="#p_dud" title="">dud</a> instead.
+</p><p>For documentation on driver updates see <a href="http://ftp.suse.com/pub/people/hvogel/Update-Media-HOWTO/index.html" class='external free' title="http://ftp.suse.com/pub/people/hvogel/Update-Media-HOWTO/index.html" rel="nofollow">http://ftp.suse.com/pub/people/hvogel/Update-Media-HOWTO/index.html</a>.
+</p><p>There are two semantics: <i>driverupdate=1</i> and <i>driverupdate=&lt;url&gt;</i>.
+With <i>driverupdate=1</i> linuxrc lets you interactively select a driverupdate.
+<i>driverupdate=&lt;url&gt;</i> specifies the location of the driver update directly.
+<i>&lt;url&gt;</i> should point either to a directory with the unpacked driver update
+or to a driver update archive.
+</p><p>You can use this option several times; linuxrc will load all specified updates.
+</p><p>For supported schemes and a syntax description, look <a href="#url_descr" title="">here</a>.
+</p><p>Note that driver updates are automatically searched for on your installation
+server/media. You don't have to use this option for that.
+</p><p>Examples:
+</p>
+<pre># ask for driver update disk
+driverupdate=1
+# load 'myupdate' from server 'foo'
+driverupdate=ftp://foo/myupdate
+# search &amp; load 'update1' on local disks and load update2 from network
+driverupdate=disk:/update1 driverupdate=http://foo/update2
+</pre>
+<p>For easy testing the semantics has been extended a bit: if <i>&lt;url&gt;</i> does not
+point to a driverupdate but rather a normal filesystem image, cpio archive, or rpm,
+it is unpacked and the files are added to the install (or rescue) system.
+(But note that this currently works only with ftp and http urls.)
+</p><p>Examples:
+</p>
+<pre># add ftp server to rescue system
+# rescue=1 dud=http://foo/bar/vsftpd.rpm
+</pre>
+</td></tr>
+
+<tr>
+<td> DUD </td><td>
+<p><span id="p_dud" />
+</p><p>Alias for <a href="#p_driverupdate" title="">driverupdate</a> parameter.
+</p>
+</td></tr>
+
+<tr>
+<td> ESCDelay </td><td>
+</td></tr>
+
+<tr>
+<td> ethtool </td><td>
+<p>Run <i>ethtool</i> for any or all network interfaces.
+Ethtool can change ethernet card settings. See <i>man ethtool</i> for details.
+</p><p>Format:
+</p>
+<pre>[if0=]option
+</pre>
+<p>Examples:
+</p>
+<pre>"ethtool=eth0=duplex full"     # only applies to eth0
+"ethtool=speed 10"             # applies to all network interfaces
+</pre>
+</td></tr>
+
+<tr>
+<td> Exec </td><td>
+<p>Executes an additional binary.
+</p><p>Example:
+</p>
+<pre>exec=/usr/bin/top
+</pre>
+</td></tr>
+
+<tr>
+<td> Expert </td><td>
+<p><i>deprecated</i>
+</p><p>Combines <i>Textmode</i> and <i>DriverUpdate</i>
+</p>
+<pre> Values:
+ 0 ignored
+ 1 enable text mode
+ 2 ask for driver update disk
+ 3 both
+</pre>
+</td></tr>
+
+<tr>
+<td> FloppyDevice </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> ForceRootimage </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> Gateway </td><td>
+<p>This specifies the gateway through which the installation server can be
+reached if it is not located in the subnetwork of the host.
+</p><p>Example:
+</p>
+<pre>gateway=192.168.1.1
+</pre>
+</td></tr>
+
+<tr>
+<td> HasPCMCIA </td><td>
+</td></tr>
+
+<tr>
+<td> HostIP </td><td>
+<p>Specifies the static IP address of the host. The number
+of network bits can be appended, saving you the extra <i>netmask</i> parameter.
+</p><p>Examples:
+</p>
+<pre>hostip=192.168.1.101
+# or, giving netmask 255.255.255.0 as well
+hostip=192.168.1.101/24
+</pre>
+</td></tr>
+
+<tr>
+<td> Hostname </td><td>
+<p>Full qualified hostname.
+</p>
+</td></tr>
+
+<tr>
+<td> HWDetect </td><td>
+<p>Controls hardware detection.
+</p>
+<pre> Values: 0 (off), 1 (on)
+</pre>
+</td></tr>
+
+<tr>
+<td> Info </td><td>
+<p><span id="p_info" />
+</p><p>Specifies the file to read more options from as URL. For supported schemes and
+a syntax description, look <a href="#url_descr" title="">here</a>.
+</p><p>linuxrc reads all specified files. A file may contain further <i>info</i> parameters.
+</p><p>Examples:
+</p>
+<pre>info=cd:/info1
+info=disk:/install/info2
+info=http://foo/bar/info3
+</pre>
+</td></tr>
+
+<tr>
+<td> InitrdID </td><td>
+<p>Forces initrd ID to a given value. linuxrc compares instsys and initrd IDs and only proceeds if both are identical.
+</p>
+</td></tr>
+
+<tr>
+<td> InitrdModules </td><td>
+<p>List of additional modules to put into the installed system's initrd.
+</p>
+</td></tr>
+
+<tr>
+<td> Insecure </td><td>
+<p>linuxrc checks SHA1 sums of all files it downloads. They are taken from
+<i>(repository):/content</i> after its signature has been verified.
+</p><p>If you don't want this, do:
+</p>
+<pre>insecure=1
+</pre>
+<p>Note that it is not possible to bring linuxrc back into secure mode after this.
+In particular:
+</p>
+<pre>insecure=0
+</pre>
+<p>will not work.
+</p>
+</td></tr>
+
+<tr>
+<td> Insmod </td><td>
+<p>This specifies a module the kernel should load, together with any parameters needed for it. Module parameters must be separated by blanks.
+</p><p>The module is loaded before hardware detection starts. Module
+dependencies are automatically resolved (the name <i>insmod</i> is a bit
+misleading here).
+</p><p>Note that modules blacklisted with <a href="#p_brokenmodules" title="">brokenmodules</a>
+cannot be loaded this way.
+</p><p>Examples:
+</p>
+<pre># load ahci
+insmod=ahci
+# remember the quotes
+insmod="loop max_loop=100"
+# load several modules
+insmod=tg3 insmod=e1000
+</pre>
+</td></tr>
+
+<tr>
+<td> Install </td><td>
+<p><span id="p_install" />
+</p><p>Specifies the installation repository as URL. For supported schemes and
+a syntax description, look <a href="#url_descr" title="">here</a>.
+</p><p>It must point to either a directory or an ISO image.
+</p><p>Additionally, a special scheme <i>exec</i> is supported which does
+not need a repository but just runs the argument after linuxrc did
+the hardware setup.
+</p><p>Examples:
+</p>
+<pre># from CD-ROM
+install=cd:/
+# ftp from server <i>foo</i>, directory <i>openSUSE-10.3-i386</i>
+install=ftp://foo/pub/openSUSE-10.3-i386
+# local disk, ISO image <i>openSUSE-10.3-i386-DVD.iso</i>
+install=disk://install/openSUSE-10.3-i386-DVD.iso
+# Windows share <i>bar</i>, ISO image <i>openSUSE-10.3-i386-DVD.iso</i>
+install=smb://foo/bar/openSUSE-10.3-i386-DVD.iso
+# get real URL via SLP
+install=slp:/
+# just start a shell
+install=exec:/bin/sh
+</pre>
+<p>The installation program is normally loaded from the repository. If for some
+reason you don't want this, you can specify the installation system image to
+use explicitly by adding <i>?instsys=</i> or using the <a href="#p_instsys" title="">instsys</a> parameter; for example:
+</p>
+<pre>install=cd:/?instsys=ftp://testserver/foo
+# is the same as
+instsys=ftp://testserver/foo install=cd:/
+</pre>
+</td></tr>
+
+<tr>
+<td> InstallDir </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> InstMode </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> Instsys </td><td>
+<p><span id="p_instsys" />
+</p><p>Specifies the installation system to use. Default value is
+<i>boot/&lt;arch&gt;/root</i>. May point to a filesystem image or to a directory.
+For supported schemes and a syntax description, look <a href="#url_descr" title="">here</a>.
+See <a href="#p_install" title="">install</a> for an alternative way to specify it.
+</p><p>Example:
+</p>
+<pre>instsys=my/zappel          # use <i>my/zappel</i> from repository
+instsys=http://foo/zappel  # use <i>zappel</i> from server <i>foo</i>
+</pre>
+</td></tr>
+
+<tr>
+<td> InstsysComplain </td><td>
+<p>Controls what initrd should do if initrd ID and instsys ID do not match.
+</p>
+<pre> Values:
+ 0 ignore
+ 1 print a warning
+ 2 abort with an error
+</pre>
+<p>In non-Beta systems this parameter defaults to 0 (ignore).
+</p>
+</td></tr>
+
+<tr>
+<td> InstsysID </td><td>
+<p>Force instsys ID to a given value. linuxrc compares instsys and initrd IDs and only proceeds if both are identical.
+</p>
+</td></tr>
+
+<tr>
+<td> ipv4 </td><td>
+<p>[<i>SL 11.1+</i>]
+</p><p>Turn on IPv4 support. (This is the default.)
+</p>
+</td></tr>
+
+<tr>
+<td> ipv4only </td><td>
+<p>[<i>SL 11.1+</i>]
+</p><p>Turn on IPv4 support, disable IPv6.
+</p><p>Example:
+</p>
+<pre> ipv4only=1
+ # is identical to
+ ipv6only=0
+</pre>
+</td></tr>
+
+<tr>
+<td> ipv6 </td><td>
+<p>[<i>experimental</i>]
+</p><p>Turn on IPv6 support (additionally to IPv4).
+</p>
+</td></tr>
+
+<tr>
+<td> ipv6only </td><td>
+<p>[<i>experimental</i>]
+</p><p>Turn on IPv6 support, disable IPv4.
+</p><p>Example:
+</p>
+<pre> ipv6only=1
+</pre>
+</td></tr>
+
+<tr>
+<td> KBDTimeout </td><td>
+<p><i>windowed only</i>
+</p><p>Keyboard timeout in seconds. The time after which linuxrc proceeds with default values if no input is made. Default to <i>0</i> (off).
+</p>
+</td></tr>
+
+<tr>
+<td> Kexec </td><td>
+<p>If set to <i>1</i>, linuxrc will load kernel and initrd from the repository
+and restart with them.
+</p><p>Spares people installing via network the download of the Boot-CD as you
+can keep using an old one.
+</p><p>Available only for x86 and x86-64 currently.
+</p><p>Example:
+</p>
+<pre> kexec=1
+</pre>
+</td></tr>
+
+<tr>
+<td> kexec_reboot </td><td>
+<p>If set to <i>1</i> (the default on most machines), then kexec will be used to reboot the machine after finishing the 1st stage of installation. If set to <i>0</i>, a normal reboot will be used. There is some blacklist maintained in YaST (for example for VirtualBox) for machine that are known to be broken with kexec.
+</p><p><br />
+</p>
+</td></tr>
+
+<tr>
+<td> Keytable </td><td>
+<p>Virtual console keyboard map to load.
+</p>
+<pre> Example:
+ Keytable=fr-latin1
+</pre>
+</td></tr>
+
+<tr>
+<td> Lang </td><td>
+<p>Alias for <i>Language</i> parameter.
+</p>
+</td></tr>
+
+<tr>
+<td> Language </td><td>
+<p>Language preselected for the installation.
+</p>
+<pre> Example:
+ Language=de_DE
+ Language=fr_FR
+ Language=cs_CZ
+</pre>
+</td></tr>
+
+<tr>
+<td> Linemode </td><td>
+<p><span id="p_linemode" />
+</p><p>Enables line-mode usable on dumb terminals.
+</p><p>Example:
+</p>
+<pre> linemode=1
+</pre>
+</td></tr>
+
+<tr>
+<td> linuxrc </td><td>
+<p>Obsolete. Please don't use.
+</p>
+</td></tr>
+
+<tr>
+<td> LinuxrcDebug </td><td>
+<p><span id="p_linuxrcdebug" />
+</p><p>Comma-separated list of a numerical debug level (max. 4) and debug flags.
+Flags can be turned on or off (prepend '+' or '-'). Debug flags currently
+supported are:
+</p>
+<ul><li> <i>tmpfs</i>: move everything into tmpfs at startup (default)
+</li><li> <i>udev</i>: use udev to manage <i>/dev</i> tree (default)
+</li><li> <i>udev.mods</i>: let udev load modules (default)
+</li><li> <i>wait</i>: stop at critical points and wait for a keypress
+</li></ul>
+<p>Examples:
+</p>
+<pre># a reasonable amount of debug info
+linuxrc.debug=1
+# ... and stop at some critical points
+linuxrc.debug=1,wait
+# linuxrc loads drivers itself
+linuxrc.debug=-udev.mods
+# don't copy files into tmpfs (but keep them in ramfs)
+linuxrc.debug=-tmpfs
+</pre>
+</td></tr>
+
+<tr>
+<td> LinuxrcLog </td><td>
+<p><span id="p_linuxrclog" />
+</p><p>Device to print log messages to. Defaults to <i>/dev/tty3</i>.
+To see more log messages, increase the <i><a href="#p_linuxrcdebug" title="">debug level</a></i>.
+</p><p>Example:
+</p>
+<pre># save all log messages to 'foo'
+linuxrc.log=/foo
+# show them on the default console (ideally together with <i><a href="#p_linemode" title="">linemode</a></i>)
+linuxrc.log=/dev/console linemode=1
+</pre>
+</td></tr>
+
+<tr>
+<td> LinuxrcSTDERR </td><td>
+<p>Obsolete. Use <a href="#p_linuxrclog" title="">linuxrclog</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> Listen </td><td>
+<p><i>* experimental *</i>
+</p><p>linuxrc sets up the network and listens on the specified port for
+input. (You may want to use <i><a href="#p_manual" title="">manual</a></i>=1 along with this option and then connect via telnet to linuxrc.)
+</p><p>Examples:
+</p>
+<pre># wait for input on port 1234
+listen=1234
+</pre>
+</td></tr>
+
+<tr>
+<td> Loghost </td><td>
+<p><span id="p_loghost" />
+Hostname to redirect syslog to. Also YaST will log both to y2log and to the remote syslog.
+</p><p>To enable log reception on the destination host, see "source" section in <i>/etc/syslog-ng/syslog-ng.conf</i>
+</p>
+</td></tr>
+
+<tr>
+<td> LogLevel </td><td>
+<p>Set kernel log level.
+</p>
+<pre> Values: 1 - 8
+</pre>
+<p>Defaults to 1 for serial consoles, 7 for all other consoles.
+</p>
+</td></tr>
+
+<tr>
+<td> LXRCDebug </td><td>
+<p>Obsolete. Use <i><a href="#p_linuxrcdebug" title="">linuxrcdebug</a></i>.
+</p>
+</td></tr>
+
+<tr>
+<td> Manual </td><td>
+<p>Start linuxrc in manual mode.
+</p>
+<pre> Values:
+ 0 automatic mode (this is the default)
+ 1 manual mode
+ 2 really manual manual mode (E.g. no USB keyboard since no USB setup is done!)
+</pre>
+<p>There's normally no reason to use manual mode. Please
+avoid it. You can pass everything directly via command line.
+</p><p><i>manual=1</i> still uses hardware detection to some degree
+(e.g. to mark suitable modules in module loading dialogs)
+but you basically have to take care to load all necessary drivers
+yourself.
+</p><p><i>manual=2</i> does no automatic hardware detection at all and is
+useful only if the hardware detection has some
+problem. A typical example would be linuxrc not letting
+you select a network interface even though the driver is loaded
+and the interface exists.
+</p>
+</td></tr>
+
+<tr>
+<td> MemLimit </td><td>
+<p>Amount of free memory in kB below which linuxrc will ask the user to set up a swap partition.
+</p>
+</td></tr>
+
+<tr>
+<td> MemLoadImage </td><td>
+<p>Amount of free memory in kB below which linuxrc will not copy the root image into RAM.
+</p>
+</td></tr>
+
+<tr>
+<td> MemYaST </td><td>
+<p>Amount of free memory in kB below which linuxrc will start YaST in text mode.
+</p>
+</td></tr>
+
+<tr>
+<td> MemYaSTText </td><td>
+<p>Amount of free memory in kB below which linuxrc will ask the user to set up a swap partition before starting YaST.
+</p>
+</td></tr>
+
+<tr>
+<td> MinMemory </td><td>
+<p>Amount of memory in kB below which linuxrc will refuse to start. Defaults to 0.
+</p>
+</td></tr>
+
+<tr>
+<td> ModuleDelay </td><td>
+<p>Wait some seconds after loading each module. Useful if
+your hardware is a bit slow.
+</p>
+<pre> Example:
+ # wait 5 seconds
+ ModuleDelay=5
+</pre>
+<p>Defaults to 0.
+</p>
+</td></tr>
+
+<tr>
+<td> ModuleDisks </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> Nameserver </td><td>
+<p>DNS nameserver IP address.
+</p>
+<pre> Example:
+ Nameserver=192.168.1.1
+</pre>
+</td></tr>
+
+<tr>
+<td> Netdevice </td><td>
+<p>Specify the network interface. See <a href="#device_descr" title="">device description</a> for allowed values.
+</p><p>Normally, this is not necessary. But if you really need this option, consider
+adding it to the URL of the <a href="#p_install" title="">Install</a> parameter.
+</p><p>Examples:
+</p>
+<pre>netdevice=eth1        # 2nd ethernet interface
+netdevice=wlan*       # wlan interface
+</pre>
+</td></tr>
+
+<tr>
+<td> Netmask </td><td>
+<p><i>also via DHCP</i>
+</p><p>Static IP netmask of the installing host.
+</p>
+</td></tr>
+
+<tr>
+<td> Netretry </td><td>
+<p>Netretry=N will retry all network connection attempts N times (e.g., when trying
+to reach the FTP server).
+This is mainly for debugging network problems.
+</p>
+</td></tr>
+
+<tr>
+<td> NetSetup </td><td>
+<p><span id="p_netsetup" />
+</p><p>Prompt for network parameters and setup network. Normally linuxrc
+will do this automatically when you <a href="#p_install" title="">install</a> via
+network. But if you want to configure the network even if you
+install from local media, use this option.
+</p><p><i>netsetup</i> accepts a comma-separated list of <i>default</i>, <i>dhcp</i>, <i>hostip</i>, <i>netmask</i>, <i>gateway</i>, <i>nameserver</i>,
+or <i>all</i>.
+</p><p>Examples:
+</p>
+<pre># default = dhcp,hostip,netmask,gateway,nameserver
+netsetup=default
+# same as 'default'
+netsetup=1
+# do dhcp
+netsetup=dhcp
+# setup all interfaces
+netsetup=dhcp,all
+
+</pre>
+</td></tr>
+
+<tr>
+<td> _NetStop </td><td>
+<p><i>internal</i>
+</p>
+</td></tr>
+
+<tr>
+<td> NetUniqueID </td><td>
+</td></tr>
+
+<tr>
+<td> NetWait </td><td>
+<p><span id="p_netwait" />
+</p><p>Wait some seconds after activating the network interface. This might be
+needed in rare cases for some cards.
+</p><p>If you have problems with DHCP, also look at <a href="#p_dhcpcd" title="">dhcpcd</a>;
+for BOOTP, try <a href="#p_bootpwait" title="">bootpwait</a>
+</p>
+<pre> Example:
+ # wait 8 seconds
+ NetWait=8
+</pre>
+</td></tr>
+
+<tr>
+<td> Network </td><td>
+<p><i>also via DHCP</i>
+</p>
+</td></tr>
+
+<tr>
+<td> NewID </td><td>
+</td></tr>
+
+<tr>
+<td> NFSOpts </td><td>
+<p><span id="p_nfsopts" />
+</p><p>NFS mount options. A comma-separated list. Supported options are
+<i>vers</i>, <i>tcp</i>, <i>udp</i>, <i>rsize</i> and <i>wsize</i>.
+</p><p>Examples:
+</p>
+<pre># use NFSv2 via UDP
+nfsopts=udp,vers=2
+# different block size
+nfsopts=rsize=4096,wsize=4096
+</pre>
+</td></tr>
+
+<tr>
+<td> NFS.RSize </td><td>
+<p>Obsolete. Use <i><a href="#p_nfsopts" title="">NFSOpts</a></i>.
+</p>
+</td></tr>
+
+<tr>
+<td> NFS.TCP </td><td>
+<p>No longer supported. Use <i><a href="#p_nfsopts" title="">NFSOpts</a></i>.
+</p>
+</td></tr>
+
+<tr>
+<td> NFS.WSize </td><td>
+<p>Obsolete. Use <i><a href="#p_nfsopts" title="">NFSOpts</a></i>.
+</p>
+</td></tr>
+
+<tr>
+<td> NoMDNS </td><td>
+<p>Turn off MDNS usage.
+</p><p>Example:
+</p>
+<pre>nomdns=1
+</pre>
+</td></tr>
+
+<tr>
+<td> NoPCMCIA </td><td>
+<p><i>deprecated</i>
+</p><p>Do not start the PCMCIA card manager. This option may not be useful any more.
+</p>
+</td></tr>
+
+<tr>
+<td> NoShell </td><td>
+<p>Do not start any shell. By default, linuxrc starts <i>/bin/bash</i> at
+<i>/dev/tty2</i>, <i>/dev/tty9</i> and if memory requirements permit
+(well, about always) also at <i>/dev/tty5</i> and <i>/dev/tty6</i>.
+</p><p>See also parameters <i>MemLimit</i>, <i>MemYaST</i> and <i>MemYaSTText</i>.
+</p>
+<pre> Example:
+ noshell=1
+</pre>
+</td></tr>
+
+<tr>
+<td> Options </td><td>
+<p><span id="p_options" />
+</p><p>Pass options to kernel modules. Syntax is "module.parameter" or "module=parameter".
+</p><p>Examples:
+</p>
+<pre># "tzp=50" for module "thermal"
+options=thermal.tzp=50
+# looks a bit weird, but means the same:
+options=thermal=tzp=50
+# create 100 loop devices
+options=loop.max_loop=100
+</pre>
+<p>Alternatively, all options that are unknown but have the form
+<i>foo.bar</i> are interpreted as option <i>bar</i> to module <i>foo</i>.
+</p><p>Examples:
+</p>
+<pre>thermal.tzp=50
+loop.max_loop=100
+</pre>
+<p>To pass several options to a module, use, e.g.:
+</p>
+<pre>libata.atapi_enabled=1 libata.ignore_hpa=1
+# same as above, but in one go:
+options="libata.atapi_enabled=1 ignore_hpa=1"
+</pre>
+</td></tr>
+
+<tr>
+<td> Partition </td><td>
+<p>No longer supported. Use <a href="#p_device" title="">device</a> or <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> Password </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> PCMCIA </td><td>
+</td></tr>
+
+<tr>
+<td> Product </td><td>
+</td></tr>
+
+<tr>
+<td> ProductDir </td><td>
+</td></tr>
+
+<tr>
+<td> Proxy </td><td>
+<p><span id="p_proxy" />
+</p><p>Defines a HTTP proxy server.
+For a URL syntax overview, look <a href="#url_descr" title="">here</a>.
+</p><p>Examples:
+</p>
+<pre># use proxy.foo.org at port 3128
+proxy=http://proxy.foo.org:3128
+# using 'http://' is optional:
+proxy=proxy.foo.org:3128
+# or, with authentication
+proxy=http://foo:bar@proxy.foo.org:3128
+</pre>
+</td></tr>
+
+<tr>
+<td> ProxyPort </td><td>
+<p>No longer supported. Use <a href="#p_proxy" title="">proxy</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> ProxyProto </td><td>
+<p>No longer supported. Use <a href="#p_proxy" title="">proxy</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> Rescue </td><td>
+<p><span id="p_rescue" />
+</p><p>Load the rescue system. See <a href="#p_install" title="">install</a> for syntax.
+</p><p>Alternatively, use <i>rescue=1</i> and <a href="#p_install" title="">install</a> or <a href="#p_instsys" title="">instsys</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> RescueImage </td><td>
+<p>Location of the rescue system image within the installation source.
+</p>
+</td></tr>
+
+<tr>
+<td> RootImage </td><td>
+<p>Location of root image (installation system image) within the installation source.
+</p>
+</td></tr>
+
+<tr>
+<td> RootImage2 </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> RootPassword </td><td>
+<p>Linuxrc asks for a root's password.
+</p>
+<pre> Example:
+ RootPassword=ask
+</pre>
+</td></tr>
+
+<tr>
+<td> RootPath </td><td>
+<p><i>DHCP only</i>
+</p>
+</td></tr>
+
+<tr>
+<td> Sax2 </td><td>
+<p><span id="p_sax2" />
+</p><p>Use sax2 to setup Xorg (graphics) during installation. This might be useful
+if you have some unusual hardware. Or you are in a virtual machine.
+</p><p>Example:
+</p>
+<pre>sax2=1
+</pre>
+</td></tr>
+
+<tr>
+<td> Screenmap </td><td>
+<p>Obsolete, do not use (it does not do what you probably think [if you think of anything it could do&nbsp;;) ]).
+</p>
+</td></tr>
+
+<tr>
+<td> SCSIBeforeUSB </td><td>
+</td></tr>
+
+<tr>
+<td> SCSIRename </td><td>
+</td></tr>
+
+<tr>
+<td> Server </td><td>
+</td></tr>
+
+<tr>
+<td> Serverdir </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> SetupCmd </td><td>
+</td></tr>
+
+<tr>
+<td> SetupNetIF </td><td>
+</td></tr>
+
+<tr>
+<td> Share </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> Splash </td><td>
+<p>Defines whether a splash-screen is used during initialization.
+</p>
+<pre> Example
+ Splash=silent
+ Splash=verbose
+</pre>
+</td></tr>
+
+<tr>
+<td> SSH </td><td>
+<p><span id="p_ssh" />
+</p><p>This parameter enables access to linuxrc via SSH when performing the installation with YaST in text mode or via X11 forwarding. Use <i>ssh -X root@hostname</i> or <i>ssh -Y root@hostname</i> for X11 forwarding.
+</p>
+<pre> Values: 0 (off), 1 (on)
+</pre>
+<p>Example:
+</p>
+<pre> # use ssh and set ssh password
+ ssh=1 sshpassword=foobar123
+</pre>
+</td></tr>
+
+<tr>
+<td> SSHPassword </td><td>
+<p>This sets the password for the user root for logging into the SSH server during installation if <i>UseSSH</i> is set. This is not the password of the system to be installed. See <i>RootPassword</i>.
+</p><p>Example:
+</p>
+<pre> SSHPassword=12345678
+</pre>
+</td></tr>
+
+<tr>
+<td> StartShell </td><td>
+<p>Boots into the installation system and starts a shell. Waits until user exits the shell. User can modify the installation system, mount or remount partitions or start YaST installation manually by running <i>yast</i>.
+</p><p>Example:
+</p>
+<pre> StartShell=1
+</pre>
+</td></tr>
+
+<tr>
+<td> StaticDevices </td><td>
+</td></tr>
+
+<tr>
+<td> TERM </td><td>
+<p>Terminal type on which linuxrc is running
+</p>
+<pre> Example:
+ TERM=dumb
+</pre>
+</td></tr>
+
+<tr>
+<td> _TestMode </td><td>
+<p><i>internal</i> <i>config file only</i>
+</p>
+</td></tr>
+
+<tr>
+<td> Textmode </td><td>
+<p>Enables starting YaST in text mode otherwise it starts in Qt if possible.
+</p>
+<pre> Example:
+ Textmode=1
+</pre>
+</td></tr>
+
+<tr>
+<td> TFTPTimeout </td><td>
+<p>Timeout for TFTP connections in seconds.
+</p>
+</td></tr>
+
+<tr>
+<td> _TmpFS </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> UpdateComplain </td><td>
+</td></tr>
+
+<tr>
+<td> UpdateDir </td><td>
+</td></tr>
+
+<tr>
+<td> UpdateExpected </td><td>
+</td></tr>
+
+<tr>
+<td> UpdateID </td><td>
+<p><i>config file only</i>
+</p>
+</td></tr>
+
+<tr>
+<td> UpdateName </td><td>
+</td></tr>
+
+<tr>
+<td> UpdatePriority </td><td>
+<p><i>config file only</i>
+</p>
+</td></tr>
+
+<tr>
+<td> UpdateStyle </td><td>
+</td></tr>
+
+<tr>
+<td> USBWait </td><td>
+<p>Number of seconds to wait after loading USB modules.
+</p>
+</td></tr>
+
+<tr>
+<td> UseDHCP </td><td>
+<p>If an automatic network setup is required, defines whether DHCP or BOOTP should be used. Default is DHCP.
+</p>
+<pre> Example:
+ # use BOOTP
+ UseDHCP=0
+</pre>
+</td></tr>
+
+<tr>
+<td> Username </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> UseSax2 </td><td>
+<p>Alias for <a href="#p_sax2" title="">sax2</a> parameter.
+</p>
+</td></tr>
+
+<tr>
+<td> SSH </td><td>
+<p><span id="p_ssh" />
+</p><p>This parameter enables access to linuxrc via SSH when performing the installation with YaST in text mode or via X11 forwarding. Use <i>ssh -X root@hostname</i> or <i>ssh -Y root@hostname</i> for X11 forwarding.
+</p>
+<pre> Values: 0 (off), 1 (on)
+</pre>
+<p>Example:
+</p>
+<pre> # use ssh and set ssh password
+ ssh=1 sshpassword=foobar123
+</pre>
+</td></tr>
+
+<tr>
+<td> UseSSH </td><td>
+<p>Alias for <a href="#p_ssh" title="">ssh</a> parameter.
+</p>
+</td></tr>
+
+<tr>
+<td> UseVNC </td><td>
+<p>Alias for <a href="#p_vnc" title="">vnc</a> parameter.
+</p>
+</td></tr>
+
+<tr>
+<td> VNC </td><td>
+<p><span id="p_vnc" />
+</p><p>The VNC parameter enables the installation process via VNC, making the installation more convenient on hosts that have no or no really usable local console. If enabled, a VNC server is activated on the installation host. See also <i>VNCPassword</i>.
+</p><p>Example:
+</p>
+<pre>vnc=1 # enable VNC
+</pre>
+</td></tr>
+
+<tr>
+<td> VNCPassword </td><td>
+<p>This sets the VNC password for an installation via VNC.
+</p>
+<pre> Example:
+ VNCPassword=12345678
+</pre>
+</td></tr>
+
+<tr>
+<td> WaitReboot </td><td>
+</td></tr>
+
+<tr>
+<td> WithiSCSI </td><td>
+<p>During installation starts <a href="/YaST" title="YaST">YaST</a> module to configure iSCSI initiator
+</p>
+</td></tr>
+
+<tr>
+<td> WlanAuth </td><td>
+</td></tr>
+
+<tr>
+<td> WlanESSID </td><td>
+</td></tr>
+
+<tr>
+<td> WlanKeyAscii </td><td>
+</td></tr>
+
+<tr>
+<td> WlanKeyHex </td><td>
+</td></tr>
+
+<tr>
+<td> WlanKeyLen </td><td>
+</td></tr>
+
+<tr>
+<td> WlanKeyPass </td><td>
+</td></tr>
+
+<tr>
+<td> WorkDomain </td><td>
+<p>No longer supported. Use <a href="#p_install" title="">install</a>.
+</p>
+</td></tr>
+
+<tr>
+<td> YaST2update </td><td>
+</td></tr>
+
+<tr>
+<td> YaST2color </td><td>
+</td></tr>
+
+<tr>
+<td> Zen </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> ZenConfig </td><td>
+<p>No longer supported.
+</p>
+</td></tr>
+
+<tr>
+<td> Zombies </td><td>
+<p>If you don't want linuxrc to take care of zombie processes during installation,
+set this to 0. (Don't do this.)
+</p><p>Example:
+</p>
+<pre>zombies=0
+</pre>
+</td></tr></table>
+<a name="Special_parameters_for_S.2F390_and_zSeries"></a><h2>Special parameters for S/390 and zSeries</h2>
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
+<tr>
+<th> Parameter </th><th> Description
+</th></tr>
+
+<tr>
+<td> CTCProtocol </td><td>
+<p>CTC protocol to use.
+</p>
+<pre> Values:
+ 0 compatible
+ 1 extended
+ 2 z/OS
+</pre>
+</td></tr>
+
+<tr>
+<td> DataChannel </td><td>
+<p>CCW data channel for CU3088 and QDIO devices
+</p>
+<pre> Format: h.h.hhhh
+</pre>
+</td></tr>
+
+<tr>
+<td> InstNetDev </td><td>
+<p>Network device to install from.
+</p>
+<pre> Values:
+ osa OSA-2 or OSA Express
+ hsi Hipersocket
+ ctc CTC (deprecated)
+ escon ESCON (deprecated)
+ iucv IUCV (deprecated)
+</pre>
+</td></tr>
+
+<tr>
+<td> IUCVPeer </td><td>
+<p>Name of peer for IUCV networking.
+</p>
+</td></tr>
+
+<tr>
+<td> Layer2 </td><td>
+<p>Turn on OSI layer 2 access for OSA Express Ethernet interfaces.
+</p>
+<pre> Values: 0 (off), 1 (on)
+</pre>
+</td></tr>
+
+<tr>
+<td> OSAHWAddr </td><td>
+<p><i>introduced in SLE10 SP1</i><br />
+Manual MAC address setting for Layer 2-enabled OSA devices. Note that this is distinct from HWAddr, which contains the default MAC address as detected by linuxrc.
+</p>
+<pre> Example: OSAHWAddr=11:22:33:44:55:66
+</pre>
+</td></tr>
+
+<tr>
+<td> OSAInterface </td><td>
+<p>Software interface for OSA devices.
+</p>
+<pre> Values:
+ qdio QDIO
+ lcs LCS
+</pre>
+</td></tr>
+
+<tr>
+<td> OSAMedium </td><td>
+<p>Physical medium for OSA devices.
+</p>
+<pre> Values:
+ eth Ethernet
+ tr Token Ring
+</pre>
+</td></tr>
+
+<tr>
+<td> Portname </td><td>
+<p>Portname for OSA devices.
+</p>
+</td></tr>
+
+<tr>
+<td> ReadChannel </td><td>
+<p>CCW read channel for CU3088 and QDIO devices.
+</p>
+<pre> Format: h.h.hhhh
+</pre>
+</td></tr>
+
+<tr>
+<td> WriteChannel </td><td>
+<p>CCW write channel for CU3088 and QDIO devices.
+</p>
+<pre> Format: h.h.hhhh
+</pre>
+</td></tr></table>
+<p><br />
+</p>
+<a name="Special_parameters_not_handled_by_Linuxrc_itself"></a><h2>Special parameters not handled by Linuxrc itself</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+<tr>
+<th> Parameter </th><th> Description
+</th></tr>
+
+<tr>
+<td> Mem </td><td>
+<p>Defines a maximum RAM that will be used by the installation system.
+It's helpful for testing installation memory requirements.
+</p>
+<pre> Example:
+ mem=128M
+</pre>
+</td></tr>
+
+<tr>
+<td> Y2_BRAILLE </td><td>
+<p>This environment variable sets the style of installation textmode UI 
+to 'braille' i.e. it is optimized for visually impaired people. Use
+together with 'textmode=1'
+</p>
+<pre> Example:
+ Y2_BRAILLE=1
+</pre>
+</td></tr>
+
+<tr>
+<td> Y2DEBUG </td><td>
+<p>Turns all YaST debugging messages on. These messages are logged into the <i>/var/log/YaST2/y2log</i> file marked with <i>&lt;0&gt;</i> flag. This parameter is handled by <a href="/YaST" title="YaST">YaST</a> itself and can be also prepended to the command-line when starting any YaST module.
+</p>
+</td></tr>
+
+<tr>
+<td> TERM </td><td>
+<p>Setting this environment variable influences the color style that will 
+be used in installation textmode UI. E.g. <i>TERM=xterm</i> sets the theme to 
+<i>xterm</i>, some TERM not supporting colors will use monochromatic theme. When not
+set, default theme <i>linux</i> is applied. However, be careful and before 
+setting any TERM value, check that it has valid terminfo entry. Otherwise
+installation may abort.
+</p><p>Available terms can be found in the <i>/yast/instsource/inst-sys/usr/share/terminfo</i>
+directory - installation system has another set of available terms than a running system.
+To get a monochromatic term, use <i>linux-m</i>.
+</p><p>Use this parameter together with <i>textmode=1</i>.
+</p>
+<pre> Example:
+ TERM=xterm
+ TERM=linux-m
+</pre>
+</td></tr>
+
+<tr>
+<td> ZYPP_FULLLOG </td><td>
+<p>Sets <a href="/Libzypp/Main_page" title="Libzypp/Main page">LibZYPP</a> logging level to the highest value. Useful for debugging products,
+packages and patches dependency problems. This variable can be also set on a running system before
+running every <a href="/YaST" title="YaST">YaST</a> module.
+</p>
+<pre> Example:
+ ZYPP_FULLLOG=1                           # Linuxrc
+ ZYPP_FULLLOG=1 /sbin/yast2 online_update # Running system
+</pre>
+</td></tr></table>
+<p><br />
+</p>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</span>
+</p>
+ </body>
 </html>
+
