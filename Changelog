@@ -1,5 +1,6 @@
-
-******  This is NOT sle11/11.1!  ******
+12/2/2009:	v3.3.31
+	- removed obsolete documentation and added a snapshot from the
+	  openSUSE wiki instead (bnc #474848, bnc #473523)
 
 11/2/2009:	v3.3.30
 	- s390: delay net IF setup in auto-install mode (bnc#473749)
