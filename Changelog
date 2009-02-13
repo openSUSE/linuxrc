@@ -1,3 +1,7 @@
+13/2/2009:	v3.3.32
+	- call gpg with '--ignore-valid-from --ignore-time-conflict' to avoid
+	  failing on systems with broken date/time (bnc #456755)
+
 12/2/2009:	v3.3.31
 	- removed obsolete documentation and added a snapshot from the
 	  openSUSE wiki instead (bnc #474848, bnc #473523)
