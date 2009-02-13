@@ -1470,7 +1470,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   }
   strprintf(&dst_sig, "%s.asc", dst);
   strprintf(&buf,
-    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --verify %s >/dev/null%s",
+    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --ignore-valid-from --ignore-time-conflict --verify %s >/dev/null%s",
     dst_sig, config.debug < 2 ? " 2>&1" : ""
   );
 
