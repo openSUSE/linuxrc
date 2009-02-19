@@ -2150,12 +2150,11 @@ void if_down(char *dev)
 
 #if defined(__s390__) || defined(__s390x__)
 
-/* switch to manual mode if expr is false, execute following statement if in manual mode */
-#define IFNOTAUTO(expr) if(!config.manual && !(expr)) { \
-                          config.manual=1; \
-                          if(!config.win) util_disp_init(); \
+/* turn on display and execute if expr is false */
+#define IFNOTAUTO(expr) if(!(expr) && !config.win) { \
+                          util_disp_init(); \
                         } \
-                        if(config.manual)
+                        if(config.manual || !(expr))
 
 #include <dirent.h>
 
