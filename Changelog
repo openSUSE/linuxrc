@@ -1,3 +1,8 @@
+19/2/2009:	v3.3.33
+        - s390: falling back to manual mode in network setup has nasty side
+          effects and is not really necessary to begin with; do away with it
+          (bnc#471452)
+
 13/2/2009:	v3.3.32
 	- call gpg with '--ignore-valid-from --ignore-time-conflict' to avoid
 	  failing on systems with broken date/time (bnc #456755)
