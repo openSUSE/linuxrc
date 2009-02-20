@@ -1,3 +1,7 @@
+18/2/2009:	v3.3.33
+	- s390: ask for relative port number even when device parameters
+	  have been entered manually (bnc#477918)
+
 17/2/2009:	v3.3.32
 	- s390: falling back to manual mode in network setup has nasty side
           effects and is not really necessary to begin with; do away with it
