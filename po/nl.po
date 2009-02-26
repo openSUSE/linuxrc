@@ -1238,3 +1238,7 @@ msgstr "Bestand niet ondertekend."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Ongeldige ondertekening."
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

@@ -1240,3 +1240,7 @@ msgstr "Datei nicht signiert."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Ungültige Signatur."
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

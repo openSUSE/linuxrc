@@ -1236,3 +1236,7 @@ msgstr "ファイルに署名されていません。"
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "無効な署名です。"
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

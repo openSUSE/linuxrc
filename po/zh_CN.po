@@ -1236,3 +1236,7 @@ msgstr "文件未签名。"
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "无效签名。"
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

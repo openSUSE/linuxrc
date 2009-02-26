@@ -1246,3 +1246,7 @@ msgstr "A fájl nincs aláírva."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Érvénytelen aláírás."
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

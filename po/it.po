@@ -1235,3 +1235,7 @@ msgstr "File non firmato."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Firma non valida."
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

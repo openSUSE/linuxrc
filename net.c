@@ -32,6 +32,7 @@
 #include <net/if.h>
 #include <net/route.h>
 #include <netinet/in.h>
+#include <netinet/ether.h>
 #include <nfs/nfs.h>
 #include "nfs_mount4.h"
 
@@ -2433,6 +2434,11 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         {
           config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
         }
+        if(config.hwp.layer2 == 2) {
+          IFNOTAUTO(config.hwp.osahwaddr) {
+            dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
+          }
+        }
       }
       
     }
@@ -2508,6 +2514,41 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     sprintf(cmd, "network configuration script failed (error code %d)", rc);
     dia_message(cmd, MSGTYPE_ERROR);
     return -1;
+  }
+  
+  if(config.hwp.osahwaddr && strlen(config.hwp.osahwaddr) > 0) {
+    struct ifreq ifr;
+    struct ether_addr* ea;
+    int skfd;
+    DIR* d;
+    struct dirent* de;
+    char* ifname;
+    
+    net_s390_get_ifname(config.hwp.readchan, &ifname);
+    strcpy(ifr.ifr_name, ifname);
+    free(ifname);
+    
+    if((skfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) {
+      perror("socket");
+      return 1;
+    }
+    
+    /* convert MAC address to binary */
+    if((ea = ether_aton(config.hwp.osahwaddr)) == NULL) {
+      fprintf(stderr,"MAC address invalid: %s\n", config.hwp.osahwaddr);
+      return 1;
+    }
+    memcpy((void*) &ifr.ifr_hwaddr.sa_data[0], ea, ETHER_ADDR_LEN);
+    
+    //ifr.ifr_hwaddr.sa_len = ETHER_ADDR_LEN
+    ifr.ifr_hwaddr.sa_family = AF_UNIX;
+    
+    if(ioctl(skfd, SIOCSIFHWADDR, &ifr) < 0) {
+      fprintf(stderr, "SIOCSIFHWADDR: %s\n", strerror(errno));
+      close(skfd);
+      return 1;
+    }
+    close(skfd);
   }
   
   if (device) {

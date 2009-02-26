@@ -588,6 +588,7 @@ typedef struct {
     int medium;
     int layer2;
     int portno;
+    char* osahwaddr;
   } hwp;
   
 #endif
