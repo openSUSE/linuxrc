@@ -238,6 +238,7 @@ static struct {
   { key_osainterface,	"OSAInterface",	  kf_cfg + kf_cmd		 },
   { key_layer2,		"Layer2",	  kf_cfg + kf_cmd		 },
   { key_portno,         "PortNo",         kf_cfg + kf_cmd                },
+  { key_osahwaddr,	"OSAHWAddr",      kf_cfg + kf_cmd		 },
 #endif
   { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
   { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
@@ -1192,6 +1193,9 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_portno:
         if(f->is.numeric) config.hwp.portno = f->nvalue + 1;
         break;
+      case key_osahwaddr:
+        if(*f->value) str_copy(&config.hwp.osahwaddr, f->value);
+        break;
 #endif      
 
       case key_netwait:
@@ -1761,6 +1765,10 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_netid, config.net.unique_id);
     file_write_str(f, key_nethwaddr, config.net.hwaddr);
     file_write_str(f, key_netcardname, config.net.cardname);
+#if defined(__s390__) || defined(__s390x__)
+    if(config.hwp.osahwaddr) file_write_str(f, key_osahwaddr, config.hwp.osahwaddr);
+    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2 - 1);
+#endif
     file_write_str(f, key_ethtool, config.net.ethtool_used);
     file_write_inet2(f, key_ip, &config.net.hostname, INET_WRITE_IP_BOTH + INET_WRITE_PREFIX);
     if(config.net.realhostname) {

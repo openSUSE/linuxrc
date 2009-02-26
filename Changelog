@@ -1,3 +1,4 @@
+	- s390: merge OSAHWAddr feature from SLES10 (bnc#479481)
 	- s390: ask for relative port number even when device parameters
 	  have been entered manually (bnc#477918)
 

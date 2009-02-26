@@ -1188,3 +1188,7 @@ msgstr ""
 msgid "Invalid signature."
 msgstr ""
 
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+

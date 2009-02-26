@@ -1410,3 +1410,7 @@ msgstr "Fichier non signé."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Signature non valide."
+#. TXT_HWADDR
+msgid "MAC address"
+msgstr ""
+
