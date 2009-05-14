@@ -36,7 +36,6 @@
 #include "url.h"
 #include "checkmd5.h"
 
-static void auto2_user_netconfig(void);
 static int driver_is_active(hd_t *hd);
 static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_files(url_t *url);

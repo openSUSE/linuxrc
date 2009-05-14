@@ -50,7 +50,7 @@ typedef enum {
   key_nomdns, key_yepurl, key_yepcert, key_mediacheck, key_y2gdb, key_squash,
   key_kexec_reboot, key_devbyid, key_braille, key_nfsopts, key_ipv4, key_ipv4only,
   key_ipv6, key_ipv6only, key_usesax2, key_efi, key_supporturl, key_portno,
-  key_osahwaddr
+  key_osahwaddr, key_zen, key_zenconfig
 } file_key_t;
 
 typedef enum {

@@ -325,6 +325,8 @@ typedef struct {
   unsigned forceip:1;		/* do not check for duplicate IP address */
   unsigned mediacheck:1;	/* check media */
   unsigned installfilesread:1;	/* already got install files */
+  unsigned zen;			/* zenworks mode */
+  char *zenconfig;		/* zenworks config file */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned secure:1;		/* secure mode (check sha1 of all downloaded files) */

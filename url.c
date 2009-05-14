@@ -30,6 +30,7 @@ known issues:
 #include "slp.h"
 #include "dialog.h"
 #include "display.h"
+#include "auto2.h"
 #include "url.h"
 
 #define CRAMFS_SUPER_MAGIC	0x28cd3d45
@@ -1836,15 +1837,21 @@ int url_find_repo(url_t *url, char *dir)
       config.sha1 = slist_free(config.sha1);
       config.sha1_failed = 0;
 
+      strprintf(&buf, "/%s", config.zen ? config.zenconfig : "content");
+      strprintf(&buf2, "file:%s", buf);
+
       if(
-        url_read_file(url, NULL, "/content", "/content", NULL,
+        url_read_file(url, NULL, buf, buf, NULL,
           URL_FLAG_NOSHA1 + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         )
       ) return 0;
 
       if(!config.sig_failed) {
-        file_read_info_file("file:/content", kf_cont);
+        file_read_info_file(buf2, config.zen ? kf_cont + kf_cfg : kf_cont);
       }
+
+      str_copy(&buf, NULL);
+      str_copy(&buf2, NULL);
     }
 
     if(config.url.instsys->scheme != inst_rel || config.kexec) return 1;
@@ -2259,7 +2266,9 @@ int url_setup_interface(url_t *url)
 
   if(url->is.wlan && wlan_setup()) return 0;
 
-  config.net.configured = nc_static;
+  if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
+
+  if(config.net.configured == nc_none) config.net.configured = nc_static;
 
   /* we need at least ip & netmask for static network config */
   if((net_config_mask() & 3) != 3) {

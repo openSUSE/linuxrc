@@ -1,6 +1,9 @@
+14/5/2009:	v3.4.0
 	- s390: merge OSAHWAddr feature from SLES10 (bnc#479481)
 	- s390: ask for relative port number even when device parameters
 	  have been entered manually (bnc#477918)
+	- netsetup option is not used when doing network install (bnc #495525)
+	- reintegrate zenworks imaging options
 
 19/2/2009:	v3.3.33
         - s390: falling back to manual mode in network setup has nasty side
