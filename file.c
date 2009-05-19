@@ -243,6 +243,7 @@ static struct {
   { key_osamedium,	"OSAMedium",	  kf_cfg + kf_cmd		 },
   { key_osainterface,	"OSAInterface",	  kf_cfg + kf_cmd		 },
   { key_layer2,		"Layer2",	  kf_cfg + kf_cmd		 },
+  { key_portno,         "PortNo",         kf_cfg + kf_cmd                },
   { key_osahwaddr,      "OSAHWAddr",      kf_cfg + kf_cmd		 },
 #endif
   { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
@@ -1339,6 +1340,9 @@ void file_do_info(file_t *f0)
         break;
       case key_layer2:
         if(f->is.numeric) config.hwp.layer2 = f->nvalue + 1;
+        break;
+      case key_portno:
+        if(f->is.numeric) config.hwp.portno = f->nvalue + 1;
         break;
       case key_osahwaddr:
         if(*f->value) str_copy(&config.hwp.osahwaddr, f->value);

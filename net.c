@@ -1855,6 +1855,7 @@ static int net_s390_ctc_protocol(int protocol)
     return rc;
 }
 
+
 /* set port number */
 static int net_s390_lcs_portno(char *portno)
 {
@@ -1870,6 +1871,15 @@ static int net_s390_lcs_portno(char *portno)
     }
 
     return rc;
+}
+
+/* same thing for OSA local port number */
+static int net_s390_set_portno(int portno)
+{
+    char pn[2];
+    pn[1] = 0;
+    pn[0] = portno + '0';
+    return net_s390_lcs_portno(pn);
 }
 
 /* set portname */
@@ -2115,6 +2125,7 @@ int net_activate_s390_devs(void)
       }
       else
         rc=config.hwp.medium;
+        
     }
 
     if(config.hwp.interface == di_osa_qdio)
@@ -2147,12 +2158,20 @@ int net_activate_s390_devs(void)
              dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
           }
         }
+        IFNOTAUTO(config.hwp.portno)
+        {
+          char* port = NULL;
+          if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &port,2,0))) return rc;
+          if(port) config.hwp.portno = atoi(port) + 1;
+          else config.hwp.portno = 0 + 1;
+        }
       }
       
       if((rc=net_s390_group_chans(3,"qeth"))) return rc;
 
       if((rc=net_s390_qdio_portname(config.hwp.portname))) return rc;
       
+      if(config.hwp.portno) if((rc = net_s390_set_portno(config.hwp.portno))) return rc;
       if(config.hwp.layer2 == 2) if((rc=net_s390_enable_layer2(1))) return rc;
 
       if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
@@ -2216,6 +2235,7 @@ int net_activate_s390_devs(void)
   if(config.hwp.protocol) fprintf(fp,"CCW_CHAN_MODE=\"%d\"\n",config.hwp.protocol-1);
   HWE(portname,CCW_CHAN_MODE)
   if(config.hwp.layer2) fprintf(fp,"QETH_LAYER2_SUPPORT=\"%d\"\n",config.hwp.layer2 - 1);
+  if(config.hwp.portno) fprintf(fp,"QETH_PORTNO=\"%d\"\n", config.hwp.portno - 1);
 # undef HWE
   fclose(fp);
   

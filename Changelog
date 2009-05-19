@@ -1,3 +1,6 @@
+28/4/2009:	v2.0.82
+	- backported OSA port number setting from SLE11 (fate#306075)
+
 6/2/2009:	v2.0.81
 	- create modprobe blacklist and copy it to rescue system (bnc #471211)
 
