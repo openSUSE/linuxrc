@@ -1104,7 +1104,7 @@ void add_flag(slist_t **sl, char *buf, int value, char *name)
 {
   int l;
 
-  if(!value) return;
+  if(value <= 0) return;
 
   if(!*buf) strcpy(buf, "  ");
   l = strlen(buf);
@@ -1223,6 +1223,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
   add_flag(&sl0, buf, config.zen, "zen");
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
+  add_flag(&sl0, buf, config.efi, "efi");
+  add_flag(&sl0, buf, config.efi_vars, "efivars");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);

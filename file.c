@@ -278,7 +278,8 @@ static struct {
   { key_yepurl,         "regurl",         kf_cfg + kf_cmd                },
   { key_yepcert,        "regcert",        kf_cfg + kf_cmd                },
   { key_yepurl,         "smturl",         kf_cfg + kf_cmd                },
-  { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                }
+  { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                },
+  { key_efi,            "EFI",            kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1531,6 +1532,10 @@ void file_do_info(file_t *f0)
         str_copy(&config.yepcert, f->value);
         break;
 
+      case key_efi:
+        if(f->is.numeric) config.efi = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1870,6 +1875,7 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_yepurl, config.yepurl);
   file_write_str(f, key_yepcert, config.yepcert);
+  file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
 
   if(config.net.ifup_wait) fprintf(f, "ConnectWait: %d\n", config.net.ifup_wait);
 

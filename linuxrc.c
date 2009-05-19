@@ -806,6 +806,7 @@ void lxrc_init()
   config.kbd_fd = -1;
 
   config.hwdetect = 1;
+  config.efi = -1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
@@ -959,6 +960,11 @@ void lxrc_init()
   file_read_info_file("cmdline", kf_cmd1);
 
   if(config.had_segv) config.manual = 1;
+
+  /* check efi status */
+  if(util_check_exist("/sys/firmware/efi/vars") == 'd') {
+    config.efi_vars = 1;
+  }
 
   /* get usb keyboard working */
   if(config.manual == 1 && !config.had_segv) util_load_usb();

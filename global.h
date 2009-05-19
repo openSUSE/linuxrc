@@ -299,6 +299,8 @@ typedef struct {
   unsigned zombies:1;		/* keep zombies around */
   unsigned forceip:1;           /* do not check for duplicate IP address */
   unsigned installfilesread:1;	/* already got install files */
+  unsigned efi_vars:1;		/* efi vars exist */
+  int efi;			/* use efi; -1 = auto */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
   unsigned xxx;			/* xxx */

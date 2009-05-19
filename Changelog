@@ -1,3 +1,6 @@
+13/5/2009:	v2.0.84
+	- backport efi stuff (fate #306032)
+
 7/5/2009:	v2.0.83
 	- backport sles11 DUD option handling (fate #305855, fate #302851)
 

@@ -47,7 +47,7 @@ typedef enum {
   key_staticdevices, key_withiscsi, key_ethtool, key_listen, key_zombies, key_forceip,
   key_dhcpcd, key_layer2, key_osahwaddr, key_ibft_hwaddr, key_ibft_ipaddr,
   key_ibft_netmask, key_ibft_gateway, key_ibft_dns, key_net_retry, key_bootif,
-  key_nomdns, key_yepurl, key_yepcert, key_portno
+  key_nomdns, key_yepurl, key_yepcert, key_portno, key_efi
 } file_key_t;
 
 typedef enum {
