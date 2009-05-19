@@ -859,7 +859,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2008 SUSE Linux Products GmbH <<<\n",
+      ">>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2009 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
@@ -1074,7 +1074,7 @@ void lxrc_init()
   }
 
   /* file_read_info() is called in auto2_init(), too */
-  if(!config.info.loaded && !config.hwcheck && !config.had_segv && !config.info.file) file_read_info();
+  if(!config.info.loaded && !config.hwcheck && !config.had_segv) file_read_info();
 
   set_activate_language(config.language);
 

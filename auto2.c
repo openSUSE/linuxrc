@@ -119,8 +119,10 @@ void auto2_scan_hardware(char *log_file)
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
   int i, j, ju, k, with_usb;
-  slist_t *usb_modules = NULL;
-  int storage_loaded = 0;
+  slist_t *usb_modules = NULL, *sl, **names;
+  int storage_loaded = 0, compressed = 0;
+  unsigned dud_count;
+  char *dud_url;
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -313,26 +315,99 @@ void auto2_scan_hardware(char *log_file)
   }
 #endif
 
+  if(hd_data->progress) printf("\n");
+
   if(config.info.add_cmdline) {
     file_read_info_file("cmdline", kf_cmd);
   }
 
-  if(config.info.file) {
-    load_network_mods();
+  if(config.info.file || config.update.urls) load_network_mods();
 
-    fprintf(stderr, "Looking for info file: %s\n", config.info.file);
-    if(hd_data->progress) printf("\r%64s\r", "");
-    printf("Reading info file:\n  %s ...", config.info.file);
+  /* load & parse info files */
+  for(sl = config.info.file; sl; sl = sl->next) {
+    fprintf(stderr, "info file: %s\n", sl->key);
+    printf("Reading info file: %s\n", sl->key);
     fflush(stdout);
-    i = get_url(config.info.file, "/download/info");
+    i = get_url(sl->key, "/download/info", 0);
     printf("%s\n", i ? " failed" : " ok");
     if(!i) {
-      fprintf(stderr, "Parsing info file: %s\n", config.info.file);
+      fprintf(stderr, "parsing info file: %s\n", sl->key);
       file_read_info_file("file:/download/info", kf_cfg);
     }
-    else {
-      fprintf(stderr, "Info file not found: %s\n", config.info.file);
+  }
+
+  /* load & run driverupdates */
+  if(config.update.urls) {
+    dud_count = config.update.count;
+    /* point at list end */
+    for(names = &config.update.name_list; *names; names = &(*names)->next);
+
+    for(sl = config.update.urls; sl; sl = sl->next) {
+      if(!(dud_url = sl->key)) continue;
+      fprintf(stderr, "dud url: %s\n", dud_url);
+      printf("Reading driver update: %s\n", dud_url);
+      fflush(stdout);
+
+      unlink("/download/update");
+      i = get_url(dud_url, "/download/update", 1);
+      printf("Download%s\n", i ? " failed" : " ok");
+      if(!i) {
+        if(util_check_exist("/download/update") == 'r') {
+          util_fileinfo("/download/update", NULL, &compressed);
+          if(compressed) {
+            i = system("/bin/gunzip -c /download/update >/download/update.xxx");
+            if(!i) i = rename("/download/update.xxx", "/download/update");
+          }
+
+          if(i) {
+            fprintf(stderr, "uncompressing DUD failed\n");
+          }
+          else {
+            fprintf(stderr, "Applying DUD: %s\n", dud_url);
+
+            i = util_mount_ro("/download/update", config.mountpoint.update);
+            if(!i) util_chk_driver_update(config.mountpoint.update, get_instmode_name(inst_file));
+            util_umount(config.mountpoint.update);
+          }
+        }
+      }
+      else {
+        fprintf(stderr, "DUD not found: %s\n", dud_url);
+      }
     }
+
+    util_do_driver_updates();
+
+    if(dud_count == config.update.count) {
+      fprintf(stderr, "No new driver updates found.\n");
+      if(config.win && config.manual) {
+        dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
+      }
+      else {
+        // printf("No new driver updates found.\n");
+      }
+    }
+    else {
+      if(*names) {
+        if(config.win && config.manual) {
+          dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+        }
+        else {
+          printf("%s:\n", txt_get(TXT_DUD_ADDED));
+          for(sl = *names; sl; sl = sl->next) {
+            printf("  %s\n", sl->key);
+          }
+        }
+      }
+      else {
+        if(config.win && config.manual) {
+          dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+        }
+        else {
+          printf("%s\n", txt_get(TXT_DUD_OK));
+        }
+      }
+    }  
   }
 
   if(log_file && (f = fopen(log_file, "w+"))) {

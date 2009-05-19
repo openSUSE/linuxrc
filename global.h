@@ -163,6 +163,7 @@ typedef struct {
   char *user;
   char *password;
   char *domain;
+  char *device;
   unsigned port;
 } url_t;
 
@@ -318,7 +319,7 @@ typedef struct {
   char *instsys;		/* installation system mount point */
   char *instsys2;		/* extra installation system mount point */
   struct {
-    char *file;			/* 'info' file name */
+    slist_t *file;		/* 'info' file name */
     char *loaded;		/* actual 'info' file that was loaded */
     unsigned add_cmdline:1;	/* parse cmdline, too */
   } info;
@@ -380,6 +381,7 @@ typedef struct {
     slist_t *name_list;		/* list of update names */
     slist_t **next_name;	/* points into name_list */
     slist_t *expected_name_list;	/* updates we must have */
+    slist_t *urls;		/* update sources */
   } update;
 
   struct {

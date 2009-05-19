@@ -532,10 +532,15 @@ void file_free_file(file_t *file)
 }
 
 
+/*
+ * Note: legacy 'info' file handling: only when config.info.file == 0.
+ */
 int file_read_info()
 {
   window_t win_ri;
   char *file = NULL, *s;
+
+  if(config.info.file) return 0;
 
   if(config.win) {
     dia_info(&win_ri, txt_get(TXT_SEARCH_INFOFILE));
@@ -546,13 +551,8 @@ int file_read_info()
     config.linebreak = 1;
   }
 
-  if(!config.info.file || !strcmp(config.info.file, "default")) {
-    file = file_read_info_file("floppy:/info", kf_cfg);
-    if(!file) file = file_read_info_file("file:/info", kf_cfg);
-  }
-  else {
-    file = file_read_info_file(config.info.file, kf_cfg);
-  }
+  file = file_read_info_file("floppy:/info", kf_cfg);
+  if(!file) file = file_read_info_file("file:/info", kf_cfg);
 
   if(config.info.add_cmdline) {
     s = file_read_info_file("cmdline", kf_cmd);
@@ -911,12 +911,18 @@ void file_do_info(file_t *f0)
 
             if(config.insttype == inst_net) {
               name2inet(&config.net.server, url->server);
+              if(url->device) {
+                str_copy(&config.net.device, url->device);
+                config.net.device_given = 1;
+              }
             }
-            else if(config.insttype == inst_cdrom && url->server) {
-              str_copy(&config.cdromdev, url->server);
+            else if(config.insttype == inst_cdrom) {
+              if(url->server) str_copy(&config.cdromdev, url->server);
+              if(url->device) str_copy(&config.cdromdev, url->device);
             }
-            else if(config.insttype == inst_hd && url->server) {
-              str_copy(&config.partition, url->server);
+            else if(config.insttype == inst_hd) {
+              if(url->server) str_copy(&config.partition, url->server);
+              if(url->device) str_copy(&config.partition, url->device);
             }
           }
         }
@@ -932,7 +938,7 @@ void file_do_info(file_t *f0)
         break;
 
       case key_info:
-        str_copy(&config.info.file, *f->value ? f->value : "default");
+        if(*f->value) slist_append_str(&config.info.file, f->value);
         break;
 
       case key_vnc:
@@ -1225,7 +1231,12 @@ void file_do_info(file_t *f0)
         break;
 
       case key_updateask:
-        if(f->is.numeric) config.update.ask = f->nvalue;
+        if(f->is.numeric) {
+          config.update.ask = f->nvalue;
+        }
+        else if(*f->value) {
+          slist_append_str(&config.update.urls, f->value);
+        }
         break;
 
       case key_loglevel:

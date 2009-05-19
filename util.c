@@ -3024,6 +3024,7 @@ url_t *parse_url(char *str)
   if(url.password) free(url.password);
   if(url.domain) free(url.domain);
   if(url.share) free(url.share);
+  if(url.device) free(url.device);
 
   memset(&url, 0, sizeof url);
 
@@ -3105,6 +3106,7 @@ url_t *parse_url(char *str)
       if(S_ISDIR(sbuf.st_mode)) continue;
       if(S_ISBLK(sbuf.st_mode)) {
         str_copy(&url.server, buf + sizeof "/dev/" - 1);
+        str_copy(&url.device, url.server);
         *s = 0;
         for(sl = sl->next; sl; sl = sl->next) {
           strcat(strcat(s, "/"), sl->key);
@@ -3155,6 +3157,25 @@ url_t *parse_url(char *str)
     }
   }
 
+  if(url.dir && (s = strchr(url.dir, '?'))) {
+    *s++ = 0;
+
+    sl0 = slist_split('&', s);
+    for(sl = sl0; sl; sl = sl->next) {
+      if((s1 = strchr(sl->key, '='))) {
+        *s1++ = 0;
+        sl->value = strdup(s1);
+      }
+    }
+
+    if((sl = slist_getentry(sl0, "device"))) {
+      s1 = short_dev(sl->value);
+      str_copy(&url.device, *s1 ? s1 : NULL);
+    }
+
+    slist_free(sl0);
+  }
+
   if(
     url.scheme == inst_http ||
     (url.scheme == inst_slp && !*url.dir) ||
@@ -3166,9 +3187,9 @@ url_t *parse_url(char *str)
   if(config.debug >= 2) {
     fprintf(stderr,
       "  scheme = %s, server = \"%s\", dir = \"%s\", share = \"%s\"\n"
-      "  domain = \"%s\", user = \"%s\", password = \"%s\", port = %u\n",
+      "  domain = \"%s\", user = \"%s\", password = \"%s\", port = %u, dev = %s\n",
       get_instmode_name(url.scheme), url.server, url.dir, url.share,
-      url.domain, url.user, url.password, url.port
+      url.domain, url.user, url.password, url.port, url.device
     );
   }
 
@@ -4760,10 +4781,10 @@ int util_process_running(char *name)
 /*
  *
  */
-int get_url(char *src_url, char *dst)
+int get_url(char *src_url, char *dst, int check_update)
 {
   url_t *url;
-  int err = 1, i, j, fd_in, fd_out;
+  int err = 1, i, j, fd_in, fd_out, matched;
   hd_data_t *hd_data;
   hd_t *hd;
   char *dir = NULL, *dir2 = NULL, *file;
@@ -4772,6 +4793,7 @@ int get_url(char *src_url, char *dst)
   char *dev, *module, *type;
   instmode_t instmode_save;
   inet_t server_save;
+  str_list_t *sl;
 
   if(!src_url || !dst) return err;
 
@@ -4782,7 +4804,7 @@ int get_url(char *src_url, char *dst)
 
   switch(url->scheme) {
     case inst_file:
-      if(util_check_exist(url->dir) == 'r') {
+      if((i = util_check_exist(url->dir)) == 'r') {
         char *argv[3];
 
         unlink(dst);
@@ -4790,6 +4812,10 @@ int get_url(char *src_url, char *dst)
         argv[2] = dst;
         util_cp_main(3, argv);
 
+        err = 0;
+      }
+      else if(check_update && i == 'd') {
+        util_chk_driver_update(url->dir, get_instmode_name(url->scheme));
         err = 0;
       }
       break;
@@ -4814,13 +4840,13 @@ int get_url(char *src_url, char *dst)
         /* no block devs with partitions */
         if(hd->child_ids || !hd->unix_dev_name) continue;
 
-        dev = long_dev(url->server);
+        matched = url->device ? match_netdevice(short_dev(hd->unix_dev_name), NULL, url->device) : 1;
 
-        if(
-          url->server &&
-          strcmp(hd->unix_dev_name, dev) &&
-          !search_str_list(hd->unix_dev_names, dev)
-        ) continue;
+        for(sl = hd->unix_dev_names; !matched && sl; sl = sl->next) {
+          matched = match_netdevice(short_dev(sl->str), NULL, url->device);
+        }
+
+        if(!matched) continue;
 
         dev = hd->unix_dev_name;
 
@@ -4842,7 +4868,7 @@ int get_url(char *src_url, char *dst)
 
         strprintf(&dir, "/mnt/%s", url->dir);
 
-        if(util_check_exist(dir) == 'r') {
+        if((i = util_check_exist(dir)) == 'r') {
           char *argv[3];
 
           unlink(dst);
@@ -4851,7 +4877,11 @@ int get_url(char *src_url, char *dst)
           util_cp_main(3, argv);
 
           err = 0;
-          fprintf(stderr, "disk: %s::%s: got info file\n", dev, url->dir);
+          fprintf(stderr, "disk: %s::%s: got file\n", dev, url->dir);
+        }
+        else if(check_update && i == 'd') {
+          util_chk_driver_update(dir, get_instmode_name(url->scheme));
+          err = 0;
         }
         else {
           fprintf(stderr, "disk: %s::%s: file not found\n", dev, url->dir);
@@ -4934,31 +4964,49 @@ int get_url(char *src_url, char *dst)
 
         case inst_nfs:
           str_copy(&dir, url->dir);
-          file = dir ? strrchr(dir, '/') : dir;
-          if(file && *file == '/') *file++ = 0;
-          if(file) {
+          i = 0;
+          if(check_update) {
             fprintf(stderr, "nfs: trying to mount %s:%s\n", config.net.server.name, dir ?: "");
             i = net_mount_nfs("/mnt", &config.net.server, dir);
             if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", i);
             if(!i) {
-              strprintf(&dir2, "/mnt/%s", file);
-
-              if(util_check_exist(dir2) == 'r') {
-                char *argv[3];
-
-                unlink(dst);
-                argv[1] = dir2;
-                argv[2] = dst;
-                util_cp_main(3, argv);
-
-                err = 0;
-                fprintf(stderr, "nfs: %s::%s: got info file\n", config.net.server.name, url->dir);
-              }
-              else {
-                fprintf(stderr, "nfs: %s::%s: file not found\n", config.net.server.name, url->dir);
-              }
+              util_chk_driver_update("/mnt", get_instmode_name(url->scheme));
+              err = 0;
             }
             umount("/mnt");
+          }
+
+          if(!check_update || (i == ENOTDIR || i == ENOENT)) {
+            file = dir ? strrchr(dir, '/') : dir;
+            if(file && *file == '/') *file++ = 0;
+            if(file) {
+              fprintf(stderr, "nfs: trying to mount %s:%s\n", config.net.server.name, dir ?: "");
+              i = net_mount_nfs("/mnt", &config.net.server, dir);
+              if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", i);
+              if(!i) {
+                strprintf(&dir2, "/mnt/%s", file);
+
+                if((i = util_check_exist(dir2)) == 'r') {
+                  char *argv[3];
+
+                  unlink(dst);
+                  argv[1] = dir2;
+                  argv[2] = dst;
+                  util_cp_main(3, argv);
+
+                  err = 0;
+                  fprintf(stderr, "nfs: %s::%s: got file\n", config.net.server.name, url->dir);
+                }
+                else if(check_update && i == 'd') {
+                  util_chk_driver_update(dir2, get_instmode_name(url->scheme));
+                  err = 0;
+                }
+                else {
+                  fprintf(stderr, "nfs: %s::%s: file not found\n", config.net.server.name, url->dir);
+                }
+              }
+              umount("/mnt");
+            }
           }
           break;
 
@@ -4969,7 +5017,7 @@ int get_url(char *src_url, char *dst)
             if(!i) {
               strprintf(&dir, "/mnt/%s", url->dir);
 
-              if(util_check_exist(dir) == 'r') {
+              if((i = util_check_exist(dir)) == 'r') {
                 char *argv[3];
 
                 unlink(dst);
@@ -4978,7 +5026,11 @@ int get_url(char *src_url, char *dst)
                 util_cp_main(3, argv);
 
                 err = 0;
-                fprintf(stderr, "smb: %s: got info file\n", url->dir);
+                fprintf(stderr, "smb: %s: got file\n", url->dir);
+              }
+              else if(check_update && i == 'd') {
+                util_chk_driver_update(dir, get_instmode_name(url->scheme));
+                err = 0;
               }
               else {
                 fprintf(stderr, "smb: %s: file not found\n", url->dir);

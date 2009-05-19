@@ -1,3 +1,6 @@
+7/5/2009:	v2.0.83
+	- backport sles11 DUD option handling (fate #305855, fate #302851)
+
 28/4/2009:	v2.0.82
 	- backported OSA port number setting from SLE11 (fate#306075)
 
