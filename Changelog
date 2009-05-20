@@ -1,3 +1,10 @@
+14/5/2009:	v3.3.36
+	- netsetup option is not used when doing network install (bnc #495525)
+	- added 'netsetup=now' to force immediate network configuration (bnc #495525)
+
+28/4/2009:	v3.3.35
+	- reintegrate zenworks imaging options (bnc #495525)
+
 25/2/2009:	v3.3.34
 	- s390: merge OSAHWAddr feature from SLES10 (bnc#479481)
 

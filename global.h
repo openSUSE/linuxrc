@@ -261,6 +261,7 @@ typedef struct {
 #define NS_ALLIFS		(1 << 6)
 #define NS_DISPLAY		(1 << 7)
 // #define NS_DHCP6		(1 << 8)
+#define NS_NOW			(1 << 9)
 
 #if defined(__s390__) || defined(__s390x__)
 #define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER | NS_DISPLAY)
@@ -325,6 +326,8 @@ typedef struct {
   unsigned forceip:1;		/* do not check for duplicate IP address */
   unsigned mediacheck:1;	/* check media */
   unsigned installfilesread:1;	/* already got install files */
+  unsigned zen;			/* zenworks mode */
+  char *zenconfig;		/* zenworks config file */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned secure:1;		/* secure mode (check sha1 of all downloaded files) */
@@ -504,6 +507,7 @@ typedef struct {
     unsigned is_configured:1;	/* set if network is configured */
     unsigned keep:1;		/* keep network interface up */
     unsigned all_ifs:1;		/* try all interfaces */
+    unsigned now:1;		/* configure network _now_ */
     unsigned ipv4:1;		/* do ipv4 config */
     unsigned ipv6:1;		/* do ipv6 config */
     unsigned do_setup;		/* do network setup */

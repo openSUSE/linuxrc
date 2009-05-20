@@ -243,6 +243,8 @@ static struct {
   { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
   { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
   { key_moduledisks,    "ModuleDisks",    kf_cfg + kf_cmd                },
+  { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
+  { key_zenconfig,      "ZenConfig",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_port,           "Port",           kf_none                        },
   { key_smbshare,       "Share",          kf_none                        },
   { key_rootimage2,     "RootImage2",     kf_cfg + kf_cmd                },
@@ -1110,6 +1112,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 #if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
 #endif
+            else if(!strcmp(s, "now")) i = NS_NOW;
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
               i = NS_NAMESERVER;
               t = s + sizeof "nameserver" - 1;
@@ -1128,6 +1131,9 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             if(i == NS_ALLIFS) {
               config.net.all_ifs = *sl->key == '-' ? 0 : 1;
             }
+            else if(i == NS_NOW) {
+              config.net.now = *sl->key == '-' ? 0 : 1;
+            }
             else if(i) {
               if(*sl->key == '-') {
                 config.net.setup &= ~i;
@@ -1141,6 +1147,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           slist_free(sl0);
         }
         if(!config.net.setup) config.net.do_setup = 0;
+        if(config.net.now) {
+          auto2_user_netconfig();
+          config.net.now = 0;
+        }
         break;
 
       case key_rootpassword:
@@ -1208,6 +1218,14 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_moduledisks:
         if(f->is.numeric) config.module.disks = f->nvalue;
+        break;
+
+      case key_zen:
+        if(f->is.numeric) config.zen = f->nvalue;
+        break;
+
+      case key_zenconfig:
+        if(*f->value) str_copy(&config.zenconfig, f->value);
         break;
 
       case key_rootimage2:
