@@ -6,14 +6,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-03-30 01:52+0100\n"
-"Last-Translator: Stanisław Małolepszy <smalolepszy@aviary.pl>\n"
-"Language-Team:  <pl@li.org>\n"
+"PO-Revision-Date: 2008-12-19 00:45\n"
+"Last-Translator: Novell Language <language@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -464,7 +462,7 @@ msgstr "Wystąpił błąd podczas instalacji"
 
 #. TXT_DRIVES
 msgid "Hard Disks or CD-ROMs"
-msgstr "Dyski twarde / płyty CD"
+msgstr "Dyski twarde / napędy CD"
 
 #. TXT_LITTLE_MEM
 msgid ""
@@ -1167,8 +1165,17 @@ msgstr "Adres MAC"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "Adres IP %s jest już używany przez inny komputer!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Wykrywanie i wczytywanie sterowników sieci"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Proszę podać adres IP serwera nazw %u albo wprowadzić \"+++\", jeśli go brak."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Proszę wprowadzić adres IP serwera nazw. Jeśli serwer nazw nie jest używany, należy wprowadzić \"+++\"."

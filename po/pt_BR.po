@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-08-03 12:00+0200\n"
+"PO-Revision-Date: 2009-01-05 15:10\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -1165,8 +1165,17 @@ msgstr "Endereço MAC"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "O endereço IP %s já está em uso por outra máquina!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Detectando e carregando os drivers de rede"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Digite o IP do servidor de nomes %u ou \"+++\" para nenhum."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Digite o endereço IP de seu servidor de nomes. Se você não usa um servidor de nomes, digite \"+++\"."

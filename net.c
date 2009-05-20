@@ -1218,10 +1218,18 @@ void net_setup_nameserver()
     if((config.net.setup & NS_NAMESERVER)) {
       for(u = 0; u < config.net.nameservers; u++) {
         if(config.net.nameservers == 1) {
+#if defined(__s390__) || defined(__s390x__)
+          s = txt_get(TXT_INPUT_NAMED_S390);
+#else
           s = txt_get(TXT_INPUT_NAMED);
+#endif
         }
         else {
+#if defined(__s390__) || defined(__s390x__)
+           sprintf(buf, txt_get(TXT_INPUT_NAMED1_S390), u + 1);
+#else
            sprintf(buf, txt_get(TXT_INPUT_NAMED1), u + 1);
+#endif
            s = buf;
         }
         if(net_get_address(s, &config.net.nameserver[u], 0)) break;

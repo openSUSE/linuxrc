@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sk\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-03-02 21:37+0100\n"
+"PO-Revision-Date: 2008-05-12 15:48+0100\n"
 "Last-Translator: Ladislav Michnovič <lmichnovic@suse.cz>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 & n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-Language: Slovak\n"
 
 #. TXT_OK
@@ -56,7 +56,7 @@ msgstr "Jazyk"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Moduly jadra (ovládače hardware)"
+msgstr "Moduly jadra (ovládače hardvéru)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
@@ -409,7 +409,7 @@ msgstr ""
 "\n"
 "\"Štart inštalácie/systému\"\n"
 "\n"
-"Aby ste to mohli urobiť , možno bude nutné načítať niektoré ovládače (moduly) pre podporu vášho hardware."
+"Aby ste to mohli urobiť , možno bude nutné načítať niektoré ovládače (moduly) pre podporu vášho hardvéru."
 
 #. TXT_NO_CTRLC
 msgid "You cannot exit Linuxrc with <Ctrl-C>."
@@ -475,7 +475,7 @@ msgid ""
 "\n"
 "Before you acknowledge this message, you must switch to virtual console 2 (press ALT-F2) to create and activate some swap space."
 msgstr ""
-"Váš počítač má extrémne málo pamäti!\n"
+"Váš počítač má extrémne málo pamäte!\n"
 "\n"
 "Pred potvrdením tejto správy sa musíte prepnúť na virtuálnu konzolu 2 (stlačením ALT-F2) vytvoriť a aktivovať nejaký priestor pre swap."
 
@@ -806,11 +806,11 @@ msgstr "Vyberte oddiel pre swap."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
-msgstr "Pre načítanie všetkých dát nie je dosť pamäti."
+msgstr "Pre načítanie všetkých dát nie je dosť pamäte."
 
 #. TXT_LOW_MEMORY2
 msgid "Your computer does not have enough memory to run YaST."
-msgstr "Váš počítač nemá dosť pamäti pre spustenie YaST-u."
+msgstr "Váš počítač nemá dosť pamäte pre spustenie YaST-u."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
@@ -1172,8 +1172,17 @@ msgstr "MAC adresa"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP adresu %s už používa iný počítač!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
+msgstr "Detegujem a nahrávam sieťové ovládače."
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr ""
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
 msgstr ""

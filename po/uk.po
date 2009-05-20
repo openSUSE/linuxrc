@@ -6,15 +6,15 @@
 # Ivan Petrouchtchak <ivanpetrouchtchak@yahoo.com>, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: uk\n"
-"PO-Revision-Date: 2006-02-04 12:01-0700\n"
-"Last-Translator: Ivan Petrouchtchak <ivanpetrouchtchak@yahoo.com>\n"
+"Project-Id-Version: linuxrc.uk\n"
+"PO-Revision-Date: 2008-08-17 16:42-0700\n"
+"Last-Translator: Ivan Petrouchtchak <fr.ivan@ukrainian-orthodox.org>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 & n%100!=11 ? 0 : n%10>=2 & n%10<=4 & (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -214,11 +214,11 @@ msgstr "Вкажіть ваш кореневий розділ (напр., /dev/s
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device."
-msgstr "Не чинний кореневий пристрій."
+msgstr "Нечинний кореневий пристрій."
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr "Не чинний ввід."
+msgstr "Нечинний ввід."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
@@ -445,7 +445,7 @@ msgstr "Перезавантажити систему вже?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
-msgstr "Базову систему було успішно встановлено. Тепер цю ново-встановлену систему буде запущено, щоб закінчити встановлення."
+msgstr "Базову систему було успішно встановлено. Тепер цю нововстановлену систему буде запущено, щоб завершити встановлення."
 
 #. TXT_ENTER_PARTITION
 msgid "Enter the hard disk partition (e.g., /dev/sda1)"
@@ -1022,7 +1022,7 @@ msgstr "Будь ласка, введіть пристрій оновлення 
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
-msgstr "Не чинна назва пристрою."
+msgstr "Нечинна назва пристрою."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
@@ -1117,7 +1117,7 @@ msgstr "Ethernet"
 
 #. TXT_OSA_TR
 msgid "Token Ring"
-msgstr "Кільцевидна мережа з естафетним доступом"
+msgstr "Кільцеподібна мережа з естафетним доступом"
 
 #. TXT_OSA_LCS
 msgid "LCS"
@@ -1172,8 +1172,17 @@ msgstr "Адреса MAC"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "Адреса IP %s вже використовується на іншому комп’ютері."
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Виявлення і завантаження мережних драйверів"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Введіть IP сервера назв %u або введіть \"+++\", якщо немає."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Введіть адресу IP вашого сервера назв. Якщо ви не використовуєте сервер назв, просто введіть \"+++\"."

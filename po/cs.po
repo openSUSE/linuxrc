@@ -8,15 +8,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: cs\n"
-"PO-Revision-Date: 2005-07-31 18:35+0200\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-09 10:52\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.1\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 & n%100!=11 ? 0 : n%10>=2 & n%10<=4 & (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -319,7 +317,7 @@ msgstr "Autodetekce (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
-msgstr "Chcete vyhledat další SCSI řadiče?"
+msgstr "Chcete vyhledat další řadiče SCSI?"
 
 #. TXT_WANT_MORE_NET
 msgid "Search for additional network cards?"
@@ -1172,8 +1170,17 @@ msgstr "Adresa MAC"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP adresu %s již používá jiný počítač!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Detekují se a zavádějí se síťové ovladače"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Zadejte IP adresu name serveru %u nebo zadejte \"+++\"."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Zadejte IP adresu vašeho name serveru. Pokud nepoužíváte name server, pak vložte \"+++\"."

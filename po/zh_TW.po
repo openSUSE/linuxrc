@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2006-05-17 17:14\n"
+"PO-Revision-Date: 2009-01-06 10:47\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -244,7 +244,7 @@ msgstr ""
 "\n"
 "IP 位址：%s\n"
 "名稱：%s\n"
-"領域：%s"
+"網域：%s"
 
 #. TXT_ERROR_CONF_NET
 msgid "An error occurred during the network configuration. Your network card probably was not recognized by the kernel."
@@ -595,15 +595,15 @@ msgstr "輸入 FTP 使用者帳戶的密碼。"
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "輸入 FTP proxy 的位址。"
+msgstr "輸入 FTP 代理的位址。"
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "輸入 FTP proxy 的埠。"
+msgstr "輸入 FTP 代理的埠。"
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
-msgstr "使用 FTP proxy？"
+msgstr "使用 FTP 代理？"
 
 #. TXT_NOMEM_FTP
 #, c-format
@@ -779,7 +779,7 @@ msgstr "繼續"
 
 #. TXT_ABORT
 msgid "Abort"
-msgstr "終止"
+msgstr "中止"
 
 #. TXT_NO_NEW_MODULES
 msgid "No new modules found."
@@ -830,17 +830,17 @@ msgstr "輸入 %s 伺服器的密碼。"
 #. TXT_WANT_PROXY
 #, c-format
 msgid "Use a %s proxy?"
-msgstr "要使用 %s proxy 嗎？"
+msgstr "要使用 %s 代理嗎？"
 
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "輸入 %s proxy 的位址。"
+msgstr "輸入 %s 代理的位址。"
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "輸入 %s proxy 的埠。"
+msgstr "輸入 %s 代理的埠。"
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -892,8 +892,8 @@ msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"輸入暫存 root 密碼。\n"
-"您需要在第一次以 root 使用者登入後變更此密碼。"
+"輸入暫存根使用者密碼。\n"
+"您需要在第一次以根使用者登入後變更此密碼。"
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -1165,8 +1165,17 @@ msgstr "MAC 位址"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP 位址 %s 已經被其他機器使用！"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "偵測及載入網路驅動程式"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "輸入名稱伺服器 %u 的 IP 或按「+++」不提供 IP。"
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "輸入名稱伺服器的 IP 位址。若不使用名稱伺服器，請按「+++」。"

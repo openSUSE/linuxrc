@@ -6,16 +6,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: @PACKAGE@\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-27 16:23+0200\n"
-"PO-Revision-Date: 2005-03-09 13:54+0100\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-08 15:19\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1172,8 +1169,17 @@ msgstr "MAC-Adresse"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP-Adresse '%s' wird bereits von einem anderen Computer verwendet!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Netzwerktreiber werden ermittelt und geladen"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Geben Sie IP-Adresse von Nameserver '%u' bzw. \"+++\" ein, wenn kein Nameserver verwendet wird."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Geben Sie die IP-Adresse Ihres Nameservers ein. Wenn Sie keinen Nameserver verwenden, geben Sie einfach \"+++\" ein."

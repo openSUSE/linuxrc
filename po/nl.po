@@ -6,15 +6,13 @@
 # nagelezen tot 120
 msgid ""
 msgstr ""
-"Project-Id-Version: nl\n"
-"PO-Revision-Date: 2006-01-28 12:11+0100\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-01-08 15:48\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.1\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -127,7 +125,7 @@ msgstr "Diskette"
 
 #. TXT_HARDDISK
 msgid "Hard Disk"
-msgstr "Harde schijf"
+msgstr "Vaste schijf"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
@@ -1169,8 +1167,17 @@ msgstr "MAC-adres"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP-adres %s is al in gebruik door een andere machine!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Detectie en laden van netwerkstuurprogramma's"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Geef het IP-adres van de naamserver %u in of \"+++\" voor geen."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Voer het IP-adres van uw naamserver in. Wanneer u geen naamserver gebruikt, voert u \"+++\" in."

@@ -1,3 +1,6 @@
+20/5/2009:	v2.0.85
+	- backport fix for bnc #388424
+
 13/5/2009:	v2.0.84
 	- backport efi stuff (fate #306032)
 

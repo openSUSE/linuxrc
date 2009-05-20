@@ -6,18 +6,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc-da\n"
-"PO-Revision-Date: 2005-08-13 19:43+0200\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2008-10-21 11:33+0200\n"
+"Last-Translator: Martin Schlander <mschlander@opensuse.org>\n"
+"Language-Team: Danish <opensuse-translation@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.1\n"
+"X-Generator: Lokalize 0.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
-msgstr "Ok"
+msgstr "OK"
 
 #. TXT_CANCEL
 msgid "Back"
@@ -142,12 +143,12 @@ msgstr "Indlæs redningssystem via NFS"
 
 #. TXT_BOOT_SYSTEM
 msgid "Boot Installed System"
-msgstr "Start det installerede system"
+msgstr "Boot det installerede system"
 
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Søger efter \"%s\" disken..."
+msgstr "Søger efter imagefilen \"%s\"..."
 
 #. TXT_RI_NOT_FOUND
 msgid ""
@@ -181,7 +182,7 @@ msgstr "DMA"
 
 #. TXT_INFO_IRQS
 msgid "Interrupts"
-msgstr "Interrupts"
+msgstr "Afbrydelser"
 
 #. TXT_INFO_IOPORTS
 msgid "I/O Ports"
@@ -217,7 +218,7 @@ msgstr "Ugyldig rodenhed."
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr "Ugyldig inddata."
+msgstr "Ugyldig indput."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
@@ -264,7 +265,7 @@ msgstr "Skriv IP-adressen på FTP serveren."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
-msgstr "Indtast stien på serveren."
+msgstr "Indtast mappen på serveren."
 
 #. TXT_ENTER_PARAMS
 #, c-format
@@ -278,7 +279,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Forsøger at montere kataloget\n"
+"Forsøger at montere mappen\n"
 "\n"
 "\"%s:%s\"..."
 
@@ -312,7 +313,7 @@ msgstr "Der er ikke loadet nogen moduler i øjeblikket."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Autodetekterer (%s)...      "
+msgstr "Autoprøver (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -336,15 +337,15 @@ msgstr "parallelport"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "token ring netkort"
+msgstr "token ring netværkskort"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "arcnet netkort"
+msgstr "arcnet netværkskort"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "FDDI netkort"
+msgstr "FDDI netværkskort"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
@@ -352,7 +353,7 @@ msgstr "HIPPI netkort"
 
 #. TXT_CHOOSE_NET
 msgid "Choose the network device."
-msgstr "Vælg netkortsenheden."
+msgstr "Vælg netværkskortenheden."
 
 #. TXT_INPUT_PLIP_IP
 msgid "Enter the IP address of the PLIP partner."
@@ -456,7 +457,7 @@ msgstr "Kunne ikke montere den angivne partition."
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
-msgstr "Indtast kildekataloget."
+msgstr "Indtast kildekmappe."
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
@@ -494,15 +495,15 @@ msgstr "Aflusning (debug - for eksperter)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Indlæs roddisken til ramdisk"
+msgstr "Indlæs rodimagefilen til ramdisk"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr "Angiv roddisk"
+msgstr "Angiv rodimagefil"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
-msgstr "Vil du indlæse roddisken til ramdisk?"
+msgstr "Vil du indlæse rodimagefilen til ramdisk?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
@@ -550,7 +551,7 @@ msgstr "Angiv NFS porten."
 
 #. TXT_ASKING_NAMED
 msgid "Asking name server..."
-msgstr "Laver DNS opslag..."
+msgstr "Spørger om navne server..."
 
 #. TXT_HOST_NOT_FOUND
 #, c-format
@@ -559,7 +560,7 @@ msgstr "Værten %s blev ikke fundet."
 
 #. TXT_NET_CONFIGURED
 msgid "Your network is already configured. Keep this configuration?"
-msgstr "Dit netkort er allerede opsat. Vil du beholde denne opsætning?"
+msgstr "Dit netværkskort er allerede opsat. Vil du beholde denne opsætning?"
 
 #. TXT_ASK_BREAK
 msgid "Abort?"
@@ -570,8 +571,8 @@ msgid ""
 "No network device found.\n"
 "Load a network module first."
 msgstr ""
-"Der blev ikke fundet nogen netkort.\n"
-"Indlæst et netkortsmodul først."
+"Der blev ikke fundet nogen netværkskort.\n"
+"Indlæst et netværkskortsmodul først."
 
 #. TXT_ALREADY_FOUND
 #, c-format
@@ -599,11 +600,11 @@ msgstr "Indtast adgangskoden for FTP brugerens konto."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "Indtast adressen på FTP proxien."
+msgstr "Indtast adressen på FTP proxy."
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "Indtast porten på FTP proxien."
+msgstr "Indtast porten på FTP proxy."
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
@@ -676,8 +677,8 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Hvis du vil tilgå det udbudte drev som gæst behøver du ikke angive noget brugnavn,adgangskode eller arbejdsgruppe.\n"
-"Vil du tilgå det udbudte drev som gæst?"
+"Hvis du vil tilgå det delte drev som gæst behøver du ikke angive noget brugnavn,adgangskode eller arbejdsgruppe.\n"
+"Vil du tilgå det delte drev som gæst?"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
@@ -689,7 +690,7 @@ msgstr "Skriv din adgangskode på SMB serveren."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
-msgstr "Indtast din arbejdsgruppe.Hvis du ikke behøver at angive en arbejdsgruppe kan du lave feltet være blankt."
+msgstr "Indtast din arbejdsgruppe.Hvis du ikke behøver at angive en arbejdsgruppe kan du lade feltet være blankt."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -698,7 +699,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Forsøger at montere det udbudte drev\n"
+"Forsøger at montere det delte drev\n"
 "\n"
 "\"//%s/%s\""
 
@@ -839,16 +840,16 @@ msgstr "Brug en %s proxy?"
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Angiv adressen på %s proxien."
+msgstr "Angiv adressen på %s proxy."
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "Angiv porten på %s proxien."
+msgstr "Angiv porten på %s proxy."
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
-msgstr "Slå VNC til eller fra"
+msgstr "Aktivér eller deaktivér VNC"
 
 #. TXT_VNC_YES_NO
 msgid "Use VNC for install?"
@@ -856,7 +857,7 @@ msgstr "Brug VNC til installationen?"
 
 #. TXT_SSH_SWITCH
 msgid "Enable or Disable SSH Mode"
-msgstr "Slå SSH til eller fra"
+msgstr "Aktivér eller deaktivér SSH tilstand"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
@@ -889,7 +890,7 @@ msgstr "Vis driveropdateringer"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Indtast IP'et på %u serveren eller tryk ESC."
+msgstr "Indtast IP'et på %u navneserveren eller tryk ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -918,7 +919,7 @@ msgstr "Indtast IP-adressen på maskinen der kører X11 serveren."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Vælg venligst din netkortstype."
+msgstr "Vælg venligst din netværkskortsenhed."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the target VM guest."
@@ -1045,7 +1046,7 @@ msgstr "Driveropdateringsliste"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Ingen driveropdateringer endnu."
+msgstr "Ingen driveropdateringer indtil videre."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1086,7 +1087,7 @@ msgstr ""
 
 #. TXT_SLP_SOURCE
 msgid "Choose an installation source"
-msgstr "Vælg en installationskilde"
+msgstr "Vælg en softwarekilde"
 
 #. TXT_INVALID_FQHOSTNAME
 msgid "This is not a valid fully qualified hostname."
@@ -1169,8 +1170,17 @@ msgstr "MAC-adresse"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP-adressen %s er allerede i brug af en anden maskine!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Finder og indlæser netværk-drivers"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Indtast IP'en på navneserveren %u eller \"+++\" for 'ingen'."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Skriv IP-adressen på din navneserver her. Hvis du ikke bruger en navneserver så indtast \"+++\"."

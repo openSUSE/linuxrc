@@ -5,13 +5,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2001-09-22 08:19+0200\n"
+"PO-Revision-Date: 2009-01-05 16:57\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.5\n"
 
 #. TXT_OK
 msgid "OK"
@@ -231,7 +230,7 @@ msgstr "Если для доступа к серверу используетс�
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Введите IP-адрес сервера имен. Если сервер имен не используется, нажмите клавишу ESC."
+msgstr "Введите IP-адрес cканер имен. Если сервер имен не используется, нажмите клавишу ESC."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -254,11 +253,11 @@ msgstr "Во время настройки сети возникла ошибк�
 
 #. TXT_INPUT_SERVER
 msgid "Enter the IP address of the NFS server."
-msgstr "Введите IP-адрес NFS-сервера."
+msgstr "Введите IP-адрес NFS-cканер."
 
 #. TXT_INPUT_FTPSERVER
 msgid "Enter the IP address of the FTP server."
-msgstr "Введите IP-адрес FTP-сервера."
+msgstr "Введите IP-адрес FTP-cканер."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
@@ -489,7 +488,7 @@ msgstr "Отладка (для экспертов)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Загрузить корневой образ в виртуальный диск"
+msgstr "Загрузить корн. образ в вирт.диск"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
@@ -594,11 +593,11 @@ msgstr "Введите пароль для учетной записи поль�
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "Введите адрес прокси-сервера для FTP."
+msgstr "Введите адрес прокси-cканер для FTP."
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "Введите порт прокси-сервера для FTP."
+msgstr "Введите порт прокси-cканер для FTP."
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
@@ -676,11 +675,11 @@ msgstr ""
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
-msgstr "Введите имя пользователя SMB сервера."
+msgstr "Введите имя пользователя SMB cканер."
 
 #. TXT_SMB_ENTER_PASSWORD
 msgid "Enter your password on the SMB server."
-msgstr "Введите ваш пароль SMB сервера.."
+msgstr "Введите ваш пароль SMB cканер.."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
@@ -739,7 +738,7 @@ msgstr "Выберите сетевой протокол."
 #. TXT_INPUT_NETSERVER
 #, c-format
 msgid "Enter the IP address of the %s server."
-msgstr "Введите IP-адрес сервера %s."
+msgstr "Введите IP-адрес cканер %s."
 
 # %s is FTP or HTTP
 #. TXT_TRY_REACH_SERVER
@@ -832,12 +831,12 @@ msgstr "Использовать %s прокси?"
 #. TXT_ENTER_PROXY
 #, c-format
 msgid "Enter the address of the %s proxy."
-msgstr "Введите адрес прокси-сервера для %s."
+msgstr "Введите адрес прокси-cканер для %s."
 
 #. TXT_ENTER_PROXYPORT
 #, c-format
 msgid "Enter the port of the %s proxy."
-msgstr "Введите порт прокси-сервера для %s."
+msgstr "Введите порт прокси-cканер для %s."
 
 #. TXT_VNC_SWITCH
 msgid "VNC Enable or Disable"
@@ -882,7 +881,7 @@ msgstr "Показать обновления драйвера"
 #. TXT_INPUT_NAMED1
 #, c-format
 msgid "Enter the IP of name server %u or press ESC."
-msgstr "Введите IP-адрес сервера имен %u или нажмите клавишу ESC."
+msgstr "Введите IP-адрес cканер имен %u или нажмите клавишу ESC."
 
 #. TXT_ROOT_PASSWORD
 msgid ""
@@ -1162,8 +1161,17 @@ msgstr "MAC-адрес"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP-адрес %s уже используется другим компьютером!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Обнаружение и загрузка сетевых драйверов"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Введите IP-адрес cканер имен %u или при отсутствии введите \"+++\"."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Введите IP-адрес cканер имен. Если сервер имен не используется, просто введите \"+++\"."

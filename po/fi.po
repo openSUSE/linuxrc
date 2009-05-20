@@ -5,14 +5,15 @@
 # Jyri Palokangas <jmp@netti.fi>, 2005, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: fi\n"
-"PO-Revision-Date: 2006-03-20 10:05+0200\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"Project-Id-Version: linuxrc.fi\n"
+"PO-Revision-Date: 2008-08-23 11:39+0300\n"
+"Last-Translator: Mikko Piippo <mikko.piippo@opensuse.fi>\n"
+"Language-Team: Finnish <kde-i18n-doc@lists.kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.2\n"
+"X-Generator: LoKalize 0.2\n"
+"Plural-Forms:  nplurals=2; plural=n != 1;\n"
 
 #. TXT_OK
 msgid "OK"
@@ -52,7 +53,7 @@ msgstr "Kieli"
 
 #. TXT_MENU_MODULES
 msgid "Kernel Modules (Hardware Drivers)"
-msgstr "Ydinmoduulit (Laitteisto-ohjaimet)"
+msgstr "Ydinmoduulit (laitteisto-ohjaimet)"
 
 #. TXT_MENU_START
 msgid "Start Installation or System"
@@ -103,7 +104,7 @@ msgid ""
 msgstr ""
 "Yritetään ottaa käyttöön moduulia \"%s\"...\n"
 "\n"
-"Käyttöönoton aikana voit seurata ytimen viestejä virtuaalikonsolissa 4 (ALT-F4). Käytä ALT-F1 palataksesi takaisin tähän valikkoon."
+"Käyttöönoton aikana voit seurata ytimen viestejä virtuaalikonsolissa 4 (Alt-F4). Käytä Alt-F1 palataksesi takaisin tähän valikkoon."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
@@ -200,7 +201,7 @@ msgstr "PCI"
 
 #. TXT_INSERT_DISK
 msgid "Insert the disk and press ENTER."
-msgstr "Laita levy asemaan ja paina ENTER."
+msgstr "Laita levy asemaan ja paina Enter."
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
@@ -208,15 +209,15 @@ msgstr "Virhe luettaessa levykkeeltä."
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
-msgstr "Anna juuri-osio (esim, /dev/sda3)"
+msgstr "Anna juuri-osio (esimerkiksi /dev/sda3)"
 
 #. TXT_INVALID_ROOT_FS
 msgid "Invalid root device."
-msgstr "Juuri-laite ei kelpaa."
+msgstr "Root-laite ei kelpaa."
 
 #. TXT_INVALID_INPUT
 msgid "Invalid input."
-msgstr "Epäkelpo syöte."
+msgstr "Virheellinen syöte."
 
 #. TXT_INPUT_IPADDR
 msgid "Enter your IP address."
@@ -232,7 +233,7 @@ msgstr "Jos tarvitset yhdyskäytävää tavoittaaksesi palvelimen, anna yhdyskä
 
 #. TXT_INPUT_NAMED
 msgid "Enter the IP address of your name server. If you do not use a name server, press ESC."
-msgstr "Anna nimipalvelimesi IP-osoite. Jos et käytä nimipalvelinta, paina ESC."
+msgstr "Anna nimipalvelimesi IP-osoite. Jos et käytä nimipalvelinta, paina Esc."
 
 #. TXT_FOUND_HOST
 #, c-format
@@ -335,7 +336,7 @@ msgstr "rinnakkaisportti"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "token ring-verkkokortti"
+msgstr "token ring -verkkokortti"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
@@ -427,7 +428,7 @@ msgstr ""
 
 #. TXT_CHOOSE_SOURCE
 msgid "Choose the source medium."
-msgstr "Valitse lähdemedia."
+msgstr "Valitse lähdetietoväline."
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
@@ -473,7 +474,7 @@ msgid ""
 msgstr ""
 "Tietokoneessasi on erittäin vähän muistia.\n"
 "\n"
-"Ennen tämän viestin kuittaamista, sinun tulisi vaihtaa virtuaalikonsoliin 2 (paina ALT-F2) luodaksesi ja ottaaksesi käyttöön swap-tilaa."
+"Ennen tämän viestin kuittaamista, sinun tulisi vaihtaa virtuaalikonsoliin 2 (paina Alt-F2) luodaksesi ja ottaaksesi käyttöön swap-tilaa."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -493,15 +494,15 @@ msgstr "Virheenjäljitys (asiantuntija)"
 
 #. TXT_FORCE_ROOTIMAGE
 msgid "Load Root Image into RAM Disk"
-msgstr "Lataa juuri-levykuva RAM-levylle"
+msgstr "Lataa juurilevykuva RAM-levylle"
 
 #. TXT_NEW_ROOTIMAGE
 msgid "Enter Root Image"
-msgstr "Anna juuri-levykuva"
+msgstr "Anna juurilevykuva"
 
 #. TXT_ASK_RI_FORCE
 msgid "Should the root image be loaded into the RAM disk?"
-msgstr "Tulisiko juuri-levykuva ladata RAM-levylle?"
+msgstr "Tulisiko juurilevykuva ladata RAM-levylle?"
 
 #. TXT_ENTER_ROOTIMAGE
 msgid "Enter the path and name of the file to load into the RAM disk as the root file system."
@@ -619,7 +620,7 @@ msgid ""
 "Use a user name and password?"
 msgstr ""
 "Yleensä FTP-asennus suoritetaan anonyymin FTP:n kautta. On mahdollista määrittää käyttäjätunnus ja salasana FTP-palvelimen yhteydelle.\n"
-"Käytetäänlö käyttäjätunnusta ja salasanaa?"
+"Käytetäänkö käyttäjätunnusta ja salasanaa?"
 
 #. TXT_MORE_MODULES
 msgid "-- More Modules --"
@@ -675,7 +676,7 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"Jos haluat pääsyn jakoon vieras-tilillä,sinun ei tarvitse määrittää käyttäjätunnusta, salasanaa ja työryhmää.\n"
+"Jos haluat pääsyn jakoon vieras-tilillä, sinun ei tarvitse määrittää käyttäjätunnusta, salasanaa ja työryhmää.\n"
 "Yhdistetäänkö jakoon vieraana?"
 
 #. TXT_SMB_ENTER_USER
@@ -688,7 +689,7 @@ msgstr "Anna salasanasi SMB-palvelimelle."
 
 #. TXT_SMB_ENTER_WORKGROUP
 msgid "Enter your workgroup.If you do not need to specify a workgroup,leave the field empty."
-msgstr "Anna työryhmäsi.Jos sinun ei tarvitse määrittää työryhmää,jätä kenttä tyhjäksi."
+msgstr "Anna työryhmäsi. Jos sinun ei tarvitse määrittää työryhmää, jätä kenttä tyhjäksi."
 
 #. TXT_SMB_TRYING_MOUNT
 #, c-format
@@ -764,7 +765,7 @@ msgstr "Lataa %s moduulit"
 
 #. TXT_LOAD_FS
 msgid "Load File System Modules"
-msgstr "Lataa tiedostojärjestelmä-moduulit"
+msgstr "Lataa tiedostojärjestelmämoduulit"
 
 #. TXT_LOAD_OTHER
 msgid "Load Unknown Modules"
@@ -874,7 +875,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"Perusjärjestelmä asennettiin onnistuneesti. Tietokoneesi täytyy uudelleen käynnistää. Poista kaikki asennusmediat (CD-ROM, levyke).\n"
+"Perusjärjestelmä asennettiin onnistuneesti. Tietokoneesi täytyy uudelleen käynnistää. Poista kaikki asennustietovälineet (CD-ROM, levyke).\n"
 "Älä poista levykettä, jos käynnistyslatain on asennettu sille."
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -965,7 +966,7 @@ msgstr "Laajennettu tila"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
-msgstr "Yhteensopivuustila OS/390 ja z/OS päätteille"
+msgstr "Yhteensopivuustila OS/390- ja z/OS-päätteille"
 
 #. TXT_QETH_PORTNAME
 msgid "Portname to use"
@@ -981,7 +982,7 @@ msgstr "Anna vastaava portin numero"
 
 #. TXT_CHECK_CD
 msgid "Verify Installation CD-ROM/DVD"
-msgstr "Tarkista asennus CD-ROM/DVD"
+msgstr "Tarkista asennus-CD-ROM/DVD"
 
 # turn the computer off
 #. TXT_POWER_OFF
@@ -990,7 +991,7 @@ msgstr "Sammuta"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Ohjaimen päivitysmedian käyttäminen ei onnistu"
+msgstr "Ohjaimen päivitystietovälineen käyttäminen ei onnistu"
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
@@ -1011,7 +1012,7 @@ msgstr "Ohjainpäivitys ok"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Valitse ohjainpäivitysmedia."
+msgstr "Valitse ohjainpäivitystietoväline."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
@@ -1019,7 +1020,7 @@ msgstr "Anna ohjainpäivityslaite."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
-msgstr "Epäkelpo laitenimi."
+msgstr "Virheellinen laitenimi."
 
 #. TXT_SEARCH_CDROM
 msgid "Looking for CD-ROM drives..."
@@ -1048,11 +1049,11 @@ msgstr "Ei ohjainpäivityksiä tähän mennessä."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
-msgstr "Syötä asennus CD-ROM- tai DVD-levy."
+msgstr "Syötä asennus-CD-ROM- tai DVD-levy."
 
 #. TXT_NO_CD_DVD
 msgid "No CD-ROM or DVD found."
-msgstr "CD-ROM tai DVD-levyä ei löytynyt."
+msgstr "CD-ROM- tai DVD-levyä ei löytynyt."
 
 # e.g 'not a SUSE LINUX CD-ROM'
 #. TXT_WRONG_CD
@@ -1130,7 +1131,7 @@ msgstr "Valitse CCW-väyläliitäntä."
 
 #. TXT_CHOOSE_OSA_MEDIUM
 msgid "Please choose the physical medium."
-msgstr "Valitse fyysinen media."
+msgstr "Valitse fyysinen tietoväline."
 
 # progress indicator label
 #. TXT_LOADING_MODULES
@@ -1168,8 +1169,17 @@ msgstr "MAC-osoite"
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr ""
+msgstr "IP osoite %s on jo toisen koneen käytössä!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr ""
+msgstr "Tunnistetaan ja ladataan verkkoajurit"
+
+#. TXT_INPUT_NAMED1_S390
+#, c-format
+msgid "Enter the IP of name server %u or \"+++\" for none."
+msgstr "Anna nimipalvelimen %u IP-osoite tai \"+++\"."
+
+#. TXT_INPUT_NAMED_S390
+msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
+msgstr "Anna nimipalvelimesi IP-osoite. Jos et käytä nimipalvelinta, anna \"+++\"."
