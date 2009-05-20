@@ -10,3 +10,4 @@ int auto2_add_extension(char *extension);
 int auto2_remove_extension(char *extension);
 void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item);
 void auto2_user_netconfig(void);
+void auto2_user_netconfig(void);

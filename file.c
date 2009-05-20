@@ -1112,6 +1112,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 #if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
 #endif
+            else if(!strcmp(s, "now")) i = NS_NOW;
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
               i = NS_NAMESERVER;
               t = s + sizeof "nameserver" - 1;
@@ -1130,6 +1131,9 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             if(i == NS_ALLIFS) {
               config.net.all_ifs = *sl->key == '-' ? 0 : 1;
             }
+            else if(i == NS_NOW) {
+              config.net.now = *sl->key == '-' ? 0 : 1;
+            }
             else if(i) {
               if(*sl->key == '-') {
                 config.net.setup &= ~i;
@@ -1143,6 +1147,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           slist_free(sl0);
         }
         if(!config.net.setup) config.net.do_setup = 0;
+        if(config.net.now) {
+          auto2_user_netconfig();
+          config.net.now = 0;
+        }
         break;
 
       case key_rootpassword:
