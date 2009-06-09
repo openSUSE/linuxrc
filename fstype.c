@@ -260,7 +260,7 @@ fstype(const char *device) {
 
     if (!type) {
         unsigned ntype = 0;
-        char *type_str[] = { "ext2", "ext3", "ext4dev" };
+        char *type_str[] = { "ext2", "ext3", "ext4" };
 
 	/* block 1 */
 	if (lseek(fd, 1024, SEEK_SET) != 1024 ||
