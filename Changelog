@@ -1,3 +1,6 @@
+10/6/2009:	v3.3.37
+	- don't look for yast files in zen mode
+
 14/5/2009:	v3.3.36
 	- netsetup option is not used when doing network install (bnc #495525)
 	- added 'netsetup=now' to force immediate network configuration (bnc #495525)

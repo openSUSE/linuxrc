@@ -500,7 +500,7 @@ int auto2_find_repo()
   }
 
   /* get some files for lazy yast */
-  if(!err) auto2_read_repo_files(config.url.install);
+  if(!err && !config.zen) auto2_read_repo_files(config.url.install);
 
 #if 0
   if(err && (config.sig_failed || config.sha1_failed)) {
