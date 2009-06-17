@@ -1,3 +1,6 @@
+17/6/2009:	v2.0.87
+	- s390: deactivate devices after an error occurred (bnc#411635)
+
 9/6/2009:	v2.0.86
 	- remove s390 reboot workaround (fate#305938)
 

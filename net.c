@@ -1998,6 +1998,8 @@ int net_activate_s390_devs(void)
   int rc;
   char buf[100];
   char hwcfg_name[40];
+  static int device_is_grouped = 0;
+  static int device_is_online = 0;
 
   dia_item_t di;
   dia_item_t items[] = {
@@ -2009,6 +2011,24 @@ int net_activate_s390_devs(void)
     di_390net_iucv,
     di_none
   };
+  
+  if (device_is_online) {
+    if (config.hwp.type == di_390net_iucv) {
+      sprintf(buf, "/sys/bus/iucv/drivers/netiucv/remove");
+      /* assumes we never have more than one IUCV interface at a time */
+      (void)util_set_sysfs_attr(buf, "netiucv0");
+    }
+    else {
+      sprintf(buf, "/sys/bus/ccwgroup/devices/%s/online", config.hwp.readchan);
+      (void)util_set_sysfs_attr(buf, "0");
+    }
+    device_is_online = 0;
+  }
+  if (device_is_grouped) {
+    sprintf(buf, "/sys/bus/ccwgroup/devices/%s/ungroup", config.hwp.readchan);
+    (void)util_set_sysfs_attr(buf, "1");
+    device_is_grouped = 0;
+  }
 
   IFNOTAUTO(config.hwp.type)
   {
@@ -2032,6 +2052,7 @@ int net_activate_s390_devs(void)
     mod_modprobe("netiucv",NULL);	// FIXME: error handling
 
     if((rc=util_set_sysfs_attr("/sys/bus/iucv/drivers/netiucv/connection",config.hwp.userid))) return rc;
+    device_is_online = 1;
 
     sprintf(hwcfg_name,"static-iucv-id-%s",config.hwp.userid);
     config.hwp.module="netiucv";
@@ -2075,6 +2096,7 @@ int net_activate_s390_devs(void)
     }
 
     if((rc=net_s390_group_chans(2,"ctc"))) return rc;
+    device_is_grouped = 1;
 
     /* set protocol */
     if ((rc=net_s390_ctc_protocol(config.hwp.protocol-1))) return rc;
@@ -2083,6 +2105,7 @@ int net_activate_s390_devs(void)
 	fprintf(stderr,"Could not activate device\n");
 	return rc;
     }
+    device_is_online = 1;
     net_s390_set_config_ccwdev();
     sprintf(hwcfg_name, "ctc-bus-ccw-%s",config.hwp.readchan);
     config.hwp.module="ctc";
@@ -2176,6 +2199,7 @@ int net_activate_s390_devs(void)
       }
       
       if((rc=net_s390_group_chans(3,"qeth"))) return rc;
+      device_is_grouped = 1;
 
       if((rc=net_s390_qdio_portname(config.hwp.portname))) return rc;
       
@@ -2183,6 +2207,7 @@ int net_activate_s390_devs(void)
       if(config.hwp.layer2 == 2) if((rc=net_s390_enable_layer2(1))) return rc;
 
       if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
+      device_is_online = 1;
       
       sprintf(hwcfg_name, "qeth-bus-ccw-%s",config.hwp.readchan);
       config.hwp.module="qeth";
@@ -2203,11 +2228,13 @@ int net_activate_s390_devs(void)
         if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
 
       if((rc=net_s390_group_chans(2,"lcs"))) return rc;
+      device_is_grouped = 1;
       
       /* set port number */
       if((rc=net_s390_lcs_portno(config.hwp.portname))) return rc;
       
       if((rc=net_s390_put_online(config.hwp.readchan))) return rc;
+      device_is_online = 1;
       
       net_s390_set_config_ccwdev();
       sprintf(hwcfg_name, "lcs-bus-ccw-%s",config.hwp.readchan);
