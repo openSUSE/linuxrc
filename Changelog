@@ -1,3 +1,6 @@
+9/6/2009:	v2.0.86
+	- remove s390 reboot workaround (fate#305938)
+
 20/5/2009:	v2.0.85
 	- backport fix for bnc #388424
 
