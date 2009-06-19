@@ -834,6 +834,8 @@ void lxrc_init()
 
   util_redirect_kmsg();
 
+  util_setup_udevrules();
+
   if(!config.udev_mods) {
     system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
   }

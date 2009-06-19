@@ -407,6 +407,7 @@ typedef struct {
   char *vga;			/* vga option */
   int vga_mode;			/* vga mode number */
   slist_t *extend_list;		/* list of loaded instsys extensions */
+  slist_t *udevrules;		/* udev rules */
 
   struct {
     char *instsys_default;	/* default instsys url */

@@ -158,4 +158,5 @@ char *new_download(void);
 void util_clear_downloads(void);
 void util_wait(const char *file, int line);
 void run_braille(void);
+void util_setup_udevrules(void);
 

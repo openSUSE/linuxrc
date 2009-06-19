@@ -1,3 +1,6 @@
+19/6/2009:	v3.4.2
+	- added udev.rule option to write udev rules (fate #305867)
+
 9/6/2009:	v3.4.1
 	- added 'netsetup=now' to force immediate network configuration
 	- ext4dev -> ext4

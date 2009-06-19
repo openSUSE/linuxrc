@@ -302,6 +302,7 @@ static struct {
   { key_usesax2,        "Sax2",           kf_cfg + kf_cmd                },
   { key_efi,            "EFI",            kf_cfg + kf_cmd                },
   { key_supporturl,     "supporturl",     kf_cfg + kf_cmd                },
+  { key_udevrule,       "udev.rule",      kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1565,6 +1566,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         str_copy(&config.supporturl, f->value);
         break;
 
+      case key_udevrule:
+        if(*f->value && !slist_getentry(config.udevrules, f->value)) {
+          slist_append_str(&config.udevrules, f->value);
+        }
+        break;
+
       default:
         break;
     }
@@ -2026,16 +2033,18 @@ file_t *file_read_cmdline(file_key_flag_t flags)
 file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
 {
   file_t *ft0 = NULL, **ft = &ft0;
-  char *current, *s, *s1, *t, *t1;
+  char *current, *s, *s1, *t, *t1, sep = ' ';
   int i, quote;
 
   if(!buf) return NULL;
 
+  if((flags & kf_comma)) sep = ',';
+
   current = buf;
 
   do {
-    while(isspace(*current)) current++;
-    for(quote = 0, s = current; *s && (quote || !isspace(*s)); s++) {
+    while(isspace(*current) || *current == sep) current++;
+    for(quote = 0, s = current; *s && (quote || !(isspace(*s) || *s == sep)); s++) {
       if(quote) {
         if(*s == quote) quote = 0;
       }

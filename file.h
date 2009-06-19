@@ -50,7 +50,7 @@ typedef enum {
   key_nomdns, key_yepurl, key_yepcert, key_mediacheck, key_y2gdb, key_squash,
   key_kexec_reboot, key_devbyid, key_braille, key_nfsopts, key_ipv4, key_ipv4only,
   key_ipv6, key_ipv6only, key_usesax2, key_efi, key_supporturl, key_portno,
-  key_osahwaddr, key_zen, key_zenconfig
+  key_osahwaddr, key_zen, key_zenconfig, key_udevrule
 } file_key_t;
 
 typedef enum {
@@ -64,7 +64,8 @@ typedef enum {
   kf_boot = 1 << 6,		/* things the boot loader used */
   kf_cmd1 = 1 << 7,		/* between cmd_early and start of hw detection */
   kf_ibft = 1 << 8,		/* ibft values (iSCSI BIOS) */
-  kf_cont = 1 << 9		/* 'content' file */
+  kf_cont = 1 << 9,		/* 'content' file */
+  kf_comma = 1 << 10		/* accept commas as option separator (in command line syntax) */
 } file_key_flag_t;
 
 typedef struct file_s {
