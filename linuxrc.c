@@ -502,14 +502,6 @@ void lxrc_end()
   LXRC_WAIT
 
   if(!config.test) {
-    if(config.new_root) {
-      // really ???
-      // tell kernel root is /dev/ram0, prevents remount after initrd
-      if(!(f = fopen ("/proc/sys/kernel/real-root-dev", "w"))) return;
-      fprintf(f, "256\n");
-      fclose(f);
-    }
-
     util_umount("/dev/pts");
     util_umount("/sys");
     util_umount("/proc/bus/usb");

@@ -1,3 +1,5 @@
+	- removed last trace of real-root-dev (bnc #192405)
+
 19/6/2009:	v3.4.2
 	- added udev.rule option to write udev rules (fate #305867)
 
