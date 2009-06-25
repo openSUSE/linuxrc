@@ -1,4 +1,6 @@
+25/6/2009:	v3.4.3
 	- removed last trace of real-root-dev (bnc #192405)
+	- pass on DHCPTimeout to install.inf (bnc #396824)
 
 19/6/2009:	v3.4.2
 	- added udev.rule option to write udev rules (fate #305867)

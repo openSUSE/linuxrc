@@ -700,7 +700,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_dhcptimeout:
-        if(f->is.numeric) config.net.dhcp_timeout = f->nvalue;
+        if(f->is.numeric) {
+          config.net.dhcp_timeout = f->nvalue;
+          config.net.dhcp_timeout_set = 1;
+        }
         break;
 
       case key_tftptimeout:
@@ -1884,6 +1887,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
   file_write_num(f, key_usesax2, config.usesax2);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
+  if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
 
   if(
     config.rootpassword &&
