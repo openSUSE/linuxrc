@@ -2203,7 +2203,7 @@ int net_activate_s390_devs(void)
 
       if((rc=net_s390_qdio_portname(config.hwp.portname))) return rc;
       
-      if(config.hwp.portno) if((rc = net_s390_set_portno(config.hwp.portno))) return rc;
+      if(config.hwp.portno) if((rc = net_s390_set_portno(config.hwp.portno - 1))) return rc;
       if(config.hwp.layer2 == 2) if((rc=net_s390_enable_layer2(1))) return rc;
 
       if((rc=net_s390_put_online(config.hwp.readchan))) return rc;

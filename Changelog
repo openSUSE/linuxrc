@@ -1,3 +1,6 @@
+6/7/2009:	v2.0.88
+	- s390: off-by-one in OSA port number code (bnc#519136)
+
 17/6/2009:	v2.0.87
 	- s390: deactivate devices after an error occurred (bnc#411635)
 
