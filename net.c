@@ -1848,6 +1848,7 @@ int net_dhcp4()
   char cmd[256], file[256], *s;
   file_t *f0, *f;
   window_t win;
+  int got_ip = 0;
   slist_t *sl0, *sl;
 
   if(config.net.dhcp_active || config.net.keep) return 0;
@@ -1888,6 +1889,7 @@ int net_dhcp4()
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_ipaddr:
+        got_ip = 1;
         name2inet(&config.net.hostname, f->value);
         net_check_address(&config.net.hostname, 0);
         break;
@@ -1947,7 +1949,7 @@ int net_dhcp4()
 
   if(config.win) win_close(&win);
 
-  if(f0) {
+  if(got_ip) {
     config.net.dhcp_active = 1;
     if(config.net.ifup_wait) sleep(config.net.ifup_wait);
   }

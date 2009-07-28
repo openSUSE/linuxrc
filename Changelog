@@ -1,3 +1,6 @@
+28/7/2009:	v3.3.39
+	- correctly detect dhcp failure (bnc #406475)
+
 25/6/2009:	v3.3.38
 	- pass on DHCPTimeout to install.inf (bnc #396824)
 
