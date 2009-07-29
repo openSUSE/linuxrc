@@ -1,3 +1,6 @@
+29/7/2009:	v3.4.4
+	- handle zypp iso url scheme (bnc #507474)
+
 25/6/2009:	v3.4.3
 	- removed last trace of real-root-dev (bnc #192405)
 	- pass on DHCPTimeout to install.inf (bnc #396824)

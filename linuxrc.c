@@ -475,8 +475,6 @@ void lxrc_movetotmpfs()
 
 void lxrc_end()
 {
-  FILE *f;
-
   if(config.netstop) {
     LXRC_WAIT
 

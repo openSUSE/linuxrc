@@ -723,15 +723,30 @@ char *url_print(url_t *url, int format)
 }
 
 
+/*
+ * according to zypp/media/MediaManager.h
+ */
 char *url_print_zypp(url_t *url)
 {
   static char *buf = NULL, *s;
+  char *path = NULL, *file = NULL;
   int q = 0, scheme;
 
   // printf("start buf = %p\n", buf);
   // LXRC_WAIT
 
   str_copy(&buf, NULL);
+
+  str_copy(&path, url->path);
+
+  if(url->is.file && path) {
+    if((file = strrchr(path, '/')) && *file) {
+      *file++ = 0;
+    }
+    else {
+      file = NULL;
+    }
+  }
 
   scheme = url->scheme;
 
@@ -778,11 +793,11 @@ char *url_print_zypp(url_t *url)
   }
 
   if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
-  if(url->path) {
+  if(path) {
     strprintf(&buf, "%s/%s%s",
       buf,
-      url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
-      *url->path == '/' ? url->path + 1 : url->path
+      url->scheme == inst_ftp && *path == '/' ? "%2F" : "",
+      *path == '/' ? path + 1 : path
     );
   }
 
@@ -791,6 +806,12 @@ char *url_print_zypp(url_t *url)
       strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', long_dev(s));
     }
   }
+
+  if(url->is.file && file) {
+    strprintf(&buf, "iso:/?iso=%s&url=%s", file, buf);
+  }
+
+  str_copy(&path, NULL);
 
   // printf("end buf = %p\n", buf);
   // LXRC_WAIT

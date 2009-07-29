@@ -81,6 +81,10 @@ int auto2_init()
 
   ok = auto2_find_repo();
 
+  if(config.debug) fprintf(stderr, "ZyppRepoURL: %s\n", url_print(config.url.install, 4));
+
+  LXRC_WAIT
+
   util_splash_bar(50, SPLASH_50);
 
   return ok;
