@@ -2176,10 +2176,8 @@ int net_activate_s390_devs(void)
 	  }
       }
       
-      if(config.hwp.medium == di_osa_eth && di != di_390net_hsi)
-      {
-        IFNOTAUTO(config.hwp.layer2)
-        {
+      if(config.hwp.medium == di_osa_eth) {
+        IFNOTAUTO(config.hwp.layer2) {
           config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
         }
         if(config.hwp.layer2 == 2) {
@@ -2187,6 +2185,8 @@ int net_activate_s390_devs(void)
              dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
           }
         }
+      }
+      if(config.hwp.medium == di_osa_eth && di != di_390net_hsi) {
         IFNOTAUTO(config.hwp.portno)
         {
           char* port = NULL;

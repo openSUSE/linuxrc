@@ -1,3 +1,6 @@
+30/7/2009:	v2.0.90
+	- s390: ask for layer2 and MAC address for HSI, too (bnc#524546)
+
 14/7/2009:	v2.0.89
 	- set default dhcp timeout to 90s (bnc #518599)
 
