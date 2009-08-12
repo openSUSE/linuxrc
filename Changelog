@@ -1,3 +1,7 @@
+12/8/2009:	v2.0.91
+	- s390: work around bugged Operating System Messages console
+          that sends empty lines as " \r" instead of "\r" (bnc#517763)
+
 30/7/2009:	v2.0.90
 	- s390: ask for layer2 and MAC address for HSI, too (bnc#524546)
 

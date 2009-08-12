@@ -1024,6 +1024,13 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
       win_close (&win_ri);
     }
     
+#if defined(__s390__) || defined(__s390x__)
+    /* HMC console is bugged and sends SPACE LF instead of LF when
+       user presses enter on an empty line */
+    if(strcmp(input_tr, " ") == 0) {
+      *input_tr = 0;
+    }
+#endif
     if(strcmp(input_tr, "+++") == 0)	/* escape sequence */
       return -1;
     else
