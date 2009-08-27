@@ -1,3 +1,6 @@
+27/8/2009:	v3.3.40
+	- no blocking popup for DHCP error message (bnc #534078)
+
 28/7/2009:	v3.3.39
 	- correctly detect dhcp failure (bnc #406475)
 

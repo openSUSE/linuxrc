@@ -1201,7 +1201,7 @@ int net_choose_device()
   }
 
   if(config.manual == 1 && !net_drivers_loaded) {
-    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS));
+    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS), MSGTYPE_INFO);
     load_network_mods();
     win_close(&win);
     net_drivers_loaded = 1;
@@ -1638,7 +1638,7 @@ int net_bootp()
 
   if(config.win) {
     sprintf(tmp, txt_get(TXT_SEND_DHCP), "BOOTP");
-    dia_info(&win, tmp);
+    dia_info(&win, tmp, MSGTYPE_INFO);
   }
 
   if(config.net.bootp_wait) sleep(config.net.bootp_wait);
@@ -1861,7 +1861,7 @@ int net_dhcp4()
 
   if(config.win) {
     sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");
-    dia_info(&win, cmd);
+    dia_info(&win, cmd, MSGTYPE_INFO);
   }
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
@@ -1956,7 +1956,9 @@ int net_dhcp4()
   else {
     if(config.win) {
       sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
-      dia_message(cmd, MSGTYPE_ERROR);
+      dia_info(&win, cmd, MSGTYPE_ERROR);
+      sleep(4);
+      win_close(&win);
     }
   }
 
@@ -2001,7 +2003,7 @@ int net_dhcp6()
 
   if(config.win) {
     strprintf(&cmd, txt_get(TXT_SEND_DHCP), "DHCP6");
-    dia_info(&win, cmd);
+    dia_info(&win, cmd, MSGTYPE_INFO);
   }
 
   if(!config.net.ipv4) net_apply_ethtool(config.net.device, config.net.hwaddr);
