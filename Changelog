@@ -1,3 +1,6 @@
+28/8/2009:	v3.3.41
+	- added udev.rule option to write udev rules (fate #305867)
+
 27/8/2009:	v3.3.40
 	- no blocking popup for DHCP error message (bnc #534078)
 

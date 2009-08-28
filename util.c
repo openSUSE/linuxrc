@@ -4768,3 +4768,30 @@ void run_braille()
   }
 }
 
+
+void util_setup_udevrules()
+{
+  slist_t *rule;
+  file_t *f, *f_mac, *f_name;
+  FILE *ff;
+
+  for(rule = config.udevrules; rule; rule = rule->next) {
+    f = file_parse_buffer(rule->key, kf_comma + kf_none);
+    if(
+      (f_mac = file_getentry(f, "mac")) &&
+      (f_name = file_getentry(f, "name"))
+    ) {
+      fprintf(stderr, "udev net rule: mac = \"%s\", name = \"%s\"\n", f_mac->value, f_name->value);
+      if((ff = fopen("/etc/udev/rules.d/70-persistent-net.rules", "a"))) {
+        fprintf(ff,
+          "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"%s\", ATTR{type}==\"1\", KERNEL==\"eth*\", NAME=\"%s\"\n",
+          f_mac->value,
+          f_name->value
+        );
+        fclose(ff);
+      }
+    }
+    file_free_file(f);
+  }
+}
+
