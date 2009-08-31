@@ -311,6 +311,11 @@ void auto2_scan_hardware()
     printf("Reading info file: %s\n", sl->key);
     fflush(stdout);
     url = url_set(sl->key);
+#if defined(__s390__) || defined(__s390x__)
+    if(url->is.network) {
+      net_config();
+    }
+#endif
     err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NOSHA1);
     url_umount(url);
     url_free(url);

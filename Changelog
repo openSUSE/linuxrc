@@ -1,3 +1,6 @@
+31/8/2009:	v3.3.42
+	- s390: activate network interface before loading info file
+
 28/8/2009:	v3.3.41
 	- added udev.rule option to write udev rules (fate #305867)
 
