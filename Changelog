@@ -1,3 +1,6 @@
+2/9/2009:	v3.3.43
+	- add possibility to run /bin/ip on network devices (bnc#462272)
+
 31/8/2009:	v3.3.42
 	- s390: activate network interface before loading info file
 

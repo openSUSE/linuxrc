@@ -395,6 +395,7 @@ typedef struct {
   char *rootpassword;
   int kbd_fd;			/* fd for console */
   slist_t *ethtool;		/* ethtool options */
+  slist_t *iptool;		/* /bin/ip options */
   slist_t *cd1texts;		/* text for requesting next product cd */
   unsigned swap_file_size;	/* swap file size in MB */
   window_t progress_win;	/* download status window */
@@ -555,6 +556,7 @@ typedef struct {
     char *unique_id;		/* unique id of network card */
     char *hwaddr;		/* hardware addr of network card */
     char *ethtool_used;		/* ethtool options used for active card */
+    char *iptool_used;		/* /bin/ip options used for active card */
     char *cardname;		/* network card name */
     struct {
       char *binary;		/* cifs/smb mount binary */

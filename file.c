@@ -66,7 +66,7 @@ static void file_write_inet2(FILE *f, file_key_t key, inet_t *inet, unsigned wha
 static void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what);
 
 static void add_driver(char *str);
-static void parse_ethtool(slist_t *sl, char *str);
+static void parse_nettool(slist_t *sl, char *str);
 static void wait_for_conn(int port);
 static int activate_network(void);
 
@@ -256,6 +256,7 @@ static struct {
   { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
   { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
+  { key_iptool,         "iptool",         kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
   { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
   { key_forceip,        "forceip",        kf_cfg + kf_cmd                },
@@ -1317,7 +1318,14 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_ethtool:
         if(*f->value) {
           sl = slist_append(&config.ethtool, slist_new());
-          parse_ethtool(sl, f->value);
+          parse_nettool(sl, f->value);
+        }
+        break;
+
+      case key_iptool:
+        if(*f->value) {
+          sl = slist_append(&config.iptool, slist_new());
+          parse_nettool(sl, f->value);
         }
         break;
 
@@ -1798,6 +1806,7 @@ void file_write_install_inf(char *dir)
     if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2 - 1);
 #endif
     file_write_str(f, key_ethtool, config.net.ethtool_used);
+    file_write_str(f, key_iptool, config.net.iptool_used);
     file_write_inet2(f, key_ip, &config.net.hostname, INET_WRITE_IP_BOTH + INET_WRITE_PREFIX);
     if(config.net.realhostname) {
       file_write_str(f, key_hostname, config.net.realhostname);
@@ -2442,10 +2451,11 @@ void get_ide_options()
 
 /*
  * Parse str and return result in sl. Modifies str.
+ * Used for (/bin/)ip and ethtool
  *
- * Syntax: [if:]ethtool_options
+ * Syntax: [if:]tool_options
  */
-void parse_ethtool(slist_t *sl, char *str)
+void parse_nettool(slist_t *sl, char *str)
 {
   char *s1, *s2;
 
@@ -2464,7 +2474,6 @@ void parse_ethtool(slist_t *sl, char *str)
     str_copy(&sl->value, str);
   }
 }
-
 
 void wait_for_conn(int port)
 {

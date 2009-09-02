@@ -24,5 +24,6 @@ int net_get_address(char *text, inet_t *inet, int do_dns);
 int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **password, unsigned *port);
 char *net_if2module(char *net_if);
 void net_apply_ethtool(char *device, char *hwaddr);
+void net_apply_iptool(char *device);
 int wlan_setup(void);
 

@@ -607,6 +607,7 @@ int net_activate4()
   if(!error_ii) {
     config.net.is_configured = nc_static;
     if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+    net_apply_iptool(config.net.device);
   }
 
   return error_ii;
@@ -697,6 +698,7 @@ int net_activate6()
   if(!err) {
     config.net.is_configured = nc_static;
     if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+    net_apply_iptool(config.net.device);
   }
 
   return err;
@@ -1952,6 +1954,7 @@ int net_dhcp4()
   if(got_ip) {
     config.net.dhcp_active = 1;
     if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+    net_apply_iptool(config.net.device);
   }
   else {
     if(config.win) {
@@ -2056,6 +2059,7 @@ int net_dhcp6()
   if(ok) {
     config.net.dhcp_active = 1;
     sleep(config.net.ifup_wait + 10);
+    net_apply_iptool(config.net.device);
   }
 
   if(config.win) win_close(&win);
@@ -2592,6 +2596,45 @@ void net_apply_ethtool(char *device, char *hwaddr)
   if(s) {
     str_copy(&config.net.ethtool_used, s);
     strprintf(&s, "ethtool -s %s %s", device, s);
+    fprintf(stderr, "%s\n", s);
+    system(s);
+    free(s);
+  }
+}
+
+/*
+ * Run /bin/ip for matching devices.
+ */
+void net_apply_iptool(char *device)
+{
+  slist_t *sl;
+  char *s = NULL;
+
+  for(sl = config.iptool; sl; sl = sl->next) {
+    if(device && !fnmatch(sl->key, device, 0))
+    {
+      if(s) {
+        strprintf(&s, "%s %s", s, sl->value);
+      }
+      else {
+        str_copy(&s, sl->value);
+      }
+    }
+  }
+
+  if(s) {
+    char *s1;
+    if(index(s, '%') != rindex(s, '%')) {
+      sprintf(s1, "invalid ip tool string %s", s);
+      dia_message(s1, MSGTYPE_ERROR);
+      free(s1);
+      free(s);
+      return;
+    }
+    strprintf(&s1, "ip %s", s);
+    strprintf(&s, s1, device); /* replace %s with the device name */
+    free(s1);
+    str_copy(&config.net.iptool_used, s);
     fprintf(stderr, "%s\n", s);
     system(s);
     free(s);

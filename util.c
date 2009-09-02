@@ -1408,6 +1408,15 @@ void util_status_info()
     }
   }
 
+  if(config.iptool) {
+    strcpy(buf, "/bin/ip options:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.iptool; sl; sl = sl->next) {
+      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.cdroms) {
     strcpy(buf, "cdroms:");
     slist_append_str(&sl0, buf);
