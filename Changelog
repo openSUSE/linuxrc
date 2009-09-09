@@ -1,3 +1,5 @@
+9/9/2009:	v3.4.5
+	- s390: activate network interface before loading info file
 	- no blocking popup for DHCP error message (bnc #534078)
 	- starting new network setup code
 
