@@ -1,3 +1,6 @@
+	- no blocking popup for DHCP error message (bnc #534078)
+	- starting new network setup code
+
 29/7/2009:	v3.4.4
 	- handle zypp iso url scheme (bnc #507474)
 

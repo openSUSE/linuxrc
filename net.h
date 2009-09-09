@@ -7,6 +7,7 @@
  */
 
 int net_config(void);
+int net_config2(int type);
 int net_bootp(void);
 void net_ask_password(void);
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port);

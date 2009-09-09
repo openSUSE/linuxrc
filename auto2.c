@@ -1029,7 +1029,7 @@ void auto2_driverupdate(url_t *url)
   /* point at list end */
   for(names = &config.update.name_list; *names; names = &(*names)->next);
 
-  if(config.win) dia_info(&win, txt_get(TXT_DUD_READ));
+  if(config.win) dia_info(&win, txt_get(TXT_DUD_READ), MSGTYPE_INFO);
 
   /* first, look for 'driverupdate' archive */
   err = url_read_file(

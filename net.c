@@ -248,6 +248,175 @@ int net_config()
 }
 
 
+static void net_config2_manual(void);
+
+
+/*
+ * Configure network interface. Ask for network config data if necessary.
+ * Does either DHCP, BOOTP or static network setup.
+ *
+ * config.net.device: network interface
+ * config.net.use_dhcp: dhcp vs. bootp
+ *
+ * Return:
+ *      0: ok
+ *   != 0: error or abort
+ *
+ *   config.net.is_configured: nc_none, nc_dhcp, nc_bootp, nc_static
+ *
+ * Does nothing if DHCP is active.
+ *
+ */
+int net_config2(int type)
+{
+  config.net.configured = nc_none;
+
+  // ###### FIXME: use net_choose_device()
+  if(!config.net.device) str_copy(&config.net.device, config.netdevice);
+  if(!config.net.device) {
+    util_update_netdevice_list(NULL, 1);
+    if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+  }
+
+  if(!config.net.device) {
+    fprintf(stderr, "interface setup: no interfaces\n");
+    return 1;
+  }
+
+  fprintf(stderr, "interface setup: %s\n", config.net.device);
+
+//  if(url->is.wlan && wlan_setup()) return 0;
+
+  if((config.net.do_setup & DS_SETUP)) net_config2_manual();
+
+  if(config.net.configured == nc_none) config.net.configured = nc_static;
+
+  /* we need at least ip & netmask for static network config */
+  if((net_config_mask() & 3) != 3) {
+    printf(
+      "Sending %s request to %s...\n",
+      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
+      config.net.device
+    );
+    fflush(stdout);
+    fprintf(stderr,
+      "sending %s request to %s... ",
+      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
+      config.net.device
+    );
+
+    config.net.use_dhcp ? net_dhcp() : net_bootp();
+
+    if(
+      !config.test &&
+      !config.net.ipv6 &&
+      (
+        !config.net.hostname.ok ||
+        !config.net.netmask.ok ||
+        !config.net.broadcast.ok
+      )
+    ) {
+      fprintf(stderr, "no/incomplete answer.\n");
+      config.net.configured = nc_none;
+
+      return 0;
+    }
+    fprintf(stderr, "ok.\n");
+
+    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+  }
+
+  if(net_activate_ns()) {
+    fprintf(stderr, "network setup failed\n");
+    config.net.configured = nc_none;
+
+    return 0;
+  }
+  else {
+    fprintf(stderr, "%s activated\n", config.net.device);
+  }
+
+
+
+
+
+  return 0;
+}
+
+
+void net_config2_manual()
+{
+  int win_old;
+  slist_t *sl;
+
+  if(!config.net.do_setup) return;
+
+  if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
+    config.net.configured = nc_static;
+    /* looks a bit weird, but we need it here for net_activate_ns() */
+    if(!config.net.device) str_copy(&config.net.device, config.netdevice);
+    if(!config.net.device) {
+      util_update_netdevice_list(NULL, 1);
+      if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
+    }
+    if(net_activate_ns()) {
+      fprintf(stderr, "net activation failed\n");
+      config.net.configured = nc_none;
+    }
+  }
+
+  if(config.net.configured == nc_none || config.net.do_setup) {
+    if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
+      util_update_netdevice_list(NULL, 1);
+
+      config.net.configured = nc_none;
+
+      for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
+        str_copy(&config.net.device, sl->key);
+
+        printf(
+          "Sending %s request to %s...\n",
+          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+        );
+        fflush(stdout);
+        fprintf(stderr,
+          "Sending %s request to %s... ",
+          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+        );
+        config.net.use_dhcp ? net_dhcp() : net_bootp();
+        if(
+          !config.net.hostname.ok ||
+          !config.net.netmask.ok ||
+          !config.net.broadcast.ok
+        ) {
+          fprintf(stderr, "no/incomplete answer.\n");
+        }
+        else {
+          config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+
+          if(net_activate_ns()) {
+            fprintf(stderr, "%s: net activation failed\n", config.net.device);
+            config.net.configured = nc_none;
+          }
+          else {
+            fprintf(stderr, "%s: ok\n", config.net.device);
+          }
+        }
+      }
+    }
+    else {
+      if(!(win_old = config.win)) util_disp_init();
+      net_config();
+      if(!win_old) util_disp_done();
+    }
+  }
+
+  if(config.net.configured == nc_none) {
+    config.vnc = config.usessh = 0;
+  }
+}
+
+
 /*
  * Shut down all network interfaces.
  *
@@ -1201,7 +1370,7 @@ int net_choose_device()
   }
 
   if(config.manual == 1 && !net_drivers_loaded) {
-    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS));
+    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS), MSGTYPE_INFO);
     load_network_mods();
     win_close(&win);
     net_drivers_loaded = 1;
@@ -1638,7 +1807,7 @@ int net_bootp()
 
   if(config.win) {
     sprintf(tmp, txt_get(TXT_SEND_DHCP), "BOOTP");
-    dia_info(&win, tmp);
+    dia_info(&win, tmp, MSGTYPE_INFO);
   }
 
   if(config.net.bootp_wait) sleep(config.net.bootp_wait);
@@ -1848,7 +2017,7 @@ int net_dhcp4()
   char cmd[256], file[256], *s;
   file_t *f0, *f;
   window_t win;
-  int got_ip = 0;
+  int got_ip = 0, i, is_static = 0, rc;
   slist_t *sl0, *sl;
 
   if(config.net.dhcp_active || config.net.keep) return 0;
@@ -1861,7 +2030,7 @@ int net_dhcp4()
 
   if(config.win) {
     sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");
-    dia_info(&win, cmd);
+    dia_info(&win, cmd, MSGTYPE_INFO);
   }
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
@@ -1955,14 +2124,30 @@ int net_dhcp4()
   }
   else {
     if(config.win) {
-      sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
-      dia_message(cmd, MSGTYPE_ERROR);
+      if(config.net.dhcpfail && strcmp(config.net.dhcpfail, "ignore")) {
+        if(!strcmp(config.net.dhcpfail, "show")) {
+          sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
+          dia_info(&win, cmd, MSGTYPE_ERROR);
+          sleep(4);
+          win_close(&win);
+        }
+        else if(!strcmp(config.net.dhcpfail, "manual")) {
+          sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
+          i = dia_yesno(cmd, NO);
+          if(i == YES) {
+            is_static = 1;
+            // ?????
+          }
+        }
+      }
     }
   }
 
   file_free_file(f0);
 
-  return config.net.dhcp_active ? 0 : 1;
+  rc = config.net.dhcp_active ? 0 : 1;
+
+  return rc;
 }
 
 
@@ -2001,7 +2186,7 @@ int net_dhcp6()
 
   if(config.win) {
     strprintf(&cmd, txt_get(TXT_SEND_DHCP), "DHCP6");
-    dia_info(&win, cmd);
+    dia_info(&win, cmd, MSGTYPE_INFO);
   }
 
   if(!config.net.ipv4) net_apply_ethtool(config.net.device, config.net.hwaddr);

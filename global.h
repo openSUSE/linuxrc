@@ -556,6 +556,7 @@ typedef struct {
     char *hwaddr;		/* hardware addr of network card */
     char *ethtool_used;		/* ethtool options used for active card */
     char *cardname;		/* network card name */
+    char *dhcpfail;		/* dhcp failure action */
     struct {
       char *binary;		/* cifs/smb mount binary */
       char *module;		/* cifs/smb kernel module */

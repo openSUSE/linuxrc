@@ -619,7 +619,7 @@ void mod_load_module_manual(char *module, int show)
   if(show) {
     if(s) {
       sprintf(buf, txt_get(TXT_TRY_TO_LOAD), ml->name);
-      dia_info(&win, buf);
+      dia_info(&win, buf, MSGTYPE_INFO);
       mod_insmod(ml->name, s);
       win_close(&win);
       i = mod_is_loaded(ml->name);

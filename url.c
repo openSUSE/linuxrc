@@ -2276,14 +2276,16 @@ int url_setup_interface(url_t *url)
 
   /* if(!getenv("PXEBOOT")) */ net_stop();
 
-  config.net.configured = nc_none;
-
-  fprintf(stderr, "interface setup: %s\n", url->used.device);
-
   str_copy(&config.net.device, url->used.device);
   str_copy(&config.net.hwaddr, url->used.hwaddr);
   str_copy(&config.net.cardname, url->used.model);
   str_copy(&config.net.unique_id, url->used.unique_id);
+
+// --- net_config2() start ---
+
+  config.net.configured = nc_none;
+
+  fprintf(stderr, "interface setup: %s\n", url->used.device);
 
   if(url->is.wlan && wlan_setup()) return 0;
 
@@ -2335,6 +2337,8 @@ int url_setup_interface(url_t *url)
   else {
     fprintf(stderr, "%s activated\n", url->used.device);
   }
+
+// --- net_config2() end ---
 
   if(url->scheme == inst_slp) {
     tmp_url = url_set(slp_get_install(url));

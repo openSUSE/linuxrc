@@ -1390,7 +1390,7 @@ int choose_dud(char **dev)
   hd_data = calloc(1, sizeof *hd_data);
 
   if(config.manual < 2) {
-    dia_info(&win, "Searching for storage devices...");
+    dia_info(&win, "Searching for storage devices...", MSGTYPE_INFO);
     hd_list(hd_data, hw_block, 1, NULL);
     win_close(&win);
   }

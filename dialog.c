@@ -1321,7 +1321,7 @@ int dia_show_file (char *head_tv, char *file_tv, int eof_iv)
     }
 
 
-void dia_info (window_t *win_prr, char *txt_tv)
+void dia_info (window_t *win_prr, char *txt_tv, int type)
     {
     int        width_ii;
     window_t   tmp_win_ri;
@@ -1355,8 +1355,14 @@ void dia_info (window_t *win_prr, char *txt_tv)
     win_prr->shadow = TRUE;
     win_prr->style = STYLE_RAISED;
     win_prr->save_bg = TRUE;
-    win_prr->bg_color = colors_prg->msg_win;
-    win_prr->fg_color = colors_prg->msg_fg;
+    if(type == MSGTYPE_ERROR) {
+      win_prr->bg_color = colors_prg->error_win;
+      win_prr->fg_color = colors_prg->error_fg;
+    }
+    else {
+      win_prr->bg_color = colors_prg->msg_win;
+      win_prr->fg_color = colors_prg->msg_fg;
+    }
     win_open (win_prr);
     win_clear (win_prr);
 

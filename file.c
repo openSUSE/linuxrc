@@ -303,6 +303,7 @@ static struct {
   { key_efi,            "EFI",            kf_cfg + kf_cmd                },
   { key_supporturl,     "supporturl",     kf_cfg + kf_cmd                },
   { key_udevrule,       "udev.rule",      kf_cfg + kf_cmd_early          },
+  { key_dhcpfail,       "DHCPFail",       kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1573,6 +1574,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value && !slist_getentry(config.udevrules, f->value)) {
           slist_append_str(&config.udevrules, f->value);
         }
+        break;
+
+      case key_dhcpfail:
+        str_copy(&config.net.dhcpfail, f->value);
         break;
 
       default:

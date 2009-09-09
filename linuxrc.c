@@ -738,6 +738,8 @@ void lxrc_init()
 
   util_set_product_dir("suse");
 
+  str_copy(&config.net.dhcpfail, "show");
+
   config.net.bootp_timeout = 10;
   config.net.dhcp_timeout = 60;
   config.net.tftp_timeout = 10;
