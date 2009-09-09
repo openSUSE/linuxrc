@@ -1,3 +1,6 @@
+31/8/2009:	v3.4.5
+	- s390: activate network interface before loading info file
+
 29/7/2009:	v3.4.4
 	- handle zypp iso url scheme (bnc #507474)
 
