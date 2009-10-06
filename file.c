@@ -641,6 +641,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_keytable:
         str_copy(&config.keymap, *f->value ? f->value : NULL);
+        config.keymap_set = config.keymap ? 1 : 0;
         break;
 
       case key_hostip:
@@ -1730,7 +1731,7 @@ void file_write_install_inf(char *dir)
 
   set_write_info(f);
 
-  if(config.keymap && config.manual) {
+  if(config.keymap_set || config.manual) {
     file_write_str(f, key_keytable, config.keymap);
   }
 
