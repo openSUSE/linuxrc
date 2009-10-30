@@ -2064,7 +2064,7 @@ int net_dhcp6()
 
   if(config.win) win_close(&win);
 
-  if(!ok & config.win) {
+  if(!ok && config.win) {
     strprintf(&cmd, txt_get(TXT_ERROR_DHCP), "DHCP6");
     dia_message(cmd, MSGTYPE_ERROR);
   }

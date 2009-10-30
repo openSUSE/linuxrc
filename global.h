@@ -346,6 +346,7 @@ typedef struct {
   unsigned efi_vars:1;		/* efi vars exist */
   int efi;			/* use efi; -1 = auto */
   unsigned udev_mods:1;		/* let udev load modules */
+  unsigned configure_network:1;	/* value just passed to yast */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */

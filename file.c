@@ -304,6 +304,7 @@ static struct {
   { key_efi,            "EFI",            kf_cfg + kf_cmd                },
   { key_supporturl,     "supporturl",     kf_cfg + kf_cmd                },
   { key_udevrule,       "udev.rule",      kf_cfg + kf_cmd_early          },
+  { key_configure_network, "ConfigureNetwork", kf_cfg + kf_cmd           },
 };
 
 static struct {
@@ -1583,6 +1584,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
+      case key_configure_network:
+        if(f->is.numeric) config.configure_network = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1897,6 +1902,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_usesax2, config.usesax2);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
+  file_write_num(f, key_configure_network, config.configure_network);
 
   if(
     config.rootpassword &&

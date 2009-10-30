@@ -1,3 +1,6 @@
+30/9/2009:	v3.3.44
+	- added configurenetwork option (fate #303069)
+
 2/9/2009:	v3.3.43
 	- add possibility to run /bin/ip on network devices (bnc#462272)
 
