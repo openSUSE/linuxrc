@@ -2709,7 +2709,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     int skfd;
     DIR* d;
     struct dirent* de;
-    char* ifname;
+    char* ifname = NULL;
     
     net_s390_get_ifname(config.hwp.readchan, &ifname);
     strcpy(ifr.ifr_name, ifname);

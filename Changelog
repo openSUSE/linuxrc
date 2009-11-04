@@ -1,3 +1,5 @@
+	- don't pass uninitialized pointers to strprintf() (bnc#494301)
+
 6/10/2009:	v3.4.7
 	- pass keyboard mapping to yast (bnc #534856)
 
