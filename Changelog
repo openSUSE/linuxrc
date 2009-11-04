@@ -1,5 +1,6 @@
 4/11/2009:	v3.3.45
 	- use ctc_configure for LCS devices (bnc#550232)
+	- don't pass uninitialized pointers to strprintf() (bnc#494301)
 
 30/9/2009:	v3.3.44
 	- added configurenetwork option (fate #303069)

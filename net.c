@@ -2532,7 +2532,7 @@ setup_ctc:
     int skfd;
     DIR* d;
     struct dirent* de;
-    char* ifname;
+    char* ifname = NULL;
     
     net_s390_get_ifname(config.hwp.readchan, &ifname);
     strcpy(ifr.ifr_name, ifname);
