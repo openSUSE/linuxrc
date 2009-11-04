@@ -2491,8 +2491,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       sprintf(cmd, "iucv_configure %s 1", config.hwp.userid);
       break;
     case di_390net_ctc:
-    case di_390net_lcs:
     case di_390net_escon:
+setup_ctc:
       if(config.hwp.protocol > 0)
         sprintf(cmd, "ctc_configure %s %s 1 %d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
       else
@@ -2500,6 +2500,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       break;
     case di_390net_hsi:
     case di_390net_osa:
+      if (config.hwp.interface == di_390net_lcs)
+        goto setup_ctc;
       ccmd += sprintf(ccmd, "qeth_configure ");
       if(config.hwp.portno)
         ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
