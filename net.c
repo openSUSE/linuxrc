@@ -443,7 +443,7 @@ int net_activate4()
     }
 
     if(!config.net.device) {
-      fprintf(stderr, "net_activate: no network interface!\n");
+      util_error_trace("net_activate: no network interface!\n");
       return 1;
     }
 
@@ -453,25 +453,25 @@ int net_activate4()
 
     if(!config.forceip && util_check_exist("/sbin/arping")) {
        sprintf(command, "ifconfig %s up", config.net.device);
-       fprintf(stderr, "net_activate: %s\n", command);
+       util_error_trace("net_activate: %s\n", command);
        rc = system(command);
        if (rc) {
-           fprintf(stderr, "net_activate: ifconfig %s up failed!\n", config.net.device);
+           util_error_trace("net_activate: ifconfig %s up failed!\n", config.net.device);
            return 1;
        }
 
        sleep(config.net.ifup_wait + 2);
 
        sprintf(command, "arping -c 1 -I %s -D %s 1>&2", config.net.device, inet_ntoa(config.net.hostname.ip));
-       fprintf(stderr, "net_activate: %s\n", command);
+       util_error_trace("net_activate: %s\n", command);
        rc = system(command);
 
        sprintf(command, "ifconfig %s down", config.net.device);
        (void)system (command);
-       fprintf(stderr, "net_activate: %s\n", command);
+       util_error_trace("net_activate: %s\n", command);
 
        if (rc) {
-           fprintf(stderr, "net_activate: address %s in use by another machine!\n", inet_ntoa(config.net.hostname.ip));
+           util_error_trace("net_activate: address %s in use by another machine!\n", inet_ntoa(config.net.hostname.ip));
            sprintf(command, txt_get(TXT_IP_ADDRESS_IN_USE), inet_ntoa(config.net.hostname.ip));
            dia_message(command, MSGTYPE_ERROR);
            return 1;
@@ -481,7 +481,7 @@ int net_activate4()
     socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
     if (socket_ii == -1)
     {
-        fprintf(stderr, "net_activate: socket(AF_INET, SOCK_DGRAM, 0) failed at %d\n",__LINE__);
+        util_error_trace("net_activate: socket(AF_INET, SOCK_DGRAM, 0) failed at %d\n",__LINE__);
         return (socket_ii);
     }
 
@@ -495,7 +495,7 @@ int net_activate4()
     if (ioctl (socket_ii, SIOCSIFADDR, &interface_ri) < 0)
     {
         error_ii = TRUE;
-        fprintf(stderr, "net_activate: SIOCSIFADDR failed at %d\n",__LINE__);
+        util_error_trace("net_activate: SIOCSIFADDR failed at %d\n",__LINE__);
     }
 
     if (net_is_ptp_im)
@@ -505,7 +505,7 @@ int net_activate4()
         if (ioctl (socket_ii, SIOCSIFDSTADDR, &interface_ri) < 0)
         {
             error_ii = TRUE;
-            fprintf(stderr, "net_activate: SIOCSIFDSTADDR failed at %d\n",__LINE__);
+            util_error_trace("net_activate: SIOCSIFDSTADDR failed at %d\n",__LINE__);
         }
         }
     else
@@ -516,7 +516,7 @@ int net_activate4()
             if (config.net.netmask.ip.s_addr)
             {
                 error_ii = TRUE;
-                fprintf(stderr, "net_activate: SIOCSIFNETMASK failed at %d\n",__LINE__);
+                util_error_trace("net_activate: SIOCSIFNETMASK failed at %d\n",__LINE__);
             }
 
         sockaddr_ri.sin_addr = config.net.broadcast.ip;
@@ -525,14 +525,14 @@ int net_activate4()
             if (config.net.broadcast.ip.s_addr != 0xffffffff)
             {
                 error_ii = TRUE;
-                fprintf(stderr, "net_activate: SIOCSIFBRDADDR failed at %d\n",__LINE__);
+                util_error_trace("net_activate: SIOCSIFBRDADDR failed at %d\n",__LINE__);
             }
         }
 
     if (ioctl (socket_ii, SIOCGIFFLAGS, &interface_ri) < 0)
     {
         error_ii = TRUE;
-        fprintf(stderr, "net_activate: SIOCGIFFLAGS failed at %d\n",__LINE__);
+        util_error_trace("net_activate: SIOCGIFFLAGS failed at %d\n",__LINE__);
     }
 
     interface_ri.ifr_flags |= IFF_UP | IFF_RUNNING;
@@ -543,7 +543,7 @@ int net_activate4()
     if (ioctl (socket_ii, SIOCSIFFLAGS, &interface_ri) < 0)
     {
         error_ii = TRUE;
-        fprintf(stderr, "net_activate: SIOCSIFFLAGS failed at %d\n",__LINE__);
+        util_error_trace("net_activate: SIOCSIFFLAGS failed at %d\n",__LINE__);
     }
 
     memset (&route_ri, 0, sizeof (struct rtentry));
@@ -557,7 +557,7 @@ int net_activate4()
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
         {
             error_ii = TRUE;
-            fprintf(stderr, "net_activate: SIOCADDRT failed at %d\n",__LINE__);
+            util_error_trace("net_activate: SIOCADDRT failed at %d\n",__LINE__);
         }
 
         memset (&route_ri.rt_dst, 0, sizeof (route_ri.rt_dst));
@@ -567,7 +567,7 @@ int net_activate4()
         if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
         {
             error_ii = TRUE;
-            fprintf(stderr, "net_activate: SIOCADDRT failed at %d\n",__LINE__);
+            util_error_trace("net_activate: SIOCADDRT failed at %d\n",__LINE__);
         }
         }
     else
@@ -597,7 +597,7 @@ int net_activate4()
             if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
             {
                 error_ii = TRUE;
-                fprintf(stderr, "net_activate: SIOCADDRT failed at %d\n",__LINE__);
+                util_error_trace("net_activate: SIOCADDRT failed at %d\n",__LINE__);
             }
             }
         }

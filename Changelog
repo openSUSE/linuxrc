@@ -1,4 +1,5 @@
 	- added util_error_trace() to facilitate debugging
+	- do backtraces when net_activate4() fails
 
 4/11/2009:	v3.3.45
 	- use ctc_configure for LCS devices (bnc#550232)
