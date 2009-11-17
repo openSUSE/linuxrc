@@ -1,6 +1,6 @@
 CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
-LDFLAGS	= -lhd -lblkid -lcurl
+LDFLAGS	= -rdynamic -lhd -lblkid -lcurl
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)

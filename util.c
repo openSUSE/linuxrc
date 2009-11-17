@@ -40,6 +40,7 @@
 #include <net/if.h>
 #include <linux/major.h>
 #include <linux/raid/md_u.h>
+#include <execinfo.h>
 
 #define CDROMEJECT	0x5309	/* Ejects the cdrom media */
 
@@ -4804,3 +4805,15 @@ void util_setup_udevrules()
   }
 }
 
+void util_error_trace(char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  vfprintf(stderr, format, args);
+  va_end(args);
+  
+  void *buffer[100];
+  int nptrs;
+  nptrs = backtrace(buffer, 100);
+  backtrace_symbols_fd(buffer, nptrs, STDERR_FILENO);
+}
