@@ -2436,7 +2436,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 	  }
       }
       
-      if(config.hwp.medium == di_osa_eth && config.hwp.type != di_390net_hsi)
+      if(config.hwp.medium == di_osa_eth)
       {
         IFNOTAUTO(config.hwp.layer2)
         {
