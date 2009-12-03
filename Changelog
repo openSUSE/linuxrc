@@ -1,6 +1,7 @@
+3/12/2009:	v3.3.46
 	- added util_error_trace() to facilitate debugging
 	- do backtraces when net_activate4() fails
-	- s390: re-enable layer 2 for HSI
+	- s390: re-enable layer 2 for HSI (bnc#559174)
 
 4/11/2009:	v3.3.45
 	- use ctc_configure for LCS devices (bnc#550232)
