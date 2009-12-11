@@ -1,3 +1,6 @@
+11/12/2009:	v3.3.47
+	- s390: fix check for existing network config (bnc#562101)
+
 3/12/2009:	v3.3.46
 	- added util_error_trace() to facilitate debugging
 	- do backtraces when net_activate4() fails
