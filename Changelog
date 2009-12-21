@@ -1,5 +1,8 @@
 15/12/2009:	v3.3.48
 	- s390: detect PTP devices in autoinstall case (bnc#555236)
+	- s390: work around bugged Operating System Messages console
+          that sends empty lines as " \r" instead of "\r" (forward-ported
+          from SLES10 SP3, bnc#517763, bnc#484358)
 
 11/12/2009:	v3.3.47
 	- s390: fix check for existing network config (bnc#562101)
