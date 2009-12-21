@@ -62,7 +62,7 @@
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
 
-static int  net_is_ptp_im = FALSE;
+int  net_is_ptp_im = FALSE;
 
 #if !defined(NETWORK_CONFIG)
 #  define NETWORK_CONFIG 1

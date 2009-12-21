@@ -1,3 +1,6 @@
+15/12/2009:	v3.3.48
+	- s390: detect PTP devices in autoinstall case (bnc#555236)
+
 11/12/2009:	v3.3.47
 	- s390: fix check for existing network config (bnc#562101)
 

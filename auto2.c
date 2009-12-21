@@ -528,6 +528,8 @@ int auto2_find_repo()
 /*
  * Let user enter network config data.
  */
+extern int net_is_ptp_im;
+
 void auto2_user_netconfig()
 {
   int win_old;
@@ -597,6 +599,12 @@ void auto2_user_netconfig()
 
   if(config.net.configured == nc_none) {
     config.vnc = config.usessh = 0;
+  }
+  else {
+    net_is_ptp_im = FALSE;
+    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im = TRUE;
+    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
+    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
   }
 }
 
