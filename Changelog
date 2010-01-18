@@ -1,3 +1,6 @@
+18/1/2010:	v3.3.49
+	- s390: allow installation via console (bnc#476373)
+
 15/12/2009:	v3.3.48
 	- s390: detect PTP devices in autoinstall case (bnc#555236)
 	- s390: work around bugged Operating System Messages console

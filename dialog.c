@@ -99,6 +99,7 @@ struct {
   { di_display_vnc,    	 0, "VNC"	          },
   { di_display_x11,  	 0, "X11"	          },
   { di_display_ssh,      0, "SSH"	          },
+  { di_display_console,  0, "ASCII Console"	  },
   
   { di_390net_osa,	 TXT_390NET_OSA           },
   { di_390net_ctc,	 TXT_390NET_CTC	          },
