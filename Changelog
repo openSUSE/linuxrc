@@ -1,3 +1,6 @@
+22/1/2010:	v3.3.50
+	- s390: set defaults for CCW write and data channels
+
 18/1/2010:	v3.3.49
 	- s390: allow installation via console (bnc#476373)
 

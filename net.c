@@ -2208,7 +2208,13 @@ static int net_s390_getrwchans_ex(hd_t* hd)
         ccw = (int) r->io.base;
       }
     }
-    if(ccw != -1) strprintf(&config.hwp.readchan, "%1x.%1x.%04x", lcss >> 8, lcss & 0xf, ccw);
+    if(ccw != -1) {
+      strprintf(&config.hwp.readchan, "%1x.%1x.%04x", lcss >> 8, lcss & 0xf, ccw);
+      if(!config.hwp.writechan)
+        strprintf(&config.hwp.writechan, "%1x.%1x.%04x", lcss >> 8, lcss & 0xf, ccw + 1);
+      if(!config.hwp.datachan)
+        strprintf(&config.hwp.datachan, "%1x.%1x.%04x", lcss >> 8, lcss & 0xf, ccw + 2);
+    }
   }
 
   IFNOTAUTO(config.hwp.readchan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
