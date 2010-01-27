@@ -1,3 +1,7 @@
+27/1/2010:	v3.3.51
+	- s390: don't use net_config() in auto mode to avoid fallback to
+	  manual (bnc#474457)
+
 22/1/2010:	v3.3.50
 	- s390: set defaults for CCW write and data channels
 

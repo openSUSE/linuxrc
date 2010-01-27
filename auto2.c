@@ -312,8 +312,8 @@ void auto2_scan_hardware()
     fflush(stdout);
     url = url_set(sl->key);
 #if defined(__s390__) || defined(__s390x__)
-    if(url->is.network) {
-      net_config();
+    if(url->is.network && !config.net.configured) {
+        net_activate_s390_devs();
     }
 #endif
     err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NOSHA1);
