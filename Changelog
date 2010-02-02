@@ -1,3 +1,6 @@
+2/2/2010:	v3.3.52
+	- keep /lib/firmware from initrd in rescure system
+
 27/1/2010:	v3.3.51
 	- s390: don't use net_config() in auto mode to avoid fallback to
 	  manual (bnc#474457)
