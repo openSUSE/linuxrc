@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-22 09:04\n"
+"PO-Revision-Date: 2010-02-15 12:19\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -190,7 +190,7 @@ msgstr "Plaats de diskette en druk op ENTER."
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
-msgstr "Fout opgetreden bij het lezen van de diskette."
+msgstr "Er is een fout opgetreden bij het lezen van de diskette."
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
@@ -555,7 +555,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Fout opgetreden bij het verbinding maken met de FTP-server:\n"
+"Er is een fout opgetreden bij het verbinding maken met de FTP-server:\n"
 "\n"
 "%s"
 
@@ -783,7 +783,7 @@ msgstr "Activeer enige swapruimte om door te kunnen gaan."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Fout opgetreden tijdens het activeren van de swapruimte."
+msgstr "Er is een fout opgetreden tijdens het activeren van de swapruimte."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
@@ -1040,7 +1040,7 @@ msgstr "Foutieve checksum."
 #. TXT_CD_READ_FAILED
 #, c-format
 msgid "Error reading sector %u."
-msgstr "Fout opgetreden tijdens het lezen van sector %u."
+msgstr "Er is een fout opgetreden tijdens het lezen van sector %u."
 
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
@@ -1238,7 +1238,7 @@ msgstr "Bestand niet ondertekend."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Ongeldige ondertekening."
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "MAC-adres"

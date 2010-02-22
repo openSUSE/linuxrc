@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-20 22:36\n"
+"PO-Revision-Date: 2010-02-16 12:10\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -296,7 +296,7 @@ msgstr "Brak aktualnie wczytanych modułów"
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Automatyczne sprawdzanie (%s)..."
+msgstr "Automatyczne sprawdzanie (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -1236,7 +1236,7 @@ msgstr "Plik niepodpisany."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Nieprawidłowy podpis."
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Adres MAC"

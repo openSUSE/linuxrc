@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-23 10:24\n"
+"PO-Revision-Date: 2010-02-15 10:29\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -1241,7 +1241,7 @@ msgstr "Soubor nebyl podepsán."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Neplatný podpis"
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Adresa MAC"

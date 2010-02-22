@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-21 10:05\n"
+"PO-Revision-Date: 2010-02-15 11:11\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -422,7 +422,7 @@ msgstr "CD-ROMをマウントできませんでした。"
 
 #. TXT_ASK_REBOOT
 msgid "Reboot the system now?"
-msgstr "システムを今すぐ再起動しますか?"
+msgstr "システムを今すぐリブートしますか?"
 
 #. TXT_INSTALL_SUCCESS
 msgid "The base system has been successfully installed. This newly installed system will now be started to commit the installation."
@@ -504,7 +504,7 @@ msgstr "インストールの準備をしています..."
 
 #. TXT_END_REBOOT
 msgid "Exit or Reboot"
-msgstr "終了または再起動する"
+msgstr "終了またはリブートする"
 
 #. TXT_SEARCH_INFOFILE
 msgid "Searching for info file..."
@@ -841,7 +841,7 @@ msgid ""
 "The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
 "Do not remove the floppy disk if the boot manager was installed on it."
 msgstr ""
-"ベースシステムがインストールされました。 今すぐコンピュータを再起動する必要があります。 ドライブに挿入されているインストール用メディア(CD-ROM、フロッピーディスク)をすべて取り出してください。\n"
+"ベースシステムがインストールされました。 今すぐコンピュータをリブートする必要があります。 ドライブに挿入されているインストール用メディア(CD-ROM、フロッピーディスク)をすべて取り出してください。\n"
 "ただし、ブートマネージャをフロッピーディスクにインストールした場合は、フロッピーディスクを取り出さないでください。"
 
 #. TXT_ADD_DRIVER_UPDATE
@@ -867,7 +867,7 @@ msgstr ""
 
 #. TXT_REBOOT
 msgid "Reboot"
-msgstr "再起動する"
+msgstr "リブート"
 
 #. TXT_NO_RAM
 #, c-format
@@ -1236,7 +1236,7 @@ msgstr "ファイルに署名されていません。"
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "無効な署名です。"
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "MACアドレス"
