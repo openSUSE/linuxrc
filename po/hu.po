@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc.hu\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-12-07 14:04+0100\n"
+"PO-Revision-Date: 2010-01-29 17:52+0100\n"
 "Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
 "Language-Team:  <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -450,7 +450,7 @@ msgstr "Adja meg a forráskönyvtárat."
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
-msgstr "Hiba történt a telepítés folyamán."
+msgstr "Hiba történt a telepítés közben."
 
 #. TXT_DRIVES
 msgid "Hard Disks or CD-ROMs"
@@ -1246,7 +1246,7 @@ msgstr "A fájl nincs aláírva."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Érvénytelen aláírás."
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "MAC-cím"

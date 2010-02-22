@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2008-10-21 11:33+0200\n"
+"PO-Revision-Date: 2008-11-23 15:47+0100\n"
 "Last-Translator: Martin Schlander <mschlander@opensuse.org>\n"
 "Language-Team: Danish <opensuse-translation@opensuse.org>\n"
 "MIME-Version: 1.0\n"
@@ -616,11 +616,11 @@ msgstr "Skub CD ud"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "DHCP svartiden udløb"
+msgstr "Tidsudløb af DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "Angiv svartidsværdien for DHCP."
+msgstr "Indtast svartidsværdien for DHCP."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -1173,75 +1173,75 @@ msgstr "Indtast IP'en på navneserveren %u eller \"+++\" for 'ingen'."
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Avanceret"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Start skal før og efter YaST?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Start skal"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "Hent SLP-info"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Vis konfiguration"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Ændr konfiguration"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Kør kommando"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Afslut linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Angiv dine søgedomæner, adskilt af mellemrum:"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Hvert domæne skal være en gyldig IP-adresse."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Kun op til seks søgedomæner er tilladt."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Hvis du virkelig har tillid til softwarekilden kan du fortsætte i usikker tilstand."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "SHA1-sum forkert."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Installation afbrudt."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "Filen ikke signeret."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Ugyldig signatur."
+
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr ""
-

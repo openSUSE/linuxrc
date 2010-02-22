@@ -249,6 +249,7 @@ int inst_choose_display()
       di_display_x11,
       di_display_vnc,
       di_display_ssh,
+      di_display_console,
       di_none
     };
 
@@ -282,6 +283,10 @@ int inst_choose_display_cb(dia_item_t di)
     case di_display_ssh:
       config.usessh=1;
       net_ask_password();
+      break;
+
+    case di_display_console:
+      /* nothing to do */
       break;
 
     default:

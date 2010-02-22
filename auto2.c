@@ -316,8 +316,8 @@ void auto2_scan_hardware()
     fflush(stdout);
     url = url_set(sl->key);
 #if defined(__s390__) || defined(__s390x__)
-    if(url->is.network) {
-      net_config();
+    if(url->is.network && !config.net.configured) {
+        net_activate_s390_devs();
     }
 #endif
     err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NOSHA1);
@@ -479,7 +479,7 @@ int auto2_find_repo()
    */
   if(config.url.install->is.network) {
 #if defined(__s390__) || defined(__s390x__)
-    if(!config.net.is_configured && net_activate_s390_devs()) return 0;
+    if(!config.net.configured && net_activate_s390_devs()) return 0;
 #endif
 
     if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
@@ -532,6 +532,8 @@ int auto2_find_repo()
 /*
  * Let user enter network config data.
  */
+extern int net_is_ptp_im;
+
 void auto2_user_netconfig()
 {
   int win_old;
@@ -601,6 +603,12 @@ void auto2_user_netconfig()
 
   if(config.net.configured == nc_none) {
     config.vnc = config.usessh = 0;
+  }
+  else {
+    net_is_ptp_im = FALSE;
+    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im = TRUE;
+    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
+    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
   }
 }
 

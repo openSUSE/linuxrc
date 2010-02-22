@@ -160,3 +160,4 @@ void util_wait(const char *file, int line);
 void run_braille(void);
 void util_setup_udevrules(void);
 
+void util_error_trace(char *format, ...);

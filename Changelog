@@ -1,5 +1,21 @@
+22/2/2010:	v3.4.8
 	- use ctc_configure for LCS devices (bnc#550232)
 	- don't pass uninitialized pointers to strprintf() (bnc#494301)
+	- added sle11 patches (v3.3.46 - v3.3.53, inclusive):
+	  * translations updated
+	  * keep /lib/firmware from initrd in rescue system (bnc #576072)
+	  * s390: don't use net_config() in auto mode to avoid fallback to
+	    manual (bnc#474457)
+	  * s390: set defaults for CCW write and data channels
+	  * s390: allow installation via console (bnc#476373)
+	  * s390: detect PTP devices in autoinstall case (bnc#555236)
+	  * s390: work around bugged Operating System Messages console
+	    that sends empty lines as " \r" instead of "\r" (forward-ported
+	    from SLES10 SP3, bnc#517763, bnc#484358)
+	  * s390: fix check for existing network config (bnc#562101)
+	  * added util_error_trace() to facilitate debugging
+	  * do backtraces when net_activate4() fails
+	  * s390: re-enable layer 2 for HSI (bnc#559174)
 
 6/10/2009:	v3.4.7
 	- pass keyboard mapping to yast (bnc #534856)

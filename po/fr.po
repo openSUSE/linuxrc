@@ -10,7 +10,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-07 15:47\n"
+"PO-Revision-Date: 2010-02-15 10:46\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -94,7 +94,7 @@ msgstr "Écran"
 #. TLABEL linuxrc_2002_03_29_0036__15
 #. TXT_MENU_KEYMAP
 msgid "Keymap"
-msgstr "Disposition du clavier"
+msgstr "Codage clavier"
 
 #. TLABEL linuxrc_2002_03_29_0036__16
 #. TXT_LOAD_NET
@@ -1410,7 +1410,7 @@ msgstr "Fichier non signé."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Signature non valide."
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Adresse MAC"

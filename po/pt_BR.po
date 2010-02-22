@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2009-01-05 15:10\n"
+"PO-Revision-Date: 2010-02-15 13:26\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -1236,7 +1236,7 @@ msgstr "Arquivo não assinado."
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
 msgstr "Assinatura inválida."
+
 #. TXT_HWADDR
 msgid "MAC address"
-msgstr ""
-
+msgstr "Endereço MAC"
