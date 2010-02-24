@@ -19,7 +19,7 @@ SUBDIRS	= po mkpsfu
 all: changelog libs linuxrc
 
 ifneq ($(GIT2LOG),)
-changelog: .git/HEAD .git/COMMIT_EDITMSG
+changelog: .git/HEAD .git/refs/heads .git/refs/tags
 	$(GIT2LOG) --log >changelog
 
 VERSION: .git/HEAD
