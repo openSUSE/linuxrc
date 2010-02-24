@@ -22,7 +22,7 @@ ifneq ($(GIT2LOG),)
 changelog: .git/HEAD .git/refs/heads .git/refs/tags
 	$(GIT2LOG) --log >changelog
 
-VERSION: .git/HEAD
+VERSION: .git/HEAD .git/refs/heads .git/refs/tags
 	$(GIT2LOG) --version >VERSION
 endif
 
