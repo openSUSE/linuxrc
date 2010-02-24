@@ -14,7 +14,13 @@ SUBDIRS	= po mkpsfu
 %.o:	%.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-all: libs linuxrc
+all: changelog libs linuxrc
+
+changelog: .git/HEAD
+	git2log --log >changelog
+
+VERSION: .git/HEAD
+	git2log --version >VERSION
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
@@ -43,7 +49,7 @@ clean: libs
 TAGS: *.c *.h */*.c */*.h
 	etags *.c *.h */*.c */*.h
 
-ifneq ($(MAKECMDGOALS),clean)
+ifeq ($(filter clean changelog VERSION, $(MAKECMDGOALS)),)
 .depend: version.h $(SRC) $(INC)
 	@$(MAKE) -C po
 	@$(CC) -MM $(CFLAGS) $(SRC) >$@
