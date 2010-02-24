@@ -807,6 +807,12 @@ char *url_print_zypp(url_t *url)
     }
   }
 
+  if(url->scheme == inst_cdrom) {
+    if((s = url->used.device) || (s = url->device)) {
+      strprintf(&buf, "%s%cdevices=%s", buf, q++ ? '&' : '?', long_dev(s));
+    }
+  }
+
   if(url->is.file && file) {
     strprintf(&buf, "iso:/?iso=%s&url=%s", file, buf);
   }
