@@ -2,7 +2,7 @@ CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
 LDFLAGS	= -rdynamic -lhd -lblkid -lcurl
 
-GIT2LOG = ./git2log
+GIT2LOG = $(shell [ -x ./git2log ] && echo ./git2log )
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
@@ -18,11 +18,13 @@ SUBDIRS	= po mkpsfu
 
 all: changelog libs linuxrc
 
+ifneq ($(GIT2LOG),)
 changelog: .git/HEAD .git/COMMIT_EDITMSG
 	$(GIT2LOG) --log >changelog
 
 VERSION: .git/HEAD
 	$(GIT2LOG) --version >VERSION
+endif
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
