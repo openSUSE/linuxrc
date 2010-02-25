@@ -551,7 +551,7 @@ void auto2_user_netconfig()
     }
   }
 
-  if(config.net.configured == nc_none || config.net.do_setup) {
+  if(config.net.configured == nc_none) {
     if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
       util_update_netdevice_list(NULL, 1);
 
