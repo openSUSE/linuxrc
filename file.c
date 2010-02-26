@@ -304,6 +304,7 @@ static struct {
   { key_supporturl,     "supporturl",     kf_cfg + kf_cmd                },
   { key_udevrule,       "udev.rule",      kf_cfg + kf_cmd_early          },
   { key_dhcpfail,       "DHCPFail",       kf_cfg + kf_cmd                },
+  { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1579,6 +1580,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_dhcpfail:
         str_copy(&config.net.dhcpfail, f->value);
+        break;
+
+      case key_namescheme:
+        str_copy(&config.namescheme, f->value);
         break;
 
       default:

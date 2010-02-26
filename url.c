@@ -1361,7 +1361,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   url_device = url->device;
   if(!url_device) url_device = url->is.network ? config.netdevice : config.device;
 
-  for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_item, 0, NULL)); hd; hd = hd->next) {
+  for(found = 0, hd = sort_a_bit(fix_device_names(hd_list(config.hd_data, hw_item, 0, NULL))); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
         hwaddr = res->hwaddr.addr;
@@ -2671,5 +2671,4 @@ int link_detected(hd_t *hd)
 
   return 0;
 }
-
 

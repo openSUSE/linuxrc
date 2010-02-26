@@ -778,6 +778,8 @@ void lxrc_init()
 
   config.swap_file_size = 1024;		/* 1024 MB */
 
+  str_copy(&config.namescheme, "by-id");
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
@@ -817,7 +819,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2009 SUSE Linux Products GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2010 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)

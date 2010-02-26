@@ -191,7 +191,7 @@ void info_show_hardware()
 
   hd_data = calloc(1, sizeof *hd_data);
 
-  hd0 = hd_list2(hd_data, hw_items, 1);
+  hd0 = fix_device_names(hd_list2(hd_data, hw_items, 1));
 
   for(hd = hd0; hd; hd = hd->next) {
     if(!hd->unix_dev_name) continue;

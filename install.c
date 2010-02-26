@@ -1396,7 +1396,7 @@ int choose_dud(char **dev)
 
   if(config.manual < 2) {
     dia_info(&win, "Searching for storage devices...", MSGTYPE_INFO);
-    hd_list(hd_data, hw_block, 1, NULL);
+    fix_device_names(hd_list(hd_data, hw_block, 1, NULL));
     win_close(&win);
   }
 

@@ -3477,7 +3477,7 @@ int util_update_disk_list(char *module, int add)
   hd_data_t *hd_data = calloc(1, sizeof *hd_data);
 
   hd_data->flags.list_md = 1;
-  hd_list(hd_data, hw_disk, 1, NULL);
+  fix_device_names(hd_list(hd_data, hw_disk, 1, NULL));
 
   if(add) {
     for(hsl = hd_data->disks; hsl; hsl = hsl->next) {
@@ -4536,7 +4536,7 @@ void update_device_list(int force)
 
   config.hd_data = calloc(1, sizeof *config.hd_data);
 
-  hd_list2(config.hd_data, hw_items, 1);
+  fix_device_names(hd_list2(config.hd_data, hw_items, 1));
 }
 
 
@@ -4814,6 +4814,7 @@ void util_setup_udevrules()
   }
 }
 
+
 void util_error_trace(char *format, ...)
 {
   va_list args;
@@ -4826,3 +4827,42 @@ void util_error_trace(char *format, ...)
   nptrs = backtrace(buffer, 100);
   backtrace_symbols_fd(buffer, nptrs, STDERR_FILENO);
 }
+
+
+/*
+ * Change device names to match requested naming scheme.
+ */
+hd_t *fix_device_names(hd_t *hd)
+{
+  hd_t *hd0 = hd;
+  str_list_t *sl, *sl0;
+  char *s = NULL;
+
+  if(!config.namescheme || !*config.namescheme) return hd0;
+
+  asprintf(&s, "/%s/", config.namescheme);
+
+  for(; hd; hd = hd->next) {
+    if(!hd->unix_dev_name || !hd->unix_dev_names) continue;
+
+    if(strstr(hd->unix_dev_name, s)) continue;
+
+    for(sl = hd->unix_dev_names; sl; sl = sl->next) {
+      if(strstr(sl->str, s)) {
+        sl0 = calloc(1 , sizeof *sl0);
+        sl0->next = hd->unix_dev_names;
+        hd->unix_dev_names = sl0;
+        sl0->str = strdup(sl->str);
+        // ########## FIXME: should be freed
+//        free(hd->unix_dev_name);
+        hd->unix_dev_name = strdup(sl->str);
+        break;
+      }
+    }
+  }
+
+  free(s);
+
+  return hd0;
+}
+
