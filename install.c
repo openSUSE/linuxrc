@@ -311,7 +311,9 @@ int inst_choose_source()
   dia_item_t items[] = {
     di_source_cdrom,
     di_source_net,
+#if !defined(__s390__) && !defined(__s390x__)
     di_source_hd,
+#endif
     di_none
   };
 
@@ -321,9 +323,11 @@ int inst_choose_source()
       if(config.url.install->is.network) {
         di_inst_choose_source_last = di_source_net;
       }
+#if !defined(__s390__) && !defined(__s390x__)
       else if(!config.url.install->is.cdrom) {
         di_inst_choose_source_last = di_source_hd;
       }
+#endif
     }
   }
 
@@ -356,9 +360,11 @@ int inst_choose_source_cb(dia_item_t di)
       rc = inst_choose_netsource();
       break;
 
+#if !defined(__s390__) && !defined(__s390x__)
     case di_source_hd:
       err = inst_do_harddisk();
       break;
+#endif
 
     default:
       break;

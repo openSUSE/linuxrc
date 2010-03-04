@@ -1,6 +1,7 @@
 4/3/2010:	v3.3.55
 	- autoinst: recognize point-to-point devices as such early on and
 	  don't try any DHCP/BOOTP stuff on them (bnc#555236)
+	- s390: don't offer installation from HD (bnc#572575)
 
 25/2/2010:	v3.3.54
 	- autoinst: do not reconfigure network devices dynamically that have
