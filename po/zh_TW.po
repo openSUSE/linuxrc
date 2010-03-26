@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2010-02-15 09:32\n"
+"PO-Revision-Date: 2010-03-24 15:28\n"
 "Last-Translator: Novell Language <language@novell.com>\n"
 "Language-Team: Novell Language <language@novell.com>\n"
 "MIME-Version: 1.0\n"
@@ -260,7 +260,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"正在嘗試裝載目錄\n"
+"正在嘗試掛接目錄\n"
 "\n"
 "\"%s:%s\"..."
 
@@ -271,7 +271,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"嘗試裝載 NFS 目錄時發生錯誤。\n"
+"嘗試掛接 NFS 目錄時發生錯誤。\n"
 "\n"
 "伺服器所提供的原因如下：%s"
 
@@ -314,7 +314,7 @@ msgstr "乙太網路卡"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
-msgstr "並列埠"
+msgstr "平行埠"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
@@ -414,11 +414,11 @@ msgstr "選擇來源媒體。"
 
 #. TXT_TRY_CD_MOUNT
 msgid "Trying to mount the CD-ROM..."
-msgstr "嘗試裝載 CD-ROM 中..."
+msgstr "嘗試掛接 CD-ROM 中..."
 
 #. TXT_ERROR_CD_MOUNT
 msgid "Unable to mount the CD-ROM."
-msgstr "無法裝載 CD-ROM。"
+msgstr "無法掛接 CD-ROM。"
 
 #. TXT_ASK_REBOOT
 msgid "Reboot the system now?"
@@ -434,7 +434,7 @@ msgstr "輸入硬碟分割區 (例如，/dev/sda1)"
 
 #. TXT_ERROR_HD_MOUNT
 msgid "Could not mount the specified partition."
-msgstr "無法裝載指定的分割區。"
+msgstr "無法掛接指定的分割區。"
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
@@ -594,7 +594,7 @@ msgstr "-- 更多模組 --"
 
 #. TXT_INIT_PARPORT
 msgid "Initializing parallel port..."
-msgstr "啟始化並列埠..."
+msgstr "啟始化平行埠..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
@@ -619,7 +619,7 @@ msgstr "輸入 DHCP 的逾時值。"
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
-msgstr "通道間的連線"
+msgstr "通道對通道連線"
 
 #. TXT_NET_ESCON
 msgid "ESCON connection"
@@ -642,8 +642,8 @@ msgid ""
 "If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
 "Access the share as guest?"
 msgstr ""
-"如果您想要以訪客身份存取共用項目，您不必指定使用者名稱、密碼及工作群組。\n"
-"要以訪客身份存取共用項目嗎？"
+"如果您想要以訪客身分存取共用項目，您不必指定使用者名稱、密碼及工作群組。\n"
+"要以訪客身分存取共用項目嗎？"
 
 #. TXT_SMB_ENTER_USER
 msgid "Enter your user name on the SMB server."
@@ -664,7 +664,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"正在嘗試裝載共用\n"
+"正在嘗試掛接共用\n"
 "\n"
 "\"//%s/%s\""
 
@@ -862,8 +862,8 @@ msgid ""
 "Enter temporary root password.\n"
 "You will be required to change this password on initial root user login."
 msgstr ""
-"輸入暫存根使用者密碼。\n"
-"您需要在第一次以根使用者登入後變更此密碼。"
+"輸入暫存 root 使用者密碼。\n"
+"您需要在第一次以 root 使用者登入後變更此密碼。"
 
 #. TXT_REBOOT
 msgid "Reboot"
@@ -940,7 +940,7 @@ msgstr "要使用的埠名稱"
 
 #. TXT_HOSTNAME
 msgid "Fully qualified hostname"
-msgstr "完全合格主機名稱"
+msgstr "完全合格的主機名稱"
 
 #. TXT_OSA_PORTNO
 msgid "Enter the relative port number"
