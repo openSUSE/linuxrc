@@ -544,6 +544,10 @@ url_t *url_set(char *str)
     url->file_list = slist_split(',', sl->value);
   }
 
+  if((sl = slist_getentry(url->query, "type"))) {
+    url->is.file = strcmp(sl->value, "file") ? 0 : 1;
+  }
+
   if(
     url->scheme == inst_file ||
     url->scheme == inst_nfs ||
@@ -612,7 +616,10 @@ url_t *url_set(char *str)
         fprintf(stderr, "\n");
       }
 
-      fprintf(stderr, "  network = %u, mountable = %u\n", url->is.network, url->is.mountable);
+      fprintf(stderr,
+        "  network = %u, mountable = %u, file = %u\n",
+        url->is.network, url->is.mountable, url->is.file
+      );
 
       if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
 
@@ -1161,10 +1168,15 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
         if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
 
-        err = net_mount_nfs(url->mount, &url->used.server, url->path, url->port);
-        fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
+        if(!url->is.file) {
+          err = net_mount_nfs(url->mount, &url->used.server, url->path, url->port);
+          fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
+        }
+        else {
+          fprintf(stderr, "nfs: %s: is file, mounting one level up\n", url->path);
+        }
 
-        if(err == ENOTDIR || err == ENOENT) {
+        if(err == ENOTDIR || err == ENOENT || url->is.file) {
           str_copy(&url->mount, NULL);
           str_copy(&buf, url->path);
 
@@ -1237,7 +1249,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     if(url->is.mountable) {
       file_type = util_check_exist(path);
 
-      if(file_type == 'r') url->is.file = 1;
+      url->is.file = file_type == 'r' ? 1 : 0;
 
       if(file_type) {
         if(
