@@ -2041,9 +2041,7 @@ int net_dhcp4()
     sprintf(cmd + strlen(cmd), " %s", config.net.dhcpcd);
   }
 
-  if(config.net.dhcp_timeout != 60) {
-    sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
-  }
+  sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
 
   sprintf(cmd + strlen(cmd), " %s", config.net.device);
 
