@@ -1,3 +1,6 @@
+19/4/2010:	v3.3.59
+	- make backtrace logs optional (bnc #597797)
+
 12/4/2010:	v3.3.58
 	- always set dhcp timeout (bnc #594606)
 

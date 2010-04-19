@@ -4808,6 +4808,9 @@ void util_setup_udevrules()
 void util_error_trace(char *format, ...)
 {
   va_list args;
+
+  if(!config.error_trace) return;
+
   va_start(args, format);
   vfprintf(stderr, format, args);
   va_end(args);
