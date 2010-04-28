@@ -383,7 +383,7 @@ void auto2_scan_hardware()
 
         LXRC_WAIT;
 
-        if(!is_dud && !dud_retry && dud_download) {
+        if(!is_dud && !dud_retry && (dud_download || url->is.file)) {
           int i;
           char *s = url_print(url, 1);
 
