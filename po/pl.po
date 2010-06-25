@@ -6,12 +6,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2010-02-16 12:10\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"PO-Revision-Date: 2010-05-24 03:02+0200\n"
+"Last-Translator: Mariusz Fik <fisiu@opensuse.org>\n"
+"Language-Team: Polish <opensuse-pl@opensuse.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TXT_OK
 msgid "OK"
@@ -1208,7 +1210,7 @@ msgstr "Każda domena musi być prawidłowym adresem IP."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr "Dowolonych jest tylko do sześciu domen wyszukiwania."
+msgstr "Dozwolonych jest tylko do sześciu domen wyszukiwania."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"

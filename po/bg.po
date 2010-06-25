@@ -7,8 +7,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.bg\n"
-"PO-Revision-Date: 2008-10-14 20:31+0300\n"
+"Project-Id-Version: linuxrc\n"
+"PO-Revision-Date: 2009-10-05 22:04+0300\n"
 "Last-Translator: Borislav Mitev <morbid_viper@tkzs.org>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -34,7 +34,7 @@ msgstr "Не"
 
 #. TXT_CHOOSE_LANGUAGE
 msgid "Select the language."
-msgstr "Изборете на език."
+msgstr "Изберете език."
 
 #. TXT_COLOR_DISPLAY
 msgid "Color display"
@@ -58,7 +58,7 @@ msgstr "Модули на ядрото (хардуерни драйвери)"
 
 #. TXT_MENU_START
 msgid "Start Installation"
-msgstr "Стартиране на инсталация"
+msgstr "Начало на инсталация"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -103,19 +103,19 @@ msgid ""
 "\n"
 "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu."
 msgstr ""
-"Опит за зареждане на модула \"%s\"...\n"
+"Опит за зареждане на модула „%s“…\n"
 "\n"
 "По време на зареждането, може да наблюдавате съобщенията от ядрото на виртуална конзола 4 (ALT-F4). Използвайте ALT-F1 за да се върнете пак към това меню."
 
 #. TXT_LOAD_SUCCESSFUL
 #, c-format
 msgid "Module \"%s\" loaded successfully."
-msgstr "Модулът \"%s\" бе зареден успешно."
+msgstr "Модулът „%s“ бе зареден успешно."
 
 #. TXT_LOAD_FAILED
 #, c-format
 msgid "Failed to load module \"%s\"."
-msgstr "Неуспешно зареждане на модула \"%s\"."
+msgstr "Неуспешно зареждане на модула „%s“."
 
 #. TXT_FLOPPY
 msgid "Floppy"
@@ -144,7 +144,7 @@ msgstr "Зареждане на инсталирана система"
 #. TXT_SEARCH_FOR_RI
 #, c-format
 msgid "Searching for image \"%s\"..."
-msgstr "Търсене на образ \"%s\"..."
+msgstr "Търсене на образ „%s“..."
 
 #. TXT_INFO_KERNEL
 msgid "Kernel Messages"
@@ -256,7 +256,7 @@ msgstr "Въведете директория на сървъра."
 #. TXT_ENTER_PARAMS
 #, c-format
 msgid "Enter parameters for \"%s\"."
-msgstr "Въведете параметри за \"%s\"."
+msgstr "Въведете параметри за „%s“."
 
 #. TXT_TRY_NFS_MOUNT
 #, c-format
@@ -267,7 +267,7 @@ msgid ""
 msgstr ""
 "Опит за монтиране на директорията\n"
 "\n"
-"\"%s:%s\"..."
+"„%s:%s“..."
 
 #. TXT_ERROR_NFSMOUNT
 #, c-format
@@ -316,7 +316,7 @@ msgstr "Желаете ли да потърсите допълнителни CD-
 
 #. TXT_NET_ETH0
 msgid "ethernet network card"
-msgstr "ethernet мрежова карта"
+msgstr "мрежова карта ethernet"
 
 #. TXT_NET_PLIP
 msgid "parallel port"
@@ -324,19 +324,19 @@ msgstr "паралелен порт"
 
 #. TXT_NET_TR0
 msgid "token ring network card"
-msgstr "token ring мрежова карта"
+msgstr "мрежова карта token ring"
 
 #. TXT_NET_ARC0
 msgid "arcnet network card"
-msgstr "arcnet мрежова карта"
+msgstr "мрежова карта arcnet"
 
 #. TXT_NET_FDDI
 msgid "FDDI network card"
-msgstr "FDDI мрежова карта"
+msgstr "мрежова карта FDDI"
 
 #. TXT_NET_HIPPI
 msgid "HIPPI network card"
-msgstr "HIPPI мрежова карта"
+msgstr "мрежова карта HIPPI"
 
 #. TXT_CHOOSE_NET
 msgid "Choose the network device."
@@ -348,7 +348,7 @@ msgstr "Въведете IP адрес на PLIP партньора."
 
 #. TXT_NO_PCMCIA
 msgid "The PCMCIA chipset could not be detectedautomatically. Specify it manually."
-msgstr "PCMCIA чипсетът не бе намерен автоматично! Моля, задайте го ръчно."
+msgstr "Чипсетът на PCMCIA не бе намерен автоматично! Моля, задайте го ръчно."
 
 #. TXT_FOUND_PCMCIA
 #, c-format
@@ -357,18 +357,18 @@ msgid ""
 "\n"
 "Enter parameters for PCMCIA core modules."
 msgstr ""
-"Намерен е PCMCIA чипсет \"%s\".\n"
+"Намерен е чипсет на PCMCIA „%s“.\n"
 "\n"
 "Въведете параметри за основните PCMCIA модули."
 
 #. TXT_PCMCIA_PARAMS
 #, c-format
 msgid "Enter specific parameters for chipset \"%s\"."
-msgstr "Въведете специфичните параметри за чипсета \"%s\"."
+msgstr "Въведете специфичните параметри за чипсета „%s“."
 
 #. TXT_START_CARDMGR
 msgid "Starting card manager..."
-msgstr "Стартиране на мениджъра за карти..."
+msgstr "Стартиране управлението на карти..."
 
 #. TXT_PCMCIA_SUCCESS
 msgid "Successfully started PCMCIA card services."
@@ -392,7 +392,7 @@ msgid ""
 msgstr ""
 "Можете да напуснете Linuxrc само през\n"
 "\n"
-"\"Стартиране на инсталация или система\"\n"
+"„Стартиране на инсталация или система“\n"
 "\n"
 "Може да се наложи да заредите някои драйвери (модули) за поддръжка на Вашия хардуера."
 
@@ -591,7 +591,8 @@ msgid ""
 "Usually an FTP installation is performed via anonymous FTP. It is possible to specify a user name and password for the FTP server access.\n"
 "Use a user name and password?"
 msgstr ""
-"Обикновено FTP инсталацията се осъществява чрез анонимно FTP. Възможно е да се въведе потребителско име и парола за достъп до FTP сървъра.\n"
+"Обикновено FTP инсталацията се осъществява чрез анонимно FTP. \n"
+"Възможно е да се въведе потребителско име и парола за достъп до FTP сървъра.\n"
 "Желаете ли да използвате потребителско име и парола?"
 
 #. TXT_MORE_MODULES
@@ -604,7 +605,7 @@ msgstr "Инициализация на паралелния порт..."
 
 #. TXT_ENTER_NFSPORT
 msgid "Enter the port number on which the NFS server is running."
-msgstr "Въведете номера на порта, на който работи NFS сървъра."
+msgstr "Въведете номера на порта, на който работи NFS сървърът."
 
 #. TXT_INSERT_CD
 #, c-format
@@ -617,7 +618,7 @@ msgstr "Изваждане на CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "DHCP просрочка"
+msgstr "Просрочка за DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
@@ -672,7 +673,7 @@ msgid ""
 msgstr ""
 "Опит за монтиране на ресурса\n"
 "\n"
-"\"//%s/%s\""
+"„//%s/%s“"
 
 #. %s is either BOOTP or DHCP
 #. TXT_ASK_DHCP
@@ -1165,83 +1166,83 @@ msgstr "Разпознаване и зареждане на мрежовите �
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Задайте IP адреса на DNS сървъра. Ако не използвате DNS сървър, просто въведете \"+++\"."
+msgstr "Задайте IP адреса на DNS сървъра. Ако не използвате DNS сървър, просто въведете „+++“."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "Въведете IP на DNS сървъра %u или \"+++\", ако не използвате."
+msgstr "Въведете IP на DNS сървъра %u или „+++“, ако не използвате."
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Експертно"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Желаете ли да пуснете обвивка преди и след YaST?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Пускане на обвивка"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "Инфо за SLP"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Показване на настройката"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Промяна на настройката"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Изпълнение на команда"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Изход от linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Въведете домейните за търсене, разделени с интервал: "
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Всеки домейн трябва да бъде валиден IP адрес."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Разрешени до шест домейна за търсене."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Ако наистина вярвате на това хранилище можете да продължите в несигурен режим."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "Сумата за проверка с SHA1 е грешна."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Инсталирането бе прекъснато."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "Файлът не е подписан."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Невалиден подпис."
 
 #. TXT_HWADDR
 msgid "MAC address"

@@ -8,11 +8,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc.hu\n"
+"Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2010-01-29 17:52+0100\n"
+"PO-Revision-Date: 2009-10-12 19:09+0200\n"
 "Last-Translator: Kalman Kemenczy <kkemenczy@novell.com>\n"
-"Language-Team:  <hu@li.org>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -573,15 +573,15 @@ msgstr "Adjon meg egy jelszót az FTP felhasználói fiókhoz."
 
 #. TXT_ENTER_FTPPROXY
 msgid "Enter the address of the FTP proxy."
-msgstr "Adja meg az FTP proxy címét."
+msgstr "Adja meg az FTP-proxy címét."
 
 #. TXT_ENTER_FTPPORT
 msgid "Enter the port of the FTP proxy."
-msgstr "Adja meg az FTP proxy portját."
+msgstr "Adja meg az FTP-proxy portját."
 
 #. TXT_WANT_FTPPROXY
 msgid "Use an FTP proxy?"
-msgstr "Akar FTP proxyt használni?"
+msgstr "Akar FTP-proxyt használni?"
 
 #. TXT_NOMEM_FTP
 #, c-format
@@ -835,7 +835,7 @@ msgstr "SSH-mód engedélyezése vagy tiltása"
 
 #. TXT_SSH_YES_NO
 msgid "Start SSH for Text Install?"
-msgstr "Elindítja az SSH-t a szöveges módú telepítéshez?"
+msgstr "Elindítja az SSH-t a karakteres telepítéshez?"
 
 #. TXT_VNC_PASSWORD
 msgid "Enter your VNC password."

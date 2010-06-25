@@ -6,17 +6,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: sk\n"
+"Project-Id-Version: linuxrc\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-05-12 15:48+0100\n"
-"Last-Translator: Ladislav Michnovič <lmichnovic@suse.cz>\n"
-"Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
+"PO-Revision-Date: 2009-03-26 20:33+0100\n"
+"Last-Translator: Rastislav Krupanský <rastislav.krupansky@gmail.com>\n"
+"Language-Team:  <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10\n"
+"X-Generator: KBabel 1.11.4\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-Language: Slovak\n"
+"X-Poedit-Country: SLOVAKIA\n"
 
 #. TXT_OK
 msgid "OK"
@@ -60,7 +61,7 @@ msgstr "Moduly jadra (ovládače hardvéru)"
 
 #. TXT_MENU_START
 msgid "Start Installation"
-msgstr "Štart inštalácie"
+msgstr "Spustiť inštaláciu"
 
 #. TXT_MENU_INFO
 msgid "System Information"
@@ -301,7 +302,7 @@ msgstr "Nie sú načítané žiadne moduly."
 #. TXT_AUTO_RUNNING
 #, c-format
 msgid "Autoprobing (%s)...      "
-msgstr "Automaticky skúšam (%s)..."
+msgstr "Automaticky skúšam (%s)...      "
 
 #. TXT_WANT_MORE_SCSI
 msgid "Search for additional SCSI host adaptors?"
@@ -618,11 +619,11 @@ msgstr "Vysunúť CD"
 
 #. TXT_BOOTP_TIMEOUT
 msgid "DHCP Time-Out"
-msgstr "Čakanie na DHCP"
+msgstr "Prerušenie DHCP"
 
 #. TXT_ENTER_BOOTP_TIMEOUT
 msgid "Enter the time-out value for DHCP."
-msgstr "Zadajte dĺžku čakania na DHCP."
+msgstr "Zadajte dĺžku prerušenia pre DHCP."
 
 #. TXT_NET_CTC
 msgid "channel to channel connection"
@@ -935,7 +936,7 @@ msgstr "Režim kompatibility (prednastavený)"
 
 #. TXT_CTC_PROT_EXT
 msgid "Extended mode"
-msgstr "Extended režim"
+msgstr "Rozšírený režim"
 
 #. TXT_CTC_PROT_ZOS390
 msgid "Compatibility mode for OS/390 and z/OS peers"
@@ -1166,83 +1167,83 @@ msgstr "Detegujem a nahrávam sieťové ovládače."
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr ""
+msgstr "Zadajte IP adresu vášho názvového serveru. Ak ho nepoužívate, zadajte iba \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr ""
+msgstr "Zadajte IP adresu vášho názvového serveru %u, alebo \"+++\"."
 
 #. TXT_EXPERT
 msgid "Expert"
-msgstr ""
+msgstr "Expert"
 
 #. TXT_START_SHELL_YAST
 msgid "Start shell before and after YaST?"
-msgstr ""
+msgstr "Spustiť shell pred a po spustení YaSTu?"
 
 #. TXT_START_SHELL
 msgid "Start shell"
-msgstr ""
+msgstr "Spustiť shell"
 
 #. TXT_GET_SLP_INFO
 msgid "Get SLP info"
-msgstr ""
+msgstr "Získať SLP info"
 
 #. TXT_SHOW_CONFIG
 msgid "Show config"
-msgstr ""
+msgstr "Zobraziť nastavenie"
 
 #. TXT_CHANGE_CONFIG
 msgid "Change config"
-msgstr ""
+msgstr "Zmeniť nastavenie"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr ""
+msgstr "Spustiť príkaz"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
-msgstr ""
+msgstr "Ukončiť linuxrc"
 
 #. TXT_INPUT_DOMAIN
 msgid "Enter your search domains, separated by a space:"
-msgstr ""
+msgstr "Zadajte vaše vyhľadávacie domény, oddelené medzerou:"
 
 #. TXT_DOMAIN_ALPHANUMERIC
 msgid "Each domain must be a valid IP address."
-msgstr ""
+msgstr "Každá doména musí byť platná IP adresa."
 
 #. TXT_DOMAIN_TOOMANY
 msgid "Only up to six search domains are allowed."
-msgstr ""
+msgstr "Je povolených šesť vyhľadávacích domén."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr ""
+msgstr "DVD / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr ""
+msgstr "Ak naozaj dôverujete repozitáru, môžete pokračovať, ale nie je to bezpečné."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr ""
+msgstr "Nesprávna kontrolná suma SHA1."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
-msgstr ""
+msgstr "Inštalácia prerušená."
 
 #. missing GPG signature
 #. TXT_NO_SIGNATURE
 msgid "File not signed."
-msgstr ""
+msgstr "Súbor nie je podpísaný."
 
 #. incorrect GPG signature
 #. TXT_INVALID_SIGNATURE
 msgid "Invalid signature."
-msgstr ""
+msgstr "Neplatný podpis."
 
 #. TXT_HWADDR
 msgid "MAC address"

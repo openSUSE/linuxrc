@@ -5,13 +5,14 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2010-02-15 14:07\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"Project-Id-Version: linuxrc.sv\n"
+"PO-Revision-Date: 2008-11-08 10:50+0100\n"
+"Last-Translator: Jonas Björk <jonas@jonasbjork.net>\n"
+"Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. TXT_OK
 msgid "OK"
@@ -878,7 +879,7 @@ msgstr "Datorn har inte tillräckligt med RAM-minne för installation av %s. Du 
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Lösenordet är för kort (det måste innehålla minst 8 tecken)."
+msgstr "Lösenordet är för kort (måste ha minst 8 tecken)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -1138,7 +1139,7 @@ msgstr "Ange parametrar för nätverksenheter manuellt"
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "Det gick inte att hitta något arkiv."
+msgstr "Förrådet hittades inte."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
@@ -1154,20 +1155,20 @@ msgstr "Behöver du ett användarnamn och lösenord för att komma åt %s-server
 #. TXT_IP_ADDRESS_IN_USE
 #, c-format
 msgid "IP address %s is already in use by another machine!"
-msgstr "IP-adressen %s används redan av en annan dator."
+msgstr "IP-adressen %s används redan av en annan maskin!"
 
 #. TXT_LOAD_NETWORK_DRIVERS
 msgid "Detecting and loading network drivers"
-msgstr "Identifierar och läser in nätverksdrivrutiner"
+msgstr "Upptäcker och laddar drivrutiner för nätverk."
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Ange namnserverns IP-adress. Om du inte använder någon namnserver skriver du bara \"+++\"."
+msgstr "Ange din namnservers IP-adress. Om du inte använder en namnserver skriver du \"+++\"."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
 msgid "Enter the IP of name server %u or \"+++\" for none."
-msgstr "Ange IP-adressen för namnservern %u eller +++ om du inte använder någon namnserver."
+msgstr "Ange IP-numret för namnservern %u eller ange \"+++\" för ingen."
 
 #. TXT_EXPERT
 msgid "Expert"

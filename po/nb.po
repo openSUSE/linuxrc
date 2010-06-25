@@ -1142,7 +1142,7 @@ msgstr "Angi parametere til nettverksheten manuelt"
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "Ingen arkiver ble ikke funnet."
+msgstr "Ingen pakkebrønner funnet."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
@@ -1223,7 +1223,7 @@ msgstr "DVD- / CD-ROM"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr "Hvis du stoler på dette arkivet, kan du fortsette i usikker modus."
+msgstr "Hvis du stoler på dene pakkebrønnen, kan du fortsette i usikker modus."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED

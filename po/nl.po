@@ -6,13 +6,15 @@
 # nagelezen tot 120
 msgid ""
 msgstr ""
-"Project-Id-Version: linuxrc\n"
-"PO-Revision-Date: 2010-02-15 12:19\n"
-"Last-Translator: Novell Language <language@novell.com>\n"
-"Language-Team: Novell Language <language@novell.com>\n"
+"Project-Id-Version: linuxrc.nl\n"
+"PO-Revision-Date: 2008-11-20 16:46+0100\n"
+"Last-Translator: Freek de Kruijf <freek@opensuse.org>\n"
+"Language-Team: Dutch <yast-nl-l10n@lists.sf.kovoks.nl>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural= n != 1;\n"
 
 #. TXT_OK
 msgid "OK"
@@ -121,11 +123,11 @@ msgstr "Diskette"
 
 #. TXT_HARDDISK
 msgid "Hard Disk"
-msgstr "Vaste schijf"
+msgstr "Harde schijf"
 
 #. TXT_START_INSTALL
 msgid "Start Installation or Update"
-msgstr "Installatie of update starten"
+msgstr "Installatie of opwaardering starten"
 
 #. TXT_START_RESCUE
 msgid "Start Rescue System"
@@ -190,7 +192,7 @@ msgstr "Plaats de diskette en druk op ENTER."
 
 #. TXT_ERROR_READ_DISK
 msgid "Error reading from floppy disk."
-msgstr "Er is een fout opgetreden bij het lezen van de diskette."
+msgstr "Fout opgetreden bij het lezen van de diskette."
 
 #. TXT_ENTER_ROOT_FS
 msgid "Enter your root partition (e.g., /dev/sda3)"
@@ -249,7 +251,7 @@ msgstr "Voer het IP-adres van de FTP-server in."
 
 #. TXT_INPUT_DIR
 msgid "Enter the directory on the server."
-msgstr "Voer de server-directory in."
+msgstr "Voer de servermap in."
 
 #. TXT_ENTER_PARAMS
 #, c-format
@@ -263,7 +265,7 @@ msgid ""
 "\n"
 "\"%s:%s\"..."
 msgstr ""
-"Probeert de directory\n"
+"Probeert de map\n"
 "\n"
 "\"%s:%s\"\n"
 "aan te koppelen..."
@@ -275,7 +277,7 @@ msgid ""
 "\n"
 "Reason given by server: %s"
 msgstr ""
-"Er is een fout opgetreden tijdens het aankoppelen van de NFS-directory.\n"
+"Er is een fout opgetreden tijdens het aankoppelen van de NFS-map.\n"
 "\n"
 "De server gaf de volgende reden: %s"
 
@@ -442,7 +444,7 @@ msgstr "Kon de gespecificeerde partitie niet aankoppelen."
 
 #. TXT_ENTER_HD_DIR
 msgid "Enter the source directory."
-msgstr "Geef de bron-directory op."
+msgstr "Geef de bronmap op."
 
 #. TXT_ERROR_INSTALL
 msgid "An error occurred during the installation."
@@ -460,7 +462,7 @@ msgid ""
 msgstr ""
 "Uw computer beschikt over erg weinig geheugen.\n"
 "\n"
-"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op ALT-F2) om enige swapruimte te maken en te activeren."
+"Voordat u deze melding accepteert moet u eerst naar console 2 gaan (druk op ALT-F2) om enige wisselgeheugenruimte (swap) te maken en te activeren."
 
 #. TXT_ASK_ANIMATE
 msgid "Animation"
@@ -555,7 +557,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Er is een fout opgetreden bij het verbinding maken met de FTP-server:\n"
+"Fout opgetreden bij het verbinding maken met de FTP-server:\n"
 "\n"
 "%s"
 
@@ -639,7 +641,7 @@ msgstr "kanaal verbonden cisco router"
 
 #. TXT_SMB_ENTER_SHARE
 msgid "Enter the share name on the SMB server."
-msgstr "Geef de share naam van de SMB-server op."
+msgstr "Geef de sharenaam van de SMB-server op."
 
 #. TXT_SMB_GUEST_LOGIN
 msgid ""
@@ -668,7 +670,7 @@ msgid ""
 "\n"
 "\"//%s/%s\""
 msgstr ""
-"Er wordt geprobeerd om de share te mounten:\n"
+"Er wordt geprobeerd om de share aan te koppelen:\n"
 "\n"
 "\"//%s/%s\""
 
@@ -767,7 +769,7 @@ msgstr "Selecteer de root partitie."
 
 #. TXT_CHOOSE_SWAP
 msgid "Choose the swap partition."
-msgstr "Selecteer de swap partitie."
+msgstr "Selecteer de partitie voor het wisselgeheugen."
 
 #. TXT_LOW_MEMORY1
 msgid "There is not enough memory to load all data."
@@ -779,15 +781,15 @@ msgstr "Uw computer heeft niet genoeg geheugen om YaST te kunnen opstarten."
 
 #. TXT_ADD_SWAP
 msgid "To continue, activate some swap space."
-msgstr "Activeer enige swapruimte om door te kunnen gaan."
+msgstr "Activeer enige wisselgeheugenruimte (swap) om door te kunnen gaan."
 
 #. TXT_ERROR_SWAP
 msgid "Error activating swap space."
-msgstr "Er is een fout opgetreden tijdens het activeren van de swapruimte."
+msgstr "Fout opgetreden tijdens het activeren van de wisselgeheugenruimte."
 
 #. TXT_ENTER_SWAP
 msgid "Enter the swap partition (e.g., /dev/sda2)"
-msgstr "Geef de swap partitie op (bijv: /dev/sda2)"
+msgstr "Geef de partitie voor het wisselgeheugen op (bijv: /dev/sda2)"
 
 #. TXT_ENTER_USER
 #, c-format
@@ -848,11 +850,11 @@ msgstr ""
 
 #. TXT_ADD_DRIVER_UPDATE
 msgid "Add Driver Update"
-msgstr "Stuurprogramma-update toevoegen"
+msgstr "Stuurprogramma-opwaardering toevoegen"
 
 #. TXT_SHOW_DRIVER_UPDATES
 msgid "Show Driver Updates"
-msgstr "Stuurprogramma-updates weergeven"
+msgstr "Stuurprogramma-opwaardering weergeven"
 
 #. TXT_INPUT_NAMED1
 #, c-format
@@ -878,7 +880,7 @@ msgstr "Uw computer heeft niet genoeg RAM om %s te kunnen installeren. U heeft m
 
 #. TXT_VNC_PASSWORD_TOO_SHORT
 msgid "Password is too short (must have at least 8 characters)."
-msgstr "Wachtwoord is te kort (moet uit minstens 8 tekens bestaan)."
+msgstr "Wachtwoord is te kort (moet uit minstens 8 lettertekens bestaan)."
 
 #. TXT_XSERVER_IP
 msgid "Enter the IP address of the host running the X11 server."
@@ -886,7 +888,7 @@ msgstr "Geef het IP-adres van de host, met daarop de werkende X11 server, op."
 
 #. TXT_CHOOSE_390NET
 msgid "Please select the type of your network device."
-msgstr "Selecteer uw type netwerk apparaat aub."
+msgstr "Selecteer uw type netwerk apparaat a.u.b.."
 
 #. TXT_IUCV_PEER
 msgid "Please enter the name (user ID) of the target VM guest."
@@ -959,32 +961,32 @@ msgstr "Power uit"
 
 #. TXT_DUD_FAIL
 msgid "Failed to access Driver Update medium."
-msgstr "Kon geen toegang tot het medium met stuurprogramma-update krijgen."
+msgstr "Kon geen toegang tot het medium met stuurprogramma-opwaardering krijgen."
 
 #. TXT_DUD_READ
 msgid "Reading Driver Update..."
-msgstr "Stuurprogramma-update wordt gelezen..."
+msgstr "Stuurprogramma-opwaardering wordt gelezen..."
 
 #. TXT_DUD_NOTFOUND
 msgid "No new Driver Updates found"
-msgstr "Geen nieuwe stuurprogramma-updates gevonden"
+msgstr "Geen nieuwe stuurprogramma-opwaardering gevonden"
 
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
-msgstr "Stuurprogramma-updates toegevoegd"
+msgstr "Stuurprogramma-opwaardering toegevoegd"
 
 #. shown if driver update succeeded
 #. TXT_DUD_OK
 msgid "Driver Update ok"
-msgstr "Stuurprogramma-update gelukt"
+msgstr "Stuurprogramma-opwaardering gelukt"
 
 #. TXT_DUD_SELECT
 msgid "Please choose the Driver Update medium."
-msgstr "Kies het medium met de stuurprogramma-update."
+msgstr "Kies het medium met de stuurprogramma-opwaardering."
 
 #. TXT_DUD_DEVICE
 msgid "Please enter the Driver Update device."
-msgstr "Geef het apparaat met stuurprogramma-update op."
+msgstr "Geef het apparaat met stuurprogramma-opwaardering op."
 
 #. TXT_DUD_INVALID_DEVICE
 msgid "Invalid device name."
@@ -1009,11 +1011,11 @@ msgstr "Geen diskette gevonden."
 #. heading for a listing of updates
 #. TXT_DUD_LIST
 msgid "Driver Update list"
-msgstr "Lijst met stuurprogramma-updates"
+msgstr "Lijst met stuurprogramma-opwaarderingen"
 
 #. TXT_DUD_NOT_YET
 msgid "No Driver Updates so far."
-msgstr "Momenteel zijn er geen stuurprogramma-updates."
+msgstr "Momenteel zijn er geen stuurprogramma-opwaarderingen."
 
 #. TXT_INSERT_CD_DVD
 msgid "Insert Installation CD-ROM or DVD."
@@ -1040,7 +1042,7 @@ msgstr "Foutieve checksum."
 #. TXT_CD_READ_FAILED
 #, c-format
 msgid "Error reading sector %u."
-msgstr "Er is een fout opgetreden tijdens het lezen van sector %u."
+msgstr "Fout opgetreden tijdens het lezen van sector %u."
 
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
@@ -1119,7 +1121,7 @@ msgstr "Aanvullende lettertypen laden"
 #. progress indicator label
 #. TXT_LOADING_UPDATE
 msgid "Loading Driver Update"
-msgstr "Stuurprogramma-update laden"
+msgstr "Stuurprogramma-opwaardering laden"
 
 #. progress indicator label
 #. TXT_LOADING_RESCUE
@@ -1137,7 +1139,7 @@ msgstr "Voer de apparaatparameters handmatig in"
 #. dialog box if install repository is missing
 #. TXT_NO_REPO
 msgid "No repository found."
-msgstr "Geen opslagruimte gevonden."
+msgstr "Geen installatiebron gevonden."
 
 #. a web proxy
 #. TXT_USER_PW_PROXY
@@ -1161,7 +1163,7 @@ msgstr "Detectie en laden van netwerkstuurprogramma's"
 
 #. TXT_INPUT_NAMED_S390
 msgid "Enter the IP address of your name server. If you do not use a name server, just enter \"+++\"."
-msgstr "Voer het IP-adres van uw naamserver in. Wanneer u geen naamserver gebruikt, voert u \"+++\" in."
+msgstr "Voer het IP-adres van uw naamserver in. Wanneer u geen naamserver gebruikt, voer dan \"+++\" in."
 
 #. TXT_INPUT_NAMED1_S390
 #, c-format
@@ -1194,7 +1196,7 @@ msgstr "Configuratie wijzigen"
 
 #. TXT_RUN_COMMAND
 msgid "Run command"
-msgstr "Opdracht uitvoeren"
+msgstr "Commando uitvoeren"
 
 #. TXT_QUIT_LINUXRC
 msgid "Quit linuxrc"
@@ -1214,16 +1216,16 @@ msgstr "Er zijn maximaal zes zoekdomeinen toegestaan."
 
 #. TXT_DVD
 msgid "DVD / CD-ROM"
-msgstr "Dvd/cd-rom"
+msgstr "Dvd / cd-rom"
 
 #. TXT_INSECURE_REPO2
 msgid "If you really trust your repository, you may continue in an insecure mode."
-msgstr "Als u deze opslagruimte echt vertrouwd, dan kunt u doorgaan in een onveilige modus."
+msgstr "Als u deze bron echt vertrouwd, dan kunt u doorgaan in een onveilige modus."
 
 #. message when check sum test failed
 #. TXT_SHA1_FAILED
 msgid "SHA1 sum wrong."
-msgstr "Foutieve SHA1-checksum."
+msgstr "Foutieve SHA1 checksum."
 
 #. TXT_INSTALL_ABORT
 msgid "Installation aborted."
