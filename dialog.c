@@ -954,6 +954,7 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
       {
 	int i, c;
 
+ctrlc:
 	putchar('\n');
 	i = strlen(txt_tv);
 	if (i > 0 && txt_tv[i - 1] == '.')
@@ -995,6 +996,13 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
 		    if (pw_mode)
 		      kbd_reset();
 		    return -1;
+		  }
+		if (c == 033 || c == 'x')
+		  {
+		    while (c = lgetchar(), c != '\n' && c != '\r' && c != EOF);
+		    if (pw_mode) kbd_reset();
+		    dia_handle_ctrlc();
+		    goto ctrlc;
 		  }
 	      }
 	    if ((unsigned char)c < ' ')
