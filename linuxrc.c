@@ -775,6 +775,7 @@ void lxrc_init()
   config.kexec_reboot = 1;
   config.efi = -1;
   config.udev_mods = 1;
+  config.content = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;

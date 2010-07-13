@@ -1882,6 +1882,8 @@ int net_dhcp4()
 
   unlink(file);
 
+  fprintf(stderr, "%s\n", cmd);
+
   system(cmd);
 
   f0 = file_read_file(file, kf_dhcp);

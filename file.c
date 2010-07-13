@@ -305,6 +305,7 @@ static struct {
   { key_supporturl,     "supporturl",     kf_cfg + kf_cmd                },
   { key_udevrule,       "udev.rule",      kf_cfg + kf_cmd_early          },
   { key_configure_network, "ConfigureNetwork", kf_cfg + kf_cmd           },
+  { key_content,        "Content",        kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1587,6 +1588,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_configure_network:
         if(f->is.numeric) config.configure_network = f->nvalue;
+        break;
+
+      case key_content:
+        if(f->is.numeric) config.content = f->nvalue;
         break;
 
       default:

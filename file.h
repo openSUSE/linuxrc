@@ -51,7 +51,7 @@ typedef enum {
   key_kexec_reboot, key_devbyid, key_braille, key_nfsopts, key_ipv4, key_ipv4only,
   key_ipv6, key_ipv6only, key_usesax2, key_efi, key_supporturl, key_portno,
   key_osahwaddr, key_zen, key_zenconfig, key_udevrule, key_iptool,
-  key_configure_network
+  key_configure_network, key_content
 } file_key_t;
 
 typedef enum {

@@ -1852,14 +1852,16 @@ int url_find_repo(url_t *url, char *dir)
       strprintf(&buf, "/%s", config.zen ? config.zenconfig : "content");
       strprintf(&buf2, "file:%s", buf);
 
-      if(
-        url_read_file(url, NULL, buf, buf, NULL,
-          URL_FLAG_NOSHA1 + (config.secure ? URL_FLAG_CHECK_SIG : 0)
-        )
-      ) return 0;
+      if(config.content) {
+        if(
+          url_read_file(url, NULL, buf, buf, NULL,
+            URL_FLAG_NOSHA1 + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+          )
+        ) return 0;
 
-      if(!config.sig_failed) {
-        file_read_info_file(buf2, config.zen ? kf_cont + kf_cfg : kf_cont);
+        if(!config.sig_failed) {
+          file_read_info_file(buf2, config.zen ? kf_cont + kf_cfg : kf_cont);
+        }
       }
 
       str_copy(&buf, NULL);
