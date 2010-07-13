@@ -1,6 +1,7 @@
 13/7/2010:	v3.3.61
 	- add 'content' option to allow repos without 'content' file
 	- extra menu can be reached from input line via 'ESC ESC' or 'ESC x'
+	- fix url server address resolving (bnc #619119)
 
 25/6/2010:	v3.3.60
 	- s390: make sure network device has been activated before driver
