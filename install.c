@@ -636,6 +636,7 @@ int inst_mount_nfs()
     sprintf(text, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(config.instmode));
     if((rc = net_get_address(text, &config.net.server, 1))) return rc;
     if((rc = dia_input2(txt_get(TXT_INPUT_DIR), &config.serverdir, 30, 0))) return rc;
+    config.net.is.file = 0;
   }
   return do_mount_nfs();
 }
@@ -2204,9 +2205,14 @@ int do_mount_nfs()
   fprintf(stderr, "Starting portmap.\n");
   system("portmap");
 
-  rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
-
-  if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", rc);
+  if(!config.net.is.file) {
+    rc = net_mount_nfs(config.mountpoint.instdata, &config.net.server, config.serverdir);
+    if(config.debug) fprintf(stderr, "nfs: err #1 = %d\n", rc);
+  }
+  else {
+    if(config.debug) fprintf(stderr, "nfs: %s: is file, mounting one level up\n", config.serverdir);
+    rc = ENOTDIR;
+  }
 
   if(rc == ENOTDIR && config.serverdir) {
     str_copy(&serverdir, config.serverdir);

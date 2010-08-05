@@ -897,6 +897,7 @@ void file_do_info(file_t *f0)
         if(url && url->scheme) {
           set_instmode(url->scheme);
           if(url->port) config.net.port = url->port;
+          config.net.is.file = url->is.file;
 
           if(config.instmode == inst_slp) {
             str_copy(&config.slp.proto, url->server && *url->server ? url->server : NULL);

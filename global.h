@@ -165,6 +165,9 @@ typedef struct {
   char *domain;
   char *device;
   unsigned port;
+  struct {
+    unsigned file:1;	/* path points to file (not to directory) */
+  } is;
 } url_t;
 
 
@@ -521,6 +524,9 @@ typedef struct {
       char *module;		/* cifs/smb kernel module */
     } cifs;
     char *dhcpcd;		/* dhcpcd parameters (if any) */
+    struct {
+      unsigned file:1;		/* nfs path points to file (not to directory) */
+    } is;
   } net;
 
   struct {

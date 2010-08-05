@@ -3175,6 +3175,10 @@ url_t *parse_url(char *str)
       str_copy(&url.device, *s1 ? s1 : NULL);
     }
 
+    if((sl = slist_getentry(sl0, "type"))) {
+      url.is.file = strcmp(sl->value, "file") ? 0 : 1;
+    }
+
     slist_free(sl0);
   }
 
@@ -3189,9 +3193,11 @@ url_t *parse_url(char *str)
   if(config.debug >= 2) {
     fprintf(stderr,
       "  scheme = %s, server = \"%s\", dir = \"%s\", share = \"%s\"\n"
-      "  domain = \"%s\", user = \"%s\", password = \"%s\", port = %u, dev = %s\n",
+      "  domain = \"%s\", user = \"%s\", password = \"%s\"\n"
+      "  port = %u, dev = %s, file = %u\n",
       get_instmode_name(url.scheme), url.server, url.dir, url.share,
-      url.domain, url.user, url.password, url.port, url.device
+      url.domain, url.user, url.password,
+      url.port, url.device, url.is.file
     );
   }
 
