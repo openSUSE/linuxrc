@@ -548,6 +548,14 @@ url_t *url_set(char *str)
     url->is.file = strcmp(sl->value, "file") ? 0 : 1;
   }
 
+  if((sl = slist_getentry(url->query, "all"))) {
+    url->search_all = strtoul(sl->value, NULL, 0);
+  }
+
+  if((sl = slist_getentry(url->query, "quiet"))) {
+    url->quiet = strtoul(sl->value, NULL, 0);
+  }
+
   if(
     url->scheme == inst_file ||
     url->scheme == inst_nfs ||
@@ -617,8 +625,8 @@ url_t *url_set(char *str)
       }
 
       fprintf(stderr,
-        "  network = %u, mountable = %u, file = %u\n",
-        url->is.network, url->is.mountable, url->is.file
+        "  network = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
+        url->is.network, url->is.mountable, url->is.file, url->search_all, url->quiet
       );
 
       if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
