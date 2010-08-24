@@ -1390,17 +1390,14 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     }
 
     if(
-      (
+      (	/* hd: neither floppy nor cdrom */
+        url->scheme == inst_hd &&
         (
-          url->scheme == inst_hd ||
-          url->scheme == inst_disk
-        ) &&
-        (					/* hd means: */
-          hd_is_hw_class(hd, hw_floppy) ||	/*  - not a floppy */
-          hd_is_hw_class(hd, hw_cdrom) ||	/*  - not a cdrom */
-          hd->child_ids				/*  - has no partitions */
+          hd_is_hw_class(hd, hw_floppy) ||
+          hd_is_hw_class(hd, hw_cdrom)
         )
       ) ||
+      hd->child_ids ||		/* skip whole device if there are partitions */
       !hd->unix_dev_name
     ) continue;
 

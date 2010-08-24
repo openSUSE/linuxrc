@@ -339,9 +339,11 @@ void auto2_scan_hardware()
 
     for(sl = config.update.urls; sl && !config.sig_failed; sl = sl->next) {
       fprintf(stderr, "dud url: %s\n", sl->key);
-      printf("Reading driver update: %s\n", sl->key);
-      fflush(stdout);
+
       url = url_set(sl->key);
+
+      fprintf(url->quiet ? stderr : stdout, "Reading driver update: %s\n", sl->key);
+      fflush(url->quiet ? stderr : stdout);
 
       if(url->is.mountable) {
         err = url_mount(url, config.mountpoint.update, test_and_add_dud);
