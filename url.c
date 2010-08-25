@@ -554,6 +554,14 @@ url_t *url_set(char *str)
     url->is.file = strcmp(sl->value, "file") ? 0 : 1;
   }
 
+  if((sl = slist_getentry(url->query, "all"))) {
+    url->search_all = strtoul(sl->value, NULL, 0);
+  }
+
+  if((sl = slist_getentry(url->query, "quiet"))) {
+    url->quiet = strtoul(sl->value, NULL, 0);
+  }
+
   if(
     url->scheme == inst_file ||
     url->scheme == inst_nfs ||
@@ -623,8 +631,8 @@ url_t *url_set(char *str)
       }
 
       fprintf(stderr,
-        "  network = %u, mountable = %u, file = %u\n",
-        url->is.network, url->is.mountable, url->is.file
+        "  network = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
+        url->is.network, url->is.mountable, url->is.file, url->search_all, url->quiet
       );
 
       if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
@@ -1361,17 +1369,14 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     }
 
     if(
-      (
+      (	/* hd: neither floppy nor cdrom */
+        url->scheme == inst_hd &&
         (
-          url->scheme == inst_hd ||
-          url->scheme == inst_disk
-        ) &&
-        (					/* hd means: */
-          hd_is_hw_class(hd, hw_floppy) ||	/*  - not a floppy */
-          hd_is_hw_class(hd, hw_cdrom) ||	/*  - not a cdrom */
-          hd->child_ids				/*  - has no partitions */
+          hd_is_hw_class(hd, hw_floppy) ||
+          hd_is_hw_class(hd, hw_cdrom)
         )
       ) ||
+      hd->child_ids ||		/* skip whole device if there are partitions */
       !hd->unix_dev_name
     ) continue;
 

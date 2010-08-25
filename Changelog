@@ -1,3 +1,8 @@
+25/8/2010:	v3.3.62
+	- implemented 'disk' scheme to mean 'all local devices' as documented (bnc #596458)
+	- added all=1 option to url to keep searching on all devices (bnc #596456)
+	- added quiet=1 option to url syntax (print less messages)
+
 13/7/2010:	v3.3.61
 	- add 'content' option to allow repos without 'content' file
 	- extra menu can be reached from input line via 'ESC ESC' or 'ESC x'

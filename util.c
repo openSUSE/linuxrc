@@ -4611,6 +4611,7 @@ void util_wait(const char *file, int line)
 {
   if(!config.debugwait) return;
 
+  fprintf(stderr, "%s(%d)\n", file, line);
   printf("%s(%d) ?", file, line);
 
   switch(getchar()) {

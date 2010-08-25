@@ -42,6 +42,8 @@ static void auto2_read_repo_files(url_t *url);
 static char *auto2_splash_name(void);
 static void auto2_kexec(url_t *url);
 
+static int test_and_add_dud(url_t *url);
+
 
 /*
  * Initializes hardware and looks for repository/inst-sys.
@@ -97,7 +99,7 @@ void auto2_scan_hardware()
 {
   hd_t *hd, *hd_sys, *hd_usb, *hd_fw, *hd_pcmcia, *hd_pcmcia2;
   driver_info_t *di;
-  int ju, err, is_dud, dud_retry, dud_download;
+  int ju, err;
   slist_t *usb_modules = NULL, *sl, **names;
   int storage_loaded = 0, max_wait;
   hd_data_t *hd_data;
@@ -333,14 +335,14 @@ void auto2_scan_hardware()
 
     for(sl = config.update.urls; sl && !config.sig_failed; sl = sl->next) {
       fprintf(stderr, "dud url: %s\n", sl->key);
-      printf("Reading driver update: %s\n", sl->key);
-      fflush(stdout);
+
       url = url_set(sl->key);
 
-      dud_retry = dud_download = 0;
+      fprintf(url->quiet ? stderr : stdout, "Reading driver update: %s\n", sl->key);
+      fflush(url->quiet ? stderr : stdout);
 
       if(url->is.mountable) {
-        err = url_mount(url, config.mountpoint.update, NULL);
+        err = url_mount(url, config.mountpoint.update, test_and_add_dud);
       }
       else {
         char *file_name = strdup(new_download());
@@ -358,10 +360,7 @@ void auto2_scan_hardware()
           URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         );
 
-        if(!err) dud_download = 1;
-
         if(err && !config.sig_failed) {
-          dud_retry = 1;
           str_copy(&url->path, path2);
           err = url_read_file_anywhere(
             url, NULL, NULL, file_name, NULL,
@@ -376,33 +375,16 @@ void auto2_scan_hardware()
         free(file_name);
 
         free(path2);
-      }
-      if(!err) {
-        char *buf = NULL;
 
-        is_dud = util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
-
-        LXRC_WAIT;
-
-        if(!is_dud && !dud_retry && dud_download) {
-          int i;
-          char *s = url_print(url, 1);
-
-          printf("%s: adding to %s system\n", s, config.rescue ? "rescue" : "installation");
-
-          strprintf(&buf, "%s/dud_%04u", config.download.base, config.update.ext_count++);
-
-          fprintf(stderr, "%s -> %s: converting dud to squashfs\n", s, buf);
-          strprintf(&buf, "mksquashfs %s %s -noappend -no-progress >%s", config.mountpoint.update, buf, config.debug ? "&2" : "/dev/null");
-          i = system(buf);
-          if(i) fprintf(stderr, "mount: mksquashfs failed\n");
-
+        if(!err) {
+          test_and_add_dud(url);
           LXRC_WAIT
+          util_umount(config.mountpoint.update);
         }
-        str_copy(&buf, NULL);
       }
 
-      util_umount(config.mountpoint.update);
+      LXRC_WAIT
+
       url_umount(url);
       url_free(url);
     }
@@ -445,6 +427,40 @@ void auto2_scan_hardware()
   if(!config.url.instsys) {
     config.url.instsys = url_set(config.url.instsys_default ?: config.rescue ? config.rescueimage : config.rootimage);
   }
+}
+
+
+/*
+ * 0: failed, 1: ok, 2: ok but continue search
+ */
+int test_and_add_dud(url_t *url)
+{
+  char *buf = NULL, *s;
+  int i, is_dud;
+
+  if(config.debug) fprintf(stderr, "test_and_add_dud: all = %u\n", url->search_all);
+
+  is_dud = util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
+
+  LXRC_WAIT;
+
+  if(!is_dud && (url->is.file || !url->is.mountable)) {
+    s = url_print(url, 1);
+
+    printf("%s: adding to %s system\n", s, config.rescue ? "rescue" : "installation");
+
+    strprintf(&buf, "%s/dud_%04u", config.download.base, config.update.ext_count++);
+
+    fprintf(stderr, "%s -> %s: converting dud to squashfs\n", s, buf);
+    strprintf(&buf, "mksquashfs %s %s -noappend -no-progress >%s", config.mountpoint.update, buf, config.debug ? "&2" : "/dev/null");
+    i = system(buf);
+    if(i) fprintf(stderr, "mount: mksquashfs failed\n");
+
+    LXRC_WAIT
+  }
+  str_copy(&buf, NULL);
+
+  return url->search_all && !url->is.network ? 2 : 1;
 }
 
 

@@ -221,6 +221,8 @@ typedef struct {
   slist_t *query;
   slist_t *file_list;
   unsigned download:1;		/* force download */
+  unsigned search_all:1;	/* dud: search all possible local storage devices */
+  unsigned quiet:1;		/* dud: don't report if nothing was found */
   struct {
     unsigned network:1;		/* scheme needs network */
     unsigned mountable:1;	/* scheme is mountable */
