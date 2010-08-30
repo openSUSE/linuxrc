@@ -123,6 +123,9 @@ void auto2_scan_hardware(char *log_file)
   int storage_loaded = 0, compressed = 0;
   unsigned dud_count;
   char *dud_url;
+#if defined(__s390__) || defined(__s390x__)
+  url_t *url;
+#endif
 
   if(hd_data) {
     hd_free_hd_data(hd_data);
@@ -328,6 +331,21 @@ void auto2_scan_hardware(char *log_file)
     fprintf(stderr, "info file: %s\n", sl->key);
     printf("Reading info file: %s\n", sl->key);
     fflush(stdout);
+#if defined(__s390__) || defined(__s390x__)
+    if((url = parse_url(sl->key))) {
+      switch(url->scheme) {
+        case inst_ftp:
+        case inst_tftp:
+        case inst_http:
+        case inst_nfs:
+        case inst_smb:
+          net_config();
+          break;
+        default:
+          break;
+      }
+    }
+#endif
     i = get_url(sl->key, "/download/info", 0);
     printf("%s\n", i ? " failed" : " ok");
     if(!i) {

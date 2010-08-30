@@ -1,3 +1,7 @@
+13/8/2010:	v2.0.93
+	- s390: make sure network is set up before downloading info file
+	  (bnc#600068)
+
 6/7/2010:	v2.0.92
 	- add 'type' option to url syntax (bnc #610997, bnc #590811)
 
