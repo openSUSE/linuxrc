@@ -1397,7 +1397,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
           hd_is_hw_class(hd, hw_cdrom)
         )
       ) ||
-      hd->child_ids ||		/* skip whole device if there are partitions */
+      (hd_is_hw_class(hd, hw_block) && hd->child_ids) ||	/* skip whole block device if there are partitions */
       !hd->unix_dev_name
     ) continue;
 
