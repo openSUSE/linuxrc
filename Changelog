@@ -1,3 +1,6 @@
+2/9/2010:	v3.3.63
+	- fix 'disk scheme' patch in 3.3.62
+
 25/8/2010:	v3.3.62
 	- implemented 'disk' scheme to mean 'all local devices' as documented (bnc #596458)
 	- added all=1 option to url to keep searching on all devices (bnc #596456)
