@@ -917,8 +917,9 @@ int util_chk_driver_update(char *dir, char *loc)
   slist_t *sl0 = NULL, *sl;
   struct dirent *de;
   DIR *d;
+  int is_update = 0;
 
-  if(!dir || !loc || !config.tmpfs || !config.update.dir) return 0;
+  if(!dir || !loc || !config.tmpfs || !config.update.dir) return is_update;
 
   /* never delete module dir */
   config.memory.min_modules = 0;
@@ -927,6 +928,7 @@ int util_chk_driver_update(char *dir, char *loc)
 
   if(util_check_exist(drv_src) == 'd') {
     strprintf(&dud_loc, "%s:%s", loc, config.update.dir);
+    is_update = 1;
     add_driver_update(drv_src, dud_loc);
   }
 
@@ -937,6 +939,7 @@ int util_chk_driver_update(char *dir, char *loc)
       if(!*s) {
         strprintf(&drv_src, "%s/%s%s", dir, de->d_name, config.update.dir);
         if(util_check_exist(drv_src) == 'd') {
+          is_update = 1;
           slist_append_str(&sl0, de->d_name);
         }
       }
@@ -955,7 +958,7 @@ int util_chk_driver_update(char *dir, char *loc)
   free(drv_src);
   free(dud_loc);
 
-  return 0;
+  return is_update;
 }
 
 
@@ -3179,6 +3182,10 @@ url_t *parse_url(char *str)
       url.is.file = strcmp(sl->value, "file") ? 0 : 1;
     }
 
+    if((sl = slist_getentry(sl0, "all"))) {
+      url.search_all = strtoul(sl->value, NULL, 0);
+    }
+
     slist_free(sl0);
   }
 
@@ -3194,10 +3201,11 @@ url_t *parse_url(char *str)
     fprintf(stderr,
       "  scheme = %s, server = \"%s\", dir = \"%s\", share = \"%s\"\n"
       "  domain = \"%s\", user = \"%s\", password = \"%s\"\n"
-      "  port = %u, dev = %s, file = %u\n",
+      "  port = %u, dev = %s, file = %u, all = %u\n",
       get_instmode_name(url.scheme), url.server, url.dir, url.share,
       url.domain, url.user, url.password,
-      url.port, url.device, url.is.file
+      url.port, url.device, url.is.file,
+      url.search_all
     );
   }
 
@@ -4808,6 +4816,8 @@ int get_url(char *src_url, char *dst, int check_update)
   url = parse_url(src_url);
   if(!url || !url->scheme) return err;
 
+  if(config.debug >= 2) fprintf(stderr, "get_url(%s, )\n", src_url);
+
   hd_data = calloc(1, sizeof *hd_data);
 
   switch(url->scheme) {
@@ -4823,8 +4833,7 @@ int get_url(char *src_url, char *dst, int check_update)
         err = 0;
       }
       else if(check_update && i == 'd') {
-        util_chk_driver_update(url->dir, get_instmode_name(url->scheme));
-        err = 0;
+        err= !util_chk_driver_update(url->dir, get_instmode_name(url->scheme));
       }
       break;
 
@@ -4844,7 +4853,9 @@ int get_url(char *src_url, char *dst, int check_update)
           hw_item = hw_block;
       }
 
-      for(hd = hd_list(hd_data, hw_item, 1, NULL); hd && err; hd = hd->next) {
+      for(hd = hd_list(hd_data, hw_item, 1, NULL); hd && (err || url->search_all); hd = hd->next) {
+        if(config.debug >= 2) fprintf(stderr, "  all = %d, err = %d, dev %s\n", url->search_all, err, hd->unix_dev_name);
+
         /* no block devs with partitions */
         if(hd->child_ids || !hd->unix_dev_name) continue;
 
@@ -4888,8 +4899,7 @@ int get_url(char *src_url, char *dst, int check_update)
           fprintf(stderr, "disk: %s::%s: got file\n", dev, url->dir);
         }
         else if(check_update && i == 'd') {
-          util_chk_driver_update(dir, get_instmode_name(url->scheme));
-          err = 0;
+          err = !util_chk_driver_update(dir, get_instmode_name(url->scheme));
         }
         else {
           fprintf(stderr, "disk: %s::%s: file not found\n", dev, url->dir);
@@ -4897,6 +4907,7 @@ int get_url(char *src_url, char *dst, int check_update)
 
         umount("/mnt");
       }
+      if(url->search_all) err = 0;	/* prevent error message */
       break;
 
     case inst_ftp:

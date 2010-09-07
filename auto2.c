@@ -368,7 +368,7 @@ void auto2_scan_hardware(char *log_file)
 
       unlink("/download/update");
       i = get_url(dud_url, "/download/update", 1);
-      printf("Download%s\n", i ? " failed" : " ok");
+      fprintf(stderr, "Download%s\n", i ? " failed" : " ok");
       if(!i) {
         if(util_check_exist("/download/update") == 'r') {
           util_fileinfo("/download/update", NULL, &compressed);

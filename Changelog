@@ -1,3 +1,7 @@
+7/9/2010:	v2.0.94
+	- added all=1 tag to url to keep searching on all local devices (bnc #596456)
+	- allow dots ('.') in linuxrc options (as in sle11 and later)
+
 13/8/2010:	v2.0.93
 	- s390: make sure network is set up before downloading info file
 	  (bnc#600068)

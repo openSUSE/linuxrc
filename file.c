@@ -192,6 +192,7 @@ static struct {
   { key_product,        "Product",        kf_cfg + kf_cmd                },
   { key_productdir,     "ProductDir",     kf_cfg + kf_cmd                },
   { key_linuxrcstderr,  "LinuxrcSTDERR",  kf_cfg + kf_cmd + kf_cmd_early },
+  { key_linuxrcstderr,  "LinuxrcLog",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_comment,        "#",              kf_cfg                         },
   { key_kbdtimeout,     "KBDTimeout",     kf_cfg + kf_cmd                },
   { key_brokenmodules,  "BrokenModules",  kf_cfg + kf_cmd + kf_cmd_early },
@@ -204,6 +205,7 @@ static struct {
   { key_scsirename,     "SCSIRename",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_doscsirename,   "DoSCSIRename",   kf_cfg + kf_cmd                },
   { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
+  { key_lxrcdebug,      "LinuxrcDebug",   kf_cfg + kf_cmd + kf_cmd_early },
   { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
   { key_liveconfig,     "LiveConfig",     kf_cfg + kf_cmd                },
   { key_useidescsi,     "UseIDESCSI",     kf_cfg + kf_cmd + kf_cmd_early },
@@ -356,8 +358,10 @@ char *file_key2str(file_key_t key)
   return "";
 }
 
-/* compare strings, ignoring '-' and '_' characters in strings not starting
-   with '_' */
+/*
+ * Compare strings, ignoring '-', '_', and '.' characters in strings not
+ * starting with '_'.
+ */
 static int strcasecmpignorestrich(const char* s1, const char* s2)
 {
   char* str1 = strdup(s1);
@@ -368,7 +372,7 @@ static int strcasecmpignorestrich(const char* s1, const char* s2)
   /* remove all '-' and '_' */
   if(*str1 != '_') {
     for(i = 0, s = str1; str1[i]; i++) {
-      if(str1[i] != '_' && str1[i] != '-') {
+      if(str1[i] != '_' && str1[i] != '-' && str1[i] != '.') {
         *s++ = str1[i];
       }
     }
@@ -378,7 +382,7 @@ static int strcasecmpignorestrich(const char* s1, const char* s2)
   /* remove all '-' and '_' */
   if(*str2 != '_') {
     for(i = 0, s = str2; str2[i]; i++) {
-      if(str2[i] != '_' && str2[i] != '-') {
+      if(str2[i] != '_' && str2[i] != '-' && str2[i] != '.') {
         *s++ = str2[i];
       }
     }

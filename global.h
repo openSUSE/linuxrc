@@ -165,6 +165,7 @@ typedef struct {
   char *domain;
   char *device;
   unsigned port;
+  unsigned search_all:1;	/* dud: search all possible local storage devices */
   struct {
     unsigned file:1;	/* path points to file (not to directory) */
   } is;
