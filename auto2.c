@@ -444,6 +444,8 @@ int test_and_add_dud(url_t *url)
   LXRC_WAIT;
 
   if(!is_dud && (url->is.file || !url->is.mountable)) {
+    is_dud = 1;
+
     s = url_print(url, 1);
 
     printf("%s: adding to %s system\n", s, config.rescue ? "rescue" : "installation");
@@ -459,7 +461,7 @@ int test_and_add_dud(url_t *url)
   }
   str_copy(&buf, NULL);
 
-  return url->search_all && !url->is.network ? 2 : 1;
+  return (url->search_all || !is_dud) && !url->is.network ? 2 : 1;
 }
 
 
