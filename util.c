@@ -3344,9 +3344,18 @@ int _net_open(char *filename)
   char buf[256];
   char *instmode_name = get_instmode_name(config.instmode);
   struct sockaddr_in sa;
+  int win_old = config.win;
 
   user = config.net.user;
   password = config.net.password;
+  
+  if(user && !password) {
+    sprintf(buf, txt_get(TXT_ENTER_PASSWORD), instmode_name);
+    if(!config.win) util_disp_init();
+    dia_input2(buf, &config.net.password, 20, 1);
+    if(!win_old) util_disp_done();
+    password = config.net.password;
+  }
 
   if(user && !*user) user = NULL;
   if(password && !*password) password = NULL;

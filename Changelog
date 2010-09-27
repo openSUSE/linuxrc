@@ -1,3 +1,6 @@
+27/9/2010:	v2.0.95
+	- ask for password if a user but no password are specified in URL (bnc #424970)
+
 7/9/2010:	v2.0.94
 	- added all=1 tag to url to keep searching on all local devices (bnc #596456)
 	- allow dots ('.') in linuxrc options (as in sle11 and later)
