@@ -972,10 +972,6 @@ msgstr "Nem sikerült hozzáférni az illesztőprogram-frissítés adathordozóh
 msgid "Reading Driver Update..."
 msgstr "Illesztőprogram-frissítés olvasása..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Új Illesztőprogram-frissítés nem található"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Illesztőprogram-frissítések hozzáadva"

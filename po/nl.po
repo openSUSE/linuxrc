@@ -967,10 +967,6 @@ msgstr "Kon geen toegang tot het medium met stuurprogramma-opwaardering krijgen.
 msgid "Reading Driver Update..."
 msgstr "Stuurprogramma-opwaardering wordt gelezen..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Geen nieuwe stuurprogramma-opwaardering gevonden"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Stuurprogramma-opwaardering toegevoegd"

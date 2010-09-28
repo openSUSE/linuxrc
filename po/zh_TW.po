@@ -964,10 +964,6 @@ msgstr "存取「驅動程式更新」媒體失敗。"
 msgid "Reading Driver Update..."
 msgstr "正在讀取「驅動程式更新」..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "找不到新的「驅動程式更新」"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "「驅動程式更新」已新增"

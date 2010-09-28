@@ -970,10 +970,6 @@ msgstr "Chyba při přístupu k médiu aktualizace ovladače."
 msgid "Reading Driver Update..."
 msgstr "Načítám aktualizaci ovladače..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Nebyla nalezena žádná aktualizace ovladače"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Aktualizace ovladače provedena"

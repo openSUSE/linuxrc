@@ -971,10 +971,6 @@ msgstr "No ha sido posible acceder al medio de actualización de controladores."
 msgid "Reading Driver Update..."
 msgstr "Leyendo actualización de controladores..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "No se han encontrado actualizaciones de controladores"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Actualizaciones de controladores añadidas"

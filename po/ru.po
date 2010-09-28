@@ -965,10 +965,6 @@ msgstr "Не удалось получить доступ к носителю о
 msgid "Reading Driver Update..."
 msgstr "Чтение обновлений драйверов..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Новые обновления драйверов не найдены"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Обновления драйверов добавлены"

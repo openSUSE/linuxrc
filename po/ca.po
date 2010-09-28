@@ -966,10 +966,6 @@ msgstr "Error en accedir al medi d'actualització de controladors."
 msgid "Reading Driver Update..."
 msgstr "S'està llegint l'actualització de controladors..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "No s'ha trobat cap actualització de controladors."
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "S'ha afegit l'actualització de controladors"

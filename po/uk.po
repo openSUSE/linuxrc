@@ -968,10 +968,6 @@ msgstr "Помилка доступу до носія з оновленнями 
 msgid "Reading Driver Update..."
 msgstr "Читання оновлення драйверів..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Не знайдено нових оновлень драйверів"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Додано оновлення драйверів"

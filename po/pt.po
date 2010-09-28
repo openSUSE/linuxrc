@@ -968,10 +968,6 @@ msgstr "Falha no acesso ao suporte de Actualização do Driver."
 msgid "Reading Driver Update..."
 msgstr "A ler a Actualização do Driver..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Nenhuma Actualização Nova do Driver encontrada"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Actualizações do Driver Adicionadas"

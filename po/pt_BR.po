@@ -967,10 +967,6 @@ msgstr "Falha ao acessar mídia de atualização de driver."
 msgid "Reading Driver Update..."
 msgstr "Lendo a atualização de driver..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Nenhuma atualização de driver encontrada"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Atualizações de driver adicionadas"

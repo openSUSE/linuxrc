@@ -972,10 +972,6 @@ msgstr "Αποτυχία στη προσπέλαση του μέσου Ενημ�
 msgid "Reading Driver Update..."
 msgstr "Ανάγνωση Ενημέρωσης Οδηγού..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Δεν βρέθηκαν νέες Ενημερώσεις Οδηγών"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Προστέθηκε Ενημέρωση Οδηγού "

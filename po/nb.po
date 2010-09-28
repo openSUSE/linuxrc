@@ -970,10 +970,6 @@ msgstr "Ingen tilgang til driveroppgraderingsmedium."
 msgid "Reading Driver Update..."
 msgstr "Leser driveroppgradering..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Ingen nye driveroppgraderinger funnet"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Driveroppgraderinger lagt til"

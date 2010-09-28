@@ -966,10 +966,6 @@ msgstr "ドライバ更新のメディアにアクセスできませんでした
 msgid "Reading Driver Update..."
 msgstr "ドライバ更新を読み取っています..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "新しいドライバ更新が見つかりませんでした。"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "ドライバ更新が追加されました"

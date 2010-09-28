@@ -1140,10 +1140,6 @@ msgstr "Impossible d'accéder au support de la mise à jour du pilote."
 msgid "Reading Driver Update..."
 msgstr "Lecture de la mise à jour du pilote..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Aucune nouvelle mise à jour de pilote"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Mises à jour de pilote ajoutées"

@@ -963,10 +963,6 @@ msgstr "Ihlulekile ukungena endaweni Yokuvuselelwa Kwe-Driver."
 msgid "Reading Driver Update..."
 msgstr "Ifunda Ukuvuselelwa Kwe-Driver..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Akukho Ukuvuselelwa Kwama-Driver Amasha okutholakele"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Izinhlelo Zokuvuselelwa Kwama-Driver Zifakiwe"

@@ -968,10 +968,6 @@ msgstr "Kunne ikke tilgå driveropdateringsmediet."
 msgid "Reading Driver Update..."
 msgstr "Indlæser driveropdatering..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Ingen nye drivere fundet"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Driveropdateringer tilføjet"

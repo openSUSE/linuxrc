@@ -971,10 +971,6 @@ msgstr "Zugriff auf das Treiber-Aktualisierungs-Medium fehlgeschlagen"
 msgid "Reading Driver Update..."
 msgstr "Treiber-Aktualisierung wird eingelesen ..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Es wurden keine neuen Treiber-Aktualisierungen gefunden."
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Treiber-Aktualisierungen hinzugefügt"

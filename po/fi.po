@@ -967,10 +967,6 @@ msgstr "Ohjaimen päivitystietovälineen käyttäminen ei onnistu"
 msgid "Reading Driver Update..."
 msgstr "Luetaan ohjainpäivitystä..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Uusia ohjainpäivityksiä ei löytynyt"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Ohjainpäivitykset lisättiin"

@@ -917,10 +917,6 @@ msgstr ""
 msgid "Reading Driver Update..."
 msgstr ""
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr ""
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr ""

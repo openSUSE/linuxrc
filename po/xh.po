@@ -960,10 +960,6 @@ msgstr "Kusilele ukufikelela kwisilondolozi Sohlaziyo Lomqhubi."
 msgid "Reading Driver Update..."
 msgstr "Kufundwa Uhlaziyo Lomqhubi..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Akukho Ziganeko Zohlaziyo zitsha Zomqhubi zifunyenweyo"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Kufakelwa Iziganeko Zohlaziyo Lomqhubi"

@@ -967,10 +967,6 @@ msgstr "Det gick inte att komma åt mediet för drivrutinsuppdatering."
 msgid "Reading Driver Update..."
 msgstr "Läser drivrutinsuppdatering..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Det gick inte att hitta några nya drivrutinsuppdateringar"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Drivrutinsuppdateringar har lagts till"

@@ -391,12 +391,6 @@ void auto2_scan_hardware()
 
     if(dud_count == config.update.count) {
       fprintf(stderr, "No new driver updates found.\n");
-      if(config.win && config.manual) {
-        dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
-      }
-      else {
-        // printf("No new driver updates found.\n");
-      }
     }
     else {
       if(*names) {
@@ -1094,7 +1088,6 @@ void auto2_driverupdate(url_t *url)
 
   if(dud_count == config.update.count) {
     fprintf(stderr, "No new driver updates found.\n");
-    if(config.win && config.manual) dia_message(txt_get(TXT_DUD_NOTFOUND), MSGTYPE_INFO);
   }
   else {
     if(*names) {

@@ -971,10 +971,6 @@ msgstr "Prístup na médium aktualizácie ovládačov zlyhal."
 msgid "Reading Driver Update..."
 msgstr "Čítam aktualizáciu ovládačov..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Neboli nájdené žiadne aktualizované ovládače"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Boli pridané aktualizácie ovládačov"

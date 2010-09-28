@@ -966,10 +966,6 @@ msgstr "未能访问驱动程序更新介质。"
 msgid "Reading Driver Update..."
 msgstr "正在读取驱动程序更新..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "未找到任何新驱动程序更新"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "已添加驱动程序更新"

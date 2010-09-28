@@ -965,10 +965,6 @@ msgstr "Odczyt nośnika z aktualizacją sterowników nie powiódł się"
 msgid "Reading Driver Update..."
 msgstr "Odczytywanie aktualizacji sterowników..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Nie znaleziono aktualizacji sterowników"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Dodana aktualizacja sterowników"

@@ -968,10 +968,6 @@ msgstr "Neuspešen dostop do media za posodobitev gonilnika."
 msgid "Reading Driver Update..."
 msgstr "Branje posodobitve gonilnika."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Posodobitev gonilnika ni."
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Dodane posodobitve gonilnika"

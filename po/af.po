@@ -963,10 +963,6 @@ msgstr "Misluk om toegang tot aandrywerbywerkingmedium te verkry."
 msgid "Reading Driver Update..."
 msgstr "Lees van aandrywerbywerking ..."
 
-#. TXT_DUD_NOTFOUND
-msgid "No new Driver Updates found"
-msgstr "Geen nuwe aandrywerbywerkings gevind nie"
-
 #. TXT_DUD_ADDED
 msgid "Driver Updates added"
 msgstr "Aandrywerbywerkings bygevoeg"
