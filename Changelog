@@ -1,3 +1,6 @@
+20/10/2010:	v3.3.64
+	- really accept static ipv6 addresses (bnc #633519)
+
 2/9/2010:	v3.3.63
 	- fix 'disk scheme' patch in 3.3.62
 

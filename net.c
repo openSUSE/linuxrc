@@ -2104,7 +2104,7 @@ unsigned net_config_mask()
   unsigned u = 0;
 
   if(config.net.hostname.name) u |= 1;
-  if(config.net.netmask.ok) u |= 2;
+  if(config.net.netmask.ok || config.net.hostname.prefix4 || config.net.hostname.prefix6) u |= 2;
   if(config.net.gateway.ok) u |= 4;
   if(config.net.nameserver[0].ok) u |= 0x10;
 
