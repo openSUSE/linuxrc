@@ -414,6 +414,7 @@ typedef struct {
   int vga_mode;			/* vga mode number */
   slist_t *extend_list;		/* list of loaded instsys extensions */
   slist_t *udevrules;		/* udev rules */
+  char *namescheme;		/* device name scheme (e.g.: by-id, by-label, by-path) */
 
   struct {
     char *instsys_default;	/* default instsys url */

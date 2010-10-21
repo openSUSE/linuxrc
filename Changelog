@@ -1,3 +1,8 @@
+21/10/2010:	v3.3.65
+	- added 'namescheme' option to linuxrc to select alternative device name
+	  schemes (by-id, by-path, by-label) and set default to by-id
+	  (bnc #640851, bnc #582717)
+
 20/10/2010:	v3.3.64
 	- really accept static ipv6 addresses (bnc #633519)
 

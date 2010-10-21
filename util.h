@@ -161,3 +161,5 @@ void run_braille(void);
 void util_setup_udevrules(void);
 
 void util_error_trace(char *format, ...);
+hd_t *fix_device_names(hd_t *hd);
+

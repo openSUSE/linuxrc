@@ -49,7 +49,7 @@ void md5_verify()
 
   iso.err = 1;
 
-  for(hd = hd_list(config.hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+  for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
     if(hd->is.notready) continue;
     get_info(hd->unix_dev_name);
     if(!iso.err) break;
@@ -58,7 +58,7 @@ void md5_verify()
   if(iso.err) {
     if(dia_message(txt_get(TXT_INSERT_CD_DVD), MSGTYPE_INFO)) return;
 
-    for(hd = hd_list(config.hd_data, hw_cdrom, 0, NULL); hd; hd = hd->next) {
+    for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
       if(hd->is.notready) continue;
       get_info(hd->unix_dev_name);
       if(!iso.err) break;

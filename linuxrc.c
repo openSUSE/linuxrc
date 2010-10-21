@@ -787,6 +787,8 @@ void lxrc_init()
 
   config.swap_file_size = 1024;		/* 1024 MB */
 
+  str_copy(&config.namescheme, "by-id");
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
