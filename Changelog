@@ -1,3 +1,6 @@
+28/10/2010:	v3.3.66
+	- increase TTL for SLP (bnc #649854, bnc #649632)
+
 21/10/2010:	v3.3.65
 	- added 'namescheme' option to linuxrc to select alternative device name
 	  schemes (by-id, by-path, by-label) and set default to by-id
