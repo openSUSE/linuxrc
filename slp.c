@@ -248,6 +248,11 @@ slp_get_install()
       close(s);
       return 1;
     }
+  i = 8;	/* like openslp */
+  if (setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &i, sizeof(i)));
+    {
+      perror("setsockopt IP_MULTICAST_TTL");
+    }
   for (tries = 0; tries < 3; tries++)
     {
       l2 = sendto(s, sendbuf, l, 0, (struct sockaddr *)&mcsa, sizeof(mcsa));
