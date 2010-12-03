@@ -1041,6 +1041,10 @@ msgstr "Checksum errado."
 msgid "Error reading sector %u."
 msgstr "Erro ao ler sector %u."
 
+#. TXT_CD_CHECK_CANCELED
+msgid "Checksumming Canceled."
+msgstr ""
+
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format

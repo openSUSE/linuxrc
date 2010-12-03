@@ -119,7 +119,7 @@ void md5_verify()
   if(iso.md5_ok) {
     dia_message(txt_get(TXT_CD_CHECK_OK), MSGTYPE_INFO);
   }
-  else {
+  else if(iso.err) {
     if(iso.err_ofs) {
       sprintf(buf, txt_get(TXT_CD_READ_FAILED), iso.err_ofs >> 1);
     }
@@ -129,6 +129,9 @@ void md5_verify()
     sprintf(buf + strlen(buf), txt_get(TXT_CD_BROKEN), *iso.media_type == 'C' ? "CD-ROM" : iso.media_type);
     dia_message(buf, MSGTYPE_ERROR);
     config.manual=1;
+  }
+  else {
+    dia_message(txt_get(TXT_CD_CHECK_CANCELED), MSGTYPE_INFO);
   }
 
 }
@@ -187,6 +190,7 @@ void do_md5(char *file)
        iso.got_old_md5 = 0;
        iso.md5_ok = 0;
        iso.err_ofs = 0;
+       iso.err = 0;
        close(fd);
        return;
     }

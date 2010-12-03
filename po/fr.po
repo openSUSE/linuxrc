@@ -1213,6 +1213,10 @@ msgstr "Somme de vérification (checksum) fausse."
 msgid "Error reading sector %u."
 msgstr "Erreur lors de la lecture du secteur %u."
 
+#. TXT_CD_CHECK_CANCELED
+msgid "Checksumming Canceled."
+msgstr ""
+
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format

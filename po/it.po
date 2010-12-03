@@ -1037,6 +1037,10 @@ msgstr "Somma di controllo errata."
 msgid "Error reading sector %u."
 msgstr "Si è verificato un errore nella lettura del settore %u."
 
+#. TXT_CD_CHECK_CANCELED
+msgid "Checksumming Canceled."
+msgstr ""
+
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format

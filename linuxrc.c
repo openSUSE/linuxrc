@@ -897,6 +897,9 @@ void lxrc_init()
   util_redirect_kmsg();
   disp_init();
 
+  // clear keyboard queue
+  while(kbd_getch_old(0));
+
   set_activate_language(config.language);
 
   // auto2_chk_expert();

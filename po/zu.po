@@ -1036,6 +1036,10 @@ msgstr "I-checksum inephutha."
 msgid "Error reading sector %u."
 msgstr "Kwenzeke iphutha ifunda i-sector %u."
 
+#. TXT_CD_CHECK_CANCELED
+msgid "Checksumming Canceled."
+msgstr ""
+
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format

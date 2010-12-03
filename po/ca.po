@@ -1039,6 +1039,10 @@ msgstr "La suma de verificació és incorrecta."
 msgid "Error reading sector %u."
 msgstr "Error en llegir el sector %u."
 
+#. TXT_CD_CHECK_CANCELED
+msgid "Checksumming Canceled."
+msgstr ""
+
 #. %s is CD-ROM or DVD
 #. TXT_CD_BROKEN
 #, c-format
