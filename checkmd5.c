@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -42,17 +43,21 @@ window_t win;
 void md5_verify()
 {
   int i;
-  char buf[256];
+  char buf[256], *device = NULL;
   hd_t *hd;
 
   update_device_list(0);
 
   iso.err = 1;
 
-  for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
-    if(hd->is.notready) continue;
-    get_info(hd->unix_dev_name);
-    if(!iso.err) break;
+  if(config.device) get_info(device = config.device);
+
+  if(iso.err) {
+    for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
+      if(hd->is.notready) continue;
+      get_info(device = hd->unix_dev_name);
+      if(!iso.err) break;
+    }
   }
 
   if(iso.err) {
@@ -60,7 +65,7 @@ void md5_verify()
 
     for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
       if(hd->is.notready) continue;
-      get_info(hd->unix_dev_name);
+      get_info(device = hd->unix_dev_name);
       if(!iso.err) break;
     }
   }
@@ -91,7 +96,7 @@ void md5_verify()
     return;
   }
 
-  do_md5(hd->unix_dev_name);
+  do_md5(device);
 
   if(iso.err_ofs) {
     fprintf(stderr, "  err: sector %u\n", iso.err_ofs >> 1);
@@ -152,6 +157,7 @@ void do_md5(char *file)
   unsigned chunk, u;
   unsigned last_size = ((iso.size - iso.pad) % (sizeof buffer >> 10)) << 10;
   char msg[256];
+  time_t t0 = 0, t1 = 0;
 
   if((fd = open(file, O_RDONLY | O_LARGEFILE)) == -1) return;
 
@@ -180,19 +186,26 @@ void do_md5(char *file)
 
     md5_process_block(buffer, sizeof buffer, &ctx);
 
-    update_progress((chunk + 1) * (sizeof buffer >> 10));
+    if(!(chunk % 16)) {
+      update_progress((chunk + 1) * (sizeof buffer >> 10));
 
-    if (kbd_getch_old (FALSE) == KEY_ESC) {
-       md5_finish_ctx(&ctx, iso.md5);
-       md5_finish_ctx(&full_ctx, iso.full_md5);
-       dia_status_off(&win);
-       iso.got_md5 = 0;
-       iso.got_old_md5 = 0;
-       iso.md5_ok = 0;
-       iso.err_ofs = 0;
-       iso.err = 0;
-       close(fd);
-       return;
+      t1 = time(NULL);
+
+      // once a second is enough
+      if(t1 != t0 && kbd_getch_old(0) == KEY_ESC) {
+         md5_finish_ctx(&ctx, iso.md5);
+         md5_finish_ctx(&full_ctx, iso.full_md5);
+         dia_status_off(&win);
+         iso.got_md5 = 0;
+         iso.got_old_md5 = 0;
+         iso.md5_ok = 0;
+         iso.err_ofs = 0;
+         iso.err = 0;
+         close(fd);
+         return;
+      }
+
+      t0 = t1;
     }
   }
 
@@ -231,6 +244,9 @@ void do_md5(char *file)
 
   if(iso.got_old_md5 && !memcmp(iso.md5, iso.old_md5, sizeof iso.md5)) {
     iso.md5_ok = 1;
+  }
+  else {
+    iso.err = 1;
   }
 
   close(fd);

@@ -67,3 +67,4 @@ extern void  kbd_switch_tty   (int tty_iv);
 extern void  kbd_echo_off     (void);
 extern int   kbd_getch_old    (int);
 void kbd_unimode(void);
+extern int kbd_getch_raw(int do_wait);

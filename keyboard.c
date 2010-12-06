@@ -82,8 +82,6 @@ static void kbd_del_timeout (void);
 static void kbd_set_timeout (long timeout_lv);
 static void kbd_timeout     (int signal_iv);
 
-static int kbd_getch_raw    (int wait_iv);
-
 static void get_screen_size(int fd);
 
 
