@@ -305,6 +305,7 @@ static struct {
   { key_udevrule,       "udev.rule",      kf_cfg + kf_cmd_early          },
   { key_dhcpfail,       "DHCPFail",       kf_cfg + kf_cmd                },
   { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -598,6 +599,9 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
 }
 
 
+/*
+ * Note: may modify f->key if f->key is key_none.
+ */
 void file_do_info(file_t *f0, file_key_flag_t flags)
 {
   file_t *f;
@@ -1241,6 +1245,18 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_none:
+      case key_is_ptoption:
+        for(sl = config.ptoptions; sl; sl = sl->next) {
+          if(!strcasecmpignorestrich(sl->key, f->key_str)) {
+            str_copy(&sl->value, f->value);
+            f->key = key_is_ptoption;
+            break;
+          }
+        }
+
+        /* was user defined option */
+        if(key_is_ptoption) break;
+
         /* assume kernel module option if it can be parsed as 'module.option' */
 
         /* Note: f->unparsed is only set when we read from cmdline/argv *NOT* from files. */
@@ -1587,6 +1603,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         str_copy(&config.namescheme, f->value);
         break;
 
+      case key_ptoptions:
+        slist_assign_values(&config.ptoptions, f->value);
+        break;
+
       default:
         break;
     }
@@ -1914,6 +1934,10 @@ void file_write_install_inf(char *dir)
   if(config.braille.dev) {
     fprintf(f, "Braille: %s\n", config.braille.type);
     fprintf(f, "Brailledevice: %s\n", config.braille.dev);
+  }
+
+  for(sl = config.ptoptions; sl; sl = sl->next) {
+    if(sl->value) fprintf(f, "%s: %s\n", sl->key, sl->value);
   }
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
