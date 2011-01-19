@@ -1107,7 +1107,7 @@ void add_flag(slist_t **sl, char *buf, int value, char *name)
 }
 
 
-void util_status_info()
+void util_status_info(int log_it)
 {
   int i, j;
   char *s, *t;
@@ -1490,7 +1490,17 @@ void util_status_info()
     }
   }
 
-  dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
+  if(log_it || config.debug >= 1) {
+    fprintf(stderr, "------  Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")  ------\n");
+    for(sl = sl0; sl; sl = sl->next) {
+      fprintf(stderr, "  %s\n", sl->key);
+    }
+    fprintf(stderr, "------  ------\n");
+  }
+
+  if(!log_it) {
+    dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
+  }
 
   slist_free(sl0);
 

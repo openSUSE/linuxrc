@@ -960,6 +960,8 @@ int inst_start_install()
     inst_choose_display()
   ) err = 1;
 #endif
+
+  if(config.debug >= 2) util_status_info(1);
   
   if(!err) err = inst_execute_yast();
 

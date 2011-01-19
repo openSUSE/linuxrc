@@ -1519,7 +1519,7 @@ void dia_handle_ctrlc (void)
 	*((unsigned char *) NULL) = 7;
       }
       else if(i == -71) {
-	util_status_info();
+	util_status_info(0);
       }
       else if(i == -73) {
 	i = dia_input(txt_get(TXT_CHANGE_CONFIG), s, sizeof s - 1, 35, 0);

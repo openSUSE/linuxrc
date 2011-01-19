@@ -678,7 +678,7 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_extras_info:
-      util_status_info();
+      util_status_info(0);
       break;
 
     case di_extras_change:
