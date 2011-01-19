@@ -980,8 +980,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_brokenmodules:
-        slist_free(config.module.broken);
-        config.module.broken = slist_split(',', f->value);
+        slist_assign_values(&config.module.broken, f->value);
         if(config.module.broken && !config.test) {
           if((w = fopen("/etc/modprobe.d/blacklist", "w"))) {
             for(sl = config.module.broken; sl; sl = sl->next) {
