@@ -1246,16 +1246,18 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_none:
       case key_is_ptoption:
-        for(sl = config.ptoptions; sl; sl = sl->next) {
-          if(!strcasecmpignorestrich(sl->key, f->key_str)) {
-            str_copy(&sl->value, f->value);
-            f->key = key_is_ptoption;
-            break;
+        if((flags & (kf_cmd + kf_cfg))) {
+          for(sl = config.ptoptions; sl; sl = sl->next) {
+            if(!strcasecmpignorestrich(sl->key, f->key_str)) {
+              str_copy(&sl->value, f->value);
+              f->key = key_is_ptoption;
+              break;
+            }
           }
         }
 
         /* was user defined option */
-        if(key_is_ptoption) break;
+        if(f->key == key_is_ptoption) break;
 
         /* assume kernel module option if it can be parsed as 'module.option' */
 
