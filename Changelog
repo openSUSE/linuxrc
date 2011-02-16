@@ -1,3 +1,6 @@
+16/2/2011:	v2.0.97
+	- s390: don't offer installation from hd (bnc #658709, bnc #572575)
+
 19/11/2010:	v2.0.96
 	- increase TTL for SLP (bnc #649853)
 

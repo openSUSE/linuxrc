@@ -390,7 +390,11 @@ int inst_choose_source()
   dia_item_t items[] = {
     di_source_cdrom,
     di_source_net,
+#if !defined(__s390__) && !defined(__s390x__)
     di_source_hd,
+#else
+    di_skip,
+#endif
     di_source_floppy,
     di_none
   };
