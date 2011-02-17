@@ -40,7 +40,6 @@
 
 #define YAST_INF_FILE		"/etc/yast.inf"
 #define INSTALL_INF_FILE	"/etc/install.inf"
-#define MTAB_FILE		"/etc/mtab"
 #define CMDLINE_FILE		"/proc/cmdline"
 
 // #define DEBUG_FILE

@@ -1006,9 +1006,6 @@ int add_instsys()
   setenv("YAST_DEBUG", "/debug/yast.debug", 1);
 
   if(!config.test) {
-    // fake mtab
-    system("rm /etc/mtab 2>/dev/null; cat /proc/mounts >/etc/mtab");
-
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
       argv[1] = sl->value;
       argv[2] = "/";
