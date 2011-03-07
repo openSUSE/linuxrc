@@ -1,3 +1,6 @@
+7/3/2010:	v3.3.67
+	- introduce minimal terminal size to work with strange terminals (bnc #668667)
+
 28/10/2010:	v3.3.66
 	- increase TTL for SLP (bnc #649854, bnc #649632)
 
