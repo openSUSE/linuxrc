@@ -76,9 +76,11 @@ extern void util_umount_all_devices (void);
 
 slist_t *slist_new(void);
 slist_t *slist_free(slist_t *sl);
+slist_t *slist_free_entry(slist_t **sl0, char *str);
 slist_t *slist_append(slist_t **sl0, slist_t *sl);
 slist_t *slist_append_str(slist_t **sl0, char *str);
 slist_t *slist_add(slist_t **sl0, slist_t *sl);
+slist_t *slist_assign_values(slist_t **sl0, char *str);
 slist_t *slist_getentry(slist_t *sl, char *key);
 slist_t *slist_reverse(slist_t *sl0);
 slist_t *slist_sort(slist_t *sl0, int (*cmp_func)(const void *, const void *));

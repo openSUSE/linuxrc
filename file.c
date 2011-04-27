@@ -307,6 +307,7 @@ static struct {
   { key_configure_network, "ConfigureNetwork", kf_cfg + kf_cmd           },
   { key_content,        "Content",        kf_cfg + kf_cmd                },
   { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -395,11 +396,11 @@ char *file_key2str(file_key_t key)
  * Compare strings, ignoring '-', '_', and '.' characters in strings not
  * starting with '_'.
  */
-static int strcasecmpignorestrich(const char* s1, const char* s2)
+static int strcasecmpignorestrich(const char *s1, const char *s2)
 {
-  char* str1 = strdup(s1);
-  char* str2 = strdup(s2);
-  char* s;
+  char *str1 = strdup(s1);
+  char *str2 = strdup(s2);
+  char *s;
   int i;
   
   /* remove all '-' and '_' */
@@ -423,22 +424,32 @@ static int strcasecmpignorestrich(const char* s1, const char* s2)
   }
 
   i = strcasecmp(str1, str2);
-  free(str1); free(str2);
+
+  free(str1);
+  free(str2);
+
   return i;
 }
 
-/* !!! str is overwritten !!! */
+
 file_key_t file_str2key(char *str, file_key_flag_t flags)
 {
   int i;
+  slist_t *sl;
 
   if(!str || !*str || flags == kf_none) return key_none;
 
   if(!*str) return key_none;
 
-  for(i = 0; (unsigned) i < sizeof keywords / sizeof *keywords; i++) {
+  for(i = 0; i < sizeof keywords / sizeof *keywords; i++) {
     if((keywords[i].flags & flags) && !strcasecmpignorestrich(keywords[i].value, str)) {
       return keywords[i].key;
+    }
+  }
+
+  if(flags & (kf_cmd + kf_cfg)) {
+    for(sl = config.ptoptions; sl; sl = sl->next) {
+      if(!strcasecmpignorestrich(sl->key, str)) return key_is_ptoption;
     }
   }
 
@@ -539,7 +550,7 @@ file_t *file_read_file(char *name, file_key_flag_t flags)
       *ft = calloc(1, sizeof **ft);
 
       (*ft)->key_str = strdup(s);
-      (*ft)->key = file_str2key(s, flags);	/* destroys s!!! */
+      (*ft)->key = file_str2key(s, flags);
       (*ft)->value = strdup(t);
 
       parse_value(*ft);
@@ -600,6 +611,9 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
 }
 
 
+/*
+ * Note: may modify f->key if f->key is key_none.
+ */
 void file_do_info(file_t *f0, file_key_flag_t flags)
 {
   file_t *f;
@@ -977,8 +991,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_brokenmodules:
-        slist_free(config.module.broken);
-        config.module.broken = slist_split(',', f->value);
+        slist_assign_values(&config.module.broken, f->value);
         if(config.module.broken && !config.test) {
           if((w = fopen("/etc/modprobe.d/blacklist", "w"))) {
             for(sl = config.module.broken; sl; sl = sl->next) {
@@ -1242,6 +1255,20 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_none:
+      case key_is_ptoption:
+        if((flags & (kf_cmd + kf_cfg))) {
+          for(sl = config.ptoptions; sl; sl = sl->next) {
+            if(!strcasecmpignorestrich(sl->key, f->key_str)) {
+              str_copy(&sl->value, f->value);
+              f->key = key_is_ptoption;
+              break;
+            }
+          }
+        }
+
+        /* was user defined option */
+        if(f->key == key_is_ptoption) break;
+
         /* assume kernel module option if it can be parsed as 'module.option' */
 
         /* Note: f->unparsed is only set when we read from cmdline/argv *NOT* from files. */
@@ -1599,6 +1626,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         str_copy(&config.namescheme, f->value);
         break;
 
+      case key_ptoptions:
+        slist_assign_values(&config.ptoptions, f->value);
+        break;
+
       default:
         break;
     }
@@ -1930,6 +1961,10 @@ void file_write_install_inf(char *dir)
     fprintf(f, "Brailledevice: %s\n", config.braille.dev);
   }
 
+  for(sl = config.ptoptions; sl; sl = sl->next) {
+    if(sl->value) fprintf(f, "%s: %s\n", sl->key, sl->value);
+  }
+
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
   for(i = 0, ft = ft0; ft; ft = ft->next) {
@@ -2118,7 +2153,7 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags)
 
       (*ft)->unparsed = t1;
       (*ft)->key_str = strdup(t);
-      (*ft)->key = file_str2key(t, flags);	/* destroys t!!! */
+      (*ft)->key = file_str2key(t, flags);
       (*ft)->value = strdup(s1 ?: "");
 
       parse_value(*ft);

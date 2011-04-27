@@ -1,4 +1,9 @@
-7/3/2010:	v3.3.67
+27/4/2011:	v3.3.68
+	- allow for user defined options; those options are ignored by linuxrc
+	  but added unchanged to /etc/install.inf (fate #307445, fate #310481)
+	- fix perl warning in po2h
+
+7/3/2011:	v3.3.67
 	- introduce minimal terminal size to work with strange terminals (bnc #668667)
 
 28/10/2010:	v3.3.66

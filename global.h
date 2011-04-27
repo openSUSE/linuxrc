@@ -420,6 +420,7 @@ typedef struct {
   slist_t *extend_list;		/* list of loaded instsys extensions */
   slist_t *udevrules;		/* udev rules */
   char *namescheme;		/* device name scheme (e.g.: by-id, by-label, by-path) */
+  slist_t *ptoptions;		/* pass-through options: options that just need to be added to /etc/install.inf */
 
   struct {
     char *instsys_default;	/* default instsys url */

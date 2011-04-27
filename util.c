@@ -1476,6 +1476,15 @@ void util_status_info()
     }
   }
 
+  if(config.ptoptions) {
+    strcpy(buf, "user defined options:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ptoptions; sl; sl = sl->next) {
+      sprintf(buf, "  %s: %s", sl->key, sl->value ?: "<unset>");
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.module.options) {
     strcpy(buf, "module options:");
     slist_append_str(&sl0, buf);
@@ -2748,6 +2757,31 @@ slist_t *slist_free(slist_t *sl)
 }
 
 
+slist_t *slist_free_entry(slist_t **sl0, char *str)
+{
+  slist_t *sl, *sl_prev, sl_tmp = { };
+
+  if(!str) return *sl0;
+
+  sl_tmp.next = *sl0;
+
+  for(sl_prev = &sl_tmp, sl = sl_prev->next; sl; sl = sl->next) {
+    if(sl->key && !strcmp(sl->key, str)) {
+      free(sl->key);
+      if(sl->value) free(sl->value);
+      sl_prev->next = sl->next;
+      free(sl);
+      sl = sl_prev;
+    }
+    else {
+      sl_prev = sl;
+    }
+  }
+
+  return *sl0 = sl_tmp.next;
+}
+
+
 slist_t *slist_append(slist_t **sl0, slist_t *sl)
 {
   for(; *sl0; sl0 = &(*sl0)->next);
@@ -2770,6 +2804,51 @@ slist_t *slist_add(slist_t **sl0, slist_t *sl)
 {
   sl->next = *sl0;
   return *sl0 = sl;
+}
+
+
+slist_t *slist_assign_values(slist_t **sl0, char *str)
+{
+  int todo = 0;
+  slist_t *sl, *sl1;
+
+  if(!sl0) return NULL;
+
+  if(!str) str = "";
+
+  switch(*str) {
+    case '+':
+      todo = 1;
+      str++;
+      break;
+
+    case '-':
+      todo = -1;
+      str++;
+      break;
+  }
+
+  sl1 = slist_split(',', str);
+
+  if(todo) {
+    for(sl = sl1; sl; sl = sl->next) {
+      if(todo > 0) {
+        if(!slist_getentry(*sl0, sl->key)) slist_append_str(sl0, sl->key);
+      }
+      else {
+        slist_free_entry(sl0, sl->key);
+      }
+    }
+  }
+  else {
+    slist_free(*sl0);
+    *sl0 = sl1;
+    sl1 = NULL;
+  }
+
+  slist_free(sl1);
+
+  return *sl0;
 }
 
 
