@@ -165,3 +165,5 @@ void util_setup_udevrules(void);
 void util_error_trace(char *format, ...);
 hd_t *fix_device_names(hd_t *hd);
 
+int is_dell(void);
+

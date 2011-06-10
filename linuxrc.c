@@ -822,6 +822,10 @@ void lxrc_init()
   config.initrd_has_ldso = 1;
 #endif
 
+  if(config.manual < 2) {
+    config.biosdevname = is_dell();
+  }
+
   file_read_info_file("file:/linuxrc.config", kf_cfg);
 
   if(!config.had_segv) {

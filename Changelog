@@ -1,3 +1,6 @@
+10/6/2011:	v3.3.69
+	- add biosdevname option (fate #311332)
+
 27/4/2011:	v3.3.68
 	- allow for user defined options; those options are ignored by linuxrc
 	  but added unchanged to /etc/install.inf (fate #307445, fate #310481)

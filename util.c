@@ -4940,3 +4940,29 @@ hd_t *fix_device_names(hd_t *hd)
   return hd0;
 }
 
+
+int is_dell()
+{
+  hd_data_t *hd_data = calloc(1, sizeof *hd_data);
+  hd_smbios_t *sm;
+  int dell = 0;
+
+  hd_list(hd_data, hw_bios, 1, NULL);
+
+  for(sm = hd_data->smbios; sm; sm = sm->next) {
+    if(sm->any.type == sm_sysinfo && sm->sysinfo.manuf) {
+      if(config.debug) fprintf(stderr, "DMI System Info: %s/%s\n", sm->sysinfo.manuf, sm->sysinfo.product);
+      dell = strncasecmp(sm->sysinfo.manuf, "dell", sizeof "dell" - 1) ? 0 : 1;
+      if(config.debug && dell) fprintf(stderr, "-> is dell\n");
+      break;
+    }
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  LXRC_WAIT;
+
+  return dell;
+}
+

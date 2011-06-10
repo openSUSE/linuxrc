@@ -308,6 +308,7 @@ static struct {
   { key_content,        "Content",        kf_cfg + kf_cmd                },
   { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
+  { key_biosdevname,    "biosdevname",    kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1630,6 +1631,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         slist_assign_values(&config.ptoptions, f->value);
         break;
 
+      case key_biosdevname:
+        if(f->is.numeric) config.biosdevname = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1945,6 +1950,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
   file_write_num(f, key_configure_network, config.configure_network);
+  file_write_num(f, key_biosdevname, config.biosdevname);
 
   if(
     config.rootpassword &&
