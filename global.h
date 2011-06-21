@@ -486,17 +486,17 @@ typedef struct {
     slist_t *options;		/* potential module parameters */
   } module;
 
-  struct {
-    int total;			/* memory size (in kB) */
-    int free;			/* free memory (in kB) when linuxrc starts */
-    int free_swap;		/* free swap */
-    int current;		/* currently free memory */
-    int min_free;		/* don't let it drop below this */
-    int min_yast;		/* minimum for yast */
-    int load_image;		/* _load_ rootimage, if we have at least that much */
-    int ram;			/* ram size in MB */
-    int ram_min;		/* min required memory (ram size) needed for install in MB */
-  } memory;
+  struct {			/* Note: all memory sizes are now in bytes */
+    int64_t total;		/* memory size */
+    int64_t free;		/* free memory when linuxrc starts */
+    int64_t free_swap;		/* free swap */
+    int64_t current;		/* currently free memory */
+    int64_t min_free;		/* don't let it drop below this */
+    int64_t min_yast;		/* minimum for yast */
+    int64_t load_image;		/* _load_ rootimage, if we have at least that much */
+    int64_t ram;		/* ram size */
+    int64_t ram_min;		/* min required memory (ram size) needed for install */
+  } memoryXXX;
 
   struct {			/* mountpoints */
     unsigned cnt;		/* mp counter */

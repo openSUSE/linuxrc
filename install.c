@@ -1140,7 +1140,7 @@ int inst_execute_yast()
   util_free_mem();
   if(config.addswap) {
     i = ask_for_swap(
-      config.addswap == 2 ? -1 : config.memory.min_yast - config.memory.min_free,
+      config.addswap == 2 ? -1 : config.memoryXXX.min_yast - config.memoryXXX.min_free,
       txt_get(TXT_LOW_MEMORY2)
     );
   }

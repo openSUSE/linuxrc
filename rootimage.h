@@ -7,5 +7,5 @@
  */
 
 extern int  root_boot_system    (void);
-int ask_for_swap(int size, char *msg);
+int ask_for_swap(int64_t size, char *msg);
 

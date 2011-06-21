@@ -200,7 +200,7 @@ int main(int argc, char **argv, char **env)
 
       // fprintf(stderr, "free: %d, %d\n", config.memory.free, config.tmpfs);
 
-      if(config.tmpfs && config.memory.free > 24 * 1024) {
+      if(config.tmpfs && config.memoryXXX.free > (24 << 20)) {
         lxrc_movetotmpfs();	/* does not return if successful */
       }
 
@@ -781,9 +781,9 @@ void lxrc_init()
   config.scsi_before_usb = 1;
 
   // default memory limits
-  config.memory.min_free =       12 * 1024;
-  config.memory.min_yast =      224 * 1024;
-  config.memory.load_image =    350 * 1024;
+  config.memoryXXX.min_free =       12 << 20;
+  config.memoryXXX.min_yast =      224 << 20;
+  config.memoryXXX.load_image =    350 << 20;
 
   config.swap_file_size = 1024;		/* 1024 MB */
 
@@ -880,12 +880,12 @@ void lxrc_init()
 
   util_free_mem();
 
-  if(config.memory.free < config.memory.min_free) {
-    config.memory.min_free = config.memory.free;
+  if(config.memoryXXX.free < config.memoryXXX.min_free) {
+    config.memoryXXX.min_free = config.memoryXXX.free;
   }
 
   if(!config.download.instsys_set) {
-    config.download.instsys = config.memory.free > config.memory.load_image ? 1 : 0;
+    config.download.instsys = config.memoryXXX.free > config.memoryXXX.load_image ? 1 : 0;
   }
 
   lxrc_set_modprobe("/etc/nothing");
@@ -1027,21 +1027,22 @@ void lxrc_init()
   }
 #endif
 
-  if(config.memory.ram_min && !config.had_segv) {
-    int window = config.win, ram;
+  if(config.memoryXXX.ram_min && !config.had_segv) {
+    int window = config.win;
+    int64_t ram;
     char *msg = NULL;
 
     util_get_ram_size();
 
-    ram = config.memory.ram_min - config.memory.ram_min / 8;
+    ram = config.memoryXXX.ram_min - config.memoryXXX.ram_min / 8;
 
-    if(config.memory.ram < ram) {
+    if(config.memoryXXX.ram < ram) {
       if(!window) util_disp_init();
-      strprintf(&msg, txt_get(TXT_NO_RAM), config.product, config.memory.ram_min);
+      strprintf(&msg, txt_get(TXT_NO_RAM), config.product, (int) (config.memoryXXX.ram_min >> 20));
       dia_message(msg, MSGTYPE_REBOOT);
       free(msg);
       if(!window) util_disp_done();
-      if(config.memory.ram_min) {
+      if(config.memoryXXX.ram_min) {
         config.manual = 1;
         if(config.test) {
           fprintf(stderr, "*** reboot ***\n");

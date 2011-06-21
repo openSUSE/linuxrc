@@ -1,3 +1,6 @@
+21/6/2011:	v3.3.70
+	- use 64 bit memory sizes everywhere (bnc #699886)
+
 10/6/2011:	v3.3.69
 	- add biosdevname option (fate #311332)
 

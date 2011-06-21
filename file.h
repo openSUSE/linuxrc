@@ -87,7 +87,7 @@ file_t *file_read_file(char *name, file_key_flag_t flags);
 void file_free_file(file_t *file);
 
 void file_write_str(FILE *f, file_key_t key, char *str);
-void file_write_num(FILE *f, file_key_t key, int num);
+void file_write_num(FILE *f, file_key_t key, int64_t num);
 void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num);
 
 void file_write_install_inf(char *dir);

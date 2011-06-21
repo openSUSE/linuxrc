@@ -773,18 +773,18 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_memlimit:
-        if(f->is.numeric) config.memory.min_free = f->nvalue;
+        if(f->is.numeric) config.memoryXXX.min_free = f->nvalue << 10;
         break;
 
       case key_memyast:
-        if(f->is.numeric) config.memory.min_yast = f->nvalue;
+        if(f->is.numeric) config.memoryXXX.min_yast = f->nvalue << 10;
         break;
 
       case key_memloadimage:
         if(f->is.numeric) {
-          config.memory.load_image = f->nvalue;
+          config.memoryXXX.load_image = f->nvalue;
           if(!config.download.instsys_set) {
-            config.download.instsys = config.memory.free > config.memory.load_image ? 1 : 0;
+            config.download.instsys = config.memoryXXX.free > config.memoryXXX.load_image ? 1 : 0;
           }
         }
         break;
@@ -1189,7 +1189,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_minmem:
-        if(f->is.numeric) config.memory.ram_min = f->nvalue;
+        if(f->is.numeric) config.memoryXXX.ram_min = f->nvalue << 10;
         break;
 
 #if defined(__s390__) || defined(__s390x__)
@@ -1703,9 +1703,9 @@ void file_write_str(FILE *f, file_key_t key, char *str)
 }
 
 
-void file_write_num(FILE *f, file_key_t key, int num)
+void file_write_num(FILE *f, file_key_t key, int64_t num)
 {
-  fprintf(f, "%s: %d\n", file_key2str(key), num);
+  fprintf(f, "%s: %lld\n", file_key2str(key), (long long) num);
 }
 
 
@@ -1932,7 +1932,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
   file_write_num(f, key_textmode, config.textmode);
   file_write_str(f, key_autoyast, config.autoyast);
-  file_write_num(f, key_memfree, config.memory.current);
+  file_write_num(f, key_memfree, config.memoryXXX.current >> 10);	// convention: in kB
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
   file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
