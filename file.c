@@ -782,7 +782,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_memloadimage:
         if(f->is.numeric) {
-          config.memoryXXX.load_image = f->nvalue;
+          config.memoryXXX.load_image = f->nvalue << 10;
           if(!config.download.instsys_set) {
             config.download.instsys = config.memoryXXX.free > config.memoryXXX.load_image ? 1 : 0;
           }

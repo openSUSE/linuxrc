@@ -1128,27 +1128,28 @@ void util_status_info()
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory: total %lld, free %lld (%lld), ramdisk %lld",
-    (long long) config.memoryXXX.total, (long long) config.memoryXXX.current,
-    (long long) (config.memoryXXX.current - config.memoryXXX.free_swap),
-    (long long) (config.memoryXXX.free - config.memoryXXX.current)
+    "memory (MB): total %lld, free %lld (%lld), ramdisk %lld",
+    (long long) config.memoryXXX.total >> 20,
+    (long long) config.memoryXXX.current >> 20,
+    (long long) (config.memoryXXX.current - config.memoryXXX.free_swap) >> 20,
+    (long long) (config.memoryXXX.free - config.memoryXXX.current) >> 20
   );
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory limits: min %lld, yast %lld, image %lld",
-    (long long) config.memoryXXX.min_free,
-    (long long) config.memoryXXX.min_yast,
-    (long long) config.memoryXXX.load_image
+    "memory limits (MB): min %lld, yast %lld, image %lld",
+    (long long) config.memoryXXX.min_free >> 20,
+    (long long) config.memoryXXX.min_yast >> 20,
+    (long long) config.memoryXXX.load_image >> 20
   );
   slist_append_str(&sl0, buf);
 
   util_get_ram_size();
 
   sprintf(buf,
-    "RAM size (MB): total %llu, min %llu",
-    (unsigned long long) (config.memoryXXX.ram >> 20),
-    (unsigned long long) (config.memoryXXX.ram_min >> 20)
+    "RAM size (MB): total %lld, min %lld",
+    (long long) (config.memoryXXX.ram >> 20),
+    (long long) (config.memoryXXX.ram_min >> 20)
   );
   slist_append_str(&sl0, buf);
 
@@ -2589,9 +2590,9 @@ void util_free_mem()
 
   file_free_file(f0);
 
-  config.memoryXXX.total = mem_total;
-  config.memoryXXX.free = mem_free;
-  config.memoryXXX.free_swap = mem_free_swap;
+  config.memoryXXX.total = mem_total << 10;
+  config.memoryXXX.free = mem_free << 10;
+  config.memoryXXX.free_swap = mem_free_swap << 10;
 
   util_update_meminfo();
 }
