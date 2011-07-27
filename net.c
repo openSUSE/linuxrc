@@ -693,6 +693,16 @@ int net_activate6()
 
       } while(--delay > 0 && f && !config.net.hostname.ok && !config.net.hostname.ipv6);
     }
+
+    if(
+      config.net.gateway.ok &&
+      config.net.gateway.ipv6 &&
+      (ip = inet_ntop(AF_INET6, &config.net.gateway.ip6, ip_buf, sizeof ip_buf))
+    ) {
+      strprintf(&cmd, "route -A inet6 add default gw %s", ip);
+      err = system(cmd);
+      if(config.debug) fprintf(stderr, "%s = %d\n", cmd, err);
+    }
   }
 
   if(!err) {
