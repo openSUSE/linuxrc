@@ -1,3 +1,6 @@
+9/8/2011:	v3.3.73
+	- print segfault backtrace even without trace option
+
 9/8/2011:	v3.3.72
 	- print backtrace when we get a segfault (bnc #709990)
 

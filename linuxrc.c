@@ -656,6 +656,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
   ip = scp.sc_fpc_eir;
 #endif
 
+  config.error_trace = 1;
   util_error_trace("***  signal 11 ***\n");
 
   fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
