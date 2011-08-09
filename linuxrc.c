@@ -162,6 +162,8 @@ int main(int argc, char **argv, char **env)
 
   /* maybe we had a segfault recently... */
   if(argc == 4 && !strcmp(argv[1], "segv")) {
+    unsigned state = argv[3][0] - '0';
+
     for(i = 0; i < 16 && argv[2][i]; i++) {
       config.segv_addr <<= 4;
       j = argv[2][i] - '0';
@@ -170,7 +172,9 @@ int main(int argc, char **argv, char **env)
     }
     config.had_segv = 1;
 
-    if(argv[3][0] == '0') {	/* was not in window mode */
+    config.linemode = (state >> 1) & 1;
+
+    if((state & 1) == 0) {	/* was not in window mode */
       fprintf(stderr, "\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
       printf("\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
       fflush(stdout);
@@ -642,6 +646,8 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
   ip = scp.sc_fpc_eir;
 #endif
 
+  util_error_trace("***  signal 11 ***\n");
+
   fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
   if(config.restart_on_segv) {
     config.restart_on_segv = 0;
@@ -651,7 +657,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
       addr[i] = j + '0';
     }
     addr[16] = 0;
-    state[0] = config.win ? '1' : '0';
+    state[0] = (config.win + (config.linemode << 1)) + '0';
     state[1] = 0;
     kbd_end(1);		/* restore terminal settings */
     execl(*config.argv, "init", "segv", addr, state, NULL);

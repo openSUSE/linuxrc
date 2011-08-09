@@ -4907,6 +4907,8 @@ void util_setup_udevrules()
 
 void util_error_trace(char *format, ...)
 {
+  void *buffer[64], **p;
+  int nptrs;
   va_list args;
 
   if(!config.error_trace) return;
@@ -4915,10 +4917,12 @@ void util_error_trace(char *format, ...)
   vfprintf(stderr, format, args);
   va_end(args);
   
-  void *buffer[100];
-  int nptrs;
   nptrs = backtrace(buffer, 100);
-  backtrace_symbols_fd(buffer, nptrs, STDERR_FILENO);
+  p = buffer;
+  if(nptrs > 1) nptrs--, p++;
+  backtrace_symbols_fd(p, nptrs, STDERR_FILENO);
+
+  fprintf(stderr, "--------\n");
 }
 
 
