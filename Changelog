@@ -1,3 +1,6 @@
+2/9/2011:	v3.3.75
+	- remove biosdevanme handling (bnc #712049)
+
 25/8/2011:	v3.3.74
 	- detect btrfs (bnc #713393)
 

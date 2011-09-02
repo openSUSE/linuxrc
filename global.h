@@ -356,7 +356,6 @@ typedef struct {
   unsigned configure_network:1;	/* value just passed to yast */
   unsigned error_trace:1;	/* enable backtrace log */
   unsigned content:1;		/* download and parse 'content' file */
-  unsigned biosdevname:1;	/* use bios provided network names (for yast) */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */
