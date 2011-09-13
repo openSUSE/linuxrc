@@ -63,7 +63,7 @@ void get_scsi_list()
 
   scsi_list = calloc(MAX_SCSI_DEVS + 1, sizeof *scsi_list);
 
-  sf_class = reverse_str_list(read_dir("/sys/block", 'd'));
+  sf_class = reverse_str_list(read_dir("/sys/block", 'D'));
 
   if(!sf_class) {
     if(config.debug) fprintf(stderr, "no block devices\n");
