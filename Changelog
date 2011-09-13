@@ -1,3 +1,6 @@
+13/9/2011:	v3.3.76
+	- handle symlinks in /sys/block directory
+
 2/9/2011:	v3.3.75
 	- remove biosdevanme handling (bnc #712049)
 
