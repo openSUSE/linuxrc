@@ -1,3 +1,6 @@
+6/10/2011:	v3.3.77
+	- preserve default value when chopping whitespace (bnc#706605)
+
 13/9/2011:	v3.3.76
 	- handle symlinks in /sys/block directory
 

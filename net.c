@@ -2227,10 +2227,17 @@ static int net_s390_getrwchans_ex(hd_t* hd)
     }
   }
 
-  IFNOTAUTO(config.hwp.readchan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0))) return rc;
-  if((rc=net_check_ccw_address(config.hwp.readchan))) return rc;
-  IFNOTAUTO(config.hwp.writechan) if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0))) return rc;
-  if((rc=net_check_ccw_address(config.hwp.writechan))) return rc;
+  IFNOTAUTO(config.hwp.readchan)
+    if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0)))
+      return rc;
+  if((rc=net_check_ccw_address(config.hwp.readchan)))
+    return rc;
+  IFNOTAUTO(config.hwp.writechan)
+    if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0)))
+      return rc;
+  if((rc=net_check_ccw_address(config.hwp.writechan)))
+    return rc;
+
   return 0;
 }
 
