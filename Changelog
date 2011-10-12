@@ -1,3 +1,6 @@
+11/10/2011:	v3.3.78
+	- s390: fix type mixup in LCS activation code (bnc#689374)
+
 6/10/2011:	v3.3.77
 	- preserve default value when chopping whitespace (bnc#706605)
 
