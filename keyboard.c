@@ -113,8 +113,8 @@ void kbd_init (int first)
 	tcsetattr (config.kbd_fd, TCSAFLUSH, &kbd_tio_rm);
 	if (first)
 	    {
-	    max_x_ig = 80;
-	    max_y_ig = 24;
+	    max_x_ig = X_DEFAULT;
+	    max_y_ig = Y_DEFAULT;
 	    }
 	return;
 	}
@@ -124,7 +124,7 @@ void kbd_init (int first)
     kbd_tio_rm.c_iflag &= ~(INLCR | IGNCR | ICRNL);
     if (first && !ioctl (config.kbd_fd, TIOCGWINSZ, &winsize_ri))
         {
-        if (winsize_ri.ws_col && winsize_ri.ws_row)
+        if (winsize_ri.ws_col >= MIN_X && winsize_ri.ws_row >= MIN_Y)
             {
             max_x_ig = winsize_ri.ws_col;
             max_y_ig = winsize_ri.ws_row;
@@ -148,6 +148,11 @@ void kbd_init (int first)
 
       if(max_x_ig > MAX_X) max_x_ig = MAX_X;
       if(max_y_ig > MAX_Y) max_y_ig = MAX_Y;
+
+      if(max_x_ig < MIN_X || max_y_ig < MIN_Y) {
+        max_x_ig = X_DEFAULT;
+        max_y_ig = Y_DEFAULT;
+      }
 
       if(!config.had_segv) fprintf(stderr, "Window size: %d x %d\n", max_x_ig, max_y_ig);
 
