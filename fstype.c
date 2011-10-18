@@ -394,6 +394,17 @@ fstype(const char *device) {
     }
 
     if (!type) {
+        char buf[8];
+        if (
+            lseek(fd, 0x10040, SEEK_SET) == 0x10040 &&
+            read(fd, buf, sizeof buf) == sizeof buf &&
+            !memcmp(buf, "_BHRfS_M", sizeof buf)
+        ) {
+            type = "btrfs";
+        }
+    }
+
+    if (!type) {
 	    /* perhaps the user tries to mount the swap space
 	       on a new disk; warn her before she does mke2fs on it */
 	    int pagesize = getpagesize();
