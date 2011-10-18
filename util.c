@@ -1133,24 +1133,28 @@ void util_status_info(int log_it)
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory (kB): total %d, free %d (%d), ramdisk %d",
-    config.memory.total, config.memory.current,
-    config.memory.current - config.memory.free_swap,
-    config.memory.free - config.memory.current
+    "memory (MB): total %lld, free %lld (%lld), ramdisk %lld",
+    (long long) config.memoryXXX.total >> 20,
+    (long long) config.memoryXXX.current >> 20,
+    (long long) (config.memoryXXX.current - config.memoryXXX.free_swap) >> 20,
+    (long long) (config.memoryXXX.free - config.memoryXXX.current) >> 20
   );
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
-    "memory limits: min %d, yast %d, image %d",
-    config.memory.min_free, config.memory.min_yast, config.memory.load_image
+    "memory limits (MB): min %lld, yast %lld, image %lld",
+    (long long) config.memoryXXX.min_free >> 20,
+    (long long) config.memoryXXX.min_yast >> 20,
+    (long long) config.memoryXXX.load_image >> 20
   );
   slist_append_str(&sl0, buf);
 
   util_get_ram_size();
 
   sprintf(buf,
-    "RAM size (MB): total %u, min %u",
-    config.memory.ram, config.memory.ram_min
+    "RAM size (MB): total %lld, min %lld",
+    (long long) (config.memoryXXX.ram >> 20),
+    (long long) (config.memoryXXX.ram_min >> 20)
   );
   slist_append_str(&sl0, buf);
 
@@ -2559,7 +2563,7 @@ int util_raidautorun_main(int argc, char **argv)
 void util_free_mem()
 {
   file_t *f0, *f;
-  int i, mem_total = 0, mem_free = 0, mem_free_swap = 0;
+  int64_t i, mem_total = 0, mem_free = 0, mem_free_swap = 0;
   char *s;
 
   f0 = file_read_file("/proc/meminfo", kf_mem);
@@ -2568,7 +2572,7 @@ void util_free_mem()
     switch(f->key) {
       case key_memtotal:
       case key_swaptotal:
-        i = strtoul(f->value, &s, 10);
+        i = strtoull(f->value, &s, 10);
         if(!*s || *s == ' ') mem_total += i;
         break;
 
@@ -2576,7 +2580,7 @@ void util_free_mem()
       case key_buffers:
       case key_cached:
       case key_swapfree:
-        i = strtol(f->value, &s, 10);
+        i = strtoll(f->value, &s, 10);
         if(!*s || *s == ' ') {
           mem_free += i;
           if(f->key == key_swapfree) {
@@ -2592,9 +2596,9 @@ void util_free_mem()
 
   file_free_file(f0);
 
-  config.memory.total = mem_total;
-  config.memory.free = mem_free;
-  config.memory.free_swap = mem_free_swap;
+  config.memoryXXX.total = mem_total << 10;
+  config.memoryXXX.free = mem_free << 10;
+  config.memoryXXX.free_swap = mem_free_swap << 10;
 
   util_update_meminfo();
 }
@@ -2602,11 +2606,7 @@ void util_free_mem()
 
 void util_update_meminfo()
 {
-  int rd_mem = 0;
-
-  // FIXME: do something with download files ???
-
-  config.memory.current = config.memory.free - (rd_mem >> 10);
+  config.memoryXXX.current = config.memoryXXX.free;
 }
 
 
@@ -2614,7 +2614,10 @@ int util_free_main(int argc, char **argv)
 {
   util_free_mem();
 
-  printf("MemTotal: %9d kB\nMemFree: %10d kB\n", config.memory.total, config.memory.free);
+  printf("MemTotal: %9lld kB\nMemFree: %10lld kB\n",
+    (long long) (config.memoryXXX.total >> 10),
+    (long long) (config.memoryXXX.free >> 10)
+  );
 
   return 0;
 }
@@ -4124,7 +4127,7 @@ void util_get_ram_size()
   hd_t *hd;
   hd_res_t *res;
 
-  if(config.memory.ram) return;
+  if(config.memoryXXX.ram) return;
 
   hd_data = calloc(1, sizeof *hd_data);
 
@@ -4133,8 +4136,8 @@ void util_get_ram_size()
   if(hd && hd->base_class.id == bc_internal && hd->sub_class.id == sc_int_main_mem) {
     for(res = hd->res; res; res = res->next) {
       if(res->any.type == res_phys_mem) {
-        config.memory.ram = res->phys_mem.range >> 20;
-        fprintf(stderr, "RAM size: %u MB\n", config.memory.ram);
+        config.memoryXXX.ram = res->phys_mem.range;
+        fprintf(stderr, "RAM size: %llu MB\n", (unsigned long long) (config.memoryXXX.ram >> 20));
         break;
       }
     }

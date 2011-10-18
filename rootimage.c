@@ -45,13 +45,13 @@ static int  root_check_root      (char *root_string_tv);
  *
  * return: 0 ok, -1 error
  */
-int ask_for_swap(int size, char *msg)
+int ask_for_swap(int64_t size, char *msg)
 {
   int i, j, did_init = 0;
   char *partition = NULL;
   char *argv[] = { NULL, NULL };
 
-  if(size >= 0 && config.memory.current >= config.memory.min_free + size) return 0;
+  if(size >= 0 && config.memoryXXX.current >= config.memoryXXX.min_free + size) return 0;
 
   if(!config.win) {
     util_disp_init();
