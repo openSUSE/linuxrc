@@ -1731,23 +1731,44 @@ int dia_input2_chopspace(char* txt, char** input, int fieldlen, int pw_mode)
   int retval;
   char* final;	/* stripped string */
   char* oinput;	/* original pointer to input string */
-  
+
+  char *deflt = NULL;
+  if (*input)
+    deflt = strdup(*input);
+
   retval = dia_input2(txt, input, fieldlen, pw_mode);
   oinput = *input;
-  
+
   /* null pointer or empty string */
-  if(!*input || !**input) return retval;
-  
+  if(!*input || !**input) {
+    if (deflt) {
+      /* restore what we had as default */
+      if (*input)
+        free(*input);
+      *input = deflt;
+    }
+    return retval;
+  }
+
   while(**input && isspace(**input)) /* skip leading whitespace */
     (*input)++;
   while(isspace(*(*input+strlen(*input)-1))) /* overwrite trailing whitespace */
     *(*input+strlen(*input)-1) = 0;
-  
-  /* copy result and discard original string */
-  final = strdup(*input);
+
+  if (!strlen(*input)) {
+    /* nothing left after stripping whitespace
+       -> restore previous default */
+    *input = deflt;
+  }
+  else {
+    /* copy result and discard original string */
+    final = strdup(*input);
+    *input = final;
+    if (deflt)
+      free(deflt);
+  }
   free(oinput);
-  *input = final;
-  
+
   return retval;
 }
 
