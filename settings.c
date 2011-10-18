@@ -180,7 +180,7 @@ static language_t set_languages_arm [] =
 {lang_dummy, "", "us", SMALL_FONT, UNI_FONT, 0, 0, NULL, 0 },
 };
 
-#if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
+#if defined(__i386__) || defined(__arm__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
 #define KEYMAP_DEFAULT	"us"
 static keymap_t set_keymaps_arm [] =
 {
