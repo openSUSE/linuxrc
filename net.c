@@ -2700,7 +2700,7 @@ setup_ctc:
       break;
     case di_390net_hsi:
     case di_390net_osa:
-      if (config.hwp.interface == di_390net_lcs)
+      if (config.hwp.interface == di_osa_lcs)
         goto setup_ctc;
       ccmd += sprintf(ccmd, "qeth_configure ");
       if(config.hwp.portno)
