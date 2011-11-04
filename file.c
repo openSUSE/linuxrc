@@ -308,6 +308,7 @@ static struct {
   { key_content,        "Content",        kf_cfg + kf_cmd                },
   { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
+  { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1341,6 +1342,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
+      case key_withfcoe:
+        if(f->is.numeric) config.withfcoe = f->nvalue;
+        break;
+
       case key_startshell:
         if(!*f->value) config.startshell = 1;
         if(f->is.numeric) config.startshell = f->nvalue;
@@ -1938,6 +1943,7 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_initrd_id, config.initrd_id);
   file_write_str(f, key_instsys_id, config.instsys_id);
   file_write_num(f, key_withiscsi, config.withiscsi);
+  file_write_num(f, key_withfcoe, config.withfcoe);
   file_write_num(f, key_startshell, config.startshell);
   file_write_num(f, key_y2gdb, config.y2gdb);
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);

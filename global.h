@@ -349,6 +349,7 @@ typedef struct {
   unsigned device_by_id:1;	/* use /dev/disk/by-id device names */
   unsigned usesax2:1;		/* just passed to yast */
   unsigned withiscsi;		/* iSCSI parameter */
+  unsigned withfcoe;		/* FCoE parameter */
   unsigned restart_method;	/* 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   unsigned efi_vars:1;		/* efi vars exist */
   int efi;			/* use efi; -1 = auto */

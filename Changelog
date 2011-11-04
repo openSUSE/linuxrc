@@ -1,3 +1,6 @@
+4/11/2011:	v3.3.79
+	- detect fcoe disks (bnc #725134)
+
 11/10/2011:	v3.3.78
 	- s390: fix type mixup in LCS activation code (bnc#689374)
 
