@@ -918,6 +918,7 @@ void lxrc_init()
   info_init();
 
   read_iscsi_ibft();
+  config.withfcoe = fcoe_check();
 
   printf("Loading basic drivers...");
   fflush(stdout);

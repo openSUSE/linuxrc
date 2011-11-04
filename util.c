@@ -4966,3 +4966,48 @@ hd_t *fix_device_names(hd_t *hd)
   return hd0;
 }
 
+
+/*
+ * fcoe = fibre channel + network
+ * edd/raw_data[interface] = 'FIBRE' + edd/pci_dev = network device
+ */
+int fcoe_check()
+{
+  struct dirent *de;
+  DIR *d, *dn;
+  int fd, raw_len, fcoe_ok = 0;
+  char *attr;
+  const char *sysfs_edd = "/sys/firmware/edd";
+  unsigned char raw[64];
+
+  if(!(d = opendir(sysfs_edd))) return fcoe_ok;
+
+  while((de = readdir(d))) {
+    asprintf(&attr, "%s/%s/raw_data", sysfs_edd, de->d_name);
+    fd = open(attr, O_RDONLY);
+    if(fd >= 0) {
+      raw_len = read(fd, raw, sizeof raw);
+      if(raw_len >= 48 && !memcmp(raw + 40, "FIBRE", 5)) {
+        fprintf(stderr, "%s: fibre channel\n", de->d_name);
+      }
+
+      close(fd);
+    }
+    free(attr);
+
+    asprintf(&attr, "%s/%s/pci_dev/net", sysfs_edd, de->d_name);
+    if((dn = opendir(attr))) {
+      fprintf(stderr, "%s: network\n", de->d_name);
+      fcoe_ok = 1;
+      closedir(dn);
+    }
+    free(attr);
+  }
+
+  closedir(d);
+
+  fprintf(stderr, "fcoe_check: %d\n", fcoe_ok);
+
+  return fcoe_ok;
+}
+
