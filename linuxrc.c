@@ -852,6 +852,8 @@ void lxrc_init()
     util_start_shell("/dev/tty8", "/bin/lsh", 1);
   }
 
+  LXRC_WAIT
+
   if(config.staticdevices) {
     util_mkdevs();
   }
