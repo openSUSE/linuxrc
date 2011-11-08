@@ -1060,6 +1060,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
               else if(!strcmp(s, "udev")) config.staticdevices = i ^ 1;
               else if(!strcmp(s, "udev.mods")) config.udev_mods = i;
               else if(!strcmp(s, "trace")) config.error_trace = i;
+              else if(!strcmp(s, "bash")) config.early_bash = i;
+              else if(!strcmp(s, "lsh")) config.early_lsh = i;
             }
           }
         }

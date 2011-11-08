@@ -845,6 +845,13 @@ void lxrc_init()
     system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
   }
 
+  if(config.early_bash) {
+    util_start_shell("/dev/tty8", "/bin/bash", 3);
+  }
+  else if(config.early_lsh) {
+    util_start_shell("/dev/tty8", "/bin/lsh", 1);
+  }
+
   if(config.staticdevices) {
     util_mkdevs();
   }
