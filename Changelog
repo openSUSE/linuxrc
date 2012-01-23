@@ -1,3 +1,7 @@
+15/11/2011:	v3.3.81
+	- s390: allow empty parameters for "portname" and "osahwaddr"
+	  (bnc#720765)
+
 15/11/2011:	v3.3.80
 	- s390: choose thermonuclear option to deal with whitespace issues
 	  once and for all (bnc#706605)

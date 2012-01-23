@@ -1200,7 +1200,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value) str_copy(&config.hwp.userid, f->value);
         break;
       case key_portname:
-        if(*f->value) str_copy(&config.hwp.portname, f->value);
+        str_copy(&config.hwp.portname, f->value);
         break;
       case key_readchan:
         if(*f->value) str_copy(&config.hwp.readchan, f->value);
@@ -1227,7 +1227,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.hwp.portno = f->nvalue + 1;
         break;
       case key_osahwaddr:
-        if(*f->value) str_copy(&config.hwp.osahwaddr, f->value);
+        str_copy(&config.hwp.osahwaddr, f->value);
         break;
 #endif      
 
