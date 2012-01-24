@@ -1209,6 +1209,10 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.efi_vars, "efivars");
   add_flag(&sl0, buf, config.staticdevices ^ 1, "udev");
   add_flag(&sl0, buf, config.udev_mods, "udev.mods");
+  add_flag(&sl0, buf, config.digests.md5, "md5");
+  add_flag(&sl0, buf, config.digests.sha1, "sha1");
+  add_flag(&sl0, buf, config.digests.sha256, "sha256");
+  add_flag(&sl0, buf, config.digests.sha512, "sha512");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
@@ -1467,10 +1471,10 @@ void util_status_info(int log_it)
     }
   }
 
-  if(config.sha1) {
-    strcpy(buf, "sha1 sums:");
+  if(config.digests.list) {
+    strcpy(buf, "digests:");
     slist_append_str(&sl0, buf);
-    for(sl = config.sha1; sl; sl = sl->next) {
+    for(sl = config.digests.list; sl; sl = sl->next) {
       sprintf(buf, "  %s %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }

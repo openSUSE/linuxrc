@@ -14,16 +14,35 @@
 #include "dialog.h"
 #include "util.h"
 #include "md5.h"
+#include "sha1.h"
+#include "sha256.h"
+#include "sha512.h"
 #include "keyboard.h"
 
-static void do_md5(char *file);
+#define MAX_DIGEST_SIZE SHA512_DIGEST_SIZE
+
+typedef enum {
+  digest_none, digest_md5, digest_sha1, digest_sha256, digest_sha512
+} digest_t;
+
+typedef union {
+  struct md5_ctx md5;
+  struct sha1_ctx sha1;
+  struct sha256_ctx sha256;
+  struct sha512_ctx sha512;
+} digest_ctx_t;
+
+
+static void do_digest(char *file);
 static void get_info(char *file);
 static void update_progress(unsigned size);
 
+static void digest_media_init(digest_ctx_t *ctx);
+static void digest_media_process(digest_ctx_t *ctx, unsigned char *buffer, unsigned len);
+static void digest_media_finish(digest_ctx_t *ctx, unsigned char *buffer);
+
+
 struct {
-  unsigned got_md5:1;		/* got md5sum */
-  unsigned got_old_md5:1;	/* got md5sum stored in iso */
-  unsigned md5_ok:1;		/* md5sums match */
   unsigned err:1;		/* some error */
   unsigned err_ofs;		/* read error pos */
   unsigned size;		/* in kb */
@@ -32,15 +51,26 @@ struct {
   char vol_id[33];		/* volume id */
   char app_id[81];		/* application id */
   char app_data[0x201];		/* app specific data*/
-  unsigned char old_md5[16];	/* md5sum stored in iso */
-  unsigned char md5[16];	/* md5sum */
-  unsigned char full_md5[16];	/* complete md5sum */
   unsigned pad;			/* pad size in kb */
+  struct {
+    digest_t type;				/* digest type */
+    char *name;					/* digest name */
+    int size;					/* digest size */
+    unsigned got_old:1;				/* got digest stored in iso */
+    unsigned got_current:1;			/* calculated current digest */
+    unsigned ok:1;				/* digest matches */
+    unsigned char old[MAX_DIGEST_SIZE];		/* digest stored in iso */
+    unsigned char current[MAX_DIGEST_SIZE];	/* digest of iso ex special area */
+    unsigned char full[MAX_DIGEST_SIZE];	/* full digest of iso */
+    digest_ctx_t ctx;
+    digest_ctx_t full_ctx;
+  } digest;
 } iso;
 
 window_t win;
 
-void md5_verify()
+
+void digest_media_verify()
 {
   int i;
   char buf[256], *device = NULL;
@@ -86,42 +116,42 @@ void md5_verify()
   );
 
   fprintf(stderr, "  ref: ");
-  if(iso.got_old_md5) for(i = 0; i < sizeof iso.old_md5; i++) fprintf(stderr, "%02x", iso.old_md5[i]);
+  if(iso.digest.got_old) for(i = 0; i < iso.digest.size; i++) fprintf(stderr, "%02x", iso.digest.old[i]);
   fprintf(stderr, "\n");
 
-  if(!*iso.app_id || !iso.got_old_md5 || iso.pad >= iso.size) {
+  if(!*iso.app_id || !iso.digest.got_old || iso.pad >= iso.size) {
     sprintf(buf, txt_get(TXT_WRONG_CD), config.product);
     dia_message(buf, MSGTYPE_ERROR);
     config.manual=1;
     return;
   }
 
-  do_md5(device);
+  do_digest(device);
 
   if(iso.err_ofs) {
     fprintf(stderr, "  err: sector %u\n", iso.err_ofs >> 1);
   }
 
   fprintf(stderr, "check: ");
-  if(iso.got_old_md5) {
-    if(iso.md5_ok) {
-      fprintf(stderr, "md5sum ok\n");
+  if(iso.digest.got_old) {
+    if(iso.digest.ok) {
+      fprintf(stderr, "%ssum ok\n", iso.digest.name);
     }
     else {
-      fprintf(stderr, "md5sum wrong\n");
+      fprintf(stderr, "%ssum wrong\n", iso.digest.name);
     }
   }
   else {
-    fprintf(stderr, "md5sum not checked\n");
+    fprintf(stderr, "%ssum not checked\n", iso.digest.name);
   }
 
-  if(iso.got_md5) {
-    fprintf(stderr, "  md5: ");
-    for(i = 0; i < sizeof iso.full_md5; i++) fprintf(stderr, "%02x", iso.full_md5[i]);
+  if(iso.digest.got_current) {
+    fprintf(stderr, "  %s: ", iso.digest.name);
+    for(i = 0; i < iso.digest.size; i++) fprintf(stderr, "%02x", iso.digest.full[i]);
     fprintf(stderr, "\n");
   }
 
-  if(iso.md5_ok) {
+  if(iso.digest.ok) {
     dia_message(txt_get(TXT_CD_CHECK_OK), MSGTYPE_INFO);
   }
   else if(iso.err) {
@@ -138,21 +168,19 @@ void md5_verify()
   else {
     dia_message(txt_get(TXT_CD_CHECK_CANCELED), MSGTYPE_INFO);
   }
-
 }
 
 
 /*
- * Calculate md5 sum.
+ * Calculate digest over iso.
  *
- * Normal md5sum, except that we assume
+ * Normal digest, except that we assume
  *   - 0x0000 - 0x01ff is filled with zeros (0)
  *   - 0x8373 - 0x8572 is filled with spaces (' ').
  */
-void do_md5(char *file)
+void do_digest(char *file)
 {
   unsigned char buffer[64 << 10]; /* at least 36k! */
-  struct md5_ctx ctx, full_ctx;
   int fd, err = 0;
   unsigned chunks = (iso.size - iso.pad) / (sizeof buffer >> 10);
   unsigned chunk, u;
@@ -165,13 +193,8 @@ void do_md5(char *file)
   sprintf(msg, "%s, %s%u", iso.app_id, iso.media_type, iso.media_nr ?: 1);
   dia_status_on(&win, msg);
 
-  md5_init_ctx(&ctx);
-  md5_init_ctx(&full_ctx);
-
-  /*
-   * Note: md5_process_block() below *requires* buffer sizes to be a
-   * multiple of 64. Otherwise use md5_process_bytes().
-   */
+  digest_media_init(&iso.digest.ctx);
+  digest_media_init(&iso.digest.full_ctx);
 
   for(chunk = 0; chunk < chunks; chunk++) {
     if((u = read(fd, buffer, sizeof buffer)) != sizeof buffer) {
@@ -181,14 +204,14 @@ void do_md5(char *file)
       break;
     };
 
-    md5_process_block(buffer, sizeof buffer, &full_ctx);
+    digest_media_process(&iso.digest.full_ctx, buffer, sizeof buffer);
 
     if(chunk == 0) {
       memset(buffer, 0, 0x200);
       memset(buffer + 0x8373, ' ', 0x200);
     }
 
-    md5_process_block(buffer, sizeof buffer, &ctx);
+    digest_media_process(&iso.digest.ctx, buffer, sizeof buffer);
 
     if(!(chunk % 16)) {
       update_progress((chunk + 1) * (sizeof buffer >> 10));
@@ -197,12 +220,12 @@ void do_md5(char *file)
 
       // once a second is enough
       if(t1 != t0 && kbd_getch_old(0) == KEY_ESC) {
-         md5_finish_ctx(&ctx, iso.md5);
-         md5_finish_ctx(&full_ctx, iso.full_md5);
+         digest_media_finish(&iso.digest.ctx, iso.digest.current);
+         digest_media_finish(&iso.digest.full_ctx, iso.digest.full);
          dia_status_off(&win);
-         iso.got_md5 = 0;
-         iso.got_old_md5 = 0;
-         iso.md5_ok = 0;
+         iso.digest.got_current = 0;
+         iso.digest.got_old = 0;
+         iso.digest.ok = 0;
          iso.err_ofs = 0;
          iso.err = 0;
          close(fd);
@@ -220,8 +243,8 @@ void do_md5(char *file)
       iso.err_ofs = (u >> 10) + chunk * (sizeof buffer >> 10);
     }
     else {
-      md5_process_block(buffer, last_size, &ctx);
-      md5_process_block(buffer, last_size, &full_ctx);
+      digest_media_process(&iso.digest.ctx, buffer, last_size);
+      digest_media_process(&iso.digest.full_ctx, buffer, last_size);
 
       update_progress(iso.size - iso.pad);
     }
@@ -230,24 +253,24 @@ void do_md5(char *file)
   if(!err) {
     memset(buffer, 0, 2 << 10);		/* 2k */
     for(u = 0; u < (iso.pad >> 1); u++) {
-      md5_process_block(buffer, 2 << 10, &ctx);
-      md5_process_block(buffer, 2 << 10, &full_ctx);
+      digest_media_process(&iso.digest.ctx, buffer, 2 << 10);
+      digest_media_process(&iso.digest.full_ctx, buffer, 2 << 10);
 
       update_progress(iso.size - iso.pad + ((u + 1) << 1));
     }
   }
 
-  md5_finish_ctx(&ctx, iso.md5);
-  md5_finish_ctx(&full_ctx, iso.full_md5);
+  digest_media_finish(&iso.digest.ctx, iso.digest.current);
+  digest_media_finish(&iso.digest.full_ctx, iso.digest.full);
 
   dia_status_off(&win);
 
   if(err) iso.err = 1;
 
-  iso.got_md5 = 1;
+  iso.digest.got_current = 1;
 
-  if(iso.got_old_md5 && !memcmp(iso.md5, iso.old_md5, sizeof iso.md5)) {
-    iso.md5_ok = 1;
+  if(iso.digest.got_old && !memcmp(iso.digest.current, iso.digest.old, iso.digest.size)) {
+    iso.digest.ok = 1;
   }
   else {
     iso.err = 1;
@@ -336,16 +359,40 @@ void get_info(char *file)
 
   if((s = strstr(iso.app_data, "md5sum="))) {
     s += sizeof "md5sum=" - 1;
-    if(strlen(s) >= 32) {
-      for(u = 0 ; u < sizeof iso.old_md5; u++, s += 2) {
+    iso.digest.type = digest_md5;
+    iso.digest.size = MD5_DIGEST_SIZE;
+    iso.digest.name = "md5";
+  }
+  else if((s = strstr(iso.app_data, "sha1sum="))) {
+    s += sizeof "sha1sum=" - 1;
+    iso.digest.type = digest_sha1;
+    iso.digest.size = SHA1_DIGEST_SIZE;
+    iso.digest.name = "sha1";
+  }
+  else if((s = strstr(iso.app_data, "sha256sum="))) {
+    s += sizeof "sha256sum=" - 1;
+    iso.digest.type = digest_sha256;
+    iso.digest.size = SHA256_DIGEST_SIZE;
+    iso.digest.name = "sha256";
+  }
+  else if((s = strstr(iso.app_data, "sha512sum="))) {
+    s += sizeof "sha512sum=" - 1;
+    iso.digest.type = digest_sha512;
+    iso.digest.size = SHA512_DIGEST_SIZE;
+    iso.digest.name = "sha512";
+  }
+
+  if(iso.digest.type) {
+    if(strlen(s) >= iso.digest.size) {
+      for(u = 0 ; u < iso.digest.size; u++, s += 2) {
          if(sscanf(s, "%2x", &u1) == 1) {
-           iso.old_md5[u] = u1;
+           iso.digest.old[u] = u1;
          }
          else {
            break;
          }
       }
-      if(u == sizeof iso.old_md5) iso.got_old_md5 = 1;
+      if(u == iso.digest.size) iso.digest.got_old = 1;
     }
   }
 
@@ -353,7 +400,6 @@ void get_info(char *file)
     s += sizeof "pad=" - 1;
     if(isdigit(*s)) iso.pad = strtoul(s, NULL, 0) << 1;
   }
-
 }
 
 
@@ -367,6 +413,73 @@ void update_progress(unsigned size)
   percent = (size * 100) / (iso.size ?: 1);
   if(percent != last_percent) {
     dia_status(&win, last_percent = percent);
+  }
+}
+
+
+void digest_media_init(digest_ctx_t *ctx)
+{
+  switch(iso.digest.type) {
+    case digest_md5:
+      md5_init_ctx(&ctx->md5);
+      break;
+    case digest_sha1:
+      sha1_init_ctx(&ctx->sha1);
+      break;
+    case digest_sha256:
+      sha256_init_ctx(&ctx->sha256);
+      break;
+    case digest_sha512:
+      sha512_init_ctx(&ctx->sha512);
+      break;
+    default:
+      break;
+  }
+}
+
+
+/*
+ * Note: digest_media_process() *requires* buffer sizes to be a
+ * multiple of 128. Otherwise use XXX_process_bytes().
+ */
+void digest_media_process(digest_ctx_t *ctx, unsigned char *buffer, unsigned len)
+{
+  switch(iso.digest.type) {
+    case digest_md5:
+      md5_process_block(buffer, len, &ctx->md5);
+      break;
+    case digest_sha1:
+      sha1_process_block(buffer, len, &ctx->sha1);
+      break;
+    case digest_sha256:
+      sha256_process_block(buffer, len, &ctx->sha256);
+      break;
+    case digest_sha512:
+      sha512_process_block(buffer, len, &ctx->sha512);
+      break;
+    default:
+      break;
+  }
+}
+
+
+void digest_media_finish(digest_ctx_t *ctx, unsigned char *buffer)
+{
+  switch(iso.digest.type) {
+    case digest_md5:
+      md5_finish_ctx(&ctx->md5, buffer);
+      break;
+    case digest_sha1:
+      sha1_finish_ctx(&ctx->sha1, buffer);
+      break;
+    case digest_sha256:
+      sha256_finish_ctx(&ctx->sha256, buffer);
+      break;
+    case digest_sha512:
+      sha512_finish_ctx(&ctx->sha512, buffer);
+      break;
+    default:
+      break;
   }
 }
 

@@ -76,7 +76,7 @@ int auto2_init()
 
   if(config.mediacheck) {
     if(!config.win) util_disp_init();
-    md5_verify();  
+    digest_media_verify();  
   }
 
   if(config.win && !win_old) util_disp_done();
@@ -322,7 +322,7 @@ void auto2_scan_hardware()
         net_activate_s390_devs();
     }
 #endif
-    err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NOSHA1);
+    err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
     if(!err) {
@@ -356,14 +356,14 @@ void auto2_scan_hardware()
 
         err = url_read_file_anywhere(
           url, NULL, NULL, file_name, NULL,
-          URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+          URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         );
 
         if(err && !config.sig_failed) {
           str_copy(&url->path, path2);
           err = url_read_file_anywhere(
             url, NULL, NULL, file_name, NULL,
-            URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+            URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
           );
         }
         fprintf(stderr, "err2 = %d\n", err);
@@ -474,7 +474,7 @@ int auto2_find_repo()
   int err;
 
   config.sig_failed = 0;
-  config.sha1_failed = 0;
+  config.digests.failed = 0;
 
   if(!config.url.install || !config.url.install->scheme) return 0;
 
@@ -524,7 +524,7 @@ int auto2_find_repo()
   if(!err) auto2_read_repo_files(config.url.install);
 
 #if 0
-  if(err && (config.sig_failed || config.sha1_failed)) {
+  if(err && (config.sig_failed || config.digests.failed)) {
     url_umount(config.url.instsys);
     url_umount(config.url.install);
   }
@@ -898,13 +898,13 @@ void auto2_read_repo_files(url_t *url)
   // url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
 
   if((f0 = file_read_file(file_list, kf_none))) {
-    for(f = f0; f && !config.sha1_failed; f = f->next) {
+    for(f = f0; f && !config.digests.failed; f = f->next) {
       strprintf(&dst, "/%s/%s", f->value, *f->key_str == '/' ? f->key_str + 1 : f->key_str);
       url_read_file(url, NULL, f->key_str, dst, NULL, 0 /* + URL_FLAG_PROGRESS */);
     }
   }
   else {
-    for(i = 0; i < sizeof default_list / sizeof *default_list && !config.sha1_failed; i++) {
+    for(i = 0; i < sizeof default_list / sizeof *default_list && !config.digests.failed; i++) {
       url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, 0 /* + URL_FLAG_PROGRESS */);
     }
   }
@@ -994,7 +994,7 @@ void auto2_kexec(url_t *url)
   }
 
 #if 0
-  if(!err && config.secure && (config.sig_failed || config.sha1_failed)) {
+  if(!err && config.secure && (config.sig_failed || config.digests.failed)) {
     if(!(win = config.win)) util_disp_init();
     i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
     if(!win) util_disp_done();
@@ -1063,7 +1063,7 @@ void auto2_driverupdate(url_t *url)
     "driverupdate",
     file_name = strdup(new_download()),
     txt_get(TXT_LOADING_UPDATE),
-    URL_FLAG_UNZIP + URL_FLAG_NOSHA1 + URL_FLAG_KEEP_MOUNTED + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+    URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_KEEP_MOUNTED + (config.secure ? URL_FLAG_CHECK_SIG : 0)
   );
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update, NULL);

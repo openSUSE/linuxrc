@@ -670,7 +670,7 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_expert_verify:
-      md5_verify();
+      digest_media_verify();
       break;
 
     case di_expert_eject:

@@ -65,6 +65,10 @@ static slist_t *url_config_get_file_list(char *entry);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
 static char *url_print_zypp(url_t *url);
+static void digest_init(url_data_t *url_data);
+static void digest_process(url_data_t *url_data, void *buffer, size_t len);
+static void digest_finish(url_data_t *url_data);
+static int digest_verify(url_data_t *url_data, char *file_name);
 
 
 void url_read(url_data_t *url_data)
@@ -74,9 +78,8 @@ void url_read(url_data_t *url_data)
   FILE *f;
   char *buf, *s, *proxy_url = NULL;
   sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);
-  unsigned char sha1[20];
 
-  sha1_init_ctx(&url_data->sha1_ctx);
+  digest_init(url_data);
 
   c_handle = curl_easy_init();
   // fprintf(stderr, "curl handle = %p\n", c_handle);
@@ -184,14 +187,7 @@ void url_read(url_data_t *url_data)
 
   signal(SIGPIPE, old_sigpipe);
 
-  if(!url_data->err) {
-    memset(sha1, 0, 16);
-    sha1_finish_ctx(&url_data->sha1_ctx, sha1);
-    url_data->sha1 = calloc(2 * sizeof sha1 + 1, 1);
-    for(i = 0; i < sizeof sha1; i++) {
-      sprintf(url_data->sha1 + 2 * i, "%02x", sha1[i]);
-    }
-  }
+  if(!url_data->err) digest_finish(url_data);
 }
 
 
@@ -212,7 +208,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 
   z1 = size * nmemb;
 
-  if(z1) sha1_process_bytes(buffer, z1, &url_data->sha1_ctx);
+  digest_process(url_data, buffer, z1);
 
   if(url_data->buf.len < url_data->buf.max && z1) {
     z2 = url_data->buf.max - url_data->buf.len;
@@ -928,7 +924,6 @@ void url_data_free(url_data_t *url_data)
   free(url_data->tmp_file);
   free(url_data->buf.data);
   free(url_data->label);
-  free(url_data->sha1);
 
   free(url_data);
 }
@@ -1274,7 +1269,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             path,
             s = strdup(new_download()),
             NULL,
-            URL_FLAG_PROGRESS + URL_FLAG_UNZIP + URL_FLAG_NOSHA1
+            URL_FLAG_PROGRESS + URL_FLAG_UNZIP + URL_FLAG_NODIGEST
           ) ? 0 : 1;
 
           if(ok) ok = util_mount_ro(s, url->mount, url->file_list) ? 0 : 1;
@@ -1425,7 +1420,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     if((ok = url_mount_disk(url, dir, test_func))) {
       found++;
       if(hd_is_hw_class(hd, hw_cdrom)) url->is.cdrom = 1;
-      if(ok == 1 || config.sig_failed || config.sha1_failed) break;
+      if(ok == 1 || config.sig_failed || config.digests.failed) break;
     }
     else {
       err = 1;
@@ -1483,7 +1478,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     return err;
   }
 
-  flags |= URL_FLAG_NOSHA1;
+  flags |= URL_FLAG_NODIGEST;
 
   err = url_read_file_nosig(url, dir, src, dst, label, flags);
   str_copy(&url->path, old_path);
@@ -1588,10 +1583,9 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
 
   int test_and_copy(url_t *url)
   {
-    int ok = 0, new_url = 0, i, j, k, win;
+    int ok = 0, new_url = 0, i, win;
     char *old_path, *buf = NULL;
     url_data_t *url_data;
-    slist_t *sl;
 
     if(!url) return 0;
 
@@ -1647,24 +1641,21 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
     else {
       ok = 1;
       if(config.secure) {
-        fprintf(stderr, "sha1 %s\n", url_data->sha1);
-        if((flags & URL_FLAG_NOSHA1)) {
-          fprintf(stderr, "sha1 not checked\n");
+        if(config.digests.md5) fprintf(stderr, "md5    %.32s\n", url_data->digest.md5);
+        if(config.digests.sha1) fprintf(stderr, "sha1   %.32s...\n", url_data->digest.sha1);
+        if(config.digests.sha256) fprintf(stderr, "sha256 %.32s...\n", url_data->digest.sha256);
+        if(config.digests.sha512) fprintf(stderr, "sha512 %.32s...\n", url_data->digest.sha512);
+
+        if((flags & URL_FLAG_NODIGEST)) {
+          fprintf(stderr, "digest not checked\n");
         }
         else {
-          k = 0;
-          sl = slist_getentry(config.sha1, url_data->sha1);
-          if(sl && url_data->url->path) {
-            i = strlen(sl->value);
-            j = strlen(url_data->url->path);
-            if(i <= j && !strcmp(url_data->url->path + j - i, sl->value)) k = 1;
-          }
-          if(sl) {	/* if(k) to verify filenames as well */
-            fprintf(stderr, "sha1 ok\n");
+          if(digest_verify(url_data, url_data->url->path)) {
+            fprintf(stderr, "digest ok\n");
           }
           else {
-            fprintf(stderr, "sha1 check failed\n");
-            config.sha1_failed = 1;
+            fprintf(stderr, "digest check failed\n");
+            config.digests.failed = 1;
             strprintf(&buf,
               "%s: %s\n\n%s",
               url_print2(url_data->url, NULL),
@@ -1676,7 +1667,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
             if(!win) util_disp_done();
             if(i == YES) {
               config.secure = 0;
-              config.sha1_failed = 0;
+              config.digests.failed = 0;
             }
             else {
               ok = 0;
@@ -1821,7 +1812,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
           found++;
           break;
         }
-        if(config.sig_failed || config.sha1_failed) break;
+        if(config.sig_failed || config.digests.failed) break;
       }
 
       if(!found) {
@@ -1878,15 +1869,15 @@ int url_find_repo(url_t *url, char *dir)
     ) return 0;
 
     if(!config.keepinstsysconfig) {
-      config.sha1 = slist_free(config.sha1);
-      config.sha1_failed = 0;
+      config.digests.list = slist_free(config.digests.list);
+      config.digests.failed = 0;
 
       strprintf(&buf, "/%s", config.zen ? config.zenconfig : "content");
       strprintf(&buf2, "file:%s", buf);
 
       if(
         url_read_file(url, NULL, buf, buf, NULL,
-          URL_FLAG_NOSHA1 + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+          URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         )
       ) return 0;
 
@@ -1920,7 +1911,7 @@ int url_find_repo(url_t *url, char *dir)
         )) {
           free(file_name);
           file_name = NULL;
-          if(config.sha1_failed) return 1;
+          if(config.digests.failed) return 1;
         }
       }
 
@@ -2687,5 +2678,103 @@ int link_detected(hd_t *hd)
   }
 
   return 0;
+}
+
+
+void digest_init(url_data_t *url_data)
+{
+  if(config.digests.md5) md5_init_ctx(&url_data->digest.ctx.md5);
+  if(config.digests.sha1) sha1_init_ctx(&url_data->digest.ctx.sha1);
+  if(config.digests.sha256) sha256_init_ctx(&url_data->digest.ctx.sha256);
+  if(config.digests.sha512) sha512_init_ctx(&url_data->digest.ctx.sha512);
+}
+
+
+void digest_process(url_data_t *url_data, void *buffer, size_t len)
+{
+  if(len) {
+    if(config.digests.md5) md5_process_bytes(buffer, len, &url_data->digest.ctx.md5);
+    if(config.digests.sha1) sha1_process_bytes(buffer, len, &url_data->digest.ctx.sha1);
+    if(config.digests.sha256) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha256);
+    if(config.digests.sha512) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha512);
+  }
+}
+
+
+void digest_finish(url_data_t *url_data)
+{
+  int i;
+  unsigned char buf[MAX_DIGEST_SIZE];
+
+  if(config.digests.md5) {
+    md5_finish_ctx(&url_data->digest.ctx.md5, buf);
+    for(i = 0; i < MD5_DIGEST_SIZE; i++) {
+      sprintf(url_data->digest.md5 + 2 * i, "%02x", buf[i]);
+    }
+  }
+
+  if(config.digests.sha1) {
+    sha1_finish_ctx(&url_data->digest.ctx.sha1, buf);
+    for(i = 0; i < SHA1_DIGEST_SIZE; i++) {
+      sprintf(url_data->digest.sha1 + 2 * i, "%02x", buf[i]);
+    }
+  }
+
+  if(config.digests.sha256) {
+    sha256_finish_ctx(&url_data->digest.ctx.sha256, buf);
+    for(i = 0; i < SHA256_DIGEST_SIZE; i++) {
+      sprintf(url_data->digest.sha256 + 2 * i, "%02x", buf[i]);
+    }
+  }
+
+  if(config.digests.sha512) {
+    sha512_finish_ctx(&url_data->digest.ctx.sha512, buf);
+    for(i = 0; i < SHA512_DIGEST_SIZE; i++) {
+      sprintf(url_data->digest.sha512 + 2 * i, "%02x", buf[i]);
+    }
+  }
+}
+
+
+int digest_verify(url_data_t *url_data, char *file_name)
+{
+  slist_t *sl, *sl0;
+  int len, file_name_len, ok = 0;
+
+  file_name_len = file_name ? strlen(file_name) : 0;
+
+  for(sl = config.digests.list; sl; sl = sl->next) {
+    // first check file name
+    if(file_name_len) {
+      len = strlen(sl->value);
+      if(len > file_name_len || strcmp(file_name + file_name_len - len, sl->value)) continue;
+    }
+
+    // compare digest
+    sl0 = slist_split(' ', sl->key);
+    if(sl0->next) {
+      if(config.digests.md5 &&
+        !strcasecmp(sl0->key, "md5") &&
+        !strcasecmp(sl0->next->key, url_data->digest.md5)
+      ) ok = 1;
+      if(config.digests.sha1 &&
+        !strcasecmp(sl0->key, "sha1") &&
+        !strcasecmp(sl0->next->key, url_data->digest.sha1)
+      ) ok = 1;
+      if(config.digests.sha256 &&
+        !strcasecmp(sl0->key, "sha256") &&
+        !strcasecmp(sl0->next->key, url_data->digest.sha256)
+      ) ok = 1;
+      if(config.digests.sha512 &&
+        !strcasecmp(sl0->key, "sha512") &&
+        !strcasecmp(sl0->next->key, url_data->digest.sha512)
+      ) ok = 1;
+    }
+    slist_free(sl0);
+
+    if(ok) break;
+  }
+
+  return ok;
 }
 

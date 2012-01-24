@@ -337,8 +337,7 @@ typedef struct {
   char *zenconfig;		/* zenworks config file */
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
-  unsigned secure:1;		/* secure mode (check sha1 of all downloaded files) */
-  unsigned sha1_failed:1;	/* sha1 check failed */
+  unsigned secure:1;		/* secure mode (check digest of all downloaded files) */
   unsigned sig_failed:2;	/* signature check failed (1: not signed, 2: wrong signature) */
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */
   unsigned kexec_reboot:1;	/* kexec to installed system (just passed to yast) */
@@ -411,7 +410,6 @@ typedef struct {
   unsigned swap_file_size;	/* swap file size in MB */
   window_t progress_win;	/* download status window */
   hd_data_t *hd_data;		/* device list */
-  slist_t *sha1;		/* sha1sum list */
   char *kexec_kernel;		/* kernel image for kexec */
   char *kexec_initrd;		/* initrd image for kexec */
   char *device;			/* local device to use */
@@ -422,6 +420,15 @@ typedef struct {
   slist_t *udevrules;		/* udev rules */
   char *namescheme;		/* device name scheme (e.g.: by-id, by-label, by-path) */
   slist_t *ptoptions;		/* pass-through options: options that just need to be added /etc/install.inf */
+
+  struct {
+    unsigned md5:1;		/* support md5 */
+    unsigned sha1:1;		/* support sha1 */
+    unsigned sha256:1;		/* support sha256 */
+    unsigned sha512:1;		/* support sha512 */
+    unsigned failed:1;		/* digest check failed */
+    slist_t *list;		/* list of file digests */
+  } digests;
 
   struct {
     char *instsys_default;	/* default instsys url */

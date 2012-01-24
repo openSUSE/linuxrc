@@ -1,4 +1,9 @@
+#include "md5.h"
 #include "sha1.h"
+#include "sha256.h"
+#include "sha512.h"
+
+#define MAX_DIGEST_SIZE SHA512_DIGEST_SIZE
 
 typedef struct url_data_s {
   url_t *url;
@@ -29,13 +34,23 @@ typedef struct url_data_s {
     unsigned char *data;
   } buf;
   int (*progress)(struct url_data_s *, int);
-  struct sha1_ctx sha1_ctx;
-  char *sha1;
+  struct {
+    struct {
+      struct md5_ctx md5;
+      struct sha1_ctx sha1;
+      struct sha256_ctx sha256;
+      struct sha512_ctx sha512;
+    } ctx;
+    char md5[MD5_DIGEST_SIZE * 2 + 1];
+    char sha1[SHA1_DIGEST_SIZE * 2 + 1];
+    char sha256[SHA256_DIGEST_SIZE * 2 + 1];
+    char sha512[SHA512_DIGEST_SIZE * 2 + 1];
+  } digest;
 } url_data_t;
 
 #define URL_FLAG_UNZIP		(1 << 0)
 #define URL_FLAG_PROGRESS	(1 << 1)
-#define URL_FLAG_NOSHA1		(1 << 2)
+#define URL_FLAG_NODIGEST	(1 << 2)
 #define URL_FLAG_NOUNLINK	(1 << 3)
 #define URL_FLAG_KEEP_MOUNTED	(1 << 4)
 #define URL_FLAG_OPTIONAL	(1 << 5)

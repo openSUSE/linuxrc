@@ -324,7 +324,7 @@ void lxrc_change_root()
   slist_t *sl;
   char *argv[3] = { };
   char *dirs[] = {
-    "bin", "boot", "etc", "home", "lib", "lib/firmware",
+    "bin", "boot", "etc", "home", "lib",
     "media", "mounts", "mounts/initrd", "mnt", "proc", "sbin",
     "sys", "tmp", "usr", "usr/lib", "usr/lib/microcode", "var",
     NULL

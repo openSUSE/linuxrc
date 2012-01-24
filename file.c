@@ -275,7 +275,7 @@ static struct {
   { key_bootif,         "BOOTIF",         kf_cmd                         },
   { key_swap_size,      "SwapSize",       kf_cfg + kf_cmd                },
   { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
-  { key_sha1,           "HASH",           kf_cfg + kf_cont               },
+  { key_hash,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
   { key_kexec_reboot,   "kexec_reboot",   kf_cfg + kf_cmd                },
@@ -306,6 +306,7 @@ static struct {
   { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
+  { key_digests,        "Digests",        kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1464,12 +1465,15 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.ntfs_3g = f->nvalue;
         break;
 
-      case key_sha1:
+      case key_hash:
         if(*f->value) {
           sl0 = slist_split(' ', f->value);
-          if(sl0->key && sl0->next && sl0->next->next && !strcasecmp(sl0->key, "sha1")) {
-            sl = slist_append_str(&config.sha1, sl0->next->key);
+          if(sl0->key && sl0->next && sl0->next->next) {
+            sl = slist_append_str(&config.digests.list, sl0->key);
+            strprintf(&sl->key, "%s %s", sl->key, sl0->next->key);
             sl->value = strdup(sl0->next->next->key);
+            // key = 'SHAXXX <shaxxx_sum>'
+            // value = '<file name>'
           }
           slist_free(sl0);
         }
@@ -1478,7 +1482,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_insecure:
         if(f->is.numeric && f->nvalue) {
           config.secure = 0;
-          config.sha1_failed = config.sig_failed = 0;
+          config.digests.failed = config.sig_failed = 0;
         }
         break;
 
@@ -1622,6 +1626,21 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_ptoptions:
         slist_assign_values(&config.ptoptions, f->value);
+        break;
+
+      case key_digests:
+        config.digests.md5 =
+        config.digests.sha1 =
+        config.digests.sha256 =
+        config.digests.sha512 = 0;
+        sl0 = slist_split(',', f->value);
+        for(sl = sl0; sl; sl = sl->next) {
+          if(!strcasecmp(sl->key, "md5")) config.digests.md5 = 1;
+          if(!strcasecmp(sl->key, "sha1")) config.digests.sha1 = 1;
+          if(!strcasecmp(sl->key, "sha256")) config.digests.sha256 = 1;
+          if(!strcasecmp(sl->key, "sha512")) config.digests.sha512 = 1;
+        }
+        slist_free(sl0);
         break;
 
       default:
