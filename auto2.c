@@ -34,7 +34,7 @@
 #include "auto2.h"
 #include "settings.h"
 #include "url.h"
-#include "checkmd5.h"
+#include "checkmedia.h"
 
 static int driver_is_active(hd_t *hd);
 static void auto2_progress(char *pos, char *msg);

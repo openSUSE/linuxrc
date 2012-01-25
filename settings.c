@@ -18,7 +18,7 @@
 #include "util.h"
 #include "info.h"
 #include "module.h"
-#include "checkmd5.h"
+#include "checkmedia.h"
 #include "display.h"
 #include "keyboard.h"
 #include "dialog.h"
