@@ -1643,7 +1643,9 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
       if(config.secure) {
         if(config.digests.md5) fprintf(stderr, "md5    %.32s\n", url_data->digest.md5);
         if(config.digests.sha1) fprintf(stderr, "sha1   %.32s...\n", url_data->digest.sha1);
+        if(config.digests.sha224) fprintf(stderr, "sha224 %.32s...\n", url_data->digest.sha224);
         if(config.digests.sha256) fprintf(stderr, "sha256 %.32s...\n", url_data->digest.sha256);
+        if(config.digests.sha384) fprintf(stderr, "sha384 %.32s...\n", url_data->digest.sha384 );
         if(config.digests.sha512) fprintf(stderr, "sha512 %.32s...\n", url_data->digest.sha512);
 
         if((flags & URL_FLAG_NODIGEST)) {
@@ -2685,7 +2687,9 @@ void digest_init(url_data_t *url_data)
 {
   if(config.digests.md5) md5_init_ctx(&url_data->digest.ctx.md5);
   if(config.digests.sha1) sha1_init_ctx(&url_data->digest.ctx.sha1);
+  if(config.digests.sha224) sha224_init_ctx(&url_data->digest.ctx.sha224);
   if(config.digests.sha256) sha256_init_ctx(&url_data->digest.ctx.sha256);
+  if(config.digests.sha384) sha384_init_ctx(&url_data->digest.ctx.sha384);
   if(config.digests.sha512) sha512_init_ctx(&url_data->digest.ctx.sha512);
 }
 
@@ -2695,7 +2699,9 @@ void digest_process(url_data_t *url_data, void *buffer, size_t len)
   if(len) {
     if(config.digests.md5) md5_process_bytes(buffer, len, &url_data->digest.ctx.md5);
     if(config.digests.sha1) sha1_process_bytes(buffer, len, &url_data->digest.ctx.sha1);
+    if(config.digests.sha224) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha224);
     if(config.digests.sha256) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha256);
+    if(config.digests.sha384) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha384);
     if(config.digests.sha512) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha512);
   }
 }
@@ -2720,10 +2726,24 @@ void digest_finish(url_data_t *url_data)
     }
   }
 
+  if(config.digests.sha224) {
+    sha224_finish_ctx(&url_data->digest.ctx.sha224, buf);
+    for(i = 0; i < SHA224_DIGEST_SIZE; i++) {
+      sprintf(url_data->digest.sha224 + 2 * i, "%02x", buf[i]);
+    }
+  }
+
   if(config.digests.sha256) {
     sha256_finish_ctx(&url_data->digest.ctx.sha256, buf);
     for(i = 0; i < SHA256_DIGEST_SIZE; i++) {
       sprintf(url_data->digest.sha256 + 2 * i, "%02x", buf[i]);
+    }
+  }
+
+  if(config.digests.sha384) {
+    sha384_finish_ctx(&url_data->digest.ctx.sha384, buf);
+    for(i = 0; i < SHA384_DIGEST_SIZE; i++) {
+      sprintf(url_data->digest.sha384 + 2 * i, "%02x", buf[i]);
     }
   }
 
@@ -2761,9 +2781,17 @@ int digest_verify(url_data_t *url_data, char *file_name)
         !strcasecmp(sl0->key, "sha1") &&
         !strcasecmp(sl0->next->key, url_data->digest.sha1)
       ) ok = 1;
+      if(config.digests.sha224 &&
+        !strcasecmp(sl0->key, "sha224") &&
+        !strcasecmp(sl0->next->key, url_data->digest.sha224)
+      ) ok = 1;
       if(config.digests.sha256 &&
         !strcasecmp(sl0->key, "sha256") &&
         !strcasecmp(sl0->next->key, url_data->digest.sha256)
+      ) ok = 1;
+      if(config.digests.sha384 &&
+        !strcasecmp(sl0->key, "sha384") &&
+        !strcasecmp(sl0->next->key, url_data->digest.sha384)
       ) ok = 1;
       if(config.digests.sha512 &&
         !strcasecmp(sl0->key, "sha512") &&

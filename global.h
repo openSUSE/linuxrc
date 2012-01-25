@@ -424,7 +424,9 @@ typedef struct {
   struct {
     unsigned md5:1;		/* support md5 */
     unsigned sha1:1;		/* support sha1 */
+    unsigned sha224:1;		/* support sha224 */
     unsigned sha256:1;		/* support sha256 */
+    unsigned sha384:1;		/* support sha384 */
     unsigned sha512:1;		/* support sha512 */
     unsigned failed:1;		/* digest check failed */
     slist_t *list;		/* list of file digests */

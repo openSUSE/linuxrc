@@ -38,12 +38,16 @@ typedef struct url_data_s {
     struct {
       struct md5_ctx md5;
       struct sha1_ctx sha1;
+      struct sha256_ctx sha224;
       struct sha256_ctx sha256;
+      struct sha512_ctx sha384;
       struct sha512_ctx sha512;
     } ctx;
     char md5[MD5_DIGEST_SIZE * 2 + 1];
     char sha1[SHA1_DIGEST_SIZE * 2 + 1];
+    char sha224[SHA224_DIGEST_SIZE * 2 + 1];
     char sha256[SHA256_DIGEST_SIZE * 2 + 1];
+    char sha384[SHA384_DIGEST_SIZE * 2 + 1];
     char sha512[SHA512_DIGEST_SIZE * 2 + 1];
   } digest;
 } url_data_t;
