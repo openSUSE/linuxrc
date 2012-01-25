@@ -22,13 +22,15 @@
 #define MAX_DIGEST_SIZE SHA512_DIGEST_SIZE
 
 typedef enum {
-  digest_none, digest_md5, digest_sha1, digest_sha256, digest_sha512
+  digest_none, digest_md5, digest_sha1, digest_sha224, digest_sha256, digest_sha384, digest_sha512
 } digest_t;
 
 typedef union {
   struct md5_ctx md5;
   struct sha1_ctx sha1;
+  struct sha256_ctx sha224;
   struct sha256_ctx sha256;
+  struct sha512_ctx sha384;
   struct sha512_ctx sha512;
 } digest_ctx_t;
 
@@ -369,11 +371,23 @@ void get_info(char *file)
     iso.digest.size = SHA1_DIGEST_SIZE;
     iso.digest.name = "sha1";
   }
+  else if((s = strstr(iso.app_data, "sha224sum="))) {
+    s += sizeof "sha224sum=" - 1;
+    iso.digest.type = digest_sha224;
+    iso.digest.size = SHA224_DIGEST_SIZE;
+    iso.digest.name = "sha224";
+  }
   else if((s = strstr(iso.app_data, "sha256sum="))) {
     s += sizeof "sha256sum=" - 1;
     iso.digest.type = digest_sha256;
     iso.digest.size = SHA256_DIGEST_SIZE;
     iso.digest.name = "sha256";
+  }
+  else if((s = strstr(iso.app_data, "sha384sum="))) {
+    s += sizeof "sha384sum=" - 1;
+    iso.digest.type = digest_sha384;
+    iso.digest.size = SHA384_DIGEST_SIZE;
+    iso.digest.name = "sha384";
   }
   else if((s = strstr(iso.app_data, "sha512sum="))) {
     s += sizeof "sha512sum=" - 1;
@@ -426,8 +440,14 @@ void digest_media_init(digest_ctx_t *ctx)
     case digest_sha1:
       sha1_init_ctx(&ctx->sha1);
       break;
+    case digest_sha224:
+      sha224_init_ctx(&ctx->sha224);
+      break;
     case digest_sha256:
       sha256_init_ctx(&ctx->sha256);
+      break;
+    case digest_sha384:
+      sha384_init_ctx(&ctx->sha384);
       break;
     case digest_sha512:
       sha512_init_ctx(&ctx->sha512);
@@ -451,8 +471,14 @@ void digest_media_process(digest_ctx_t *ctx, unsigned char *buffer, unsigned len
     case digest_sha1:
       sha1_process_block(buffer, len, &ctx->sha1);
       break;
+    case digest_sha224:
+      sha256_process_block(buffer, len, &ctx->sha224);
+      break;
     case digest_sha256:
       sha256_process_block(buffer, len, &ctx->sha256);
+      break;
+    case digest_sha384:
+      sha512_process_block(buffer, len, &ctx->sha384);
       break;
     case digest_sha512:
       sha512_process_block(buffer, len, &ctx->sha512);
@@ -472,8 +498,14 @@ void digest_media_finish(digest_ctx_t *ctx, unsigned char *buffer)
     case digest_sha1:
       sha1_finish_ctx(&ctx->sha1, buffer);
       break;
+    case digest_sha224:
+      sha224_finish_ctx(&ctx->sha224, buffer);
+      break;
     case digest_sha256:
       sha256_finish_ctx(&ctx->sha256, buffer);
+      break;
+    case digest_sha384:
+      sha384_finish_ctx(&ctx->sha384, buffer);
       break;
     case digest_sha512:
       sha512_finish_ctx(&ctx->sha512, buffer);
