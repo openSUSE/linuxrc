@@ -1392,7 +1392,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
           hd_is_hw_class(hd, hw_cdrom)
         )
       ) ||
-      (hd_is_hw_class(hd, hw_block) && hd->child_ids) ||	/* skip whole block device if there are partitions */
+      (hd_is_hw_class(hd, hw_block) && hd->child_ids && hd->child_ids->next) ||	/* skip whole block device if it has > 1 partition */
       !hd->unix_dev_name
     ) continue;
 
