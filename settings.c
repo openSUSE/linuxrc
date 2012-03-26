@@ -626,7 +626,6 @@ void set_expert_menu()
   time_t t;
   struct tm *gm;
 
-  dia_item_t di;
   dia_item_t items[] = {
     di_expert_info,
     di_expert_modules,
@@ -642,7 +641,7 @@ void set_expert_menu()
   gm = gmtime(&t);
   sprintf(tmp, "%s -- Time: %02d:%02d", txt_get(TXT_EXPERT), gm->tm_hour, gm->tm_min);
 
-  di = dia_menu2(tmp, 42, set_expert_cb, items, di_set_expert_last);
+  dia_menu2(tmp, 42, set_expert_cb, items, di_set_expert_last);
 }
 
 

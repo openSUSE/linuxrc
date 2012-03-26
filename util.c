@@ -3127,7 +3127,6 @@ int util_wget_main(int argc, char **argv)
   url_t *url;
   unsigned flags = URL_FLAG_PROGRESS + URL_FLAG_NOUNLINK;
   char *label = NULL;
-  int err;
 
   config.test = 1;
 
@@ -3150,7 +3149,7 @@ int util_wget_main(int argc, char **argv)
 
   url = url_set(argv[0]);
 
-  err = url_read_file(url, NULL, NULL, argv[1], label, flags);
+  url_read_file(url, NULL, NULL, argv[1], label, flags);
 
   url_umount(url);
   url_free(url);

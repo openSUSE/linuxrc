@@ -946,7 +946,6 @@ void dia_status_off (window_t *win_prv)
 int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
 {
     window_t  win_ri;
-    int       width_ii;
     window_t  tmp_win_ri;
     int       rc_ii;
 
@@ -1023,7 +1022,7 @@ ctrlc:
       memset (&win_ri, 0, sizeof (window_t));
       win_ri.bg_color = colors_prg->input_win;
       win_ri.fg_color = colors_prg->msg_fg;
-      width_ii = dia_win_open (&win_ri, txt_tv);
+      dia_win_open (&win_ri, txt_tv);
 
       memset (&tmp_win_ri, 0, sizeof (window_t));
       tmp_win_ri.x_left = win_ri.x_left + 1;

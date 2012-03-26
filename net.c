@@ -1789,7 +1789,7 @@ int net_input_data()
 int net_bootp()
 {
   window_t  win;
-  int rc, netconf_error;
+  int rc;
   char *s;
   char tmp[256];
 
@@ -1802,7 +1802,6 @@ int net_bootp()
   s_addr2inet(&config.net.broadcast, 0xffffffff);
   name2inet(&config.net.ptphost, "");
   name2inet(&config.net.hostname, "");
-  netconf_error	= 0;
 
   if(net_activate_ns()) {
     if(config.win) {
@@ -2027,7 +2026,7 @@ int net_dhcp4()
   char cmd[256], file[256], *s;
   file_t *f0, *f;
   window_t win;
-  int got_ip = 0, i, is_static = 0, rc;
+  int got_ip = 0, i, rc;
   slist_t *sl0, *sl;
 
   if(config.net.dhcp_active || config.net.keep) return 0;
@@ -2143,7 +2142,7 @@ int net_dhcp4()
           sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
           i = dia_yesno(cmd, NO);
           if(i == YES) {
-            is_static = 1;
+            // is_static = 1;
             // ?????
           }
         }
