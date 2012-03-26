@@ -774,6 +774,7 @@ void lxrc_init()
   config.kexec_reboot = 1;
   config.efi = -1;
   config.udev_mods = 1;
+  config.devtmpfs = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
@@ -856,6 +857,10 @@ void lxrc_init()
   }
 
   LXRC_WAIT
+
+  if(config.devtmpfs) {
+    mount("devtmpfs", "/dev", "devtmpfs", 0, 0);
+  }
 
   if(config.staticdevices) {
     util_mkdevs();
