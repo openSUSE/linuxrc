@@ -861,6 +861,7 @@ void lxrc_init()
   if(config.devtmpfs) {
     umount("/dev/pts");
     mount("devtmpfs", "/dev", "devtmpfs", 0, 0);
+    mkdir("/dev/pts", 0755);
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
 
