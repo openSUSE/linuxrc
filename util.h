@@ -166,4 +166,5 @@ void util_error_trace(char *format, ...);
 hd_t *fix_device_names(hd_t *hd);
 
 int fcoe_check(void);
+void util_run_script(char *name);
 

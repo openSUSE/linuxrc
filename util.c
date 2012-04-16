@@ -5015,3 +5015,23 @@ int fcoe_check()
   return fcoe_ok;
 }
 
+
+void util_run_script(char *name)
+{
+  char *buf = NULL;
+
+  if(util_check_exist2("/scripts", name) != 'r') return;
+
+  file_write_install_inf("");
+
+  strprintf(&buf, "/scripts/%s", name);
+
+  system(buf);
+
+  str_copy(&buf, NULL);
+
+  file_read_info_file("file:/tmp/script.result", kf_cfg);
+
+  unlink("/tmp/script.result");
+}
+
