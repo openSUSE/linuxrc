@@ -859,7 +859,9 @@ void lxrc_init()
   LXRC_WAIT
 
   if(config.devtmpfs) {
+    umount("/dev/pts");
     mount("devtmpfs", "/dev", "devtmpfs", 0, 0);
+    mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
 
   if(config.staticdevices) {
