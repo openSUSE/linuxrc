@@ -406,7 +406,7 @@ void lxrc_change_root()
   chroot(".");
 
   if(config.rescue) {
-    system("/mounts/initrd/bin/prepare_rescue");
+    system("/mounts/initrd/scripts/prepare_rescue");
 
     // system("PS1='\\w # ' /bin/bash 2>&1");
 
