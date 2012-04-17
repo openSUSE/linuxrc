@@ -324,7 +324,7 @@ void lxrc_change_root()
   slist_t *sl;
   char *argv[3] = { };
   char *dirs[] = {
-    "bin", "boot", "etc", "home", "lib",
+    "bin", "boot", "etc", "home", "lib", "run",
     "media", "mounts", "mounts/initrd", "mnt", "proc", "sbin",
     "sys", "tmp", "usr", "usr/lib", "usr/lib/microcode", "var",
     NULL
@@ -371,7 +371,15 @@ void lxrc_change_root()
 
     // add devices
     strprintf(&buf, "%s/dev", mp);
-    rename("/dev", buf);
+    if(config.devtmpfs) {
+      umount("/dev/pts");
+      umount("/dev");
+      mkdir(buf, 0755);
+      mount("devtmpfs", buf, "devtmpfs", 0, 0);
+    }
+    else {
+      rename("/dev", buf);
+    }
 
     // keep initrd available
     strprintf(&buf, "%s/mounts/initrd", mp);
