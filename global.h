@@ -19,7 +19,6 @@ extern str_list_t *search_str_list(str_list_t *sl, char *str);
 extern str_list_t *add_str_list(str_list_t **sl, char *str);
 extern char *hd_join(char *del, str_list_t *str);
 
-#include "tftp.h"
 #include "po/text_langids.h"
 #include "text.h"
 #include "settings.h"
@@ -540,7 +539,6 @@ typedef struct {
     char *device;		/* currently used device */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
-    struct tftp tftp;		/* used by tftp code */
     int file_length;		/* length of currently retrieved file */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
