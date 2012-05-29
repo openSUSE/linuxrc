@@ -700,7 +700,6 @@ int set_expert_cb(dia_item_t di)
           fflush(stdout);
         }
 
-        // system(util_check_exist("/lbin/lsh") ? "/lbin/lsh 2>&1" : "/bin/sh 2>&1");
         system("PS1='\\w # ' /bin/bash 2>&1");
 
         kbd_init(0);

@@ -45,7 +45,6 @@ extern int  util_cat_main          (int argc, char **argv);
 extern int  util_hex_main          (int argc, char **argv);
 extern int  util_echo_main         (int argc, char **argv);
 extern int  util_nothing_main      (int argc, char **argv);
-extern int  util_sh_main           (int argc, char **argv);
 extern void util_get_splash_status (void);
 void   util_splash_bar(unsigned num, char *trigger);
 extern int  util_ps_main           (int argc, char **argv);

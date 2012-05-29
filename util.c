@@ -61,7 +61,6 @@
 #include "net.h"
 #include "auto2.h"
 #include "file.h"
-#include "lsh.h"
 #include "bootpc.h"
 #include "fstype.h"
 #include "mkdevs.h"
@@ -2410,18 +2409,6 @@ int util_ls_main(int argc, char **argv)
 
   return 0;
 }
-
-
-/*
- * Redirect all output of system() to tty3.
- */
-int util_sh_main(int argc, char **argv)
-{
-  close(3);
-
-  return lsh_main(argc, argv);
-}
-
 
 char *util_process_name(pid_t pid)
 {

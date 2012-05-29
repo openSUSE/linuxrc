@@ -42,7 +42,6 @@
 #include "file.h"
 #include "linuxrc.h"
 #include "auto2.h"
-#include "lsh.h"
 #include "mkdevs.h"
 #include "scsi_rename.h"
 #include "hotplug.h"
@@ -95,8 +94,6 @@ static struct {
   char *name;
   int (*func)(int, char **);
 } lxrc_internal[] = {
-  { "sh",          util_sh_main          },
-  { "lsh",         lsh_main              },
   { "mkdevs",      mkdevs_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
@@ -211,7 +208,7 @@ int main(int argc, char **argv, char **env)
       config.tmpfs = 0;
 
       if(!config.serial && config.debugwait) {
-        util_start_shell("/dev/tty9", "/bin/lsh", 1);
+        util_start_shell("/dev/tty9", "/bin/sh", 1);
         config.shell_started = 1;
       }
       LXRC_WAIT
@@ -538,7 +535,7 @@ void lxrc_end()
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "lsh", "dhcpcd", "cifsd", "mount.smbfs", "udevd",
+    "portmap", "rpciod", "lockd", "dhcpcd", "cifsd", "mount.smbfs", "udevd",
     "mount.ntfs-3g", "brld", "sbl"
   };
   int i;
@@ -860,9 +857,6 @@ void lxrc_init()
   if(config.early_bash) {
     util_start_shell("/dev/tty8", "/bin/bash", 3);
   }
-  else if(config.early_lsh) {
-    util_start_shell("/dev/tty8", "/bin/lsh", 1);
-  }
 
   LXRC_WAIT
 
@@ -963,7 +957,7 @@ void lxrc_init()
   util_update_cdrom_list();
 
   if(!(config.test || config.serial || config.shell_started || config.noshell)) {
-    util_start_shell("/dev/tty9", "/bin/lsh", 1);
+    util_start_shell("/dev/tty9", "/bin/sh", 1);
     config.shell_started = 1;
   }
 

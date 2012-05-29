@@ -355,7 +355,6 @@ typedef struct {
   unsigned udev_mods:1;		/* let udev load modules */
   unsigned error_trace:1;	/* enable backtrace log */
   unsigned early_bash:1;	/* start bash on tty8 */
-  unsigned early_lsh:1;		/* start lsh on tty8 */
   unsigned devtmpfs:1;		/* mount devtmpfs */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
