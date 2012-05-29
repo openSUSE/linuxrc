@@ -326,10 +326,6 @@ msgstr "Κάρτα δικτύου ethernet"
 msgid "parallel port"
 msgstr "Παράλληλη θύρα"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "Κάρτα δικτύου δακτυλίου με κουπόνι"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "Κάρτα δικτύου arcnet "
@@ -1087,10 +1083,6 @@ msgstr "OSA-2 ή OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Δίκτυο Δακτυλίου με Κουπόνι"
 
 #. TXT_OSA_LCS
 msgid "LCS"

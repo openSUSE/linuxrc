@@ -616,7 +616,6 @@ typedef struct {
     char* portname;
     int type;
     int interface;
-    int medium;
     int layer2;
     int portno;
     char* osahwaddr;

@@ -300,10 +300,6 @@ msgstr ""
 msgid "parallel port"
 msgstr ""
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr ""
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr ""
@@ -1029,10 +1025,6 @@ msgstr ""
 
 #. TXT_OSA_ETH
 msgid "Ethernet"
-msgstr ""
-
-#. TXT_OSA_TR
-msgid "Token Ring"
 msgstr ""
 
 #. TXT_OSA_LCS

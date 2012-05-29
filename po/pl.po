@@ -320,10 +320,6 @@ msgstr "Karta sieciowa (ethernet)"
 msgid "parallel port"
 msgstr "Port równoległy"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "Karta sieciowa (Token Ring)"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "Karta sieciowa (arcnet)"
@@ -1080,10 +1076,6 @@ msgstr "OSA-2 albo OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

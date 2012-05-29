@@ -1359,7 +1359,6 @@ int net_choose_device()
     { "eth",   TXT_NET_ETH0  },
     { "veth",  TXT_NET_ETH0  },
     { "plip",  TXT_NET_PLIP  },
-    { "tr",    TXT_NET_TR0   },
     { "arc",   TXT_NET_ARC0  },
     { "fddi",  TXT_NET_FDDI  },
     { "hip",   TXT_NET_HIPPI },
@@ -2473,7 +2472,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   case 0x87:	/* HSI */
     config.hwp.type = di_390net_hsi;
     config.hwp.interface = di_osa_qdio;
-    config.hwp.medium = di_osa_eth;
     break;
   case 0x88:	/* CTC */
     config.hwp.type = di_390net_ctc;
@@ -2564,7 +2562,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     if(config.hwp.type == di_390net_hsi)
     {
       config.hwp.interface=di_osa_qdio;
-      config.hwp.medium=di_osa_eth;
     }
     else
     {
@@ -2586,23 +2583,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
           rc=config.hwp.interface;
       }
 
-      /* ask for TR/ETH */
-
-      dia_item_t media[] = {
-        di_osa_eth,
-        di_osa_tr,
-        di_none
-      };
-
-      IFNOTAUTO(config.hwp.medium)
-      {
-        rc = dia_menu2(txt_get(TXT_CHOOSE_OSA_MEDIUM), 33, 0, media, config.hwp.medium?:di_osa_eth);
-        if(rc == -1) return rc;
-        config.hwp.medium=rc;
-      }
-      else
-        rc=config.hwp.medium;
-        
       if(!hd || hd->is.dualport)
       {
         IFNOTAUTO(config.hwp.portno)
@@ -2635,16 +2615,13 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 	  }
       }
       
-      if(config.hwp.medium == di_osa_eth)
+      IFNOTAUTO(config.hwp.layer2)
       {
-        IFNOTAUTO(config.hwp.layer2)
-        {
-          config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
-        }
-        if(config.hwp.layer2 == 2) {
-          IFNOTAUTO(config.hwp.osahwaddr) {
-            dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
-          }
+        config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
+      }
+      if(config.hwp.layer2 == 2) {
+        IFNOTAUTO(config.hwp.osahwaddr) {
+          dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
         }
       }
       

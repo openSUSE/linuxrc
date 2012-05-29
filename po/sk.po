@@ -324,10 +324,6 @@ msgstr "sieťová karta typu ethernet"
 msgid "parallel port"
 msgstr "paralelný port"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "sieťová karta typu token ring"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "sieťová karta typu arcnet"
@@ -1086,10 +1082,6 @@ msgstr "OSA-2 alebo OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

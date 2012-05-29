@@ -39,7 +39,7 @@ typedef enum {
   key_instnetdev, key_iucvpeer, key_portname, key_readchan, key_writechan,
   key_datachan, key_ctcprotocol, key_netwait, key_newid, key_moduledisks,
   key_port, key_smbshare, key_rootimage2, key_instsys_id,
-  key_initrd_id, key_instsys_complain, key_osamedium,
+  key_initrd_id, key_instsys_complain,
   key_osainterface, key_dud_complain, key_dud_expected, key_staticdevices,
   key_withiscsi, key_ethtool, key_listen, key_zombies, key_dhcpcd, key_forceip,
   key_layer2, key_wlan_essid, key_wlan_auth, key_wlan_key_ascii,

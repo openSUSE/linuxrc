@@ -316,10 +316,6 @@ msgstr "Ikhadi lenethiwekhi le-ethernet"
 msgid "parallel port"
 msgstr "I-parallel port"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "Ikhadi lesiqinisekiso senethiwekhi ewuxhaxha"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "ikhadi lenethiwekhi eliyi-arcnet"
@@ -1078,10 +1074,6 @@ msgstr "I-OSA-2 noma OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "I-Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "I-Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

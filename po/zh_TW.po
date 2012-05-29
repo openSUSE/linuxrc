@@ -317,10 +317,6 @@ msgstr "乙太網路卡"
 msgid "parallel port"
 msgstr "平行埠"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "記號環網路卡"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "arcnet 網路卡"
@@ -1079,10 +1075,6 @@ msgstr "OSA-2 或 OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "乙太網路"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "記號環"
 
 #. TXT_OSA_LCS
 msgid "LCS"

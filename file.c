@@ -233,7 +233,6 @@ static struct {
   { key_writechan,	"WriteChannel",   kf_cfg + kf_cmd		 },
   { key_datachan,	"DataChannel",	  kf_cfg + kf_cmd		 },
   { key_ctcprotocol,	"CTCProtocol",	  kf_cfg + kf_cmd		 },
-  { key_osamedium,	"OSAMedium",	  kf_cfg + kf_cmd		 },
   { key_osainterface,	"OSAInterface",	  kf_cfg + kf_cmd		 },
   { key_layer2,		"Layer2",	  kf_cfg + kf_cmd		 },
   { key_portno,         "PortNo",         kf_cfg + kf_cmd                },
@@ -353,8 +352,6 @@ static struct {
   { "escon",	 di_390net_escon    },
   { "iucv",	 di_390net_iucv     },
   { "hsi",	 di_390net_hsi	    },
-  { "eth",	 di_osa_eth	    },
-  { "tr",	 di_osa_tr	    },
   { "qdio",	 di_osa_qdio	    },
   { "lcs",	 di_osa_lcs	    },
 #endif
@@ -1216,9 +1213,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_ctcprotocol:
         if(f->is.numeric) config.hwp.protocol = f->nvalue + 1;
         break;        
-      case key_osamedium:
-        if(*f->value) config.hwp.medium=file_sym2num(f->value);
-        break;
       case key_osainterface:
         if(*f->value) config.hwp.interface=file_sym2num(f->value);
         break;

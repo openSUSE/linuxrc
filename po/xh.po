@@ -316,10 +316,6 @@ msgstr "Ikhadi yomsebenzi wothungelwano lwe-ethernet"
 msgid "parallel port"
 msgstr "isiqhagamshelanisi esinxusileyo"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "ikhadi yomsebenzi wothungelwano wesangqa somqondiso"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "ikhadi yomsebenzi wothungelwano lwe-arcnet"
@@ -1075,10 +1071,6 @@ msgstr "Inkcazo ye-OSA-2 okanye ye-OSA"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Uthungelwano lwe-ether"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Isangqa Somqondiso"
 
 #. TXT_OSA_LCS
 msgid "LCS"

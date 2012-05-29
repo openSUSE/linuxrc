@@ -112,8 +112,6 @@ struct {
   { di_ctc_ext,		 TXT_CTC_PROT_EXT         },
   { di_ctc_zos390,	 TXT_CTC_PROT_ZOS390      },
   
-  { di_osa_eth,		 TXT_OSA_ETH              },
-  { di_osa_tr,		 TXT_OSA_TR               },
   { di_osa_lcs,		 TXT_OSA_LCS              },
   { di_osa_qdio,	 TXT_OSA_QDIO             },
 

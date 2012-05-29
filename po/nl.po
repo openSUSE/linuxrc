@@ -322,10 +322,6 @@ msgstr "ethernetnetwerkkaart"
 msgid "parallel port"
 msgstr "parallelle poort"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "token ring-netwerkkaart"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "arcnet-netwerkkaart"
@@ -1082,10 +1078,6 @@ msgstr "OSA-2 of OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

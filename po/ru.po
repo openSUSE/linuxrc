@@ -320,10 +320,6 @@ msgstr "сетевая карта ethernet"
 msgid "parallel port"
 msgstr "параллельный порт"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "сетевая карта token ring"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "сетевая карта arcnet"
@@ -1080,10 +1076,6 @@ msgstr "OSA-2 или OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

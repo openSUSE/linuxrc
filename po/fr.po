@@ -390,11 +390,6 @@ msgstr "Carte réseau Ethernet"
 msgid "parallel port"
 msgstr "Port parallèle"
 
-#. TLABEL linuxrc_2002_03_29_0036__69
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "Carte réseau Token Ring"
-
 #. TLABEL linuxrc_2002_03_29_0036__70
 #. TXT_NET_ARC0
 msgid "arcnet network card"
@@ -1255,10 +1250,6 @@ msgstr "OSA-2 ou OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

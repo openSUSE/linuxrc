@@ -322,10 +322,6 @@ msgstr "tarjeta de red ethernet"
 msgid "parallel port"
 msgstr "puerto paralelo"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "tarjeta de red Token Ring"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "tarjeta de red Arcnet"
@@ -1086,10 +1082,6 @@ msgstr "OSA-2 u OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Token Ring"
 
 #. TXT_OSA_LCS
 msgid "LCS"

@@ -321,10 +321,6 @@ msgstr "мережна плата типу Ethernet"
 msgid "parallel port"
 msgstr "паралельний порт"
 
-#. TXT_NET_TR0
-msgid "token ring network card"
-msgstr "мережна плата типу Token ring"
-
 #. TXT_NET_ARC0
 msgid "arcnet network card"
 msgstr "мережна плата типу Arcnet"
@@ -1083,10 +1079,6 @@ msgstr "OSA-2 або OSA Express"
 #. TXT_OSA_ETH
 msgid "Ethernet"
 msgstr "Ethernet"
-
-#. TXT_OSA_TR
-msgid "Token Ring"
-msgstr "Кільцеподібна мережа з естафетним доступом"
 
 #. TXT_OSA_LCS
 msgid "LCS"
