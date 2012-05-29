@@ -385,11 +385,10 @@ void disp_save_area(window_t *win)
 }
 
 
-void disp_restore_area(window_t *win, int mode)
+void disp_restore_area(window_t *win)
 {
-  int x, x_len, x_start, x_end;
-  int y, y_len, y_start, y_end;
-  int ready;
+  int x, x_len;
+  int y, y_len;
   char save_attr;
 
   disp_toggle_output(DISP_ON);
@@ -408,102 +407,23 @@ void disp_restore_area(window_t *win, int mode)
   if(x_len + win->x_left > max_x_ig) x_len = max_x_ig - win->x_left + 1;
   if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
 
-  if(!config.explode_win || config.serial) mode = DISP_RESTORE_NORMAL;
-
 #if 0
   fprintf(stderr,
-    "restore area at %d x %d (size %d x %d), mode %d\n",
-    win->x_left, win->y_left, x_len, y_len, mode
+    "restore area at %d x %d (size %d x %d)\n",
+    win->x_left, win->y_left, x_len, y_len
   );
 #endif
 
 //  dump_screen("restore area, start");
 
-  switch(mode) {
-    case DISP_RESTORE_EXPLODE:
-    case DISP_RESTORE_IMPLODE:
-      if(mode == DISP_RESTORE_EXPLODE) {
-        if(x_len > y_len) {
-          y_start = (y_len - 1) / 2;
-          y_end = y_len / 2;
-          x_start = y_start;
-          x_end = x_len - x_start - 1;
-        }
-        else {
-          x_start = (x_len - 1) / 2;
-          x_end = x_len / 2;
-          y_start = x_start;
-          y_end = y_len - y_start - 1;
-        }
-      }
-      else {
-        x_start = 0;
-        x_end = x_len - 1;
-        y_start = 0;
-        y_end = y_len - 1;
-      }
-
-      ready = FALSE;
-
-      do {
-        disp_gotoxy (win->x_left + x_start, win->y_left + y_start);
-
-        for(x = x_start; x <= x_end; ) {
-          disp_set_attr(win->save_area[y_start][x].attr);
-          x+= disp_write_char(win->save_area[y_start][x].c);
-        }
-
-        for(y = y_start; y <= y_end; y++) {
-          disp_gotoxy(win->x_left + x_start, win->y_left + y);
-          disp_set_attr(win->save_area[y][x_start].attr);
-          disp_write_char(win->save_area[y][x_start].c);
-
-          disp_gotoxy(win->x_left + x_end, win->y_left + y);
-          disp_set_attr(win->save_area[y][x_end].attr);
-          disp_write_char(win->save_area[y][x_end].c);
-        }
-
-        if(y_start != y_end) {
-          disp_gotoxy(win->x_left + x_start, win->y_left + y_end);
-          for(x = x_start; x <= x_end; ) {
-            disp_set_attr(win->save_area[y_end][x].attr);
-            x+= disp_write_char(win->save_area[y_end][x].c);
-          }
-        }
-
-        if(mode == DISP_RESTORE_EXPLODE) {
-          x_start--;
-          y_start--;
-          x_end++;
-          y_end++;
-          if(x_start < 0) ready = TRUE;
-        }
-        else {
-          x_start++;
-          y_start++;
-          x_end--;
-          y_end--;
-          if(x_end - x_start < 0 || y_end - y_start < 0) ready = TRUE;
-        }
-
-        fflush (stdout);
-
-        if(x_start % 2) usleep (10000);
-      }
-      while(!ready);
-      break;
-
-    default:
-      for(y = 0; y < y_len; y++) {
-        disp_gotoxy(win->x_left, win->y_left + y);
-        for(x = 0; x < x_len;) {
-          disp_set_attr(win->save_area[y][x].attr);
-          x += disp_write_char(win->save_area[y][x].c);
-        }
-      }
-      fflush(stdout);
-      break;
+  for(y = 0; y < y_len; y++) {
+    disp_gotoxy(win->x_left, win->y_left + y);
+    for(x = 0; x < x_len;) {
+      disp_set_attr(win->save_area[y][x].attr);
+      x += disp_write_char(win->save_area[y][x].c);
+    }
   }
+  fflush(stdout);
 
   for(y = 0; y < y_len; y++) free(win->save_area[y]);
   free(win->save_area);
@@ -520,7 +440,7 @@ void disp_flush_area(window_t *win)
 
   tmp_win = *win;
   disp_save_area(&tmp_win);
-  disp_restore_area(&tmp_win, DISP_RESTORE_EXPLODE);
+  disp_restore_area(&tmp_win);
 }
 
 
