@@ -113,7 +113,6 @@ static struct {
   { "chroot",      util_chroot_main      },
   { "kill",        util_kill_main        },
   { "killall",     util_killall_main     },
-  { "bootpc",      util_bootpc_main      },
 //  { "swapon",      util_swapon_main      },
   { "swapoff",     util_swapoff_main     },
   { "raidautorun", util_raidautorun_main },
@@ -756,7 +755,6 @@ void lxrc_init()
 
   str_copy(&config.net.dhcpfail, "show");
 
-  config.net.bootp_timeout = 10;
   config.net.dhcp_timeout = 60;
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
@@ -766,7 +764,6 @@ void lxrc_init()
 
   config.explode_win = 1;
   config.color = 2;
-  config.net.use_dhcp = 1;
   config.addswap = 1;
   config.netstop = 1;
   config.usbwait = 4;		/* 4 seconds */

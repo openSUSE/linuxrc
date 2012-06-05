@@ -61,7 +61,6 @@
 #include "net.h"
 #include "auto2.h"
 #include "file.h"
-#include "bootpc.h"
 #include "fstype.h"
 #include "mkdevs.h"
 #include "scsi_rename.h"
@@ -1109,7 +1108,7 @@ void add_flag(slist_t **sl, char *buf, int value, char *name)
 void util_status_info(int log_it)
 {
   int i, j;
-  char *s, *t;
+  char *s;
   hd_data_t *hd_data;
   slist_t *sl, *sl0 = NULL;
   char buf[256];
@@ -1186,7 +1185,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
   add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
-  add_flag(&sl0, buf, config.net.use_dhcp, "dhcp");
   add_flag(&sl0, buf, config.net.dhcp_active, "dhcp_active");
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
@@ -1321,25 +1319,14 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
   }
 
-  if(config.net.use_dhcp) {
-    s = "", t = "*";
-  }
-  else {
-    s = "*", t = "";
-  }
   sprintf(buf,
-    "timeouts: bootp%s = %ds, dhcp%s = %ds, tftp = %ds",
-    s, config.net.bootp_timeout, t, config.net.dhcp_timeout, config.net.tftp_timeout
+    "timeouts: dhcp* = %ds, tftp = %ds",
+    config.net.dhcp_timeout, config.net.tftp_timeout
   );
   slist_append_str(&sl0, buf);
 
   if(config.net.retry) {
     sprintf(buf, "max connection retries: %d", config.net.retry);
-    slist_append_str(&sl0, buf);
-  }
-
-  if(config.net.bootp_wait) {
-    sprintf(buf, "bootp wait = %d", config.net.bootp_wait);
     slist_append_str(&sl0, buf);
   }
 
@@ -2709,31 +2696,6 @@ int util_killall_main(int argc, char **argv)
   while(argc--) util_killall(*argv++, sig);
 
   return 0;
-}
-
-
-int util_bootpc_main(int argc, char **argv)
-{
-  int i;
-  char *dev = "eth0";
-
-  argv++; argc--;
-
-  if(argc && !strcmp(*argv, "-t")) {
-    bootp_testing = 1;
-    argc--; argv++;
-  }
-
-  if(argc) {
-    dev = *argv;
-  }
-
-  i = performBootp(dev,
-    "255.255.255.255", "", config.net.bootp_timeout,
-    0, NULL, 0, 1, BP_PUT_ENV | BP_PRINT_OUT, 1
-  );
-
-  return i;
 }
 
 

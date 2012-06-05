@@ -40,8 +40,6 @@ typedef enum {
   di_set_animate,
   di_set_forceroot,
   di_set_rootimage,
-  di_set_bootptimeout,
-  di_set_dhcp,
   di_set_vnc,
   di_set_usessh,
   di_set_startshell,

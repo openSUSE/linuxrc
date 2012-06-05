@@ -64,7 +64,6 @@ extern int  util_mkdir_main        (int argc, char **argv);
 extern int  util_chroot_main       (int argc, char **argv);
 extern int  util_kill_main         (int argc, char **argv);
 extern int  util_killall_main      (int argc, char **argv);
-extern int  util_bootpc_main       (int argc, char **argv);
 extern int  util_wget_main         (int argc, char **argv);
 extern int  util_fstype_main       (int argc, char **argv);
 extern int  util_extend_main       (int argc, char **argv);

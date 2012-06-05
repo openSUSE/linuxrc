@@ -2313,17 +2313,17 @@ int url_setup_interface(url_t *url)
   if((net_config_mask() & 3) != 3) {
     printf(
       "Sending %s request to %s...\n",
-      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
+      config.net.ipv6 ? "DHCP6" : "DHCP",
       url->used.device
     );
     fflush(stdout);
     fprintf(stderr,
       "sending %s request to %s... ",
-      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
+      config.net.ipv6 ? "DHCP6" : "DHCP",
       url->used.device
     );
 
-    config.net.use_dhcp ? net_dhcp() : net_bootp();
+    net_dhcp();
 
     if(
       !config.test &&
@@ -2341,7 +2341,7 @@ int url_setup_interface(url_t *url)
     }
     fprintf(stderr, "ok.\n");
 
-    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+    config.net.configured = nc_dhcp;
   }
 
   if(net_activate_ns()) {

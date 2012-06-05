@@ -54,8 +54,6 @@ struct {
   { di_set_animate,      TXT_ASK_ANIMATE,         },
   { di_set_forceroot,    TXT_FORCE_ROOTIMAGE,     },
   { di_set_rootimage,    TXT_NEW_ROOTIMAGE,       },
-  { di_set_bootptimeout, TXT_BOOTP_TIMEOUT,       },
-  { di_set_dhcp,         0, "DHCP/BOOTP"          },
   { di_set_vnc,          TXT_VNC_SWITCH,          },
   { di_set_usessh,       TXT_SSH_SWITCH,          },
   { di_set_startshell,   TXT_START_SHELL_YAST,    },

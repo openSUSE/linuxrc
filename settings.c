@@ -334,8 +334,6 @@ int set_settings()
     di_set_animate,
     di_set_forceroot,
     di_set_rootimage,
-    di_set_bootptimeout,
-    di_set_dhcp,
     di_set_vnc,
     di_set_usessh,
     di_set_startshell,
@@ -356,7 +354,7 @@ int set_settings()
 int set_settings_cb (dia_item_t di)
 {
   int rc = 0;
-  char tmp[MAX_FILENAME], *s;
+  char *s;
   url_t *url;
 
   di_set_settings_last = di;
@@ -397,19 +395,6 @@ int set_settings_cb (dia_item_t di)
 
     case di_set_rootimage:
       (void) dia_input2(txt_get(TXT_ENTER_ROOTIMAGE), &config.rootimage, 30, 0);
-      rc = 1;
-      break;
-
-    case di_set_bootptimeout:
-      sprintf(tmp, "%d", config.net.bootp_timeout);
-      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4, 0);
-      if(!rc) config.net.bootp_timeout = atoi(tmp);
-      rc = 1;
-      break;
-
-    case di_set_dhcp:
-      rc = dia_yesno(txt_get(TXT_DHCP_VS_BOOTP), config.net.use_dhcp ? YES : NO);
-      if(rc != ESCAPE) config.net.use_dhcp = rc == YES ? 1 : 0;
       rc = 1;
       break;
 

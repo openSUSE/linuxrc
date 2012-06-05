@@ -52,7 +52,6 @@
 #include "window.h"
 #include "util.h"
 #include "net.h"
-#include "bootpc.h"
 #include "file.h"
 #include "module.h"
 #include "hotplug.h"
@@ -212,7 +211,7 @@ int net_config()
 
   if(config.win && config.net.setup != NS_DHCP) {
     if((config.net.setup & NS_DHCP)) {
-      sprintf(buf, txt_get(TXT_ASK_DHCP), config.net.use_dhcp ? "DHCP" : "BOOTP");
+      sprintf(buf, txt_get(TXT_ASK_DHCP), "DHCP");
       rc = dia_yesno(buf, NO);
     }
     else {
@@ -226,8 +225,8 @@ int net_config()
   if(rc == ESCAPE) return -1;
 
   if(rc == YES) {
-    rc = config.net.use_dhcp ? net_dhcp() : net_bootp();
-    if(!rc) config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+    rc = net_dhcp();
+    if(!rc) config.net.configured = nc_dhcp;
   }
   else {
     rc = net_input_data();
@@ -256,13 +255,12 @@ static void net_config2_manual(void);
  * Does either DHCP, BOOTP or static network setup.
  *
  * config.net.device: network interface
- * config.net.use_dhcp: dhcp vs. bootp
  *
  * Return:
  *      0: ok
  *   != 0: error or abort
  *
- *   config.net.is_configured: nc_none, nc_dhcp, nc_bootp, nc_static
+ *   config.net.is_configured: nc_none, nc_dhcp, nc_static
  *
  * Does nothing if DHCP is active.
  *
@@ -295,17 +293,17 @@ int net_config2(int type)
   if((net_config_mask() & 3) != 3) {
     printf(
       "Sending %s request to %s...\n",
-      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
+      config.net.ipv6 ? "DHCP6" : "DHCP",
       config.net.device
     );
     fflush(stdout);
     fprintf(stderr,
       "sending %s request to %s... ",
-      config.net.use_dhcp ? config.net.ipv6 ? "DHCP6" : "DHCP" : "BOOTP",
+      config.net.ipv6 ? "DHCP6" : "DHCP",
       config.net.device
     );
 
-    config.net.use_dhcp ? net_dhcp() : net_bootp();
+    net_dhcp();
 
     if(
       !config.test &&
@@ -323,7 +321,7 @@ int net_config2(int type)
     }
     fprintf(stderr, "ok.\n");
 
-    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+    config.net.configured = nc_dhcp;
   }
 
   if(net_activate_ns()) {
@@ -375,15 +373,13 @@ void net_config2_manual()
         str_copy(&config.net.device, sl->key);
 
         printf(
-          "Sending %s request to %s...\n",
-          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+          "Sending DHCP request to %s...\n", config.net.device
         );
         fflush(stdout);
         fprintf(stderr,
-          "Sending %s request to %s... ",
-          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+          "Sending DHCP request to %s... ", config.net.device
         );
-        config.net.use_dhcp ? net_dhcp() : net_bootp();
+        net_dhcp();
         if(
           !config.net.hostname.ok ||
           !config.net.netmask.ok ||
@@ -392,7 +388,7 @@ void net_config2_manual()
           fprintf(stderr, "no/incomplete answer.\n");
         }
         else {
-          config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+          config.net.configured = nc_dhcp;
 
           if(net_activate_ns()) {
             fprintf(stderr, "%s: net activation failed\n", config.net.device);
@@ -1763,110 +1759,6 @@ int net_input_data()
   return 0;
 }
 #endif
-
-
-/*
- * Use bootp to get network config data.
- *
- * Does nothing if we already got a hostip address (in config.net.hostname).
- *
- * Note: shuts all interfaces down.
- *
- * Global vars changed:
- *  config.net.hostname
- *  config.net.netmask
- *  config.net.network
- *  config.net.broadcast
- *  config.net.ptphost
- *  config.net.gateway
- *  config.net.nameserver
- *  config.net.domain
- * 
- * config.net.bootp_wait: delay between interface setup & bootp request
- * config.net.device: interface
- */
-int net_bootp()
-{
-  window_t  win;
-  int rc;
-  char *s;
-  char tmp[256];
-
-  if(config.net.hostname.ok || config.net.keep) return 0;
-
-  if(config.test) return 0;
-
-  name2inet(&config.net.netmask, "");
-  name2inet(&config.net.network, "");
-  s_addr2inet(&config.net.broadcast, 0xffffffff);
-  name2inet(&config.net.ptphost, "");
-  name2inet(&config.net.hostname, "");
-
-  if(net_activate_ns()) {
-    if(config.win) {
-      dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
-    }
-    else {
-      fprintf(stderr, "network setup failed\n");
-    }
-            
-    return -1;
-  }
-
-  if(config.win) {
-    sprintf(tmp, txt_get(TXT_SEND_DHCP), "BOOTP");
-    dia_info(&win, tmp, MSGTYPE_INFO);
-  }
-
-  if(config.net.bootp_wait) sleep(config.net.bootp_wait);
-
-  rc = performBootp(
-    config.net.device, "255.255.255.255", "",
-    config.net.bootp_timeout, 0, NULL, 0, 1, BP_PUT_ENV, 1
-  );
-
-  win_close(&win);
-
-  if(rc || !getenv("BOOTP_IPADDR")) {
-    if(config.win) {
-      sprintf(tmp, txt_get(TXT_ERROR_DHCP), "BOOTP");
-      dia_message(tmp, MSGTYPE_ERROR);
-    }
-    return -1;
-  }
-
-  name2inet(&config.net.hostname, getenv("BOOTP_IPADDR"));
-  net_check_address(&config.net.hostname, 0);
-
-  name2inet(&config.net.netmask, getenv("BOOTP_NETMASK"));
-  net_check_address(&config.net.netmask, 0);
-
-  name2inet(&config.net.broadcast, getenv("BOOTP_BROADCAST"));
-  net_check_address(&config.net.broadcast, 0);
-
-  name2inet(&config.net.network, getenv("BOOTP_NETWORK"));
-  net_check_address(&config.net.network, 0);
-
-  name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS"));
-  name2inet(&config.net.gateway, getenv("BOOTP_GATEWAYS_1"));
-  net_check_address(&config.net.gateway, 0);
-
-  name2inet(&config.net.nameserver[0], getenv("BOOTP_DNSSRVS"));
-  name2inet(&config.net.nameserver[0], getenv("BOOTP_DNSSRVS_1"));
-  net_check_address(&config.net.nameserver[0], 0);
-
-  s = getenv("BOOTP_HOSTNAME");
-  if(s && !config.net.hostname.name) config.net.hostname.name = strdup(s);
-
-  if((s = getenv("BOOTP_DOMAIN"))) {
-    if(config.net.domain) free(config.net.domain);
-    config.net.domain = strdup(s);
-  }
-
-  net_stop();
-
-  return 0;
-}
 
 
 /*

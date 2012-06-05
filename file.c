@@ -94,8 +94,6 @@ static struct {
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
   { key_serverdir,      "Serverdir",      kf_none                        },
   { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
-  { key_bootpwait,      "Bootpwait",      kf_cfg + kf_cmd                },
-  { key_bootptimeout,   "BOOTPTimeout",   kf_cfg + kf_cmd                },
   { key_forcerootimage, "ForceRootimage", kf_cfg + kf_cmd                },
   { key_forcerootimage, "LoadImage",      kf_cfg + kf_cmd                },
   { key_rebootwait,     "WaitReboot",     kf_cfg + kf_cmd                },	/* drop it? */
@@ -129,7 +127,6 @@ static struct {
   { key_autoyast,       "AutoYaST",       kf_cfg + kf_cmd_early          },
   { key_linuxrc,        "linuxrc",        kf_cfg + kf_cmd_early          },
   { key_forceinsmod,    "ForceInsmod",    kf_cfg + kf_cmd                },
-  { key_dhcp,           "DHCP",           kf_cmd                         },	/* not really useful */
   { key_ipaddr,         "IPAddr",         kf_dhcp                        },
   { key_hostname,       "Hostname",       kf_cfg + kf_cmd                },
   { key_dns,            "DNS",            kf_dhcp                        },
@@ -706,14 +703,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
-      case key_bootpwait:
-        if(f->is.numeric) config.net.bootp_wait = f->nvalue;
-        break;
-
-      case key_bootptimeout:
-        if(f->is.numeric) config.net.bootp_timeout = f->nvalue;
-        break;
-
       case key_dhcptimeout:
         if(f->is.numeric) {
           config.net.dhcp_timeout = f->nvalue;
@@ -752,20 +741,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_forceinsmod:
         config.forceinsmod = f->nvalue;
-        break;
-
-      case key_dhcp:
-        config.net.use_dhcp = f->is.numeric ? f->nvalue : 1;
-        if(config.net.use_dhcp) net_config();
-        break;
-
-      case key_usedhcp:
-        if(f->is.numeric) {
-          config.net.use_dhcp = f->nvalue;
-        }
-        else {
-          if(!*f->value) config.net.use_dhcp = 1;
-        }
         break;
 
       case key_memlimit:
@@ -1843,9 +1818,6 @@ void file_write_install_inf(char *dir)
       case nc_static:
         s = "static";
         break;
-      case nc_bootp:
-        s = "bootp";
-        break;
       case nc_dhcp:
         s = config.net.ipv6 ? config.net.ipv4 ? "dhcp,dhcp6" : "dhcp6" : "dhcp";
         break;
@@ -2588,13 +2560,13 @@ int activate_network()
   }
 
   if(!config.net.hostname.ok || !config.net.netmask.ok) {
-    config.net.use_dhcp ? net_dhcp() : net_bootp();
+    net_dhcp();
     if(!config.net.hostname.ok) {
       fprintf(stderr, "%s: DHCP network setup failed\n", config.net.device);
       return 0;
     }
 
-    config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+    config.net.configured = nc_dhcp;
   }
   else {
     if(net_activate_ns()) {

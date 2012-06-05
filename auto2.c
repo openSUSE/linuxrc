@@ -577,15 +577,13 @@ void auto2_user_netconfig()
         str_copy(&config.net.device, sl->key);
 
         printf(
-          "Sending %s request to %s...\n",
-          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+          "Sending DHCP request to %s...\n", config.net.device
         );
         fflush(stdout);
         fprintf(stderr,
-          "Sending %s request to %s... ",
-          config.net.use_dhcp ? "DHCP" : "BOOTP", config.net.device
+          "Sending DHCP request to %s... ", config.net.device
         );
-        config.net.use_dhcp ? net_dhcp() : net_bootp();
+        net_dhcp();
         if(
           !config.net.hostname.ok ||
           !config.net.netmask.ok ||
@@ -594,7 +592,7 @@ void auto2_user_netconfig()
           fprintf(stderr, "no/incomplete answer.\n");
         }
         else {
-          config.net.configured = config.net.use_dhcp ? nc_dhcp : nc_bootp;
+          config.net.configured = nc_dhcp;
 
           if(net_activate_ns()) {
             fprintf(stderr, "%s: net activation failed\n", config.net.device);

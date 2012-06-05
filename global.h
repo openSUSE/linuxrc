@@ -194,7 +194,7 @@ typedef struct driver_s {
 
 
 typedef enum {
-  nc_none, nc_static, nc_bootp, nc_dhcp
+  nc_none, nc_static, nc_dhcp
 } net_config_t;
 
 
@@ -524,7 +524,6 @@ typedef struct {
   } download;
 
   struct {
-    unsigned use_dhcp:1;	/* use dhcp instead of bootp */
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned ifconfig:1;	/* setup network interface */
     unsigned is_configured:1;	/* set if network is configured */
@@ -542,10 +541,8 @@ typedef struct {
     int file_length;		/* length of currently retrieved file */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
-    int bootp_timeout;		/* various timeout values (in s) */
     int dhcp_timeout;
     int tftp_timeout;
-    int bootp_wait;		/* wait this time (in s) after network setup before starting bootp */
     int ifup_wait;		/* wait this time (in s) after network setup */
     struct {
       char *opts;		/* mount options string */
