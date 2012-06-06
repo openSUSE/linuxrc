@@ -364,16 +364,16 @@ int win_input (int x, int y, char *buf, int buf_len, int field_len, int pw_mode)
     int   old_end_ii;
     int   tmp_end_ii;
 
-  void goto_end(void)
-  {
-    if(end < field_len) {
-      ofs = 0;
-      cur = end;
-    }
-    else {
-      cur = field_len - 1;
-      ofs = end - cur;
-    }
+#define goto_end() \
+  { \
+    if(end < field_len) { \
+      ofs = 0; \
+      cur = end; \
+    } \
+    else { \
+      cur = field_len - 1; \
+      ofs = end - cur; \
+    } \
   }
 
   disp_cursor_on();
