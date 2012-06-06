@@ -282,7 +282,7 @@ char *slp_get_install(url_t *url)
       return NULL;
     }
   i = 8;	/* like openslp */
-  if (setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &i, sizeof(i)));
+  if (setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &i, sizeof(i)))
     {
       perror("setsockopt IP_MULTICAST_TTL");
     }
