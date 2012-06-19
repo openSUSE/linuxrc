@@ -325,7 +325,6 @@ typedef struct {
   unsigned instsys_complain:2;	/* check instsys id */
   unsigned do_pcmcia_startup:1;	/* run pcmcia-socket-startup */
   unsigned update_complain:2;	/* check for certain updates */
-  unsigned staticdevices:1;	/* use static /dev tree (not udev) */
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
   unsigned zombies:1;		/* keep zombies around */

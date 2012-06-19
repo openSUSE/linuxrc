@@ -42,7 +42,6 @@
 #include "file.h"
 #include "linuxrc.h"
 #include "auto2.h"
-#include "mkdevs.h"
 #include "scsi_rename.h"
 #include "hotplug.h"
 #include "checkmedia.h"
@@ -94,7 +93,6 @@ static struct {
   char *name;
   int (*func)(int, char **);
 } lxrc_internal[] = {
-  { "mkdevs",      mkdevs_main           },
   { "rmmod",       rmmod_main            },
   { "lsmod",       util_lsmod_main       },
   { "mount",       util_mount_main       },
@@ -864,10 +862,7 @@ void lxrc_init()
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
 
-  if(config.staticdevices) {
-    util_mkdevs();
-  }
-  else if(!config.test) {
+  if(!config.test) {
     fprintf(stderr, "Starting udev... ");
     fflush(stderr);
     system("/bin/myudevstart >/dev/null 2>&1");

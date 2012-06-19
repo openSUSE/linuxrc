@@ -62,7 +62,6 @@
 #include "auto2.h"
 #include "file.h"
 #include "fstype.h"
-#include "mkdevs.h"
 #include "scsi_rename.h"
 #include "utf8.h"
 #include "url.h"
@@ -1204,7 +1203,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.net.ipv6, "ipv6");
   add_flag(&sl0, buf, config.efi, "efi");
   add_flag(&sl0, buf, config.efi_vars, "efivars");
-  add_flag(&sl0, buf, config.staticdevices ^ 1, "udev");
   add_flag(&sl0, buf, config.udev_mods, "udev.mods");
   add_flag(&sl0, buf, config.digests.md5, "md5");
   add_flag(&sl0, buf, config.digests.sha1, "sha1");
@@ -3763,34 +3761,6 @@ char *long_dev(char *dev)
 
   return dev;
 }
-
-/* create device files */
-void util_mkdevs()
-{
-  FILE *f;
-  size_t len;
-  unsigned char *buf;
-  int inodes = 0;
-
-  fprintf(stderr, "Creating /dev tree ");
-
-  if((f = fopen("/devz", "r"))) {
-    len = (fgetc(f) & 0xff) << 8;
-    len += fgetc(f) & 0xff;
-    if(len) {
-      buf = malloc(len);
-      if(fread(buf, len, 1, f) == 1) {
-        inodes = mkdevs(buf, 1);
-        unlink("/devz");
-      }
-      free(buf);
-    }
-    fclose(f);
-  }
-
-  fprintf(stderr, "(%d inodes)\n", inodes);
-}
-
 
 /*
  * Get unique id & hw address for network device.

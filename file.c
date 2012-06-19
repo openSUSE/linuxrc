@@ -248,7 +248,6 @@ static struct {
   { key_instsys_complain, "InstsysComplain", kf_cfg + kf_cmd             },
   { key_dud_complain,   "UpdateComplain", kf_cfg + kf_cmd                },
   { key_dud_expected,   "UpdateExpected", kf_cfg + kf_cmd                },
-  { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
   { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
@@ -1030,7 +1029,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
               }
               if(!strcmp(s, "wait")) config.debugwait = i;
               else if(!strcmp(s, "tmpfs")) config.tmpfs = i;
-              else if(!strcmp(s, "udev")) config.staticdevices = i ^ 1;
               else if(!strcmp(s, "udev.mods")) config.udev_mods = i;
               else if(!strcmp(s, "trace")) config.error_trace = i;
               else if(!strcmp(s, "bash")) config.early_bash = i;
@@ -1298,10 +1296,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_dud_expected:
         if(*f->value) slist_append_str(&config.update.expected_name_list, f->value);
-        break;
-
-      case key_staticdevices:
-        if(f->is.numeric) config.staticdevices = f->nvalue;
         break;
 
       case key_withiscsi:
