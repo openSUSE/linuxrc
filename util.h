@@ -57,7 +57,6 @@ extern int  util_mv_main           (int argc, char **argv);
 extern int  util_ln_main           (int argc, char **argv);
 extern int  util_swapon_main       (int argc, char **argv);
 extern int  util_swapoff_main      (int argc, char **argv);
-extern int  util_lsmod_main        (int argc, char **argv);
 extern int  util_raidautorun_main  (int argc, char **argv);
 extern int  util_free_main         (int argc, char **argv);
 extern int  util_mkdir_main        (int argc, char **argv);

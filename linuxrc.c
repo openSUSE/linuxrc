@@ -87,14 +87,11 @@ static void lxrc_makelinks(char *name);
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
-int rmmod_main(int argc, char **argv);
 
 static struct {
   char *name;
   int (*func)(int, char **);
 } lxrc_internal[] = {
-  { "rmmod",       rmmod_main            },
-  { "lsmod",       util_lsmod_main       },
   { "mount",       util_mount_main       },
   { "umount",      util_umount_main      },
   { "cat",         util_cat_main         },

@@ -2510,12 +2510,6 @@ int util_swapoff_main(int argc, char **argv)
 }
 
 
-int util_lsmod_main(int argc, char **argv)
-{
-  return system("cat /proc/modules");
-}
-
-
 int util_raidautorun_main(int argc, char **argv)
 {
   int err = 0;
