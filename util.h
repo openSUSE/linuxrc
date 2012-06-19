@@ -39,8 +39,6 @@ int util_chk_driver_update(char *dir, char *loc);
 extern void util_do_driver_updates (void);
 extern int show_driver_updates(void);
 extern void util_status_info       (int log_it);
-extern int  util_mount_main        (int argc, char **argv);
-extern int  util_umount_main       (int argc, char **argv);
 extern int  util_cat_main          (int argc, char **argv);
 extern int  util_hex_main          (int argc, char **argv);
 extern int  util_echo_main         (int argc, char **argv);
