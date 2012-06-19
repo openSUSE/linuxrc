@@ -92,11 +92,6 @@ static struct {
   char *name;
   int (*func)(int, char **);
 } lxrc_internal[] = {
-  { "cat",         util_cat_main         },
-  { "hex",         util_hex_main         },
-  { "echo",        util_echo_main        },
-  { "ps",          util_ps_main          },
-  { "lsof",        util_lsof_main        },
   { "cp",          util_cp_main          },
   { "ls",          util_ls_main          },
   { "rm",          util_rm_main          },

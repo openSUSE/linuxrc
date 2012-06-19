@@ -80,9 +80,6 @@ typedef struct {
   unsigned port;
 } url1_t;
 
-static void show_lsof_info(FILE *f, unsigned pid);
-static void show_ps_info(FILE *f, unsigned pid);
-
 static struct hlink_s {
   struct hlink_s *next;
   dev_t dev;
@@ -1558,78 +1555,6 @@ char *read_symlink(char *file)
 }
 
 
-void show_lsof_info(FILE *f, unsigned pid)
-{
-  char pe[128];
-  char buf1[64], buf2[128], buf3[256];
-  FILE *p;
-  DIR *dir;
-  struct dirent *de;
-  unsigned status = 0;
-  char *s, c;
-  struct stat sbuf;
-  file_t *f0, *f1;
-  slist_t *sl0 = NULL, *sl;
-
-  sprintf(pe, "/proc/%u/status", pid);
-  if((p = fopen(pe, "r"))) {
-    if(fscanf(p, "Name: %63[^\n]", buf1) == 1) status = 1;
-    fclose(p);
-  }
-
-  if(!status) *buf1 = 0;
-
-  sprintf(buf2, "%-9s %5u ", buf1, pid);
-
-  sprintf(pe, "/proc/%u/cwd", pid);
-  if(*(s = read_symlink(pe))) fprintf(f, "%s cwd  %s\n", buf2, s);
-
-  sprintf(pe, "/proc/%u/root", pid);
-  if(*(s = read_symlink(pe))) fprintf(f, "%s rtd  %s\n", buf2, s);
-
-  sprintf(pe, "/proc/%u/exe", pid);
-  if(*(s = read_symlink(pe))) fprintf(f, "%s txt  %s\n", buf2, s);
-
-  sprintf(pe, "/proc/%u/fd", pid);
-  if((dir = opendir(pe))) {
-    while((de = readdir(dir))) {
-      if(*de->d_name != '.') {
-        sprintf(pe, "/proc/%u/fd/%s", pid, de->d_name);
-        if(*(s = read_symlink(pe))) {
-          c = ' ';
-          if(!lstat(pe, &sbuf)) {
-            if((sbuf.st_mode & S_IRUSR)) c = 'r';
-            if((sbuf.st_mode & S_IWUSR)) c = c == 'r' ? 'u' : 'w';
-          }
-          fprintf(f, "%s %3s%c %s\n", buf2, de->d_name, c, s);
-        }
-      }
-    }
-    closedir(dir);
-  }
-
-  sprintf(pe, "/proc/%u/maps", pid);
-  f0 = file_read_file(pe, kf_none);
-
-  for(f1 = f0; f1; f1 = f1->next) {
-    *buf3 = 0;
-    if(sscanf(f1->value, "%*s %*s %*s %*s %255[^\n]", buf3)) {
-      if(*buf3 && !slist_getentry(sl0, buf3)) {
-        sl = slist_append(&sl0, slist_new());
-        sl->key = strdup(buf3);
-      }
-    }
-  }
-
-  file_free_file(f0);
-
-  for(sl = sl0; sl; sl = sl->next) {
-    fprintf(f, "%s mem  %s\n", buf2, sl->key);
-  }
-
-  slist_free(sl0);
-}
-
 char *util_process_cmdline(pid_t pid)
 {
   char pe[100];
@@ -1651,28 +1576,6 @@ char *util_process_cmdline(pid_t pid)
   if(!status) *buf = 0;
 
   return buf;
-}
-
-void show_ps_info(FILE *f, unsigned pid)
-{
-  char pe[100];
-  char buf1[64], buf2[2], *buf3;
-  FILE *p;
-  unsigned status = 0;
-
-  sprintf(pe, "/proc/%u/status", pid);
-  if((p = fopen(pe, "r"))) {
-    if(fscanf(p, "Name: %63[^\n]", buf1) == 1) status |= 1;
-    if(fscanf(p, "\nState: %1s", buf2) == 1) status |= 2;
-    fclose(p);
-  }
-
-  buf3 = util_process_cmdline(pid);
-
-  if(!(status & 1)) *buf1 = 0;
-  if(!(status & 2)) *buf2 = 0;
-
-  fprintf(f, "%5u %s %-16s %s\n", pid, buf2, buf1, buf3);
 }
 
 int util_do_cp(char *src, char *dst)
@@ -1947,137 +1850,6 @@ void util_start_shell(char *tty, char *shell, int flags)
     fprintf(stderr, "Couldn't start shell (errno = %d)\n", errno);
     exit(-1);
   }
-}
-
-
-int util_ps_main(int argc, char **argv)
-{
-  DIR *proc;
-  struct dirent *de;
-  unsigned u;
-  char *s;
-
-  if((proc = opendir("/proc"))) {
-    while((de = readdir(proc))) {
-      if(de->d_name) {
-        u = strtoul(de->d_name, &s, 10);
-        if(!*s) show_ps_info(stdout, u);
-      }
-    }
-    closedir(proc);
-  }
-
-  return 0;
-}
-
-
-int util_lsof_main(int argc, char **argv)
-{
-  DIR *proc;
-  struct dirent *de;
-  unsigned u;
-  char *s;
-
-  if((proc = opendir("/proc"))) {
-    while((de = readdir(proc))) {
-      if(de->d_name) {
-        u = strtoul(de->d_name, &s, 10);
-        if(!*s) show_lsof_info(stdout, u);
-      }
-    }
-    closedir(proc);
-  }
-
-  return 0;
-}
-
-
-int util_cat_main(int argc, char **argv)
-{
-  FILE *f;
-  int i, c;
-
-  argv++; argc--;
-
-  if(!argc) {
-    while((c = fgetc(stdin)) != EOF) fputc(c, stdout);
-    fflush(stdout);
-    return 0;
-  }
-
-  for(i = 0; i < argc; i++) {
-    if((f = fopen(argv[i], "r"))) {
-      while((c = fgetc(f)) != EOF) fputc(c, stdout);
-      fclose(f);
-    }
-    else {
-      perror(argv[i]);
-      return 1;
-    }
-  }
-
-  fflush(stdout);
-
-  return 0;
-}
-
-
-int util_hex_main(int argc, char **argv)
-{
-  FILE *f;
-  int i, j = 0;
-  char s[17];
-
-  if(argc > 1) {
-    f = fopen(argv[1], "r");
-    if(!f) {
-      perror(argv[1]);
-      return errno;
-    }
-  }
-  else {
-    f = stdin;
-  }
-
-  s[16] = 0;
-  while((i = fgetc(f)) != EOF) {
-    i = i & 0xff;
-    s[j & 15] = (i >= 0x20 && i <= 0x7e) ? i : '.';
-    if(!(j & 15)) {
-      printf("%06x  ", j);
-    }
-    if(!(j & 7) && (j & 15)) printf(" ");
-    printf("%02x ", (int) i);
-    if(!(++j & 15)) {
-      printf(" %s\n", s);
-    }
-  }
-
-  if(j & 15) {
-    s[j & 15] = 0;
-    if(!(j & 8)) printf(" ");
-    printf("%*s %s\n", 3 * (16 - (j & 15)), "", s);
-  }
-
-  fflush(stdout);
-
-  return 0;
-}
-
-
-int util_echo_main(int argc, char **argv)
-{
-  int i;
-
-  argv++; argc--;
-
-  for(i = 0; i < argc; i++) {
-    printf("%s%s", i ? " " : "", argv[i]);
-  }
-
-  printf("\n");
-
-  return 0;
 }
 
 
