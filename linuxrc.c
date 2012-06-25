@@ -43,7 +43,6 @@
 #include "linuxrc.h"
 #include "auto2.h"
 #include "scsi_rename.h"
-#include "hotplug.h"
 #include "checkmedia.h"
 
 #if defined(__alpha__) || defined(__ia64__)
@@ -95,7 +94,6 @@ static struct {
 //  { "swapon",      util_swapon_main      },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
-  { "hotplug",     hotplug_main          },
 };
 #endif
 
@@ -1297,7 +1295,6 @@ void lxrc_makelinks(char *name)
     sprintf(buf, "/lbin/%s", lxrc_internal[i].name);
     if(!util_check_exist(buf)) link(name, buf);
   }
-  if(!util_check_exist("/sbin/hotplug")) link(name, "/sbin/hotplug");
 }
 #endif
 
