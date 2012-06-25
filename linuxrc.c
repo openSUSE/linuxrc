@@ -94,16 +94,10 @@ static struct {
 } lxrc_internal[] = {
   { "cp",          util_cp_main          },
 //  { "swapon",      util_swapon_main      },
-  { "swapoff",     util_swapoff_main     },
-  { "raidautorun", util_raidautorun_main },
-  { "free",        util_free_main        },
-  { "wget",        util_wget_main        },
-  { "fstype",      util_fstype_main      },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
   { "extend",      util_extend_main      },
   { "hotplug",     hotplug_main          },
-  { "nothing",     util_nothing_main     }
 };
 #endif
 

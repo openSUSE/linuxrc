@@ -1853,12 +1853,6 @@ void util_start_shell(char *tty, char *shell, int flags)
 }
 
 
-int util_nothing_main(int argc, char **argv)
-{
-  return 0;
-}
-
-
 int util_cp_main(int argc, char **argv)
 {
   int err = 0, rec = 0, preserve = 0;
@@ -1993,46 +1987,6 @@ int util_swapon_main(int argc, char **argv)
 }
 
 
-int util_swapoff_main(int argc, char **argv)
-{
-  int i;
-
-  argv++; argc--;
-
-  if(argc != 1) return -1;
-
-  i = swapoff(*argv);
-
-  if(i) {
-    i = errno;
-    fprintf(stderr, "swapoff: "); perror(*argv);
-  }
-
-  return i;
-}
-
-
-int util_raidautorun_main(int argc, char **argv)
-{
-  int err = 0;
-  int fd;
-
-  if((fd = open("/dev/md0", O_RDWR)) >= 0) {
-    if(ioctl(fd , RAID_AUTORUN, 0)) {
-      err = errno;
-      perror("/dev/md0");
-    }
-    close(fd);
-  }
-  else {
-    err = errno;
-    perror("/dev/md0");
-  }
-
-  return err;
-}
-
-
 void util_free_mem()
 {
   file_t *f0, *f;
@@ -2080,19 +2034,6 @@ void util_free_mem()
 void util_update_meminfo()
 {
   config.memoryXXX.current = config.memoryXXX.free;
-}
-
-
-int util_free_main(int argc, char **argv)
-{
-  util_free_mem();
-
-  printf("MemTotal: %9lld kB\nMemFree: %10lld kB\n",
-    (long long) (config.memoryXXX.total >> 10),
-    (long long) (config.memoryXXX.free >> 10)
-  );
-
-  return 0;
 }
 
 
@@ -2465,62 +2406,6 @@ char *get_instmode_name_up(instmode_t instmode)
   }
 
   return name;
-}
-
-
-int util_wget_main(int argc, char **argv)
-{
-  url_t *url;
-  unsigned flags = URL_FLAG_PROGRESS + URL_FLAG_NOUNLINK;
-  char *label = NULL;
-
-  config.test = 1;
-
-  config.download.base = strdup("/tmp/download");
-  mkdir(config.download.base, 0755);
-  config.mountpoint.base = strdup("/tmp/mounts/");
-  mkdir("/tmp/mounts", 0755);
-
-  str_copy(&config.net.cifs.binary, "/sbin/mount.cifs");
-
-  argv++; argc--;
-
-  while(
-    (argc && !strcmp(*argv, "-v") && (config.debug++, argc--, argv++)) ||
-    (argc && !strcmp(*argv, "-z") && (flags += URL_FLAG_UNZIP, argc--, argv++)) ||
-    (argc && !strcmp(*argv, "-l") && (label = argv[1], argc -= 2, argv += 2))
-  );
-
-  if(argc != 2) return fprintf(stderr, "usage: wget url file\n"), 1;
-
-  url = url_set(argv[0]);
-
-  url_read_file(url, NULL, NULL, argv[1], label, flags);
-
-  url_umount(url);
-  url_free(url);
-
-  url_cleanup();
-
-  return 0;
-}
-
-
-int util_fstype_main(int argc, char **argv)
-{
-  char *s;
-
-  argv++; argc--;
-
-  if(!argc) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
-
-  while(argc--) {
-    s = fstype(*argv);
-    printf("%s: %s\n", *argv, s ?: "unknown fs");
-    argv++;
-  }
-
-  return 0;
 }
 
 
