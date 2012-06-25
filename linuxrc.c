@@ -93,10 +93,6 @@ static struct {
   int (*func)(int, char **);
 } lxrc_internal[] = {
   { "cp",          util_cp_main          },
-  { "ls",          util_ls_main          },
-  { "rm",          util_rm_main          },
-  { "mv",          util_mv_main          },
-  { "ln",          util_ln_main          },
   { "mkdir",       util_mkdir_main       },
   { "chroot",      util_chroot_main      },
   { "kill",        util_kill_main        },
