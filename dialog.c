@@ -631,80 +631,29 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
         switch (key_ii)
             {
             case KEY_DOWN:
-                #if 0
-                if (current_ii < phys_items_ii - 1)
-                    current_ii++;
-                else if (offset_ii + current_ii < nr_items_iv - 1)
-                    {
-                    offset_ii++;
-                    need_redraw_ii = TRUE;
-                    }
-                else if (phys_items_ii == nr_items_iv)
-                    current_ii = (current_ii + 1) % phys_items_ii;
-                #endif
                 cur_new = current_ii + offset_ii + 1;
                 if(phys_items_ii == nr_items_iv && cur_new == nr_items_iv) cur_new = 0;
                 dir = 1;
                 break;
             case KEY_UP:
-                #if 0
-                if (current_ii > 0)
-                    current_ii--;
-                else if (offset_ii > 0)
-                    {
-                    offset_ii--;
-                    need_redraw_ii = TRUE;
-                    }
-                else if (phys_items_ii == nr_items_iv)
-                    current_ii = (current_ii + phys_items_ii - 1) %
-                                         phys_items_ii;
-                #endif
                 cur_new = current_ii + offset_ii - 1;
                 if(phys_items_ii == nr_items_iv && cur_new == -1) cur_new = nr_items_iv - 1;
                 dir = -1;
                 break;
             case KEY_HOME:
-                // offset_ii = 0;
-                // current_ii = 0;
-                // need_redraw_ii = TRUE;
                 cur_new = 0;
                 dir = 1;
                 break;
             case KEY_PGUP:
-                #if 0
-                if (offset_ii == 0)
-                    current_ii = 0;
-                else
-                    {
-                    offset_ii -= phys_items_ii;
-                    if (offset_ii < 0)
-                        offset_ii = 0;
-                    }
-                need_redraw_ii = TRUE;
-                #endif
                 cur_new = current_ii + offset_ii - phys_items_ii;
                 ofs_new -= phys_items_ii;
                 dir = -1;
                 break;
             case KEY_END:
-                // offset_ii = nr_items_iv - phys_items_ii;
-                // current_ii = phys_items_ii - 1;
-                // need_redraw_ii = TRUE;
                 cur_new = nr_items_iv - 1;
                 dir = -1;
                 break;
             case KEY_PGDOWN:
-                #if 0
-                if (offset_ii + phys_items_ii >= nr_items_iv - 1)
-                    current_ii = phys_items_ii - 1;
-                else
-                    {
-                    offset_ii += phys_items_ii;
-                    if (offset_ii > nr_items_iv - phys_items_ii)
-                        offset_ii = nr_items_iv - phys_items_ii;
-                    }
-                need_redraw_ii = TRUE;
-                #endif
                 cur_new = current_ii + offset_ii + phys_items_ii;
                 ofs_new += phys_items_ii;
                 dir = 1;

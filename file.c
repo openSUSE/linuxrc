@@ -1043,10 +1043,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         slist_free(config.linuxrc);
         config.linuxrc = slist_split(',', f->value);
         if(slist_getentry(config.linuxrc, "nocmdline")) config.info.add_cmdline = 0;
-#if 0
-        /* ###### still needed? */
-        if(slist_getentry(config.linuxrc, "reboot")) config.restart_method = 1;
-#endif
         break;
 
       case key_kernel_pcmcia:
@@ -2313,17 +2309,6 @@ module_t *file_read_modinfo(char *name)
       }
     }
 
-#if 0
-    if(fields) {
-      fprintf(stderr, "type = %d (%s)\n", current_type, config.module.type_name[current_type]);
-
-      for(i = 0; i < fields; i++) {
-        fprintf(stderr, ">%s< ", field[i]);
-      }
-      fprintf(stderr, "\n");
-    }
-#endif
-
     if(fields && **field) {
       ml1 = *ml = calloc(1, sizeof **ml);
 
@@ -2643,13 +2628,6 @@ slist_t *file_parse_xmllike(char *name, char *tag)
   free(buf);
   free(tag_start);
   free(tag_end);
-
-#if 0
-  for(sl = sl0; sl; sl = sl->next) {
-    fprintf(stderr, "key = \'%s\'\n", sl->key);
-    fprintf(stderr, "value = \'%s\'\n", sl->value);
-  }
-#endif
 
   return sl0;
 }

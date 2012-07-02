@@ -59,10 +59,6 @@ unsigned char *utf8_encode(int c)
 
   if(c & ~0x7fffffff) return s;
 
-#if 0
-  fprintf(stderr, "{u+%02x:", c);
-#endif
-
   if(c < 0x80) {
     *--s = c;
   }
@@ -73,14 +69,6 @@ unsigned char *utf8_encode(int c)
     }
     *--s = mask | c;
   }
-
-#if 0
-  {
-    unsigned char *t;
-    for(t = s; *t; t++) fprintf(stderr, " %02x", *t);
-  }
-  fprintf(stderr, "}");
-#endif
 
   return s;
 }
@@ -179,10 +167,6 @@ int utf8_strwidth(unsigned char *str)
   }
 
   free(buf);
-
-#if 0
-  fprintf(stderr, "[%d: <%s>]\n", width, str);
-#endif
 
   return width;
 }

@@ -137,18 +137,6 @@ void get_scsi_list()
     );
   }
 
-#if 0
-  if(config.debug) {
-    if(disk_list && disk_list_len) {
-      fprintf(stderr, "disks: %u at %u\n", disk_list_len, disk_list - scsi_list);
-    }
-
-    if(cdrom_list && cdrom_list_len) {
-      fprintf(stderr, "  cds: %u at %u\n", cdrom_list_len, cdrom_list - scsi_list);
-    }
-  }
-#endif
-
 }
 
 

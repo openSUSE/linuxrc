@@ -199,13 +199,6 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
   struct cramfs_super_block *cramfs_sb;
   off_t off;
 
-#if 0
-  fprintf(stderr,
-    "buffer = %p, size = %d, nmemb = %d, userp = %p\n",
-    buffer, size, nmemb, userp
-  );
-#endif
-
   z1 = size * nmemb;
 
   digest_process(url_data, buffer, z1);
@@ -257,13 +250,6 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
     ) {
       url_data->image_size = i;
     }
-
-#if 0
-    fprintf(stderr,
-      "gzip = %d, cramfs = %d, >%s<\n",
-      url_data->gzip, url_data->cramfs, url_data->orig_name
-    );
-#endif
   }
 
   if(url_data->buf.len == url_data->buf.max || url_data->flush) {

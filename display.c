@@ -15,10 +15,6 @@
 #include "display.h"
 #include "utf8.h"
 
-#if 0
-void dump_screen(char *label);
-#endif
-
 /*
  *
  * data on module level
@@ -126,40 +122,6 @@ void disp_init (void)
         disp_mono_rm.error_fg   = COL_BLACK;
         }
 
-#if 0
-  { 0x005f, 0x25AE },
-  { 0x0060, 0x25C6 },
-  { 0x0061, 0x2592 },
-  { 0x0062, 0x2409 },
-  { 0x0063, 0x240C },
-  { 0x0064, 0x240D },
-  { 0x0065, 0x240A },
-  { 0x0066, 0x00B0 },
-  { 0x0067, 0x00B1 },
-  { 0x0068, 0x2424 },
-  { 0x0069, 0x240B },
-  { 0x006a, 0x2518 },
-  { 0x006b, 0x2510 },
-  { 0x006c, 0x250C },
-  { 0x006d, 0x2514 },
-  { 0x006e, 0x253C },
-  { 0x006f, 0x23BA },
-  { 0x0070, 0x23BB },
-  { 0x0071, 0x2500 },
-  { 0x0072, 0x23BC },
-  { 0x0073, 0x23BD },
-  { 0x0074, 0x251C },
-  { 0x0075, 0x2524 },
-  { 0x0076, 0x2534 },
-  { 0x0077, 0x252C },
-  { 0x0078, 0x2502 },
-  { 0x0079, 0x2264 },
-  { 0x007a, 0x2265 },
-  { 0x007b, 0x03C0 },
-  { 0x007c, 0x2260 },
-  { 0x007d, 0x00A3 },
-  { 0x007e, 0x00B7 },
-#endif
 
     if(config.utf8) {
       graphics_sg.lrcorner = 0x2518;
@@ -407,15 +369,6 @@ void disp_restore_area(window_t *win)
   if(x_len + win->x_left > max_x_ig) x_len = max_x_ig - win->x_left + 1;
   if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
 
-#if 0
-  fprintf(stderr,
-    "restore area at %d x %d (size %d x %d)\n",
-    win->x_left, win->y_left, x_len, y_len
-  );
-#endif
-
-//  dump_screen("restore area, start");
-
   for(y = 0; y < y_len; y++) {
     disp_gotoxy(win->x_left, win->y_left + y);
     for(x = 0; x < x_len;) {
@@ -429,8 +382,6 @@ void disp_restore_area(window_t *win)
   free(win->save_area);
 
   disp_set_attr(save_attr);
-
-//  dump_screen("restore area, end");
 }
 
 
@@ -611,23 +562,3 @@ int disp_write_char(int c)
 
   return width;
 }
-
-
-#if 0
-void dump_screen(char *label)
-{
-  int x, y;
-
-  fprintf(stderr, "[%d x %d: %s\n", max_x_ig, max_y_ig, label);
-
-  for(y = 0; y < max_y_ig; y++) {
-    for(x = 0; x < max_x_ig; x++) {
-      fprintf(stderr, "%s", utf8_encode(disp_screen_aprm[y][x].c));
-    }
-    fprintf(stderr, "\n");
-  }
-
-  fprintf(stderr, "]\n");
-}
-#endif
-

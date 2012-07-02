@@ -217,12 +217,6 @@ int main(int argc, char **argv, char **env)
 
   if(err) {
     util_disp_init();
-
-#if 0
-    extern int ask_for_swap(int size, char *msg);
-    ask_for_swap(-1, "Foo Bar");
-#endif
-
     lxrc_main_menu();
   }
 
@@ -230,20 +224,6 @@ int main(int argc, char **argv, char **env)
 
   return err;
 }
-
-
-#if 0
-int my_syslog (int type_iv, char *buffer_pci, ...)
-    {
-    va_list  args_ri;
-
-    va_start (args_ri, buffer_pci);
-    vfprintf (stderr, buffer_pci, args_ri);
-    va_end (args_ri);
-    fprintf (stderr, "\n");
-    return (0);
-    }
-#endif
 
 
 int my_logmessage (char *buffer_pci, ...)
@@ -1312,35 +1292,6 @@ void find_shell()
     symlink("/lbin/sh", "/bin/sh");
   }
 }
-
-
-#if 0
-/*
- * Configure rescue system mounted at mp.
- */
-void config_rescue(char *mp)
-{
-  char *s = NULL;
-  FILE *f;
-
-  /* add getty entry for /dev/console */
-  if(config.serial) {
-    strprintf(&s, "%s/etc/securetty", mp);
-    if((f = fopen(s, "a"))) {
-      fprintf(f, "console\n");
-      fclose(f);
-    }
-
-    strprintf(&s, "%s/etc/inittab", mp);
-    if((f = fopen(s, "a"))) {
-      fprintf(f, "c:2345:respawn:/sbin/mingetty --noclear console\n");
-      fclose(f);
-    }
-  }
-
-}
-
-#endif
 
 
 int cmp_entry(slist_t *sl0, slist_t *sl1)

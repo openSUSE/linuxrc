@@ -58,10 +58,6 @@ int ask_for_swap(int64_t size, char *msg)
     did_init = 1;
   }
 
-#if 0
-  // sprintf(tmp, "%s\n\n%s", msg, txt_get(TXT_ADD_SWAP));
-#endif
-
   do {
     j = inst_choose_partition(&partition, 1, txt_get(TXT_ADD_SWAP), txt_get(TXT_ENTER_SWAP));
     

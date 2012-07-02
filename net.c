@@ -1989,12 +1989,6 @@ int net_dhcp4()
         if(*f->value) str_copy(&config.net.domain, f->value);
         break;
 
-#if 0
-      case key_rootpath:
-      case key_bootfile:
-        break;
-#endif
-
       case key_dns:
         for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
@@ -2306,13 +2300,6 @@ static int net_s390_getrwchans_ex(hd_t* hd)
 
   return 0;
 }
-
-#if 0 /* currently unused */
-static int net_s390_getrwchans()
-{
-  return net_s390_getrwchans_ex(NULL);
-}
-#endif
 
 int net_activate_s390_devs(void)
 {

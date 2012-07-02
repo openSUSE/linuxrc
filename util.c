@@ -152,10 +152,6 @@ void util_center_text(unsigned char *txt, int max_width)
   if(pre) memset(txt, ' ', pre);
   if(post) memset(txt + pre + len, ' ', post);
   txt[pre + len + post] = 0;
-
-#if 0
-  fprintf(stderr, "[center %d->%d: <%s>]\n", width, max_width, txt);
-#endif
 }
 
 
@@ -242,10 +238,6 @@ int util_format_txt(unsigned char *txt, unsigned char **lines, int max_width)
 {
   int line, pos, width, w_width, w_enc_len, w_space;
 
-#if 0
-  fprintf(stderr, "[format: %d <%s> = ", max_width, txt);
-#endif
-
   line = 0;
   *(lines[line] = malloc(UTF8_SIZE(max_width))) = 0;
 
@@ -261,10 +253,6 @@ int util_format_txt(unsigned char *txt, unsigned char **lines, int max_width)
     }
     else {
       w_space = word_size(txt, &w_width, &w_enc_len);
-
-#if 0
-      fprintf(stderr, "{<%s> %d %d %d}", txt, w_width, w_enc_len, w_space);
-#endif
 
       if(w_width + width <= max_width || width == 0) {
         if(w_width && w_enc_len) {
@@ -302,11 +290,6 @@ int util_format_txt(unsigned char *txt, unsigned char **lines, int max_width)
     while(width > 0 && lines[pos][width - 1] == ' ') lines[pos][--width] = 0;
     util_center_text(lines[pos], max_width);
   }
-
-#if 0
-  for(pos = 0; pos < line; pos++) fprintf(stderr, " <%s>", lines[pos]);
-  fprintf(stderr, "]\n");
-#endif
 
   return line;
 }
@@ -2817,14 +2800,6 @@ void util_set_serial_console(char *str)
   if(sl) {
     /* if it's uart, don't bother to find the matching ttySx */
     str_copy(&config.console, long_dev(strcmp(sl->key, "uart") ? sl->key : "console"));
-#if 0
-    s = long_dev(sl->key);
-    if(!config.console || strcmp(s, config.console)) {
-      str_copy(&config.console, s);
-      freopen(config.console, "r", stdin);
-      freopen(config.console, "a", stdout);
-    }
-#endif
     config.textmode = 1;
   }
      

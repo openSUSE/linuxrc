@@ -523,13 +523,6 @@ int auto2_find_repo()
   /* get some files for lazy yast */
   if(!err) auto2_read_repo_files(config.url.install);
 
-#if 0
-  if(err && (config.sig_failed || config.digests.failed)) {
-    url_umount(config.url.instsys);
-    url_umount(config.url.install);
-  }
-#endif
-
   if(err) {
     fprintf(stderr, "no %s repository found\n", config.product);
     return 0;
@@ -990,22 +983,6 @@ void auto2_kexec(url_t *url)
       err = 0;
     }
   }
-
-#if 0
-  if(!err && config.secure && (config.sig_failed || config.digests.failed)) {
-    if(!(win = config.win)) util_disp_init();
-    i = dia_okcancel(txt_get(TXT_INSECURE_REPO), NO);
-    if(!win) util_disp_done();
-    if(i == YES) {
-      config.secure = 0;
-    }
-    else {
-      err = 1;
-      url_umount(config.url.instsys);
-      url_umount(config.url.install);
-    }
-  }
-#endif
 
   if(!err) {
     cmdline = calloc(1024, 1);

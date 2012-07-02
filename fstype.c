@@ -88,16 +88,6 @@ assemble4le(unsigned char *p) {
     Added sysv - Tim Launchbury
 */
 
-#if 0
-static char
-*magic_known[] = {
-	"bfs", "cramfs", "ext", "ext2", "ext3",
-	"hfs", "hpfs", "iso9660", "jfs", "minix", "ntfs",
-	"qnx4", "reiserfs", "romfs", "swap", "sysv", "udf", "ufs",
-	"vxfs", "xfs", "xiafs"
-};
-#endif
-
 #ifdef ALL_TYPES
 /* udf magic - I find that trying to mount garbage as an udf fs
    causes a very large kernel delay, almost killing the machine.
