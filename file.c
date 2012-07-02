@@ -2051,7 +2051,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
 
   if(config.test) {
     if(!config.had_segv) {
-      for((argv = config.argv) && argv++; *argv; argv++) {
+      for(argv = config.argv, argv++; *argv; argv++) {
         strprintf(&cmdline, "%s \"%s\"", cmdline ?: "", *argv);
       }
     }

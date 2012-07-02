@@ -446,7 +446,7 @@ void net_stop()
   slist_append_str(&sl0, config.net.device);
 
   f0 = file_read_file("/proc/net/route", kf_none);
-  for((f = f0) && (f = f->next); f; f = f->next) {
+  for(f = f0, f = f->next; f; f = f->next) {
     if(f->key_str && !slist_getentry(sl0, f->key_str)) slist_append_str(&sl0, f->key_str);
   }
   file_free_file(f0);
