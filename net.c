@@ -54,7 +54,6 @@
 #include "net.h"
 #include "file.h"
 #include "module.h"
-#include "hotplug.h"
 #include "url.h"
 #include "auto2.h"
 
