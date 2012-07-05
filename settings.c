@@ -14,7 +14,6 @@
 
 #include "global.h"
 #include "settings.h"
-#include "text.h"
 #include "util.h"
 #include "info.h"
 #include "module.h"
@@ -341,7 +340,7 @@ int set_settings()
     di_none
   };
 
-  return dia_menu2(txt_get(TXT_SETTINGS), 40, set_settings_cb, items, di_set_settings_last);
+  return dia_menu2("Settings", 40, set_settings_cb, items, di_set_settings_last);
 }
 
 
@@ -375,7 +374,7 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_animate:
-      rc = dia_yesno(txt_get(TXT_ASK_EXPLODE), config.explode_win ? YES : NO);
+      rc = dia_yesno("Use animated windows?", config.explode_win ? YES : NO);
       if(rc == YES)
         config.explode_win = 1;
       else if(rc == NO)
@@ -384,7 +383,7 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_forceroot:
-      rc = dia_yesno(txt_get(TXT_ASK_RI_FORCE), config.download.instsys ? YES : NO);
+      rc = dia_yesno("Should the root image be loaded into the RAM disk?", config.download.instsys ? YES : NO);
       config.download.instsys_set = 1;
       if(rc == YES)
         config.download.instsys = 1;
@@ -394,12 +393,12 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_rootimage:
-      (void) dia_input2(txt_get(TXT_ENTER_ROOTIMAGE), &config.rootimage, 30, 0);
+      (void) dia_input2("Enter the path and name of the file to load into the RAM disk as the root file system.", &config.rootimage, 30, 0);
       rc = 1;
       break;
 
     case di_set_vnc:
-      rc = dia_yesno(txt_get(TXT_VNC_YES_NO), config.vnc ? YES : NO);
+      rc = dia_yesno("Use VNC for install?", config.vnc ? YES : NO);
       if(rc != ESCAPE) {
         if((config.vnc = rc == YES ? 1 : 0)) {
           config.net.do_setup |= DS_VNC;
@@ -412,7 +411,7 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_usessh:
-      rc = dia_yesno(txt_get(TXT_SSH_YES_NO), config.usessh ? YES : NO);
+      rc = dia_yesno("Start SSH for Text Install?", config.usessh ? YES : NO);
       if(rc != ESCAPE) {
         if((config.usessh = rc == YES ? 1 : 0)) {
           config.net.do_setup |= DS_SSH;
@@ -425,7 +424,7 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_startshell:
-      rc = dia_yesno(txt_get(TXT_START_SHELL_YAST), config.startshell ? YES : NO);
+      rc = dia_yesno("Start shell before and after YaST?", config.startshell ? YES : NO);
       if(rc != ESCAPE) config.startshell = rc == YES ? 1 : 0;
       rc = 1;
       break;
@@ -461,12 +460,12 @@ void set_choose_display()
 {
   static int last_item = 0;
   char *items[] = {
-    txt_get(TXT_COLOR_DISPLAY),
-    txt_get(TXT_MONO_DISPLAY),
+    "Color display",
+    "Monochrome display",
     NULL
   };
 
-  last_item = dia_list(txt_get(TXT_CHOOSE_DISPLAY), 30, NULL, items, last_item, align_center);
+  last_item = dia_list("Select the display type.", 30, NULL, items, last_item, align_center);
 
   config.color = 3 - last_item;
 
@@ -526,7 +525,9 @@ void set_choose_keytable(int always_show)
   }
   items[cnt] = NULL;
 
-  i = dia_list(txt_get(TXT_CHOOSE_KEYMAP), 24, NULL, items, default_idx + 1, align_left);
+  i = dia_list("Choose a keyboard map.\n"
+               "YaST will offer additional keyboard tables later.",
+               24, NULL, items, default_idx + 1, align_left);
 
   if(i) set_activate_keymap(keymap[i - 1].mapname);
 }
@@ -599,7 +600,7 @@ void set_choose_language()
   i = set_get_current_language(lang_undef);
   if(set_languages_arm[i - 1].id == lang_dummy) i = set_get_current_language(LANG_DEFAULT);
 
-  i = dia_list(txt_get(TXT_CHOOSE_LANGUAGE), 29, NULL, items, i, align_left);
+  i = dia_list("Select the language.", 29, NULL, items, i, align_left);
 
   if(i > 0) set_activate_language(set_languages_arm[i - 1].id);
 }
@@ -624,7 +625,7 @@ void set_expert_menu()
 
   t = time(NULL);
   gm = gmtime(&t);
-  sprintf(tmp, "%s -- Time: %02d:%02d", txt_get(TXT_EXPERT), gm->tm_hour, gm->tm_min);
+  sprintf(tmp, "%s -- Time: %02d:%02d", "Expert", gm->tm_hour, gm->tm_min);
 
   dia_menu2(tmp, 42, set_expert_cb, items, di_set_expert_last);
 }
@@ -666,7 +667,7 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_extras_change:
-        i = dia_input(txt_get(TXT_CHANGE_CONFIG), s, sizeof s - 1, 35, 0);
+        i = dia_input("Change config", s, sizeof s - 1, 35, 0);
         if(!i) {
           f = file_parse_buffer(s, kf_cfg + kf_cmd + kf_cmd_early);
           file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);

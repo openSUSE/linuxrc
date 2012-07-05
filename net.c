@@ -47,7 +47,6 @@
 #include <hd.h>
 
 #include "global.h"
-#include "text.h"
 #include "dialog.h"
 #include "window.h"
 #include "util.h"
@@ -105,15 +104,15 @@ void net_ask_password()
   if(config.vnc && (!config.net.vncpassword || strlen(config.net.vncpassword) < 8)) {
     if(!config.win) util_disp_init();
     for(;;) {
-      if(dia_input2(txt_get(TXT_VNC_PASSWORD), &config.net.vncpassword, 20, 1)) break;
+      if(dia_input2("Enter your VNC password.", &config.net.vncpassword, 20, 1)) break;
       if(config.net.vncpassword && strlen(config.net.vncpassword) >= 8) break;
-      dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
+      dia_message("Password is too short (must have at least 8 characters).", MSGTYPE_ERROR);
     }
   }
 
   if(config.usessh && !config.net.sshpassword) {
     if(!config.win) util_disp_init();
-    dia_input2(txt_get(TXT_SSH_PASSWORD), &config.net.sshpassword, 20, 1);
+    dia_input2("Enter your temporary SSH password.", &config.net.sshpassword, 20, 1);
   }
 
   if(config.win && !win_old) util_disp_done();
@@ -132,7 +131,7 @@ void net_ask_domain()
   do {
     err = ndomains = 0;
 
-    dia_input2(txt_get(TXT_INPUT_DOMAIN), &tmp, 40, 0);  
+    dia_input2("Enter your search domains, separated by a space:", &tmp, 40, 0);  
     if(!tmp) {
       str_copy(&config.net.domain, NULL);
       return;
@@ -142,13 +141,13 @@ void net_ask_domain()
 
     for(sl = sl0; sl; sl = sl->next) {
       if(++ndomains > 6) {
-        dia_message(txt_get(TXT_DOMAIN_TOOMANY), MSGTYPE_ERROR);
+        dia_message("Only up to six search domains are allowed.", MSGTYPE_ERROR);
         break;
       }
       str_copy(&ip.name, sl->key);
 /*      net_check_address(&ip, 0);
       if(!ip.ok) {
-        dia_message(txt_get(TXT_DOMAIN_ALPHANUMERIC), MSGTYPE_ERROR);
+        dia_message("Each domain must be a valid IP address.", MSGTYPE_ERROR);
         break;
       } */
     }
@@ -197,7 +196,7 @@ int net_config()
   if(
     config.win &&
     config.net.is_configured &&
-    (!config.manual || dia_yesno(txt_get(TXT_NET_CONFIGURED), YES) == YES)
+    (!config.manual || dia_yesno("Your network is already configured. Keep this configuration?", YES) == YES)
   ) {
     return 0;
   }
@@ -210,7 +209,7 @@ int net_config()
 
   if(config.win && config.net.setup != NS_DHCP) {
     if((config.net.setup & NS_DHCP)) {
-      sprintf(buf, txt_get(TXT_ASK_DHCP), "DHCP");
+      sprintf(buf, "Automatic configuration via %s?", "DHCP");
       rc = dia_yesno(buf, NO);
     }
     else {
@@ -235,7 +234,7 @@ int net_config()
   if(rc) return -1;
 
   if(net_activate_ns()) {
-    dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
+    dia_message("An error occurred during the network configuration. Your network card probably was not recognized by the kernel.", MSGTYPE_ERROR);
     config.net.configured = nc_none;
     if(!config.test) return rc = -1;
   }
@@ -636,7 +635,7 @@ int net_activate4()
 
        if (rc) {
            util_error_trace("net_activate: address %s in use by another machine!\n", inet_ntoa(config.net.hostname.ip));
-           sprintf(command, txt_get(TXT_IP_ADDRESS_IN_USE), inet_ntoa(config.net.hostname.ip));
+           sprintf(command, "IP address %s is already in use by another machine!", inet_ntoa(config.net.hostname.ip));
            dia_message(command, MSGTYPE_ERROR);
            return 1;
        }
@@ -1349,19 +1348,19 @@ int net_choose_device()
   static int last_item = 0;
   static struct {
     char *dev;
-    int name;
+    char *name;
   } net_dev[] = {
-    { "eth",   TXT_NET_ETH0  },
-    { "veth",  TXT_NET_ETH0  },
-    { "plip",  TXT_NET_PLIP  },
-    { "arc",   TXT_NET_ARC0  },
-    { "fddi",  TXT_NET_FDDI  },
-    { "hip",   TXT_NET_HIPPI },
-    { "ctc",   TXT_NET_CTC   },
-    { "escon", TXT_NET_ESCON },
-    { "ci",    TXT_NET_CLAW  },
-    { "iucv",  TXT_NET_IUCV  },
-    { "hsi",   TXT_NET_HSI   }
+    { "eth",   "ethernet network card"  },
+    { "veth",  "ethernet network card"  },
+    { "plip",  "parallel port"  },
+    { "arc",   "arcnet network card"  },
+    { "fddi",  "FDDI network card"  },
+    { "hip",   "HIPPI network card" },
+    { "ctc",   "channel to channel connection"   },
+    { "escon", "ESCON connection" },
+    { "ci",    "channel attached cisco router"  },
+    { "iucv",  "IUCV connection"  },
+    { "hsi",   "Hipersocket"   }
   };
   hd_data_t *hd_data = calloc(1, sizeof *hd_data);
   hd_t *hd, *hd_cards;
@@ -1374,7 +1373,7 @@ int net_choose_device()
   }
 
   if(config.manual == 1 && !net_drivers_loaded) {
-    dia_info(&win, txt_get(TXT_LOAD_NETWORK_DRIVERS), MSGTYPE_INFO);
+    dia_info(&win, "Detecting and loading network drivers", MSGTYPE_INFO);
     load_network_mods();
     win_close(&win);
     net_drivers_loaded = 1;
@@ -1403,7 +1402,7 @@ int net_choose_device()
     for(item_cnt = 0, f = f0; f && item_cnt < max_items; f = f->next) {
       for(i = 0; i < sizeof net_dev / sizeof *net_dev; i++) {
         if(strstr(f->key_str, net_dev[i].dev) == f->key_str) {
-          strprintf(&buf, "%-6s : %s", f->key_str, txt_get(net_dev[i].name));
+          strprintf(&buf, "%-6s : %s", f->key_str, net_dev[i].name);
           item_devs[item_cnt] = strdup(f->key_str);
           items[item_cnt++] = strdup(buf);
           break;
@@ -1439,7 +1438,7 @@ int net_choose_device()
 #define MAX_NET_DEVICES_SHOWN 20
       if(item_cnt > MAX_NET_DEVICES_SHOWN) {
         item_hds[item_cnt] = NULL;
-        strprintf(items + item_cnt++, txt_get(TXT_MANUAL_NETDEV_PARAMS));
+        strprintf(items + item_cnt++, "Enter network device parameters manually");
         break;
       } else {
         int lcss = -1;
@@ -1485,13 +1484,15 @@ int net_choose_device()
   }
 
   if(item_cnt == 0) {
-    dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
+    dia_message("No network device found.\n"
+                "Load a network module first.",
+                MSGTYPE_ERROR);
     choice = -1;
   } else if(item_cnt == 1) {
     choice = 1;
   }
   else {
-    choice = dia_list(txt_get(TXT_CHOOSE_NET), 50, NULL, items, last_item, align_left);
+    choice = dia_list("Choose the network device.", 50, NULL, items, last_item, align_left);
     if(choice) last_item = choice;
   }
 
@@ -1501,7 +1502,9 @@ int net_choose_device()
     net_activate_s390_devs_ex(item_hds[choice - 1], &item_devs[choice - 1]);
     if(!item_devs[choice - 1]) {
 #endif
-      dia_message(txt_get(TXT_NO_NETDEVICE), MSGTYPE_ERROR);
+      dia_message("No network device found.\n"
+                  "Load a network module first.",
+                  MSGTYPE_ERROR);
       choice = -1;
 #if defined(__s390__) || defined(__s390x__)
     }
@@ -1592,7 +1595,9 @@ static void net_show_error(enum nfs_stat status_rv)
   }
 
   sprintf(tmp,
-    config.win ? txt_get(TXT_ERROR_NFSMOUNT) : "mount: nfs mount failed, server says: %s\n",
+    config.win ? "An error occurred while trying to mount the NFS directory.\n\n"
+                 "Reason given by server: %s" 
+               : "mount: nfs mount failed, server says: %s\n",
     s
   );
 
@@ -1630,7 +1635,7 @@ void net_setup_nameserver()
           if(config.linemode) s = "Enter the IP address of your name server. Leave empty or enter \"+++\" if you don't need one.";
         }
         else {
-           sprintf(buf, txt_get(config.linemode ? TXT_INPUT_NAMED1_S390 : TXT_INPUT_NAMED1), u + 1);
+           sprintf(buf, config.linemode ? "Enter the IP of name server %u or \"+++\" for none." : "Enter the IP of name server %u or press ESC.", u + 1);
            s = buf;
         }
         if(net_get_address(s, &config.net.nameserver[u], 0)) break;
@@ -1707,7 +1712,7 @@ int net_input_data()
       name2inet(&config.net.ptphost, config.net.hostname.name);
     }
 
-    if(net_get_address(txt_get(TXT_INPUT_PLIP_IP), &config.net.ptphost, 1)) return -1;
+    if(net_get_address("Enter the IP address of the PLIP partner.", &config.net.ptphost, 1)) return -1;
 
     if(!config.net.gateway.name) {
       name2inet(&config.net.gateway, config.net.ptphost.name);
@@ -1731,7 +1736,7 @@ int net_input_data()
         !config.net.netmask.ok &&
         (config.net.setup & NS_NETMASK)
       ) {
-        if(net_get_address(txt_get(TXT_INPUT_NETMASK), &config.net.netmask, 0)) return -1;
+        if(net_get_address("Enter your netmask. For a normal class C network, this is usually 255.255.255.0.", &config.net.netmask, 0)) return -1;
       }
 
       if(config.net.hostname.ipv4) {
@@ -1789,7 +1794,7 @@ int net_get_address(char *text, inet_t *inet, int do_dns)
       break;
     }
     if(net_check_address(inet, do_dns)) err = 2;
-    if(err) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+    if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
   } while(err);
 
   return err;
@@ -1849,7 +1854,7 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
     else {
       err = 1;
     }
-    if(err) dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+    if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
   } while(err);
 
   if(!err) {
@@ -1928,7 +1933,7 @@ int net_dhcp4()
   }
 
   if(config.win) {
-    sprintf(cmd, txt_get(TXT_SEND_DHCP), "DHCP");
+    sprintf(cmd, "Sending %s request...", "DHCP");
     dia_info(&win, cmd, MSGTYPE_INFO);
   }
 
@@ -2017,13 +2022,13 @@ int net_dhcp4()
     if(config.win) {
       if(config.net.dhcpfail && strcmp(config.net.dhcpfail, "ignore")) {
         if(!strcmp(config.net.dhcpfail, "show")) {
-          sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
+          sprintf(cmd, "%s configuration failed.", "DHCP");
           dia_info(&win, cmd, MSGTYPE_ERROR);
           sleep(4);
           win_close(&win);
         }
         else if(!strcmp(config.net.dhcpfail, "manual")) {
-          sprintf(cmd, txt_get(TXT_ERROR_DHCP), "DHCP");
+          sprintf(cmd, "%s configuration failed.", "DHCP");
           i = dia_yesno(cmd, NO);
           if(i == YES) {
             // is_static = 1;
@@ -2076,7 +2081,7 @@ int net_dhcp6()
   }
 
   if(config.win) {
-    strprintf(&cmd, txt_get(TXT_SEND_DHCP), "DHCP6");
+    strprintf(&cmd, "Sending %s request...", "DHCP6");
     dia_info(&win, cmd, MSGTYPE_INFO);
   }
 
@@ -2135,7 +2140,7 @@ int net_dhcp6()
   if(config.win) win_close(&win);
 
   if(!ok && config.win) {
-    strprintf(&cmd, txt_get(TXT_ERROR_DHCP), "DHCP6");
+    strprintf(&cmd, "%s configuration failed.", "DHCP6");
     dia_message(cmd, MSGTYPE_ERROR);
   }
 
@@ -2260,7 +2265,7 @@ int net_check_ccw_address(char* addr)
 
 error:
   if(!config.win) util_disp_init();
-  dia_message(txt_get(TXT_INVALID_CCW_ADDRESS), MSGTYPE_ERROR);
+  dia_message("This is not a valid CCW address.", MSGTYPE_ERROR);
   return -1;
 }
 
@@ -2288,12 +2293,12 @@ static int net_s390_getrwchans_ex(hd_t* hd)
   }
 
   IFNOTAUTO(config.hwp.readchan)
-    if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_READ), &config.hwp.readchan, 9, 0)))
+    if((rc=dia_input2_chopspace("Device address for read channel", &config.hwp.readchan, 9, 0)))
       return rc;
   if((rc=net_check_ccw_address(config.hwp.readchan)))
     return rc;
   IFNOTAUTO(config.hwp.writechan)
-    if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_WRITE), &config.hwp.writechan, 9, 0)))
+    if((rc=dia_input2_chopspace("Device address for write channel", &config.hwp.writechan, 9, 0)))
       return rc;
   if((rc=net_check_ccw_address(config.hwp.writechan)))
     return rc;
@@ -2372,7 +2377,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     };
   
     IFNOTAUTO(config.hwp.type) {
-      di = dia_menu2(txt_get(TXT_CHOOSE_390NET), 60, 0, items, config.hwp.type?:di_390net_iucv);
+      di = dia_menu2("Please select the type of your network device.", 60, 0, items, config.hwp.type?:di_390net_iucv);
       config.hwp.type = di;
     } else di = config.hwp.type;
   }
@@ -2387,7 +2392,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   {
   case di_390net_iucv:
     IFNOTAUTO(config.hwp.userid)
-      if((rc=dia_input2_chopspace(txt_get(TXT_IUCV_PEER), &config.hwp.userid,20,0))) return rc;
+      if((rc=dia_input2_chopspace("Please enter the name (user ID) of the target VM guest.", &config.hwp.userid,20,0))) return rc;
 
     if(mod_modprobe("netiucv",NULL)) {
       dia_message("failed to load netiucv module",MSGTYPE_ERROR);
@@ -2423,7 +2428,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     else rc=0;    
     IFNOTAUTO(config.hwp.protocol)
     {
-      rc=dia_menu2(txt_get(TXT_CHOOSE_CTC_PROTOCOL), 50, 0, protocols, rc);
+      rc=dia_menu2("Select protocol for this CTC device.", 50, 0, protocols, rc);
       switch(rc)
       {
       case di_ctc_compat: config.hwp.protocol=0+1; break;
@@ -2453,7 +2458,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 
         IFNOTAUTO(config.hwp.interface)
         {
-          rc = dia_menu2(txt_get(TXT_CHOOSE_OSA_INTERFACE), 33, 0, interfaces, config.hwp.interface?:di_osa_qdio);
+          rc = dia_menu2("Please choose the CCW bus interface.", 33, 0, interfaces, config.hwp.interface?:di_osa_qdio);
           if(rc == -1) return rc;
           config.hwp.interface=rc;
         }
@@ -2466,7 +2471,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         IFNOTAUTO(config.hwp.portno)
         {
           char* port = NULL;
-          if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &port,2,0))) return rc;
+          if((rc=dia_input2_chopspace("Enter the relative port number", &port,2,0))) return rc;
           if(port) config.hwp.portno = atoi(port) + 1;
           else config.hwp.portno = 0 + 1;
         }
@@ -2482,24 +2487,24 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       IFNOTAUTO(config.hwp.datachan)
-        if((rc=dia_input2_chopspace(txt_get(TXT_CTC_CHANNEL_DATA), &config.hwp.datachan, 9, 0))) return rc;
+        if((rc=dia_input2_chopspace("Device address for data channel", &config.hwp.datachan, 9, 0))) return rc;
       if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
 
       if (config.hwp.type != di_390net_hsi) {
 	  IFNOTAUTO(config.hwp.portname)
 	  {
-	      if((rc=dia_input2_chopspace(txt_get(TXT_QETH_PORTNAME), &config.hwp.portname,9,0))) return rc;
+	      if((rc=dia_input2_chopspace("Portname to use", &config.hwp.portname,9,0))) return rc;
 	      // FIXME: warn about problems related to empty portnames
 	  }
       }
       
       IFNOTAUTO(config.hwp.layer2)
       {
-        config.hwp.layer2 = dia_yesno(txt_get(TXT_ENABLE_LAYER2), YES) == YES ? 2 : 1;
+        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 2 : 1;
       }
       if(config.hwp.layer2 == 2) {
         IFNOTAUTO(config.hwp.osahwaddr) {
-          dia_input2(txt_get(TXT_HWADDR), &config.hwp.osahwaddr, 17, 1);
+          dia_input2("MAC address", &config.hwp.osahwaddr, 17, 1);
         }
       }
       
@@ -2514,7 +2519,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       
       IFNOTAUTO(config.hwp.portname)
-        if((rc=dia_input2_chopspace(txt_get(TXT_OSA_PORTNO), &config.hwp.portname,9,0))) return rc;
+        if((rc=dia_input2_chopspace("Enter the relative port number", &config.hwp.portname,9,0))) return rc;
 
     }
     
@@ -2889,7 +2894,7 @@ int wlan_auth_cb(dia_item_t di)
         }
 
         if(config.net.wlan.key_type == kt_pass && strlen(config.net.wlan.key) < 8) {
-          dia_message(txt_get(TXT_VNC_PASSWORD_TOO_SHORT), MSGTYPE_ERROR);
+          dia_message("Password is too short (must have at least 8 characters).", MSGTYPE_ERROR);
           rc = -1;
           break;
         }

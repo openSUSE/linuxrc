@@ -56,7 +56,6 @@
 #include "window.h"
 #include "module.h"
 #include "keyboard.h"
-#include "text.h"
 #include "dialog.h"
 #include "net.h"
 #include "auto2.h"
@@ -568,7 +567,7 @@ int util_check_break (void)
     {
     if (kbd_getch (FALSE) == KEY_CTRL_C)
         {
-        if (dia_yesno (txt_get (TXT_ASK_BREAK), 2) == YES)
+        if (dia_yesno ("Abort?", 2) == YES)
             return (1);
         else
             return (0);
@@ -1051,10 +1050,10 @@ int show_driver_updates()
 {
 
   if(config.update.name_list) {
-    dia_show_lines2(txt_get(TXT_DUD_LIST), config.update.name_list, 64);
+    dia_show_lines2("Driver Update list", config.update.name_list, 64);
   }
   else {
-    dia_message(txt_get(TXT_DUD_NOT_YET), MSGTYPE_INFO);
+    dia_message("No Driver Updates so far.", MSGTYPE_INFO);
   }
 
   return 0;

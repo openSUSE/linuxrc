@@ -24,7 +24,6 @@
 
 #include "global.h"
 #include "file.h"
-#include "text.h"
 #include "util.h"
 #include "module.h"
 #include "window.h"

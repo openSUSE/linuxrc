@@ -18,7 +18,6 @@
 #include "global.h"
 #include "window.h"
 #include "keyboard.h"
-#include "text.h"
 #include "util.h"
 #include "display.h"
 #include "dialog.h"
@@ -32,91 +31,90 @@
 
 struct {
   dia_item_t item;
-  int text_id;
   char *text;
 } dia_texts[] = {
-  { di_main_start,       TXT_MENU_START,          },
-  { di_main_settings,    TXT_SETTINGS,            },
-  { di_main_expert,      TXT_EXPERT,              },
-  { di_main_exit,        TXT_END_REBOOT,          },
+  { di_main_start,       "Start Installation",          },
+  { di_main_settings,    "Settings",            },
+  { di_main_expert,      "Expert",              },
+  { di_main_exit,        "Exit or Reboot",          },
 
-  { di_expert_info,      TXT_MENU_INFO,           },
-  { di_expert_modules,   TXT_MENU_MODULES,        },
-  { di_expert_verify,    TXT_CHECK_CD,            },
-  { di_expert_eject,     TXT_EJECT_CD,            },
+  { di_expert_info,      "System Information",           },
+  { di_expert_modules,   "Kernel Modules (Hardware Drivers)",        },
+  { di_expert_verify,    "Verify Installation CD-ROM/DVD",            },
+  { di_expert_eject,     "Eject CD",            },
 
-  { di_exit_reboot,      TXT_END_REBOOT,          },
-  { di_exit_halt,        TXT_POWER_OFF,           },
+  { di_exit_reboot,      "Exit or Reboot",          },
+  { di_exit_halt,        "Power off",           },
 
-  { di_set_lang,         TXT_MENU_LANG,           },
-  { di_set_display,      TXT_MENU_DISPLAY,        },
-  { di_set_keymap,       TXT_MENU_KEYMAP,         },
-  { di_set_animate,      TXT_ASK_ANIMATE,         },
-  { di_set_forceroot,    TXT_FORCE_ROOTIMAGE,     },
-  { di_set_rootimage,    TXT_NEW_ROOTIMAGE,       },
-  { di_set_vnc,          TXT_VNC_SWITCH,          },
-  { di_set_usessh,       TXT_SSH_SWITCH,          },
-  { di_set_startshell,   TXT_START_SHELL_YAST,    },
-  { di_set_slp,          TXT_GET_SLP_INFO,        },
+  { di_set_lang,         "Language",           },
+  { di_set_display,      "Display",        },
+  { di_set_keymap,       "Keymap",         },
+  { di_set_animate,      "Animation",         },
+  { di_set_forceroot,    "Load Root Image into RAM Disk",     },
+  { di_set_rootimage,    "Enter Root Image",       },
+  { di_set_vnc,          "VNC Enable or Disable",          },
+  { di_set_usessh,       "Enable or Disable SSH Mode",          },
+  { di_set_startshell,   "Start shell before and after YaST?",    },
+  { di_set_slp,          "Get SLP info",        },
 
-  { di_inst_install,     TXT_START_INSTALL,       },
-  { di_inst_system,      TXT_BOOT_SYSTEM,         },
-  { di_inst_rescue,      TXT_START_RESCUE,        },
-  { di_inst_update_add,  TXT_ADD_DRIVER_UPDATE,   },
-  { di_inst_update_show, TXT_SHOW_DRIVER_UPDATES, },
+  { di_inst_install,     "Start Installation or Update",       },
+  { di_inst_system,      "Boot Installed System",         },
+  { di_inst_rescue,      "Start Rescue System",        },
+  { di_inst_update_add,  "Add Driver Update",   },
+  { di_inst_update_show, "Show Driver Updates", },
 
-  { di_source_cdrom,     TXT_DVD,                 },
-  { di_source_net,       TXT_NET,                 },
-  { di_source_hd,        TXT_HARDDISK,            },
-  { di_source_floppy,    TXT_FLOPPY,              },
+  { di_source_cdrom,     "DVD / CD-ROM",                 },
+  { di_source_net,       "Network",                 },
+  { di_source_hd,        "Hard Disk",            },
+  { di_source_floppy,    "Floppy",              },
 
-  { di_netsource_nfs,    0, "NFS"                 },
-  { di_netsource_smb,    0, "SMB / CIFS (Windows Share)" },
-  { di_netsource_ftp,    0, "FTP"                 },
-  { di_netsource_http,   0, "HTTP"                },
-  { di_netsource_tftp,   0, "TFTP"                },
+  { di_netsource_nfs,    "NFS"                 },
+  { di_netsource_smb,    "SMB / CIFS (Windows Share)" },
+  { di_netsource_ftp,    "FTP"                 },
+  { di_netsource_http,   "HTTP"                },
+  { di_netsource_tftp,   "TFTP"                },
 
-  { di_info_kernel,      TXT_INFO_KERNEL          },
-  { di_info_drives,      TXT_DRIVES               },
-  { di_info_modules,     TXT_INFO_MODULES         },
-  { di_info_pci,         TXT_INFO_PCI             },
-  { di_info_cpu,         TXT_INFO_CPU             },
-  { di_info_mem,         TXT_INFO_MEM             },
-  { di_info_ioports,     TXT_INFO_IOPORTS         },
-  { di_info_interrupts,  TXT_INFO_IRQS            },
-  { di_info_devices,     TXT_INFO_DEVICES         },
-  { di_info_netdev,      TXT_INFO_NETDEV          },
-  { di_info_dma,         TXT_INFO_DMA             },
+  { di_info_kernel,      "Kernel Messages"          },
+  { di_info_drives,      "Hard Disks or CD-ROMs"               },
+  { di_info_modules,     "Modules"         },
+  { di_info_pci,         "PCI"             },
+  { di_info_cpu,         "Processor"             },
+  { di_info_mem,         "Memory"             },
+  { di_info_ioports,     "I/O Ports"         },
+  { di_info_interrupts,  "Interrupts"            },
+  { di_info_devices,     "Devices"         },
+  { di_info_netdev,      "Network Cards"          },
+  { di_info_dma,         "DMA"             },
 
-  { di_extras_info,      TXT_SHOW_CONFIG          },
-  { di_extras_change,    TXT_CHANGE_CONFIG        },
-  { di_extras_shell,     TXT_START_SHELL          },
-  { di_extras_command,   TXT_RUN_COMMAND          },
-  { di_extras_quit,      TXT_QUIT_LINUXRC         },
+  { di_extras_info,      "Show config"          },
+  { di_extras_change,    "Change config"        },
+  { di_extras_shell,     "Start shell"          },
+  { di_extras_command,   "Run command"          },
+  { di_extras_quit,      "Quit linuxrc"         },
   
-  { di_display_vnc,    	 0, "VNC"	          },
-  { di_display_x11,  	 0, "X11"	          },
-  { di_display_ssh,      0, "SSH"	          },
-  { di_display_console,  0, "ASCII Console"	  },
+  { di_display_vnc,    	 "VNC"	          },
+  { di_display_x11,  	 "X11"	          },
+  { di_display_ssh,      "SSH"	          },
+  { di_display_console,  "ASCII Console"	  },
   
-  { di_390net_osa,	 TXT_390NET_OSA           },
-  { di_390net_ctc,	 TXT_390NET_CTC	          },
-  { di_390net_escon,	 TXT_390NET_ESCON         },
-  { di_390net_iucv,	 TXT_390NET_IUCV          },
-  { di_390net_hsi,	 TXT_390NET_HSI	          },
-  { di_390net_sep,	 0, "#--------------------" },
+  { di_390net_osa,	 "OSA-2 or OSA Express"           },
+  { di_390net_ctc,	 "Channel To Channel (CTC)"	          },
+  { di_390net_escon,	 "ESCON"         },
+  { di_390net_iucv,	 "Inter-User Communication Vehicle (IUCV)"          },
+  { di_390net_hsi,	 "Hipersockets"	          },
+  { di_390net_sep,	 "#--------------------" },
   
-  { di_ctc_compat,	 TXT_CTC_PROT_COMPAT      },
-  { di_ctc_ext,		 TXT_CTC_PROT_EXT         },
-  { di_ctc_zos390,	 TXT_CTC_PROT_ZOS390      },
+  { di_ctc_compat,	 "Compatibility mode (default)"      },
+  { di_ctc_ext,		 "Extended mode"         },
+  { di_ctc_zos390,	 "Compatibility mode for OS/390 and z/OS peers"      },
   
-  { di_osa_lcs,		 TXT_OSA_LCS              },
-  { di_osa_qdio,	 TXT_OSA_QDIO             },
+  { di_osa_lcs,		 "LCS"              },
+  { di_osa_qdio,	 "QDIO"             },
 
-  { di_wlan_open,        0, "No Authentication"   },
-  { di_wlan_wep_o,       0, "WEP - Open"          },
-  { di_wlan_wep_r,       0, "WEP - Shared Key"    },
-  { di_wlan_wpa,         0, "WPA-PSK"             },
+  { di_wlan_open,        "No Authentication"   },
+  { di_wlan_wep_o,       "WEP - Open"          },
+  { di_wlan_wep_r,       "WEP - Shared Key"    },
+  { di_wlan_wpa,         "WPA-PSK"             },
 
 };
 
@@ -141,7 +139,7 @@ int dia_contabort(char *txt, int def)
 {
   int i;
 
-  i = dia_binary(txt, txt_get(TXT_CONTINUE), txt_get(TXT_ABORT), def == NO ? 1 : 0);
+  i = dia_binary(txt, "Continue", "Abort", def == NO ? 1 : 0);
 
   switch(i) {
     case 0:
@@ -157,7 +155,7 @@ int dia_yesno(char *txt, int def)
 {
   int i;
 
-  i = dia_binary(txt, txt_get(TXT_YES), txt_get(TXT_NO), def == NO ? 1 : 0);
+  i = dia_binary(txt, "Yes", "No", def == NO ? 1 : 0);
 
   switch(i) {
     case 0:
@@ -173,7 +171,7 @@ int dia_okcancel(char *txt, int def)
 {
   int i;
 
-  i = dia_binary(txt, txt_get(TXT_OK), txt_get(TXT_CANCEL), def == NO ? 1 : 0);
+  i = dia_binary(txt, "OK", "Back", def == NO ? 1 : 0);
 
   switch(i) {
     case 0:
@@ -347,7 +345,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
         win_ri.fg_color = colors_prg->msg_fg;
         }
     width_ii = dia_win_open (&win_ri, txt_tv);
-    s = txt_get(msgtype_iv == MSGTYPE_REBOOT ? TXT_REBOOT : TXT_OK);
+    s = msgtype_iv == MSGTYPE_REBOOT ? "Reboot" : "OK";
     util_generate_button (&button_ri, s, utf8_strwidth(s));
     win_add_button (&win_ri, &button_ri,
                     width_ii / 2 - utf8_strwidth (button_ri.text) / 2 - 1,
@@ -530,8 +528,8 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
         free (lines_ati [i_ii - 1]);
         }
     
-    s0 = txt_get (TXT_OK);
-    s1 = txt_get (TXT_CANCEL);
+    s0 = "OK";
+    s1 = "Back";
 
     len0 = utf8_strwidth(s0);
     len1 = utf8_strwidth(s1);
@@ -1082,7 +1080,7 @@ int dia_show_lines (char *head_tv, char *lines_atv [], int nr_lines_iv,
         free (lines_ati [i_ii - 1]);
         }
     
-    s = txt_get (TXT_OK);
+    s = "OK";
     util_generate_button (&button_ri, s, utf8_strwidth(s));
 
     win_add_button (&file_win_ri, &button_ri,
@@ -1417,7 +1415,7 @@ void dia_handle_ctrlc (void)
 
     for (;;) {
       if (!config.linemode) {
-	i = dia_message(txt_get(TXT_NO_CTRLC), MSGTYPE_ERROR);
+	i = dia_message("You cannot exit Linuxrc with <Ctrl-C>.", MSGTYPE_ERROR);
       } else {
 	static dia_item_t items[] = {
 	  di_extras_info,
@@ -1466,7 +1464,7 @@ void dia_handle_ctrlc (void)
 	util_status_info(0);
       }
       else if(i == -73) {
-	i = dia_input(txt_get(TXT_CHANGE_CONFIG), s, sizeof s - 1, 35, 0);
+	i = dia_input("Change config", s, sizeof s - 1, 35, 0);
 	if(!i) {
 	  f = file_parse_buffer(s, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
@@ -1510,7 +1508,7 @@ char *dia_get_text(dia_item_t di)
 
   for(i = 0; (unsigned) i < sizeof dia_texts / sizeof *dia_texts; i++) {
     if(dia_texts[i].item == di) {
-      s = dia_texts[i].text ?: txt_get(dia_texts[i].text_id);
+      s = dia_texts[i].text;
       break;
     }
   }

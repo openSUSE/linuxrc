@@ -20,7 +20,6 @@
 #include <hd.h>
 
 #include "global.h"
-#include "text.h"
 #include "dialog.h"
 #include "util.h"
 #include "module.h"
@@ -50,7 +49,7 @@ void info_menu()
     di_none
   };
 
-  dia_menu2(txt_get(TXT_MENU_INFO), 26, info_show_cb, items, di_info_menu_last);
+  dia_menu2("System Information", 26, info_show_cb, items, di_info_menu_last);
 }
 
 
@@ -70,7 +69,7 @@ int info_show_cb(dia_item_t di)
   s = NULL;
   switch(di) {
     case di_info_kernel:
-      dia_show_file(txt_get(TXT_INFO_KERNEL), kernellog_tg, FALSE);
+      dia_show_file("Kernel Messages", kernellog_tg, FALSE);
       break;
 
     case di_info_drives:
@@ -116,7 +115,7 @@ int info_show_cb(dia_item_t di)
   if(s) {
     strcat(buf, s);
     i = dia_show_file(dia_get_text(di), buf, FALSE);
-    if(i) dia_message(txt_get(TXT_NO_INFO_AVAIL), MSGTYPE_INFO);
+    if(i) dia_message("No information available.", MSGTYPE_INFO);
   }
 
   return 1;
@@ -256,9 +255,9 @@ void info_show_hardware()
 
   }
 
-  if(!sl0) slist_append_str(&sl0, txt_get(TXT_NO_DRIVES));
+  if(!sl0) slist_append_str(&sl0, "No hard disks or CD-ROM drives have been detected so far.");
 
-  dia_show_lines2(txt_get(TXT_DRIVES), sl0, 60);
+  dia_show_lines2("Hard Disks or CD-ROMs", sl0, 60);
 
   slist_free(sl0);
 

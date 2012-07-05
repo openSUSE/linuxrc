@@ -93,7 +93,7 @@ void digest_media_verify()
   }
 
   if(iso.err) {
-    if(dia_message(txt_get(TXT_INSERT_CD_DVD), MSGTYPE_INFO)) return;
+    if(dia_message("Insert Installation CD-ROM or DVD.", MSGTYPE_INFO)) return;
 
     for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
       if(hd->is.notready) continue;
@@ -103,7 +103,7 @@ void digest_media_verify()
   }
 
   if(iso.err) {
-    dia_message(txt_get(TXT_NO_CD_DVD), MSGTYPE_ERROR);
+    dia_message("No CD-ROM or DVD found.", MSGTYPE_ERROR);
     config.manual=1;
     return;
   }
@@ -122,7 +122,7 @@ void digest_media_verify()
   fprintf(stderr, "\n");
 
   if(!*iso.app_id || !iso.digest.got_old || iso.pad >= iso.size) {
-    sprintf(buf, txt_get(TXT_WRONG_CD), config.product);
+    sprintf(buf, "This is not a %s CD-ROM.", config.product);
     dia_message(buf, MSGTYPE_ERROR);
     config.manual=1;
     return;
@@ -154,21 +154,21 @@ void digest_media_verify()
   }
 
   if(iso.digest.ok) {
-    dia_message(txt_get(TXT_CD_CHECK_OK), MSGTYPE_INFO);
+    dia_message("No errors found.", MSGTYPE_INFO);
   }
   else if(iso.err) {
     if(iso.err_ofs) {
-      sprintf(buf, txt_get(TXT_CD_READ_FAILED), iso.err_ofs >> 1);
+      sprintf(buf, "Error reading sector %u.", iso.err_ofs >> 1);
     }
     else {
-      sprintf(buf, txt_get(TXT_CD_MD5_FAILED));
+      sprintf(buf, "Checksum wrong.");
     }
-    sprintf(buf + strlen(buf), txt_get(TXT_CD_BROKEN), *iso.media_type == 'C' ? "CD-ROM" : iso.media_type);
+    sprintf(buf + strlen(buf), "\nThis %s is broken.", *iso.media_type == 'C' ? "CD-ROM" : iso.media_type);
     dia_message(buf, MSGTYPE_ERROR);
     config.manual=1;
   }
   else {
-    dia_message(txt_get(TXT_CD_CHECK_CANCELED), MSGTYPE_INFO);
+    dia_message("Checksumming Canceled.", MSGTYPE_INFO);
   }
 }
 

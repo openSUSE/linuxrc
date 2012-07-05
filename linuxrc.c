@@ -28,7 +28,6 @@
 #include <hd.h>
 
 #include "global.h"
-#include "text.h"
 #include "info.h"
 #include "util.h"
 #include "display.h"
@@ -193,7 +192,9 @@ int main(int argc, char **argv, char **env)
 
     if(!(win_old = config.win)) util_disp_init();
     str_copy(&config.rootpassword, NULL);
-    dia_input2(txt_get(TXT_ROOT_PASSWORD), &config.rootpassword, 20, 1);
+    dia_input2("Enter temporary root password.\n"
+               "You will be required to change this password on initial root user login.",
+               &config.rootpassword, 20, 1);
     if(!win_old) util_disp_done();
   }
 
@@ -245,7 +246,7 @@ void lxrc_reboot()
     return;
   }
 
-  if(dia_yesno(txt_get(TXT_ASK_REBOOT), 1) == YES) {
+  if(dia_yesno("Reboot the system now?", 1) == YES) {
     reboot(RB_AUTOBOOT);
   }
 }
@@ -257,7 +258,7 @@ void lxrc_halt()
     return;
   }
 
-  if(dia_yesno(txt_get(TXT_HALT), 1) == YES) {
+  if(dia_yesno("Do you want to halt the system now?", 1) == YES) {
     reboot(RB_POWER_OFF);
   }
 }
@@ -647,11 +648,6 @@ void lxrc_init()
   int i, j;
   char buf[256];
 
-  if(txt_init()) {
-    printf("Linuxrc error: Corrupted texts!\n");
-    exit(-1);
-  }
-
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);
   siginterrupt(SIGBUS, 1);
@@ -1003,7 +999,7 @@ void lxrc_init()
 
     if(config.memoryXXX.ram < ram) {
       if(!window) util_disp_init();
-      strprintf(&msg, txt_get(TXT_NO_RAM), config.product, (int) (config.memoryXXX.ram_min >> 20));
+      strprintf(&msg, "Your computer does not have enough RAM for the installation of %s. You need at least %d MB.", config.product, (int) (config.memoryXXX.ram_min >> 20));
       dia_message(msg, MSGTYPE_REBOOT);
       free(msg);
       if(!window) util_disp_done();
@@ -1041,7 +1037,7 @@ void lxrc_init()
       char *s = get_translation(config.cd1texts, current_language()->locale);
       char *buf = NULL;
 
-      strprintf(&buf, s ?: txt_get(TXT_INSERT_CD), 1);
+      strprintf(&buf, s ?: "Make sure that CD number %d is in your drive.", 1);
       do {
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
@@ -1130,10 +1126,16 @@ void lxrc_main_menu()
   di_lxrc_main_menu_last = di_main_start;
 
   for(;;) {
-    di = dia_menu2(txt_get(TXT_HDR_MAIN), 38, lxrc_main_cb, items, di_lxrc_main_menu_last);
+    di = dia_menu2("Main Menu", 38, lxrc_main_cb, items, di_lxrc_main_menu_last);
 
     if(di == di_none) {
-      if(dia_message(txt_get(TXT_NO_LXRC_END), MSGTYPE_INFO) == -42) break;
+      if(dia_message("You can leave Linuxrc only via \n"
+                     "\n"
+                     "\"Start Installation or System\"\n"
+                     "\n"
+                     "You may need to load some drivers (modules) to support your hardware.",
+                     MSGTYPE_INFO) == -42)
+        break;
       continue;
     }
 
@@ -1195,7 +1197,7 @@ int lxrc_exit_menu()
     di_none
   };
 
-return dia_menu2(txt_get(TXT_END_REBOOT), 30, lxrc_exit_cb, items, 1);
+return dia_menu2("Exit or Reboot", 30, lxrc_exit_cb, items, 1);
 }
 
 int lxrc_exit_cb (dia_item_t di)

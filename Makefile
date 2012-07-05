@@ -8,7 +8,7 @@ SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= po mkpsfu
+SUBDIRS	= mkpsfu
 
 .EXPORT_ALL_VARIABLES:
 .PHONY:	all clean install libs
@@ -55,7 +55,6 @@ TAGS: *.c *.h */*.c */*.h
 
 ifeq ($(filter clean changelog VERSION, $(MAKECMDGOALS)),)
 .depend: version.h $(SRC) $(INC)
-	@$(MAKE) -C po
 	@$(CC) -MM $(CFLAGS) $(SRC) >$@
 -include .depend
 endif

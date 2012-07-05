@@ -32,7 +32,6 @@
 
 #include "global.h"
 #include "linuxrc.h"
-#include "text.h"
 #include "util.h"
 #include "dialog.h"
 #include "window.h"
@@ -100,7 +99,7 @@ int inst_menu()
   /* ... apparently not: keep VNC & SSH settings (bnc #447433) */
   config.net.do_setup &= DS_VNC | DS_SSH;
 
-  di = dia_menu2(txt_get(TXT_MENU_START), 40, inst_menu_cb, items, di_inst_menu_last);
+  di = dia_menu2("Start Installation", 40, inst_menu_cb, items, di_inst_menu_last);
 
   return di == di_none ? 1 : 0;
 }
@@ -188,7 +187,7 @@ int inst_choose_netsource()
     }
   }
 
-  di = dia_menu2(txt_get(TXT_CHOOSE_NETSOURCE), 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
+  di = dia_menu2("Choose the network protocol.", 33, inst_choose_netsource_cb, items, di_inst_choose_netsource_last);
 
   return di == di_none ? 1 : 0;
 }
@@ -231,7 +230,7 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
   }
 
-  if(err) dia_message(txt_get(TXT_NO_REPO), MSGTYPE_ERROR);
+  if(err) dia_message("No repository found.", MSGTYPE_ERROR);
 
   return err ? 1 : 0;
 }
@@ -253,7 +252,7 @@ int inst_choose_display()
       di_none
     };
 
-    di = dia_menu2(txt_get(TXT_CHOOSE_DISPLAY), 33, inst_choose_display_cb, items, di_inst_choose_display_last);
+    di = dia_menu2("Select the display type.", 33, inst_choose_display_cb, items, di_inst_choose_display_last);
 
     return di == di_none ? -1 : 0;
   }
@@ -272,7 +271,7 @@ int inst_choose_display_cb(dia_item_t di)
 
   switch(di) {
     case di_display_x11:
-      if(net_get_address(txt_get(TXT_XSERVER_IP), &config.net.displayip, 1)) return -1;
+      if(net_get_address("Enter the IP address of the host running the X11 server.", &config.net.displayip, 1)) return -1;
       break;
 
     case di_display_vnc:
@@ -327,7 +326,7 @@ int inst_choose_source()
     }
   }
 
-  di = dia_menu2(txt_get(TXT_CHOOSE_SOURCE), 33, inst_choose_source_cb, items, di_inst_choose_source_last);
+  di = dia_menu2("Choose the source medium.", 33, inst_choose_source_cb, items, di_inst_choose_source_last);
 
   return di == di_none ? 1 : 0;
 }
@@ -365,7 +364,7 @@ int inst_choose_source_cb(dia_item_t di)
   }
 
   if(err) {
-    dia_message(txt_get(TXT_NO_REPO), MSGTYPE_ERROR);
+    dia_message("No repository found.", MSGTYPE_ERROR);
     rc = 1;
   }
 
@@ -497,7 +496,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
               if(swapon(dev, 0)) {
                 fprintf(stderr, "swapon: ");
                 perror(dev);
-                dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+                dia_message("Error activating swap space.", MSGTYPE_ERROR);
               }
               else {
                 rc = 0;
@@ -561,7 +560,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
                 if(swapon(file, 0)) {
                   fprintf(stderr, "swapon: ");
                   perror(file);
-                  dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+                  dia_message("Error activating swap space.", MSGTYPE_ERROR);
                 }
                 else {
                   umount2(config.mountpoint.swap, MNT_DETACH);
@@ -665,8 +664,8 @@ int inst_do_harddisk()
     str_copy(&path, config.url.install->path);
   }
 
-  if(inst_choose_partition(&device, 0, txt_get(TXT_CHOOSE_PARTITION), txt_get(TXT_ENTER_PARTITION))) err = 1;
-  if(!err && dia_input2(txt_get(TXT_ENTER_HD_DIR), &path, 30, 0)) err = 1;
+  if(inst_choose_partition(&device, 0, "Choose the hard disk partition.", "Enter the hard disk partition (e.g., /dev/sda1)")) err = 1;
+  if(!err && dia_input2("Enter the source directory.", &path, 30, 0)) err = 1;
 
   if(!err) {
     url_free(config.url.install);
@@ -721,21 +720,21 @@ int inst_do_network(instmode_t scheme)
   }
 
   /* server name */
-  strprintf(&buf, txt_get(TXT_INPUT_NETSERVER), get_instmode_name_up(scheme));
+  strprintf(&buf, "Enter the IP address of the %s server.", get_instmode_name_up(scheme));
   if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
   if(!err && n_port) port = n_port;
 
   /* smb share */
-  if(!err && scheme == inst_smb && dia_input2(txt_get(TXT_SMB_ENTER_SHARE), &share, 30, 0)) err = 1;
+  if(!err && scheme == inst_smb && dia_input2("Enter the share name on the SMB server.", &share, 30, 0)) err = 1;
 
   /* path */
-  if(!err && dia_input2(txt_get(TXT_INPUT_DIR), &path, 30, 0)) err = 1;
+  if(!err && dia_input2("Enter the directory on the server.", &path, 30, 0)) err = 1;
 
   /* user, password */
   if(!err && (scheme == inst_http || scheme == inst_ftp)) {
     if(!n_user) {
       strprintf(&buf,
-        txt_get(TXT_USER_PW_SERVER),
+        "Do you need a username and password to access the %s server?",
         get_instmode_name_up(scheme)
       );
       i = dia_yesno(buf, NO);
@@ -749,8 +748,8 @@ int inst_do_network(instmode_t scheme)
           str_copy(&password, NULL);
         }
         else {
-          strprintf(&buf, txt_get(TXT_ENTER_USER), get_instmode_name_up(scheme));
-          strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), get_instmode_name_up(scheme));
+          strprintf(&buf, "Enter the user name with which to access the %s server.", get_instmode_name_up(scheme));
+          strprintf(&buf2, "Enter the password for the %s server.", get_instmode_name_up(scheme));
           if(
             dia_input2(buf, &user, 20, 0) ||
             dia_input2(buf2, &password, 20, 1)
@@ -766,7 +765,8 @@ int inst_do_network(instmode_t scheme)
 
   /* smb user, password, workgroup */
   if(!err && scheme == inst_smb) {
-    i = dia_yesno(txt_get(TXT_SMB_GUEST_LOGIN), YES);
+    i = dia_yesno("If you want to access the share as guest,you do not need to specify user name, password, and workgroup.\n"
+                  "Access the share as guest?", YES);
 
     if(i == ESCAPE) {
       err = 1;
@@ -779,9 +779,9 @@ int inst_do_network(instmode_t scheme)
       }
       else {
         if(
-          dia_input2(txt_get(TXT_SMB_ENTER_USER), &user, 20, 0) ||
-          dia_input2(txt_get(TXT_SMB_ENTER_PASSWORD), &password, 20, 1) ||
-          dia_input2(txt_get(TXT_SMB_ENTER_WORKGROUP), &domain, 20, 0)
+          dia_input2("Enter your user name on the SMB server.", &user, 20, 0) ||
+          dia_input2("Enter your password on the SMB server.", &password, 20, 1) ||
+          dia_input2("Enter your workgroup.If you do not need to specify a workgroup,leave the field empty.", &domain, 20, 0)
         ) err = 1;
       }
     }
@@ -798,25 +798,25 @@ int inst_do_network(instmode_t scheme)
       str_copy(&proxy_password, config.url.proxy->password);
     }
 
-    strprintf(&buf, txt_get(TXT_WANT_PROXY), get_instmode_name_up(inst_http));
+    strprintf(&buf, "Use a %s proxy?", get_instmode_name_up(inst_http));
     i = dia_yesno(buf, NO);
     if(i == ESCAPE) {
       err = 1;
     }
     else if(i == YES) {
       /* new proxy */
-      strprintf(&buf, txt_get(TXT_ENTER_PROXY), get_instmode_name_up(inst_http));
+      strprintf(&buf, "Enter the address of the %s proxy.", get_instmode_name_up(inst_http));
       if(net_get_address2(buf, &proxy, 1, &n_user, &n_password, &n_port)) err = 1;
 
       if(!err) {
         if(!n_port) {
           strprintf(&buf2, "%u", proxy_port);
-          strprintf(&buf, txt_get(TXT_ENTER_PROXYPORT), get_instmode_name_up(inst_http));
+          strprintf(&buf, "Enter the port of the %s proxy.", get_instmode_name_up(inst_http));
           if(dia_input2(buf, &buf2, 6, 0)) err = 1;
           if(!err) {
             u = strtoul(buf2, &s, 0);
             if(*s) {
-              dia_message(txt_get(TXT_INVALID_INPUT), MSGTYPE_ERROR);
+              dia_message("Invalid input.", MSGTYPE_ERROR);
               err = 1;
             }
             else {
@@ -832,7 +832,7 @@ int inst_do_network(instmode_t scheme)
       /* proxy user, password */
       if(!err) {
         if(!n_user) {
-          i = dia_yesno(txt_get(TXT_USER_PW_PROXY), NO);
+          i = dia_yesno("Do you need a username and password to access the proxy?", NO);
 
           if(i == ESCAPE) {
             err = 1;
@@ -843,8 +843,8 @@ int inst_do_network(instmode_t scheme)
               str_copy(&proxy_password, NULL);
             }
             else {
-              strprintf(&buf, txt_get(TXT_ENTER_USER), "proxy");
-              strprintf(&buf2, txt_get(TXT_ENTER_PASSWORD), "proxy");
+              strprintf(&buf, "Enter the user name with which to access the %s server.", "proxy");
+              strprintf(&buf2, "Enter the password for the %s server.", "proxy");
               if(
                 dia_input2(buf, &proxy_user, 20, 0) ||
                 dia_input2(buf2, &proxy_password, 20, 1)
@@ -1134,7 +1134,7 @@ int inst_execute_yast()
   if(config.addswap) {
     i = ask_for_swap(
       config.addswap == 2 ? -1 : config.memoryXXX.min_yast - config.memoryXXX.min_free,
-      txt_get(TXT_LOW_MEMORY2)
+      "Your computer does not have enough memory to run YaST."
     );
   }
 
@@ -1269,7 +1269,7 @@ int inst_execute_yast()
   if(config.manual) util_disp_init();
 
   if(err && config.win) {
-    dia_message(txt_get(TXT_ERROR_INSTALL), MSGTYPE_ERROR);
+    dia_message("An error occurred during the installation.", MSGTYPE_ERROR);
   }
 
   if(!config.test) {
@@ -1304,7 +1304,8 @@ int inst_commit_install()
       if(config.rebootmsg){
         disp_clear_screen();
         util_disp_init();
-        dia_message(txt_get(TXT_DO_REBOOT), MSGTYPE_INFO);
+        dia_message("The base system was successfully installed. Your machine must now be rebooted. Remove all installation media (CD-ROM, floppy).\n"
+                    "Do not remove the floppy disk if the boot manager was installed on it.", MSGTYPE_INFO);
       }
 
       if(config.test) {
@@ -1534,7 +1535,7 @@ int choose_dud(char **dev)
   if(item_width > 60) item_width = 60;
 
   if(item_cnt > 1) {
-    i = dia_list(txt_get(TXT_DUD_SELECT), item_width + 2, NULL, items, last_item, align_left);
+    i = dia_list("Please choose the Driver Update medium.", item_width + 2, NULL, items, last_item, align_left);
   }
   else {
     i = item_cnt;
@@ -1548,14 +1549,14 @@ int choose_dud(char **dev)
     }
     else {
       str_copy(&buf, NULL);
-      i = dia_input2(txt_get(TXT_DUD_DEVICE), &buf, 30, 0);
+      i = dia_input2("Please enter the Driver Update device.", &buf, 30, 0);
       if(!i) {
         if(util_check_exist(long_dev(buf)) == 'b') {
           str_copy(&config.update.dev, short_dev(buf));
           *dev = config.update.dev;
         }
         else {
-          dia_message(txt_get(TXT_DUD_INVALID_DEVICE), MSGTYPE_ERROR);
+          dia_message("Invalid device name.", MSGTYPE_ERROR);
         }
       }
       else {

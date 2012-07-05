@@ -21,7 +21,6 @@
 #include <hd.h>
 
 #include "global.h"
-#include "text.h"
 #include "module.h"
 #include "util.h"
 #include "dialog.h"
@@ -318,7 +317,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   }
 
   if(config.module.disks && config.module.more_file[type]) {
-    items[i++] = strdup(txt_get(TXT_MORE_MODULES));
+    items[i++] = strdup("-- More Modules --");
   }
 
   if(list) *list = items;
@@ -335,18 +334,18 @@ char *mod_get_title(int type)
   /* we have translations for these... */
   if(type) {
     if(type == config.module.network_type) {
-      s = txt_get(TXT_LOAD_NET);
+      s = "Load Network Card Modules";
     }
     if(type == config.module.fs_type) {
-      s = txt_get(TXT_LOAD_FS);
+      s = "Load File System Modules";
     }
     if(type == MAX_MODULE_TYPES - 1) {
-      s = txt_get(TXT_LOAD_OTHER);
+      s = "Load Unknown Modules";
     }
   }
 
   if(!s) {
-    sprintf(buf, txt_get(TXT_LOAD_MODULES), config.module.type_name[type]);
+    sprintf(buf, "Load %s Modules", config.module.type_name[type]);
     s = buf;
   }
 
@@ -374,14 +373,14 @@ void mod_menu()
 
     i = mod_types;
 
-    items[i++] = txt_get(TXT_SHOW_MODULES);
-    items[i++] = txt_get(TXT_DEL_MODULES);
-    items[i++] = txt_get(TXT_ADD_DRIVER_UPDATE);
-    items[i++] = txt_get(TXT_SHOW_DRIVER_UPDATES);
+    items[i++] = "Show Loaded Modules";
+    items[i++] = "Unload Modules";
+    items[i++] = "Add Driver Update";
+    items[i++] = "Show Driver Updates";
 
     items[i] = NULL;
 
-    again = dia_list(txt_get(TXT_MENU_MODULES), 40, mod_menu_cb, items, mod_menu_last, align_center);
+    again = dia_list("Kernel Modules (Hardware Drivers)", 40, mod_menu_cb, items, mod_menu_last, align_center);
 
     for(i = 0; i < mod_types; i++) free(items[i]);
   }
@@ -566,13 +565,13 @@ char *mod_get_params(module_t *mod)
     strcpy(buf, mod_param_text);
   }
   else {
-    sprintf(buf, txt_get(TXT_ENTER_PARAMS), mod->name);
+    sprintf(buf, "Enter parameters for \"%s\".", mod->name);
   }
 
   *buf2 = 0;
 
   if(mod->param) {
-    strcat(buf, txt_get(TXT_EXAMPLE_PAR));
+    strcat(buf, "\n\nExample: ");
     strcat(buf, mod->param);
     if(mod->autoload) strcpy(buf2, mod->param);
   }
@@ -618,18 +617,20 @@ void mod_load_module_manual(char *module, int show)
 
   if(show) {
     if(s) {
-      sprintf(buf, txt_get(TXT_TRY_TO_LOAD), ml->name);
+      sprintf(buf, "Trying to load module \"%s\"...\n\n"
+                   "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
+                   ml->name);
       dia_info(&win, buf, MSGTYPE_INFO);
       mod_insmod(ml->name, s);
       win_close(&win);
       i = mod_is_loaded(ml->name);
       if(i) {
-        sprintf(buf, txt_get(TXT_LOAD_SUCCESSFUL), ml->name);
+        sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
         dia_message(buf, MSGTYPE_INFO);
       }
       else {
         util_beep(FALSE);
-        sprintf(buf, txt_get(TXT_LOAD_FAILED), ml->name);
+        sprintf(buf, "Failed to load module \"%s\".", ml->name);
         dia_message(buf, MSGTYPE_ERROR);
       }
     }
@@ -829,10 +830,10 @@ void mod_show_modules()
 #endif
 
   if(items) {
-    dia_show_lines(txt_get(TXT_SHOW_MODULES), list, items, MENU_WIDTH, FALSE);
+    dia_show_lines("Show Loaded Modules", list, items, MENU_WIDTH, FALSE);
   }
   else {
-    dia_message(txt_get(TXT_NO_MODULES), MSGTYPE_INFO);
+    dia_message("No modules currently loaded.", MSGTYPE_INFO);
   }
 }
 
@@ -846,7 +847,7 @@ void mod_delete_module()
   items = mod_list_loaded_modules(&list, &mod_list, align_none);
 
   if(items) {
-    choice = dia_list(txt_get(TXT_DELETE_MODULE), MENU_WIDTH, NULL, list, 1, align_left);
+    choice = dia_list("Choose the module to unload.", MENU_WIDTH, NULL, list, 1, align_left);
     if(choice > 0) {
       mod = mod_list[choice - 1];
       if(mod->post_inst) {
@@ -859,7 +860,7 @@ void mod_delete_module()
     }
   }
   else {
-    dia_message(txt_get(TXT_NO_MODULES), MSGTYPE_INFO);
+    dia_message("No modules currently loaded.", MSGTYPE_INFO);
   }
 }
 
@@ -868,7 +869,7 @@ void mod_disk_text(char *buf, int type)
 {
   if(!buf) return;
 
-  strcat(buf, txt_get(TXT_MODDISK0));
+  strcat(buf, "Insert a modules disk.");
 }
 
 

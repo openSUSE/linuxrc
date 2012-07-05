@@ -19,7 +19,6 @@
 
 #include "global.h"
 #include "linuxrc.h"
-#include "text.h"
 #include "util.h"
 #include "dialog.h"
 #include "window.h"
@@ -395,10 +394,10 @@ void auto2_scan_hardware()
     else {
       if(*names) {
         if(config.win && config.manual) {
-          dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+          dia_show_lines2("Driver Updates added", *names, 64);
         }
         else {
-          printf("%s:\n", txt_get(TXT_DUD_ADDED));
+          printf("%s:\n", "Driver Updates added");
           for(sl = *names; sl; sl = sl->next) {
             printf("  %s\n", sl->key);
           }
@@ -406,10 +405,10 @@ void auto2_scan_hardware()
       }
       else {
         if(config.win && config.manual) {
-          dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+          dia_message("Driver Update ok", MSGTYPE_INFO);
         }
         else {
-          printf("%s\n", txt_get(TXT_DUD_OK));
+          printf("%s\n", "Driver Update ok");
         }
       }
     }  
@@ -1029,7 +1028,7 @@ void auto2_driverupdate(url_t *url)
   /* point at list end */
   for(names = &config.update.name_list; *names; names = &(*names)->next);
 
-  if(config.win) dia_info(&win, txt_get(TXT_DUD_READ), MSGTYPE_INFO);
+  if(config.win) dia_info(&win, "Reading Driver Update...", MSGTYPE_INFO);
 
   /* first, look for 'driverupdate' archive */
   err = url_read_file(
@@ -1037,7 +1036,7 @@ void auto2_driverupdate(url_t *url)
     NULL,
     "driverupdate",
     file_name = strdup(new_download()),
-    txt_get(TXT_LOADING_UPDATE),
+    "Loading Driver Update",
     URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_KEEP_MOUNTED + (config.secure ? URL_FLAG_CHECK_SIG : 0)
   );
 
@@ -1066,10 +1065,10 @@ void auto2_driverupdate(url_t *url)
   }
   else {
     if(*names) {
-      if(config.win && config.manual) dia_show_lines2(txt_get(TXT_DUD_ADDED), *names, 64);
+      if(config.win && config.manual) dia_show_lines2("Driver Updates added", *names, 64);
     }
     else {
-      if(config.win && config.manual) dia_message(txt_get(TXT_DUD_OK), MSGTYPE_INFO);
+      if(config.win && config.manual) dia_message("Driver Update ok", MSGTYPE_INFO);
     }
   }  
 }

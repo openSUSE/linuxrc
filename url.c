@@ -1523,8 +1523,8 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     strprintf(&buf,
       "%s: %s\n\n%s",
       s,
-      txt_get(config.sig_failed == 1 ? TXT_NO_SIGNATURE : TXT_INVALID_SIGNATURE),
-      txt_get(config.sig_failed == 1 ? TXT_INSECURE_REPO2 : TXT_INSTALL_ABORT)
+      config.sig_failed == 1 ? "File not signed." : "Invalid signature.",
+      config.sig_failed == 1 ? "If you really trust your repository, you may continue in an insecure mode." : "Installation aborted."
     );
     if(!(win = config.win)) util_disp_init();
     if(config.sig_failed == 1) {
@@ -1639,8 +1639,8 @@ static int test_and_copy(url_t *url)
           strprintf(&buf,
             "%s: %s\n\n%s",
             url_print2(url_data->url, NULL),
-            txt_get(TXT_SHA1_FAILED),
-            txt_get(TXT_INSECURE_REPO2)
+            "SHA1 sum wrong.",
+            "If you really trust your repository, you may continue in an insecure mode."
           );
           if(!(win = config.win)) util_disp_init();
           i = dia_okcancel(buf, NO);
@@ -1966,11 +1966,11 @@ static int test_is_repo(url_t *url)
     else {
       if(parts > 1) {
         strprintf(&buf2, "%s (%d/%d)",
-          txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS), part, parts
+          config.rescue ? "Loading Rescue System" : "Loading Installation System", part, parts
         );
       }
       else {
-        str_copy(&buf2, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
+        str_copy(&buf2, config.rescue ? "Loading Rescue System" : "Loading Installation System");
       }
 
       if(!url_read_file(url,
@@ -2158,11 +2158,11 @@ int url_find_instsys(url_t *url, char *dir)
       else {
         if(parts > 1) {
           strprintf(&buf2, "%s (%d/%d)",
-            txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS), part, parts
+            config.rescue ? "Loading Rescue System" : "Loading Installation System", part, parts
           );
         }
         else {
-          str_copy(&buf2, txt_get(config.rescue ? TXT_LOADING_RESCUE : TXT_LOADING_INSTSYS));
+          str_copy(&buf2, config.rescue ? "Loading Rescue System" : "Loading Installation System");
         }
 
         if(!url_read_file(url,

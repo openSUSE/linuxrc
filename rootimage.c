@@ -23,7 +23,6 @@
 #include <errno.h>
 
 #include "global.h"
-#include "text.h"
 #include "util.h"
 #include "dialog.h"
 #include "window.h"
@@ -59,14 +58,14 @@ int ask_for_swap(int64_t size, char *msg)
   }
 
   do {
-    j = inst_choose_partition(&partition, 1, txt_get(TXT_ADD_SWAP), txt_get(TXT_ENTER_SWAP));
+    j = inst_choose_partition(&partition, 1, "To continue, activate some swap space.", "Enter the swap partition (e.g., /dev/sda2)");
     
     if(j == 0 && partition) {
       argv[1] = long_dev(partition);
       fprintf(stderr, "swapon %s\n", argv[1]);
       i = util_swapon_main(2, argv);
       if(i) {
-        dia_message(txt_get(TXT_ERROR_SWAP), MSGTYPE_ERROR);
+        dia_message("Error activating swap space.", MSGTYPE_ERROR);
         j = 1;
       }
     }
@@ -111,7 +110,7 @@ int root_boot_system()
   char buf[256], root[256];
 
   do {
-    rc = inst_choose_partition(&config.device, 0, txt_get(TXT_CHOOSE_ROOT_FS), txt_get(TXT_ENTER_ROOT_FS));
+    rc = inst_choose_partition(&config.device, 0, "Choose the root partition.", "Enter your root partition (e.g., /dev/sda3)");
     if(rc || !config.device) return -1;
     sprintf(root, "/dev/%s", config.device);
 
@@ -123,7 +122,7 @@ int root_boot_system()
     }
 
     if((rc = root_check_root(root))) {
-      dia_message(txt_get(TXT_INVALID_ROOT_FS), MSGTYPE_ERROR);
+      dia_message("Invalid root device.", MSGTYPE_ERROR);
     }
   }
   while(rc);
