@@ -5047,6 +5047,8 @@ void util_plymouth_off()
   if(util_check_exist("/usr/bin/plymouth") != 'r') return;
 
   system("/usr/bin/plymouth quit");
+
+  kbd_init(0);
 }
 
 

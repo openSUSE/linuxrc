@@ -1172,7 +1172,10 @@ int inst_execute_yast()
     );
   }
 
-  util_plymouth_off();
+  // inst_setup turns plymouth off, so don't do it here
+  if(!(setupcmd && strstr(setupcmd, " inst_setup "))) {
+    util_plymouth_off();
+  }
 
   fprintf(stderr, "starting %s\n", setupcmd);
 

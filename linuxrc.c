@@ -801,6 +801,8 @@ void lxrc_init()
   config.digests.sha1 =
   config.digests.sha256 = 1;
 
+  config.plymouth = 1;
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
