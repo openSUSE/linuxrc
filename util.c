@@ -611,6 +611,7 @@ void util_disp_init()
   int i_ii;
 
   config.win = 1;
+  util_plymouth_off();
   disp_set_display();
   if (config.utf8) printf("\033%%G");
   fflush(stdout);
@@ -5035,4 +5036,17 @@ void util_run_script(char *name)
 
   unlink("/tmp/script.result");
 }
+
+
+void util_plymouth_off()
+{
+  if(!config.plymouth) return;
+
+  config.plymouth = 0;
+
+  if(util_check_exist("/usr/bin/plymouth") != 'r') return;
+
+  system("/usr/bin/plymouth quit");
+}
+
 

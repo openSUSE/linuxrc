@@ -1172,6 +1172,8 @@ int inst_execute_yast()
     );
   }
 
+  util_plymouth_off();
+
   fprintf(stderr, "starting %s\n", setupcmd);
 
   LXRC_WAIT
