@@ -307,6 +307,7 @@ static struct {
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
   { key_digests,        "Digests",        kf_cfg + kf_cmd + kf_cmd_early },
+  { key_plymouth,       "Plymouth",       kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1646,6 +1647,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           if(!strcasecmp(sl->key, "sha512")) config.digests.sha512 = 1;
         }
         slist_free(sl0);
+        break;
+
+      case key_plymouth:
+        if(f->is.numeric) config.plymouth = f->nvalue;
         break;
 
       default:

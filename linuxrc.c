@@ -799,6 +799,8 @@ void lxrc_init()
   config.digests.sha1 =
   config.digests.sha256 = 1;
 
+  config.plymouth = util_check_exist("/usr/sbin/plymouthd") == 'r' ? 1 : 0;
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
@@ -901,6 +903,8 @@ void lxrc_init()
   }
 
   util_run_script("early_setup");
+
+  if(config.plymouth) util_run_script("plymouth_setup");
 
   util_free_mem();
 

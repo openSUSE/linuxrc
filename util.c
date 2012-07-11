@@ -1214,6 +1214,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.digests.sha256, "sha256");
   add_flag(&sl0, buf, config.digests.sha512, "sha512");
   add_flag(&sl0, buf, config.devtmpfs, "devtmpfs");
+  add_flag(&sl0, buf, config.plymouth, "plymouth");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
