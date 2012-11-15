@@ -583,6 +583,7 @@ void util_disp_init()
   int i_ii;
 
   config.win = 1;
+  util_plymouth_off();
   disp_set_display();
   if (config.utf8) printf("\033%%G");
   fflush(stdout);
@@ -1184,6 +1185,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.digests.sha256, "sha256");
   add_flag(&sl0, buf, config.digests.sha512, "sha512");
   add_flag(&sl0, buf, config.devtmpfs, "devtmpfs");
+  add_flag(&sl0, buf, config.plymouth, "plymouth");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
@@ -4110,4 +4112,19 @@ void util_run_script(char *name)
 
   unlink("/tmp/script.result");
 }
+
+
+void util_plymouth_off()
+{
+  if(!config.plymouth) return;
+
+  config.plymouth = 0;
+
+  if(util_check_exist("/usr/bin/plymouth") != 'r') return;
+
+  system("/usr/bin/plymouth quit");
+
+  kbd_init(0);
+}
+
 

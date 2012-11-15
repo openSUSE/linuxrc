@@ -437,6 +437,8 @@ void lxrc_movetotmpfs()
 
 void lxrc_end()
 {
+  util_plymouth_off();
+
   if(config.netstop) {
     LXRC_WAIT
 
@@ -742,6 +744,8 @@ void lxrc_init()
   config.digests.sha1 =
   config.digests.sha256 = 1;
 
+  config.plymouth = 1;
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
@@ -800,6 +804,9 @@ void lxrc_init()
     system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
   }
 
+  config.plymouth &= util_check_exist("/usr/sbin/plymouthd") == 'r' ? 1 : 0;
+  config.plymouth &= !(config.linemode || config.manual);
+
   if(config.early_bash) {
     util_start_shell("/dev/tty8", "/bin/bash", 3);
   }
@@ -838,6 +845,8 @@ void lxrc_init()
   }
 
   util_run_script("early_setup");
+
+  if(config.plymouth) util_run_script("plymouth_setup");
 
   util_free_mem();
 
