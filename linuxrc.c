@@ -70,6 +70,7 @@ static int do_not_kill         (char *name);
 static void lxrc_change_root   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
+static void lxrc_usr1(int signum);
 static int  lxrc_exit_menu     (void);
 static int  lxrc_exit_cb       (dia_item_t di);
 
@@ -94,6 +95,7 @@ static struct {
 //  { "swapon",      util_swapon_main      },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
+  { "extend",      util_extend_main      },
 };
 #endif
 
@@ -662,6 +664,7 @@ void lxrc_init()
   siginterrupt(SIGSEGV, 1);
   siginterrupt(SIGPIPE, 1);
   lxrc_catch_signal(0);
+  signal(SIGUSR1, lxrc_usr1);
 
 /*  reboot (RB_DISABLE_CAD); */
 
@@ -1300,6 +1303,83 @@ void find_shell()
     unlink("/bin/sh");
     symlink("/lbin/sh", "/bin/sh");
   }
+}
+
+
+void lxrc_usr1(int signum)
+{
+  static unsigned extend_cnt = 0;
+  int i, err = 0;
+  char *s, buf[1024];
+  FILE *f;
+  slist_t *sl = NULL, *sl_task = NULL;
+  char task = 0, *ext = NULL;
+  int extend_pid = 0;
+
+  if(!rename("/tmp/extend.job", s = new_download())) {
+    *buf = 0;
+    f = fopen(s, "r");
+    if(f) {
+      if(!fgets(buf, sizeof buf, f)) *buf = 0;
+      if(*buf) {
+        sl_task = slist_split(' ', buf);
+        extend_pid = atoi(sl_task->key);
+        if(sl_task->next) {
+          task = *sl_task->next->key;
+          if(sl_task->next->next) ext = sl_task->next->next->key;
+        }
+      }
+      fclose(f);
+    }
+    unlink(s);
+    if((task == 'a' || task == 'r') && ext) {
+      sl = slist_getentry(config.extend_list, ext);
+      if(task == 'a' && !sl) {
+        slist_append_str(&config.extend_list, ext);
+      }
+      else if(task == 'r' && sl) {
+        str_copy(&sl->key, NULL);
+      }
+      if(!fork()) {
+        for(i = 0; i < 256; i++) close(i);
+        open("/tmp/extend.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
+        dup(0);
+        dup(0);
+        setlinebuf(stderr);
+        config.download.cnt = 1000 + extend_cnt;
+        config.mountpoint.cnt = 1000 + extend_cnt;
+        if(!config.debug) config.debug = 1;
+
+        config.keepinstsysconfig = 1;
+
+        if(task == 'a' && sl) {
+          fprintf(stderr, "instsys extend: add %s\n%s: already added\n", ext, ext);
+          err = 0;
+        }
+        else if(task == 'r' && !sl) {
+          fprintf(stderr, "instsys extend: remove %s\n%s: not there\n", ext, ext);
+          err = 0;
+        }
+        else if(task == 'a') {
+          err = auto2_add_extension(ext);
+        }
+        else if(task == 'r') {
+          err = auto2_remove_extension(ext);
+        }
+        f = fopen("/tmp/extend.result", "w");
+        if(f) fprintf(f, "%d\n", err);
+        fclose(f);
+        if(extend_pid > 0) kill(extend_pid, SIGUSR1);
+        exit(0);
+      }
+    }
+  }
+
+  slist_free(sl_task);
+
+  extend_cnt += 10;
+
+  signal(SIGUSR1, lxrc_usr1);
 }
 
 
