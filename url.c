@@ -1678,7 +1678,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
   int err = 0, free_src = 0;
   char *buf1 = NULL, *s, *t;
 
-  tc_src = src;
+  // don't assign tc_src yet, src may get modified
   tc_dst = dst;
   tc_flags = flags;
   tc_label = label;
@@ -1716,6 +1716,8 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
     }
     free_src = 1;
   }
+
+  tc_src = src;
 
   if(url->mount) {
     strprintf(&buf1, "file:%s", url->mount);
