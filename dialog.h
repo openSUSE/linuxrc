@@ -60,6 +60,7 @@ typedef enum {
   di_netsource_smb,
   di_netsource_ftp,
   di_netsource_http,
+  di_netsource_https,
   di_netsource_tftp,
 
   di_info_kernel,

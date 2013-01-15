@@ -1179,6 +1179,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
   add_flag(&sl0, buf, config.secure, "secure");
+  add_flag(&sl0, buf, config.sslcerts, "sslcerts");
   add_flag(&sl0, buf, config.mediacheck, "mediacheck");
   add_flag(&sl0, buf, config.net.ipv4, "ipv4");
   add_flag(&sl0, buf, config.net.ipv6, "ipv6");

@@ -126,7 +126,7 @@ typedef struct {
  */
 typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
-  inst_http, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
+  inst_http, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
   inst_rel, inst_disk
 } instmode_t;
@@ -336,6 +336,7 @@ typedef struct {
   unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned secure:1;		/* secure mode (check digest of all downloaded files) */
+  unsigned sslcerts:1;		/* whether to check ssl certificates */
   unsigned sig_failed:2;	/* signature check failed (1: not signed, 2: wrong signature) */
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */
   unsigned kexec_reboot:1;	/* kexec to installed system (just passed to yast) */
