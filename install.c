@@ -1105,8 +1105,6 @@ void inst_yast_done()
 
   if(config.test) return;
 
-  lxrc_set_modprobe("/etc/nothing");
-
   lxrc_killall(0);
 
   for(count = 0; count < 8; count++) {
@@ -1134,7 +1132,6 @@ int inst_execute_yast()
   }
 
   if(!config.test) {
-    lxrc_set_modprobe("/sbin/modprobe");
     if(util_check_exist("/sbin/update")) system("/sbin/update");
   }
 

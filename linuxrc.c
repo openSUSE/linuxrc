@@ -460,7 +460,6 @@ void lxrc_end()
   /* screen saver on */
   if(!config.linemode) printf("\033[9;15]");
 
-  lxrc_set_modprobe("/sbin/modprobe");
   lxrc_set_bdflush(40);
 
   LXRC_WAIT
@@ -862,7 +861,6 @@ void lxrc_init()
     config.download.instsys = config.memoryXXX.free > config.memoryXXX.load_image ? 1 : 0;
   }
 
-  lxrc_set_modprobe("/etc/nothing");
   lxrc_set_bdflush(5);
 
   lxrc_check_console();
@@ -1229,19 +1227,6 @@ int lxrc_exit_cb (dia_item_t di)
 return (1);
 }
 
-void lxrc_set_modprobe(char *prog)
-{
-  FILE *f;
-
-  /* do nothing if we have a modprobe */
-  if(config.test || !config.nomodprobe) return;
-
-  if((f = fopen("/proc/sys/kernel/modprobe", "w"))) {
-    fprintf(f, "%s\n", prog);
-    fclose(f);
-  }
-}
-
 
 /* Check if we start linuxrc on a serial console. On Intel and
    Alpha, we look if the "console" parameter was used on the
@@ -1281,8 +1266,6 @@ void lxrc_makelinks(char *name)
   char buf[64];
 
   if(!util_check_exist("/lbin")) mkdir("/lbin", 0755);
-
-  if(!util_check_exist("/etc/nothing")) link(name, "/etc/nothing");
 
   for(i = 0; (unsigned) i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
     sprintf(buf, "/lbin/%s", lxrc_internal[i].name);
