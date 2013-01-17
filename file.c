@@ -279,6 +279,7 @@ static struct {
   { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_sha1,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_sslcerts,       "SSLCerts",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
   { key_kexec_reboot,   "kexec_reboot",   kf_cfg + kf_cmd                },
   { key_nisdomain,      "NISDomain",      kf_dhcp                        },
@@ -334,6 +335,7 @@ static struct {
   { "ftp",       inst_ftp           },
   { "smb",       inst_smb           },
   { "http",      inst_http          },
+  { "https",     inst_https         },
   { "tftp",      inst_tftp          },
   { "cd",        inst_cdrom         },
   { "floppy",    inst_floppy        },
@@ -1486,6 +1488,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric && f->nvalue) {
           config.secure = 0;
           config.sha1_failed = config.sig_failed = 0;
+        }
+        break;
+
+      case key_sslcerts:
+        if(f->is.numeric && !f->nvalue) {
+          config.sslcerts = 0;
         }
         break;
 

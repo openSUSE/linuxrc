@@ -1,3 +1,6 @@
+17/1/2013:	v3.3.82
+	- support https (fate #314237)
+
 15/11/2011:	v3.3.81
 	- s390: allow empty parameters for "portname" and "osahwaddr"
 	  (bnc#720765)

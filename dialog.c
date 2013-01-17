@@ -76,6 +76,7 @@ struct {
   { di_netsource_smb,    0, "SMB / CIFS (Windows Share)" },
   { di_netsource_ftp,    0, "FTP"                 },
   { di_netsource_http,   0, "HTTP"                },
+  { di_netsource_https,  0, "HTTPS"               },
   { di_netsource_tftp,   0, "TFTP"                },
 
   { di_info_kernel,      TXT_INFO_KERNEL          },

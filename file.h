@@ -52,7 +52,7 @@ typedef enum {
   key_ipv6, key_ipv6only, key_usesax2, key_efi, key_supporturl, key_portno,
   key_osahwaddr, key_zen, key_zenconfig, key_udevrule, key_iptool,
   key_configure_network, key_content, key_namescheme, key_ptoptions,
-  key_is_ptoption, key_withfcoe
+  key_is_ptoption, key_withfcoe, key_sslcerts
 } file_key_t;
 
 typedef enum {

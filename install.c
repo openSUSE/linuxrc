@@ -156,6 +156,7 @@ int inst_choose_netsource()
   dia_item_t items[] = {
     di_netsource_ftp,
     di_netsource_http,
+    di_netsource_https,
     di_netsource_nfs,
     di_netsource_smb,
     di_netsource_tftp,
@@ -172,6 +173,10 @@ int inst_choose_netsource()
 
       case inst_http:
         di_inst_choose_netsource_last = di_netsource_http;
+        break;
+
+      case inst_https:
+        di_inst_choose_netsource_last = di_netsource_https;
         break;
 
       case inst_smb:
@@ -221,6 +226,10 @@ int inst_choose_netsource_cb(dia_item_t di)
 
     case di_netsource_http:
       err = inst_do_network(inst_http);
+      break;
+
+    case di_netsource_https:
+      err = inst_do_network(inst_https);
       break;
 
     case di_netsource_tftp:
@@ -738,7 +747,7 @@ int inst_do_network(instmode_t scheme)
   if(!err && dia_input2(txt_get(TXT_INPUT_DIR), &path, 30, 0)) err = 1;
 
   /* user, password */
-  if(!err && (scheme == inst_http || scheme == inst_ftp)) {
+  if(!err && (scheme == inst_http || scheme == inst_https || scheme == inst_ftp)) {
     if(!n_user) {
       strprintf(&buf,
         txt_get(TXT_USER_PW_SERVER),
@@ -794,7 +803,7 @@ int inst_do_network(instmode_t scheme)
   }
 
   /* proxy setup */
-  if(!err && (scheme == inst_http || scheme == inst_ftp)) {
+  if(!err && (scheme == inst_http || scheme == inst_https || scheme == inst_ftp)) {
 
     /* get current proxy values*/
     if(config.url.proxy) {
@@ -911,7 +920,7 @@ int inst_do_network(instmode_t scheme)
       str_copy(&config.url.install->domain, domain);
     }
 
-    if(scheme == inst_http || scheme == inst_ftp || scheme == inst_smb) {
+    if(scheme == inst_http || scheme == inst_http || scheme == inst_ftp || scheme == inst_smb) {
       str_copy(&config.url.install->user, user);
       str_copy(&config.url.install->password, password);
     }
