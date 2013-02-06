@@ -255,6 +255,7 @@ static struct {
   { key_dud_expected,   "UpdateExpected", kf_cfg + kf_cmd                },
   { key_staticdevices,  "StaticDevices",  kf_cfg + kf_cmd_early          },
   { key_withiscsi,      "WithiSCSI",      kf_cfg + kf_cmd                },
+  { key_withiscsi,      "UseiSCSI",       kf_cfg + kf_cmd                },
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_iptool,         "iptool",         kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
@@ -310,6 +311,7 @@ static struct {
   { key_namescheme,     "NameScheme",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
+  { key_withfcoe,       "UseFCoE",        kf_cfg + kf_cmd                },
 };
 
 static struct {

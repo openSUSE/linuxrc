@@ -131,8 +131,9 @@ void util_killall(char *name, int sig);
 void util_get_ram_size(void);
 void util_load_usb(void);
 
-int util_set_sysfs_attr(char* attr, char* value);
-int util_get_sysfs_int_attr(char* attr, int *retval);
+int util_set_attr(char* attr, char* value);
+char *util_get_attr(char* attr);
+int util_get_int_attr(char* attr);
 
 char *print_driverid(driver_t *drv, int with_0x);
 int apply_driverid(driver_t *drv);
@@ -166,4 +167,5 @@ void util_error_trace(char *format, ...);
 hd_t *fix_device_names(hd_t *hd);
 
 int fcoe_check(void);
+int iscsi_check(void);
 

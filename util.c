@@ -1205,6 +1205,8 @@ void util_status_info()
   add_flag(&sl0, buf, config.efi_vars, "efivars");
   add_flag(&sl0, buf, config.staticdevices ^ 1, "udev");
   add_flag(&sl0, buf, config.udev_mods, "udev.mods");
+  add_flag(&sl0, buf, config.withiscsi, "iscsi");
+  add_flag(&sl0, buf, config.withfcoe, "fcoe");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
@@ -3117,7 +3119,6 @@ int util_wget_main(int argc, char **argv)
   url_t *url;
   unsigned flags = URL_FLAG_PROGRESS + URL_FLAG_NOUNLINK;
   char *label = NULL;
-  int err;
 
   config.test = 1;
 
@@ -3140,7 +3141,7 @@ int util_wget_main(int argc, char **argv)
 
   url = url_set(argv[0]);
 
-  err = url_read_file(url, NULL, NULL, argv[1], label, flags);
+  url_read_file(url, NULL, NULL, argv[1], label, flags);
 
   url_umount(url);
   url_free(url);
@@ -4163,7 +4164,7 @@ void util_load_usb()
   hd_free_hd_data(hd_data);
 }
 
-int util_set_sysfs_attr(char* attr, char* value)
+int util_set_attr(char* attr, char* value)
 {
   int i, fd;
 
@@ -4176,12 +4177,14 @@ int util_set_sysfs_attr(char* attr, char* value)
   return i < 0 ? i : 0;
 }
 
-int util_get_sysfs_int_attr(char* attr, int *retval)
+char *util_get_attr(char* attr)
 {
   int i, fd;
-  char buf[1024];
+  static char buf[1024];
 
-  if((fd = open(attr, O_RDONLY)) < 0) return -1;
+  *buf = 0;
+
+  if((fd = open(attr, O_RDONLY)) < 0) return buf;
 
   i = read(fd, buf, sizeof buf - 1);
 
@@ -4189,14 +4192,19 @@ int util_get_sysfs_int_attr(char* attr, int *retval)
 
   if(i >= 0) {
     buf[i] = 0;
-  }
-  else {
-    return -1;
+
+    while(i > 0 && isspace(buf[i - 1])) {
+      buf[--i] = 0;
+    }
+
   }
     
-  *retval = strtol(buf, NULL, 0);
+  return buf;
+}
 
-  return 0;
+int util_get_int_attr(char* attr)
+{
+  return strtol(util_get_attr(attr), NULL, 0);
 }
 
 char *print_driverid(driver_t *drv, int with_0x)
@@ -4991,5 +4999,101 @@ int fcoe_check()
   fprintf(stderr, "fcoe_check: %d\n", fcoe_ok);
 
   return fcoe_ok;
+}
+
+
+int iscsi_check()
+{
+  int iscsi_ok = 0;
+  char *attr, *s;
+  char *sysfs_ibft = "/sys/firmware/ibft/ethernet0";
+  unsigned use_dhcp = 0;
+
+  if(util_check_exist("/modules/iscsi_ibft.ko")) {
+    system("/sbin/modprobe iscsi_ibft");
+    sleep(1);
+  }
+
+  if(!util_check_exist(sysfs_ibft)) return iscsi_ok;
+
+  asprintf(&attr, "%s/origin", sysfs_ibft);
+  s = util_get_attr(attr);
+  fprintf(stderr, "ibft: origin = %s\n", s);
+  if(s[0] == '3') use_dhcp = 1;
+  fprintf(stderr, "ibft: dhcp = %d\n", use_dhcp);
+  free(attr);
+
+  if(use_dhcp) {
+    config.net.do_setup |= DS_SETUP;
+    config.net.setup = NS_DHCP;
+  }
+  else {
+    asprintf(&attr, "%s/mac", sysfs_ibft);
+    s = util_get_attr(attr);
+    fprintf(stderr, "ibft: mac = %s\n", s);
+    if(*s) {
+      str_copy(&config.netdevice, s);
+      iscsi_ok++;
+    }
+    free(attr);
+
+    asprintf(&attr, "%s/ip-addr", sysfs_ibft);
+    s = util_get_attr(attr);
+    fprintf(stderr, "ibft: ip-addr = %s\n", s);
+    if(*s) {
+      name2inet(&config.net.hostname, s);
+      net_check_address(&config.net.hostname, 0);
+      iscsi_ok++;
+    }
+    free(attr);
+
+    asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
+    s = util_get_attr(attr);
+    fprintf(stderr, "ibft: subnet-mask = %s\n", s);
+    if(*s) {
+      name2inet(&config.net.netmask, s);
+      net_check_address(&config.net.netmask, 0);
+      iscsi_ok++;
+    }
+    free(attr);
+
+    if(iscsi_ok == 3) {
+      config.net.do_setup |= DS_SETUP;
+      config.net.setup = NS_HOSTIP | NS_NETMASK;
+
+      asprintf(&attr, "%s/gateway", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: gateway = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.gateway, s);
+        net_check_address(&config.net.gateway, 0);
+        config.net.setup |= NS_GATEWAY;
+      }
+      free(attr);
+
+      asprintf(&attr, "%s/primary-dns", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: primary-dns = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.nameserver[0], s);
+        net_check_address(&config.net.nameserver[0], 0);
+        config.net.nameservers = 1;
+        config.net.setup |= NS_NAMESERVER;
+      }
+      free(attr);
+
+      asprintf(&attr, "%s/secondary-dns", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: secondary-dns = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.nameserver[1], s);
+        net_check_address(&config.net.nameserver[1], 0);
+        config.net.nameservers = 2;
+      }
+      free(attr);
+    }
+  }
+
+  return use_dhcp || iscsi_ok == 3;
 }
 

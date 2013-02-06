@@ -1,3 +1,6 @@
+6/2/2013:	v3.3.83
+	- use ibft values for iscsi installations (fate #313996)
+
 17/1/2013:	v3.3.82
 	- support https (fate #314237)
 
