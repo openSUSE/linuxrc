@@ -1,3 +1,6 @@
+22/2/2013:	v3.3.84
+	- s390: handle empty portname correctly (bnc#760042)
+
 6/2/2013:	v3.3.83
 	- use ibft values for iscsi installations (fate #313996)
 
