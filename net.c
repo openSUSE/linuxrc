@@ -2564,9 +2564,10 @@ setup_ctc:
       ccmd += sprintf(ccmd, "qeth_configure ");
       if(config.hwp.portno)
         ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
-      ccmd += sprintf(ccmd, "%s %s %s %s %s %s 1",
-        config.hwp.portname ? "-p" : "",
+      ccmd += sprintf(ccmd, "%s%s%s %s %s %s %s 1",
+        config.hwp.portname ? "-p \"" : "",
         config.hwp.portname ? config.hwp.portname : "",
+        config.hwp.portname ? "\"" : "",
         config.hwp.layer2 == 2 ? "-l" : "",
         config.hwp.readchan,
         config.hwp.writechan,
