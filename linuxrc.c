@@ -69,6 +69,7 @@ static int do_not_kill         (char *name);
 static void lxrc_change_root   (void);
 static void lxrc_reboot        (void);
 static void lxrc_halt          (void);
+static void lxrc_usr1(int signum);
 static int  lxrc_exit_menu     (void);
 static int  lxrc_exit_cb       (dia_item_t di);
 
@@ -93,6 +94,7 @@ static struct {
 //  { "swapon",      util_swapon_main      },
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
+  { "extend",      util_extend_main      },
 };
 #endif
 
@@ -438,6 +440,8 @@ void lxrc_movetotmpfs()
 
 void lxrc_end()
 {
+  util_plymouth_off();
+
   if(config.netstop) {
     LXRC_WAIT
 
@@ -457,7 +461,6 @@ void lxrc_end()
   /* screen saver on */
   if(!config.linemode) printf("\033[9;15]");
 
-  lxrc_set_modprobe("/sbin/modprobe");
   lxrc_set_bdflush(40);
 
   LXRC_WAIT
@@ -656,6 +659,7 @@ void lxrc_init()
   siginterrupt(SIGSEGV, 1);
   siginterrupt(SIGPIPE, 1);
   lxrc_catch_signal(0);
+  signal(SIGUSR1, lxrc_usr1);
 
 /*  reboot (RB_DISABLE_CAD); */
 
@@ -717,6 +721,7 @@ void lxrc_init()
   config.kbd_fd = -1;
   config.ntfs_3g = 1;
   config.secure = 1;
+  config.sslcerts = 1;
   config.squash = 1;
   config.kexec_reboot = 1;
   config.efi = -1;
@@ -737,6 +742,8 @@ void lxrc_init()
 
   config.digests.sha1 =
   config.digests.sha256 = 1;
+
+  config.plymouth = 1;
 
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
@@ -796,6 +803,9 @@ void lxrc_init()
     system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
   }
 
+  config.plymouth &= util_check_exist("/usr/sbin/plymouthd") == 'r' ? 1 : 0;
+  config.plymouth &= !(config.linemode || config.manual);
+
   if(config.early_bash) {
     util_start_shell("/dev/tty8", "/bin/bash", 3);
   }
@@ -835,6 +845,8 @@ void lxrc_init()
 
   util_run_script("early_setup");
 
+  if(config.plymouth) util_run_script("plymouth_setup");
+
   util_free_mem();
 
   if(config.memoryXXX.free < config.memoryXXX.min_free) {
@@ -845,7 +857,6 @@ void lxrc_init()
     config.download.instsys = config.memoryXXX.free > config.memoryXXX.load_image ? 1 : 0;
   }
 
-  lxrc_set_modprobe("/etc/nothing");
   lxrc_set_bdflush(5);
 
   lxrc_check_console();
@@ -1218,19 +1229,6 @@ int lxrc_exit_cb (dia_item_t di)
 return (1);
 }
 
-void lxrc_set_modprobe(char *prog)
-{
-  FILE *f;
-
-  /* do nothing if we have a modprobe */
-  if(config.test || !config.nomodprobe) return;
-
-  if((f = fopen("/proc/sys/kernel/modprobe", "w"))) {
-    fprintf(f, "%s\n", prog);
-    fclose(f);
-  }
-}
-
 
 /* Check if we start linuxrc on a serial console. On Intel and
    Alpha, we look if the "console" parameter was used on the
@@ -1271,8 +1269,6 @@ void lxrc_makelinks(char *name)
 
   if(!util_check_exist("/lbin")) mkdir("/lbin", 0755);
 
-  if(!util_check_exist("/etc/nothing")) link(name, "/etc/nothing");
-
   for(i = 0; (unsigned) i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
     sprintf(buf, "/lbin/%s", lxrc_internal[i].name);
     if(!util_check_exist(buf)) link(name, buf);
@@ -1293,6 +1289,83 @@ void find_shell()
     unlink("/bin/sh");
     symlink("/lbin/sh", "/bin/sh");
   }
+}
+
+
+void lxrc_usr1(int signum)
+{
+  static unsigned extend_cnt = 0;
+  int i, err = 0;
+  char *s, buf[1024];
+  FILE *f;
+  slist_t *sl = NULL, *sl_task = NULL;
+  char task = 0, *ext = NULL;
+  int extend_pid = 0;
+
+  if(!rename("/tmp/extend.job", s = new_download())) {
+    *buf = 0;
+    f = fopen(s, "r");
+    if(f) {
+      if(!fgets(buf, sizeof buf, f)) *buf = 0;
+      if(*buf) {
+        sl_task = slist_split(' ', buf);
+        extend_pid = atoi(sl_task->key);
+        if(sl_task->next) {
+          task = *sl_task->next->key;
+          if(sl_task->next->next) ext = sl_task->next->next->key;
+        }
+      }
+      fclose(f);
+    }
+    unlink(s);
+    if((task == 'a' || task == 'r') && ext) {
+      sl = slist_getentry(config.extend_list, ext);
+      if(task == 'a' && !sl) {
+        slist_append_str(&config.extend_list, ext);
+      }
+      else if(task == 'r' && sl) {
+        str_copy(&sl->key, NULL);
+      }
+      if(!fork()) {
+        for(i = 0; i < 256; i++) close(i);
+        open("/tmp/extend.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
+        dup(0);
+        dup(0);
+        setlinebuf(stderr);
+        config.download.cnt = 1000 + extend_cnt;
+        config.mountpoint.cnt = 1000 + extend_cnt;
+        if(!config.debug) config.debug = 1;
+
+        config.keepinstsysconfig = 1;
+
+        if(task == 'a' && sl) {
+          fprintf(stderr, "instsys extend: add %s\n%s: already added\n", ext, ext);
+          err = 0;
+        }
+        else if(task == 'r' && !sl) {
+          fprintf(stderr, "instsys extend: remove %s\n%s: not there\n", ext, ext);
+          err = 0;
+        }
+        else if(task == 'a') {
+          err = auto2_add_extension(ext);
+        }
+        else if(task == 'r') {
+          err = auto2_remove_extension(ext);
+        }
+        f = fopen("/tmp/extend.result", "w");
+        if(f) fprintf(f, "%d\n", err);
+        fclose(f);
+        if(extend_pid > 0) kill(extend_pid, SIGUSR1);
+        exit(0);
+      }
+    }
+  }
+
+  slist_free(sl_task);
+
+  extend_cnt += 10;
+
+  signal(SIGUSR1, lxrc_usr1);
 }
 
 

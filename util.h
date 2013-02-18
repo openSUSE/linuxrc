@@ -144,3 +144,5 @@ hd_t *fix_device_names(hd_t *hd);
 int fcoe_check(void);
 void util_run_script(char *name);
 
+void util_plymouth_off(void);
+

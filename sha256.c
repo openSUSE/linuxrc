@@ -30,6 +30,11 @@
 # include "unlocked-io.h"
 #endif
 
+#include <endian.h>
+#if __BYTE_ORDER == __BIG_ENDIAN
+# define WORDS_BIGENDIAN 1
+#endif
+
 #ifdef WORDS_BIGENDIAN
 # define SWAP(n) (n)
 #else

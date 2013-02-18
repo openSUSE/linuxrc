@@ -271,6 +271,7 @@ static struct {
   { key_ntfs_3g,        "UseNTFS-3G",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_hash,           "HASH",           kf_cfg + kf_cont               },
   { key_insecure,       "Insecure",       kf_cfg + kf_cmd + kf_cmd_early },
+  { key_sslcerts,       "SSLCerts",       kf_cfg + kf_cmd + kf_cmd_early },
   { key_kexec,          "kexec",          kf_cfg + kf_cmd                },
   { key_kexec_reboot,   "kexec_reboot",   kf_cfg + kf_cmd                },
   { key_nisdomain,      "NISDomain",      kf_dhcp                        },
@@ -301,6 +302,7 @@ static struct {
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
   { key_digests,        "Digests",        kf_cfg + kf_cmd + kf_cmd_early },
+  { key_plymouth,       "Plymouth",       kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -326,6 +328,7 @@ static struct {
   { "ftp",       inst_ftp           },
   { "smb",       inst_smb           },
   { "http",      inst_http          },
+  { "https",     inst_https         },
   { "tftp",      inst_tftp          },
   { "cd",        inst_cdrom         },
   { "floppy",    inst_floppy        },
@@ -963,13 +966,13 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_brokenmodules:
         slist_assign_values(&config.module.broken, f->value);
         if(config.module.broken && !config.test) {
-          if((w = fopen("/etc/modprobe.d/blacklist", "w"))) {
+          if((w = fopen("/etc/modprobe.d/blacklist.conf", "w"))) {
             for(sl = config.module.broken; sl; sl = sl->next) {
               if(sl->key) fprintf(w, "blacklist %s\n", sl->key);
             }
             fclose(w);
           }
-          if((w = fopen("/etc/modprobe.d/noload", "w"))) {
+          if((w = fopen("/etc/modprobe.d/noload.conf", "w"))) {
             for(sl = config.module.broken; sl; sl = sl->next) {
               if(sl->key) fprintf(w, "install %s /bin/true\n", sl->key);
             }
@@ -1444,6 +1447,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
+      case key_sslcerts:
+        if(f->is.numeric && !f->nvalue) {
+          config.sslcerts = 0;
+        }
+        break;
+
       case key_kexec:
         if(f->is.numeric) config.kexec = f->nvalue;
         break;
@@ -1603,6 +1612,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           if(!strcasecmp(sl->key, "sha512")) config.digests.sha512 = 1;
         }
         slist_free(sl0);
+        break;
+
+      case key_plymouth:
+        if(f->is.numeric) config.plymouth = f->nvalue;
         break;
 
       default:

@@ -20,7 +20,6 @@
    Scott G. Miller's sha1.c
 */
 
-#include "sha512.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -29,6 +28,13 @@
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #endif
+
+#include <endian.h>
+#if __BYTE_ORDER == __BIG_ENDIAN
+# define WORDS_BIGENDIAN 1
+#endif
+
+#include "sha512.h"
 
 #ifdef WORDS_BIGENDIAN
 # define SWAP(n) (n)

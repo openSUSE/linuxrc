@@ -88,6 +88,7 @@ static struct hlink_s {
 
 static char *exclude = NULL;
 static int rec_level = 0;
+static int extend_ready = 0;
 
 static void add_flag(slist_t **sl, char *buf, int value, char *name);
 
@@ -106,6 +107,10 @@ static void scsi_rename_onedevice(char **dev);
 
 static int skip_spaces(unsigned char **str);
 static int word_size(unsigned char *str, int *width, int *enc_len);
+
+static void util_extend_usr1(int signum);
+static int util_extend(char *extension, char task, int verbose);
+
 
 void util_redirect_kmsg()
 {
@@ -582,6 +587,7 @@ void util_disp_init()
   int i_ii;
 
   config.win = 1;
+  util_plymouth_off();
   disp_set_display();
   if (config.utf8) printf("\033%%G");
   fflush(stdout);
@@ -1172,6 +1178,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
   add_flag(&sl0, buf, config.secure, "secure");
+  add_flag(&sl0, buf, config.sslcerts, "sslcerts");
   add_flag(&sl0, buf, config.mediacheck, "mediacheck");
   add_flag(&sl0, buf, config.net.ipv4, "ipv4");
   add_flag(&sl0, buf, config.net.ipv6, "ipv6");
@@ -1183,6 +1190,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.digests.sha256, "sha256");
   add_flag(&sl0, buf, config.digests.sha512, "sha512");
   add_flag(&sl0, buf, config.devtmpfs, "devtmpfs");
+  add_flag(&sl0, buf, config.plymouth, "plymouth");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
@@ -2425,6 +2433,103 @@ char *util_fstype(char *dev, char **module)
   }
 
   return type;
+}
+
+
+void util_extend_usr1(int signum)
+{
+  extend_ready = 1;
+}
+
+
+int util_extend(char *extension, char task, int verbose)
+{
+  FILE *f, *w;
+  int err = 0;
+  char buf[1024];
+
+  extend_ready = 0;
+  signal(SIGUSR1, util_extend_usr1);
+
+  unlink("/tmp/extend.result");
+  f = fopen("/tmp/extend.job", "w");
+  if(f) {
+    fprintf(f, "%d %c %s\n", (int) getpid(), task, extension);
+    fclose(f);
+
+    if(util_check_exist("/usr/src/packages") || getuid()) config.test = 1;
+
+    if(config.test) {
+      util_killall("linuxrc", SIGUSR1);
+    }
+    else {
+      if(kill(1, SIGUSR1)) err = 2;
+    }
+
+    if(!err) {
+      while(!extend_ready) { sleep(1); }
+
+      if((f = fopen("/tmp/extend.result", "r"))) {
+        fscanf(f, "%d", &err);
+        fclose(f);
+      }
+    }
+  }
+  else {
+    err = 1;
+  }
+
+  f = fopen("/tmp/extend.log", "r");
+  if(f) {
+    w = fopen("/var/log/extend", "a");
+    while(fgets(buf, sizeof buf, f)) {
+      if(verbose > 0) printf("%s", buf);
+      if(w) fprintf(w, "%s", buf);
+    }
+    if(w) fclose(w);
+    fclose(f);
+  }
+
+  if(verbose >= 0) printf("%s: extend %s\n", extension, err ? "failed" : "ok");
+
+  return err;
+}
+
+
+int util_extend_main(int argc, char **argv)
+{
+  int err = 0;
+  char task = 'a';
+  struct { unsigned verbose:1; unsigned help:1; } opt = {};
+
+  argv++; argc--;
+
+  while(argc) {
+    if(!strcmp(*argv, "-r")) {
+      task = 'r';
+    }
+    else if(!strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
+      opt.help = 1;
+    }
+    else if(!strcmp(*argv, "-v")) {
+      opt.verbose = 1;
+    }
+    else {
+      break;
+    }
+    argv++; argc--;
+  }
+
+  if(!argc || opt.help) {
+    return fprintf(stderr, "Usage: extend [-v] [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
+  }
+
+  err = util_extend(*argv, task, opt.verbose);
+
+  // remove it to keep internal list correct
+  if(err && task == 'a') util_extend(*argv, 'r', -1);
+
+  return err;
 }
 
 
@@ -4109,4 +4214,19 @@ void util_run_script(char *name)
 
   unlink("/tmp/script.result");
 }
+
+
+void util_plymouth_off()
+{
+  if(!config.plymouth) return;
+
+  config.plymouth = 0;
+
+  if(util_check_exist("/usr/bin/plymouth") != 'r') return;
+
+  system("/usr/bin/plymouth quit");
+
+  kbd_init(0);
+}
+
 
