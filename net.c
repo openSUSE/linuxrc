@@ -6,6 +6,7 @@
  *
  */
 
+#define _GNU_SOURCE 1
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,6 +35,7 @@
 #include <netinet/in.h>
 #include <netinet/ether.h>
 #include <nfs/nfs.h>
+#include <sys/wait.h>
 #include "nfs_mount4.h"
 
 /* this is probably the wrong solution... */
@@ -78,7 +80,6 @@ static void net_setup_nameserver(void);
 static int net_choose_device(void);
 static int net_input_data(void);
 #endif
-static void net_show_error(enum nfs_stat status_rv);
 static int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags);
 
 static void if_down(char *dev);
@@ -1209,117 +1210,67 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port
  */
 int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags)
 {
-  struct sockaddr_in server_in, mount_server_in;
-  struct nfs_mount_data mount_data;
-  CLIENT *client;
-  int sock, fsock, err, i;
-  struct timeval tv;
-  struct fhstatus fhs;
-  char *buf = NULL;
+  int i = 0;
+  char addr[INET6_ADDRSTRLEN];
+  char *args[6];
+  char *path;
+  char options[4096];
+  int err, len = 0;
+  pid_t mount_pid;
 
   if(net_check_address(server, 1)) return -2;
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
 
-  memset(&server_in, 0, sizeof server_in);
-  server_in.sin_family = AF_INET;
-  server_in.sin_addr.s_addr = server->ip.s_addr;
-  memcpy(&mount_server_in, &server_in, sizeof mount_server_in);
-  memset(&mount_data, 0, sizeof mount_data);
-  mount_data.flags = flags;
-  mount_data.rsize = config.net.nfs.rsize;
-  mount_data.wsize = config.net.nfs.wsize;
-  mount_data.retrans = 3;
-  mount_data.acregmin = 3;
-  mount_data.acregmax = 60;
-  mount_data.acdirmin = 30;
-  mount_data.acdirmax = 60;
-  mount_data.namlen = NAME_MAX;
-  mount_data.version = NFS_MOUNT_VERSION;
-
-  /* two tries */
-  for(i = 0, client = NULL; i < 2 && !client; i++) {
-    if(i) sleep(2);
-    mount_data.timeo = 7;
-    mount_server_in.sin_port = htons(0);
-    sock = RPC_ANYSOCK;
-    tv.tv_sec = 3;
-    tv.tv_usec = 0;
-    client = clntudp_create(&mount_server_in, MOUNTPROG, MOUNTVERS, tv, &sock);
+  mount_pid = fork();
+  if (mount_pid < 0) {
+    perror("fork");
+    return mount_pid;
+  } else if (mount_pid > 0) {
+    int err;
+    pid_t pid;
+    while((pid = waitpid(-1, &err, 0)) && pid != mount_pid);
+    return WEXITSTATUS(err);
   }
 
-  if(!client) {
-    net_show_error(-1);
-
-    return -1;
+  if (server->ipv4)
+    err = asprintf(&path, "%s:%s",
+		   inet_ntop(AF_INET, &server->ip.s_addr, addr,
+			     INET_ADDRSTRLEN), hostdir);
+  else
+    err = asprintf(&path, "[%s]:%s",
+		   inet_ntop(AF_INET6, &server->ip6.s6_addr, addr,
+			     INET6_ADDRSTRLEN), hostdir);
+  if (err < 0) {
+    perror("asprintf");
+    return err;
   }
 
-  client->cl_auth = authunix_create_default();
-  tv.tv_sec = 20;
-  tv.tv_usec = 0;
+  len = snprintf(options, sizeof(options), "%s%s%sretrans=%d,timeo=%d",
+		 flags & NFS_MOUNT_TCP ? "tcp," : "",
+		 flags & NFS_MOUNT_VER3 ? "vers=3," : "",
+		 flags & NFS_MOUNT_NONLM ? "nolock," : "",
+		 3, 7);
 
-  err = clnt_call(client, MOUNTPROC_MNT,
-    (xdrproc_t) xdr_dirpath, (caddr_t) &hostdir,
-    (xdrproc_t) xdr_fhstatus, (caddr_t) &fhs,
-    tv
-  );
+  if (config.net.nfs.rsize && len < sizeof(options))
+    len += snprintf(options, sizeof(options) - len,
+		    ",rsize=%d", config.net.nfs.rsize);
+  if (config.net.nfs.wsize && len < sizeof(options))
+    len += snprintf(options, sizeof(options) - len,
+		    ",wsize=%d", config.net.nfs.wsize);
 
-  if(err) {
-    net_show_error(-1);
-    return -1;
-  }
+  args[i++] = "mount";
+  args[i++] = "-o";
+  args[i++] = options;
+  args[i++] = path;
+  args[i++] = mountpoint;
+  args[i++] = NULL;
 
-  if(fhs.fhs_status) {
-    net_show_error(fhs.fhs_status);
-
-    return -1;
-  }
-
-  memcpy(&mount_data.root.data, fhs.fhstatus_u.fhs_fhandle, NFS_FHSIZE);
-  mount_data.root.size = NFS_FHSIZE;
-
-  memcpy(&mount_data.old_root.data, fhs.fhstatus_u.fhs_fhandle, NFS_FHSIZE);
-
-  fsock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-  if(fsock < 0) {
-    net_show_error(-1);
-    
-    return -1;
-  }
-
-  if(bindresvport(fsock, 0) < 0) {
-    net_show_error(-1);
-
-    return -1;
-  }
-
-  if(!port) {
-    server_in.sin_port = PMAPPORT;
-    port = pmap_getport(&server_in, NFS_PROGRAM, NFS_VERSION, IPPROTO_UDP);
-    if(!port) port = NFS_PORT;
-  }
-
-  server_in.sin_port = htons(port);
-
-  mount_data.fd = fsock;
-  memcpy(&mount_data.addr, &server_in, sizeof mount_data.addr);
-
-  strncpy(mount_data.hostname, inet_ntoa(server->ip), sizeof mount_data.hostname);
-
-  auth_destroy(client->cl_auth);
-  clnt_destroy(client);
-  close(sock);
-
-  strprintf(&buf, "%s:%s", inet_ntoa(server->ip), hostdir);
-
-  err = mount(buf, mountpoint, "nfs", MS_RDONLY | MS_MGC_VAL, &mount_data);
-
-  free(buf);
-
-  if(err == -1) return errno;
-
-  return err;
+  signal(SIGUSR1, SIG_IGN);
+  execvp("mount", args);
+  perror("execvp(\"mount\")");
+  exit(EXIT_FAILURE);
 }
 
 
@@ -1539,71 +1490,6 @@ int net_choose_device()
   return choice > 0 ? 0 : -1;
 }
 #endif
-
-
-/*
- * Show NFS error messages.
- *
- * Helper for net_mount_nfs().
- *
- * nfs_stat: NFS status
- */
-static void net_show_error(enum nfs_stat status_rv)
-{
-  int i;
-  char *s, tmp[1024], tmp2[64];
-
-  struct {
-    enum nfs_stat stat;
-    int errnumber;
-  } nfs_err[] = {
-    { NFS_OK,                 0               },
-    { NFSERR_PERM,            EPERM           },
-    { NFSERR_NOENT,           ENOENT          },
-    { NFSERR_IO,              EIO             },
-    { NFSERR_NXIO,            ENXIO           },
-    { NFSERR_ACCES,           EACCES          },
-    { NFSERR_EXIST,           EEXIST          },
-    { NFSERR_NODEV,           ENODEV          },
-    { NFSERR_NOTDIR,          ENOTDIR         },
-    { NFSERR_ISDIR,           EISDIR          },
-    { NFSERR_INVAL,           EINVAL          },
-    { NFSERR_FBIG,            EFBIG           },
-    { NFSERR_NOSPC,           ENOSPC          },
-    { NFSERR_ROFS,            EROFS           },
-    { NFSERR_NAMETOOLONG,     ENAMETOOLONG    },
-    { NFSERR_NOTEMPTY,        ENOTEMPTY       },
-    { NFSERR_DQUOT,           EDQUOT          },
-    { NFSERR_STALE,           ESTALE          }
-  };
-
-  s = NULL;
-
-  for(i = 0; (unsigned) i < sizeof nfs_err / sizeof *nfs_err; i++) {
-    if(nfs_err[i].stat == status_rv) {
-      s = strerror(nfs_err[i].errnumber);
-      break;
-    }
-  }
-
-  if(!s) {
-    sprintf(tmp2, "unknown error %d\n", status_rv);
-    s = tmp2;
-  }
-
-  sprintf(tmp,
-    config.win ? txt_get(TXT_ERROR_NFSMOUNT) : "mount: nfs mount failed, server says: %s\n",
-    s
-  );
-
-  if(config.win) {
-    dia_message(tmp, MSGTYPE_ERROR);
-  }
-  else {
-    fprintf(stderr, "%s\n", tmp);
-  }
-}
-
 
 /*
  * Let user enter nameservers.
