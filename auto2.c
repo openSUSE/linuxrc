@@ -56,9 +56,18 @@ static int test_and_add_dud(url_t *url);
  */
 int auto2_init()
 {
-  int ok, win_old;
+  int ok, win_old, install_unset = 0;
 
   auto2_scan_hardware();
+
+  /* set default repository: try dvd drives */
+  if(!config.url.install) {
+    install_unset = 1;
+    config.url.install = url_set("cd:/");
+  }
+  if(!config.url.instsys) {
+    config.url.instsys = url_set(config.url.instsys_default ?: config.rescue ? config.rescueimage : config.rootimage);
+  }
 
   if(config.sig_failed) return 0;
 
@@ -82,6 +91,12 @@ int auto2_init()
   if(config.win && !win_old) util_disp_done();
 
   ok = auto2_find_repo();
+
+  /* try again, hard disks */
+  if(!ok && install_unset) {
+    config.url.install = url_set("hd:/");
+    ok = auto2_find_repo();
+  }
 
   if(config.debug) fprintf(stderr, "ZyppRepoURL: %s\n", url_print(config.url.install, 4));
 
@@ -413,12 +428,6 @@ void auto2_scan_hardware()
         }
       }
     }  
-  }
-
-  /* set default repository */
-  if(!config.url.install) config.url.install = url_set("cd:/");
-  if(!config.url.instsys) {
-    config.url.instsys = url_set(config.url.instsys_default ?: config.rescue ? config.rescueimage : config.rootimage);
   }
 }
 
