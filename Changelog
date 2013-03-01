@@ -1,3 +1,6 @@
+1/2/2013:	v3.3.85
+	- if no install url given, try dvds, then hds (bnc #806470)
+
 22/2/2013:	v3.3.84
 	- s390: handle empty portname correctly (bnc#760042)
 
