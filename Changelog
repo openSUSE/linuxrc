@@ -1,3 +1,6 @@
+8/3/2013:	v3.3.86
+	- try harder to resolve mac addresses to interface names (bnc #806593)
+
 1/2/2013:	v3.3.85
 	- if no install url given, try dvds, then hds (bnc #806470)
 

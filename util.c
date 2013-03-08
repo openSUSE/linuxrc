@@ -114,6 +114,9 @@ static void scsi_rename_onedevice(char **dev);
 static int skip_spaces(unsigned char **str);
 static int word_size(unsigned char *str, int *width, int *enc_len);
 
+static char *mac_to_interface_log(char *mac, int log);
+
+
 void util_redirect_kmsg()
 {
   static char newvt[2] = { 11, 4 /* console 4 */ };
@@ -5005,7 +5008,7 @@ int fcoe_check()
 int iscsi_check()
 {
   int iscsi_ok = 0;
-  char *attr, *s;
+  char *attr, *s, *t;
   char *sysfs_ibft = "/sys/firmware/ibft/ethernet0";
   unsigned use_dhcp = 0;
 
@@ -5032,7 +5035,10 @@ int iscsi_check()
     s = util_get_attr(attr);
     fprintf(stderr, "ibft: mac = %s\n", s);
     if(*s) {
+      /* try to get the interface name, up to offset 2 */
+      if((t = mac_to_interface(s, 2))) s = t;
       str_copy(&config.netdevice, s);
+      free(t);
       iscsi_ok++;
     }
     free(attr);
@@ -5096,4 +5102,93 @@ int iscsi_check()
 
   return use_dhcp || iscsi_ok == 3;
 }
+
+
+/*
+ * Interal function, use mac_to_interface().
+ *
+ * return value must be freed
+ */
+char *mac_to_interface_log(char *mac, int log)
+{
+  struct dirent *de;
+  DIR *d;
+  char *sys = "/sys/class/net", *if_name = NULL, *attr, *if_mac;
+
+  if(util_check_exist2(sys, mac)) return strdup(mac);
+
+  if(log) fprintf(stderr, "%s = ?\n", mac);
+
+  if(!(d = opendir(sys))) return NULL;
+
+  while((de = readdir(d))) {
+    if(de->d_name[0] == '.') continue;
+    asprintf(&attr, "%s/%s/address", sys, de->d_name);
+    if_mac = util_get_attr(attr);
+    free(attr);
+    if(!*if_mac || !strcmp(if_mac, "00:00:00:00:00:00")) continue;
+
+    if(!if_name && !fnmatch(mac, if_mac, FNM_CASEFOLD)) {
+      if_name = strdup(de->d_name);
+    }
+
+    if(log) {
+      fprintf(stderr, "%s = %s%s\n",
+        if_mac,
+        de->d_name,
+        if_name && !strcmp(if_name, de->d_name) ? " *" : ""
+      );
+    }
+  }
+
+  closedir(d);
+
+  return if_name;
+}
+
+
+/*
+ * Get network interface name from mac. If max_offset
+ * is set decrease mac and retry up to max_offset.
+ *
+ * return value must be freed
+ */
+char *mac_to_interface(char *mac, int max_offset)
+{
+  char *if_name, *s, *t;
+  unsigned u;
+  int ofs = 0;
+
+  if(!mac || mac[0] == 0 || mac[0] == '.') return NULL;
+
+  if_name = mac_to_interface_log(mac, 1);
+
+  if(!if_name) {
+    /* no direct match, retry with offset */
+
+    mac = strdup(mac);
+
+    if((s = strrchr(mac, ':'))) {
+      if(strlen(s) == 3) {
+        u = strtoul(s + 1, &t, 16);
+        if(!*t) {
+          for(ofs = 1; ofs <= max_offset; ofs++) {
+            sprintf(s + 1, "%02x", (u - ofs) & 0xff);
+            if_name = mac_to_interface_log(mac, 0);
+            if(if_name) break;
+          }
+        }
+      }
+    }
+
+    free(mac);
+  }
+
+  fprintf(stderr, "if = %s", if_name);
+  if(if_name && ofs) fprintf(stderr, ", offset = %u", ofs);
+  fprintf(stderr, "\n");
+
+  return if_name;
+}
+
 
