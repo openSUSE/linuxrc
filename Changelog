@@ -1,3 +1,6 @@
+11/3/2013:	v3.3.87
+	- ibft: use mac with dhcp, use static ip only if mac matches (bnc #806593)
+
 8/3/2013:	v3.3.86
 	- try harder to resolve mac addresses to interface names (bnc #806593)
 
