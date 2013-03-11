@@ -402,7 +402,7 @@ int net_activate_ns()
   if(config.net.keep) return 0;
 
   /* make sure we get the interface name if a mac was passed */
-  if((s = mac_to_interface(config.net.device, 0))) {
+  if((s = mac_to_interface(config.net.device, NULL))) {
     free(config.net.device);
     config.net.device = s;
   }
@@ -1838,7 +1838,7 @@ int net_dhcp()
   char *s;
 
   /* make sure we get the interface name if a mac was passed */
-  if((s = mac_to_interface(config.net.device, 0))) {
+  if((s = mac_to_interface(config.net.device, NULL))) {
     free(config.net.device);
     config.net.device = s;
   }

@@ -5011,6 +5011,7 @@ int iscsi_check()
   char *attr, *s, *t;
   char *sysfs_ibft = "/sys/firmware/ibft/ethernet0";
   unsigned use_dhcp = 0;
+  int mac_ofs = 2;
 
   if(util_check_exist("/modules/iscsi_ibft.ko")) {
     system("/sbin/modprobe iscsi_ibft");
@@ -5031,7 +5032,7 @@ int iscsi_check()
   fprintf(stderr, "ibft: mac = %s\n", s);
   if(*s) {
     /* try to get the interface name, up to offset 2 */
-    if((t = mac_to_interface(s, 2))) s = t;
+    if((t = mac_to_interface(s, &mac_ofs))) s = t;
     str_copy(&config.netdevice, s);
     free(t);
     iscsi_ok++;
@@ -5043,15 +5044,18 @@ int iscsi_check()
     config.net.setup = NS_DHCP;
   }
   else {
-    asprintf(&attr, "%s/ip-addr", sysfs_ibft);
-    s = util_get_attr(attr);
-    fprintf(stderr, "ibft: ip-addr = %s\n", s);
-    if(*s) {
-      name2inet(&config.net.hostname, s);
-      net_check_address(&config.net.hostname, 0);
-      iscsi_ok++;
+    /* use ibft config only if mac matches */
+    if(!mac_ofs) {
+      asprintf(&attr, "%s/ip-addr", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: ip-addr = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.hostname, s);
+        net_check_address(&config.net.hostname, 0);
+        iscsi_ok++;
+      }
+      free(attr);
     }
-    free(attr);
 
     asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
     s = util_get_attr(attr);
@@ -5151,13 +5155,17 @@ char *mac_to_interface_log(char *mac, int log)
  * Get network interface name from mac. If max_offset
  * is set decrease mac and retry up to max_offset.
  *
+ * If max_offset is not NULL, set to actual offset.
+ *
  * return value must be freed
  */
-char *mac_to_interface(char *mac, int max_offset)
+char *mac_to_interface(char *mac, int *max_offset)
 {
   char *if_name, *s, *t;
   unsigned u;
-  int ofs = 0;
+  int ofs = 0, max_ofs = 0;
+
+  if(max_offset) max_ofs = *max_offset;
 
   if(!mac || mac[0] == 0 || mac[0] == '.') return NULL;
 
@@ -5172,7 +5180,7 @@ char *mac_to_interface(char *mac, int max_offset)
       if(strlen(s) == 3) {
         u = strtoul(s + 1, &t, 16);
         if(!*t) {
-          for(ofs = 1; ofs <= max_offset; ofs++) {
+          for(ofs = 1; ofs <= max_ofs; ofs++) {
             sprintf(s + 1, "%02x", (u - ofs) & 0xff);
             if_name = mac_to_interface_log(mac, 0);
             if(if_name) break;
@@ -5183,6 +5191,8 @@ char *mac_to_interface(char *mac, int max_offset)
 
     free(mac);
   }
+
+  if(if_name && max_offset) *max_offset = ofs;
 
   fprintf(stderr, "if = %s", if_name);
   if(if_name && ofs) fprintf(stderr, ", offset = %u", ofs);

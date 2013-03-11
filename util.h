@@ -169,5 +169,5 @@ hd_t *fix_device_names(hd_t *hd);
 int fcoe_check(void);
 int iscsi_check(void);
 
-char *mac_to_interface(char *mac, int max_offset);
+char *mac_to_interface(char *mac, int *max_offset);
 
