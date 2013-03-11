@@ -5056,6 +5056,9 @@ int iscsi_check()
       }
       free(attr);
     }
+    else {
+      iscsi_ok++;
+    }
 
     asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
     s = util_get_attr(attr);
