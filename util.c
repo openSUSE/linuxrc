@@ -5026,23 +5026,23 @@ int iscsi_check()
   fprintf(stderr, "ibft: dhcp = %d\n", use_dhcp);
   free(attr);
 
+  asprintf(&attr, "%s/mac", sysfs_ibft);
+  s = util_get_attr(attr);
+  fprintf(stderr, "ibft: mac = %s\n", s);
+  if(*s) {
+    /* try to get the interface name, up to offset 2 */
+    if((t = mac_to_interface(s, 2))) s = t;
+    str_copy(&config.netdevice, s);
+    free(t);
+    iscsi_ok++;
+  }
+  free(attr);
+
   if(use_dhcp) {
     config.net.do_setup |= DS_SETUP;
     config.net.setup = NS_DHCP;
   }
   else {
-    asprintf(&attr, "%s/mac", sysfs_ibft);
-    s = util_get_attr(attr);
-    fprintf(stderr, "ibft: mac = %s\n", s);
-    if(*s) {
-      /* try to get the interface name, up to offset 2 */
-      if((t = mac_to_interface(s, 2))) s = t;
-      str_copy(&config.netdevice, s);
-      free(t);
-      iscsi_ok++;
-    }
-    free(attr);
-
     asprintf(&attr, "%s/ip-addr", sysfs_ibft);
     s = util_get_attr(attr);
     fprintf(stderr, "ibft: ip-addr = %s\n", s);
