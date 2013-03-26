@@ -5028,15 +5028,18 @@ int iscsi_check()
   free(attr);
 
   asprintf(&attr, "%s/mac", sysfs_ibft);
-  s = util_get_attr(attr);
+  s = strdup(util_get_attr(attr));
   fprintf(stderr, "ibft: mac = %s\n", s);
   if(*s) {
     /* try to get the interface name, up to offset 2 */
-    if((t = mac_to_interface(s, &mac_ofs))) s = t;
+    if((t = mac_to_interface(s, &mac_ofs))) {
+      free(s);
+      s = t;
+    }
     str_copy(&config.netdevice, s);
-    free(t);
     iscsi_ok++;
   }
+  free(s);
   free(attr);
 
   if(use_dhcp) {
