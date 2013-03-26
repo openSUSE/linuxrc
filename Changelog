@@ -1,3 +1,6 @@
+26/3/2013:	v3.3.88
+	- fix last patch
+
 11/3/2013:	v3.3.87
 	- ibft: use mac with dhcp, use static ip only if mac matches (bnc #806593)
 
