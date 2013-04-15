@@ -137,8 +137,9 @@ void md5_verify()
 /*
  * Calculate md5 sum.
  *
- * Normal md5sum, except we assume the area 0x8373 - 0x8572 to be filled
- * with spaces (' ').
+ * Normal md5sum, except that we assume
+ *   - 0x0000 - 0x01ff is filled with zeros (0)
+ *   - 0x8373 - 0x8572 is filled with spaces (' ').
  */
 void do_md5(char *file)
 {
@@ -173,7 +174,10 @@ void do_md5(char *file)
 
     md5_process_block(buffer, sizeof buffer, &full_ctx);
 
-    if(chunk == 0) memset(buffer + 0x8373, ' ', 0x200);
+    if(chunk == 0) {
+      memset(buffer, 0, 0x200);
+      memset(buffer + 0x8373, ' ', 0x200);
+    }
 
     md5_process_block(buffer, sizeof buffer, &ctx);
 

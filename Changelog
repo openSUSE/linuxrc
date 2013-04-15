@@ -1,3 +1,6 @@
+15/4/2013:	v3.3.89
+	- fix media check to work with isohybrid images (bnc #811798)
+
 26/3/2013:	v3.3.88
 	- fix last patch
 
