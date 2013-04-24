@@ -1,3 +1,6 @@
+24/4/2013:	v3.3.90
+	- fix nextmedia handling (bnc #813141)
+
 15/4/2013:	v3.3.89
 	- fix media check to work with isohybrid images (bnc #811798)
 
