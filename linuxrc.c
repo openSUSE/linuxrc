@@ -1086,7 +1086,14 @@ void lxrc_init()
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
           config.manual = 0;
+          url_free(config.url.install);
+          config.url.install = url_set("cd:/");
           i = auto2_find_repo();
+          if(!i) {
+            url_free(config.url.install);
+            config.url.install = url_set("hd:/");
+            i = auto2_find_repo();
+          }
         }
       } while(!i && j);
 
