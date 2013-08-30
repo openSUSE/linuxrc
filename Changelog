@@ -1,3 +1,6 @@
+21/8/2013:	v2.0.98
+	- introduce minimal terminal size to work with strange terminals (bnc #668667, bnc #827678)
+
 16/2/2011:	v2.0.97
 	- s390: don't offer installation from hd (bnc #658709, bnc #572575)
 

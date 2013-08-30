@@ -47,8 +47,13 @@
 /* max bytes needed for utf8 string of length a */
 #define UTF8_SIZE(a)		((a) * 6 + 1)
 
+/* terminal sizes */
+#define X_DEFAULT		80
+#define Y_DEFAULT		24
 #define MAX_X			250
 #define MAX_Y			150
+#define MIN_X			8
+#define MIN_Y			4
 
 #define BUTTON_SIZE_NORMAL	8
 #define BUTTON_SIZE_LARGE	10

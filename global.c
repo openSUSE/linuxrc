@@ -8,9 +8,6 @@
 
 #include "global.h"
 
-#define X_DEFAULT         80
-#define Y_DEFAULT         25
-
 int             max_x_ig = X_DEFAULT;
 int             max_y_ig = Y_DEFAULT;
 
