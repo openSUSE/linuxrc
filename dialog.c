@@ -72,6 +72,7 @@ struct {
   { di_netsource_smb,    "SMB / CIFS (Windows Share)" },
   { di_netsource_ftp,    "FTP"                 },
   { di_netsource_http,   "HTTP"                },
+  { di_netsource_auto,   0, "Automatic HTTP external mirror" },
   { di_netsource_https,  "HTTPS"               },
   { di_netsource_tftp,   "TFTP"                },
 

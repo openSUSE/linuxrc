@@ -218,6 +218,16 @@ int main(int argc, char **argv, char **env)
     err = 99;
   }
 
+  /* auto launch HTTP installation with the external mirror
+   * download.opensuse.org 
+   * fetching product version to install from the linuxrc.config file
+   */ 
+  if(strcmp(config.url.install->path, "auto") == 0) {
+       fprintf(stderr, "Starting auto HTTP external installation... ");
+       config.manual = 0;
+       inst_do_network(inst_auto);
+   }
+
   if(err) {
     util_disp_init();
     lxrc_main_menu();
@@ -784,7 +794,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2012 SUSE Linux Products GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2013 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
@@ -1032,7 +1042,7 @@ void lxrc_init()
 
   if(config.braille.check) run_braille();
 
-  if(!config.manual && !auto2_init()) {
+  if(!config.manual && !auto2_init() && strcmp(config.url.install->path, "auto")) {
     fprintf(stderr, "Automatic setup not possible.\n");
 
     util_disp_init();

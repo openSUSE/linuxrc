@@ -328,6 +328,7 @@ static struct {
   { "ftp",       inst_ftp           },
   { "smb",       inst_smb           },
   { "http",      inst_http          },
+  { "http",      inst_auto          },
   { "https",     inst_https         },
   { "tftp",      inst_tftp          },
   { "cd",        inst_cdrom         },

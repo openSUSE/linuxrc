@@ -10,3 +10,4 @@ int inst_menu(void);
 int inst_start_install(void);
 int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_input);
 int inst_update_cd(void);
+int inst_do_network(instmode_t scheme);

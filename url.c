@@ -559,6 +559,7 @@ url_t *url_set(char *str)
     url->scheme == inst_ftp ||
     url->scheme == inst_smb ||
     url->scheme == inst_http ||
+    url->scheme == inst_auto ||
     url->scheme == inst_https ||
     url->scheme == inst_tftp
     ) {
@@ -759,6 +760,7 @@ char *url_print_zypp(url_t *url)
     scheme != inst_file &&
     scheme != inst_ftp &&
     scheme != inst_http &&
+    scheme != inst_auto &&
     scheme != inst_https &&
     scheme != inst_nfs &&
     scheme != inst_smb &&
@@ -1226,6 +1228,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         break;
 
       case inst_http:
+      case inst_auto:
       case inst_https:
       case inst_ftp:
       case inst_tftp:
@@ -2806,4 +2809,3 @@ int digest_verify(url_data_t *url_data, char *file_name)
 
   return ok;
 }
-

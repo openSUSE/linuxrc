@@ -145,4 +145,5 @@ int fcoe_check(void);
 void util_run_script(char *name);
 
 void util_plymouth_off(void);
+char *get_product_version(void);
 

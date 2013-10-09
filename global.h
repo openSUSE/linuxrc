@@ -19,7 +19,7 @@ extern str_list_t *search_str_list(str_list_t *sl, char *str);
 extern str_list_t *add_str_list(str_list_t **sl, char *str);
 extern char *hd_join(char *del, str_list_t *str);
 
-#include "po/text_langids.h"
+#include "text_langids.h"
 #include "settings.h"
 
 #include "version.h"
@@ -125,7 +125,7 @@ typedef struct {
  */
 typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
-  inst_http, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
+  inst_http, inst_auto, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
   inst_rel, inst_disk
 } instmode_t;

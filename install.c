@@ -155,6 +155,7 @@ int inst_choose_netsource()
   dia_item_t items[] = {
     di_netsource_ftp,
     di_netsource_http,
+    di_netsource_auto,
     di_netsource_https,
     di_netsource_nfs,
     di_netsource_smb,
@@ -172,6 +173,10 @@ int inst_choose_netsource()
 
       case inst_http:
         di_inst_choose_netsource_last = di_netsource_http;
+        break;
+
+      case inst_auto:
+        di_inst_choose_netsource_last = di_netsource_auto;
         break;
 
       case inst_https:
@@ -225,6 +230,10 @@ int inst_choose_netsource_cb(dia_item_t di)
 
     case di_netsource_http:
       err = inst_do_network(inst_http);
+      break;
+
+    case di_netsource_auto:
+      err = inst_do_network(inst_auto);
       break;
 
     case di_netsource_https:
@@ -704,7 +713,7 @@ int inst_do_network(instmode_t scheme)
 {
   int i, err = 0, port = 0, n_port = 0, proxy_port = 0;
   unsigned u;
-  char *s;
+  char *s; char *version;
   char *buf = NULL, *buf2 = NULL, *path = NULL, *share = NULL, *domain = NULL,
     *user = NULL, *password = NULL, *proxy_user = NULL, *proxy_password = NULL,
     *n_user = NULL, *n_password = NULL;
@@ -713,14 +722,24 @@ int inst_do_network(instmode_t scheme)
     &n_user, &n_password
   };
   inet_t server = {}, proxy = {};
+  char *autopath = NULL;
 
   /* setup network */
   if(net_config()) return 1;
 
   /* get current values */
   if(config.url.install) {
-    str_copy(&path, config.url.install->path);
-    name2inet(&server, config.url.install->server);
+      if (scheme == inst_auto) {
+          version = get_product_version();
+          strprintf(&autopath, "/distribution/%s/repo/oss", version);
+          name2inet(&server, "download.opensuse.org");
+          str_copy(&config.url.install->server, server.name);
+          str_copy(&config.url.install->path, autopath);
+          str_copy(&path, autopath);
+      } else {
+          str_copy(&path, config.url.install->path);
+          name2inet(&server, config.url.install->server);
+      }
     str_copy(&share, config.url.install->share);
     str_copy(&domain, config.url.install->domain);
     str_copy(&user, config.url.install->user);
@@ -728,18 +747,28 @@ int inst_do_network(instmode_t scheme)
     port = config.url.install->port;
   }
 
-  /* server name */
-  strprintf(&buf, "Enter the IP address of the %s server.", get_instmode_name_up(scheme));
-  if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
-  if(!err && n_port) port = n_port;
+  /* server name 
+   * server name is already set in auto mode
+   */
+  if (scheme != inst_auto) {
+    strprintf(&buf, "Enter the IP address of the %s server.", get_instmode_name_up(scheme));
+    if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
+    if(!err && n_port) port = n_port;
+  }
 
   /* smb share */
   if(!err && scheme == inst_smb && dia_input2("Enter the share name on the SMB server.", &share, 30, 0)) err = 1;
 
-  /* path */
-  if(!err && dia_input2("Enter the directory on the server.", &path, 30, 0)) err = 1;
+  /* path 
+   * path is already set in auto mode
+   */
+  if (scheme != inst_auto) {
+      if(!err && dia_input2("Enter the directory on the server.", &path, 30, 0)) err = 1;
+  }
 
-  /* user, password */
+  /* user, password 
+   * no user/password setup for the Automatic external mirror
+   */
   if(!err && (scheme == inst_http || scheme == inst_https || scheme == inst_ftp)) {
     if(!n_user) {
       strprintf(&buf,
@@ -796,7 +825,9 @@ int inst_do_network(instmode_t scheme)
     }
   }
 
-  /* proxy setup */
+  /* proxy setup 
+   * don't use proxy setup for the Automatic external mirror
+   */
   if(!err && (scheme == inst_http || scheme == inst_https || scheme == inst_ftp)) {
 
     /* get current proxy values*/
