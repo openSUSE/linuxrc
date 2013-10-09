@@ -105,6 +105,7 @@ install=hd:/?device=sdb*                 # any partition on 2nd hard disk
 install=hd:/?device=*label/foo           # partition with fs label 'foo'
 install=nfs://foo/bar?device=eth0        # works with network devices, too
 install=nfs://foo/bar?device=00:0e:0c:*  # matches MAC addresses, too
+install=auto                             # Automatic usage of download.opensuse.org HTTP external mirror
 </pre>
 <p><i>instsys</i> is only relevant for the <a href="#p_install" title="">install</a> parameter. Also, see
 <a href="#p_instsys" title="">instsys</a> option.
@@ -526,6 +527,8 @@ install=smb://foo/bar/openSUSE-10.3-i386-DVD.iso
 install=slp:/
 # just start a shell
 install=exec:/bin/sh
+# HTTP installation with external mirror, auto selection of the product
+install=auto
 </pre>
 <p>The installation program is normally loaded from the repository. If for some
 reason you don't want this, you can specify the installation system image to
