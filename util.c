@@ -4229,4 +4229,18 @@ void util_plymouth_off()
   kbd_init(0);
 }
 
+char *get_product_version()
+{
+  /* parse config.product to find the name and the version */
+   char *product_info; char *product_version;
+   int count = 0;
+   product_info = strtok(config.product, " ");
+   for (count= 0; count < 2 ; count++)
+   {
+      if (count == 1) product_version = product_info;
+      product_info = strtok(NULL, " ");
+   }
+   if(config.debug) { fprintf(stderr, "product version: %s\n", product_version); }
+   return product_version;
+}
 
