@@ -129,7 +129,7 @@ int net_ask_vlanid()
 {
     window_t win;
     // probe needed modules for VLAN
-    dia_info(&win, txt_get(TXT_PROBING_VLAN_MODULES), MSGTYPE_INFO);
+    dia_info(&win, "Probing VLAN modules and configuring Vlan ID", MSGTYPE_INFO);
     if(mod_modprobe("llc", NULL)) { dia_message("failed to load llc module",MSGTYPE_ERROR); return -1; }
     if(mod_modprobe("stp", NULL)) { dia_message("failed to load stp module",MSGTYPE_ERROR); return -1; }
     if(mod_modprobe("garp", NULL)) { dia_message("failed to load garp module",MSGTYPE_ERROR); return -1; }
@@ -137,7 +137,7 @@ int net_ask_vlanid()
     win_close(&win);
 
     if(!config.net.vlanid) {
-        dia_input2(txt_get(TXT_VLANID_INFO), &config.net.vlanid, 25, 0);
+        dia_input2("The vlan_id is the identifier (0-4095) of the VLAN you are operating on", &config.net.vlanid, 25, 0);
     }   
     //printf("config.net.vlanid: %s \n", config.net.vlanid);
     configure_vlan(config.net.device, "add", config.net.vlanid);
