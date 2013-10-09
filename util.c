@@ -4231,7 +4231,7 @@ void util_plymouth_off()
 
 char *get_product_version()
 {
-  /* parse config.product to find the name and the version */
+  /* parse config.update.dir to find the name and the version */
    char *product_info; char *product_version;
    int count = 0;
    product_info = strtok(config.update.dir, "-");
