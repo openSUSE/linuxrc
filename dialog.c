@@ -54,6 +54,7 @@ struct {
   { di_set_rootimage,    "Enter Root Image",       },
   { di_set_vnc,          "VNC Enable or Disable",          },
   { di_set_usessh,       "Enable or Disable SSH Mode",          },
+  { di_set_vlan,         "Enable or Disable VLAN Mode",         },
   { di_set_startshell,   "Start shell before and after YaST?",    },
   { di_set_slp,          "Get SLP info",        },
 

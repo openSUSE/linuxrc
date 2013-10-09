@@ -1161,6 +1161,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.vnc, "vnc");
   add_flag(&sl0, buf, config.usessh, "usessh");
+  add_flag(&sl0, buf, config.vlan, "vlan");
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
   add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
@@ -1237,6 +1238,9 @@ void util_status_info(int log_it)
     sprintf(buf, "cdrom id = %s", config.cdid);
     slist_append_str(&sl0, buf);
   }
+
+  sprintf(buf, "vlanid = %s", config.net.vlanid ?: "");
+  slist_append_str(&sl0, buf);
 
   sprintf(buf, "hostname = %s", inet2print(&config.net.hostname));
   slist_append_str(&sl0, buf);

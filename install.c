@@ -247,7 +247,7 @@ int inst_choose_netsource_cb(dia_item_t di)
 #if defined(__s390__) || defined(__s390x__)  
 int inst_choose_display()
 {
-  if(!config.manual && (config.net.displayip.ok || config.vnc || config.usessh)) {
+  if(!config.manual && (config.net.displayip.ok || config.vnc || config.usessh || config.vlan)) {
     net_ask_password();
     return 0;
   }

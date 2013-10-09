@@ -42,6 +42,7 @@ typedef enum {
   di_set_rootimage,
   di_set_vnc,
   di_set_usessh,
+  di_set_vlan,
   di_set_startshell,
   di_set_slp,
 

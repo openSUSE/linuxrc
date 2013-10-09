@@ -1196,6 +1196,28 @@ if you have some unusual hardware. Or you are in a virtual machine.
 </pre>
 </td></tr>
 
+<td> VLAN </td><td>
+<p><span id="p_vlan" />
+</p><p>This parameter enables Vlan ID configuration when performing the network configuration.
+</p>
+<pre> Values: 0 (off), 1 (on)
+</pre>
+<p>Example:
+</p>
+<pre> # activate Vlan ID configuration
+vlan=1 
+</pre>
+</td></tr>
+
+<tr>
+<td> VlanID </td><td>
+<p>The vlan_id is the identifier (0-4095) of the VLAN you are operating on.
+</p><p>Example:
+</p>
+<pre>VlanID=3
+</pre>
+</td></tr>
+
 <tr>
 <td> StartShell </td><td>
 <p>Boots into the installation system and starts a shell. Waits until user exits the shell. User can modify the installation system, mount or remount partitions or start YaST installation manually by running <i>yast</i>.

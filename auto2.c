@@ -604,7 +604,7 @@ void auto2_user_netconfig()
   }
 
   if(config.net.configured == nc_none) {
-    config.vnc = config.usessh = 0;
+    config.vnc = config.usessh = config.vlan = 0;
   }
   else {
     net_is_ptp_im = FALSE;

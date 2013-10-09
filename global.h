@@ -254,6 +254,7 @@ typedef struct {
 #define DS_INSTALL		(1 << 1)
 #define DS_VNC			(1 << 2)
 #define DS_SSH			(1 << 3)
+#define DS_VLAN         (1 << 4)
 
 /* config.net.setup bitmasks */
 
@@ -305,6 +306,7 @@ typedef struct {
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
   unsigned usessh:1;		/* ssh mode */
+  unsigned vlan:2;          /* Vlan id mode */
   unsigned addswap:2;		/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
@@ -541,6 +543,7 @@ typedef struct {
     int file_length;		/* length of currently retrieved file */
     char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
+    char *vlanid;        /* VLAN ID */
     int dhcp_timeout;
     int tftp_timeout;
     int ifup_wait;		/* wait this time (in s) after network setup */

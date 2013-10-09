@@ -335,6 +335,7 @@ int set_settings()
     di_set_rootimage,
     di_set_vnc,
     di_set_usessh,
+    di_set_vlan,
     di_set_startshell,
     di_set_slp,
     di_none
@@ -418,6 +419,19 @@ int set_settings_cb (dia_item_t di)
         }
         else {
           config.net.do_setup &= ~DS_SSH;
+        }
+      }
+      rc = 1;
+      break;
+
+    case di_set_vlan:
+      rc = dia_yesno("Use Vlan ID ?", config.vlan ? YES : NO);
+      if(rc != ESCAPE) {
+        if((config.vlan = rc == YES ? 1 : 0)) {
+          config.net.do_setup |= DS_VLAN;
+        }
+        else {
+          config.net.do_setup &= ~DS_VLAN;
         }
       }
       rc = 1;
