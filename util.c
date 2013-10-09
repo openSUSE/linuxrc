@@ -4234,11 +4234,11 @@ char *get_product_version()
   /* parse config.product to find the name and the version */
    char *product_info; char *product_version;
    int count = 0;
-   product_info = strtok(config.product, " ");
+   product_info = strtok(config.update.dir, "-");
    for (count= 0; count < 2 ; count++)
    {
       if (count == 1) product_version = product_info;
-      product_info = strtok(NULL, " ");
+      product_info = strtok(NULL, "-");
    }
    if(config.debug) { fprintf(stderr, "product version: %s\n", product_version); }
    return product_version;
