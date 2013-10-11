@@ -55,6 +55,7 @@
 #include "module.h"
 #include "url.h"
 #include "auto2.h"
+#include "vlan.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -118,6 +119,30 @@ void net_ask_password()
   if(config.win && !win_old) util_disp_done();
 }
 
+/*
+ * Ask for VLANID, unless it has been aldready been set.
+ *
+ * Global vars changed:
+ *  config.net.vlanid
+ */
+int net_ask_vlanid()
+{
+    window_t win;
+    // probe needed modules for VLAN
+    dia_info(&win, "Probing VLAN modules and configuring Vlan ID", MSGTYPE_INFO);
+    if(mod_modprobe("llc", NULL)) { dia_message("failed to load llc module",MSGTYPE_ERROR); return -1; }
+    if(mod_modprobe("stp", NULL)) { dia_message("failed to load stp module",MSGTYPE_ERROR); return -1; }
+    if(mod_modprobe("garp", NULL)) { dia_message("failed to load garp module",MSGTYPE_ERROR); return -1; }
+    if(mod_modprobe("8021q", NULL)) { dia_message("failed to load 8021q module",MSGTYPE_ERROR); return -1; }
+    win_close(&win);
+
+    if(!config.net.vlanid) {
+        dia_input2("The vlan_id is the identifier (0-4095) of the VLAN you are operating on", &config.net.vlanid, 25, 0);
+    }   
+    //printf("config.net.vlanid: %s \n", config.net.vlanid);
+    configure_vlan(config.net.device, "add", config.net.vlanid);
+    return 0;
+}
 
 void net_ask_domain()
 {
@@ -206,6 +231,8 @@ int net_config()
   net_stop();
 
   config.net.configured = nc_none;
+
+  if (config.vlan) { net_ask_vlanid(); }
 
   if(config.win && config.net.setup != NS_DHCP) {
     if((config.net.setup & NS_DHCP)) {

@@ -90,6 +90,8 @@ static struct {
   { key_nameserver,     "Nameserver",     kf_cfg + kf_cmd                },
   { key_broadcast,      "Broadcast",      kf_cfg + kf_cmd + kf_dhcp      },
   { key_network,        "Network",        kf_cfg + kf_cmd + kf_dhcp      },
+  { key_vlan,           "Vlan",           kf_cfg + kf_cmd                },
+  { key_vlanid,         "VlanID",         kf_cfg + kf_cmd                },
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
   { key_serverdir,      "Serverdir",      kf_none                        },
   { key_netdevice,      "Netdevice",      kf_cfg + kf_cmd                },
@@ -702,6 +704,17 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           url_free(config.url.proxy);
           config.url.proxy = url_set(buf);
         }
+        break;
+
+      case key_vlan:
+        if(f->is.numeric) config.vlan = f->nvalue;
+        if(config.vlan) {
+          config.net.do_setup |= DS_VLAN;
+        }
+        break;
+
+      case key_vlanid:
+        str_copy(&config.net.vlanid, f->value);
         break;
 
       case key_dhcptimeout:
@@ -1929,6 +1942,8 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_usesax2, config.usesax2);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
+  file_write_num(f, key_vlan, config.vlan);
+  if(config.net.vlanid) file_write_str(f, key_vlanid, config.net.vlanid);
 
   if(
     config.rootpassword &&
