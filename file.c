@@ -303,6 +303,7 @@ static struct {
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
   { key_digests,        "Digests",        kf_cfg + kf_cmd + kf_cmd_early },
   { key_plymouth,       "Plymouth",       kf_cfg + kf_cmd_early          },
+  { key_ignore_features,"IgnoreFeatures", kf_yast                        },
 };
 
 static struct {
@@ -1947,6 +1948,10 @@ void file_write_install_inf(char *dir)
 
   for(sl = config.ptoptions; sl; sl = sl->next) {
     if(sl->value) fprintf(f, "%s: %s\n", sl->key, sl->value);
+  }
+
+  if (config.key_ignore_features) {
+    file_write_str(f, key_ignore_features, config.key_ignore_features);
   }
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
