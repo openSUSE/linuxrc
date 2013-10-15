@@ -1,3 +1,6 @@
+15/10/2013:	v3.3.92
+	- don't load edd.ko on efi systems (bnc #837747)
+
 10/5/2013:	v3.3.91
 	- more fixes for nextmedia handling (bnc #813141)
 
