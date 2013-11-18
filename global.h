@@ -19,7 +19,40 @@ extern str_list_t *search_str_list(str_list_t *sl, char *str);
 extern str_list_t *add_str_list(str_list_t **sl, char *str);
 extern char *hd_join(char *del, str_list_t *str);
 
-#include "po/text_langids.h"
+/* lang_undef _must_ be 0 */
+enum langid_t {
+  lang_undef,
+  lang_en,
+  lang_pt,
+  lang_sk,
+  lang_de,
+  lang_it,
+  lang_ja,
+  lang_nl,
+  lang_ru,
+  lang_zh_TW,
+  lang_el,
+  lang_nb,
+  lang_sl,
+  lang_pt_BR,
+  lang_zh_CN,
+  lang_xh,
+  lang_pl,
+  lang_bg,
+  lang_da,
+  lang_zu,
+  lang_fr,
+  lang_af,
+  lang_es,
+  lang_uk,
+  lang_ca,
+  lang_hu,
+  lang_fi,
+  lang_sv,
+  lang_cs,
+  lang_dummy
+};
+
 #include "settings.h"
 
 #include "version.h"
