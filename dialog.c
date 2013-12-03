@@ -40,7 +40,7 @@ struct {
 
   { di_expert_info,      "System Information",           },
   { di_expert_modules,   "Kernel Modules (Hardware Drivers)",        },
-  { di_expert_verify,    "Verify Installation CD-ROM/DVD",            },
+  { di_expert_verify,    "Verify Installation Medium",            },
   { di_expert_eject,     "Eject CD",            },
 
   { di_exit_reboot,      "Exit or Reboot",          },

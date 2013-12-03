@@ -72,18 +72,28 @@ struct {
 window_t win;
 
 
-void digest_media_verify()
+void digest_media_verify(char *device)
 {
   int i;
-  char buf[256], *device = NULL;
+  char buf[256];
   hd_t *hd;
-
-  update_device_list(0);
 
   iso.err = 1;
 
-  if(config.device) get_info(device = config.device);
+  fprintf(stderr, "digest_media_verify(%s)\n", device);
 
+  if(device) {
+    device = strdup(long_dev(device));
+    get_info(device);
+  }
+  else {
+    update_device_list(0);
+    if(config.device) get_info(device = config.device);
+
+    dia_message("No CD-ROM or DVD found!!!", MSGTYPE_ERROR);
+  }
+
+#if 0
   if(iso.err) {
     for(hd = fix_device_names(hd_list(config.hd_data, hw_cdrom, 0, NULL)); hd; hd = hd->next) {
       if(hd->is.notready) continue;
@@ -107,6 +117,7 @@ void digest_media_verify()
     config.manual=1;
     return;
   }
+#endif
 
   fprintf(stderr,
     "  app: %s\nmedia: %s%d\n size: %u kB\n  pad: %u kB\n",
@@ -122,7 +133,7 @@ void digest_media_verify()
   fprintf(stderr, "\n");
 
   if(!*iso.app_id || !iso.digest.got_old || iso.pad >= iso.size) {
-    sprintf(buf, "This is not a %s CD-ROM.", config.product);
+    sprintf(buf, "This is not a %s medium.", config.product);
     dia_message(buf, MSGTYPE_ERROR);
     config.manual=1;
     return;
@@ -168,7 +179,7 @@ void digest_media_verify()
     config.manual=1;
   }
   else {
-    dia_message("Checksumming Canceled.", MSGTYPE_INFO);
+    dia_message("Checksumming canceled.", MSGTYPE_INFO);
   }
 }
 

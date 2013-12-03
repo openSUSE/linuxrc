@@ -56,6 +56,7 @@ static int test_and_add_dud(url_t *url);
 int auto2_init()
 {
   int ok, win_old, install_unset = 0;
+  char *device;
 
   auto2_scan_hardware();
 
@@ -82,11 +83,6 @@ int auto2_init()
     while(!inst_update_cd());
   }
 
-  if(config.mediacheck) {
-    if(!config.win) util_disp_init();
-    digest_media_verify();  
-  }
-
   if(config.win && !win_old) util_disp_done();
 
   ok = auto2_find_repo();
@@ -98,6 +94,32 @@ int auto2_init()
   }
 
   if(config.debug) fprintf(stderr, "ZyppRepoURL: %s\n", url_print(config.url.install, 4));
+
+  LXRC_WAIT
+
+  device = config.url.install->used.device ?: config.url.install->device;
+
+  win_old = config.win;
+
+  if(config.debug) {
+    fprintf(stderr, "ok = %d\n", ok);
+    fprintf(stderr, "is.network = %d\n", config.url.install->is.network);
+    fprintf(stderr, "is.mountable = %d\n", config.url.install->is.mountable);
+    fprintf(stderr, "device = %s\n", device);
+  }
+
+  if(
+    ok &&
+    config.mediacheck &&
+    !config.url.install->is.network &&
+    config.url.install->is.mountable &&
+    device
+  ) {
+    if(!config.win) util_disp_init();
+    digest_media_verify(device);
+  }
+
+  if(config.win && !win_old) util_disp_done();
 
   LXRC_WAIT
 

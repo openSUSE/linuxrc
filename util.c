@@ -4230,3 +4230,225 @@ void util_plymouth_off()
 }
 
 
+/*
+ * Let user enter a device
+ * (*dev = NULL if she changed her mind).
+ *
+ * type: 0 = all block devs
+ *       1 = skip whole disk if it has partitions
+ *       2 = skip partitions
+ *
+ * return values:
+ *  0    : ok
+ *  1    : abort
+ */
+int util_choose_disk_device(char **dev, int type, char *list_title, char *input_title)
+{
+  int i, j, item_cnt, last_item, dev_len, item_width;
+  int sort_cnt, err = 0;
+  char *s, *s1, *s2, *s3, *buf = NULL, **items, **values;
+  hd_data_t *hd_data;
+  hd_t *hd, *hd1;
+  window_t win;
+
+  *dev = NULL;
+
+  hd_data = calloc(1, sizeof *hd_data);
+
+  if(config.manual < 2) {
+    dia_info(&win, "Searching for storage devices...", MSGTYPE_INFO);
+    fix_device_names(hd_list(hd_data, hw_block, 1, NULL));
+    win_close(&win);
+  }
+
+  for(i = 0, hd = hd_data->hd; hd; hd = hd->next) {
+    if(!hd_is_hw_class(hd, hw_block)) continue;
+
+    if(
+      type == 1 &&	// skip whole disks if there are partitions
+      (hd1 = hd_get_device_by_idx(hd_data, hd->attached_to)) &&
+      hd1->base_class.id == bc_storage_device
+    ) {
+      hd1->status.available = status_no;
+    }
+
+    if(
+      type == 2 &&	// skip partitions
+      hd_is_hw_class(hd, hw_partition)
+    ) {
+      hd->status.available = status_no;
+    }
+
+    i++;
+  }
+
+  /* just max values, actual lists might be shorter */
+  items = calloc(i + 1 + 2, sizeof *items);
+  values = calloc(i + 1 + 2, sizeof *values);
+
+  item_cnt = 0;
+
+  /* max device name length */
+  for(dev_len = 0, hd = hd_data->hd; hd; hd = hd->next) {
+    if(
+      !hd_is_hw_class(hd, hw_block) ||
+      hd->status.available == status_no ||
+      !hd->unix_dev_name
+    ) continue;
+
+    j = strlen(hd->unix_dev_name);
+    if(j > dev_len) dev_len = j;
+  }
+  dev_len = dev_len > 5 ? dev_len - 5 : 1;
+
+  item_width = sizeof "other device" - 1;
+
+  for(sort_cnt = 0; sort_cnt < 4; sort_cnt++) {
+    for(hd = hd_data->hd; hd; hd = hd->next) {
+      if(
+        !hd_is_hw_class(hd, hw_block) ||
+        hd->status.available == status_no ||
+        !hd->unix_dev_name ||
+        strncmp(hd->unix_dev_name, "/dev/", sizeof "/dev/" - 1)
+      ) continue;
+
+      j = 0;
+      switch(sort_cnt) {
+        case 0:
+          if(hd_is_hw_class(hd, hw_floppy)) j = 1;
+          break;
+
+        case 1:
+          if(hd_is_hw_class(hd, hw_cdrom)) j = 1;
+          break;
+
+        case 2:
+          if(hd_is_hw_class(hd, hw_usb)) {
+            j = 1;
+          }
+          else {
+            hd1 = hd_get_device_by_idx(hd_data, hd->attached_to);
+            if(hd1 && hd_is_hw_class(hd1, hw_usb)) j = 1;
+          }
+          break;
+
+        default:
+          j = 1;
+          break;
+      }
+
+      if(!j) continue;
+
+      hd->status.available = status_no;
+
+      if(
+        !(hd1 = hd_get_device_by_idx(hd_data, hd->attached_to)) ||
+        hd1->base_class.id != bc_storage_device
+      ) {
+        hd1 = hd;
+      }
+      
+      s1 = hd1->model;
+      if(hd_is_hw_class(hd, hw_floppy)) s1 = "";
+
+      s2 = "Disk";
+      if(hd_is_hw_class(hd, hw_partition)) s2 = "Partition";
+      if(hd_is_hw_class(hd, hw_floppy)) s2 = "Floppy";
+      if(hd_is_hw_class(hd, hw_cdrom)) s2 = "CD-ROM";
+
+      s3 = "";
+      if(hd_is_hw_class(hd1, hw_usb)) s3 = "USB ";
+
+      s = NULL;
+      strprintf(&s, "%*s: %s%s%s%s",
+        dev_len,
+        short_dev(hd->unix_dev_name),
+        s3,
+        s2,
+        *s1 ? ", " : "",
+        s1
+      );
+
+      j = strlen(s);
+      if(j > item_width) item_width = j;
+
+      // fprintf(stderr, "<%s>\n", s);
+
+      values[item_cnt] = strdup(short_dev(hd->unix_dev_name));
+      items[item_cnt++] = s;
+      s = NULL;
+    }
+  }
+
+  last_item = 0;
+
+  if(config.update.dev) {
+    for(i = 0; i < item_cnt; i++) {
+      if(values[i] && !strcmp(values[i], config.update.dev)) {
+        last_item = i + 1;
+        break;
+      }
+    }
+
+    if(!last_item) {
+      values[item_cnt] = strdup(config.update.dev);
+      items[item_cnt++] = strdup(config.update.dev);
+      last_item = item_cnt;
+    }
+  }
+
+  values[item_cnt] = NULL;
+  items[item_cnt++] = strdup("other device");
+
+  if(item_width > 60) item_width = 60;
+
+  if(item_cnt > 1) {
+    i = dia_list(list_title, item_width + 2, NULL, items, last_item, align_left);
+  }
+  else {
+    i = item_cnt;
+  }
+
+  if(i > 0) {
+    s = values[i - 1];
+    if(s) {
+      str_copy(&config.update.dev, values[i - 1]);
+      *dev = config.update.dev;
+    }
+    else {
+      str_copy(&buf, NULL);
+      i = dia_input2(input_title, &buf, 30, 0);
+      if(!i) {
+        if(util_check_exist(long_dev(buf)) == 'b') {
+          str_copy(&config.update.dev, short_dev(buf));
+          *dev = config.update.dev;
+        }
+        else {
+          dia_message("Invalid device name.", MSGTYPE_ERROR);
+        }
+      }
+      else {
+        err = 1;
+      }
+    }
+  }
+  else {
+    err = 1;
+  }
+
+  for(i = 0; i < item_cnt; i++) { free(items[i]); free(values[i]); }
+  free(items);
+  free(values);
+
+  free(buf);
+
+  hd_free_hd_data(hd_data);
+
+  free(hd_data);
+
+  // fprintf(stderr, "dud dev = %s\n", *dev);
+
+  return err;
+}
+
+
