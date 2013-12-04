@@ -555,7 +555,6 @@ void set_expert_menu()
 int set_expert_cb(dia_item_t di)
 {
   int i;
-  static char s[64] = { };
   char *dev = NULL;
   file_t *f;
 
@@ -584,9 +583,9 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_extras_change:
-        i = dia_input("Change config", s, sizeof s - 1, 35, 0);
+        i = dia_input2("Change config", &config.change_config, 35, 0);
         if(!i) {
-          f = file_parse_buffer(s, kf_cfg + kf_cmd + kf_cmd_early);
+          f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
           file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
           file_free_file(f);
         }

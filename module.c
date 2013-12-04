@@ -558,7 +558,7 @@ int mod_load_modules(char *modules, int show)
 
 char *mod_get_params(module_t *mod)
 {
-  char buf[256], buf2[256];
+  char buf[256], *buf2 = NULL;
   slist_t *sl;
 
   if(mod_param_text) {
@@ -580,14 +580,14 @@ char *mod_get_params(module_t *mod)
 
   if(sl && sl->value) strcpy(buf2, sl->value);
 
-  if(dia_input(buf, buf2, sizeof buf2 - 1, 30, 0)) return NULL;
+  if(dia_input2(buf, &buf2, 30, 0)) return NULL;
 
   if(!sl) {
     sl = slist_add(&config.module.input_params, slist_new());
     sl->key = strdup(mod->name);
   }
   if(sl->value) free(sl->value);
-  sl->value = strdup(buf2);
+  sl->value = buf2;
 
   return sl->value;
 }

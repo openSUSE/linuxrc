@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <readline/readline.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -129,6 +130,9 @@ struct {
 static int dia_binary(char *txt, char *button0, char *button1, int def);
 static int dia_win_open (window_t *win_prr, char *txt_tv);
 static int lgetchar(void);
+static char *readline_input(char *prompt, char *val);
+
+static int dia_input(char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode);
 
 /*
  *
@@ -270,6 +274,7 @@ int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
 	  putchar('\n');
 	  dia_printformatted(txt, 0, max_x_ig - 1, 1);
 	  putchar('\n');
+          printf("0) <-- Back <--\n");
 	  printf("1) %s\n", button0_txt);
 	  printf("2) %s\n", button1_txt);
 	  printf("\n> ");fflush(stdout);
@@ -430,6 +435,9 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 	    putchar('\n');
 	    dia_printformatted(head_tv, 0, max_x_ig - 1, 1);
 	    putchar('\n');
+
+	    printf("%s0) <-- Back <--\n", nr_items_iv >= 10 ? " " : "");
+
 	    for (i = cnt = 0; i < nr_items_iv; i++)
 	      {
 	        for (p = items_arv[i].text; *p == ' '; p++)
@@ -443,6 +451,8 @@ int dia_menu (char *head_tv,     item_t  items_arv [],
 		  printf(nr_items_iv >= 10 ? "%2d) %s\n" : "%d) %s\n", cnt, p);
 		}
 	      }
+
+	    // printf("\n%s0) <-- Back <--\n", nr_items_iv >= 10 ? " " : "");
 
 	    printf("\n> "); fflush(stdout);
 
@@ -893,7 +903,7 @@ int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw
     window_t  tmp_win_ri;
     int       rc_ii;
 
-    if (config.linemode)
+    if (config.linemode == 2)
       {
 	int i, c;
 
@@ -960,6 +970,20 @@ ctrlc:
 	  kbd_reset();
         rc_ii = 0;
       }
+    else if(config.linemode == 1) {
+      char *s;
+      if(txt_tv) printf("\n%s\n", txt_tv);
+      if(pw_mode) kbd_echo_off();
+      s = readline_input("> ", input_tr);
+      if(pw_mode) kbd_reset();
+      rc_ii = -1;
+      if(s && strcmp(s, "+++")) {
+        printf(">>%s<<\n", s);
+        strncpy(input_tr, s, len_iv);
+        input_tr[len_iv] = 0;
+        rc_ii = 0;
+      }
+    }
     else
     {
       disp_toggle_output (DISP_OFF);
@@ -1405,7 +1429,6 @@ void dia_handle_ctrlc (void)
 {
     int i, j;
     static int is_in_ctrlc_is = FALSE;
-    static char s[64] = { };
     char *t;
     file_t *f;
 
@@ -1442,17 +1465,17 @@ void dia_handle_ctrlc (void)
 	exit(0);
       }
       else if(i == -69) {
-	i = dia_input("Run Command", s, sizeof s - 1, 35, 0);
-	if(!i) {
-	  if(strstr(s, "exec ") == s) {
-	    t = s + 5;
+	i = dia_input2("Run Command", &config.run_command, 35, 0);
+	if(!i && config.run_command) {
+	  if(strstr(config.run_command, "exec ") == config.run_command) {
+	    t = config.run_command + 5;
 	    while(isspace(*t)) t++;
 	    kbd_end(0);	/* restore terminal settings */
 	    j = execlp(t, t, NULL);
 	    kbd_init(0);
 	  }
 	  else {
-	    j = system(s);
+	    j = system(config.run_command);
 	  }
 	  if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
 	}
@@ -1465,9 +1488,9 @@ void dia_handle_ctrlc (void)
 	util_status_info(0);
       }
       else if(i == -73) {
-	i = dia_input("Change config", s, sizeof s - 1, 35, 0);
+	i = dia_input2("Change config", &config.change_config, 35, 0);
 	if(!i) {
-	  f = file_parse_buffer(s, kf_cfg + kf_cmd + kf_cmd_early);
+	  f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_free_file(f);
 	}
@@ -1646,7 +1669,7 @@ int dia_show_lines2(char *head, slist_t *sl0, int width)
 
 int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
 {
-  char buf[256];
+  char buf[1024];
   int i;
 
   if(!input) return 0;
@@ -1722,5 +1745,24 @@ int lgetchar()
   while((i = getchar()) == '\r' && config.listen);
 
   return i;
+}
+
+
+char *readline_input(char *prompt, char *val)
+{
+  char *s;
+
+  // rl_catch_signals = 0;
+  // rl_set_signals();
+
+  if(val) {
+    while(*val) rl_stuff_char(*val++);
+  }
+
+  s = readline(prompt);
+
+  rl_clear_signals();
+
+  return s;
 }
 

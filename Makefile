@@ -1,6 +1,6 @@
 CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
-LDFLAGS	= -rdynamic -lhd -lblkid -lcurl
+LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline
 
 GIT2LOG = $(shell [ -x ./git2log ] && echo ./git2log )
 
