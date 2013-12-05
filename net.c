@@ -1517,10 +1517,9 @@ void net_setup_nameserver()
       for(u = 0; u < config.net.nameservers; u++) {
         if(config.net.nameservers == 1) {
           s = "Enter the IP address of your name server. Leave empty if you don't need one.";
-          if(config.linemode) s = "Enter the IP address of your name server. Leave empty or enter \"+++\" if you don't need one.";
         }
         else {
-           sprintf(buf, config.linemode ? "Enter the IP of name server %u or \"+++\" for none." : "Enter the IP of name server %u or press ESC.", u + 1);
+           sprintf(buf, "Enter the IP of name server %u or press ESC.", u + 1);
            s = buf;
         }
         if(net_get_address(s, &config.net.nameserver[u], 0)) break;

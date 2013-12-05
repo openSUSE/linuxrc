@@ -897,130 +897,123 @@ void dia_status_off (window_t *win_prv)
   win_close(win_prv);
 }
 
-int dia_input (char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
+int dia_input(char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_mode)
 {
-    window_t  win_ri;
-    window_t  tmp_win_ri;
-    int       rc_ii;
+  window_t win_ri;
+  window_t tmp_win_ri;
+  int rc_ii = 0;
 
-    if (config.linemode == 2)
-      {
-	int i, c;
+  if(config.linemode) {
+    int i;
+    char *buf = NULL;
+
+    if(txt_tv) {
+      printf(
+        "\n%s%s (Enter '+++' to abort).\n",
+        txt_tv,
+        *txt_tv && txt_tv[strlen(txt_tv) - 1] == '.' ? "" : "."
+      );
+    }
+
+    if(pw_mode) kbd_echo_off();
+
+    if(config.linemode == 1) {
+      buf = readline_input("> ", input_tr);
+    }
+    else {
+      int c;
+      const int buf_len = 1024;
+
+      buf = malloc(buf_len);
+
+      strncpy(buf, input_tr, buf_len - 1);
+      buf[buf_len - 1] = 0;
 
 ctrlc:
-	putchar('\n');
-	i = strlen(txt_tv);
-	if (i > 0 && txt_tv[i - 1] == '.')
-	  i--;
-	c = i = dia_printformatted(txt_tv, i, max_x_ig - 1, 0);
-	if(c) {
-	  putchar('\n');
-	  c = i = 0;
-	}
-	if (*input_tr)
-	  i += strlen(input_tr) + 3;
-	if (i > max_x_ig - fieldlen_iv - 2)
-	  {
-	    putchar('\n');
-	    c = 0;
-	  }
-	if (*input_tr && !pw_mode)
-	  printf(" [%s]> " + (c == 0), input_tr);
-        else
-	  printf("> ");
-	fflush(stdout);
-	if (pw_mode)
-	  kbd_echo_off();
-	for (i = 0; ; i++)
-	  {
-	    c = lgetchar();
-	    if (c == '\n' || c == '\r' || c == EOF)
-	      {
-		if (i == 0)
-		  break;
-	        input_tr[i < len_iv - 1 ? i : len_iv - 1] = 0;
-	        break;
-	      }
-	    if (i == 0 && c == 033 /* escape */)
-	      {
-		c = lgetchar();
-		if (c == '\n' || c == '\r' || c == EOF)
-		  {
-		    if (pw_mode)
-		      kbd_reset();
-		    return -1;
-		  }
-		if (c == 033 || c == 'x')
-		  {
-		    while (c = lgetchar(), c != '\n' && c != '\r' && c != EOF);
-		    if (pw_mode) kbd_reset();
-		    dia_handle_ctrlc();
-		    goto ctrlc;
-		  }
-	      }
-	    if ((unsigned char)c < ' ')
-	      {
-		i--;
-		continue;
-	      }
-	    if (i < len_iv - 1)
-	      input_tr[i] = c;
-	  }
-	if (pw_mode)
-	  kbd_reset();
-        rc_ii = 0;
+      if(*buf && !pw_mode) {
+        printf("[%s]> ", buf);
       }
-    else if(config.linemode == 1) {
-      char *s;
-      if(txt_tv) printf("\n%s\n", txt_tv);
-      if(pw_mode) kbd_echo_off();
-      s = readline_input("> ", input_tr);
-      if(pw_mode) kbd_reset();
+      else {
+        printf("> ");
+      }
+      fflush(stdout);
+
+      for(i = 0; ; i++) {
+        c = lgetchar();
+
+        if(c == '\n' || c == '\r' || c == EOF) {
+          if(i == 0) break;
+          buf[i < buf_len - 1 ? i : buf_len - 1] = 0;
+          break;
+        }
+
+        if(i == 0 && c == 033 /* escape */) {
+          c = lgetchar();
+          if(c == '\n' || c == '\r' || c == EOF) {
+            free(buf);
+            buf = NULL;
+            break;
+          }
+          if(c == 033 || c == 'x') {
+            while (c = lgetchar(), c != '\n' && c != '\r' && c != EOF);
+            if(pw_mode) kbd_reset();
+            dia_handle_ctrlc();
+            if(pw_mode) kbd_echo_off();
+            goto ctrlc;
+          }
+        }
+
+        if((unsigned char) c < ' ') { i--; continue; }
+
+        if(i < buf_len - 1) buf[i] = c;
+      }
+    }
+
+    if(pw_mode) kbd_reset();
+
+    if(buf && ((i = strlen(buf)) < 3 || strcmp(buf + i - 3, "+++"))) {
+      strncpy(input_tr, buf, len_iv);
+      input_tr[len_iv - 1] = 0;
+    }
+    else {
       rc_ii = -1;
-      if(s && strcmp(s, "+++")) {
-        printf(">>%s<<\n", s);
-        strncpy(input_tr, s, len_iv);
-        input_tr[len_iv] = 0;
-        rc_ii = 0;
-      }
     }
-    else
-    {
-      disp_toggle_output (DISP_OFF);
-      memset (&win_ri, 0, sizeof (window_t));
-      win_ri.bg_color = colors_prg->input_win;
-      win_ri.fg_color = colors_prg->msg_fg;
-      dia_win_open (&win_ri, txt_tv);
 
-      memset (&tmp_win_ri, 0, sizeof (window_t));
-      tmp_win_ri.x_left = win_ri.x_left + 1;
-      tmp_win_ri.y_left = win_ri.y_right - 3;
-      tmp_win_ri.x_right = win_ri.x_right - 1;
-      tmp_win_ri.y_right = win_ri.y_right - 1;
-      tmp_win_ri.style = STYLE_RAISED;
-      tmp_win_ri.bg_color = win_ri.bg_color;
-      tmp_win_ri.fg_color = win_ri.fg_color;
-      win_open (&tmp_win_ri);
-      win_clear (&tmp_win_ri);
-      disp_flush_area (&win_ri);
+    free(buf);
+  }
+  else {
+    disp_toggle_output(DISP_OFF);
+    memset(&win_ri, 0, sizeof (window_t));
+    win_ri.bg_color = colors_prg->input_win;
+    win_ri.fg_color = colors_prg->msg_fg;
+    dia_win_open(&win_ri, txt_tv);
 
-      rc_ii = win_input (max_x_ig / 2 - fieldlen_iv / 2, win_ri.y_right - 2,
-                         input_tr, len_iv, fieldlen_iv, pw_mode);
+    memset(&tmp_win_ri, 0, sizeof (window_t));
+    tmp_win_ri.x_left = win_ri.x_left + 1;
+    tmp_win_ri.y_left = win_ri.y_right - 3;
+    tmp_win_ri.x_right = win_ri.x_right - 1;
+    tmp_win_ri.y_right = win_ri.y_right - 1;
+    tmp_win_ri.style = STYLE_RAISED;
+    tmp_win_ri.bg_color = win_ri.bg_color;
+    tmp_win_ri.fg_color = win_ri.fg_color;
+    win_open(&tmp_win_ri);
+    win_clear(&tmp_win_ri);
+    disp_flush_area(&win_ri);
 
-      win_close (&win_ri);
-    }
+    rc_ii = win_input(max_x_ig / 2 - fieldlen_iv / 2, win_ri.y_right - 2, input_tr, len_iv, fieldlen_iv, pw_mode);
+
+    win_close(&win_ri);
+  }
     
 #if defined(__s390__) || defined(__s390x__)
-    /* HMC console is bugged and sends SPACE LF instead of LF when
-       user presses enter on an empty line */
-    if(strcmp(input_tr, " ") == 0) {
-      *input_tr = 0;
-    }
+  /*
+   * HMC console is bugged and sends SPACE LF instead of LF when
+   * user presses enter on an empty line.
+   */
+  if(!strcmp(input_tr, " ")) *input_tr = 0;
 #endif
-    if(strcmp(input_tr, "+++") == 0)	/* escape sequence */
-      return -1;
-    else
-      return (rc_ii);
+
+  return rc_ii;
 }
 
 
