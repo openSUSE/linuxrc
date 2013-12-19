@@ -388,6 +388,8 @@ typedef struct {
   unsigned early_bash:1;	/* start bash on tty8 */
   unsigned devtmpfs:1;		/* mount devtmpfs */
   unsigned plymouth:1;		/* start plymouth */
+  unsigned restarting:1;	/* we are preparing for restart */
+  unsigned restarted:1;		/* we have been restarted */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */

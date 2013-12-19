@@ -76,7 +76,6 @@ void digest_media_verify(char *device)
 {
   int i;
   char buf[256];
-  hd_t *hd;
 
   iso.err = 1;
 

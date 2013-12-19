@@ -102,7 +102,7 @@ static dia_item_t di_lxrc_main_menu_last;
 
 int main(int argc, char **argv, char **env)
 {
-  char *prog;
+  char *prog, *s;
   int err, i, j;
 
   prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
@@ -147,6 +147,14 @@ int main(int argc, char **argv, char **env)
       fflush(stdout);
       getchar();
     }
+  }
+
+  if((s = getenv("restarted")) && !strcmp(s, "42")) {
+    config.restarted = 1;
+    unsetenv("restarted");
+    fprintf(stderr, "\n\nLinuxrc has been restarted\n");
+    printf("\n\nLinuxrc has neem restarted\n");
+    fflush(stdout);
   }
 
   if(!config.had_segv) config.restart_on_segv = 1;
@@ -442,7 +450,7 @@ void lxrc_end()
 {
   util_plymouth_off();
 
-  if(config.netstop) {
+  if(config.netstop || config.restarting) {
     LXRC_WAIT
 
     net_stop();
@@ -478,7 +486,7 @@ void lxrc_end()
   kbd_end(1);
   disp_end();
 
-  lxrc_change_root();
+  if(!config.restarting) lxrc_change_root();
 }
 
 /*
@@ -657,7 +665,13 @@ void lxrc_init()
   signal(SIGINT,  SIG_IGN);
   signal(SIGUSR1, lxrc_usr1);
 
-/*  reboot (RB_DISABLE_CAD); */
+  {
+    struct sigaction sa = { };
+
+    sa.sa_handler = util_restart;
+    sa.sa_flags = SA_NODEFER;
+    sigaction(SIGUSR2, &sa, NULL);
+  }
 
   umask(022);
 

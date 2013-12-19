@@ -303,6 +303,8 @@ static struct {
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
   { key_digests,        "Digests",        kf_cfg + kf_cmd + kf_cmd_early },
   { key_plymouth,       "Plymouth",       kf_cfg + kf_cmd_early          },
+  { key_restart,        "Restart",        kf_cfg                         },
+  { key_restarted,      "Restarted",      kf_cfg                         },
 };
 
 static struct {
@@ -1616,6 +1618,14 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_plymouth:
         if(f->is.numeric) config.plymouth = f->nvalue;
+        break;
+
+      case key_restart:
+        if(f->is.numeric && f->nvalue > 0) util_restart();
+        break;
+
+      case key_restarted:
+        if(f->is.numeric) config.restarted = f->nvalue;
         break;
 
       default:

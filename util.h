@@ -147,4 +147,5 @@ void util_run_script(char *name);
 void util_plymouth_off(void);
 int util_choose_disk_device(char **dev, int type, char *list_title, char *input_title);
 
+void util_restart();
 

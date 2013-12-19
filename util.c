@@ -66,6 +66,8 @@
 #include "url.h"
 #include "linuxrc.h"
 
+extern char **environ;
+
 #define LED_TIME     50000
 
 typedef struct {
@@ -1803,7 +1805,6 @@ void util_start_shell(char *tty, char *shell, int flags)
     "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/lbin",
     NULL
   };
-  extern char **environ;
 
   *args = (s = strrchr(shell, '/')) ? s + 1 : shell;
 
@@ -4449,6 +4450,17 @@ int util_choose_disk_device(char **dev, int type, char *list_title, char *input_
   // fprintf(stderr, "dud dev = %s\n", *dev);
 
   return err;
+}
+
+
+void util_restart()
+{
+  if(config.restarting || config.restarted) return;
+
+  config.restarting = 1;
+  lxrc_end();
+  setenv("restarted", "42", 1);
+  execve(*config.argv, config.argv, environ);
 }
 
 
