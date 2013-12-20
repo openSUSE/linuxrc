@@ -917,7 +917,7 @@ int dia_input(char *txt_tv, char *input_tr, int len_iv, int fieldlen_iv, int pw_
 
     if(pw_mode) kbd_echo_off();
 
-    if(config.linemode == 1) {
+    if(config.linemode == 2) {
       buf = readline_input("> ", input_tr);
     }
     else {

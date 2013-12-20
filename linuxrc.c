@@ -755,6 +755,10 @@ void lxrc_init()
 
   config.plymouth = 1;
 
+  #if defined(__s390__) || defined(__s390x__)
+  config.linemode = 1;
+  #endif
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
