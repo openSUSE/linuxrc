@@ -4201,6 +4201,8 @@ void util_run_script(char *name)
 {
   char *buf = NULL;
 
+  if(config.test) return;
+
   if(util_check_exist2("/scripts", name) != 'r') return;
 
   file_write_install_inf("");
