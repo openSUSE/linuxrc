@@ -85,6 +85,7 @@ static void if_down(char *dev);
 static int wlan_auth_cb(dia_item_t di);
 
 static dia_item_t di_wlan_auth_last = di_none;
+static int net_wicked(void);
 static int net_dhcp4(void);
 static int net_dhcp6(void);
 
@@ -1774,15 +1775,167 @@ int net_dhcp()
 {
   unsigned active4, active = config.net.dhcp_active;
 
-  if(config.net.ipv4) net_dhcp4();
+  if(config.wicked) {
+    net_wicked();
+  }
+  else {
+    if(config.net.ipv4) net_dhcp4();
 
-  active4 = config.net.dhcp_active;
-  config.net.dhcp_active = active;
+    active4 = config.net.dhcp_active;
+    config.net.dhcp_active = active;
 
-  if(config.net.ipv6) net_dhcp6();
-  config.net.dhcp_active |= active4;
+    if(config.net.ipv6) net_dhcp6();
+    config.net.dhcp_active |= active4;
+  }
 
   return config.net.dhcp_active ? 0 : 1;
+}
+
+
+/*
+ * Start dhcp client and read dhcp info.
+ *
+ * Global vars changed:
+ *  config.net.dhcp_active
+ *  config.net.hostname
+ *  config.net.netmask
+ *  config.net.network
+ *  config.net.broadcast
+ *  config.net.gateway
+ *  config.net.domain
+ *  config.net.nisdomain
+ *  config.net.nameserver
+ */
+int net_wicked()
+{
+  char cmd[256], file[256], *s;
+  file_t *f0, *f;
+  window_t win;
+  int got_ip = 0, i, rc;
+  slist_t *sl0, *sl;
+  FILE *fp;
+
+  if(config.net.dhcp_active || config.net.keep) return 0;
+
+  if(config.test) {
+    config.net.dhcp_active = 1;
+
+    return 0;
+  }
+
+  if(config.win) {
+    sprintf(cmd, "Sending %s request...", "DHCP");
+    dia_info(&win, cmd, MSGTYPE_INFO);
+  }
+
+  sprintf(file, "/etc/sysconfig/network/ifcfg-%s", config.net.device);
+
+  fp = fopen(file, "w");
+  fprintf(fp, "BOOTPROTO='dhcp'\n");
+  fprintf(fp, "STARTMODE='auto'\n");
+  fclose(fp);
+
+  net_apply_ethtool(config.net.device, config.net.hwaddr);
+
+  // FIXME: config.net.dhcp_timeout
+
+  sprintf(cmd, "wicked ifup %s", config.net.device);
+
+  sprintf(file, "/var/run/wicked/leaseinfo.%s.dhcp.ipv4", config.net.device);
+
+  unlink(file);
+
+  system(cmd);
+
+  f0 = file_read_file(file, kf_dhcp);
+
+  for(f = f0; f; f = f->next) {
+    switch(f->key) {
+      case key_ipaddr:
+        got_ip = 1;
+        name2inet(&config.net.hostname, f->value);
+        net_check_address(&config.net.hostname, 0);
+        break;
+
+      case key_hostname:
+        str_copy(&config.net.realhostname, f->value);
+        break;
+
+      case key_netmask:
+        name2inet(&config.net.netmask, f->value);
+        net_check_address(&config.net.netmask, 0);
+        break;
+
+      case key_network:
+        name2inet(&config.net.network, f->value);
+        net_check_address(&config.net.network, 0);
+        break;
+
+      case key_broadcast:
+        name2inet(&config.net.broadcast, f->value);
+        net_check_address(&config.net.broadcast, 0);
+        break;
+
+      case key_gateway:
+        if((s = strchr(f->value, ' '))) *s = 0;
+        name2inet(&config.net.gateway, f->value);
+        net_check_address(&config.net.gateway, 0);
+        break;
+
+      case key_domain:
+        if(*f->value) str_copy(&config.net.domain, f->value);
+        break;
+
+      case key_dns:
+        for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
+          name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
+          net_check_address(&config.net.nameserver[config.net.nameservers], 0);
+          if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
+        }
+        slist_free(sl0);
+        break;
+
+      case key_nisdomain:
+        if(*f->value) str_copy(&config.net.nisdomain, f->value);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if(config.win) win_close(&win);
+
+  if(got_ip) {
+    config.net.dhcp_active = 1;
+    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
+  }
+  else {
+    if(config.win) {
+      if(config.net.dhcpfail && strcmp(config.net.dhcpfail, "ignore")) {
+        if(!strcmp(config.net.dhcpfail, "show")) {
+          sprintf(cmd, "%s configuration failed.", "DHCP");
+          dia_info(&win, cmd, MSGTYPE_ERROR);
+          sleep(4);
+          win_close(&win);
+        }
+        else if(!strcmp(config.net.dhcpfail, "manual")) {
+          sprintf(cmd, "%s configuration failed.", "DHCP");
+          i = dia_yesno(cmd, NO);
+          if(i == YES) {
+            // is_static = 1;
+            // ?????
+          }
+        }
+      }
+    }
+  }
+
+  file_free_file(f0);
+
+  rc = config.net.dhcp_active ? 0 : 1;
+
+  return rc;
 }
 
 
@@ -2045,9 +2198,14 @@ void net_dhcp_stop()
 {
   if(!config.net.dhcp_active) return;
 
+  if(config.wicked) {
+    system("wicked ifdown all");
+  }
+
   /* kill them all */
   util_killall("dhcpcd", SIGHUP);
   util_killall("dhcp6c", SIGTERM);
+
   /* give them some time */
   sleep(2);
 

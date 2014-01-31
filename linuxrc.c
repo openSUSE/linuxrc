@@ -737,6 +737,7 @@ void lxrc_init()
   config.efi = -1;
   config.udev_mods = 1;
   config.devtmpfs = 1;
+  config.wicked = 0;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;

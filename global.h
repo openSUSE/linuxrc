@@ -390,6 +390,7 @@ typedef struct {
   unsigned plymouth:1;		/* start plymouth */
   unsigned restarting:1;	/* we are preparing for restart */
   unsigned restarted:1;		/* we have been restarted */
+  unsigned wicked:1;		/* use wicked for network setup */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */
