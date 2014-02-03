@@ -94,8 +94,9 @@ static language_t set_languages_arm[] = {
   { lang_dummy, "", "us", SMALL_FONT, UNI_FONT, 0, 0, "en_US", "en_US", 0 },
 };
 
-#if defined(__i386__) || defined(__arm__) || defined(__x86_64__) || defined(__alpha__) || defined(__PPC__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
 #define KEYMAP_DEFAULT	"us"
+
+#if !defined(__sparc__)
 static keymap_t set_keymaps_arm [] =
 {
 { "Belgian",              "be-latin1"    },
@@ -121,10 +122,7 @@ static keymap_t set_keymaps_arm [] =
 { "Suomi",                "fi-latin1"    },
 { "Svensk",               "sv-latin1"    }
 };
-#endif
-
-#if defined(__sparc__)
-#define KEYMAP_DEFAULT "us"
+#else		/* defined(__sparc__) */
 static keymap_t set_keymaps_arm [] =
 {
 { "Ceske (PS/2)",                "cz-us-qwertz"    },

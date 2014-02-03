@@ -46,7 +46,7 @@
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
-#else	// __i386__ __x86_64__ __PPC__ __sparc__ __s390__ __s390x__ __MIPSEB__
+#else	// all others
 #define SIGNAL_ARGS	int signum, struct sigcontext scp
 #endif
 

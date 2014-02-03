@@ -57,12 +57,6 @@ enum langid_t {
 
 #include "version.h"
 
-#if defined(__sparc__) || defined(__PPC__) || defined(__s390__) || defined(__s390x__) || defined(__MIPSEB__)
-#define WITH_PCMCIA	0
-#else
-#define WITH_PCMCIA	1
-#endif
-
 // linuxrc includes a lot of other
 // functionality like 'mount/umount', 'loadkeys', ...
 
