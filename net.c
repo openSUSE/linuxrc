@@ -90,6 +90,7 @@ static int net_dhcp4(void);
 static int net_dhcp6(void);
 
 static void net_ask_domain(void);
+static int write_ifcfg(void);
 
 
 /*
@@ -441,6 +442,11 @@ void net_stop()
     config.net.is_configured = nc_none;
   }
 
+  // FIXME: for now, delete all ethernet config files
+  if(config.wicked) {
+    system("rm -f /etc/sysconfig/network/ifcfg-e*");
+  }
+
   if(!config.net.is_configured) return;
 
   /* build list of configured interfaces */
@@ -568,7 +574,10 @@ int net_activate_ns()
   if(config.net.ipv4) err4 = net_activate4();
   if(config.net.ipv6) err6 = net_activate6();
 
-  if(!err4 || !err6) net_setup_nameserver();
+  if(!err4 || !err6) {
+    net_setup_nameserver();
+    write_ifcfg();
+  }
 
   // at least one should have worked
   return err4 && err6 ? 1 : 0;
@@ -2989,4 +2998,42 @@ int wlan_auth_cb(dia_item_t di)
   return rc;
 }
 
+
+int write_ifcfg()
+{
+  char *fname;
+  FILE *fp;
+
+  if(!config.wicked) return 0;
+
+  if(!config.net.device) return 0;
+
+  if(!config.net.hostname.ok) return 0;
+
+  if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s", config.net.device) == -1) fname = NULL;
+
+  if((fp = fopen(fname, "w"))) {
+    fprintf(fp, "BOOTPROTO='static'\n");
+    fprintf(fp, "STARTMODE='auto'\n");
+
+    if(config.net.hostname.ipv4) {
+      char *s = inet_ntoa(config.net.hostname.ip);
+      fprintf(fp, "IPADDR='%s/%u'\n", s, config.net.hostname.prefix4); 
+    }
+
+    if(config.net.hostname.ipv6) {
+      char buf[INET6_ADDRSTRLEN];
+      const char *s = inet_ntop(AF_INET6, &config.net.hostname.ip6, buf, sizeof buf);
+      fprintf(fp, "IPADDR='%s/%u'\n", s, config.net.hostname.prefix6); 
+    }
+
+    // GATEWAY?
+
+    fclose(fp);
+  }
+
+  free(fname);
+
+  return 0;
+}
 
