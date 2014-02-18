@@ -91,6 +91,7 @@ static int net_dhcp6(void);
 
 static void net_ask_domain(void);
 static int write_ifcfg(void);
+static char *inet2str(inet_t *inet, int type);
 
 
 /*
@@ -445,6 +446,7 @@ void net_stop()
   // FIXME: for now, delete all ethernet config files
   if(config.wicked) {
     system("rm -f /etc/sysconfig/network/ifcfg-e*");
+    system("rm -f /etc/sysconfig/network/ifroute-e*");
   }
 
   if(!config.net.is_configured) return;
@@ -576,7 +578,7 @@ int net_activate_ns()
 
   if(!err4 || !err6) {
     net_setup_nameserver();
-    write_ifcfg();
+    if(!config.net.dhcp_active) write_ifcfg();
   }
 
   // at least one should have worked
@@ -2999,10 +3001,29 @@ int wlan_auth_cb(dia_item_t di)
 }
 
 
+char *inet2str(inet_t *inet, int type)
+{
+  static char buf[INET6_ADDRSTRLEN];
+  const char *s = NULL;
+
+  if(!inet) return NULL;
+
+  if(type == 4 && config.net.ipv4 && inet->ipv4) {
+    s = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
+  }
+  else if(type == 6 && config.net.ipv6 && inet->ipv6) {
+    s = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
+  }
+
+
+  return (char *) s;
+}
+
+
 int write_ifcfg()
 {
-  char *fname;
-  FILE *fp;
+  char *fname, *s;
+  FILE *fp, *fp2;
 
   if(!config.wicked) return 0;
 
@@ -3016,23 +3037,74 @@ int write_ifcfg()
     fprintf(fp, "BOOTPROTO='static'\n");
     fprintf(fp, "STARTMODE='auto'\n");
 
-    if(config.net.hostname.ipv4) {
-      char *s = inet_ntoa(config.net.hostname.ip);
+    if((s = inet2str(&config.net.hostname, 4))) {
       fprintf(fp, "IPADDR='%s/%u'\n", s, config.net.hostname.prefix4); 
     }
 
-    if(config.net.hostname.ipv6) {
-      char buf[INET6_ADDRSTRLEN];
-      const char *s = inet_ntop(AF_INET6, &config.net.hostname.ip6, buf, sizeof buf);
+    if((s = inet2str(&config.net.hostname, 6))) {
       fprintf(fp, "IPADDR='%s/%u'\n", s, config.net.hostname.prefix6); 
     }
-
-    // GATEWAY?
 
     fclose(fp);
   }
 
   free(fname);
+
+  if(config.net.gateway.ok) {
+    if(asprintf(&fname, "/etc/sysconfig/network/ifroute-%s", config.net.device) == -1) fname = NULL;
+
+    if((fp = fopen(fname, "w"))) {
+      if((s = inet2str(&config.net.gateway, 4))) {
+        fprintf(fp, "default %s - %s\n", s, config.net.device);
+      }
+
+      if((s = inet2str(&config.net.gateway, 6))) {
+        fprintf(fp, "default %s - %s\n", s, config.net.device);
+      }
+
+      fclose(fp);
+    }
+
+    free(fname);
+  }
+
+  if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
+    if((fp2 = fopen("/etc/sysconfig/network/config.tmp", "w"))) {
+      char buf[1024];
+      unsigned u, first;
+
+      while(fgets(buf, sizeof buf, fp)) {
+        if(
+          !strncmp(buf, "NETCONFIG_DNS_STATIC_SEARCHLIST=", sizeof "NETCONFIG_DNS_STATIC_SEARCHLIST=" - 1) &&
+          config.net.domain
+        ) {
+          fprintf(fp2, "NETCONFIG_DNS_STATIC_SEARCHLIST=\"%s\"\n", config.net.domain);
+        }
+        else if(
+          !strncmp(buf, "NETCONFIG_DNS_STATIC_SERVERS=", sizeof "NETCONFIG_DNS_STATIC_SERVERS=" - 1) &&
+          config.net.nameserver[0].ok
+        ) {
+          fprintf(fp2, "NETCONFIG_DNS_STATIC_SERVERS=\"");
+          for(u = 0, first = 1; u < config.net.nameservers; u++) {
+            if(config.net.nameserver[u].ok) {
+              fprintf(fp2, "%s%s", first ? "" : " ", config.net.nameserver[u].name);
+              first = 0;
+            }
+          }
+          fprintf(fp2, "\"\n");
+        }
+        else {
+          fputs(buf, fp2);
+        }
+      }
+
+      fclose(fp2);
+    }
+
+    fclose(fp);
+
+    rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
+  }
 
   return 0;
 }
