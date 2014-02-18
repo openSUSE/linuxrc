@@ -799,7 +799,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2012 SUSE Linux Products GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2014 SUSE Linux Products GmbH <<<\n",
       config.product
     );
     if (config.linemode)
