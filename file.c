@@ -728,7 +728,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_textmode:
-        config.textmode = f->nvalue;
+        if(!*f->value) config.textmode = 1;
+        if(f->is.numeric) config.textmode = f->nvalue;
         break;
 
       case key_username:
