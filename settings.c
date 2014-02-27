@@ -90,8 +90,8 @@ static language_t set_languages_arm[] = {
   { lang_uk, "Українська", "us", SMALL_FONT, UNI_FONT, 0, 1, "uk_UA", "uk", 0 },
   { lang_xh, "isiXhosa", "us", SMALL_FONT, UNI_FONT, 0, 0, "xh_ZA", "xh", 0 },
   { lang_zu, "isiZulu", "us", SMALL_FONT, UNI_FONT, 0, 0, "zu_ZA", "zu", 0 },
-  // dummy for unknown language, must be last entry
-  { lang_dummy, "", "us", SMALL_FONT, UNI_FONT, 0, 0, "en_US", "en_US", 0 },
+  // entry for unknown language
+  { lang_dummy, "", "us", SMALL_FONT, UNI_FONT, 0, 0, NULL, NULL, 0 },
 };
 
 #define KEYMAP_DEFAULT	"us"
