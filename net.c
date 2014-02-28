@@ -3031,6 +3031,23 @@ int write_ifcfg()
 
   if(!config.net.hostname.ok) return 0;
 
+  // calculate prefix from netmask if missing
+  if(
+    config.net.hostname.ipv4 &&
+    !config.net.hostname.prefix4 &&
+    config.net.netmask.ok &&
+    config.net.netmask.ip.s_addr
+  ) {
+    int i = 1;
+    uint32_t u = ntohl(config.net.netmask.ip.s_addr);
+
+    while(u <<= 1) i++;
+
+    if(config.debug) fprintf(stderr, "netmask to prefix: %d\n", i);
+
+    config.net.hostname.prefix4 = i;
+  }
+
   if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s", config.net.device) == -1) fname = NULL;
 
   if((fp = fopen(fname, "w"))) {
