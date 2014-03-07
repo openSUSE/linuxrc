@@ -1070,11 +1070,7 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
       strcat(options, workgroup);
     }
   } else {
-     /*
-      * mount.cifs needs a username, otherwise it takes LOGNAME from
-      * environment. see bugzilla #20152
-      */
-    strcat(options, ",username=root,guest");
+    strcat(options, ",guest");
   }
 }
 
