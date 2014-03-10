@@ -124,6 +124,7 @@ static struct {
   { key_screenmap,      "Screenmap",      kf_none                        },
   { key_fontmagic,      "Fontmagic",      kf_none                        },
   { key_autoyast,       "AutoYaST",       kf_cfg + kf_cmd_early          },
+  { key_autoyast2,      "AutoYaST2",      kf_cfg + kf_cmd_early          },
   { key_linuxrc,        "linuxrc",        kf_cfg + kf_cmd_early          },
   { key_forceinsmod,    "ForceInsmod",    kf_cfg + kf_cmd                },
   { key_ipaddr,         "IPAddr",         kf_dhcp                        },
@@ -830,7 +831,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_autoyast:
         str_copy(&config.autoyast, *f->value ? f->value : "default");
         config.manual = 0;
-        config.url.autoyast = url_set(f->value);
+        break;
+
+      case key_autoyast2:
+        str_copy(&config.autoyast2, *f->value ? f->value : NULL);
         break;
 
       case key_info:

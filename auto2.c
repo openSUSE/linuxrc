@@ -367,6 +367,29 @@ void auto2_scan_hardware()
     }
   }
 
+  /*
+   * load autoyast file unless the user has specified an autoyast option
+   * -- ok this sounds weird but actually makes sense...
+   */
+  if(config.autoyast2 && !config.autoyast) {
+    fprintf(stderr, "Downloading AutoYaST file: %s\n", config.autoyast2);
+    printf("Downloading AutoYaST file: %s\n", config.autoyast2);
+    fflush(stdout);
+    url = url_set(config.autoyast2);
+#if defined(__s390__) || defined(__s390x__)
+    if(url->is.network && !config.net.configured) net_activate_s390_devs();
+#endif
+    err = url_read_file_anywhere(url, NULL, NULL, "/download/autoyast.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
+    url_umount(url);
+    url_free(url);
+    if(!err) {
+      fprintf(stderr, "setting AutoYaST option to file:///download/autoyast.xml\n");
+      str_copy(&config.autoyast, "file:///download/autoyast.xml");
+      // don't parse it
+      // file_read_info_file("file:/download/autoyast.xml", kf_cfg);
+    }
+  }
+
   /* load & run driverupdates */
   if(config.update.urls) {
     dud_count = config.update.count;
