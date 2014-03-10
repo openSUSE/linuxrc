@@ -390,6 +390,11 @@ void auto2_scan_hardware()
 
         strprintf(&path2, "%s%sdriverupdate", path1, path1[0] == 0 || path1[strlen(path1) - 1] == '/' ? "" : "/");
 
+#if defined(__s390__) || defined(__s390x__)
+        if(url->is.network && !config.net.configured) {
+            net_activate_s390_devs();
+        }
+#endif
         err = url_read_file_anywhere(
           url, NULL, NULL, file_name, NULL,
           URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
