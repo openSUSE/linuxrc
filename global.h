@@ -404,6 +404,7 @@ typedef struct {
     unsigned add_cmdline:1;	/* parse cmdline, too */
   } info;
   char *autoyast;		/* yast autoinstall parameter */
+  char *autoyast2;		/* yast autoinstall parameter, loaded by linuxrc */
   char *yepurl;			/* just pass it to yast */
   char *yepcert;		/* just pass it to yast */
   char *supporturl;		/* just pass it to yast */
@@ -469,7 +470,6 @@ typedef struct {
     slist_t *instsys_list;	/* instsys list */
     url_t *install;		/* install url */
     url_t *instsys;		/* instsys url */
-    url_t *autoyast;		/* autoyast url */
     url_t *proxy;		/* proxy url */
   } url;
 
