@@ -186,7 +186,7 @@ int main(int argc, char **argv, char **env)
       config.tmpfs = 0;
 
       if(!config.serial && config.debugwait) {
-        util_start_shell("/dev/tty9", "/bin/sh", 1);
+        util_start_shell("/dev/tty9", "/bin/sh", 3);
         config.shell_started = 1;
       }
       LXRC_WAIT
@@ -497,7 +497,8 @@ int do_not_kill(char *name)
 {
   static char *progs[] = {
     "portmap", "rpciod", "lockd", "dhcpcd", "cifsd", "mount.smbfs", "udevd",
-    "mount.ntfs-3g", "brld", "sbl"
+    "mount.ntfs-3g", "brld", "sbl", "wickedd", "wickedd-auto4", "wickedd-dhcp4",
+    "wickedd-dhcp6", "dbus-daemon", "rpc.idmapd", "sh"
   };
   int i;
 
@@ -922,7 +923,7 @@ void lxrc_init()
   util_update_cdrom_list();
 
   if(!(config.test || config.serial || config.shell_started || config.noshell)) {
-    util_start_shell("/dev/tty9", "/bin/sh", 1);
+    util_start_shell("/dev/tty9", "/bin/sh", 3);
     config.shell_started = 1;
   }
 

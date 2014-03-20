@@ -1499,7 +1499,7 @@ void dia_handle_ctrlc (void)
           fflush(stdout);
         }
 
-        system("PS1='\\w # ' /bin/bash 2>&1");
+        system("exec bash -l 2>&1");
 
         kbd_init(0);
         if(config.win) {
