@@ -107,6 +107,7 @@ void kbd_init (int first)
     if(config.kbd_fd == -1) config.kbd_fd = open(config.console, O_RDWR);
     tcgetattr (config.kbd_fd, &kbd_norm_tio_rm);
     kbd_tio_rm = kbd_norm_tio_rm;
+    kbd_norm_tio_rm.c_lflag |= ECHO;
     if (config.linemode)
         {
 	kbd_tio_rm.c_lflag &= ~ISIG;
