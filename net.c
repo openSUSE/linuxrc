@@ -625,7 +625,13 @@ int net_activate4()
 
     net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-    if(!config.forceip && util_check_exist("/sbin/arping")) {
+    check_ptp();
+
+    if(
+      !config.net.ptp &&
+      !config.forceip &&
+      util_check_exist("/sbin/arping")
+    ) {
        sprintf(command, "ifconfig %s up", config.net.device);
        util_error_trace("net_activate: %s\n", command);
        rc = system(command);
