@@ -595,8 +595,6 @@ int auto2_find_repo()
 /*
  * Let user enter network config data.
  */
-extern int net_is_ptp_im;
-
 void auto2_user_netconfig()
 {
   int win_old;
@@ -604,14 +602,9 @@ void auto2_user_netconfig()
 
   if(!config.net.do_setup) return;
 
-  if (config.net.device) {
-    net_is_ptp_im = FALSE;
-    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im = TRUE;
-    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
-    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
-  }
+  check_ptp();
   
-  if( ((net_config_mask() & 3) == 3) || (net_is_ptp_im && ((net_config_mask() & 1) == 1)) ) {
+  if( ((net_config_mask() & 3) == 3) || (config.net.ptp && ((net_config_mask() & 1) == 1)) ) {
     /* we have IP & netmask (or just IP for PTP devices) */
     config.net.configured = nc_static;
     /* looks a bit weird, but we need it here for net_activate_ns() */

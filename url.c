@@ -2260,7 +2260,6 @@ int url_setup_device(url_t *url)
 }
 
 
-extern int net_is_ptp_im;
 /*
  * Setup network interface.
  *
@@ -2311,16 +2310,11 @@ int url_setup_interface(url_t *url)
 
   if(config.net.configured == nc_none) config.net.configured = nc_static;
 
-  if (config.net.device) {
-    net_is_ptp_im = FALSE;
-    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im = TRUE;
-    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
-    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
-  }
+  check_ptp();
 
   /* we need at least ip & netmask for static network config */
   /* just netmask for PTP devices */
-  if(!net_is_ptp_im && (net_config_mask() & 3) != 3) {
+  if(!config.net.ptp && (net_config_mask() & 3) != 3) {
     printf(
       "Sending %s request to %s...\n",
       config.net.ipv6 ? "DHCP6" : "DHCP",

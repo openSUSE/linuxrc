@@ -61,8 +61,6 @@
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
 
-int  net_is_ptp_im = FALSE;
-
 #if !defined(NETWORK_CONFIG)
 #  define NETWORK_CONFIG 1
 #endif
@@ -674,7 +672,7 @@ int net_activate4()
         util_error_trace("net_activate: SIOCSIFADDR failed at %d\n",__LINE__);
     }
 
-    if (net_is_ptp_im)
+    if (config.net.ptp)
         {
         sockaddr_ri.sin_addr = config.net.ptphost.ip;
         memcpy (&interface_ri.ifr_dstaddr, &sockaddr_ri, sizeof (sockaddr_ri));
@@ -712,7 +710,7 @@ int net_activate4()
     }
 
     interface_ri.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (net_is_ptp_im)
+    if (config.net.ptp)
         interface_ri.ifr_flags |= IFF_POINTOPOINT | IFF_NOARP;
     else
         interface_ri.ifr_flags |= IFF_BROADCAST;
@@ -725,7 +723,7 @@ int net_activate4()
     memset (&route_ri, 0, sizeof (struct rtentry));
     route_ri.rt_dev = config.net.device;
 
-    if (net_is_ptp_im)
+    if (config.net.ptp)
         {
         sockaddr_ri.sin_addr = config.net.ptphost.ip;
         memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
@@ -1472,10 +1470,8 @@ int net_choose_device()
 
   if(choice > 0) {
     str_copy(&config.net.device, item_devs[choice - 1]);
-    net_is_ptp_im = FALSE;
-    if(strstr(config.net.device, "plip") == config.net.device) net_is_ptp_im = TRUE;
-    if(strstr(config.net.device, "iucv") == config.net.device) net_is_ptp_im = TRUE;
-    if(strstr(config.net.device, "ctc") == config.net.device) net_is_ptp_im = TRUE;
+
+    check_ptp();
 
     if(item_hds && item_hds[choice - 1]) {
       hd = item_hds[choice - 1];
@@ -1599,7 +1595,7 @@ int net_input_data()
     s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
   }
 
-  if(net_is_ptp_im) {
+  if(config.net.ptp) {
     if(!config.net.ptphost.name) {
       name2inet(&config.net.ptphost, config.net.hostname.name);
     }

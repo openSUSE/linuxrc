@@ -4466,3 +4466,19 @@ void util_restart()
 }
 
 
+/*
+ * Check if interface is a ptp interface and set config.net.ptp accordingly.
+ */
+void check_ptp()
+{
+  config.net.ptp = 0;
+
+  if(!config.net.device) return;
+
+  if(
+    !strncmp(config.net.device, "plip", sizeof "plip" - 1) ||
+    !strncmp(config.net.device, "iucv", sizeof "iucv" - 1) ||
+    !strncmp(config.net.device, "ctc", sizeof "ctc" - 1)
+  ) config.net.ptp = 1;
+}
+
