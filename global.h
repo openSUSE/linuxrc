@@ -646,6 +646,7 @@ typedef struct {
     int layer2;
     int portno;
     char* osahwaddr;
+    char* hypervisor;
   } hwp;
   
 #endif
