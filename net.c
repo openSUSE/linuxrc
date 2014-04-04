@@ -1345,11 +1345,13 @@ int net_choose_device()
   /* The IUCV driver is special. There's no way for anything to detect
      IUCV is available for use unless the driver is already loaded. So,
      if we're running on z/VM we always load it, no matter what.       */
+  #if defined(__s390__) || defined(__s390x__)
   if(strncmp(config.hwp.hypervisor,"z/VM",4)==0) {
      dia_info(&win, "We are running on z/VM", MSGTYPE_INFO);
      dia_info(&win, "Loading the IUCV network driver", MSGTYPE_INFO);
      mod_modprobe("netiucv","");
   }
+  #endif
 
   if(config.manual >= 2) {
 #if defined(__s390__) || defined(__s390x__)
