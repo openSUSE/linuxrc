@@ -209,8 +209,8 @@ int net_config()
 
   config.net.configured = nc_none;
 
-  if(config.win && config.net.setup != NS_DHCP && !config.net.ptp) {
-    if((config.net.setup & NS_DHCP)) {
+  if(config.win && config.net.setup != NS_DHCP) {
+    if(config.net.setup & NS_DHCP && !config.net.ptp) {
       sprintf(buf, "Automatic configuration via %s?", "DHCP");
       rc = dia_yesno(buf, NO);
     }
