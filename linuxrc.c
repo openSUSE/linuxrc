@@ -475,6 +475,9 @@ void lxrc_end()
 
   if(!config.test) {
     util_umount("/dev/pts");
+    #if defined(__s390__) || defined(__s390x__)
+    util_umount("/sys/hypervisor/s390");
+    #endif
     util_umount("/sys");
     util_umount("/proc/bus/usb");
     if (!config.rescue)
