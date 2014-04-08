@@ -475,6 +475,9 @@ void lxrc_end()
 
   if(!config.test) {
     util_umount("/dev/pts");
+    #if defined(__s390__) || defined(__s390x__)
+    util_umount("/sys/hypervisor/s390");
+    #endif
     util_umount("/sys");
     util_umount("/proc/bus/usb");
     if (!config.rescue)
@@ -679,6 +682,9 @@ void lxrc_init()
   if(!config.test) {
     if(config.had_segv) {
       umount("/dev/pts");
+      #if defined(__s390__) || defined(__s390x__)
+      umount("/sys/hypervisor/s390");
+      #endif
       umount("/sys");
       umount("/proc");
     }
@@ -686,6 +692,36 @@ void lxrc_init()
     mount("sysfs", "/sys", "sysfs", 0, 0);
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
+
+  #if defined(__s390__) || defined(__s390x__)
+  if(util_check_exist("/sys/hypervisor/s390")) {
+    mount("s390_hypfs","/sys/hypervisor/s390","s390_hypfs", 0, 0);
+    if(util_check_exist("/sys/hypervisor/s390/hyp/type")) {
+
+      FILE *hyp_type;
+      *buf = 0;
+
+      hyp_type = fopen("/sys/hypervisor/s390/hyp/type", "r");
+      if(hyp_type) {
+        fgets(buf, sizeof buf -1 , hyp_type);
+        if(*buf) {
+          if(strncmp(buf,"z/VM",4)==0) {
+            config.hwp.hypervisor="z/VM";
+          }
+          else if(strncmp(buf,"LPAR",4)==0) {
+               config.hwp.hypervisor="LPAR";
+               }
+               else {
+                 config.hwp.hypervisor="Unknown";
+             }
+          *buf = 0;
+        } 
+        fclose(hyp_type);
+      }
+    }
+  }
+
+  #endif
 
   /* add cmdline to info file */
   config.info.add_cmdline = 1;
