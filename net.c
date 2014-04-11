@@ -568,8 +568,15 @@ int net_setup_localhost()
 int net_activate_ns()
 {
   int err4 = 1, err6 = 1;
+  char *s;
 
   if(config.net.keep) return 0;
+
+  /* make sure we get the interface name if a mac was passed */
+  if((s = mac_to_interface(config.net.device, NULL))) {
+    free(config.net.device);
+    config.net.device = s;
+  }
 
   if(config.net.ipv4) err4 = net_activate4();
   if(config.net.ipv6) err6 = net_activate6();
@@ -1794,6 +1801,13 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
 int net_dhcp()
 {
   unsigned active4, active = config.net.dhcp_active;
+  char *s;
+
+  /* make sure we get the interface name if a mac was passed */
+  if((s = mac_to_interface(config.net.device, NULL))) {
+    free(config.net.device);
+    config.net.device = s;
+  }
 
   if(config.wicked) {
     net_wicked();

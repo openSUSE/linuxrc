@@ -107,8 +107,9 @@ void util_killall(char *name, int sig);
 void util_get_ram_size(void);
 void util_load_usb(void);
 
-int util_set_sysfs_attr(char* attr, char* value);
-int util_get_sysfs_int_attr(char* attr, int *retval);
+int util_set_attr(char* attr, char* value);
+char *util_get_attr(char* attr);
+int util_get_int_attr(char* attr);
 
 char *print_driverid(driver_t *drv, int with_0x);
 int apply_driverid(driver_t *drv);
@@ -123,8 +124,6 @@ char *get_translation(slist_t *trans, char *locale);
 int util_process_running(char *name);
 
 int system_log(char *cmd);
-
-void read_iscsi_ibft(void);
 
 char *blk_size_str(char *dev);
 uint64_t blk_size(char *dev);
@@ -142,6 +141,10 @@ void util_error_trace(char *format, ...);
 hd_t *fix_device_names(hd_t *hd);
 
 int fcoe_check(void);
+int iscsi_check(void);
+
+char *mac_to_interface(char *mac, int *max_offset);
+
 void util_run_script(char *name);
 
 void util_plymouth_off(void);

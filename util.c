@@ -110,6 +110,8 @@ static void scsi_rename_onedevice(char **dev);
 static int skip_spaces(unsigned char **str);
 static int word_size(unsigned char *str, int *width, int *enc_len);
 
+static char *mac_to_interface_log(char *mac, int log);
+
 static void util_extend_usr1(int signum);
 static int util_extend(char *extension, char task, int verbose);
 
@@ -1193,6 +1195,8 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.digests.sha512, "sha512");
   add_flag(&sl0, buf, config.devtmpfs, "devtmpfs");
   add_flag(&sl0, buf, config.plymouth, "plymouth");
+  add_flag(&sl0, buf, config.withiscsi, "iscsi");
+  add_flag(&sl0, buf, config.withfcoe, "fcoe");
   add_flag(&sl0, buf, config.withipoib, "ipoib");
   if(*buf) slist_append_str(&sl0, buf);
 
@@ -3367,7 +3371,8 @@ void util_load_usb()
   hd_free_hd_data(hd_data);
 }
 
-int util_set_sysfs_attr(char* attr, char* value)
+
+int util_set_attr(char* attr, char* value)
 {
   int i, fd;
 
@@ -3380,12 +3385,15 @@ int util_set_sysfs_attr(char* attr, char* value)
   return i < 0 ? i : 0;
 }
 
-int util_get_sysfs_int_attr(char* attr, int *retval)
+
+char *util_get_attr(char* attr)
 {
   int i, fd;
-  char buf[1024];
+  static char buf[1024];
 
-  if((fd = open(attr, O_RDONLY)) < 0) return -1;
+  *buf = 0;
+
+  if((fd = open(attr, O_RDONLY)) < 0) return buf;
 
   i = read(fd, buf, sizeof buf - 1);
 
@@ -3393,15 +3401,22 @@ int util_get_sysfs_int_attr(char* attr, int *retval)
 
   if(i >= 0) {
     buf[i] = 0;
-  }
-  else {
-    return -1;
+
+    while(i > 0 && isspace(buf[i - 1])) {
+      buf[--i] = 0;
+    }
+
   }
     
-  *retval = strtol(buf, NULL, 0);
-
-  return 0;
+  return buf;
 }
+
+
+int util_get_int_attr(char* attr)
+{
+  return strtol(util_get_attr(attr), NULL, 0);
+}
+
 
 char *print_driverid(driver_t *drv, int with_0x)
 {
@@ -3647,61 +3662,6 @@ int system_log(char *cmd)
   free(buf);
 
   return i;
-}
-
-
-void read_iscsi_ibft()
-{
-  file_t *f0, *f;
-
-  if(!util_check_exist("/sbin/iscsiadm")) return;
-
-  system("/sbin/iscsiadm -m fw >/var/log/ibft");
-
-  f0 = file_read_file("/var/log/ibft", kf_ibft);
-
-  if(config.debug) {
-    if(f0) {
-      fprintf(stderr, "ibft values:\n");
-      for(f = f0; f; f = f->next) {
-        fprintf(stderr, "  %s=%s\n", f->key_str, f->value);
-      }
-    }
-    else {
-      fprintf(stderr, "no ibft\n");
-    }
-  }
-
-  for(f = f0; f; f = f->next) {
-    switch(f->key) {
-      case key_ibft_hwaddr:
-        str_copy(&config.netdevice, f->value);
-        break;
-
-      case key_ibft_ipaddr:
-        name2inet(&config.net.hostname, f->value);
-        net_check_address(&config.net.hostname, 0);
-        break;
-
-      case key_ibft_netmask:
-        name2inet(&config.net.netmask, f->value);
-        net_check_address(&config.net.netmask, 0);
-        break;
-
-      case key_ibft_gateway:
-        name2inet(&config.net.gateway, f->value);
-        net_check_address(&config.net.gateway, 0);
-        break;
-
-      case key_ibft_dns:
-        name2inet(&config.net.nameserver[0], f->value);
-        net_check_address(&config.net.nameserver[0], 0);
-        break;
-
-      default:
-        break;
-    }
-  }
 }
 
 
@@ -4195,6 +4155,212 @@ int fcoe_check()
   fprintf(stderr, "fcoe_check: %d\n", fcoe_ok);
 
   return fcoe_ok;
+}
+
+
+int iscsi_check()
+{
+  int iscsi_ok = 0;
+  char *attr, *s, *t;
+  char *sysfs_ibft = "/sys/firmware/ibft/ethernet0";
+  unsigned use_dhcp = 0;
+  int mac_ofs = 2;
+
+  if(util_check_exist("/modules/iscsi_ibft.ko")) {
+    system("/sbin/modprobe iscsi_ibft");
+    sleep(1);
+  }
+
+  if(!util_check_exist(sysfs_ibft)) return iscsi_ok;
+
+  asprintf(&attr, "%s/origin", sysfs_ibft);
+  s = util_get_attr(attr);
+  fprintf(stderr, "ibft: origin = %s\n", s);
+  if(s[0] == '3') use_dhcp = 1;
+  fprintf(stderr, "ibft: dhcp = %d\n", use_dhcp);
+  free(attr);
+
+  asprintf(&attr, "%s/mac", sysfs_ibft);
+  s = strdup(util_get_attr(attr));
+  fprintf(stderr, "ibft: mac = %s\n", s);
+  if(*s) {
+    /* try to get the interface name, up to offset 2 */
+    if((t = mac_to_interface(s, &mac_ofs))) {
+      free(s);
+      s = t;
+    }
+    str_copy(&config.netdevice, s);
+    iscsi_ok++;
+  }
+  free(s);
+  free(attr);
+
+  if(use_dhcp) {
+    config.net.do_setup |= DS_SETUP;
+    config.net.setup = NS_DHCP;
+  }
+  else {
+    /* use ibft config only if mac matches */
+    if(!mac_ofs) {
+      asprintf(&attr, "%s/ip-addr", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: ip-addr = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.hostname, s);
+        net_check_address(&config.net.hostname, 0);
+        iscsi_ok++;
+      }
+      free(attr);
+    }
+    else {
+      iscsi_ok++;
+    }
+
+    asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
+    s = util_get_attr(attr);
+    fprintf(stderr, "ibft: subnet-mask = %s\n", s);
+    if(*s) {
+      name2inet(&config.net.netmask, s);
+      net_check_address(&config.net.netmask, 0);
+      iscsi_ok++;
+    }
+    free(attr);
+
+    if(iscsi_ok == 3) {
+      config.net.do_setup |= DS_SETUP;
+      config.net.setup = NS_HOSTIP | NS_NETMASK;
+
+      asprintf(&attr, "%s/gateway", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: gateway = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.gateway, s);
+        net_check_address(&config.net.gateway, 0);
+        config.net.setup |= NS_GATEWAY;
+      }
+      free(attr);
+
+      asprintf(&attr, "%s/primary-dns", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: primary-dns = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.nameserver[0], s);
+        net_check_address(&config.net.nameserver[0], 0);
+        config.net.nameservers = 1;
+        config.net.setup |= NS_NAMESERVER;
+      }
+      free(attr);
+
+      asprintf(&attr, "%s/secondary-dns", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: secondary-dns = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.nameserver[1], s);
+        net_check_address(&config.net.nameserver[1], 0);
+        config.net.nameservers = 2;
+      }
+      free(attr);
+    }
+  }
+
+  return use_dhcp || iscsi_ok == 3;
+}
+
+
+/*
+ * Interal function, use mac_to_interface().
+ *
+ * return value must be freed
+ */
+char *mac_to_interface_log(char *mac, int log)
+{
+  struct dirent *de;
+  DIR *d;
+  char *sys = "/sys/class/net", *if_name = NULL, *attr, *if_mac;
+
+  if(util_check_exist2(sys, mac)) return strdup(mac);
+
+  if(log) fprintf(stderr, "%s = ?\n", mac);
+
+  if(!(d = opendir(sys))) return NULL;
+
+  while((de = readdir(d))) {
+    if(de->d_name[0] == '.') continue;
+    asprintf(&attr, "%s/%s/address", sys, de->d_name);
+    if_mac = util_get_attr(attr);
+    free(attr);
+    if(!*if_mac || !strcmp(if_mac, "00:00:00:00:00:00")) continue;
+
+    if(!if_name && !fnmatch(mac, if_mac, FNM_CASEFOLD)) {
+      if_name = strdup(de->d_name);
+    }
+
+    if(log) {
+      fprintf(stderr, "%s = %s%s\n",
+        if_mac,
+        de->d_name,
+        if_name && !strcmp(if_name, de->d_name) ? " *" : ""
+      );
+    }
+  }
+
+  closedir(d);
+
+  return if_name;
+}
+
+
+/*
+ * Get network interface name from mac. If max_offset
+ * is set decrease mac and retry up to max_offset.
+ *
+ * If max_offset is not NULL, set to actual offset.
+ *
+ * Note: The max_offset param is there to help ibft parsing. Don't worry too
+ * much about it.
+ *
+ * return value must be freed
+ */
+char *mac_to_interface(char *mac, int *max_offset)
+{
+  char *if_name, *s, *t;
+  unsigned u;
+  int ofs = 0, max_ofs = 0;
+
+  if(max_offset) max_ofs = *max_offset;
+
+  if(!mac || mac[0] == 0 || mac[0] == '.') return NULL;
+
+  if_name = mac_to_interface_log(mac, 1);
+
+  if(!if_name) {
+    /* no direct match, retry with offset */
+
+    mac = strdup(mac);
+
+    if((s = strrchr(mac, ':'))) {
+      if(strlen(s) == 3) {
+        u = strtoul(s + 1, &t, 16);
+        if(!*t) {
+          for(ofs = 1; ofs <= max_ofs; ofs++) {
+            sprintf(s + 1, "%02x", (u - ofs) & 0xff);
+            if_name = mac_to_interface_log(mac, 0);
+            if(if_name) break;
+          }
+        }
+      }
+    }
+
+    free(mac);
+  }
+
+  if(if_name && max_offset) *max_offset = ofs;
+
+  fprintf(stderr, "if = %s", if_name);
+  if(if_name && ofs) fprintf(stderr, ", offset = %u", ofs);
+  fprintf(stderr, "\n");
+
+  return if_name;
 }
 
 
