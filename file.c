@@ -1820,6 +1820,7 @@ void file_write_install_inf(char *dir)
   fprintf(f, "RepoURL: %s\n", url_print(url, 3));
   fprintf(f, "InstsysURL: %s\n", url_print(config.url.instsys, 3));
   fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
+  if(!config.sslcerts) fprintf(f, "ssl_verify: no\n");
 
   file_write_str(f, key_instmode, get_instmode_name(url->scheme));
 
