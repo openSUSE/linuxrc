@@ -975,6 +975,12 @@ void lxrc_init()
   /* get usb keyboard working */
   if(config.manual == 1 && !config.had_segv) util_load_usb();
 
+  /* load ip over infiniband modules */
+  if(config.withipoib) {
+    mod_modprobe("ib_cm", NULL);
+    mod_modprobe("ib_ipoib", NULL);
+  }
+
 #if defined(__s390__) || defined(__s390x__)
   /* activate boot FCP adapter */
   {

@@ -307,6 +307,7 @@ static struct {
   { key_restart,        "Restart",        kf_cfg                         },
   { key_restarted,      "Restarted",      kf_cfg                         },
   { key_wicked,         "Wicked",         kf_cfg + kf_cmd + kf_cmd_early },
+  { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1636,6 +1637,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_wicked:
         if(f->is.numeric) config.wicked = f->nvalue;
+        break;
+
+      case key_withipoib:
+        if(f->is.numeric) config.withipoib = f->nvalue;
         break;
 
       default:

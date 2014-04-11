@@ -374,6 +374,7 @@ typedef struct {
   unsigned usesax2:1;		/* just passed to yast */
   unsigned withiscsi;		/* iSCSI parameter */
   unsigned withfcoe;		/* FCoE parameter */
+  unsigned withipoib;		/* IPoIB */
   unsigned restart_method;	/* 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   unsigned efi_vars:1;		/* efi vars exist */
   int efi;			/* use efi; -1 = auto */
