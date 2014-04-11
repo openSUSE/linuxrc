@@ -696,32 +696,22 @@ void lxrc_init()
 
   #if defined(__s390__) || defined(__s390x__)
   if(util_check_exist("/sys/hypervisor/s390")) {
-    mount("s390_hypfs","/sys/hypervisor/s390","s390_hypfs", 0, 0);
-    if(util_check_exist("/sys/hypervisor/s390/hyp/type")) {
+    char *type;
 
-      FILE *hyp_type;
-      *buf = 0;
+    mount("s390_hypfs", "/sys/hypervisor/s390", "s390_hypfs", 0, 0);
 
-      hyp_type = fopen("/sys/hypervisor/s390/hyp/type", "r");
-      if(hyp_type) {
-        fgets(buf, sizeof buf -1 , hyp_type);
-        if(*buf) {
-          if(strncmp(buf,"z/VM",4)==0) {
-            config.hwp.hypervisor="z/VM";
-          }
-          else if(strncmp(buf,"LPAR",4)==0) {
-               config.hwp.hypervisor="LPAR";
-               }
-               else {
-                 config.hwp.hypervisor="Unknown";
-             }
-          *buf = 0;
-        } 
-        fclose(hyp_type);
-      }
+    type = util_get_attr("/sys/hypervisor/s390/hyp/type");
+
+    if(!strncmp(type, "z/VM", sizeof "z/VM" - 1)) {
+      config.hwp.hypervisor = "z/VM";
+    }
+    else if(!strncmp(type, "LPAR", sizeof "LPAR" - 1)) {
+      config.hwp.hypervisor = "LPAR";
+    }
+    else {
+      config.hwp.hypervisor = "Unknown";
     }
   }
-
   #endif
 
   /* add cmdline to info file */
