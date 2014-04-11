@@ -804,7 +804,7 @@ void lxrc_init()
   if(!config.had_segv) {
     lxrc_add_parts();
     // we need edd for udev
-    if(util_check_exist("/modules/edd.ko")) {
+    if(!config.udev_mods && util_check_exist("/modules/edd.ko")) {
       system("/sbin/insmod /modules/edd.ko");
     }
   }
@@ -1111,7 +1111,14 @@ void lxrc_init()
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
           config.manual = 0;
+          url_free(config.url.install);
+          config.url.install = url_set("cd:/");
           i = auto2_find_repo();
+          if(!i) {
+            url_free(config.url.install);
+            config.url.install = url_set("hd:/");
+            i = auto2_find_repo();
+          }
         }
       } while(!i && j);
 
