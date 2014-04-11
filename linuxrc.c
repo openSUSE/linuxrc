@@ -1102,7 +1102,7 @@ void lxrc_init()
       config.cd1texts = file_parse_xmllike("/nextmedia", "text");  
     }
 
-    if(config.url.install && config.url.install->is.cdrom) {
+    if(config.url.install && (config.url.install->is.cdrom || config.cd1texts)) {
       char *s = get_translation(config.cd1texts, current_language()->locale);
       char *buf = NULL;
 
