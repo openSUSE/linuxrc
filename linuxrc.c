@@ -44,6 +44,7 @@
 #include "scsi_rename.h"
 #include "checkmedia.h"
 #include "url.h"
+#include <sys/utsname.h>
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -658,6 +659,7 @@ void lxrc_init()
 {
   int i, j;
   char buf[256];
+  struct utsname utsinfo;
 
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);
@@ -711,6 +713,11 @@ void lxrc_init()
     else {
       config.hwp.hypervisor = "Unknown";
     }
+  }
+  else {
+    uname(&utsinfo);
+    if(!strncmp(utsinfo.machine, "s390x", sizeof "s390x" - 1 )) config.hwp.hypervisor="KVM";
+    else config.hwp.hypervisor="Reallyunknown";
   }
   #endif
 
