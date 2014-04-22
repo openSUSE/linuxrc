@@ -104,6 +104,7 @@ struct {
   { di_390net_escon,	 "ESCON"         },
   { di_390net_iucv,	 "Inter-User Communication Vehicle (IUCV)"          },
   { di_390net_hsi,	 "Hipersockets"	          },
+  { di_390net_virtio,	 "VirtIO Ethernet CCW Device"},
   { di_390net_sep,	 "#--------------------" },
   
   { di_ctc_compat,	 "Compatibility mode (default)"      },
