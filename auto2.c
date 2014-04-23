@@ -420,14 +420,14 @@ void auto2_scan_hardware()
 #endif
         err = url_read_file_anywhere(
           url, NULL, NULL, file_name, NULL,
-          URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+          URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         );
 
         if(err && !config.sig_failed) {
           str_copy(&url->path, path2);
           err = url_read_file_anywhere(
             url, NULL, NULL, file_name, NULL,
-            URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+            URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
           );
         }
         fprintf(stderr, "err2 = %d\n", err);
@@ -1091,7 +1091,7 @@ void auto2_driverupdate(url_t *url)
     "driverupdate",
     file_name = strdup(new_download()),
     "Loading Driver Update",
-    URL_FLAG_UNZIP + URL_FLAG_NODIGEST + URL_FLAG_KEEP_MOUNTED + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+    URL_FLAG_NODIGEST + URL_FLAG_KEEP_MOUNTED + (config.secure ? URL_FLAG_CHECK_SIG : 0)
   );
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update, NULL);

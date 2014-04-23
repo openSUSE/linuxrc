@@ -225,7 +225,7 @@ char *fstype(const char *device)
       lseek(fd, 0, SEEK_SET) == 0 &&
       read(fd, buf, sizeof buf) == sizeof buf
     ) {
-      if(!memcmp(buf, "070701", 6)) type = "cpio";
+      if(!memcmp(buf, "070701", 6) || !memcmp(buf, "\xc7\x71", 2)) type = "cpio";
       else if(!memcmp(buf, "hsqs", 4) || !memcmp(buf, "sqsh", 4)) type = "squashfs";
       else if(!memcmp(buf, "\xed\xab\xee\xdb", 4) && buf[4] >= 3) type = "rpm";
     }

@@ -157,4 +157,5 @@ void check_ptp(void);
 
 char *compress_type(void *buf);
 char *compressed_file(char *name);
+char *compressed_archive(char *name, char **archive);
 

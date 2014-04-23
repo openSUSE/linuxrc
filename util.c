@@ -2402,7 +2402,7 @@ char *get_instmode_name_up(instmode_t instmode)
 
 int util_fstype_main(int argc, char **argv)
 {
-  char *s;
+  char *s, buf[64], *compr, *archive;
 
   argv++; argc--;
 
@@ -2410,6 +2410,18 @@ int util_fstype_main(int argc, char **argv)
 
   while(argc--) {
     s = fstype(*argv);
+    if(
+      !s &&
+      (compr = compressed_archive(*argv, &archive))
+    ) {
+      if(archive) {
+        snprintf(buf, sizeof buf, "%s.%s", archive, compr);
+        s = buf;
+      }
+      else {
+        s = compr;
+      }
+    }
     printf("%s: %s\n", *argv, s ?: "unknown fs");
     argv++;
   }
@@ -2615,6 +2627,7 @@ int util_detach_loop(char *dev)
 int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 {
   char *type, *loop_dev, *cmd = NULL, *module, *tmp_dev, *cpio_opts = NULL, *s, *buf = NULL;
+  char *compr = NULL;
   int err = -1;
   struct stat64 sbuf;
 
@@ -2649,6 +2662,8 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
   type = util_fstype(dev, &module);
   if(module) mod_modprobe(module, NULL);
 
+  if(!type) compr = compressed_archive(dev, &type);
+
   if(
     type &&
     (!strcmp(type, "cpio") || !strcmp(type, "tar") || !strcmp(type, "rpm"))
@@ -2673,7 +2688,12 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
     }
 
     if(!strcmp(type, "cpio")) {
-      strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
+      if(compr) {
+        strprintf(&buf, "cd %s ; %s -dc < %s | cpio %s", dir, compr, dev, cpio_opts);
+      }
+      else {
+        strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
+      }
       msg = "cpio";
     }
     if(!strcmp(type, "tar")) {
@@ -4708,6 +4728,35 @@ char *compressed_file(char *name)
   else {
     if(config.debug) perror(name);
   }
+
+  return compr;
+}
+
+
+char *compressed_archive(char *name, char **archive)
+{
+  char *compr = compressed_file(name);
+  char buf1[64], buf2[0x108];
+  FILE *f;
+  char *type = NULL;
+
+  if(!*archive) return compr;
+
+  if(compr) {
+    snprintf(buf1, sizeof buf1, "%s -dc < %s", compr, name);
+
+    if((f = popen(buf1, "r"))) {
+      if(fread(buf2, 1, sizeof buf2, f) == sizeof buf2) {
+        if(!memcmp(buf2, "070701", 6)) type = "cpio";
+        if(!memcmp(buf2, "\xc7\x71", 2)) type = "cpio";
+        if(!memcmp(buf2 + 0x101, "ustar", 6 /* with \0 */)) type = "tar";
+      }
+
+      pclose(f);
+    }
+  }
+
+  *archive = type;
 
   return compr;
 }
