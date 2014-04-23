@@ -2651,7 +2651,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
   if(
     type &&
-    (!strcmp(type, "cpio") || !strcmp(type, "rpm"))
+    (!strcmp(type, "cpio") || !strcmp(type, "tar") || !strcmp(type, "rpm"))
   ) {
     char *buf = NULL;
     char *msg;
@@ -2675,6 +2675,10 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
     if(!strcmp(type, "cpio")) {
       strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
       msg = "cpio";
+    }
+    if(!strcmp(type, "tar")) {
+      strprintf(&buf, "cd %s ; tar -xf %s", dir, dev);
+      msg = "tar";
     }
     else {
       strprintf(&buf, "cd %s ; rpm2cpio %s | cpio %s", dir, dev, cpio_opts);
