@@ -2400,6 +2400,24 @@ char *get_instmode_name_up(instmode_t instmode)
 }
 
 
+int util_fstype_main(int argc, char **argv)
+{
+  char *s;
+
+  argv++; argc--;
+
+  if(!argc) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
+
+  while(argc--) {
+    s = fstype(*argv);
+    printf("%s: %s\n", *argv, s ?: "unknown fs");
+    argv++;
+  }
+
+  return 0;
+}
+
+
 /*
  * Return fs name. If we have to load a module first, return it in *module.
  */
@@ -2420,6 +2438,7 @@ char *util_fstype(char *dev, char **module)
 
     if(
       !strcmp(type, "cpio") ||
+      !strcmp(type, "tar") ||
       !strcmp(type, "rpm") ||
       (config.ntfs_3g && !strcmp(type, "ntfs"))
     ) {
@@ -4647,5 +4666,45 @@ void check_ptp()
     !strncmp(config.net.device, "iucv", sizeof "iucv" - 1) ||
     !strncmp(config.net.device, "sl", sizeof "sl" - 1)
   ) config.net.ptp = 1;
+}
+
+
+/*
+ * buf: at least 6 bytes
+ */
+char *compress_type(void *buf)
+{
+  if(!memcmp(buf, "\x1f\x8b", 2)) {
+    return "gzip";
+  }
+
+  if(!memcmp(buf, "\xfd""7zXZ", 6) /* yes, including final \0 */) {
+    return "xz";
+  }
+
+  return NULL;
+}
+
+
+char *compressed_file(char *name)
+{
+  int fd;
+  char buf[8];
+  char *compr = NULL;
+
+  fd = open(name, O_RDONLY | O_LARGEFILE);
+
+  if(fd >= 0) {
+    if(read(fd, buf, sizeof buf) == sizeof buf) {
+      compr = compress_type(buf);
+    }
+
+    close(fd);
+  }
+  else {
+    if(config.debug) perror(name);
+  }
+
+  return compr;
 }
 

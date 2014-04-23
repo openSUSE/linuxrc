@@ -158,7 +158,7 @@ void url_read(url_data_t *url_data)
           free(buf);
         }
         url_data->err = 103;
-        snprintf(url_data->err_buf, url_data->err_buf_len, "gzip: command terminated");
+        snprintf(url_data->err_buf, url_data->err_buf_len, "%s: command terminated", url_data->compressed);
       }
       // fprintf(stderr, "close = %d\n", i);
     }
@@ -217,17 +217,17 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
     (url_data->buf.len == url_data->buf.max || url_data->flush) &&
     url_data->buf.len >= 11
   ) {
-    if(
-      url_data->unzip &&
-      url_data->buf.data[0] == 0x1f &&
-      url_data->buf.data[1] == 0x8b
-    ) {
-      url_data->gzip = 1;
+    if(url_data->unzip) {
+      str_copy(&url_data->compressed, compress_type(url_data->buf.data));
+    }
 
-      if((url_data->buf.data[3] & 0x08)) {
-        i = strnlen((char *) url_data->buf.data + 10, url_data->buf.len - 10);
-        if(i < url_data->buf.len - 10) {
-          url_data->orig_name = strdup((char *) url_data->buf.data + 10);
+    if(url_data->compressed) {
+      if(!strcmp(url_data->compressed, "gzip")) {
+        if((url_data->buf.data[3] & 0x08)) {
+          i = strnlen((char *) url_data->buf.data + 10, url_data->buf.len - 10);
+          if(i < url_data->buf.len - 10) {
+            url_data->orig_name = strdup((char *) url_data->buf.data + 10);
+          }
         }
       }
     }
@@ -256,7 +256,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
   if(url_data->buf.len == url_data->buf.max || url_data->flush) {
     if(!url_data->file_opened) {
       url_data->file_opened = 1;
-      if(url_data->gzip) {
+      if(url_data->compressed) {
         url_data->tmp_file = strdup("/tmp/foo_XXXXXX");
         tmp = mkstemp(url_data->tmp_file);
         if(tmp > 0) {
@@ -267,7 +267,9 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
             dup2(fd, 1);
             dup2(tmp, 2);
             url_data->pipe_fd = fd;
-            url_data->f = popen("gzip -dc", "w");
+            char cmd[64];
+            snprintf(cmd, sizeof cmd, "%s -dc", url_data->compressed);
+            url_data->f = popen(cmd, "w");
             dup2(fd1, 1);
             dup2(fd2, 2);
             url_data->zp_total = url_data->image_size << 10;
@@ -913,6 +915,7 @@ void url_data_free(url_data_t *url_data)
   free(url_data->tmp_file);
   free(url_data->buf.data);
   free(url_data->label);
+  free(url_data->compressed);
 
   free(url_data);
 }

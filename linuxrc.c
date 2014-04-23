@@ -96,6 +96,7 @@ static struct {
   { "scsi_rename", scsi_rename_main      },
   { "lndir",       util_lndir_main       },
   { "extend",      util_extend_main      },
+  { "fstype",      util_fstype_main      },
 };
 #endif
 

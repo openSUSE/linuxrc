@@ -17,12 +17,12 @@ typedef struct url_data_s {
   unsigned zp_now, zp_total;
   unsigned z_progress:1;
   unsigned flush:1;
-  unsigned gzip:1;
   unsigned cramfs:1;
   unsigned file_opened:1;
   unsigned unzip:1;
   unsigned label_shown:1;
   unsigned optional:1;
+  char *compressed;		// program name used for compression, if any
   char *label;
   int percent;
   int pipe_fd;
