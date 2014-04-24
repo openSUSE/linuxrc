@@ -77,6 +77,7 @@ char *get_instmode_name_up(instmode_t instmode);
 void util_free_mem(void);
 void util_update_meminfo(void);
 
+int util_fstype_main(int argc, char **argv);
 char *util_fstype(char *dev, char **module);
 int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list);
 int util_mount_ro(char *dev, char *dir, slist_t *file_list);
@@ -153,4 +154,8 @@ int util_choose_disk_device(char **dev, int type, char *list_title, char *input_
 void util_restart();
 
 void check_ptp(void);
+
+char *compress_type(void *buf);
+char *compressed_file(char *name);
+char *compressed_archive(char *name, char **archive);
 

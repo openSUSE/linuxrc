@@ -33,7 +33,6 @@
 #include "auto2.h"
 #include "rootimage.h"
 #include "display.h"
-#include "fstype.h"
 #include "keyboard.h"
 #include "url.h"
 
@@ -887,7 +886,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             for(sl = config.partitions; sl; sl = sl->next) {
               if(sl->key) {
                 sprintf(buf, "/dev/%s", sl->key);
-                t = fstype(buf);
+                t = util_fstype(buf, NULL);
                 if(t && !strcmp(t, "swap")) {
                   if(!--i) {
                     char *argv[2] = { };
@@ -909,7 +908,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           if(strstr(s, "/dev/") != s) {
             sprintf(s = buf, "/dev/%s", f->value);
           }
-          t = fstype(s);
+          t = util_fstype(s, NULL);
           if(t && !strcmp(t, "swap")) {
             argv[1] = s;
             fprintf(stderr, "swapon %s\n", s);

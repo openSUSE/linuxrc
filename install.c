@@ -45,7 +45,6 @@
 #include "install.h"
 #include "settings.h"
 #include "auto2.h"
-#include "fstype.h"
 #include "url.h"
 
 #ifndef MNT_DETACH
@@ -427,7 +426,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
 
       sprintf(buf, "%s (%s)", sl->key, blk_ident(long_dev(sl->key)));
 
-      type = fstype(long_dev(sl->key));
+      type = util_fstype(long_dev(sl->key), NULL);
 
       if(type && !strcmp(type, "swap")) {
         values1[item_cnt1] = strdup(sl->key);

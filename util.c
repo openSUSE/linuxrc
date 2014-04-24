@@ -2400,6 +2400,36 @@ char *get_instmode_name_up(instmode_t instmode)
 }
 
 
+int util_fstype_main(int argc, char **argv)
+{
+  char *s, buf[64], *compr, *archive;
+
+  argv++; argc--;
+
+  if(!argc) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
+
+  while(argc--) {
+    s = fstype(*argv);
+    if(
+      !s &&
+      (compr = compressed_archive(*argv, &archive))
+    ) {
+      if(archive) {
+        snprintf(buf, sizeof buf, "%s.%s", archive, compr);
+        s = buf;
+      }
+      else {
+        s = compr;
+      }
+    }
+    printf("%s: %s\n", *argv, s ?: "unknown fs");
+    argv++;
+  }
+
+  return 0;
+}
+
+
 /*
  * Return fs name. If we have to load a module first, return it in *module.
  */
@@ -2420,6 +2450,7 @@ char *util_fstype(char *dev, char **module)
 
     if(
       !strcmp(type, "cpio") ||
+      !strcmp(type, "tar") ||
       !strcmp(type, "rpm") ||
       (config.ntfs_3g && !strcmp(type, "ntfs"))
     ) {
@@ -2596,6 +2627,7 @@ int util_detach_loop(char *dev)
 int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 {
   char *type, *loop_dev, *cmd = NULL, *module, *tmp_dev, *cpio_opts = NULL, *s, *buf = NULL;
+  char *compr = NULL;
   int err = -1;
   struct stat64 sbuf;
 
@@ -2630,9 +2662,15 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
   type = util_fstype(dev, &module);
   if(module) mod_modprobe(module, NULL);
 
+  if(!type) compr = compressed_archive(dev, &type);
+
+  fprintf(stderr, "%s: type = %s.%s\n", dev, type ?: "", compr ?: "");
+
+  LXRC_WAIT
+
   if(
     type &&
-    (!strcmp(type, "cpio") || !strcmp(type, "rpm"))
+    (!strcmp(type, "cpio") || !strcmp(type, "tar") || !strcmp(type, "rpm"))
   ) {
     char *buf = NULL;
     char *msg;
@@ -2654,8 +2692,17 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
     }
 
     if(!strcmp(type, "cpio")) {
-      strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
+      if(compr) {
+        strprintf(&buf, "cd %s ; %s -dc %s | cpio %s", dir, compr, dev, cpio_opts);
+      }
+      else {
+        strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
+      }
       msg = "cpio";
+    }
+    else if(!strcmp(type, "tar")) {
+      strprintf(&buf, "cd %s ; tar -xpf %s", dir, dev);
+      msg = "tar";
     }
     else {
       strprintf(&buf, "cd %s ; rpm2cpio %s | cpio %s", dir, dev, cpio_opts);
@@ -4647,5 +4694,76 @@ void check_ptp()
     !strncmp(config.net.device, "iucv", sizeof "iucv" - 1) ||
     !strncmp(config.net.device, "sl", sizeof "sl" - 1)
   ) config.net.ptp = 1;
+}
+
+
+/*
+ * buf: at least 6 bytes
+ */
+char *compress_type(void *buf)
+{
+  if(!memcmp(buf, "\x1f\x8b", 2)) {
+    return "gzip";
+  }
+
+  if(!memcmp(buf, "\xfd""7zXZ", 6) /* yes, including final \0 */) {
+    return "xz";
+  }
+
+  return NULL;
+}
+
+
+char *compressed_file(char *name)
+{
+  int fd;
+  char buf[8];
+  char *compr = NULL;
+
+  fd = open(name, O_RDONLY | O_LARGEFILE);
+
+  if(fd >= 0) {
+    if(read(fd, buf, sizeof buf) == sizeof buf) {
+      compr = compress_type(buf);
+    }
+
+    close(fd);
+  }
+  else {
+    if(config.debug) perror(name);
+  }
+
+  return compr;
+}
+
+
+char *compressed_archive(char *name, char **archive)
+{
+  char *compr = compressed_file(name);
+  char buf1[64], buf2[0x108];
+  FILE *f;
+  char *type = NULL;
+
+  if(!archive) return compr;
+
+  if(compr) {
+    snprintf(buf1, sizeof buf1, "%s -dc %s", compr, name);
+
+    if((f = popen(buf1, "r"))) {
+      if(fread(buf2, 1, sizeof buf2, f) == sizeof buf2) {
+        if(!memcmp(buf2, "070701", 6)) type = "cpio";
+        if(!memcmp(buf2, "\xc7\x71", 2)) type = "cpio";
+        if(!memcmp(buf2 + 0x101, "ustar", 6 /* with \0 */)) type = "tar";
+      }
+
+      pclose(f);
+    }
+  }
+
+  *archive = type;
+
+  if(config.debug) fprintf(stderr, "%s = %s.%s\n", name, type ?: "", compr ?: "");
+
+  return compr;
 }
 
