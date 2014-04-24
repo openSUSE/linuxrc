@@ -2664,6 +2664,10 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
   if(!type) compr = compressed_archive(dev, &type);
 
+  fprintf(stderr, "%s: type = %s.%s\n", dev, type ?: "", compr ?: "");
+
+  LXRC_WAIT
+
   if(
     type &&
     (!strcmp(type, "cpio") || !strcmp(type, "tar") || !strcmp(type, "rpm"))
@@ -2696,7 +2700,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       }
       msg = "cpio";
     }
-    if(!strcmp(type, "tar")) {
+    else if(!strcmp(type, "tar")) {
       strprintf(&buf, "cd %s ; tar -xf %s", dir, dev);
       msg = "tar";
     }
@@ -4740,7 +4744,7 @@ char *compressed_archive(char *name, char **archive)
   FILE *f;
   char *type = NULL;
 
-  if(!*archive) return compr;
+  if(!archive) return compr;
 
   if(compr) {
     snprintf(buf1, sizeof buf1, "%s -dc < %s", compr, name);
@@ -4757,6 +4761,8 @@ char *compressed_archive(char *name, char **archive)
   }
 
   *archive = type;
+
+  if(config.debug) fprintf(stderr, "%s = %s.%s\n", name, type ?: "", compr ?: "");
 
   return compr;
 }
