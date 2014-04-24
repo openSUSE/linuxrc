@@ -2693,7 +2693,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
     if(!strcmp(type, "cpio")) {
       if(compr) {
-        strprintf(&buf, "cd %s ; %s -dc < %s | cpio %s", dir, compr, dev, cpio_opts);
+        strprintf(&buf, "cd %s ; %s -dc %s | cpio %s", dir, compr, dev, cpio_opts);
       }
       else {
         strprintf(&buf, "cd %s ; cpio %s < %s", dir, cpio_opts, dev);
@@ -2701,7 +2701,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       msg = "cpio";
     }
     else if(!strcmp(type, "tar")) {
-      strprintf(&buf, "cd %s ; tar -xf %s", dir, dev);
+      strprintf(&buf, "cd %s ; tar -xpf %s", dir, dev);
       msg = "tar";
     }
     else {
@@ -4747,7 +4747,7 @@ char *compressed_archive(char *name, char **archive)
   if(!archive) return compr;
 
   if(compr) {
-    snprintf(buf1, sizeof buf1, "%s -dc < %s", compr, name);
+    snprintf(buf1, sizeof buf1, "%s -dc %s", compr, name);
 
     if((f = popen(buf1, "r"))) {
       if(fread(buf2, 1, sizeof buf2, f) == sizeof buf2) {
