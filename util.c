@@ -4209,16 +4209,34 @@ int iscsi_check()
 {
   int iscsi_ok = 0;
   char *attr, *s, *t;
-  char *sysfs_ibft = "/sys/firmware/ibft/ethernet0";
+  char *sysfs_ibft = NULL;
   unsigned use_dhcp = 0;
   int mac_ofs = 2;
+  struct dirent *de;
+  DIR *d;
 
   if(util_check_exist("/modules/iscsi_ibft.ko")) {
     system("/sbin/modprobe iscsi_ibft");
     sleep(1);
   }
 
-  if(!util_check_exist(sysfs_ibft)) return iscsi_ok;
+  if((d = opendir("/sys/firmware"))) {
+    while((de = readdir(d))) {
+      if(!strcmp(de->d_name, "ibft")) {
+        sysfs_ibft = "/sys/firmware/ibft/ethernet0";
+        break;
+      }
+      if(!strncmp(de->d_name, "iscsi_boot", sizeof "iscsi_boot" - 1)) {
+        iscsi_ok = 1;
+        break;
+      }
+    }
+    closedir(d);
+  }
+
+  if(iscsi_ok || !util_check_exist(sysfs_ibft)) return iscsi_ok;
+
+  fprintf(stderr, "ibft: sysfs dir = %s\n", sysfs_ibft);
 
   asprintf(&attr, "%s/origin", sysfs_ibft);
   s = util_get_attr(attr);
