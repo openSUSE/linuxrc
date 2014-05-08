@@ -2326,6 +2326,7 @@ int net_check_ccw_address(char* addr)
   int i;
   fprintf(stderr, "checking CCW address %s\n",addr);
   /* format: x.x.xxxx, each x is a hex digit */
+  if(!addr) goto error;
   if(strlen(addr)!=8) goto error;
   for(i=0;i<8;i++)
   {
