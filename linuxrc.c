@@ -803,10 +803,6 @@ void lxrc_init()
 
   if(!config.had_segv) {
     lxrc_add_parts();
-    // we need edd for udev
-    if(!config.udev_mods && util_check_exist("/modules/edd.ko")) {
-      system("/sbin/insmod /modules/edd.ko");
-    }
   }
 
   LXRC_WAIT
@@ -869,6 +865,11 @@ void lxrc_init()
     mount("devtmpfs", "/dev", "devtmpfs", 0, 0);
     mkdir("/dev/pts", 0755);
     mount("devpts", "/dev/pts", "devpts", 0, 0);
+  }
+
+  // we might need edd for udev
+  if(util_check_exist("/modules/edd.ko")) {
+    system("/sbin/insmod /modules/edd.ko");
   }
 
   if(!config.test) {
@@ -943,14 +944,15 @@ void lxrc_init()
 
   info_init();
 
-  if(iscsi_check()) config.withiscsi = 1;
-  config.withfcoe = fcoe_check();
+  LXRC_WAIT
 
   printf("Loading basic drivers...");
   fflush(stdout);
   mod_init(1);
   printf(" ok\n");
   fflush(stdout);
+
+  LXRC_WAIT
 
   /* look for driver updates in initrd */
   util_chk_driver_update("/", "/");
@@ -971,6 +973,11 @@ void lxrc_init()
   if(util_check_exist("/sys/firmware/efi/vars") == 'd') {
     config.efi_vars = 1;
   }
+
+  if(iscsi_check()) config.withiscsi = 1;
+  if(fcoe_check()) config.withfcoe = 1;
+
+  LXRC_WAIT
 
   /* get usb keyboard working */
   if(config.manual == 1 && !config.had_segv) util_load_usb();
