@@ -13,13 +13,8 @@ typedef struct {
   enum langid_t  id;
   char *descr;
   char *keymap;
-  char *font1;
-  char *font2;
-  int usermap;	// redundant, will drop it later -- snwint
-  int write_info;
   char *locale;
   char *trans_id;	/* instsys translation image suffix */
-  int xfonts;		/* needs extra xfonts */
 } language_t;
 
 typedef struct {

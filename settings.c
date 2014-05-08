@@ -26,9 +26,6 @@
 #include "url.h"
 
 
-#define UNI_FONT	"linuxrc2-16.psfu"
-#define SMALL_FONT	"linuxrc-16.psfu"
-
 #define KM_L1 "iso-8859-15"
 #define KM_L2 "iso-8859-2"
 #define KM_L7 "iso-8859-7"
@@ -62,36 +59,36 @@ struct {
 
 #define LANG_DEFAULT lang_en
 static language_t set_languages_arm[] = {
-  { lang_af, "Afrikaans", "us", SMALL_FONT, UNI_FONT, 0, 0, "af_ZA", "af", 0 },
-  { lang_bg, "Български", "us", SMALL_FONT, UNI_FONT, 0, 0, "bg_BG", "bg", 0 },
-  { lang_ca, "Català", "us", SMALL_FONT, UNI_FONT, 0, 0, "ca_ES", "ca", 0 },
-  { lang_cs, "Čeština", "cz-us-qwertz", SMALL_FONT, UNI_FONT, 1, 1, "cs_CZ", "cs", 0 },
-  { lang_da, "Dansk", "dk", SMALL_FONT, UNI_FONT, 0, 0, "da_DK", "da", 0 },
-  { lang_de, "Deutsch", "de-latin1-nodeadkeys", SMALL_FONT, UNI_FONT, 0, 0, "de_DE", "de", 0 },
-  { lang_en, "English", "us", SMALL_FONT, UNI_FONT, 0, 0, "en_US", "en_US", 0 },
-  { lang_es, "Español", "es", SMALL_FONT, UNI_FONT, 0, 1, "es_ES", "es", 0 },
-  { lang_fr, "Français", "fr-latin1", SMALL_FONT, UNI_FONT, 0, 0, "fr_FR", "fr", 0 },
-  { lang_el, "Ελληνικά", "gr", SMALL_FONT, UNI_FONT, 1, 1, "el_GR", "el", 0 },
-  { lang_it, "Italiano", "it", SMALL_FONT, UNI_FONT, 0, 0, "it_IT", "it", 0 },
-  { lang_ja, "Japanese", "jp106", SMALL_FONT, UNI_FONT, 0, 0, "ja_JP", "ja", 1 },
-  { lang_hu, "Magyar", "hu", SMALL_FONT, UNI_FONT, 1, 1, "hu_HU", "hu", 0 },
-  { lang_nl, "Nederlands", "us", SMALL_FONT, UNI_FONT, 0, 1, "nl_NL", "nl", 0 },
-  { lang_nb, "Norsk", "no-latin1", SMALL_FONT, UNI_FONT, 0, 1, "nb_NO", "nb", 0 },
-  { lang_pl, "Polski", "Pl02", SMALL_FONT, UNI_FONT, 1, 1, "pl_PL", "pl", 0 },
-  { lang_pt, "Português", "pt-latin1", SMALL_FONT, UNI_FONT, 0, 1, "pt_PT", "pt", 0 },
-  { lang_pt_BR, "Português Brasileiro", "br-abnt2", SMALL_FONT, UNI_FONT, 0, 1, "pt_BR", "pt_BR", 0 },
-  { lang_ru, "Русский", "ru1", SMALL_FONT, UNI_FONT, 1, 1, "ru_RU", "ru", 0 },
-  { lang_zh_CN, "Simplified Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_CN", "zh_CN", 1 },
-  { lang_sk, "Slovenčina", "sk-qwerty", SMALL_FONT, UNI_FONT, 1, 1, "sk_SK", "sk", 0 },
-  { lang_sl, "Slovenščina", "slovene", SMALL_FONT, UNI_FONT, 1, 1, "sl_SI", "sl", 0 },
-  { lang_fi, "Suomi", "fi-latin1", SMALL_FONT, UNI_FONT, 0, 1, "fi_FI", "fi", 0 },
-  { lang_sv, "Svenska", "sv-latin1", SMALL_FONT, UNI_FONT, 0, 1, "sv_SE", "sv", 0 },
-  { lang_zh_TW, "Traditional Chinese", "us", SMALL_FONT, UNI_FONT, 0, 0, "zh_TW", "zh_TW", 1 },
-  { lang_uk, "Українська", "us", SMALL_FONT, UNI_FONT, 0, 1, "uk_UA", "uk", 0 },
-  { lang_xh, "isiXhosa", "us", SMALL_FONT, UNI_FONT, 0, 0, "xh_ZA", "xh", 0 },
-  { lang_zu, "isiZulu", "us", SMALL_FONT, UNI_FONT, 0, 0, "zu_ZA", "zu", 0 },
+  { lang_af, "Afrikaans", "us", "af_ZA", "af" },
+  { lang_bg, "Български", "us", "bg_BG", "bg" },
+  { lang_ca, "Català", "us", "ca_ES", "ca" },
+  { lang_cs, "Čeština", "cz-us-qwertz", "cs_CZ", "cs" },
+  { lang_da, "Dansk", "dk", "da_DK", "da" },
+  { lang_de, "Deutsch", "de-latin1-nodeadkeys", "de_DE", "de" },
+  { lang_en, "English", "us", "en_US", "en_US" },
+  { lang_es, "Español", "es", "es_ES", "es" },
+  { lang_fr, "Français", "fr-latin1", "fr_FR", "fr" },
+  { lang_el, "Ελληνικά", "gr", "el_GR", "el" },
+  { lang_it, "Italiano", "it", "it_IT", "it" },
+  { lang_ja, "Japanese", "jp106", "ja_JP", "ja" },
+  { lang_hu, "Magyar", "hu", "hu_HU", "hu" },
+  { lang_nl, "Nederlands", "us", "nl_NL", "nl" },
+  { lang_nb, "Norsk", "no-latin1", "nb_NO", "nb" },
+  { lang_pl, "Polski", "Pl02", "pl_PL", "pl" },
+  { lang_pt, "Português", "pt-latin1", "pt_PT", "pt" },
+  { lang_pt_BR, "Português Brasileiro", "br-abnt2", "pt_BR", "pt_BR" },
+  { lang_ru, "Русский", "ru1", "ru_RU", "ru" },
+  { lang_zh_CN, "Simplified Chinese", "us", "zh_CN", "zh_CN" },
+  { lang_sk, "Slovenčina", "sk-qwerty", "sk_SK", "sk" },
+  { lang_sl, "Slovenščina", "slovene", "sl_SI", "sl" },
+  { lang_fi, "Suomi", "fi-latin1", "fi_FI", "fi" },
+  { lang_sv, "Svenska", "sv-latin1", "sv_SE", "sv" },
+  { lang_zh_TW, "Traditional Chinese", "us", "zh_TW", "zh_TW" },
+  { lang_uk, "Українська", "us", "uk_UA", "uk" },
+  { lang_xh, "isiXhosa", "us", "xh_ZA", "xh" },
+  { lang_zu, "isiZulu", "us", "zu_ZA", "zu" },
   // entry for unknown language
-  { lang_dummy, "", "us", SMALL_FONT, UNI_FONT, 0, 0, NULL, NULL, 0 },
+  { lang_dummy, "", "us", NULL, NULL },
 };
 
 #define KEYMAP_DEFAULT	"us"
@@ -194,7 +191,6 @@ static dia_item_t di_set_expert_last = di_none;
 static int  set_settings_cb          (dia_item_t di);
 static int  set_expert_cb            (dia_item_t di);
 static int  set_get_current_language (enum langid_t lang);
-static void set_font(language_t *lang);
 static char *keymap_encoding(char *map);
 
 /*
@@ -451,17 +447,7 @@ void set_choose_keytable(int always_show)
  */
 void set_activate_language(enum langid_t lang_id)
 {
-  int i;
-  language_t *lang;
-
   config.language = lang_id;
-  i = set_get_current_language(lang_undef);
-
-  if(i > 0) {
-    lang = set_languages_arm + i - 1;
-
-    if(!config.serial && !config.linemode) set_font(lang);
-  }
 }
 
 
@@ -620,15 +606,8 @@ int set_expert_cb(dia_item_t di)
 void set_write_info(FILE *f)
 {
   language_t *lang;
-  char magic[3] = "( ";
 
   lang = set_languages_arm + set_get_current_language(lang_undef) - 1;
-
-  if(lang->write_info) {
-    file_write_str(f, key_font, lang->font1);
-    magic[1] = lang->usermap ? 'K' : 'B';
-    file_write_str(f, key_fontmagic, magic);
-  }
 
   file_write_str(f, key_locale, lang->locale);
 }
@@ -650,53 +629,6 @@ int set_get_current_language(enum langid_t lang)
   }
 
   return 1;
-}
-
-
-/*
- * New setfont code.
- * setfont apparently works with /dev/tty. This breaks things on frame buffer
- * consoles for some reason. Moreover, fb consoles can have different settings
- * for every console.
- * Hence the workaround.
- */
-void set_font(language_t *lang)
-{
-  char cmd[128], *font, dev[32];
-  int i, err = 0, max_cons;
-  FILE *f;
-
-  if(!config.fb) {;
-    if((f = fopen("/dev/fb", "r"))) {
-      config.fb = 1;
-      fclose(f);
-    }
-  }
-
-  if(!lang) return;
-
-  font = config.fb ? lang->font2 : lang->font1;
-
-  sprintf(cmd, "setfont %s", font);
-
-  fprintf(stderr, "setfont %s\n", font);
-
-  max_cons = config.fb ? 6 : 1;
-
-  if(!config.test) {
-    err |= rename("/dev/tty", "/dev/tty.bak");
-    for(i = 0; i < max_cons; i++) {
-      sprintf(dev, "/dev/tty%d", i);
-      err |= rename(dev, "/dev/tty");
-      system(cmd);
-      if(config.utf8) {
-        f = fopen("/dev/tty", "w");
-        fprintf(f, "\033%%G"); fclose(f);
-      }
-      err |= rename("/dev/tty", dev);
-    }
-    err |= rename("/dev/tty.bak", "/dev/tty");
-  }
 }
 
 
