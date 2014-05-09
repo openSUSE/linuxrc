@@ -2585,9 +2585,9 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       
       IFNOTAUTO(config.hwp.layer2)
       {
-        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 2 : 1;
+        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 1 : 0;
       }
-      if(config.hwp.layer2 == 2) {
+      if(config.hwp.layer2 == 1) {
         IFNOTAUTO(config.hwp.osahwaddr) {
           dia_input2("MAC address", &config.hwp.osahwaddr, 17, 1);
         }
@@ -2654,7 +2654,7 @@ setup_ctc:
             config.hwp.portname ? "-p \"" : "",
             config.hwp.portname ? config.hwp.portname : "",
             config.hwp.portname ? "\"" : "",
-            config.hwp.layer2 == 2 ? "-l" : "",
+            config.hwp.layer2 == 1 ? "-l" : "",
             config.hwp.readchan,
             config.hwp.writechan,
             config.hwp.datachan);

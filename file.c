@@ -1195,7 +1195,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value) config.hwp.interface=file_sym2num(f->value);
         break;
       case key_layer2:
-        if(f->is.numeric) config.hwp.layer2 = f->nvalue + 1;
+        if(f->is.numeric) config.hwp.layer2 = f->nvalue;
         break;
       case key_portno:
         if(f->is.numeric) config.hwp.portno = f->nvalue + 1;
@@ -1860,7 +1860,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_netcardname, config.net.cardname);
 #if defined(__s390__) || defined(__s390x__)
     if(config.hwp.osahwaddr) file_write_str(f, key_osahwaddr, config.hwp.osahwaddr);
-    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2 - 1);
+    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2);
 #endif
     file_write_str(f, key_ethtool, config.net.ethtool_used);
     file_write_inet2(f, key_ip, &config.net.hostname, INET_WRITE_IP_BOTH + INET_WRITE_PREFIX);
