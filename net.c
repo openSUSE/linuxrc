@@ -2654,27 +2654,25 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     case di_390net_escon:
 setup_ctc:
       if(config.hwp.protocol > 0)
-        sprintf(cmd, "/sbin/chzdev ctc %s:%s -i protocol=%d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
+        sprintf(cmd, "ctc_configure %s %s 1 %d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
       else
-        sprintf(cmd, "/sbin/chzdev ctc %s:%s -i", config.hwp.readchan, config.hwp.writechan);
+        sprintf(cmd, "ctc_configure %s %s 1", config.hwp.readchan, config.hwp.writechan);
       break;
     case di_390net_hsi:
     case di_390net_osa:
       if (config.hwp.interface == di_osa_lcs)
-        sprintf(cmd, "/sbin/chzdev lcs ctc %s:%s -i protocol=0", config.hwp.readchan, config.hwp.writechan);
-      else {
-            ccmd += sprintf(ccmd, "/sbin/qeth_configure ");
-            if(config.hwp.portno)
-              ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
-            ccmd += sprintf(ccmd, "%s%s%s %s %s %s %s 1",
-            config.hwp.portname ? "-p \"" : "",
-            config.hwp.portname ? config.hwp.portname : "",
-            config.hwp.portname ? "\"" : "",
-            config.hwp.layer2 == 1 ? "-l" : "",
-            config.hwp.readchan,
-            config.hwp.writechan,
-            config.hwp.datachan);
-           }
+        goto setup_ctc;
+      ccmd += sprintf(ccmd, "qeth_configure ");
+      if(config.hwp.portno)
+        ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
+      ccmd += sprintf(ccmd, "%s%s%s %s %s %s %s 1",
+        config.hwp.portname ? "-p \"" : "",
+        config.hwp.portname ? config.hwp.portname : "",
+        config.hwp.portname ? "\"" : "",
+        config.hwp.layer2 == 2 ? "-l" : "",
+        config.hwp.readchan,
+        config.hwp.writechan,
+        config.hwp.datachan);
       break;
     default:
       sprintf(cmd, "unknown s390 network type %d", config.hwp.type);
