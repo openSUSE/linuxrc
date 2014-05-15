@@ -210,7 +210,13 @@ int net_config()
   config.net.configured = nc_none;
 
   if(config.win && config.net.setup != NS_DHCP) {
-    if(config.net.setup & NS_DHCP && config.hwp.layer2 && !config.net.ptp) {
+    if(
+      config.net.setup & NS_DHCP &&
+#if defined(__s390__) || defined(__s390x__)
+      config.hwp.layer2 &&
+#endif
+      !config.net.ptp
+    ) {
       sprintf(buf, "Automatic configuration via %s?", "DHCP");
       rc = dia_yesno(buf, NO);
     }
