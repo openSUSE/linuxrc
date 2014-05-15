@@ -210,7 +210,7 @@ int net_config()
   config.net.configured = nc_none;
 
   if(config.win && config.net.setup != NS_DHCP) {
-    if(config.net.setup & NS_DHCP && !config.net.ptp) {
+    if(config.net.setup & NS_DHCP && config.hwp.layer2 && !config.net.ptp) {
       sprintf(buf, "Automatic configuration via %s?", "DHCP");
       rc = dia_yesno(buf, NO);
     }
@@ -1477,6 +1477,12 @@ int net_choose_device()
     if(choice) last_item = choice;
   }
 
+/*
+ *
+ * If item_devs[choice - 1] has a value, then that means the interface should already
+ * configured. If so, we can check sysfs to see if we should be using layer2 or not.
+ *
+ */
   if(choice > 0 && !item_devs[choice - 1]) {
 #if defined(__s390__) || defined(__s390x__)
     fprintf(stderr, "activate s390 devs 2\n");
@@ -1491,6 +1497,16 @@ int net_choose_device()
     }
 #endif
   }
+#if defined(__s390__) || defined(__s390x__)
+  else {
+    char path[PATH_MAX]="";
+    char *type;
+    sprintf(path, "/sys/class/net/%s/device/layer2", item_devs[choice - 1]);
+    type = util_get_attr(path);
+    if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=1; }
+    else {config.hwp.layer2=0;}
+  }
+#endif
 
   if(choice > 0) {
     str_copy(&config.net.device, item_devs[choice - 1]);
@@ -2585,9 +2601,9 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       
       IFNOTAUTO(config.hwp.layer2)
       {
-        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 2 : 1;
+        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 1 : 0;
       }
-      if(config.hwp.layer2 == 2) {
+      if(config.hwp.layer2 == 1) {
         IFNOTAUTO(config.hwp.osahwaddr) {
           dia_input2("MAC address", &config.hwp.osahwaddr, 17, 1);
         }
