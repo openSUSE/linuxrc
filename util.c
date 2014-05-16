@@ -4439,6 +4439,11 @@ void util_run_script(char *name)
 
   file_write_install_inf("");
 
+  if(config.debug) {
+    strprintf(&buf, "%d", config.debug);
+    setenv("linuxrc_debug", buf, 1);
+  }
+
   strprintf(&buf, "/scripts/%s", name);
 
   system(buf);
