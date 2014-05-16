@@ -2675,7 +2675,7 @@ setup_ctc:
         config.hwp.portname ? "-p \"" : "",
         config.hwp.portname ? config.hwp.portname : "",
         config.hwp.portname ? "\"" : "",
-        config.hwp.layer2 == 2 ? "-l" : "",
+        config.hwp.layer2 == 1 ? "-l" : "",
         config.hwp.readchan,
         config.hwp.writechan,
         config.hwp.datachan);
