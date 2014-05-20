@@ -1894,10 +1894,10 @@ int net_wicked()
   net_apply_ethtool(config.net.device, config.net.hwaddr);
 
   if(config.net.dhcp_timeout_set) {
-    sprintf(cmd, "wicked ifup --timeout %d %s", config.net.dhcp_timeout, config.net.device);
+    sprintf(cmd, "wicked ifup --timeout %d %s >&2", config.net.dhcp_timeout, config.net.device);
   }
   else {
-    sprintf(cmd, "wicked ifup %s", config.net.device);
+    sprintf(cmd, "wicked ifup %s >&2", config.net.device);
   }
 
   sprintf(file, "/var/run/wicked/leaseinfo.%s.dhcp.ipv4", config.net.device);
