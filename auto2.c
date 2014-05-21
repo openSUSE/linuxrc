@@ -372,10 +372,12 @@ void auto2_scan_hardware()
    * -- ok this sounds weird but actually makes sense...
    */
   if(config.autoyast2 && !config.autoyast) {
-    fprintf(stderr, "Downloading AutoYaST file: %s\n", config.autoyast2);
-    printf("Downloading AutoYaST file: %s\n", config.autoyast2);
-    fflush(stdout);
     url = url_set(config.autoyast2);
+    fprintf(stderr, "Downloading AutoYaST file: %s\n", config.autoyast2);
+    if(!url->quiet) {
+      printf("Downloading AutoYaST file: %s\n", config.autoyast2);
+      fflush(stdout);
+    }
 #if defined(__s390__) || defined(__s390x__)
     if(url->is.network && !config.net.configured) net_activate_s390_devs();
 #endif
@@ -385,8 +387,12 @@ void auto2_scan_hardware()
     if(!err) {
       fprintf(stderr, "setting AutoYaST option to file:///download/autoyast.xml\n");
       str_copy(&config.autoyast, "file:///download/autoyast.xml");
-      // don't parse it
-      // file_read_info_file("file:/download/autoyast.xml", kf_cfg);
+      /* parse it:
+       * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
+       * otherwise the file content is ignored
+       */
+      fprintf(stderr, "parsing AutoYaST file\n");
+      file_read_info_file("file:/download/autoyast.xml", kf_cfg);
     }
   }
 
@@ -597,7 +603,6 @@ int auto2_find_repo()
  */
 void auto2_user_netconfig()
 {
-  int win_old;
   slist_t *sl;
 
   if(!config.net.do_setup) return;
@@ -628,22 +633,9 @@ void auto2_user_netconfig()
       for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
         str_copy(&config.net.device, sl->key);
 
-        printf(
-          "Sending DHCP request to %s...\n", config.net.device
-        );
-        fflush(stdout);
-        fprintf(stderr,
-          "Sending DHCP request to %s... ", config.net.device
-        );
         net_dhcp();
-        if(
-          !config.net.hostname.ok ||
-          !config.net.netmask.ok ||
-          !config.net.broadcast.ok
-        ) {
-          fprintf(stderr, "no/incomplete answer.\n");
-        }
-        else {
+
+        if(config.net.dhcp_active) {
           config.net.configured = nc_dhcp;
 
           if(net_activate_ns()) {
@@ -657,9 +649,12 @@ void auto2_user_netconfig()
       }
     }
     else {
-      if(!(win_old = config.win)) util_disp_init();
+      int win_old, maybe_interactive;
+
+      maybe_interactive = config.net.setup != NS_DHCP;
+      if(!(win_old = config.win) && maybe_interactive) util_disp_init();
       net_config();
-      if(!win_old) util_disp_done();
+      if(!win_old && maybe_interactive) util_disp_done();
     }
   }
 

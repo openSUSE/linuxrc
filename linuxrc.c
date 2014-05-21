@@ -755,6 +755,7 @@ void lxrc_init()
   config.net.tftp_timeout = 10;
   config.net.ifconfig = 1;
   config.net.ipv4 = 1;
+  config.net.ipv6 = 1;
   config.net.setup = NS_DEFAULT;
   config.net.nameservers = 1;
 

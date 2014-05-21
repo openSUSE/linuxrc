@@ -2578,7 +2578,7 @@ int activate_network()
   if(!config.net.hostname.ok || !config.net.netmask.ok) {
     net_dhcp();
     if(!config.net.hostname.ok) {
-      fprintf(stderr, "%s: DHCP network setup failed\n", config.net.device);
+      fprintf(stderr, "%s: DHCP%s network setup failed\n", config.net.device, net_dhcp_type());
       return 0;
     }
 

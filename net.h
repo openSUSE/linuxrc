@@ -25,4 +25,4 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
 char *net_if2module(char *net_if);
 void net_apply_ethtool(char *device, char *hwaddr);
 int wlan_setup(void);
-
+char *net_dhcp_type(void);

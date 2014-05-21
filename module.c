@@ -38,7 +38,7 @@
 
 #define MENU_WIDTH		55
 #define MODULE_CONFIG		"module.config"
-#define CARDMGR_PIDFILE		"/var/run/cardmgr.pid"
+#define CARDMGR_PIDFILE		"/run/cardmgr.pid"
 
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};

@@ -2318,35 +2318,12 @@ int url_setup_interface(url_t *url)
   /* we need at least ip & netmask for static network config */
   /* just netmask for PTP devices */
   if(!config.net.ptp && (net_config_mask() & 3) != 3) {
-    printf(
-      "Sending %s request to %s...\n",
-      config.net.ipv6 ? "DHCP6" : "DHCP",
-      url->used.device
-    );
-    fflush(stdout);
-    fprintf(stderr,
-      "sending %s request to %s... ",
-      config.net.ipv6 ? "DHCP6" : "DHCP",
-      url->used.device
-    );
-
     net_dhcp();
 
-    if(
-      !config.test &&
-      !config.net.ipv6 &&
-      (
-        !config.net.hostname.ok ||
-        !config.net.netmask.ok ||
-        !config.net.broadcast.ok
-      )
-    ) {
-      fprintf(stderr, "no/incomplete answer.\n");
+    if(!config.net.dhcp_active) {
       config.net.configured = nc_none;
-
       return 0;
     }
-    fprintf(stderr, "ok.\n");
 
     config.net.configured = nc_dhcp;
   }
