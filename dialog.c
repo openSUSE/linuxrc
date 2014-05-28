@@ -1661,7 +1661,20 @@ int dia_show_lines2(char *head, slist_t *sl0, int width)
   return j;
 }
 
+
+#if defined(__s390__) || defined(__s390x__)
+/* broken HMC terminal workaround: always chop leading and trailing whitespace */
+int dia_input2_chopspace(char* txt, char** input, int fieldlen, int pw_mode);
+
 int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
+{
+  return dia_input2_chopspace(txt, input, fieldlen, pw_mode);
+}
+
+static int __dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
+#else
+int dia_input2(char *txt, char **input, int fieldlen, int pw_mode)
+#endif
 {
   char buf[1024];
   int i;
@@ -1695,7 +1708,11 @@ int dia_input2_chopspace(char* txt, char** input, int fieldlen, int pw_mode)
   if (*input)
     deflt = strdup(*input);
 
+#if defined(__s390__) || defined(__s390x__)
+  retval = __dia_input2(txt, input, fieldlen, pw_mode);
+#else
   retval = dia_input2(txt, input, fieldlen, pw_mode);
+#endif
   oinput = *input;
 
   /* null pointer or empty string */
