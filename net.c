@@ -2605,6 +2605,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         return -1;
       }
 
+      sleep(3);
+
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       IFNOTAUTO(config.hwp.datachan)
         if((rc=dia_input2_chopspace("Device address for data channel", &config.hwp.datachan, 9, 0))) return rc;
