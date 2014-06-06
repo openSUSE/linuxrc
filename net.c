@@ -2605,8 +2605,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         return -1;
       }
 
-      sleep(3);
-
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       IFNOTAUTO(config.hwp.datachan)
         if((rc=dia_input2_chopspace("Device address for data channel", &config.hwp.datachan, 9, 0))) return rc;
@@ -2701,13 +2699,21 @@ setup_ctc:
       return -1;
       break;
   }
+
   rc = system(cmd);
   if(rc) {
     sprintf(cmd, "network configuration script failed (error code %d)", rc);
     dia_message(cmd, MSGTYPE_ERROR);
     return -1;
   }
-  
+
+  rc = system("/sbin/udevadm settle");
+  if(rc) {
+    sprintf(cmd, "udevadm settle failed (error code %d)", rc);
+    dia_message(cmd, MSGTYPE_ERROR);
+    return -1;
+  }
+
   if(config.hwp.osahwaddr && strlen(config.hwp.osahwaddr) > 0) {
     struct ifreq ifr;
     struct ether_addr* ea;

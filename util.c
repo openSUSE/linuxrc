@@ -4715,6 +4715,7 @@ void check_ptp()
   if(
     !strncmp(config.net.device, "plip", sizeof "plip" - 1) ||
     !strncmp(config.net.device, "iucv", sizeof "iucv" - 1) ||
+    !strncmp(config.net.device, "ctc", sizeof "ctc" - 1) ||
     !strncmp(config.net.device, "sl", sizeof "sl" - 1)
   ) config.net.ptp = 1;
 }
