@@ -58,9 +58,10 @@ struct {
   { di_set_startshell,   "Start shell before and after YaST?",    },
   { di_set_slp,          "Get SLP info",        },
 
-  { di_inst_install,     "Start Installation or Update",       },
+  { di_inst_install,     "Installation",       },
+  { di_inst_update,      "Upgrade",       },
+  { di_inst_rescue,      "Rescue System",        },
   { di_inst_system,      "Boot Installed System",         },
-  { di_inst_rescue,      "Start Rescue System",        },
   { di_inst_update_add,  "Add Driver Update",   },
   { di_inst_update_show, "Show Driver Updates", },
 

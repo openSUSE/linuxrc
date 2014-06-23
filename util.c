@@ -1198,6 +1198,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.withiscsi, "iscsi");
   add_flag(&sl0, buf, config.withfcoe, "fcoe");
   add_flag(&sl0, buf, config.withipoib, "ipoib");
+  add_flag(&sl0, buf, config.upgrade, "upgrade");
   if(*buf) slist_append_str(&sl0, buf);
 
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());

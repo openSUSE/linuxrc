@@ -46,8 +46,9 @@ typedef enum {
   di_set_slp,
 
   di_inst_install,
-  di_inst_system,
+  di_inst_update,
   di_inst_rescue,
+  di_inst_system,
   di_inst_update_add,
   di_inst_update_show,
 

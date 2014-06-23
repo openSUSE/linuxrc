@@ -307,6 +307,7 @@ static struct {
   { key_restarted,      "Restarted",      kf_cfg                         },
   { key_wicked,         "Wicked",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
+  { key_upgrade,        "Upgrade",        kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1643,6 +1644,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.withipoib = f->nvalue;
         break;
 
+      case key_upgrade:
+        if(f->is.numeric) config.upgrade = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1954,6 +1959,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
   file_write_num(f, key_usesax2, config.usesax2);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
+  if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
   if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
 
   if(

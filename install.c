@@ -89,14 +89,19 @@ int inst_menu()
   dia_item_t di;
   dia_item_t items[] = {
     di_inst_install,
-    di_inst_system,
+    di_inst_update,
     di_inst_rescue,
+    di_inst_system,
     di_none
   };
 
   /* hope this is correct... */
   /* ... apparently not: keep VNC & SSH settings (bnc #447433) */
   config.net.do_setup &= DS_VNC | DS_SSH;
+
+  if(di_inst_menu_last == di_none) {
+    di_inst_menu_last = config.rescue ? di_inst_rescue : config.upgrade ? di_inst_update : di_inst_install;
+  }
 
   di = dia_menu2("Start Installation", 40, inst_menu_cb, items, di_inst_menu_last);
 
@@ -119,16 +124,23 @@ int inst_menu_cb(dia_item_t di)
   switch(di) {
     case di_inst_install:
       config.rescue = 0;
+      config.upgrade = 0;
       err = inst_start_install();
       break;
 
-    case di_inst_system:
-      err = root_boot_system();
+    case di_inst_update:
+      config.rescue = 0;
+      config.upgrade = 1;
+      err = inst_start_install();
       break;
 
     case di_inst_rescue:
       config.rescue = 1;
       err = inst_start_install();
+      break;
+
+    case di_inst_system:
+      err = root_boot_system();
       break;
 
     default:
