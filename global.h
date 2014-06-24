@@ -335,7 +335,7 @@ typedef struct {
   unsigned addswap:2;		/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
-  unsigned netstop:1;		/* shut down network iface at end */
+  unsigned netstop:2;		/* shut down network interface at end 0: no, 1: yes, 3: auto */
   unsigned noshell:1;		/* don't start any shells */
   volatile unsigned restart_on_segv:1;	/* restart linuxrc after segfault */
   unsigned had_segv:1;		/* last linuxrc run ended with segv */

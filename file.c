@@ -151,7 +151,7 @@ static struct {
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
   { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
   { key_tmpfs,          "_TmpFS",         kf_cmd                         },
-  { key_netstop,        "_NetStop",       kf_cfg + kf_cmd                },
+  { key_netstop,        "NetStop",        kf_cfg + kf_cmd                },
   { key_testmode,       "_TestMode",      kf_cfg                         },
   { key_debugwait,      "_DebugWait",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_expert,         "Expert",         kf_cfg + kf_cmd                },	/* drop it? */

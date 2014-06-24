@@ -374,9 +374,12 @@ void lxrc_change_root()
   chroot(".");
 
   if(config.rescue) {
+    if(config.usessh) setenv("SSH", "1", 1);
+    if(config.net.sshpassword) setenv("SSHPASSWORD", config.net.sshpassword, 1);
+
     system("/mounts/initrd/scripts/prepare_rescue");
 
-    // system("PS1='\\w # ' /bin/bash 2>&1");
+    LXRC_WAIT
 
     if(!config.debug) {
       umount("/mounts/initrd");
@@ -451,9 +454,13 @@ void lxrc_movetotmpfs()
 
 void lxrc_end()
 {
+  unsigned netstop = config.netstop;
+
+  if(netstop == 3) netstop = config.rescue ? 0 : 1;
+
   util_plymouth_off();
 
-  if(config.netstop || config.restarting) {
+  if(netstop || config.restarting) {
     LXRC_WAIT
 
     net_stop();
@@ -761,7 +768,7 @@ void lxrc_init()
   config.explode_win = 1;
   config.color = 2;
   config.addswap = 1;
-  config.netstop = 1;
+  config.netstop = 3;
   config.usbwait = 4;		/* 4 seconds */
   config.escdelay = 100;	/* 100 ms */
   config.utf8 = 1;
