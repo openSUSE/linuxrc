@@ -4277,55 +4277,56 @@ int iscsi_check()
         iscsi_ok++;
       }
       free(attr);
+
+      asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: subnet-mask = %s\n", s);
+      if(*s) {
+        name2inet(&config.net.netmask, s);
+        net_check_address(&config.net.netmask, 0);
+        iscsi_ok++;
+      }
+      free(attr);
+
+      if(iscsi_ok == 3) {
+        config.net.do_setup |= DS_SETUP;
+        config.net.setup = NS_HOSTIP | NS_NETMASK;
+
+        asprintf(&attr, "%s/gateway", sysfs_ibft);
+        s = util_get_attr(attr);
+        fprintf(stderr, "ibft: gateway = %s\n", s);
+        if(*s) {
+          name2inet(&config.net.gateway, s);
+          net_check_address(&config.net.gateway, 0);
+          config.net.setup |= NS_GATEWAY;
+        }
+        free(attr);
+
+        asprintf(&attr, "%s/primary-dns", sysfs_ibft);
+        s = util_get_attr(attr);
+        fprintf(stderr, "ibft: primary-dns = %s\n", s);
+        if(*s) {
+          name2inet(&config.net.nameserver[0], s);
+          net_check_address(&config.net.nameserver[0], 0);
+          config.net.nameservers = 1;
+          config.net.setup |= NS_NAMESERVER;
+        }
+        free(attr);
+
+        asprintf(&attr, "%s/secondary-dns", sysfs_ibft);
+        s = util_get_attr(attr);
+        fprintf(stderr, "ibft: secondary-dns = %s\n", s);
+        if(*s) {
+          name2inet(&config.net.nameserver[1], s);
+          net_check_address(&config.net.nameserver[1], 0);
+          config.net.nameservers = 2;
+        }
+        free(attr);
+      }
     }
     else {
+      fprintf(stderr, "ibft: mac didn't match - ignoring ibft data\n");
       iscsi_ok++;
-    }
-
-    asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
-    s = util_get_attr(attr);
-    fprintf(stderr, "ibft: subnet-mask = %s\n", s);
-    if(*s) {
-      name2inet(&config.net.netmask, s);
-      net_check_address(&config.net.netmask, 0);
-      iscsi_ok++;
-    }
-    free(attr);
-
-    if(iscsi_ok == 3) {
-      config.net.do_setup |= DS_SETUP;
-      config.net.setup = NS_HOSTIP | NS_NETMASK;
-
-      asprintf(&attr, "%s/gateway", sysfs_ibft);
-      s = util_get_attr(attr);
-      fprintf(stderr, "ibft: gateway = %s\n", s);
-      if(*s) {
-        name2inet(&config.net.gateway, s);
-        net_check_address(&config.net.gateway, 0);
-        config.net.setup |= NS_GATEWAY;
-      }
-      free(attr);
-
-      asprintf(&attr, "%s/primary-dns", sysfs_ibft);
-      s = util_get_attr(attr);
-      fprintf(stderr, "ibft: primary-dns = %s\n", s);
-      if(*s) {
-        name2inet(&config.net.nameserver[0], s);
-        net_check_address(&config.net.nameserver[0], 0);
-        config.net.nameservers = 1;
-        config.net.setup |= NS_NAMESERVER;
-      }
-      free(attr);
-
-      asprintf(&attr, "%s/secondary-dns", sysfs_ibft);
-      s = util_get_attr(attr);
-      fprintf(stderr, "ibft: secondary-dns = %s\n", s);
-      if(*s) {
-        name2inet(&config.net.nameserver[1], s);
-        net_check_address(&config.net.nameserver[1], 0);
-        config.net.nameservers = 2;
-      }
-      free(attr);
     }
   }
 
