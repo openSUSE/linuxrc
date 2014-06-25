@@ -4255,19 +4255,22 @@ int iscsi_check()
       free(s);
       s = t;
     }
-    str_copy(&config.netdevice, s);
+    if(!mac_ofs) str_copy(&config.netdevice, s);
+    fprintf(stderr, "ibft: tagging %s as persistent\n", t);
+    str_copy(&config.net.persistent, t);
     iscsi_ok++;
   }
+
   free(s);
   free(attr);
 
-  if(use_dhcp) {
-    config.net.do_setup |= DS_SETUP;
-    config.net.setup = NS_DHCP;
-  }
-  else {
+  if(!mac_ofs) {
     /* use ibft config only if mac matches */
-    if(!mac_ofs) {
+    if(use_dhcp) {
+      config.net.do_setup |= DS_SETUP;
+      config.net.setup = NS_DHCP;
+    }
+    else {
       asprintf(&attr, "%s/ip-addr", sysfs_ibft);
       s = util_get_attr(attr);
       fprintf(stderr, "ibft: ip-addr = %s\n", s);
@@ -4324,10 +4327,10 @@ int iscsi_check()
         free(attr);
       }
     }
-    else {
-      fprintf(stderr, "ibft: mac didn't match - ignoring ibft data\n");
-      iscsi_ok++;
-    }
+  }
+  else {
+    fprintf(stderr, "ibft: mac didn't match - ignoring ibft data\n");
+    iscsi_ok++;
   }
 
   return use_dhcp || iscsi_ok == 3;

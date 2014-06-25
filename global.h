@@ -610,6 +610,7 @@ typedef struct {
     char *ethtool_used;		/* ethtool options used for active card */
     char *cardname;		/* network card name */
     char *dhcpfail;		/* dhcp failure action */
+    char *persistent;		/* persistent interface */
     struct {
       char *binary;		/* cifs/smb mount binary */
       char *module;		/* cifs/smb kernel module */
