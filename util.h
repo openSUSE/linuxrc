@@ -62,6 +62,7 @@ slist_t *slist_reverse(slist_t *sl0);
 slist_t *slist_sort(slist_t *sl0, int (*cmp_func)(const void *, const void *));
 slist_t *slist_split(char del, char *text);
 char *slist_join(char *del, slist_t *str);
+char *slist_key(slist_t *sl, int index);
 
 char *util_attach_loop(char *file, int ro);
 int util_detach_loop(char *dev);

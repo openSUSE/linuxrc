@@ -14,7 +14,6 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, c
 void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup);
 void net_stop(void);
 int net_check_address(inet_t *inet, int do_dns);
-int net_setup_localhost(void);
 int net_activate_ns(void);
 int net_activate_s390_devs(void);
 int net_dhcp(void);
@@ -26,3 +25,4 @@ char *net_if2module(char *net_if);
 void net_apply_ethtool(char *device, char *hwaddr);
 int wlan_setup(void);
 char *net_dhcp_type(void);
+void net_write_initial_ifcfg(void);

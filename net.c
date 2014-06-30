@@ -89,8 +89,9 @@ static int net_dhcp4(void);
 static int net_dhcp6(void);
 
 static void net_ask_domain(void);
-static int write_ifcfg(void);
+static int write_ifcfg(char *device, slist_t *cfg);
 static char *inet2str(inet_t *inet, int type);
+static slist_t *ifcfg_split(char *ifcfg);
 
 
 /*
@@ -438,90 +439,6 @@ void net_stop()
 
 
 /*
- * Configure loopback interface.
- */
-int net_setup_localhost()
-{
-    char                address_ti [20];
-    struct in_addr      ipaddr_ri;
-    int                 socket_ii;
-    struct ifreq        interface_ri;
-    struct sockaddr_in  sockaddr_ri;
-    int                 error_ii = FALSE;
-
-    if(config.test) return 0;
-
-    fprintf (stderr, "Setting up localhost...");
-    fflush (stdout);
-
-    if(!util_check_exist("/etc/hosts")) system("echo 127.0.0.1 localhost >/etc/hosts");
-
-    socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
-    if (socket_ii == -1)
-        return (socket_ii);
-
-    memset (&interface_ri, 0, sizeof (struct ifreq));
-    strcpy (interface_ri.ifr_name, "lo");
-
-    sockaddr_ri.sin_family = AF_INET;
-    sockaddr_ri.sin_port = 0;
-    strcpy (address_ti, "127.0.0.1");
-    if (!inet_aton (address_ti, &ipaddr_ri))
-        error_ii = TRUE;
-    sockaddr_ri.sin_addr = ipaddr_ri;
-    memcpy (&interface_ri.ifr_addr, &sockaddr_ri, sizeof (sockaddr_ri));
-    if (ioctl (socket_ii, SIOCSIFADDR, &interface_ri) < 0)
-        {
-        HERE
-        error_ii = TRUE;
-        }
-
-    strcpy (address_ti, "255.0.0.0");
-    if (!inet_aton (address_ti, &ipaddr_ri))
-        error_ii = TRUE;
-    sockaddr_ri.sin_addr = ipaddr_ri;
-    memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
-    if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
-        if (config.net.netmask.ip.s_addr)
-            {
-            HERE
-            error_ii = TRUE;
-            }
-
-    strcpy (address_ti, "127.255.255.255");
-    if (!inet_aton (address_ti, &ipaddr_ri))
-        error_ii = TRUE;
-    sockaddr_ri.sin_addr = ipaddr_ri;
-    memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
-    if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
-        if (config.net.broadcast.ip.s_addr != 0xffffffff)
-            {
-            HERE
-            error_ii = TRUE;
-            }
-
-    if (ioctl (socket_ii, SIOCGIFFLAGS, &interface_ri) < 0)
-        {
-        HERE
-        error_ii = TRUE;
-        }
-
-    interface_ri.ifr_flags |= IFF_UP | IFF_RUNNING | IFF_LOOPBACK | IFF_BROADCAST;
-    if (ioctl (socket_ii, SIOCSIFFLAGS, &interface_ri) < 0)
-        {
-        HERE
-        error_ii = TRUE;
-        }
-
-    close (socket_ii);
-
-  fprintf (stderr, "%s\n", error_ii ? "failure" : "done");
-
-  return error_ii;
-}
-
-
-/*
  * Setup network interface and write name server config.
  *
  * Return:
@@ -554,7 +471,7 @@ int net_activate_ns()
 
   if(!err4 || !err6) {
     net_setup_nameserver();
-    if(!config.net.dhcp_active) write_ifcfg();
+    if(!config.net.dhcp_active) write_ifcfg(NULL, NULL);
   }
 
   // at least one should have worked
@@ -1908,7 +1825,7 @@ int net_wicked()
   char cmd[256], file[256];
   window_t win;
   int got_ip = 0, i, rc;
-  FILE *fp;
+  slist_t *cfg = NULL;
 
   if(config.net.dhcp_active || config.net.keep) return 0;
 
@@ -1928,12 +1845,9 @@ int net_wicked()
     fflush(stdout);
   }
 
-  snprintf(file, sizeof file, "/etc/sysconfig/network/ifcfg-%s", config.net.device);
-
-  fp = fopen(file, "w");
-  fprintf(fp, "BOOTPROTO='dhcp%s'\n", net_dhcp_type());
-  fprintf(fp, "STARTMODE='auto'\n");
-  fclose(fp);
+  cfg = slist_new();
+  strprintf(&cfg->key, "dhcp%s", net_dhcp_type());
+  write_ifcfg(config.net.device, cfg);
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
 
@@ -3094,110 +3008,254 @@ char *inet2str(inet_t *inet, int type)
 }
 
 
-int write_ifcfg()
+/*
+ * Write ifcfg/ifroute files for device.
+ *
+ * - cfg may be a dhcp or static config
+ * - if device or cfg are NULL use current data from global config
+ * - if global config is used we always create a ***static*** config
+ */
+int write_ifcfg(char *device, slist_t *cfg)
 {
   char *fname, *s;
   FILE *fp, *fp2;
+  char *gw = NULL;	// static
+  char *ns = NULL;	// allocated
+  char *domain = NULL;	// allocated
+  int global_values = 0;
+  int is_dhcp = 0;
+  slist_t *sl;
+  slist_t *sl_ifcfg = NULL;
+  slist_t *sl_ifroute = NULL;
 
   if(!config.wicked) return 0;
 
-  if(!config.net.device) return 0;
+  // use global values
+  if(!device || !cfg) global_values = 1;
 
-  if(!config.net.hostname.ok) return 0;
+  fprintf(stderr, "global = %d, cfg = %s\n", global_values, cfg ? cfg->key : "NULL");
 
-  // calculate prefix from netmask if missing
-  if(
-    config.net.hostname.ipv4 &&
-    !config.net.hostname.prefix4 &&
-    config.net.netmask.ok &&
-    config.net.netmask.ip.s_addr
-  ) {
-    int i = 1;
-    uint32_t u = ntohl(config.net.netmask.ip.s_addr);
+  if(global_values) {
+    device = config.net.device;
 
-    while(u <<= 1) i++;
+    if(!config.net.hostname.ok) return 0;
 
-    if(config.debug) fprintf(stderr, "netmask to prefix: %d\n", i);
+    // calculate prefix from netmask if missing
+    if(
+      config.net.hostname.ipv4 &&
+      !config.net.hostname.prefix4 &&
+      config.net.netmask.ok &&
+      config.net.netmask.ip.s_addr
+    ) {
+      int i = 1;
+      uint32_t u = ntohl(config.net.netmask.ip.s_addr);
 
-    config.net.hostname.prefix4 = i;
+      while(u <<= 1) i++;
+
+      if(config.debug) fprintf(stderr, "netmask to prefix: %d\n", i);
+
+      config.net.hostname.prefix4 = i;
+    }
   }
 
-  if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s", config.net.device) == -1) fname = NULL;
+  if(!device) return 0;
 
-  if((fp = fopen(fname, "w"))) {
-    fprintf(fp, "BOOTPROTO='static'\n");
-    fprintf(fp, "STARTMODE='auto'\n");
-
-    if((s = inet2str(&config.net.hostname, 4))) {
-      fprintf(fp, "IPADDR='%s/%u'\n", s, config.net.hostname.prefix4);
-    }
-
-    if((s = inet2str(&config.net.hostname, 6))) {
-      fprintf(fp, "IPADDR='%s/%u'\n", s, config.net.hostname.prefix6);
-    }
-
-    fclose(fp);
+  // 1. maybe dhcp config, but only if passed explicitly
+  if(!global_values && !strncmp(cfg->key, "dhcp", sizeof "dhcp" - 1)) {
+    sl = slist_append(&sl_ifcfg, slist_new());
+    strprintf(&sl->key, "BOOTPROTO='%s'", cfg->key);
+    is_dhcp = 1;
   }
 
-  free(fname);
+  // 2. create ifcfg entries
 
-  if(config.net.gateway.ok) {
-    if(asprintf(&fname, "/etc/sysconfig/network/ifroute-%s", config.net.device) == -1) fname = NULL;
+  if(!is_dhcp) slist_append_str(&sl_ifcfg, "BOOTPROTO='static'");
+  slist_append_str(&sl_ifcfg, "STARTMODE='auto'");
 
-    if((fp = fopen(fname, "w"))) {
-      if((s = inet2str(&config.net.gateway, 4))) {
-        fprintf(fp, "default %s - %s\n", s, config.net.device);
+  if(!is_dhcp) {
+    if(global_values) {
+      char *ip1 = NULL, *ip2 = NULL;
+
+      if((s = inet2str(&config.net.hostname, 4))) {
+        if(asprintf(&ip1, "%s/%u", s, config.net.hostname.prefix4) == -1) ip1 = NULL;
       }
 
-      if((s = inet2str(&config.net.gateway, 6))) {
-        fprintf(fp, "default %s - %s\n", s, config.net.device);
+      if((s = inet2str(&config.net.hostname, 6))) {
+        if(asprintf(&ip2, "%s/%u", s, config.net.hostname.prefix6) == -1) ip2 = NULL;
+      }
+
+      if(ip1 && ip2) {
+        sl = slist_append(&sl_ifcfg, slist_new());
+        strprintf(&sl->key, "IPADDR_1='%s'", ip1);
+        sl = slist_append(&sl_ifcfg, slist_new());
+        strprintf(&sl->key, "IPADDR_2='%s'", ip2);
+      }
+      else {
+        if(!ip1) {
+          ip1 = ip2;
+          ip2 = NULL;
+        }
+        sl = slist_append(&sl_ifcfg, slist_new());
+        strprintf(&sl->key, "IPADDR='%s'", ip1);
+      }
+
+      free(ip1);
+      free(ip2);
+
+      // net_apply_ethtool()
+      // ETHTOOL_OPTIONS
+    }
+    else {
+      int i;
+      slist_t *sl0, *sl1;
+      char *ip = cfg->key;
+
+      if((sl1 = cfg->next)) {
+        gw = sl1->key;
+        if((sl1 = sl1->next)) {
+          str_copy(&ns, sl1->key);
+          if((sl1 = sl1->next)) {
+            str_copy(&domain, sl1->key);
+            // extra stuff
+          }
+        }
+      }
+
+      sl0 = slist_split(' ', ip);
+
+      if(!sl0->next) {
+        sl = slist_append(&sl_ifcfg, slist_new());
+        strprintf(&sl->key, "IPADDR='%s'", sl0->key);
+      }
+      else {
+        for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
+          sl = slist_append(&sl_ifcfg, slist_new());
+          strprintf(&sl->key, "IPADDR_%d='%s'", ++i, sl1->key);
+        }
+      }
+    }
+  }
+
+  if(sl_ifcfg) {
+    if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s", device) == -1) fname = NULL;
+    fprintf(stderr, "creating ifcfg-%s:\n", device);
+    if(fname && (fp = fopen(fname, "w"))) {
+      for(sl = sl_ifcfg; sl; sl = sl->next) {
+        fprintf(fp, "%s\n", sl->key);
       }
 
       fclose(fp);
     }
 
+    for(sl = sl_ifcfg; sl; sl = sl->next) {
+      fprintf(stderr, "  %s\n", sl->key);
+    }
+
     free(fname);
   }
 
-  if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
-    if((fp2 = fopen("/etc/sysconfig/network/config.tmp", "w"))) {
-      char buf[1024];
-      unsigned u, first;
+  // 3. create ifroute entries
 
-      while(fgets(buf, sizeof buf, fp)) {
-        if(
-          !strncmp(buf, "NETCONFIG_DNS_STATIC_SEARCHLIST=", sizeof "NETCONFIG_DNS_STATIC_SEARCHLIST=" - 1) &&
-          config.net.domain
-        ) {
-          fprintf(fp2, "NETCONFIG_DNS_STATIC_SEARCHLIST=\"%s\"\n", config.net.domain);
+  if(!is_dhcp) {
+    if((global_values && config.net.gateway.ok) || gw) {
+      if(global_values) {
+        if((s = inet2str(&config.net.gateway, 4))) {
+          sl = slist_append(&sl_ifroute, slist_new());
+          strprintf(&sl->key, "default %s - %s", s, device);
         }
-        else if(
-          !strncmp(buf, "NETCONFIG_DNS_STATIC_SERVERS=", sizeof "NETCONFIG_DNS_STATIC_SERVERS=" - 1) &&
-          config.net.nameserver[0].ok
-        ) {
-          fprintf(fp2, "NETCONFIG_DNS_STATIC_SERVERS=\"");
-          for(u = 0, first = 1; u < config.net.nameservers; u++) {
-            if(config.net.nameserver[u].ok) {
-              fprintf(fp2, "%s%s", first ? "" : " ", config.net.nameserver[u].name);
-              first = 0;
-            }
-          }
-          fprintf(fp2, "\"\n");
-        }
-        else {
-          fputs(buf, fp2);
+
+        if((s = inet2str(&config.net.gateway, 6))) {
+          sl = slist_append(&sl_ifroute, slist_new());
+          strprintf(&sl->key, "default %s - %s", s, device);
         }
       }
-
-      fclose(fp2);
+      else {
+        sl = slist_append(&sl_ifroute, slist_new());
+        strprintf(&sl->key, "default %s - %s", gw, device);
+      }
     }
-
-    fclose(fp);
-
-    rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
   }
 
-  return 0;
+  if(sl_ifroute) {
+    if(asprintf(&fname, "/etc/sysconfig/network/ifroute-%s", device) == -1) fname = NULL;
+
+    fprintf(stderr, "creating ifroute-%s:\n", device);
+    if(fname && (fp = fopen(fname, "w"))) {
+      for(sl = sl_ifroute; sl; sl = sl->next) {
+        fprintf(fp, "%s\n", sl->key);
+      }
+
+      fclose(fp);
+    }
+
+    for(sl = sl_ifroute; sl; sl = sl->next) {
+      fprintf(stderr, "  %s\n", sl->key);
+    }
+
+    free(fname);
+  }
+
+  // 4. set nameserver and search list
+
+  if(!is_dhcp) {
+    if(global_values) {
+      str_copy(&domain, config.net.domain);
+      if(config.net.nameserver[0].ok) {
+        unsigned u, first;
+
+        for(u = 0, first = 1; u < config.net.nameservers; u++) {
+          if(config.net.nameserver[u].ok) {
+            strprintf(&ns, "%s%s%s", ns ?: "", first ? "" : " ", config.net.nameserver[u].name);
+            first = 0;
+          }
+        }
+      }
+    }
+
+    if(ns || domain) {
+      fprintf(stderr, "adjusting network/config:\n");
+      if(ns) fprintf(stderr, "  NETCONFIG_DNS_STATIC_SERVERS=\"%s\"\n", ns);
+      if(domain) fprintf(stderr, "  NETCONFIG_DNS_STATIC_SEARCHLIST=\"%s\"\n", domain);
+
+      if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
+        if((fp2 = fopen("/etc/sysconfig/network/config.tmp", "w"))) {
+          char buf[1024];
+
+          while(fgets(buf, sizeof buf, fp)) {
+            if(
+              domain &&
+              !strncmp(buf, "NETCONFIG_DNS_STATIC_SEARCHLIST=", sizeof "NETCONFIG_DNS_STATIC_SEARCHLIST=" - 1)
+            ) {
+              fprintf(fp2, "NETCONFIG_DNS_STATIC_SEARCHLIST=\"%s\"\n", domain);
+            }
+            else if(
+              ns &&
+              !strncmp(buf, "NETCONFIG_DNS_STATIC_SERVERS=", sizeof "NETCONFIG_DNS_STATIC_SERVERS=" - 1)
+            ) {
+              fprintf(fp2, "NETCONFIG_DNS_STATIC_SERVERS=\"%s\"\n", ns);
+            }
+            else {
+              fputs(buf, fp2);
+            }
+          }
+
+          fclose(fp2);
+        }
+
+        fclose(fp);
+
+        rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
+      }
+    }
+  }
+
+  str_copy(&ns, NULL);
+  str_copy(&domain, NULL);
+
+  slist_free(sl_ifcfg);
+  slist_free(sl_ifroute);
+
+  return 1;
 }
 
 
@@ -3213,5 +3271,103 @@ char *net_dhcp_type()
   if(!config.net.ipv4 && config.net.ipv6) t[0] = '6';
 
   return t;
+}
+
+
+/*
+ *
+ */
+#if 0
+ifcfg=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
+ifcfg=dhcp
+ifcfg=eth*=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
+ifcfg=eth*=dhcp
+#endif
+void net_write_initial_ifcfg()
+{
+  slist_t *sl, *sl1;
+  int matched;
+  hd_t *net_list, *hd;
+  hd_res_t *res;
+  char *device, *hwaddr, *type;
+
+  // this file always exists
+  slist_append_str(&config.ifcfg.initial, "lo");
+
+  if(!config.ifcfg.list) return;
+
+  update_device_list(0);
+  net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
+
+  for(hd = net_list; hd; hd = hd->next) {
+    for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+      if(res->any.type == res_hwaddr) {
+        hwaddr = res->hwaddr.addr;
+        break;
+      }
+    }
+
+    for(sl = config.ifcfg.list; sl; sl = sl->next) {
+      if(sl->value) continue;		// already used
+      sl1 = ifcfg_split(sl->key);
+      device = slist_key(sl1, 0);
+      type = slist_key(sl1, 1);
+      if(!type) continue;
+      matched = 0;
+      if(device && *device) {
+        matched = match_netdevice(hd->unix_dev_name, hwaddr, device);
+      }
+
+      if(matched) {
+        // static config may be used only once
+        if(!type || strncmp(type, "dhcp", sizeof "dhcp" - 1)) sl->value = strdup("");
+
+        if(write_ifcfg(hd->unix_dev_name, sl1->next)) {
+          slist_append_str(&config.ifcfg.initial, hd->unix_dev_name);
+          printf("%s: network config created\n", hd->unix_dev_name);
+        }
+        else {
+          printf("%s: failed to create network config\n", hd->unix_dev_name);
+        }
+      }
+
+      slist_free(sl1);
+    }
+  }
+
+  hd_free_hd_list(net_list);
+}
+
+
+slist_t *ifcfg_split(char *ifcfg)
+{
+  slist_t *sl, *sl0;
+
+  if(!ifcfg) return NULL;
+
+  // fprintf(stderr, "ifcfg split: %s\n", ifcfg);
+
+  sl0 = slist_new();
+  sl0->next = sl = slist_split(',', ifcfg);
+
+  if(sl) {
+    char *t;
+    if((t = strchr(sl->key, '='))) {
+      *t++ = 0;
+      sl0->key = sl->key;
+      sl->key = strdup(t);
+    }
+    else {
+      sl0->key = strdup("");
+    }
+  }
+
+#if 0
+  for(sl = sl0; sl; sl = sl->next) {
+    fprintf(stderr, "  >%s<<\n", sl->key);
+  }
+#endif
+
+  return sl0;
 }
 

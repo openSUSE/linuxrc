@@ -1098,7 +1098,9 @@ void lxrc_init()
     }
   }
 
-  net_setup_localhost();
+  net_write_initial_ifcfg();
+
+  util_run_script("network_setup");
 
   if(config.manual) file_read_info_file("cmdline", kf_cmd);
 

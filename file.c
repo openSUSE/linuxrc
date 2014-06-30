@@ -308,6 +308,7 @@ static struct {
   { key_wicked,         "Wicked",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
   { key_upgrade,        "Upgrade",        kf_cfg + kf_cmd                },
+  { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1646,6 +1647,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_upgrade:
         if(f->is.numeric) config.upgrade = f->nvalue;
+        break;
+
+      case key_ifcfg:
+        if(*f->value) slist_append_str(&config.ifcfg.list, f->value);
         break;
 
       default:

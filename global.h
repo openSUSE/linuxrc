@@ -625,6 +625,12 @@ typedef struct {
     } wlan;
   } net;
 
+  struct {
+    slist_t *list;		/* list of ifcfg options */
+    slist_t *initial;		/* list of initially setup network interfaces */
+  } ifcfg;
+
+
 #if defined(__s390__) || defined(__s390x__)
   /* hwcfg file parameters */
   struct {

@@ -2267,6 +2267,19 @@ char *slist_join(char *del, slist_t *str)
 
 
 /*
+ * return index-th key
+ */
+char *slist_key(slist_t *sl, int index)
+{
+  while(sl && index-- > 0) {
+    sl = sl->next;
+  }
+
+  return sl ? sl->key : NULL;
+}
+
+
+/*
  * Clear 'inet' und add 'name' to it.
  *
  * 'inet' is unchanged if 'name' is NULL.
@@ -3803,7 +3816,7 @@ void update_device_list(int force)
 
   if(!config.hd_data) force = 1;
 
-  if(stat("/dev/.udev/uevent_seqnum", &sbuf)) {
+  if(stat("/run/udev/queue.bin", &sbuf)) {
     force = 1;
   }
   else if(last_time != sbuf.st_mtime) {
