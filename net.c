@@ -1388,12 +1388,14 @@ int net_choose_device()
   }
 #if defined(__s390__) || defined(__s390x__)
   else {
-    char path[PATH_MAX]="";
-    char *type;
-    sprintf(path, "/sys/class/net/%s/device/layer2", item_devs[choice - 1]);
-    type = util_get_attr(path);
-    if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=1; }
-    else {config.hwp.layer2=0;}
+    if(choice > 0) {
+      char path[PATH_MAX]="";
+      char *type;
+      sprintf(path, "/sys/class/net/%s/device/layer2", item_devs[choice - 1]);
+      type = util_get_attr(path);
+      if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=1; }
+      else {config.hwp.layer2=0;}
+    }
   }
 #endif
 
