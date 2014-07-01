@@ -879,15 +879,14 @@ void lxrc_init()
     system("/sbin/insmod /modules/edd.ko 2>/dev/null");
   }
 
-  if(!config.test) {
-    fprintf(stderr, "Starting udev... ");
-    fflush(stderr);
-    system("/bin/myudevstart >/dev/null 2>&1");
-    fprintf(stderr, "ok\n");
-    unlink("/devz");	/* cf. util_mkdevs() */
-  }
-
   util_set_stderr(config.stderr_name);
+
+  if(!config.test) {
+    printf("Starting udev... ");
+    fflush(stdout);
+    util_run_script("udev_setup");
+    printf("ok\n");
+  }
 
   if(config.had_segv) config.manual = 1;
 
