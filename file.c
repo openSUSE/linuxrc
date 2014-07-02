@@ -1650,7 +1650,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_ifcfg:
-        if(*f->value) slist_append_str(&config.ifcfg.list, f->value);
+        if(*f->value) ifcfg_append(&config.ifcfg.list, ifcfg_parse(f->value));
         break;
 
       default:

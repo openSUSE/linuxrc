@@ -269,6 +269,20 @@ typedef struct {
   } used;
 } url_t;
 
+typedef struct ifcfg_s {
+  struct ifcfg_s *next;
+  char *device;		// interface name or shell glob matching interface names
+  char *type;		// dhcp{,4,6} or static
+  unsigned dhcp:1;	// use dhcp
+  unsigned used:1;	// config has been used
+  char *vlan;		// vlan id, if any
+  char *ip;		// list of ip addresses, space separated
+  char *gw;		// gateway
+  char *ns;		// nameserver list, space separated
+  char *domain;		// domain search list
+  slist_t *flags;	// extra settings for ifcfg, key=value
+} ifcfg_t;
+
 
 /* > 100 and <= 1000 */
 #define MAX_UPDATES		1000
@@ -626,8 +640,8 @@ typedef struct {
   } net;
 
   struct {
-    slist_t *list;		/* list of ifcfg options */
-    slist_t *initial;		/* list of initially setup network interfaces */
+    ifcfg_t *list;		/* list of ifcfg entries */
+    slist_t *initial;		/* list of initially set up network interfaces */
   } ifcfg;
 
 

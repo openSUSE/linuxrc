@@ -26,3 +26,5 @@ void net_apply_ethtool(char *device, char *hwaddr);
 int wlan_setup(void);
 char *net_dhcp_type(void);
 void net_write_initial_ifcfg(void);
+ifcfg_t *ifcfg_parse(char *str);
+ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p);

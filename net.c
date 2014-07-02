@@ -89,9 +89,8 @@ static int net_dhcp4(void);
 static int net_dhcp6(void);
 
 static void net_ask_domain(void);
-static int write_ifcfg(char *device, slist_t *cfg);
+static int ifcfg_write(char *device, ifcfg_t *ifcfg);
 static char *inet2str(inet_t *inet, int type);
-static slist_t *ifcfg_split(char *ifcfg);
 
 
 /*
@@ -471,7 +470,7 @@ int net_activate_ns()
 
   if(!err4 || !err6) {
     net_setup_nameserver();
-    if(!config.net.dhcp_active) write_ifcfg(NULL, NULL);
+    if(!config.net.dhcp_active) ifcfg_write(NULL, NULL);
   }
 
   // at least one should have worked
@@ -1827,7 +1826,7 @@ int net_wicked()
   char cmd[256], file[256];
   window_t win;
   int got_ip = 0, i, rc;
-  slist_t *cfg = NULL;
+  ifcfg_t *ifcfg = NULL;
 
   if(config.net.dhcp_active || config.net.keep) return 0;
 
@@ -1847,9 +1846,14 @@ int net_wicked()
     fflush(stdout);
   }
 
-  cfg = slist_new();
-  strprintf(&cfg->key, "dhcp%s", net_dhcp_type());
-  write_ifcfg(config.net.device, cfg);
+  ifcfg = calloc(1, sizeof *ifcfg);
+  ifcfg->dhcp = 1;
+  strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
+  ifcfg_write(config.net.device, ifcfg);
+
+  free(ifcfg->type);
+  free(ifcfg);
+  ifcfg = NULL;
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
 
@@ -3011,19 +3015,91 @@ char *inet2str(inet_t *inet, int type)
 
 
 /*
+ * Return currently active dhcp type ("4", "6", or "" (= both)).
+ */
+char *net_dhcp_type()
+{
+  static char t[2] = "4";
+
+  t[0] = 0;
+  if(config.net.ipv4 && !config.net.ipv6) t[0] = '4';
+  if(!config.net.ipv4 && config.net.ipv6) t[0] = '6';
+
+  return t;
+}
+
+
+/*
+ *
+ */
+#if 0
+ifcfg=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
+ifcfg=dhcp
+ifcfg=eth*=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
+ifcfg=eth*=dhcp
+#endif
+void net_write_initial_ifcfg()
+{
+  int matched;
+  hd_t *net_list, *hd;
+  hd_res_t *res;
+  char *hwaddr;
+  ifcfg_t *ifcfg;
+
+  // this file always exists
+  slist_append_str(&config.ifcfg.initial, "lo");
+
+  if(!config.ifcfg.list) return;
+
+  update_device_list(0);
+  net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
+
+  for(hd = net_list; hd; hd = hd->next) {
+    for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+      if(res->any.type == res_hwaddr) {
+        hwaddr = res->hwaddr.addr;
+        break;
+      }
+    }
+
+    for(ifcfg = config.ifcfg.list; ifcfg; ifcfg = ifcfg->next) {
+      // static config may be used only once
+      if(ifcfg->used && !ifcfg->dhcp) continue;
+      matched = ifcfg->device ? match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device) : 0;
+
+      if(matched) {
+        ifcfg->used = 1;
+
+        if(ifcfg_write(hd->unix_dev_name, ifcfg)) {
+          slist_append_str(&config.ifcfg.initial, hd->unix_dev_name);
+          printf("%s: network config created\n", hd->unix_dev_name);
+        }
+        else {
+          printf("%s: failed to create network config\n", hd->unix_dev_name);
+        }
+      }
+    }
+  }
+
+  hd_free_hd_list(net_list);
+}
+
+
+/*
  * Write ifcfg/ifroute files for device.
  *
- * - cfg may be a dhcp or static config
- * - if device or cfg are NULL use current data from global config
+ * - may be a dhcp or static config
+ * - if device or ifcfg are NULL use current data from global config
  * - if global config is used we always create a ***static*** config
  */
-int write_ifcfg(char *device, slist_t *cfg)
+int ifcfg_write(char *device, ifcfg_t *ifcfg)
 {
   char *fname, *s;
   FILE *fp, *fp2;
-  char *gw = NULL;	// static
+  char *gw = NULL;	// allocated
   char *ns = NULL;	// allocated
   char *domain = NULL;	// allocated
+  char *vlan = NULL;	// allocated
   int global_values = 0;
   int is_dhcp = 0;
   slist_t *sl;
@@ -3033,9 +3109,9 @@ int write_ifcfg(char *device, slist_t *cfg)
   if(!config.wicked) return 0;
 
   // use global values
-  if(!device || !cfg) global_values = 1;
+  if(!device || !ifcfg) global_values = 1;
 
-  fprintf(stderr, "global = %d, cfg = %s\n", global_values, cfg ? cfg->key : "NULL");
+  fprintf(stderr, "ifcfg_write: device = %s, global = %d, ifcfg = %s\n", device, global_values, ifcfg ? ifcfg->device : "");
 
   if(global_values) {
     device = config.net.device;
@@ -3063,16 +3139,28 @@ int write_ifcfg(char *device, slist_t *cfg)
   if(!device) return 0;
 
   // 1. maybe dhcp config, but only if passed explicitly
-  if(!global_values && !strncmp(cfg->key, "dhcp", sizeof "dhcp" - 1)) {
-    sl = slist_append(&sl_ifcfg, slist_new());
-    strprintf(&sl->key, "BOOTPROTO='%s'", cfg->key);
+
+  if(!global_values && ifcfg->dhcp) {
     is_dhcp = 1;
+
+    sl = slist_append_str(&sl_ifcfg, "BOOTPROTO");
+    str_copy(&sl->value, ifcfg->type);
+    if(ifcfg->vlan) {
+      strprintf(&vlan, ".%s", ifcfg->vlan);
+      sl = slist_append_str(&sl_ifcfg, "ETHERDEVICE");
+      str_copy(&sl->value, device);
+    }
   }
 
   // 2. create ifcfg entries
 
-  if(!is_dhcp) slist_append_str(&sl_ifcfg, "BOOTPROTO='static'");
-  slist_append_str(&sl_ifcfg, "STARTMODE='auto'");
+  if(!is_dhcp) {
+    sl = slist_append_str(&sl_ifcfg, "BOOTPROTO");
+    str_copy(&sl->value, "static");
+  }
+
+  sl = slist_append_str(&sl_ifcfg, "STARTMODE");
+  str_copy(&sl->value, "auto");
 
   if(!is_dhcp) {
     if(global_values) {
@@ -3087,18 +3175,18 @@ int write_ifcfg(char *device, slist_t *cfg)
       }
 
       if(ip1 && ip2) {
-        sl = slist_append(&sl_ifcfg, slist_new());
-        strprintf(&sl->key, "IPADDR_1='%s'", ip1);
-        sl = slist_append(&sl_ifcfg, slist_new());
-        strprintf(&sl->key, "IPADDR_2='%s'", ip2);
+        sl = slist_append_str(&sl_ifcfg, "IPADDR_1");
+        str_copy(&sl->value, ip1);
+        sl = slist_append_str(&sl_ifcfg, "IPADDR_2");
+        str_copy(&sl->value, ip2);
       }
       else {
         if(!ip1) {
           ip1 = ip2;
           ip2 = NULL;
         }
-        sl = slist_append(&sl_ifcfg, slist_new());
-        strprintf(&sl->key, "IPADDR='%s'", ip1);
+        sl = slist_append_str(&sl_ifcfg, "IPADDR");
+        str_copy(&sl->value, ip1);
       }
 
       free(ip1);
@@ -3110,47 +3198,51 @@ int write_ifcfg(char *device, slist_t *cfg)
     else {
       int i;
       slist_t *sl0, *sl1;
-      char *ip = cfg->key;
 
-      if((sl1 = cfg->next)) {
-        gw = sl1->key;
-        if((sl1 = sl1->next)) {
-          str_copy(&ns, sl1->key);
-          if((sl1 = sl1->next)) {
-            str_copy(&domain, sl1->key);
-            // extra stuff
-          }
-        }
+      str_copy(&gw, ifcfg->gw);
+      str_copy(&ns, ifcfg->ns);
+      str_copy(&domain, ifcfg->domain);
+      if(ifcfg->vlan) {
+        strprintf(&vlan, ".%s", ifcfg->vlan);
+        sl = slist_append_str(&sl_ifcfg, "ETHERDEVICE");
+        str_copy(&sl->value, device);
       }
 
-      sl0 = slist_split(' ', ip);
+      sl0 = slist_split(' ', ifcfg->ip);
 
       if(!sl0->next) {
-        sl = slist_append(&sl_ifcfg, slist_new());
-        strprintf(&sl->key, "IPADDR='%s'", sl0->key);
+        sl = slist_append_str(&sl_ifcfg, "IPADDR");
+        str_copy(&sl->value, sl0->key);
       }
       else {
         for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
           sl = slist_append(&sl_ifcfg, slist_new());
-          strprintf(&sl->key, "IPADDR_%d='%s'", ++i, sl1->key);
+          strprintf(&sl->key, "IPADDR_%d", ++i);
+          str_copy(&sl->value, sl1->key);
         }
+      }
+
+      for (sl = ifcfg->flags; sl; sl = sl->next) {
+        if(!(sl1 = slist_getentry(sl_ifcfg, sl->key))) sl1 = slist_append(&sl_ifcfg, slist_new());
+        str_copy(&sl1->key, sl->key);
+        str_copy(&sl1->value, sl->value);
       }
     }
   }
 
   if(sl_ifcfg) {
-    if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s", device) == -1) fname = NULL;
-    fprintf(stderr, "creating ifcfg-%s:\n", device);
+    if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s%s", device, vlan ?: "") == -1) fname = NULL;
+    fprintf(stderr, "creating ifcfg-%s%s:\n", device, vlan ?: "");
     if(fname && (fp = fopen(fname, "w"))) {
       for(sl = sl_ifcfg; sl; sl = sl->next) {
-        fprintf(fp, "%s\n", sl->key);
+        fprintf(fp, "%s='%s'\n", sl->key, sl->value);
       }
 
       fclose(fp);
     }
 
     for(sl = sl_ifcfg; sl; sl = sl->next) {
-      fprintf(stderr, "  %s\n", sl->key);
+      fprintf(stderr, "  %s='%s'\n", sl->key, sl->value);
     }
 
     free(fname);
@@ -3179,9 +3271,9 @@ int write_ifcfg(char *device, slist_t *cfg)
   }
 
   if(sl_ifroute) {
-    if(asprintf(&fname, "/etc/sysconfig/network/ifroute-%s", device) == -1) fname = NULL;
+    if(asprintf(&fname, "/etc/sysconfig/network/ifroute-%s%s", device, vlan ?: "") == -1) fname = NULL;
 
-    fprintf(stderr, "creating ifroute-%s:\n", device);
+    fprintf(stderr, "creating ifroute-%s%s:\n", device, vlan ?: "");
     if(fname && (fp = fopen(fname, "w"))) {
       for(sl = sl_ifroute; sl; sl = sl->next) {
         fprintf(fp, "%s\n", sl->key);
@@ -3251,8 +3343,10 @@ int write_ifcfg(char *device, slist_t *cfg)
     }
   }
 
+  str_copy(&gw, NULL);
   str_copy(&ns, NULL);
   str_copy(&domain, NULL);
+  str_copy(&vlan, NULL);
 
   slist_free(sl_ifcfg);
   slist_free(sl_ifroute);
@@ -3261,96 +3355,20 @@ int write_ifcfg(char *device, slist_t *cfg)
 }
 
 
-/*
- * Return currently active dhcp type ("4", "6", or "" (= both)).
- */
-char *net_dhcp_type()
+ifcfg_t *ifcfg_parse(char *str)
 {
-  static char t[2] = "4";
+  slist_t *sl, *sl0, *slx;
+  ifcfg_t *ifcfg;
+  char *s, *t;
 
-  t[0] = 0;
-  if(config.net.ipv4 && !config.net.ipv6) t[0] = '4';
-  if(!config.net.ipv4 && config.net.ipv6) t[0] = '6';
+  if(!str) return NULL;
 
-  return t;
-}
+  if(config.debug) fprintf(stderr, "ifcfg parsed: %s\n", str);
 
-
-/*
- *
- */
-#if 0
-ifcfg=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
-ifcfg=dhcp
-ifcfg=eth*=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
-ifcfg=eth*=dhcp
-#endif
-void net_write_initial_ifcfg()
-{
-  slist_t *sl, *sl1;
-  int matched;
-  hd_t *net_list, *hd;
-  hd_res_t *res;
-  char *device, *hwaddr, *type;
-
-  // this file always exists
-  slist_append_str(&config.ifcfg.initial, "lo");
-
-  if(!config.ifcfg.list) return;
-
-  update_device_list(0);
-  net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
-
-  for(hd = net_list; hd; hd = hd->next) {
-    for(hwaddr = NULL, res = hd->res; res; res = res->next) {
-      if(res->any.type == res_hwaddr) {
-        hwaddr = res->hwaddr.addr;
-        break;
-      }
-    }
-
-    for(sl = config.ifcfg.list; sl; sl = sl->next) {
-      if(sl->value) continue;		// already used
-      sl1 = ifcfg_split(sl->key);
-      device = slist_key(sl1, 0);
-      type = slist_key(sl1, 1);
-      if(!type) continue;
-      matched = 0;
-      if(device && *device) {
-        matched = match_netdevice(hd->unix_dev_name, hwaddr, device);
-      }
-
-      if(matched) {
-        // static config may be used only once
-        if(!type || strncmp(type, "dhcp", sizeof "dhcp" - 1)) sl->value = strdup("");
-
-        if(write_ifcfg(hd->unix_dev_name, sl1->next)) {
-          slist_append_str(&config.ifcfg.initial, hd->unix_dev_name);
-          printf("%s: network config created\n", hd->unix_dev_name);
-        }
-        else {
-          printf("%s: failed to create network config\n", hd->unix_dev_name);
-        }
-      }
-
-      slist_free(sl1);
-    }
-  }
-
-  hd_free_hd_list(net_list);
-}
-
-
-slist_t *ifcfg_split(char *ifcfg)
-{
-  slist_t *sl, *sl0;
-
-  if(!ifcfg) return NULL;
-
-  // fprintf(stderr, "ifcfg split: %s\n", ifcfg);
+  ifcfg = calloc(1, sizeof *ifcfg);
 
   sl0 = slist_new();
-  sl0->next = sl = slist_split(',', ifcfg);
+  sl0->next = sl = slist_split(',', str);
 
   if(sl) {
     char *t;
@@ -3364,12 +3382,72 @@ slist_t *ifcfg_split(char *ifcfg)
     }
   }
 
-#if 0
-  for(sl = sl0; sl; sl = sl->next) {
-    fprintf(stderr, "  >%s<<\n", sl->key);
+  s = slist_key(sl0, 0);
+  if(s && *s) {
+    if((t = strrchr(s, '.'))) {
+      char *t2;
+      *t++ = 0;
+      strtol(t, &t2, 10);
+      // valid number?
+      if(*t && *t2 == 0) str_copy(&ifcfg->vlan, t);
+    }
+    str_copy(&ifcfg->device, s);
   }
-#endif
 
-  return sl0;
+  s = slist_key(sl0, 1);
+  if(s && !strncmp(s, "dhcp", sizeof "dhcp" - 1)) {
+    str_copy(&ifcfg->type, s);
+    ifcfg->dhcp = 1;
+  }
+  else {
+    str_copy(&ifcfg->type, "static");
+
+    t = NULL;
+
+    if(s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ip, s);
+
+    s = slist_key(sl0, 2);
+    if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->gw, s);
+
+    s = slist_key(sl0, 3);
+    if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ns, s);
+
+    s = slist_key(sl0, 4);
+    if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->domain, s);
+  }
+
+  for(sl = sl0->next; sl; sl = sl->next) {
+    if((t = strchr(sl->key, '='))) {
+      *t++ = 0;
+      slx = slist_append(&ifcfg->flags, slist_new());
+      str_copy(&slx->key, sl->key);
+      str_copy(&slx->value, t);
+    }
+  }
+
+  slist_free(sl0);
+
+  if(config.debug) {
+    fprintf(stderr, "  device = %s\n", ifcfg->device);
+    if(ifcfg->vlan) fprintf(stderr, "  vlan = %s\n", ifcfg->vlan);
+    if(ifcfg->type) fprintf(stderr, "  type = %s\n", ifcfg->type);
+    fprintf(stderr, "  dhcp = %u\n", ifcfg->dhcp);
+    if(ifcfg->ip) fprintf(stderr, "  ip = %s\n", ifcfg->ip);
+    if(ifcfg->gw) fprintf(stderr, "  gw = %s\n", ifcfg->gw);
+    if(ifcfg->ns) fprintf(stderr, "  ns = %s\n", ifcfg->ns);
+    if(ifcfg->domain) fprintf(stderr, "  domain = %s\n", ifcfg->domain);
+    for (sl = ifcfg->flags; sl; sl = sl->next) {
+      fprintf(stderr, "  %s = \"%s\"\n", sl->key, sl->value);
+    }
+  }
+
+  return ifcfg;
+}
+
+
+ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p)
+{
+  for(; *p0; p0 = &(*p0)->next);
+  return *p0 = p;
 }
 
