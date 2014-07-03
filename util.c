@@ -4187,9 +4187,13 @@ int fcoe_check()
   const char *sysfs_edd = "/sys/firmware/edd";
   unsigned char raw[64];
 
-  if(!(d = opendir(sysfs_edd))) return fcoe_ok;
+  if(!(d = opendir(sysfs_edd))) {
+    if(config.debug) fprintf(stderr, "fcoe_check: no edd\n");
+    return fcoe_ok;
+  }
 
   while((de = readdir(d))) {
+    if(config.debug) fprintf(stderr, "checking %s\n", de->d_name);
     asprintf(&attr, "%s/%s/raw_data", sysfs_edd, de->d_name);
     fd = open(attr, O_RDONLY);
     if(fd >= 0) {

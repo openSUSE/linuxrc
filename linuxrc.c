@@ -979,6 +979,7 @@ void lxrc_init()
   if(util_check_exist("/sys/firmware/efi/vars") == 'd') {
     config.efi_vars = 1;
   }
+  if(config.debug) fprintf(stderr, "efi = %d\n", config.efi_vars);
 
   if(iscsi_check()) config.withiscsi = 1;
   if(fcoe_check()) config.withfcoe = 1;
