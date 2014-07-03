@@ -24,6 +24,7 @@
 #include <inttypes.h>
 #include <ctype.h>
 #include <errno.h>
+#include <time.h>
 
 #include <hd.h>
 
@@ -880,6 +881,13 @@ void lxrc_init()
   }
 
   util_set_stderr(config.stderr_name);
+
+  time_t t = time(NULL);
+  struct tm *gm = gmtime(&t);
+  if(gm) fprintf(
+    stderr, "\n===  linuxrc " LXRC_FULL_VERSION " - %04d-%02d-%02d %02d:%02d:%02d  ===\n",
+    gm->tm_year + 1900, gm->tm_mon + 1, gm->tm_mday, gm->tm_hour, gm->tm_min, gm->tm_sec
+  );
 
   if(!config.test) {
     printf("Starting udev... ");
