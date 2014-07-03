@@ -214,7 +214,7 @@ int net_config()
     if(
       config.net.setup & NS_DHCP &&
 #if defined(__s390__) || defined(__s390x__)
-      config.hwp.layer2 &&
+      config.hwp.layer2 - 1 &&
 #endif
       !config.net.ptp
     ) {
@@ -1392,8 +1392,8 @@ int net_choose_device()
       char *type;
       sprintf(path, "/sys/class/net/%s/device/layer2", item_devs[choice - 1]);
       type = util_get_attr(path);
-      if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=1; }
-      else {config.hwp.layer2=0;}
+      if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=2; }
+      else {config.hwp.layer2=1;}
     }
   }
 #endif
@@ -2540,9 +2540,9 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       
       IFNOTAUTO(config.hwp.layer2)
       {
-        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 1 : 0;
+        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 2 : 1;
       }
-      if(config.hwp.layer2 == 1) {
+      if(config.hwp.layer2 == 2) {
         IFNOTAUTO(config.hwp.osahwaddr) {
           dia_input2("MAC address", &config.hwp.osahwaddr, 17, 1);
         }
@@ -2608,7 +2608,7 @@ setup_ctc:
         config.hwp.portname ? "-p \"" : "",
         config.hwp.portname ? config.hwp.portname : "",
         config.hwp.portname ? "\"" : "",
-        config.hwp.layer2 == 1 ? "-l" : "",
+        config.hwp.layer2 == 2 ? "-l" : "",
         config.hwp.readchan,
         config.hwp.writechan,
         config.hwp.datachan);

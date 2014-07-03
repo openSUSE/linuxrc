@@ -1190,15 +1190,30 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_datachan:
         if(*f->value) str_copy(&config.hwp.datachan, f->value);
         break;
+/*
+ * The protocol attribute for CTCs is handled specially. We use IFNOTAUTO later
+ * on in net.c, which equates a value of 0 to "not specified". So protocol must be
+ * non-zero for even the "compatability" case where "protocol=0" in the parmfile.
+ */
       case key_ctcprotocol:
         if(f->is.numeric) config.hwp.protocol = f->nvalue + 1;
         break;        
       case key_osainterface:
         if(*f->value) config.hwp.interface=file_sym2num(f->value);
         break;
+/*
+ * The layer2 attribute is handled specially. We use IFNOTAUTO later on in net.c,
+ * which equates a value of 0 to "not specified". So layer2 must be non-zero
+ * for both the layer 2 and layer 3 cases.
+ */
       case key_layer2:
-        if(f->is.numeric) config.hwp.layer2 = f->nvalue;
+        if(f->is.numeric) config.hwp.layer2 = f->nvalue + 1;
         break;
+/*
+ * The portno attribute is handled specially. We use IFNOTAUTO later on in net.c,
+ * which equates a value of 0 to "not specified". So portno must be non-zero
+ * for both the port 0 and port 1 cases.
+ */
       case key_portno:
         if(f->is.numeric) config.hwp.portno = f->nvalue + 1;
         else config.hwp.portno = 1;
@@ -1871,7 +1886,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_netcardname, config.net.cardname);
 #if defined(__s390__) || defined(__s390x__)
     if(config.hwp.osahwaddr) file_write_str(f, key_osahwaddr, config.hwp.osahwaddr);
-    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2);
+    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2 - 1);
 #endif
     file_write_str(f, key_ethtool, config.net.ethtool_used);
     file_write_inet2(f, key_ip, &config.net.hostname, INET_WRITE_IP_BOTH + INET_WRITE_PREFIX);
