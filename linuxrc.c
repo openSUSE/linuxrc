@@ -834,7 +834,27 @@ void lxrc_init()
   config.initrd_has_ldso = 1;
 #endif
 
+  // read config from initrd:
+  //   - /linuxrc.config
+  //   - /etc/linuxrc.d/*
   file_read_info_file("file:/linuxrc.config", kf_cfg);
+  DIR *d;
+  if((d = opendir("/etc/linuxrc.d"))) {
+    struct dirent *de;
+    slist_t *sl0 = NULL, *sl;
+    while((de = readdir(d))) {
+      if(util_check_exist2("/etc/linuxrc.d", de->d_name) == 'r') {
+        sl = slist_append(&sl0, slist_new());
+        strprintf(&sl->key, "file:/etc/linuxrc.d/%s", de->d_name);
+      }
+    }
+    closedir(d);
+    sl0 = slist_sort(sl0, cmp_entry_s);
+    for (sl = sl0; sl; sl = sl->next) {
+      file_read_info_file(sl->key, kf_cfg);
+    }
+    slist_free(sl0);
+  }
 
   if(!config.had_segv) {
     if (config.linemode)
