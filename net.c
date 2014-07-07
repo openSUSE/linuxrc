@@ -1791,7 +1791,7 @@ int net_dhcp()
  */
 int net_wicked_dhcp()
 {
-  char cmd[256], file[256];
+  char file[256], *buf = NULL;
   window_t win;
   int got_ip = 0, i, rc;
   ifcfg_t *ifcfg = NULL;
@@ -1804,15 +1804,16 @@ int net_wicked_dhcp()
     return 0;
   }
 
-  snprintf(cmd, sizeof cmd, "Sending DHCP%s request to %s...", net_dhcp_type(), config.net.device);
+  strprintf(&buf, "Sending DHCP%s request to %s...", net_dhcp_type(), config.net.device);
   if(config.win) {
-    dia_info(&win, cmd, MSGTYPE_INFO);
+    dia_info(&win, buf, MSGTYPE_INFO);
   }
   else {
-    fprintf(stderr, "%s\n", cmd);
-    printf("%s\n", cmd);
+    fprintf(stderr, "%s\n", buf);
+    printf("%s\n", buf);
     fflush(stdout);
   }
+  str_copy(&buf, NULL);
 
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
@@ -1829,15 +1830,11 @@ int net_wicked_dhcp()
 
   if(config.net.ipv4) {
     snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", config.net.device);
-    unlink(file);
-    system(cmd);
     got_ip = parse_leaseinfo(file);
   }
 
   if(!got_ip && config.net.ipv6) {
     snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", config.net.device);
-    unlink(file);
-    system(cmd);
     got_ip = parse_leaseinfo(file);
   }
 
@@ -1869,18 +1866,20 @@ int net_wicked_dhcp()
   if(config.net.dhcp_active) {
     char *s;
 
-    snprintf(cmd, sizeof cmd, "ok");
+    str_copy(&buf, "ok");
 
     if((s = inet2str(&config.net.hostname, 4))) {
-      snprintf(cmd + strlen(cmd), sizeof cmd - strlen(cmd), ", ip = %s/%u", s, config.net.hostname.prefix4);
+      strprintf(&buf, "%s, ip = %s/%u", buf, s, config.net.hostname.prefix4);
     }
 
     if((s = inet2str(&config.net.hostname, 6))) {
-      snprintf(cmd + strlen(cmd), sizeof cmd - strlen(cmd), ", ip = %s/%u", s, config.net.hostname.prefix6);
+      strprintf(&buf, "%s, ip = %s/%u", buf, s, config.net.hostname.prefix6);
     }
 
-    fprintf(stderr, "%s\n", cmd);
-    printf("%s\n", cmd);
+    fprintf(stderr, "%s\n", buf);
+    printf("%s\n", buf);
+
+    str_copy(&buf, NULL);
   }
   else {
     fprintf(stderr, "no/incomplete answer.\n");
@@ -2755,6 +2754,11 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
   if(ifcfg) {
     ifcfg->used = 1;
     if(ifcfg->vlan) strprintf(&ifname, "%s.%s", device, ifcfg->vlan);
+  }
+
+  // FIXME: the next line is basically correct but shouldn't be here in this place
+  if(!ifname) {
+    str_copy(&ifname, config.net.device);
   }
 
   i = ifcfg_write(device, ifcfg);
