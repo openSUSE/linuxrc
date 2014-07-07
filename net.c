@@ -3177,7 +3177,8 @@ void net_update_state()
 
   config.ifcfg.if_up = slist_free(config.ifcfg.if_up);
   for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
-    if(!strcmp(sl->value, "up")) slist_append_str(&config.ifcfg.if_up, sl->key);
+    // interfaces != lo that are 'up'
+    if(strcmp(sl->key, "lo") && !strcmp(sl->value, "up")) slist_append_str(&config.ifcfg.if_up, sl->key);
   }
 
   if(config.debug) {
