@@ -510,7 +510,7 @@ void lxrc_end()
 int do_not_kill(char *name)
 {
   static char *progs[] = {
-    "portmap", "rpciod", "lockd", "dhcpcd", "cifsd", "mount.smbfs", "udevd",
+    "portmap", "rpciod", "lockd", "cifsd", "mount.smbfs", "udevd",
     "mount.ntfs-3g", "brld", "sbl", "wickedd", "wickedd-auto4", "wickedd-dhcp4",
     "wickedd-dhcp6", "dbus-daemon", "rpc.idmapd", "sh", "haveged"
   };
@@ -782,7 +782,6 @@ void lxrc_init()
   config.efi = -1;
   config.udev_mods = 1;
   config.devtmpfs = 1;
-  config.wicked = 1;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
@@ -1129,6 +1128,7 @@ void lxrc_init()
   net_write_initial_ifcfg();
 
   util_run_script("network_setup");
+  net_update_state();
 
   if(config.manual) file_read_info_file("cmdline", kf_cmd);
 

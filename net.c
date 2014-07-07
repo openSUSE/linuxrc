@@ -79,16 +79,14 @@ static int net_input_data(void);
 #endif
 static int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags);
 
-static void if_down(char *dev);
 static int wlan_auth_cb(dia_item_t di);
 
 static dia_item_t di_wlan_auth_last = di_none;
 static int parse_leaseinfo(char *file);
-static int net_wicked(void);
-static int net_dhcp4(void);
-static int net_dhcp6(void);
+static int net_wicked_dhcp(void);
 
 static void net_ask_domain(void);
+static int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial);
 static int ifcfg_write(char *device, ifcfg_t *ifcfg);
 static char *inet2str(inet_t *inet, int type);
 
@@ -191,8 +189,6 @@ int net_config()
   int rc = 0;
 #if NETWORK_CONFIG
   char buf[256];
-
-  if(config.net.keep) return 0;
 
   net_ask_password();
 
@@ -395,45 +391,31 @@ void net_config2_manual()
  */
 void net_stop()
 {
-  file_t *f0, *f;
-  slist_t *sl0 = NULL, *sl;
+  char *device = config.net.device;
 
-  if(config.debug) fprintf(stderr, "shutting network down\n");
+  if(config.ifcfg.current) device = config.ifcfg.current;
 
-  if(config.net.keep) return;
+  if(config.debug) fprintf(stderr, "%s: network down\n", device);
 
   if(config.test) {
     config.net.is_configured = nc_none;
     return;
   }
 
-  if(config.net.dhcp_active) {
-    net_dhcp_stop();
-    config.net.is_configured = nc_none;
-  }
-
-  // FIXME: for now, delete all ethernet config files
-  if(config.wicked) {
-    system("rm -f /etc/sysconfig/network/ifcfg-e*");
-    system("rm -f /etc/sysconfig/network/ifroute-e*");
-  }
-
-  if(!config.net.is_configured) return;
-
-  /* build list of configured interfaces */
-  slist_append_str(&sl0, config.net.device);
-
-  f0 = file_read_file("/proc/net/route", kf_none);
-  for(f = f0, f = f->next; f; f = f->next) {
-    if(f->key_str && !slist_getentry(sl0, f->key_str)) slist_append_str(&sl0, f->key_str);
-  }
-  file_free_file(f0);
-
-  for(sl = sl0; sl; sl = sl->next) if_down(sl->key);
-
-  slist_free(sl0);
-
+  net_wicked_down(device);
   config.net.is_configured = nc_none;
+
+  // delete current config
+  if(config.ifcfg.current) {
+    char *buf = NULL;
+    strprintf(&buf, "/etc/sysconfig/network/ifcfg-%s", config.ifcfg.current);
+    unlink(buf);
+    strprintf(&buf, "/etc/sysconfig/network/ifroute-%s", config.ifcfg.current);
+    unlink(buf);
+    str_copy(&buf, NULL);
+
+    str_copy(&config.ifcfg.current, NULL);
+  }
 }
 
 
@@ -457,8 +439,6 @@ int net_activate_ns()
   int err4 = 1, err6 = 1;
   char *s;
 
-  if(config.net.keep) return 0;
-
   /* make sure we get the interface name if a mac was passed */
   if((s = mac_to_interface(config.net.device, NULL))) {
     free(config.net.device);
@@ -470,7 +450,7 @@ int net_activate_ns()
 
   if(!err4 || !err6) {
     net_setup_nameserver();
-    if(!config.net.dhcp_active) ifcfg_write(NULL, NULL);
+    if(!config.net.dhcp_active) ifcfg_write2(NULL, NULL, 0);
   }
 
   // at least one should have worked
@@ -502,7 +482,7 @@ int net_activate4()
     char                command[1000];
     int                 rc;
 
-    if(!config.net.ifconfig || config.net.dhcp_active || config.net.keep) return 0;
+    if(!config.net.ifconfig || config.net.dhcp_active) return 0;
 
     if(config.test) {
       config.net.is_configured = nc_static;
@@ -710,7 +690,7 @@ int net_activate6()
   FILE *f;
   inet_t host6 = { };
 
-  if(!config.net.ifconfig || config.net.dhcp_active || config.net.keep) return 0;
+  if(!config.net.ifconfig || config.net.dhcp_active) return 0;
 
   if(config.test) {
     config.net.is_configured = nc_static;
@@ -1781,7 +1761,6 @@ int parse_leaseinfo(char *file)
  */
 int net_dhcp()
 {
-  unsigned active4, active = config.net.dhcp_active;
   char *s;
 
   /* make sure we get the interface name if a mac was passed */
@@ -1790,18 +1769,7 @@ int net_dhcp()
     config.net.device = s;
   }
 
-  if(config.wicked) {
-    net_wicked();
-  }
-  else {
-    if(config.net.ipv4) net_dhcp4();
-
-    active4 = config.net.dhcp_active;
-    config.net.dhcp_active = active;
-
-    if(config.net.ipv6) net_dhcp6();
-    config.net.dhcp_active |= active4;
-  }
+  net_wicked_dhcp();
 
   return config.net.dhcp_active ? 0 : 1;
 }
@@ -1821,14 +1789,14 @@ int net_dhcp()
  *  config.net.nisdomain
  *  config.net.nameserver
  */
-int net_wicked()
+int net_wicked_dhcp()
 {
   char cmd[256], file[256];
   window_t win;
   int got_ip = 0, i, rc;
   ifcfg_t *ifcfg = NULL;
 
-  if(config.net.dhcp_active || config.net.keep) return 0;
+  if(config.net.dhcp_active) return 0;
 
   if(config.test) {
     config.net.dhcp_active = 1;
@@ -1849,7 +1817,7 @@ int net_wicked()
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
   strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
-  ifcfg_write(config.net.device, ifcfg);
+  ifcfg_write2(config.net.device, ifcfg, 0);
 
   free(ifcfg->type);
   free(ifcfg);
@@ -1857,12 +1825,7 @@ int net_wicked()
 
   net_apply_ethtool(config.net.device, config.net.hwaddr);
 
-  if(config.net.dhcp_timeout_set) {
-    snprintf(cmd, sizeof cmd, "wicked ifup --timeout %d %s >&2", config.net.dhcp_timeout, config.net.device);
-  }
-  else {
-    snprintf(cmd, sizeof cmd, "wicked ifup %s >&2", config.net.device);
-  }
+  net_wicked_up(config.net.device);
 
   if(config.net.ipv4) {
     snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", config.net.device);
@@ -1931,280 +1894,6 @@ int net_wicked()
 
 
 /*
- * Start dhcp client and read dhcp info.
- *
- * Global vars changed:
- *  config.net.dhcp_active
- *  config.net.hostname
- *  config.net.netmask
- *  config.net.network
- *  config.net.broadcast
- *  config.net.gateway
- *  config.net.domain
- *  config.net.nisdomain
- *  config.net.nameserver
- */
-int net_dhcp4()
-{
-  char cmd[256], file[256], *s;
-  file_t *f0, *f;
-  window_t win;
-  int got_ip = 0, i, rc;
-  slist_t *sl0, *sl;
-
-  if(config.net.dhcp_active || config.net.keep) return 0;
-
-  if(config.test) {
-    config.net.dhcp_active = 1;
-
-    return 0;
-  }
-
-  if(config.win) {
-    sprintf(cmd, "Sending %s request...", "DHCP");
-    dia_info(&win, cmd, MSGTYPE_INFO);
-  }
-
-  net_apply_ethtool(config.net.device, config.net.hwaddr);
-
-  strcpy(cmd, "dhcpcd --noipv4ll");
-
-  if(config.net.dhcpcd) {
-    sprintf(cmd + strlen(cmd), " %s", config.net.dhcpcd);
-  }
-
-  sprintf(cmd + strlen(cmd), " -t %d", config.net.dhcp_timeout);
-
-  sprintf(cmd + strlen(cmd), " %s", config.net.device);
-
-  sprintf(file, "/var/lib/dhcpcd/dhcpcd-%s.info", config.net.device);
-
-  unlink(file);
-
-  system(cmd);
-
-  f0 = file_read_file(file, kf_dhcp);
-
-  for(f = f0; f; f = f->next) {
-    switch(f->key) {
-      case key_ipaddr:
-        got_ip = 1;
-        name2inet(&config.net.hostname, f->value);
-        net_check_address(&config.net.hostname, 0);
-        break;
-
-      case key_hostname:
-        str_copy(&config.net.realhostname, f->value);
-        break;
-
-      case key_netmask:
-        name2inet(&config.net.netmask, f->value);
-        net_check_address(&config.net.netmask, 0);
-        break;
-
-      case key_network:
-        name2inet(&config.net.network, f->value);
-        net_check_address(&config.net.network, 0);
-        break;
-
-      case key_broadcast:
-        name2inet(&config.net.broadcast, f->value);
-        net_check_address(&config.net.broadcast, 0);
-        break;
-
-      case key_gateway:
-        if((s = strchr(f->value, ' '))) *s = 0;
-        name2inet(&config.net.gateway, f->value);
-        net_check_address(&config.net.gateway, 0);
-        break;
-
-      case key_domain:
-        if(*f->value) str_copy(&config.net.domain, f->value);
-        break;
-
-      case key_dns:
-        for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
-          name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
-          net_check_address(&config.net.nameserver[config.net.nameservers], 0);
-          if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
-        }
-        slist_free(sl0);
-        break;
-
-      case key_nisdomain:
-        if(*f->value) str_copy(&config.net.nisdomain, f->value);
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  if(config.win) win_close(&win);
-
-  if(got_ip) {
-    config.net.dhcp_active = 1;
-    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
-  }
-  else {
-    if(config.win) {
-      if(config.net.dhcpfail && strcmp(config.net.dhcpfail, "ignore")) {
-        if(!strcmp(config.net.dhcpfail, "show")) {
-          sprintf(cmd, "%s configuration failed.", "DHCP");
-          dia_info(&win, cmd, MSGTYPE_ERROR);
-          sleep(4);
-          win_close(&win);
-        }
-        else if(!strcmp(config.net.dhcpfail, "manual")) {
-          sprintf(cmd, "%s configuration failed.", "DHCP");
-          i = dia_yesno(cmd, NO);
-          if(i == YES) {
-            // is_static = 1;
-            // ?????
-          }
-        }
-      }
-    }
-  }
-
-  file_free_file(f0);
-
-  rc = config.net.dhcp_active ? 0 : 1;
-
-  return rc;
-}
-
-
-/*
- * Start dhcp client and read dhcp info.
- *
- * Global vars changed:
- *  config.net.dhcp_active
- *  config.net.hostname
- *  config.net.netmask
- *  config.net.network
- *  config.net.broadcast
- *  config.net.gateway
- *  config.net.domain
- *  config.net.nisdomain
- *  config.net.nameserver
- */
-int net_dhcp6()
-{
-  char *cmd = NULL, *fname = NULL;
-  window_t win;
-  FILE *f;
-  DIR *dir;
-  struct dirent *de;
-  int ok = 0;
-  unsigned timeout = config.net.dhcp_timeout;
-  char buf[256];
-
-  if(config.net.dhcp_active || config.net.keep) return 0;
-
-  if(config.test) {
-    config.net.dhcp_active = 1;
-
-    return 0;
-  }
-
-  if(config.win) {
-    strprintf(&cmd, "Sending %s request...", "DHCP6");
-    dia_info(&win, cmd, MSGTYPE_INFO);
-  }
-
-  if(!config.net.ipv4) net_apply_ethtool(config.net.device, config.net.hwaddr);
-
-  system("/bin/rm -f /var/lib/dhcpv6/client6.leases*");
-
-  if((f = fopen("/etc/dhcp6c.conf", "w"))) {
-    fprintf(f,
-      "interface %s {\n  request domain-name-servers;\n  request domain-search-list;\n};\n",
-      config.net.device
-    );
-    fclose(f);
-  }
-
-  unlink("/tmp/dhcp6c_update.done");
-
-  strprintf(&cmd, "dhcp6c %s", config.net.device);
-
-  system(cmd);
-
-  // now wait a bit
-  do {
-    sleep(1);
-
-    if((dir = opendir("/var/lib/dhcpv6"))) {
-      while((de = readdir(dir))) {
-        if(!strncmp(de->d_name, "client6.leases", sizeof "client6.leases" - 1)) {
-          strprintf(&fname, "/var/lib/dhcpv6/%s", de->d_name);
-          if((f = fopen(fname, "r"))) {
-            if(fscanf(f, "lease %255s", buf) == 1) {
-              name2inet(&config.net.hostname, buf);
-              net_check_address(&config.net.hostname, 0);
-              ok = 1;
-            }
-            fclose(f);
-          }
-        }
-      }
-
-      closedir(dir);
-    }
-  } while(!ok && --timeout);
-
-  while(ok && timeout--) {
-    sleep(1);
-
-    if(util_check_exist("/tmp/dhcp6c_update.done")) break;
-  } 
-
-  if(ok) {
-    config.net.dhcp_active = 1;
-    sleep(config.net.ifup_wait + 10);
-  }
-
-  if(config.win) win_close(&win);
-
-  if(!ok && config.win) {
-    strprintf(&cmd, "%s configuration failed.", "DHCP6");
-    dia_message(cmd, MSGTYPE_ERROR);
-  }
-
-  free(fname);
-  free(cmd);
-
-  return config.net.dhcp_active ? 0 : 1;
-}
-
-
-/*
- * Stop dhcp client.
- *
- * Global vars changed:
- *  config.net.dhcp_active
- */
-void net_dhcp_stop()
-{
-  if(!config.net.dhcp_active) return;
-
-  if(config.wicked) {
-    system("wicked ifdown all");
-  }
-
-  /* kill them all */
-  util_killall("dhcpcd", SIGHUP);
-  util_killall("dhcp6c", SIGTERM);
-
-  /* give them some time */
-  sleep(2);
-
-  config.net.dhcp_active = 0;
-}
-
-
-/*
  * Return current network config state as bitmask.
  */
 unsigned net_config_mask()
@@ -2238,33 +1927,6 @@ char *net_if2module(char *net_if)
   return NULL;
 }
 
-
-/*
- * Shut down single network interface.
- *
- * dev: interface
- */
-void if_down(char *dev)
-{
-  int sock;
-  struct ifreq iface = {};
-
-  if(!dev || !*dev) return;
-
-  fprintf(stderr, "if %s down\n", dev);
-
-  sock = socket(AF_INET, SOCK_DGRAM, 0);
-  if(sock == -1) return;
-
-  strncpy(iface.ifr_name, dev, sizeof iface.ifr_name - 1);
-  iface.ifr_name[sizeof iface.ifr_name - 1] = 0;
-  iface.ifr_addr.sa_family = AF_INET;
-
-  ioctl(sock, SIOCGIFFLAGS, &iface);
-  iface.ifr_flags &= ~(IFF_UP | IFF_RUNNING);
-  ioctl(sock, SIOCSIFFLAGS, &iface);
-  close(sock);
-}
 
 #if defined(__s390__) || defined(__s390x__)
 
@@ -3033,9 +2695,9 @@ char *net_dhcp_type()
  *
  */
 #if 0
-ifcfg=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
+ifcfg=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
 ifcfg=dhcp
-ifcfg=eth*=10.10.0.1/24;10.10.0.254;10.10.1.1;suse.de
+ifcfg=eth*=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
 ifcfg=eth*=dhcp
 #endif
 void net_write_initial_ifcfg()
@@ -3063,25 +2725,52 @@ void net_write_initial_ifcfg()
     }
 
     for(ifcfg = config.ifcfg.list; ifcfg; ifcfg = ifcfg->next) {
-      // static config may be used only once
+      // static config must be used only once
       if(ifcfg->used && !ifcfg->dhcp) continue;
+
       matched = ifcfg->device ? match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device) : 0;
 
-      if(matched) {
-        ifcfg->used = 1;
-
-        if(ifcfg_write(hd->unix_dev_name, ifcfg)) {
-          slist_append_str(&config.ifcfg.initial, hd->unix_dev_name);
-          printf("%s: network config created\n", hd->unix_dev_name);
-        }
-        else {
-          printf("%s: failed to create network config\n", hd->unix_dev_name);
-        }
-      }
+      if(matched) ifcfg_write2(hd->unix_dev_name, ifcfg, 1);
     }
   }
 
   hd_free_hd_list(net_list);
+}
+
+
+
+/*
+ * Wrapper around ifcfg_write() that does some more logging.
+ *
+ * If initial is set, mark interface as 'initial'; that is, no further auto
+ * config is tried on it.
+ */
+int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
+{
+  char *ifname = NULL;
+  int i;
+
+  str_copy(&ifname, device);
+
+  if(ifcfg) {
+    ifcfg->used = 1;
+    if(ifcfg->vlan) strprintf(&ifname, "%s.%s", device, ifcfg->vlan);
+  }
+
+  i = ifcfg_write(device, ifcfg);
+
+  if(i) {
+    str_copy(&config.ifcfg.current, ifname);
+    if(initial) slist_append_str(&config.ifcfg.initial, ifname);
+    fprintf(stderr, "%s: network config created\n", ifname);
+    if(!config.win) printf("%s: network config created\n", ifname);
+  }
+  else {
+    fprintf(stderr, "%s: failed to create network config\n", ifname);
+    if(!config.win) printf("%s: failed to create network config\n", ifname);
+  }
+
+  return i;
 }
 
 
@@ -3091,6 +2780,8 @@ void net_write_initial_ifcfg()
  * - may be a dhcp or static config
  * - if device or ifcfg are NULL use current data from global config
  * - if global config is used we always create a ***static*** config
+ *
+ * Note: use ifcfg_write2()!
  */
 int ifcfg_write(char *device, ifcfg_t *ifcfg)
 {
@@ -3105,8 +2796,6 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_t *sl;
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
-
-  if(!config.wicked) return 0;
 
   // use global values
   if(!device || !ifcfg) global_values = 1;
@@ -3449,5 +3138,89 @@ ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p)
 {
   for(; *p0; p0 = &(*p0)->next);
   return *p0 = p;
+}
+
+
+/*
+ * Run wicked to collect all interface states.
+ *
+ * config.ifcfg.if_state
+ */
+void net_update_state()
+{
+  FILE *f;
+  char buf[256], *s1, *s2,*s3;
+  slist_t *sl;
+
+  config.ifcfg.if_state = slist_free(config.ifcfg.if_state);
+
+  if((f = popen("wicked show all", "r"))) {
+    while(fgets(buf, sizeof buf, f)) {
+      if(!isspace(*buf)) {
+        for(s1 = buf; *s1 && !isspace(*s1); s1++);
+        for(s2 = s1; *s2 && isspace(*s2); s2++);
+        for(s3 = s2; *s3 && !isspace(*s3); s3++);
+        *s1 = *s3 = 0;
+        if(*buf && *s2 && s2 != buf) {
+          sl = slist_append(&config.ifcfg.if_state, slist_new());
+          str_copy(&sl->key, buf);
+          str_copy(&sl->value, s2);
+        }
+      }
+    }
+    pclose(f);
+  }
+
+  config.ifcfg.if_up = slist_free(config.ifcfg.if_up);
+  for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
+    if(!strcmp(sl->value, "up")) slist_append_str(&config.ifcfg.if_up, sl->key);
+  }
+
+  if(config.debug) {
+    fprintf(stderr, "net_update_state: ");
+    for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
+      fprintf(stderr, "%s: %s%s", sl->key, sl->value, sl->next ? ", " : "");
+    }
+    fprintf(stderr, "\n");
+  }
+}
+
+
+/*
+ * Set up interface; ifname may be NULL, an interface or 'all'.
+ */
+void net_wicked_up(char *ifname)
+{
+  char *buf = NULL;
+
+  if(!ifname) return;
+
+  if(config.net.dhcp_timeout_set) {
+    strprintf(&buf, "wicked ifup --timeout %d %s >&2", config.net.dhcp_timeout, ifname);
+  }
+  else {
+    strprintf(&buf, "wicked ifup %s >&2", ifname);
+  }
+
+  system(buf);
+
+  str_copy(&buf, NULL);
+}
+
+
+/*
+ * Shut down interface; ifname may be NULL, an interface or 'all'.
+ */
+void net_wicked_down(char *ifname)
+{
+  char *buf = NULL;
+
+  if(!ifname) return;
+
+  strprintf(&buf, "wicked ifdown %s >&2", ifname);
+
+  system(buf);
+
+  str_copy(&buf, NULL);
 }
 

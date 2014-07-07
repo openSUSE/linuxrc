@@ -252,7 +252,6 @@ static struct {
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
   { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
   { key_forceip,        "forceip",        kf_cfg + kf_cmd                },
-  { key_dhcpcd,         "DHCPCD",         kf_cfg + kf_cmd                },
   { key_wlan_essid,     "WlanESSID",      kf_cfg + kf_cmd                },
   { key_wlan_auth,      "WlanAuth",       kf_cfg + kf_cmd                },
   { key_wlan_key_ascii, "WlanKeyAscii",   kf_cfg + kf_cmd                },
@@ -305,7 +304,6 @@ static struct {
   { key_plymouth,       "Plymouth",       kf_cfg + kf_cmd_early          },
   { key_restart,        "Restart",        kf_cfg                         },
   { key_restarted,      "Restarted",      kf_cfg                         },
-  { key_wicked,         "Wicked",         kf_cfg + kf_cmd + kf_cmd_early },
   { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
   { key_upgrade,        "Upgrade",        kf_cfg + kf_cmd                },
   { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
@@ -1349,7 +1347,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_listen:
         if(f->is.numeric) {
           if(activate_network()) {
-            config.net.keep = 1;
             str_copy(&config.setupcmd, "inst_setup yast");
 
             kbd_end(0);
@@ -1400,10 +1397,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_forceip:
         if(f->is.numeric) config.forceip = f->nvalue;
-        break;
-
-      case key_dhcpcd:
-        if(*f->value) str_copy(&config.net.dhcpcd, f->value);
         break;
 
       case key_wlan_essid:
@@ -1650,10 +1643,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_restarted:
         if(f->is.numeric) config.restarted = f->nvalue;
-        break;
-
-      case key_wicked:
-        if(f->is.numeric) config.wicked = f->nvalue;
         break;
 
       case key_withipoib:

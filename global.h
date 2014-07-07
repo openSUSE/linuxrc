@@ -575,7 +575,6 @@ typedef struct {
     unsigned dhcp_active:1;	/* dhcpd is running */
     unsigned ifconfig:1;	/* setup network interface */
     unsigned is_configured:1;	/* set if network is configured */
-    unsigned keep:1;		/* keep network interface up */
     unsigned all_ifs:1;		/* try all interfaces */
     unsigned now:1;		/* configure network _now_ */
     unsigned ipv4:1;		/* do ipv4 config */
@@ -629,7 +628,6 @@ typedef struct {
       char *binary;		/* cifs/smb mount binary */
       char *module;		/* cifs/smb kernel module */
     } cifs;
-    char *dhcpcd;		/* dhcpcd parameters (if any) */
     struct {
       wlan_auth_t auth;		/* open, wep, wpa */
       char *essid;		/* ESSID */
@@ -642,6 +640,9 @@ typedef struct {
   struct {
     ifcfg_t *list;		/* list of ifcfg entries */
     slist_t *initial;		/* list of initially set up network interfaces */
+    slist_t *if_state;		/* config state of network interfaces */
+    slist_t *if_up;		/* network interfaces != lo that are 'up' */
+    char *current;		/* interface name for last written ifcfg file */
   } ifcfg;
 
 

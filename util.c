@@ -446,7 +446,7 @@ void util_print_banner (void)
 
     uname (&utsinfo_ri);
     if (config.linemode) {
-      printf (">>> Linuxrc v" LXRC_FULL_VERSION " (Kernel %s) <<<\n", utsinfo_ri.release);
+      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<\n", utsinfo_ri.release);
         return;
     }
     memset (&win_ri, 0, sizeof (window_t));
@@ -477,7 +477,7 @@ void util_print_banner (void)
     win_ri.style = STYLE_SUNKEN;
     win_open (&win_ri);
 
-    sprintf (text_ti, ">>> Linuxrc v" LXRC_FULL_VERSION " (Kernel %s) <<<",
+    sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<",
              utsinfo_ri.release);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
@@ -1241,6 +1241,36 @@ void util_status_info(int log_it)
   strcat(buf, " )");
   slist_append_str(&sl0, buf);
 
+  if(config.ifcfg.initial) {
+    strcpy(buf, "initially configured network interfaces:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ifcfg.initial; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
+  if(config.ifcfg.if_state) {
+    strcpy(buf, "network interface states:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
+  if(config.ifcfg.if_up) {
+    strcpy(buf, "up interfaces:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ifcfg.if_up; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.cdid) {
     sprintf(buf, "cdrom id = %s", config.cdid);
     slist_append_str(&sl0, buf);
@@ -1474,7 +1504,7 @@ void util_status_info(int log_it)
   }
 
   if(log_it || config.debug >= 1) {
-    fprintf(stderr, "------  Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")  ------\n");
+    fprintf(stderr, "------  linuxrc " LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")  ------\n");
     for(sl = sl0; sl; sl = sl->next) {
       fprintf(stderr, "  %s\n", sl->key);
     }
@@ -1482,7 +1512,7 @@ void util_status_info(int log_it)
   }
 
   if(!log_it) {
-    dia_show_lines2("Linuxrc v" LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
+    dia_show_lines2("linuxrc " LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
   }
 
   slist_free(sl0);

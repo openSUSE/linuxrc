@@ -41,7 +41,7 @@ typedef enum {
   key_port, key_smbshare, key_rootimage2, key_instsys_id,
   key_initrd_id, key_instsys_complain,
   key_osainterface, key_dud_complain, key_dud_expected,
-  key_withiscsi, key_ethtool, key_listen, key_zombies, key_dhcpcd, key_forceip,
+  key_withiscsi, key_ethtool, key_listen, key_zombies, key_forceip,
   key_layer2, key_wlan_essid, key_wlan_auth, key_wlan_key_ascii,
   key_wlan_key_hex, key_wlan_key_pass, key_wlan_key_len, key_netcardname,
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
@@ -52,7 +52,7 @@ typedef enum {
   key_ipv6, key_ipv6only, key_usesax2, key_efi, key_supporturl, key_portno,
   key_osahwaddr, key_zen, key_zenconfig, key_udevrule, key_dhcpfail,
   key_namescheme, key_ptoptions, key_is_ptoption, key_withfcoe, key_digests,
-  key_plymouth, key_sslcerts, key_restart, key_restarted, key_wicked, key_autoyast2,
+  key_plymouth, key_sslcerts, key_restart, key_restarted, key_autoyast2,
   key_withipoib, key_upgrade, key_ifcfg
 } file_key_t;
 
