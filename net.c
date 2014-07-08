@@ -1818,6 +1818,7 @@ int net_wicked_dhcp()
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
   strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
+
   ifcfg_write2(config.net.device, ifcfg, 0);
 
   free(ifcfg->type);
@@ -1837,6 +1838,10 @@ int net_wicked_dhcp()
     snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", config.net.device);
     got_ip = parse_leaseinfo(file);
   }
+
+  net_update_state();
+
+  if(slist_getentry(config.ifcfg.if_up, config.net.device)) got_ip |= 1;
 
   if(config.win) win_close(&win);
 
@@ -2759,6 +2764,8 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
   char *ifname = NULL;
   int i;
 
+  str_copy(&config.ifcfg.current, NULL);
+
   str_copy(&ifname, device);
 
   if(ifcfg) {
@@ -2775,6 +2782,7 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
   if(slist_getentry(config.ifcfg.initial, ifname)) {
     if(ifcfg && ifcfg->pattern) {
       fprintf(stderr, "%s: network config exists, keeping it\n", ifname);
+      str_copy(&config.ifcfg.current, ifname);
       return 1;
     }
     else {
