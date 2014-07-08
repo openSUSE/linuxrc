@@ -4380,7 +4380,7 @@ int iscsi_check()
     iscsi_ok++;
   }
 
-  return use_dhcp || iscsi_ok == 3;
+  return 1;
 }
 
 
