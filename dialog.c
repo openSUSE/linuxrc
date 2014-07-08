@@ -25,6 +25,7 @@
 #include "linuxrc.h"
 #include "file.h"
 #include "utf8.h"
+#include "net.h"
 
 
 #define MIN_WIN_SIZE    40
@@ -1488,6 +1489,7 @@ void dia_handle_ctrlc (void)
 	  f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_free_file(f);
+	  net_update_ifcfg();
 	}
       }
       else if(i == -74) {

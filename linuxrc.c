@@ -804,6 +804,9 @@ void lxrc_init()
   config.linemode = 1;
   #endif
 
+  // a config for this interface always exists
+  slist_append_str(&config.ifcfg.initial, "lo");
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
@@ -1125,7 +1128,7 @@ void lxrc_init()
     }
   }
 
-  net_write_initial_ifcfg();
+  net_update_ifcfg();
 
   util_run_script("network_setup");
   net_update_state();

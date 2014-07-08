@@ -275,6 +275,7 @@ typedef struct ifcfg_s {
   char *type;		// dhcp{,4,6} or static
   unsigned dhcp:1;	// use dhcp
   unsigned used:1;	// config has been used
+  unsigned pattern:1;	// 'device' is shell glob
   char *vlan;		// vlan id, if any
   char *ip;		// list of ip addresses, space separated
   char *gw;		// gateway

@@ -364,6 +364,7 @@ void auto2_scan_hardware()
     if(!err) {
       fprintf(stderr, "parsing info file: %s\n", sl->key);
       file_read_info_file("file:/download/info", kf_cfg);
+      net_update_ifcfg();
     }
   }
 
@@ -393,6 +394,7 @@ void auto2_scan_hardware()
        */
       fprintf(stderr, "parsing AutoYaST file\n");
       file_read_info_file("file:/download/autoyast.xml", kf_cfg);
+      net_update_ifcfg();
     }
   }
 

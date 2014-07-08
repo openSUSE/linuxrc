@@ -2699,7 +2699,7 @@ ifcfg=dhcp
 ifcfg=eth*=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
 ifcfg=eth*=dhcp
 #endif
-void net_write_initial_ifcfg()
+void net_update_ifcfg()
 {
   int matched;
   hd_t *net_list, *hd;
@@ -2707,14 +2707,21 @@ void net_write_initial_ifcfg()
   char *hwaddr;
   ifcfg_t *ifcfg;
 
-  // this file always exists
-  slist_append_str(&config.ifcfg.initial, "lo");
-
   if(!config.ifcfg.list) return;
 
   update_device_list(0);
   net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
 
+  // 1st, all explicitly named interfaces
+  for(ifcfg = config.ifcfg.list; ifcfg; ifcfg = ifcfg->next) {
+    if(ifcfg->pattern) continue;
+    // static config must be used only once
+    if(ifcfg->used && !ifcfg->dhcp) continue;
+
+    ifcfg_write2(ifcfg->device, ifcfg, 1);
+  }
+
+  // 2nd, all interfaces with wildcard patterns
   for(hd = net_list; hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
@@ -2724,6 +2731,7 @@ void net_write_initial_ifcfg()
     }
 
     for(ifcfg = config.ifcfg.list; ifcfg; ifcfg = ifcfg->next) {
+      if(!ifcfg->pattern) continue;
       // static config must be used only once
       if(ifcfg->used && !ifcfg->dhcp) continue;
 
@@ -2734,8 +2742,10 @@ void net_write_initial_ifcfg()
   }
 
   hd_free_hd_list(net_list);
-}
 
+  // FIXME: free it
+  config.ifcfg.list = NULL;
+}
 
 
 /*
@@ -2759,6 +2769,17 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
   // FIXME: the next line is basically correct but shouldn't be here in this place
   if(!ifname) {
     str_copy(&ifname, config.net.device);
+  }
+
+  // if a device spec is a wildcard patterm, don't allow to overwrite an existing config
+  if(slist_getentry(config.ifcfg.initial, ifname)) {
+    if(ifcfg && ifcfg->pattern) {
+      fprintf(stderr, "%s: network config exists, keeping it\n", ifname);
+      return 1;
+    }
+    else {
+      fprintf(stderr, "%s: network config exists, overwriting it\n", ifname);
+    }
   }
 
   i = ifcfg_write(device, ifcfg);
@@ -3056,7 +3077,7 @@ ifcfg_t *ifcfg_parse(char *str)
 
   if(!str) return NULL;
 
-  if(config.debug) fprintf(stderr, "ifcfg parsed: %s\n", str);
+  if(config.debug) fprintf(stderr, "parsing ifcfg: %s\n", str);
 
   ifcfg = calloc(1, sizeof *ifcfg);
 
@@ -3120,11 +3141,20 @@ ifcfg_t *ifcfg_parse(char *str)
 
   slist_free(sl0);
 
+  if(ifcfg->device) {
+    for(s = ifcfg->device; *s; s++) {
+      if(!isalnum(*s) && *s != '_') {
+        ifcfg->pattern = 1;
+        break;
+      }
+    }
+  }
+
   if(config.debug) {
     fprintf(stderr, "  device = %s\n", ifcfg->device);
     if(ifcfg->vlan) fprintf(stderr, "  vlan = %s\n", ifcfg->vlan);
     if(ifcfg->type) fprintf(stderr, "  type = %s\n", ifcfg->type);
-    fprintf(stderr, "  dhcp = %u\n", ifcfg->dhcp);
+    fprintf(stderr, "  dhcp = %u, pattern = %u, used = %u\n", ifcfg->dhcp, ifcfg->pattern, ifcfg->used);
     if(ifcfg->ip) fprintf(stderr, "  ip = %s\n", ifcfg->ip);
     if(ifcfg->gw) fprintf(stderr, "  gw = %s\n", ifcfg->gw);
     if(ifcfg->ns) fprintf(stderr, "  ns = %s\n", ifcfg->ns);
