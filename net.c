@@ -190,6 +190,8 @@ int net_config()
 #if NETWORK_CONFIG
   char buf[256];
 
+  if(!config.win && !config.manual && config.ifcfg.if_up) return 0;
+
   net_ask_password();
 
   if(

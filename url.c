@@ -2279,6 +2279,9 @@ int url_setup_interface(url_t *url)
 
   /* setup interface */
 
+  // we already have at least one configured interface
+  if(config.ifcfg.if_up) return 1;
+
   if(
     config.net.configured &&
     config.net.device &&

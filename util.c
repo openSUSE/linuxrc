@@ -3493,12 +3493,11 @@ char *util_get_attr(char* attr)
   if(i >= 0) {
     buf[i] = 0;
 
-    while(i > 0 && isspace(buf[i - 1])) {
+    while(i > 0 && (!buf[i - 1] || isspace(buf[i - 1]))) {
       buf[--i] = 0;
     }
-
   }
-    
+
   return buf;
 }
 
@@ -4256,12 +4255,14 @@ int fcoe_check()
 int iscsi_check()
 {
   int iscsi_ok = 0;
-  char *attr, *s, *t;
-  char *sysfs_ibft = NULL;
+  char *s, *sysfs_ibft = NULL, *attr = NULL;
+  char *if_name = NULL, *if_mac = NULL, *ibft_mac = NULL;
   unsigned use_dhcp = 0;
-  int mac_ofs = 2;
+  int mac_match, vlan, prefix = -1;
   struct dirent *de;
   DIR *d;
+  ifcfg_t *ifcfg = NULL;
+  slist_t *sl;
 
   if(util_check_exist("/modules/iscsi_ibft.ko")) {
     system("/sbin/modprobe iscsi_ibft");
@@ -4272,113 +4273,126 @@ int iscsi_check()
     while((de = readdir(d))) {
       if(!strcmp(de->d_name, "ibft")) {
         sysfs_ibft = "/sys/firmware/ibft/ethernet0";
-        break;
       }
       if(!strncmp(de->d_name, "iscsi_boot", sizeof "iscsi_boot" - 1)) {
         iscsi_ok = 1;
-        break;
       }
     }
     closedir(d);
   }
 
-  if(iscsi_ok || !util_check_exist(sysfs_ibft)) return iscsi_ok;
+  if(iscsi_ok) {
+    fprintf(stderr, "ibft: iscsi_boot\n");
+    return 1;
+  }
+
+  if(!util_check_exist(sysfs_ibft)) return 0;
 
   fprintf(stderr, "ibft: sysfs dir = %s\n", sysfs_ibft);
 
-  asprintf(&attr, "%s/origin", sysfs_ibft);
+  strprintf(&attr, "%s/origin", sysfs_ibft);
   s = util_get_attr(attr);
   fprintf(stderr, "ibft: origin = %s\n", s);
   if(s[0] == '3') use_dhcp = 1;
   fprintf(stderr, "ibft: dhcp = %d\n", use_dhcp);
-  free(attr);
 
-  asprintf(&attr, "%s/mac", sysfs_ibft);
-  s = strdup(util_get_attr(attr));
-  fprintf(stderr, "ibft: mac = %s\n", s);
-  if(*s) {
-    /* try to get the interface name, up to offset 2 */
-    if((t = mac_to_interface(s, &mac_ofs))) {
-      free(s);
-      s = t;
+  strprintf(&attr, "%s/mac", sysfs_ibft);
+  s = util_get_attr(attr);
+  fprintf(stderr, "ibft: ibft mac = %s\n", s);
+  str_copy(&ibft_mac, *s ? s : NULL);
+
+  strprintf(&attr, "%s/device/net", sysfs_ibft);
+  if((d = opendir(attr))) {
+    while((de = readdir(d))) {
+      if(de->d_name[0] == '.') continue;
+      str_copy(&if_name, de->d_name);
+      break;
     }
-    if(!mac_ofs) str_copy(&config.netdevice, s);
-    fprintf(stderr, "ibft: tagging %s as persistent\n", t);
-    str_copy(&config.net.persistent, t);
-    iscsi_ok++;
+    closedir(d);
   }
 
-  free(s);
-  free(attr);
+  fprintf(stderr, "ibft: if = %s\n", if_name ?: "");
 
-  if(!mac_ofs) {
-    /* use ibft config only if mac matches */
+  if(if_name) {
+    strprintf(&attr, "%s/device/net/%s/address", sysfs_ibft, if_name);
+    s = util_get_attr(attr);
+    str_copy(&if_mac, *s ? s : NULL);
+  }
+
+  fprintf(stderr, "ibft: if mac = %s\n", if_mac ?: "");
+
+  mac_match = if_mac && ibft_mac && !strcasecmp(if_mac, ibft_mac) ? 1 : 0;
+
+  fprintf(stderr, "ibft: macs %smatch\n", mac_match ? "" : "don't ");
+
+  if(if_name) {
+    ifcfg = calloc(1, sizeof *ifcfg);
+
+    str_copy(&ifcfg->device, if_name);
+
+    strprintf(&attr, "%s/vlan", sysfs_ibft);
+    vlan = util_get_int_attr(attr);
+    fprintf(stderr, "ibft: vlan = %d\n", vlan);
+    if(vlan > 0) strprintf(&ifcfg->vlan, "%d", vlan);
+
     if(use_dhcp) {
-      config.net.do_setup |= DS_SETUP;
-      config.net.setup = NS_DHCP;
+      ifcfg->dhcp = 1;
+      strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
     }
     else {
-      asprintf(&attr, "%s/ip-addr", sysfs_ibft);
-      s = util_get_attr(attr);
-      fprintf(stderr, "ibft: ip-addr = %s\n", s);
-      if(*s) {
-        name2inet(&config.net.hostname, s);
-        net_check_address(&config.net.hostname, 0);
-        iscsi_ok++;
+      if(!mac_match) {
+        sl = slist_append(&ifcfg->flags, slist_new());
+        str_copy(&sl->key, "STARTMODE");
+        str_copy(&sl->value, "nfsroot");
       }
-      free(attr);
 
-      asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
+      strprintf(&attr, "%s/subnet-mask", sysfs_ibft);
       s = util_get_attr(attr);
       fprintf(stderr, "ibft: subnet-mask = %s\n", s);
+
       if(*s) {
-        name2inet(&config.net.netmask, s);
-        net_check_address(&config.net.netmask, 0);
-        iscsi_ok++;
+        inet_t netmask = {};
+        int i = 1;
+        uint32_t u;
+
+        name2inet(&netmask, s);
+        net_check_address(&netmask, 0);
+        if(netmask.ok && netmask.ip.s_addr) {
+          u = ntohl(netmask.ip.s_addr);
+          while(u <<= 1) i++;
+          prefix = i;
+        }
       }
-      free(attr);
 
-      if(iscsi_ok == 3) {
-        config.net.do_setup |= DS_SETUP;
-        config.net.setup = NS_HOSTIP | NS_NETMASK;
+      strprintf(&attr, "%s/ip-addr", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: ip-addr = %s/%d\n", s, prefix);
 
-        asprintf(&attr, "%s/gateway", sysfs_ibft);
-        s = util_get_attr(attr);
-        fprintf(stderr, "ibft: gateway = %s\n", s);
-        if(*s) {
-          name2inet(&config.net.gateway, s);
-          net_check_address(&config.net.gateway, 0);
-          config.net.setup |= NS_GATEWAY;
-        }
-        free(attr);
+      if(*s && prefix > 0) str_copy(&ifcfg->ip, s);
 
-        asprintf(&attr, "%s/primary-dns", sysfs_ibft);
-        s = util_get_attr(attr);
-        fprintf(stderr, "ibft: primary-dns = %s\n", s);
-        if(*s) {
-          name2inet(&config.net.nameserver[0], s);
-          net_check_address(&config.net.nameserver[0], 0);
-          config.net.nameservers = 1;
-          config.net.setup |= NS_NAMESERVER;
-        }
-        free(attr);
+      strprintf(&attr, "%s/gateway", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: gateway = %s\n", s);
+      if(*s) str_copy(&ifcfg->gw, s);
 
-        asprintf(&attr, "%s/secondary-dns", sysfs_ibft);
-        s = util_get_attr(attr);
-        fprintf(stderr, "ibft: secondary-dns = %s\n", s);
-        if(*s) {
-          name2inet(&config.net.nameserver[1], s);
-          net_check_address(&config.net.nameserver[1], 0);
-          config.net.nameservers = 2;
-        }
-        free(attr);
-      }
+      strprintf(&attr, "%s/primary-dns", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: primary-dns = %s\n", s);
+      if(*s) str_copy(&ifcfg->ns, s);
+
+      strprintf(&attr, "%s/secondary-dns", sysfs_ibft);
+      s = util_get_attr(attr);
+      fprintf(stderr, "ibft: secondary-dns = %s\n", s);
+      if(*s) strprintf(&ifcfg->ns, "%s %s", ifcfg->ns ?: "", s);
     }
+
+    ifcfg_append(&config.ifcfg.list, ifcfg);
   }
-  else {
-    fprintf(stderr, "ibft: mac didn't match - ignoring ibft data\n");
-    iscsi_ok++;
-  }
+
+  str_copy(&attr, NULL);
+  str_copy(&if_name, NULL);
+  str_copy(&if_mac, NULL);
+  str_copy(&ibft_mac, NULL);
 
   return 1;
 }
@@ -4394,6 +4408,8 @@ char *mac_to_interface_log(char *mac, int log)
   struct dirent *de;
   DIR *d;
   char *sys = "/sys/class/net", *if_name = NULL, *attr, *if_mac;
+
+  if(!mac) return NULL;
 
   if(util_check_exist2(sys, mac)) return strdup(mac);
 

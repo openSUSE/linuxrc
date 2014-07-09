@@ -609,6 +609,8 @@ void auto2_user_netconfig()
 
   if(!config.net.do_setup) return;
 
+  if(config.ifcfg.if_up) return;
+
   check_ptp();
   
   if( ((net_config_mask() & 3) == 3) || (config.net.ptp && ((net_config_mask() & 1) == 1)) ) {
