@@ -302,6 +302,7 @@ static struct {
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
   { key_digests,        "Digests",        kf_cfg + kf_cmd + kf_cmd_early },
   { key_plymouth,       "Plymouth",       kf_cfg + kf_cmd_early          },
+  { key_plymouth,       "PlymouthEnable", kf_cfg + kf_cmd_early          },
   { key_restart,        "Restart",        kf_cfg                         },
   { key_restarted,      "Restarted",      kf_cfg                         },
   { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
