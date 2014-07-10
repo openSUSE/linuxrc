@@ -57,13 +57,14 @@ int auto2_init()
 {
   int ok, win_old, install_unset = 0;
   char *device;
+  slist_t *sl;
 
   auto2_scan_hardware();
 
   /* set default repository: try dvd drives */
   if(!config.url.install) {
     install_unset = 1;
-    config.url.install = url_set("cd:/");
+    config.url.install = url_set(config.defaultrepo ? config.defaultrepo->key : "cd:/");
   }
   if(!config.url.instsys) {
     config.url.instsys = url_set(config.url.instsys_default ?: config.rescue ? config.rescueimage : config.rootimage);
@@ -87,13 +88,13 @@ int auto2_init()
 
   ok = auto2_find_repo();
 
-  /* try again, hard disks */
-  if(!ok && install_unset) {
-    config.url.install = url_set("hd:/");
-    ok = auto2_find_repo();
+  /* try again */
+  if(install_unset && (sl = config.defaultrepo)) {
+    while(!ok && (sl = sl->next)) {
+      config.url.install = url_set(sl->key);
+      ok = auto2_find_repo();
+    }
   }
-
-  if(config.debug) fprintf(stderr, "ZyppRepoURL: %s\n", url_print(config.url.install, 4));
 
   LXRC_WAIT
 
@@ -102,10 +103,12 @@ int auto2_init()
   win_old = config.win;
 
   if(config.debug) {
-    fprintf(stderr, "ok = %d\n", ok);
-    fprintf(stderr, "is.network = %d\n", config.url.install->is.network);
-    fprintf(stderr, "is.mountable = %d\n", config.url.install->is.mountable);
-    fprintf(stderr, "device = %s\n", device);
+    fprintf(stderr, "find repo:\n");
+    fprintf(stderr, "  ok = %d\n", ok);
+    fprintf(stderr, "  is.network = %d\n", config.url.install->is.network);
+    fprintf(stderr, "  is.mountable = %d\n", config.url.install->is.mountable);
+    fprintf(stderr, "  device = %s\n", device ?: "");
+    fprintf(stderr, "  ZyppRepoURL: %s\n", url_print(config.url.install, 4));
   }
 
   if(

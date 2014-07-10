@@ -469,6 +469,7 @@ typedef struct {
   slist_t *ptoptions;		/* pass-through options: options that just need to be added /etc/install.inf */
   char *change_config;		/* for 'change config option' input field */
   char *run_command;		/* for 'run command' input field */
+  slist_t *defaultrepo;		/* default repo locations */
 
   struct {
     unsigned md5:1;		/* support md5 */

@@ -1398,6 +1398,16 @@ void util_status_info(int log_it)
   sprintf(buf, "setup command = \"%s\"", config.setupcmd);
   slist_append_str(&sl0, buf);
 
+  if(config.defaultrepo) {
+    strcpy(buf, "default repo locations:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.defaultrepo; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.module.broken) {
     strcpy(buf, "broken modules:");
     slist_append_str(&sl0, buf);

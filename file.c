@@ -134,6 +134,7 @@ static struct {
   { key_rootpath,       "RootPath",       kf_dhcp                        },
   { key_bootfile,       "BootFile",       kf_dhcp                        },
   { key_install,        "Install",        kf_cfg + kf_cmd                },
+  { key_install,        "Repo",           kf_cfg + kf_cmd                },
   { key_instsys,        "InstSys",        kf_cfg + kf_cmd                },
   { key_instmode,       "InstMode",       kf_none                        },
   { key_memtotal,       "MemTotal",       kf_mem                         },
@@ -308,6 +309,8 @@ static struct {
   { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
   { key_upgrade,        "Upgrade",        kf_cfg + kf_cmd                },
   { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
+  { key_defaultinstall, "DefaultInstall", kf_cfg + kf_cmd                },
+  { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1656,6 +1659,11 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_ifcfg:
         if(*f->value) ifcfg_append(&config.ifcfg.list, ifcfg_parse(f->value));
+        break;
+
+      case key_defaultinstall:
+        config.defaultrepo = slist_free(config.defaultrepo);
+        if(*f->value) config.defaultrepo = slist_split(',', f->value);
         break;
 
       default:

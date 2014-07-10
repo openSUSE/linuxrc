@@ -807,6 +807,8 @@ void lxrc_init()
   // a config for this interface always exists
   slist_append_str(&config.ifcfg.initial, "lo");
 
+  config.defaultrepo = slist_split(',', "cd:/,hd:/");
+
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 
   LXRC_WAIT
@@ -1144,38 +1146,37 @@ void lxrc_init()
 
     i = 0;
     j = 1;
-#if 1
+
     if(util_check_exist("/nextmedia") == 'r') {
       config.cd1texts = file_parse_xmllike("/nextmedia", "text");  
     }
 
-    if(config.url.install && (config.url.install->is.cdrom || config.cd1texts)) {
+    if(config.url.install) {
       char *s = get_translation(config.cd1texts, current_language()->locale);
       char *buf = NULL;
 
-      strprintf(&buf, s ?: "Make sure that CD number %d is in your drive.", 1);
+      strprintf(&buf, "%s\n\nRetry?", s ?: "Please make sure your installation medium is available.");
       do {
         j = dia_okcancel(buf, YES) == YES ? 1 : 0;
         if(j) {
+          slist_t *sl;
           config.manual = 0;
-          url_free(config.url.install);
-          config.url.install = url_set("cd:/");
-          i = auto2_find_repo();
-          if(!i) {
+          for(sl = config.defaultrepo, i = 0; sl && !i; sl = sl->next) {
             url_free(config.url.install);
-            config.url.install = url_set("hd:/");
+            config.url.install = url_set(sl->key);
             i = auto2_find_repo();
           }
         }
       } while(!i && j);
 
-      free(buf);
+      str_copy(&buf, NULL);
     }
-#endif
 
     if(!i) {
       config.rescue = 0;
       config.manual |= 1;
+      // this message is shown only if the above message was not
+      // FIXME: this is currently impossible, remove the code later
       if(j) {
         sprintf(buf, "Could not find the %s ", config.product);
         strcat(buf, "Repository.");
