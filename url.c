@@ -1157,6 +1157,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   else {
     /* network device */
 
+    slist_t *options_sl = slist_getentry(url->query, "options");
+    char *options = options_sl ? options_sl->value : NULL;
+
     switch(url->scheme) {
       case inst_nfs:
         str_copy(&url->mount, dir ?: new_mountpoint());
@@ -1164,7 +1167,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
 
         if(!url->is.file) {
-          err = net_mount_nfs(url->mount, &url->used.server, url->path, url->port);
+          err = net_mount_nfs(url->mount, &url->used.server, url->path, url->port, options);
           fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
         }
         else {
@@ -1181,7 +1184,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
             if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
 
-            err = net_mount_nfs(url->tmp_mount, &url->used.server, buf, url->port);
+            err = net_mount_nfs(url->tmp_mount, &url->used.server, buf, url->port, options);
             fprintf(stderr, "nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
     
             if(err) {

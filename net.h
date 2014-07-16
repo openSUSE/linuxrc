@@ -9,7 +9,7 @@
 int net_config(void);
 int net_config2(int type);
 void net_ask_password(void);
-int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port);
+int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, char *options);
 int net_mount_smb(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup);
 void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup);
 void net_stop(void);
@@ -30,3 +30,4 @@ ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p);
 void net_update_state(void);
 void net_wicked_up(char *ifname);
 void net_wicked_down(char *ifname);
+int netmask_to_prefix(char *netmask);

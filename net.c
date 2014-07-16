@@ -34,17 +34,7 @@
 #include <net/route.h>
 #include <netinet/in.h>
 #include <netinet/ether.h>
-#include <nfs/nfs.h>
 #include <sys/wait.h>
-#include "nfs_mount4.h"
-
-/* this is probably the wrong solution... */
-#ifndef NFS_FHSIZE
-#define NFS_FHSIZE 32
-#endif
-#ifndef NFS_PORT
-#define NFS_PORT 2049
-#endif
 
 #include <hd.h>
 
@@ -58,12 +48,6 @@
 #include "url.h"
 #include "auto2.h"
 
-#define NFS_PROGRAM    100003
-#define NFS_VERSION         2
-
-#if !defined(NETWORK_CONFIG)
-#  define NETWORK_CONFIG 1
-#endif
 
 static int net_activate4(void);
 static int net_activate6(void);
@@ -73,11 +57,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device);
 #endif
 static void net_setup_nameserver(void);
 
-#if NETWORK_CONFIG
 static int net_choose_device(void);
 static int net_input_data(void);
-#endif
-static int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags);
 
 static int wlan_auth_cb(dia_item_t di);
 
@@ -187,7 +168,6 @@ void net_ask_domain()
 int net_config()
 {
   int rc = 0;
-#if NETWORK_CONFIG
   char buf[256];
 
   if(!config.win && !config.manual && config.ifcfg.if_up) return 0;
@@ -245,8 +225,6 @@ int net_config()
     config.net.configured = nc_none;
     if(!config.test) return rc = -1;
   }
-
-#endif
 
   return rc;
 }
@@ -1013,97 +991,29 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
 }
 
 
-int xdr_dirpath (XDR *xdrs, dirpath *objp)
-    {
-    if (!xdr_string(xdrs, objp, MNTPATHLEN))
-        return (FALSE);
-    else
-        return (TRUE);
-    }
-
-
-int xdr_fhandle (XDR *xdrs, fhandle objp)
-    {
-    if (!xdr_opaque(xdrs, objp, FHSIZE))
-        return (FALSE);
-    else
-        return (TRUE);
-    }
-
-
-int xdr_fhstatus (XDR *xdrs, fhstatus *objp)
-    {
-    if (!xdr_u_int(xdrs, &objp->fhs_status))
-        return (FALSE);
-
-    if (!objp->fhs_status)
-        if (!xdr_fhandle(xdrs, objp->fhstatus_u.fhs_fhandle))
-            return (FALSE);
-
-    return (TRUE);
-    }
-
-
 /*
  * Mount NFS volume.
- *
- * Tries v3 first, then v2.
  *
  * mountpoint: mount point
  * server: server address
  * hostdir: directory on server
+ * options: NFS mount options
  *
- * config.net.nfs: nfs options
+ * config.net.nfs: nfs options if options == NULL
  *
  * return:
  *      0: ok
  *   != 0: error code
  *
  */
-int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port)
-{
-  int err, flags = NFS_MOUNT_NONLM;
-
-  if(!config.net.nfs.udp) flags |= NFS_MOUNT_TCP;
-  if(config.net.nfs.vers != 2) flags |= NFS_MOUNT_VER3;
-
-  /* first, v3 with tcp */
-  err = _net_mount_nfs(mountpoint, server, hostdir, port, flags);
-
-  /* if that doesn't work, try v2, with udp */
-  if(err == EPROTONOSUPPORT) {
-    err = _net_mount_nfs(mountpoint, server, hostdir, port, NFS_MOUNT_NONLM);
-  }
-
-  return err;
-}
-
-
-/*
- * Mount NFS volume.
- *
- * Similar to net_mount_nfs() but lets you specify NFS mount flags.
- *
- * mountpoint: mount point
- * server: server address
- * hostdir: directory on server
- * flags: NFS mount flags
- *
- * config.net.nfs: nfs options
- *
- * return:
- *      0: ok
- *   != 0: error code
- *
- */
-int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, int flags)
+int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, char *options)
 {
   int i = 0;
   char addr[INET6_ADDRSTRLEN];
   char *args[6];
   char *path;
-  char options[4096];
-  int err, len = 0;
+  char *real_options = NULL;
+  int err;
   pid_t mount_pid;
 
   if(net_check_address(server, 1)) return -2;
@@ -1112,13 +1022,16 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned por
   if(!mountpoint || !*mountpoint) mountpoint = "/";
 
   mount_pid = fork();
-  if (mount_pid < 0) {
+  if(mount_pid < 0) {
     perror("fork");
+
     return mount_pid;
-  } else if (mount_pid > 0) {
+  }
+  else if(mount_pid > 0) {
     int err;
     pid_t pid;
     while((pid = waitpid(-1, &err, 0)) && pid != mount_pid);
+
     return WEXITSTATUS(err);
   }
 
@@ -1135,22 +1048,17 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned por
     return err;
   }
 
-  len = snprintf(options, sizeof(options), "%s%s%sretrans=%d,timeo=%d",
-		 flags & NFS_MOUNT_TCP ? "tcp," : "",
-		 flags & NFS_MOUNT_VER3 ? "vers=3," : "",
-		 flags & NFS_MOUNT_NONLM ? "nolock," : "",
-		 3, 7);
+  str_copy(&real_options, "nolock");
 
-  if (config.net.nfs.rsize && len < sizeof(options))
-    len += snprintf(options, sizeof(options) - len,
-		    ",rsize=%d", config.net.nfs.rsize);
-  if (config.net.nfs.wsize && len < sizeof(options))
-    len += snprintf(options, sizeof(options) - len,
-		    ",wsize=%d", config.net.nfs.wsize);
+  if(!options) options = config.net.nfs.opts;
+
+  if(options) strprintf(&real_options, "%s,%s", real_options, options);
+
+  if(config.debug) fprintf(stderr, "mount -o %s %s %s\n", real_options, path, mountpoint);
 
   args[i++] = "mount";
   args[i++] = "-o";
-  args[i++] = options;
+  args[i++] = real_options;
   args[i++] = path;
   args[i++] = mountpoint;
   args[i++] = NULL;
@@ -1162,7 +1070,6 @@ int _net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned por
 }
 
 
-#if NETWORK_CONFIG
 /*
  * Let user select a network interface.
  *
@@ -1408,7 +1315,6 @@ int net_choose_device()
 
   return choice > 0 ? 0 : -1;
 }
-#endif
 
 
 /*
@@ -1467,7 +1373,6 @@ void net_setup_nameserver()
 }
 
 
-#if NETWORK_CONFIG
 /*
  * Let user enter some network config data.
  *
@@ -1563,7 +1468,6 @@ int net_input_data()
 
   return 0;
 }
-#endif
 
 
 /*
@@ -2717,6 +2621,7 @@ void net_update_ifcfg()
   if(!config.ifcfg.list) return;
 
   update_device_list(0);
+  // list of network cards (this will exclude, e.g., 'lo')
   net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
 
   // 1st, all explicitly named interfaces
@@ -2849,14 +2754,8 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
       config.net.netmask.ok &&
       config.net.netmask.ip.s_addr
     ) {
-      int i = 1;
-      uint32_t u = ntohl(config.net.netmask.ip.s_addr);
-
-      while(u <<= 1) i++;
-
-      if(config.debug) fprintf(stderr, "netmask to prefix: %d\n", i);
-
-      config.net.hostname.prefix4 = i;
+      int i = netmask_to_prefix(config.net.netmask.name);
+      if(i >= 0) config.net.hostname.prefix4 = i;
     }
   }
 
@@ -2932,17 +2831,17 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
         str_copy(&sl->value, device);
       }
 
-      sl0 = slist_split(' ', ifcfg->ip);
-
-      if(!sl0->next) {
-        sl = slist_append_str(&sl_ifcfg, "IPADDR");
-        str_copy(&sl->value, sl0->key);
-      }
-      else {
-        for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
-          sl = slist_append(&sl_ifcfg, slist_new());
-          strprintf(&sl->key, "IPADDR_%d", ++i);
-          str_copy(&sl->value, sl1->key);
+      if((sl0 = slist_split(' ', ifcfg->ip))) {
+        if(!sl0->next) {
+          sl = slist_append_str(&sl_ifcfg, "IPADDR");
+          str_copy(&sl->value, sl0->key);
+        }
+        else {
+          for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
+            sl = slist_append(&sl_ifcfg, slist_new());
+            strprintf(&sl->key, "IPADDR_%d", ++i);
+            str_copy(&sl->value, sl1->key);
+          }
         }
       }
 
@@ -3267,5 +3166,44 @@ void net_wicked_down(char *ifname)
   system(buf);
 
   str_copy(&buf, NULL);
+}
+
+
+int netmask_to_prefix(char *netmask)
+{
+  int prefix = -1;
+  uint32_t u;
+  struct in_addr ip4;
+  struct in6_addr ip6;
+
+  if(netmask) {
+    if(strchr(netmask, ':')) {
+      if(inet_pton(AF_INET6, netmask, &ip6) > 0) {
+        prefix = 0;
+        for(u = 0; u < 16 && ip6.s6_addr[u] == 0xff; u++) {
+          prefix += 8;
+        }
+        if(u < 16) {
+          for(u = ip6.s6_addr[u]; u & 0x80; u <<= 1, prefix++);
+        }
+      }
+    }
+    else {
+      if(inet_pton(AF_INET, netmask, &ip4) > 0) {
+        u = ntohl(ip4.s_addr);
+        if(u == 0) {
+          prefix = 0;
+        }
+        else {
+          prefix = 1;
+          while(u <<= 1) prefix++;
+        }
+      }
+    }
+  }
+
+  if(config.debug) fprintf(stderr, "netmask -> prefix: %s -> %d\n", netmask, prefix);
+
+  return prefix;
 }
 

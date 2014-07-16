@@ -4359,26 +4359,15 @@ int iscsi_check()
       strprintf(&attr, "%s/subnet-mask", sysfs_ibft);
       s = util_get_attr(attr);
       fprintf(stderr, "ibft: subnet-mask = %s\n", s);
-
-      if(*s) {
-        inet_t netmask = {};
-        int i = 1;
-        uint32_t u;
-
-        name2inet(&netmask, s);
-        net_check_address(&netmask, 0);
-        if(netmask.ok && netmask.ip.s_addr) {
-          u = ntohl(netmask.ip.s_addr);
-          while(u <<= 1) i++;
-          prefix = i;
-        }
-      }
+      prefix = netmask_to_prefix(s);
 
       strprintf(&attr, "%s/ip-addr", sysfs_ibft);
       s = util_get_attr(attr);
-      fprintf(stderr, "ibft: ip-addr = %s/%d\n", s, prefix);
-
-      if(*s && prefix > 0) str_copy(&ifcfg->ip, s);
+      if(*s) {
+        str_copy(&ifcfg->ip, s);
+        if(prefix > 0) strprintf(&ifcfg->ip, "%s/%d", ifcfg->ip, prefix);
+      }
+      fprintf(stderr, "ibft: ip-addr = %s\n", ifcfg->ip ?: "");
 
       strprintf(&attr, "%s/gateway", sysfs_ibft);
       s = util_get_attr(attr);
