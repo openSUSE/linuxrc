@@ -112,15 +112,8 @@ void url_read(url_data_t *url_data)
   if(proxy_url) {
     if(config.debug >= 2) fprintf(stderr, "using proxy %s\n", proxy_url);
     name2inet(&config.url.proxy->used.server, config.url.proxy->server);
-    if(net_check_address(&config.url.proxy->used.server, 1)) {
-      snprintf(url_data->err_buf, url_data->err_buf_len, "invalid proxy address: %s", config.url.proxy->used.server.name);
-      fprintf(stderr, "%s\n", url_data->err_buf);
-      url_data->err = 105;
-    }
-    else {
-      curl_easy_setopt(c_handle, CURLOPT_PROXY, proxy_url);
-      if(config.debug >= 2) fprintf(stderr, "proxy: %s\n", proxy_url);
-    }
+    curl_easy_setopt(c_handle, CURLOPT_PROXY, proxy_url);
+    if(config.debug >= 2) fprintf(stderr, "proxy: %s\n", proxy_url);
   }
 
   if(url_data->progress) url_data->progress(url_data, 0);
