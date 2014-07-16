@@ -2242,17 +2242,7 @@ int url_setup_device(url_t *url)
   }
   else {
     ok = url_setup_interface(url);
-
-    if(ok) {
-      name2inet(&url->used.server, url->server);
-
-      if(net_check_address(&url->used.server, 1)) {
-        fprintf(stderr, "invalid server address: %s\n", url->used.server.name);
-        config.net.configured = nc_none;
-
-        ok = 0;
-      }
-    }
+    if(ok) name2inet(&url->used.server, url->server);
   }
 
   return ok;
