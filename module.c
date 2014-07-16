@@ -653,7 +653,7 @@ int mod_insmod(char *module, char *param)
     param = sl->value;
   }
 
-  if(config.debug) fprintf(stderr, "mod_insmod(\"%s\", \"%s\")\n", module, param);
+  if(config.debug) fprintf(stderr, "mod_insmod(%s, %s)\n", module, param ?: "");
 
   if(!module || config.test) return 0;
 

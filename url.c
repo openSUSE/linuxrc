@@ -339,7 +339,7 @@ int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal,
 /*
  * scheme://domain;user:password@server:port/path?query
  *
- * smb: path = share/path
+ * cifs: path = share/path
  * disk: path = [device/]path
  */
 
@@ -449,7 +449,7 @@ url_t *url_set(char *str)
     tmp = NULL;
   }
 
-  /* smb: first path element is share */
+  /* cifs: first path element is share */
   if(url->scheme == inst_smb && url->path) {
     url->share = url->path;
     url->path = NULL;
@@ -1215,8 +1215,8 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
         if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
 
-        err = net_mount_smb(s, &url->used.server, url->share, url->user, url->password, url->domain);
-        fprintf(stderr, "smb: %s -> %s (%d)\n", url->share, s, err);
+        err = net_mount_cifs(s, &url->used.server, url->share, url->user, url->password, url->domain, options);
+        fprintf(stderr, "cifs: %s -> %s (%d)\n", url->share, s, err);
         if(err) {
           str_copy(&url->tmp_mount, NULL);
           str_copy(&url->mount, NULL);

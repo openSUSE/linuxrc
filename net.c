@@ -66,6 +66,7 @@ static dia_item_t di_wlan_auth_last = di_none;
 static int parse_leaseinfo(char *file);
 static int net_wicked_dhcp(void);
 
+static void net_cifs_build_options(char **options, char *user, char *password, char *workgroup);
 static void net_ask_domain(void);
 static int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial);
 static int ifcfg_write(char *device, ifcfg_t *ifcfg);
@@ -911,25 +912,19 @@ int net_check_address(inet_t *inet, int do_dns)
 /*
  * Build mount option suitable for muont.cifs.
  */
-void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *password, char *workgroup)
+void net_cifs_build_options(char **options, char *user, char *password, char *workgroup)
 {
   if(!options) return;
-  *options = 0;
 
-  if(!server) return;
-  sprintf(options,"ip=%s", inet_ntoa(server->ip));
+  str_copy(options, "ro");
 
   if(user) {
-    strcat(options, ",username=");
-    strcat(options, user);
-    strcat(options, ",password=");
-    strcat(options, password ?: "");
+    strprintf(options, "%s,username=%s,password=%s", *options, user, password ?: "");
     if(workgroup) {
-      strcat(options, ",workgroup=");
-      strcat(options, workgroup);
+      strprintf(options, "%s,workgroup=%s", *options, workgroup);
     }
   } else {
-    strcat(options, ",guest");
+    strprintf(options, "%s,guest", *options);
   }
 }
 
@@ -949,9 +944,6 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
  * password: password (NULL: no password)
  * workgroup: workgroup (NULL: no workgroup)
  *
- */
-
-/*
  * depending on guest login
  *   options += "guest"
  * resp.
@@ -962,32 +954,40 @@ void net_smb_get_mount_options(char *options, inet_t *server, char *user, char *
  *   options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
  * "  mount -t smbfs" + device + " " + mountpoint + " " + options
  */
-int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, char *password, char *workgroup)
+int net_mount_cifs(char *mountpoint, inet_t *server, char *share, char *user, char *password, char *workgroup, char *options)
 {
-  char tmp[1024];
-  char mount_options[256];
+  char *cmd = NULL;
+  char *real_options = NULL;
+  int err;
 
-  if(!config.net.cifs.binary) return -2;
+  if(!config.net.cifs.binary || !server->name) return -2;
 
-  if(net_check_address(server, 1)) return -3;
+  mod_modprobe(config.net.cifs.module, NULL);
 
   if(!share) share = "";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
 
-  net_smb_get_mount_options(mount_options, server, user, password, workgroup);
+  net_cifs_build_options(&real_options, user, password, workgroup);
 
-  sprintf(tmp,
-    "%s //%s/%s %s -o ro,%s >&2",
-    config.net.cifs.binary, server->name, share, mountpoint, mount_options
-  );
+  if(options) {
+    if(*options == '-') {
+      str_copy(&real_options, options + 1);
+    }
+    else {
+      strprintf(&real_options, "%s,%s", real_options, options);
+    }
+  }
 
-  mod_modprobe(config.net.cifs.module, NULL);
+  strprintf(&cmd, "%s '//%s/%s' '%s' -o '%s' >&2", config.net.cifs.binary, server->name, share, mountpoint, real_options);
 
-  fprintf(stderr, "%s\n", tmp);
+  fprintf(stderr, "%s\n", cmd);
 
-  if(system(tmp)) return -1;
+  err = system(cmd);
 
-  return 0;
+  str_copy(&cmd, NULL);
+  str_copy(&real_options, NULL);
+
+  return err ? -1 : 0;
 }
 
 
@@ -1001,6 +1001,8 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
  *
  * config.net.nfs: nfs options if options == NULL
  *
+ * options are added to any options linuxrc uses unless it is prefixed with '-'.
+ *
  * return:
  *      0: ok
  *   != 0: error code
@@ -1008,15 +1010,11 @@ int net_mount_smb(char *mountpoint, inet_t *server, char *share, char *user, cha
  */
 int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, char *options)
 {
-  int i = 0;
-  char addr[INET6_ADDRSTRLEN];
-  char *args[6];
-  char *path;
+  char *path = NULL;
   char *real_options = NULL;
-  int err;
   pid_t mount_pid;
 
-  if(net_check_address(server, 1)) return -2;
+  if(!server->name) return -2;
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
@@ -1035,33 +1033,29 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port
     return WEXITSTATUS(err);
   }
 
-  if (server->ipv4)
-    err = asprintf(&path, "%s:%s",
-		   inet_ntop(AF_INET, &server->ip.s_addr, addr,
-			     INET_ADDRSTRLEN), hostdir);
-  else
-    err = asprintf(&path, "[%s]:%s",
-		   inet_ntop(AF_INET6, &server->ip6.s6_addr, addr,
-			     INET6_ADDRSTRLEN), hostdir);
-  if (err < 0) {
-    perror("asprintf");
-    return err;
+  if(strchr(server->name, ':')) {
+    strprintf(&path, "[%s]:%s", server->name, hostdir);
+  }
+  else {
+    strprintf(&path, "%s:%s", server->name, hostdir);
   }
 
   str_copy(&real_options, "nolock");
 
   if(!options) options = config.net.nfs.opts;
 
-  if(options) strprintf(&real_options, "%s,%s", real_options, options);
+  if(options) {
+    if(*options == '-') {
+      str_copy(&real_options, options + 1);
+    }
+    else {
+      strprintf(&real_options, "%s,%s", real_options, options);
+    }
+  }
 
-  if(config.debug) fprintf(stderr, "mount -o %s %s %s\n", real_options, path, mountpoint);
+  if(config.debug) fprintf(stderr, "mount -o '%s' '%s' '%s'\n", real_options, path, mountpoint);
 
-  args[i++] = "mount";
-  args[i++] = "-o";
-  args[i++] = real_options;
-  args[i++] = path;
-  args[i++] = mountpoint;
-  args[i++] = NULL;
+  char *args[6] = { "mount", "-o", real_options, path, mountpoint /*, NULL */ };
 
   signal(SIGUSR1, SIG_IGN);
   execvp("mount", args);
@@ -3169,6 +3163,12 @@ void net_wicked_down(char *ifname)
 }
 
 
+/*
+ * Convert netmask string to network prefix bits.
+ * Both ipv4 and ipv6 forms are allowed.
+ *
+ * Return -1 if it fails.
+ */
 int netmask_to_prefix(char *netmask)
 {
   int prefix = -1;
