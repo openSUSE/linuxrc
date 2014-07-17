@@ -99,13 +99,9 @@ void url_read(url_data_t *url_data)
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSDATA, url_data);
   curl_easy_setopt(c_handle, CURLOPT_NOPROGRESS, 0);
 
-  if(config.net.ipv6) {
-    curl_easy_setopt(c_handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
-  }
-
   url_data->err = curl_easy_setopt(c_handle, CURLOPT_URL, url_data->url->str);
-  // fprintf(stderr, "curl opt url = %d\n", url_data->err);
 
+  if(config.debug >= 2) fprintf(stderr, "curl opt url = %d (%s)\n", url_data->err, url_data->curl_err_buf);
   if(config.debug >= 2) fprintf(stderr, "url_read(%s)\n", url_data->url->str);
 
   str_copy(&proxy_url, url_print(config.url.proxy, 1));
@@ -128,7 +124,7 @@ void url_read(url_data_t *url_data)
     url_write_cb(NULL, 0, 0, url_data);
   }
 
-  // fprintf(stderr, "curl perform = %d (%s)\n", url_data->err, url_data->err_buf);
+  if(config.debug >= 2) fprintf(stderr, "curl perform = %d (%s)\n", url_data->err, url_data->curl_err_buf);
 
   if(url_data->f) {
     i = url_data->pipe_fd >= 0 ? pclose(url_data->f) : fclose(url_data->f);
@@ -806,6 +802,21 @@ char *url_print_zypp(url_t *url)
     if((s = url->used.device) || (s = url->device)) {
       strprintf(&buf, "%s%cdevices=%s", buf, q++ ? '&' : '?', long_dev(s));
     }
+  }
+
+  if(
+    config.url.proxy &&
+    config.url.proxy->server && (
+      url->scheme == inst_http ||
+      url->scheme == inst_https ||
+      url->scheme == inst_ftp ||
+      url->scheme == inst_tftp
+    )
+  ) {
+    strprintf(&buf, "%s%cproxy=%s", buf, q++ ? '&' : '?', config.url.proxy->server);
+    if(config.url.proxy->port) strprintf(&buf, "%s%cproxyport=%u", buf, q++ ? '&' : '?', config.url.proxy->port);
+    if(config.url.proxy->user) strprintf(&buf, "%s%cproxyuser=%s", buf, q++ ? '&' : '?', config.url.proxy->user);
+    if(config.url.proxy->password) strprintf(&buf, "%s%cproxypass=%s", buf, q++ ? '&' : '?', config.url.proxy->password);
   }
 
   if(url->is.file && file) {

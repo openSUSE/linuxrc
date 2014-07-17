@@ -1942,14 +1942,7 @@ void file_write_install_inf(char *dir)
 
   }
 
-  if(config.url.proxy) {
-    if(config.url.proxy->used.server.ok) {
-      file_write_inet2(f, key_proxy, &config.url.proxy->used.server, INET_WRITE_NAME_OR_IP);
-    }
-    if(config.url.proxy->port) fprintf(f, "ProxyPort: %u\n", config.url.proxy->port);
-    fprintf(f, "ProxyProto: http\n");
-    fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
-  }
+  if(config.url.proxy) fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
 
   file_write_modparms(f);
 
