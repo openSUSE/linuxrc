@@ -801,6 +801,8 @@ void lxrc_init()
 
   config.plymouth = 1;
 
+  config.ifcfg.manual = calloc(1, sizeof *config.ifcfg.manual);
+
   #if defined(__s390__) || defined(__s390x__)
   config.linemode = 1;
   #endif

@@ -26,6 +26,7 @@ char *net_dhcp_type(void);
 void net_update_ifcfg(void);
 ifcfg_t *ifcfg_parse(char *str);
 ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p);
+char *ifcfg_print(ifcfg_t *ifcfg);
 void net_update_state(void);
 void net_wicked_up(char *ifname);
 void net_wicked_down(char *ifname);

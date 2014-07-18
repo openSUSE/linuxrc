@@ -1270,6 +1270,38 @@ void util_status_info(int log_it)
     }
   }
 
+  if(config.ifcfg.all) {
+    ifcfg_t *ifcfg;
+    slist_t *sl_ifcfg;
+    strcpy(buf, "ifcfg entries:");
+    slist_append_str(&sl0, buf);
+    for(ifcfg = config.ifcfg.all; ifcfg; ifcfg = ifcfg->next) {
+      sl_ifcfg = slist_split('\n', ifcfg_print(ifcfg));
+      for(sl = sl_ifcfg; sl; sl = sl->next) {
+        if(*sl->key || ifcfg->next) {	// keep newline between entries
+          sprintf(buf, "%s", sl->key);
+          slist_append_str(&sl0, buf);
+        }
+      }
+      slist_free(sl_ifcfg);
+    }
+  }
+
+  if(config.ifcfg.manual) {
+    ifcfg_t *ifcfg = config.ifcfg.manual;
+    slist_t *sl_ifcfg;
+    strcpy(buf, "manual ifcfg entry:");
+    slist_append_str(&sl0, buf);
+    sl_ifcfg = slist_split('\n', ifcfg_print(ifcfg));
+    for(sl = sl_ifcfg; sl; sl = sl->next) {
+      if(*sl->key) {
+        sprintf(buf, "%s", sl->key);
+        slist_append_str(&sl0, buf);
+      }
+    }
+    slist_free(sl_ifcfg);
+  }
+
   if(config.cdid) {
     sprintf(buf, "cdrom id = %s", config.cdid);
     slist_append_str(&sl0, buf);
@@ -2249,7 +2281,7 @@ slist_t *slist_split(char del, char *text)
 
   text = strdup(text);
 
-  if(isspace(del)) {
+  if(isblank(del)) {
     len = strlen(text);
 
     for(i = 0; i < len; i++) if(isspace(text[i])) text[i] = 0;

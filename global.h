@@ -276,6 +276,7 @@ typedef struct ifcfg_s {
   unsigned dhcp:1;	// use dhcp
   unsigned used:1;	// config has been used
   unsigned pattern:1;	// 'device' is shell glob
+  int netmask_prefix;	// prefix given via netmask option and only used if an ip doen't have one
   char *vlan;		// vlan id, if any
   char *ip;		// list of ip addresses, space separated
   char *gw;		// gateway
@@ -639,6 +640,8 @@ typedef struct {
 
   struct {
     ifcfg_t *list;		/* list of ifcfg entries */
+    ifcfg_t *manual;		/* ifcfg data for manual network setup */
+    ifcfg_t *all;		/* all we ever did, kept for debugging */
     slist_t *initial;		/* list of initially set up network interfaces */
     slist_t *if_state;		/* config state of network interfaces */
     slist_t *if_up;		/* network interfaces != lo that are 'up' */

@@ -2461,7 +2461,7 @@ void net_update_ifcfg()
   hd_t *net_list, *hd;
   hd_res_t *res;
   char *hwaddr;
-  ifcfg_t *ifcfg;
+  ifcfg_t *ifcfg, **ifcfg_p;
 
   if(!config.ifcfg.list) return;
 
@@ -2500,7 +2500,9 @@ void net_update_ifcfg()
 
   hd_free_hd_list(net_list);
 
-  // FIXME: free it
+  // append to config.ifcfg.all and clear list
+  for(ifcfg_p = &config.ifcfg.all; *ifcfg_p; ifcfg_p = &(*ifcfg_p)->next);
+  *ifcfg_p = config.ifcfg.list;
   config.ifcfg.list = NULL;
 }
 
@@ -2904,19 +2906,7 @@ ifcfg_t *ifcfg_parse(char *str)
     }
   }
 
-  if(config.debug) {
-    fprintf(stderr, "  device = %s\n", ifcfg->device);
-    if(ifcfg->vlan) fprintf(stderr, "  vlan = %s\n", ifcfg->vlan);
-    if(ifcfg->type) fprintf(stderr, "  type = %s\n", ifcfg->type);
-    fprintf(stderr, "  dhcp = %u, pattern = %u, used = %u\n", ifcfg->dhcp, ifcfg->pattern, ifcfg->used);
-    if(ifcfg->ip) fprintf(stderr, "  ip = %s\n", ifcfg->ip);
-    if(ifcfg->gw) fprintf(stderr, "  gw = %s\n", ifcfg->gw);
-    if(ifcfg->ns) fprintf(stderr, "  ns = %s\n", ifcfg->ns);
-    if(ifcfg->domain) fprintf(stderr, "  domain = %s\n", ifcfg->domain);
-    for (sl = ifcfg->flags; sl; sl = sl->next) {
-      fprintf(stderr, "  %s = \"%s\"\n", sl->key, sl->value);
-    }
-  }
+  if(config.debug) fprintf(stderr, "%s", ifcfg_print(ifcfg));
 
   return ifcfg;
 }
@@ -2926,6 +2916,35 @@ ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p)
 {
   for(; *p0; p0 = &(*p0)->next);
   return *p0 = p;
+}
+
+
+/*
+ * Returns static buffer.
+ */
+char *ifcfg_print(ifcfg_t *ifcfg)
+{
+  slist_t *sl;
+  static char *buf = NULL;
+
+  str_copy(&buf, NULL);
+
+  strprintf(&buf, "  device = %s\n", ifcfg->device);
+  if(ifcfg->vlan) strprintf(&buf, "%s  vlan = %s\n", buf, ifcfg->vlan);
+  if(ifcfg->type) strprintf(&buf, "%s  type = %s\n", buf, ifcfg->type);
+  strprintf(&buf,
+    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d\n",
+    buf, ifcfg->dhcp, ifcfg->pattern, ifcfg->used, ifcfg->netmask_prefix
+  );
+  if(ifcfg->ip) strprintf(&buf, "%s  ip = %s\n", buf, ifcfg->ip);
+  if(ifcfg->gw) strprintf(&buf, "%s  gw = %s\n", buf, ifcfg->gw);
+  if(ifcfg->ns) strprintf(&buf, "%s  ns = %s\n", buf, ifcfg->ns);
+  if(ifcfg->domain) strprintf(&buf, "%s  domain = %s\n", buf, ifcfg->domain);
+  for (sl = ifcfg->flags; sl; sl = sl->next) {
+    strprintf(&buf, "%s  %s = \"%s\"\n", buf, sl->key, sl->value);
+  }
+
+  return buf;
 }
 
 
