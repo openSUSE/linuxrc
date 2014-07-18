@@ -2682,13 +2682,39 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
         if(!sl0->next) {
           sl = slist_append_str(&sl_ifcfg, "IPADDR");
           str_copy(&sl->value, sl0->key);
+          if(ifcfg->netmask_prefix > 0 && !strchr(sl->value, '/')) {
+            strprintf(&sl->value, "%s/%d", sl->value, ifcfg->netmask_prefix);
+          }
         }
         else {
           for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
             sl = slist_append(&sl_ifcfg, slist_new());
             strprintf(&sl->key, "IPADDR_%d", ++i);
             str_copy(&sl->value, sl1->key);
+            if(ifcfg->netmask_prefix > 0 && !strchr(sl->value, '/')) {
+              strprintf(&sl->value, "%s/%d", sl->value, ifcfg->netmask_prefix);
+            }
           }
+        }
+
+        sl0 = slist_free(sl0);
+      }
+
+      if(ifcfg->ptp) {
+        if((sl0 = slist_split(' ', ifcfg->gw))) {
+          if(!sl0->next) {
+            sl = slist_append_str(&sl_ifcfg, "REMOTE_IPADDR");
+            str_copy(&sl->value, sl0->key);
+          }
+          else {
+            for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
+              sl = slist_append(&sl_ifcfg, slist_new());
+              strprintf(&sl->key, "REMOTE_IPADDR_%d", ++i);
+              str_copy(&sl->value, sl1->key);
+            }
+          }
+
+          sl0 = slist_free(sl0);
         }
       }
 
@@ -2734,8 +2760,14 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
         }
       }
       else {
-        sl = slist_append(&sl_ifroute, slist_new());
-        strprintf(&sl->key, "default %s - %s", gw, device);
+        slist_t *sl1, *sl0 = slist_split(' ', ifcfg->gw);
+
+        for(sl1 = sl0; sl1; sl1 = sl1->next) {
+          sl = slist_append(&sl_ifroute, slist_new());
+          strprintf(&sl->key, "default %s - %s", sl1->key, device);
+        }
+
+        slist_free(sl0);
       }
     }
   }
