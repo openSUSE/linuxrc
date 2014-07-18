@@ -305,7 +305,6 @@ typedef struct ifcfg_s {
 #define NS_NETMASK		(1 << 3)
 #define NS_GATEWAY		(1 << 4)
 #define NS_NAMESERVER		(1 << 5)
-#define NS_ALLIFS		(1 << 6)
 #define NS_DISPLAY		(1 << 7)
 // #define NS_DHCP6		(1 << 8)
 #define NS_NOW			(1 << 9)

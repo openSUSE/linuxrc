@@ -1112,7 +1112,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
             else if(!strcmp(s, "netmask")) i = NS_NETMASK;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
-            else if(!strcmp(s, "all")) i = NS_ALLIFS;
 #if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
 #endif
@@ -1132,10 +1131,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
                 sizeof config.net.nameserver / sizeof *config.net.nameserver :
                 u;
             }
-            if(i == NS_ALLIFS) {
-              config.net.all_ifs = *sl->key == '-' ? 0 : 1;
-            }
-            else if(i == NS_NOW) {
+            if(i == NS_NOW) {
               config.net.now = *sl->key == '-' ? 0 : 1;
             }
             else if(i) {

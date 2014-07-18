@@ -356,11 +356,6 @@ void auto2_scan_hardware()
     printf("Reading info file: %s\n", sl->key);
     fflush(stdout);
     url = url_set(sl->key);
-#if defined(__s390__) || defined(__s390x__)
-    if(url->is.network && !config.net.configured) {
-        net_activate_s390_devs();
-    }
-#endif
     err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
@@ -382,9 +377,6 @@ void auto2_scan_hardware()
       printf("Downloading AutoYaST file: %s\n", config.autoyast2);
       fflush(stdout);
     }
-#if defined(__s390__) || defined(__s390x__)
-    if(url->is.network && !config.net.configured) net_activate_s390_devs();
-#endif
     err = url_read_file_anywhere(url, NULL, NULL, "/download/autoyast.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
@@ -424,11 +416,6 @@ void auto2_scan_hardware()
 
         strprintf(&path2, "%s%sdriverupdate", path1, path1[0] == 0 || path1[strlen(path1) - 1] == '/' ? "" : "/");
 
-#if defined(__s390__) || defined(__s390x__)
-        if(url->is.network && !config.net.configured) {
-            net_activate_s390_devs();
-        }
-#endif
         err = url_read_file_anywhere(
           url, NULL, NULL, file_name, NULL,
           URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
@@ -608,11 +595,7 @@ int auto2_find_repo()
  */
 void auto2_user_netconfig()
 {
-  slist_t *sl;
-
-  if(!config.net.do_setup) return;
-
-  if(config.ifcfg.if_up) return;
+  if(!net_config_needed(0)) return;
 
   check_ptp();
   
@@ -632,37 +615,12 @@ void auto2_user_netconfig()
   }
 
   if(config.net.configured == nc_none || config.net.do_setup) {
-    if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
-      util_update_netdevice_list(NULL, 1);
+    int win_old, maybe_interactive;
 
-      config.net.configured = nc_none;
-
-      for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
-        str_copy(&config.net.device, sl->key);
-
-        net_dhcp();
-
-        if(config.net.dhcp_active) {
-          config.net.configured = nc_dhcp;
-
-          if(net_activate_ns()) {
-            fprintf(stderr, "%s: net activation failed\n", config.net.device);
-            config.net.configured = nc_none;
-          }
-          else {
-            fprintf(stderr, "%s: ok\n", config.net.device);
-          }
-        }
-      }
-    }
-    else {
-      int win_old, maybe_interactive;
-
-      maybe_interactive = config.net.setup != NS_DHCP;
-      if(!(win_old = config.win) && maybe_interactive) util_disp_init();
-      net_config();
-      if(!win_old && maybe_interactive) util_disp_done();
-    }
+    maybe_interactive = config.net.setup != NS_DHCP;
+    if(!(win_old = config.win) && maybe_interactive) util_disp_init();
+    net_config();
+    if(!win_old && maybe_interactive) util_disp_done();
   }
 
   if(config.net.configured == nc_none) {
@@ -1252,5 +1210,4 @@ int auto2_remove_extension(char *extension)
 
   return err;
 }
-
 

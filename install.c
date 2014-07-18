@@ -92,6 +92,7 @@ int inst_menu()
     di_inst_update,
     di_inst_rescue,
     di_inst_system,
+    di_inst_net_config,
     di_none
   };
 
@@ -141,6 +142,11 @@ int inst_menu_cb(dia_item_t di)
 
     case di_inst_system:
       err = root_boot_system();
+      break;
+
+    case di_inst_net_config:
+      net_config();
+      err = 1;
       break;
 
     default:
@@ -637,7 +643,7 @@ int inst_do_cdrom()
   int err = 0;
   char *device = NULL;
 
-  if(config.net.do_setup && net_config()) return 1;
+  if(net_config_needed(0) && net_config()) return 1;
 
   if(
     config.url.install &&
@@ -671,7 +677,7 @@ int inst_do_harddisk()
   int err = 0;
   char *device = NULL, *path = NULL;
 
-  if(config.net.do_setup && net_config()) return 1;
+  if(net_config_needed(0) && net_config()) return 1;
 
   if(
     config.url.install &&
@@ -726,7 +732,7 @@ int inst_do_network(instmode_t scheme)
   inet_t server = {}, proxy = {};
 
   /* setup network */
-  if(net_config()) return 1;
+  if(net_config_needed(1) && net_config()) return 1;
 
   /* get current values */
   if(config.url.install) {

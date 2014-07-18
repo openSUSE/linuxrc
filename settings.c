@@ -247,6 +247,7 @@ int set_settings()
     di_set_usessh,
     di_set_startshell,
     di_set_slp,
+    di_inst_net_config,
     di_none
   };
 
@@ -340,6 +341,10 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_slp:
+      if(net_config_needed(1) && net_config()) {
+        rc = 1;
+        break;
+      }
       url = url_set("slp:");
       s = slp_get_install(url);
       url_free(url);
@@ -356,6 +361,11 @@ int set_settings_cb (dia_item_t di)
         }
       }
       if(rc) dia_message("SLP failed", MSGTYPE_ERROR);
+      rc = 1;
+      break;
+
+    case di_inst_net_config:
+      net_config();
       rc = 1;
       break;
 

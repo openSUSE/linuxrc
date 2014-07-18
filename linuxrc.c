@@ -512,7 +512,7 @@ int do_not_kill(char *name)
   static char *progs[] = {
     "portmap", "rpciod", "lockd", "cifsd", "mount.smbfs", "udevd",
     "mount.ntfs-3g", "brld", "sbl", "wickedd", "wickedd-auto4", "wickedd-dhcp4",
-    "wickedd-dhcp6", "dbus-daemon", "rpc.idmapd", "sh", "haveged"
+    "wickedd-dhcp6", "wickedd-nanny", "dbus-daemon", "rpc.idmapd", "sh", "haveged"
   };
   int i;
 
@@ -1158,7 +1158,7 @@ void lxrc_init()
 
       strprintf(&buf, "%s\n\nRetry?", s ?: "Please make sure your installation medium is available.");
       do {
-        j = dia_okcancel(buf, YES) == YES ? 1 : 0;
+        j = dia_yesno(buf, YES) == YES ? 1 : 0;
         if(j) {
           slist_t *sl;
           config.manual = 0;

@@ -30,3 +30,4 @@ void net_update_state(void);
 void net_wicked_up(char *ifname);
 void net_wicked_down(char *ifname);
 int netmask_to_prefix(char *netmask);
+int net_config_needed(int really);

@@ -63,8 +63,7 @@ struct {
   { di_inst_update,      "Upgrade",       },
   { di_inst_rescue,      "Rescue System",        },
   { di_inst_system,      "Boot Installed System",         },
-  { di_inst_update_add,  "Add Driver Update",   },
-  { di_inst_update_show, "Show Driver Updates", },
+  { di_inst_net_config,  "Network Setup",   },
 
   { di_source_cdrom,     "DVD / CD-ROM",                 },
   { di_source_net,       "Network",                 },

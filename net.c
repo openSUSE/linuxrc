@@ -52,7 +52,6 @@
 static int net_activate4(void);
 static int net_activate6(void);
 #if defined(__s390__) || defined(__s390x__)
-int net_activate_s390_devs(void);
 int net_activate_s390_devs_ex(hd_t* hd, char** device);
 #endif
 static void net_setup_nameserver(void);
@@ -64,7 +63,7 @@ static int wlan_auth_cb(dia_item_t di);
 
 static dia_item_t di_wlan_auth_last = di_none;
 static int parse_leaseinfo(char *file);
-static int net_wicked_dhcp(void);
+static void net_wicked_dhcp(void);
 
 static void net_cifs_build_options(char **options, char *user, char *password, char *workgroup);
 static void net_ask_domain(void);
@@ -171,14 +170,15 @@ int net_config()
   int rc = 0;
   char buf[256];
 
-  if(!config.win && !config.manual && config.ifcfg.if_up) return 0;
+  if(!config.win && !config.manual) return 0;
 
+  // really here?
   net_ask_password();
 
   if(
     config.win &&
-    config.net.is_configured &&
-    (!config.manual || dia_yesno("Your network is already configured. Keep this configuration?", YES) == YES)
+    config.ifcfg.if_up &&
+    (!config.manual || dia_yesno("Your network is already configured. Keep this configuration?", YES) != NO)
   ) {
     return 0;
   }
@@ -228,136 +228,6 @@ int net_config()
   }
 
   return rc;
-}
-
-
-static void net_config2_manual(void);
-
-
-/*
- * Configure network interface. Ask for network config data if necessary.
- * Does either DHCP, BOOTP or static network setup.
- *
- * config.net.device: network interface
- *
- * Return:
- *      0: ok
- *   != 0: error or abort
- *
- *   config.net.is_configured: nc_none, nc_dhcp, nc_static
- *
- * Does nothing if DHCP is active.
- *
- */
-int net_config2(int type)
-{
-  config.net.configured = nc_none;
-
-  // ###### FIXME: use net_choose_device()
-  if(!config.net.device) str_copy(&config.net.device, config.netdevice);
-  if(!config.net.device) {
-    util_update_netdevice_list(NULL, 1);
-    if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
-  }
-
-  if(!config.net.device) {
-    fprintf(stderr, "interface setup: no interfaces\n");
-    return 1;
-  }
-
-  fprintf(stderr, "interface setup: %s\n", config.net.device);
-
-//  if(url->is.wlan && wlan_setup()) return 0;
-
-  if((config.net.do_setup & DS_SETUP)) net_config2_manual();
-
-  if(config.net.configured == nc_none) config.net.configured = nc_static;
-
-  /* we need at least ip & netmask for static network config */
-  if((net_config_mask() & 3) != 3) {
-    net_dhcp();
-
-    if(!config.net.dhcp_active) {
-      config.net.configured = nc_none;
-      return 0;
-    }
-
-    config.net.configured = nc_dhcp;
-  }
-
-  if(net_activate_ns()) {
-    fprintf(stderr, "network setup failed\n");
-    config.net.configured = nc_none;
-
-    return 0;
-  }
-  else {
-    fprintf(stderr, "%s activated\n", config.net.device);
-  }
-
-
-
-
-
-  return 0;
-}
-
-
-void net_config2_manual()
-{
-  int win_old;
-  slist_t *sl;
-
-  if(!config.net.do_setup) return;
-
-  if((net_config_mask() & 3) == 3) {	/* we have ip & netmask */
-    config.net.configured = nc_static;
-    /* looks a bit weird, but we need it here for net_activate_ns() */
-    if(!config.net.device) str_copy(&config.net.device, config.netdevice);
-    if(!config.net.device) {
-      util_update_netdevice_list(NULL, 1);
-      if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
-    }
-    if(net_activate_ns()) {
-      fprintf(stderr, "net activation failed\n");
-      config.net.configured = nc_none;
-    }
-  }
-
-  if(config.net.configured == nc_none || config.net.do_setup) {
-    if(config.net.all_ifs && (config.net.setup & NS_DHCP)) {
-      util_update_netdevice_list(NULL, 1);
-
-      config.net.configured = nc_none;
-
-      for(sl = config.net.devices; sl && config.net.configured == nc_none; sl = sl->next) {
-        str_copy(&config.net.device, sl->key);
-
-        net_dhcp();
-
-        if(config.net.dhcp_active) {
-          config.net.configured = nc_dhcp;
-
-          if(net_activate_ns()) {
-            fprintf(stderr, "%s: net activation failed\n", config.net.device);
-            config.net.configured = nc_none;
-          }
-          else {
-            fprintf(stderr, "%s: ok\n", config.net.device);
-          }
-        }
-      }
-    }
-    else {
-      if(!(win_old = config.win)) util_disp_init();
-      net_config();
-      if(!win_old) util_disp_done();
-    }
-  }
-
-  if(config.net.configured == nc_none) {
-    config.vnc = config.usessh = 0;
-  }
 }
 
 
@@ -1689,27 +1559,25 @@ int net_dhcp()
  *  config.net.nisdomain
  *  config.net.nameserver
  */
-int net_wicked_dhcp()
+void net_wicked_dhcp()
 {
   char file[256], *buf = NULL;
   window_t win;
-  int got_ip = 0, i, rc;
+  int got_ip = 0;
   ifcfg_t *ifcfg = NULL;
-
-  if(config.net.dhcp_active) return 0;
 
   if(config.test) {
     config.net.dhcp_active = 1;
 
-    return 0;
+    return;
   }
 
   strprintf(&buf, "Sending DHCP%s request to %s...", net_dhcp_type(), config.net.device);
+  fprintf(stderr, "%s\n", buf);
   if(config.win) {
     dia_info(&win, buf, MSGTYPE_INFO);
   }
   else {
-    fprintf(stderr, "%s\n", buf);
     printf("%s\n", buf);
     fflush(stdout);
   }
@@ -1731,17 +1599,15 @@ int net_wicked_dhcp()
 
   if(config.net.ipv4) {
     snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", config.net.device);
-    got_ip = parse_leaseinfo(file);
+    parse_leaseinfo(file);
   }
 
   if(!got_ip && config.net.ipv6) {
     snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", config.net.device);
-    got_ip = parse_leaseinfo(file);
+    parse_leaseinfo(file);
   }
 
-  net_update_state();
-
-  if(slist_getentry(config.ifcfg.if_up, config.net.device)) got_ip |= 1;
+  if(slist_getentry(config.ifcfg.if_up, config.net.device)) got_ip = 1;
 
   if(config.win) win_close(&win);
 
@@ -1750,21 +1616,10 @@ int net_wicked_dhcp()
     if(config.net.ifup_wait) sleep(config.net.ifup_wait);
   }
   else {
-    if(config.win) {
-      if(config.net.dhcpfail && strcmp(config.net.dhcpfail, "ignore")) {
-        if(!strcmp(config.net.dhcpfail, "show")) {
-          dia_info(&win, "DHCP configuration failed.", MSGTYPE_ERROR);
-          sleep(4);
-          win_close(&win);
-        }
-        else if(!strcmp(config.net.dhcpfail, "manual")) {
-          i = dia_yesno("DHCP configuration failed.", NO);
-          if(i == YES) {
-            // is_static = 1;
-            // ?????
-          }
-        }
-      }
+    if(config.win && config.net.dhcpfail && !strcmp(config.net.dhcpfail, "show")) {
+      dia_info(&win, "DHCP configuration failed.", MSGTYPE_ERROR);
+      sleep(4);
+      win_close(&win);
     }
   }
 
@@ -1782,18 +1637,14 @@ int net_wicked_dhcp()
     }
 
     fprintf(stderr, "%s\n", buf);
-    printf("%s\n", buf);
+    if(!config.win) printf("%s\n", buf);
 
     str_copy(&buf, NULL);
   }
   else {
     fprintf(stderr, "no/incomplete answer.\n");
-    printf("no/incomplete answer.\n");
+    if(!config.win) printf("no/incomplete answer.\n");
   }
-
-  rc = config.net.dhcp_active ? 0 : 1;
-
-  return rc;
 }
 
 
@@ -1907,7 +1758,7 @@ static int net_s390_getrwchans_ex(hd_t* hd)
   return 0;
 }
 
-int net_activate_s390_devs(void)
+int net_activate_s390_devs()
 {
   return net_activate_s390_devs_ex(NULL, NULL);
 }
@@ -3142,6 +2993,10 @@ void net_wicked_up(char *ifname)
 
   system(buf);
 
+  sleep(1);
+
+  net_update_state();
+
   str_copy(&buf, NULL);
 }
 
@@ -3158,6 +3013,10 @@ void net_wicked_down(char *ifname)
   strprintf(&buf, "wicked ifdown %s >&2", ifname);
 
   system(buf);
+
+  sleep(1);
+
+  net_update_state();
 
   str_copy(&buf, NULL);
 }
@@ -3205,5 +3064,22 @@ int netmask_to_prefix(char *netmask)
   if(config.debug) fprintf(stderr, "netmask -> prefix: %s -> %d\n", netmask, prefix);
 
   return prefix;
+}
+
+
+/*
+ * Check whether a network setup is necessary.
+ *
+ * That is: we need a network but no interface is up.
+ *
+ * We need a network if really or config.net.do_setup is set.
+ */
+int net_config_needed(int really)
+{
+  if(!(config.net.do_setup || really)) return 0;
+
+  net_update_state();
+
+  return config.ifcfg.if_up ? 0 : 1;
 }
 

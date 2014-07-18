@@ -1168,7 +1168,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
   add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
-  add_flag(&sl0, buf, config.net.dhcp_active, "dhcp_active");
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
