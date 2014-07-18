@@ -664,6 +664,9 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_hostip:
+        str_copy(&config.ifcfg.manual->type, "static");
+        if(*f->value) str_copy(&config.ifcfg.manual->ip, f->value);
+
         name2inet(&config.net.hostname, f->value);
         net_check_address(&config.net.hostname, 0);
         if(config.net.hostname.ipv4 && config.net.hostname.net.s_addr) {
@@ -676,21 +679,33 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_netmask:
+        i = netmask_to_prefix(f->value);
+        if(i > 0) config.ifcfg.manual->netmask_prefix = i;
+
         name2inet(&config.net.netmask, f->value);
         net_check_address(&config.net.netmask, 0);
         break;
 
       case key_gateway:
+        if(*f->value) str_copy(&config.ifcfg.manual->gw, f->value);
+
         name2inet(&config.net.gateway, f->value);
         net_check_address(&config.net.gateway, 0);
         break;
 
       case key_ptphost:
+        if(*f->value) {
+          config.ifcfg.manual->ptp = 1;
+          str_copy(&config.ifcfg.manual->gw, f->value);
+        }
+
         name2inet(&config.net.ptphost, f->value);
         net_check_address(&config.net.ptphost, 0);
         break;
       
       case key_nameserver:
+        if(*f->value) str_copy(&config.ifcfg.manual->ns, f->value);
+
         for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
           name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
           net_check_address(&config.net.nameserver[config.net.nameservers], 0);
@@ -798,6 +813,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_domain:
+        if(*f->value) str_copy(&config.ifcfg.manual->domain, f->value);
+
         str_copy(&config.net.domain, f->value);
         break;
 
@@ -1485,6 +1502,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_netdevice:
+        str_copy(&config.ifcfg.manual->device, *f->value ? f->value : NULL);
+
         str_copy(&config.netdevice, short_dev(*f->value ? f->value : NULL));
         break;
 

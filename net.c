@@ -2933,8 +2933,10 @@ char *ifcfg_print(ifcfg_t *ifcfg)
   if(ifcfg->vlan) strprintf(&buf, "%s  vlan = %s\n", buf, ifcfg->vlan);
   if(ifcfg->type) strprintf(&buf, "%s  type = %s\n", buf, ifcfg->type);
   strprintf(&buf,
-    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d\n",
-    buf, ifcfg->dhcp, ifcfg->pattern, ifcfg->used, ifcfg->netmask_prefix
+    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u\n",
+    buf,
+    ifcfg->dhcp, ifcfg->pattern, ifcfg->used,
+    ifcfg->netmask_prefix, ifcfg->ptp
   );
   if(ifcfg->ip) strprintf(&buf, "%s  ip = %s\n", buf, ifcfg->ip);
   if(ifcfg->gw) strprintf(&buf, "%s  gw = %s\n", buf, ifcfg->gw);
