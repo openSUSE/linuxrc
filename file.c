@@ -2618,7 +2618,7 @@ int activate_network()
     config.net.configured = nc_dhcp;
   }
   else {
-    if(net_activate_ns()) {
+    if(net_static()) {
       fprintf(stderr, "net activation failed\n");
       return 0;
     }

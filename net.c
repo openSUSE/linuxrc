@@ -49,12 +49,9 @@
 #include "auto2.h"
 
 
-static int net_activate4(void);
-static int net_activate6(void);
 #if defined(__s390__) || defined(__s390x__)
 int net_activate_s390_devs_ex(hd_t* hd, char** device);
 #endif
-static void net_setup_nameserver(void);
 
 static int net_choose_device(void);
 static int net_input_data(void);
@@ -127,11 +124,6 @@ void net_ask_domain()
         break;
       }
       str_copy(&ip.name, sl->key);
-/*      net_check_address(&ip, 0);
-      if(!ip.ok) {
-        dia_message("Each domain must be a valid IP address.", MSGTYPE_ERROR);
-        break;
-      } */
     }
 
     if(!sl) {
@@ -152,7 +144,7 @@ void net_ask_domain()
 
 /*
  * Configure network. Ask for network config data if necessary.
- * Does either DHCP, BOOTP or calls net_activate_ns() to setup the interface.
+ * Calls either net_dhcp() or net_static() to setup the interface.
  *
  * Return:
  *      0: ok
@@ -172,7 +164,7 @@ int net_config()
 
   if(!config.win && !config.manual) return 0;
 
-  // really here?
+  // FIXME: not really here
   net_ask_password();
 
   if(
@@ -216,16 +208,15 @@ int net_config()
   }
   else {
     rc = net_input_data();
-    if(!rc) config.net.configured = nc_static;
+    if(!rc) {
+      net_static();
+      config.net.configured = nc_static;
+    }
   }
 
   if(rc) return -1;
 
-  if(net_activate_ns()) {
-    dia_message("An error occurred during the network configuration. Your network card probably was not recognized by the kernel.", MSGTYPE_ERROR);
-    config.net.configured = nc_none;
-    if(!config.test) return rc = -1;
-  }
+  // dia_message("An error occurred during the network configuration. Your network card probably was not recognized by the kernel.", MSGTYPE_ERROR);
 
   return rc;
 }
@@ -285,9 +276,9 @@ void net_stop()
  *
  * config.net.device: interface
  */
-int net_activate_ns()
+int net_static()
 {
-  int err4 = 1, err6 = 1;
+  // int err4 = 1, err6 = 1;
   char *s;
 
   /* make sure we get the interface name if a mac was passed */
@@ -296,326 +287,12 @@ int net_activate_ns()
     config.net.device = s;
   }
 
-  if(config.net.ipv4) err4 = net_activate4();
-  if(config.net.ipv6) err6 = net_activate6();
+  // net_setup_nameserver
 
-  if(!err4 || !err6) {
-    net_setup_nameserver();
-    if(!config.net.dhcp_active) ifcfg_write2(NULL, NULL, 0);
-  }
+  config.ifcfg.manual->dhcp = 0;
+  ifcfg_write2(config.net.device, config.ifcfg.manual, 0);
 
-  // at least one should have worked
-  return err4 && err6 ? 1 : 0;
-}
-
-
-/*
- * Setup IPv4 network interface.
- *
- * Return:
- *      0: ok
- *   != 0: error code
- *
- * Global vars changed:
- *  config.net.is_configured
- *
- * Does nothing if DHCP is active.
- *
- * config.net.device: interface
- */
-int net_activate4()
-{
-    int                 socket_ii;
-    struct ifreq        interface_ri;
-    struct rtentry      route_ri;
-    struct sockaddr_in  sockaddr_ri;
-    int                 error_ii = FALSE;
-    char                command[1000];
-    int                 rc;
-
-    if(!config.net.ifconfig || config.net.dhcp_active) return 0;
-
-    if(config.test) {
-      config.net.is_configured = nc_static;
-
-      return 0;
-    }
-
-    if(!config.net.device) {
-      util_error_trace("net_activate: no network interface!\n");
-      return 1;
-    }
-
-    config.net.is_configured = nc_none;
-
-    net_apply_ethtool(config.net.device, config.net.hwaddr);
-
-    check_ptp();
-
-    if(
-      !config.net.ptp &&
-      !config.forceip &&
-      util_check_exist("/sbin/arping")
-    ) {
-       sprintf(command, "ifconfig %s up", config.net.device);
-       util_error_trace("net_activate: %s\n", command);
-       rc = system(command);
-       if (rc) {
-           util_error_trace("net_activate: ifconfig %s up failed!\n", config.net.device);
-           return 1;
-       }
-
-       sleep(config.net.ifup_wait + 2);
-
-       sprintf(command, "arping -c 1 -I %s -D %s 1>&2", config.net.device, inet_ntoa(config.net.hostname.ip));
-       util_error_trace("net_activate: %s\n", command);
-       rc = system(command);
-
-       sprintf(command, "ifconfig %s down", config.net.device);
-       (void)system (command);
-       util_error_trace("net_activate: %s\n", command);
-
-       if (rc) {
-           util_error_trace("net_activate: address %s in use by another machine!\n", inet_ntoa(config.net.hostname.ip));
-           sprintf(command, "IP address %s is already in use by another machine!", inet_ntoa(config.net.hostname.ip));
-           dia_message(command, MSGTYPE_ERROR);
-           return 1;
-       }
-    }
-
-    socket_ii = socket (AF_INET, SOCK_DGRAM, 0);
-    if (socket_ii == -1)
-    {
-        util_error_trace("net_activate: socket(AF_INET, SOCK_DGRAM, 0) failed at %d\n",__LINE__);
-        return (socket_ii);
-    }
-
-    memset (&interface_ri, 0, sizeof (struct ifreq));
-    strncpy (interface_ri.ifr_name, config.net.device, sizeof interface_ri.ifr_name - 1);
-    interface_ri.ifr_name[sizeof interface_ri.ifr_name - 1] = 0;
-
-    sockaddr_ri.sin_family = AF_INET;
-    sockaddr_ri.sin_port = 0;
-    sockaddr_ri.sin_addr = config.net.hostname.ip;
-    memcpy (&interface_ri.ifr_addr, &sockaddr_ri, sizeof (sockaddr_ri));
-    if (ioctl (socket_ii, SIOCSIFADDR, &interface_ri) < 0)
-    {
-        error_ii = TRUE;
-        util_error_trace("net_activate: SIOCSIFADDR failed at %d\n",__LINE__);
-    }
-
-    if (config.net.ptp)
-        {
-        sockaddr_ri.sin_addr = config.net.ptphost.ip;
-        memcpy (&interface_ri.ifr_dstaddr, &sockaddr_ri, sizeof (sockaddr_ri));
-        if (ioctl (socket_ii, SIOCSIFDSTADDR, &interface_ri) < 0)
-        {
-            error_ii = TRUE;
-            util_error_trace("net_activate: SIOCSIFDSTADDR failed at %d\n",__LINE__);
-        }
-        }
-    else
-        {
-        sockaddr_ri.sin_addr = config.net.netmask.ip;
-        memcpy (&interface_ri.ifr_netmask, &sockaddr_ri, sizeof (sockaddr_ri));
-        if (ioctl (socket_ii, SIOCSIFNETMASK, &interface_ri) < 0)
-            if (config.net.netmask.ip.s_addr)
-            {
-                error_ii = TRUE;
-                util_error_trace("net_activate: SIOCSIFNETMASK failed at %d\n",__LINE__);
-            }
-
-        sockaddr_ri.sin_addr = config.net.broadcast.ip;
-        memcpy (&interface_ri.ifr_broadaddr, &sockaddr_ri, sizeof (sockaddr_ri));
-        if (ioctl (socket_ii, SIOCSIFBRDADDR, &interface_ri) < 0)
-            if (config.net.broadcast.ip.s_addr != 0xffffffff)
-            {
-                error_ii = TRUE;
-                util_error_trace("net_activate: SIOCSIFBRDADDR failed at %d\n",__LINE__);
-            }
-        }
-
-    if (ioctl (socket_ii, SIOCGIFFLAGS, &interface_ri) < 0)
-    {
-        error_ii = TRUE;
-        util_error_trace("net_activate: SIOCGIFFLAGS failed at %d\n",__LINE__);
-    }
-
-    interface_ri.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (config.net.ptp)
-        interface_ri.ifr_flags |= IFF_POINTOPOINT | IFF_NOARP;
-    else
-        interface_ri.ifr_flags |= IFF_BROADCAST;
-    if (ioctl (socket_ii, SIOCSIFFLAGS, &interface_ri) < 0)
-    {
-        error_ii = TRUE;
-        util_error_trace("net_activate: SIOCSIFFLAGS failed at %d\n",__LINE__);
-    }
-
-    memset (&route_ri, 0, sizeof (struct rtentry));
-    route_ri.rt_dev = config.net.device;
-
-    if (config.net.ptp)
-        {
-        sockaddr_ri.sin_addr = config.net.ptphost.ip;
-        memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
-        route_ri.rt_flags = RTF_UP | RTF_HOST;
-        if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
-        {
-            error_ii = TRUE;
-            util_error_trace("net_activate: SIOCADDRT failed at %d\n",__LINE__);
-        }
-
-        memset (&route_ri.rt_dst, 0, sizeof (route_ri.rt_dst));
-        route_ri.rt_dst.sa_family = AF_INET;
-        memcpy (&route_ri.rt_gateway, &sockaddr_ri, sizeof (sockaddr_ri));
-        route_ri.rt_flags = RTF_UP | RTF_GATEWAY;
-        if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
-        {
-            error_ii = TRUE;
-            util_error_trace("net_activate: SIOCADDRT failed at %d\n",__LINE__);
-        }
-        }
-    else
-        {
-        sockaddr_ri.sin_addr = config.net.network.ip;
-        memcpy (&route_ri.rt_dst, &sockaddr_ri, sizeof (sockaddr_ri));
-        route_ri.rt_flags = RTF_UP;
-        ioctl (socket_ii, SIOCADDRT, &route_ri);
-
-        if (
-          config.net.gateway.ip.s_addr &&
-          config.net.gateway.ip.s_addr != config.net.hostname.ip.s_addr
-        )
-            {
-            sockaddr_ri.sin_addr = config.net.gateway.ip;
-            memset (&route_ri.rt_dst, 0, sizeof (route_ri.rt_dst));
-            route_ri.rt_dst.sa_family = AF_INET;
-            memcpy (&route_ri.rt_gateway, &sockaddr_ri, sizeof (sockaddr_ri));
-
-/*            route_ri.rt_flags = RTF_UP | RTF_HOST;
-            if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
-                {
-                error_ii = TRUE;
-                } */
-
-            route_ri.rt_flags = RTF_UP | RTF_GATEWAY;
-            if (ioctl (socket_ii, SIOCADDRT, &route_ri) < 0)
-            {
-                error_ii = TRUE;
-                util_error_trace("net_activate: SIOCADDRT failed at %d\n",__LINE__);
-            }
-            }
-        }
-
-  close(socket_ii);
-
-  if(!error_ii) {
-    config.net.is_configured = nc_static;
-    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
-  }
-
-  return error_ii;
-}
-
-
-/*
- * Setup IPv6 network interface.
- *
- * Return:
- *      0: ok
- *   != 0: error code
- *
- * Global vars changed:
- *  config.net.is_configured
- *
- * Does nothing if DHCP is active.
- *
- * config.net.device: interface
- */
-int net_activate6()
-{
-  int err = 0, delay = config.net.ifup_wait + 5;
-  char *cmd = NULL, ip_buf[INET6_ADDRSTRLEN], buf1[512], buf2[512], c;
-  const char *ip;
-  FILE *f;
-  inet_t host6 = { };
-
-  if(!config.net.ifconfig || config.net.dhcp_active) return 0;
-
-  if(config.test) {
-    config.net.is_configured = nc_static;
-
-    return 0;
-  }
-
-  if(!config.net.device) {
-    fprintf(stderr, "net_activate: no network interface!\n");
-    return 1;
-  }
-
-  config.net.is_configured = nc_none;
-
-  if(!config.net.ipv4) net_apply_ethtool(config.net.device, config.net.hwaddr);
-
-  strprintf(&cmd, "ip link set %s up", config.net.device);
-  err = system(cmd);
-
-  if(!err) {
-    if(
-      config.net.hostname.ok &&
-      config.net.hostname.ipv6 &&
-      (ip = inet_ntop(AF_INET6, &config.net.hostname.ip6, ip_buf, sizeof ip_buf))
-    ) {
-      strprintf(&cmd, "ip addr add %s/%u dev %s", ip, config.net.hostname.prefix6, config.net.device);
-      err = system(cmd);
-    }
-    else {
-      // wait for autoconfig
-      strprintf(&cmd, "ip -o addr show dev %s", config.net.device);
-
-      do {
-        sleep(1);
-
-        if((f = popen(cmd, "r"))) {
-          while(fgets(buf1, sizeof buf1, f)) {
-            if(sscanf(buf1, "%*d: %*s inet6 %511s scope global %c", buf2, &c) == 2) {
-              if(config.debug) fprintf(stderr, "ip6: %s\n", buf2);
-              name2inet(&host6, buf2);
-              net_check_address(&host6, 0);
-              if(host6.ok && host6.ipv6) {
-                config.net.hostname.ok = host6.ok;
-                config.net.hostname.ipv6 = host6.ipv6;
-                config.net.hostname.ip6 = host6.ip6;
-                config.net.hostname.prefix6 = host6.prefix6;
-                str_copy(&config.net.hostname.name, host6.name);
-              }
-              break;
-            }
-          }
-          pclose(f);
-        }
-
-      } while(--delay > 0 && f && !config.net.hostname.ok && !config.net.hostname.ipv6);
-    }
-
-    if(
-      config.net.gateway.ok &&
-      config.net.gateway.ipv6 &&
-      (ip = inet_ntop(AF_INET6, &config.net.gateway.ip6, ip_buf, sizeof ip_buf))
-    ) {
-      strprintf(&cmd, "route -A inet6 add default gw %s", ip);
-      err = system(cmd);
-      if(config.debug) fprintf(stderr, "%s = %d\n", cmd, err);
-    }
-  }
-
-  if(!err) {
-    config.net.is_configured = nc_static;
-    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
-  }
-
-  return err;
+  return 0;
 }
 
 
@@ -1154,7 +831,7 @@ int net_choose_device()
   if(choice > 0) {
     str_copy(&config.net.device, item_devs[choice - 1]);
 
-    check_ptp();
+    check_ptp(NULL);
 
     if(item_hds && item_hds[choice - 1]) {
       hd = item_hds[choice - 1];
@@ -1181,6 +858,7 @@ int net_choose_device()
 }
 
 
+#if 0
 /*
  * Let user enter nameservers.
  *
@@ -1235,6 +913,7 @@ void net_setup_nameserver()
     fclose(f);
   }
 }
+#endif
 
 
 /*
@@ -1585,7 +1264,6 @@ void net_wicked_dhcp()
 
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
-  strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
 
   ifcfg_write2(config.net.device, ifcfg, 0);
 
@@ -2510,7 +2188,7 @@ void net_update_ifcfg()
 /*
  * Wrapper around ifcfg_write() that does some more logging.
  *
- * If initial is set, mark interface as 'initial'; that is, no further auto
+ * If initial is set, mark interface is 'initial'; that is, no further auto
  * config is tried on it.
  */
 int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
@@ -2583,6 +2261,7 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_t *sl;
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
+  unsigned ptp = 0;
 
   // use global values
   if(!device || !ifcfg) global_values = 1;
@@ -2608,13 +2287,24 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
 
   if(!device) return 0;
 
+  ptp = check_ptp(device);
+
+  if(ptp) fprintf(stderr, "check_ptp: ptp = %u\n", ptp);
+
+  ptp |= ifcfg->ptp;
+
   // 1. maybe dhcp config, but only if passed explicitly
 
   if(!global_values && ifcfg->dhcp) {
     is_dhcp = 1;
 
     sl = slist_append_str(&sl_ifcfg, "BOOTPROTO");
-    str_copy(&sl->value, ifcfg->type);
+    if(ifcfg->type) {
+      str_copy(&sl->value, ifcfg->type);
+    }
+    else {
+      strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
+    }
     if(ifcfg->vlan) {
       strprintf(&vlan, ".%s", ifcfg->vlan);
       sl = slist_append_str(&sl_ifcfg, "ETHERDEVICE");
@@ -2700,7 +2390,7 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
         sl0 = slist_free(sl0);
       }
 
-      if(ifcfg->ptp) {
+      if(ptp) {
         if((sl0 = slist_split(' ', ifcfg->gw))) {
           if(!sl0->next) {
             sl = slist_append_str(&sl_ifcfg, "REMOTE_IPADDR");
@@ -3134,5 +2824,28 @@ int net_config_needed(int really)
   net_update_state();
 
   return config.ifcfg.if_up ? 0 : 1;
+}
+
+
+/*
+ * Check if interface is a ptp interface and set config.net.ptp accordingly.
+ */
+unsigned check_ptp(char *ifname)
+{
+  unsigned ptp = 0;
+
+  if(!ifname) ifname = config.net.device;
+
+  if(
+    ifname &&
+    (
+      !strncmp(ifname, "plip", sizeof "plip" - 1) ||
+      !strncmp(ifname, "iucv", sizeof "iucv" - 1) ||
+      !strncmp(ifname, "ctc", sizeof "ctc" - 1) ||
+      !strncmp(ifname, "sl", sizeof "sl" - 1)
+    )
+  ) ptp = 1;
+
+  return config.net.ptp = ptp;
 }
 

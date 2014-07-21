@@ -154,8 +154,6 @@ int util_choose_disk_device(char **dev, int type, char *list_title, char *input_
 
 void util_restart();
 
-void check_ptp(void);
-
 char *compress_type(void *buf);
 char *compressed_file(char *name);
 char *compressed_archive(char *name, char **archive);

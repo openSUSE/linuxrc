@@ -13,7 +13,7 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port
 int net_mount_cifs(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup, char *options);
 void net_stop(void);
 int net_check_address(inet_t *inet, int do_dns);
-int net_activate_ns(void);
+int net_static(void);
 int net_activate_s390_devs(void);
 int net_dhcp(void);
 unsigned net_config_mask(void);
@@ -32,3 +32,4 @@ void net_wicked_up(char *ifname);
 void net_wicked_down(char *ifname);
 int netmask_to_prefix(char *netmask);
 int net_config_needed(int really);
+unsigned check_ptp(char *ifname);

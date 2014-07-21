@@ -2317,7 +2317,7 @@ int url_setup_interface(url_t *url)
 
   if(config.net.configured == nc_none) config.net.configured = nc_static;
 
-  check_ptp();
+  check_ptp(NULL);
 
   /* we need at least ip & netmask for static network config */
   /* just netmask for PTP devices */
@@ -2332,7 +2332,7 @@ int url_setup_interface(url_t *url)
     config.net.configured = nc_dhcp;
   }
 
-  if(net_activate_ns()) {
+  if(net_static()) {
     fprintf(stderr, "network setup failed\n");
     config.net.configured = nc_none;
 

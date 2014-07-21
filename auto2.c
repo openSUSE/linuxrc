@@ -597,18 +597,18 @@ void auto2_user_netconfig()
 {
   if(!net_config_needed(0)) return;
 
-  check_ptp();
+  check_ptp(NULL);
   
   if( ((net_config_mask() & 3) == 3) || (config.net.ptp && ((net_config_mask() & 1) == 1)) ) {
     /* we have IP & netmask (or just IP for PTP devices) */
     config.net.configured = nc_static;
-    /* looks a bit weird, but we need it here for net_activate_ns() */
+    /* looks a bit weird, but we need it here for net_static() */
     if(!config.net.device) str_copy(&config.net.device, config.netdevice);
     if(!config.net.device) {
       util_update_netdevice_list(NULL, 1);
       if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
     }
-    if(net_activate_ns()) {
+    if(net_static()) {
       fprintf(stderr, "net activation failed\n");
       config.net.configured = nc_none;
     }
