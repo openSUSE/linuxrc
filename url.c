@@ -2332,7 +2332,7 @@ int url_setup_interface(url_t *url)
     config.net.configured = nc_dhcp;
   }
 
-  if(net_static()) {
+  if(config.net.configured != nc_dhcp && net_static()) {
     fprintf(stderr, "network setup failed\n");
     config.net.configured = nc_none;
 

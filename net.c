@@ -292,6 +292,8 @@ int net_static()
   config.ifcfg.manual->dhcp = 0;
   ifcfg_write2(config.net.device, config.ifcfg.manual, 0);
 
+  net_wicked_up(config.net.device);
+
   return 0;
 }
 
@@ -2303,7 +2305,7 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
       str_copy(&sl->value, ifcfg->type);
     }
     else {
-      strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
+      strprintf(&sl->value, "dhcp%s", net_dhcp_type());
     }
     if(ifcfg->vlan) {
       strprintf(&vlan, ".%s", ifcfg->vlan);
