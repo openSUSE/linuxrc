@@ -1798,7 +1798,7 @@ void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what)
 void file_write_install_inf(char *dir)
 {
   FILE *f;
-  char file_name[256], buf[256], *s;
+  char file_name[256], *s;
   slist_t *sl;
   file_t *ft0, *ft;
   int i;
@@ -1823,123 +1823,15 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_keytable, config.keymap);
   }
 
-  file_write_sym(f, key_display, "Undef", config.color);
-
   file_write_str(f, key_console, config.serial);
-
-  if(config.net.do_setup && config.net.device) {
-    for(sl = config.net.devices; sl; sl = sl->next) {
-      if(sl->key && sl->value) {
-      fprintf(f, "%s: %s %s\n", file_key2str(key_alias), sl->key, sl->value);
-      }
-    }
-  }
 
   file_write_num(f, key_sourcemounted, url->mount ? 1 : 0);
 
-  fprintf(f, "SourceType: %s\n", url->is.file ? "file" : "dir");
-
   fprintf(f, "RepoURL: %s\n", url_print(url, 3));
-  fprintf(f, "InstsysURL: %s\n", url_print(config.url.instsys, 3));
   fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
   if(!config.sslcerts) fprintf(f, "ssl_verify: no\n");
 
-  file_write_str(f, key_instmode, get_instmode_name(url->scheme));
-
-  if(url->used.device) fprintf(f, "Device: %s\n", short_dev(url->used.device));
-
-  if(url->is.mountable && !url->is.network) {
-    file_write_str(f, key_cdrom, short_dev(url->used.device));
-    file_write_str(f, key_partition, short_dev(url->used.device));
-  }
-
-  if(url->used.server.ok) {
-    file_write_inet2(f, key_server, &url->used.server, INET_WRITE_NAME_OR_IP);
-  }
-  if(url->port) file_write_num(f, key_port, url->port);
-  file_write_str(f, key_serverdir, url->path);
-  file_write_str(f, key_username, url->user);
-  file_write_str(f, key_password, url->password);
-  file_write_str(f, key_smbshare, url->share);
-  file_write_str(f, key_workdomain, url->domain);
-
-  if(config.net.configured != nc_none) {
-    switch(config.net.configured) {
-      case nc_static:
-        s = "static";
-        break;
-      case nc_dhcp:
-        s = config.net.ipv6 ? config.net.ipv4 ? "dhcp,dhcp6" : "dhcp6" : "dhcp";
-        break;
-      default:
-        s = NULL;
-        break;
-    }
-    file_write_str(f, key_netconfig, s);
-    file_write_str(f, key_netdevice, config.net.device);
-    if(config.manual == 1) get_net_unique_id();
-    file_write_str(f, key_netid, config.net.unique_id);
-    file_write_str(f, key_nethwaddr, config.net.hwaddr);
-    file_write_str(f, key_netcardname, config.net.cardname);
-#if defined(__s390__) || defined(__s390x__)
-    if(config.hwp.osahwaddr) file_write_str(f, key_osahwaddr, config.hwp.osahwaddr);
-    if(config.hwp.layer2) file_write_num(f, key_layer2, config.hwp.layer2 - 1);
-#endif
-    file_write_str(f, key_ethtool, config.net.ethtool_used);
-    file_write_inet2(f, key_ip, &config.net.hostname, INET_WRITE_IP_BOTH + INET_WRITE_PREFIX);
-    if(config.net.realhostname) {
-      file_write_str(f, key_hostname, config.net.realhostname);
-    }
-    else {
-      file_write_str(f, key_hostname, config.net.hostname.name);
-    }
-    if(config.net.ipv4) {
-      file_write_inet2(f, key_broadcast, &config.net.broadcast, INET_WRITE_IP);
-      file_write_inet2(f, key_network, &config.net.network, INET_WRITE_IP);
-    }
-    if(config.net.ptphost.ok) {
-      file_write_inet2(f, key_ptphost, &config.net.ptphost, INET_WRITE_IP);
-    }
-    else {
-      if(config.net.ipv4) file_write_inet2(f, key_netmask, &config.net.netmask, INET_WRITE_IP);
-    }
-    file_write_inet2(f, key_gateway, &config.net.gateway, INET_WRITE_IP);
-    for(i = 0; i < config.net.nameservers; i++) {
-      s = file_key2str(key_nameserver);
-      if(i) { sprintf(buf, "%s%d", s, i + 1); s = buf; }
-      file_write_inet2_str(f, s, &config.net.nameserver[i], INET_WRITE_IP);
-    }
-    file_write_str(f, key_domain, config.net.domain);
-    file_write_str(f, key_nisdomain, config.net.nisdomain);
-
-    file_write_str(f, key_wlan_essid, config.net.wlan.essid);
-    switch(config.net.wlan.auth) {
-      case wa_open:
-        s = "open";
-        break;
-      case wa_wep_open:
-        s = "wep_open";
-        break;
-      case wa_wep_restricted:
-        s = "wep_restricted";
-        break;
-      case wa_wpa:
-        s = "wpa";
-        break;
-      default:
-        s = NULL;
-        break;
-    }
-    file_write_str(f, key_wlan_auth, s);
-    if(config.net.wlan.key) {
-      fprintf(f, "WlanKey: %s\n", config.net.wlan.key);
-      fprintf(f, "WlanKeyType: %s\n",
-        config.net.wlan.key_type == kt_pass ? "password" : config.net.wlan.key_type == kt_hex ? "hex" : "ascii"
-      );
-      if(config.net.wlan.key_len) file_write_num(f, key_wlan_key_len, config.net.wlan.key_len);
-    }
-
-  }
+  if(url->used.device && !url->is.network) fprintf(f, "Device: %s\n", short_dev(url->used.device));
 
   if(config.url.proxy) fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
 
@@ -1970,7 +1862,6 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_usesax2, config.usesax2);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
-  if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
 
   if(
     config.rootpassword &&
