@@ -383,7 +383,6 @@ typedef struct {
   unsigned squash:1;		/* convert archive files to squashfs after download */
   unsigned keepinstsysconfig:1;	/* don't reload instsys config data */
   unsigned device_by_id:1;	/* use /dev/disk/by-id device names */
-  unsigned usesax2:1;		/* just passed to yast */
   unsigned withiscsi;		/* iSCSI parameter */
   unsigned withfcoe;		/* FCoE parameter */
   unsigned withipoib;		/* IPoIB */
