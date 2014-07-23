@@ -543,11 +543,6 @@ int auto2_find_repo()
 #endif
 
     if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
-
-    s_addr2inet(
-      &config.net.broadcast,
-      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-    );
   }
   else {
     auto2_user_netconfig();
@@ -591,7 +586,7 @@ void auto2_user_netconfig()
 
   check_ptp(NULL);
   
-  if( ((net_config_mask() & 3) == 3) || (config.net.ptp && ((net_config_mask() & 1) == 1)) ) {
+  if( ((net_config_mask() & 3) == 3) || (config.ifcfg.manual->ptp && ((net_config_mask() & 1) == 1)) ) {
     /* we have IP & netmask (or just IP for PTP devices) */
     config.net.configured = nc_static;
     /* looks a bit weird, but we need it here for net_static() */

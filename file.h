@@ -9,7 +9,7 @@
 typedef enum {
   key_none, key_root, key_keytable, key_language, key_rebootmsg, key_insmod,
   key_display, key_ip, key_netmask, key_gateway, key_server, key_nameserver,
-  key_broadcast, key_network, key_partition, key_serverdir, key_netdevice,
+  key_network, key_partition, key_serverdir, key_netdevice,
   key_forcerootimage, key_rebootwait,
   key_sourcemounted, key_cdrom, key_console,
   key_ptphost, key_domain, key_manual, key_reboot, key_floppydisk,

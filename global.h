@@ -578,14 +578,12 @@ typedef struct {
     unsigned ipv4:1;		/* do ipv4 config */
     unsigned ipv6:1;		/* do ipv6 config */
     unsigned dhcp_timeout_set:1;	/* dhcp_timeout was set explicitly */
-    unsigned ptp:1;		/* true if interface is ptp */
     unsigned do_setup;		/* do network setup */
     unsigned setup;		/* bitmask: do these network setup things */
     char *device;		/* currently used device */
     slist_t *devices;		/* list of active network devs */
     slist_t *dns_cache;		/* cache dns lookups here */
     int file_length;		/* length of currently retrieved file */
-    char *domain;		/* domain name */
     char *nisdomain;		/* NIS domain name */
     int dhcp_timeout;
     int tftp_timeout;
@@ -600,13 +598,11 @@ typedef struct {
     int retry;			/* max retry count for network connections */
     inet_t netmask;
     inet_t network;
-    inet_t broadcast;
     inet_t gateway;
     inet_t nameserver[4];	/* up to 4 nameservers */
     unsigned nameservers;	/* actual number of nameservers */
     inet_t proxy;
     inet_t hostname;
-    inet_t ptphost;
     char *realhostname;		/* hostname, if explicitly set */
     char *workgroup;		/* SMB */
     char *share;		/* SMB */

@@ -1308,16 +1308,10 @@ void util_status_info(int log_it)
   sprintf(buf, "hostname = %s", inet2print(&config.net.hostname));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "domain = %s", config.net.domain ?: "");
-  slist_append_str(&sl0, buf);
-
   sprintf(buf, "network = %s", inet2print(&config.net.network));
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "netmask = %s", inet2print(&config.net.netmask));
-  slist_append_str(&sl0, buf);
-
-  sprintf(buf, "broadcast = %s", inet2print(&config.net.broadcast));
   slist_append_str(&sl0, buf);
 
   sprintf(buf, "gateway = %s", inet2print(&config.net.gateway));
@@ -1327,9 +1321,6 @@ void util_status_info(int log_it)
     sprintf(buf, "nameserver%d = %s", i + 1, inet2print(&config.net.nameserver[i]));
     slist_append_str(&sl0, buf);
   }
-
-  sprintf(buf, "ptp host = %s", inet2print(&config.net.ptphost));
-  slist_append_str(&sl0, buf);
 
   if(config.net.vncpassword) {
     sprintf(buf, "vncpassword = %s", config.net.vncpassword);

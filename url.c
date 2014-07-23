@@ -2321,7 +2321,7 @@ int url_setup_interface(url_t *url)
 
   /* we need at least ip & netmask for static network config */
   /* just netmask for PTP devices */
-  if(!config.net.ptp && (net_config_mask() & 3) != 3) {
+  if(!config.ifcfg.manual->ptp && (net_config_mask() & 3) != 3) {
     net_dhcp();
 
     if(!config.net.dhcp_active) {

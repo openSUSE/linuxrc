@@ -63,10 +63,11 @@ static int parse_leaseinfo(char *file);
 static void net_wicked_dhcp(void);
 
 static void net_cifs_build_options(char **options, char *user, char *password, char *workgroup);
-static void net_ask_domain(void);
 static int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial);
 static int ifcfg_write(char *device, ifcfg_t *ifcfg);
 static char *inet2str(inet_t *inet, int type);
+static int net_get_ip(char *text, char **ip, int with_prefix);
+static int net_check_ip(char *buf, int multi, int with_prefix);
 
 
 /*
@@ -97,50 +98,6 @@ void net_ask_password()
   if(config.win && !win_old) util_disp_done();
 }
 
-
-void net_ask_domain()
-{
-  char *tmp = NULL;
-  slist_t *sl0, *sl;
-  inet_t ip = { };
-  int err, ndomains;
-
-  str_copy(&tmp, config.net.domain);
-
-  do {
-    err = ndomains = 0;
-
-    dia_input2("Enter your search domains, separated by a space:", &tmp, 40, 0);  
-    if(!tmp) {
-      str_copy(&config.net.domain, NULL);
-      return;
-    }
-
-    sl0 = slist_split(' ', tmp);
-
-    for(sl = sl0; sl; sl = sl->next) {
-      if(++ndomains > 6) {
-        dia_message("Only up to six search domains are allowed.", MSGTYPE_ERROR);
-        break;
-      }
-      str_copy(&ip.name, sl->key);
-    }
-
-    if(!sl) {
-      str_copy(&config.net.domain, NULL);
-      config.net.domain = slist_join(" ", sl0);
-    }
-    else {
-      err = 1;
-    }
-
-    slist_free(sl0);
-  }
-  while(err);
-
-  str_copy(&tmp, NULL);
-  str_copy(&ip.name, NULL);
-}
 
 /*
  * Configure network. Ask for network config data if necessary.
@@ -187,7 +144,7 @@ int net_config()
 #if defined(__s390__) || defined(__s390x__)
       config.hwp.layer2 - 1 &&
 #endif
-      !config.net.ptp
+      !config.ifcfg.manual->ptp
     ) {
       sprintf(buf, "Automatic configuration via %s?", "DHCP");
       rc = dia_yesno(buf, NO);
@@ -860,158 +817,104 @@ int net_choose_device()
 }
 
 
-#if 0
 /*
- * Let user enter nameservers.
+ * Let user enter network config data.
  *
- * Asks for name servers if window mode is active.
- *
- * Writes nameserver & domain to /etc/resolv.conf.
- *
- * Global vars changed:
- *  config.net.nameserver
- */
-void net_setup_nameserver()
-{
-  char *s, buf[256];
-  FILE *f;
-  unsigned u;
-
-  if(config.win && !config.net.dhcp_active) {
-
-    if((config.net.setup & NS_NAMESERVER)) {
-      for(u = 0; u < config.net.nameservers; u++) {
-        if(config.net.nameservers == 1) {
-          s = "Enter the IP address of your name server. Leave empty if you don't need one.";
-        }
-        else {
-           sprintf(buf, "Enter the IP of name server %u or press ESC.", u + 1);
-           s = buf;
-        }
-        if(net_get_address(s, &config.net.nameserver[u], 0)) break;
-      }
-      for(; u < config.net.nameservers; u++) {
-        str_copy(&config.net.nameserver[u].name, NULL);
-        config.net.nameserver[u].ok = 0;
-      }
-    }
-  }
-
-  if(config.test) return;
-
-  /* write resolv.conf for a static network setup */
-  if(
-    !config.net.dhcp_active &&
-    (f = fopen("/etc/resolv.conf", "w"))
-  ) {
-    for(u = 0; u < config.net.nameservers; u++) {
-      if(config.net.nameserver[u].ok) {
-        fprintf(f, "nameserver %s\n", config.net.nameserver[u].name);
-      }
-    }
-    if(config.net.domain) {
-      fprintf(f, "search %s\n", config.net.domain);
-    }
-    fclose(f);
-  }
-}
-#endif
-
-
-/*
- * Let user enter some network config data.
+ * Config adata are stored in config.ifcfg.manual.
  *
  * Note: expects window mode.
- *
- * Global vars changed:
- *  config.net.hostname
- *  config.net.netmask
- *  config.net.ptphost
- *  config.net.gateway
- *  config.net.broadcast
- *  config.net.network
- *  config.net.gateway
  */
 int net_input_data()
 {
-  inet_t host6 = {};
-
-  config.net.netmask.ok = 0;
-
   if((config.net.setup & NS_HOSTIP)) {
-    if(config.net.ipv4) {
-      if(net_get_address("Enter your IPv4 address.\n Example: 192.168.5.77/24", &config.net.hostname, 1)) return -1;
-    }
-    if(config.net.ipv6) {
-      if(net_get_address("Enter your IPv6 address (leave empty for autoconfig).\nExample: 2001:db8:75:fff::3/64", &host6, 1) == 2) return -1;
-      if(host6.ok && host6.ipv6) {
-        config.net.hostname.ok = host6.ok;
-        config.net.hostname.ipv6 = host6.ipv6;
-        config.net.hostname.ip6 = host6.ip6;
-        config.net.hostname.prefix6 = host6.prefix6;
-        if(!config.net.hostname.name) str_copy(&config.net.hostname.name, host6.name);
-      }
-    }
+    if(net_get_ip(
+      "Enter your IP address with network prefix.\n\n"
+      "You can enter more than one, separated by space, if necessary.\n"
+      "Leave empty for autoconfig.\n\n"
+      "Examples: 192.168.5.77/24 2001:db8:75:fff::3/64",
+      &config.ifcfg.manual->ip, 1) == 2
+    ) return -1;
   }
 
-  if(config.net.hostname.ipv4 && config.net.hostname.net.s_addr) {
-    s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
-  }
-
-  if(config.net.ptp) {
-    if(!config.net.ptphost.name) {
-      name2inet(&config.net.ptphost, config.net.hostname.name);
-    }
-
-    if(net_get_address("Enter the IP address of the PLIP partner.", &config.net.ptphost, 1)) return -1;
-
-    if(!config.net.gateway.name) {
-      name2inet(&config.net.gateway, config.net.ptphost.name);
-    }
+  if(config.ifcfg.manual->ptp) {
+    if(net_get_ip(
+      "Enter the IP address of the PLIP partner.\n\n"
+      "Examples: 192.168.5.77 2001:db8:75:fff::3",
+      &config.ifcfg.manual->gw, 0) == 2
+    ) return -1;
   }
   else {
-    name2inet(&config.net.ptphost, "");
-
-    if(config.net.ipv4) {
-      if(!config.net.netmask.ok) {
-        char *s = inet_ntoa(config.net.hostname.ip);
-
-        name2inet(
-          &config.net.netmask,
-          strstr(s, "10.10.") == s ? "255.255.0.0" : "255.255.255.0"
-        );
-      }
-
-      if(
-        !config.net.hostname.prefix4 &&
-        !config.net.netmask.ok &&
-        (config.net.setup & NS_NETMASK)
-      ) {
-        if(net_get_address("Enter your netmask. For a normal class C network, this is usually 255.255.255.0.", &config.net.netmask, 0)) return -1;
-      }
-
-      if(config.net.hostname.ipv4) {
-        s_addr2inet(
-          &config.net.broadcast,
-          config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-        );
-
-        s_addr2inet(
-          &config.net.network,
-          config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
-        );
-      }
-    }
-
     if((config.net.setup & NS_GATEWAY)) {
-      config.net.gateway.ok = 0;
-      if(net_get_address("Enter the IP address of the gateway. Leave empty if you don't need one.", &config.net.gateway, 1) == 2) return -1;
+      if(net_get_ip(
+        "Enter your gateway IP address.\n\n"
+        "You can enter more than one, separated by space, if necessary.\n"
+        "Leave empty if you don't need one.\n\n"
+        "Examples: 192.168.5.77 2001:db8:75:fff::3",
+        &config.ifcfg.manual->gw, 0) == 2
+      ) return -1;
     }
 
-    if((config.net.setup & NS_NAMESERVER)) net_ask_domain();
+    if((config.net.setup & NS_NAMESERVER)) {
+      if(net_get_ip(
+        "Enter your name server IP address.\n\n"
+        "You can enter more than one, separated by space, if necessary.\n"
+        "Leave empty if you don't need one.\n\n"
+        "Examples: 192.168.5.77 2001:db8:75:fff::3",
+        &config.ifcfg.manual->ns, 0) == 2
+      ) return -1;
+
+      dia_input2(
+        "Enter your search domains, separated by a space.",
+        &config.ifcfg.manual->domain, 40, 0
+      );
+    }
   }
 
   return 0;
+}
+
+
+/*
+ * Ask user for a space-separated list of network addresses.
+ *
+ * If with_prefix is set, it must include the '/prefix' notation.
+ *
+ * return:
+ *   0: ok
+ *   1: empty input
+ *   2: error or abort
+ *
+ * Note: expects window mode.
+ */
+int net_get_ip(char *text, char **ip, int with_prefix)
+{
+  int err = 0;
+
+  char *buf = NULL;
+
+  if(ip) str_copy(&buf, *ip);
+
+  do {
+    err = 0;
+
+    if(dia_input2(text, &buf, 40, 0)) {
+      err = 2;
+      break;
+    }
+
+    if(!buf) {
+      err = 1;
+      break;
+    }
+    if(!net_check_ip(buf, 1, with_prefix)) err = 2;
+    if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
+  } while(err);
+
+  if(err != 2 && ip) str_copy(ip, buf);
+
+  str_copy(&buf, NULL);
+
+  return err;
 }
 
 
@@ -1157,19 +1060,10 @@ int parse_leaseinfo(char *file)
         net_check_address(&config.net.network, 0);
         break;
 
-      case key_broadcast:
-        name2inet(&config.net.broadcast, f->value);
-        net_check_address(&config.net.broadcast, 0);
-        break;
-
       case key_gateway:
         if((s = strchr(f->value, ' '))) *s = 0;
         name2inet(&config.net.gateway, f->value);
         net_check_address(&config.net.gateway, 0);
-        break;
-
-      case key_domain:
-        if(*f->value) str_copy(&config.net.domain, f->value);
         break;
 
       case key_dns:
@@ -1204,9 +1098,7 @@ int parse_leaseinfo(char *file)
  *  config.net.hostname
  *  config.net.netmask
  *  config.net.network
- *  config.net.broadcast
  *  config.net.gateway
- *  config.net.domain
  *  config.net.nisdomain
  *  config.net.nameserver
  */
@@ -1234,9 +1126,7 @@ int net_dhcp()
  *  config.net.hostname
  *  config.net.netmask
  *  config.net.network
- *  config.net.broadcast
  *  config.net.gateway
- *  config.net.domain
  *  config.net.nisdomain
  *  config.net.nameserver
  */
@@ -2245,7 +2135,6 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
  * Write ifcfg/ifroute files for device.
  *
  * - may be a dhcp or static config
- * - if device or ifcfg are NULL use current data from global config
  * - if global config is used we always create a ***static*** config
  *
  * Note: use ifcfg_write2()!
@@ -2266,7 +2155,17 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
   unsigned ptp = 0;
 
   // use global values
-  if(!device || !ifcfg) global_values = 1;
+  if(!device || !ifcfg) {
+    global_values = 1;
+
+    fprintf(stderr, "\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
+    printf("\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
+    fflush(stdout);
+
+    sleep(60);
+
+    return 0;
+  }
 
   fprintf(stderr, "ifcfg_write: device = %s, global = %d, ifcfg = %s\n", device, global_values, ifcfg ? ifcfg->device : "");
 
@@ -2486,20 +2385,6 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
   // 4. set nameserver and search list
 
   if(!is_dhcp) {
-    if(global_values) {
-      str_copy(&domain, config.net.domain);
-      if(config.net.nameserver[0].ok) {
-        unsigned u, first;
-
-        for(u = 0, first = 1; u < config.net.nameservers; u++) {
-          if(config.net.nameserver[u].ok) {
-            strprintf(&ns, "%s%s%s", ns ?: "", first ? "" : " ", config.net.nameserver[u].name);
-            first = 0;
-          }
-        }
-      }
-    }
-
     if(ns || domain) {
       fprintf(stderr, "adjusting network/config:\n");
       if(ns) fprintf(stderr, "  NETCONFIG_DNS_STATIC_SERVERS=\"%s\"\n", ns);
@@ -2830,7 +2715,7 @@ int net_config_needed(int really)
 
 
 /*
- * Check if interface is a ptp interface and set config.net.ptp accordingly.
+ * Check if interface is a ptp interface and set config.ifcfg.manual accordingly.
  */
 unsigned check_ptp(char *ifname)
 {
@@ -2848,6 +2733,61 @@ unsigned check_ptp(char *ifname)
     )
   ) ptp = 1;
 
-  return config.net.ptp = ptp;
+  config.ifcfg.manual->ptp = ptp;
+
+  return ptp;
 }
+
+
+int net_check_ip(char *buf, int multi, int with_prefix)
+{
+  int ok = 1;
+  struct in_addr ip4;
+  struct in6_addr ip6;
+  slist_t *sl, *sl0;
+  char *s;
+
+  sl0 = slist_split(' ', buf);
+
+  if(!sl0 || !*sl0->key || (sl0->next && !multi)) {
+    slist_free(sl0);
+
+    if(config.debug) fprintf(stderr, "check_ip: %s = wrong\n", buf);
+
+    return 0;
+  }
+
+  for(sl = sl0; sl; sl = sl->next) {
+    s = strchr(sl->key, '/');
+    if(s) *s = 0;
+    if((s && !with_prefix) || (!s && with_prefix)) {
+      ok = 0;
+      break;
+    }
+  }
+
+  if(ok) {
+    for(sl = sl0; sl; sl = sl->next) {
+      if(strchr(sl->key, ':')) {
+        if(!config.net.ipv6 || inet_pton(AF_INET6, sl->key, &ip6) <= 0) {
+          ok = 0;
+          break;
+        }
+      }
+      else {
+        if(!config.net.ipv4 || inet_pton(AF_INET, sl->key, &ip4) <= 0) {
+          ok = 0;
+          break;
+        }
+      }
+    }
+  }
+
+  slist_free(sl0);
+
+  if(config.debug) fprintf(stderr, "check_ip: %s = %s\n", buf, ok ? "ok" : "wrong");
+
+  return ok;
+}
+
 

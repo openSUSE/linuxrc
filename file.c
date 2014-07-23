@@ -87,7 +87,6 @@ static struct {
   { key_gateway,        "Gateways",       kf_cfg + kf_cmd + kf_dhcp      },
   { key_server,         "Server",         kf_none                        },
   { key_nameserver,     "Nameserver",     kf_cfg + kf_cmd                },
-  { key_broadcast,      "Broadcast",      kf_cfg + kf_cmd + kf_dhcp      },
   { key_network,        "Network",        kf_cfg + kf_cmd + kf_dhcp      },
   { key_partition,      "Partition",      kf_cfg + kf_cmd                },
   { key_serverdir,      "Serverdir",      kf_none                        },
@@ -658,13 +657,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_hostip:
         str_copy(&config.ifcfg.manual->type, "static");
+        config.ifcfg.manual->dhcp = 0;
         if(*f->value) str_copy(&config.ifcfg.manual->ip, f->value);
-
-        name2inet(&config.net.hostname, f->value);
-        net_check_address(&config.net.hostname, 0);
-        if(config.net.hostname.ipv4 && config.net.hostname.net.s_addr) {
-          s_addr2inet(&config.net.netmask, config.net.hostname.net.s_addr);
-        }
         break;
 
       case key_hostname:
@@ -674,16 +668,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_netmask:
         i = netmask_to_prefix(f->value);
         if(i > 0) config.ifcfg.manual->netmask_prefix = i;
-
-        name2inet(&config.net.netmask, f->value);
-        net_check_address(&config.net.netmask, 0);
         break;
 
       case key_gateway:
         if(*f->value) str_copy(&config.ifcfg.manual->gw, f->value);
-
-        name2inet(&config.net.gateway, f->value);
-        net_check_address(&config.net.gateway, 0);
         break;
 
       case key_ptphost:
@@ -691,21 +679,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           config.ifcfg.manual->ptp = 1;
           str_copy(&config.ifcfg.manual->gw, f->value);
         }
-
-        name2inet(&config.net.ptphost, f->value);
-        net_check_address(&config.net.ptphost, 0);
         break;
       
       case key_nameserver:
         if(*f->value) str_copy(&config.ifcfg.manual->ns, f->value);
-
-        for(config.net.nameservers = 0, sl = sl0 = slist_split(',', f->value); sl; sl = sl->next) {
-          name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
-          net_check_address(&config.net.nameserver[config.net.nameservers], 0);
-          if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
-        }
-        slist_free(sl0);
-        break;
 
       case key_proxy:
         url_free(config.url.proxy);
@@ -803,8 +780,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_domain:
         if(*f->value) str_copy(&config.ifcfg.manual->domain, f->value);
-
-        str_copy(&config.net.domain, f->value);
         break;
 
       case key_rootimage:
@@ -1669,10 +1644,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
   if((net_config_mask() & 3) == 3) {
     s_addr2inet(
-      &config.net.broadcast,
-      config.net.hostname.ip.s_addr | ~config.net.netmask.ip.s_addr
-    );
-    s_addr2inet(
       &config.net.network,
       config.net.hostname.ip.s_addr & config.net.netmask.ip.s_addr
     );
@@ -1841,7 +1812,6 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
   file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
-  file_write_inet2(f, key_ptphost, &config.net.ptphost, INET_WRITE_IP);
   file_write_num(f, key_usessh, config.usessh);
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);
   file_write_str(f, key_initrd_id, config.initrd_id);
