@@ -685,5 +685,4 @@ extern char           *kernellog_tg;
 extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
 extern char            xkbmodel_tg [20];
-extern unsigned        yast2_color_ig;
 extern int             reboot_wait_ig;

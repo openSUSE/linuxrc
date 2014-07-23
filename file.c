@@ -107,7 +107,6 @@ static struct {
   { key_keyboard,       "Keyboard",       kf_none                        },
   { key_yast2update,    "YaST2update",    kf_none                        },
   { key_textmode,       "Textmode",       kf_cfg + kf_cmd                },
-  { key_yast2color,     "YaST2color",     kf_none                        },
   { key_bootdisk,       "BootDisk",       kf_none                        },	/* obsolete */
   { key_disks,          "Disks",          kf_none                        },	/* obsolete */
   { key_username,       "Username",       kf_cfg + kf_cmd                },
@@ -1844,7 +1843,6 @@ void file_write_install_inf(char *dir)
   file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
   file_write_inet2(f, key_ptphost, &config.net.ptphost, INET_WRITE_IP);
   file_write_num(f, key_usessh, config.usessh);
-  if(yast2_color_ig) fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);
   file_write_str(f, key_initrd_id, config.initrd_id);
   file_write_str(f, key_instsys_id, config.instsys_id);

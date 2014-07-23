@@ -13,7 +13,7 @@ typedef enum {
   key_forcerootimage, key_rebootwait,
   key_sourcemounted, key_cdrom, key_console,
   key_ptphost, key_domain, key_manual, key_reboot, key_floppydisk,
-  key_keyboard, key_yast2update, key_textmode, key_yast2color, key_bootdisk,
+  key_keyboard, key_yast2update, key_textmode, key_bootdisk,
   key_disks, key_username, key_password, key_workdomain, key_alias,
   key_options, key_initrdmodules, key_locale, key_font, key_screenmap,
   key_fontmagic, key_autoyast, key_linuxrc, key_forceinsmod, key_dhcp,
