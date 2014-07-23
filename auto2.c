@@ -199,12 +199,9 @@ void auto2_scan_hardware()
 
     if(config.usbwait > 0) sleep(config.usbwait);
 
-    pcmcia_socket_startup();
-
     sleep(2);
 
     hd_pcmcia2 = hd_list(hd_data, hw_pcmcia, 1, NULL);
-    if(hd_pcmcia2) config.has_pcmcia = 1;
     for(hd = hd_pcmcia2; hd; hd = hd->next) activate_driver(hd_data, hd, NULL, 0);
     hd_pcmcia2 = hd_free_hd_list(hd_pcmcia2);
 
@@ -663,24 +660,11 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
   str_list_t *sl1, *sl2;
   slist_t *slm;
   int i, j, ok = 0;
-  char buf[256];
   FILE *msg = config.win ? stderr : stdout;
 
   if(!hd || driver_is_active(hd)) return 1;
 
   if(hd->is.notready) return 1;
-
-  if(
-    !config.nopcmcia &&
-    hd->hotplug == hp_pcmcia &&
-    hd->hotplug_slot &&
-    util_check_exist("/sbin/pcmcia-socket-startup")
-  ) {
-    sprintf(buf, "%s %d\n", "/sbin/pcmcia-socket-startup", hd->hotplug_slot - 1);
-    fprintf(stderr, "pcmcia socket startup for: %s (socket %d)\n", hd->sysfs_id, hd->hotplug_slot - 1);
-
-    system(buf);
-  }
 
   for(j = 0, di = hd->driver_info; di; di = di->next) {
     if(di->module.type == di_module) {
@@ -845,42 +829,6 @@ char *auto2_serial_console()
   free(hd_data);
 
   return console;
-}
-
-
-/*
- * Do special pcmcia startup things.
- */
-void pcmcia_socket_startup()
-{
-  char buf[256];
-  struct dirent *de;
-  DIR *d;
-  FILE *f;
-  int i, socket;
-
-  if(!util_check_exist("/sbin/pcmcia-socket-startup")) return;
-
-  if((d = opendir("/sys/class/pcmcia_socket"))) {
-    while((de = readdir(d))) {
-      if(sscanf(de->d_name, "pcmcia_socket%d", &socket) == 1) {
-        sprintf(buf, "%s/%s/card_type", "/sys/class/pcmcia_socket", de->d_name);
-        i = 0;
-        if((f = fopen(buf, "r"))) {
-          i = fgetc(f) == EOF ? 0 : 1;
-          fclose(f);
-        }
-
-        if(!i) continue;
-
-        sprintf(buf, "%s %d\n", "/sbin/pcmcia-socket-startup", socket);
-        fprintf(stderr, "pcmcia socket startup for: socket %d\n", socket);
-
-        system(buf);
-      }
-    }
-    closedir(d);
-  }
 }
 
 

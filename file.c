@@ -97,8 +97,6 @@ static struct {
   { key_rebootwait,     "WaitReboot",     kf_cfg + kf_cmd                },	/* drop it? */
   { key_sourcemounted,  "Sourcemounted",  kf_none                        },
   { key_cdrom,          "Cdrom",          kf_none                        },
-  { key_pcmcia,         "PCMCIA",         kf_none                        },
-  { key_haspcmcia,      "HasPCMCIA",      kf_none                        },
   { key_console,        "Console",        kf_none                        },
   { key_ptphost,        "Pointopoint",    kf_cfg + kf_cmd                },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
@@ -159,7 +157,6 @@ static struct {
   { key_rescue,         "Rescue",         kf_cfg + kf_cmd                },
   { key_rootimage,      "RootImage",      kf_cfg + kf_cmd                },
   { key_rescueimage,    "RescueImage",    kf_cfg + kf_cmd                },
-  { key_nopcmcia,       "NoPCMCIA",       kf_cfg + kf_cmd                },	/* kf_cmd_early? */
   { key_vnc,            "VNC",            kf_cfg + kf_cmd                },
   { key_vnc,            "UseVNC",         kf_cfg + kf_cmd                },
   { key_usessh,         "UseSSH",         kf_cfg + kf_cmd                },
@@ -196,7 +193,6 @@ static struct {
   { key_doscsirename,   "DoSCSIRename",   kf_cfg + kf_cmd                },
   { key_lxrcdebug,      "LXRCDebug",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_lxrcdebug,      "LinuxrcDebug",   kf_cfg + kf_cmd + kf_cmd_early },
-  { key_kernel_pcmcia,  "KernelPCMCIA",   kf_cfg + kf_cmd                },
   { key_updatename,     "UpdateName",     kf_cfg + kf_cmd                },
   { key_updatestyle,    "UpdateStyle",    kf_cfg + kf_cmd                },
   { key_updateid,       "UpdateID",       kf_cfg                         },
@@ -808,10 +804,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
-      case key_nopcmcia:
-        if(f->is.numeric) config.nopcmcia = f->nvalue;
-        break;
-
       case key_domain:
         if(*f->value) str_copy(&config.ifcfg.manual->domain, f->value);
 
@@ -1074,10 +1066,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         slist_free(config.linuxrc);
         config.linuxrc = slist_split(',', f->value);
         if(slist_getentry(config.linuxrc, "nocmdline")) config.info.add_cmdline = 0;
-        break;
-
-      case key_kernel_pcmcia:
-        if(f->is.numeric) config.kernel_pcmcia = f->nvalue;
         break;
 
       case key_updatename:
@@ -1836,10 +1824,6 @@ void file_write_install_inf(char *dir)
   }
 
   file_write_sym(f, key_display, "Undef", config.color);
-
-  file_write_num(f, key_haspcmcia, config.has_pcmcia);
-
-  file_write_num(f, key_nopcmcia, config.nopcmcia);
 
   file_write_str(f, key_console, config.serial);
 

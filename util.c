@@ -1167,7 +1167,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.usessh, "usessh");
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
-  add_flag(&sl0, buf, config.nopcmcia, "nopcmcia");
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
@@ -1177,7 +1176,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
   add_flag(&sl0, buf, config.scsi_rename, "scsirename");
-  add_flag(&sl0, buf, config.has_pcmcia, "pcmcia");
   add_flag(&sl0, buf, config.net.all_ifs, "all_ifs");
   add_flag(&sl0, buf, config.ntfs_3g, "ntfs-3g");
   add_flag(&sl0, buf, config.secure, "secure");

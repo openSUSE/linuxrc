@@ -344,7 +344,6 @@ typedef struct {
   unsigned linemode:2;		/* line mode */
   unsigned ask_language:1;	/* let use choose language  */
   unsigned ask_keytable:1;	/* let user choose keytable */
-  unsigned nopcmcia:1;		/* don't start pcmcia automatically */
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
   unsigned usessh:1;		/* ssh mode */
@@ -358,14 +357,12 @@ typedef struct {
   unsigned explode_win:1;	/* animated windows */
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
   unsigned scsi_rename:1;	/* ensure hotplug scsi devs are last */
-  unsigned kernel_pcmcia:1;	/* use kernel pcmcia modules */
   unsigned debug;		/* debug */
   unsigned linebreak:1;		/* internal: print a newline first */
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
   unsigned fb:1;		/* has frame buffer */
   unsigned instsys_complain:2;	/* check instsys id */
-  unsigned do_pcmcia_startup:1;	/* run pcmcia-socket-startup */
   unsigned update_complain:2;	/* check for certain updates */
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
@@ -375,7 +372,6 @@ typedef struct {
   unsigned installfilesread:1;	/* already got install files */
   unsigned zen;			/* zenworks mode */
   char *zenconfig;		/* zenworks config file */
-  unsigned has_pcmcia:1;	/* we've seen a pcmcia chip */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned secure:1;		/* secure mode (check digest of all downloaded files) */
   unsigned sslcerts:1;		/* whether to check ssl certificates */

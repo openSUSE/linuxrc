@@ -449,18 +449,12 @@ int mod_load_manually(int type)
     if(i--) {
       if(mod_items[i]) {
         ok = 1;
-        config.do_pcmcia_startup = 0;
         if(mod_items[i]->pre_inst) {
           ok = mod_load_modules(mod_items[i]->pre_inst, 1);
         }
         if(ok) ok = mod_load_modules(mod_items[i]->name, 2);
         if(ok && mod_items[i]->post_inst) {
           ok = mod_load_modules(mod_items[i]->post_inst, 1);
-        }
-        if(config.do_pcmcia_startup) {
-          sleep(2);
-          pcmcia_socket_startup();
-          sleep(2);
         }
       }
       else {
@@ -658,8 +652,6 @@ int mod_insmod(char *module, char *param)
   if(!module || config.test) return 0;
 
   if(mod_is_loaded(module)) return 0;
-
-  if(!strcmp(module, "pcmcia")) config.do_pcmcia_startup = 1;
 
   if(!config.forceinsmod) {
     if(!util_check_exist(module)) {
