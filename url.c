@@ -57,6 +57,7 @@ static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
 static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
 static int url_setup_interface(url_t *url);
+static int url_setup_slp(url_t *url);
 static void url_parse_instsys_config(char *file);
 static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
 static char *url_instsys_config(char *path);
@@ -1773,76 +1774,65 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   str_list_t *sl;
   char *url_device;
 
-  if(!url || !url->is.network || url->used.device) return url_read_file(url, dir, src, dst, label, flags);
+  if(!url || !url->is.network || config.ifcfg.if_up) return url_read_file(url, dir, src, dst, label, flags);
 
   LXRC_WAIT
 
-  if(config.net.configured) {
-    str_copy(&url->used.device, config.net.device);
-    str_copy(&url->used.hwaddr, config.net.hwaddr);
-    str_copy(&url->used.model, config.net.cardname);
-    str_copy(&url->used.unique_id, config.net.unique_id);
-
-    LXRC_WAIT
-
-  }
-  else {
 #if defined(__s390__) || defined(__s390x__)
-    net_activate_s390_devs();
+  net_activate_s390_devs();
 #endif
 
-    update_device_list(0);
+  update_device_list(0);
 
-    LXRC_WAIT
+  LXRC_WAIT
 
-    if(config.hd_data) {
-      url_device = url->device ?: config.ifcfg.manual->device;
+  if(config.hd_data) {
+    url_device = url->device ?: config.ifcfg.manual->device;
 
-      for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_network_ctrl, 0, NULL)); hd; hd = hd->next) {
-        for(hwaddr = NULL, res = hd->res; res; res = res->next) {
-          if(res->any.type == res_hwaddr) {
-            hwaddr = res->hwaddr.addr;
-            break;
-          }
-        }
-
-        if(!hd->unix_dev_name) continue;
-
-        matched = url_device ? match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url_device) : 1;
-
-        for(sl = hd->unix_dev_names; !matched && sl; sl = sl->next) {
-          matched = match_netdevice(short_dev(sl->str), NULL, url_device);
-        }
-
-        if(!matched) continue;
-
-        str_copy(&url->used.unique_id, hd->unique_id);
-        str_copy(&url->used.device, hd->unix_dev_name);
-        str_copy(&url->used.hwaddr, hwaddr);
-        str_copy(&url->used.model, hd->model);
-
-        url->is.wlan = hd->is.wlan;
-
-        url_setup_device(url);
-
-        if(!url_read_file(url, dir, src, dst, label, flags)) {
-          found++;
+    for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_network_ctrl, 0, NULL)); hd; hd = hd->next) {
+      for(hwaddr = NULL, res = hd->res; res; res = res->next) {
+        if(res->any.type == res_hwaddr) {
+          hwaddr = res->hwaddr.addr;
           break;
         }
-        if(config.sig_failed || config.digests.failed) break;
       }
 
-      if(!found) {
-        str_copy(&url->used.device, NULL);
-        str_copy(&url->used.model, NULL); 
-        str_copy(&url->used.hwaddr, NULL);
-        str_copy(&url->used.unique_id, NULL);
+      if(!hd->unix_dev_name) continue;
+
+      matched = url_device ? match_netdevice(short_dev(hd->unix_dev_name), hwaddr, url_device) : 1;
+
+      for(sl = hd->unix_dev_names; !matched && sl; sl = sl->next) {
+        matched = match_netdevice(short_dev(sl->str), NULL, url_device);
       }
 
-      LXRC_WAIT
- 
-      return found ? 0 : 1;
+      if(!matched) continue;
+
+      str_copy(&url->used.unique_id, hd->unique_id);
+      str_copy(&url->used.device, hd->unix_dev_name);
+      str_copy(&url->used.hwaddr, hwaddr);
+      str_copy(&url->used.model, hd->model);
+
+      url->is.wlan = hd->is.wlan;
+
+      url_setup_device(url);
+
+      if(!url_read_file(url, dir, src, dst, label, flags)) {
+        found++;
+        break;
+      }
+      if(config.sig_failed || config.digests.failed) break;
     }
+
+    if(!found) {
+      str_copy(&url->used.device, NULL);
+      str_copy(&url->used.model, NULL);
+      str_copy(&url->used.hwaddr, NULL);
+      str_copy(&url->used.unique_id, NULL);
+    }
+
+    LXRC_WAIT
+ 
+    return found ? 0 : 1;
   }
 
   if(url->used.device) url_setup_device(url);
@@ -2257,7 +2247,11 @@ int url_setup_device(url_t *url)
   }
   else {
     ok = url_setup_interface(url);
-    if(ok) name2inet(&url->used.server, url->server);
+    if(ok) {
+      name2inet(&url->used.server, url->server);
+      net_ask_password();	// FIXME: strange location to put it here...
+      ok = url_setup_slp(url);
+    }
   }
 
   return ok;
@@ -2273,22 +2267,9 @@ int url_setup_device(url_t *url)
  */
 int url_setup_interface(url_t *url)
 {
-  int i;
-  url_t *tmp_url;
-
-  // fprintf(stderr, "*** url_setup_interface(dev = %s)\n", url->used.device);
-
-  /* setup interface */
-
   // we already have at least one configured interface
-  if(config.ifcfg.if_up) return 1;
-
-  if(
-    config.net.configured &&
-    config.net.device &&
-    !strcmp(url->used.device, config.net.device)
-  ) {
-    // fprintf(stderr, "*** url_setup_interface(dev = %s): already up\n", url->used.device);
+  if(config.ifcfg.if_up) {
+    fprintf(stderr, "setup_interface: already up\n");
 
     return 1;
   }
@@ -2298,56 +2279,54 @@ int url_setup_interface(url_t *url)
     !strncmp(url->used.device, "sit", sizeof "sit" - 1)
   ) return 0;
 
-  /* if(!getenv("PXEBOOT")) */ net_stop();
+  net_stop();
 
-  str_copy(&config.net.device, url->used.device);
-  str_copy(&config.net.hwaddr, url->used.hwaddr);
-  str_copy(&config.net.cardname, url->used.model);
-  str_copy(&config.net.unique_id, url->used.unique_id);
+  str_copy(&config.ifcfg.manual->device, url->used.device);
 
-// --- net_config2() start ---
-
-  config.net.configured = nc_none;
-
-  fprintf(stderr, "interface setup: %s\n", url->used.device);
+  fprintf(stderr, "interface setup: %s\n", config.ifcfg.manual->device);
 
   if(url->is.wlan && wlan_setup()) return 0;
 
   if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
 
-  if(config.net.configured == nc_none) config.net.configured = nc_static;
+  if(!config.ifcfg.if_up) {
+    check_ptp(NULL);
 
-  check_ptp(NULL);
-
-  /* we need at least ip & netmask for static network config */
-  /* just netmask for PTP devices */
-  if(!config.ifcfg.manual->ptp && (net_config_mask() & 3) != 3) {
-    net_dhcp();
-
-    if(!config.net.dhcp_active) {
-      config.net.configured = nc_none;
-      return 0;
+    if(config.ifcfg.manual->dhcp && !config.ifcfg.manual->ptp) {
+      net_dhcp();
     }
-
-    config.net.configured = nc_dhcp;
+    else {
+      net_static();
+    }
   }
 
-  if(config.net.configured != nc_dhcp && net_static()) {
+  if(!config.ifcfg.if_up) {
     fprintf(stderr, "network setup failed\n");
-    config.net.configured = nc_none;
-
     return 0;
   }
   else {
-    fprintf(stderr, "%s activated\n", url->used.device);
+    fprintf(stderr, "%s activated\n", config.ifcfg.manual->device);
   }
 
-// --- net_config2() end ---
+  return 1;
+}
+
+
+/*
+ * Get SLP data.
+ *
+ * return:
+ *   0: failed
+ *   1: ok
+ */
+int url_setup_slp(url_t *url)
+{
+  url_t *tmp_url;
 
   if(url->scheme == inst_slp) {
     tmp_url = url_set(slp_get_install(url));
     if(!tmp_url->scheme) {
-      fprintf(stderr, "%s: SLP failed\n", url->used.device);
+      fprintf(stderr, "SLP failed\n");
       url_free(tmp_url);
 
       return 0;
@@ -2369,18 +2348,6 @@ int url_setup_interface(url_t *url)
     url_free(tmp_url);
 
     fprintf(stderr, "slp: using %s\n", url_print(url, 0));
-  }
-
-  net_ask_password();
-
-  fprintf(stderr, "hostip: %s\n", inet2print(&config.net.hostname));
-  if(config.net.gateway.ok) {
-    fprintf(stderr, "gateway: %s\n", inet2print(&config.net.gateway));
-  }
-  for(i = 0; i < sizeof config.net.nameserver / sizeof *config.net.nameserver; i++) {
-    if(config.net.nameserver[i].ok) {
-      fprintf(stderr, "nameserver %d: %s\n", i, inet2print(&config.net.nameserver[i]));
-    }
   }
 
   return 1;

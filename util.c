@@ -3150,40 +3150,6 @@ char *long_dev(char *dev)
   return dev;
 }
 
-/*
- * Get unique id & hw address for network device.
- *
- */
-void get_net_unique_id()
-{
-  hd_data_t *hd_data;
-  hd_t *hd, *hd_card;
-  hd_res_t *res;
-
-  if(!config.net.device) return;
-
-  hd_data = calloc(1, sizeof *hd_data);
-
-  add_str_list(&hd_data->only, config.net.device);
-
-  hd = hd_list(hd_data, hw_network, 1, NULL);
-
-  if(hd) {
-    for(res = hd->res; res; res = res->next) {
-      if(res->any.type == res_hwaddr) {
-        str_copy(&config.net.hwaddr, res->hwaddr.addr);
-        break;
-      }
-    }
-    if((hd_card = hd_get_device_by_idx(hd_data, hd->attached_to))) {
-      str_copy(&config.net.unique_id, hd_card->unique_id);
-      str_copy(&config.net.cardname, hd_card->model);
-    }
-  }
-
-  hd_free_hd_data(hd_data);
-}
-
 
 static int is_there(char *name);
 static int is_dir(char *name);
