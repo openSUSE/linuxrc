@@ -59,7 +59,7 @@ static int net_input_data(void);
 static int wlan_auth_cb(dia_item_t di);
 
 static dia_item_t di_wlan_auth_last = di_none;
-static int parse_leaseinfo(char *file);
+static void parse_leaseinfo(char *file);
 static void net_wicked_dhcp(void);
 
 static void net_cifs_build_options(char **options, char *user, char *password, char *workgroup);
@@ -190,9 +190,9 @@ int net_config()
  */
 void net_stop()
 {
-  char *device = config.net.device;
+  char *device = config.ifcfg.current;
 
-  if(config.ifcfg.current) device = config.ifcfg.current;
+  if(!device) return;
 
   if(config.debug) fprintf(stderr, "%s: network down\n", device);
 
@@ -219,37 +219,27 @@ void net_stop()
 
 
 /*
- * Setup network interface and write name server config.
+ * Setup network interface with static config.
  *
  * Return:
  *      0: ok
  *   != 0: error code
  *
- * Global vars changed:
- *  config.net.is_configured
- *  config.net.nameserver
- *
- * Writes nameserver & domain to /etc/resolv.conf.
- *
- * config.net.device: interface
  */
 int net_static()
 {
-  // int err4 = 1, err6 = 1;
   char *s;
 
   /* make sure we get the interface name if a mac was passed */
-  if((s = mac_to_interface(config.net.device, NULL))) {
-    free(config.net.device);
-    config.net.device = s;
+  if((s = mac_to_interface(config.ifcfg.manual->device, NULL))) {
+    free(config.ifcfg.manual->device);
+    config.ifcfg.manual->device = s;
   }
 
-  // net_setup_nameserver
-
   config.ifcfg.manual->dhcp = 0;
-  ifcfg_write2(config.net.device, config.ifcfg.manual, 0);
+  ifcfg_write2(config.ifcfg.manual->device, config.ifcfg.manual, 0);
 
-  net_wicked_up(config.net.device);
+  net_wicked_up(config.ifcfg.manual->device);
 
   return 0;
 }
@@ -613,11 +603,8 @@ int net_choose_device()
   hd_t *hd, *hd_cards;
   hd_t **item_hds = NULL;
     
-  if(config.netdevice) {
-    str_copy(&config.net.device, config.netdevice);
-
-    return 0;
-  }
+  // return if we already have one and we're not in manual mode
+  if(config.ifcfg.manual->device && !config.manual) return 0;
 
   if(config.manual == 1 && !net_drivers_loaded) {
     dia_info(&win, "Detecting and loading network drivers", MSGTYPE_INFO);
@@ -788,7 +775,7 @@ int net_choose_device()
 #endif
 
   if(choice > 0) {
-    str_copy(&config.net.device, item_devs[choice - 1]);
+    str_copy(&config.ifcfg.manual->device, item_devs[choice - 1]);
 
     check_ptp(NULL);
 
@@ -976,7 +963,7 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
   str_copy(&input, inet->name);
 
   do {
-    if((err = dia_input2(text, &input, 32, 0))) break;
+    if((err = dia_input2(text, &input, 40, 0))) break;
     if(input) {
       if(
         (user || password || port) &&
@@ -1002,7 +989,6 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
       else {
         name2inet(inet, input);
       }
-      if(!err) err = net_check_address(inet, do_dns);
     }
     else {
       err = 1;
@@ -1029,54 +1015,17 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
  * Parse dhcp leaseinfo and set network config vars accordingly.
  * Returns 1 to indicate that valid data were found.
  */
-int parse_leaseinfo(char *file)
+void parse_leaseinfo(char *file)
 {
   file_t *f0, *f;
-  char *s;
-  slist_t *sl0, *sl;
-  int got_ip = 0;
 
   f0 = file_read_file(file, kf_dhcp);
 
   for(f = f0; f; f = f->next) {
     switch(f->key) {
       case key_ipaddr:
-        got_ip = 1;
         name2inet(&config.net.hostname, f->value);
         net_check_address(&config.net.hostname, 0);
-        break;
-
-      case key_hostname:
-        str_copy(&config.net.realhostname, f->value);
-        break;
-
-      case key_netmask:
-        name2inet(&config.net.netmask, f->value);
-        net_check_address(&config.net.netmask, 0);
-        break;
-
-      case key_network:
-        name2inet(&config.net.network, f->value);
-        net_check_address(&config.net.network, 0);
-        break;
-
-      case key_gateway:
-        if((s = strchr(f->value, ' '))) *s = 0;
-        name2inet(&config.net.gateway, f->value);
-        net_check_address(&config.net.gateway, 0);
-        break;
-
-      case key_dns:
-        for(config.net.nameservers = 0, sl = sl0 = slist_split(' ', f->value); sl; sl = sl->next) {
-          name2inet(&config.net.nameserver[config.net.nameservers], sl->key);
-          net_check_address(&config.net.nameserver[config.net.nameservers], 0);
-          if(++config.net.nameservers >= sizeof config.net.nameserver / sizeof *config.net.nameserver) break;
-        }
-        slist_free(sl0);
-        break;
-
-      case key_nisdomain:
-        if(*f->value) str_copy(&config.net.nisdomain, f->value);
         break;
 
       default:
@@ -1085,31 +1034,21 @@ int parse_leaseinfo(char *file)
   }
 
   file_free_file(f0);
-
-  return got_ip;
 }
 
 
 /*
  * Start dhcp client and read dhcp info.
  *
- * Global vars changed:
- *  config.net.dhcp_active
- *  config.net.hostname
- *  config.net.netmask
- *  config.net.network
- *  config.net.gateway
- *  config.net.nisdomain
- *  config.net.nameserver
  */
 int net_dhcp()
 {
   char *s;
 
   /* make sure we get the interface name if a mac was passed */
-  if((s = mac_to_interface(config.net.device, NULL))) {
-    free(config.net.device);
-    config.net.device = s;
+  if((s = mac_to_interface(config.ifcfg.manual->device, NULL))) {
+    free(config.ifcfg.manual->device);
+    config.ifcfg.manual->device = s;
   }
 
   net_wicked_dhcp();
@@ -1136,6 +1075,7 @@ void net_wicked_dhcp()
   window_t win;
   int got_ip = 0;
   ifcfg_t *ifcfg = NULL;
+  char *device = config.ifcfg.manual->device;
 
   if(config.test) {
     config.net.dhcp_active = 1;
@@ -1143,7 +1083,7 @@ void net_wicked_dhcp()
     return;
   }
 
-  strprintf(&buf, "Sending DHCP%s request to %s...", net_dhcp_type(), config.net.device);
+  strprintf(&buf, "Sending DHCP%s request to %s...", net_dhcp_type(), device);
   fprintf(stderr, "%s\n", buf);
   if(config.win) {
     dia_info(&win, buf, MSGTYPE_INFO);
@@ -1157,27 +1097,27 @@ void net_wicked_dhcp()
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
 
-  ifcfg_write2(config.net.device, ifcfg, 0);
+  ifcfg_write2(device, ifcfg, 0);
 
   free(ifcfg->type);
   free(ifcfg);
   ifcfg = NULL;
 
-  net_apply_ethtool(config.net.device, config.net.hwaddr);
+  net_apply_ethtool(device, NULL);
 
-  net_wicked_up(config.net.device);
+  net_wicked_up(device);
 
   if(config.net.ipv4) {
-    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", config.net.device);
+    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", device);
     parse_leaseinfo(file);
   }
 
   if(!got_ip && config.net.ipv6) {
-    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", config.net.device);
+    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", device);
     parse_leaseinfo(file);
   }
 
-  if(slist_getentry(config.ifcfg.if_up, config.net.device)) got_ip = 1;
+  if(slist_getentry(config.ifcfg.if_up, device)) got_ip = 1;
 
   if(config.win) win_close(&win);
 
@@ -1231,25 +1171,6 @@ unsigned net_config_mask()
   if(config.net.nameserver[0].ok) u |= 0x10;
 
   return u;
-}
-
-
-/*
- * Return module that handles a network interface.
- *
- * Returns NULL if unknown.
- *
- * net_if: interface
- */
-char *net_if2module(char *net_if)
-{
-  slist_t *sl;
-
-  for(sl = config.net.devices; sl; sl = sl->next ) {
-    if(sl->key && !strcmp(sl->key, net_if)) return sl->value;
-  }
-
-  return NULL;
 }
 
 
@@ -2017,14 +1938,10 @@ char *net_dhcp_type()
 
 
 /*
+ * Setup all interfaces in config.ifcfg.list.
  *
+ * Note: Clears config.ifcfg.current!
  */
-#if 0
-ifcfg=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
-ifcfg=dhcp
-ifcfg=eth*=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
-ifcfg=eth*=dhcp
-#endif
 void net_update_ifcfg()
 {
   int matched;
@@ -2074,6 +1991,8 @@ void net_update_ifcfg()
   for(ifcfg_p = &config.ifcfg.all; *ifcfg_p; ifcfg_p = &(*ifcfg_p)->next);
   *ifcfg_p = config.ifcfg.list;
   config.ifcfg.list = NULL;
+
+  str_copy(&config.ifcfg.current, NULL);
 }
 
 
@@ -2434,6 +2353,15 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
 }
 
 
+/*
+ * Parse ifcfg option.
+ *
+ * Examples:
+ *   ifcfg=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
+ *   ifcfg=dhcp
+ *   ifcfg=eth*=10.10.0.1/24,10.10.0.254,10.10.1.1 10.10.1.2,suse.de[,XXX_OPTION=foo]
+ *   ifcfg=eth*=dhcp
+ */
 ifcfg_t *ifcfg_parse(char *str)
 {
   slist_t *sl, *sl0, *slx;

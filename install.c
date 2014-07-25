@@ -921,9 +921,6 @@ int inst_do_network(instmode_t scheme)
 
     config.url.install->port = port;
 
-    str_copy(&config.url.install->device, config.net.device);
-    str_copy(&config.url.install->used.device, config.net.device);
-
     str_copy(&config.url.install->path, path);
 
     if(scheme == inst_smb) {

@@ -99,7 +99,6 @@ char *short_dev(char *dev);
 char *long_dev(char *dev);
 
 void util_mkdevs(void);
-void get_net_unique_id(void);
 
 int util_lndir_main(int argc, char **argv);
 
