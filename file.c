@@ -65,7 +65,6 @@ static void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned wha
 static void add_driver(char *str);
 static void parse_ethtool(slist_t *sl, char *str);
 static void wait_for_conn(int port);
-static int activate_network(void);
 
 
 static struct {
@@ -1323,7 +1322,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_listen:
         if(f->is.numeric) {
-          if(activate_network()) {
+          if(config.ifcfg.if_up) {
             str_copy(&config.setupcmd, "inst_setup yast");
 
             kbd_end(0);
@@ -1409,8 +1408,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_bootif:
         if(strlen(f->value) > 3) {
-          str_copy(&config.netdevice, f->value + 3);
-          for(s = config.netdevice; *s; s++) if(*s == '-') *s = ':';
+          str_copy(&config.ifcfg.manual->device, f->value + 3);
+          for(s = config.ifcfg.manual->device; *s; s++) if(*s == '-') *s = ':';
         }
         break;
 
@@ -1463,8 +1462,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_netdevice:
         str_copy(&config.ifcfg.manual->device, *f->value ? f->value : NULL);
-
-        str_copy(&config.netdevice, short_dev(*f->value ? f->value : NULL));
         break;
 
       case key_partition:
@@ -2428,41 +2425,6 @@ void wait_for_conn(int port)
   close(sock);
 
   config.listen = 1;
-}
-
-
-int activate_network()
-{
-  if(config.net.configured != nc_none || config.test) return 1;
-
-  load_network_mods();
-
-  if(!config.net.device) str_copy(&config.net.device, config.netdevice);
-
-  if(!config.net.device) {
-    util_update_netdevice_list(NULL, 1);
-    if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
-  }
-
-  if(!config.net.hostname.ok || !config.net.netmask.ok) {
-    net_dhcp();
-    if(!config.net.hostname.ok) {
-      fprintf(stderr, "%s: DHCP%s network setup failed\n", config.net.device, net_dhcp_type());
-      return 0;
-    }
-
-    config.net.configured = nc_dhcp;
-  }
-  else {
-    if(net_static()) {
-      fprintf(stderr, "net activation failed\n");
-      return 0;
-    }
-
-    config.net.configured = nc_static;
-  }
-
-  return 1;
 }
 
 

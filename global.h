@@ -456,7 +456,6 @@ typedef struct {
   char *kexec_kernel;		/* kernel image for kexec */
   char *kexec_initrd;		/* initrd image for kexec */
   char *device;			/* local device to use */
-  char *netdevice;		/* network interface to use */
   char *vga;			/* vga option */
   int vga_mode;			/* vga mode number */
   slist_t *extend_list;		/* list of loaded instsys extensions */

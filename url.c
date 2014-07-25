@@ -1374,7 +1374,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   }
 
   url_device = url->device;
-  if(!url_device) url_device = url->is.network ? config.netdevice : config.device;
+  if(!url_device) url_device = url->is.network ? config.ifcfg.manual->device : config.device;
 
   for(found = 0, hd = sort_a_bit(fix_device_names(hd_list(config.hd_data, hw_item, 0, NULL))); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
@@ -1796,7 +1796,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
     LXRC_WAIT
 
     if(config.hd_data) {
-      url_device = url->device ?: config.netdevice;
+      url_device = url->device ?: config.ifcfg.manual->device;
 
       for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_network_ctrl, 0, NULL)); hd; hd = hd->next) {
         for(hwaddr = NULL, res = hd->res; res; res = res->next) {

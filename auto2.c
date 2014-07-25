@@ -590,7 +590,7 @@ void auto2_user_netconfig()
     /* we have IP & netmask (or just IP for PTP devices) */
     config.net.configured = nc_static;
     /* looks a bit weird, but we need it here for net_static() */
-    if(!config.net.device) str_copy(&config.net.device, config.netdevice);
+    if(!config.net.device) str_copy(&config.net.device, config.ifcfg.manual->device);
     if(!config.net.device) {
       util_update_netdevice_list(NULL, 1);
       if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);

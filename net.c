@@ -613,8 +613,8 @@ int net_choose_device()
   hd_t *hd, *hd_cards;
   hd_t **item_hds = NULL;
     
-  if(config.netdevice) {
-    str_copy(&config.net.device, config.netdevice);
+  if(config.ifcfg.manual->device) {
+    str_copy(&config.net.device, config.ifcfg.manual->device);
 
     return 0;
   }
