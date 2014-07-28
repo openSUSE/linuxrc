@@ -3989,6 +3989,7 @@ void util_wait(const char *file, int line)
           disp_cursor_off();
           if(!config.linemode) disp_restore_screen();
         }
+        break;
 
       case 'c':
         config.debugwait_off = 1;
