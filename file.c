@@ -682,6 +682,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       
       case key_nameserver:
         if(*f->value) str_copy(&config.ifcfg.manual->ns, f->value);
+        break;
 
       case key_proxy:
         url_free(config.url.proxy);

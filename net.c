@@ -2553,6 +2553,8 @@ void net_wicked_up(char *ifname)
 
   sleep(1);
 
+  LXRC_WAIT
+
   net_update_state();
 
   str_copy(&buf, NULL);
@@ -2573,6 +2575,8 @@ void net_wicked_down(char *ifname)
   system(buf);
 
   sleep(1);
+
+  LXRC_WAIT
 
   net_update_state();
 
