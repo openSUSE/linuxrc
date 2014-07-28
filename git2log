@@ -72,7 +72,7 @@ if($branch ne 'master') {
 
   # print STDERR ">> $branch-$bi\n";
 
-  die "no tags in this branch?\n" unless $bi;
+  warn "no tags in this branch\n" unless $bi;
 
   for ($i = 0; $i < $i2; $i++) {
     if($tags[$i] eq $bi) {

@@ -149,7 +149,7 @@ static struct {
   { key_tmpfs,          "_TmpFS",         kf_cmd                         },
   { key_netstop,        "NetStop",        kf_cfg + kf_cmd                },
   { key_testmode,       "_TestMode",      kf_cfg                         },
-  { key_debugwait,      "_DebugWait",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_debugwait,      "DebugWait",      kf_cfg + kf_cmd + kf_cmd_early },
   { key_expert,         "Expert",         kf_cfg + kf_cmd                },	/* drop it? */
   { key_rescue,         "Rescue",         kf_cfg + kf_cmd                },
   { key_rootimage,      "RootImage",      kf_cfg + kf_cmd                },
@@ -682,6 +682,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       
       case key_nameserver:
         if(*f->value) str_copy(&config.ifcfg.manual->ns, f->value);
+        break;
 
       case key_proxy:
         url_free(config.url.proxy);
@@ -763,7 +764,13 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_debugwait:
-        if(f->is.numeric) config.debugwait = f->nvalue;
+        if(f->is.numeric) {
+          config.debugwait = f->nvalue;
+        }
+        else if(*f->value) {
+          config.debugwait = 1;
+          slist_append_str(&config.debugwait_list, f->value);
+        }
         break;
 
       case key_manual:
