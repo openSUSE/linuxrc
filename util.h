@@ -70,7 +70,7 @@ int util_detach_loop(char *dev);
 void name2inet(inet_t *inet, char *name);
 void s_addr2inet(inet_t *inet, unsigned long s_addr);
 char *inet2print(inet_t *inet);
-void str_copy(char **dst, char *src);
+void str_copy(char **dst, const char *src);
 void strprintf(char **buf, char *format, ...) __attribute__ ((format (printf, 2, 3)));
 char *get_instmode_name(instmode_t instmode);
 char *get_instmode_name_up(instmode_t instmode);

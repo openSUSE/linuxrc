@@ -2423,7 +2423,7 @@ char *inet2print(inet_t *inet)
 /*
  * copy strings, *dst points to malloc'ed memory
  */
-void str_copy(char **dst, char *src)
+void str_copy(char **dst, const char *src)
 {
   char *s;
 
@@ -3940,43 +3940,68 @@ void util_clear_downloads()
 }
 
 
+/*
+ * Stop and allow to start a shell.
+ *
+ * Current code position is passed as arg.
+ *
+ * Useful for debugging. See linuxrc.debug and debug.wait options.
+ */
 void util_wait(const char *file, int line)
 {
-  if(!config.debugwait) return;
+  char *pos = NULL, *s;
 
-  fprintf(stderr, "%s(%d)\n", file, line);
-  printf("%s(%d) ?", file, line);
+  if(!config.debugwait || config.debugwait_off) return;
 
-  switch(getchar()) {
-    case 'q':
-      util_umount_all();
-      util_clear_downloads();
-      config.debugwait = 0;
-      lxrc_end();
-      exit(0);
-      break;
+  str_copy(&pos, file);
+  if((s = strrchr(pos, '.'))) *s = 0;
+  strprintf(&pos, "%s:%d", pos, line);
 
-    case 's':
-      kbd_end(0);
-      if(config.win) disp_cursor_on();
-      if(!config.linemode) {
-        printf("\033c");
-        if(config.utf8) printf("\033%%G");
-        fflush(stdout);
-      }
+  if(
+    !config.debugwait_list ||
+    slist_getentry(config.debugwait_list, pos)
+  ) {
+    fprintf(stderr, "== %s ==\n", pos);
+    printf("== %s ==\n(enter = next, s = shell, c = continue normally, q = quit)? ", pos);
 
-      system("PS1='\\w # ' /bin/bash 2>&1");
+    switch(getchar()) {
+      case 'q':
+        util_umount_all();
+        util_clear_downloads();
+        config.debugwait = 0;
+        lxrc_end();
+        exit(0);
+        break;
 
-      kbd_init(0);
-      if(config.win) {
-        disp_cursor_off();
-        if(!config.linemode) disp_restore_screen();
-      }
+      case 's':
+        kbd_end(0);
+        if(config.win) disp_cursor_on();
+        if(!config.linemode) {
+          printf("\033c");
+          if(config.utf8) printf("\033%%G");
+          fflush(stdout);
+        }
 
-    default:
-      break;
+        system("PS1='\\w # ' /bin/bash 2>&1");
+
+        kbd_init(0);
+        if(config.win) {
+          disp_cursor_off();
+          if(!config.linemode) disp_restore_screen();
+        }
+
+      case 'c':
+        config.debugwait_off = 1;
+        break;
+
+      default:
+        break;
+    }
   }
+
+  str_copy(&pos, NULL);
 }
+
 
 void util_umount_all_devices ()
     {
