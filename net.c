@@ -63,8 +63,8 @@ static void parse_leaseinfo(char *file);
 static void net_wicked_dhcp(void);
 
 static void net_cifs_build_options(char **options, char *user, char *password, char *workgroup);
-static int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial);
-static int ifcfg_write(char *device, ifcfg_t *ifcfg);
+static int ifcfg_write(char *device, ifcfg_t *ifcfg, int initial);
+static int _ifcfg_write(char *device, ifcfg_t *ifcfg);
 static char *inet2str(inet_t *inet, int type);
 static int net_get_ip(char *text, char **ip, int with_prefix);
 static int net_check_ip(char *buf, int multi, int with_prefix);
@@ -237,7 +237,7 @@ int net_static()
   }
 
   config.ifcfg.manual->dhcp = 0;
-  ifcfg_write2(config.ifcfg.manual->device, config.ifcfg.manual, 0);
+  ifcfg_write(config.ifcfg.manual->device, config.ifcfg.manual, 0);
 
   net_wicked_up(config.ifcfg.manual->device);
 
@@ -1097,7 +1097,7 @@ void net_wicked_dhcp()
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
 
-  ifcfg_write2(device, ifcfg, 0);
+  ifcfg_write(device, ifcfg, 0);
 
   free(ifcfg->type);
   free(ifcfg);
@@ -1962,7 +1962,7 @@ void net_update_ifcfg()
     // static config must be used only once
     if(ifcfg->used && !ifcfg->dhcp) continue;
 
-    ifcfg_write2(ifcfg->device, ifcfg, 1);
+    ifcfg_write(ifcfg->device, ifcfg, 1);
   }
 
   // 2nd, all interfaces with wildcard patterns
@@ -1981,7 +1981,7 @@ void net_update_ifcfg()
 
       matched = ifcfg->device ? match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device) : 0;
 
-      if(matched) ifcfg_write2(hd->unix_dev_name, ifcfg, 1);
+      if(matched) ifcfg_write(hd->unix_dev_name, ifcfg, 1);
     }
   }
 
@@ -1997,12 +1997,18 @@ void net_update_ifcfg()
 
 
 /*
- * Wrapper around ifcfg_write() that does some more logging.
+ * Write ifcfg/ifroute files for device.
+ *
+ * May be a dhcp or static config.
+ *
+ * Wrapper around _ifcfg_write() that does some more logging.
+ *
+ * Note: 'device' is the interface name not including any vlan id.
  *
  * If initial is set, mark interface is 'initial'; that is, no further auto
  * config is tried on it.
  */
-int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
+int ifcfg_write(char *device, ifcfg_t *ifcfg, int initial)
 {
   char *ifname = NULL;
   int i;
@@ -2014,11 +2020,6 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
   if(ifcfg) {
     ifcfg->used = 1;
     if(ifcfg->vlan) strprintf(&ifname, "%s.%s", device, ifcfg->vlan);
-  }
-
-  // FIXME: the next line is basically correct but shouldn't be here in this place
-  if(!ifname) {
-    str_copy(&ifname, config.net.device);
   }
 
   // if a device spec is a wildcard patterm, don't allow to overwrite an existing config
@@ -2033,7 +2034,7 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
     }
   }
 
-  i = ifcfg_write(device, ifcfg);
+  i = _ifcfg_write(device, ifcfg);
 
   if(i) {
     str_copy(&config.ifcfg.current, ifname);
@@ -2053,30 +2054,30 @@ int ifcfg_write2(char *device, ifcfg_t *ifcfg, int initial)
 /*
  * Write ifcfg/ifroute files for device.
  *
- * - may be a dhcp or static config
- * - if global config is used we always create a ***static*** config
+ * May be a dhcp or static config.
  *
- * Note: use ifcfg_write2()!
+ * Note1: use ifcfg_write() instead!
+ *
+ * Note2: 'device' is the verbatim interface name as used in ifcfg-* or
+ * ifroute-* (including vlan id) while ifcfg->device may even be a wildcard
+ * pattern.
  */
-int ifcfg_write(char *device, ifcfg_t *ifcfg)
+int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 {
-  char *fname, *s;
+  char *fname;
   FILE *fp, *fp2;
   char *gw = NULL;	// allocated
   char *ns = NULL;	// allocated
   char *domain = NULL;	// allocated
   char *vlan = NULL;	// allocated
-  int global_values = 0;
   int is_dhcp = 0;
   slist_t *sl;
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
   unsigned ptp = 0;
 
-  // use global values
+  // obsolete: use global values
   if(!device || !ifcfg) {
-    global_values = 1;
-
     fprintf(stderr, "\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
     printf("\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
     fflush(stdout);
@@ -2086,26 +2087,7 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
     return 0;
   }
 
-  fprintf(stderr, "ifcfg_write: device = %s, global = %d, ifcfg = %s\n", device, global_values, ifcfg ? ifcfg->device : "");
-
-  if(global_values) {
-    device = config.net.device;
-
-    if(!config.net.hostname.ok) return 0;
-
-    // calculate prefix from netmask if missing
-    if(
-      config.net.hostname.ipv4 &&
-      !config.net.hostname.prefix4 &&
-      config.net.netmask.ok &&
-      config.net.netmask.ip.s_addr
-    ) {
-      int i = netmask_to_prefix(config.net.netmask.name);
-      if(i >= 0) config.net.hostname.prefix4 = i;
-    }
-  }
-
-  if(!device) return 0;
+  fprintf(stderr, "ifcfg_write: device = %s, ifcfg = %s\n", device, ifcfg ? ifcfg->device : "");
 
   ptp = check_ptp(device);
 
@@ -2113,9 +2095,9 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
 
   ptp |= ifcfg->ptp;
 
-  // 1. maybe dhcp config, but only if passed explicitly
+  // 1. maybe dhcp config
 
-  if(!global_values && ifcfg->dhcp) {
+  if(ifcfg->dhcp) {
     is_dhcp = 1;
 
     sl = slist_append_str(&sl_ifcfg, "BOOTPROTO");
@@ -2143,96 +2125,62 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
   str_copy(&sl->value, "auto");
 
   if(!is_dhcp) {
-    if(global_values) {
-      char *ip1 = NULL, *ip2 = NULL;
+    int i;
+    slist_t *sl0, *sl1;
 
-      if((s = inet2str(&config.net.hostname, 4))) {
-        if(asprintf(&ip1, "%s/%u", s, config.net.hostname.prefix4) == -1) ip1 = NULL;
-      }
+    str_copy(&gw, ifcfg->gw);
+    str_copy(&ns, ifcfg->ns);
+    str_copy(&domain, ifcfg->domain);
+    if(ifcfg->vlan) {
+      strprintf(&vlan, ".%s", ifcfg->vlan);
+      sl = slist_append_str(&sl_ifcfg, "ETHERDEVICE");
+      str_copy(&sl->value, device);
+    }
 
-      if((s = inet2str(&config.net.hostname, 6))) {
-        if(asprintf(&ip2, "%s/%u", s, config.net.hostname.prefix6) == -1) ip2 = NULL;
-      }
-
-      if(ip1 && ip2) {
-        sl = slist_append_str(&sl_ifcfg, "IPADDR_1");
-        str_copy(&sl->value, ip1);
-        sl = slist_append_str(&sl_ifcfg, "IPADDR_2");
-        str_copy(&sl->value, ip2);
+    if((sl0 = slist_split(' ', ifcfg->ip))) {
+      if(!sl0->next) {
+        sl = slist_append_str(&sl_ifcfg, "IPADDR");
+        str_copy(&sl->value, sl0->key);
+        if(ifcfg->netmask_prefix > 0 && !strchr(sl->value, '/')) {
+          strprintf(&sl->value, "%s/%d", sl->value, ifcfg->netmask_prefix);
+        }
       }
       else {
-        if(!ip1) {
-          ip1 = ip2;
-          ip2 = NULL;
-        }
-        sl = slist_append_str(&sl_ifcfg, "IPADDR");
-        str_copy(&sl->value, ip1);
-      }
-
-      free(ip1);
-      free(ip2);
-
-      // net_apply_ethtool()
-      // ETHTOOL_OPTIONS
-    }
-    else {
-      int i;
-      slist_t *sl0, *sl1;
-
-      str_copy(&gw, ifcfg->gw);
-      str_copy(&ns, ifcfg->ns);
-      str_copy(&domain, ifcfg->domain);
-      if(ifcfg->vlan) {
-        strprintf(&vlan, ".%s", ifcfg->vlan);
-        sl = slist_append_str(&sl_ifcfg, "ETHERDEVICE");
-        str_copy(&sl->value, device);
-      }
-
-      if((sl0 = slist_split(' ', ifcfg->ip))) {
-        if(!sl0->next) {
-          sl = slist_append_str(&sl_ifcfg, "IPADDR");
-          str_copy(&sl->value, sl0->key);
+        for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
+          sl = slist_append(&sl_ifcfg, slist_new());
+          strprintf(&sl->key, "IPADDR_%d", ++i);
+          str_copy(&sl->value, sl1->key);
           if(ifcfg->netmask_prefix > 0 && !strchr(sl->value, '/')) {
             strprintf(&sl->value, "%s/%d", sl->value, ifcfg->netmask_prefix);
           }
         }
+      }
+
+      sl0 = slist_free(sl0);
+    }
+
+    if(ptp) {
+      if((sl0 = slist_split(' ', ifcfg->gw))) {
+        if(!sl0->next) {
+          sl = slist_append_str(&sl_ifcfg, "REMOTE_IPADDR");
+          str_copy(&sl->value, sl0->key);
+        }
         else {
           for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
             sl = slist_append(&sl_ifcfg, slist_new());
-            strprintf(&sl->key, "IPADDR_%d", ++i);
+            strprintf(&sl->key, "REMOTE_IPADDR_%d", ++i);
             str_copy(&sl->value, sl1->key);
-            if(ifcfg->netmask_prefix > 0 && !strchr(sl->value, '/')) {
-              strprintf(&sl->value, "%s/%d", sl->value, ifcfg->netmask_prefix);
-            }
           }
         }
 
         sl0 = slist_free(sl0);
       }
+    }
 
-      if(ptp) {
-        if((sl0 = slist_split(' ', ifcfg->gw))) {
-          if(!sl0->next) {
-            sl = slist_append_str(&sl_ifcfg, "REMOTE_IPADDR");
-            str_copy(&sl->value, sl0->key);
-          }
-          else {
-            for(i = 0, sl1 = sl0; sl1; sl1 = sl1->next) {
-              sl = slist_append(&sl_ifcfg, slist_new());
-              strprintf(&sl->key, "REMOTE_IPADDR_%d", ++i);
-              str_copy(&sl->value, sl1->key);
-            }
-          }
-
-          sl0 = slist_free(sl0);
-        }
-      }
-
-      for (sl = ifcfg->flags; sl; sl = sl->next) {
-        if(!(sl1 = slist_getentry(sl_ifcfg, sl->key))) sl1 = slist_append(&sl_ifcfg, slist_new());
-        str_copy(&sl1->key, sl->key);
-        str_copy(&sl1->value, sl->value);
-      }
+    for (sl = ifcfg->flags; sl; sl = sl->next) {
+      if(!(sl1 = slist_getentry(sl_ifcfg, sl->key))) sl1 = slist_append(&sl_ifcfg, slist_new());
+      str_copy(&sl1->key, sl->key);
+      str_copy(&sl1->value, sl->value);
     }
   }
 
@@ -2257,28 +2205,15 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg)
   // 3. create ifroute entries
 
   if(!is_dhcp) {
-    if((global_values && config.net.gateway.ok) || gw) {
-      if(global_values) {
-        if((s = inet2str(&config.net.gateway, 4))) {
-          sl = slist_append(&sl_ifroute, slist_new());
-          strprintf(&sl->key, "default %s - %s", s, device);
-        }
+    if(gw) {
+      slist_t *sl1, *sl0 = slist_split(' ', ifcfg->gw);
 
-        if((s = inet2str(&config.net.gateway, 6))) {
-          sl = slist_append(&sl_ifroute, slist_new());
-          strprintf(&sl->key, "default %s - %s", s, device);
-        }
+      for(sl1 = sl0; sl1; sl1 = sl1->next) {
+        sl = slist_append(&sl_ifroute, slist_new());
+        strprintf(&sl->key, "default %s - %s", sl1->key, device);
       }
-      else {
-        slist_t *sl1, *sl0 = slist_split(' ', ifcfg->gw);
 
-        for(sl1 = sl0; sl1; sl1 = sl1->next) {
-          sl = slist_append(&sl_ifroute, slist_new());
-          strprintf(&sl->key, "default %s - %s", sl1->key, device);
-        }
-
-        slist_free(sl0);
-      }
+      slist_free(sl0);
     }
   }
 
