@@ -1803,6 +1803,8 @@ void file_write_install_inf(char *dir)
 
   if(config.url.proxy) fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
 
+  if(config.net.realhostname) file_write_str(f, key_hostname, config.net.realhostname);
+
   file_write_modparms(f);
 
   file_write_str(f, key_loghost, config.loghost);
