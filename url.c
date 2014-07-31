@@ -2290,7 +2290,7 @@ int url_setup_interface(url_t *url)
   if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
 
   if(!config.ifcfg.if_up) {
-    check_ptp(NULL);
+    check_ptp(config.ifcfg.manual->device);
 
     if(config.ifcfg.manual->dhcp && !config.ifcfg.manual->ptp) {
       net_dhcp();

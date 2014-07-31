@@ -777,7 +777,7 @@ int net_choose_device()
   if(choice > 0) {
     str_copy(&config.ifcfg.manual->device, item_devs[choice - 1]);
 
-    check_ptp(NULL);
+    check_ptp(config.ifcfg.manual->device);
 
     if(item_hds && item_hds[choice - 1]) {
       hd = item_hds[choice - 1];
@@ -813,17 +813,17 @@ int net_choose_device()
  */
 int net_input_data()
 {
-  if((config.net.setup & NS_HOSTIP)) {
-    if(net_get_ip(
-      "Enter your IP address with network prefix.\n\n"
-      "You can enter more than one, separated by space, if necessary.\n"
-      "Leave empty for autoconfig.\n\n"
-      "Examples: 192.168.5.77/24 2001:db8:75:fff::3/64",
-      &config.ifcfg.manual->ip, 1) == 2
-    ) return -1;
-  }
-
   if(config.ifcfg.manual->ptp) {
+    if((config.net.setup & NS_HOSTIP)) {
+      if(net_get_ip(
+        "Enter your IP address.\n\n"
+        "You can enter more than one, separated by space, if necessary.\n"
+        "Leave empty for autoconfig.\n\n"
+        "Examples: 192.168.5.77 2001:db8:75:fff::3",
+        &config.ifcfg.manual->ip, 0) == 2
+      ) return -1;
+    }
+
     if(net_get_ip(
       "Enter the IP address of the PLIP partner.\n\n"
       "Examples: 192.168.5.77 2001:db8:75:fff::3",
@@ -831,6 +831,16 @@ int net_input_data()
     ) return -1;
   }
   else {
+    if((config.net.setup & NS_HOSTIP)) {
+      if(net_get_ip(
+        "Enter your IP address with network prefix.\n\n"
+        "You can enter more than one, separated by space, if necessary.\n"
+        "Leave empty for autoconfig.\n\n"
+        "Examples: 192.168.5.77/24 2001:db8:75:fff::3/64",
+        &config.ifcfg.manual->ip, 1) == 2
+      ) return -1;
+    }
+
     if((config.net.setup & NS_GATEWAY)) {
       if(net_get_ip(
         "Enter your gateway IP address.\n\n"
@@ -840,21 +850,21 @@ int net_input_data()
         &config.ifcfg.manual->gw, 0) == 2
       ) return -1;
     }
+  }
 
-    if((config.net.setup & NS_NAMESERVER)) {
-      if(net_get_ip(
-        "Enter your name server IP address.\n\n"
-        "You can enter more than one, separated by space, if necessary.\n"
-        "Leave empty if you don't need one.\n\n"
-        "Examples: 192.168.5.77 2001:db8:75:fff::3",
-        &config.ifcfg.manual->ns, 0) == 2
-      ) return -1;
+  if((config.net.setup & NS_NAMESERVER)) {
+    if(net_get_ip(
+      "Enter your name server IP address.\n\n"
+      "You can enter more than one, separated by space, if necessary.\n"
+      "Leave empty if you don't need one.\n\n"
+      "Examples: 192.168.5.77 2001:db8:75:fff::3",
+      &config.ifcfg.manual->ns, 0) == 2
+    ) return -1;
 
-      dia_input2(
-        "Enter your search domains, separated by a space.",
-        &config.ifcfg.manual->domain, 40, 0
-      );
-    }
+    dia_input2(
+      "Enter your search domains, separated by a space.",
+      &config.ifcfg.manual->domain, 40, 0
+    );
   }
 
   return 0;
@@ -2582,13 +2592,11 @@ int net_config_needed(int really)
 
 
 /*
- * Check if interface is a ptp interface and set config.ifcfg.manual accordingly.
+ * Check if interface is a ptp interface and set config.ifcfg.manual->ptp accordingly.
  */
 unsigned check_ptp(char *ifname)
 {
   unsigned ptp = 0;
-
-  if(!ifname) ifname = config.net.device;
 
   if(
     ifname &&
