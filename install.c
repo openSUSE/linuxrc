@@ -1165,9 +1165,9 @@ int inst_execute_yast()
 
   util_free_mem();
 
-  if(!config.test && config.usessh && config.net.sshpassword) {
-    if((f = popen("/usr/sbin/chpasswd", "w"))) {
-      fprintf(f, "root:%s\n", config.net.sshpassword);
+  if(!config.test && (config.net.sshpassword || config.net.sshpassword_enc)) {
+    if((f = popen(config.net.sshpassword_enc ? "chpasswd -e" : "chpasswd", "w"))) {
+      fprintf(f, "root:%s\n", config.net.sshpassword_enc ?: config.net.sshpassword);
       pclose(f);
     }
   }
