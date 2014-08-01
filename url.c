@@ -100,6 +100,16 @@ void url_read(url_data_t *url_data)
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSDATA, url_data);
   curl_easy_setopt(c_handle, CURLOPT_NOPROGRESS, 0);
 
+  if(config.net.ipv6 && !config.net.ipv4) {
+    curl_easy_setopt(c_handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+  }
+  else if(config.net.ipv4 && !config.net.ipv6) {
+    curl_easy_setopt(c_handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+  }
+  else {
+    curl_easy_setopt(c_handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
+  }
+
   url_data->err = curl_easy_setopt(c_handle, CURLOPT_URL, url_data->url->str);
 
   if(config.debug >= 2) fprintf(stderr, "curl opt url = %d (%s)\n", url_data->err, url_data->curl_err_buf);
