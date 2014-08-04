@@ -1328,7 +1328,12 @@ void util_status_info(int log_it)
   }
 
   if(config.net.sshpassword) {
-    sprintf(buf, "sshpassword = %s", config.net.sshpassword);
+    sprintf(buf, "password = %s", config.net.sshpassword);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.net.sshpassword_enc) {
+    sprintf(buf, "encrypted password = %s", config.net.sshpassword_enc);
     slist_append_str(&sl0, buf);
   }
 

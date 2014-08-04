@@ -109,6 +109,7 @@ static struct {
   { key_disks,          "Disks",          kf_none                        },	/* obsolete */
   { key_username,       "Username",       kf_cfg + kf_cmd                },
   { key_password,       "Password",       kf_cfg + kf_cmd                },
+  { key_passwordenc,    "PasswordEnc",    kf_cfg + kf_cmd                },
   { key_workdomain,     "WorkDomain",     kf_cfg + kf_cmd                },
   { key_alias,          "Alias",          kf_none                        },
   { key_options,        "Options",        kf_cfg + kf_cmd_early          },
@@ -161,6 +162,7 @@ static struct {
   { key_vncpassword,    "VNCPassword",    kf_cfg + kf_cmd                },
   { key_displayip,	"Display_IP",     kf_cfg + kf_cmd		 },
   { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },
+  { key_sshpasswordenc, "SSHPasswordEnc", kf_cfg + kf_cmd                },
   { key_term,           "TERM",           kf_cfg + kf_cmd                },
   { key_addswap,        "AddSwap",        kf_cfg + kf_cmd                },
   { key_aborted,        "Aborted",        kf_yast                        },
@@ -727,7 +729,11 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_password:
-        str_copy(&config.net.password, *f->value ? f->value : NULL);
+        str_copy(&config.net.sshpassword, *f->value ? f->value : NULL);
+        break;
+
+      case key_passwordenc:
+        str_copy(&config.net.sshpassword_enc, *f->value ? f->value : NULL);
         break;
 
       case key_workdomain:
@@ -859,6 +865,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_sshpassword:
         str_copy(&config.net.sshpassword, *f->value ? f->value : NULL);
 	/* do not enable ssh nor network ... this is done with usessh=1 */
+        break;
+
+      case key_sshpasswordenc:
+        str_copy(&config.net.sshpassword_enc, *f->value ? f->value : NULL);
         break;
 
       case key_term:
