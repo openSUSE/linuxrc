@@ -608,10 +608,10 @@ typedef struct {
     char *workgroup;		/* SMB */
     char *share;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
-    char *password;
     char *vncpassword;
     inet_t displayip;		/* IP of remote X server */
-    char *sshpassword;
+    char *sshpassword;		/* inst-sys root password */
+    char *sshpassword_enc;	/* encrypted inst-sys root password */
     net_config_t configured;	/* how we configured the network device */
     char *ethtool_used;		/* ethtool options used for active card */
     char *dhcpfail;		/* dhcp failure action */
