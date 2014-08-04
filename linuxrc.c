@@ -377,6 +377,7 @@ void lxrc_change_root()
   if(config.rescue) {
     if(config.usessh) setenv("SSH", "1", 1);
     if(config.net.sshpassword) setenv("SSHPASSWORD", config.net.sshpassword, 1);
+    if(config.net.sshpassword_enc) setenv("SSHPASSWORDENC", config.net.sshpassword_enc, 1);
 
     system("/mounts/initrd/scripts/prepare_rescue");
 
