@@ -775,7 +775,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         else if(*f->value) {
           config.debugwait = 1;
-          slist_append_str(&config.debugwait_list, f->value);
+          slist_assign_values(&config.debugwait_list, f->value);
         }
         break;
 

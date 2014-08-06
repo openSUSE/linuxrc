@@ -92,7 +92,7 @@ enum langid_t {
 #define BUTTON_SIZE_LARGE	10
 #define STATUS_SIZE		50
 
-#define LXRC_WAIT util_wait(__FILE__, __LINE__);
+#define LXRC_WAIT util_wait(__FILE__, __LINE__, __FUNCTION__);
 
 #define RAMDISK_2  "/dev/ram2"
 
