@@ -146,6 +146,7 @@ static struct {
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
   { key_usedhcp,        "UseDHCP",        kf_cfg + kf_cmd                },
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
+  { key_dhcptimeout,    "WickedTimeout",  kf_cfg + kf_cmd                },
   { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
   { key_tmpfs,          "_TmpFS",         kf_cmd                         },
   { key_netstop,        "NetStop",        kf_cfg + kf_cmd                },

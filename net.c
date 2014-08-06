@@ -1133,7 +1133,6 @@ void net_wicked_dhcp()
 
   if(got_ip) {
     config.net.dhcp_active = 1;
-    if(config.net.ifup_wait) sleep(config.net.ifup_wait);
   }
   else {
     if(config.win && config.net.dhcpfail && !strcmp(config.net.dhcpfail, "show")) {
@@ -2487,6 +2486,8 @@ void net_wicked_up(char *ifname)
 
   if(!ifname) return;
 
+  if(config.debug) fprintf(stderr, "wicked ifup %s\n", ifname);
+
   if(config.net.dhcp_timeout_set) {
     strprintf(&buf, "wicked ifup --timeout %d %s >&2", config.net.dhcp_timeout, ifname);
   }
@@ -2496,7 +2497,7 @@ void net_wicked_up(char *ifname)
 
   system(buf);
 
-  sleep(1);
+  sleep(config.net.ifup_wait + 1);
 
   LXRC_WAIT
 
@@ -2514,6 +2515,8 @@ void net_wicked_down(char *ifname)
   char *buf = NULL;
 
   if(!ifname) return;
+
+  if(config.debug) fprintf(stderr, "wicked ifdown %s\n", ifname);
 
   strprintf(&buf, "wicked ifdown %s >&2", ifname);
 
