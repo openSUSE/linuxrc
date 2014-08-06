@@ -1165,6 +1165,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.vnc, "vnc");
   add_flag(&sl0, buf, config.usessh, "usessh");
+  add_flag(&sl0, buf, config.sshd_only, "sshd");
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");

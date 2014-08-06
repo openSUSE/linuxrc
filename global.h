@@ -348,6 +348,7 @@ typedef struct {
   unsigned use_ramdisk:1;	/* used internally */
   unsigned vnc:1;		/* vnc mode */
   unsigned usessh:1;		/* ssh mode */
+  unsigned sshd_only:1;		/* start only sshd */
   unsigned addswap:2;		/* offer to add swap if yast needs it */
   unsigned aborted:1;		/* yast did abort the installation */
   unsigned splash:1;		/* splash active */
