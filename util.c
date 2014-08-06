@@ -1165,6 +1165,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.vnc, "vnc");
   add_flag(&sl0, buf, config.usessh, "usessh");
+  add_flag(&sl0, buf, config.sshd_only, "sshd");
   add_flag(&sl0, buf, config.textmode, "textmode");
   add_flag(&sl0, buf, config.rebootmsg, "rebootmsg");
   add_flag(&sl0, buf, config.use_ramdisk, "ramdisk");
@@ -3952,9 +3953,10 @@ void util_clear_downloads()
  *
  * Useful for debugging. See linuxrc.debug and debug.wait options.
  */
-void util_wait(const char *file, int line)
+void util_wait(const char *file, int line, const char *func)
 {
   char *pos = NULL, *s;
+  slist_t *sl = NULL;
 
   if(!config.debugwait || config.debugwait_off) return;
 
@@ -3962,12 +3964,15 @@ void util_wait(const char *file, int line)
   if((s = strrchr(pos, '.'))) *s = 0;
   strprintf(&pos, "%s:%d", pos, line);
 
-  if(
-    !config.debugwait_list ||
-    slist_getentry(config.debugwait_list, pos)
-  ) {
-    fprintf(stderr, "== %s ==\n", pos);
-    printf("== %s ==\n(enter = next, s = shell, c = continue normally, q = quit)? ", pos);
+  if(config.debugwait_list) {
+    for(sl = config.debugwait_list; sl; sl = sl->next) {
+      if(!fnmatch(sl->key, pos, 0) || !fnmatch(sl->key, func, 0)) break;
+    }
+  }
+
+  if(!config.debugwait_list || sl) {
+    fprintf(stderr, "== %s in %s() ==\n", pos, func);
+    printf("== %s in %s() ==\n(enter = next, s = shell, c = continue normally, q = quit)? ", pos, func);
 
     switch(getchar()) {
       case 'q':

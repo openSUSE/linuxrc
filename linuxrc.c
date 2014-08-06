@@ -1137,8 +1137,7 @@ void lxrc_init()
 
   net_update_ifcfg();
 
-  util_run_script("network_setup");
-  net_update_state();
+  net_wicked_up("all");
 
   if(config.manual) file_read_info_file("cmdline", kf_cmd);
 

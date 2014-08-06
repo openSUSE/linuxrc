@@ -179,10 +179,13 @@ void disp_end (void)
     printf ("\033c");
     fflush (stdout);
 
-    for (i_ii = 0; i_ii < max_y_ig; i_ii++)
-        free (disp_screen_aprm [i_ii]);
+    if (disp_screen_aprm)
+      {
+        for (i_ii = 0; i_ii < max_y_ig; i_ii++)
+            free (disp_screen_aprm [i_ii]);
 
-    free (disp_screen_aprm);
+        free (disp_screen_aprm);
+      }
 
     if(!config.test)
         {

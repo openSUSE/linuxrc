@@ -26,7 +26,7 @@ typedef enum {
   key_rescueimage, key_vnc, key_vncpassword, key_displayip,
   key_sshpassword, key_sshpasswordenc, key_term, key_addswap, key_aborted, key_netstop,
   key_exec, key_usbwait, key_nfsrsize, key_nfswsize, key_setupcmd,
-  key_setupnetif, key_netconfig, key_usessh, key_noshell, key_hwdetect,
+  key_setupnetif, key_netconfig, key_usessh, key_sshd, key_noshell, key_hwdetect,
   key_consoledevice, key_product, key_productdir,
   key_linuxrcstderr, key_comment, key_kbdtimeout, key_brokenmodules,
   key_scsibeforeusb, key_hostip, key_linemode, key_moduledelay,

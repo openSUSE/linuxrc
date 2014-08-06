@@ -146,6 +146,7 @@ static struct {
   { key_proxy,          "Proxy",          kf_cfg + kf_cmd                },
   { key_usedhcp,        "UseDHCP",        kf_cfg + kf_cmd                },
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd                },
+  { key_dhcptimeout,    "WickedTimeout",  kf_cfg + kf_cmd                },
   { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
   { key_tmpfs,          "_TmpFS",         kf_cmd                         },
   { key_netstop,        "NetStop",        kf_cfg + kf_cmd                },
@@ -159,6 +160,7 @@ static struct {
   { key_vnc,            "UseVNC",         kf_cfg + kf_cmd                },
   { key_usessh,         "UseSSH",         kf_cfg + kf_cmd                },
   { key_usessh,         "SSH",            kf_cfg + kf_cmd                },
+  { key_sshd,           "SSHD",           kf_cfg + kf_cmd                },
   { key_vncpassword,    "VNCPassword",    kf_cfg + kf_cmd                },
   { key_displayip,	"Display_IP",     kf_cfg + kf_cmd		 },
   { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },
@@ -775,7 +777,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         else if(*f->value) {
           config.debugwait = 1;
-          slist_append_str(&config.debugwait_list, f->value);
+          slist_assign_values(&config.debugwait_list, f->value);
         }
         break;
 
@@ -846,6 +848,15 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_usessh:
+        config.sshd_only = 0;
+        if(f->is.numeric) config.usessh = f->nvalue;
+        if(config.usessh) {
+          config.net.do_setup |= DS_SSH;
+        }
+        break;
+
+      case key_sshd:
+        config.sshd_only = 1;
         if(f->is.numeric) config.usessh = f->nvalue;
         if(config.usessh) {
           config.net.do_setup |= DS_SSH;
@@ -1828,7 +1839,8 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
   file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
-  file_write_num(f, key_usessh, config.usessh);
+  file_write_num(f, key_usessh, config.usessh & ~config.sshd_only);
+  file_write_num(f, key_sshd, config.usessh);
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);
   file_write_str(f, key_initrd_id, config.initrd_id);
   file_write_str(f, key_instsys_id, config.instsys_id);
