@@ -1301,6 +1301,16 @@ void util_status_info(int log_it)
     slist_free(sl_ifcfg);
   }
 
+  if(config.ifcfg.to_global) {
+    strcpy(buf, "values to store in global network config file:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ifcfg.to_global; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.cdid) {
     sprintf(buf, "cdrom id = %s", config.cdid);
     slist_append_str(&sl0, buf);

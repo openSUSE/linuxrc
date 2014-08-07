@@ -2083,6 +2083,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_t *sl;
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
+  slist_t *sl_global = NULL;
   unsigned ptp = 0;
 
   // obsolete: use global values
@@ -2103,6 +2104,12 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   if(ptp) fprintf(stderr, "check_ptp: ptp = %u\n", ptp);
 
   ptp |= ifcfg->ptp;
+
+  // set wicked timeout
+  if(config.net.dhcp_timeout_set) {
+    sl = slist_append_str(&sl_global, "WAIT_FOR_INTERFACES");
+    strprintf(&sl->value, "%d", config.net.dhcp_timeout);
+  }
 
   // 1. maybe dhcp config
 
@@ -2186,8 +2193,13 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
       }
     }
 
-    for (sl = ifcfg->flags; sl; sl = sl->next) {
-      if(!(sl1 = slist_getentry(sl_ifcfg, sl->key))) sl1 = slist_append(&sl_ifcfg, slist_new());
+    for(sl = ifcfg->flags; sl; sl = sl->next) {
+      if(slist_getentry(config.ifcfg.to_global, sl->key)) {
+        if(!(sl1 = slist_getentry(sl_global, sl->key))) sl1 = slist_append(&sl_global, slist_new());
+      }
+      else {
+        if(!(sl1 = slist_getentry(sl_ifcfg, sl->key))) sl1 = slist_append(&sl_ifcfg, slist_new());
+      }
       str_copy(&sl1->key, sl->key);
       str_copy(&sl1->value, sl->value);
     }
@@ -2248,39 +2260,57 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   // 4. set nameserver and search list
 
   if(!is_dhcp) {
-    if(ns || domain) {
-      fprintf(stderr, "adjusting network/config:\n");
-      if(ns) fprintf(stderr, "  NETCONFIG_DNS_STATIC_SERVERS=\"%s\"\n", ns);
-      if(domain) fprintf(stderr, "  NETCONFIG_DNS_STATIC_SEARCHLIST=\"%s\"\n", domain);
+    // if user has set NETCONFIG_* via flags, keep it
 
-      if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
-        if((fp2 = fopen("/etc/sysconfig/network/config.tmp", "w"))) {
-          char buf[1024];
+    if(ns && !slist_getentry(sl_global, "NETCONFIG_DNS_STATIC_SERVERS")) {
+       sl = slist_append_str(&sl_global, "NETCONFIG_DNS_STATIC_SERVERS");
+       str_copy(&sl->value, ns);
+    }
 
-          while(fgets(buf, sizeof buf, fp)) {
-            if(
-              domain &&
-              !strncmp(buf, "NETCONFIG_DNS_STATIC_SEARCHLIST=", sizeof "NETCONFIG_DNS_STATIC_SEARCHLIST=" - 1)
-            ) {
-              fprintf(fp2, "NETCONFIG_DNS_STATIC_SEARCHLIST=\"%s\"\n", domain);
-            }
-            else if(
-              ns &&
-              !strncmp(buf, "NETCONFIG_DNS_STATIC_SERVERS=", sizeof "NETCONFIG_DNS_STATIC_SERVERS=" - 1)
-            ) {
-              fprintf(fp2, "NETCONFIG_DNS_STATIC_SERVERS=\"%s\"\n", ns);
-            }
-            else {
-              fputs(buf, fp2);
+    if(domain && !slist_getentry(sl_global, "NETCONFIG_DNS_STATIC_SEARCHLIST")) {
+       sl = slist_append_str(&sl_global, "NETCONFIG_DNS_STATIC_SEARCHLIST");
+       str_copy(&sl->value, domain);
+    }
+  }
+
+  // 5. update global network config
+
+  if(sl_global) {
+    fprintf(stderr, "adjusting network/config:\n");
+
+    // it's easier below if we append the '=' to the keys
+    for(sl = sl_global; sl; sl = sl->next) {
+      strprintf(&sl->key, "%s=", sl->key);
+    }
+
+    if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
+      char buf[4096];
+
+      // we allow open to fail and check fp2 for NULL later
+      fp2 = fopen("/etc/sysconfig/network/config.tmp", "w");
+
+      while(fgets(buf, sizeof buf, fp)) {
+        if(*buf && *buf != '#' && !isspace(*buf)) {
+          for(sl = sl_global; sl; sl = sl->next) {
+            if(!strncmp(buf, sl->key, strlen(sl->key))) {
+              fprintf(stderr, "  %s\"%s\"\n", sl->key, sl->value);
+              if(fp2) fprintf(fp2, "%s\"%s\"\n", sl->key, sl->value);
+              *buf = 0;
+              break;
             }
           }
-
-          fclose(fp2);
         }
+        if(*buf && fp2) fputs(buf, fp2);
+      }
 
-        fclose(fp);
+      fclose(fp);
 
+      if(fp2) {
+        fclose(fp2);
         rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
+      }
+      else {
+        fprintf(stderr, "warning: /etc/sysconfig/network/config not updated\n");
       }
     }
   }
@@ -2290,6 +2320,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   str_copy(&domain, NULL);
   str_copy(&vlan, NULL);
 
+  slist_free(sl_global);
   slist_free(sl_ifcfg);
   slist_free(sl_ifroute);
 
@@ -2668,4 +2699,42 @@ int net_check_ip(char *buf, int multi, int with_prefix)
   return ok;
 }
 
+
+/*
+ * Read network config template and remember keys mentioned there.
+ *
+ * This list is used to decide whether to put network config options into
+ * per interface files ifcfg-* or the global .../config.
+ */
+void net_wicked_get_config_keys()
+{
+  file_t *f0, *f1, *f;
+  slist_t *sl0 = NULL;
+
+  f0 = file_read_file("/etc/sysconfig/network/ifcfg.template", kf_none);
+  f1 = file_read_file("/etc/sysconfig/network/config", kf_none);
+
+  for(f = f0; f; f = f->next) {
+    if(*f->key_str && *f->key_str != '#') slist_append_str(&sl0, f->key_str);
+  }
+
+  /*
+   * There are keys that can go either into ifcfg-* or config.
+   * We go for ifcfg-* in these cases.
+   */
+  for(f = f1; f; f = f->next) {
+    if(
+      *f->key_str &&
+      *f->key_str != '#' &&
+      !slist_getentry(sl0, f->key_str)
+    ) {
+      slist_append_str(&config.ifcfg.to_global, f->key_str);
+    }
+  }
+
+  slist_free(sl0);
+
+  file_free_file(f1);
+  file_free_file(f0);
+}
 
