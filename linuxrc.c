@@ -939,6 +939,9 @@ void lxrc_init()
     }
   }
 
+  // set up config key list
+  net_wicked_get_config_keys();
+
   util_run_script("early_setup");
 
   if(config.plymouth) util_run_script("plymouth_setup");
