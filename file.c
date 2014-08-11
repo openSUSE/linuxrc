@@ -1093,6 +1093,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_netsetup:
         config.net.do_setup |= DS_SETUP;
+
+        // for compatibility, see below
+        int do_all = 0;
+
         if(f->is.numeric) {
           config.net.setup = f->nvalue ? NS_DEFAULT : 0;
         }
@@ -1120,6 +1124,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
 #endif
             else if(!strcmp(s, "now")) i = NS_NOW;
+            else if(!strcmp(s, "all")) do_all = 1;
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
               i = NS_NAMESERVER;
               t = s + sizeof "nameserver" - 1;
@@ -1149,6 +1154,14 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           }
 
           slist_free(sl0);
+        }
+        /*
+         * for compatibility with old versions:
+         * make netsetup=dhcp,all an alias for ifcfg=*=dhcp
+         */
+        if(do_all && (config.net.setup & NS_DHCP)) {
+          ifcfg_append(&config.ifcfg.list, ifcfg_parse("*=dhcp"));
+          net_update_ifcfg();
         }
         if(!config.net.setup) config.net.do_setup = 0;
         if(config.net.now) {

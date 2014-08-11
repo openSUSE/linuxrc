@@ -119,7 +119,8 @@ int net_config()
   int rc = 0;
   char buf[256];
 
-  if(!config.win && !config.manual) return 0;
+  // in manual mode, ask for everything
+  if(config.manual) config.net.setup = NS_DEFAULT;
 
   // FIXME: not really here
   net_ask_password();

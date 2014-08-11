@@ -590,6 +590,8 @@ void util_disp_init()
 {
   int i_ii;
 
+  if(config.debug) fprintf(stderr, "win on\n");
+
   config.win = 1;
   util_plymouth_off();
   disp_set_display();
@@ -605,6 +607,8 @@ void util_disp_init()
 
 void util_disp_done()
 {
+  if(config.debug) fprintf(stderr, "win off\n");
+
   if (config.linemode) {
     printf("\n\n");
     config.win = 0;
