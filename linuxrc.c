@@ -765,7 +765,7 @@ void lxrc_init()
   config.net.ifconfig = 1;
   config.net.ipv4 = 1;
   config.net.ipv6 = 1;
-  config.net.setup = NS_DEFAULT;
+  config.net.setup = NS_DHCP;	/* unless we are told otherwise just go for dhcp */
   config.net.nameservers = 1;
 
   config.explode_win = 1;
