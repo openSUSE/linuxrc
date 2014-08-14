@@ -306,6 +306,7 @@ static struct {
   { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
   { key_defaultinstall, "DefaultInstall", kf_cfg + kf_cmd                },
   { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
+  { key_nanny,          "nanny",          kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1673,6 +1674,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_defaultinstall:
         config.defaultrepo = slist_free(config.defaultrepo);
         if(*f->value) config.defaultrepo = slist_split(',', f->value);
+        break;
+
+      case key_nanny:
+        if(f->is.numeric) config.nanny = f->nvalue;
         break;
 
       default:

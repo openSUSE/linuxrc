@@ -399,6 +399,7 @@ typedef struct {
   unsigned restarting:1;	/* we are preparing for restart */
   unsigned restarted:1;		/* we have been restarted */
   unsigned wicked:1;		/* use wicked for network setup */
+  unsigned nanny:1;		/* use wickedd-nanny */
   unsigned upgrade:1;		/* upgrade or fresh install */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */

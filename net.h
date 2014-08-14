@@ -33,3 +33,4 @@ int netmask_to_prefix(char *netmask);
 int net_config_needed(int really);
 unsigned check_ptp(char *ifname);
 void net_wicked_get_config_keys(void);
+void net_nanny(void);

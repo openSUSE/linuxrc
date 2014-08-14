@@ -2739,3 +2739,38 @@ void net_wicked_get_config_keys()
   file_free_file(f0);
 }
 
+
+/*
+ * Enable/disable wickedd-nanny according to config.nanny.
+ */
+void net_nanny()
+{
+  FILE *fp, *fp2;
+
+  if((fp = fopen("/etc/wicked/common.xml", "r"))) {
+    char buf[4096];
+
+    // we allow open to fail and check fp2 for NULL later
+    fp2 = fopen("/etc/wicked/common.xml.tmp", "w");
+
+    while(fgets(buf, sizeof buf, fp)) {
+      if(strstr(buf, "<use-nanny>") && strstr(buf, "</use-nanny>")) {
+        if(config.debug) fprintf(stderr, "wickedd-nanny: %s\n", config.nanny ? "enabled" : "disabled");
+        if(fp2) fprintf(fp2, "  <use-nanny>%s</use-nanny>\n", config.nanny ? "true" : "false");
+        *buf = 0;
+      }
+      if(*buf && fp2) fputs(buf, fp2);
+    }
+
+    fclose(fp);
+
+    if(fp2) {
+      fclose(fp2);
+      rename("/etc/wicked/common.xml.tmp", "/etc/wicked/common.xml");
+    }
+    else {
+      fprintf(stderr, "warning: /etc/wicked/common.xml not updated\n");
+    }
+  }
+}
+
