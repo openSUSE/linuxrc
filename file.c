@@ -306,6 +306,7 @@ static struct {
   { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
   { key_defaultinstall, "DefaultInstall", kf_cfg + kf_cmd                },
   { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
+  { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1118,7 +1119,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             i = 0;
             if(!strcmp(s, "dhcp")) i = NS_DHCP;
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
-            else if(!strcmp(s, "netmask")) i = NS_NETMASK;
+            else if(!strcmp(s, "vlanid")) i = NS_VLANID;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
 #if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
@@ -1673,6 +1674,17 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_defaultinstall:
         config.defaultrepo = slist_free(config.defaultrepo);
         if(*f->value) config.defaultrepo = slist_split(',', f->value);
+        break;
+
+      case key_vlanid:
+        if(f->is.numeric && f->nvalue > 0) {
+          // set vlan id if it's a positive integer...
+          strprintf(&config.ifcfg.manual->vlan, "%d", f->nvalue);
+        }
+        else {
+          // ... else clear setting
+          str_copy(&config.ifcfg.manual->vlan, NULL);
+        }
         break;
 
       default:

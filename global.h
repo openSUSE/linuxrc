@@ -304,17 +304,16 @@ typedef struct ifcfg_s {
 /* reserved 			(1 << 0) */
 #define NS_DHCP			(1 << 1)
 #define NS_HOSTIP		(1 << 2)
-#define NS_NETMASK		(1 << 3)
+#define NS_VLANID		(1 << 3)
 #define NS_GATEWAY		(1 << 4)
 #define NS_NAMESERVER		(1 << 5)
 #define NS_DISPLAY		(1 << 7)
-// #define NS_DHCP6		(1 << 8)
 #define NS_NOW			(1 << 9)
 
 #if defined(__s390__) || defined(__s390x__)
-#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER | NS_DISPLAY)
+#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_VLANID | NS_GATEWAY | NS_NAMESERVER | NS_DISPLAY)
 #else
-#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_NETMASK | NS_GATEWAY | NS_NAMESERVER)
+#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_VLANID | NS_GATEWAY | NS_NAMESERVER)
 #endif
 
 #define SPLASH_10	NULL

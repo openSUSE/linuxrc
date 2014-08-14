@@ -832,6 +832,15 @@ int net_input_data()
     ) return -1;
   }
   else {
+    if((config.net.setup & NS_VLANID)) {
+      int i;
+      i = dia_input2(
+        "Enter your VLAN ID\n\nLeave empty if you don't setup a VLAN.",
+        &config.ifcfg.manual->vlan, 30, 0
+      );
+      fprintf(stderr, "i = %d\n", i);
+    }
+
     if((config.net.setup & NS_HOSTIP)) {
       if(net_get_ip(
         "Enter your IP address with network prefix.\n\n"
