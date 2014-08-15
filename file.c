@@ -306,6 +306,7 @@ static struct {
   { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
   { key_defaultinstall, "DefaultInstall", kf_cfg + kf_cmd                },
   { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
+  { key_nanny,          "nanny",          kf_cfg + kf_cmd_early          },
   { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
 };
 
@@ -1342,7 +1343,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.withiscsi = f->nvalue;
         if(config.withiscsi && !config.net.do_setup) {
           config.net.do_setup |= DS_SETUP;
-          config.net.setup = NS_DEFAULT;
+          config.net.setup |= NS_DEFAULT;
         }
         break;
 
@@ -1676,10 +1677,17 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value) config.defaultrepo = slist_split(',', f->value);
         break;
 
+      case key_nanny:
+        if(f->is.numeric) config.nanny = f->nvalue;
+        break;
+
       case key_vlanid:
-        if(f->is.numeric && f->nvalue > 0) {
+        if(f->is.numeric) {
           // set vlan id if it's a positive integer...
-          strprintf(&config.ifcfg.manual->vlan, "%d", f->nvalue);
+          if(f->nvalue > 0) {
+            strprintf(&config.ifcfg.manual->vlan, "%d", f->nvalue);
+          }
+          config.net.setup |= NS_VLANID;
         }
         else {
           // ... else clear setting

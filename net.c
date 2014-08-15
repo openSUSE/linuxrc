@@ -55,6 +55,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device);
 
 static int net_choose_device(void);
 static int net_input_data(void);
+static int net_input_vlanid(void);
 
 static int wlan_auth_cb(dia_item_t di);
 
@@ -120,7 +121,7 @@ int net_config()
   char buf[256];
 
   // in manual mode, ask for everything
-  if(config.manual) config.net.setup = NS_DEFAULT;
+  if(config.manual) config.net.setup |= NS_DEFAULT;
 
   // FIXME: not really here
   net_ask_password();
@@ -138,6 +139,11 @@ int net_config()
   net_stop();
 
   config.net.configured = nc_none;
+
+  if(config.win) {
+    rc = net_input_vlanid();
+    if(rc) return -1;
+  }
 
   if(config.win && config.net.setup != NS_DHCP) {
     if(
@@ -832,15 +838,6 @@ int net_input_data()
     ) return -1;
   }
   else {
-    if((config.net.setup & NS_VLANID)) {
-      int i;
-      i = dia_input2(
-        "Enter your VLAN ID\n\nLeave empty if you don't setup a VLAN.",
-        &config.ifcfg.manual->vlan, 30, 0
-      );
-      fprintf(stderr, "i = %d\n", i);
-    }
-
     if((config.net.setup & NS_HOSTIP)) {
       if(net_get_ip(
         "Enter your IP address with network prefix.\n\n"
@@ -878,6 +875,45 @@ int net_input_data()
   }
 
   return 0;
+}
+
+
+/*
+ * Ask for vlan id and store in config.ifcfg.manual.
+ */
+int net_input_vlanid()
+{
+  int err = 0, id;
+
+  char *buf = NULL, *s;
+
+  if(!(config.net.setup & NS_VLANID)) return 0;
+
+  str_copy(&buf, config.ifcfg.manual->vlan);
+
+  do {
+    err = 0;
+
+    if(dia_input2("Enter your VLAN ID\n\nLeave empty if you don't setup a VLAN.", &buf, 30, 0)) {
+      err = 2;
+      break;
+    }
+
+    if(!buf) {
+      err = 1;
+      break;
+    }
+
+    id = strtoul(buf, &s, 0);
+    if(*s || id <= 0) err = 2;
+    if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
+  } while(err);
+
+  if(err != 2) str_copy(&config.ifcfg.manual->vlan, buf);
+
+  str_copy(&buf, NULL);
+
+  return err;
 }
 
 
@@ -2746,5 +2782,40 @@ void net_wicked_get_config_keys()
 
   file_free_file(f1);
   file_free_file(f0);
+}
+
+
+/*
+ * Enable/disable wickedd-nanny according to config.nanny.
+ */
+void net_nanny()
+{
+  FILE *fp, *fp2;
+
+  if((fp = fopen("/etc/wicked/common.xml", "r"))) {
+    char buf[4096];
+
+    // we allow open to fail and check fp2 for NULL later
+    fp2 = fopen("/etc/wicked/common.xml.tmp", "w");
+
+    while(fgets(buf, sizeof buf, fp)) {
+      if(strstr(buf, "<use-nanny>") && strstr(buf, "</use-nanny>")) {
+        if(config.debug) fprintf(stderr, "wickedd-nanny: %s\n", config.nanny ? "enabled" : "disabled");
+        if(fp2) fprintf(fp2, "  <use-nanny>%s</use-nanny>\n", config.nanny ? "true" : "false");
+        *buf = 0;
+      }
+      if(*buf && fp2) fputs(buf, fp2);
+    }
+
+    fclose(fp);
+
+    if(fp2) {
+      fclose(fp2);
+      rename("/etc/wicked/common.xml.tmp", "/etc/wicked/common.xml");
+    }
+    else {
+      fprintf(stderr, "warning: /etc/wicked/common.xml not updated\n");
+    }
+  }
 }
 

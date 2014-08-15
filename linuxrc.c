@@ -805,6 +805,8 @@ void lxrc_init()
   config.ifcfg.manual = calloc(1, sizeof *config.ifcfg.manual);
   config.ifcfg.manual->dhcp = 1;
 
+  config.nanny = 0;	// disable for now
+
   #if defined(__s390__) || defined(__s390x__)
   config.linemode = 1;
   #endif
@@ -938,6 +940,9 @@ void lxrc_init()
       rename("/.bin", "/bin");
     }
   }
+
+  // prepare wicked for nanny
+  net_nanny();
 
   // set up config key list
   net_wicked_get_config_keys();
