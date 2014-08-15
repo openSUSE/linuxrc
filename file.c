@@ -307,6 +307,7 @@ static struct {
   { key_defaultinstall, "DefaultInstall", kf_cfg + kf_cmd                },
   { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
   { key_nanny,          "nanny",          kf_cfg + kf_cmd_early          },
+  { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1119,7 +1120,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             i = 0;
             if(!strcmp(s, "dhcp")) i = NS_DHCP;
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
-            else if(!strcmp(s, "netmask")) i = NS_NETMASK;
+            else if(!strcmp(s, "vlanid")) i = NS_VLANID;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
 #if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
@@ -1342,7 +1343,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.withiscsi = f->nvalue;
         if(config.withiscsi && !config.net.do_setup) {
           config.net.do_setup |= DS_SETUP;
-          config.net.setup = NS_DEFAULT;
+          config.net.setup |= NS_DEFAULT;
         }
         break;
 
@@ -1678,6 +1679,20 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_nanny:
         if(f->is.numeric) config.nanny = f->nvalue;
+        break;
+
+      case key_vlanid:
+        if(f->is.numeric) {
+          // set vlan id if it's a positive integer...
+          if(f->nvalue > 0) {
+            strprintf(&config.ifcfg.manual->vlan, "%d", f->nvalue);
+          }
+          config.net.setup |= NS_VLANID;
+        }
+        else {
+          // ... else clear setting
+          str_copy(&config.ifcfg.manual->vlan, NULL);
+        }
         break;
 
       default:
