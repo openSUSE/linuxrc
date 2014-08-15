@@ -895,21 +895,18 @@ int net_input_vlanid()
     err = 0;
 
     if(dia_input2("Enter your VLAN ID\n\nLeave empty if you don't setup a VLAN.", &buf, 30, 0)) {
-      err = 2;
-      break;
-    }
-
-    if(!buf) {
       err = 1;
       break;
     }
 
+    if(!buf) break;
+
     id = strtoul(buf, &s, 0);
-    if(*s || id <= 0) err = 2;
+    if(*s || id <= 0) err = 1;
     if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
   } while(err);
 
-  if(err != 2) str_copy(&config.ifcfg.manual->vlan, buf);
+  if(!err) str_copy(&config.ifcfg.manual->vlan, buf);
 
   str_copy(&buf, NULL);
 
