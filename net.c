@@ -55,6 +55,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device);
 
 static int net_choose_device(void);
 static int net_input_data(void);
+static int net_input_vlanid(void);
 
 static int wlan_auth_cb(dia_item_t di);
 
@@ -120,7 +121,7 @@ int net_config()
   char buf[256];
 
   // in manual mode, ask for everything
-  if(config.manual) config.net.setup = NS_DEFAULT;
+  if(config.manual) config.net.setup |= NS_DEFAULT;
 
   // FIXME: not really here
   net_ask_password();
@@ -138,6 +139,11 @@ int net_config()
   net_stop();
 
   config.net.configured = nc_none;
+
+  if(config.win) {
+    rc = net_input_vlanid();
+    if(rc) return -1;
+  }
 
   if(config.win && config.net.setup != NS_DHCP) {
     if(
@@ -869,6 +875,42 @@ int net_input_data()
   }
 
   return 0;
+}
+
+
+/*
+ * Ask for vlan id and store in config.ifcfg.manual.
+ */
+int net_input_vlanid()
+{
+  int err = 0, id;
+
+  char *buf = NULL, *s;
+
+  if(!(config.net.setup & NS_VLANID)) return 0;
+
+  str_copy(&buf, config.ifcfg.manual->vlan);
+
+  do {
+    err = 0;
+
+    if(dia_input2("Enter your VLAN ID\n\nLeave empty if you don't setup a VLAN.", &buf, 30, 0)) {
+      err = 1;
+      break;
+    }
+
+    if(!buf) break;
+
+    id = strtoul(buf, &s, 0);
+    if(*s || id <= 0) err = 1;
+    if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
+  } while(err);
+
+  if(!err) str_copy(&config.ifcfg.manual->vlan, buf);
+
+  str_copy(&buf, NULL);
+
+  return err;
 }
 
 
