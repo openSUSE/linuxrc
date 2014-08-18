@@ -2691,6 +2691,14 @@ unsigned check_ptp(char *ifname)
 }
 
 
+/*
+ * Check if buf is a valid ip address.
+ *
+ * If with_prefix is set, require '/prefix_bits' appended.
+ * If multi is set, buf may be a space-separated list of ip addresses.
+ *
+ * Returns 1 for ok and 0 for not ok.
+ */
 int net_check_ip(char *buf, int multi, int with_prefix)
 {
   int ok = 1;
