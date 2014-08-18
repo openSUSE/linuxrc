@@ -609,7 +609,7 @@ typedef struct {
     char *share;		/* SMB */
     char *user;			/* if this is NULL, perform guest login */
     char *vncpassword;
-    inet_t displayip;		/* IP of remote X server */
+    char *displayip;		/* name of remote X server */
     char *sshpassword;		/* inst-sys root password */
     char *sshpassword_enc;	/* encrypted inst-sys root password */
     net_config_t configured;	/* how we configured the network device */

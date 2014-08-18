@@ -264,7 +264,7 @@ int inst_choose_netsource_cb(dia_item_t di)
 #if defined(__s390__) || defined(__s390x__)  
 int inst_choose_display()
 {
-  if(!config.manual && (config.net.displayip.ok || config.vnc || config.usessh)) {
+  if(!config.manual && (config.net.displayip || config.vnc || config.usessh)) {
     net_ask_password();
     return 0;
   }
@@ -297,7 +297,7 @@ int inst_choose_display_cb(dia_item_t di)
 
   switch(di) {
     case di_display_x11:
-      if(net_get_address("Enter the IP address of the host running the X11 server.", &config.net.displayip, 1)) return -1;
+      if(dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40)) return -1;
       break;
 
     case di_display_vnc:
