@@ -9,8 +9,8 @@
 int net_config(void);
 int net_config2(int type);
 void net_ask_password(void);
-int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, char *options);
-int net_mount_cifs(char *mountpoint, inet_t *server, char *hostdir, char *user, char *password, char *workgroup, char *options);
+int net_mount_nfs(char *mountpoint, char *server, char *hostdir, unsigned port, char *options);
+int net_mount_cifs(char *mountpoint, char *server, char *hostdir, char *user, char *password, char *workgroup, char *options);
 void net_stop(void);
 int net_check_address(inet_t *inet, int do_dns);
 int net_static(void);

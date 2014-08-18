@@ -746,7 +746,7 @@ int inst_do_network(instmode_t scheme)
   }
 
   /* server name */
-  strprintf(&buf, "Enter the IP address of the %s server.", get_instmode_name_up(scheme));
+  strprintf(&buf, "Enter the name of the %s server.", get_instmode_name_up(scheme));
   if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
   if(!err && n_port) port = n_port;
 
@@ -831,7 +831,7 @@ int inst_do_network(instmode_t scheme)
     }
     else if(i == YES) {
       /* new proxy */
-      strprintf(&buf, "Enter the address of the %s proxy.", get_instmode_name_up(inst_http));
+      strprintf(&buf, "Enter the name of the %s proxy.", get_instmode_name_up(inst_http));
       if(net_get_address2(buf, &proxy, 1, &n_user, &n_password, &n_port)) err = 1;
 
       if(!err) {
@@ -916,7 +916,6 @@ int inst_do_network(instmode_t scheme)
     }
     config.url.install = url_set(buf);
 
-    memcpy(&config.url.install->used.server, &server, sizeof config.url.install->used.server);
     memset(&server, 0, sizeof server);
 
     config.url.install->port = port;
