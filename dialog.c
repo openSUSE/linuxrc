@@ -130,7 +130,7 @@ struct {
  */
 
 static int dia_binary(char *txt, char *button0, char *button1, int def);
-static int dia_win_open (window_t *win_prr, char *txt_tv);
+static int dia_win_open (window_t *win_prr, char *txt_tv, int min_width);
 static int lgetchar(void);
 static char *readline_input(char *prompt, char *val);
 
@@ -291,7 +291,7 @@ int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
   memset(&win, 0, sizeof win);
   win.bg_color = colors_prg->choice_win;
   win.fg_color = colors_prg->choice_fg;
-  width = dia_win_open(&win, txt);
+  width = dia_win_open(&win, txt, 0);
 
   len0 = utf8_strwidth(button0_txt);
   len1 = utf8_strwidth(button1_txt);
@@ -352,7 +352,7 @@ int dia_message (char *txt_tv, int msgtype_iv)
         win_ri.bg_color = colors_prg->msg_win;
         win_ri.fg_color = colors_prg->msg_fg;
         }
-    width_ii = dia_win_open (&win_ri, txt_tv);
+    width_ii = dia_win_open (&win_ri, txt_tv, 0);
     s = msgtype_iv == MSGTYPE_REBOOT ? "Reboot" : "OK";
     util_generate_button (&button_ri, s, utf8_strwidth(s));
     win_add_button (&win_ri, &button_ri,
@@ -988,7 +988,7 @@ ctrlc:
     memset(&win_ri, 0, sizeof (window_t));
     win_ri.bg_color = colors_prg->input_win;
     win_ri.fg_color = colors_prg->msg_fg;
-    dia_win_open(&win_ri, txt_tv);
+    dia_win_open(&win_ri, txt_tv, fieldlen_iv);
 
     memset(&tmp_win_ri, 0, sizeof (window_t));
     tmp_win_ri.x_left = win_ri.x_left + 1;
@@ -1370,7 +1370,7 @@ void dia_info (window_t *win_prr, char *txt_tv, int type)
  *
  */
 
-static int dia_win_open (window_t *win_prr, char *txt_tv)
+static int dia_win_open (window_t *win_prr, char *txt_tv, int min_width)
     {
     int        width_ii;
     window_t   tmp_win_ri;
@@ -1379,7 +1379,10 @@ static int dia_win_open (window_t *win_prr, char *txt_tv)
     int        i_ii;
 
 
-    width_ii = utf8_strwidth (txt_tv) + 6;
+    width_ii = utf8_strwidth (txt_tv);
+    if(min_width > width_ii) width_ii = min_width;
+    width_ii += 6;
+
     if (width_ii < MIN_WIN_SIZE)
         width_ii = MIN_WIN_SIZE;
 
