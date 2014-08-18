@@ -463,7 +463,7 @@ int net_mount_cifs(char *mountpoint, char *server, char *share, char *user, char
   char *real_options = NULL;
   int err;
 
-  if(!config.net.cifs.binary || !server) return -89;
+  if(!config.net.cifs.binary || !server) return -EDESTADDRREQ;	// -89
 
   mod_modprobe(config.net.cifs.module, NULL);
 
@@ -517,7 +517,7 @@ int net_mount_nfs(char *mountpoint, char *server, char *hostdir, unsigned port, 
   char *real_options = NULL;
   pid_t mount_pid;
 
-  if(!server) return -89;
+  if(!server) return -EDESTADDRREQ;	// -89
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
