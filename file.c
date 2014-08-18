@@ -59,9 +59,6 @@ static void file_dump_flist(file_t *ft);
 static void file_dump_mlist(module_t *ml);
 #endif
 
-static void file_write_inet2(FILE *f, file_key_t key, inet_t *inet, unsigned what);
-static void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what);
-
 static void add_driver(char *str);
 static void parse_ethtool(slist_t *sl, char *str);
 static void wait_for_conn(int port);
@@ -871,8 +868,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_displayip:
-        name2inet(&config.net.displayip, f->value);
-        net_check_address(&config.net.displayip, 0);
+        str_copy(&config.net.displayip, *f->value ? f->value : NULL);
         break;
                                       
       case key_sshpassword:
@@ -1779,44 +1775,6 @@ void file_write_sym(FILE *f, file_key_t key, char *base_sym, int num)
 }
 
 
-void file_write_inet2(FILE *f, file_key_t key, inet_t *inet, unsigned what)
-{
-  file_write_inet2_str(f, file_key2str(key), inet, what);
-}
-
-
-void file_write_inet2_str(FILE *f, char *name, inet_t *inet, unsigned what)
-{
-  const char *ip = NULL;
-  char buf[INET6_ADDRSTRLEN];
-  char prefix4[64], prefix6[64];
-
-  *prefix4 = *prefix6 = 0;
-  if(inet->prefix4 && (what & INET_WRITE_PREFIX)) sprintf(prefix4, "/%u", inet->prefix4);
-  if(inet->prefix6 && (what & INET_WRITE_PREFIX)) sprintf(prefix6, "/%u", inet->prefix6);
-
-  if((what & INET_WRITE_NAME_OR_IP)) {
-    if(inet->name && *inet->name) ip = inet->name;
-  }
-
-  if(!ip) {
-    if(inet->ok && inet->ipv6 && config.net.ipv6) {
-      ip = inet_ntop(AF_INET6, &inet->ip6, buf, sizeof buf);
-      if(ip && (what & INET_WRITE_IP_BOTH)) {
-        fprintf(f, "%s6: %s%s\n", name, ip, prefix6);
-        ip = NULL;
-      }
-    }
-  }
-
-  if(!ip && inet->ok && inet->ipv4 && config.net.ipv4) {
-    ip = inet_ntop(AF_INET, &inet->ip, buf, sizeof buf);
-  }
-
-  if(ip) fprintf(f, "%s: %s\n", name, ip);
-}
-
-
 void file_write_install_inf(char *dir)
 {
   FILE *f;
@@ -1871,7 +1829,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_memfree, config.memoryXXX.current >> 10);	// convention: in kB
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
-  file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
+  file_write_str(f, key_displayip, config.net.displayip);
   file_write_num(f, key_usessh, config.usessh & ~config.sshd_only);
   file_write_num(f, key_sshd, config.usessh);
   if(config.noshell) file_write_num(f, key_noshell, config.noshell);

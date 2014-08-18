@@ -264,7 +264,7 @@ int inst_choose_netsource_cb(dia_item_t di)
 #if defined(__s390__) || defined(__s390x__)  
 int inst_choose_display()
 {
-  if(!config.manual && (config.net.displayip.ok || config.vnc || config.usessh)) {
+  if(!config.manual && (config.net.displayip || config.vnc || config.usessh)) {
     net_ask_password();
     return 0;
   }
@@ -297,7 +297,7 @@ int inst_choose_display_cb(dia_item_t di)
 
   switch(di) {
     case di_display_x11:
-      if(net_get_address("Enter the IP address of the host running the X11 server.", &config.net.displayip, 1)) return -1;
+      if(dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40)) return -1;
       break;
 
     case di_display_vnc:
@@ -746,7 +746,7 @@ int inst_do_network(instmode_t scheme)
   }
 
   /* server name */
-  strprintf(&buf, "Enter the IP address of the %s server.", get_instmode_name_up(scheme));
+  strprintf(&buf, "Enter the name of the %s server.", get_instmode_name_up(scheme));
   if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
   if(!err && n_port) port = n_port;
 
@@ -831,7 +831,7 @@ int inst_do_network(instmode_t scheme)
     }
     else if(i == YES) {
       /* new proxy */
-      strprintf(&buf, "Enter the address of the %s proxy.", get_instmode_name_up(inst_http));
+      strprintf(&buf, "Enter the name of the %s proxy.", get_instmode_name_up(inst_http));
       if(net_get_address2(buf, &proxy, 1, &n_user, &n_password, &n_port)) err = 1;
 
       if(!err) {
@@ -916,7 +916,6 @@ int inst_do_network(instmode_t scheme)
     }
     config.url.install = url_set(buf);
 
-    memcpy(&config.url.install->used.server, &server, sizeof config.url.install->used.server);
     memset(&server, 0, sizeof server);
 
     config.url.install->port = port;

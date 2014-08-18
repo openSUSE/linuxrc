@@ -118,7 +118,6 @@ void url_read(url_data_t *url_data)
   str_copy(&proxy_url, url_print(config.url.proxy, 1));
   if(proxy_url) {
     if(config.debug >= 2) fprintf(stderr, "using proxy %s\n", proxy_url);
-    name2inet(&config.url.proxy->used.server, config.url.proxy->server);
     curl_easy_setopt(c_handle, CURLOPT_PROXY, proxy_url);
     if(config.debug >= 2) fprintf(stderr, "proxy: %s\n", proxy_url);
   }
@@ -881,7 +880,6 @@ url_t *url_free(url_t *url)
     free(url->used.hwaddr);
     free(url->used.model);
     free(url->used.unique_id);
-    free(url->used.server.name);
 
     slist_free(url->query);
     slist_free(url->file_list);
@@ -1179,10 +1177,10 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
       case inst_nfs:
         str_copy(&url->mount, dir ?: new_mountpoint());
 
-        if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
+        if(config.debug) fprintf(stderr, "[server = %s]\n", url->server ?: "");
 
         if(!url->is.file) {
-          err = net_mount_nfs(url->mount, &url->used.server, url->path, url->port, options);
+          err = net_mount_nfs(url->mount, url->server, url->path, url->port, options);
           fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
         }
         else {
@@ -1197,9 +1195,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             *s++ = 0;
             str_copy(&url->tmp_mount, new_mountpoint());
 
-            if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
+            if(config.debug) fprintf(stderr, "[server = %s]\n", url->server ?: "");
 
-            err = net_mount_nfs(url->tmp_mount, &url->used.server, buf, url->port, options);
+            err = net_mount_nfs(url->tmp_mount, url->server, buf, url->port, options);
             fprintf(stderr, "nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
     
             if(err) {
@@ -1228,9 +1226,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
           s = url->mount;
         }
 
-        if(config.debug) fprintf(stderr, "[server = %s]\n", inet2print(&url->used.server));
+        if(config.debug) fprintf(stderr, "[server = %s]\n", url->server ?: "");
 
-        err = net_mount_cifs(s, &url->used.server, url->share, url->user, url->password, url->domain, options);
+        err = net_mount_cifs(s, url->server, url->share, url->user, url->password, url->domain, options);
         fprintf(stderr, "cifs: %s -> %s (%d)\n", url->share, s, err);
         if(err) {
           str_copy(&url->tmp_mount, NULL);
@@ -2258,7 +2256,6 @@ int url_setup_device(url_t *url)
   else {
     ok = url_setup_interface(url);
     if(ok) {
-      name2inet(&url->used.server, url->server);
       net_ask_password();	// FIXME: strange location to put it here...
       ok = url_setup_slp(url);
     }

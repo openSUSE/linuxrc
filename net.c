@@ -457,13 +457,13 @@ void net_cifs_build_options(char **options, char *user, char *password, char *wo
  *   options += ",ip=" + SERVER_IP          falls SERVER_IP gesetzt ist
  * "  mount -t smbfs" + device + " " + mountpoint + " " + options
  */
-int net_mount_cifs(char *mountpoint, inet_t *server, char *share, char *user, char *password, char *workgroup, char *options)
+int net_mount_cifs(char *mountpoint, char *server, char *share, char *user, char *password, char *workgroup, char *options)
 {
   char *cmd = NULL;
   char *real_options = NULL;
   int err;
 
-  if(!config.net.cifs.binary || !server->name) return -2;
+  if(!config.net.cifs.binary || !server) return -EDESTADDRREQ;	// -89
 
   mod_modprobe(config.net.cifs.module, NULL);
 
@@ -481,7 +481,7 @@ int net_mount_cifs(char *mountpoint, inet_t *server, char *share, char *user, ch
     }
   }
 
-  strprintf(&cmd, "%s '//%s/%s' '%s' -o '%s' >&2", config.net.cifs.binary, server->name, share, mountpoint, real_options);
+  strprintf(&cmd, "%s '//%s/%s' '%s' -o '%s' >&2", config.net.cifs.binary, server, share, mountpoint, real_options);
 
   fprintf(stderr, "%s\n", cmd);
 
@@ -498,7 +498,7 @@ int net_mount_cifs(char *mountpoint, inet_t *server, char *share, char *user, ch
  * Mount NFS volume.
  *
  * mountpoint: mount point
- * server: server address
+ * server: NFS server name
  * hostdir: directory on server
  * options: NFS mount options
  *
@@ -511,13 +511,13 @@ int net_mount_cifs(char *mountpoint, inet_t *server, char *share, char *user, ch
  *   != 0: error code
  *
  */
-int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port, char *options)
+int net_mount_nfs(char *mountpoint, char *server, char *hostdir, unsigned port, char *options)
 {
   char *path = NULL;
   char *real_options = NULL;
   pid_t mount_pid;
 
-  if(!server->name) return -2;
+  if(!server) return -EDESTADDRREQ;	// -89
 
   if(!hostdir) hostdir = "/";
   if(!mountpoint || !*mountpoint) mountpoint = "/";
@@ -536,11 +536,11 @@ int net_mount_nfs(char *mountpoint, inet_t *server, char *hostdir, unsigned port
     return WEXITSTATUS(err);
   }
 
-  if(strchr(server->name, ':')) {
-    strprintf(&path, "[%s]:%s", server->name, hostdir);
+  if(strchr(server, ':')) {
+    strprintf(&path, "[%s]:%s", server, hostdir);
   }
   else {
-    strprintf(&path, "%s:%s", server->name, hostdir);
+    strprintf(&path, "%s:%s", server, hostdir);
   }
 
   str_copy(&real_options, "nolock");
@@ -2691,6 +2691,14 @@ unsigned check_ptp(char *ifname)
 }
 
 
+/*
+ * Check if buf is a valid ip address.
+ *
+ * If with_prefix is set, require '/prefix_bits' appended.
+ * If multi is set, buf may be a space-separated list of ip addresses.
+ *
+ * Returns 1 for ok and 0 for not ok.
+ */
 int net_check_ip(char *buf, int multi, int with_prefix)
 {
   int ok = 1;
