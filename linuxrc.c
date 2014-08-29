@@ -791,7 +791,7 @@ void lxrc_init()
   // default memory limits
   config.memoryXXX.min_free =       12 << 20;
   config.memoryXXX.min_yast =      224 << 20;
-  config.memoryXXX.load_image =    350 << 20;
+  config.memoryXXX.load_image =    750 << 20;
 
   config.swap_file_size = 1024;		/* 1024 MB */
 
