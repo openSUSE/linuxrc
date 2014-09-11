@@ -2014,7 +2014,18 @@ void net_update_ifcfg()
     // static config must be used only once
     if(ifcfg->used && !ifcfg->dhcp) continue;
 
-    ifcfg_write(ifcfg->device, ifcfg, 1);
+    if(ifcfg->device) {
+      ifcfg_write(ifcfg->device, ifcfg, 1);
+    }
+    else {
+      /*
+       * If there's no device specified we just remember the settings.
+       * So e.g. ifcfg=1.2.3.4/12,1.1.1.1 just becomes equivalent to
+       * hostip=1.2.3.4/12 gateway=1.1.1.1.
+       */
+      ifcfg_copy(config.ifcfg.manual, ifcfg);
+      ifcfg->used = 1;
+    }
   }
 
   // 2nd, all interfaces with wildcard patterns
@@ -2464,6 +2475,28 @@ ifcfg_t *ifcfg_parse(char *str)
   if(config.debug) fprintf(stderr, "%s", ifcfg_print(ifcfg));
 
   return ifcfg;
+}
+
+
+/*
+ * Make a (deep) copy of an ifcfg_t struct.
+ */
+void ifcfg_copy(ifcfg_t *dst, ifcfg_t *src)
+{
+  if(!dst || !src) return;
+
+  str_copy(&dst->device, src->device);
+  str_copy(&dst->type, src->type);
+  dst->dhcp = src->dhcp;
+  dst->used = src->used;
+  dst->pattern = src->pattern;
+  dst->ptp = src->ptp;
+  dst->netmask_prefix = src->netmask_prefix;
+  str_copy(&dst->vlan, src->vlan);
+  str_copy(&dst->ip, src->ip);
+  str_copy(&dst->gw, src->gw);
+  str_copy(&dst->ns, src->ns);
+  str_copy(&dst->domain, src->domain);
 }
 
 
