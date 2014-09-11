@@ -369,18 +369,18 @@ void auto2_scan_hardware()
       printf("Downloading AutoYaST file: %s\n", config.autoyast2);
       fflush(stdout);
     }
-    err = url_read_file_anywhere(url, NULL, NULL, "/download/autoyast.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
+    err = url_read_file_anywhere(url, NULL, NULL, "/download/autoinst.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
     if(!err) {
-      fprintf(stderr, "setting AutoYaST option to file:///download/autoyast.xml\n");
-      str_copy(&config.autoyast, "file:///download/autoyast.xml");
+      fprintf(stderr, "setting AutoYaST option to file:///download/autoinst.xml\n");
+      str_copy(&config.autoyast, "file:///download/autoinst.xml");
       /* parse it:
        * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
        * otherwise the file content is ignored
        */
       fprintf(stderr, "parsing AutoYaST file\n");
-      file_read_info_file("file:/download/autoyast.xml", kf_cfg);
+      file_read_info_file("file:/download/autoinst.xml", kf_cfg);
       net_update_ifcfg();
     }
   }
@@ -834,7 +834,8 @@ void auto2_read_repo_files(url_t *url)
     { "/media.1/info.txt", "/info.txt" },
     { "/license.tar.gz", "/license.tar.gz" },
     { "/part.info", "/part.info" },
-    { "/control.xml", "/control.xml" }
+    { "/control.xml", "/control.xml" },
+    { "/autoinst.xml", "/tmp/autoinst.xml" }
   };
 
   // url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
@@ -855,6 +856,21 @@ void auto2_read_repo_files(url_t *url)
 
   str_copy(&dst, NULL);
   str_copy(&file_list, NULL);
+
+  if(!config.autoyast) {
+    if(util_check_exist("/tmp/autoinst.xml")) rename("/tmp/autoinst.xml", "/autoinst.xml");
+    if(util_check_exist("/autoinst.xml")) {
+      fprintf(stderr, "setting AutoYaST option to file:///autoinst.xml\n");
+      str_copy(&config.autoyast, "file:///autoinst.xml");
+      /* parse it:
+       * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
+       * otherwise the file content is ignored
+       */
+      fprintf(stderr, "parsing AutoYaST file\n");
+      file_read_info_file("file:/autoinst.xml", kf_cfg);
+      net_update_ifcfg();
+    }
+  }
 }
 
 
