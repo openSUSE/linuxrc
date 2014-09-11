@@ -297,7 +297,7 @@ int inst_choose_display_cb(dia_item_t di)
 
   switch(di) {
     case di_display_x11:
-      if(dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40)) return -1;
+      if(dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40, 0)) return -1;
       break;
 
     case di_display_vnc:
