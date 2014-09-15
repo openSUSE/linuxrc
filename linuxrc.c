@@ -906,11 +906,6 @@ void lxrc_init()
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
 
-  // we might need edd for udev
-  if(util_check_exist("/modules/edd.ko")) {
-    system("/sbin/insmod /modules/edd.ko 2>/dev/null");
-  }
-
   util_set_stderr(config.stderr_name);
 
   time_t t = time(NULL);
