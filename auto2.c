@@ -828,8 +828,7 @@ char *auto2_serial_console()
 void auto2_read_repo_files(url_t *url)
 {
   int i;
-  file_t *f0, *f;
-  char *dst = NULL, *file_list = NULL;
+  char *dst = NULL;
   static char *default_list[][2] = {
     { "/media.1/info.txt", "/info.txt" },
     { "/license.tar.gz", "/license.tar.gz" },
@@ -838,24 +837,11 @@ void auto2_read_repo_files(url_t *url)
     { "/autoinst.xml", "/tmp/autoinst.xml" }
   };
 
-  // url_read_file(url, NULL, "/media.1/installfiles", file_list = strdup(new_download()), NULL, URL_FLAG_PROGRESS);
-
-  if((f0 = file_read_file(file_list, kf_none))) {
-    for(f = f0; f && !config.digests.failed; f = f->next) {
-      strprintf(&dst, "/%s/%s", f->value, *f->key_str == '/' ? f->key_str + 1 : f->key_str);
-      url_read_file(url, NULL, f->key_str, dst, NULL, 0 /* + URL_FLAG_PROGRESS */);
-    }
+  for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
+    url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, URL_FLAG_NODIGEST);
   }
-  else {
-    for(i = 0; i < sizeof default_list / sizeof *default_list && !config.digests.failed; i++) {
-      url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, 0 /* + URL_FLAG_PROGRESS */);
-    }
-  }
-
-  file_free_file(f0);
 
   str_copy(&dst, NULL);
-  str_copy(&file_list, NULL);
 
   if(!config.autoyast) {
     if(util_check_exist("/tmp/autoinst.xml")) rename("/tmp/autoinst.xml", "/autoinst.xml");
