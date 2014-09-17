@@ -837,7 +837,7 @@ void auto2_read_repo_files(url_t *url)
     { "/autoinst.xml", "/tmp/autoinst.xml" }
   };
 
-  for(i = 0; i < sizeof default_list / sizeof *default_list && !config.digests.failed; i++) {
+  for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
     url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, URL_FLAG_NODIGEST);
   }
 
