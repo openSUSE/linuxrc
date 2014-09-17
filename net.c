@@ -1129,6 +1129,7 @@ void net_wicked_dhcp()
   int got_ip = 0;
   ifcfg_t *ifcfg = NULL;
   char *device = config.ifcfg.manual->device;
+  char *type;
 
   if(config.test) {
     config.net.dhcp_active = 1;
@@ -1136,7 +1137,15 @@ void net_wicked_dhcp()
     return;
   }
 
-  strprintf(&buf, "Sending DHCP%s request to %s...", net_dhcp_type(), device);
+  type = net_dhcp_type();
+
+  // override the default by an explicit ifcfg=dhcp{4,6}
+  if(!*type && config.ifcfg.manual->type) {
+    if(!strcmp(config.ifcfg.manual->type, "dhcp4")) type = "4";
+    if(!strcmp(config.ifcfg.manual->type, "dhcp6")) type = "6";
+  }
+
+  strprintf(&buf, "Sending DHCP%s request to %s...", type, device);
   fprintf(stderr, "%s\n", buf);
   if(config.win) {
     dia_info(&win, buf, MSGTYPE_INFO);
@@ -1149,6 +1158,8 @@ void net_wicked_dhcp()
 
   ifcfg = calloc(1, sizeof *ifcfg);
   ifcfg->dhcp = 1;
+
+  strprintf(&ifcfg->type, "dhcp%s", type);
 
   ifcfg_write(device, ifcfg, 0);
 
