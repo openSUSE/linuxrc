@@ -162,6 +162,7 @@ static struct {
   { key_displayip,	"Display_IP",     kf_cfg + kf_cmd		 },
   { key_sshpassword,    "SSHPassword",    kf_cfg + kf_cmd                },
   { key_sshpasswordenc, "SSHPasswordEnc", kf_cfg + kf_cmd                },
+  { key_sshkey,         "SSHKey",         kf_cfg + kf_cmd                },
   { key_term,           "TERM",           kf_cfg + kf_cmd                },
   { key_addswap,        "AddSwap",        kf_cfg + kf_cmd                },
   { key_aborted,        "Aborted",        kf_yast                        },
@@ -878,6 +879,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_sshpasswordenc:
         str_copy(&config.net.sshpassword_enc, *f->value ? f->value : NULL);
+        break;
+
+      case key_sshkey:
+        str_copy(&config.net.sshkey, *f->value ? f->value : NULL);
         break;
 
       case key_term:

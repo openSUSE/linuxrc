@@ -612,6 +612,7 @@ typedef struct {
     char *displayip;		/* name of remote X server */
     char *sshpassword;		/* inst-sys root password */
     char *sshpassword_enc;	/* encrypted inst-sys root password */
+    char *sshkey;		/* url pointing to ssh key */
     net_config_t configured;	/* how we configured the network device */
     char *ethtool_used;		/* ethtool options used for active card */
     char *dhcpfail;		/* dhcp failure action */
