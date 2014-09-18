@@ -359,6 +359,24 @@ void auto2_scan_hardware()
   }
 
   /*
+   * load ssh key
+   */
+  if(config.net.sshkey) {
+    url = url_set(config.net.sshkey);
+    fprintf(stderr, "Downloading SSH key: %s\n", config.net.sshkey);
+    printf("Downloading SSH key: %s\n", config.net.sshkey);
+    fflush(stdout);
+    err = url_read_file_anywhere(url, NULL, NULL, "/download/authorized_keys", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
+    url_umount(url);
+    url_free(url);
+    if(!err) {
+      fprintf(stderr, "activating SSH key\n");
+      mkdir("/root/.ssh", 0755);
+      rename("/download/authorized_keys", "/root/.ssh/authorized_keys");
+    }
+  }
+
+  /*
    * load autoyast file unless the user has specified an autoyast option
    * -- ok this sounds weird but actually makes sense...
    */
