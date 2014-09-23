@@ -2,7 +2,10 @@ CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
 LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline
 
-GIT2LOG = $(shell [ -x ./git2log ] && echo ./git2log )
+GIT2LOG := $(shell if [ -x ./git2log ] ; then echo ./git2log --update ; else echo true ; fi)
+GITDEPS := $(shell [ -d .git ] && echo .git/HEAD .git/refs/heads .git/refs/tags)
+
+VERSION := $(shell $(GIT2LOG) --version VERSION ; cat VERSION)
 
 SRC	= $(filter-out inflate.c,$(wildcard *.c))
 INC	= $(wildcard *.h)
@@ -18,13 +21,8 @@ SUBDIRS	= mkpsfu
 
 all: changelog libs linuxrc
 
-ifneq ($(GIT2LOG),)
-changelog: .git/HEAD .git/refs/heads .git/refs/tags
-	$(GIT2LOG) --log >changelog
-
-VERSION: .git/HEAD .git/refs/heads .git/refs/tags
-	$(GIT2LOG) --version >VERSION
-endif
+changelog: $(GITDEPS)
+	$(GIT2LOG) --changelog changelog
 
 version.h: VERSION
 	@echo "#define LXRC_VERSION \"`cut -d. -f1-2 VERSION`\"" >$@
