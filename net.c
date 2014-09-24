@@ -2270,6 +2270,19 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
     }
   }
 
+#if defined(__s390__) || defined(__s390x__)
+  // s390 layer2 interfaces
+  if(
+    config.hwp.layer2 &&
+    config.hwp.osahwaddr &&
+    config.hwp.hypervisor &&
+    !strcmp(config.hwp.hypervisor, "LPAR")
+  ) {
+    sl = slist_append_str(&sl_ifcfg, "LLADDR");
+    str_copy(&sl->value, config.hwp.osahwaddr);
+  }
+#endif
+
   if(sl_ifcfg) {
     if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s%s", device, vlan ?: "") == -1) fname = NULL;
     fprintf(stderr, "creating ifcfg-%s%s:\n", device, vlan ?: "");
