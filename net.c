@@ -2144,6 +2144,8 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   char *ns = NULL;	// allocated
   char *domain = NULL;	// allocated
   char *vlan = NULL;	// allocated
+  char sysfs_string[256];
+  char *card_type = NULL;
   int is_dhcp = 0;
   slist_t *sl;
   slist_t *sl_ifcfg = NULL;
@@ -2272,9 +2274,13 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
 #if defined(__s390__) || defined(__s390x__)
   // s390 layer2 interfaces
-  if(config.hwp.layer2 && config.hwp.osahwaddr) {
-    sl = slist_append_str(&sl_ifcfg, "LLADDR");
-    str_copy(&sl->value, config.hwp.osahwaddr);
+  if(config.hwp.layer2==2 && config.hwp.osahwaddr) {
+    sprintf(sysfs_string, "/sys/bus/ccwgroup/devices/%s/card_type", config.hwp.readchan ); 
+    card_type = util_get_attr(sysfs_string);
+    if(strncmp(card_type, "Virt.NIC", sizeof "Virt.NIC" - 1)) {
+      sl = slist_append_str(&sl_ifcfg, "LLADDR");
+      str_copy(&sl->value, config.hwp.osahwaddr);
+    }
   }
 #endif
 
