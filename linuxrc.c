@@ -513,7 +513,8 @@ int do_not_kill(char *name)
   static char *progs[] = {
     "portmap", "rpciod", "lockd", "cifsd", "mount.smbfs", "udevd",
     "mount.ntfs-3g", "brld", "sbl", "wickedd", "wickedd-auto4", "wickedd-dhcp4",
-    "wickedd-dhcp6", "wickedd-nanny", "dbus-daemon", "rpc.idmapd", "sh", "haveged"
+    "wickedd-dhcp6", "wickedd-nanny", "dbus-daemon", "rpc.idmapd", "sh", "haveged",
+    "wpa_supplicant"
   };
   int i;
 
