@@ -2145,7 +2145,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   char *domain = NULL;	// allocated
   char *vlan = NULL;	// allocated
   int is_dhcp = 0;
-  slist_t *sl;
+  slist_t *sl, *sl2;
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
   slist_t *sl_global = NULL;
@@ -2257,17 +2257,19 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
         sl0 = slist_free(sl0);
       }
     }
+  }
 
-    for(sl = ifcfg->flags; sl; sl = sl->next) {
-      if(slist_getentry(config.ifcfg.to_global, sl->key)) {
-        if(!(sl1 = slist_getentry(sl_global, sl->key))) sl1 = slist_append(&sl_global, slist_new());
-      }
-      else {
-        if(!(sl1 = slist_getentry(sl_ifcfg, sl->key))) sl1 = slist_append(&sl_ifcfg, slist_new());
-      }
-      str_copy(&sl1->key, sl->key);
-      str_copy(&sl1->value, sl->value);
+  // handle additional flags and put them either into 'ifcfg-*' or 'config'
+
+  for(sl = ifcfg->flags; sl; sl = sl->next) {
+    if(slist_getentry(config.ifcfg.to_global, sl->key)) {
+      if(!(sl2 = slist_getentry(sl_global, sl->key))) sl2 = slist_append(&sl_global, slist_new());
     }
+    else {
+      if(!(sl2 = slist_getentry(sl_ifcfg, sl->key))) sl2 = slist_append(&sl_ifcfg, slist_new());
+    }
+    str_copy(&sl2->key, sl->key);
+    str_copy(&sl2->value, sl->value);
   }
 
 #if defined(__s390__) || defined(__s390x__)
