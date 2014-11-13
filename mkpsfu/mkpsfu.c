@@ -107,6 +107,7 @@ static int is_special_nongfx(char_data_t *cd);
 static int assign_char_pos(void);
 static void add_data(file_data_t *d, void *buffer, unsigned size);
 static void write_data(char *name);
+static uint32_t read_utf32le(void *p);
 
 int main(int argc, char **argv)
 {
@@ -204,7 +205,7 @@ int main(int argc, char **argv)
         for(j = 0; j < sizeof ibuf2; j++) ibuf2[j] = j;
         iconv(ic2, &ibuf_ptr, &ibuf_left, &obuf_ptr, &obuf_left);
         for(str = obuf2; str < obuf_ptr; str += 4) {
-          i = *(int *) str;
+          i = read_utf32le(str);
           if(i >= 0x20) add_char(i);
         }
         iconv_close(ic2);
@@ -234,7 +235,7 @@ int main(int argc, char **argv)
               if(k >= 0 || (k == -1 && !obuf_left)) {
                 ok = 1;
                 if(!obuf_left) {
-                  i = *(int *) obuf;
+                  i = read_utf32le(obuf);
                   if(i >= 0x20) {
                     // fprintf(stderr, "add char 0x%x\n", i);
                     add_char(i);
@@ -954,4 +955,11 @@ void write_data(char *name)
   fclose(f);
 }
 
+
+uint32_t read_utf32le(void *p)
+{
+  unsigned char *s = p;
+
+  return s[0] + (s[1] << 8) + (s[2] << 16) + (s[3] << 24);
+}
 

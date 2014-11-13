@@ -47,6 +47,7 @@
 #include "scsi_rename.h"
 #include "hotplug.h"
 #include "checkmd5.h"
+#include "url.h"
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
