@@ -372,7 +372,10 @@ void lxrc_change_root()
 
     // add devices
     strprintf(&buf, "%s/dev", mp);
-    rename("/dev", buf);
+    umount("/dev/pts");
+    umount("/dev");
+    mkdir(buf, 0755);
+    mount("devtmpfs", buf, "devtmpfs", 0, 0);
 
     // keep initrd available
     strprintf(&buf, "%s/mounts/initrd", mp);
@@ -855,6 +858,11 @@ void lxrc_init()
   if(!config.udev_mods) {
     system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
   }
+
+  umount("/dev/pts");
+  mount("devtmpfs", "/dev", "devtmpfs", 0, 0);
+  mkdir("/dev/pts", 0755);
+  mount("devpts", "/dev/pts", "devpts", 0, 0);
 
   if(config.staticdevices) {
     util_mkdevs();
