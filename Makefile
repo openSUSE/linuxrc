@@ -23,7 +23,6 @@ SUBDIRS	= po mkpsfu
 all: changelog libs linuxrc
 
 changelog: $(GITDEPS)
-	echo $(GITDEPS)
 	$(GIT2LOG) --changelog changelog
 
 version.h: VERSION
