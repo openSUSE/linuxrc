@@ -1629,7 +1629,7 @@ int net_input_data()
 int net_bootp()
 {
   window_t  win;
-  int rc, netconf_error;
+  int rc;
   char *s;
   char tmp[256];
 
@@ -1642,7 +1642,6 @@ int net_bootp()
   s_addr2inet(&config.net.broadcast, 0xffffffff);
   name2inet(&config.net.ptphost, "");
   name2inet(&config.net.hostname, "");
-  netconf_error	= 0;
 
   if(net_activate_ns()) {
     if(config.win) {

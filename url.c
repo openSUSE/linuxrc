@@ -1571,7 +1571,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
 
   int test_and_copy(url_t *url)
   {
-    int ok = 0, new_url = 0, i, j, k, win;
+    int ok = 0, new_url = 0, i, win;
     char *old_path, *buf = NULL;
     url_data_t *url_data;
     slist_t *sl;
@@ -1635,14 +1635,11 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
           fprintf(stderr, "sha1 not checked\n");
         }
         else {
-          k = 0;
           sl = slist_getentry(config.sha1, url_data->sha1);
           if(sl && url_data->url->path) {
             i = strlen(sl->value);
-            j = strlen(url_data->url->path);
-            if(i <= j && !strcmp(url_data->url->path + j - i, sl->value)) k = 1;
           }
-          if(sl) {	/* if(k) to verify filenames as well */
+          if(sl) {
             fprintf(stderr, "sha1 ok\n");
           }
           else {
