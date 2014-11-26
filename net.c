@@ -69,6 +69,7 @@ static int _ifcfg_write(char *device, ifcfg_t *ifcfg);
 static char *inet2str(inet_t *inet, int type);
 static int net_get_ip(char *text, char **ip, int with_prefix);
 static int net_check_ip(char *buf, int multi, int with_prefix);
+static int compare_subnet(char *ip1, char *ip2, unsigned prefix);
 
 
 /*
@@ -2150,6 +2151,8 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_t *sl_ifroute = NULL;
   slist_t *sl_global = NULL;
   unsigned ptp = 0;
+  char *v4_ip = NULL;	// allocated
+  unsigned v4_prefix = 0;
 
   // obsolete: use global values
   if(!device || !ifcfg) {
@@ -2224,6 +2227,15 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
         str_copy(&sl->value, sl0->key);
         if(ifcfg->netmask_prefix > 0 && !strchr(sl->value, '/')) {
           strprintf(&sl->value, "%s/%d", sl->value, ifcfg->netmask_prefix);
+        }
+
+        // remember ip and net prefix for later use
+        str_copy(&v4_ip, sl0->key);
+        v4_prefix = ifcfg->netmask_prefix;
+        char *t = strchr(v4_ip, '/');
+        if(t) {
+          *t = 0;
+          v4_prefix = atoi(t + 1);
         }
       }
       else {
@@ -2315,6 +2327,14 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
       for(sl1 = sl0; sl1; sl1 = sl1->next) {
         sl = slist_append(&sl_ifroute, slist_new());
+
+        // set explicit route to gw unless gw is in the same ipv4 subnet
+        // note: we might as well set it always
+        if(!compare_subnet(v4_ip, sl1->key, v4_prefix)) {
+          strprintf(&sl->key, "%s - - %s", sl1->key, device);
+          sl = slist_append(&sl_ifroute, slist_new());
+        }
+
         strprintf(&sl->key, "default %s - %s", sl1->key, device);
       }
 
@@ -2403,6 +2423,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   str_copy(&ns, NULL);
   str_copy(&domain, NULL);
   str_copy(&vlan, NULL);
+  str_copy(&v4_ip, NULL);
 
   slist_free(sl_global);
   slist_free(sl_ifcfg);
@@ -2885,5 +2906,32 @@ void net_nanny()
       fprintf(stderr, "warning: /etc/wicked/common.xml not updated\n");
     }
   }
+}
+
+
+/*
+ * Check whether ip1 and ip2 share the same ipv4 subnet.
+ */
+int compare_subnet(char *ip1, char *ip2, unsigned prefix)
+{
+  struct in_addr ip4_1, ip4_2;
+  uint32_t mask;
+  int ok = 0;
+
+  if(prefix > 32 || !ip1 || !ip2) return 0;
+
+  // no ipv6
+  if(strchr(ip1, ':') || strchr(ip2, ':')) return 0;
+
+  mask = htonl(prefix ? -1 << (32 - prefix) : 0);
+
+  if(
+    inet_pton(AF_INET, ip1, &ip4_1) > 0 &&
+    inet_pton(AF_INET, ip2, &ip4_2) > 0
+  ) {
+    ok = (ip4_1.s_addr & mask) == (ip4_2.s_addr & mask);
+  }
+
+  return ok;
 }
 
