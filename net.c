@@ -1473,10 +1473,9 @@ void net_setup_nameserver()
       for(u = 0; u < config.net.nameservers; u++) {
         if(config.net.nameservers == 1) {
           s = "Enter the IP address of your name server. Leave empty if you don't need one.";
-          if(config.linemode) s = "Enter the IP address of your name server. Leave empty or enter \"+++\" if you don't need one.";
         }
         else {
-           sprintf(buf, txt_get(config.linemode ? TXT_INPUT_NAMED1_S390 : TXT_INPUT_NAMED1), u + 1);
+           sprintf(buf, txt_get(TXT_INPUT_NAMED1), u + 1);
            s = buf;
         }
         if(net_get_address(s, &config.net.nameserver[u], 0)) break;
