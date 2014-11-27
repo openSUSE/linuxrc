@@ -173,7 +173,7 @@ int main(int argc, char **argv, char **env)
     }
     config.had_segv = 1;
 
-    config.linemode = (state >> 1) & 1;
+    config.linemode = (state >> 1) & 3;
 
     if((state & 1) == 0) {	/* was not in window mode */
       fprintf(stderr, "\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
@@ -691,12 +691,7 @@ void lxrc_catch_signal(int signum)
   }
 
   signal(SIGBUS,  lxrc_catch_signal);
-
-  if(!config.test) {
-    signal(SIGINT,  lxrc_catch_signal);
-    signal(SIGTERM, lxrc_catch_signal);
-  }
-
+  signal(SIGTERM, lxrc_catch_signal);
   signal(SIGSEGV, (void (*)(int)) lxrc_catch_signal_11);
   signal(SIGPIPE, lxrc_catch_signal);
 }
@@ -720,6 +715,7 @@ void lxrc_init()
   siginterrupt(SIGSEGV, 1);
   siginterrupt(SIGPIPE, 1);
   lxrc_catch_signal(0);
+  signal(SIGINT,  SIG_IGN);
   signal(SIGUSR1, lxrc_usr1);
 
 /*  reboot (RB_DISABLE_CAD); */
@@ -800,6 +796,10 @@ void lxrc_init()
   config.swap_file_size = 1024;		/* 1024 MB */
 
   str_copy(&config.namescheme, "by-id");
+
+  #if defined(__s390__) || defined(__s390x__)
+  config.linemode = 1;
+  #endif
 
   file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
 

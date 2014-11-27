@@ -1,6 +1,6 @@
 CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
-LDFLAGS	= -rdynamic -lhd -lblkid -lcurl
+LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline
 
 GIT2LOG := $(shell if [ -x ./git2log ] ; then echo ./git2log --update ; else echo true ; fi)
 GITDEPS := $(shell [ -d .git ] && echo .git/HEAD .git/refs/heads .git/refs/tags)

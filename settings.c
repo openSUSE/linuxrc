@@ -6,6 +6,7 @@
  *
  */
 
+#define _GNU_SOURCE
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -356,7 +357,7 @@ int set_settings()
 int set_settings_cb (dia_item_t di)
 {
   int rc = 0;
-  char tmp[MAX_FILENAME], *s;
+  char *tmp, *s;
   url_t *url;
 
   di_set_settings_last = di;
@@ -401,9 +402,10 @@ int set_settings_cb (dia_item_t di)
       break;
 
     case di_set_bootptimeout:
-      sprintf(tmp, "%d", config.net.bootp_timeout);
-      rc = dia_input(txt_get(TXT_ENTER_BOOTP_TIMEOUT), tmp, 4, 4, 0);
-      if(!rc) config.net.bootp_timeout = atoi(tmp);
+      asprintf(&tmp, "%d", config.net.bootp_timeout);
+      rc = dia_input2(txt_get(TXT_ENTER_BOOTP_TIMEOUT), &tmp, 10, 0);
+      if(!rc && tmp) config.net.bootp_timeout = atoi(tmp);
+      free(tmp);
       rc = 1;
       break;
 
@@ -654,7 +656,6 @@ void set_expert_menu()
 int set_expert_cb(dia_item_t di)
 {
   int i;
-  static char s[64] = { };
   file_t *f;
 
   di_set_expert_last = di;
@@ -681,9 +682,9 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_extras_change:
-        i = dia_input(txt_get(TXT_CHANGE_CONFIG), s, sizeof s - 1, 35, 0);
+        i = dia_input2(txt_get(TXT_CHANGE_CONFIG), &config.change_config, 35, 0);
         if(!i) {
-          f = file_parse_buffer(s, kf_cfg + kf_cmd + kf_cmd_early);
+          f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
           file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
           file_free_file(f);
         }
