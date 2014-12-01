@@ -2862,7 +2862,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
   }
 
   if(config.ntfs_3g && type && !strcmp(type, "ntfs")) {
-    asprintf(&cmd, "/bin/mount -t ntfs-3g%s %s %s", (flags & MS_RDONLY) ? " -oro" : "", dev, dir);
+    asprintf(&cmd, "mount -t ntfs-3g%s %s %s", (flags & MS_RDONLY) ? " -oro" : "", dev, dir);
     err = system(cmd);
     free(cmd);
   }
