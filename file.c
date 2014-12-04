@@ -312,6 +312,7 @@ static struct {
   { key_ptoptions,      "PTOptions",      kf_cfg + kf_cmd_early          },
   { key_withfcoe,       "WithFCoE",       kf_cfg + kf_cmd                },
   { key_withfcoe,       "UseFCoE",        kf_cfg + kf_cmd                },
+  { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1134,6 +1135,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             i = 0;
             if(!strcmp(s, "dhcp")) i = NS_DHCP;
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
+            else if(!strcmp(s, "vlanid")) i = NS_VLANID;
             else if(!strcmp(s, "netmask")) i = NS_NETMASK;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
             else if(!strcmp(s, "all")) i = NS_ALLIFS;
@@ -1646,6 +1648,18 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         slist_assign_values(&config.ptoptions, f->value);
         break;
 
+      case key_vlanid:
+        if(f->is.numeric) {
+          if(f->nvalue >= 0) {
+            strprintf(&config.net.vlanid, "%d", f->nvalue);
+          }
+          config.net.setup |= NS_VLANID;
+        }
+        else {
+          str_copy(&config.net.vlanid, NULL);
+        }
+        break;
+
       default:
         break;
     }
@@ -1963,6 +1977,10 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   if(config.net.dhcp_timeout_set) file_write_num(f, key_dhcptimeout, config.net.dhcp_timeout);
   file_write_num(f, key_configure_network, config.configure_network);
+  if(config.net.vlanid && strcmp(config.net.vlanid, "0")) {
+    // if it's a nonzero value, pass it along
+    file_write_str(f, key_vlanid, config.net.vlanid);
+  }
 
   if(
     config.rootpassword &&

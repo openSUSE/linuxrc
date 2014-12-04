@@ -58,6 +58,7 @@
 #include "hotplug.h"
 #include "url.h"
 #include "auto2.h"
+#include "vlan.h"
 
 #define NFS_PROGRAM    100003
 #define NFS_VERSION         2
@@ -91,6 +92,7 @@ static int net_dhcp4(void);
 static int net_dhcp6(void);
 
 static void net_ask_domain(void);
+static int net_input_vlanid(void);
 
 
 /*
@@ -235,6 +237,10 @@ int net_config()
   }
 
   if(rc) return -1;
+
+  if(config.net.vlanid && strcmp(config.net.vlanid, "0")) {
+    configure_vlan(config.net.device, "add", config.net.vlanid);
+  }
 
   if(net_activate_ns()) {
     dia_message(txt_get(TXT_ERROR_CONF_NET), MSGTYPE_ERROR);
@@ -1526,6 +1532,8 @@ int net_input_data()
   inet_t host6 = {};
 
   config.net.netmask.ok = 0;
+
+  net_input_vlanid();
 
   if((config.net.setup & NS_HOSTIP)) {
     if(config.net.ipv4) {
@@ -2960,4 +2968,39 @@ int wlan_auth_cb(dia_item_t di)
   return rc;
 }
 
+
+/*
+ * Ask for vlan id and store in config.net.vlanid
+ */
+int net_input_vlanid()
+{
+  int err = 0, id;
+
+  char *buf = NULL, *s;
+
+  if(!(config.net.setup & NS_VLANID)) return 0;
+
+  str_copy(&buf, config.net.vlanid);
+
+  do {
+    err = 0;
+
+    if(dia_input2("Enter your VLAN ID\n\nLeave empty if you don't setup a VLAN.", &buf, 30, 0)) {
+      err = 1;
+      break;
+    }
+
+    if(!buf) break;
+
+    id = strtoul(buf, &s, 0);
+    if(*s || id <= 0) err = 1;
+    if(err) dia_message("Invalid input.", MSGTYPE_ERROR);
+  } while(err);
+
+  if(!err) str_copy(&config.net.vlanid, buf);
+
+  str_copy(&buf, NULL);
+
+  return err;
+}
 

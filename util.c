@@ -1283,6 +1283,11 @@ void util_status_info()
   sprintf(buf, "ptp host = %s", inet2print(&config.net.ptphost));
   slist_append_str(&sl0, buf);
 
+  if(config.net.vlanid) {
+    sprintf(buf, "vlanid = %s", config.net.vlanid);
+    slist_append_str(&sl0, buf);
+  }
+
   if(config.net.vncpassword) {
     sprintf(buf, "vncpassword = %s", config.net.vncpassword);
     slist_append_str(&sl0, buf);
