@@ -339,6 +339,7 @@ int set_settings()
     di_set_dhcp,
     di_set_vnc,
     di_set_usessh,
+    di_set_vlanid,
     di_set_startshell,
     di_set_slp,
     di_none
@@ -436,6 +437,20 @@ int set_settings_cb (dia_item_t di)
         }
         else {
           config.net.do_setup &= ~DS_SSH;
+        }
+      }
+      rc = 1;
+      break;
+
+    case di_set_vlanid:
+      rc = dia_yesno("Support VLAN?", config.net.vlanid ? YES : NO);
+      if(rc != ESCAPE) {
+        if(rc == YES) {
+          if(!config.net.vlanid) str_copy(&config.net.vlanid, "0");
+          config.net.setup |= NS_VLANID;
+        }
+        else {
+          str_copy(&config.net.vlanid, NULL);
         }
       }
       rc = 1;

@@ -267,7 +267,7 @@ typedef struct {
 #define NS_NAMESERVER		(1 << 5)
 #define NS_ALLIFS		(1 << 6)
 #define NS_DISPLAY		(1 << 7)
-// #define NS_DHCP6		(1 << 8)
+#define NS_VLANID		(1 << 8)
 #define NS_NOW			(1 << 9)
 
 #if defined(__s390__) || defined(__s390x__)
@@ -543,6 +543,7 @@ typedef struct {
     int tftp_timeout;
     int bootp_wait;		/* wait this time (in s) after network setup before starting bootp */
     int ifup_wait;		/* wait this time (in s) after network setup */
+    char *vlanid;		/* vlan id */
     struct {
       char *opts;		/* mount options string */
       unsigned rsize;		/* nfs rsize mount option */

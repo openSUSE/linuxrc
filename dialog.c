@@ -61,6 +61,7 @@ struct {
   { di_set_usessh,       TXT_SSH_SWITCH,          },
   { di_set_startshell,   TXT_START_SHELL_YAST,    },
   { di_set_slp,          TXT_GET_SLP_INFO,        },
+  { di_set_vlanid,       0, "Enable or Disable VLAN Support" },
 
   { di_inst_install,     TXT_START_INSTALL,       },
   { di_inst_system,      TXT_BOOT_SYSTEM,         },
