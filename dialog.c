@@ -1491,7 +1491,7 @@ void dia_handle_ctrlc (void)
 	  f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
 	  file_free_file(f);
-	  net_update_ifcfg();
+	  net_update_ifcfg(IFCFG_IFUP);
 	}
       }
       else if(i == -74) {

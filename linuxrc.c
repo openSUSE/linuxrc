@@ -1139,7 +1139,7 @@ void lxrc_init()
     }
   }
 
-  net_update_ifcfg();
+  net_update_ifcfg(0);
 
   net_wicked_up("all");
 
