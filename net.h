@@ -6,6 +6,10 @@
  *
  */
 
+// flags to pass to ifcfg_write()
+#define IFCFG_INITIAL	(1 << 0)
+#define IFCFG_IFUP	(1 << 1)
+
 int net_config(void);
 int net_config2(int type);
 void net_ask_password(void);
@@ -22,7 +26,7 @@ int net_get_address2(char *text, inet_t *inet, int do_dns, char **user, char **p
 void net_apply_ethtool(char *device, char *hwaddr);
 int wlan_setup(void);
 char *net_dhcp_type(void);
-void net_update_ifcfg(void);
+void net_update_ifcfg(int flags);
 ifcfg_t *ifcfg_parse(char *str);
 ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p);
 void ifcfg_copy(ifcfg_t *dst, ifcfg_t *src);

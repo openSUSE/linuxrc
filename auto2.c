@@ -354,7 +354,7 @@ void auto2_scan_hardware()
     if(!err) {
       fprintf(stderr, "parsing info file: %s\n", sl->key);
       file_read_info_file("file:/download/info", kf_cfg);
-      net_update_ifcfg();
+      net_update_ifcfg(IFCFG_IFUP);
     }
   }
 
@@ -399,7 +399,7 @@ void auto2_scan_hardware()
        */
       fprintf(stderr, "parsing AutoYaST file\n");
       file_read_info_file("file:/download/autoinst.xml", kf_cfg);
-      net_update_ifcfg();
+      net_update_ifcfg(IFCFG_IFUP);
     }
   }
 
@@ -872,7 +872,7 @@ void auto2_read_repo_files(url_t *url)
        */
       fprintf(stderr, "parsing AutoYaST file\n");
       file_read_info_file("file:/autoinst.xml", kf_cfg);
-      net_update_ifcfg();
+      net_update_ifcfg(IFCFG_IFUP);
     }
   }
 }

@@ -64,7 +64,7 @@ static void parse_leaseinfo(char *file);
 static void net_wicked_dhcp(void);
 
 static void net_cifs_build_options(char **options, char *user, char *password, char *workgroup);
-static int ifcfg_write(char *device, ifcfg_t *ifcfg, int initial);
+static int ifcfg_write(char *device, ifcfg_t *ifcfg, int flags);
 static int _ifcfg_write(char *device, ifcfg_t *ifcfg);
 static char *inet2str(inet_t *inet, int type);
 static int net_get_ip(char *text, char **ip, int with_prefix);
@@ -2004,9 +2004,11 @@ char *net_dhcp_type()
 /*
  * Setup all interfaces in config.ifcfg.list.
  *
+ * For flags see ifcfg_write().
+ *
  * Note: Clears config.ifcfg.current!
  */
-void net_update_ifcfg()
+void net_update_ifcfg(int flags)
 {
   int matched;
   hd_t *net_list, *hd;
@@ -2027,7 +2029,7 @@ void net_update_ifcfg()
     if(ifcfg->used && !ifcfg->dhcp) continue;
 
     if(ifcfg->device) {
-      ifcfg_write(ifcfg->device, ifcfg, 1);
+      ifcfg_write(ifcfg->device, ifcfg, flags | IFCFG_INITIAL);
     }
     else {
       /*
@@ -2056,7 +2058,7 @@ void net_update_ifcfg()
 
       matched = ifcfg->device ? match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device) : 0;
 
-      if(matched) ifcfg_write(hd->unix_dev_name, ifcfg, 1);
+      if(matched) ifcfg_write(hd->unix_dev_name, ifcfg, flags | IFCFG_INITIAL);
     }
   }
 
@@ -2080,10 +2082,13 @@ void net_update_ifcfg()
  *
  * Note: 'device' is the interface name not including any vlan id.
  *
- * If initial is set, mark interface is 'initial'; that is, no further auto
- * config is tried on it.
+ * flags:
+ *   - IFCFG_INITIAL: mark interface as 'initial'; that is, no further auto
+ *     config is tried on it
+ *   - IFCFG_IFUP: bring interface up immediately; else a separate call to
+ *     net_wicked_up() is necessary
  */
-int ifcfg_write(char *device, ifcfg_t *ifcfg, int initial)
+int ifcfg_write(char *device, ifcfg_t *ifcfg, int flags)
 {
   char *ifname = NULL;
   int i;
@@ -2113,9 +2118,10 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg, int initial)
 
   if(i) {
     str_copy(&config.ifcfg.current, ifname);
-    if(initial) slist_append_str(&config.ifcfg.initial, ifname);
+    if(flags & IFCFG_INITIAL) slist_append_str(&config.ifcfg.initial, ifname);
     fprintf(stderr, "%s: network config created\n", ifname);
     if(!config.win) printf("%s: network config created\n", ifname);
+    if(flags & IFCFG_IFUP) net_wicked_up(ifname);
   }
   else {
     fprintf(stderr, "%s: failed to create network config\n", ifname);

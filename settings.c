@@ -583,7 +583,7 @@ int set_expert_cb(dia_item_t di)
           f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
           file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
           file_free_file(f);
-          net_update_ifcfg();
+          net_update_ifcfg(IFCFG_IFUP);
         }
        break;
 
