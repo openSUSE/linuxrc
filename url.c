@@ -1763,6 +1763,10 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
 
   }
   else {
+#if defined(__s390__) || defined(__s390x__)
+    net_activate_s390_devs();
+#endif
+
     update_device_list(0);
 
     LXRC_WAIT
