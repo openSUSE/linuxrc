@@ -905,6 +905,10 @@ msgstr "Inter-User Communication Vehicle (IUCV)"
 msgid "Hipersockets"
 msgstr "Hipersockets"
 
+#. TXT_390NET_VIRTIO
+msgid "VirtIO Ethernet CCW Device"
+msgstr ""
+
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
 msgstr "Indirizzo di dispositivo per canale di lettura"

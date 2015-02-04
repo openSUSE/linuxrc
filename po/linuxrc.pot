@@ -860,6 +860,10 @@ msgstr ""
 msgid "Hipersockets"
 msgstr ""
 
+#. TXT_390NET_VIRTIO
+msgid "VirtIO Ethernet CCW Device"
+msgstr ""
+
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
 msgstr ""
@@ -1191,4 +1195,3 @@ msgstr ""
 #. TXT_HWADDR
 msgid "MAC address"
 msgstr ""
-

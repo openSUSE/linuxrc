@@ -1072,6 +1072,10 @@ msgstr "Това не е валиден CCW адрес."
 msgid "Hipersocket"
 msgstr "Hipersocket"
 
+#. TXT_390NET_VIRTIO
+msgid "VirtIO Ethernet CCW Device"
+msgstr ""
+
 #. power-off message
 #. TXT_HALT
 msgid "Do you want to halt the system now?"
