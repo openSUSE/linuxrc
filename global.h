@@ -567,7 +567,7 @@ typedef struct {
     char *user;			/* if this is NULL, perform guest login */
     char *password;
     char *vncpassword;
-    inet_t displayip;		/* IP of remote X server */
+    char *displayip;		/* name of remote X server or DISPLAY var */
     char *sshpassword;
     net_config_t configured;	/* how we configured the network device */
     char *unique_id;		/* unique id of network card */

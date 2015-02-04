@@ -887,8 +887,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_displayip:
-        name2inet(&config.net.displayip, f->value);
-        net_check_address(&config.net.displayip, 0);
+        str_copy(&config.net.displayip, *f->value ? f->value : NULL);
         break;
                                       
       case key_sshpassword:
@@ -1961,7 +1960,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_memfree, config.memoryXXX.current >> 10);	// convention: in kB
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
-  file_write_inet2(f, key_displayip, &config.net.displayip, INET_WRITE_IP);
+  file_write_str(f, key_displayip, config.net.displayip);
   file_write_inet2(f, key_ptphost, &config.net.ptphost, INET_WRITE_IP);
   file_write_num(f, key_usessh, config.usessh);
   if(yast2_color_ig) fprintf(f, "%s: %06x\n", file_key2str(key_yast2color), yast2_color_ig);
