@@ -248,7 +248,7 @@ int inst_choose_netsource_cb(dia_item_t di)
 #if defined(__s390__) || defined(__s390x__)  
 int inst_choose_display()
 {
-  if(!config.manual && (config.net.displayip.ok || config.vnc || config.usessh)) {
+  if(!config.manual && (config.net.displayip || config.vnc || config.usessh)) {
     net_ask_password();
     return 0;
   }
@@ -281,7 +281,7 @@ int inst_choose_display_cb(dia_item_t di)
 
   switch(di) {
     case di_display_x11:
-      if(net_get_address(txt_get(TXT_XSERVER_IP), &config.net.displayip, 1)) return -1;
+      if(dia_input2(txt_get(TXT_XSERVER_IP), &config.net.displayip, 40, 0)) return -1;
       break;
 
     case di_display_vnc:
