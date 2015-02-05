@@ -1166,7 +1166,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
           fprintf(stderr, "nfs: %s: is file, mounting one level up\n", url->path);
         }
 
-        if(err == ENOTDIR || err == ENOENT || url->is.file) {
+        if(err || url->is.file) {
           str_copy(&url->mount, NULL);
           str_copy(&buf, url->path);
 
