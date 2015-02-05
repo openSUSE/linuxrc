@@ -48,6 +48,7 @@
 #include "hotplug.h"
 #include "checkmd5.h"
 #include "url.h"
+#include <sys/utsname.h>
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -523,6 +524,9 @@ void lxrc_end()
     }
 
     util_umount("/dev/pts");
+    #if defined(__s390__) || defined(__s390x__)
+    util_umount("/sys/hypervisor/s390");
+    #endif
     util_umount("/sys");
     util_umount("/proc/bus/usb");
     if (!config.rescue)
@@ -701,6 +705,7 @@ void lxrc_init()
 {
   int i, j;
   char buf[256];
+  struct utsname utsinfo;
 
   if(txt_init()) {
     printf("Linuxrc error: Corrupted texts!\n");
@@ -725,6 +730,9 @@ void lxrc_init()
   if(!config.test) {
     if(config.had_segv) {
       umount("/dev/pts");
+      #if defined(__s390__) || defined(__s390x__)
+      umount("/sys/hypervisor/s390");
+      #endif
       umount("/sys");
       umount("/proc");
     }
@@ -732,6 +740,31 @@ void lxrc_init()
     mount("sysfs", "/sys", "sysfs", 0, 0);
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
+
+  #if defined(__s390__) || defined(__s390x__)
+  if(util_check_exist("/sys/hypervisor/s390")) {
+    char *type;
+
+    mount("s390_hypfs", "/sys/hypervisor/s390", "s390_hypfs", 0, 0);
+
+    type = util_get_attr("/sys/hypervisor/s390/hyp/type");
+
+    if(!strncmp(type, "z/VM", sizeof "z/VM" - 1)) {
+      config.hwp.hypervisor = "z/VM";
+    }
+    else if(!strncmp(type, "LPAR", sizeof "LPAR" - 1)) {
+      config.hwp.hypervisor = "LPAR";
+    }
+    else {
+      config.hwp.hypervisor = "Unknown";
+    }
+  }
+  else {
+    uname(&utsinfo);
+    if(!strncmp(utsinfo.machine, "s390x", sizeof "s390x" - 1 )) config.hwp.hypervisor="KVM";
+    else config.hwp.hypervisor="Reallyunknown";
+  }
+  #endif
 
   /* add cmdline to info file */
   config.info.add_cmdline = 1;

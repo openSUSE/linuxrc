@@ -906,6 +906,10 @@ msgstr "I-Inter-User Communication Vehicle (IUCV)"
 msgid "Hipersockets"
 msgstr "Ama-hipersocket"
 
+#. TXT_390NET_VIRTIO
+msgid "VirtIO Ethernet CCW Device"
+msgstr ""
+
 #. TXT_CTC_CHANNEL_READ
 msgid "Device address for read channel"
 msgstr "Ikheli ledivayisi lesiteshi sokufunda"

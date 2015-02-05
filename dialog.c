@@ -109,6 +109,7 @@ struct {
   { di_390net_escon,	 TXT_390NET_ESCON         },
   { di_390net_iucv,	 TXT_390NET_IUCV          },
   { di_390net_hsi,	 TXT_390NET_HSI	          },
+  { di_390net_virtio,	 TXT_390NET_VIRTIO        },
   { di_390net_sep,	 0, "#--------------------" },
   
   { di_ctc_compat,	 TXT_CTC_PROT_COMPAT      },
