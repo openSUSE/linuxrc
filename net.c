@@ -2887,6 +2887,9 @@ void net_nanny()
 {
   FILE *fp, *fp2;
 
+  // keep the default unless explicitly changed
+  if(!config.nanny_set) return;
+
   if((fp = fopen("/etc/wicked/common.xml", "r"))) {
     char buf[4096];
 

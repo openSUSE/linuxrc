@@ -1679,7 +1679,13 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_nanny:
-        if(f->is.numeric) config.nanny = f->nvalue;
+        if(f->is.numeric) {
+          config.nanny = f->nvalue;
+          config.nanny_set = 1;
+        }
+        else {
+          config.nanny_set = 0;
+        }
         break;
 
       case key_vlanid:
