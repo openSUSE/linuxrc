@@ -806,7 +806,7 @@ void lxrc_init()
   config.ifcfg.manual = calloc(1, sizeof *config.ifcfg.manual);
   config.ifcfg.manual->dhcp = 1;
 
-  config.nanny = 0;	// disable for now
+  // config.nanny = 0;	/* see config.nanny_set */
 
   #if defined(__s390__) || defined(__s390x__)
   config.linemode = 1;
