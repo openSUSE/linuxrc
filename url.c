@@ -1166,7 +1166,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
           fprintf(stderr, "nfs: %s: is file, mounting one level up\n", url->path);
         }
 
-        if(err == ENOTDIR || err == ENOENT || url->is.file) {
+        if(err || url->is.file) {
           str_copy(&url->mount, NULL);
           str_copy(&buf, url->path);
 
@@ -1333,6 +1333,10 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   char *url_device;
 
   if(!url || !url->scheme) return 1;
+
+#if defined(__s390__) || defined(__s390x__)
+  if(url->is.network && !config.net.configured) net_activate_s390_devs();
+#endif
 
   update_device_list(0);
 
