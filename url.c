@@ -1463,6 +1463,122 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
 
 /*
+ * Warn if signature check failed and ask user what to do.
+ *
+ * Return 0 if it's ok to continue or 1 if we should report en error.
+ */
+int warn_signature_failed(char *file_name)
+{
+  int i, win, err = 0;
+  char *buf = NULL;
+
+  if(config.sig_failed) {
+    strprintf(&buf,
+      "%s: %s\n\n%s",
+      file_name,
+      config.sig_failed == 1 ? "File not signed." : "Invalid signature.",
+      config.sig_failed == 1 ? "If you really trust your repository, you may continue in an insecure mode." : "Installation aborted."
+    );
+    if(!(win = config.win)) util_disp_init();
+    if(config.sig_failed == 1) {
+      i = dia_okcancel(buf, NO);
+    }
+    else {
+      dia_message(buf, MSGTYPE_ERROR);
+      i = NO;
+    }
+    if(!win) util_disp_done();
+    if(i == YES) {
+      config.secure = 0;
+      config.sig_failed = 0;
+      err = 0;
+    }
+    else {
+      err = 1;
+    }
+  }
+
+  str_copy(&buf, NULL);
+
+  return err;
+}
+
+
+/*
+  Test if 'file' is a gpg signed file.
+  If so, unpack it (replacing 'file') and verify signature.
+  if 'check' is set, update config.sig_failed and show warning to user.
+
+  Return values:
+    -1: file or gpg not found
+     0: file gpg format, sig ok
+     1: file gpg format, sig wrong
+     2: file not gpg format
+*/
+int is_gpg_signed(char *file, int check)
+{
+  char *cmd = NULL, *buf = NULL;
+  int err = -1, is_sig = 0, sig_ok = 0;
+  size_t len = 0;
+  FILE *f;
+
+  if(util_check_exist(file) != 'r') {
+    if(config.debug) fprintf(stderr, "%s: gpg check = %d\n", file, err);
+
+    return err;
+  }
+
+  strprintf(&cmd,
+    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg "
+    "--ignore-valid-from --ignore-time-conflict --output %s.unpacked %s 2>&1",
+    file,
+    file
+  );
+
+  if((f = popen(cmd, "r"))) {
+    while(getline(&buf, &len, f) > 0) {
+      if(config.debug >= 2) fprintf(stderr, "%s", buf);
+      if(strncmp(buf, "gpg: Signature made", sizeof "gpg: Signature made" - 1)) is_sig = 1;
+      if(strncmp(buf, "gpg: Good signature", sizeof "gpg: Good signature" - 1)) sig_ok = 1;
+    }
+    err = pclose(f) ? 1 : 0;
+    if(config.debug >= 2) fprintf(stderr, "gog returned %s\n", err ? "an error" : "ok");
+  }
+
+  strprintf(&buf, "%s.unpacked", file);
+
+  if(is_sig && rename(buf, file)) is_sig = 0;
+
+  unlink(buf);
+
+  str_copy(&cmd, NULL);
+  free(buf);
+
+  if(err != -1) {
+    if(is_sig) {
+      err = !err && sig_ok ? 0 : 1;
+    }
+    else {
+      err = 2;
+    }
+  }
+
+  if(err == 0 || err == 1) {
+    fprintf(stderr, "%s: gpg signature %s\n", file, err ? "failed" : "ok");
+  }
+
+  if(check && config.secure && err == 1) {
+    config.sig_failed = 2;
+    err = warn_signature_failed(file);
+  }
+
+  if(config.debug) fprintf(stderr, "%s: gpg check = %d\n", file, err);
+
+  return err;
+}
+
+
+/*
  * Read file 'src' relative to 'url' and write it to 'dst'. If 'dir' is set,
  * mount 'url' at 'dir' if necessary.
  *
@@ -1471,10 +1587,15 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
  * return:
  *   0: ok
  *   1: failed
+ *
+ * This function also sets config.sig_failed:
+ *   0: signature ok or config.secure == 0
+ *   1: no signature
+ *   2: wrong signature
  */
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags)
 {
-  int err, win, i;
+  int err, gpg;
   char *src_sig = NULL, *dst_sig = NULL, *buf = NULL, *old_path = NULL, *s;
 
   str_copy(&old_path, url->path);
@@ -1500,8 +1621,16 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   config.sig_failed = 0;
 
   if(!config.secure) {
+    is_gpg_signed(dst, 0);
     free(old_path);
     return err;
+  }
+
+  gpg = is_gpg_signed(dst, 1);
+
+  if(gpg != 2) {
+    free(old_path);
+    return gpg ? 1 : 0;
   }
 
   config.sig_failed = 1;
@@ -1542,31 +1671,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
     fprintf(stderr, "%s: no signature\n", s);
   }
 
-  if(config.sig_failed) {
-    strprintf(&buf,
-      "%s: %s\n\n%s",
-      s,
-      config.sig_failed == 1 ? "File not signed." : "Invalid signature.",
-      config.sig_failed == 1 ? "If you really trust your repository, you may continue in an insecure mode." : "Installation aborted."
-    );
-    if(!(win = config.win)) util_disp_init();
-    if(config.sig_failed == 1) {
-      i = dia_okcancel(buf, NO);
-    }
-    else {
-      dia_message(buf, MSGTYPE_ERROR);
-      i = NO;
-    }
-    if(!win) util_disp_done();
-    if(i == YES) {
-      config.secure = 0;
-      config.sig_failed = 0;
-      err = 0;
-    }
-    else {
-      err = 1;
-    }
-  }
+  err = warn_signature_failed(s);
 
   free(buf);
   free(dst_sig);
