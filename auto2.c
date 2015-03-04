@@ -417,8 +417,13 @@ void auto2_scan_hardware()
       fprintf(url->quiet ? stderr : stdout, "Reading driver update: %s\n", sl->key);
       fflush(url->quiet ? stderr : stdout);
 
+      // for later...
+      char *err_buf = NULL;
+      strprintf(&err_buf, "Failed to load driver update:\n%s", url_print(url, 0));
+
       if(url->is.mountable) {
         err = url_mount(url, config.mountpoint.update, test_and_add_dud);
+        if(err && !url->quiet) dia_message2(err_buf, MSGTYPE_ERROR);
       }
       else {
         char *file_name = strdup(new_download());
@@ -452,7 +457,12 @@ void auto2_scan_hardware()
           LXRC_WAIT
           util_umount(config.mountpoint.update);
         }
+        else if(!url->quiet) {
+          dia_message2(err_buf, MSGTYPE_ERROR);
+        }
       }
+
+      str_copy(&err_buf, NULL);
 
       LXRC_WAIT
 
