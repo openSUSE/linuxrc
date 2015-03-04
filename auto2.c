@@ -405,6 +405,8 @@ void auto2_scan_hardware()
 
   /* load & run driverupdates */
   if(config.update.urls) {
+    int should_have_updates = 0;
+
     dud_count = config.update.count;
     /* point at list end */
     for(names = &config.update.name_list; *names; names = &(*names)->next);
@@ -423,7 +425,14 @@ void auto2_scan_hardware()
 
       if(url->is.mountable) {
         err = url_mount(url, config.mountpoint.update, test_and_add_dud);
-        if(err && !url->quiet) dia_message2(err_buf, MSGTYPE_ERROR);
+        if(!url->quiet) {
+          if(err) {
+            dia_message2(err_buf, MSGTYPE_ERROR);
+          }
+          else {
+            should_have_updates = 1;
+          }
+        }
       }
       else {
         char *file_name = strdup(new_download());
@@ -453,6 +462,7 @@ void auto2_scan_hardware()
         free(path2);
 
         if(!err) {
+          if(!url->quiet) should_have_updates = 1;
           test_and_add_dud(url);
           LXRC_WAIT
           util_umount(config.mountpoint.update);
@@ -472,7 +482,11 @@ void auto2_scan_hardware()
     util_do_driver_updates();
 
     if(dud_count == config.update.count) {
-      fprintf(stderr, "No new driver updates found.\n");
+      if(should_have_updates) {
+        char *msg = "No applicable driver updates found.";
+        fprintf(stderr, "%s\n", msg);
+        dia_message2(msg, MSGTYPE_INFO);
+      }
     }
     else {
       if(*names) {
@@ -1043,7 +1057,11 @@ void auto2_driverupdate(url_t *url)
   if(config.win) win_close(&win);
 
   if(dud_count == config.update.count) {
-    fprintf(stderr, "No new driver updates found.\n");
+    if(!err) {
+      char *msg = "No applicable driver updates found.";
+      fprintf(stderr, "%s\n", msg);
+      dia_message2(msg, MSGTYPE_INFO);
+    }
   }
   else {
     if(*names) {
