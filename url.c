@@ -1530,7 +1530,7 @@ int is_gpg_signed(char *file, int check)
 
   strprintf(&cmd,
     "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg "
-    "--ignore-valid-from --ignore-time-conflict --output %s.unpacked %s 2>&1",
+    "--ignore-valid-from --ignore-time-conflict --output '%s.unpacked' '%s' 2>&1",
     file,
     file
   );
@@ -1542,7 +1542,7 @@ int is_gpg_signed(char *file, int check)
       if(strncmp(buf, "gpg: Good signature", sizeof "gpg: Good signature" - 1)) sig_ok = 1;
     }
     err = pclose(f) ? 1 : 0;
-    if(config.debug >= 2) fprintf(stderr, "gog returned %s\n", err ? "an error" : "ok");
+    if(config.debug >= 2) fprintf(stderr, "gpg returned %s\n", err ? "an error" : "ok");
   }
 
   strprintf(&buf, "%s.unpacked", file);
@@ -1648,7 +1648,7 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   }
   strprintf(&dst_sig, "%s.asc", dst);
   strprintf(&buf,
-    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --ignore-valid-from --ignore-time-conflict --verify %s %s >/dev/null%s",
+    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --ignore-valid-from --ignore-time-conflict --verify '%s' '%s' >/dev/null%s",
     dst_sig, dst, config.debug < 2 ? " 2>&1" : ""
   );
 
