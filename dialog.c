@@ -314,6 +314,21 @@ int dia_binary(char *txt, char *button0_txt, char *button1_txt, int def)
 }
 
 
+/*
+ * Like dia_message() but start and stop window mode as needed.
+ */
+int dia_message2(char *txt, int type)
+{
+  int i, win;
+
+  if(!(win = config.win)) util_disp_init();
+  i = dia_message(txt, type);
+  if(!win) util_disp_done();
+
+  return i;
+}
+
+
 int dia_message (char *txt_tv, int msgtype_iv)
     {
     window_t  win_ri;

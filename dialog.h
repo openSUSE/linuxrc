@@ -126,6 +126,7 @@ extern int  dia_show_lines   (char *head_tv,   char *lines_atv [],
                               int nr_lines_iv, int   width_iv, int eof_iv);
 extern void dia_handle_ctrlc (void);
 
+int dia_message2(char *txt, int type);
 char *dia_get_text(dia_item_t di);
 dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t *items, dia_item_t default_item);
 int dia_list(char *title, int width, int (*func)(int), char **items, int default_item, dia_align_t align);
