@@ -1190,7 +1190,7 @@ void lxrc_init()
     if(old_win) util_print_banner(); else util_disp_done();
   }
 
-  if(!(config.serial || config.is_iseries || config.linemode)) {
+  if(!(config.serial || config.is_iseries || config.linemode) && config.manual) {
     set_choose_keytable(0);
   }
 
