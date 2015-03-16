@@ -530,6 +530,10 @@ int test_and_add_dud(url_t *url)
   if(!is_dud && (url->is.file || !url->is.mountable)) {
     is_dud = 1;
 
+    // log as driver update
+    config.update.count++;
+    slist_append_str(&config.update.name_list, url->path);
+
     s = url_print(url, 1);
 
     printf("%s: adding to %s system\n", s, config.rescue ? "rescue" : "installation");
