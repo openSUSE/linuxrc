@@ -1,4 +1,4 @@
-#define _GNU_SOURCE	/* strnlen, getline */
+#define _GNU_SOURCE	/* strnlen, getline, strcasestr */
 
 /*
 
@@ -70,6 +70,10 @@ static void digest_init(url_data_t *url_data);
 static void digest_process(url_data_t *url_data, void *buffer, size_t len);
 static void digest_finish(url_data_t *url_data);
 static int digest_verify(url_data_t *url_data, char *file_name);
+static int warn_signature_failed(char *file_name);
+static int is_gpg_signed(char *file);
+static int is_rpm_signed(char *file);
+static int is_signed(char *file, int check);
 
 
 void url_read(url_data_t *url_data)
@@ -1507,7 +1511,6 @@ int warn_signature_failed(char *file_name)
 /*
   Test if 'file' is a gpg signed file.
   If so, unpack it (replacing 'file') and verify signature.
-  if 'check' is set, update config.sig_failed and show warning to user.
 
   Return values:
     -1: file or gpg not found
@@ -1515,7 +1518,7 @@ int warn_signature_failed(char *file_name)
      1: file gpg format, sig wrong
      2: file not gpg format
 */
-int is_gpg_signed(char *file, int check)
+int is_gpg_signed(char *file)
 {
   char *cmd = NULL, *buf = NULL;
   int err = -1, is_sig = 0, sig_ok = 0;
@@ -1567,12 +1570,104 @@ int is_gpg_signed(char *file, int check)
     fprintf(stderr, "%s: gpg signature %s\n", file, err ? "failed" : "ok");
   }
 
+  if(config.debug) fprintf(stderr, "%s: gpg check = %d\n", file, err);
+
+  return err;
+}
+
+
+/*
+  Test if 'file' is a signed rpm.
+  If so, verify signature.
+
+  Return values:
+    -1: file or 'rpmkeys' not found
+     0: file rpm format, sig ok
+     1: file rpm format, sig wrong
+     2: file not rpm format or not signed
+*/
+int is_rpm_signed(char *file)
+{
+  char *cmd = NULL, *buf = NULL;
+  int err = -1, is_sig = 0, sig_ok = 0;
+  size_t len = 0;
+  FILE *f;
+
+  if(util_check_exist(file) != 'r') {
+    if(config.debug) fprintf(stderr, "%s: rpm sig check = %d\n", file, err);
+
+    return err;
+  }
+
+  char *type = util_fstype(file, NULL);
+  if(!type || strcmp(type, "rpm")) return 2;
+
+  strprintf(&cmd, "rpmkeys --checksig --define '%%_keyringpath /pubkeys' '%s' 2>&1", file);
+
+  if((f = popen(cmd, "r"))) {
+    while(getline(&buf, &len, f) > 0) {
+      char *s = strrchr(buf, ':') ?: buf;
+
+      if(config.debug >= 2) fprintf(stderr, "%s", buf);
+
+      if(strcasestr(s, " pgp ") || strcasestr(s, " gpg ")) is_sig = 1;
+      if(strstr(s, " pgp ") || strstr(s, " gpg ")) sig_ok = 1;
+    }
+    err = pclose(f) ? 1 : 0;
+    if(config.debug >= 2) fprintf(stderr, "rpmkeys returned %s\n", err ? "an error" : "ok");
+  }
+
+  str_copy(&cmd, NULL);
+  free(buf);
+
+  if(err != -1) {
+    if(is_sig) {
+      err = !err && sig_ok ? 0 : 1;
+    }
+    else {
+      err = 2;
+    }
+  }
+
+  if(err == 0 || err == 1) {
+    fprintf(stderr, "%s: rpm signature %s\n", file, err ? "failed" : "ok");
+  }
+
+  if(config.debug) fprintf(stderr, "%s: rpm sig check = %d\n", file, err);
+
+  return err;
+}
+
+
+/*
+  Test if 'file' is a (non-detached) signed file.
+  Verify signature and, if necessary (gpg), unpack it,
+  replacing original 'file'.
+
+  If 'check' is set, update config.sig_failed and show warning to user.
+
+  Return values:
+    -1: file or checking command not found
+     0: file has signature, sig ok
+     1: file has signature, sig wrong
+     2: file not signed
+*/
+int is_signed(char *file, int check)
+{
+  int err;
+
+  // first, maybe it's an rpm
+  err = is_rpm_signed(file);
+
+  // if not, maybe gpg signed
+  if(!(err == 0 || err == 1)) err = is_gpg_signed(file);
+
   if(check && config.secure && err == 1) {
     config.sig_failed = 2;
     err = warn_signature_failed(file);
   }
 
-  if(config.debug) fprintf(stderr, "%s: gpg check = %d\n", file, err);
+  if(config.debug) fprintf(stderr, "%s: sig check = %d\n", file, err);
 
   return err;
 }
@@ -1621,12 +1716,12 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   config.sig_failed = 0;
 
   if(!config.secure) {
-    is_gpg_signed(dst, 0);
+    is_signed(dst, 0);
     free(old_path);
     return err;
   }
 
-  gpg = is_gpg_signed(dst, 1);
+  gpg = is_signed(dst, 1);
 
   if(gpg != 2) {
     free(old_path);
