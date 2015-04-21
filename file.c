@@ -1451,12 +1451,21 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_bootif:
-        if(strlen(f->value) > 3) {
-          str_copy(&config.ifcfg.manual->device, f->value + 3);
-          for(s = config.ifcfg.manual->device; *s; s++) if(*s == '-') *s = ':';
-        }
+        {
+          /* handle both EUI-48 and EUI-64 both with and without
+           * the ipappend value
+           * EUI-48 w/o 17 : "01:23:45:67:89:0a"
+           * EUI-48 w/  20 : "99-01:23:45:67:89:0a"
+           * EUI-64 w/o 23 : "01:23:45:67:89:0a:bc:de"
+           * EUI-64 w/  26 : "99-01:23:45:67:89:0a:bc:de"
+           */
+          int len = strlen(f->value);
+          if ( len > 3 ) {
+            str_copy(&config.ifcfg.manual->device, f->value + (len == 20 || len == 26 ? 3 : 0));
+            for(s = config.ifcfg.manual->device; *s; s++) if(*s == '-') *s = ':';
+          }
         break;
-
+        }
       case key_swap_size:
         if(f->is.numeric) config.swap_file_size = f->nvalue;
         break;
