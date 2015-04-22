@@ -18,5 +18,6 @@ Linuxrc can run on installed system. It runs in testmode that make debugging eas
 
 * ctrl+c then 's' - start shell
 
-
-
+### Logging
+To capture log into file with maximum log verbosity use these linuxrc params:
+`linuxrc.log=/tmp/linuxrc.log linuxrc.debug=4`
