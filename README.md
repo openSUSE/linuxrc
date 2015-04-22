@@ -7,6 +7,7 @@ See <https://en.opensuse.org/SDB:Linuxrc>.
 
 ### Run on Installed System
 Linuxrc can run on installed system. It runs in testmode that make debugging easier.
+Parameters are passed as common parametrs like: `linuxrc linemode=0 manual=1 LogLevel=8`
 
 ### Useful Shortcuts
 
