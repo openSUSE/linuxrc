@@ -1015,7 +1015,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_linemode:
         if(f->is.numeric) config.linemode = f->nvalue;
-        if(config.linemode) config.utf8 = 0;
+        config.utf8 = config.linemode ? 0 : 1;
         break;
 
       case key_moduledelay:

@@ -1166,6 +1166,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
   add_flag(&sl0, buf, config.manual, "manual");
+  add_flag(&sl0, buf, config.utf8, "utf8");
   add_flag(&sl0, buf, config.rescue, "rescue");
   add_flag(&sl0, buf, config.vnc, "vnc");
   add_flag(&sl0, buf, config.usessh, "usessh");
