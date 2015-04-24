@@ -2019,6 +2019,8 @@ int util_mount_main(int argc, char **argv)
 
   argv++; argc--;
 
+  config.net.ipv4 = config.net.ipv6 = 1;
+
   if(!argc) {
     return system("cat /proc/mounts");
   }
