@@ -4358,7 +4358,7 @@ int match_netdevice(char *device, char *hwaddr, char *key)
 
   if(
     (device && !fnmatch(key, device, 0)) ||
-    (hwaddr && !fnmatch(key, hwaddr, 0))
+    (hwaddr && !fnmatch(key, hwaddr, FNM_CASEFOLD))
   ) return 1;
 
   return 0;

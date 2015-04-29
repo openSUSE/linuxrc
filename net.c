@@ -6,6 +6,7 @@
  *
  */
 
+#define _GNU_SOURCE 1
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -2454,7 +2455,7 @@ void net_apply_ethtool(char *device, char *hwaddr)
   for(sl = config.ethtool; sl; sl = sl->next) {
     if(
       (device && !fnmatch(sl->key, device, 0)) ||
-      (hwaddr && !fnmatch(sl->key, hwaddr, 0))
+      (hwaddr && !fnmatch(sl->key, hwaddr, FNM_CASEFOLD))
     ) {
       if(s) {
         strprintf(&s, "%s %s", s, sl->value);
