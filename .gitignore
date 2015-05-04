@@ -1,3 +1,9 @@
 changelog
 Changelog
+.depend
+/linuxrc
+mkpsfu/mkpsfu
 VERSION
+version.h
+*.o
+po/*.h
