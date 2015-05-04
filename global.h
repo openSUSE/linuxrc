@@ -174,6 +174,7 @@ typedef struct slist_s {
 } slist_t;
 
 
+/** IPv4 and/or IPv6 address, with prefix, and hostname */
 typedef struct {
   unsigned ok:1;		/* at least ip or ip6 is valid */
   unsigned ipv4:1;		/* 1: valid ipv4 */
