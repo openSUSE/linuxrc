@@ -727,12 +727,15 @@ int net_activate6()
 }
 
 
-/*
- * Parse inet->name for ipv4/ipv6 adress. If do_dns is set, try nameserver lookup.
+/**
+ * Parse inet->name for ipv4/ipv6 adress.
+ * If do_dns is set, try nameserver lookup.
  *
- * return:
- *   0 : ok
- *   1 : failed
+ * Sets name && ok && ((ip6 && prefix6) || (ipv4 && ip && net && prefix4))
+ *
+ * @return
+ * -  0 : ok
+ * -  1 : failed
  */
 int net_check_address(inet_t *inet, int do_dns)
 {

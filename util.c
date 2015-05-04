@@ -547,12 +547,12 @@ void util_truncate_dir(char *dir)
 }
 
 
-/*
+/**
  * Check whether 'file' exists and return file type.
  *
- * return:
- *   0: does not exists
- *   'r', 'd', 'b', 1: type (1: other)
+ * @return
+ * -  0: does not exist.
+ * -  'r', 'd', 'b', 1: type (1: other)
  */
 int util_check_exist(char *file)
 {
@@ -568,12 +568,12 @@ int util_check_exist(char *file)
 }
 
 
-/*
+/**
  * Check whether 'dir/file' exists and return file type.
  *
- * return:
- *   0: does not exists
- *   'r', 'd', 'b', 1: type (1: other)
+ * @return
+ * -  0: does not exist.
+ * -  'r', 'd', 'b', 1: type (1: other)
  */
 int util_check_exist2(char *dir, char *file)
 {
@@ -2990,8 +2990,8 @@ char *slist_join(char *del, slist_t *str)
 }
 
 
-/*
- * Clear 'inet' und add 'name' to it.
+/**
+ * Clear 'inet' and add 'name' to it.
  *
  * 'inet' is unchanged if 'name' is NULL.
  * If 'name' is "", 'inet' is just cleared.
@@ -3071,8 +3071,11 @@ char *inet2print(inet_t *inet)
 }
 
 
-/*
- * copy strings, *dst points to malloc'ed memory
+/**
+ * strdup src to *dst.
+ * The previous contents is free'd (that is, iff *dst was non-NULL)
+ * If src is NULL, *dst will be NULL.
+ * (Does nothing if dst is NULL).
  */
 void str_copy(char **dst, char *src)
 {
@@ -4188,6 +4191,11 @@ int util_set_attr(char* attr, char* value)
   return i < 0 ? i : 0;
 }
 
+/**
+ * Read contents of a file, trimmed of trailing whitespace.
+ * Useful for sysfs attributes.
+ * @return Trimmed contents, or ""; the result is in a static buffer.
+ */
 char *util_get_attr(char* attr)
 {
   int i, fd;
@@ -5012,7 +5020,10 @@ int fcoe_check()
   return fcoe_ok;
 }
 
-
+/**
+ * Detect iSCSI from sysfs
+ * @return 1 if iSCSI should be used
+ */
 int iscsi_check()
 {
   int iscsi_ok = 0;
@@ -5123,7 +5134,7 @@ int iscsi_check()
 
 
 /*
- * Interal function, use mac_to_interface().
+ * Internal function, use mac_to_interface().
  *
  * return value must be freed
  */
@@ -5165,7 +5176,7 @@ char *mac_to_interface_log(char *mac, int log)
 }
 
 
-/*
+/**
  * Get network interface name from mac. If max_offset
  * is set decrease mac and retry up to max_offset.
  *
