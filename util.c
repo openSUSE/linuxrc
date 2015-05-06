@@ -4473,61 +4473,6 @@ int system_log(char *cmd)
 }
 
 
-void read_iscsi_ibft()
-{
-  file_t *f0, *f;
-
-  if(!util_check_exist("/sbin/iscsiadm")) return;
-
-  system("/sbin/iscsiadm -m fw >/var/log/ibft");
-
-  f0 = file_read_file("/var/log/ibft", kf_ibft);
-
-  if(config.debug) {
-    if(f0) {
-      fprintf(stderr, "ibft values:\n");
-      for(f = f0; f; f = f->next) {
-        fprintf(stderr, "  %s=%s\n", f->key_str, f->value);
-      }
-    }
-    else {
-      fprintf(stderr, "no ibft\n");
-    }
-  }
-
-  for(f = f0; f; f = f->next) {
-    switch(f->key) {
-      case key_ibft_hwaddr:
-        str_copy(&config.netdevice, f->value);
-        break;
-
-      case key_ibft_ipaddr:
-        name2inet(&config.net.hostname, f->value);
-        net_check_address(&config.net.hostname, 0);
-        break;
-
-      case key_ibft_netmask:
-        name2inet(&config.net.netmask, f->value);
-        net_check_address(&config.net.netmask, 0);
-        break;
-
-      case key_ibft_gateway:
-        name2inet(&config.net.gateway, f->value);
-        net_check_address(&config.net.gateway, 0);
-        break;
-
-      case key_ibft_dns:
-        name2inet(&config.net.nameserver[0], f->value);
-        net_check_address(&config.net.nameserver[0], 0);
-        break;
-
-      default:
-        break;
-    }
-  }
-}
-
-
 char *blk_ident(char *dev)
 {
   char *type, *label, *size;
