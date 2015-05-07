@@ -4213,6 +4213,18 @@ char *util_get_attr(char* attr)
   return buf;
 }
 
+char *util_get_attr2(char* dir, char* attr)
+{
+  char *full_attr;
+  char *buf;
+
+  asprintf(&full_attr, "%s/%s", dir, attr);
+  buf = util_get_attr(full_attr);
+  free(full_attr);
+
+  return buf;
+}
+
 int util_get_int_attr(char* attr)
 {
   return strtol(util_get_attr(attr), NULL, 0);
@@ -4961,7 +4973,7 @@ int fcoe_check()
 int iscsi_check()
 {
   int iscsi_ok = 0;
-  char *attr, *s, *t;
+  char *s, *t;
   char *sysfs_ibft = "/sys/firmware/ibft/ethernet0";
   unsigned use_dhcp = 0;
   int mac_ofs = 2;
@@ -4973,15 +4985,12 @@ int iscsi_check()
 
   if(!util_check_exist(sysfs_ibft)) return iscsi_ok;
 
-  asprintf(&attr, "%s/origin", sysfs_ibft);
-  s = util_get_attr(attr);
+  s = util_get_attr2(sysfs_ibft, "origin");
   fprintf(stderr, "ibft: origin = %s\n", s);
   if(s[0] == '3') use_dhcp = 1;
   fprintf(stderr, "ibft: dhcp = %d\n", use_dhcp);
-  free(attr);
 
-  asprintf(&attr, "%s/mac", sysfs_ibft);
-  s = strdup(util_get_attr(attr));
+  s = strdup(util_get_attr2(sysfs_ibft, "mac"));
   fprintf(stderr, "ibft: mac = %s\n", s);
   if(*s) {
     /* try to get the interface name, up to offset 2 */
@@ -4993,13 +5002,12 @@ int iscsi_check()
     iscsi_ok++;
   }
   free(s);
-  free(attr);
 
   char *ip_addr = "";
+
+  /* use ibft config only if mac matches */
   if(!mac_ofs) {
-    asprintf(&attr, "%s/ip-addr", sysfs_ibft);
-    ip_addr = util_get_attr(attr);
-    free(attr);
+    ip_addr = util_get_attr2(sysfs_ibft, "ip-addr");
     fprintf(stderr, "ibft: ip-addr = %s\n", ip_addr);
     if(*ip_addr) {
       if (strchr(ip_addr, ':')) {
@@ -5015,7 +5023,6 @@ int iscsi_check()
     config.net.setup = NS_DHCP;
   }
   else {
-    /* use ibft config only if mac matches */
     if(!mac_ofs) {
       if(*ip_addr) {
         name2inet(&config.net.hostname, ip_addr);
@@ -5027,32 +5034,27 @@ int iscsi_check()
       iscsi_ok++;
     }
 
-    asprintf(&attr, "%s/subnet-mask", sysfs_ibft);
-    s = util_get_attr(attr);
+    s = util_get_attr2(sysfs_ibft, "subnet-mask");
     fprintf(stderr, "ibft: subnet-mask = %s\n", s);
     if(*s) {
       name2inet(&config.net.netmask, s);
       net_check_address(&config.net.netmask, 0);
       iscsi_ok++;
     }
-    free(attr);
 
     if(iscsi_ok == 3) {
       config.net.do_setup |= DS_SETUP;
       config.net.setup = NS_HOSTIP | NS_NETMASK;
 
-      asprintf(&attr, "%s/gateway", sysfs_ibft);
-      s = util_get_attr(attr);
+      s = util_get_attr2(sysfs_ibft, "gateway");
       fprintf(stderr, "ibft: gateway = %s\n", s);
       if(*s) {
         name2inet(&config.net.gateway, s);
         net_check_address(&config.net.gateway, 0);
         config.net.setup |= NS_GATEWAY;
       }
-      free(attr);
 
-      asprintf(&attr, "%s/primary-dns", sysfs_ibft);
-      s = util_get_attr(attr);
+      s = util_get_attr2(sysfs_ibft, "primary-dns");
       fprintf(stderr, "ibft: primary-dns = %s\n", s);
       if(*s) {
         name2inet(&config.net.nameserver[0], s);
@@ -5060,17 +5062,14 @@ int iscsi_check()
         config.net.nameservers = 1;
         config.net.setup |= NS_NAMESERVER;
       }
-      free(attr);
 
-      asprintf(&attr, "%s/secondary-dns", sysfs_ibft);
-      s = util_get_attr(attr);
+      s = util_get_attr2(sysfs_ibft, "secondary-dns");
       fprintf(stderr, "ibft: secondary-dns = %s\n", s);
       if(*s) {
         name2inet(&config.net.nameserver[1], s);
         net_check_address(&config.net.nameserver[1], 0);
         config.net.nameservers = 2;
       }
-      free(attr);
     }
   }
 
