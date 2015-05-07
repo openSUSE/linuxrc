@@ -4995,6 +4995,21 @@ int iscsi_check()
   free(s);
   free(attr);
 
+  char *ip_addr = "";
+  if(!mac_ofs) {
+    asprintf(&attr, "%s/ip-addr", sysfs_ibft);
+    ip_addr = util_get_attr(attr);
+    free(attr);
+    fprintf(stderr, "ibft: ip-addr = %s\n", ip_addr);
+    if(*ip_addr) {
+      if (strchr(ip_addr, ':')) {
+        /* Enable parsing and using the IPv6 address, bsc#925173 */
+        fprintf(stderr, "ibft: enabled ipv6\n");
+        config.net.ipv6 = 1;
+      }
+    }
+  }
+
   if(use_dhcp) {
     config.net.do_setup |= DS_SETUP;
     config.net.setup = NS_DHCP;
@@ -5002,19 +5017,11 @@ int iscsi_check()
   else {
     /* use ibft config only if mac matches */
     if(!mac_ofs) {
-      asprintf(&attr, "%s/ip-addr", sysfs_ibft);
-      s = util_get_attr(attr);
-      fprintf(stderr, "ibft: ip-addr = %s\n", s);
-      if(*s) {
-        if (strchr(s, ':')) {
-          /* Enable parsing and using the IPv6 address, bsc#925173 */
-          config.net.ipv6 = 1;
-        }
-        name2inet(&config.net.hostname, s);
+      if(*ip_addr) {
+        name2inet(&config.net.hostname, ip_addr);
         net_check_address(&config.net.hostname, 0);
         iscsi_ok++;
       }
-      free(attr);
     }
     else {
       iscsi_ok++;
