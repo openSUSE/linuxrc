@@ -5006,6 +5006,10 @@ int iscsi_check()
       s = util_get_attr(attr);
       fprintf(stderr, "ibft: ip-addr = %s\n", s);
       if(*s) {
+        if (strchr(s, ':')) {
+          /* Enable parsing and using the IPv6 address, bsc#925173 */
+          config.net.ipv6 = 1;
+        }
         name2inet(&config.net.hostname, s);
         net_check_address(&config.net.hostname, 0);
         iscsi_ok++;
