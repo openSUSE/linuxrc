@@ -57,8 +57,8 @@ clean: libs
 	rm -f $(OBJ) *~ linuxrc linuxrc.map linuxrc-debug .depend version.h
 	rm -rf package
 
-TAGS: *.c *.h */*.c */*.h
-	etags *.c *.h */*.c */*.h
+TAGS: *.c *.h */*.c
+	etags $^
 
 ifeq ($(filter clean changelog VERSION, $(MAKECMDGOALS)),)
 .depend: version.h $(SRC) $(INC)
