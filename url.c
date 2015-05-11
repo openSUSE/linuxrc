@@ -2474,9 +2474,9 @@ int url_setup_device(url_t *url)
  */
 int url_setup_interface(url_t *url)
 {
-  // we already have at least one configured interface
-  if(config.ifcfg.if_up) {
-    fprintf(stderr, "setup_interface: already up\n");
+  // the interface has already been configured
+  if(slist_getentry(config.ifcfg.if_up, url->used.device)) {
+    fprintf(stderr, "setup_interface: %s already up\n", url->used.device);
 
     return 1;
   }
@@ -2484,7 +2484,11 @@ int url_setup_interface(url_t *url)
   if(
     !strncmp(url->used.device, "lo", sizeof "lo" - 1) ||
     !strncmp(url->used.device, "sit", sizeof "sit" - 1)
-  ) return 0;
+  ) {
+    fprintf(stderr, "setup_interface: %s ignored\n", url->used.device);
+
+    return 0;
+  }
 
   net_stop();
 
