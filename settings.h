@@ -14,7 +14,7 @@ typedef struct {
   char *descr;
   char *keymap;
   char *locale;
-  char *trans_id;	/* instsys translation image suffix */
+  char *trans_id;	/**< instsys translation image suffix */
 } language_t;
 
 typedef struct {

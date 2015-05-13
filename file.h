@@ -59,17 +59,17 @@ typedef enum {
 
 typedef enum {
   kf_none = 0,
-  kf_cfg = 1 << 0,		/* /linuxrc.config & /info */
-  kf_cmd = 1 << 1,		/* /proc/cmdline, after info */
-  kf_cmd_early = 1 << 2,	/* /proc/cmdline, before info  */
-  kf_yast = 1 << 3,		/* /etc/yast.inf */
-  kf_dhcp = 1 << 4,		/* dhcp info file */
-  kf_mem = 1 << 5,		/* /proc/meminfo */
-  kf_boot = 1 << 6,		/* things the boot loader used */
-  kf_cmd1 = 1 << 7,		/* between cmd_early and start of hw detection */
-  kf_ibft = 1 << 8,		/* ibft values (iSCSI BIOS) */
-  kf_cont = 1 << 9,		/* 'content' file */
-  kf_comma = 1 << 10		/* accept commas as option separator (in command line syntax) */
+  kf_cfg = 1 << 0,		/**< /linuxrc.config & /info */
+  kf_cmd = 1 << 1,		/**< /proc/cmdline, after info */
+  kf_cmd_early = 1 << 2,	/**< /proc/cmdline, before info  */
+  kf_yast = 1 << 3,		/**< /etc/yast.inf */
+  kf_dhcp = 1 << 4,		/**< dhcp info file */
+  kf_mem = 1 << 5,		/**< /proc/meminfo */
+  kf_boot = 1 << 6,		/**< things the boot loader used */
+  kf_cmd1 = 1 << 7,		/**< between cmd_early and start of hw detection */
+  kf_ibft = 1 << 8,		/**< ibft values (iSCSI BIOS) */
+  kf_cont = 1 << 9,		/**< 'content' file */
+  kf_comma = 1 << 10		/**< accept commas as option separator (in command line syntax) */
 } file_key_flag_t;
 
 typedef struct file_s {
