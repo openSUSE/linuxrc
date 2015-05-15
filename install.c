@@ -1393,6 +1393,8 @@ int inst_update_cd()
   url_umount(url);
   url_free(url);
 
+  util_do_driver_updates();
+
   return 0;
 }
 

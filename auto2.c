@@ -619,6 +619,8 @@ int auto2_find_repo()
 
   auto2_driverupdate(config.url.install);
 
+  util_do_driver_updates();
+
   return config.sig_failed ? 0: 1;
 }
 
@@ -1014,6 +1016,8 @@ void auto2_kexec(url_t *url)
 
 /*
  * Check for driver updates.
+ *
+ * Note: does not apply the updates, run util_do_driver_updates() afterwards.
  */
 void auto2_driverupdate(url_t *url)
 {
@@ -1050,12 +1054,9 @@ void auto2_driverupdate(url_t *url)
 
   free(file_name);
 
-  if(!err) util_do_driver_updates();
-
   /* then, look for unpacked version */
   if(url->mount) {
     util_chk_driver_update(url->mount, get_instmode_name(url->scheme));
-    util_do_driver_updates();
   }
 
   if(config.win) win_close(&win);
