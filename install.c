@@ -1292,7 +1292,7 @@ int inst_execute_yast()
 
   if(config.manual) util_disp_init();
 
-  if(err && config.win) {
+  if(err && !config.aborted && config.win) {
     dia_message("An error occurred during the installation.", MSGTYPE_ERROR);
   }
 
