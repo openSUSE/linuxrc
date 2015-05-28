@@ -50,3 +50,10 @@ mksusecd --initrd /tmp/initrd ...
 
 You may also use `mksusecd --micro` in case you only want to test Stage 1
 and not a full install.
+
+## openSUSE Development
+
+The package is automatically submitted from the `master` branch to
+[system:install:head](https://build.opensuse.org/package/show/system:install:head/linuxrc)
+OBS project. From that place it is forwarded to
+[openSUSE Factory](https://build.opensuse.org/project/show/openSUSE:Factory).
