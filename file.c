@@ -31,7 +31,6 @@
 #include "net.h"
 #include "settings.h"
 #include "auto2.h"
-#include "rootimage.h"
 #include "display.h"
 #include "keyboard.h"
 #include "url.h"
@@ -306,6 +305,7 @@ static struct {
   { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
   { key_nanny,          "nanny",          kf_cfg + kf_cmd_early          },
   { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
+  { key_systemboot,     "SystemBoot",     kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1709,6 +1709,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           // ... else clear setting
           str_copy(&config.ifcfg.manual->vlan, NULL);
         }
+        break;
+
+      case key_systemboot:
+        if(f->is.numeric) config.systemboot = f->nvalue;
         break;
 
       default:

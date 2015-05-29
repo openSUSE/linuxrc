@@ -24,7 +24,6 @@
 #include "window.h"
 #include "net.h"
 #include "display.h"
-#include "rootimage.h"
 #include "module.h"
 #include "keyboard.h"
 #include "file.h"
@@ -82,6 +81,13 @@ int auto2_init()
       dia_show_lines2("Driver Updates added", config.update.name_list, 64);
     }
     while(!inst_update_cd());
+  }
+
+  if(config.systemboot) {
+    if(!config.win) util_disp_init();
+    util_boot_system();
+    config.manual = 1;
+    return 1;
   }
 
   if(config.win && !win_old) util_disp_done();

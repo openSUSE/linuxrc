@@ -26,7 +26,6 @@
 #include "dialog.h"
 #include "display.h"
 #include "window.h"
-#include "rootimage.h"
 #include "net.h"
 #include "info.h"
 #include "keyboard.h"

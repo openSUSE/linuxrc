@@ -4877,3 +4877,320 @@ char *compressed_archive(char *name, char **archive)
   return compr;
 }
 
+
+int cmp_alpha(slist_t *sl0, slist_t *sl1)
+{
+  return strcmp(sl0->key, sl1->key);
+}
+
+
+/* wrapper for qsort */
+int cmp_alpha_s(const void *p0, const void *p1)
+{
+  slist_t **sl0, **sl1;
+
+  sl0 = (slist_t **) p0;
+  sl1 = (slist_t **) p1;
+
+  return cmp_alpha(*sl0, *sl1);
+}
+
+
+slist_t *get_kernel_list(char *dev)
+{
+#if defined(__s390__) || defined(__s390x__)
+  char *kernel_pattern = "image-*";
+#elif defined(__x86_64__) || defined(__i386__)
+  char *kernel_pattern = "vmlinuz-*";
+#else
+  char *kernel_pattern = "vmlinux-*";
+#endif
+  char *dirs[] = { "/mnt", "/mnt/boot", "/mnt/efi/boot", "/mnt/efi/SuSE" };
+
+  int i;
+  DIR *d;
+  struct dirent *de;
+  char *buf = NULL;
+  slist_t *sl, *kernel_list = NULL;
+
+  for(i = 0; i < sizeof dirs/sizeof *dirs; i++) {
+    char link_name[2];
+
+    // skip boot -> . symlink and absolute symlinks
+    if(
+      readlink(dirs[i], link_name, 2) == 1 &&
+      (*link_name == '.' || *link_name == '/')
+    ) continue;
+
+    if((d = opendir(dirs[i]))) {
+      while((de = readdir(d))) {
+        if(!fnmatch(kernel_pattern, de->d_name, FNM_PATHNAME)) {
+          char *t = strchr(de->d_name, '-');
+          if(t) {
+            strprintf(&buf, "%s/initrd%s", dirs[i], t);
+            fprintf(stderr, "%s matched, initrd? %s\n", de->d_name, buf);
+            if(util_check_exist(buf) == 'r') {
+              char *t2 = dirs[i] + sizeof "/mnt" - 1;
+              sl = slist_append(&kernel_list, slist_new());
+              strprintf(&sl->key, "%s:%s/%s", dev, t2, de->d_name);
+              strprintf(&sl->value, "%s:%s/initrd%s", dev, t2, t);
+              fprintf(stderr, "kernel: %s / %s\n", sl->key, sl->value);
+            }
+            str_copy(&buf, NULL);
+          }
+
+        }
+      }
+      closedir(d);
+    }
+  }
+
+  return kernel_list;
+}
+
+
+void util_boot_system()
+{
+  window_t win;
+  char *buf = NULL;
+  slist_t *sl;
+  slist_t *root_list = NULL, *root = NULL;
+  slist_t *kernel_list = NULL, *kernel = NULL;
+  char *kernel_options = NULL;
+  int i, items;
+  char **item_list;
+
+  strprintf(&buf, "Analysing disks...");
+  fprintf(stderr, "%s\n", buf);
+  if(config.win) {
+    dia_info(&win, buf, MSGTYPE_INFO);
+  }
+  else {
+    printf("%s\n", buf);
+    fflush(stdout);
+  }
+  str_copy(&buf, NULL);
+
+  util_update_disk_list(NULL, 1);
+
+  for(sl = config.partitions; sl; sl = sl->next) {
+    char *type = util_fstype(long_dev(sl->key), NULL);
+    char *blk_id = blk_ident(long_dev(sl->key));
+    if(type && strcmp(type, "swap")) {
+      if(!util_mount_ro(long_dev(sl->key), "/mnt", NULL)) {
+        char *os_name = NULL;
+
+        if(util_check_exist("/mnt/etc/os-release")) {
+          char *s = util_get_attr("/mnt/etc/os-release");
+          char *t = strstr(s, "PRETTY_NAME=\"");
+          if(t) {
+            t += sizeof "PRETTY_NAME=\"" - 1;
+            char *t2 = strchr(t, '"');
+            if(t2) {
+              *t2 = 0;
+              os_name = t;
+            }
+          }
+        }
+        else if(util_check_exist("/mnt/etc/SuSE-release")) {
+          char *s = util_get_attr("/mnt/etc/SuSE-release");
+          char *t = strchr(s, '\n');
+          if(t) *t = 0;
+          if(*s) os_name = s;
+        }
+
+        strprintf(&buf, "%s (%s) -- %s", sl->key, blk_id, os_name ?: "");
+        fprintf(stderr, "%s\n", buf);
+        if(os_name) {
+          slist_t *sl2 = slist_append_str(&root_list, long_dev(sl->key));
+          str_copy(&sl2->value, buf);
+        }
+        str_copy(&buf, NULL);
+
+        slist_append(&kernel_list, get_kernel_list(sl->key));
+
+        util_umount("/mnt");
+      }
+    }
+  }
+
+  if(config.win) win_close(&win);
+
+  if(!root_list || !kernel_list) {
+    dia_message("No bootable system found.", MSGTYPE_ERROR);
+    return;
+  }
+
+  root_list = slist_sort(root_list, cmp_alpha_s);
+  kernel_list = slist_sort(kernel_list, cmp_alpha_s);
+
+  for(items = 0, sl = root_list; sl; sl = sl->next) items++;
+
+  item_list = calloc(items + 1, sizeof *item_list);
+
+  for(i = 0, sl = root_list; sl; sl = sl->next, i++) {
+    item_list[i] = sl->value;
+  }
+
+  i = dia_list("Select a system to boot", 72, NULL, item_list, 0, align_left);
+
+  free(item_list);
+  item_list = NULL;
+
+  if(i <= 0) {
+    slist_free(root_list);
+
+    return;
+  }
+
+  for(root = root_list; root && i > 1; root = root->next, i--);
+
+  // root = system partition
+
+  for(items = 0, sl = kernel_list; sl; sl = sl->next) items++;
+
+  item_list = calloc(items + 1, sizeof *item_list);
+
+  for(i = 0, sl = kernel_list; sl; sl = sl->next, i++) {
+    item_list[i] = sl->key;
+  }
+
+  strprintf(&buf, "Select a kernel to boot\n%s", root->value);
+  i = dia_list(buf, 72, NULL, item_list, 0, align_left);
+  str_copy(&buf, NULL);
+
+  free(item_list);
+  item_list = NULL;
+
+  if(i <= 0) {
+    slist_free(root_list);
+    slist_free(kernel_list);
+
+    return;
+  }
+
+  for(kernel = kernel_list; kernel && i > 1; kernel = kernel->next, i--);
+
+  // kernel = kernel/initrd pair
+
+  // maybe user wants a persistent device name for 'root' option...
+
+  hd_data_t *hd_data = calloc(1, sizeof *hd_data);
+
+  hd_data->flags.list_md = 1;
+  hd_t *hd = hd_list(hd_data, hw_partition, 1, NULL);
+
+  for(; hd; hd = hd->next) {
+    if(hd->unix_dev_name && !strcmp(hd->unix_dev_name, root->key)) {
+      str_list_t *hsl;
+
+      for(items = 0, hsl = hd->unix_dev_names; hsl; hsl = hsl->next) items++;
+
+      if(items) {
+        item_list = calloc(items + 1, sizeof *item_list);
+
+        for(i = 0, hsl = hd->unix_dev_names; hsl; hsl = hsl->next, i++) {
+          item_list[i] = hsl->str;
+        }
+
+        i = dia_list("You may select an alternative device name for the system partition", 72, NULL, item_list, 0, align_left);
+
+        if(i > 0) {
+          str_copy(&root->key, item_list[i - 1]);
+        }
+
+        free(item_list);
+        item_list = NULL;
+      }
+
+      break;
+    }
+  }
+
+  hd_free_hd_data(hd_data);
+  free(hd_data);
+
+  strprintf(&kernel_options, "root=%s", root->key);
+
+  if(dia_input2("Edit kernel options", &kernel_options, 57, 0)) {
+    str_copy(&kernel_options, NULL);
+    slist_free(root_list);
+    slist_free(kernel_list);
+
+    return;
+  }
+
+  // show what we are doing
+  fprintf(stderr, "going to boot %s, append=\"%s\"\n", kernel->key, kernel_options);
+
+  // ok, now mount partition again, and load kernel & initrd
+
+  char *kernel_name = strchr(kernel->key, ':');
+  char *initrd_name = strchr(kernel->value, ':');
+
+  // can't happen, but anyway...
+  if(!kernel_name || !initrd_name) return;
+
+  *kernel_name++ = 0;
+  *initrd_name++ = 0;
+
+  if(util_mount_ro(long_dev(kernel->key), "/mnt", NULL)) {
+    fprintf(stderr, "oops, mounting partition failed\n");
+    slist_free(root_list);
+    slist_free(kernel_list);
+
+    return;
+  }
+
+  strprintf(&buf,
+    "kexec -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
+    kernel_name, initrd_name, kernel_options
+  );
+
+  char *buf1 = NULL;
+
+  if(strstr(kernel_name, "vmlinuz-")) {
+    str_copy(&buf1, "--real-mode");
+  }
+
+  if(config.debug) {
+    if(dia_input2("Enter additional kexec options", &buf1, 57, 0)) {
+      util_umount("/mnt");
+
+      str_copy(&buf1, NULL);
+      str_copy(&kernel_options, NULL);
+      slist_free(root_list);
+      slist_free(kernel_list);
+
+      return;
+    }
+    if(buf1) strprintf(&buf, "%s %s", buf, buf1);
+  }
+
+  str_copy(&buf1, NULL);
+
+  fprintf(stderr, "%s\n", buf);
+
+  if(!config.test) {
+    strprintf(&buf, "%s >&2", buf);
+    int err = system(buf);
+    util_umount("/mnt");
+    if(!err) {
+      util_umount_all();
+      sync();
+      // dia_message("Now!", MSGTYPE_INFO);
+      LXRC_WAIT
+      system("kexec --exec >&2");
+    }
+  }
+
+  str_copy(&buf, NULL);
+  str_copy(&kernel_options, NULL);
+  slist_free(root_list);
+  slist_free(kernel_list);
+
+  // oops, we failed
+
+  dia_message("Sorry, system didn't boot.", MSGTYPE_ERROR);
+}
+

@@ -37,7 +37,6 @@
 #include "window.h"
 #include "net.h"
 #include "display.h"
-#include "rootimage.h"
 #include "module.h"
 #include "keyboard.h"
 #include "file.h"
@@ -75,6 +74,8 @@ static dia_item_t di_inst_choose_netsource_last = di_none;
 #if defined(__s390__) || defined(__s390x__)  
 static dia_item_t di_inst_choose_display_last = di_none;
 #endif
+
+static int ask_for_swap(int64_t size, char *msg);
 
 
 /*
@@ -141,7 +142,8 @@ int inst_menu_cb(dia_item_t di)
       break;
 
     case di_inst_system:
-      err = root_boot_system();
+      util_boot_system();
+      err = 1;
       break;
 
     case di_inst_net_config:
@@ -1412,4 +1414,48 @@ int choose_dud(char **dev)
   return util_choose_disk_device(dev, 1, "Please choose the Driver Update medium.", "Please enter the Driver Update device.");
 }
 
+
+/*
+ * Check if we still have enough free memory for 'size'. If not, ask user
+ * for more swap.
+ *
+ * size: in kbytes!
+ *
+ * return: 0 ok, -1 error
+ */
+int ask_for_swap(int64_t size, char *msg)
+{
+  int i, j, did_init = 0;
+  char *partition = NULL;
+  char *argv[] = { NULL, NULL };
+
+  if(size >= 0 && config.memoryXXX.current >= config.memoryXXX.min_free + size) return 0;
+
+  if(!config.win) {
+    util_disp_init();
+    did_init = 1;
+  }
+
+  do {
+    j = inst_choose_partition(&partition, 1, "To continue, activate some swap space.", "Enter the swap partition (e.g., /dev/sda2)");
+
+    if(j == 0 && partition) {
+      argv[1] = long_dev(partition);
+      fprintf(stderr, "swapon %s\n", argv[1]);
+      i = util_swapon_main(2, argv);
+      if(i) {
+        dia_message("Error activating swap space.", MSGTYPE_ERROR);
+        j = 1;
+      }
+    }
+    util_free_mem();
+  }
+  while(j > 0);
+
+  str_copy(&partition, NULL);
+
+  if(did_init) util_disp_done();
+
+  return j;
+}
 
