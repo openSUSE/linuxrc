@@ -115,6 +115,10 @@ static char *mac_to_interface_log(char *mac, int log);
 static void util_extend_usr1(int signum);
 static int util_extend(char *extension, char task, int verbose);
 
+static int cmp_alpha(slist_t *sl0, slist_t *sl1);
+static int cmp_alpha_s(const void *p0, const void *p1);
+static slist_t *get_kernel_list(char *dev);
+
 
 void util_redirect_kmsg()
 {
@@ -4878,13 +4882,18 @@ char *compressed_archive(char *name, char **archive)
 }
 
 
+/*
+ * Helper function: sort alphanumerically.
+ */
 int cmp_alpha(slist_t *sl0, slist_t *sl1)
 {
   return strcmp(sl0->key, sl1->key);
 }
 
 
-/* wrapper for qsort */
+/*
+ * Wrapper around cmp_alpha() for qsort.
+ */
 int cmp_alpha_s(const void *p0, const void *p1)
 {
   slist_t **sl0, **sl1;
@@ -4896,6 +4905,9 @@ int cmp_alpha_s(const void *p0, const void *p1)
 }
 
 
+/*
+ * Scan parition mounted at /mnt for kernel & initrd.
+ */
 slist_t *get_kernel_list(char *dev)
 {
 #if defined(__s390__) || defined(__s390x__)
@@ -4949,6 +4961,23 @@ slist_t *get_kernel_list(char *dev)
 }
 
 
+/*
+ * Boot installed system.
+ *
+ *   1. analyze disks: mount every partition and
+ *       - look for /etc/{os,SuSE}-release; every such partition is considered
+ *         to be a root file system
+ *       - look for <kernel>-XXX and matching initrd-XXX files; every such pair
+ *         is considered a bootable kernel/initrd combination; <kernel> may be
+ *         vmlinux, vmlinuz, or image depending on the architecture
+ *
+ *   2. present 4 (resp. 5) dialogs to user:
+ *       - select root partition
+ *       - select kernel/initrd
+ *       - optionally select alternative (persistent) root partition name
+ *       - optionally add further kernel parameters
+ *       - if in debug mode: optionally edit kexec options
+ */
 void util_boot_system()
 {
   window_t win;
@@ -5149,6 +5178,8 @@ void util_boot_system()
 
   char *buf1 = NULL;
 
+  // on x86, non-uefi use real-mode interface;
+  // this seems to work better
   if(strstr(kernel_name, "vmlinuz-") && !config.efi_vars) {
     str_copy(&buf1, "--real-mode");
   }
