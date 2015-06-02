@@ -5149,7 +5149,7 @@ void util_boot_system()
 
   char *buf1 = NULL;
 
-  if(strstr(kernel_name, "vmlinuz-")) {
+  if(strstr(kernel_name, "vmlinuz-") && !config.efi_vars) {
     str_copy(&buf1, "--real-mode");
   }
 
