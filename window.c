@@ -21,7 +21,7 @@
 #include "utf8.h"
 
 
-#define MAX_FIELD        40
+#define MAX_FIELD        80
 
 static int is_printable(int key);
 
