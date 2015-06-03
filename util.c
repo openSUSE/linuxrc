@@ -4930,7 +4930,7 @@ slist_t *get_kernel_list(char *dev)
 
     // skip boot -> . symlink and absolute symlinks
     if(
-      readlink(dirs[i], link_name, 2) == 1 &&
+      readlink(dirs[i], link_name, sizeof link_name) == 1 &&
       (*link_name == '.' || *link_name == '/')
     ) continue;
 
@@ -5072,6 +5072,7 @@ void util_boot_system()
     return;
   }
 
+  // get the i-th (1-based) entry from list
   for(root = root_list; root && i > 1; root = root->next, i--);
 
   // root = system partition
@@ -5098,6 +5099,7 @@ void util_boot_system()
     return;
   }
 
+  // get the i-th (1-based) entry from list
   for(kernel = kernel_list; kernel && i > 1; kernel = kernel->next, i--);
 
   // kernel = kernel/initrd pair
