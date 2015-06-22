@@ -84,7 +84,7 @@ static void lxrc_add_parts(void);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
-// static void config_rescue(char *mp);
+static void select_repo_url(char *msg, char **repo);
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
@@ -668,8 +668,7 @@ void lxrc_catch_signal(int signum)
 
 void lxrc_init()
 {
-  int i, j;
-  char buf[256];
+  int i;
 
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);
@@ -1148,53 +1147,75 @@ void lxrc_init()
   if(config.braille.check) run_braille();
 
   if(!config.manual && !auto2_init()) {
+    char *buf = NULL, *repo = NULL;
+
     fprintf(stderr, "Automatic setup not possible.\n");
 
-    util_disp_init();
+    // ok, we failed to find a suitable repo
+    // do something about it
 
-    i = 0;
-    j = 1;
+    // If the file '/nextmedia' exists, get the message to show from there
+    // and retry the default repo settings if the user is ready.
+    // Otherwise, present the user the list of repos we have tried so far and
+    // let her choose / edit one and try again.
+
+    util_disp_init();
 
     if(util_check_exist("/nextmedia") == 'r') {
       config.cd1texts = file_parse_xmllike("/nextmedia", "text");  
     }
 
-    if(config.url.install) {
-      char *s = get_translation(config.cd1texts, current_language()->locale);
-      char *buf = NULL;
+    char *next_msg = get_translation(config.cd1texts, current_language()->locale);
 
-      strprintf(&buf, "%s\n\nRetry?", s ?: "Please make sure your installation medium is available.");
-      do {
-        j = dia_yesno(buf, YES) == YES ? 1 : 0;
-        if(j) {
-          slist_t *sl;
-          config.manual = 0;
-          for(sl = config.defaultrepo, i = 0; sl && !i; sl = sl->next) {
-            url_free(config.url.install);
-            config.url.install = url_set(sl->key);
-            i = auto2_find_repo();
-          }
+    strprintf(&buf,
+      "%s\n\n%s",
+      next_msg ?: "Please make sure your installation medium is available.",
+      config.cd1texts ? "Continue?" : "Choose the URL to retry."
+    );
+
+    do {
+      config.manual = 0;
+
+      if(config.cd1texts) {
+        slist_t *sl;
+
+        if(dia_okcancel(buf, YES) != YES) {
+          config.rescue = 0;
+          config.manual |= 1;
+
+          break;
         }
-      } while(!i && j);
 
-      str_copy(&buf, NULL);
-    }
+        for(sl = config.defaultrepo; sl; sl = sl->next) {
+          config.manual = 0;
 
-    if(!i) {
-      config.rescue = 0;
-      config.manual |= 1;
-      // this message is shown only if the above message was not
-      // FIXME: this is currently impossible, remove the code later
-      if(j) {
-        sprintf(buf, "Could not find the %s ", config.product);
-        strcat(buf, "Repository.");
-        strcat(buf, "\n\nActivating manual setup program.\n");
-        dia_message(buf, MSGTYPE_ERROR);
+          url_free(config.url.install);
+          config.url.install = url_set(sl->key);
+
+          if(auto2_find_repo()) break;
+        }
+
+        break;
       }
-    }
-    else {
-      util_disp_done();
-    }
+      else {
+        select_repo_url(buf, &repo);
+
+        if(!repo || !*repo) {
+          config.rescue = 0;
+          config.manual |= 1;
+
+          break;
+        }
+
+        url_free(config.url.install);
+        config.url.install = url_set(repo);
+      }
+    } while(!auto2_find_repo());
+
+    str_copy(&buf, NULL);
+    str_copy(&repo, NULL);
+
+    if(!config.manual) util_disp_done();
   }
 
   set_activate_language(config.language);
@@ -1566,4 +1587,72 @@ void lxrc_readd_parts()
   free(mp);
 }
 
+
+/*
+ * Offer the user a list of URLs to choose from based in the current install
+ * URL and the default repo setting.
+ *
+ * In addidtion she can also edit the URL.
+ *
+ * Return NULL in repo if the user cancelled the dialogs, else repo contains
+ * the chosen repo URL.
+ */
+void select_repo_url(char *msg, char **repo)
+{
+  slist_t *sl;
+  char **item_list;
+  int i, with_install_url, items, default_item;
+
+  // if config.url.install is a duplicate of some default repo entry, skip it
+  with_install_url = config.url.install && !slist_getentry(config.defaultrepo, config.url.install->str);
+
+  for(items = 1, sl = config.defaultrepo; sl; sl = sl->next) items++;
+
+  if(with_install_url) items++;
+
+  item_list = calloc(items + 1, sizeof *item_list);
+
+  i = 0;
+
+  if(with_install_url) {
+    item_list[i++] = config.url.install->str;
+  }
+
+  for(sl = config.defaultrepo; sl; sl = sl->next, i++) {
+    item_list[i] = sl->key;
+  }
+
+  item_list[i] = "Enter another URL";
+
+  default_item = 1;
+
+  // if we skipped config.url.install because it's a duplicate of some
+  // defaultrepo entry, make it the default entry
+  if(config.url.install && !with_install_url) {
+    for(i = 1, sl = config.defaultrepo; sl && strcmp(sl->key, config.url.install->str); sl = sl->next) i++;
+    if(sl) default_item = i;
+  }
+
+  i = dia_list(msg, 64, NULL, item_list, default_item, align_left);
+
+  if(i > 0) {
+    if(i == items) {
+      if(!*repo) str_copy(repo, item_list[default_item - 1]);
+      if(dia_input2("Enter the repository URL.", repo, 64, 0)) {
+        str_copy(repo, NULL);
+      }
+    }
+    else {
+      str_copy(repo, item_list[i - 1]);
+    }
+  }
+  else {
+    str_copy(repo, NULL);
+  }
+
+  free(item_list);
+  item_list = NULL;
+
+  if(config.debug) fprintf(stderr, "repo: %s\n", *repo ?: "");
+}
 
