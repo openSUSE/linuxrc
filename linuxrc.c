@@ -1173,19 +1173,14 @@ void lxrc_init()
       config.cd1texts ? "Continue?" : "Choose the URL to retry."
     );
 
-    do {
-      config.manual = 0;
+    if(config.cd1texts) {
+      slist_t *sl;
 
-      if(config.cd1texts) {
-        slist_t *sl;
-
-        if(dia_okcancel(buf, YES) != YES) {
-          config.rescue = 0;
-          config.manual |= 1;
-
-          break;
-        }
-
+      if(dia_okcancel(buf, YES) != YES) {
+        config.rescue = 0;
+        config.manual |= 1;
+      }
+      else {
         for(sl = config.defaultrepo; sl; sl = sl->next) {
           config.manual = 0;
 
@@ -1194,10 +1189,12 @@ void lxrc_init()
 
           if(auto2_find_repo()) break;
         }
-
-        break;
       }
-      else {
+    }
+    else {
+      do {
+        config.manual = 0;
+
         select_repo_url(buf, &repo);
 
         if(!repo || !*repo) {
@@ -1209,8 +1206,8 @@ void lxrc_init()
 
         url_free(config.url.install);
         config.url.install = url_set(repo);
-      }
-    } while(!auto2_find_repo());
+      } while(!auto2_find_repo());
+    }
 
     str_copy(&buf, NULL);
     str_copy(&repo, NULL);
@@ -1592,7 +1589,7 @@ void lxrc_readd_parts()
  * Offer the user a list of URLs to choose from based in the current install
  * URL and the default repo setting.
  *
- * In addidtion she can also edit the URL.
+ * In addition she can also edit the URL.
  *
  * Return NULL in repo if the user cancelled the dialogs, else repo contains
  * the chosen repo URL.
