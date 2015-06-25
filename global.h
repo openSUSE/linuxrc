@@ -374,6 +374,7 @@ typedef struct {
   char *zenconfig;		/* zenworks config file */
   unsigned ntfs_3g:1;		/* use ntfs-3g */
   unsigned secure:1;		/* secure mode (check digest of all downloaded files) */
+  unsigned secure_always_fail:1;	/* in secure mode: never ask the user but always fail directly */
   unsigned sslcerts:1;		/* whether to check ssl certificates */
   unsigned sig_failed:2;	/* signature check failed (1: not signed, 2: wrong signature) */
   unsigned kexec:1;		/* kexec to kernel & initrd from repo */

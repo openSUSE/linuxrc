@@ -1476,6 +1476,8 @@ void lxrc_usr1(int signum)
         if(!config.debug) config.debug = 1;
 
         config.keepinstsysconfig = 1;
+        config.linemode = 1;
+        config.secure_always_fail = 1;
 
         if(task == 'a' && sl) {
           fprintf(stderr, "instsys extend: add %s\n%s: already added\n", ext, ext);

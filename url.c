@@ -1476,6 +1476,11 @@ int warn_signature_failed(char *file_name)
   int i, win, err = 0;
   char *buf = NULL;
 
+  if(config.sig_failed && config.secure_always_fail) {
+    fprintf(stderr, "%s: file not signed or invalid signature\n", file_name);
+    return 1;
+  }
+
   if(config.sig_failed) {
     strprintf(&buf,
       "%s: %s\n\n%s",
@@ -1859,21 +1864,26 @@ static int test_and_copy(url_t *url)
         else {
           fprintf(stderr, "digest check failed\n");
           config.digests.failed = 1;
-          strprintf(&buf,
-            "%s: %s\n\n%s",
-            url_print2(url_data->url, NULL),
-            "SHA1 sum wrong.",
-            "If you really trust your repository, you may continue in an insecure mode."
-          );
-          if(!(win = config.win)) util_disp_init();
-          i = dia_okcancel(buf, NO);
-          if(!win) util_disp_done();
-          if(i == YES) {
-            config.secure = 0;
-            config.digests.failed = 0;
+          if(config.secure_always_fail) {
+            ok = 0;
           }
           else {
-            ok = 0;
+            strprintf(&buf,
+              "%s: %s\n\n%s",
+              url_print2(url_data->url, NULL),
+              "SHA1 sum wrong.",
+              "If you really trust your repository, you may continue in an insecure mode."
+            );
+            if(!(win = config.win)) util_disp_init();
+            i = dia_okcancel(buf, NO);
+            if(!win) util_disp_done();
+            if(i == YES) {
+              config.secure = 0;
+              config.digests.failed = 0;
+            }
+            else {
+              ok = 0;
+            }
           }
         }
       }
