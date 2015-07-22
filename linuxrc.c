@@ -871,7 +871,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2015 SUSE Linux GmbH <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2015 SUSE LLC <<<\n",
       config.product
     );
     if (config.linemode)
@@ -887,7 +887,8 @@ void lxrc_init()
   util_setup_udevrules();
 
   if(!config.udev_mods) {
-    system("cp /lib/udev/80-drivers.rules.no_modprobe /lib/udev/rules.d/80-drivers.rules");
+    system("cp /usr/lib/udev/80-drivers.rules.no_modprobe /etc/udev/rules.d/80-drivers.rules");
+    LXRC_WAIT
   }
 
   config.plymouth &= util_check_exist("/usr/sbin/plymouthd") == 'r' ? 1 : 0;
