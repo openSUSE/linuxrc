@@ -2290,6 +2290,12 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
     str_copy(&sl2->value, sl->value);
   }
 
+  // set hostname, if requested
+  if(config.net.sethostname && !slist_getentry(sl_ifcfg, "DHCLIENT_SET_HOSTNAME")) {
+    sl2 = slist_append_str(&sl_ifcfg, "DHCLIENT_SET_HOSTNAME");
+    str_copy(&sl2->value, "yes");
+  }
+
 #if defined(__s390__) || defined(__s390x__)
   // s390 layer2 interfaces
   if(config.hwp.layer2 == 2 && config.hwp.osahwaddr) {
