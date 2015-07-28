@@ -306,6 +306,7 @@ static struct {
   { key_nanny,          "nanny",          kf_cfg + kf_cmd_early          },
   { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
   { key_systemboot,     "SystemBoot",     kf_cfg + kf_cmd                },
+  { key_sethostname,    "SetHostname",    kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1715,6 +1716,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.systemboot = f->nvalue;
         break;
 
+      case key_sethostname:
+        if(f->is.numeric) config.net.sethostname = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1839,7 +1844,18 @@ void file_write_install_inf(char *dir)
 
   if(config.url.proxy) fprintf(f, "ProxyURL: %s\n", url_print(config.url.proxy, 1));
 
-  if(config.net.realhostname) file_write_str(f, key_hostname, config.net.realhostname);
+  if(config.net.realhostname) {
+    file_write_str(f, key_hostname, config.net.realhostname);
+  }
+  else {
+    char buf[256];
+    if(!gethostname(buf, sizeof buf)) {
+      if(config.debug) fprintf(stderr, "hostname = \"%s\"\n", buf);
+      if(*buf && strcmp(buf, "(none)")) file_write_str(f, key_hostname, buf);
+    }
+  }
+
+  LXRC_WAIT
 
   file_write_modparms(f);
 
