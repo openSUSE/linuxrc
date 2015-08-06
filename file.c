@@ -1165,7 +1165,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
          */
         if(do_all && (config.net.setup & NS_DHCP)) {
           ifcfg_append(&config.ifcfg.list, ifcfg_parse("*=dhcp"));
-          net_update_ifcfg(0);
+          config.net.setup = 0;
+          net_update_ifcfg(IFCFG_IFUP);
         }
         if(!config.net.setup) config.net.do_setup = 0;
         if(config.net.now) {
