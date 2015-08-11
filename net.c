@@ -1536,6 +1536,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     }
     
     break;
+
+  case di_390net_virtio:
+    return 0;
+    break;
     
   default:
     return -1;
