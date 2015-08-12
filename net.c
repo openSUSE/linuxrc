@@ -1373,7 +1373,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     return -1;
   }
   else {	/* no hd_t entry -> ask */
-    dia_item_t di;
     dia_item_t items[] = {
       di_390net_osa,
       di_390net_hsi,
@@ -1384,15 +1383,13 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       di_none
     };
     if(!strncmp(config.hwp.hypervisor, "KVM", sizeof "KVM" - 1)) {
-      items[0] = di_390net_virtio;
-      items[1] = di_none;
+      config.hwp.type = di_390net_virtio;
     }
-
-    IFNOTAUTO(config.hwp.type) {
-      di = dia_menu2("Please select the type of your network device.", 60, 0, items, config.hwp.type?:di_390net_iucv);
-      config.hwp.type = di;
+    else {
+      IFNOTAUTO(config.hwp.type) {
+        config.hwp.type = dia_menu2("Please select the type of your network device.", 60, 0, items, config.hwp.type?:di_390net_iucv);
+      }
     }
-    else di = config.hwp.type;
   }
 
   /* hwcfg parms common to all devices */
@@ -1535,6 +1532,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 
     }
     
+    break;
+
+  case di_390net_virtio:
+    return 0;
     break;
     
   default:
