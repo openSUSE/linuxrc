@@ -776,8 +776,15 @@ int net_choose_device()
       char *type;
       sprintf(path, "/sys/class/net/%s/device/layer2", item_devs[choice - 1]);
       type = util_get_attr(path);
-      if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=2; }
-      else {config.hwp.layer2=1;}
+      // Set the layer2 tag also for cards that don't have a layer2
+      // attribute (e.g. virtio) so they behave more like in the non-s390
+      // world and linuxrc knows it can try dhcp on them.
+      if(*type == 0 || *type == '1') {
+        config.hwp.layer2 = 2;
+      }
+      else {
+        config.hwp.layer2 = 1;
+      }
     }
   }
 #endif
@@ -1535,6 +1542,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     break;
 
   case di_390net_virtio:
+    config.hwp.layer2 = 2;
     return 0;
     break;
     
