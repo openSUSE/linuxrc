@@ -50,6 +50,12 @@
 
 
 #if defined(__s390__) || defined(__s390x__)
+// settings for config.hwp.layer2
+// (layer2 attribute for network cards)
+#define LAYER2_UNDEF	0
+#define LAYER2_NO	1
+#define LAYER2_YES	2
+
 int net_activate_s390_devs_ex(hd_t* hd, char** device);
 #endif
 
@@ -150,7 +156,7 @@ int net_config()
     if(
       config.net.setup & NS_DHCP &&
 #if defined(__s390__) || defined(__s390x__)
-      config.hwp.layer2 - 1 &&
+      config.hwp.layer2 != LAYER2_NO &&
 #endif
       !config.ifcfg.manual->ptp
     ) {
@@ -776,8 +782,17 @@ int net_choose_device()
       char *type;
       sprintf(path, "/sys/class/net/%s/device/layer2", item_devs[choice - 1]);
       type = util_get_attr(path);
-      if(!strncmp(type, "1", sizeof "1" )) {config.hwp.layer2=2; }
-      else {config.hwp.layer2=1;}
+      // set the layer2 tag for network cards
+      // LAYER2_UNDEF means it doesn't have this attribute (e.g. virtio)
+      if(*type == 0) {
+        config.hwp.layer2 = LAYER2_UNDEF;
+      }
+      else if(*type == '1') {
+        config.hwp.layer2 = LAYER2_YES;
+      }
+      else {
+        config.hwp.layer2 = LAYER2_NO;
+      }
     }
   }
 #endif
@@ -1509,9 +1524,9 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       
       IFNOTAUTO(config.hwp.layer2)
       {
-        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? 2 : 1;
+        config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? LAYER2_YES : LAYER2_NO;
       }
-      if(config.hwp.layer2 == 2) {
+      if(config.hwp.layer2 == LAYER2_YES) {
         IFNOTAUTO(config.hwp.osahwaddr) {
           dia_input2("MAC address", &config.hwp.osahwaddr, 17, 1);
         }
@@ -1535,6 +1550,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     break;
 
   case di_390net_virtio:
+    config.hwp.layer2 = LAYER2_UNDEF;
     return 0;
     break;
     
@@ -1581,7 +1597,7 @@ setup_ctc:
         config.hwp.portname ? "-p \"" : "",
         config.hwp.portname ? config.hwp.portname : "",
         config.hwp.portname ? "\"" : "",
-        config.hwp.layer2 == 2 ? "-l" : "",
+        config.hwp.layer2 == LAYER2_YES ? "-l" : "",
         config.hwp.readchan,
         config.hwp.writechan,
         config.hwp.datachan);
@@ -2299,7 +2315,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
 #if defined(__s390__) || defined(__s390x__)
   // s390 layer2 interfaces
-  if(config.hwp.layer2 == 2 && config.hwp.osahwaddr) {
+  if(config.hwp.layer2 == LAYER2_YES && config.hwp.osahwaddr) {
     char *sysfs_string = NULL;
     char *card_type;
 
