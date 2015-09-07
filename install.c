@@ -304,7 +304,7 @@ int inst_choose_display_cb(dia_item_t di)
 
     case di_display_vnc:
       config.vnc=1;
-      config.ssh=0;
+      config.usessh=0;
       net_ask_password();
       break;
 
