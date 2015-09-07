@@ -304,11 +304,13 @@ int inst_choose_display_cb(dia_item_t di)
 
     case di_display_vnc:
       config.vnc=1;
+      config.usessh=0;
       net_ask_password();
       break;
 
     case di_display_ssh:
       config.usessh=1;
+      config.vnc=0;
       net_ask_password();
       break;
 
