@@ -42,7 +42,6 @@
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};
 static int mod_menu_last = 0;
-static char *mod_param_text = NULL;
 static int mod_show_kernel_messages = 0;
 
 static void mod_update_list(void);
@@ -551,34 +550,32 @@ int mod_load_modules(char *modules, int show)
 
 char *mod_get_params(module_t *mod)
 {
-  char buf[256], *buf2 = NULL;
+  char *buf = NULL, *buf2 = NULL;
   slist_t *sl;
+  int err;
 
-  if(mod_param_text) {
-    strcpy(buf, mod_param_text);
-  }
-  else {
-    sprintf(buf, "Enter parameters for \"%s\".", mod->name);
-  }
-
-  *buf2 = 0;
+  strprintf(&buf, "Enter parameters for \"%s\".", mod->name);
 
   if(mod->param) {
-    strcat(buf, "\n\nExample: ");
-    strcat(buf, mod->param);
-    if(mod->autoload) strcpy(buf2, mod->param);
+    strprintf(&buf, "%s\n\nExample: %s", buf, mod->param);
+    if(mod->autoload) str_copy(&buf2, mod->param);
   }
 
   sl = slist_getentry(config.module.input_params, mod->name);
 
-  if(sl && sl->value) strcpy(buf2, sl->value);
+  if(sl && sl->value) str_copy(&buf2, sl->value);
 
-  if(dia_input2(buf, &buf2, 30, 0)) return NULL;
+  err = dia_input2(buf, &buf2, 30, 0);
+
+  str_copy(&buf, NULL);
+
+  if(err) return NULL;
 
   if(!sl) {
     sl = slist_add(&config.module.input_params, slist_new());
     sl->key = strdup(mod->name);
   }
+
   if(sl->value) free(sl->value);
   sl->value = buf2;
 
