@@ -564,12 +564,12 @@ char *mod_get_params(module_t *mod)
   if(mod->param) {
     strcat(buf, "\n\nExample: ");
     strcat(buf, mod->param);
-    if(mod->autoload) strcpy(buf2, mod->param);
+    if(mod->autoload) str_copy(&buf2, mod->param);
   }
 
   sl = slist_getentry(config.module.input_params, mod->name);
 
-  if(sl && sl->value) strcpy(buf2, sl->value);
+  if(sl && sl->value) str_copy(&buf2, sl->value);
 
   if(dia_input2(buf, &buf2, 30, 0)) return NULL;
 
