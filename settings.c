@@ -598,7 +598,7 @@ int set_expert_cb(dia_item_t di)
           fflush(stdout);
         }
 
-        system("PS1='\\w # ' /bin/bash 2>&1");
+        system("PS1='\\w # ' setctsid `showconsole` /bin/bash 2>&1");
 
         kbd_init(0);
         if(config.win) {
