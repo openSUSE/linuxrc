@@ -561,8 +561,6 @@ char *mod_get_params(module_t *mod)
     sprintf(buf, "Enter parameters for \"%s\".", mod->name);
   }
 
-  *buf2 = 0;
-
   if(mod->param) {
     strcat(buf, "\n\nExample: ");
     strcat(buf, mod->param);
