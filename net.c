@@ -689,6 +689,8 @@ int net_choose_device()
     }
 
     for(item_cnt = 0, hd = hd_cards; hd; hd = hd->next) {
+      char* annotation = 0;
+      hd_res_t *res;
       item_hds[item_cnt] = hd;
       if(hd->unix_dev_name) {
         item_devs[item_cnt] = strdup(hd->unix_dev_name);
@@ -703,7 +705,6 @@ int net_choose_device()
         int lcss = -1;
         int ccw = -1;
         hd_res_t* r;
-        char* annotation = 0;
         
         if(hd->detail && hd->detail->ccw.data)
           lcss = hd->detail->ccw.data->lcss;
@@ -721,24 +722,26 @@ int net_choose_device()
         else {
           strprintf(&annotation, "(%1x.%1x.%04x)", lcss >> 8, lcss & 0xf, ccw);
         }
-        
-        if(hd->unix_dev_name) {
-          strprintf(items + item_cnt++, "%*s : %s %s", -width, hd->unix_dev_name, hd->model,
-            annotation);
-        }
-        else {
-          strprintf(items + item_cnt++, "%s %s", hd->model, annotation);
-        }
-        free(annotation);
-      }
-#else
-      if(hd->unix_dev_name) {
-        strprintf(items + item_cnt++, "%*s : %s", -width, hd->unix_dev_name, hd->model);
-      }
-      else {
-        strprintf(items + item_cnt++, "%s", hd->model);
       }
 #endif
+      if(!annotation) {
+        for(res = hd->res; res; res = res->next) {
+          if(res->any.type == res_hwaddr) {
+            strprintf(&annotation, "(%s)", res->hwaddr.addr);
+            break;
+          }
+        }
+      }
+
+      if(hd->unix_dev_name) {
+        strprintf(items + item_cnt++, "%*s : %s %s", -width, hd->unix_dev_name, hd->model,
+          annotation);
+      }
+      else {
+        strprintf(items + item_cnt++, "%s %s", hd->model, annotation);
+      }
+      free(annotation);
+      annotation = 0;
     }
   }
 
@@ -751,7 +754,7 @@ int net_choose_device()
     choice = 1;
   }
   else {
-    choice = dia_list("Choose the network device.", 50, NULL, items, last_item, align_left);
+    choice = dia_list("Choose the network device.", 72, NULL, items, last_item, align_left);
     if(choice) last_item = choice;
   }
 
