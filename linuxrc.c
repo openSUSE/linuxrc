@@ -752,6 +752,8 @@ void lxrc_init()
 
   config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
 
+  config.debugshell = strdup("setctsid `showconsole` /bin/bash -l");
+
   config.update.map = calloc(1, MAX_UPDATES);
 
   config.zenconfig = strdup("settings.txt");

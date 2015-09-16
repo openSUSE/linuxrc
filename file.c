@@ -307,6 +307,7 @@ static struct {
   { key_vlanid,         "VLanID",         kf_cfg + kf_cmd                },
   { key_systemboot,     "SystemBoot",     kf_cfg + kf_cmd                },
   { key_sethostname,    "SetHostname",    kf_cfg + kf_cmd_early          },
+  { key_debugshell,     "DebugShell",     kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1719,6 +1720,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_sethostname:
         if(f->is.numeric) config.net.sethostname = f->nvalue;
+        break;
+
+      case key_debugshell:
+        str_copy(&config.debugshell, *f->value ? f->value : NULL);
         break;
 
       default:
