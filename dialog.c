@@ -1520,7 +1520,10 @@ void dia_handle_ctrlc (void)
           fflush(stdout);
         }
 
-        system("exec bash -l 2>&1");
+        char *cmd = NULL;
+        strprintf(&cmd, "exec %s 2>&1", config.debugshell ?: "/bin/sh");
+        system(cmd);
+        free(cmd);
 
         kbd_init(0);
         if(config.win) {

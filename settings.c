@@ -598,7 +598,10 @@ int set_expert_cb(dia_item_t di)
           fflush(stdout);
         }
 
-        system("PS1='\\w # ' /bin/bash 2>&1");
+        char *cmd = NULL;
+        strprintf(&cmd, "PS1='\\w # ' %s 2>&1", config.debugshell ?: "/bin/sh");
+        system(cmd);
+        free(cmd);
 
         kbd_init(0);
         if(config.win) {

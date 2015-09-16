@@ -470,6 +470,7 @@ typedef struct {
   char *change_config;		/* for 'change config option' input field */
   char *run_command;		/* for 'run command' input field */
   slist_t *defaultrepo;		/* default repo locations */
+  char *debugshell;		/* command to run if we want to start a shell for debugging */
 
   struct {
     unsigned md5:1;		/* support md5 */
