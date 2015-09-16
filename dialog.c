@@ -1520,7 +1520,7 @@ void dia_handle_ctrlc (void)
           fflush(stdout);
         }
 
-        system("exec bash -l 2>&1");
+        system("exec setctsid `showconsole` /bin/bash -l 2>&1");
 
         kbd_init(0);
         if(config.win) {
