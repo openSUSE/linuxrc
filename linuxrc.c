@@ -886,10 +886,16 @@ void lxrc_init()
 
   util_redirect_kmsg();
 
+  LXRC_WAIT
+
   util_setup_udevrules();
 
   if(!config.udev_mods) {
-    system("cp /usr/lib/udev/80-drivers.rules.no_modprobe /etc/udev/rules.d/80-drivers.rules");
+    mkdir("/run/udev", 0755);
+    mkdir("/run/udev/rules.d", 0755);
+
+    system("cp /usr/lib/udev/80-drivers.rules.no_modprobe /run/udev/rules.d/80-drivers.rules");
+
     LXRC_WAIT
   }
 
