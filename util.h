@@ -144,6 +144,7 @@ hd_t *fix_device_names(hd_t *hd);
 int fcoe_check(void);
 int iscsi_check(void);
 
+char *interface_to_mac(char *device);
 char *mac_to_interface(char *mac, int *max_offset);
 
 void util_run_script(char *name);

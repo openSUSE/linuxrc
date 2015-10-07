@@ -4440,7 +4440,32 @@ int iscsi_check()
 
 
 /*
- * Interal function, use mac_to_interface().
+ * Get mac address from network interface name.
+ *
+ * return value must be freed
+ */
+char *interface_to_mac(char *device)
+{
+  char *buf = NULL;
+
+  if(!device) return NULL;
+
+  strprintf(&buf, "/sys/class/net/%s/address", device);
+
+  char *addr = util_get_attr(buf);
+
+  if(!strcmp(addr, "00:00:00:00:00:00")) *addr = 0;
+
+  if(config.debug) fprintf(stderr, "if_to_mac: %s = %s\n", device, addr);
+
+  str_copy(&buf, addr ?: NULL);
+
+  return buf;
+}
+
+
+/*
+ * Internal function, use mac_to_interface().
  *
  * return value must be freed
  */

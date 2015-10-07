@@ -76,6 +76,7 @@ static char *inet2str(inet_t *inet, int type);
 static int net_get_ip(char *text, char **ip, int with_prefix);
 static int net_check_ip(char *buf, int multi, int with_prefix);
 static int compare_subnet(char *ip1, char *ip2, unsigned prefix);
+static void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device);
 
 
 /*
@@ -251,6 +252,9 @@ int net_static()
   }
 
   config.ifcfg.manual->dhcp = 0;
+
+  get_and_copy_ifcfg_flags(config.ifcfg.manual, config.ifcfg.manual->device);
+
   ifcfg_write(config.ifcfg.manual->device, config.ifcfg.manual, 0);
 
   net_wicked_up(config.ifcfg.manual->device);
@@ -1123,6 +1127,8 @@ int net_dhcp()
     config.ifcfg.manual->device = s;
   }
 
+  get_and_copy_ifcfg_flags(config.ifcfg.manual, config.ifcfg.manual->device);
+
   net_wicked_dhcp();
 
   return config.net.dhcp_active ? 0 : 1;
@@ -1179,6 +1185,8 @@ void net_wicked_dhcp()
   ifcfg->dhcp = 1;
 
   strprintf(&ifcfg->type, "dhcp%s", type);
+
+  ifcfg->flags = config.ifcfg.manual->flags;
 
   ifcfg_write(device, ifcfg, 0);
 
@@ -2968,5 +2976,58 @@ int compare_subnet(char *ip1, char *ip2, unsigned prefix)
   }
 
   return ok;
+}
+
+
+/*
+ * If there's an 'ifcfg' boot option matching 'device', copy any flags
+ * specified there.
+ *
+ * This is used to supply config.ifcfg.manual with ifcfg flags.
+ */
+void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device)
+{
+  ifcfg_t *tmp;
+
+  if(!ifcfg || !device) return;
+
+  ifcfg->flags = slist_free(ifcfg->flags);
+
+  if(config.debug >= 2) fprintf(stderr, "ifcfg flags, before(%s):\n%s", device, ifcfg_print(ifcfg));
+
+  // 1st try, direct match
+  for(tmp = config.ifcfg.all; tmp; tmp = tmp->next) {
+    if(tmp->pattern || !tmp->device) continue;
+    if(config.debug >= 2) fprintf(stderr, "direct:\n%s", ifcfg_print(tmp));
+    if(!strcmp(tmp->device, device)) break;
+  }
+
+  // 2nd try, tmp->device contains pattern or mac addr
+  if(!tmp) {
+    char *mac = interface_to_mac(device);
+
+    for(tmp = config.ifcfg.all; tmp; tmp = tmp->next) {
+      if(!tmp->pattern || !tmp->device) continue;
+      if(config.debug >= 2) fprintf(stderr, "pattern:\n%s", ifcfg_print(tmp));
+      if(match_netdevice(device, mac, tmp->device)) break;
+    }
+
+    free(mac);
+  }
+
+  // match, copy flags
+  if(tmp) {
+    slist_t *sl;
+
+    for(sl = tmp->flags; sl; sl = sl->next) {
+      slist_t *sl1 = slist_append_str(&ifcfg->flags, sl->key);
+      str_copy(&sl1->value, sl->value);
+    }
+
+    if(config.debug >= 2) fprintf(stderr, "ifcfg flags, matched:\n%s", ifcfg_print(ifcfg));
+  }
+  else {
+    if(config.debug >= 2) fprintf(stderr, "ifcfg flags, no match\n");
+  }
 }
 
