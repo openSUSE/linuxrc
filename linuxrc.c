@@ -806,6 +806,7 @@ void lxrc_init()
 
   config.ifcfg.manual = calloc(1, sizeof *config.ifcfg.manual);
   config.ifcfg.manual->dhcp = 1;
+  config.net.sethostname = 1;
 
   // config.nanny = 0;	/* see config.nanny_set */
 
