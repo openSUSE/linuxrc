@@ -98,7 +98,7 @@ void url_read(url_data_t *url_data)
   curl_easy_setopt(c_handle, CURLOPT_FOLLOWLOCATION, 1);
   curl_easy_setopt(c_handle, CURLOPT_MAXREDIRS, 10);
   curl_easy_setopt(c_handle, CURLOPT_SSL_VERIFYPEER, config.sslcerts ? 1 : 0);
-  // curl_easy_setopt(c_handle, CURLOPT_SSL_VERIFYHOST, 2);
+  curl_easy_setopt(c_handle, CURLOPT_SSL_VERIFYHOST, config.sslcerts ? 2 : 0);
 
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSFUNCTION, url_progress_cb);
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSDATA, url_data);
