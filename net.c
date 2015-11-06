@@ -816,9 +816,6 @@ int net_choose_device()
 
     if(item_hds && item_hds[choice - 1]) {
       hd = item_hds[choice - 1];
-//      if(util_is_wlan(config.ifcfg.manual->device)) {
-//        if(wlan_setup()) choice = -1;
-//      }
     }
   }
 
