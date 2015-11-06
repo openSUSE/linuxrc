@@ -1428,7 +1428,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
       str_copy(&url->used.model, hd->model);
     }
 
-    url->is.wlan = hd->is.wlan;
+    if(hd->is.wlan) util_set_wlan(hd->unix_dev_name);
 
     if((ok = url_mount_disk(url, dir, test_func))) {
       found++;
@@ -2030,7 +2030,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
       str_copy(&url->used.hwaddr, hwaddr);
       str_copy(&url->used.model, hd->model);
 
-      url->is.wlan = hd->is.wlan;
+      if(hd->is.wlan) util_set_wlan(hd->unix_dev_name);
 
       url_setup_device(url);
 
@@ -2506,7 +2506,7 @@ int url_setup_interface(url_t *url)
 
   fprintf(stderr, "interface setup: %s\n", config.ifcfg.manual->device);
 
-  if(url->is.wlan && wlan_setup()) return 0;
+//  if(url->is.wlan && wlan_setup()) return 0;
 
   if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
 

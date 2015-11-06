@@ -99,9 +99,8 @@ typedef enum {
   di_osa_qdio,
 
   di_wlan_open,
-  di_wlan_wep_o,
-  di_wlan_wep_r,
-  di_wlan_wpa,
+  di_wlan_wpa_psk,
+  di_wlan_wpa_peap,
 
 } dia_item_t;
 

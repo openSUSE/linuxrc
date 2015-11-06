@@ -162,7 +162,7 @@ int net_config()
       !config.ifcfg.manual->ptp
     ) {
       sprintf(buf, "Automatic configuration via %s?", "DHCP");
-      rc = dia_yesno(buf, NO);
+      rc = dia_yesno(buf, YES);
     }
     else {
       rc = NO;
@@ -255,7 +255,9 @@ int net_static()
 
   get_and_copy_ifcfg_flags(config.ifcfg.manual, config.ifcfg.manual->device);
 
-  ifcfg_write(config.ifcfg.manual->device, config.ifcfg.manual, 0);
+  if(!ifcfg_write(config.ifcfg.manual->device, config.ifcfg.manual, 0)) {
+    return 1;
+  }
 
   net_wicked_up(config.ifcfg.manual->device);
 
@@ -749,6 +751,9 @@ int net_choose_device()
     }
   }
 
+  // only this should be used rather than all the hd_list() calls above...
+  update_device_list(0);
+
   if(item_cnt == 0) {
     dia_message("No network device found.\n"
                 "Load a network module first.",
@@ -811,9 +816,9 @@ int net_choose_device()
 
     if(item_hds && item_hds[choice - 1]) {
       hd = item_hds[choice - 1];
-      if(hd->is.wlan) {
-        if(wlan_setup()) choice = -1;
-      }
+//      if(util_is_wlan(config.ifcfg.manual->device)) {
+//        if(wlan_setup()) choice = -1;
+//      }
     }
   }
 
@@ -1151,7 +1156,7 @@ void net_wicked_dhcp()
 {
   char file[256], *buf = NULL;
   window_t win;
-  int got_ip = 0;
+  int got_ip = 0, cfg_ok;
   ifcfg_t *ifcfg = NULL;
   char *device = config.ifcfg.manual->device;
   char *type;
@@ -1170,6 +1175,21 @@ void net_wicked_dhcp()
     if(!strcmp(config.ifcfg.manual->type, "dhcp6")) type = "6";
   }
 
+  ifcfg = calloc(1, sizeof *ifcfg);
+  ifcfg->dhcp = 1;
+
+  strprintf(&ifcfg->type, "dhcp%s", type);
+
+  ifcfg->flags = config.ifcfg.manual->flags;
+
+  cfg_ok = ifcfg_write(device, ifcfg, 0);
+
+  free(ifcfg->type);
+  free(ifcfg);
+  ifcfg = NULL;
+
+  if(!cfg_ok) return;
+
   strprintf(&buf, "Sending DHCP%s request to %s...", type, device);
   fprintf(stderr, "%s\n", buf);
   if(config.win) {
@@ -1180,19 +1200,6 @@ void net_wicked_dhcp()
     fflush(stdout);
   }
   str_copy(&buf, NULL);
-
-  ifcfg = calloc(1, sizeof *ifcfg);
-  ifcfg->dhcp = 1;
-
-  strprintf(&ifcfg->type, "dhcp%s", type);
-
-  ifcfg->flags = config.ifcfg.manual->flags;
-
-  ifcfg_write(device, ifcfg, 0);
-
-  free(ifcfg->type);
-  free(ifcfg);
-  ifcfg = NULL;
 
   net_apply_ethtool(device, NULL);
 
@@ -1723,32 +1730,35 @@ int wlan_setup()
   dia_item_t di;
   dia_item_t items[] = {
     di_wlan_open,
-    di_wlan_wep_o,
-    di_wlan_wep_r,
-    di_wlan_wpa,
+    di_wlan_wpa_psk,
+    di_wlan_wpa_peap,
     di_none
   };
+
+  if(config.manual || !config.net.wlan.essid) {
+    if(dia_input2("ESSID (Network Name)", &config.net.wlan.essid, 30, 0)) {
+      return 1;
+    }
+  }
 
   switch(config.net.wlan.auth) {
     case wa_open:
       di = di_wlan_open;
       break;
 
-    case wa_wep_open:
-      di = di_wlan_wep_o;
+    case wa_wpa_psk:
+      di = di_wlan_wpa_psk;
       break;
 
-    case wa_wep_restricted:
-      di = di_wlan_wep_r;
-      break;
-
-    case wa_wpa:
-      di = di_wlan_wpa;
+    case wa_wpa_peap:
+      di = di_wlan_wpa_peap;
       break;
 
     default:
       di = di_none;
   }
+
+  if(di_wlan_auth_last == di_none) di_wlan_auth_last = di;
 
   if(config.manual || di == di_none) {
     di = dia_menu2("WLAN Authentication", 40, wlan_auth_cb, items, di_wlan_auth_last);
@@ -1771,215 +1781,50 @@ int wlan_setup()
  */
 int wlan_auth_cb(dia_item_t di)
 {
-  int rc = 1, i, j;
-  char *buf = NULL, *key = NULL, *s;
-  int wep_mode = 0;
-  static char *wep_key_items[] = {
-    "ASCII", "HEX", "Passphrase - 40 bit", "Passphrase - 104 bit",
-    NULL
-  };
-  static char *wpa_key_items[] = {
-    "HEX", "Passphrase",
-    NULL
-  };
-  FILE *f;
+  int rc = 1;
 
   di_wlan_auth_last = di;
-
-  util_killall("wpa_supplicant", 15);
-  usleep(100000);
-  util_killall("wpa_supplicant", 9);
 
   switch(di) {
     case di_wlan_open:
       config.net.wlan.auth = wa_open;
 
-      if(config.manual || !config.net.wlan.essid) {
-        if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
-         rc = -1;
+      rc = 0;
+      break;
+
+    case di_wlan_wpa_psk:
+      config.net.wlan.auth = wa_wpa_psk;
+
+      if(config.manual || !config.net.wlan.wpa_psk) {
+        if(dia_input2("WPA Key", &config.net.wlan.wpa_psk, 30, 0)) {
+          rc = -1;
+          break;
+        }
+
+        if(!config.net.wlan.wpa_psk || strlen(config.net.wlan.wpa_psk) < 8) {
+          dia_message("Key is too short (at least 8 characters).", MSGTYPE_ERROR);
+          rc = -1;
           break;
         }
       }
-
-      strprintf(&buf, "iwconfig %s essid %s'%s'",
-        config.net.device,
-        config.net.wlan.essid ? "-- " : "",
-        config.net.wlan.essid ?: "any"
-      );
-      fprintf(stderr, "%s\n", buf);
-      system_log(buf);
-
-      strprintf(&buf, "iwconfig %s key off", config.net.device);
-      fprintf(stderr, "%s\n", buf);
-      system_log(buf);
 
       rc = 0;
       break;
 
-    case di_wlan_wep_o:
-      wep_mode = 1;
+    case di_wlan_wpa_peap:
+      config.net.wlan.auth = wa_wpa_peap;
 
-    case di_wlan_wep_r:
-      config.net.wlan.auth = wep_mode ? wa_wep_open : wa_wep_restricted;
-
-      if(config.manual || !config.net.wlan.essid) {
-        if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
-          rc = -1;
-         break;
-        }
-      }
-
-      if(config.manual || !config.net.wlan.key) {
-        i = dia_list("WEP Key Type", 30, NULL, wep_key_items, config.net.wlan.key_type + 1, align_left) - 1;
-
-        if(i < 0) {
+      if(config.manual || !config.net.wlan.wpa_identity) {
+        if(dia_input2("WPA Identity", &config.net.wlan.wpa_identity, 30, 0)) {
           rc = -1;
           break;
         }
 
-        switch(i) {
-          case 0:
-            config.net.wlan.key_type = kt_ascii;
-            config.net.wlan.key_len = 0;
-            break;
-
-          case 1:
-            config.net.wlan.key_type = kt_hex;
-            config.net.wlan.key_len = 0;
-            break;
-
-          case 2:
-            config.net.wlan.key_type = kt_pass;
-            config.net.wlan.key_len = 40;
-            break;
-
-          case 3:
-            config.net.wlan.key_type = kt_pass;
-            config.net.wlan.key_len = 104;
-            break;
-        }
-
-        if(dia_input2("WEP Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
+        if(dia_input2("WPA Password", &config.net.wlan.wpa_password, 30, 0)) {
           rc = -1;
           break;
         }
       }
-
-      switch(config.net.wlan.key_type) {
-        case kt_ascii:
-          strprintf(&key, "s:%s", config.net.wlan.key);
-          break;
-
-        case kt_hex:
-          str_copy(&key, config.net.wlan.key);
-          break;
-
-        case kt_pass:
-          strprintf(&buf, "lwepgen%s '%s'",
-            config.net.wlan.key_len == 104 ? " -s" : "",
-            config.net.wlan.key
-          );
-          f = popen(buf, "r");
-          if(f) {
-            fgets(key = calloc(1, 256), 256, f);
-            if((s = strchr(key, '\n'))) *s = 0;
-            pclose(f);
-            if(!*key) rc = -1;
-          }
-          else {
-            rc = -1;
-          }
-          break;
-
-        default:
-          rc = -1;
-          break;
-      }
-
-      if(rc == -1) break;
-
-      strprintf(&buf, "iwconfig %s essid %s'%s'",
-        config.net.device,
-        config.net.wlan.essid ? "-- " : "",
-        config.net.wlan.essid ?: "any"
-      );
-      fprintf(stderr, "%s\n", buf);
-      system_log(buf);
-
-      strprintf(&buf, "iwconfig %s key %s '%s'",
-        config.net.device,
-        config.net.wlan.auth == wa_wep_open ? "open" : "restricted",
-        key
-      );
-      fprintf(stderr, "%s\n", buf);
-      system_log(buf);
-
-      rc = 0;
-      break;
-
-    case di_wlan_wpa:
-      if(config.manual || !config.net.wlan.essid) {
-        if(dia_input2("ESSID", &config.net.wlan.essid, 30, 0)) {
-          rc = -1;
-          break;
-        }
-      }
-
-      if(config.manual || !config.net.wlan.key) {
-        j = config.net.wlan.key_type == kt_pass ? 2 : 1;
-
-        i = dia_list("WPA Key Type", 30, NULL, wpa_key_items, j, align_left);
-
-        if(i < 1) {
-          rc = -1;
-          break;
-        }
-
-        config.net.wlan.key_type = i == 1 ? kt_hex : kt_pass;
-        config.net.wlan.key_len = 0;
-
-        if(dia_input2("WPA Key", &config.net.wlan.key, 30, 0) || !config.net.wlan.key) {
-          rc = -1;
-          break;
-        }
-
-        if(config.net.wlan.key_type == kt_pass && strlen(config.net.wlan.key) < 8) {
-          dia_message("Password is too short (must have at least 8 characters).", MSGTYPE_ERROR);
-          rc = -1;
-          break;
-        }
-      }
-
-      if(config.net.wlan.key_type == kt_pass) {
-        strprintf(&key, "\"%s\"", config.net.wlan.key);
-      }
-      else {
-        str_copy(&key, config.net.wlan.key);
-      }
-
-      f = fopen("/tmp/wpa_supplicant.conf", "w");
-      if(!f) {
-        rc = -1;
-        break;
-      }
-      fprintf(f,
-        "ap_scan=1\n"
-        "network={\n"
-        "  key_mgmt=WPA-PSK\n"
-        "  scan_ssid=1\n"
-        "  ssid=\"%s\"\n"
-        "  psk=%s\n"
-        "}\n",
-        config.net.wlan.essid,
-        key
-      );
-      fclose(f);
-
-      strprintf(&buf, "wpa_supplicant -B -Dwext -i%s -c/tmp/wpa_supplicant.conf",
-        config.net.device
-      );
-      fprintf(stderr, "%s\n", buf);
-      system_log(buf);
 
       rc = 0;
       break;
@@ -1987,9 +1832,6 @@ int wlan_auth_cb(dia_item_t di)
     default:
       break;
   }
-
-  free(buf);
-  free(key);
 
   return rc;
 }
@@ -2179,7 +2021,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   char *ns = NULL;	// allocated
   char *domain = NULL;	// allocated
   char *vlan = NULL;	// allocated
-  int is_dhcp = 0;
+  int is_dhcp = 0, ok = 0;
   slist_t *sl, *sl2;
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
@@ -2196,7 +2038,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
     sleep(60);
 
-    return 0;
+    return ok;
   }
 
   fprintf(stderr, "ifcfg_write: device = %s, ifcfg = %s\n", device, ifcfg ? ifcfg->device : "");
@@ -2319,9 +2161,41 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   }
 
   // set hostname, if requested
-  if(config.net.sethostname && !slist_getentry(sl_ifcfg, "DHCLIENT_SET_HOSTNAME")) {
-    sl2 = slist_append_str(&sl_ifcfg, "DHCLIENT_SET_HOSTNAME");
-    str_copy(&sl2->value, "yes");
+  if(config.net.sethostname) {
+    slist_setentry(&sl_ifcfg, "DHCLIENT_SET_HOSTNAME", "yes", 0);
+  }
+
+  // add wlan options, if necessary
+  if(util_is_wlan(device)) {
+    // ask for missing wifi parameters; abort of user pressed ESC
+    if(wlan_setup()) goto err;
+
+    if(config.net.wlan.essid) {
+      slist_setentry(&sl_ifcfg, "WIRELESS_ESSID", config.net.wlan.essid, 0);
+    }
+
+    switch(config.net.wlan.auth) {
+      case wa_open:
+        slist_setentry(&sl_ifcfg, "WIRELESS_AUTH_MODE", "open", 0);
+        break;
+
+      case wa_wpa_psk:
+        slist_setentry(&sl_ifcfg, "WIRELESS_AUTH_MODE", "psk", 0);
+        slist_setentry(&sl_ifcfg, "WIRELESS_WPA_PSK", config.net.wlan.wpa_psk, 0);
+        break;
+
+      case wa_wpa_peap:
+        slist_setentry(&sl_ifcfg, "WIRELESS_AUTH_MODE", "eap", 0);
+        slist_setentry(&sl_ifcfg, "WIRELESS_EAP_MODE", "PEAP", 0);
+        // seems not to be necessary
+        // slist_setentry(&sl_ifcfg, "WIRELESS_EAP_AUTH", "mschapv2", 0);
+        slist_setentry(&sl_ifcfg, "WIRELESS_WPA_IDENTITY", config.net.wlan.wpa_identity, 0);
+        slist_setentry(&sl_ifcfg, "WIRELESS_WPA_PASSWORD", config.net.wlan.wpa_password, 0);
+        break;
+
+      default:
+        break;
+    }
   }
 
 #if defined(__s390__) || defined(__s390x__)
@@ -2459,6 +2333,10 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
     }
   }
 
+  ok = 1;
+
+err:
+
   str_copy(&gw, NULL);
   str_copy(&ns, NULL);
   str_copy(&domain, NULL);
@@ -2469,7 +2347,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_free(sl_ifcfg);
   slist_free(sl_ifroute);
 
-  return 1;
+  return ok;
 }
 
 

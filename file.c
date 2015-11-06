@@ -246,13 +246,13 @@ static struct {
   { key_ethtool,        "ethtool",        kf_cfg + kf_cmd_early          },
   { key_listen,         "listen",         kf_cfg + kf_cmd                },
   { key_zombies,        "Zombies",        kf_cfg + kf_cmd                },
-  { key_forceip,        "forceip",        kf_cfg + kf_cmd                },
-  { key_wlan_essid,     "WlanESSID",      kf_cfg + kf_cmd                },
-  { key_wlan_auth,      "WlanAuth",       kf_cfg + kf_cmd                },
-  { key_wlan_key_ascii, "WlanKeyAscii",   kf_cfg + kf_cmd                },
-  { key_wlan_key_hex,   "WlanKeyHex",     kf_cfg + kf_cmd                },
-  { key_wlan_key_pass,  "WlanKeyPass",    kf_cfg + kf_cmd                },
-  { key_wlan_key_len,   "WlanKeyLen",     kf_cfg + kf_cmd                },
+  { key_wlan_essid,     "WlanESSID",      kf_cfg + kf_cmd_early          },
+  { key_wlan_essid,     "ESSID",          kf_cfg + kf_cmd_early          },
+  { key_wlan_auth,      "WlanAuth",       kf_cfg + kf_cmd_early          },
+  { key_wlan_wpa_psk,   "WPAPSK",         kf_cfg + kf_cmd_early          },
+  { key_wlan_wpa_pass,  "WPAPassword",    kf_cfg + kf_cmd_early          },
+  { key_wlan_wpa_id,    "WPAIdentity",    kf_cfg + kf_cmd_early          },
+  { key_wlan_device,    "WlanDevice",     kf_cfg + kf_cmd_early          },
   { key_netcardname,    "NetCardName",    kf_none                        },
   { key_ibft_hwaddr,    "iSCSI_INITIATOR_HWADDR",   kf_ibft              },
   { key_ibft_ipaddr,    "iSCSI_INITIATOR_IPADDR",   kf_ibft              },
@@ -359,10 +359,9 @@ static struct {
   { "lcs",	 di_osa_lcs	    },
 #endif
   { "open",      wa_open            },
-  { "wep",       wa_wep_open        },
-  { "wep_o",     wa_wep_open        },
-  { "wep_r",     wa_wep_restricted  },
-  { "wpa",       wa_wpa             },
+  { "psk",       wa_wpa_psk         },
+  { "wpa",       wa_wpa_psk         },
+  { "peap",      wa_wpa_peap        },
 };
 
 
@@ -1418,35 +1417,34 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.mediacheck = f->nvalue;
         break;
 
-      case key_forceip:
-        if(f->is.numeric) config.forceip = f->nvalue;
-        break;
-
       case key_wlan_essid:
         str_copy(&config.net.wlan.essid, *f->value ? f->value : NULL);
         break;
 
-      case key_wlan_key_ascii:
-        str_copy(&config.net.wlan.key, *f->value ? f->value : NULL);
-        config.net.wlan.key_type = kt_ascii;
+      case key_wlan_wpa_psk:
+        str_copy(&config.net.wlan.wpa_psk, *f->value ? f->value : NULL);
+        config.net.wlan.auth = wa_wpa_psk;
         break;
 
-      case key_wlan_key_hex:
-        str_copy(&config.net.wlan.key, *f->value ? f->value : NULL);
-        config.net.wlan.key_type = kt_hex;
+      case key_wlan_wpa_id:
+        str_copy(&config.net.wlan.wpa_identity, *f->value ? f->value : NULL);
+        config.net.wlan.auth = wa_wpa_peap;
         break;
 
-      case key_wlan_key_pass:
-        str_copy(&config.net.wlan.key, *f->value ? f->value : NULL);
-        config.net.wlan.key_type = kt_pass;
-        break;
-
-      case key_wlan_key_len:
-        if(f->is.numeric) config.net.wlan.key_len = f->nvalue;
+      case key_wlan_wpa_pass:
+        str_copy(&config.net.wlan.wpa_password, *f->value ? f->value : NULL);
+        config.net.wlan.auth = wa_wpa_peap;
         break;
 
       case key_wlan_auth:
         if(f->is.numeric) config.net.wlan.auth = f->nvalue;
+        break;
+
+      case key_wlan_device:
+        if(*f->value) {
+          slist_append_str(&config.net.wlan.devices, f->value);
+          config.net.wlan.devices_fixed = 1;
+        }
         break;
 
       case key_net_retry:

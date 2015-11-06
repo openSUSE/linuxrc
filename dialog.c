@@ -116,9 +116,8 @@ struct {
   { di_osa_qdio,	 "QDIO"             },
 
   { di_wlan_open,        "No Authentication"   },
-  { di_wlan_wep_o,       "WEP - Open"          },
-  { di_wlan_wep_r,       "WEP - Shared Key"    },
-  { di_wlan_wpa,         "WPA-PSK"             },
+  { di_wlan_wpa_psk,     "WPA-PSK"             },
+  { di_wlan_wpa_peap,    "WPA-PEAP"            },
 
 };
 
