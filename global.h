@@ -225,13 +225,8 @@ typedef enum {
 
 
 typedef enum {
-  wa_none, wa_open, wa_wep_open, wa_wep_restricted, wa_wpa
+  wa_none, wa_open, wa_wpa_psk, wa_wpa_peap
 } wlan_auth_t;
-
-
-typedef enum {
-  kt_ascii, kt_hex, kt_pass
-} key_type_t;
 
 
 typedef struct {
@@ -367,7 +362,6 @@ typedef struct {
   unsigned startshell:1;	/* start shell before & after yast */
   unsigned listen:1;		/* listen on port */
   unsigned zombies:1;		/* keep zombies around */
-  unsigned forceip:1;		/* do not check for duplicate IP address */
   unsigned mediacheck:1;	/* check media */
   unsigned installfilesread:1;	/* already got install files */
   unsigned zen;			/* zenworks mode */
@@ -626,11 +620,13 @@ typedef struct {
       char *module;		/* cifs/smb kernel module */
     } cifs;
     struct {
-      wlan_auth_t auth;		/* open, wep, wpa */
+      wlan_auth_t auth;		/* open, wpa_psk, wpa_peap */
       char *essid;		/* ESSID */
-      char *key;		/* wep/wpa key */
-      key_type_t key_type;	/* ascii, hex, passphrase */
-      int key_len;		/* key length in bits (40/104 for wep) */
+      char *wpa_psk;		/* wpa pre-shared key */
+      char *wpa_identity;	/* wpa peap identity */
+      char *wpa_password;	/* wpa peap password */
+      slist_t *devices;		/* list of wlan interfaces */
+      unsigned devices_fixed:1;	/* device list updated only via WlanDevices config option (for debugging) */
     } wlan;
   } net;
 

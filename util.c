@@ -1358,8 +1358,18 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
   }
 
+  if(config.net.wlan.devices) {
+    sprintf(buf, "wlan interfaces%s:", config.net.wlan.devices_fixed ? " (fixed)" : "");
+    slist_append_str(&sl0, buf);
+    for(sl = config.net.wlan.devices; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.net.wlan.auth) {
-    static char *wlan_a[] = { "", "open", "wep open", "wep restricted", "wpa" };
+    static char *wlan_a[] = { "", "open", "wpa psk", "wpa eap" };
     sprintf(buf, "wlan auth = %d (%s)",
       config.net.wlan.auth,
       wlan_a[config.net.wlan.auth < sizeof wlan_a / sizeof *wlan_a ? config.net.wlan.auth : 0]
@@ -1372,14 +1382,18 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
   }
 
-  if(config.net.wlan.key) {
-    sprintf(buf, "wlan key = \"%s\", type %d",
-      config.net.wlan.key,
-      config.net.wlan.key_type
-    );
-    if(config.net.wlan.key_len) {
-      sprintf(buf + strlen(buf), ", len %d)", config.net.wlan.key_len);
-    }
+  if(config.net.wlan.wpa_psk) {
+    sprintf(buf, "wlan psk = \"%s\"", config.net.wlan.wpa_psk);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.net.wlan.wpa_identity) {
+    sprintf(buf, "wlan eap id = \"%s\"", config.net.wlan.wpa_identity);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.net.wlan.wpa_password) {
+    sprintf(buf, "wlan eap pass = \"%s\"", config.net.wlan.wpa_password);
     slist_append_str(&sl0, buf);
   }
 
@@ -2168,7 +2182,7 @@ slist_t *slist_append(slist_t **sl0, slist_t *sl)
 }
 
 
-slist_t *slist_append_str(slist_t **sl0, char *str)  
+slist_t *slist_append_str(slist_t **sl0, char *str)
 {
   slist_t *sl;
 
@@ -2183,6 +2197,31 @@ slist_t *slist_add(slist_t **sl0, slist_t *sl)
 {
   sl->next = *sl0;
   return *sl0 = sl;
+}
+
+
+/*
+ * Append key - value pair to list.
+ *
+ * If replace is 0, it will not update an existing entry (like setenv()).
+ */
+slist_t *slist_setentry(slist_t **sl0, char *key, char *value, int replace)
+{
+  slist_t *sl;
+
+  sl = slist_getentry(*sl0, key);
+
+  if(sl) {
+    if(!replace) return sl;
+  }
+  else {
+    sl = slist_append(sl0, slist_new());
+    str_copy(&sl->key, key);
+  }
+
+  str_copy(&sl->value, value);
+
+  return sl;
 }
 
 
@@ -3860,6 +3899,9 @@ void update_device_list(int force)
 {
   static time_t last_time;
   struct stat sbuf;
+  hd_t *hd, *net_list;
+
+  fprintf(stderr, "update_device_list(%d)\n", force);
 
   hd_hw_item_t hw_items[] = {
     hw_block, hw_network_ctrl, hw_network, 0
@@ -3887,6 +3929,13 @@ void update_device_list(int force)
   config.hd_data = calloc(1, sizeof *config.hd_data);
 
   fix_device_names(hd_list2(config.hd_data, hw_items, 1));
+
+  // update wlan interface list
+  net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
+  for(hd = net_list; hd; hd = hd->next) {
+    if(hd->is.wlan) util_set_wlan(hd->unix_dev_name);
+  }
+  hd_free_hd_list(net_list);
 }
 
 
@@ -5251,5 +5300,25 @@ void util_boot_system()
   // oops, we failed
 
   dia_message("Sorry, system didn't boot.", MSGTYPE_ERROR);
+}
+
+
+/*
+ * Remember that device is a wlan interface.
+ */
+void util_set_wlan(char *device)
+{
+  if(!device || config.net.wlan.devices_fixed) return;
+
+  slist_setentry(&config.net.wlan.devices, device, NULL, 0);
+}
+
+
+/*
+ * Return 1 if device is a wlan interface.
+ */
+int util_is_wlan(char *device)
+{
+  return slist_getentry(config.net.wlan.devices, device) ? 1 : 0;
 }
 
