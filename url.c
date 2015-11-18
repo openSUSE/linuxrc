@@ -87,7 +87,7 @@ void url_read(url_data_t *url_data)
   digest_init(url_data);
 
   c_handle = curl_easy_init();
-  // fprintf(stderr, "curl handle = %p\n", c_handle);
+  // log_info("curl handle = %p\n", c_handle);
 
   // curl_easy_setopt(c_handle, CURLOPT_VERBOSE, 1);
 
@@ -116,14 +116,14 @@ void url_read(url_data_t *url_data)
 
   url_data->err = curl_easy_setopt(c_handle, CURLOPT_URL, url_data->url->str);
 
-  if(config.debug >= 2) fprintf(stderr, "curl opt url = %d (%s)\n", url_data->err, url_data->curl_err_buf);
-  if(config.debug >= 2) fprintf(stderr, "url_read(%s)\n", url_data->url->str);
+  if(config.debug >= 2) log_debug("curl opt url = %d (%s)\n", url_data->err, url_data->curl_err_buf);
+  if(config.debug >= 2) log_debug("url_read(%s)\n", url_data->url->str);
 
   str_copy(&proxy_url, url_print(config.url.proxy, 1));
   if(proxy_url) {
-    if(config.debug >= 2) fprintf(stderr, "using proxy %s\n", proxy_url);
+    if(config.debug >= 2) log_debug("using proxy %s\n", proxy_url);
     curl_easy_setopt(c_handle, CURLOPT_PROXY, proxy_url);
-    if(config.debug >= 2) fprintf(stderr, "proxy: %s\n", proxy_url);
+    if(config.debug >= 2) log_debug("proxy: %s\n", proxy_url);
   }
 
   if(url_data->progress) url_data->progress(url_data, 0);
@@ -138,7 +138,7 @@ void url_read(url_data_t *url_data)
     url_write_cb(NULL, 0, 0, url_data);
   }
 
-  if(config.debug >= 2) fprintf(stderr, "curl perform = %d (%s)\n", url_data->err, url_data->curl_err_buf);
+  if(config.debug >= 2) log_debug("curl perform = %d (%s)\n", url_data->err, url_data->curl_err_buf);
 
   if(url_data->f) {
     i = url_data->pipe_fd >= 0 ? pclose(url_data->f) : fclose(url_data->f);
@@ -163,7 +163,7 @@ void url_read(url_data_t *url_data)
         url_data->err = 103;
         snprintf(url_data->err_buf, url_data->err_buf_len, "%s: command terminated", url_data->compressed);
       }
-      // fprintf(stderr, "close = %d\n", i);
+      // log_info("close = %d\n", i);
     }
     else {
       if(i && !url_data->err) url_data->err = 104;
@@ -589,42 +589,41 @@ url_t *url_set(char *str)
     }
   }
 
-  if(config.debug >= 1) {
-    fprintf(stderr, "url = %s\n", url->str);
-    if(config.debug >= 2) {
-      fprintf(stderr, "  scheme = %s (%d)", get_instmode_name(url->scheme), url->scheme);
-      if(url->server) fprintf(stderr, ", server = \"%s\"", url->server);
-      if(url->port) fprintf(stderr, ", port = %u", url->port);
-      if(url->path) fprintf(stderr, ", path = \"%s\"", url->path);
-      fprintf(stderr, "\n");
+  log_debug("url = %s\n", url->str);
 
-      if(url->user || url->password) {
-        i = 0;
-        if(url->user) fprintf(stderr, "%c user = \"%s\"", i++ ? ',' : ' ', url->user);
-        if(url->password) fprintf(stderr, "%c password = \"%s\"", i++ ? ',' : ' ', url->password);
-        fprintf(stderr, "\n");
-      }
+  if(config.debug >= 2) {
+    log_debug("  scheme = %s (%d)", get_instmode_name(url->scheme), url->scheme);
+    if(url->server) log_debug(", server = \"%s\"", url->server);
+    if(url->port) log_debug(", port = %u", url->port);
+    if(url->path) log_debug(", path = \"%s\"", url->path);
+    log_debug("\n");
 
-      if(url->share || url->domain || url->device) {
-        i = 0;
-        if(url->share) fprintf(stderr, "%c share = \"%s\"", i++ ? ',' : ' ', url->share);
-        if(url->domain) fprintf(stderr, "%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
-        if(url->device) fprintf(stderr, "%c device = \"%s\"", i++ ? ',' : ' ', url->device);
-        fprintf(stderr, "\n");
-      }
+    if(url->user || url->password) {
+      i = 0;
+      if(url->user) log_debug("%c user = \"%s\"", i++ ? ',' : ' ', url->user);
+      if(url->password) log_debug("%c password = \"%s\"", i++ ? ',' : ' ', url->password);
+      log_debug("\n");
+    }
 
-      fprintf(stderr,
-        "  network = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
-        url->is.network, url->is.mountable, url->is.file, url->search_all, url->quiet
-      );
+    if(url->share || url->domain || url->device) {
+      i = 0;
+      if(url->share) log_debug("%c share = \"%s\"", i++ ? ',' : ' ', url->share);
+      if(url->domain) log_debug("%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
+      if(url->device) log_debug("%c device = \"%s\"", i++ ? ',' : ' ', url->device);
+      log_debug("\n");
+    }
 
-      if(url->instsys) fprintf(stderr, "  instsys = %s\n", url->instsys);
+    log_debug(
+      "  network = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
+      url->is.network, url->is.mountable, url->is.file, url->search_all, url->quiet
+    );
 
-      if(url->query) {
-        fprintf(stderr, "  query:\n");
-        for(sl = url->query; sl; sl = sl->next) {
-          fprintf(stderr, "    %s = \"%s\"\n", sl->key, sl->value);
-        }
+    if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
+
+    if(url->query) {
+      log_debug("  query:\n");
+      for(sl = url->query; sl; sl = sl->next) {
+        log_debug("    %s = \"%s\"\n", sl->key, sl->value);
       }
     }
   }
@@ -650,7 +649,7 @@ char *url_print(url_t *url, int format)
   static char *buf = NULL, *s;
   int q = 0;
 
-  // printf("start buf = %p\n", buf);
+  // log_info("start buf = %p\n", buf);
   // LXRC_WAIT
 
   str_copy(&buf, NULL);
@@ -720,7 +719,7 @@ char *url_print(url_t *url, int format)
 
   if(format == 3 && *s == '/') s++;
 
-  // printf("end buf = %p\n", buf);
+  // log_info("end buf = %p\n", buf);
   // LXRC_WAIT
 
   return s;
@@ -736,7 +735,7 @@ char *url_print_zypp(url_t *url)
   char *path = NULL, *file = NULL;
   int q = 0, scheme;
 
-  // printf("start buf = %p\n", buf);
+  // log_info("start buf = %p\n", buf);
   // LXRC_WAIT
 
   str_copy(&buf, NULL);
@@ -839,7 +838,7 @@ char *url_print_zypp(url_t *url)
 
   str_copy(&path, NULL);
 
-  // printf("end buf = %p\n", buf);
+  // log_info("end buf = %p\n", buf);
   // LXRC_WAIT
 
   return buf;
@@ -914,7 +913,7 @@ url_data_t *url_data_new()
   if(!curl_init) {
     curl_init = 1;
     err = curl_global_init(CURL_GLOBAL_ALL);
-    if(err) fprintf(stderr, "curl init = %d\n", err);
+    if(err) log_info("curl init = %d\n", err);
   }
 
   return url_data;
@@ -1095,12 +1094,12 @@ void url_umount(url_t *url)
   // FIXME: this is wrong!
 
   if(url->mount && util_umount(url->mount)) {
-    if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->mount);
+    log_debug("%s: url umount failed\n", url->mount);
   }
   str_copy(&url->mount, NULL);
 
   if(url->tmp_mount && util_umount(url->tmp_mount)) {
-    if(config.debug) fprintf(stderr, "%s: url umount failed\n", url->tmp_mount);
+    log_debug("%s: url umount failed\n", url->tmp_mount);
   }
   str_copy(&url->tmp_mount, NULL);
 }
@@ -1129,8 +1128,8 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   char *path = NULL, *buf = NULL, *s;
   url_t *tmp_url;
 
-  fprintf(stderr, "url mount: trying %s\n", url_print(url, 0));
-  if(url->used.model) fprintf(stderr, "(%s)\n", url->used.model);
+  log_info("url mount: trying %s\n", url_print(url, 0));
+  if(url->used.model) log_info("(%s)\n", url->used.model);
 
   if(
     !url ||
@@ -1154,7 +1153,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
       ok = util_mount_ro(url->used.device, url->tmp_mount, url->file_list) ? 0 : 1;
 
       if(!ok) {
-        fprintf(stderr, "disk: %s: mount failed\n", url->used.device);
+        log_info("disk: %s: mount failed\n", url->used.device);
         str_copy(&url->tmp_mount, NULL);
 
         return ok;
@@ -1181,14 +1180,14 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
       case inst_nfs:
         str_copy(&url->mount, dir ?: new_mountpoint());
 
-        if(config.debug) fprintf(stderr, "[server = %s]\n", url->server ?: "");
+        log_debug("[server = %s]\n", url->server ?: "");
 
         if(!url->is.file) {
           err = net_mount_nfs(url->mount, url->server, url->path, url->port, options);
-          fprintf(stderr, "nfs: %s -> %s (%d)\n", url->path, url->mount, err);
+          log_info("nfs: %s -> %s (%d)\n", url->path, url->mount, err);
         }
         else {
-          fprintf(stderr, "nfs: %s: is file, mounting one level up\n", url->path);
+          log_info("nfs: %s: is file, mounting one level up\n", url->path);
         }
 
         if(err || url->is.file) {
@@ -1199,13 +1198,13 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             *s++ = 0;
             str_copy(&url->tmp_mount, new_mountpoint());
 
-            if(config.debug) fprintf(stderr, "[server = %s]\n", url->server ?: "");
+            log_debug("[server = %s]\n", url->server ?: "");
 
             err = net_mount_nfs(url->tmp_mount, url->server, buf, url->port, options);
-            fprintf(stderr, "nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
+            log_info("nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
     
             if(err) {
-              fprintf(stderr, "nfs: %s: mount failed\n", url->used.device);
+              log_info("nfs: %s: mount failed\n", url->used.device);
               str_copy(&url->tmp_mount, NULL);
             }
             else {
@@ -1230,10 +1229,10 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
           s = url->mount;
         }
 
-        if(config.debug) fprintf(stderr, "[server = %s]\n", url->server ?: "");
+        log_debug("[server = %s]\n", url->server ?: "");
 
         err = net_mount_cifs(s, url->server, url->share, url->user, url->password, url->domain, options);
-        fprintf(stderr, "cifs: %s -> %s (%d)\n", url->share, s, err);
+        log_info("cifs: %s -> %s (%d)\n", url->share, s, err);
         if(err) {
           str_copy(&url->tmp_mount, NULL);
           str_copy(&url->mount, NULL);
@@ -1255,7 +1254,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         break;
 
       default:
-        fprintf(stderr, "%s: unsupported scheme\n", get_instmode_name(url->scheme));
+        log_info("%s: unsupported scheme\n", get_instmode_name(url->scheme));
         err = 1;
         break;
     }
@@ -1311,11 +1310,11 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   }
 
   if(ok && test_func && !(ok = test_func(url))) {
-    fprintf(stderr, "disk: mount ok but test failed\n");
+    log_info("disk: mount ok but test failed\n");
   }
 
   if(!ok) {
-    fprintf(stderr, "url mount: %s failed\n", url_print(url, 0));
+    log_info("url mount: %s failed\n", url_print(url, 0));
 
     util_umount(url->mount);
     util_umount(url->tmp_mount);
@@ -1324,9 +1323,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->mount, NULL);
   }
   else {
-    fprintf(stderr, "url mount: %s", url_print(url, 0));
-    if(url->mount) fprintf(stderr, " @ %s", url->mount);
-    fprintf(stderr, "\n");
+    log_info("url mount: %s", url_print(url, 0));
+    if(url->mount) log_info(" @ %s", url->mount);
+    log_info("\n");
   }
 
   str_copy(&path, NULL);
@@ -1477,7 +1476,7 @@ int warn_signature_failed(char *file_name)
   char *buf = NULL;
 
   if(config.sig_failed && config.secure_always_fail) {
-    fprintf(stderr, "%s: file not signed or invalid signature\n", file_name);
+    log_info("%s: file not signed or invalid signature\n", file_name);
     return 1;
   }
 
@@ -1531,7 +1530,7 @@ int is_gpg_signed(char *file)
   FILE *f;
 
   if(util_check_exist(file) != 'r') {
-    if(config.debug) fprintf(stderr, "%s: gpg check = %d\n", file, err);
+    log_debug("%s: gpg check = %d\n", file, err);
 
     return err;
   }
@@ -1545,12 +1544,12 @@ int is_gpg_signed(char *file)
 
   if((f = popen(cmd, "r"))) {
     while(getline(&buf, &len, f) > 0) {
-      if(config.debug >= 2) fprintf(stderr, "%s", buf);
+      if(config.debug >= 2) log_debug("%s", buf);
       if(strncmp(buf, "gpg: Signature made", sizeof "gpg: Signature made" - 1)) is_sig = 1;
       if(strncmp(buf, "gpg: Good signature", sizeof "gpg: Good signature" - 1)) sig_ok = 1;
     }
     err = pclose(f) ? 1 : 0;
-    if(config.debug >= 2) fprintf(stderr, "gpg returned %s\n", err ? "an error" : "ok");
+    if(config.debug >= 2) log_debug("gpg returned %s\n", err ? "an error" : "ok");
   }
 
   strprintf(&buf, "%s.unpacked", file);
@@ -1572,10 +1571,10 @@ int is_gpg_signed(char *file)
   }
 
   if(err == 0 || err == 1) {
-    fprintf(stderr, "%s: gpg signature %s\n", file, err ? "failed" : "ok");
+    log_info("%s: gpg signature %s\n", file, err ? "failed" : "ok");
   }
 
-  if(config.debug) fprintf(stderr, "%s: gpg check = %d\n", file, err);
+  log_debug("%s: gpg check = %d\n", file, err);
 
   return err;
 }
@@ -1599,7 +1598,7 @@ int is_rpm_signed(char *file)
   FILE *f;
 
   if(util_check_exist(file) != 'r') {
-    if(config.debug) fprintf(stderr, "%s: rpm sig check = %d\n", file, err);
+    log_debug("%s: rpm sig check = %d\n", file, err);
 
     return err;
   }
@@ -1613,13 +1612,13 @@ int is_rpm_signed(char *file)
     while(getline(&buf, &len, f) > 0) {
       char *s = strrchr(buf, ':') ?: buf;
 
-      if(config.debug >= 2) fprintf(stderr, "%s", buf);
+      if(config.debug >= 2) log_debug("%s", buf);
 
       if(strcasestr(s, " pgp ") || strcasestr(s, " gpg ")) is_sig = 1;
       if(strstr(s, " pgp ") || strstr(s, " gpg ")) sig_ok = 1;
     }
     err = pclose(f) ? 1 : 0;
-    if(config.debug >= 2) fprintf(stderr, "rpmkeys returned %s\n", err ? "an error" : "ok");
+    if(config.debug >= 2) log_debug("rpmkeys returned %s\n", err ? "an error" : "ok");
   }
 
   str_copy(&cmd, NULL);
@@ -1635,10 +1634,10 @@ int is_rpm_signed(char *file)
   }
 
   if(err == 0 || err == 1) {
-    fprintf(stderr, "%s: rpm signature %s\n", file, err ? "failed" : "ok");
+    log_info("%s: rpm signature %s\n", file, err ? "failed" : "ok");
   }
 
-  if(config.debug) fprintf(stderr, "%s: rpm sig check = %d\n", file, err);
+  log_debug("%s: rpm sig check = %d\n", file, err);
 
   return err;
 }
@@ -1672,7 +1671,7 @@ int is_signed(char *file, int check)
     err = warn_signature_failed(file);
   }
 
-  if(config.debug) fprintf(stderr, "%s: sig check = %d\n", file, err);
+  log_debug("%s: sig check = %d\n", file, err);
 
   return err;
 }
@@ -1748,8 +1747,8 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   }
   strprintf(&dst_sig, "%s.asc", dst);
   strprintf(&buf,
-    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --ignore-valid-from --ignore-time-conflict --verify '%s' '%s' >/dev/null%s",
-    dst_sig, dst, config.debug < 2 ? " 2>&1" : ""
+    "gpg --homedir /root/.gnupg --batch --no-default-keyring --keyring /installkey.gpg --ignore-valid-from --ignore-time-conflict --verify '%s' '%s'",
+    dst_sig, dst
   );
 
   err = url_read_file_nosig(url, dir, src_sig, dst_sig, NULL, flags);
@@ -1758,17 +1757,17 @@ int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsi
   s = url_print2(url, src);
 
   if(!err) {
-    if(system(buf)) {
-      fprintf(stderr, "%s: signature check failed\n", s);
+    if(lxrc_run(buf)) {
+      log_info("%s: signature check failed\n", s);
       config.sig_failed = 2;
     }
     else {
-      fprintf(stderr, "%s: signature ok\n", s);
+      log_info("%s: signature ok\n", s);
       config.sig_failed = 0;
     }
   }
   else {
-    fprintf(stderr, "%s: no signature\n", s);
+    log_info("%s: no signature\n", s);
   }
 
   err = warn_signature_failed(s);
@@ -1822,7 +1821,7 @@ static int test_and_copy(url_t *url)
   );
   if(url->path[0] == '/' && url->path[1] == '/') str_copy(&url->path, url->path + 1);
 
-  if(config.debug >= 3) fprintf(stderr, "path: \"%s\" + \"%s\" = \"%s\"\n", old_path, tc_src, url->path);
+  if(config.debug >= 3) log_debug("path: \"%s\" + \"%s\" = \"%s\"\n", old_path, tc_src, url->path);
 
   str_copy(&buf, url_print(url, 1));
   url_data->url = url_set(buf);
@@ -1837,32 +1836,32 @@ static int test_and_copy(url_t *url)
   if((tc_flags & URL_FLAG_PROGRESS)) url_data->progress = url_progress;
   str_copy(&url_data->label, tc_label);
 
-  fprintf(stderr, "loading %s -> %s\n", url_print(url_data->url, 0), url_data->file_name);
+  log_info("loading %s -> %s\n", url_print(url_data->url, 0), url_data->file_name);
 
   url_read(url_data);
 
   if(url_data->err) {
-    fprintf(stderr, "error %d: %s%s\n", url_data->err, url_data->err_buf, url_data->optional ? " (ignored)" : "");
+    log_info("error %d: %s%s\n", url_data->err, url_data->err_buf, url_data->optional ? " (ignored)" : "");
   }
   else {
     ok = 1;
     if(config.secure) {
-      if(config.digests.md5) fprintf(stderr, "md5    %.32s\n", url_data->digest.md5);
-      if(config.digests.sha1) fprintf(stderr, "sha1   %.32s...\n", url_data->digest.sha1);
-      if(config.digests.sha224) fprintf(stderr, "sha224 %.32s...\n", url_data->digest.sha224);
-      if(config.digests.sha256) fprintf(stderr, "sha256 %.32s...\n", url_data->digest.sha256);
-      if(config.digests.sha384) fprintf(stderr, "sha384 %.32s...\n", url_data->digest.sha384 );
-      if(config.digests.sha512) fprintf(stderr, "sha512 %.32s...\n", url_data->digest.sha512);
+      if(config.digests.md5) log_info("md5    %.32s\n", url_data->digest.md5);
+      if(config.digests.sha1) log_info("sha1   %.32s...\n", url_data->digest.sha1);
+      if(config.digests.sha224) log_info("sha224 %.32s...\n", url_data->digest.sha224);
+      if(config.digests.sha256) log_info("sha256 %.32s...\n", url_data->digest.sha256);
+      if(config.digests.sha384) log_info("sha384 %.32s...\n", url_data->digest.sha384 );
+      if(config.digests.sha512) log_info("sha512 %.32s...\n", url_data->digest.sha512);
 
       if((tc_flags & URL_FLAG_NODIGEST)) {
-        fprintf(stderr, "digest not checked\n");
+        log_info("digest not checked\n");
       }
       else {
         if(digest_verify(url_data, url_data->url->path)) {
-          fprintf(stderr, "digest ok\n");
+          log_info("digest ok\n");
         }
         else {
-          fprintf(stderr, "digest check failed\n");
+          log_info("digest check failed\n");
           config.digests.failed = 1;
           if(config.secure_always_fail) {
             ok = 0;
@@ -1929,7 +1928,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
   str_copy(&buf1, NULL);
 
   if(err) {
-    fprintf(stderr, "url read: %s: failed to create directories\n", dst);
+    log_info("url read: %s: failed to create directories\n", dst);
 
     return 1;
   }
@@ -2142,10 +2141,10 @@ static int test_is_repo(url_t *url)
 
       if(!util_check_exist2(url->mount, t)) {
         if(opt) {
-          fprintf(stderr, "instsys missing: %s (optional)\n", t);
+          log_info("instsys missing: %s (optional)\n", t);
         }
         else {
-          fprintf(stderr, "instsys missing: %s\n", t);
+          log_info("instsys missing: %s\n", t);
           free(t);
           return 0;
         }
@@ -2181,14 +2180,14 @@ static int test_is_repo(url_t *url)
       (!config.download.instsys || util_check_exist(buf) == 'd')
     ) {
       if(!util_check_exist(buf) && opt) {
-        fprintf(stderr, "mount %s -> %s failed (ignored)\n", buf, sl->value);
+        log_info("mount %s -> %s failed (ignored)\n", buf, sl->value);
       }
       else {
-        fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+        log_info("mount %s -> %s\n", buf, sl->value);
 
         i = util_mount_ro(buf, sl->value, url->file_list) ? 0 : 1;
         ok &= i;
-        if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        if(!i) log_info("instsys mount failed: %s\n", sl->value);
       }
     }
     else {
@@ -2208,14 +2207,14 @@ static int test_is_repo(url_t *url)
         buf2,
         URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
       )) {
-        fprintf(stderr, "mount %s -> %s\n", file_name, sl->value);
+        log_info("mount %s -> %s\n", file_name, sl->value);
 
         i = util_mount_ro(file_name, sl->value, url->file_list) ? 0 : 1;
         ok &= i;
-        if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+        if(!i) log_info("instsys mount failed: %s\n", sl->value);
       }
       else {
-        fprintf(stderr, "download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
+        log_info("download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
         if(!opt) ok = 0;
       }
 
@@ -2250,17 +2249,17 @@ int url_find_repo(url_t *url, char *dir)
   int err = 0;
 
 
-  fprintf(stderr, "repository: looking for %s\n", url_print(url, 0));
+  log_info("repository: looking for %s\n", url_print(url, 0));
 
   err = url_mount(url, dir, test_is_repo);
 
   if(err) {
-    fprintf(stderr, "repository: not found\n");
+    log_info("repository: not found\n");
   }
   else {
-    fprintf(stderr, "repository: using %s", url_print(url, 0));
-    if(url->mount) fprintf(stderr, " @ %s", url->mount);
-    fprintf(stderr, "\n");
+    log_info("repository: using %s", url_print(url, 0));
+    if(url->mount) log_info(" @ %s", url->mount);
+    log_info("\n");
   }
 
   return err;
@@ -2305,7 +2304,7 @@ int url_find_instsys(url_t *url, char *dir)
         URL_FLAG_KEEP_MOUNTED
       )
     ) {
-      // fprintf(stderr, "XXX %d %s\n", url->is.mountable, url->mount);
+      // log_info("XXX %d %s\n", url->is.mountable, url->mount);
       if(!(url->is.mountable && url->mount)) {
         str_copy(&url->path, url_path);
       }
@@ -2331,10 +2330,10 @@ int url_find_instsys(url_t *url, char *dir)
 
       if(!util_check_exist2(url->mount, t)) {
         if(opt) {
-          fprintf(stderr, "instsys missing: %s (optional)\n", t);
+          log_info("instsys missing: %s (optional)\n", t);
         }
         else {
-          fprintf(stderr, "instsys missing: %s\n", t);
+          log_info("instsys missing: %s\n", t);
           ok = 0;
 
           break;
@@ -2373,14 +2372,14 @@ int url_find_instsys(url_t *url, char *dir)
         (!config.download.instsys || util_check_exist(buf) == 'd')
       ) {
         if(!util_check_exist(buf) && opt) {
-          fprintf(stderr, "mount %s -> %s failed (ignored)\n", buf, sl->value);
+          log_info("mount %s -> %s failed (ignored)\n", buf, sl->value);
         }
         else {
-          fprintf(stderr, "mount %s -> %s\n", buf, sl->value);
+          log_info("mount %s -> %s\n", buf, sl->value);
 
           i = util_mount_ro(buf, sl->value, url->file_list) ? 0 : 1;
           ok &= i;
-          if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+          if(!i) log_info("instsys mount failed: %s\n", sl->value);
         }
       }
       else {
@@ -2400,14 +2399,14 @@ int url_find_instsys(url_t *url, char *dir)
           buf2,
           URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
         )) {
-          fprintf(stderr, "mount %s -> %s\n", file_name, sl->value);
+          log_info("mount %s -> %s\n", file_name, sl->value);
 
           i = util_mount_ro(file_name, sl->value, url->file_list) ? 0 : 1;
           ok &= i;
-          if(!i) fprintf(stderr, "instsys mount failed: %s\n", sl->value);
+          if(!i) log_info("instsys mount failed: %s\n", sl->value);
         }
         else {
-          fprintf(stderr, "download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
+          log_info("download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
           if(!opt) ok = 0;
         }
 
@@ -2447,7 +2446,7 @@ int url_setup_device(url_t *url)
   int ok = 0;
   char *type;
 
-  // fprintf(stderr, "*** url_setup_device(%s)\n", url_print(url, 0));
+  // log_info("*** url_setup_device(%s)\n", url_print(url, 0));
 
   if(!url) return 0;
 
@@ -2455,7 +2454,7 @@ int url_setup_device(url_t *url)
 
   if(!url->used.device) return 0;
 
-  // fprintf(stderr, "*** url_setup_device(dev = %s)\n", url->used.device);
+  // log_info("*** url_setup_device(dev = %s)\n", url->used.device);
 
   if(!url->is.network) {
     /* load fs module if necessary */
@@ -2486,7 +2485,7 @@ int url_setup_interface(url_t *url)
 {
   // the interface has already been configured
   if(slist_getentry(config.ifcfg.if_up, url->used.device)) {
-    fprintf(stderr, "setup_interface: %s already up\n", url->used.device);
+    log_info("setup_interface: %s already up\n", url->used.device);
 
     return 1;
   }
@@ -2495,7 +2494,7 @@ int url_setup_interface(url_t *url)
     !strncmp(url->used.device, "lo", sizeof "lo" - 1) ||
     !strncmp(url->used.device, "sit", sizeof "sit" - 1)
   ) {
-    fprintf(stderr, "setup_interface: %s ignored\n", url->used.device);
+    log_info("setup_interface: %s ignored\n", url->used.device);
 
     return 0;
   }
@@ -2504,7 +2503,7 @@ int url_setup_interface(url_t *url)
 
   str_copy(&config.ifcfg.manual->device, url->used.device);
 
-  fprintf(stderr, "interface setup: %s\n", config.ifcfg.manual->device);
+  log_info("interface setup: %s\n", config.ifcfg.manual->device);
 
   if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
 
@@ -2520,11 +2519,11 @@ int url_setup_interface(url_t *url)
   }
 
   if(!config.ifcfg.if_up) {
-    fprintf(stderr, "network setup failed\n");
+    log_info("network setup failed\n");
     return 0;
   }
   else {
-    fprintf(stderr, "%s activated\n", config.ifcfg.manual->device);
+    log_info("%s activated\n", config.ifcfg.manual->device);
   }
 
   return 1;
@@ -2545,7 +2544,7 @@ int url_setup_slp(url_t *url)
   if(url->scheme == inst_slp) {
     tmp_url = url_set(slp_get_install(url));
     if(!tmp_url->scheme) {
-      fprintf(stderr, "SLP failed\n");
+      log_info("SLP failed\n");
       url_free(tmp_url);
 
       return 0;
@@ -2566,7 +2565,7 @@ int url_setup_slp(url_t *url)
 
     url_free(tmp_url);
 
-    fprintf(stderr, "slp: using %s\n", url_print(url, 0));
+    log_info("slp: using %s\n", url_print(url, 0));
   }
 
   return 1;
@@ -2596,11 +2595,9 @@ void url_parse_instsys_config(char *file)
   }
   file_free_file(f0);
 
-  if(config.debug) {
-    fprintf(stderr, "instsys deps:\n");
-    for(sl = config.url.instsys_deps; sl; sl = sl->next) {
-      fprintf(stderr, "  %s: %s\n", sl->key, sl->value);
-    }
+  log_debug("instsys deps:\n");
+  for(sl = config.url.instsys_deps; sl; sl = sl->next) {
+    log_debug("  %s: %s\n", sl->key, sl->value);
   }
 }
 
@@ -2704,7 +2701,7 @@ void url_build_instsys_list(char *image, int read_list)
   if(read_list && (f = fopen("/etc/instsys.parts", "r"))) {
     while(getline(&lbuf, &lbuf_size, f) > 0) {
       sl = slist_split(' ', lbuf);
-      // fprintf(stderr, ">%s< >%s<\n", sl->key, lbuf);
+      // log_info(">%s< >%s<\n", sl->key, lbuf);
       if(*sl->key != '#') slist_append_str(&parts, sl->key);
       sl = slist_free(sl);
     }
@@ -2723,11 +2720,9 @@ void url_build_instsys_list(char *image, int read_list)
   config.url.instsys_list = list;
   list = NULL;
 
-  if(config.debug) {
-    fprintf(stderr, "instsys list:\n");
-    for(sl = config.url.instsys_list; sl; sl = sl->next) {
-      fprintf(stderr, "  %s\n", sl->key);
-    }
+  log_debug("instsys list:\n");
+  for(sl = config.url.instsys_list; sl; sl = sl->next) {
+    log_debug("  %s\n", sl->key);
   }
 
   free(lbuf);

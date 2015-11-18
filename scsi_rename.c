@@ -36,7 +36,7 @@ int scsi_rename_main(int argc, char **argv)
   }
 
   if(argc) {
-    fprintf(stderr, "usage: scsi_rename [-v]\n");
+    log_info("usage: scsi_rename [-v]\n");
     return 1;
   }
 
@@ -66,7 +66,7 @@ void get_scsi_list()
   sf_class = reverse_str_list(read_dir("/sys/block", 'D'));
 
   if(!sf_class) {
-    if(config.debug) fprintf(stderr, "no block devices\n");
+    log_info("no block devices\n");
     return;
   }
 
@@ -128,7 +128,7 @@ void get_scsi_list()
 
   for(u = 0; u < scsi_list_len; u++) {
     scsi_dev = scsi_list[u];
-    if(config.debug) fprintf(stderr,
+    log_debug(
       "%c %s >%s< %s\n",
       scsi_dev->hotplug ? '*' : ' ',
       scsi_dev->name,
@@ -208,7 +208,7 @@ void rename_scsi_devs()
 
   for(u = 0; u < scsi_list_len; u++) {
     if(scsi_list[u]->new_name) {
-      fprintf(stderr, "%s -> %s\n", scsi_list[u]->name, scsi_list[u]->new_name);
+      log_info("%s -> %s\n", scsi_list[u]->name, scsi_list[u]->new_name);
     }
   }
 }
@@ -218,7 +218,7 @@ void write_proc_scsi(scsi_dev_t *sd, int add)
 {
   FILE *f;
 
-  if(config.debug) fprintf(stderr, "scsi %s-single-device %s\n", add ? "add" : "remove", sd->bus_id);
+  log_debug("scsi %s-single-device %s\n", add ? "add" : "remove", sd->bus_id);
 
   if((f = fopen("/proc/scsi/scsi", "w"))) {
     fprintf(f, "scsi %s-single-device %s\n", add ? "add" : "remove", sd->bus_id);

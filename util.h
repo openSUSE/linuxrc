@@ -6,14 +6,6 @@
  *
  */
 
-/* #define LXRCDEBUG */
-
-#ifdef LXRCDEBUG
-#define HERE fprintf (stderr, "%s, Line %d\n", __FILE__, __LINE__); fflush (stderr);
-#else
-#define HERE
-#endif
-
 extern void util_redirect_kmsg     (void);
 extern void util_center_text       (unsigned char *txt, int size);
 extern void util_generate_button   (button_t *button, char *txt, int size);
@@ -125,8 +117,6 @@ int util_read_and_chop(char* path, char* dst, int dst_size);
 char *get_translation(slist_t *trans, char *locale);
 int util_process_running(char *name);
 
-int system_log(char *cmd);
-
 char *blk_size_str(char *dev);
 uint64_t blk_size(char *dev);
 char *blk_ident(char *dev);
@@ -164,3 +154,6 @@ void util_boot_system(void);
 void util_set_wlan(char *device);
 int util_is_wlan(char *device);
 
+void util_log(unsigned level, char *format, ...);
+int util_run(char *cmd, unsigned log_stdout);
+void util_perror(unsigned level, char *msg);

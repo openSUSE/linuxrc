@@ -594,7 +594,7 @@ void util_disp_init()
 {
   int i_ii;
 
-  if(config.debug) fprintf(stderr, "win on\n");
+  log_debug("win on\n");
 
   config.win = 1;
   util_plymouth_off();
@@ -611,7 +611,7 @@ void util_disp_init()
 
 void util_disp_done()
 {
-  if(config.debug) fprintf(stderr, "win off\n");
+  log_debug("win off\n");
 
   if (config.linemode) {
     printf("\n\n");
@@ -636,14 +636,14 @@ int util_umount(char *dir)
 
   if(stat(dir, &sbuf)) return -1;
 
-  // fprintf(stderr, "umount: >%s<\n", dir);
+  // log_info("umount: >%s<\n", dir);
 
   f0 = file_read_file("/proc/mounts", kf_none);
 
   if((i = umount(dir))) {
-    // fprintf(stderr, "umount: %s: %s\n", dir, strerror(errno));
+    // log_info("umount: %s: %s\n", dir, strerror(errno));
     if(errno != ENOENT && errno != EINVAL) {
-      if(config.run_as_linuxrc) fprintf(stderr, "umount: %s: %s\n", dir, strerror(errno));
+      if(config.run_as_linuxrc) log_info("umount: %s: %s\n", dir, strerror(errno));
     }
   }
 
@@ -697,7 +697,7 @@ int _util_eject_cdrom(char *dev)
     dev = buf;
   }
 
-  fprintf(stderr, "eject %s\n", dev);
+  log_info("eject %s\n", dev);
 
   if((fd = open(dev, O_RDONLY | O_NONBLOCK)) < 0) return 1;
   util_umount(dev);
@@ -765,12 +765,12 @@ void add_driver_update(char *dir, char *loc)
   }
 
   if(prio >= MAX_UPDATES) {
-    fprintf(stderr, "Error: Too many driver updates!!!\n");
+    log_info("Error: Too many driver updates!!!\n");
     return;
   }
 
   if((sl = slist_getentry(config.update.id_list, config.update.id))) {
-    fprintf(stderr, "dud: %s (duplicate of %s, skipped)\n", loc, sl->value);
+    log_info("dud: %s (duplicate of %s, skipped)\n", loc, sl->value);
     return;
   }
 
@@ -780,11 +780,11 @@ void add_driver_update(char *dir, char *loc)
   strprintf(&dst, "%s/%03u", config.update.dst, prio);
   if(mkdir(dst, 0755)) return;
 
-  fprintf(stderr, "dud %u: %s", prio, loc);
+  log_info("dud %u: %s", prio, loc);
   if(config.update.id) {
-    fprintf(stderr, " (id %s)", config.update.id);
+    log_info(" (id %s)", config.update.id);
   }
-  fprintf(stderr, "\n");
+  log_info("\n");
 
   if(config.update.id) {
     sl = slist_append_str(&config.update.id_list, config.update.id);
@@ -953,20 +953,14 @@ void util_do_driver_update(unsigned idx)
   if(!config.update.name_added) create_update_name(idx);
 
   /* write update name, if there is one */
-  fprintf(stderr, "dud %u:\n", idx);
+  log_info("dud %u:\n", idx);
   for(
     ;
     (sl = *config.update.next_name);
     config.update.next_name = &(*config.update.next_name)->next
   ) {
-    fprintf(stderr, "  %s\n", sl->key);
-    if(!config.win) {
-      if(config.linebreak) {
-        printf("\n");
-        config.linebreak = 0;
-      }
-      printf("Driver Update: %s\n", sl->key);
-    }
+    log_info("  %s\n", sl->key);
+    log_show_maybe(!config.win, "Driver Update: %s\n", sl->key);
   }
 
   /* read new driver data */
@@ -977,7 +971,7 @@ void util_do_driver_update(unsigned idx)
       buf1,
       util_check_exist("/var/lib/hardware/hd.ids") ? "/var/lib/hardware/hd.ids" : ""
     );
-    system(buf2);
+    lxrc_run_console(buf2);
     rename("/var/lib/hardware/tmp.ids", "/var/lib/hardware/hd.ids");
   }
 
@@ -995,7 +989,7 @@ void util_do_driver_update(unsigned idx)
   strprintf(&buf1, "%s/modules/module.config", dst);
   if(util_check_exist(buf1) == 'r') {
     strprintf(&buf2, "cp %s/modules/module.config /modules", dst);
-    system(buf2);
+    lxrc_run(buf2);
     mod_init(1);
   }
   else {
@@ -1573,15 +1567,14 @@ void util_status_info(int log_it)
     }
   }
 
-  if(log_it || config.debug >= 1) {
-    fprintf(stderr, "------  linuxrc " LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")  ------\n");
+  if(log_it) {
+    log_debug("------  linuxrc " LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")  ------\n");
     for(sl = sl0; sl; sl = sl->next) {
-      fprintf(stderr, "  %s\n", sl->key);
+      log_debug("  %s\n", sl->key);
     }
-    fprintf(stderr, "------  ------\n");
+    log_debug("------  ------\n");
   }
-
-  if(!log_it) {
+  else {
     dia_show_lines2("linuxrc " LXRC_FULL_VERSION " (" __DATE__ ", " __TIME__ ")", sl0, 76);
   }
 
@@ -1628,7 +1621,7 @@ void util_splash_bar(unsigned num, char *trigger)
   if(trigger) sprintf(buf2, "-t '%s'", trigger);
 
   sprintf(buf, "/sbin/splash -p %u:%d %s", old, num - old, buf2);
-  system(buf);
+  lxrc_run_console(buf);
 
   old = num;
 }
@@ -1710,7 +1703,7 @@ int do_cp(char *src, char *dst)
       sprintf(dst2, "%s/%s", dst, de->d_name);
       i = lstat(src2, &sbuf);
       if(i == -1) {
-        perror(src2);
+        perror_info(src2);
         err = 2;
         break;
       }
@@ -1725,7 +1718,7 @@ int do_cp(char *src, char *dst)
           i = mkdir(dst2, 0755);
           if(i) {
             err = 4;
-            perror(dst2);
+            perror_info(dst2);
             break;
           }
         }
@@ -1750,7 +1743,7 @@ int do_cp(char *src, char *dst)
           i = link(s, dst2);
           if(i) {
             err = 12;
-            perror(dst2);
+            perror_info(dst2);
             break;
           }
         }
@@ -1760,13 +1753,13 @@ int do_cp(char *src, char *dst)
           fd1 = open(src2, O_RDONLY);
           if(fd1 < 0) {
             err = 5;
-            perror(src2);
+            perror_info(src2);
             break;
           }
           fd2 = open(dst2, O_WRONLY | O_CREAT | O_TRUNC, 0644);
           if(fd2 < 0) {
             err = 6;
-            perror(dst2);
+            perror_info(dst2);
             close(fd1);
             break;
           }
@@ -1779,11 +1772,11 @@ int do_cp(char *src, char *dst)
           }
           while(i > 0 && j > 0);
           if(i < 0) {
-            perror(src2);
+            perror_info(src2);
             err = 7;
           }
           if(j < 0) {
-            perror(dst2);
+            perror_info(dst2);
             err = 8;
           }
           close(fd1);
@@ -1796,7 +1789,7 @@ int do_cp(char *src, char *dst)
         i = readlink(src2, buf, sizeof buf - 1);
         if(i < 0) {
           err = 9;
-          perror(src2);
+          perror_info(src2);
           break;
         }
         else {
@@ -1806,7 +1799,7 @@ int do_cp(char *src, char *dst)
         i = symlink(buf, dst2);
         if(i) {
           err = 10;
-          perror(dst2);
+          perror_info(dst2);
           break;
         }
       }
@@ -1821,13 +1814,13 @@ int do_cp(char *src, char *dst)
         i = mknod(dst2, sbuf.st_mode, sbuf.st_rdev);
         if(i) {
           err = 11;
-          perror(dst2);
+          perror_info(dst2);
           break;
         }
       }
 
       else {
-        fprintf(stderr, "%s: type not supported\n", src2);
+        log_info("%s: type not supported\n", src2);
         err = 3;
         break;
       }
@@ -1844,7 +1837,7 @@ int do_cp(char *src, char *dst)
 
     }
   } else {
-    perror(src);
+    perror_info(src);
     return 1;
   }
 
@@ -1939,7 +1932,7 @@ void util_start_shell(char *tty, char *shell, int flags)
     }
 
     execve(shell, args, (flags & 1) ? env : environ);
-    fprintf(stderr, "Couldn't start shell (errno = %d)\n", errno);
+    log_info("Couldn't start shell (errno = %d)\n", errno);
     exit(-1);
   }
 }
@@ -1993,14 +1986,14 @@ int util_cp_main(int argc, char **argv)
     fd1 = open(src, O_RDONLY);
     if(fd1 < 0) {
       err = 1;
-      perror(src);
+      perror_info(src);
     }
     else {
       unlink(dst);
       fd2 = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0644);
       if(fd2 < 0) {
         err = 2;
-        perror(dst);
+        perror_info(dst);
         close(fd1);
       }
       else {
@@ -2013,11 +2006,11 @@ int util_cp_main(int argc, char **argv)
         }
         while(i > 0 && j > 0);
         if(i < 0) {
-          perror(src);
+          perror_info(src);
           err = 3;
         }
         if(j < 0) {
-          perror(dst);
+          perror_info(dst);
           err = 4;
         }
         close(fd1);
@@ -2072,7 +2065,8 @@ int util_swapon_main(int argc, char **argv)
 
   if(i) {
     i = errno;
-    fprintf(stderr, "swapon: "); perror(*argv);
+    log_info("swapon: ");
+    perror_info(*argv);
   }
 
   return i;
@@ -2500,21 +2494,21 @@ void str_copy(char **dst, const char *src)
 }
 
 
+/*
+ * Similar to asprintf() but frees old buffer.
+ */
 void strprintf(char **buf, char *format, ...)
 {
-  char sbuf[1024];
-  
+  char *new_buf;
   va_list args;
 
   va_start(args, format);
-  vsnprintf(sbuf, sizeof sbuf - 1, format, args);
+  if(vasprintf(&new_buf, format, args) == -1) new_buf = NULL;
   va_end(args);
-
-  sbuf[sizeof sbuf - 1] = 0;
 
   if(*buf) free(*buf);
 
-  *buf = strcpy(malloc(strlen(sbuf) + 1), sbuf);
+  *buf = new_buf;
 }
 
 
@@ -2545,7 +2539,7 @@ int util_fstype_main(int argc, char **argv)
 
   argv++; argc--;
 
-  if(!argc) return fprintf(stderr, "usage: fstype blockdevice\n"), 1;
+  if(!argc) return log_info("usage: fstype blockdevice\n"), 1;
 
   while(argc--) {
     s = fstype(*argv);
@@ -2666,7 +2660,7 @@ int util_extend(char *extension, char task, int verbose)
     fclose(f);
   }
 
-  if(verbose >= 0) printf("%s: extend %s\n", extension, err ? "failed" : "ok");
+  if(verbose >= 0) log_show("%s: extend %s\n", extension, err ? "failed" : "ok");
 
   return err;
 }
@@ -2697,7 +2691,7 @@ int util_extend_main(int argc, char **argv)
   }
 
   if(!argc || opt.help) {
-    return fprintf(stderr, "Usage: extend [-v] [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
+    return log_info("Usage: extend [-v] [-r] extension\nAdd or remove inst-sys extension.\n"), 1;
   }
 
   err = util_extend(*argv, task, opt.verbose);
@@ -2719,7 +2713,7 @@ char *util_attach_loop(char *file, int ro)
   static char buf[32];
 
   if((fd = open(file, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) < 0) {
-    perror(file);
+    perror_info(file);
     return NULL;
   }
 
@@ -2749,12 +2743,12 @@ int util_detach_loop(char *dev)
   int i, fd;
 
   if((fd = open(dev, O_RDONLY | O_LARGEFILE)) < 0) {
-    if(config.debug) perror(dev);
+    perror_debug(dev);
     return -1;
   }
 
   if((i = ioctl(fd, LOOP_CLR_FD, 0)) == -1) {
-    if(config.debug) perror(dev);
+    perror_debug(dev);
   }
 
   close(fd);
@@ -2781,20 +2775,20 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
   }
 
   if(stat64(dev, &sbuf)) {
-    fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
+    log_info("mount: %s: %s\n", dev, strerror(errno));
     return -1;
   }
 
   if(S_ISDIR(sbuf.st_mode)) {
     err = mount(dev, dir, "none", MS_BIND, 0);
     if(err && config.run_as_linuxrc) {
-      fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
+      log_info("mount: %s: %s\n", dev, strerror(errno));
     }
     return err;
   }
 
   if(!S_ISREG(sbuf.st_mode) && !S_ISBLK(sbuf.st_mode)) {
-    fprintf(stderr, "mount: %s: not a block device\n", dev);
+    log_info("mount: %s: not a block device\n", dev);
     return -1;
   }
 
@@ -2803,7 +2797,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
   if(!type) compr = compressed_archive(dev, &type);
 
-  fprintf(stderr, "%s: type = %s.%s\n", dev, type ?: "", compr ?: "");
+  log_info("%s: type = %s.%s\n", dev, type ?: "", compr ?: "");
 
   LXRC_WAIT
 
@@ -2816,7 +2810,7 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
     err = mount("tmpfs", dir, "tmpfs", 0, "size=0,nr_inodes=0");
     if(err) {
-      if(config.run_as_linuxrc) fprintf(stderr, "mount: tmpfs: %s\n", strerror(errno));
+      if(config.run_as_linuxrc) log_info("mount: tmpfs: %s\n", strerror(errno));
       return err;
     }
 
@@ -2850,13 +2844,11 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
     str_copy(&cpio_opts, NULL);
 
-    if(config.debug) fprintf(stderr, "%s\n", buf);
-    err = system(buf);
-    free(buf);
-    buf = NULL;
+    err = lxrc_run(buf);
+    str_copy(&buf, NULL);
 
     if(err) {
-      if(config.run_as_linuxrc) fprintf(stderr, "mount: %s failed\n", msg);
+      if(config.run_as_linuxrc) log_info("mount: %s failed\n", msg);
       umount(dir);
       return err;
     }
@@ -2869,10 +2861,10 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       else {
         tmp_dev = dev;
       }
-      fprintf(stderr, "%s -> %s: converting to squashfs\n", dev, tmp_dev);
-      strprintf(&buf, "mksquashfs %s %s -noappend -no-progress >%s", dir, tmp_dev, config.debug ? "&2" : "/dev/null");
-      err = system(buf);
-      if(err && config.run_as_linuxrc) fprintf(stderr, "mount: mksquashfs failed\n");
+      log_info("%s -> %s: converting to squashfs\n", dev, tmp_dev);
+      strprintf(&buf, "mksquashfs %s %s -noappend -no-progress", dir, tmp_dev);
+      err = lxrc_run(buf);
+      if(err && config.run_as_linuxrc) log_info("mount: mksquashfs failed\n");
       if(!err) {
         umount(dir);
         err = util_mount(tmp_dev, dir, flags, NULL);
@@ -2888,13 +2880,13 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
       (!strcmp(type, "cramfs") && strstr(dev, "/dev/ram") == dev)
     )
   ) {
-    if(config.run_as_linuxrc) fprintf(stderr, "mount: %s: we need a loop device\n", dev);
+    if(config.run_as_linuxrc) log_info("mount: %s: we need a loop device\n", dev);
     loop_dev = util_attach_loop(dev, (flags & MS_RDONLY) ? 1 : 0);
     if(!loop_dev) {
-      fprintf(stderr, "mount: no usable loop device found\n");
+      log_info("mount: no usable loop device found\n");
       return -1;
     }
-    if(config.run_as_linuxrc) fprintf(stderr, "mount: using %s\n", loop_dev);
+    if(config.run_as_linuxrc) log_info("mount: using %s\n", loop_dev);
 
     strprintf(&buf, "%s/file_", config.download.base);
 
@@ -2908,17 +2900,17 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
 
   if(config.ntfs_3g && type && !strcmp(type, "ntfs")) {
     asprintf(&cmd, "mount -t ntfs-3g%s %s %s", (flags & MS_RDONLY) ? " -oro" : "", dev, dir);
-    err = system(cmd);
+    err = lxrc_run(cmd);
     free(cmd);
   }
   else if(type) {
     err = mount(dev, dir, type, flags, 0);
     if(err && config.run_as_linuxrc) {
-      fprintf(stderr, "mount: %s: %s\n", dev, strerror(errno));
+      log_info("mount: %s: %s\n", dev, strerror(errno));
     }
   }
   else {
-    fprintf(stderr, "%s: unknown fs type\n", dev);
+    log_info("%s: unknown fs type\n", dev);
     err = -1;
   }
 
@@ -3109,9 +3101,20 @@ void util_set_stderr(char *name)
 
   str_copy(&config.stderr_name, name);
 
-  freopen(config.stderr_name, "a", stderr);
+  if(!freopen(config.stderr_name, "a", stderr)) {
+    freopen("/dev/null", "a", stderr);
+  }
 
   setlinebuf(stderr);
+
+  if(
+    !config.log.dest[1].name ||
+    strcmp(config.log.dest[1].name, config.stderr_name)
+  ) {
+    str_copy(&config.log.dest[1].name, config.stderr_name);
+    if(config.log.dest[1].f) fclose(config.log.dest[1].f);
+    config.log.dest[1].f = NULL;
+  }
 }
 
 
@@ -3280,7 +3283,7 @@ int make_links(char *src, char *dst)
   char *s, *t;
   int err = 0;
 
-  // fprintf(stderr, "make_links: %s -> %s\n", src, dst);
+  // log_info("make_links: %s -> %s\n", src, dst);
 
   if((dir = opendir(src))) {
     while((de = readdir(dir))) {
@@ -3288,7 +3291,7 @@ int make_links(char *src, char *dst)
       sprintf(src2, "%s/%s", src, de->d_name);
       sprintf(dst2, "%s/%s", dst, de->d_name);
 
-      // fprintf(stderr, "?: %s -> %s\n", src2, dst2);
+      // log_info("?: %s -> %s\n", src2, dst2);
 
 #if 0
 
@@ -3325,7 +3328,7 @@ int make_links(char *src, char *dst)
       if(is_dir(src2) /* && !is_link(src2) */) {
         /* add directory */
 
-        // fprintf(stderr, "dir: %s -> %s\n", src2, dst2);
+        // log_info("dir: %s -> %s\n", src2, dst2);
 
         if(is_dir(dst2)) {
           if(is_link(dst2)) {
@@ -3333,7 +3336,7 @@ int make_links(char *src, char *dst)
             sprintf(tmp_dir, "%s/mklXXXXXX", dst);
             s = mkdtemp(tmp_dir);
             if(!s) {
-              perror(tmp_dir);
+              perror_info(tmp_dir);
               err = 2;
               continue;
             }
@@ -3352,12 +3355,12 @@ int make_links(char *src, char *dst)
             }
             if((err = make_links(s, tmp_dir))) continue;
             if(unlink(dst2)) {
-              perror(dst2);
+              perror_info(dst2);
               err = 4;
               continue;
             }
             if(rename(tmp_dir, dst2)) {
-              perror(tmp_dir);
+              perror_info(tmp_dir);
               err = 5;
               continue;
             }
@@ -3376,7 +3379,7 @@ int make_links(char *src, char *dst)
           s = src2;
           if(is_link(src2)) s = read_symlink(src2);
           if(symlink(s, dst2)) {
-            perror(s);
+            perror_info(s);
             err = 7;
             continue;
           }
@@ -3387,7 +3390,7 @@ int make_links(char *src, char *dst)
         s = src2;
         if(is_link(src2)) s = read_symlink(src2);
         if(symlink(s, dst2)) {
-          perror(s);
+          perror_info(s);
           err = 6;
           continue;
         }
@@ -3399,7 +3402,7 @@ int make_links(char *src, char *dst)
     free(tmp_s);
   }
   else {
-    perror(src);
+    perror_info(src);
     return 1;
   }
 
@@ -3450,12 +3453,11 @@ void util_killall(char *name, int sig)
     pid = strtoul(sl->key, NULL, 10);
     if(pid == mypid) continue;
     if(!strcmp(sl->value, name)) {
-      if(config.debug) fprintf(stderr, "kill -%d %d\n", sig, pid);
+      log_debug("kill -%d %d\n", sig, pid);
       kill(pid, sig);
       usleep(20000);
     }
   }
-
 
   slist_free(sl0);
 
@@ -3479,7 +3481,7 @@ void util_get_ram_size()
     for(res = hd->res; res; res = res->next) {
       if(res->any.type == res_phys_mem) {
         config.memoryXXX.ram = res->phys_mem.range;
-        fprintf(stderr, "RAM size: %llu MB\n", (unsigned long long) (config.memoryXXX.ram >> 20));
+        log_info("RAM size: %llu MB\n", (unsigned long long) (config.memoryXXX.ram >> 20));
         break;
       }
     }
@@ -3630,7 +3632,7 @@ int apply_driverid(driver_t *drv)
   fprintf(f, "%s\n", print_driverid(drv, 0));
   fclose(f);
 
-  fprintf(stderr, "new id [%s]: %s\n", name, print_driverid(drv, 0));
+  log_info("new id [%s]: %s\n", name, print_driverid(drv, 0));
 
   return 1;
 }
@@ -3796,26 +3798,6 @@ int util_process_running(char *name)
 }
 
 
-/*
- * like system() but redirect stdout to stderr
- */
-int system_log(char *cmd)
-{
-  char *buf = NULL;
-  int i;
-
-  if(!cmd) return 0;
-
-  strprintf(&buf, "%s >&2", cmd);
-
-  i = system(buf);
-
-  free(buf);
-
-  return i;
-}
-
-
 char *blk_ident(char *dev)
 {
   char *type, *label, *size;
@@ -3901,7 +3883,7 @@ void update_device_list(int force)
   struct stat sbuf;
   hd_t *hd, *net_list;
 
-  fprintf(stderr, "update_device_list(%d)\n", force);
+  log_info("update_device_list(%d)\n", force);
 
   hd_hw_item_t hw_items[] = {
     hw_block, hw_network_ctrl, hw_network, 0
@@ -3919,7 +3901,7 @@ void update_device_list(int force)
 
   if(!force) return;
 
-  fprintf(stderr, "%sscanning devices\n", config.hd_data ? "re" : "");
+  log_info("%sscanning devices\n", config.hd_data ? "re" : "");
 
   if(config.hd_data) {
     hd_free_hd_data(config.hd_data);
@@ -4040,7 +4022,7 @@ void util_wait(const char *file, int line, const char *func)
   }
 
   if(!config.debugwait_list || sl) {
-    fprintf(stderr, "== %s in %s() ==\n", pos, func);
+    log_info("== %s in %s() ==\n", pos, func);
     printf("== %s in %s() ==\n(enter = next, s = shell, c = continue normally, q = quit)? ", pos, func);
 
     switch(getchar()) {
@@ -4110,7 +4092,7 @@ void util_umount_all_devices ()
 
         if (!nr_dirs) return;
 
-        fprintf (stderr, "Trying to unmount %d directories:\n", --nr_dirs);
+        log_info("Trying to unmount %d directories:\n", --nr_dirs);
 
         /* we need to unmount in reverse order */
 
@@ -4120,7 +4102,7 @@ void util_umount_all_devices ()
                 {
                 if (dirs [nr_dirs][1])
 		    {
-		    fprintf (stderr, "Unmounting %s...\n", dirs [nr_dirs]);
+		    log_info("Unmounting %s...\n", dirs [nr_dirs]);
 		    umount (dirs [nr_dirs]);
 		    }
 		free (dirs [nr_dirs]);
@@ -4140,8 +4122,7 @@ void run_braille()
 
   hd_data->debug = -1;
 
-  printf("Activating usb devices...\n");
-  fprintf(stderr, "Activating usb devices...\n");
+  log_show("Activating usb devices...\n");
 
   /* braille dev might need usb modules */
   util_load_usb();
@@ -4153,8 +4134,7 @@ void run_braille()
 
   sleep(config.usbwait + 1);
 
-  printf("detecting braille devices...\n");
-  fprintf(stderr, "detecting braille devices...\n");
+  log_show("detecting braille devices...\n");
 
   hd = hd_list(hd_data, hw_braille, 1, NULL);
 
@@ -4193,8 +4173,7 @@ void run_braille()
   free(hd_data);
 
   if(config.braille.dev) {
-    printf("%s: %s\n", config.braille.dev, config.braille.type);
-    fprintf(stderr, "%s: %s\n", config.braille.dev, config.braille.type);
+    log_show("%s: %s\n", config.braille.dev, config.braille.type);
 
     if(util_check_exist("/etc/suse-blinux.conf") == 'r') {
       strprintf(&cmd,
@@ -4202,13 +4181,12 @@ void run_braille()
         config.braille.type, config.braille.dev
       );
 
-      if(config.debug) fprintf(stderr, "%s\n", cmd);
-      system(cmd);
+      lxrc_run(cmd);
 
       str_copy(&cmd, NULL);
 
-      system("/etc/init.d/brld start >&2");
-      system("/etc/init.d/sbl start >&2");
+      lxrc_run("/etc/init.d/brld start");
+      lxrc_run("/etc/init.d/sbl start");
 
       str_copy(&config.setupcmd, "inst_setup yast");
 
@@ -4230,7 +4208,7 @@ void util_setup_udevrules()
       (f_mac = file_getentry(f, "mac")) &&
       (f_name = file_getentry(f, "name"))
     ) {
-      fprintf(stderr, "udev net rule: mac = \"%s\", name = \"%s\"\n", f_mac->value, f_name->value);
+      log_info("udev net rule: mac = \"%s\", name = \"%s\"\n", f_mac->value, f_name->value);
       if((ff = fopen("/etc/udev/rules.d/70-persistent-net.rules", "a"))) {
         fprintf(ff,
           "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"%s\", ATTR{type}==\"1\", KERNEL==\"eth*\", NAME=\"%s\"\n",
@@ -4318,18 +4296,18 @@ int fcoe_check()
   unsigned char raw[64];
 
   if(!(d = opendir(sysfs_edd))) {
-    if(config.debug) fprintf(stderr, "fcoe_check: no edd\n");
+    log_debug("fcoe_check: no edd\n");
     return fcoe_ok;
   }
 
   while((de = readdir(d))) {
-    if(config.debug) fprintf(stderr, "checking %s\n", de->d_name);
+    log_debug("checking %s\n", de->d_name);
     asprintf(&attr, "%s/%s/raw_data", sysfs_edd, de->d_name);
     fd = open(attr, O_RDONLY);
     if(fd >= 0) {
       raw_len = read(fd, raw, sizeof raw);
       if(raw_len >= 48 && !memcmp(raw + 40, "FIBRE", 5)) {
-        fprintf(stderr, "%s: fibre channel\n", de->d_name);
+        log_info("%s: fibre channel\n", de->d_name);
       }
 
       close(fd);
@@ -4338,7 +4316,7 @@ int fcoe_check()
 
     asprintf(&attr, "%s/%s/pci_dev/net", sysfs_edd, de->d_name);
     if((dn = opendir(attr))) {
-      fprintf(stderr, "%s: network\n", de->d_name);
+      log_info("%s: network\n", de->d_name);
       fcoe_ok = 1;
       closedir(dn);
     }
@@ -4347,7 +4325,7 @@ int fcoe_check()
 
   closedir(d);
 
-  fprintf(stderr, "fcoe_check: %d\n", fcoe_ok);
+  log_info("fcoe_check: %d\n", fcoe_ok);
 
   return fcoe_ok;
 }
@@ -4366,7 +4344,7 @@ int iscsi_check()
   slist_t *sl;
 
   if(util_check_exist("/modules/iscsi_ibft.ko")) {
-    system("/sbin/modprobe iscsi_ibft");
+    lxrc_run("/sbin/modprobe iscsi_ibft");
     sleep(1);
   }
 
@@ -4383,23 +4361,23 @@ int iscsi_check()
   }
 
   if(iscsi_ok) {
-    fprintf(stderr, "ibft: iscsi_boot\n");
+    log_info("ibft: iscsi_boot\n");
     return 1;
   }
 
   if(!util_check_exist(sysfs_ibft)) return 0;
 
-  fprintf(stderr, "ibft: sysfs dir = %s\n", sysfs_ibft);
+  log_info("ibft: sysfs dir = %s\n", sysfs_ibft);
 
   strprintf(&attr, "%s/origin", sysfs_ibft);
   s = util_get_attr(attr);
-  fprintf(stderr, "ibft: origin = %s\n", s);
+  log_info("ibft: origin = %s\n", s);
   if(s[0] == '3') use_dhcp = 1;
-  fprintf(stderr, "ibft: dhcp = %d\n", use_dhcp);
+  log_info("ibft: dhcp = %d\n", use_dhcp);
 
   strprintf(&attr, "%s/mac", sysfs_ibft);
   s = util_get_attr(attr);
-  fprintf(stderr, "ibft: ibft mac = %s\n", s);
+  log_info("ibft: ibft mac = %s\n", s);
   str_copy(&ibft_mac, *s ? s : NULL);
 
   strprintf(&attr, "%s/device/net", sysfs_ibft);
@@ -4412,7 +4390,7 @@ int iscsi_check()
     closedir(d);
   }
 
-  fprintf(stderr, "ibft: if = %s\n", if_name ?: "");
+  log_info("ibft: if = %s\n", if_name ?: "");
 
   if(if_name) {
     strprintf(&attr, "%s/device/net/%s/address", sysfs_ibft, if_name);
@@ -4420,11 +4398,11 @@ int iscsi_check()
     str_copy(&if_mac, *s ? s : NULL);
   }
 
-  fprintf(stderr, "ibft: if mac = %s\n", if_mac ?: "");
+  log_info("ibft: if mac = %s\n", if_mac ?: "");
 
   mac_match = if_mac && ibft_mac && !strcasecmp(if_mac, ibft_mac) ? 1 : 0;
 
-  fprintf(stderr, "ibft: macs %smatch\n", mac_match ? "" : "don't ");
+  log_info("ibft: macs %smatch\n", mac_match ? "" : "don't ");
 
   if(if_name) {
     ifcfg = calloc(1, sizeof *ifcfg);
@@ -4433,7 +4411,7 @@ int iscsi_check()
 
     strprintf(&attr, "%s/vlan", sysfs_ibft);
     vlan = util_get_int_attr(attr);
-    fprintf(stderr, "ibft: vlan = %d\n", vlan);
+    log_info("ibft: vlan = %d\n", vlan);
     if(vlan > 0) strprintf(&ifcfg->vlan, "%d", vlan);
 
     if(use_dhcp) {
@@ -4449,7 +4427,7 @@ int iscsi_check()
 
       strprintf(&attr, "%s/subnet-mask", sysfs_ibft);
       s = util_get_attr(attr);
-      fprintf(stderr, "ibft: subnet-mask = %s\n", s);
+      log_info("ibft: subnet-mask = %s\n", s);
       prefix = netmask_to_prefix(s);
 
       strprintf(&attr, "%s/ip-addr", sysfs_ibft);
@@ -4458,21 +4436,21 @@ int iscsi_check()
         str_copy(&ifcfg->ip, s);
         if(prefix > 0) strprintf(&ifcfg->ip, "%s/%d", ifcfg->ip, prefix);
       }
-      fprintf(stderr, "ibft: ip-addr = %s\n", ifcfg->ip ?: "");
+      log_info("ibft: ip-addr = %s\n", ifcfg->ip ?: "");
 
       strprintf(&attr, "%s/gateway", sysfs_ibft);
       s = util_get_attr(attr);
-      fprintf(stderr, "ibft: gateway = %s\n", s);
+      log_info("ibft: gateway = %s\n", s);
       if(*s) str_copy(&ifcfg->gw, s);
 
       strprintf(&attr, "%s/primary-dns", sysfs_ibft);
       s = util_get_attr(attr);
-      fprintf(stderr, "ibft: primary-dns = %s\n", s);
+      log_info("ibft: primary-dns = %s\n", s);
       if(*s) str_copy(&ifcfg->ns, s);
 
       strprintf(&attr, "%s/secondary-dns", sysfs_ibft);
       s = util_get_attr(attr);
-      fprintf(stderr, "ibft: secondary-dns = %s\n", s);
+      log_info("ibft: secondary-dns = %s\n", s);
       if(*s) strprintf(&ifcfg->ns, "%s %s", ifcfg->ns ?: "", s);
     }
 
@@ -4505,7 +4483,7 @@ char *interface_to_mac(char *device)
 
   if(!strcmp(addr, "00:00:00:00:00:00")) *addr = 0;
 
-  if(config.debug) fprintf(stderr, "if_to_mac: %s = %s\n", device, addr);
+  log_debug("if_to_mac: %s = %s\n", device, addr);
 
   str_copy(&buf, addr ?: NULL);
 
@@ -4528,7 +4506,7 @@ char *mac_to_interface_log(char *mac, int log)
 
   if(util_check_exist2(sys, mac)) return strdup(mac);
 
-  if(log) fprintf(stderr, "%s = ?\n", mac);
+  if(log) log_debug("%s = ?\n", mac);
 
   if(!(d = opendir(sys))) return NULL;
 
@@ -4544,7 +4522,7 @@ char *mac_to_interface_log(char *mac, int log)
     }
 
     if(log) {
-      fprintf(stderr, "%s = %s%s\n",
+      log_debug("%s = %s%s\n",
         if_mac,
         de->d_name,
         if_name && !strcmp(if_name, de->d_name) ? " *" : ""
@@ -4604,9 +4582,9 @@ char *mac_to_interface(char *mac, int *max_offset)
 
   if(if_name && max_offset) *max_offset = ofs;
 
-  fprintf(stderr, "if = %s", if_name);
-  if(if_name && ofs) fprintf(stderr, ", offset = %u", ofs);
-  fprintf(stderr, "\n");
+  log_debug("if = %s", if_name);
+  if(if_name && ofs) log_debug(", offset = %u", ofs);
+  log_debug("\n");
 
   return if_name;
 }
@@ -4629,7 +4607,7 @@ void util_run_script(char *name)
 
   strprintf(&buf, "/scripts/%s", name);
 
-  system(buf);
+  lxrc_run(buf);
 
   str_copy(&buf, NULL);
 
@@ -4647,7 +4625,7 @@ void util_plymouth_off()
 
   if(util_check_exist("/usr/bin/plymouth") != 'r') return;
 
-  system("/usr/bin/plymouth quit");
+  lxrc_run_console("/usr/bin/plymouth quit");
 
   kbd_init(0);
 }
@@ -4795,7 +4773,7 @@ int util_choose_disk_device(char **dev, int type, char *list_title, char *input_
       j = strlen(s);
       if(j > item_width) item_width = j;
 
-      // fprintf(stderr, "<%s>\n", s);
+      // log_info("<%s>\n", s);
 
       values[item_cnt] = strdup(short_dev(hd->unix_dev_name));
       items[item_cnt++] = s;
@@ -4869,7 +4847,7 @@ int util_choose_disk_device(char **dev, int type, char *list_title, char *input_
 
   free(hd_data);
 
-  // fprintf(stderr, "dud dev = %s\n", *dev);
+  // log_info("dud dev = %s\n", *dev);
 
   return err;
 }
@@ -4919,7 +4897,7 @@ char *compressed_file(char *name)
     close(fd);
   }
   else {
-    if(config.debug) perror(name);
+    perror_debug(name);
   }
 
   return compr;
@@ -4951,7 +4929,7 @@ char *compressed_archive(char *name, char **archive)
 
   *archive = type;
 
-  if(config.debug) fprintf(stderr, "%s = %s.%s\n", name, type ?: "", compr ?: "");
+  log_debug("%s = %s.%s\n", name, type ?: "", compr ?: "");
 
   return compr;
 }
@@ -5015,13 +4993,13 @@ slist_t *get_kernel_list(char *dev)
           char *t = strchr(de->d_name, '-');
           if(t) {
             strprintf(&buf, "%s/initrd%s", dirs[i], t);
-            fprintf(stderr, "%s matched, initrd? %s\n", de->d_name, buf);
+            log_info("%s matched, initrd? %s\n", de->d_name, buf);
             if(util_check_exist(buf) == 'r') {
               char *t2 = dirs[i] + sizeof "/mnt" - 1;
               sl = slist_append(&kernel_list, slist_new());
               strprintf(&sl->key, "%s:%s/%s", dev, t2, de->d_name);
               strprintf(&sl->value, "%s:%s/initrd%s", dev, t2, t);
-              fprintf(stderr, "kernel: %s / %s\n", sl->key, sl->value);
+              log_info("kernel: %s / %s\n", sl->key, sl->value);
             }
             str_copy(&buf, NULL);
           }
@@ -5065,7 +5043,7 @@ void util_boot_system()
   char **item_list;
 
   strprintf(&buf, "Analysing disks...");
-  fprintf(stderr, "%s\n", buf);
+  log_info("%s\n", buf);
   if(config.win) {
     dia_info(&win, buf, MSGTYPE_INFO);
   }
@@ -5104,7 +5082,7 @@ void util_boot_system()
         }
 
         strprintf(&buf, "%s (%s) -- %s", sl->key, blk_id, os_name ?: "");
-        fprintf(stderr, "%s\n", buf);
+        log_info("%s\n", buf);
         if(os_name) {
           slist_t *sl2 = slist_append_str(&root_list, long_dev(sl->key));
           str_copy(&sl2->value, buf);
@@ -5227,7 +5205,7 @@ void util_boot_system()
   }
 
   // show what we are doing
-  fprintf(stderr, "going to boot %s, append=\"%s\"\n", kernel->key, kernel_options);
+  log_info("going to boot %s, append=\"%s\"\n", kernel->key, kernel_options);
 
   // ok, now mount partition again, and load kernel & initrd
 
@@ -5241,7 +5219,7 @@ void util_boot_system()
   *initrd_name++ = 0;
 
   if(util_mount_ro(long_dev(kernel->key), "/mnt", NULL)) {
-    fprintf(stderr, "oops, mounting partition failed\n");
+    log_info("oops, mounting partition failed\n");
     slist_free(root_list);
     slist_free(kernel_list);
 
@@ -5277,19 +5255,19 @@ void util_boot_system()
 
   str_copy(&buf1, NULL);
 
-  fprintf(stderr, "%s\n", buf);
-
   if(!config.test) {
-    strprintf(&buf, "%s >&2", buf);
-    int err = system(buf);
+    int err = lxrc_run(buf);
     util_umount("/mnt");
     if(!err) {
       util_umount_all();
       sync();
       // dia_message("Now!", MSGTYPE_INFO);
       LXRC_WAIT
-      system("kexec --exec >&2");
+      lxrc_run("kexec --exec");
     }
+  }
+  else {
+    log_info("%s\n", buf);
   }
 
   str_copy(&buf, NULL);
@@ -5320,5 +5298,115 @@ void util_set_wlan(char *device)
 int util_is_wlan(char *device)
 {
   return slist_getentry(config.net.wlan.devices, device) ? 1 : 0;
+}
+
+
+/*
+ * Write log message.
+ *
+ * level is a bitmask determining the destination to log to.
+ *
+ * Add a time stamp when the destination has the LOG_TIMESTAMP flag set.
+ */
+void util_log(unsigned level, char *format, ...)
+{
+  va_list args;
+  char *buf;
+  int buf_len = 0;
+  log_file_t *lf;
+
+  time_t t = time(NULL);
+  struct tm *gm = gmtime(&t);
+
+  va_start(args, format);
+  if(vasprintf(&buf, format, args) == -1) buf = NULL;
+  if(buf) buf_len = strlen(buf);
+  va_end(args);
+
+  for(lf = config.log.dest; lf < config.log.dest + sizeof config.log.dest / sizeof *config.log.dest; lf++) {
+    if((level & lf->level)) {
+      if(!lf->f && lf->name) {
+        lf->f = fopen(lf->name, "a");
+      }
+      if(lf->f) {
+        if((lf->level & LOG_TIMESTAMP)) {
+          if(gm) {
+            fprintf(lf->f, "%02d:%02d:%02d <%u> ", gm->tm_hour, gm->tm_min, gm->tm_sec, level);
+          }
+        }
+        if(buf_len) {
+          fwrite(buf, buf_len, 1, lf->f);
+          // supplement a missing trailing newline
+          if(
+            buf[buf_len - 1] != '\n' &&
+            (lf->level & LOG_TIMESTAMP)
+          ) {
+            fputc('\n', lf->f);
+          }
+          fflush(lf->f);
+        }
+      }
+    }
+  }
+
+  str_copy(&buf, NULL);
+}
+
+
+/*
+ * Run command and redirect and log stderr to linuxrc log file.
+ *
+ * If log_stdout is != 0, redirect and log also stdout.
+ */
+int util_run(char *cmd, unsigned log_stdout)
+{
+  char buf[10], *buf2 = NULL, *cmd2 = NULL;
+  int fd, i, err = -1;
+
+  if(!cmd) return err;
+
+  fd = open("/tmp", O_TMPFILE | O_RDWR, S_IRUSR | S_IWUSR);
+
+  if(fd < 0) return err;
+
+  strprintf(&cmd2, "%s 2>&%d%s", cmd, fd, log_stdout ? " >&2" : "");
+
+  err = WEXITSTATUS(system(cmd2));
+
+  log_info("exec: %s = %d\n", cmd, err);
+
+  lseek(fd, 0, SEEK_SET);
+
+  while((i = read(fd, buf, sizeof buf - 1)) > 0) {
+    buf[i] = 0;
+    strprintf(&buf2, "%s%s", buf2 ?: "", buf);
+  }
+
+  close(fd);
+
+  if(buf2) {
+    log_debug("%sstderr:\n%s", log_stdout ? "stdout + " : "", buf2);
+  }
+
+  str_copy(&buf2, NULL);
+  str_copy(&cmd2, NULL);
+
+  return err;
+}
+
+
+/*
+ * Like perror() but using logging function.
+ */
+void util_perror(unsigned level, char *msg)
+{
+  char *str = strerror(errno);
+
+  if(msg && *msg) {
+    util_log(level, "%s: %s\n", msg, str);
+  }
+  else {
+    util_log(level, "%s\n", str);
+  }
 }
 

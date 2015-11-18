@@ -584,7 +584,7 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
   file_t *f0 = NULL;
 
 #ifdef DEBUG_FILE
-  fprintf(stderr, "looking for info file: %s\n", file);
+  log_debug("looking for info file: %s\n", file);
 #endif
 
   if(!strcmp(file, "cmdline")) {
@@ -597,7 +597,7 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
   if(!f0) return NULL;
 
 #ifdef DEBUG_FILE
-  fprintf(stderr, "info file read from \"%s\":\n", file);
+  log_debug("info file read from \"%s\":\n", file);
   file_dump_flist(f0);
 #endif
 
@@ -908,7 +908,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
                     char *argv[2] = { };
 
                     argv[1] = buf;
-                    fprintf(stderr, "swapon %s\n", buf);
+                    log_info("swapon %s\n", buf);
                     util_swapon_main(2, argv);
                     break;
                   }
@@ -927,14 +927,14 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           t = util_fstype(s, NULL);
           if(t && !strcmp(t, "swap")) {
             argv[1] = s;
-            fprintf(stderr, "swapon %s\n", s);
+            log_info("swapon %s\n", s);
             util_swapon_main(2, argv);
           }
         }
         break;
 
       case key_exec:
-        if(*f->value) system(f->value);
+        if(*f->value) lxrc_run_console(f->value);
         break;
 
       case key_usbwait:
@@ -1317,7 +1317,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 	    else {
 	      strprintf(&sl->value, "%s %s", sl->value, s);
 	    }
-            if(config.debug >= 2) fprintf(stderr, "options[%s] = \"%s\"\n", sl->key, sl->value);
+            log_debug("options[%s] = \"%s\"\n", sl->key, sl->value);
           }
         }
         break;
@@ -1824,7 +1824,7 @@ void file_write_install_inf(char *dir)
   strcat(strcpy(file_name, dir), INSTALL_INF_FILE);
 
   if(!(f = fopen(file_name, "w"))) {
-    fprintf(stderr, "Cannot open yast info file\n");
+    log_info("Cannot open yast info file\n");
     return;
   }
 
@@ -1854,7 +1854,7 @@ void file_write_install_inf(char *dir)
   else {
     char buf[256];
     if(!gethostname(buf, sizeof buf)) {
-      if(config.debug) fprintf(stderr, "hostname = \"%s\"\n", buf);
+      log_debug("hostname = \"%s\"\n", buf);
       if(*buf && strcmp(buf, "(none)")) file_write_str(f, key_hostname, buf);
     }
   }
@@ -2156,8 +2156,8 @@ void file_module_load(char *insmod_arg)
 void file_dump_flist(file_t *ft)
 {
   for(; ft; ft = ft->next) {
-    fprintf(stderr, "%d: \"%s\" = \"%s\"\n", ft->key, ft->key_str, ft->value);
-    if(ft->is.numeric) fprintf(stderr, "  num = %d\n", ft->nvalue);
+    log_debug("%d: \"%s\" = \"%s\"\n", ft->key, ft->key_str, ft->value);
+    if(ft->is.numeric) log_debug("  num = %d\n", ft->nvalue);
   }
 }
 
@@ -2322,21 +2322,21 @@ module_t *file_read_modinfo(char *name)
 void file_dump_mlist(module_t *ml)
 {
   for(; ml; ml = ml->next) {
-    fprintf(stderr, "%s (%s:%s): \"%s\"\n",
+    log_debug("%s (%s:%s): \"%s\"\n",
       ml->name,
       config.module.type_name[ml->type],
       config.module.more_file[ml->type] ?: "-",
       ml->descr ?: ""
     );
-    fprintf(stderr, "  initrd = %s, show = %s, auto = %s, ask = %s\n",
+    log_debug("  initrd = %s, show = %s, auto = %s, ask = %s\n",
       ml->initrd ? "yes" : "no",
       ml->descr ? "yes" : "no",
       ml->autoload ? "yes" : "no",
       ml->dontask ? "no" : "yes"
     );
-    if(ml->param) fprintf(stderr, "  param: \"%s\"\n", ml->param);
-    if(ml->pre_inst) fprintf(stderr, "  pre_inst: \"%s\"\n", ml->pre_inst);
-    if(ml->post_inst) fprintf(stderr, "  post_inst: \"%s\"\n", ml->post_inst);
+    if(ml->param) log_debug("  param: \"%s\"\n", ml->param);
+    if(ml->pre_inst) log_debug("  pre_inst: \"%s\"\n", ml->pre_inst);
+    if(ml->post_inst) log_debug("  post_inst: \"%s\"\n", ml->post_inst);
   }
 }
 
@@ -2384,7 +2384,7 @@ void add_driver(char *str)
       config.module.drivers = malloc(sizeof *config.module.drivers);
       memcpy(config.module.drivers, &drv, sizeof *config.module.drivers);
 
-      fprintf(stderr, "new id: %s,%s,%s\n",
+      log_info("new id: %s,%s,%s\n",
         print_driverid(config.module.drivers, 1),
         config.module.drivers->name ?: "",
         config.module.drivers->sysfs_name ?: ""

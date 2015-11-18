@@ -23,6 +23,7 @@
 
 #include "global.h"
 #include "keyboard.h"
+#include "util.h"
 #include "utf8.h"
 
 /*
@@ -155,7 +156,7 @@ void kbd_init (int first)
         max_y_ig = Y_DEFAULT;
       }
 
-      if(!config.had_segv) fprintf(stderr, "Window size: %d x %d\n", max_x_ig, max_y_ig);
+      if(!config.had_segv) log_info("Window size: %d x %d\n", max_x_ig, max_y_ig);
 
       memset(&winsize_ri, 0, sizeof winsize_ri);
 
@@ -202,7 +203,7 @@ int kbd_getch(int wait_iv)
   do {
     key = kbd_getch_raw(wait_iv);
 
-//    fprintf(stderr, "rawkey(%d): %d\n", wait_iv, key);
+//    log_info("rawkey(%d): %d\n", wait_iv, key);
 
     if(key == KEY_ENTER || key == KEY_CTRL_M) {
       if(!last_was_nl) {
@@ -222,7 +223,7 @@ int kbd_getch(int wait_iv)
   if(key == KEY_CTRL_M) key = KEY_ENTER;
 
   if(config.debug >= 3) {
-    fprintf(stderr, "key(%d): 0x%02x\n", wait_iv, key);
+    log_debug("key(%d): 0x%02x\n", wait_iv, key);
   }
 
   return key;
@@ -256,11 +257,11 @@ void check_for_key(int del_garbage)
   if(!kbd.pos) return;
 
   if(config.debug >= 4) {
-    fprintf(stderr, "kbd buffer(%d):", del_garbage);
+    log_debug("kbd buffer(%d):", del_garbage);
     for(u = 0; u < kbd.pos; u++) {
-      fprintf(stderr, " 0x%02x", kbd.buffer[u]);
+      log_debug(" 0x%02x", kbd.buffer[u]);
     }
-    fprintf(stderr, "\n");
+    log_debug("\n");
   }
 
   /* look for esc sequences */
@@ -269,7 +270,7 @@ void check_for_key(int del_garbage)
     if(len && len <= kbd.pos && !memcmp(kbd.buffer, key_list[u].bytes, len)) {
       kbd.key = key_list[u].key;
       del_keys(len);
-//      fprintf(stderr, "-> key = 0x%02x\n", kbd.key);
+//      log_debug("-> key = 0x%02x\n", kbd.key);
 
       return;
     }
@@ -290,7 +291,7 @@ void check_for_key(int del_garbage)
       kbd.key = utf8_decode(kbd.buffer);
       del_keys(u);
 
-//      fprintf(stderr, "utf8(%u) = 0x%02x\n", u, kbd.key);
+//      log_debug("utf8(%u) = 0x%02x\n", u, kbd.key);
 
       return;
     }
@@ -508,7 +509,7 @@ void get_screen_size(int fd)
     max_y_ig = u1;
   }
   else if(*buf) {
-    fprintf(stderr, "Unexpected response: >>%s<<\n", buf + 1);
+    log_info("Unexpected response: >>%s<<\n", buf + 1);
   }
 }
 
@@ -522,7 +523,7 @@ void kbd_unimode()
   fd = open(config.console, O_RDWR);
 
   if(fd < 0 || ioctl(fd, KDSKBMODE, kbd_mode) == -1) {
-    perror("error setting kbd mode");
+    perror_info("error setting kbd mode");
   }
 
   if(fd >= 0) close(fd);

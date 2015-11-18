@@ -108,14 +108,12 @@ int auto2_init()
 
   win_old = config.win;
 
-  if(config.debug) {
-    fprintf(stderr, "find repo:\n");
-    fprintf(stderr, "  ok = %d\n", ok);
-    fprintf(stderr, "  is.network = %d\n", config.url.install->is.network);
-    fprintf(stderr, "  is.mountable = %d\n", config.url.install->is.mountable);
-    fprintf(stderr, "  device = %s\n", device ?: "");
-    fprintf(stderr, "  ZyppRepoURL: %s\n", url_print(config.url.install, 4));
-  }
+  log_debug("find repo:\n");
+  log_debug("  ok = %d\n", ok);
+  log_debug("  is.network = %d\n", config.url.install->is.network);
+  log_debug("  is.mountable = %d\n", config.url.install->is.mountable);
+  log_debug("  device = %s\n", device ?: "");
+  log_debug("  ZyppRepoURL: %s\n", url_print(config.url.install, 4));
 
   if(
     ok &&
@@ -164,7 +162,7 @@ void auto2_scan_hardware()
   if(config.debug) hd_data->progress = auto2_progress;
 #endif
 
-  fprintf(stderr, "Starting hardware detection...\n");
+  log_info("Starting hardware detection...\n");
   printf("Starting hardware detection...");
   if(hd_data->progress) printf("\n");
   fflush(stdout);
@@ -178,12 +176,11 @@ void auto2_scan_hardware()
     printf(" ok\n");
   }
   fflush(stdout);
-  fprintf(stderr, "Hardware detection finished.\n");
+  log_info("Hardware detection finished.\n");
 
   util_splash_bar(20, SPLASH_20);
 
-  printf("(If a driver is not working for you, try booting with brokenmodules=driver_name.)\n\n");
-  fflush(stdout);
+  log_show("(If a driver is not working for you, try booting with brokenmodules=driver_name.)\n\n");
 
   if(config.scsi_before_usb) {
     load_drivers(hd_data, hw_storage_ctrl);
@@ -191,8 +188,7 @@ void auto2_scan_hardware()
   }
 
   if((hd_pcmcia = hd_list(hd_data, hw_pcmcia_ctrl, 0, NULL)) && !config.test) {
-    printf("Activating pcmcia devices...");
-    fflush(stdout);
+    log_show("Activating pcmcia devices...");
 
     hd_data->progress = NULL;
 
@@ -211,13 +207,11 @@ void auto2_scan_hardware()
     for(hd = hd_pcmcia2; hd; hd = hd->next) activate_driver(hd_data, hd, NULL, 0);
     hd_pcmcia2 = hd_free_hd_list(hd_pcmcia2);
 
-    printf(" ok\n");
-    fflush(stdout);
+    log_show(" ok\n");
   }
 
   if((hd_usb = hd_list(hd_data, hw_usb_ctrl, 0, NULL)) && !config.test) {
-    printf("Activating usb devices...");
-    fflush(stdout);
+    log_show("Activating usb devices...");
 
     hd_data->progress = NULL;
 
@@ -253,8 +247,7 @@ void auto2_scan_hardware()
 
     hd_list(hd_data, hw_usb, 1, NULL);
 
-    printf(" ok\n");
-    fflush(stdout);
+    log_show(" ok\n");
 
     load_drivers(hd_data, hw_usb);
 
@@ -262,8 +255,7 @@ void auto2_scan_hardware()
   }
 
   if((hd_fw = hd_list(hd_data, hw_ieee1394_ctrl, 0, NULL)) && !config.test) {
-    printf("Activating ieee1394 devices...");
-    fflush(stdout);
+    log_show("Activating ieee1394 devices...");
 
     hd_data->progress = NULL;
 
@@ -278,8 +270,7 @@ void auto2_scan_hardware()
 
     if(config.usbwait > 0) sleep(config.usbwait);
 
-    printf(" ok\n");
-    fflush(stdout);
+    log_show(" ok\n");
   }
 
   util_splash_bar(30, SPLASH_30);
@@ -350,15 +341,13 @@ void auto2_scan_hardware()
 
   /* load & parse info files */
   for(sl = config.info.file; sl; sl = sl->next) {
-    fprintf(stderr, "info file: %s\n", sl->key);
-    printf("Reading info file: %s\n", sl->key);
-    fflush(stdout);
+    log_show("Reading info file: %s\n", sl->key);
     url = url_set(sl->key);
     err = url_read_file_anywhere(url, NULL, NULL, "/download/info", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
     if(!err) {
-      fprintf(stderr, "parsing info file: %s\n", sl->key);
+      log_info("parsing info file: %s\n", sl->key);
       file_read_info_file("file:/download/info", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
     }
@@ -369,14 +358,12 @@ void auto2_scan_hardware()
    */
   if(config.net.sshkey) {
     url = url_set(config.net.sshkey);
-    fprintf(stderr, "Downloading SSH key: %s\n", config.net.sshkey);
-    printf("Downloading SSH key: %s\n", config.net.sshkey);
-    fflush(stdout);
+    log_show("Downloading SSH key: %s\n", config.net.sshkey);
     err = url_read_file_anywhere(url, NULL, NULL, "/download/authorized_keys", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
     if(!err) {
-      fprintf(stderr, "activating SSH key\n");
+      log_info("activating SSH key\n");
       mkdir("/root/.ssh", 0755);
       rename("/download/authorized_keys", "/root/.ssh/authorized_keys");
     }
@@ -388,22 +375,19 @@ void auto2_scan_hardware()
    */
   if(config.autoyast2 && !config.autoyast) {
     url = url_set(config.autoyast2);
-    fprintf(stderr, "Downloading AutoYaST file: %s\n", config.autoyast2);
-    if(!url->quiet) {
-      printf("Downloading AutoYaST file: %s\n", config.autoyast2);
-      fflush(stdout);
-    }
+    log_show_maybe(!url->quiet, "Downloading AutoYaST file: %s\n", config.autoyast2);
+
     err = url_read_file_anywhere(url, NULL, NULL, "/download/autoinst.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
     url_umount(url);
     url_free(url);
     if(!err) {
-      fprintf(stderr, "setting AutoYaST option to file:///download/autoinst.xml\n");
+      log_info("setting AutoYaST option to file:///download/autoinst.xml\n");
       str_copy(&config.autoyast, "file:///download/autoinst.xml");
       /* parse it:
        * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
        * otherwise the file content is ignored
        */
-      fprintf(stderr, "parsing AutoYaST file\n");
+      log_info("parsing AutoYaST file\n");
       file_read_info_file("file:/download/autoinst.xml", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
     }
@@ -418,12 +402,11 @@ void auto2_scan_hardware()
     for(names = &config.update.name_list; *names; names = &(*names)->next);
 
     for(sl = config.update.urls; sl && !config.sig_failed; sl = sl->next) {
-      fprintf(stderr, "dud url: %s\n", sl->key);
+      log_info("dud url: %s\n", sl->key);
 
       url = url_set(sl->key);
 
-      fprintf(url->quiet ? stderr : stdout, "Reading driver update: %s\n", sl->key);
-      fflush(url->quiet ? stderr : stdout);
+      log_show_maybe(!url->quiet, "Reading driver update: %s\n", sl->key);
 
       // for later...
       char *err_buf = NULL;
@@ -458,8 +441,10 @@ void auto2_scan_hardware()
             URL_FLAG_NODIGEST + URL_FLAG_PROGRESS + (config.secure ? URL_FLAG_CHECK_SIG : 0)
           );
         }
-        fprintf(stderr, "err2 = %d\n", err);
+        log_info("err2 = %d\n", err);
+
         LXRC_WAIT
+
         if(!err) err = util_mount_ro(file_name, config.mountpoint.update, url->file_list) ? 1 : 0;
 
         if(err) unlink(file_name);
@@ -490,7 +475,7 @@ void auto2_scan_hardware()
     if(dud_count == config.update.count) {
       if(should_have_updates) {
         char *msg = "No applicable driver updates found.";
-        fprintf(stderr, "%s\n", msg);
+        log_info("%s\n", msg);
         dia_message2(msg, MSGTYPE_INFO);
       }
     }
@@ -500,9 +485,9 @@ void auto2_scan_hardware()
           dia_show_lines2("Driver Updates added", *names, 64);
         }
         else {
-          printf("%s:\n", "Driver Updates added");
+          log_show("%s:\n", "Driver Updates added");
           for(sl = *names; sl; sl = sl->next) {
-            printf("  %s\n", sl->key);
+            log_show("  %s\n", sl->key);
           }
         }
       }
@@ -511,7 +496,7 @@ void auto2_scan_hardware()
           dia_message("Driver Update ok", MSGTYPE_INFO);
         }
         else {
-          printf("%s\n", "Driver Update ok");
+          log_show("%s\n", "Driver Update ok");
         }
       }
     }  
@@ -527,7 +512,7 @@ int test_and_add_dud(url_t *url)
   char *buf = NULL, *s;
   int i, is_dud;
 
-  if(config.debug) fprintf(stderr, "test_and_add_dud: all = %u\n", url->search_all);
+  log_debug("test_and_add_dud: all = %u\n", url->search_all);
 
   is_dud = util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
 
@@ -542,14 +527,14 @@ int test_and_add_dud(url_t *url)
 
     s = url_print(url, 1);
 
-    printf("%s: adding to %s system\n", s, config.rescue ? "rescue" : "installation");
+    log_show("%s: adding to %s system\n", s, config.rescue ? "rescue" : "installation");
 
     strprintf(&buf, "%s/dud_%04u", config.download.base, config.update.ext_count++);
 
-    fprintf(stderr, "%s -> %s: converting dud to squashfs\n", s, buf);
-    strprintf(&buf, "mksquashfs %s %s -noappend -no-progress >%s", config.mountpoint.update, buf, config.debug ? "&2" : "/dev/null");
-    i = system(buf);
-    if(i) fprintf(stderr, "mount: mksquashfs failed\n");
+    log_info("%s -> %s: converting dud to squashfs\n", s, buf);
+    strprintf(&buf, "mksquashfs %s %s -noappend -no-progress", config.mountpoint.update, buf);
+    i = lxrc_run(buf);
+    if(i) log_info("mount: mksquashfs failed\n");
 
     LXRC_WAIT
   }
@@ -605,7 +590,7 @@ int auto2_find_repo()
 
   if(!err && config.kexec) {
     auto2_kexec(config.url.install);
-    fprintf(stderr, "kexec failed\n");
+    log_info("kexec failed\n");
     return 0;
   }
 
@@ -619,7 +604,7 @@ int auto2_find_repo()
   if(!err) auto2_read_repo_files(config.url.install);
 
   if(err) {
-    fprintf(stderr, "no %s repository found\n", config.product);
+    log_info("no %s repository found\n", config.product);
     return 0;
   }
 
@@ -650,7 +635,7 @@ void auto2_user_netconfig()
       if(config.net.devices) str_copy(&config.net.device, config.net.devices->key);
     }
     if(net_static()) {
-      fprintf(stderr, "net activation failed\n");
+      log_info("net activation failed\n");
       config.net.configured = nc_none;
     }
   }
@@ -704,7 +689,6 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
   str_list_t *sl1, *sl2;
   slist_t *slm;
   int i, j, ok = 0;
-  FILE *msg = config.win ? stderr : stdout;
 
   if(!hd || driver_is_active(hd)) return 1;
 
@@ -719,8 +703,7 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
       ) {
         if(!hd_module_is_active(hd_data, sl1->str)) {
           if(show_modules && !slist_getentry(config.module.broken, sl1->str)) {
-            fprintf(msg, "%s %s", j++ ? "," : "  loading", sl1->str);
-            fflush(msg);
+            log_show_maybe(!config.win, "%s %s", j++ ? "," : "  loading", sl1->str);
           }
           di->module.modprobe ? mod_modprobe(sl1->str, sl2->str) : mod_insmod(sl1->str, sl2->str);
         }
@@ -741,7 +724,7 @@ int activate_driver(hd_data_t *hd_data, hd_t *hd, slist_t **mod_list, int show_m
       }
     }
   }
-  if(j) fprintf(msg, "\n");
+  if(j) log_show_maybe(!config.win, "\n");
 
   return ok;
 }
@@ -768,7 +751,6 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
   driver_info_t *di;
   int i, active;
   char *mods;
-  FILE *msg = config.win ? stderr : stdout;
 
   for(hd = hd_list(hd_data, hw_item, 0, NULL); hd; hd = hd->next) {
     hd_add_driver_data(hd_data, hd);
@@ -783,7 +765,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
           di->module.names &&
           di->module.names->str
         ) {
-          if(!i) fprintf(msg, "%s\n", hd->model);
+          if(!i) log_show_maybe(!config.win, "%s\n", hd->model);
           if(hd->driver_module) {
             active =
               !mod_cmp(hd->driver_module, di->module.names->str) ||
@@ -803,7 +785,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
               );
           }
           mods = hd_join("+", di->module.names);
-          fprintf(msg, "%s %s%s",
+          log_show_maybe(!config.win, "%s %s%s",
             i++ ? "," : "  drivers:",
             mods,
             active ? "*" : ""
@@ -812,8 +794,7 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
         }
       }
       if(i) {
-        fprintf(msg, "\n");
-        fflush(msg);
+        log_show_maybe(!config.win, "\n");
       }
     }
     activate_driver(hd_data, hd, NULL, 1);
@@ -900,13 +881,13 @@ void auto2_read_repo_files(url_t *url)
   if(!config.autoyast) {
     if(util_check_exist("/tmp/autoinst.xml")) rename("/tmp/autoinst.xml", "/autoinst.xml");
     if(util_check_exist("/autoinst.xml")) {
-      fprintf(stderr, "setting AutoYaST option to file:///autoinst.xml\n");
+      log_info("setting AutoYaST option to file:///autoinst.xml\n");
       str_copy(&config.autoyast, "file:///autoinst.xml");
       /* parse it:
        * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
        * otherwise the file content is ignored
        */
-      fprintf(stderr, "parsing AutoYaST file\n");
+      log_info("parsing AutoYaST file\n");
       file_read_info_file("file:/autoinst.xml", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
     }
@@ -959,17 +940,17 @@ void auto2_kexec(url_t *url)
   unsigned vga_mode = 0;
 
   if(!config.kexec_kernel || !config.kexec_initrd) {
-    fprintf(stderr, "no kernel and initrd for kexec specified\n");
+    log_info("no kernel and initrd for kexec specified\n");
     return;
   }
 
   splash_name = auto2_splash_name();
-  if(config.debug) fprintf(stderr, "splash = %s\n", splash_name);
+  log_debug("splash = %s\n", splash_name);
 
 #if defined(__i386__) || defined(__x86_64__)
   if(config.vga) {
     vga_mode = config.vga_mode;
-    if(config.debug) fprintf(stderr, "vga = 0x%04x\n", vga_mode);
+    log_debug("vga = 0x%04x\n", vga_mode);
   }
 #endif
 
@@ -984,7 +965,7 @@ void auto2_kexec(url_t *url)
     err = url_read_file(url, NULL, splash_name, splash, NULL, URL_FLAG_PROGRESS);
     if(!err) {
       strprintf(&buf, "cat %s >>%s", splash, initrd);
-      system(buf);
+      lxrc_run_console(buf);
     }
     else {
       err = 0;
@@ -1001,13 +982,12 @@ void auto2_kexec(url_t *url)
     sync();
 
     strprintf(&buf, "kexec -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
-    fprintf(stderr, "%s\n", buf);
 
     if(!config.test) {
-      system(buf);
+      lxrc_run(buf);
       util_umount_all();
       sync();
-      system("kexec -e");
+      lxrc_run("kexec -e");
     }
   }
 
@@ -1070,7 +1050,7 @@ void auto2_driverupdate(url_t *url)
   if(dud_count == config.update.count) {
     if(!err) {
       char *msg = "No applicable driver updates found.";
-      fprintf(stderr, "%s\n", msg);
+      log_info("%s\n", msg);
       dia_message2(msg, MSGTYPE_INFO);
     }
   }
@@ -1092,7 +1072,7 @@ int auto2_add_extension(char *extension)
   char *s, *cmd = NULL;
   slist_t *sl;
 
-  fprintf(stderr, "instsys add extension: %s\n", extension);
+  log_info("instsys add extension: %s\n", extension);
 
   str_copy(&config.mountpoint.instdata, new_mountpoint());
   str_copy(&config.mountpoint.instsys, new_mountpoint());
@@ -1106,12 +1086,12 @@ int auto2_add_extension(char *extension)
   }
 
   if(!config.url.instsys) {
-    fprintf(stderr, "no instsys\n");
+    log_info("no instsys\n");
     err = 1;
   }
 
   if(config.url.instsys->scheme == inst_rel && !config.url.install) {
-    fprintf(stderr, "no repo\n");
+    log_info("no repo\n");
     err = 2;
   }
 
@@ -1141,14 +1121,14 @@ int auto2_add_extension(char *extension)
 
   if(!err) {
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
-      fprintf(stderr, "integrating %s (%s)\n", sl->key, sl->value);
+      log_info("integrating %s (%s)\n", sl->key, sl->value);
       if(!config.test) {
         argv[1] = sl->value;
         argv[2] = "/";
         util_lndir_main(3, argv);
         if(util_check_exist2(sl->value, ".init") == 'r') {
           strprintf(&cmd, "%s/.init %s", sl->value, sl->value);
-          system(cmd);
+          lxrc_run(cmd);
           str_copy(&cmd, NULL);
         }
       }
@@ -1167,7 +1147,7 @@ int auto2_remove_extension(char *extension)
   FILE *f, *w;
   slist_t *sl0 = NULL, *sl;
 
-  fprintf(stderr, "instsys remove extension: %s\n", extension);
+  log_info("instsys remove extension: %s\n", extension);
 
   s = url_instsys_base(config.url.instsys->path);
   if(!s) return 3;
@@ -1187,7 +1167,7 @@ int auto2_remove_extension(char *extension)
             for(sl = sl0->next; sl; sl = sl->next) {
               if(util_check_exist2(sl->key, ".done") == 'r') {
                 strprintf(&cmd, "%s/.done %s", sl->key, sl->key);
-                system(cmd);
+                lxrc_run(cmd);
                 str_copy(&cmd, NULL);
               }
               util_umount(sl->key);

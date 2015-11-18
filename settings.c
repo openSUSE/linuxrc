@@ -486,8 +486,7 @@ void set_activate_keymap(char *keymap)
       keymap, enc
     );
     if(!config.test) {
-      if(config.debug) fprintf(stderr, "%s\n", cmd);
-      system(cmd);
+      lxrc_run_console(cmd);
     }
   }
 }

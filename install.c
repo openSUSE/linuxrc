@@ -518,13 +518,12 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
           sprintf(buf, "Warning: all data on %s will be deleted!", dev);
           j = dia_contabort(buf, NO);
           if(j == YES) {
-            sprintf(buf, "/sbin/mkswap %s >/dev/null 2>&1", dev);
-            fprintf(stderr, "mkswap %s\n", dev);
-            if(!system(buf)) {
-              fprintf(stderr, "swapon %s\n", dev);
+            sprintf(buf, "/sbin/mkswap %s", dev);
+            if(!lxrc_run(buf)) {
+              log_info("swapon %s\n", dev);
               if(swapon(dev, 0)) {
-                fprintf(stderr, "swapon: ");
-                perror(dev);
+                log_info("swapon: ");
+                perror_info(dev);
                 dia_message("Error activating swap space.", MSGTYPE_ERROR);
               }
               else {
@@ -582,13 +581,12 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
               dia_message("failed to create swapfile", MSGTYPE_ERROR);
             }
             else {
-              sprintf(buf, "/sbin/mkswap %s >/dev/null 2>&1", file);
-              fprintf(stderr, "mkswap %s\n", file);
-              if(!system(buf)) {
-                fprintf(stderr, "swapon %s\n", file);
+              sprintf(buf, "/sbin/mkswap %s", file);
+              if(!lxrc_run(buf)) {
+                log_info("swapon %s\n", file);
                 if(swapon(file, 0)) {
-                  fprintf(stderr, "swapon: ");
-                  perror(file);
+                  log_info("swapon: ");
+                  perror_info(file);
                   dia_message("Error activating swap space.", MSGTYPE_ERROR);
                 }
                 else {
@@ -628,7 +626,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
   free(items3);
   free(values3);
 
-  // fprintf(stderr, "rc = %d\n", rc);
+  // log_info("rc = %d\n", rc);
 
   return rc;
 }
@@ -986,7 +984,7 @@ int inst_start_install()
   ) err = 1;
 #endif
 
-  if(config.debug >= 2) util_status_info(1);
+  if(config.debug) util_status_info(1);
   
   if(!err) err = inst_execute_yast();
 
@@ -1148,7 +1146,7 @@ int inst_execute_yast()
   }
 
   if(!config.test) {
-    if(util_check_exist("/sbin/update")) system("/sbin/update");
+    if(util_check_exist("/sbin/update")) lxrc_run("/sbin/update");
   }
 
   i = 0;
@@ -1184,7 +1182,7 @@ int inst_execute_yast()
   disp_set_color(COL_WHITE, COL_BLACK);
   if(config.win) util_disp_done();
 
-  if(config.splash && config.textmode) system("echo 0 >/proc/splash");
+  if(config.splash && config.textmode) lxrc_run_console("echo 0 >/proc/splash");
 
   str_copy(&setupcmd, config.setupcmd);
 
@@ -1199,7 +1197,7 @@ int inst_execute_yast()
     util_plymouth_off();
   }
 
-  fprintf(stderr, "starting %s\n", setupcmd);
+  log_info("starting %s\n", setupcmd);
 
   LXRC_WAIT
 
@@ -1219,28 +1217,28 @@ int inst_execute_yast()
       inst_pid = fork();
 
       if(inst_pid) {
-        // fprintf(stderr, "%d: inst_pid = %d\n", getpid(), inst_pid);
+        // log_info("%d: inst_pid = %d\n", getpid(), inst_pid);
 
         while((pid = waitpid(-1, &err, 0))) {
-          // fprintf(stderr, "%d: chld(%d) = %d\n", getpid(), pid, err);
+          // log_info("%d: chld(%d) = %d\n", getpid(), pid, err);
           if(pid == inst_pid) {
-            // fprintf(stderr, "%d: last chld\n", getpid());
+            // log_info("%d: last chld\n", getpid());
             break;
           }
         }
 
-        // fprintf(stderr, "%d: back from loop\n", getpid());
+        // log_info("%d: back from loop\n", getpid());
       }
       else {
         signal(SIGUSR1, SIG_IGN);
 
-        // fprintf(stderr, "%d: system()\n", getpid());
+        // log_info("%d: system()\n", getpid());
         err = system(setupcmd);
-        // fprintf(stderr, "%d: exit(%d)\n", getpid(), err);
+        // log_info("%d: exit(%d)\n", getpid(), err);
         exit(WEXITSTATUS(err));
       }
 
-      // fprintf(stderr, "%d: back, err = %d\n", getpid(), err);
+      // log_info("%d: back, err = %d\n", getpid(), err);
     }
   }
 
@@ -1269,16 +1267,16 @@ int inst_execute_yast()
 
   str_copy(&setupcmd, NULL);
 
-  if(config.splash && config.textmode) system("echo 1 >/proc/splash");
+  if(config.splash && config.textmode) lxrc_run_console("echo 1 >/proc/splash");
 
-  fprintf(stderr, "install program exit code is %d\n", err);
+  log_info("install program exit code is %d\n", err);
 
   /* Redraw erverything and go back to the main menu. */
   config.redraw_menu = 1;
 
-  fprintf(stderr, "sync...");
+  log_info("sync...");
   sync();
-  fprintf(stderr, " ok\n");
+  log_info(" ok\n");
 
   LXRC_WAIT
 
@@ -1336,7 +1334,7 @@ int inst_commit_install()
       }
 
       if(config.test) {
-        fprintf(stderr, "*** reboot ***\n");
+        log_info("*** reboot ***\n");
         break;
       }
 
@@ -1345,7 +1343,7 @@ int inst_commit_install()
 
     case 2:	/* power off */
       if(config.test) {
-        fprintf(stderr, "*** power off ***\n");
+        log_info("*** power off ***\n");
         break;
       }
 
@@ -1354,11 +1352,11 @@ int inst_commit_install()
 
     case 3:	/* kexec */
       if(config.test) {
-        fprintf(stderr, "*** kexec ***\n");
+        log_info("*** kexec ***\n");
         break;
       }
 
-      system("kexec -e");
+      lxrc_run("kexec -e");
       break;
 
     default:	/* do nothing */
@@ -1442,7 +1440,7 @@ int ask_for_swap(int64_t size, char *msg)
 
     if(j == 0 && partition) {
       argv[1] = long_dev(partition);
-      fprintf(stderr, "swapon %s\n", argv[1]);
+      log_info("swapon %s\n", argv[1]);
       i = util_swapon_main(2, argv);
       if(i) {
         dia_message("Error activating swap space.", MSGTYPE_ERROR);

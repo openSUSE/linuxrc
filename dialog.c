@@ -1489,7 +1489,7 @@ void dia_handle_ctrlc (void)
 	  else {
 	    j = system(config.run_command);
 	  }
-	  if(j) fprintf(stderr, "  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
+	  if(j) log_info("  exit code: %d\n", WIFEXITED(j) ? WEXITSTATUS(j) : -1);
 	}
       }
       else if(i == -70) {

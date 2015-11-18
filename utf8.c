@@ -179,7 +179,7 @@ void utf8_strwcpy(unsigned char *dst, unsigned char *src, int width)
 {
   int w = 0, c, l = 0;
 
-//  fprintf(stderr, "[wcpy %d: <%s>", width, src);
+//  log_info("[wcpy %d: <%s>", width, src);
 
   while(
     (c = utf8_decode(src + l)) &&
@@ -191,7 +191,7 @@ void utf8_strwcpy(unsigned char *dst, unsigned char *src, int width)
   memcpy(dst, src, l);
   dst[l] = 0;
 
-//  fprintf(stderr, " <%s>]\n", dst);
+//  log_info(" <%s>]\n", dst);
 }
 
 

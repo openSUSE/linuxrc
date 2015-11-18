@@ -79,7 +79,7 @@ void digest_media_verify(char *device)
 
   iso.err = 1;
 
-  fprintf(stderr, "digest_media_verify(%s)\n", device);
+  log_info("digest_media_verify(%s)\n", device);
 
   if(device) {
     device = strdup(long_dev(device));
@@ -118,7 +118,7 @@ void digest_media_verify(char *device)
   }
 #endif
 
-  fprintf(stderr,
+  log_info(
     "  app: %s\nmedia: %s%d\n size: %u kB\n  pad: %u kB\n",
     iso.app_id,
     iso.media_type,
@@ -127,9 +127,9 @@ void digest_media_verify(char *device)
     iso.pad
   );
 
-  fprintf(stderr, "  ref: ");
-  if(iso.digest.got_old) for(i = 0; i < iso.digest.size; i++) fprintf(stderr, "%02x", iso.digest.old[i]);
-  fprintf(stderr, "\n");
+  log_info("  ref: ");
+  if(iso.digest.got_old) for(i = 0; i < iso.digest.size; i++) log_info("%02x", iso.digest.old[i]);
+  log_info("\n");
 
   if(!*iso.app_id || !iso.digest.got_old || iso.pad >= iso.size) {
     sprintf(buf, "This is not a %s medium.", config.product);
@@ -141,26 +141,26 @@ void digest_media_verify(char *device)
   do_digest(device);
 
   if(iso.err_ofs) {
-    fprintf(stderr, "  err: sector %u\n", iso.err_ofs >> 1);
+    log_info("  err: sector %u\n", iso.err_ofs >> 1);
   }
 
-  fprintf(stderr, "check: ");
+  log_info("check: ");
   if(iso.digest.got_old) {
     if(iso.digest.ok) {
-      fprintf(stderr, "%ssum ok\n", iso.digest.name);
+      log_info("%ssum ok\n", iso.digest.name);
     }
     else {
-      fprintf(stderr, "%ssum wrong\n", iso.digest.name);
+      log_info("%ssum wrong\n", iso.digest.name);
     }
   }
   else {
-    fprintf(stderr, "%ssum not checked\n", iso.digest.name);
+    log_info("%ssum not checked\n", iso.digest.name);
   }
 
   if(iso.digest.got_current) {
-    fprintf(stderr, "  %s: ", iso.digest.name);
-    for(i = 0; i < iso.digest.size; i++) fprintf(stderr, "%02x", iso.digest.full[i]);
-    fprintf(stderr, "\n");
+    log_info("  %s: ", iso.digest.name);
+    for(i = 0; i < iso.digest.size; i++) log_info("%02x", iso.digest.full[i]);
+    log_info("\n");
   }
 
   if(iso.digest.ok) {
