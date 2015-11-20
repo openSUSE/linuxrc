@@ -2248,7 +2248,6 @@ int url_find_repo(url_t *url, char *dir)
 {
   int err = 0;
 
-
   log_info("repository: looking for %s\n", url_print(url, 0));
 
   err = url_mount(url, dir, test_is_repo);

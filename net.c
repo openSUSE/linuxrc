@@ -2507,7 +2507,7 @@ void net_update_state()
 
   config.ifcfg.if_state = slist_free(config.ifcfg.if_state);
 
-  if((f = popen("wicked show all", "r"))) {
+  if((f = popen("wicked show all 2>/dev/null", "r"))) {
     while(fgets(buf, sizeof buf, f)) {
       if(!isspace(*buf)) {
         for(s1 = buf; *s1 && !isspace(*s1); s1++);
@@ -2556,7 +2556,7 @@ void net_wicked_up(char *ifname)
     strprintf(&buf, "wicked ifup %s", ifname);
   }
 
-  lxrc_run(buf);
+  if(!config.test) lxrc_run(buf);
 
   sleep(config.net.ifup_wait + 1);
 
@@ -2581,7 +2581,7 @@ void net_wicked_down(char *ifname)
 
   strprintf(&buf, "wicked ifdown %s", ifname);
 
-  lxrc_run(buf);
+  if(!config.test) lxrc_run(buf);
 
   sleep(1);
 

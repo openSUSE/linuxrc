@@ -980,7 +980,16 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_linuxrcstderr:
-        if(*f->value) util_set_stderr(f->value);
+        if(*f->value) {
+          if(
+            !config.log.dest[1].name ||
+            strcmp(config.log.dest[1].name, f->value)
+          ) {
+            str_copy(&config.log.dest[1].name, f->value);
+            if(config.log.dest[1].f) fclose(config.log.dest[1].f);
+            config.log.dest[1].f = NULL;
+          }
+        }
         break;
 
       case key_kbdtimeout:
@@ -1063,6 +1072,13 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           }
         }
         slist_free(sl0);
+
+        if(config.error_trace) {
+          config.log.dest[2].level |= LOG_CALLER;
+        }
+        else {
+          config.log.dest[2].level &= ~LOG_CALLER;
+        }
         break;
 
       case key_linuxrc:
@@ -2466,8 +2482,7 @@ void wait_for_conn(int port)
 
   addr.sin_port = htons(port);
 
-  printf("\n%s waiting for connection on port %d\n", inet2print(&config.net.hostname), port);
-  fflush(stdout);
+  log_show("\n%s waiting for connection on port %d\n", inet2print(&config.net.hostname), port);
 
   if(
     (sock = socket(AF_INET, SOCK_STREAM, 0)) == -1 ||

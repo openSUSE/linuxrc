@@ -131,7 +131,6 @@ int main(int argc, char **argv, char **env)
   config.tmpfs = 1;
 
   str_copy(&config.console, "/dev/console");
-  str_copy(&config.stderr_name, "/dev/tty3");
 
   // define logging destinations for the various log levels:
 
@@ -180,7 +179,7 @@ int main(int argc, char **argv, char **env)
   if(!config.had_segv) config.restart_on_segv = 1;
 
   if(util_check_exist("/usr/src/packages") || getuid()) {
-    printf("Seems we are on a running system; activating testmode...\n");
+    log_show("Seems we are on a running system; activating testmode...\n");
     config.test = 1;
     str_copy(&config.console, "/dev/tty");
   }
@@ -193,6 +192,7 @@ int main(int argc, char **argv, char **env)
       find_shell();
       mount("proc", "/proc", "proc", 0, 0);
       file_do_info(file_get_cmdline(key_tmpfs), kf_cmd + kf_cmd_early);
+      file_do_info(file_get_cmdline(key_linuxrcstderr), kf_cmd + kf_cmd_early);
       file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
       util_free_mem();
       umount("/proc");
@@ -918,8 +918,6 @@ void lxrc_init()
     mkdir("/dev/pts", 0755);
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
-
-  util_set_stderr(config.stderr_name);
 
   time_t t = time(NULL);
   struct tm *gm = gmtime(&t);

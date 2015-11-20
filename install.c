@@ -984,7 +984,7 @@ int inst_start_install()
   ) err = 1;
 #endif
 
-  if(config.debug) util_status_info(1);
+  if(config.debug >= 2) util_status_info(1);
   
   if(!err) err = inst_execute_yast();
 
@@ -1254,7 +1254,7 @@ int inst_execute_yast()
   if(!config.test && !config.listen) {
     freopen(config.console, "r", stdin);
     freopen(config.console, "a", stdout);
-    freopen(config.stderr_name, "a", stderr);
+    freopen(config.console, "a", stderr);
   }
   else {
     dup2(1, 0);

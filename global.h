@@ -100,6 +100,8 @@ enum langid_t {
 #define LOG_LEVEL_DEBUG	(1 << 2)
 // add time stamps to log entries
 #define LOG_TIMESTAMP	(1 << 3)
+// add calling function name to log entries
+#define LOG_CALLER	(1 << 4)
 
 // log to the default console
 #define log_show(...) util_log(LOG_LEVEL_SHOW, __VA_ARGS__)
@@ -110,6 +112,9 @@ enum langid_t {
 // log to the default console if cond is true
 // else log to logging console
 #define log_show_maybe(cond, ...) util_log((cond) ? LOG_LEVEL_SHOW : LOG_LEVEL_INFO, __VA_ARGS__)
+// log to the logging console if cond is true
+// else log only to log file
+#define log_info_maybe(cond, ...) util_log((cond) ? LOG_LEVEL_INFO : LOG_LEVEL_DEBUG, __VA_ARGS__)
 
 // perror() equivalents
 #define perror_show(a) util_perror(LOG_LEVEL_SHOW, a)
@@ -459,7 +464,6 @@ typedef struct {
   char *yepcert;		/* just pass it to yast */
   char *supporturl;		/* just pass it to yast */
   slist_t *linuxrc;		/* 'linuxrc' parameters */
-  char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */

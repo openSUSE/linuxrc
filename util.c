@@ -1160,7 +1160,6 @@ void util_status_info(int log_it)
   }
 
   sprintf(buf, "flags = ");
-  add_flag(&sl0, buf, config.debug, "debug");
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
   add_flag(&sl0, buf, config.manual, "manual");
@@ -1434,9 +1433,19 @@ void util_status_info(int log_it)
   sprintf(buf, "esc delay: %dms", config.escdelay);
   slist_append_str(&sl0, buf);
 
-
-  sprintf(buf, "stderr = \"%s\"", config.stderr_name);
+  sprintf(buf, "debug level = %d", config.debug);
   slist_append_str(&sl0, buf);
+
+  for(i = 0; i < sizeof config.log.dest / sizeof *config.log.dest; i++) {
+    sprintf(buf,
+      "log[%d]: mask = 0x%x, name = %s, fd = %d",
+      i,
+      config.log.dest[i].level,
+      config.log.dest[i].name ?: "",
+      config.log.dest[i].f ? fileno(config.log.dest[i].f) : -1
+    );
+    slist_append_str(&sl0, buf);
+  }
 
   sprintf(buf, "rootimage = \"%s\"", config.rootimage);
   slist_append_str(&sl0, buf);
@@ -3095,29 +3104,6 @@ void util_set_serial_console(char *str)
 }
 
 
-void util_set_stderr(char *name)
-{
-  if(!name || !*name) return;
-
-  str_copy(&config.stderr_name, name);
-
-  if(!freopen(config.stderr_name, "a", stderr)) {
-    freopen("/dev/null", "a", stderr);
-  }
-
-  setlinebuf(stderr);
-
-  if(
-    !config.log.dest[1].name ||
-    strcmp(config.log.dest[1].name, config.stderr_name)
-  ) {
-    str_copy(&config.log.dest[1].name, config.stderr_name);
-    if(config.log.dest[1].f) fclose(config.log.dest[1].f);
-    config.log.dest[1].f = NULL;
-  }
-}
-
-
 void util_set_product_dir(char *prod)
 {
   struct utsname ubuf;
@@ -4235,7 +4221,7 @@ void util_error_trace(char *format, ...)
   vfprintf(stderr, format, args);
   va_end(args);
   
-  nptrs = backtrace(buffer, 100);
+  nptrs = backtrace(buffer, sizeof buffer / sizeof *buffer);
   p = buffer;
   if(nptrs > 1) nptrs--, p++;
   backtrace_symbols_fd(p, nptrs, STDERR_FILENO);
@@ -5311,7 +5297,7 @@ int util_is_wlan(char *device)
 void util_log(unsigned level, char *format, ...)
 {
   va_list args;
-  char *buf;
+  char *buf, *caller = NULL;
   int buf_len = 0;
   log_file_t *lf;
 
@@ -5331,7 +5317,12 @@ void util_log(unsigned level, char *format, ...)
       if(lf->f) {
         if((lf->level & LOG_TIMESTAMP)) {
           if(gm) {
-            fprintf(lf->f, "%02d:%02d:%02d <%u> ", gm->tm_hour, gm->tm_min, gm->tm_sec, level);
+            fprintf(lf->f, "%02d:%02d:%02d <%u>", gm->tm_hour, gm->tm_min, gm->tm_sec, level);
+            if((lf->level & LOG_CALLER)) {
+              if(!caller) caller = util_get_caller(1);
+              if(caller) fprintf(lf->f, " %-28s", caller);
+            }
+            fprintf(lf->f, ": ");
           }
         }
         if(buf_len) {
@@ -5373,7 +5364,7 @@ int util_run(char *cmd, unsigned log_stdout)
 
   err = WEXITSTATUS(system(cmd2));
 
-  log_info("exec: %s = %d\n", cmd, err);
+  log_info_maybe(config.debug, "exec: %s = %d\n", cmd, err);
 
   lseek(fd, 0, SEEK_SET);
 
@@ -5408,5 +5399,46 @@ void util_perror(unsigned level, char *msg)
   else {
     util_log(level, "%s\n", str);
   }
+}
+
+
+/*
+ * Run backtrace to get the name of the calling function.
+ *
+ * Skip 'skip' calling levels.
+ *
+ * If the symbolic name can't be found, it (recursively) tries to get the
+ * name of the parant function and appends ".?" to the name.
+ */
+char *util_get_caller(int skip)
+{
+  void *buffer[8], **p;
+  char **syms, *s, *t;
+  static char *buf = NULL;
+  int i, len;
+
+  str_copy(&buf, NULL);
+
+  len = backtrace(buffer, sizeof buffer / sizeof *buffer);
+
+  if((len -= ++skip) <= 0) return buf;
+  p = buffer + skip;
+
+  if(!(syms = backtrace_symbols(p, len))) return buf;
+
+  for(i = 0, s = 0; i < len; i++) {
+    if((s = strchr(syms[i], '(')) && s[1] != ')') {
+      if((t = strchr(++s, ')'))) {
+        *t = 0;
+        i = i >= 3 ? 0 : 2 * (3 - i);
+        asprintf(&buf, "%s%s", s, ".?.?.?" + i);
+      }
+      break;
+    }
+  }
+
+  free(syms);
+
+  return buf;
 }
 

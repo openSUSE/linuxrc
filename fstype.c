@@ -39,10 +39,11 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "linux_fs.h"
-#include "fstype.h"
 
 #include "global.h"
+#include "util.h"
+#include "linux_fs.h"
+#include "fstype.h"
 
 /*
  * Most file system types can be recognized by a `magic' number
@@ -145,7 +146,7 @@ char *fstype(const char *device)
   /* try harder */
   if(fd < 0 && errno == ENOMEDIUM) fd = open(device, O_RDONLY | O_LARGEFILE);
   if(fd < 0) {
-    if(config.debug) perror(device);
+    perror_debug((char *) device);
     return 0;
   }
 

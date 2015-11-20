@@ -83,7 +83,6 @@ void util_update_cdrom_list(void);
 void util_update_swap_list(void);
 int util_is_mountable(char *file);
 void util_set_serial_console(char *str);
-void util_set_stderr(char *name);
 void util_set_product_dir(char *prod);
 
 void scsi_rename(void);
@@ -157,3 +156,4 @@ int util_is_wlan(char *device);
 void util_log(unsigned level, char *format, ...);
 int util_run(char *cmd, unsigned log_stdout);
 void util_perror(unsigned level, char *msg);
+char *util_get_caller(int skip);
