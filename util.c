@@ -5408,7 +5408,7 @@ void util_perror(unsigned level, char *msg)
  * Skip 'skip' calling levels.
  *
  * If the symbolic name can't be found, it (recursively) tries to get the
- * name of the parant function and appends ".?" to the name.
+ * name of the parent function and appends ".?" to the name.
  */
 char *util_get_caller(int skip)
 {
