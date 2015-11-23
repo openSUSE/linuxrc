@@ -5351,7 +5351,7 @@ void util_log(unsigned level, char *format, ...)
  */
 int util_run(char *cmd, unsigned log_stdout)
 {
-  char buf[10], *buf2 = NULL, *cmd2 = NULL;
+  char buf[1024], *buf2 = NULL, *cmd2 = NULL;
   int fd, i, err = -1;
 
   if(!cmd) return err;
