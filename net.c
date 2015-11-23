@@ -209,7 +209,7 @@ void net_stop()
 
   if(!device) return;
 
-  if(config.debug) fprintf(stderr, "%s: network down\n", device);
+  log_debug("%s: network down\n", device);
 
   if(config.test) {
     config.net.is_configured = nc_none;
@@ -371,7 +371,7 @@ int net_check_address(inet_t *inet, int do_dns)
       if(!he) { sleep(1); he = gethostbyname2(inet->name, AF_INET6); }
       if(!he) {
         if(config.run_as_linuxrc) {
-          fprintf(stderr, "dns6: what is \"%s\"?\n", inet->name);
+          log_info("dns6: what is \"%s\"?\n", inet->name);
         }
       }
       else {
@@ -386,7 +386,7 @@ int net_check_address(inet_t *inet, int do_dns)
           str_copy(&sl->value, s);
 
           if(config.run_as_linuxrc) {
-            fprintf(stderr, "dns6: %s is %s\n", inet->name, s);
+            log_info("dns6: %s is %s\n", inet->name, s);
           }
         }
       }
@@ -397,7 +397,7 @@ int net_check_address(inet_t *inet, int do_dns)
       if(!he) { sleep(1); gethostbyname2(inet->name, AF_INET); }
       if(!he) {
         if(config.run_as_linuxrc) {
-          fprintf(stderr, "dns: what is \"%s\"?\n", inet->name);
+          log_info("dns: what is \"%s\"?\n", inet->name);
         }
       }
       else {
@@ -412,7 +412,7 @@ int net_check_address(inet_t *inet, int do_dns)
           str_copy(&sl->value, s);
 
           if(config.run_as_linuxrc) {
-            fprintf(stderr, "dns: %s is %s\n", inet->name, s);
+            log_info("dns: %s is %s\n", inet->name, s);
           }
         }
       }
@@ -494,11 +494,9 @@ int net_mount_cifs(char *mountpoint, char *server, char *share, char *user, char
     }
   }
 
-  strprintf(&cmd, "%s '//%s/%s' '%s' -o '%s' >&2", config.net.cifs.binary, server, share, mountpoint, real_options);
+  strprintf(&cmd, "%s '//%s/%s' '%s' -o '%s'", config.net.cifs.binary, server, share, mountpoint, real_options);
 
-  fprintf(stderr, "%s\n", cmd);
-
-  err = system(cmd);
+  err = lxrc_run(cmd);
 
   str_copy(&cmd, NULL);
   str_copy(&real_options, NULL);
@@ -537,7 +535,7 @@ int net_mount_nfs(char *mountpoint, char *server, char *hostdir, unsigned port, 
 
   mount_pid = fork();
   if(mount_pid < 0) {
-    perror("fork");
+    perror_info("fork");
 
     return mount_pid;
   }
@@ -569,13 +567,13 @@ int net_mount_nfs(char *mountpoint, char *server, char *hostdir, unsigned port, 
     }
   }
 
-  if(config.debug) fprintf(stderr, "mount -o '%s' '%s' '%s'\n", real_options, path, mountpoint);
+  log_debug("mount -o '%s' '%s' '%s'\n", real_options, path, mountpoint);
 
   char *args[6] = { "mount", "-o", real_options, path, mountpoint /*, NULL */ };
 
   signal(SIGUSR1, SIG_IGN);
   execvp("mount", args);
-  perror("execvp(\"mount\")");
+  perror_info("execvp(\"mount\")");
   exit(EXIT_FAILURE);
 }
 
@@ -647,7 +645,7 @@ int net_choose_device()
   if(config.manual >= 2) {
 #if defined(__s390__) || defined(__s390x__)
     /* bring up network devices, write hwcfg */
-    fprintf(stderr, "activate s390 devs 1\n");
+    log_info("activate s390 devs 1\n");
     if(net_activate_s390_devs()) return 1;
 #endif
 
@@ -775,7 +773,7 @@ int net_choose_device()
  */
   if(choice > 0 && !item_devs[choice - 1]) {
 #if defined(__s390__) || defined(__s390x__)
-    fprintf(stderr, "activate s390 devs 2\n");
+    log_info("activate s390 devs 2\n");
     net_activate_s390_devs_ex(item_hds[choice - 1], &item_devs[choice - 1]);
     if(!item_devs[choice - 1]) {
 #endif
@@ -1188,13 +1186,9 @@ void net_wicked_dhcp()
   if(!cfg_ok) return;
 
   strprintf(&buf, "Sending DHCP%s request to %s...", type, device);
-  fprintf(stderr, "%s\n", buf);
+  log_show_maybe(!config.win, "%s\n", buf);
   if(config.win) {
     dia_info(&win, buf, MSGTYPE_INFO);
-  }
-  else {
-    printf("%s\n", buf);
-    fflush(stdout);
   }
   str_copy(&buf, NULL);
 
@@ -1240,14 +1234,12 @@ void net_wicked_dhcp()
       strprintf(&buf, "%s, ip = %s/%u", buf, s, config.net.hostname.prefix6);
     }
 
-    fprintf(stderr, "%s\n", buf);
-    if(!config.win) printf("%s\n", buf);
+    log_show_maybe(!config.win, "%s\n", buf);
 
     str_copy(&buf, NULL);
   }
   else {
-    fprintf(stderr, "no/incomplete answer.\n");
-    if(!config.win) printf("no/incomplete answer.\n");
+    log_show_maybe(!config.win, "no/incomplete answer.\n");
   }
 }
 
@@ -1281,7 +1273,9 @@ unsigned net_config_mask()
 int net_check_ccw_address(char* addr)
 {
   int i;
-  fprintf(stderr, "checking CCW address %s\n",addr);
+
+  log_info("checking CCW address %s\n", addr);
+
   /* format: x.x.xxxx, each x is a hex digit */
   if(!addr) goto error;
   if(strlen(addr)!=8) goto error;
@@ -1303,6 +1297,7 @@ int net_check_ccw_address(char* addr)
 error:
   if(!config.win) util_disp_init();
   dia_message("This is not a valid CCW address.", MSGTYPE_ERROR);
+
   return -1;
 }
 
@@ -1359,13 +1354,13 @@ int net_s390_get_ifname(char* channel, char** device)
   if(!d) return -1;
   while((e = readdir(d))) {
     if(e->d_name[0] == '.') continue;
-    fprintf(stderr, "ccwgroup %s has network IF %s\n", channel, e->d_name);
+    log_info("ccwgroup %s has network IF %s\n", channel, e->d_name);
     strprintf(device, e->d_name);
     closedir(d);
     return 0;
   }
   closedir(d);
-  fprintf(stderr, "no network IF found for channel group %s\n", channel);
+  log_info("no network IF found for channel group %s\n", channel);
   return -1;
 }
 
@@ -1624,14 +1619,14 @@ setup_ctc:
       break;
   }
 
-  rc = system(cmd);
+  rc = lxrc_run(cmd);
   if(rc) {
     sprintf(cmd, "network configuration script failed (error code %d)", rc);
     dia_message(cmd, MSGTYPE_ERROR);
     return -1;
   }
 
-  rc = system("/sbin/udevadm settle");
+  rc = lxrc_run("/sbin/udevadm settle");
   if(rc) {
     sprintf(cmd, "udevadm settle failed (error code %d)", rc);
     dia_message(cmd, MSGTYPE_ERROR);
@@ -1652,13 +1647,13 @@ setup_ctc:
     free(ifname);
     
     if((skfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) {
-      perror("socket");
+      perror_info("socket");
       return 1;
     }
     
     /* convert MAC address to binary */
     if((ea = ether_aton(config.hwp.osahwaddr)) == NULL) {
-      fprintf(stderr,"MAC address invalid: %s\n", config.hwp.osahwaddr);
+      log_info("MAC address invalid: %s\n", config.hwp.osahwaddr);
       return 1;
     }
     memcpy((void*) &ifr.ifr_hwaddr.sa_data[0], ea, ETHER_ADDR_LEN);
@@ -1667,7 +1662,7 @@ setup_ctc:
     ifr.ifr_hwaddr.sa_family = AF_UNIX;
     
     if(ioctl(skfd, SIOCSIFHWADDR, &ifr) < 0) {
-      fprintf(stderr, "SIOCSIFHWADDR: %s\n", strerror(errno));
+      log_info("SIOCSIFHWADDR: %s\n", strerror(errno));
       close(skfd);
       return 1;
     }
@@ -1711,8 +1706,7 @@ void net_apply_ethtool(char *device, char *hwaddr)
   if(s) {
     str_copy(&config.net.ethtool_used, s);
     strprintf(&s, "ethtool -s %s %s", device, s);
-    fprintf(stderr, "%s\n", s);
-    system(s);
+    lxrc_run(s);
     free(s);
   }
 }
@@ -1972,12 +1966,12 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg, int flags)
   // if a device spec is a wildcard patterm, don't allow to overwrite an existing config
   if(slist_getentry(config.ifcfg.initial, ifname)) {
     if(ifcfg && ifcfg->pattern) {
-      fprintf(stderr, "%s: network config exists, keeping it\n", ifname);
+      log_info("%s: network config exists, keeping it\n", ifname);
       str_copy(&config.ifcfg.current, ifname);
       return 1;
     }
     else {
-      fprintf(stderr, "%s: network config exists, overwriting it\n", ifname);
+      log_info("%s: network config exists, overwriting it\n", ifname);
     }
   }
 
@@ -1986,13 +1980,11 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg, int flags)
   if(i) {
     str_copy(&config.ifcfg.current, ifname);
     if(flags & IFCFG_INITIAL) slist_append_str(&config.ifcfg.initial, ifname);
-    fprintf(stderr, "%s: network config created\n", ifname);
-    if(!config.win) printf("%s: network config created\n", ifname);
+    log_show_maybe(!config.win, "%s: network config created\n", ifname);
     if(flags & IFCFG_IFUP) net_wicked_up(ifname);
   }
   else {
-    fprintf(stderr, "%s: failed to create network config\n", ifname);
-    if(!config.win) printf("%s: failed to create network config\n", ifname);
+    log_show_maybe(!config.win, "%s: failed to create network config\n", ifname);
   }
 
   return i;
@@ -2029,20 +2021,18 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
   // obsolete: use global values
   if(!device || !ifcfg) {
-    fprintf(stderr, "\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
-    printf("\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
-    fflush(stdout);
+    log_show("\n\nXXX  Old net config NOT SUPPORTED!  XXX\n\n");
 
     sleep(60);
 
     return ok;
   }
 
-  fprintf(stderr, "ifcfg_write: device = %s, ifcfg = %s\n", device, ifcfg ? ifcfg->device : "");
+  log_info("ifcfg_write: device = %s, ifcfg = %s\n", device, ifcfg ? ifcfg->device : "");
 
   ptp = check_ptp(device);
 
-  if(ptp) fprintf(stderr, "check_ptp: ptp = %u\n", ptp);
+  if(ptp) log_info("check_ptp: ptp = %u\n", ptp);
 
   ptp |= ifcfg->ptp;
 
@@ -2214,7 +2204,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
   if(sl_ifcfg) {
     if(asprintf(&fname, "/etc/sysconfig/network/ifcfg-%s%s", device, vlan ?: "") == -1) fname = NULL;
-    fprintf(stderr, "creating ifcfg-%s%s:\n", device, vlan ?: "");
+    log_info("creating ifcfg-%s%s:\n", device, vlan ?: "");
     if(fname && (fp = fopen(fname, "w"))) {
       for(sl = sl_ifcfg; sl; sl = sl->next) {
         fprintf(fp, "%s='%s'\n", sl->key, sl->value);
@@ -2224,7 +2214,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
     }
 
     for(sl = sl_ifcfg; sl; sl = sl->next) {
-      fprintf(stderr, "  %s='%s'\n", sl->key, sl->value);
+      log_info("  %s='%s'\n", sl->key, sl->value);
     }
 
     free(fname);
@@ -2256,7 +2246,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   if(sl_ifroute) {
     if(asprintf(&fname, "/etc/sysconfig/network/ifroute-%s%s", device, vlan ?: "") == -1) fname = NULL;
 
-    fprintf(stderr, "creating ifroute-%s%s:\n", device, vlan ?: "");
+    log_info("creating ifroute-%s%s:\n", device, vlan ?: "");
     if(fname && (fp = fopen(fname, "w"))) {
       for(sl = sl_ifroute; sl; sl = sl->next) {
         fprintf(fp, "%s\n", sl->key);
@@ -2266,7 +2256,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
     }
 
     for(sl = sl_ifroute; sl; sl = sl->next) {
-      fprintf(stderr, "  %s\n", sl->key);
+      log_info("  %s\n", sl->key);
     }
 
     free(fname);
@@ -2291,7 +2281,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   // 5. update global network config
 
   if(sl_global) {
-    fprintf(stderr, "adjusting network/config:\n");
+    log_info("adjusting network/config:\n");
 
     // it's easier below if we append the '=' to the keys
     for(sl = sl_global; sl; sl = sl->next) {
@@ -2308,7 +2298,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
         if(*buf && *buf != '#' && !isspace(*buf)) {
           for(sl = sl_global; sl; sl = sl->next) {
             if(!strncmp(buf, sl->key, strlen(sl->key))) {
-              fprintf(stderr, "  %s\"%s\"\n", sl->key, sl->value);
+              log_info("  %s\"%s\"\n", sl->key, sl->value);
               if(fp2) fprintf(fp2, "%s\"%s\"\n", sl->key, sl->value);
               *buf = 0;
               break;
@@ -2325,7 +2315,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
         rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
       }
       else {
-        fprintf(stderr, "warning: /etc/sysconfig/network/config not updated\n");
+        log_info("warning: /etc/sysconfig/network/config not updated\n");
       }
     }
   }
@@ -2365,7 +2355,7 @@ ifcfg_t *ifcfg_parse(char *str)
 
   if(!str) return NULL;
 
-  if(config.debug) fprintf(stderr, "parsing ifcfg: %s\n", str);
+  log_debug("parsing ifcfg: %s\n", str);
 
   ifcfg = calloc(1, sizeof *ifcfg);
 
@@ -2438,7 +2428,7 @@ ifcfg_t *ifcfg_parse(char *str)
     }
   }
 
-  if(config.debug) fprintf(stderr, "%s", ifcfg_print(ifcfg));
+  log_debug("%s", ifcfg_print(ifcfg));
 
   return ifcfg;
 }
@@ -2517,7 +2507,7 @@ void net_update_state()
 
   config.ifcfg.if_state = slist_free(config.ifcfg.if_state);
 
-  if((f = popen("wicked show all", "r"))) {
+  if((f = popen("wicked show all 2>/dev/null", "r"))) {
     while(fgets(buf, sizeof buf, f)) {
       if(!isspace(*buf)) {
         for(s1 = buf; *s1 && !isspace(*s1); s1++);
@@ -2540,13 +2530,11 @@ void net_update_state()
     if(strcmp(sl->key, "lo") && !strcmp(sl->value, "up")) slist_append_str(&config.ifcfg.if_up, sl->key);
   }
 
-  if(config.debug) {
-    fprintf(stderr, "net_update_state: ");
-    for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
-      fprintf(stderr, "%s: %s%s", sl->key, sl->value, sl->next ? ", " : "");
-    }
-    fprintf(stderr, "\n");
+  log_debug("net_update_state: ");
+  for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
+    log_debug("%s: %s%s", sl->key, sl->value, sl->next ? ", " : "");
   }
+  log_debug("\n");
 }
 
 
@@ -2559,16 +2547,16 @@ void net_wicked_up(char *ifname)
 
   if(!ifname) return;
 
-  if(config.debug) fprintf(stderr, "wicked ifup %s\n", ifname);
+  log_debug("wicked ifup %s\n", ifname);
 
   if(config.net.dhcp_timeout_set) {
-    strprintf(&buf, "wicked ifup --timeout %d %s >&2", config.net.dhcp_timeout, ifname);
+    strprintf(&buf, "wicked ifup --timeout %d %s", config.net.dhcp_timeout, ifname);
   }
   else {
-    strprintf(&buf, "wicked ifup %s >&2", ifname);
+    strprintf(&buf, "wicked ifup %s", ifname);
   }
 
-  system(buf);
+  if(!config.test) lxrc_run(buf);
 
   sleep(config.net.ifup_wait + 1);
 
@@ -2589,11 +2577,11 @@ void net_wicked_down(char *ifname)
 
   if(!ifname) return;
 
-  if(config.debug) fprintf(stderr, "wicked ifdown %s\n", ifname);
+  log_debug("wicked ifdown %s\n", ifname);
 
-  strprintf(&buf, "wicked ifdown %s >&2", ifname);
+  strprintf(&buf, "wicked ifdown %s", ifname);
 
-  system(buf);
+  if(!config.test) lxrc_run(buf);
 
   sleep(1);
 
@@ -2644,7 +2632,7 @@ int netmask_to_prefix(char *netmask)
     }
   }
 
-  if(config.debug) fprintf(stderr, "netmask -> prefix: %s -> %d\n", netmask, prefix);
+  log_debug("netmask -> prefix: %s -> %d\n", netmask, prefix);
 
   return prefix;
 }
@@ -2711,7 +2699,7 @@ int net_check_ip(char *buf, int multi, int with_prefix)
   if(!sl0 || !*sl0->key || (sl0->next && !multi)) {
     slist_free(sl0);
 
-    if(config.debug) fprintf(stderr, "check_ip: %s = wrong\n", buf);
+    log_debug("check_ip: %s = wrong\n", buf);
 
     return 0;
   }
@@ -2744,7 +2732,7 @@ int net_check_ip(char *buf, int multi, int with_prefix)
 
   slist_free(sl0);
 
-  if(config.debug) fprintf(stderr, "check_ip: %s = %s\n", buf, ok ? "ok" : "wrong");
+  log_debug("check_ip: %s = %s\n", buf, ok ? "ok" : "wrong");
 
   return ok;
 }
@@ -2807,7 +2795,7 @@ void net_nanny()
 
     while(fgets(buf, sizeof buf, fp)) {
       if(strstr(buf, "<use-nanny>") && strstr(buf, "</use-nanny>")) {
-        if(config.debug) fprintf(stderr, "wickedd-nanny: %s\n", config.nanny ? "enabled" : "disabled");
+        log_debug("wickedd-nanny: %s\n", config.nanny ? "enabled" : "disabled");
         if(fp2) fprintf(fp2, "  <use-nanny>%s</use-nanny>\n", config.nanny ? "true" : "false");
         *buf = 0;
       }
@@ -2821,7 +2809,7 @@ void net_nanny()
       rename("/etc/wicked/common.xml.tmp", "/etc/wicked/common.xml");
     }
     else {
-      fprintf(stderr, "warning: /etc/wicked/common.xml not updated\n");
+      log_info("warning: /etc/wicked/common.xml not updated\n");
     }
   }
 }
@@ -2868,12 +2856,12 @@ void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device)
 
   ifcfg->flags = slist_free(ifcfg->flags);
 
-  if(config.debug >= 2) fprintf(stderr, "ifcfg flags, before(%s):\n%s", device, ifcfg_print(ifcfg));
+  if(config.debug >= 2) log_debug("ifcfg flags, before(%s):\n%s", device, ifcfg_print(ifcfg));
 
   // 1st try, direct match
   for(tmp = config.ifcfg.all; tmp; tmp = tmp->next) {
     if(tmp->pattern || !tmp->device) continue;
-    if(config.debug >= 2) fprintf(stderr, "direct:\n%s", ifcfg_print(tmp));
+    if(config.debug >= 2) log_debug("direct:\n%s", ifcfg_print(tmp));
     if(!strcmp(tmp->device, device)) break;
   }
 
@@ -2883,7 +2871,7 @@ void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device)
 
     for(tmp = config.ifcfg.all; tmp; tmp = tmp->next) {
       if(!tmp->pattern || !tmp->device) continue;
-      if(config.debug >= 2) fprintf(stderr, "pattern:\n%s", ifcfg_print(tmp));
+      if(config.debug >= 2) log_debug("pattern:\n%s", ifcfg_print(tmp));
       if(match_netdevice(device, mac, tmp->device)) break;
     }
 
@@ -2899,10 +2887,10 @@ void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device)
       str_copy(&sl1->value, sl->value);
     }
 
-    if(config.debug >= 2) fprintf(stderr, "ifcfg flags, matched:\n%s", ifcfg_print(ifcfg));
+    if(config.debug >= 2) log_debug("ifcfg flags, matched:\n%s", ifcfg_print(ifcfg));
   }
   else {
-    if(config.debug >= 2) fprintf(stderr, "ifcfg flags, no match\n");
+    if(config.debug >= 2) log_debug("ifcfg flags, no match\n");
   }
 }
 

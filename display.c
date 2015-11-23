@@ -13,6 +13,7 @@
 
 #include "global.h"
 #include "display.h"
+#include "util.h"
 #include "utf8.h"
 
 /*
@@ -208,7 +209,7 @@ void disp_gotoxy(int x, int y)
 {
   if(x == disp_x_im && y == disp_y_im) return;
 
-//  fprintf(stderr, "gotoxy %d x %d\n", x, y);
+//  log_info("gotoxy %d x %d\n", x, y);
 
   if(
     x > 0 && x <= max_x_ig &&
@@ -331,7 +332,7 @@ void disp_save_area(window_t *win)
 
   if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
 
-//  fprintf(stderr, "save area at %d x %d (size %d x %d)\n", win->x_left, win->y_left, x_len, y_len);
+//  log_info("save area at %d x %d (size %d x %d)\n", win->x_left, win->y_left, x_len, y_len);
 
 //  dump_screen("save area, start");
 
@@ -443,7 +444,7 @@ void disp_restore_screen()
 {
   int x, y;
 
-  fprintf(stderr, "restore screen\n");
+  log_info("restore screen\n");
 
   disp_x_im = 0;
 
@@ -519,7 +520,7 @@ void disp_write_string(char *str)
 {
   int len, *buf;
 
-//  fprintf(stderr, "[* <%s>", str); fflush(stderr);
+//  log_info("[* <%s>", str);
 //  getchar();
 
   len = strlen(str) + 1;
@@ -528,7 +529,7 @@ void disp_write_string(char *str)
   utf8_to_utf32(buf, len, str);
   disp_write_utf32string(buf);
 
-//  fprintf(stderr, "#]\n"); fflush(stderr);
+//  log_info("#]\n");
 
   free(buf);
 }

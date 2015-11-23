@@ -114,6 +114,12 @@ int main(int argc, char **argv, char **env)
 #if SWISS_ARMY_KNIFE
   for(i = 0; (unsigned) i < sizeof lxrc_internal / sizeof *lxrc_internal; i++) {
     if(!strcmp(prog, lxrc_internal[i].name)) {
+      config.log.dest[0].level = LOG_LEVEL_SHOW;
+      config.log.dest[0].f = stdout;
+
+      config.log.dest[1].level = LOG_LEVEL_INFO;
+      config.log.dest[1].f = stderr;
+
       return lxrc_internal[i].func(argc, argv);
     }
   }
@@ -125,7 +131,20 @@ int main(int argc, char **argv, char **env)
   config.tmpfs = 1;
 
   str_copy(&config.console, "/dev/console");
-  str_copy(&config.stderr_name, "/dev/tty3");
+
+  // define logging destinations for the various log levels:
+
+  // standard linuxrc console
+  config.log.dest[0].level = LOG_LEVEL_SHOW;
+  config.log.dest[0].f = stdout;
+
+  // linuxrc error console (tty3)
+  config.log.dest[1].level = LOG_LEVEL_INFO;
+  str_copy(&config.log.dest[1].name, "/dev/tty3");
+
+  // linuxrc log file
+  config.log.dest[2].level = LOG_LEVEL_SHOW | LOG_LEVEL_INFO | LOG_LEVEL_DEBUG | LOG_TIMESTAMP;
+  str_copy(&config.log.dest[2].name, "/var/log/linuxrc.log");
 
   str_copy(&config.product, "SUSE Linux");
 
@@ -146,9 +165,7 @@ int main(int argc, char **argv, char **env)
     config.linemode = (state >> 1) & 3;
 
     if((state & 1) == 0) {	/* was not in window mode */
-      fprintf(stderr, "\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
-      printf("\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
-      fflush(stdout);
+      log_show("\n\nLinuxrc crashed. :-((\nPress ENTER to continue.\n");
       getchar();
     }
   }
@@ -156,15 +173,13 @@ int main(int argc, char **argv, char **env)
   if((s = getenv("restarted")) && !strcmp(s, "42")) {
     config.restarted = 1;
     unsetenv("restarted");
-    fprintf(stderr, "\n\nLinuxrc has been restarted\n");
-    printf("\n\nLinuxrc has neem restarted\n");
-    fflush(stdout);
+    log_show("\n\nLinuxrc has been restarted\n");
   }
 
   if(!config.had_segv) config.restart_on_segv = 1;
 
   if(util_check_exist("/usr/src/packages") || getuid()) {
-    printf("Seems we are on a running system; activating testmode...\n");
+    log_show("Seems we are on a running system; activating testmode...\n");
     config.test = 1;
     str_copy(&config.console, "/dev/tty");
   }
@@ -177,11 +192,12 @@ int main(int argc, char **argv, char **env)
       find_shell();
       mount("proc", "/proc", "proc", 0, 0);
       file_do_info(file_get_cmdline(key_tmpfs), kf_cmd + kf_cmd_early);
+      file_do_info(file_get_cmdline(key_linuxrcstderr), kf_cmd + kf_cmd_early);
       file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
       util_free_mem();
       umount("/proc");
 
-      // fprintf(stderr, "free: %d, %d\n", config.memory.free, config.tmpfs);
+      // log_info("free: %d, %d\n", config.memory.free, config.tmpfs);
 
       if(config.tmpfs && config.memoryXXX.free > (24 << 20)) {
         lxrc_movetotmpfs();	/* does not return if successful */
@@ -241,22 +257,10 @@ int main(int argc, char **argv, char **env)
 }
 
 
-int my_logmessage (char *buffer_pci, ...)
-    {
-    va_list  args_ri;
-
-    va_start (args_ri, buffer_pci);
-    vfprintf (stderr, buffer_pci, args_ri);
-    va_end (args_ri);
-    fprintf (stderr, "\n");
-    return (0);
-    }
-
-
 void lxrc_reboot()
 {
   if(config.test) {
-    fprintf(stderr, "*** reboot ***\n");
+    log_info("*** reboot ***\n");
     return;
   }
 
@@ -268,7 +272,7 @@ void lxrc_reboot()
 void lxrc_halt()
 {
   if(config.test) {
-    fprintf(stderr, "*** power off ***\n");
+    log_info("*** power off ***\n");
     return;
   }
 
@@ -300,7 +304,7 @@ void lxrc_change_root()
     config.url.instsys &&
     (mp = config.url.instsys->mount)
   ) {
-    fprintf(stderr, "starting rescue\n");
+    log_info("starting rescue\n");
 
     // add dud images
     for(i = 0; i < config.update.ext_count; i++) {
@@ -314,7 +318,7 @@ void lxrc_change_root()
     for(s = dirs; *s; s++) {
       strprintf(&buf, "%s/%s", mp, *s);
       mkdir(buf, 0755);
-      fprintf(stderr, "mkdir %s\n", buf);
+      log_info("mkdir %s\n", buf);
       if(!strcmp(*s, "tmp")) chmod(buf, 01777);
     }
 
@@ -364,7 +368,7 @@ void lxrc_change_root()
     // config_rescue(mp);
   }
   else if(config.new_root) {
-    fprintf(stderr, "starting %s\n", config.new_root);
+    log_info("starting %s\n", config.new_root);
 
     util_mount_ro(config.new_root, mp, NULL);
   }
@@ -379,7 +383,7 @@ void lxrc_change_root()
     if(config.net.sshpassword) setenv("SSHPASSWORD", config.net.sshpassword, 1);
     if(config.net.sshpassword_enc) setenv("SSHPASSWORDENC", config.net.sshpassword_enc, 1);
 
-    system("/mounts/initrd/scripts/prepare_rescue");
+    lxrc_run_console("/mounts/initrd/scripts/prepare_rescue");
 
     LXRC_WAIT
 
@@ -391,11 +395,11 @@ void lxrc_change_root()
 
   execl("/sbin/init", "init", NULL);
 
-  perror("init failed\n");
+  perror_info("init failed\n");
 
   chdir("/");
   umount(mp);
-  fprintf(stderr, "system start failed\n");
+  log_info("system start failed\n");
 
   LXRC_WAIT
 }
@@ -410,7 +414,7 @@ void lxrc_movetotmpfs()
   int i;
   char *newroot = "/.newroot";
 
-  fprintf(stderr, "Moving into tmpfs...");
+  log_info("Moving into tmpfs...");
   i = mkdir(newroot, 0755);
   if(i) {
     perror(newroot);
@@ -425,17 +429,17 @@ void lxrc_movetotmpfs()
 
   i = util_do_cp("/", newroot);
   if(i) {
-    fprintf(stderr, "copy failed: %d\n", i);
+    log_info("copy failed: %d\n", i);
     return;
   }
 
-  fprintf(stderr, " done.\n");
+  log_info(" done.\n");
 
-  system("/bin/rm -r /lib /dev /bin /sbin /usr /etc /init /lbin");
+  lxrc_run("/bin/rm -r /lib /dev /bin /sbin /usr /etc /init /lbin");
 
-  if(chdir(newroot)) perror(newroot);
+  if(chdir(newroot)) perror_info(newroot);
 
-  if(mkdir("oldroot", 0755)) perror("oldroot");
+  if(mkdir("oldroot", 0755)) perror_info("oldroot");
 
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
@@ -450,7 +454,7 @@ void lxrc_movetotmpfs()
   dup(0);
   execve("/init", config.argv, environ);
 
-  perror("/init");
+  perror_info("/init");
 }
 
 
@@ -472,11 +476,11 @@ void lxrc_end()
 
   lxrc_killall(1);
 
-  fprintf(stderr, "all killed\n");
+  log_info("all killed\n");
 
 //  while(waitpid(-1, NULL, WNOHANG) == 0);
 
-  fprintf(stderr, "all done\n");
+  log_info("all done\n");
 
   /* screen saver on */
   if(!config.linemode) printf("\033[9;15]");
@@ -566,7 +570,7 @@ void lxrc_killall(int really_all_iv)
         pid > mypid &&
         (really_all_iv || !do_not_kill(sl->value))
       ) {
-        if(sig == 15) fprintf(stderr, "killing %s (%d)\n", sl->value, pid);
+        if(sig == 15) log_info("killing %s (%d)\n", sl->value, pid);
         kill(pid, sig);
         usleep(20000);
       }
@@ -632,7 +636,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
   config.error_trace = 1;
   util_error_trace("***  signal 11 ***\n");
 
-  fprintf(stderr, "Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
+  log_info("Linuxrc segfault at 0x%08"PRIx64". :-((\n", ip);
   if(config.restart_on_segv) {
     config.restart_on_segv = 0;
     for(i = 15; i >= 0; i--, ip >>= 4) {
@@ -655,7 +659,7 @@ void lxrc_catch_signal_11(SIGNAL_ARGS)
 void lxrc_catch_signal(int signum)
 {
   if(signum) {
-    fprintf(stderr, "Caught signal %d!\n", signum);
+    log_info("Caught signal %d!\n", signum);
     sleep(10);
   }
 
@@ -894,7 +898,7 @@ void lxrc_init()
     mkdir("/run/udev", 0755);
     mkdir("/run/udev/rules.d", 0755);
 
-    system("cp /usr/lib/udev/80-drivers.rules.no_modprobe /run/udev/rules.d/80-drivers.rules");
+    lxrc_run("cp /usr/lib/udev/80-drivers.rules.no_modprobe /run/udev/rules.d/80-drivers.rules");
 
     LXRC_WAIT
   }
@@ -915,28 +919,25 @@ void lxrc_init()
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
 
-  util_set_stderr(config.stderr_name);
-
   time_t t = time(NULL);
   struct tm *gm = gmtime(&t);
-  if(gm) fprintf(
-    stderr, "\n===  linuxrc " LXRC_FULL_VERSION " - %04d-%02d-%02d %02d:%02d:%02d  ===\n",
+  if(gm) log_info(
+    "===  linuxrc " LXRC_FULL_VERSION " - %04d-%02d-%02d %02d:%02d:%02d  ===\n",
     gm->tm_year + 1900, gm->tm_mon + 1, gm->tm_mday, gm->tm_hour, gm->tm_min, gm->tm_sec
   );
 
   if(!config.test) {
-    printf("Starting udev... ");
-    fflush(stdout);
+    log_show("Starting udev... ");
     util_run_script("udev_setup");
-    printf("ok\n");
+    log_show("ok\n");
   }
 
   if(config.had_segv) config.manual = 1;
 
   if(!config.test && !config.had_segv) {
-    fprintf(stderr, "Remount of / ");
+    log_info("Remount of / ");
     i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
-    fprintf(stderr, i ? "failed\n" : "ok\n");
+    log_info(i ? "failed\n" : "ok\n");
 
     /* Check for special case with aborted installation */
     if(util_check_exist ("/.bin")) {
@@ -1001,11 +1002,9 @@ void lxrc_init()
 
   LXRC_WAIT
 
-  printf("Loading basic drivers...");
-  fflush(stdout);
+  log_show("Loading basic drivers...");
   mod_init(1);
-  printf(" ok\n");
-  fflush(stdout);
+  log_show(" ok\n");
 
   LXRC_WAIT
 
@@ -1028,7 +1027,7 @@ void lxrc_init()
   if(util_check_exist("/sys/firmware/efi/vars") == 'd') {
     config.efi_vars = 1;
   }
-  if(config.debug) fprintf(stderr, "efi = %d\n", config.efi_vars);
+  log_debug("efi = %d\n", config.efi_vars);
 
   if(iscsi_check()) config.withiscsi = 1;
   if(fcoe_check()) config.withfcoe = 1;
@@ -1061,22 +1060,20 @@ void lxrc_init()
         if(util_read_and_chop("/sys/firmware/ipl/device", device, sizeof device))
         {
           sprintf(cmd,"/sbin/zfcp_host_configure %s 1",device);
-          fprintf(stderr,"executing %s\n",cmd);
-          if(!config.test) system(cmd);
+          if(!config.test) lxrc_run(cmd);
           if(util_read_and_chop("/sys/firmware/ipl/wwpn", wwpn, sizeof wwpn))
           {
             if(util_read_and_chop("/sys/firmware/ipl/lun", lun, sizeof lun))
             {
               sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s 1",device,wwpn,lun);
-              fprintf(stderr,"executing %s\n",cmd);
-              if(!config.test) system(cmd);
+              if(!config.test) lxrc_run(cmd);
             }
           }
         }
       }
-      else fprintf(stderr,"not booted via FCP\n");
+      else log_info("not booted via FCP\n");
     }
-    else fprintf(stderr,"could not read /sys/firmware/ipl/ipl_type\n");
+    else log_info("could not read /sys/firmware/ipl/ipl_type\n");
   }
 #endif
 
@@ -1101,18 +1098,17 @@ void lxrc_init()
     {
       if(strcmp(buf,"SonyPS3")==0)
       {
-        fprintf(stderr,"loading ps3vram, mtdblock and ps3_gelic\n");
+        log_info("loading ps3vram, mtdblock and ps3_gelic\n");
         mod_modprobe("ps3vram","");
         mod_modprobe("mtdblock","");
         mod_modprobe("ps3_gelic","");
         if(!config.test && util_check_exist("/sys/block/mtdblock0"))
         {
-          fprintf(stderr,"executing %s\n",cmd);
-          system(cmd);
+          lxrc_run(cmd);
 	}
       } else if(strcmp(buf,"Pegasos2")==0)
       {
-        fprintf(stderr,"preloading via-rhine, loading mv643xx_eth\n");
+        log_info("preloading via-rhine, loading mv643xx_eth\n");
         mod_modprobe("via-rhine","");
         mod_modprobe("mv643xx_eth","");
       }
@@ -1138,7 +1134,7 @@ void lxrc_init()
       if(config.memoryXXX.ram_min) {
         config.manual = 1;
         if(config.test) {
-          fprintf(stderr, "*** reboot ***\n");
+          log_info("*** reboot ***\n");
         }
         else {
           reboot(RB_AUTOBOOT);
@@ -1158,7 +1154,7 @@ void lxrc_init()
   if(!config.manual && !auto2_init()) {
     char *buf = NULL, *repo = NULL;
 
-    fprintf(stderr, "Automatic setup not possible.\n");
+    log_info("Automatic setup not possible.\n");
 
     // ok, we failed to find a suitable repo
     // do something about it
@@ -1386,7 +1382,7 @@ void lxrc_check_console()
   util_set_serial_console(auto2_serial_console());
 
   if(config.serial) {
-    fprintf(stderr,
+    log_info(
       "Console: %s, serial line params \"%s\"\n",
       config.console, config.serial
     );
@@ -1489,11 +1485,11 @@ void lxrc_usr1(int signum)
         config.secure_always_fail = 1;
 
         if(task == 'a' && sl) {
-          fprintf(stderr, "instsys extend: add %s\n%s: already added\n", ext, ext);
+          log_info("instsys extend: add %s\n%s: already added\n", ext, ext);
           err = 0;
         }
         else if(task == 'r' && !sl) {
-          fprintf(stderr, "instsys extend: remove %s\n%s: not there\n", ext, ext);
+          log_info("instsys extend: remove %s\n%s: not there\n", ext, ext);
           err = 0;
         }
         else if(task == 'a') {
@@ -1558,11 +1554,11 @@ void lxrc_add_parts()
   sl0 = slist_sort(sl0, cmp_entry_s);
 
   for(sl = sl0; sl; sl = sl->next) {
-    fprintf(stderr, "Integrating %s\n", sl->key);
+    log_info("Integrating %s\n", sl->key);
     if(!config.test) {
       if(!insmod_done) {
         insmod_done = 1;
-        system("/sbin/insmod /modules/loop.ko max_loop=64");
+        lxrc_run("/sbin/insmod /modules/loop.ko max_loop=64");
       }
       strprintf(&mp, "/parts/mp_%04u", config.mountpoint.initrd_parts++);
       mkdir(mp, 0755);
@@ -1661,6 +1657,6 @@ void select_repo_url(char *msg, char **repo)
   free(item_list);
   item_list = NULL;
 
-  if(config.debug) fprintf(stderr, "repo: %s\n", *repo ?: "");
+  log_debug("repo: %s\n", *repo ?: "");
 }
 

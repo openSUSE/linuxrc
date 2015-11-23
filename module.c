@@ -143,8 +143,7 @@ int mod_copy_modules(char *src_dir, int doit)
       if(!ok) {
         if(doit) {
           sprintf(buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
-          // fprintf(stderr, "%s\n", buf);
-          system(buf);
+          lxrc_run(buf);
           if(doit == 2) {
             dia_status(&win, (cnt * 100) / files);
             if(strcmp(de->d_name, MODULE_CONFIG)) cnt++;
@@ -473,8 +472,7 @@ void mod_unload_module(char *module)
   int err;
 
   sprintf(cmd, "rmmod %s", module);
-  fprintf(stderr, "%s\n", cmd);
-  err = system(cmd);
+  err = lxrc_run(cmd);
   util_update_kernellog();
 
   if(!err) {
@@ -643,7 +641,7 @@ int mod_insmod(char *module, char *param)
     param = sl->value;
   }
 
-  if(config.debug) fprintf(stderr, "mod_insmod(%s, %s)\n", module, param ?: "");
+  log_debug("mod_insmod(%s, %s)\n", module, param ?: "");
 
   if(!module || config.test) return 0;
 
@@ -657,17 +655,13 @@ int mod_insmod(char *module, char *param)
   }
 
   if(slist_getentry(config.module.broken, module)) {
-    fprintf(stderr, "%s tagged as broken, not loaded\n", module);
+    log_info("%s tagged as broken, not loaded\n", module);
     return -1;
   }
 
   sprintf(buf, "insmod %s%s/%s" MODULE_SUFFIX, force, config.module.dir, module);
 
   if(param && *param) sprintf(buf + strlen(buf), " '%s'", param);
-
-  fprintf(stderr, "%s\n", buf);
-
-  strcat(buf, " >&2");
 
   if(config.run_as_linuxrc) {
     util_update_netdevice_list(NULL, 1);
@@ -677,7 +671,7 @@ int mod_insmod(char *module, char *param)
     if(mod_show_kernel_messages) kbd_switch_tty(4);
   }
 
-  err = system(buf);
+  err = lxrc_run(buf);
 
   if(config.module.delay > 0) sleep(config.module.delay);
 
@@ -691,7 +685,7 @@ int mod_insmod(char *module, char *param)
     }
   }
   else {
-    if(config.debug) fprintf(stderr, "insmod error: %d\n", err);
+    log_info("insmod error: %d\n", err);
   }
 
   if(cnt) sleep(config.module.delay + 1);
@@ -813,7 +807,7 @@ void mod_show_modules()
 
 #ifdef DEBUG_MODULE
   for(sl = config.module.used_params; sl; sl = sl->next) {
-    fprintf(stderr, "  %s: >%s<\n", sl->key, sl->value);
+    log_info("  %s: >%s<\n", sl->key, sl->value);
   }
 #endif
 

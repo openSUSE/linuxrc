@@ -171,7 +171,7 @@ void info_init (void)
 
     fclose (fd_pri);
 
-    if(!config.had_segv) fprintf (stderr, "CPU: %d, Memory: %"PRId64"\n",
+    if(!config.had_segv) log_info ("CPU: %d, Memory: %"PRId64"\n",
              cpu_ig, memory_ig);
 
     }

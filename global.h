@@ -94,6 +94,39 @@ enum langid_t {
 
 #define LXRC_WAIT util_wait(__FILE__, __LINE__, __FUNCTION__);
 
+// LOG_* are bitmasks
+#define LOG_LEVEL_SHOW	(1 << 0)
+#define LOG_LEVEL_INFO	(1 << 1)
+#define LOG_LEVEL_DEBUG	(1 << 2)
+// add time stamps to log entries
+#define LOG_TIMESTAMP	(1 << 3)
+// add calling function name to log entries
+#define LOG_CALLER	(1 << 4)
+
+// log to the default console
+#define log_show(...) util_log(LOG_LEVEL_SHOW, __VA_ARGS__)
+// log to the logging console
+#define log_info(...) util_log(LOG_LEVEL_INFO, __VA_ARGS__)
+// log to the log file
+#define log_debug(...) util_log(LOG_LEVEL_DEBUG, __VA_ARGS__)
+// log to the default console if cond is true
+// else log to logging console
+#define log_show_maybe(cond, ...) util_log((cond) ? LOG_LEVEL_SHOW : LOG_LEVEL_INFO, __VA_ARGS__)
+// log to the logging console if cond is true
+// else log only to log file
+#define log_info_maybe(cond, ...) util_log((cond) ? LOG_LEVEL_INFO : LOG_LEVEL_DEBUG, __VA_ARGS__)
+
+// perror() equivalents
+#define perror_show(a) util_perror(LOG_LEVEL_SHOW, a)
+#define perror_info(a) util_perror(LOG_LEVEL_INFO, a)
+#define perror_debug(a) util_perror(LOG_LEVEL_DEBUG, a)
+
+// run command and redirect stdout & stderr to log file
+#define lxrc_run(a) util_run(a, 1)
+
+// run command and redirect stderr to log file
+#define lxrc_run_console(a) util_run(a, 0)
+
 #define RAMDISK_2  "/dev/ram2"
 
 #define MAX_FILENAME     300
@@ -263,6 +296,7 @@ typedef struct {
   } used;
 } url_t;
 
+
 typedef struct ifcfg_s {
   struct ifcfg_s *next;
   char *device;		// interface name or shell glob matching interface names
@@ -279,6 +313,16 @@ typedef struct ifcfg_s {
   char *domain;		// domain search list
   slist_t *flags;	// extra settings for ifcfg, key=value
 } ifcfg_t;
+
+
+/*
+ * struct holding logging file info
+ */
+typedef struct {
+  unsigned level;
+  char *name;
+  FILE *f;
+} log_file_t;
 
 
 /* > 100 and <= 1000 */
@@ -353,7 +397,6 @@ typedef struct {
   unsigned scsi_before_usb:1;	/* load storage controller modules before usb/ieee1394 */
   unsigned scsi_rename:1;	/* ensure hotplug scsi devs are last */
   unsigned debug;		/* debug */
-  unsigned linebreak:1;		/* internal: print a newline first */
   unsigned manual;		/* manual mode */
   unsigned utf8:1;		/* in utf8 mode */
   unsigned fb:1;		/* has frame buffer */
@@ -421,7 +464,6 @@ typedef struct {
   char *yepcert;		/* just pass it to yast */
   char *supporturl;		/* just pass it to yast */
   slist_t *linuxrc;		/* 'linuxrc' parameters */
-  char *stderr_name;		/* stderr device name */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */
   enum langid_t language;	/* currently selected language */
   char *keymap;			/* current keymap */
@@ -641,6 +683,9 @@ typedef struct {
     slist_t *to_global;		/* keys that go to global /etc/sysconfig/network/config */
   } ifcfg;
 
+  struct {
+    log_file_t dest[3];		/* logging destinations, see linuxrc.c */
+  } log;
 
 #if defined(__s390__) || defined(__s390x__)
   /* hwcfg file parameters */

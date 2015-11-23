@@ -449,7 +449,7 @@ char *slp_get_install(url_t *url)
   close(s);
   if (urlcnt == 0)
     {
-      fprintf(stderr, "SLP: no installation source found\n");
+      log_info("SLP: no installation source found\n");
       return NULL;
     }
   ambg = malloc((urlcnt + 1) * sizeof(char **));
