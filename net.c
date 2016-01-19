@@ -1552,9 +1552,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       
       if((rc=net_s390_getrwchans_ex(hd))) return rc;
       
-      IFNOTAUTO(config.hwp.portname)
-        if((rc=dia_input2_chopspace("Enter the relative port number", &config.hwp.portname,9,0))) return rc;
-
     }
     
     break;
