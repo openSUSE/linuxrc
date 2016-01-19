@@ -1559,6 +1559,9 @@ void lxrc_add_parts()
       if(!insmod_done) {
         insmod_done = 1;
         lxrc_run("/sbin/insmod /modules/loop.ko max_loop=64");
+        if(util_check_exist("/modules/lz4_decompress.ko")) {
+          lxrc_run("/sbin/insmod /modules/lz4_decompress.ko");
+        }
       }
       strprintf(&mp, "/parts/mp_%04u", config.mountpoint.initrd_parts++);
       mkdir(mp, 0755);
