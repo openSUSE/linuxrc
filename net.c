@@ -2229,11 +2229,11 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
         // set explicit route to gw unless gw is in the same ipv4 subnet
         // note: we might as well set it always
         if(!compare_subnet(v4_ip, sl1->key, v4_prefix)) {
-          strprintf(&sl->key, "%s - - %s", sl1->key, device);
+          strprintf(&sl->key, "%s - - %s%s", sl1->key, device, vlan ?: "");
           sl = slist_append(&sl_ifroute, slist_new());
         }
 
-        strprintf(&sl->key, "default %s - %s", sl1->key, device);
+        strprintf(&sl->key, "default %s - %s%s", sl1->key, device, vlan ?: "");
       }
 
       slist_free(sl0);
