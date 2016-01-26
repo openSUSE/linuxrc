@@ -1235,7 +1235,14 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.hwp.protocol = f->nvalue + 1;
         break;        
       case key_osainterface:
-        if(*f->value) config.hwp.interface=file_sym2num(f->value);
+        if(*f->value) {
+          config.hwp.interface=file_sym2num(f->value);
+          if(config.hwp.interface != di_osa_lcs &&
+             config.hwp.interface != di_osa_qdio) {
+             log_show("\n*** The OsaInterface type of \"%s\" is not valid. Ignoring it.\n", f->value);
+             config.hwp.interface=0;
+          }
+        }
         break;
 /*
  * The layer2 attribute is handled specially. We use IFNOTAUTO later on in net.c,
