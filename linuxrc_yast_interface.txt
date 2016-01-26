@@ -1,0 +1,301 @@
+linuxrc - yast interface
+========================
+
+linuxrc communicates with yast via two files:
+
+(1) /etc/install.inf
+  This file is written before linuxrc starts yast and contains a number of
+  variable settings in a 'key: value' (one per line) format.
+  yast is quite picky when parsing this file and makes e.g. a difference
+  between a missing key and a key set to 0.
+
+(2) /etc/yast.inf
+  This file is written by yast when it exits and tells linuxrc what it should
+  do or whether there was some error.
+  Entries are also in a 'key: value' format.
+
+
+*** Note ***
+
+  This document describes the settings in both file from a developer's
+  perspective. At some places, I've added some additional remarks between
+  dashes ('-') when something needs further clarification.
+
+  This covers the current situation (master branch in git). In the past
+  linuxrc used to put also a number of network config settings into
+  install.inf, but this is no longer the case.
+
+
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+yast.inf
+--------
+
+# char* config.new_root
+# int config.restart_method
+# action, linuxrc should take
+# if device, it's put into config.new_root and we chroot there and start
+# else, set config.restart_method: reboot = 1, halt = 2, kexec = 3
+# - I think yast never puts a device here -
+Root: reboot|halt|kexec|<device to start from>
+
+# char* config.keymap
+# load keymap
+# if set, takes the keyboard setting from yast
+# - unused by yast? -
+Keytable: %s
+
+# config.language = set_langidbyname(char*)
+# set language
+# if set, takes the lang setting from yast
+# - unused by yast? -
+Language: %s
+
+# int config.rebootmsg
+# - obsolete -
+# that's really an obscue feature showing a popup asking the user to
+# remove CD or floppy when the machine is about to reboot
+RebootMsg: %d
+
+# int config.aborted
+# != 0 indicates to linuxrc that yast bas been (deliberately) aborted
+# linuxrc then shows no error message
+Aborted: %d
+
+
+*** Note ***
+
+  (1) at least 'Root' || 'Aborted' should be set
+
+  (2) linuxrc also checks the yast exit code
+
+  (3) Keytable and Language _can_ be set (don't know if they still are) to
+  tell linuxrc the current settings. linuxrc in turn will pass them on via
+  install.inf in case the user runs yast again. linuxrc itself does not care
+  about the Language setting (no translations any longer).
+
+
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+install.inf
+-----------
+
+# if != 0, linuxrc was in manual mode
+# (yes, it can be > 1)
+# - only s390x people seem to use manual mode regularly (because they
+# strictly do what's documented); I would question that yast2 working specially
+# when manual mode was active [showing extra dialogs] is still justified) -
+Manual: %d
+
+# the current locale (default to en_US)
+Locale: %s
+
+# console keyboard mapping, if linuxrc did change it (e.g. de-latin1-nodeadkeys)
+# else the entry is missing
+Keytable: %s
+
+# console device name if it's a serial line (e.g. /dev/ttyS0)
+# else the entry is missing
+Console: %s
+
+# 0 or 1, indicating that linuxrc left the install repo mounted at /var/adm/mount
+# - does it really matter? yast unmounts the repo anyway at startup, or not? -
+Sourcemounted: %s
+
+# the install repo location in URI form
+# - that was used sometime in the past, I think it's obsolete -
+# the relevant entry is ZyppRepoURL
+RepoURL: %s
+
+# the install repo location in URI form for libzypp
+ZyppRepoURL: %s
+
+# whether to verify ssl certificates
+# Use boot option ssl.certs=0 to get this.
+# In some (test) setups it's useful to disable the checks.
+# The entry is missing (there's no 'ssl_verify: yes' or so) if cert checks
+# are active (the default).
+ssl_verify: no
+
+# the repo device/partition for a local install, without leading '/dev/'
+# e.g. disk/by-id/ata-WDC_WD10EARS-00Y4B2_WD-WCAV587297-part2
+# missing for a network install
+# - obsolete, go for ZyppRepoURL - 
+Device: %s
+
+# proxy setting, if any was specified
+# else the entry is missing
+ProxyURL: %s
+
+# the hostname as set by dhcp or by 'hostname=foo' boot option
+# entry is missing if unset
+Hostname: %s
+
+# URL for registration server, use 'regurl' boot option to set
+# fate#303335
+# entry is missing if unset
+# - code for this is at a strange place in linuxrc, should be moved -
+regurl: %s
+
+# certificates for registration server, use 'regcert' boot option to set
+# fate#303335
+# entry is missing if unset
+# - code for this is at a strange place in linuxrc, should be moved -
+regcert: %s
+
+# URL for uploadeing supportconfig data, use 'supporturl' boot option to set
+# fate#305180
+# entry is missing if unset
+# - code for this is at a strange place in linuxrc, should be moved -
+supporturl: %s
+
+# list of modules, separated by spaces (e.g.: scsi_dh st sg) that
+# were needed to activate the hardware so far
+InitrdModules: %s
+
+# for each module in InitrdModules that was loaded using special parameters,
+# list module followed by parameter string
+# e.g.: foo xxx=1 bar=5
+# there's a separate 'Options' line for each such module
+Options: %s
+
+# if(config.restart_method)
+# - obsolete - (technically impossible to actually see this entry)
+Reboot: Reboot|Halt|kexec
+
+# set via 'loghost' boot option
+# entry is missing if unset
+# - this is unused by linuxrc and just passed on -
+LogHost: %s
+
+# this entry is always there
+# - makes no sense, can we get rid of it? -
+Keyboard: 1
+
+# base dir where we look for driver updates
+# e.g. /linux/suse/x86_64-13.2
+# entry is always defined
+UpdateDir: %s
+
+# a driver update has been used
+# - obsolete? -
+YaST2update: 0|1
+
+# 1: yast should run in text mode (ncurses)
+Textmode: 0|1
+
+# autoyast URL
+# entry is missing if unset
+AutoYaST: %s
+
+# free memory in kiB
+MemFree: %d
+
+# 1: do a VNC install
+VNC: 0|1
+
+# VNC password
+# entry is missing if unset
+VNCPassword: %s
+
+# IP or DISPLAY var to use for X11 connection
+# e.g. 10.0.0.1 or 10.10.0.1:2
+# (at least I _think_ the ':port' notation is allowed in recent yast versions)
+# this is basically used only on s390x
+# entry is missing if unset
+Display_IP: %s
+
+# 1: yast is accessed via SSH
+# see also 'SSHD' below
+UseSSH: 0|1
+
+# 1: an SSH server should be started
+# see also 'UseSSH' above
+# note: up to SLE12/oS13.2 there was only 'UseSSH' implicitly starting sshd;
+#   now both have been logically separated and you can get sshd running without
+#   forcing yast into ssh mode (useful for debugging)
+SSHD: 0|1
+
+# 1: don't start any shells on some consoles during installation (security considerations)
+# entry is missing if unset (0)
+NoShell: 1
+
+# build ID of initrd
+# I can't think of any use for this
+# - obsolete? -
+# entry is missing if unset
+InitrdID: %s
+
+# build Id of inst-sys
+# I can't think of any use for this
+# - obsolete? -
+# entry is missing if unset
+InstsysID: %s
+
+# 1: activate iscsi config dialogs
+# the value is auto-detected and can be overridden with 'withiscsi' boot option
+WithiSCSI: 0|1
+
+# 1: activate fcoe config dialogs
+# the value is auto-detected and can be overridden with 'withfcoe' boot option
+WithFCoE: 0|1
+
+# 1: start shell before and after running yast (for debugging)
+StartShell: %d
+
+# value of the 'y2gdb' boot option, just passed on to yast
+# no idea if that is still used by yast
+# - obsolete? -
+Y2GDB: 0|1
+
+# value of 'kexecreboot' boot option, just passed on to yast
+# (boot installed system using kexec, default = 1)
+kexec_reboot: 0|1
+
+# 1: configure as an EFI system
+# the value is auto-detected and can be overridden with 'efi' boot option
+EFI: %d
+
+# 1: yast should do an upgrade
+# entry is missing if unset (0)
+Upgrade: 1
+
+# set via 'rootpassword' boot option
+# if set to 'ask', linuxrc will show a dialog asking for a password
+# this should be used a temporary root password for the target system
+# - ??? is this really used ??? -
+# entry is missing if unset
+RootPassword: %s
+
+# set via 'brokenmodules' boot option
+# comma(,)-separated list of modules that must not be loaded
+# - is this actually used by yast? -
+# entry is missing if unset
+BrokenModules: %s
+
+# braille device tyde (e.g. ht30)
+# - still used? -
+# entry is missing if 'Brailledevice' is unset
+Braille: %s
+
+# device braille line is connected to
+# - still used? -
+# entry is missing if unset
+Brailledevice: %s
+
+# any options mentioned in the 'ptoptions' boot option that were set
+# please check https://en.opensuse.org/SDB:Linuxrc#p_ptoptions for some explanation
+# e.g.:
+FOO: %s
+
+# any boot options linuxrc didn't handle and that should probably
+# be kept for the target system boot config
+# entry is missing if unset
+Cmdline: %s
+
+
+*** Note ***
+
+ There may be some more entries in install.inf but they are put there by
+ some inst-sys scripts and not linuxrc.
+
