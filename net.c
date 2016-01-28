@@ -259,7 +259,15 @@ int net_static()
     return 1;
   }
 
-  net_wicked_up(config.ifcfg.manual->device);
+  char *ifname = NULL;
+
+  str_copy(&ifname, config.ifcfg.manual->device);
+
+  if(config.ifcfg.manual->vlan) strprintf(&ifname, "%s.%s", ifname, config.ifcfg.manual->vlan);
+
+  net_wicked_up(ifname);
+
+  str_copy(&ifname, NULL);
 
   return 0;
 }
@@ -1176,16 +1184,24 @@ void net_wicked_dhcp()
   strprintf(&ifcfg->type, "dhcp%s", type);
 
   ifcfg->flags = config.ifcfg.manual->flags;
+  str_copy(&ifcfg->vlan, config.ifcfg.manual->vlan);
 
   cfg_ok = ifcfg_write(device, ifcfg, 0);
 
   free(ifcfg->type);
+  free(ifcfg->vlan);
   free(ifcfg);
   ifcfg = NULL;
 
   if(!cfg_ok) return;
 
-  strprintf(&buf, "Sending DHCP%s request to %s...", type, device);
+  char *ifname = NULL;
+
+  str_copy(&ifname, device);
+
+  if(config.ifcfg.manual->vlan) strprintf(&ifname, "%s.%s", ifname, config.ifcfg.manual->vlan);
+
+  strprintf(&buf, "Sending DHCP%s request to %s...", type, ifname);
   log_show_maybe(!config.win, "%s\n", buf);
   if(config.win) {
     dia_info(&win, buf, MSGTYPE_INFO);
@@ -1194,19 +1210,19 @@ void net_wicked_dhcp()
 
   net_apply_ethtool(device, NULL);
 
-  net_wicked_up(device);
+  net_wicked_up(ifname);
 
   if(config.net.ipv4) {
-    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", device);
+    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv4", ifname);
     parse_leaseinfo(file);
   }
 
   if(!got_ip && config.net.ipv6) {
-    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", device);
+    snprintf(file, sizeof file, "/run/wicked/leaseinfo.%s.dhcp.ipv6", ifname);
     parse_leaseinfo(file);
   }
 
-  if(slist_getentry(config.ifcfg.if_up, device)) got_ip = 1;
+  if(slist_getentry(config.ifcfg.if_up, ifname)) got_ip = 1;
 
   if(config.win) win_close(&win);
 
@@ -1241,6 +1257,8 @@ void net_wicked_dhcp()
   else {
     log_show_maybe(!config.win, "no/incomplete answer.\n");
   }
+
+  str_copy(&ifname, NULL);
 }
 
 
@@ -2229,11 +2247,11 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
         // set explicit route to gw unless gw is in the same ipv4 subnet
         // note: we might as well set it always
         if(!compare_subnet(v4_ip, sl1->key, v4_prefix)) {
-          strprintf(&sl->key, "%s - - %s", sl1->key, device);
+          strprintf(&sl->key, "%s - - %s%s", sl1->key, device, vlan ?: "");
           sl = slist_append(&sl_ifroute, slist_new());
         }
 
-        strprintf(&sl->key, "default %s - %s", sl1->key, device);
+        strprintf(&sl->key, "default %s - %s%s", sl1->key, device, vlan ?: "");
       }
 
       slist_free(sl0);
