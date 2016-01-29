@@ -61,6 +61,9 @@
 #define MNT_DETACH	(1 << 1)
 #endif
 
+// maximum number of times we try to load the loop module
+#define MAX_LOOP_TRIES	10
+
 static void lxrc_main_menu     (void);
 static void lxrc_catch_signal_11(SIGNAL_ARGS);
 static void lxrc_catch_signal  (int signum);
@@ -1539,7 +1542,7 @@ void lxrc_add_parts()
   DIR *d;
   slist_t *sl0 = NULL, *sl;
   char *mp = NULL, *argv[3] = { };
-  int insmod_done = 0;
+  int i, insmod_done = 0;
 
   if((d = opendir("/parts"))) {
     while((de = readdir(d))) {
@@ -1558,7 +1561,15 @@ void lxrc_add_parts()
     if(!config.test) {
       if(!insmod_done) {
         insmod_done = 1;
-        lxrc_run("/sbin/insmod /modules/loop.ko max_loop=64");
+        for(i = 0; i < MAX_LOOP_TRIES; i++) {
+          if(!lxrc_run("/sbin/insmod /modules/loop.ko max_loop=64")) break;
+          sleep(1);
+        }
+        if(i == MAX_LOOP_TRIES) {
+          log_show("Hm, module loading seems not to work, giving up.\n");
+          config.debugwait = 1;
+          LXRC_WAIT
+        }
         if(util_check_exist("/modules/lz4_decompress.ko")) {
           lxrc_run("/sbin/insmod /modules/lz4_decompress.ko");
         }
