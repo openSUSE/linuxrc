@@ -5356,9 +5356,14 @@ int util_run(char *cmd, unsigned log_stdout)
 
   if(!cmd) return err;
 
-  fd = open("/tmp", O_TMPFILE | O_RDWR, S_IRUSR | S_IWUSR);
+  // workaround: include O_DIRECTORY so it works on ppc64 (bsc #964709)
+  fd = open("/tmp", O_TMPFILE | O_DIRECTORY | O_RDWR, S_IRUSR | S_IWUSR);
 
-  if(fd < 0) return err;
+  if(fd == -1) {
+    perror_debug("failed to create tmp file");
+
+    return err;
+  }
 
   strprintf(&cmd2, "%s 2>&%d%s", cmd, fd, log_stdout ? " >&2" : "");
 
