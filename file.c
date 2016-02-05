@@ -686,7 +686,15 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
       
       case key_nameserver:
-        if(*f->value) str_copy(&config.ifcfg.manual->ns, f->value);
+        if(*f->value) {
+          str_copy(&config.ifcfg.manual->ns, f->value);
+          // normally space separated list
+          // but allow comma separated list for compatibility
+          char *s = config.ifcfg.manual->ns;
+          do {
+            if(*s == ',') *s = ' ';
+          } while(*s++);
+        }
         break;
 
       case key_proxy:
