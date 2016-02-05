@@ -187,7 +187,8 @@ typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
-  inst_rel, inst_disk
+  inst_rel, inst_disk,
+  inst_extern // must be last
 } instmode_t;
 
 
@@ -507,6 +508,7 @@ typedef struct {
   char *run_command;		/* for 'run command' input field */
   slist_t *defaultrepo;		/* default repo locations */
   char *debugshell;		/* command to run if we want to start a shell for debugging */
+  slist_t *extern_scheme;	/* externally handled URL schemes */
 
   struct {
     unsigned md5:1;		/* support md5 */

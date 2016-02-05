@@ -1202,6 +1202,17 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.net.sethostname, "hostname");
   if(*buf) slist_append_str(&sl0, buf);
 
+  if(config.extern_scheme) {
+    strcpy(buf, "additional URL schemes:");
+    slist_append_str(&sl0, buf);
+    char *s = slist_join(", ", config.extern_scheme);
+    if(s) {
+      sprintf(buf, "  %s", s);
+      slist_append_str(&sl0, buf);
+      free(s);
+    }
+  }
+
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
   slist_append_str(&sl0, buf);
 
@@ -2521,18 +2532,66 @@ void strprintf(char **buf, char *format, ...)
 }
 
 
-char *get_instmode_name(instmode_t instmode)
+/*
+ * Convert URL scheme to internal number.
+ */
+instmode_t get_instmode_id(char *scheme)
 {
-  return file_num2sym("no scheme", instmode);
+  int i;
+  slist_t *sl;
+
+  if(!scheme || !*scheme) return inst_none;
+
+  i = file_sym2num(scheme);
+
+  if(i >= 0) return i;
+
+  if(util_check_exist2("/scripts/url", scheme) == 'd') {
+    slist_setentry(&config.extern_scheme, scheme, NULL, 0);
+  }
+
+  for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
+    if(!strcmp(sl->key, scheme)) return i;
+  }
+
+  return inst_none;
 }
 
 
+/*
+ * String representing the URL scheme.
+ */
+char *get_instmode_name(instmode_t instmode)
+{
+  char *s = NULL;
+  slist_t *sl;
+  instmode_t i;
+
+  if(instmode < inst_extern) {
+    s = file_num2sym("no scheme", instmode);
+  }
+  else {
+    for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
+      if(i == instmode) {
+        s = sl->key;
+        break;
+      }
+    }
+  }
+
+  return s;
+}
+
+
+/*
+ * Uppercase variant of URL scheme; used in messages.
+ */
 char *get_instmode_name_up(instmode_t instmode)
 {
   static char *name = NULL;
   int i;
 
-  str_copy(&name, file_num2sym("no scheme", instmode));
+  str_copy(&name, get_instmode_name(instmode));
 
   if(name) {
     for(i = 0; name[i]; i++) name[i] = toupper(name[i]);

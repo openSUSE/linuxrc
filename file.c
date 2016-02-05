@@ -345,6 +345,7 @@ static struct {
   { "exec",      inst_exec          },
   { "rel",       inst_rel           },
   { "disk",      inst_disk          },
+  { "extern",    inst_extern        },
   /* add new inst modes _here_! */
   { "harddisk",  inst_hd            },
   { "cdrom",     inst_cdrom         },

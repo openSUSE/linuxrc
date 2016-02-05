@@ -364,8 +364,7 @@ url_t *url_set(char *str)
   if((s1 = strchr(s0, ':'))) {
     *s1++ = 0;
 
-    i = file_sym2num(s0);
-    url->scheme = i >= 0 ? i : inst_none;
+    url->scheme = get_instmode_id(s0);
 
     if(url->scheme) {
       s0 = s1;
