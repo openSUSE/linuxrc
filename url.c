@@ -74,7 +74,10 @@ static int warn_signature_failed(char *file_name);
 static int is_gpg_signed(char *file);
 static int is_rpm_signed(char *file);
 static int is_signed(char *file, int check);
-
+static unsigned url_is_mountable(instmode_t scheme);
+static unsigned url_is_network(instmode_t scheme);
+static unsigned url_is_blockdev(instmode_t scheme);
+static unsigned url_scheme_attr(instmode_t scheme, char *attr_name);
 
 void url_read(url_data_t *url_data)
 {
@@ -364,7 +367,7 @@ url_t *url_set(char *str)
   if((s1 = strchr(s0, ':'))) {
     *s1++ = 0;
 
-    url->scheme = get_instmode_id(s0);
+    url->scheme = url_scheme2id(s0);
 
     if(url->scheme) {
       s0 = s1;
@@ -478,15 +481,10 @@ url_t *url_set(char *str)
     }
   }
 
-  /* disk/cdrom: allow path to begin with device name */
+  /* local storage device: allow path to begin with device name */
   if(
-    (
-      url->scheme == inst_disk ||
-      url->scheme == inst_cdrom ||
-      url->scheme == inst_dvd ||
-      url->scheme == inst_floppy ||
-      url->scheme == inst_hd
-    ) && url->path
+    url->is.blockdev &&
+    url->path
   ) {
     tmp = malloc(strlen(url->path) + 6);
     strcpy(tmp, "/");
@@ -543,31 +541,11 @@ url_t *url_set(char *str)
     url->quiet = strtoul(sl->value, NULL, 0);
   }
 
-  if(
-    url->scheme == inst_file ||
-    url->scheme == inst_nfs ||
-    url->scheme == inst_smb ||
-    url->scheme == inst_cdrom ||
-    url->scheme == inst_floppy ||
-    url->scheme == inst_hd ||
-    url->scheme == inst_disk ||
-    url->scheme == inst_dvd ||
-    url->scheme == inst_exec
-    ) {
-    url->is.mountable = 1;
-  }
+  url->is.mountable = url_is_mountable(url->scheme);
 
-  if(
-    url->scheme == inst_slp ||
-    url->scheme == inst_nfs ||
-    url->scheme == inst_ftp ||
-    url->scheme == inst_smb ||
-    url->scheme == inst_http ||
-    url->scheme == inst_https ||
-    url->scheme == inst_tftp
-    ) {
-    url->is.network = 1;
-  }
+  url->is.blockdev = url_is_blockdev(url->scheme);
+
+  url->is.network = url_is_network(url->scheme);
 
   if(
     url->scheme == inst_cdrom ||
@@ -591,7 +569,7 @@ url_t *url_set(char *str)
   log_debug("url = %s\n", url->str);
 
   if(config.debug >= 2) {
-    log_debug("  scheme = %s (%d)", get_instmode_name(url->scheme), url->scheme);
+    log_debug("  scheme = %s (%d)", url_scheme2name(url->scheme), url->scheme);
     if(url->server) log_debug(", server = \"%s\"", url->server);
     if(url->port) log_debug(", port = %u", url->port);
     if(url->path) log_debug(", path = \"%s\"", url->path);
@@ -613,8 +591,9 @@ url_t *url_set(char *str)
     }
 
     log_debug(
-      "  network = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
-      url->is.network, url->is.mountable, url->is.file, url->search_all, url->quiet
+      "  network = %u, blockdev = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
+      url->is.network, url->is.blockdev, url->is.mountable, url->is.file,
+      url->search_all, url->quiet
     );
 
     if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
@@ -658,7 +637,7 @@ char *url_print(url_t *url, int format)
   if(format == 4) return url_print_zypp(url);
 
   if(format != 3 || url->scheme != inst_rel) {
-    strprintf(&buf, "%s:", get_instmode_name(url->scheme));
+    strprintf(&buf, "%s:", url_scheme2name(url->scheme));
   }
   else {
     str_copy(&buf, "");
@@ -768,7 +747,7 @@ char *url_print_zypp(url_t *url)
     scheme != inst_tftp
   ) return buf;
 
-  strprintf(&buf, "%s:", get_instmode_name(scheme));
+  strprintf(&buf, "%s:", url_scheme2name(scheme));
 
   if(url->domain || url->user || url->password || url->server || url->port) {
     strprintf(&buf, "%s//", buf);
@@ -1253,7 +1232,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         break;
 
       default:
-        log_info("%s: unsupported scheme\n", get_instmode_name(url->scheme));
+        log_info("%s: unsupported scheme\n", url_scheme2name(url->scheme));
         err = 1;
         break;
     }
@@ -2971,5 +2950,166 @@ int digest_verify(url_data_t *url_data, char *file_name)
   }
 
   return ok;
+}
+
+
+/*
+ * Return 1 if we can mount the url.
+ */
+unsigned url_is_mountable(instmode_t scheme)
+{
+  if(
+    scheme == inst_file ||
+    scheme == inst_nfs ||
+    scheme == inst_smb ||
+    scheme == inst_cdrom ||
+    scheme == inst_floppy ||
+    scheme == inst_hd ||
+    scheme == inst_disk ||
+    scheme == inst_dvd ||
+    scheme == inst_exec
+  ) {
+    return 1;
+  }
+
+  return url_scheme_attr(scheme, "mount");
+}
+
+
+/*
+ * Return 1 if we need network for this url scheme.
+ */
+unsigned url_is_network(instmode_t scheme)
+{
+  if(
+    scheme == inst_slp ||
+    scheme == inst_nfs ||
+    scheme == inst_ftp ||
+    scheme == inst_smb ||
+    scheme == inst_http ||
+    scheme == inst_https ||
+    scheme == inst_tftp
+  ) {
+    return 1;
+  }
+
+  return url_scheme_attr(scheme, "network");
+}
+
+
+/*
+ * Return 1 if url scheme needs a local block device.
+ *
+ * (In this case, the path component of the url may optionally start the
+ * device name.)
+ *
+ */
+unsigned url_is_blockdev(instmode_t scheme)
+{
+  if(
+    scheme == inst_disk ||
+    scheme == inst_cdrom ||
+    scheme == inst_dvd ||
+    scheme == inst_floppy ||
+    scheme == inst_hd
+  ) {
+    return 1;
+  }
+
+  return url_scheme_attr(scheme, "blockdev");
+}
+
+
+/*
+ * Check for presence of file 'attr_name' in URL directory.
+ */
+unsigned url_scheme_attr(instmode_t scheme, char *attr_name)
+{
+  int ok = 0;
+
+  if(scheme >= inst_extern && attr_name && *attr_name) {
+    char *path = NULL;
+
+    strprintf(&path, "/scripts/url/%s/%s", url_scheme2name(scheme), attr_name);
+    ok = util_check_exist(path) ? 1 : 0;
+
+    str_copy(&path, NULL);
+  }
+
+  return ok;
+}
+
+
+/*
+ * Convert URL scheme to internal number.
+ *
+ * Note: if the URL scheme is an externally supported one (via "/scripts/url")
+ * it is regsitered and gets assigned an id.
+ */
+instmode_t url_scheme2id(char *scheme)
+{
+  int i;
+  slist_t *sl;
+
+  if(!scheme || !*scheme) return inst_none;
+
+  i = file_sym2num(scheme);
+
+  if(i >= 0) return i;
+
+  if(util_check_exist2("/scripts/url", scheme) == 'd') {
+    slist_setentry(&config.extern_scheme, scheme, NULL, 0);
+  }
+
+  for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
+    if(!strcmp(sl->key, scheme)) return i;
+  }
+
+  return inst_none;
+}
+
+
+/*
+ * String representing the URL scheme.
+ *
+ * Returns NULL if scheme is unknown.;
+ */
+char *url_scheme2name(instmode_t scheme_id)
+{
+  char *s = NULL;
+  slist_t *sl;
+  instmode_t i;
+
+  if(scheme_id < inst_extern) {
+    s = file_num2sym("no scheme", scheme_id);
+  }
+  else {
+    for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
+      if(i == scheme_id) {
+        s = sl->key;
+        break;
+      }
+    }
+  }
+
+  return s;
+}
+
+
+/*
+ * Uppercase variant of URL scheme; used in messages.
+ */
+char *url_scheme2name_upper(instmode_t scheme_id)
+{
+  static char *name = NULL;
+  int i;
+
+  str_copy(&name, url_scheme2name(scheme_id));
+
+  if(name) {
+    for(i = 0; name[i]; i++) name[i] = toupper(name[i]);
+  }
+
+  return name;
 }
 

@@ -747,7 +747,7 @@ int inst_do_network(instmode_t scheme)
   }
 
   /* server name */
-  strprintf(&buf, "Enter the name of the %s server.", get_instmode_name_up(scheme));
+  strprintf(&buf, "Enter the name of the %s server.", url_scheme2name_upper(scheme));
   if(net_get_address2(buf, &server, 1, &n_user, &n_password, &n_port)) err = 1;
   if(!err && n_port) port = n_port;
 
@@ -762,7 +762,7 @@ int inst_do_network(instmode_t scheme)
     if(!n_user) {
       strprintf(&buf,
         "Do you need a username and password to access the %s server?",
-        get_instmode_name_up(scheme)
+        url_scheme2name_upper(scheme)
       );
       i = dia_yesno(buf, NO);
 
@@ -775,8 +775,8 @@ int inst_do_network(instmode_t scheme)
           str_copy(&password, NULL);
         }
         else {
-          strprintf(&buf, "Enter the user name with which to access the %s server.", get_instmode_name_up(scheme));
-          strprintf(&buf2, "Enter the password for the %s server.", get_instmode_name_up(scheme));
+          strprintf(&buf, "Enter the user name with which to access the %s server.", url_scheme2name_upper(scheme));
+          strprintf(&buf2, "Enter the password for the %s server.", url_scheme2name_upper(scheme));
           if(
             dia_input2(buf, &user, 20, 0) ||
             dia_input2(buf2, &password, 20, 1)
@@ -825,20 +825,20 @@ int inst_do_network(instmode_t scheme)
       str_copy(&proxy_password, config.url.proxy->password);
     }
 
-    strprintf(&buf, "Use a %s proxy?", get_instmode_name_up(inst_http));
+    strprintf(&buf, "Use a %s proxy?", url_scheme2name_upper(inst_http));
     i = dia_yesno(buf, NO);
     if(i == ESCAPE) {
       err = 1;
     }
     else if(i == YES) {
       /* new proxy */
-      strprintf(&buf, "Enter the name of the %s proxy.", get_instmode_name_up(inst_http));
+      strprintf(&buf, "Enter the name of the %s proxy.", url_scheme2name_upper(inst_http));
       if(net_get_address2(buf, &proxy, 1, &n_user, &n_password, &n_port)) err = 1;
 
       if(!err) {
         if(!n_port) {
           strprintf(&buf2, "%u", proxy_port);
-          strprintf(&buf, "Enter the port of the %s proxy.", get_instmode_name_up(inst_http));
+          strprintf(&buf, "Enter the port of the %s proxy.", url_scheme2name_upper(inst_http));
           if(dia_input2(buf, &buf2, 6, 0)) err = 1;
           if(!err) {
             u = strtoul(buf2, &s, 0);
@@ -910,10 +910,10 @@ int inst_do_network(instmode_t scheme)
     url_free(config.url.install);
 
     if(server.name && strchr(server.name, ':')) {
-      strprintf(&buf, "%s://[%s]", get_instmode_name(scheme), server.name);
+      strprintf(&buf, "%s://[%s]", url_scheme2name(scheme), server.name);
     }
     else {
-      strprintf(&buf, "%s://%s", get_instmode_name(scheme), server.name);
+      strprintf(&buf, "%s://%s", url_scheme2name(scheme), server.name);
     }
     config.url.install = url_set(buf);
 

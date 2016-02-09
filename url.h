@@ -76,3 +76,7 @@ char *url_print(url_t *url, int format);
 char *url_print2(url_t *url, char *file);
 char *url_instsys_base(char *path);
 void url_build_instsys_list(char *instsys, int read_list);
+
+instmode_t url_scheme2id(char *scheme);
+char *url_scheme2name(instmode_t scheme_id);
+char *url_scheme2name_upper(instmode_t scheme_id);

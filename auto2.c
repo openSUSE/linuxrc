@@ -514,7 +514,7 @@ int test_and_add_dud(url_t *url)
 
   log_debug("test_and_add_dud: all = %u\n", url->search_all);
 
-  is_dud = util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
+  is_dud = util_chk_driver_update(config.mountpoint.update, url_scheme2name(url->scheme));
 
   LXRC_WAIT;
 
@@ -1032,7 +1032,7 @@ void auto2_driverupdate(url_t *url)
 
   if(!err) err = util_mount_ro(file_name, config.mountpoint.update, NULL);
 
-  if(!err) util_chk_driver_update(config.mountpoint.update, get_instmode_name(url->scheme));
+  if(!err) util_chk_driver_update(config.mountpoint.update, url_scheme2name(url->scheme));
 
   util_umount(config.mountpoint.update);
 
@@ -1042,7 +1042,7 @@ void auto2_driverupdate(url_t *url)
 
   /* then, look for unpacked version */
   if(url->mount) {
-    util_chk_driver_update(url->mount, get_instmode_name(url->scheme));
+    util_chk_driver_update(url->mount, url_scheme2name(url->scheme));
   }
 
   if(config.win) win_close(&win);

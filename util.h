@@ -65,9 +65,6 @@ void s_addr2inet(inet_t *inet, unsigned long s_addr);
 char *inet2print(inet_t *inet);
 void str_copy(char **dst, const char *src);
 void strprintf(char **buf, char *format, ...) __attribute__ ((format (printf, 2, 3)));
-instmode_t get_instmode_id(char *scheme);
-char *get_instmode_name(instmode_t instmode);
-char *get_instmode_name_up(instmode_t instmode);
 
 void util_free_mem(void);
 void util_update_meminfo(void);

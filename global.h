@@ -288,6 +288,7 @@ typedef struct {
     unsigned cdrom:1;		/* device is cdrom */
     unsigned file:1;		/* path points to file (not to directory) */
     unsigned wlan:1;		/* wlan interface */
+    unsigned blockdev:1;	/* needs block device */
   } is;
   struct {
     char *device;
