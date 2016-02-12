@@ -5356,8 +5356,14 @@ int util_run(char *cmd, unsigned log_stdout)
 
   if(!cmd) return err;
 
+#ifdef __aarch64__
+#warning "ugly workaround activated - please remove as soon as glibc is fixed"
+  // O_TMPFILE definition is broken - see (bsc#965068)
+  fd = open("/tmp", 0x404000 | O_RDWR, S_IRUSR | S_IWUSR);
+#else
   // workaround: include O_DIRECTORY so it works on ppc64 (bsc #964709)
   fd = open("/tmp", O_TMPFILE | O_DIRECTORY | O_RDWR, S_IRUSR | S_IWUSR);
+#endif
 
   if(fd == -1) {
     perror_debug("failed to create tmp file");
