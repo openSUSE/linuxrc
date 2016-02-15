@@ -1,0 +1,47 @@
+User-defined URl schemes
+========================
+
+[Note: the 'get' part has not been implemented yet]
+
+You can add URL schemes to linuxrc that can be used with the
+'install', 'info', 'dud', and 'autoyast2' options.
+
+Also, it can show up in the linuxrc menus when linuxrc is run in manual
+mode.
+
+linuxrc supports two kinds of url schemes: (1) mountable and (2)
+downloadable schemes. For (1), the url points to some directory structure
+that can be mounted. For (2), only individual files can be accessed (downloaded).
+
+To define a url scheme, create (in the initrd) a directory below /scripts
+with the name of the scheme (e.g. 'foo'). Then put an executable script
+named 'mount' (for case (1)) or 'get' (for case (2)) into this directory.
+
+Optionally put any of the following (possibly empty) files into that
+directory:
+
+- 'network' to indicate that the network should be set up; linuxrc may try
+  this url configuring all available network interfaces in turn
+
+- 'blockdev' to indicate that linuxrc can try this url on all block devices
+  (including partitions); the name of the currebt block device is passed to
+  the script
+
+- 'network' and 'blockdev' are mutually exclusive
+
+The 'mount'/'get' scripts are passed parameters via environment variables:
+
+url_device:	current block device / network interface (if any)
+url_dir:	where to mount the url to
+url_options:	anything passed via '?options' in the url
+url_server:	the server part of the url
+url_path:	the path part of the url
+url_zypp:       the name of a file; anything written into that file will
+		constitute the url passed to zypp later; zypp has a
+		different set of url schemes than linuxrc; use this file
+		to rewrite the url into zypp form
+
+The scripts should exit with 0 to indicate that it was successful.
+
+Note that any mounted url will still be mounted when yast is started.
+
