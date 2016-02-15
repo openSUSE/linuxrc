@@ -2763,6 +2763,8 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
   int err = -1;
   struct stat64 sbuf;
 
+  log_info("mount: dev = %s, dir = %s, flags = 0x%lx\n", dev, dir, flags & 0xffff);
+
   if(!dev || !dir) return -1;
 
   if(

@@ -276,6 +276,7 @@ typedef struct {
   char *instsys;
   char *mount;
   char *tmp_mount;
+  char *rewrite_for_zypp;	/* pass this value instead of the original url to zypp */
   unsigned port;
   slist_t *query;
   slist_t *file_list;
@@ -289,6 +290,7 @@ typedef struct {
     unsigned file:1;		/* path points to file (not to directory) */
     unsigned wlan:1;		/* wlan interface */
     unsigned blockdev:1;	/* needs block device */
+    unsigned nodevneeded:1;	/* does not need any device */
   } is;
   struct {
     char *device;

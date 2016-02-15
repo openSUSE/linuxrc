@@ -53,6 +53,7 @@ static size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 static int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
 static int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
+static int url_mount_really(url_t *url, char *device, char *dir);
 static int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *));
 static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
@@ -547,6 +548,8 @@ url_t *url_set(char *str)
 
   url->is.network = url_is_network(url->scheme);
 
+  url->is.nodevneeded = !(url->is.network || url->is.blockdev);
+
   if(
     url->scheme == inst_cdrom ||
     url->scheme == inst_dvd
@@ -715,6 +718,12 @@ char *url_print_zypp(url_t *url)
 
   // log_info("start buf = %p\n", buf);
   // LXRC_WAIT
+
+  if(url->rewrite_for_zypp) {
+    str_copy(&buf, url->rewrite_for_zypp);
+
+    return buf;
+  }
 
   str_copy(&buf, NULL);
 
@@ -1084,6 +1093,85 @@ void url_umount(url_t *url)
 
 
 /*
+ * Really mount 'device' to 'dir' (do an actual mount() call).
+ *
+ * Get additionally needed params out of 'url'.
+ *
+ * Return 0 if ok, else some error code.
+ */
+int url_mount_really(url_t *url, char *device, char *dir)
+{
+  int err = -1;
+
+  slist_t *options_sl = slist_getentry(url->query, "options");
+  char *options = options_sl ? options_sl->value : NULL;
+
+  if(!url->is.mountable) return err;
+
+  if(url->scheme >= inst_extern) {
+    // run external script
+    char *cmd = NULL;
+    char *zypp_file = "/tmp/zypp.url";
+
+    strprintf(&cmd, "/scripts/url/%s/mount", url_scheme2name(url->scheme));
+
+    if(device) setenv("url_device", device, 1);
+    if(dir) setenv("url_dir", dir, 1);
+    if(options) setenv("url_options", options, 1);
+    if(url->server) setenv("url_server", url->server, 1);
+    if(url->path) setenv("url_path", url->path, 1);
+
+    setenv("url_zypp", zypp_file, 1);
+
+    err = lxrc_run(cmd);
+
+    if(!err) {
+      char *s = util_get_attr(zypp_file);
+      if(*s) {
+        str_copy(&url->rewrite_for_zypp, s);
+        log_info("url for zypp: %s", url->rewrite_for_zypp);
+      }
+    }
+
+    unlink(zypp_file);
+
+    unsetenv("url_device");
+    unsetenv("url_dir");
+    unsetenv("url_options");
+    unsetenv("url_server");
+    unsetenv("url_path");
+    unsetenv("url_rewrite");
+
+    str_copy(&cmd, NULL);
+  }
+  else {
+    if(!url->is.network) {
+      err = util_mount_ro(device, dir, url->file_list);
+    }
+    else {
+      switch(url->scheme) {
+        case inst_nfs:
+          err = net_mount_nfs(dir, url->server, device, url->port, options);
+          break;
+
+        case inst_smb:
+          err = net_mount_cifs(dir, url->server, device, url->user, url->password, url->domain, options);
+          break;
+
+        default:
+          log_info("%s: unsupported scheme\n", url_scheme2name(url->scheme));
+          break;
+      }
+    }
+  }
+
+  log_info("%s: %s -> %s (%d)\n", url_scheme2name(url->scheme), device ?: "", dir, err);
+
+  return err;
+}
+
+
+/*
  * Mount url to dir; if dir is NULL, assign temporary mountpoint.
  *
  * If test_func() is set it must return:
@@ -1113,7 +1201,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     !url ||
     !url->scheme ||
     !url->path ||
-    (!url->used.device && url->scheme != inst_file)
+    !(url->used.device || url->is.nodevneeded)
   ) return 0;
 
   url_umount(url);
@@ -1126,9 +1214,12 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
     /* local device */
 
     /* we might need an extra mountpoint */
-    if(url->scheme != inst_file && strcmp(url->path, "/")) {
+    if(
+      (url->scheme != inst_file && strcmp(url->path, "/")) ||
+      url->scheme >= inst_extern
+    ) {
       str_copy(&url->tmp_mount, new_mountpoint());
-      ok = util_mount_ro(url->used.device, url->tmp_mount, url->file_list) ? 0 : 1;
+      ok = url_mount_really(url, url->used.device, url->tmp_mount) ? 0 : 1;
 
       if(!ok) {
         log_info("disk: %s: mount failed\n", url->used.device);
@@ -1151,9 +1242,6 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   else {
     /* network device */
 
-    slist_t *options_sl = slist_getentry(url->query, "options");
-    char *options = options_sl ? options_sl->value : NULL;
-
     switch(url->scheme) {
       case inst_nfs:
         str_copy(&url->mount, dir ?: new_mountpoint());
@@ -1161,8 +1249,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         log_debug("[server = %s]\n", url->server ?: "");
 
         if(!url->is.file) {
-          err = net_mount_nfs(url->mount, url->server, url->path, url->port, options);
-          log_info("nfs: %s -> %s (%d)\n", url->path, url->mount, err);
+          err = url_mount_really(url, url->path, url->mount);
         }
         else {
           log_info("nfs: %s: is file, mounting one level up\n", url->path);
@@ -1178,8 +1265,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
             log_debug("[server = %s]\n", url->server ?: "");
 
-            err = net_mount_nfs(url->tmp_mount, url->server, buf, url->port, options);
-            log_info("nfs: %s -> %s (%d)\n", buf, url->tmp_mount, err);
+            err = url_mount_really(url, buf, url->tmp_mount);
     
             if(err) {
               log_info("nfs: %s: mount failed\n", url->used.device);
@@ -1209,9 +1295,10 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
 
         log_debug("[server = %s]\n", url->server ?: "");
 
-        err = net_mount_cifs(s, url->server, url->share, url->user, url->password, url->domain, options);
-        log_info("cifs: %s -> %s (%d)\n", url->share, s, err);
+        err = url_mount_really(url, url->share, s);
+
         if(err) {
+          log_info("cifs: %s: mount failed\n", url->used.device);
           str_copy(&url->tmp_mount, NULL);
           str_copy(&url->mount, NULL);
         }
@@ -1340,10 +1427,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
 
   if(!config.hd_data) return 1;
 
-  if(
-    url->scheme == inst_file ||
-    url->used.device
-  ) {
+  // we either don't need to setup/select a device or have already done so
+  if(url->is.nodevneeded || url->used.device) {
     return url_mount_disk(url, dir, test_func) ? 0 : 1;
   }
 
@@ -2423,11 +2508,11 @@ int url_setup_device(url_t *url)
   int ok = 0;
   char *type;
 
-  // log_info("*** url_setup_device(%s)\n", url_print(url, 0));
+  log_info("url_setup_device: %s\n", url_print(url, 0));
 
   if(!url) return 0;
 
-  if(url->scheme == inst_file) return 1;
+  if(url->is.nodevneeded) return 1;
 
   if(!url->used.device) return 0;
 
