@@ -50,9 +50,18 @@
 #define MNT_DETACH	(1 << 1)
 #endif
 
+// maximum number of entries you can get in a dialog
+// - this is just more than you can reasonably expect -
+#define MAX_DIALOG_ITEMS	64
+
+// flags for inst_choose_partition()
+#define ICP_SWAP	1
+#define ICP_BLOCK_ALL	2
+
 static int inst_do_cdrom(void);
 static int inst_do_harddisk(void);
-int inst_do_network(instmode_t scheme);
+static int inst_do_mountable(instmode_t scheme);
+static int inst_do_network(instmode_t scheme);
 static int   add_instsys              (void);
 static void  inst_yast_done           (void);
 static int   inst_execute_yast        (void);
@@ -335,13 +344,24 @@ int inst_choose_display_cb(dia_item_t di)
  */
 int inst_choose_source()
 {
+  int i, j;
+  slist_t *sl;
   dia_item_t di;
-  dia_item_t items[] = {
+  dia_item_t items[MAX_DIALOG_ITEMS] = {
     di_source_cdrom,
     di_source_net,
-    di_source_hd,
-    di_none
+    di_source_hd
   };
+
+  j = 3;	// first 3 items have aleady been filled in
+  for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
+    if(sl->value && url_is_mountable(i)) {
+      items[j] = dia_get_id(sl->key, sl->value);
+      if(++j >= MAX_DIALOG_ITEMS - 1) break;
+    }
+  }
+
+  items[j] = di_none;
 
   if(di_inst_choose_source_last == di_none) {
     di_inst_choose_source_last = di_source_cdrom;
@@ -372,6 +392,8 @@ int inst_choose_source()
 int inst_choose_source_cb(dia_item_t di)
 {
   int err = 0, rc = 0;
+  instmode_t scheme;
+  char *s;
 
   di_inst_choose_source_last = di;
 
@@ -389,6 +411,14 @@ int inst_choose_source_cb(dia_item_t di)
       break;
 
     default:
+      s = dia_get_label(di);
+      if(s) {
+        scheme = url_scheme2id(s);
+        err = inst_do_mountable(scheme);
+      }
+      else {
+        err = 1;
+      }
       break;
   }
 
@@ -403,8 +433,13 @@ int inst_choose_source_cb(dia_item_t di)
 
 /*
  * build a partition list
+ *
+ * flags:
+ *   0:             list all partitions with file systems on it
+ *   ICP_BLOCK_ALL: list all block devices + partitions (empty or used)
+ *   ICP_SWAP:      present selection for suitable swap partitions
  */
-int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_input)
+int inst_choose_partition(char **partition, int flags, char *txt_menu, char *txt_input)
 {
   int i, j, rc, item_cnt, item_cnt1, item_cnt2, item_cnt3;
   char **items, **values;
@@ -419,11 +454,28 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
   static char *last_part = NULL;
   int last_item, last_found, last_item1 = 0, last_item2 = 0, last_item3 = 0;
   char *module;
+  slist_t *device_list = NULL;
 
   util_update_disk_list(NULL, 1);
   util_update_swap_list();
 
-  for(i = 0, sl = config.partitions; sl; sl = sl->next) i++;
+  if((flags & ICP_BLOCK_ALL)) {
+    util_update_cdrom_list();
+
+    for(sl = config.cdroms; sl; sl = sl->next) {
+      slist_append_str(&device_list, sl->key);
+    }
+
+    for(sl = config.disks; sl; sl = sl->next) {
+      slist_append_str(&device_list, sl->key);
+    }
+  }
+
+  for(sl = config.partitions; sl; sl = sl->next) {
+    slist_append_str(&device_list, sl->key);
+  }
+
+  for(i = 0, sl = device_list; sl; sl = sl->next) i++;
 
   /*
    * Just max values, actual lists might be shorter.
@@ -436,7 +488,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
   items3 = calloc(i + 4, sizeof *items3);
   values3 = calloc(i + 4, sizeof *values3);
 
-  for(item_cnt1 = item_cnt2 = item_cnt3 = 0, sl = config.partitions; sl; sl = sl->next) {
+  for(item_cnt1 = item_cnt2 = item_cnt3 = 0, sl = device_list; sl; sl = sl->next) {
     if(
       sl->key && !slist_getentry(config.swaps, sl->key)		/* don't show active swaps */
     ) {
@@ -454,7 +506,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
         items1[item_cnt1++] = strdup(buf);
         if(last_found) last_item1 = item_cnt1;
       }
-      else if(type || swap) {
+      else if(type || (flags & (ICP_SWAP | ICP_BLOCK_ALL))) {
         values2[item_cnt2] = strdup(sl->key);
         items2[item_cnt2++] = strdup(buf);
         if(last_found) last_item2 = item_cnt2;
@@ -473,7 +525,7 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
     items2[item_cnt2++] = strdup(buf);
   }
 
-  if(swap) {
+  if((flags & ICP_SWAP)) {
     values1[item_cnt1] = NULL;
     items1[item_cnt1++] = strdup("create swap partition");
     item_mk_part = item_cnt1;
@@ -484,11 +536,17 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
     }
   }
 
-  if(swap) {
+  if((flags & ICP_SWAP)) {
     item_cnt = item_cnt1;
     items = items1;
     values = values1;
     last_item = last_item1;
+  }
+  else if((flags & ICP_BLOCK_ALL)) {
+    item_cnt = item_cnt2;
+    items = items2;
+    values = values2;
+    last_item = last_item2;
   }
   else {
     item_cnt = item_cnt3;
@@ -509,88 +567,25 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
       rc = 0;
     }
 
-    if(i == item_mk_part) {
-      do {
-        i = dia_list("create a swap partition", 36, NULL, items2, last_item2, align_left);
-        if(i > 0 && values2[i - 1]) {
-          str_copy(&last_part, values2[i - 1]);
-          dev = long_dev(values2[i - 1]);
-          sprintf(buf, "Warning: all data on %s will be deleted!", dev);
-          j = dia_contabort(buf, NO);
-          if(j == YES) {
-            sprintf(buf, "/sbin/mkswap %s", dev);
-            if(!lxrc_run(buf)) {
-              log_info("swapon %s\n", dev);
-              if(swapon(dev, 0)) {
-                log_info("swapon: ");
-                perror_info(dev);
-                dia_message("Error activating swap space.", MSGTYPE_ERROR);
-              }
-              else {
-                rc = 0;
-              }
-            }
-            else {
-              dia_message("mkswap failed", MSGTYPE_ERROR);
-            }
-          }
-          else {
-            rc = 1;
-          }
-        }
-      }
-      while(rc && i);
-    }
-    else if(i == item_mk_file) {
-      do {
-        i = dia_list("select partition for swap file", 36, NULL, items3, last_item3, align_left);
-        if(i > 0 && values3[i - 1]) {
-          str_copy(&last_part, values3[i - 1]);
-          dev = long_dev(values3[i - 1]);
-          util_fstype(dev, &module);
-          if(module) mod_modprobe(module, NULL);
-          j = util_mount_rw(dev, config.mountpoint.swap, NULL);
-          if(j) {
-            dia_message("mount failed", MSGTYPE_ERROR);
-          }
-          else {
-            char *tmp, file[256];
-            int fd;
-            window_t win;
-            unsigned swap_size = config.swap_file_size << (20 - 18);	/* in 256k chunks */
-
-            sprintf(file, "%s/suseswap.img", config.mountpoint.swap);
-
-            tmp = calloc(1, 1 << 18);
-
-            fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-            if(fd >= 0) {
-              sprintf(buf, "creating swap file 'suseswap.img' (%u MB)", config.swap_file_size);
-              dia_status_on(&win, buf);
-              for(j = 0; j < swap_size; j++) {
-                if(write(fd, tmp, 1 << 18) != 1 << 18) break;
-                fsync(fd);
-                dia_status(&win, (j + 1) * 100 / swap_size);
-              }
-              close(fd);
-              dia_status_off(&win);
-            }
-            free(tmp);
-
-            if(j != swap_size) {
-              dia_message("failed to create swapfile", MSGTYPE_ERROR);
-            }
-            else {
-              sprintf(buf, "/sbin/mkswap %s", file);
+    if((flags & ICP_SWAP)) {
+      if(i == item_mk_part) {
+        do {
+          i = dia_list("create a swap partition", 36, NULL, items2, last_item2, align_left);
+          if(i > 0 && values2[i - 1]) {
+            str_copy(&last_part, values2[i - 1]);
+            dev = long_dev(values2[i - 1]);
+            sprintf(buf, "Warning: all data on %s will be deleted!", dev);
+            j = dia_contabort(buf, NO);
+            if(j == YES) {
+              sprintf(buf, "/sbin/mkswap %s", dev);
               if(!lxrc_run(buf)) {
-                log_info("swapon %s\n", file);
-                if(swapon(file, 0)) {
+                log_info("swapon %s\n", dev);
+                if(swapon(dev, 0)) {
                   log_info("swapon: ");
-                  perror_info(file);
+                  perror_info(dev);
                   dia_message("Error activating swap space.", MSGTYPE_ERROR);
                 }
                 else {
-                  umount2(config.mountpoint.swap, MNT_DETACH);
                   rc = 0;
                 }
               }
@@ -598,11 +593,76 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
                 dia_message("mkswap failed", MSGTYPE_ERROR);
               }
             }
-            if(rc) util_umount(config.mountpoint.swap);
+            else {
+              rc = 1;
+            }
           }
         }
+        while(rc && i);
       }
-      while(rc && i);
+      else if(i == item_mk_file) {
+        do {
+          i = dia_list("select partition for swap file", 36, NULL, items3, last_item3, align_left);
+          if(i > 0 && values3[i - 1]) {
+            str_copy(&last_part, values3[i - 1]);
+            dev = long_dev(values3[i - 1]);
+            util_fstype(dev, &module);
+            if(module) mod_modprobe(module, NULL);
+            j = util_mount_rw(dev, config.mountpoint.swap, NULL);
+            if(j) {
+              dia_message("mount failed", MSGTYPE_ERROR);
+            }
+            else {
+              char *tmp, file[256];
+              int fd;
+              window_t win;
+              unsigned swap_size = config.swap_file_size << (20 - 18);	/* in 256k chunks */
+
+              sprintf(file, "%s/suseswap.img", config.mountpoint.swap);
+
+              tmp = calloc(1, 1 << 18);
+
+              fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+              if(fd >= 0) {
+                sprintf(buf, "creating swap file 'suseswap.img' (%u MB)", config.swap_file_size);
+                dia_status_on(&win, buf);
+                for(j = 0; j < swap_size; j++) {
+                  if(write(fd, tmp, 1 << 18) != 1 << 18) break;
+                  fsync(fd);
+                  dia_status(&win, (j + 1) * 100 / swap_size);
+                }
+                close(fd);
+                dia_status_off(&win);
+              }
+              free(tmp);
+
+              if(j != swap_size) {
+                dia_message("failed to create swapfile", MSGTYPE_ERROR);
+              }
+              else {
+                sprintf(buf, "/sbin/mkswap %s", file);
+                if(!lxrc_run(buf)) {
+                  log_info("swapon %s\n", file);
+                  if(swapon(file, 0)) {
+                    log_info("swapon: ");
+                    perror_info(file);
+                    dia_message("Error activating swap space.", MSGTYPE_ERROR);
+                  }
+                  else {
+                    umount2(config.mountpoint.swap, MNT_DETACH);
+                    rc = 0;
+                  }
+                }
+                else {
+                  dia_message("mkswap failed", MSGTYPE_ERROR);
+                }
+              }
+              if(rc) util_umount(config.mountpoint.swap);
+            }
+          }
+        }
+        while(rc && i);
+      }
     }
   }
   else {
@@ -615,6 +675,8 @@ int inst_choose_partition(char **partition, int swap, char *txt_menu, char *txt_
       str_copy(&tmp, NULL);
     }
   }
+
+  slist_free(device_list);
 
   for(i = 0; i < item_cnt1; i++) { free(items1[i]); free(values1[i]); }
   free(items1);
@@ -697,6 +759,56 @@ int inst_do_harddisk()
   if(!err) {
     url_free(config.url.install);
     config.url.install = url_set("hd:");
+    str_copy(&config.url.install->device, device);
+    str_copy(&config.url.install->path, path);
+    str_copy(&config.url.install->used.device, long_dev(device));
+
+    err = auto2_find_repo() ? 0 : 1;
+  }
+
+  str_copy(&device, NULL);
+  str_copy(&path, NULL);
+
+  return err;
+}
+
+
+/*
+ * Select and mount local repo.
+ *
+ * return:
+ *   0: ok
+ *   1: failed
+ */
+int inst_do_mountable(instmode_t scheme)
+{
+  int err = 0;
+  char *device = NULL, *path = NULL;
+
+  if(net_config_needed(0) && net_config()) return 1;
+
+  if(
+    config.url.install &&
+    config.url.install->scheme == scheme
+  ) {
+    str_copy(&device, config.url.install->device);
+    str_copy(&path, config.url.install->path);
+  }
+
+  if(url_is_blockdev(scheme)) {
+    if(inst_choose_partition(&device, ICP_BLOCK_ALL, "Choose disk / partition.", "Enter the device name (e.g., /dev/sda1)")) err = 1;
+  }
+
+  if(!err && !url_is_nopath(scheme)) {
+    if(dia_input2("Enter the source directory.", &path, 30, 0)) err = 1;
+  }
+
+  if(!err) {
+    char *tmp_url = NULL;
+    strprintf(&tmp_url, "%s:", url_scheme2name(scheme));
+    url_free(config.url.install);
+    config.url.install = url_set(tmp_url);
+    str_copy(&tmp_url, NULL);
     str_copy(&config.url.install->device, device);
     str_copy(&config.url.install->path, path);
     str_copy(&config.url.install->used.device, long_dev(device));
@@ -1436,7 +1548,7 @@ int ask_for_swap(int64_t size, char *msg)
   }
 
   do {
-    j = inst_choose_partition(&partition, 1, "To continue, activate some swap space.", "Enter the swap partition (e.g., /dev/sda2)");
+    j = inst_choose_partition(&partition, ICP_SWAP, "To continue, activate some swap space.", "Enter the swap partition (e.g., /dev/sda2)");
 
     if(j == 0 && partition) {
       argv[1] = long_dev(partition);

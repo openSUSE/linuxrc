@@ -27,6 +27,9 @@ directory:
   (including partitions); the name of the currebt block device is passed to
   the script
 
+- 'nopath' to indicate that no path component is required (linuxrc will not
+  ask for a path in manual mode)
+
 - 'network' and 'blockdev' are mutually exclusive
 
 The 'mount'/'get' scripts are passed parameters via environment variables:

@@ -1011,6 +1011,8 @@ void lxrc_init()
   /* look for driver updates in initrd */
   util_chk_driver_update("/", "/");
 
+  url_register_schemes();
+
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 

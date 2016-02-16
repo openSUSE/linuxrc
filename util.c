@@ -1205,11 +1205,10 @@ void util_status_info(int log_it)
   if(config.extern_scheme) {
     strcpy(buf, "additional URL schemes:");
     slist_append_str(&sl0, buf);
-    char *s = slist_join(", ", config.extern_scheme);
-    if(s) {
-      sprintf(buf, "  %s", s);
+    for(sl = config.extern_scheme; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s: %s", sl->key, sl->value ?: "");
       slist_append_str(&sl0, buf);
-      free(s);
     }
   }
 

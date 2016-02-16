@@ -512,6 +512,7 @@ typedef struct {
   slist_t *defaultrepo;		/* default repo locations */
   char *debugshell;		/* command to run if we want to start a shell for debugging */
   slist_t *extern_scheme;	/* externally handled URL schemes */
+  slist_t *dia_extra_texts;	/* dynamically defined dialog entries; cf. dia_get_text_id() */
 
   struct {
     unsigned md5:1;		/* support md5 */

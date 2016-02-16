@@ -118,7 +118,6 @@ struct {
   { di_wlan_open,        "No Authentication"   },
   { di_wlan_wpa_psk,     "WPA-PSK"             },
   { di_wlan_wpa_peap,    "WPA-PEAP"            },
-
 };
 
 
@@ -1541,19 +1540,74 @@ void dia_handle_ctrlc (void)
 }
 
 
+/*
+ * Return menu text for item di.
+ */
 char *dia_get_text(dia_item_t di)
 {
   int i;
+  slist_t *sl;
   char *s = "";
 
-  for(i = 0; (unsigned) i < sizeof dia_texts / sizeof *dia_texts; i++) {
-    if(dia_texts[i].item == di) {
-      s = dia_texts[i].text;
-      break;
+  if(di >= di_extra) {
+    for(sl = config.dia_extra_texts, i = di_extra; sl; sl = sl->next, i++) {
+      if(i == di) {
+        s = sl->value;
+        break;
+      }
+    }
+  }
+  else {
+    for(i = 0; i < sizeof dia_texts / sizeof *dia_texts; i++) {
+      if(dia_texts[i].item == di) {
+        s = dia_texts[i].text;
+        break;
+      }
     }
   }
 
   return s;
+}
+
+
+/*
+ * Return menu label for item di.
+ */
+char *dia_get_label(dia_item_t di)
+{
+  int i;
+  slist_t *sl;
+
+  if(di < di_extra) return NULL;
+
+  for(sl = config.dia_extra_texts, i = di_extra; sl; sl = sl->next, i++) {
+    if(i == di) return sl->key;
+  }
+
+  return NULL;
+}
+
+
+/*
+ * Get an id for menu entry.
+ *
+ * The returned id can later be used in dia_get_text() and dia_get_label()
+ * to get back text and label.
+ */
+dia_item_t dia_get_id(char *label, char *text)
+{
+  int i;
+  slist_t *sl;
+
+  if(!label || !text) return di_none;
+
+  for(sl = config.dia_extra_texts, i = di_extra; sl; sl = sl->next, i++) {
+    if(!strcmp(sl->key, label)) return i;
+  }
+
+  slist_setentry(&config.dia_extra_texts, label, text, 0);
+
+  return dia_get_id(label, text);
 }
 
 

@@ -16,6 +16,7 @@ known issues:
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
@@ -75,9 +76,6 @@ static int warn_signature_failed(char *file_name);
 static int is_gpg_signed(char *file);
 static int is_rpm_signed(char *file);
 static int is_signed(char *file, int check);
-static unsigned url_is_mountable(instmode_t scheme);
-static unsigned url_is_network(instmode_t scheme);
-static unsigned url_is_blockdev(instmode_t scheme);
 static unsigned url_scheme_attr(instmode_t scheme, char *attr_name);
 
 void url_read(url_data_t *url_data)
@@ -3106,6 +3104,22 @@ unsigned url_is_blockdev(instmode_t scheme)
 
 
 /*
+ * Return 1 if url scheme does not have a path component.
+ *
+ */
+unsigned url_is_nopath(instmode_t scheme)
+{
+  if(
+    scheme == inst_slp
+  ) {
+    return 1;
+  }
+
+  return url_scheme_attr(scheme, "nopath");
+}
+
+
+/*
  * Check for presence of file 'attr_name' in URL directory.
  */
 unsigned url_scheme_attr(instmode_t scheme, char *attr_name)
@@ -3143,7 +3157,14 @@ instmode_t url_scheme2id(char *scheme)
   if(i >= 0) return i;
 
   if(util_check_exist2("/scripts/url", scheme) == 'd') {
-    slist_setentry(&config.extern_scheme, scheme, NULL, 0);
+    char *attr = NULL, *attr_val;
+    strprintf(&attr, "/scripts/url/%s/menu", scheme);
+    attr_val = util_get_attr(attr);
+    str_copy(&attr, NULL);
+    if(!slist_getentry(config.extern_scheme, scheme)) {
+      log_info("registering url scheme: %s: %s\n", scheme, attr_val);
+    }
+    sl = slist_setentry(&config.extern_scheme, scheme, *attr_val ? attr_val : NULL, 1);
   }
 
   for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
@@ -3196,5 +3217,27 @@ char *url_scheme2name_upper(instmode_t scheme_id)
   }
 
   return name;
+}
+
+
+/*
+ * Register all user-defined schemes.
+ *
+ * Each scheme is auto-registered on first use. But to get the menus in
+ * manual mode right, we register all in one go.
+ */
+void url_register_schemes()
+{
+  struct dirent *de;
+  DIR *d;
+
+ if((d = opendir("/scripts/url"))) {
+    while((de = readdir(d))) {
+      if(de->d_name[0] != '.') {
+        url_scheme2id(de->d_name);
+      }
+    }
+    closedir(d);
+  }
 }
 
