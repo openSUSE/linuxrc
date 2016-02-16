@@ -81,6 +81,7 @@ unsigned url_is_mountable(instmode_t scheme);
 unsigned url_is_network(instmode_t scheme);
 unsigned url_is_blockdev(instmode_t scheme);
 unsigned url_is_nopath(instmode_t scheme);
+unsigned url_is_auth(instmode_t scheme);
 instmode_t url_scheme2id(char *scheme);
 char *url_scheme2name(instmode_t scheme_id);
 char *url_scheme2name_upper(instmode_t scheme_id);

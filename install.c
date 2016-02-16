@@ -179,18 +179,27 @@ int inst_menu_cb(dia_item_t di)
  */
 int inst_choose_netsource()
 {
+  int i, j;
+  slist_t *sl;
   dia_item_t di;
-  dia_item_t items[] = {
+  dia_item_t items[MAX_DIALOG_ITEMS] = {
     di_netsource_ftp,
     di_netsource_http,
     di_netsource_https,
     di_netsource_nfs,
     di_netsource_smb,
     di_netsource_tftp,
-    di_none
   };
 
-  if(!(config.test || config.net.cifs.binary)) items[3] = di_skip;
+ j = 6;        // first 6 items have aleady been filled in
+  for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
+    if(sl->value && url_is_network(i)) {
+      items[j] = dia_get_id(sl->key, sl->value);
+      if(++j >= MAX_DIALOG_ITEMS - 1) break;
+    }
+  }
+
+  items[j] = di_none;
 
   if(di_inst_choose_netsource_last == di_none && config.url.install) {
     switch(config.url.install->scheme) {
@@ -235,6 +244,8 @@ int inst_choose_netsource()
 int inst_choose_netsource_cb(dia_item_t di)
 {
   int err = 0;
+  instmode_t scheme;
+  char *s;
 
   di_inst_choose_netsource_last = di;
 
@@ -264,6 +275,14 @@ int inst_choose_netsource_cb(dia_item_t di)
       break;
 
     default:
+      s = dia_get_label(di);
+      if(s) {
+        scheme = url_scheme2id(s);
+        err = inst_do_network(scheme);
+      }
+      else {
+        err = 1;
+      }
       break;
   }
 
@@ -870,7 +889,7 @@ int inst_do_network(instmode_t scheme)
   if(!err && dia_input2("Enter the directory on the server.", &path, 30, 0)) err = 1;
 
   /* user, password */
-  if(!err && (scheme == inst_http || scheme == inst_https || scheme == inst_ftp)) {
+  if(!err && url_is_auth(scheme)) {
     if(!n_user) {
       strprintf(&buf,
         "Do you need a username and password to access the %s server?",

@@ -30,6 +30,9 @@ directory:
 - 'nopath' to indicate that no path component is required (linuxrc will not
   ask for a path in manual mode)
 
+- 'auth' to indicate the url accepts user/password (linuxrc will ask for them
+  in manual mode)
+
 - 'network' and 'blockdev' are mutually exclusive
 
 The 'mount'/'get' scripts are passed parameters via environment variables:
@@ -39,6 +42,8 @@ url_dir:	where to mount the url to
 url_options:	anything passed via '?options' in the url
 url_server:	the server part of the url
 url_path:	the path part of the url
+url_user:       user name for authentication (if any)
+url_password:   password for authentication (if any)
 url_zypp:       the name of a file; anything written into that file will
 		constitute the url passed to zypp later; zypp has a
 		different set of url schemes than linuxrc; use this file

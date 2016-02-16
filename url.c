@@ -1118,6 +1118,8 @@ int url_mount_really(url_t *url, char *device, char *dir)
     if(options) setenv("url_options", options, 1);
     if(url->server) setenv("url_server", url->server, 1);
     if(url->path) setenv("url_path", url->path, 1);
+    if(url->user) setenv("url_user", url->user, 1);
+    if(url->password) setenv("url_password", url->password, 1);
 
     setenv("url_zypp", zypp_file, 1);
 
@@ -1139,6 +1141,8 @@ int url_mount_really(url_t *url, char *device, char *dir)
     unsetenv("url_server");
     unsetenv("url_path");
     unsetenv("url_rewrite");
+    unsetenv("url_user");
+    unsetenv("url_password");
 
     str_copy(&cmd, NULL);
   }
@@ -1317,8 +1321,19 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
         break;
 
       default:
-        log_info("%s: unsupported scheme\n", url_scheme2name(url->scheme));
-        err = 1;
+        if(url_is_mountable(url->scheme)) {
+          str_copy(&url->tmp_mount, new_mountpoint());
+          err = url_mount_really(url, url->used.device, url->tmp_mount);
+
+          if(err) {
+            log_info("disk: %s: mount failed\n", url->used.device);
+            str_copy(&url->tmp_mount, NULL);
+          }
+        }
+        else {
+          log_info("%s: unsupported scheme\n", url_scheme2name(url->scheme));
+          err = 1;
+        }
         break;
     }
   }
@@ -3116,6 +3131,25 @@ unsigned url_is_nopath(instmode_t scheme)
   }
 
   return url_scheme_attr(scheme, "nopath");
+}
+
+
+/*
+ * Return 1 if url scheme may need user/password.
+ *
+ */
+unsigned url_is_auth(instmode_t scheme)
+{
+  if(
+    scheme == inst_ftp ||
+    scheme == inst_smb ||
+    scheme == inst_http ||
+    scheme == inst_https
+  ) {
+    return 1;
+  }
+
+  return url_scheme_attr(scheme, "auth");
 }
 
 
