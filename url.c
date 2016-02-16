@@ -1196,7 +1196,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
   char *path = NULL, *buf = NULL, *s;
   url_t *tmp_url;
 
-  log_info("url mount: trying %s\n", url_print(url, 0));
+  log_info("url mount: trying %s (path = %s)\n", url_print(url, 0), url->path ?: "");
   if(url->used.model) log_info("(%s)\n", url->used.model);
 
   if(

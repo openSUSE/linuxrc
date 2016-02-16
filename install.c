@@ -374,7 +374,7 @@ int inst_choose_source()
 
   j = 3;	// first 3 items have aleady been filled in
   for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
-    if(sl->value && url_is_mountable(i)) {
+    if(sl->value && url_is_mountable(i) && !url_is_network(i)) {
       items[j] = dia_get_id(sl->key, sl->value);
       if(++j >= MAX_DIALOG_ITEMS - 1) break;
     }
@@ -779,7 +779,7 @@ int inst_do_harddisk()
     url_free(config.url.install);
     config.url.install = url_set("hd:");
     str_copy(&config.url.install->device, device);
-    str_copy(&config.url.install->path, path);
+    str_copy(&config.url.install->path, path ?: "/");
     str_copy(&config.url.install->used.device, long_dev(device));
 
     err = auto2_find_repo() ? 0 : 1;
@@ -829,7 +829,7 @@ int inst_do_mountable(instmode_t scheme)
     config.url.install = url_set(tmp_url);
     str_copy(&tmp_url, NULL);
     str_copy(&config.url.install->device, device);
-    str_copy(&config.url.install->path, path);
+    str_copy(&config.url.install->path, path ?: "/");
     str_copy(&config.url.install->used.device, long_dev(device));
 
     err = auto2_find_repo() ? 0 : 1;
