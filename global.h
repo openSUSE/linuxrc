@@ -443,6 +443,7 @@ typedef struct {
   unsigned nanny_set:1;		/* nanny setting was changed */
   unsigned upgrade:1;		/* upgrade or fresh install */
   unsigned systemboot:1;	/* boot installed system */
+  unsigned extend_running:1;	/* currently running an 'extend' job */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */

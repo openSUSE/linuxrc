@@ -24,7 +24,7 @@ directory:
   this url configuring all available network interfaces in turn
 
 - 'blockdev' to indicate that linuxrc can try this url on all block devices
-  (including partitions); the name of the currebt block device is passed to
+  (including partitions); the name of the current block device is passed to
   the script
 
 - 'nopath' to indicate that no path component is required (linuxrc will not
@@ -44,12 +44,16 @@ url_server:	the server part of the url
 url_path:	the path part of the url
 url_user:       user name for authentication (if any)
 url_password:   password for authentication (if any)
-url_zypp:       the name of a file; anything written into that file will
-		constitute the url passed to zypp later; zypp has a
+url_zypp:       if set, the name of a file; anything written into that file
+		will constitute the url passed to zypp later; zypp has a
 		different set of url schemes than linuxrc; use this file
-		to rewrite the url into zypp form
+		to rewrite the url into zypp form;
+		*note*: var might be unset - in this case rewritten url is
+		not needed
 
-The scripts should exit with 0 to indicate that it was successful.
+The script should exit with 0 to indicate that it was successful.
 
-Note that any mounted url will still be mounted when yast is started.
+The 'mount' script is expected to mount the url to $url_dir. It should
+preferably be mounted read-only. *Note*: it must be possible to mount
+the url to different directories at the same time.
 

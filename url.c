@@ -1121,7 +1121,8 @@ int url_mount_really(url_t *url, char *device, char *dir)
     if(url->user) setenv("url_user", url->user, 1);
     if(url->password) setenv("url_password", url->password, 1);
 
-    setenv("url_zypp", zypp_file, 1);
+    // we don't need rewritten urls for 'extend'
+    if(!config.extend_running) setenv("url_zypp", zypp_file, 1);
 
     err = lxrc_run(cmd);
 
@@ -1143,6 +1144,7 @@ int url_mount_really(url_t *url, char *device, char *dir)
     unsetenv("url_rewrite");
     unsetenv("url_user");
     unsetenv("url_password");
+    unsetenv("url_zypp");
 
     str_copy(&cmd, NULL);
   }
