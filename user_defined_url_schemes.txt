@@ -1,0 +1,59 @@
+User-defined URl schemes
+========================
+
+[Note: the 'get' part has not been implemented yet]
+
+You can add URL schemes to linuxrc that can be used with the
+'install', 'info', 'dud', and 'autoyast2' options.
+
+Also, it can show up in the linuxrc menus when linuxrc is run in manual
+mode.
+
+linuxrc supports two kinds of url schemes: (1) mountable and (2)
+downloadable schemes. For (1), the url points to some directory structure
+that can be mounted. For (2), only individual files can be accessed (downloaded).
+
+To define a url scheme, create (in the initrd) a directory below /scripts
+with the name of the scheme (e.g. 'foo'). Then put an executable script
+named 'mount' (for case (1)) or 'get' (for case (2)) into this directory.
+
+Optionally put any of the following (possibly empty) files into that
+directory:
+
+- 'network' to indicate that the network should be set up; linuxrc may try
+  this url configuring all available network interfaces in turn
+
+- 'blockdev' to indicate that linuxrc can try this url on all block devices
+  (including partitions); the name of the current block device is passed to
+  the script
+
+- 'nopath' to indicate that no path component is required (linuxrc will not
+  ask for a path in manual mode)
+
+- 'auth' to indicate the url accepts user/password (linuxrc will ask for them
+  in manual mode)
+
+- 'network' and 'blockdev' are mutually exclusive
+
+The 'mount'/'get' scripts are passed parameters via environment variables:
+
+url_device:	current block device / network interface (if any)
+url_dir:	where to mount the url to
+url_options:	anything passed via '?options' in the url
+url_server:	the server part of the url
+url_path:	the path part of the url
+url_user:       user name for authentication (if any)
+url_password:   password for authentication (if any)
+url_zypp:       if set, the name of a file; anything written into that file
+		will constitute the url passed to zypp later; zypp has a
+		different set of url schemes than linuxrc; use this file
+		to rewrite the url into zypp form;
+		*note*: var might be unset - in this case rewritten url is
+		not needed
+
+The script should exit with 0 to indicate that it was successful.
+
+The 'mount' script is expected to mount the url to $url_dir. It should
+preferably be mounted read-only. *Note*: it must be possible to mount
+the url to different directories at the same time.
+

@@ -76,3 +76,13 @@ char *url_print(url_t *url, int format);
 char *url_print2(url_t *url, char *file);
 char *url_instsys_base(char *path);
 void url_build_instsys_list(char *instsys, int read_list);
+
+unsigned url_is_mountable(instmode_t scheme);
+unsigned url_is_network(instmode_t scheme);
+unsigned url_is_blockdev(instmode_t scheme);
+unsigned url_is_nopath(instmode_t scheme);
+unsigned url_is_auth(instmode_t scheme);
+instmode_t url_scheme2id(char *scheme);
+char *url_scheme2name(instmode_t scheme_id);
+char *url_scheme2name_upper(instmode_t scheme_id);
+void url_register_schemes(void);

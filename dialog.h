@@ -102,6 +102,11 @@ typedef enum {
   di_wlan_wpa_psk,
   di_wlan_wpa_peap,
 
+  /*
+   * must be last - placeholder for dynamically defined values
+   * cf. config.dia_extra_texts, dia_get_text_id()
+   */
+  di_extra
 } dia_item_t;
 
 typedef enum {
@@ -127,6 +132,8 @@ extern void dia_handle_ctrlc (void);
 
 int dia_message2(char *txt, int type);
 char *dia_get_text(dia_item_t di);
+char *dia_get_label(dia_item_t di);
+dia_item_t dia_get_id(char *label, char *text);
 dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t *items, dia_item_t default_item);
 int dia_list(char *title, int width, int (*func)(int), char **items, int default_item, dia_align_t align);
 int dia_show_lines2(char *head, slist_t *sl0, int width);

@@ -187,7 +187,8 @@ typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
-  inst_rel, inst_disk
+  inst_rel, inst_disk,
+  inst_extern // must be last
 } instmode_t;
 
 
@@ -275,6 +276,7 @@ typedef struct {
   char *instsys;
   char *mount;
   char *tmp_mount;
+  char *rewrite_for_zypp;	/* pass this value instead of the original url to zypp */
   unsigned port;
   slist_t *query;
   slist_t *file_list;
@@ -287,6 +289,8 @@ typedef struct {
     unsigned cdrom:1;		/* device is cdrom */
     unsigned file:1;		/* path points to file (not to directory) */
     unsigned wlan:1;		/* wlan interface */
+    unsigned blockdev:1;	/* needs block device */
+    unsigned nodevneeded:1;	/* does not need any device */
   } is;
   struct {
     char *device;
@@ -439,6 +443,7 @@ typedef struct {
   unsigned nanny_set:1;		/* nanny setting was changed */
   unsigned upgrade:1;		/* upgrade or fresh install */
   unsigned systemboot:1;	/* boot installed system */
+  unsigned extend_running:1;	/* currently running an 'extend' job */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */
@@ -507,6 +512,8 @@ typedef struct {
   char *run_command;		/* for 'run command' input field */
   slist_t *defaultrepo;		/* default repo locations */
   char *debugshell;		/* command to run if we want to start a shell for debugging */
+  slist_t *extern_scheme;	/* externally handled URL schemes */
+  slist_t *dia_extra_texts;	/* dynamically defined dialog entries; cf. dia_get_text_id() */
 
   struct {
     unsigned md5:1;		/* support md5 */

@@ -1202,6 +1202,16 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.net.sethostname, "hostname");
   if(*buf) slist_append_str(&sl0, buf);
 
+  if(config.extern_scheme) {
+    strcpy(buf, "additional URL schemes:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.extern_scheme; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s: %s", sl->key, sl->value ?: "");
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
   slist_append_str(&sl0, buf);
 
@@ -2521,27 +2531,6 @@ void strprintf(char **buf, char *format, ...)
 }
 
 
-char *get_instmode_name(instmode_t instmode)
-{
-  return file_num2sym("no scheme", instmode);
-}
-
-
-char *get_instmode_name_up(instmode_t instmode)
-{
-  static char *name = NULL;
-  int i;
-
-  str_copy(&name, file_num2sym("no scheme", instmode));
-
-  if(name) {
-    for(i = 0; name[i]; i++) name[i] = toupper(name[i]);
-  }
-
-  return name;
-}
-
-
 int util_fstype_main(int argc, char **argv)
 {
   char *s, buf[64], *compr, *archive;
@@ -2772,6 +2761,8 @@ int util_mount(char *dev, char *dir, unsigned long flags, slist_t *file_list)
   char *compr = NULL;
   int err = -1;
   struct stat64 sbuf;
+
+  log_info("mount: dev = %s, dir = %s, flags = 0x%lx\n", dev, dir, flags & 0xffff);
 
   if(!dev || !dir) return -1;
 

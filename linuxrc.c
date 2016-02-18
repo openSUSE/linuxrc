@@ -1011,6 +1011,8 @@ void lxrc_init()
   /* look for driver updates in initrd */
   util_chk_driver_update("/", "/");
 
+  url_register_schemes();
+
   util_update_disk_list(NULL, 1);
   util_update_cdrom_list();
 
@@ -1471,11 +1473,18 @@ void lxrc_usr1(int signum)
         str_copy(&sl->key, NULL);
       }
       if(!fork()) {
-        for(i = 0; i < 256; i++) close(i);
-        open("/tmp/extend.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
-        dup(0);
-        dup(0);
-        setlinebuf(stderr);
+        config.extend_running = 1;
+
+        log_debug("=== extend started ===\n");
+
+        for(i = 0; i < 3; i++) close(i);
+
+        // get us a copy of the logs
+        unlink("/tmp/extend.log");
+        str_copy(&config.log.dest[1].name, "/tmp/extend.log");
+        config.log.dest[1].f = NULL;
+        config.log.dest[1].level = LOG_LEVEL_SHOW | LOG_LEVEL_INFO | LOG_LEVEL_DEBUG | LOG_TIMESTAMP;
+
         config.download.cnt = 1000 + extend_cnt;
         config.mountpoint.cnt = 1000 + extend_cnt;
         if(!config.debug) config.debug = 1;
@@ -1485,11 +1494,13 @@ void lxrc_usr1(int signum)
         config.secure_always_fail = 1;
 
         if(task == 'a' && sl) {
-          log_info("instsys extend: add %s\n%s: already added\n", ext, ext);
+          log_info("instsys extend: add %s\n", ext);
+          log_info("%s: already added\n", ext, ext);
           err = 0;
         }
         else if(task == 'r' && !sl) {
-          log_info("instsys extend: remove %s\n%s: not there\n", ext, ext);
+          log_info("instsys extend: remove %s\n", ext);
+          log_info("%s: not there\n", ext);
           err = 0;
         }
         else if(task == 'a') {
@@ -1501,6 +1512,10 @@ void lxrc_usr1(int signum)
         f = fopen("/tmp/extend.result", "w");
         if(f) fprintf(f, "%d\n", err);
         fclose(f);
+
+        config.log.dest[1].level = 0;
+        log_debug("=== extend finished ===\n");
+
         if(extend_pid > 0) kill(extend_pid, SIGUSR1);
         exit(0);
       }
