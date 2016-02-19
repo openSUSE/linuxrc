@@ -1224,7 +1224,9 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value) str_copy(&config.hwp.userid, f->value);
         break;
       case key_portname:
-        str_copy(&config.hwp.portname, f->value);
+        log_show("***\n"); 
+        log_show("*** The Portname parameter is no longer needed. Please do not specify it.\n"); 
+        log_show("***\n"); 
         break;
       case key_readchan:
         if(*f->value) str_copy(&config.hwp.readchan, f->value);
