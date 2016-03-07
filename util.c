@@ -1200,7 +1200,13 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.withipoib, "ipoib");
   add_flag(&sl0, buf, config.upgrade, "upgrade");
   add_flag(&sl0, buf, config.net.sethostname, "hostname");
+  add_flag(&sl0, buf, config.self_update, "self_update");
   if(*buf) slist_append_str(&sl0, buf);
+
+  if(config.self_update_url) {
+    sprintf(buf, "self-update URL: %s", url_print(config.self_update_url, 0));
+    slist_append_str(&sl0, buf);
+  }
 
   if(config.extern_scheme) {
     strcpy(buf, "additional URL schemes:");
