@@ -293,11 +293,15 @@ FOO: %s
 # entry is missing if unset
 Cmdline: %s
 
-# 1: enable self-update feature
-# 0: disable self-update feature
+# 1: self-update feature enabled
+# 0: self-update feature disabled
 # if a URL is given, it will be used to search for
 # updates.
 SelfUpdate: 0|1|%s
+
+# 1: secure mode disabled
+# 0: secure mode enabled
+Insecure: 0|1
 
 *** Note ***
 

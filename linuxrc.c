@@ -784,6 +784,7 @@ void lxrc_init()
   config.kbd_fd = -1;
   config.ntfs_3g = 1;
   config.secure = 1;
+  config.insecure = 0;
   config.sslcerts = 1;
   config.squash = 1;
   config.kexec_reboot = 1;

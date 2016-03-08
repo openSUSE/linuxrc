@@ -1525,6 +1525,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       case key_insecure:
         if(f->is.numeric && f->nvalue) {
           config.secure = 0;
+          config.insecure = 1;
           config.digests.failed = config.sig_failed = 0;
         }
         break;
@@ -1927,6 +1928,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_y2gdb, config.y2gdb);
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
+  file_write_num(f, key_insecure, config.insecure);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
   if(config.self_update_url)
     file_write_str(f, key_self_update, config.self_update_url);
