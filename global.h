@@ -514,7 +514,7 @@ typedef struct {
   char *debugshell;		/* command to run if we want to start a shell for debugging */
   slist_t *extern_scheme;	/* externally handled URL schemes */
   slist_t *dia_extra_texts;	/* dynamically defined dialog entries; cf. dia_get_text_id() */
-  url_t *self_update_url; /* URL of YaST update for self-update */
+  char *self_update_url; /* URL of YaST update for self-update */
   unsigned self_update:1; /* enables YaST self-update feature */
 
   struct {

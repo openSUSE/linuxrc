@@ -1761,7 +1761,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if (f->is.numeric) {
           config.self_update = f->nvalue;
         } else {
-          config.self_update_url = url_set(f->value);
+          str_copy(&config.self_update_url, f->value);
           config.self_update = 1;
         }
         break;
@@ -1929,7 +1929,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
   if(config.self_update_url)
-    file_write_str(f, key_self_update, url_print(config.self_update_url, 0));
+    file_write_str(f, key_self_update, config.self_update_url);
   else if (config.self_update == 0 || config.self_update == 1)
     file_write_num(f, key_self_update, config.self_update);
   else

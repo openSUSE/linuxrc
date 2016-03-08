@@ -1204,7 +1204,7 @@ void util_status_info(int log_it)
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.self_update_url) {
-    sprintf(buf, "self-update URL: %s", url_print(config.self_update_url, 0));
+    sprintf(buf, "self-update URL: %s", config.self_update_url);
     slist_append_str(&sl0, buf);
   }
 
