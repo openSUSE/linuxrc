@@ -1331,6 +1331,9 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             log_info("disk: %s: mount failed\n", url->used.device);
             str_copy(&url->tmp_mount, NULL);
           }
+          else {
+            strprintf(&path, "%s%s", url->tmp_mount, url->path);
+          }
         }
         else {
           log_info("%s: unsupported scheme\n", url_scheme2name(url->scheme));
