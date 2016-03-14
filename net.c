@@ -1542,14 +1542,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         if((rc=dia_input2_chopspace("Device address for data channel", &config.hwp.datachan, 9, 0))) return rc;
       if((rc=net_check_ccw_address(config.hwp.datachan))) return rc;
 
-      if (config.hwp.type != di_390net_hsi) {
-	  IFNOTAUTO(config.hwp.portname)
-	  {
-	      if((rc=dia_input2_chopspace("Portname to use", &config.hwp.portname,9,0))) return rc;
-	      // FIXME: warn about problems related to empty portnames
-	  }
-      }
-      
       IFNOTAUTO(config.hwp.layer2)
       {
         config.hwp.layer2 = dia_yesno("Enable OSI Layer 2 support?", YES) == YES ? LAYER2_YES : LAYER2_NO;
@@ -1618,10 +1610,7 @@ setup_ctc:
       ccmd += sprintf(ccmd, "qeth_configure ");
       if(config.hwp.portno)
         ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
-      ccmd += sprintf(ccmd, "%s%s%s %s %s %s %s 1",
-        config.hwp.portname ? "-p \"" : "",
-        config.hwp.portname ? config.hwp.portname : "",
-        config.hwp.portname ? "\"" : "",
+      ccmd += sprintf(ccmd, "%s %s %s %s 1",
         config.hwp.layer2 == LAYER2_YES ? "-l" : "",
         config.hwp.readchan,
         config.hwp.writechan,

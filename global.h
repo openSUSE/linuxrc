@@ -714,7 +714,6 @@ typedef struct {
     char* ccw_chan_ids;
     int ccw_chan_num;
     int protocol;
-    char* portname;
     int type;
     int interface;
     int layer2;
