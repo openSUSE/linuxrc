@@ -888,6 +888,18 @@ int inst_do_network(instmode_t scheme)
   /* path */
   if(!err && dia_input2("Enter the directory on the server.", &path, 30, 0)) err = 1;
 
+  /* ensure leading "/" if mountable */
+  if(!err && url_is_mountable(scheme)) {
+    if(path) {
+      if(*path != '/') {
+        strprintf(&path, "/%s", path);
+      }
+    }
+    else {
+      path = strdup("/");
+    }
+  }
+
   /* user, password */
   if(!err && url_is_auth(scheme)) {
     if(!n_user) {
