@@ -299,6 +299,10 @@ Cmdline: %s
 # updates.
 SelfUpdate: 0|1|%s
 
+# 1: secure mode disabled
+# 0: secure mode enabled
+Insecure: 0|1
+
 *** Note ***
 
  There may be some more entries in install.inf but they are put there by
