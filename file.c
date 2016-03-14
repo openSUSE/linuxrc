@@ -308,6 +308,7 @@ static struct {
   { key_systemboot,     "SystemBoot",     kf_cfg + kf_cmd                },
   { key_sethostname,    "SetHostname",    kf_cfg + kf_cmd_early          },
   { key_debugshell,     "DebugShell",     kf_cfg + kf_cmd + kf_cmd_early },
+  { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1756,6 +1757,15 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         str_copy(&config.debugshell, *f->value ? f->value : NULL);
         break;
 
+      case key_self_update:
+        if (f->is.numeric) {
+          config.self_update = f->nvalue;
+        } else {
+          str_copy(&config.self_update_url, f->value);
+          config.self_update = 1;
+        }
+        break;
+
       default:
         break;
     }
@@ -1917,7 +1927,13 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_y2gdb, config.y2gdb);
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
+  file_write_num(f, key_insecure, !config.secure);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
+  if(config.self_update_url)
+    file_write_str(f, key_self_update, config.self_update_url);
+  else if (config.self_update == 0 || config.self_update == 1)
+    file_write_num(f, key_self_update, config.self_update);
+  else
 
   if(
     config.rootpassword &&

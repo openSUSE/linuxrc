@@ -791,6 +791,10 @@ void lxrc_init()
   config.udev_mods = 1;
   config.devtmpfs = 1;
 
+  // defaults for self-update feature
+  config.self_update_url = NULL;
+  config.self_update = 1;
+
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
 

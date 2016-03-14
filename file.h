@@ -54,7 +54,7 @@ typedef enum {
   key_namescheme, key_ptoptions, key_is_ptoption, key_withfcoe, key_digests,
   key_plymouth, key_sslcerts, key_restart, key_restarted, key_autoyast2,
   key_withipoib, key_upgrade, key_ifcfg, key_defaultinstall, key_nanny, key_vlanid,
-  key_sshkey, key_systemboot, key_sethostname, key_debugshell
+  key_sshkey, key_systemboot, key_sethostname, key_debugshell, key_self_update
 } file_key_t;
 
 typedef enum {
