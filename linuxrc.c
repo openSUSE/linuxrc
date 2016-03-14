@@ -1006,9 +1006,20 @@ void lxrc_init()
 
   LXRC_WAIT
 
-  log_show("Loading basic drivers...");
+  if(config.config) {
+    if(!dia_input2("Enter install parameters", &config.change_config, 70, 0)) {
+      file_t *f = file_parse_buffer(config.change_config, kf_cfg + kf_cmd + kf_cmd_early);
+      file_do_info(f, kf_cfg + kf_cmd + kf_cmd_early);
+      file_free_file(f);
+    }
+    if(!config.manual) util_disp_done();
+  }
+
+  LXRC_WAIT
+
+  log_show_maybe(!config.win, "Loading basic drivers...");
   mod_init(1);
-  log_show(" ok\n");
+  log_show_maybe(!config.win, " ok\n");
 
   LXRC_WAIT
 

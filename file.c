@@ -309,6 +309,7 @@ static struct {
   { key_sethostname,    "SetHostname",    kf_cfg + kf_cmd_early          },
   { key_debugshell,     "DebugShell",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
+  { key_config,         "LinuxrcConfig",  kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1766,6 +1767,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           str_copy(&config.self_update_url, f->value);
           config.self_update = 1;
         }
+        break;
+
+      case key_config:
+        if(f->is.numeric) config.config = f->nvalue;
         break;
 
       default:

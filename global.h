@@ -444,6 +444,7 @@ typedef struct {
   unsigned upgrade:1;		/* upgrade or fresh install */
   unsigned systemboot:1;	/* boot installed system */
   unsigned extend_running:1;	/* currently running an 'extend' job */
+  unsigned config:1;		/* show dialog asking for config options */
   struct {
     unsigned check:1;		/* check for braille displays and start brld if found */
     char *dev;			/* braille device */
