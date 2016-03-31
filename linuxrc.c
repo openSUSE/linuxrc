@@ -421,7 +421,7 @@ void lxrc_movetotmpfs()
     return;
   }
 
-  i = mount("tmpfs", newroot, "tmpfs", 0, "size=100%");
+  i = mount("tmpfs", newroot, "tmpfs", 0, "size=100%,nr_inodes=0");
   if(i) {
     perror(newroot);
     return;
