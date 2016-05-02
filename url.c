@@ -2583,11 +2583,11 @@ int url_setup_interface(url_t *url)
 
   str_copy(&config.ifcfg.manual->device, url->used.device);
 
-  log_info("interface setup: %s\n", config.ifcfg.manual->device);
+  log_info("interface setup: %s\n", net_get_ifname(config.ifcfg.manual));
 
   if((config.net.do_setup & DS_SETUP)) auto2_user_netconfig();
 
-  if(!config.ifcfg.if_up) {
+  if(!slist_getentry(config.ifcfg.if_up, net_get_ifname(config.ifcfg.manual))) {
     check_ptp(config.ifcfg.manual->device);
 
     if(config.ifcfg.manual->dhcp && !config.ifcfg.manual->ptp) {
@@ -2598,12 +2598,12 @@ int url_setup_interface(url_t *url)
     }
   }
 
-  if(!config.ifcfg.if_up) {
-    log_info("network setup failed\n");
+  if(!slist_getentry(config.ifcfg.if_up, net_get_ifname(config.ifcfg.manual))) {
+    log_info("%s network setup failed\n", net_get_ifname(config.ifcfg.manual));
     return 0;
   }
   else {
-    log_info("%s activated\n", config.ifcfg.manual->device);
+    log_info("%s activated\n", net_get_ifname(config.ifcfg.manual));
   }
 
   return 1;
