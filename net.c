@@ -1548,7 +1548,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       }
       if(config.hwp.layer2 == LAYER2_YES) {
         IFNOTAUTO(config.hwp.osahwaddr) {
-          dia_input2("MAC address", &config.hwp.osahwaddr, 17, 1);
+          dia_info(&win, "Specifying a MAC address is optional.", MSGTYPE_INFO);
+          dia_info(&win, "In most cases letting it default is the correct choice.", MSGTYPE_INFO);
+          dia_info(&win, "Provide one only if you know it is truly necessary.", MSGTYPE_INFO);
+          dia_input2("Optional MAC address", &config.hwp.osahwaddr, 17, 1);
         }
       }
       
