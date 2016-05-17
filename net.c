@@ -261,9 +261,7 @@ int net_static()
 
   char *ifname = NULL;
 
-  str_copy(&ifname, config.ifcfg.manual->device);
-
-  if(config.ifcfg.manual->vlan) strprintf(&ifname, "%s.%s", ifname, config.ifcfg.manual->vlan);
+  str_copy(&ifname, net_get_ifname(config.ifcfg.manual));
 
   net_wicked_up(ifname);
 
@@ -1161,7 +1159,6 @@ void net_wicked_dhcp()
   window_t win;
   int got_ip = 0, cfg_ok;
   ifcfg_t *ifcfg = NULL;
-  char *device = config.ifcfg.manual->device;
   char *type;
 
   if(config.test) {
@@ -1186,7 +1183,7 @@ void net_wicked_dhcp()
   ifcfg->flags = config.ifcfg.manual->flags;
   str_copy(&ifcfg->vlan, config.ifcfg.manual->vlan);
 
-  cfg_ok = ifcfg_write(device, ifcfg, 0);
+  cfg_ok = ifcfg_write(config.ifcfg.manual->device, ifcfg, 0);
 
   free(ifcfg->type);
   free(ifcfg->vlan);
@@ -1197,9 +1194,7 @@ void net_wicked_dhcp()
 
   char *ifname = NULL;
 
-  str_copy(&ifname, device);
-
-  if(config.ifcfg.manual->vlan) strprintf(&ifname, "%s.%s", ifname, config.ifcfg.manual->vlan);
+  str_copy(&ifname, net_get_ifname(config.ifcfg.manual));
 
   strprintf(&buf, "Sending DHCP%s request to %s...", type, ifname);
   log_show_maybe(!config.win, "%s\n", buf);
@@ -1208,7 +1203,7 @@ void net_wicked_dhcp()
   }
   str_copy(&buf, NULL);
 
-  net_apply_ethtool(device, NULL);
+  net_apply_ethtool(config.ifcfg.manual->device, NULL);
 
   net_wicked_up(ifname);
 
@@ -2577,7 +2572,7 @@ void net_wicked_up(char *ifname)
  */
 void net_wicked_down(char *ifname)
 {
-  char *buf = NULL;
+  char *buf = NULL, *s;
 
   if(!ifname) return;
 
@@ -2592,6 +2587,20 @@ void net_wicked_down(char *ifname)
   LXRC_WAIT
 
   net_update_state();
+
+  str_copy(&buf, ifname);
+
+  /*
+   * In case we were just taking down a vlan tagged interface, shutdown the
+   * untagged interface as well, unless there's an explicit config file for
+   * it (it was brought up by wicked implicitly).
+   */
+  if((s = strchr(buf, '.'))) {
+    *s = 0;
+    if(!util_check_exist2("/etc/sysconfig/network/ifcfg-", buf)) {
+      net_wicked_down(buf);
+    }
+  }
 
   str_copy(&buf, NULL);
 }
@@ -2896,5 +2905,24 @@ void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device)
   else {
     if(config.debug >= 2) log_debug("ifcfg flags, no match\n");
   }
+}
+
+
+/*
+ * Convenience function: provide network interface name in "INTERFACE.VLANID" form.
+ *
+ * Returns the string in a static buffer;
+ */
+char *net_get_ifname(ifcfg_t *ifcfg)
+{
+  static char *buf = NULL;
+
+  if(!ifcfg || !ifcfg->device) return NULL;
+
+  str_copy(&buf, ifcfg->device);
+
+  if(ifcfg->vlan) strprintf(&buf, "%s.%s", buf, ifcfg->vlan);
+
+  return buf;
 }
 
