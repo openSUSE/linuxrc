@@ -1113,6 +1113,9 @@ int inst_start_install()
     if(inst_choose_source()) err = 1;
   }
 
+  /* if the user specified a hostname, set it */
+  util_set_hostname(config.net.realhostname);
+
   if(! err && config.rescue) {
     /* get rid of repo */
     url_umount(config.url.install);

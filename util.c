@@ -5443,3 +5443,17 @@ char *util_get_caller(int skip)
   return buf;
 }
 
+
+/*
+ * Convenience function:
+ * Set hostname and log this.
+ */
+void util_set_hostname(char *hostname)
+{
+  if(!hostname) return;
+
+  sethostname(hostname, strlen(hostname));
+
+  log_info("set hostname: %s\n", hostname);
+}
+

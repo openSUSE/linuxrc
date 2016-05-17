@@ -127,7 +127,7 @@ Device: %s
 # else the entry is missing
 ProxyURL: %s
 
-# the hostname as set by dhcp or by 'hostname=foo' boot option
+# the hostname as set by 'hostname=foo' boot option
 # entry is missing if unset
 Hostname: %s
 

@@ -1895,13 +1895,6 @@ void file_write_install_inf(char *dir)
   if(config.net.realhostname) {
     file_write_str(f, key_hostname, config.net.realhostname);
   }
-  else {
-    char buf[256];
-    if(!gethostname(buf, sizeof buf)) {
-      log_debug("hostname = \"%s\"\n", buf);
-      if(*buf && strcmp(buf, "(none)")) file_write_str(f, key_hostname, buf);
-    }
-  }
 
   LXRC_WAIT
 
