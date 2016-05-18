@@ -1907,6 +1907,14 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
   file_write_num(f, key_textmode, config.textmode);
   file_write_str(f, key_autoyast, config.autoyast);
+  /*
+   * autoyast + upgrade = autoupgrade
+   *
+   * autoyast uses a different config var to trigger updates for historical reasons
+   */
+  if(config.autoyast && config.upgrade) {
+    fprintf(f, "AutoUpgrade: 1\n");
+  }
   file_write_num(f, key_memfree, config.memoryXXX.current >> 10);	// convention: in kB
   file_write_num(f, key_vnc, config.vnc);
   file_write_str(f, key_vncpassword, config.net.vncpassword);
