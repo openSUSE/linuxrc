@@ -35,7 +35,9 @@
 #include "checkmedia.h"
 
 static int driver_is_active(hd_t *hd);
+#if !defined(__s390__) && !defined(__s390x__)
 static void auto2_progress(char *pos, char *msg);
+#endif
 static void auto2_read_repo_files(url_t *url);
 static char *auto2_splash_name(void);
 static void auto2_kexec(url_t *url);
@@ -805,12 +807,14 @@ void load_drivers(hd_data_t *hd_data, hd_hw_item_t hw_item)
 /*
  * Default progress indicator for hardware probing.
  */
+#if !defined(__s390__) && !defined(__s390x__)
 void auto2_progress(char *pos, char *msg)
 {
   printf("\r%64s\r", "");
   printf("> %s: %s", pos, msg);
   fflush(stdout);
 }
+#endif
 
 
 char *auto2_serial_console()
@@ -937,7 +941,9 @@ void auto2_kexec(url_t *url)
   char *kernel, *initrd, *buf = NULL, *cmdline = NULL, *splash = NULL, *splash_name = NULL;
   FILE *f;
   int err = 0;
+#if defined(__i386__) || defined(__x86_64__)
   unsigned vga_mode = 0;
+#endif
 
   if(!config.kexec_kernel || !config.kexec_initrd) {
     log_info("no kernel and initrd for kexec specified\n");

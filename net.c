@@ -727,7 +727,7 @@ int net_choose_device()
         if ( ccw == -1 ) {
           /* IUCV device */
           if(hd->rom_id) strprintf(&annotation, "(%s)", hd->rom_id);
-          else strprintf(&annotation, "");
+          else strprintf(&annotation, " ");
         }
         else {
           strprintf(&annotation, "(%1x.%1x.%04x)", lcss >> 8, lcss & 0xf, ccw);
@@ -1379,11 +1379,7 @@ int net_s390_get_ifname(char* channel, char** device)
 
 int net_activate_s390_devs_ex(hd_t* hd, char** device)
 {
-  int rc, i;
-  char buf[100];
-  char hwcfg_name[40];
-  char* chans[3] = { config.hwp.readchan, config.hwp.writechan, config.hwp.datachan };
-  char chanlist[27];
+  int rc;
 
   if(hd) switch(hd->sub_class.id) {
   case 0x89:	/* OSA2 */
@@ -1639,8 +1635,6 @@ setup_ctc:
     struct ifreq ifr;
     struct ether_addr* ea;
     int skfd;
-    DIR* d;
-    struct dirent* de;
     char* ifname = NULL;
     
     net_s390_get_ifname(config.hwp.readchan, &ifname);
