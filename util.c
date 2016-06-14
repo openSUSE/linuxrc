@@ -5457,3 +5457,40 @@ void util_set_hostname(char *hostname)
   log_info("set hostname: %s\n", hostname);
 }
 
+
+/*
+ * Run debug shell.
+ *
+ * This takes care of screen settings and restoring standard file
+ * descriptors.
+ */
+void util_run_debugshell()
+{
+  kbd_end(1);
+
+  if(config.win) {
+    disp_cursor_on();
+  }
+  if(!config.linemode) {
+    printf("\033c");
+    if(config.utf8) printf("\033%%G");
+    fflush(stdout);
+  }
+
+  char *cmd = NULL;
+  strprintf(&cmd, "exec %s 2>&1", config.debugshell ?: "/bin/sh");
+  system(cmd);
+  free(cmd);
+
+  freopen(config.console, "r", stdin);
+  freopen(config.console, "a", stdout);
+  freopen(config.console, "a", stderr);
+
+  kbd_init(0);
+
+  if(config.win) {
+    disp_cursor_off();
+    if(!config.linemode) disp_restore_screen();
+  }
+}
+
