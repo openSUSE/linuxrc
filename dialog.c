@@ -1508,27 +1508,7 @@ void dia_handle_ctrlc (void)
 	}
       }
       else if(i == -74) {
-        kbd_end(0);
-        if(config.win) {
-          disp_cursor_on();
-        }
-        if(!config.linemode) {
-          printf("\033c");
-          if(config.utf8) printf("\033%%G");
-          fflush(stdout);
-        }
-
-        char *cmd = NULL;
-        strprintf(&cmd, "exec %s 2>&1", config.debugshell ?: "/bin/sh");
-        system(cmd);
-        free(cmd);
-
-        kbd_init(0);
-        if(config.win) {
-          disp_cursor_off();
-          if(!config.linemode) disp_restore_screen();
-        }
-
+        util_run_debugshell();
       } else {
 	break;
       }
