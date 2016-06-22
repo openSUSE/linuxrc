@@ -303,6 +303,17 @@ SelfUpdate: 0|1|%s
 # 0: secure mode enabled
 Insecure: 0|1
 
+# xvideo option as passed at the boot prompt
+#
+# Option accepts a screen size ("1024x768") optionally followed by a
+# screen resolution in dpi ("1024x768,100").
+#
+# This is expected to only change the installer screen size and not to be
+# applied to the installed system.
+#
+# entry is missing if no xvideo option was used
+XVideo: %s
+
 *** Note ***
 
  There may be some more entries in install.inf but they are put there by
