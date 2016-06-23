@@ -92,8 +92,6 @@ static language_t set_languages_arm[] = {
   { lang_dummy, "", "us", NULL, NULL },
 };
 
-#define KEYMAP_DEFAULT	"us"
-
 #if !defined(__sparc__)
 static keymap_t set_keymaps_arm [] =
 {
@@ -157,7 +155,9 @@ static keymap_t set_keymaps_arm [] =
 #define NR_LANGUAGES (sizeof(set_languages_arm)/sizeof(set_languages_arm[0]))
 #define NR_KEYMAPS (sizeof(set_keymaps_arm)/sizeof(set_keymaps_arm[0]))
 
-#if defined(__PPC__)
+#if !defined(__PPC__)
+#define KEYMAP_DEFAULT	"us"
+#else
 #define KEYMAP_DEFAULT	"mac-us"
 static keymap_t set_keymaps_arm_mac [] =
 {
