@@ -1194,7 +1194,7 @@ int add_instsys()
     }
   }
 
-  file_read_info_file("/.instsys.config", kf_cfg);
+  file_read_info_file("file:/.instsys.config", kf_cfg);
 
   file_write_install_inf("");
 
