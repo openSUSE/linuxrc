@@ -26,38 +26,6 @@
 #include "url.h"
 #include "net.h"
 
-
-#define KM_L1 "iso-8859-15"
-#define KM_L2 "iso-8859-2"
-#define KM_L7 "iso-8859-7"
-#define KM_KOI "koi8-r"
-
-
-/* keymap encodings */
-struct {
-  char *map;
-  char *enc;
-} km_enc[] = {
-  { "Pl02",         KM_L2  },
-  { "be-latin1",    KM_L1  },
-  { "br-abnt2",     KM_L1  },
-  { "cz-us-qwertz", KM_L2  },
-  { "de-latin1-nodeadkeys",   KM_L1  },
-  { "es",           KM_L1  },
-  { "fr-latin1",    KM_L1  },
-  { "gr",           KM_L7  },
-  { "hu",           KM_L2  },
-  { "it",           KM_L1  },
-  { "no-latin1",    KM_L1  },
-  { "pt-latin1",    KM_L1  },
-  { "fi-latin1",    KM_L1  },
-  { "sv-latin1",    KM_L1  },
-  { "ru1",          KM_KOI },
-  { "sk-qwerty",    KM_L2  },
-  { "slovene",      KM_L2  }
-};
-
-
 #define LANG_DEFAULT lang_en
 static language_t set_languages_arm[] = {
   { lang_af, "Afrikaans", "us", "af_ZA", "af" },
@@ -158,7 +126,6 @@ static dia_item_t di_set_expert_last = di_none;
 static int  set_settings_cb          (dia_item_t di);
 static int  set_expert_cb            (dia_item_t di);
 static int  set_get_current_language (enum langid_t lang);
-static char *keymap_encoding(char *map);
 
 /*
  *
@@ -434,7 +401,7 @@ void set_activate_language(enum langid_t lang_id)
 void set_activate_keymap(char *keymap)
 {
   char cmd[MAX_FILENAME];
-  char *s, enc[64];
+  char *s;
 
   /* keymap might be config.keymap, so be careful... */
   keymap = keymap ? strdup(keymap) : NULL;
@@ -443,14 +410,7 @@ void set_activate_keymap(char *keymap)
 
   if((config.keymap = keymap)) {
     kbd_unimode();
-    *enc = 0;
-    if((s = keymap_encoding(config.keymap))) {
-      sprintf(enc, " -c %s", s);
-    }
-    sprintf(cmd,
-      "loadkeys -q %s ; dumpkeys%s >/tmp/dk ; loadkeys -q --unicode </tmp/dk",
-      keymap, enc
-    );
+    sprintf(cmd, "loadkeys -q %s", keymap);
     if(!config.test) {
       lxrc_run_console(cmd);
     }
@@ -597,20 +557,4 @@ language_t *current_language()
 {
   return set_languages_arm + set_get_current_language(lang_undef) - 1;
 }
-
-
-/* look up keymap encoding */
-char *keymap_encoding(char *map)
-{
-  int i;
-
-  if(map) {
-    for(i = 0; i < sizeof km_enc / sizeof *km_enc; i++) {
-      if(!strcmp(km_enc[i].map, map)) return km_enc[i].enc;
-    }
- }
-
-  return NULL;
-}
-
 
