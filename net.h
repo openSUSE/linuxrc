@@ -27,3 +27,8 @@ void net_apply_ethtool(char *device, char *hwaddr);
 void net_apply_iptool(char *device);
 int wlan_setup(void);
 
+void net_device_no_vlanid(void);
+void net_device_with_vlanid(void);
+int net_vlanid_used(void);
+void net_activate_main_interface_for_vlan(void);
+
