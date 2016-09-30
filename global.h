@@ -690,6 +690,7 @@ typedef struct {
     slist_t *if_up;		/* network interfaces != lo that are 'up' */
     char *current;		/* interface name for last written ifcfg file */
     slist_t *to_global;		/* keys that go to global /etc/sysconfig/network/config */
+    slist_t *ibft;		/* list of ibft interfaces (not to be configured by linuxrc) */
   } ifcfg;
 
   struct {
