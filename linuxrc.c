@@ -676,6 +676,7 @@ void lxrc_catch_signal(int signum)
 void lxrc_init()
 {
   int i;
+  slist_t *sl;
 
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);
@@ -963,6 +964,13 @@ void lxrc_init()
   net_wicked_get_config_keys();
 
   util_run_script("early_setup");
+
+  file_read_info_file("file:/etc/ibft_devices", kf_cfg);
+
+  // ibft interfaces are handled by wicked
+  for(sl = config.ifcfg.ibft; sl; sl = sl->next) {
+    slist_append_str(&config.ifcfg.initial, sl->key);
+  }
 
   if(config.plymouth) util_run_script("plymouth_setup");
 
