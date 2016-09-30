@@ -1268,6 +1268,16 @@ void util_status_info(int log_it)
     }
   }
 
+  if(config.ifcfg.ibft) {
+    strcpy(buf, "ibft interfaces:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ifcfg.ibft; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.ifcfg.if_state) {
     strcpy(buf, "network interface states:");
     slist_append_str(&sl0, buf);
@@ -4314,17 +4324,21 @@ int fcoe_check()
 }
 
 
+/*
+ * Don't actually do anything except loading the required modules and
+ * logging a bit.
+ *
+ * ibft devices are handled by wicked now.
+ */
 int iscsi_check()
 {
   int iscsi_ok = 0;
   char *s, *sysfs_ibft = NULL, *attr = NULL;
   char *if_name = NULL, *if_mac = NULL, *ibft_mac = NULL;
   unsigned use_dhcp = 0;
-  int mac_match, vlan, prefix = -1;
+  int mac_match;
   struct dirent *de;
   DIR *d;
-  ifcfg_t *ifcfg = NULL;
-  slist_t *sl;
 
   if(util_check_exist("/modules/iscsi_ibft.ko")) {
     lxrc_run("/sbin/modprobe iscsi_ibft");
@@ -4386,59 +4400,6 @@ int iscsi_check()
   mac_match = if_mac && ibft_mac && !strcasecmp(if_mac, ibft_mac) ? 1 : 0;
 
   log_info("ibft: macs %smatch\n", mac_match ? "" : "don't ");
-
-  if(if_name) {
-    ifcfg = calloc(1, sizeof *ifcfg);
-
-    str_copy(&ifcfg->device, if_name);
-
-    strprintf(&attr, "%s/vlan", sysfs_ibft);
-    vlan = util_get_int_attr(attr);
-    log_info("ibft: vlan = %d\n", vlan);
-    if(vlan > 0) strprintf(&ifcfg->vlan, "%d", vlan);
-
-    if(use_dhcp) {
-      ifcfg->dhcp = 1;
-      strprintf(&ifcfg->type, "dhcp%s", net_dhcp_type());
-    }
-    else {
-      if(!mac_match) {
-        sl = slist_append(&ifcfg->flags, slist_new());
-        str_copy(&sl->key, "STARTMODE");
-        str_copy(&sl->value, "nfsroot");
-      }
-
-      strprintf(&attr, "%s/subnet-mask", sysfs_ibft);
-      s = util_get_attr(attr);
-      log_info("ibft: subnet-mask = %s\n", s);
-      prefix = netmask_to_prefix(s);
-
-      strprintf(&attr, "%s/ip-addr", sysfs_ibft);
-      s = util_get_attr(attr);
-      if(*s) {
-        str_copy(&ifcfg->ip, s);
-        if(prefix > 0) strprintf(&ifcfg->ip, "%s/%d", ifcfg->ip, prefix);
-      }
-      log_info("ibft: ip-addr = %s\n", ifcfg->ip ?: "");
-
-      strprintf(&attr, "%s/gateway", sysfs_ibft);
-      s = util_get_attr(attr);
-      log_info("ibft: gateway = %s\n", s);
-      if(*s) str_copy(&ifcfg->gw, s);
-
-      strprintf(&attr, "%s/primary-dns", sysfs_ibft);
-      s = util_get_attr(attr);
-      log_info("ibft: primary-dns = %s\n", s);
-      if(*s) str_copy(&ifcfg->ns, s);
-
-      strprintf(&attr, "%s/secondary-dns", sysfs_ibft);
-      s = util_get_attr(attr);
-      log_info("ibft: secondary-dns = %s\n", s);
-      if(*s) strprintf(&ifcfg->ns, "%s %s", ifcfg->ns ?: "", s);
-    }
-
-    ifcfg_append(&config.ifcfg.list, ifcfg);
-  }
 
   str_copy(&attr, NULL);
   str_copy(&if_name, NULL);
