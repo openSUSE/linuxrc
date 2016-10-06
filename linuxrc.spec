@@ -1,7 +1,7 @@
 #
 # spec file for package linuxrc
 #
-# Copyright (c) 2016 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2016 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -17,46 +17,38 @@
 
 
 Name:           linuxrc
-BuildRequires:  e2fsprogs-devel
-BuildRequires:  hwinfo-devel
-BuildRequires:  libblkid-devel
-BuildRequires:  libcurl-devel
-BuildRequires:  readline-devel
+Version:        5.0.86
+Release:        0
 Summary:        SUSE Installation Program
 License:        GPL-3.0+
 Group:          System/Boot
-Version:        5.0.86
-Release:        0
 Source:         %{name}-%{version}.tar.xz
+BuildRequires:  e2fsprogs-devel
+BuildRequires:  pkgconfig
+BuildRequires:  readline-devel
+BuildRequires:  pkgconfig(blkid)
+BuildRequires:  pkgconfig(hwinfo)
+BuildRequires:  pkgconfig(libcurl)
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 SUSE installation program.
 
-
-
-Authors:
---------
-    Hubert Mantel <mantel@suse.de>
-
 %prep
-%setup
+%setup -q
 
 %build
   make
 
 %install
-  install -d -m 755 %{buildroot}/usr/{s,}bin
-  make install DESTDIR=%{buildroot}
-
-%clean 
-rm -rf %{buildroot}
+  install -d -m 755 %{buildroot}%{_prefix}/{s,}bin
+make %{?_smp_mflags} DESTDIR=%{buildroot} install
 
 %files
 %defattr(-,root,root)
-/usr/sbin/linuxrc
-/usr/bin/mkpsfu
-/usr/share/linuxrc
+%{_sbindir}/linuxrc
+%{_bindir}/mkpsfu
+%{_datadir}/linuxrc
 %doc linuxrc.html
 
 %changelog
