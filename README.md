@@ -3,6 +3,13 @@ This is the early part of the SUSE installation process, before
 
 See <https://en.opensuse.org/SDB:Linuxrc>.
 
+## Requirements
+Building linuxrc will require some additional dependencies.
+
+For example on openSUSE/SUSE distributions run:
+```sh
+zypper install e2fsprogs-devel hwinfo-devel libblkid-devel libcurl-devel readline-devel
+```
 ## Debugging
 
 ### Run on Installed System
