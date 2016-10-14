@@ -229,7 +229,7 @@ static struct {
   { key_portno,         "PortNo",         kf_cfg + kf_cmd                },
   { key_osahwaddr,	"OSAHWAddr",      kf_cfg + kf_cmd		 },
 #endif
-  { key_netwait,        "NetWait",        kf_cfg + kf_cmd                },
+  { key_netwait,        "NetWait",        kf_cfg + kf_cmd_early          },
   { key_newid,          "NewID",          kf_cfg + kf_cmd_early          },
   { key_moduledisks,    "ModuleDisks",    kf_cfg + kf_cmd                },
   { key_zen,            "Zen",            kf_cfg + kf_cmd + kf_cmd_early },
