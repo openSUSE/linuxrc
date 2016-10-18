@@ -237,7 +237,7 @@ int net_config()
 
   if(rc) return -1;
 
-  if(config.net.vlanid && strcmp(config.net.vlanid, "0")) {
+  if(net_vlanid_used()) {
     configure_vlan(config.net.device, "add", config.net.vlanid);
   }
 
@@ -412,10 +412,16 @@ int net_activate_ns()
     config.net.device = s;
   }
 
+  net_activate_main_interface_for_vlan();
+
+  net_device_with_vlanid();
+
   if(config.net.ipv4) err4 = net_activate4();
   if(config.net.ipv6) err6 = net_activate6();
 
   if(!err4 || !err6) net_setup_nameserver();
+
+  net_device_no_vlanid();
 
   // at least one should have worked
   return err4 && err6 ? 1 : 0;
@@ -1671,6 +1677,10 @@ int net_dhcp()
     config.net.device = s;
   }
 
+  net_activate_main_interface_for_vlan();
+
+  net_device_with_vlanid();
+
   if(config.net.ipv4) net_dhcp4();
 
   active4 = config.net.dhcp_active;
@@ -1678,6 +1688,8 @@ int net_dhcp()
 
   if(config.net.ipv6) net_dhcp6();
   config.net.dhcp_active |= active4;
+
+  net_device_no_vlanid();
 
   return config.net.dhcp_active ? 0 : 1;
 }
@@ -2829,5 +2841,61 @@ int net_input_vlanid()
   str_copy(&buf, NULL);
 
   return err;
+}
+
+
+/*
+ * Set config.net.device to "iface" (without ".vlanid" appended).
+ */
+void net_device_no_vlanid()
+{
+  char *s;
+
+  if(!config.net.device) return;
+
+  s = strchr(config.net.device, '.');
+  if(s) *s = 0;
+}
+
+
+/*
+ * Set config.net.device to "iface.vlanid".
+ */
+void net_device_with_vlanid()
+{
+  if(!config.net.device) return;
+
+  net_device_no_vlanid();
+
+  if(!net_vlanid_used()) return;
+
+  strprintf(&config.net.device, "%s.%s", config.net.device, config.net.vlanid);
+}
+
+
+/*
+ * Check if vlanid is set.
+ */
+int net_vlanid_used()
+{
+  return config.net.vlanid && strcmp(config.net.vlanid, "0");
+}
+
+
+/*
+ * Activate main interface when vlan is used (e.g. eth0 when using eth0.43).
+ */
+void net_activate_main_interface_for_vlan()
+{
+  char *cmd = NULL;
+
+  net_device_no_vlanid();
+
+  if(!config.net.device || !net_vlanid_used()) return;
+
+  strprintf(&cmd, "ifconfig %s up", config.net.device);
+  system(cmd);
+  sleep(config.net.ifup_wait + 1);
+  str_copy(&cmd, NULL);
 }
 
