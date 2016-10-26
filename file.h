@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef FILE_H_
+#define FILE_H_
+
 typedef enum {
   key_none, key_root, key_keytable, key_language, key_rebootmsg, key_insmod,
   key_display, key_ip, key_netmask, key_gateway, key_server, key_nameserver,
@@ -106,3 +109,4 @@ void file_do_info(file_t *f0, file_key_flag_t flags);
 void get_ide_options(void);
 slist_t *file_parse_xmllike(char *name, char *tag);
 
+#endif // FILE_H_

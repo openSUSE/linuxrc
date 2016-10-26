@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef DISPLAY_H_
+#define DISPLAY_H_
+
 #define COL_BLACK          0
 #define COL_RED            1
 #define COL_GREEN          2
@@ -83,3 +86,5 @@ extern void disp_clear_screen   (void);
 int disp_write_char(int c);
 void disp_write_string(char *str);
 void disp_write_utf32string(int *str);
+
+#endif // DISPLAY_H

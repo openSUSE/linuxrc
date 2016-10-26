@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef SCSI_RENAME_H_
+#define SCSI_RENAME_H_
+
 // flags to pass to ifcfg_write()
 #define IFCFG_INITIAL	(1 << 0)
 #define IFCFG_IFUP	(1 << 1)
@@ -40,3 +43,5 @@ unsigned check_ptp(char *ifname);
 void net_wicked_get_config_keys(void);
 void net_nanny(void);
 char *net_get_ifname(ifcfg_t *ifcfg);
+
+#endif // SCSI_RENAME_H_

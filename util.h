@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef UTIL_H_
+#define UTIL_H_
+
 extern void util_redirect_kmsg     (void);
 extern void util_center_text       (unsigned char *txt, int size);
 extern void util_generate_button   (button_t *button, char *txt, int size);
@@ -157,3 +160,5 @@ void util_perror(unsigned level, char *msg);
 char *util_get_caller(int skip);
 void util_set_hostname(char *hostname);
 void util_run_debugshell(void);
+
+#endif // UTIL_H_
