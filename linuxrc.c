@@ -798,7 +798,8 @@ void lxrc_init()
 
   // defaults for self-update feature
   config.self_update_url = NULL;
-  config.self_update = 1;
+  // self-update is disabled by default (bsc#1001839)
+  config.self_update = 0;
 
   config.scsi_rename = 0;
   config.scsi_before_usb = 1;
