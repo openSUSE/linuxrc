@@ -137,12 +137,6 @@ Hostname: %s
 # - code for this is at a strange place in linuxrc, should be moved -
 regurl: %s
 
-# certificates for registration server, use 'regcert' boot option to set
-# fate#303335
-# entry is missing if unset
-# - code for this is at a strange place in linuxrc, should be moved -
-regcert: %s
-
 # URL for uploadeing supportconfig data, use 'supporturl' boot option to set
 # fate#305180
 # entry is missing if unset
