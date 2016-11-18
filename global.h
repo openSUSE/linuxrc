@@ -466,7 +466,6 @@ typedef struct {
   char *autoyast;		/* yast autoinstall parameter */
   char *autoyast2;		/* yast autoinstall parameter, loaded by linuxrc */
   char *yepurl;			/* just pass it to yast */
-  char *yepcert;		/* just pass it to yast */
   char *supporturl;		/* just pass it to yast */
   slist_t *linuxrc;		/* 'linuxrc' parameters */
   int color;			/* color scheme: 0-3: undef, mono, color, alternate */

@@ -273,9 +273,6 @@ static struct {
   { key_device,         "Device",         kf_cfg + kf_cmd                },
   { key_nomdns,         "NoMDNS",         kf_cfg + kf_cmd                },
   { key_yepurl,         "regurl",         kf_cfg + kf_cmd                },
-  { key_yepcert,        "regcert",        kf_cfg + kf_cmd                },
-  { key_yepurl,         "smturl",         kf_cfg + kf_cmd                },
-  { key_yepcert,        "smtcert",        kf_cfg + kf_cmd                },
   { key_mediacheck,     "mediacheck",     kf_cfg + kf_cmd_early          },
   { key_y2gdb,          "Y2GDB",          kf_cfg + kf_cmd                },
   { key_squash,         "squash",         kf_cfg + kf_cmd                },
@@ -1574,10 +1571,6 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         str_copy(&config.yepurl, f->value);
         break;
 
-      case key_yepcert:
-        str_copy(&config.yepcert, f->value);
-        break;
-
       case key_y2gdb:
         if(f->is.numeric) config.y2gdb = f->nvalue;
         break;
@@ -2005,7 +1998,6 @@ void file_write_modparms(FILE *f)
   }
 
   file_write_str(f, key_yepurl, config.yepurl);
-  file_write_str(f, key_yepcert, config.yepcert);
 
   file_write_str(f, key_supporturl, config.supporturl);
 

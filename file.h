@@ -47,7 +47,7 @@ typedef enum {
   key_ibft_hwaddr, key_ibft_ipaddr, key_ibft_netmask, key_ibft_gateway,
   key_ibft_dns, key_net_retry, key_bootif, key_swap_size, key_ntfs_3g,
   key_hash, key_insecure, key_kexec, key_nisdomain, key_nomodprobe, key_device,
-  key_nomdns, key_yepurl, key_yepcert, key_mediacheck, key_y2gdb, key_squash,
+  key_nomdns, key_yepurl, key_mediacheck, key_y2gdb, key_squash,
   key_kexec_reboot, key_devbyid, key_braille, key_nfsopts, key_ipv4, key_ipv4only,
   key_ipv6, key_ipv6only, key_efi, key_supporturl, key_portno,
   key_osahwaddr, key_zen, key_zenconfig, key_udevrule, key_dhcpfail,
