@@ -4549,6 +4549,8 @@ void util_run_script(char *name)
     setenv("linuxrc_debug", buf, 1);
   }
 
+  if(config.loghost) setenv("LOGHOST", config.loghost, 1);
+
   strprintf(&buf, "/scripts/%s", name);
 
   lxrc_run(buf);

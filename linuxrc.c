@@ -1278,6 +1278,8 @@ void lxrc_init()
 
   util_update_kernellog();
 
+  if(config.loghost) util_run_script("remote_log_setup");
+
 #if !(defined(__PPC__) || defined(__sparc__))
   if(config.manual || reboot_wait_ig) {
     config.rebootmsg = 1;
