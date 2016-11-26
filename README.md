@@ -53,7 +53,7 @@ mkdir /tmp/initrd
 cp linuxrc /tmp/initrd/init
 mksusecd --initrd /tmp/initrd --create $OUTPUT_ISO $INPUT
 ```
-
+Forgetting about the correct shared libraries usually leads to crashes and backtraces printed on the terminal.
 When compiling linuxrc on a system different from the one in the input iso, make sure that the shared libraries are passed as well. For instance here is a possible output of `tree /tmp/initrd`:
 
 ```sh 
