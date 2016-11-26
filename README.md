@@ -42,7 +42,7 @@ For testing a shortcut is available: mksusecd
 Use:
 
 ```sh
-mksusecd --initrd ./linuxrc.rpm ...
+mksusecd --initrd ./linuxrc.rpm --create $OUTPUT_ISO $INPUT
 ```
 
 or, without an RPM:
@@ -51,7 +51,24 @@ or, without an RPM:
 make
 mkdir /tmp/initrd
 cp linuxrc /tmp/initrd/init
-mksusecd --initrd /tmp/initrd ...
+mksusecd --initrd /tmp/initrd --create $OUTPUT_ISO $INPUT
+```
+
+When compiling linuxrc on a system different from the one in the input iso, make sure that the shared libraries are passed as well. For instance here is a possible output of `tree /tmp/initrd`:
+
+```sh 
+/tmp/initrd
+├── init
+├── lib64
+│   ├── libreadline.so.6 -> libreadline.so.6.2
+│   └── libreadline.so.6.2
+└── usr
+    └── lib64
+        ├── libhd.so -> libhd.so.21
+        ├── libhd.so.21 -> libhd.so.21.30
+        └── libhd.so.21.30
+
+3 directories, 6 files
 ```
 
 You may also use `mksusecd --micro` in case you only want to test Stage 1
