@@ -54,9 +54,10 @@ cp linuxrc /tmp/initrd/init
 mksusecd --initrd /tmp/initrd --create $OUTPUT_ISO $INPUT
 ```
 Forgetting about the correct shared libraries usually leads to crashes and backtraces printed on the terminal.
-When compiling linuxrc on a system different from the one in the input iso, make sure that the shared libraries are passed as well. For instance here is a possible output of `tree /tmp/initrd`:
+When compiling linuxrc on a system different from the one in the input iso, make sure that shared libraries are passed with matching versions; typically you'll need libreadline.so and libhd.so but your mileage may vary. In the following example, linuxrc was compiled on Leap 42.1 to build against Tumbleweed; the versions of the two libraries were not matching on the two versions of openSUSE so the correct versions (including symlinks) were attached with `mksusecd` using the following folder structure:
 
 ```sh 
+#tree /tmp/initrd
 /tmp/initrd
 ├── init
 ├── lib64
