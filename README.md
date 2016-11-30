@@ -49,7 +49,7 @@ For testing a shortcut is available: mksusecd
 Use:
 
 ```sh
-mksusecd --initrd ./linuxrc.rpm ...
+mksusecd --initrd ./linuxrc.rpm --create $OUTPUT_ISO $INPUT
 ```
 
 or, without an RPM:
@@ -58,7 +58,25 @@ or, without an RPM:
 make
 mkdir /tmp/initrd
 cp linuxrc /tmp/initrd/init
-mksusecd --initrd /tmp/initrd ...
+mksusecd --initrd /tmp/initrd --create $OUTPUT_ISO $INPUT
+```
+Forgetting about the correct shared libraries usually leads to crashes and backtraces printed on the terminal.
+When compiling linuxrc on a system different from the one in the input iso, make sure that shared libraries are passed with matching versions; typically you'll need libreadline.so and libhd.so but your mileage may vary. In the following example, linuxrc was compiled on Leap 42.1 to build against Tumbleweed; the versions of the two libraries were not matching on the two versions of openSUSE so the correct versions (including symlinks) were attached with `mksusecd` using the following folder structure:
+
+```sh 
+#tree /tmp/initrd
+/tmp/initrd
+├── init
+├── lib64
+│   ├── libreadline.so.6 -> libreadline.so.6.2
+│   └── libreadline.so.6.2
+└── usr
+    └── lib64
+        ├── libhd.so -> libhd.so.21
+        ├── libhd.so.21 -> libhd.so.21.30
+        └── libhd.so.21.30
+
+3 directories, 6 files
 ```
 
 You may also use `mksusecd --micro` in case you only want to test Stage 1
