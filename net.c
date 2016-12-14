@@ -2018,6 +2018,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
   slist_t *sl_global = NULL;
+  slist_t *sl_dhcp = NULL;
   unsigned ptp = 0;
   char *v4_ip = NULL;	// allocated
   unsigned v4_prefix = 0;
@@ -2152,7 +2153,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
   // set hostname, if requested
   if(config.net.sethostname) {
-    slist_setentry(&sl_ifcfg, "DHCLIENT_SET_HOSTNAME", "yes", 0);
+    slist_setentry(&sl_dhcp, "DHCLIENT_SET_HOSTNAME", "yes", 0);
   }
 
   // add wlan options, if necessary
@@ -2286,6 +2287,11 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
     update_sysconfig(sl_global, "/etc/sysconfig/network/config");
   }
 
+  // 6. update global DHCP config
+  if(sl_dhcp) {
+    update_sysconfig(sl_dhcp, "/etc/sysconfig/network/dhcp");
+  }
+
   ok = 1;
 
 err:
@@ -2296,6 +2302,7 @@ err:
   str_copy(&vlan, NULL);
   str_copy(&v4_ip, NULL);
 
+  slist_free(sl_dhcp);
   slist_free(sl_global);
   slist_free(sl_ifcfg);
   slist_free(sl_ifroute);
