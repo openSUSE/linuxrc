@@ -77,6 +77,7 @@ static int net_get_ip(char *text, char **ip, int with_prefix);
 static int net_check_ip(char *buf, int multi, int with_prefix);
 static int compare_subnet(char *ip1, char *ip2, unsigned prefix);
 static void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device);
+static void update_sysconfig(slist_t *slist, char *filename, char *filename_tmp);
 
 
 /*
@@ -2007,7 +2008,7 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg, int flags)
 int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 {
   char *fname;
-  FILE *fp, *fp2;
+  FILE *fp;
   char *gw = NULL;	// allocated
   char *ns = NULL;	// allocated
   char *domain = NULL;	// allocated
@@ -2283,43 +2284,9 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   // 5. update global network config
 
   if(sl_global) {
-    log_info("adjusting network/config:\n");
-
-    // it's easier below if we append the '=' to the keys
-    for(sl = sl_global; sl; sl = sl->next) {
-      strprintf(&sl->key, "%s=", sl->key);
-    }
-
-    if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
-      char buf[4096];
-
-      // we allow open to fail and check fp2 for NULL later
-      fp2 = fopen("/etc/sysconfig/network/config.tmp", "w");
-
-      while(fgets(buf, sizeof buf, fp)) {
-        if(*buf && *buf != '#' && !isspace(*buf)) {
-          for(sl = sl_global; sl; sl = sl->next) {
-            if(!strncmp(buf, sl->key, strlen(sl->key))) {
-              log_info("  %s\"%s\"\n", sl->key, sl->value);
-              if(fp2) fprintf(fp2, "%s\"%s\"\n", sl->key, sl->value);
-              *buf = 0;
-              break;
-            }
-          }
-        }
-        if(*buf && fp2) fputs(buf, fp2);
-      }
-
-      fclose(fp);
-
-      if(fp2) {
-        fclose(fp2);
-        rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
-      }
-      else {
-        log_info("warning: /etc/sysconfig/network/config not updated\n");
-      }
-    }
+    update_sysconfig(sl_global,
+                     "/etc/sysconfig/network/config",
+                     "/etc/sysconfig/network/config.tmp");
   }
 
   ok = 1;
@@ -2337,6 +2304,52 @@ err:
   slist_free(sl_ifroute);
 
   return ok;
+}
+
+// Update the sysconfig file *filename* with the data in *slist*.
+//
+// slist is mutated by appending "=" to the keys
+void update_sysconfig(slist_t *slist, char *filename, char *filename_tmp) {
+  slist_t *sl;
+  FILE *fp, *fp2;
+
+  log_info("adjusting %s:\n", filename);
+
+  // it's easier below if we append the '=' to the keys
+  for(sl = slist; sl; sl = sl->next) {
+    strprintf(&sl->key, "%s=", sl->key);
+  }
+
+  if((fp = fopen(filename, "r"))) {
+    char buf[4096];
+
+    // we allow open to fail and check fp2 for NULL later
+    fp2 = fopen(filename_tmp, "w");
+
+    while(fgets(buf, sizeof buf, fp)) {
+      if(*buf && *buf != '#' && !isspace(*buf)) {
+        for(sl = slist; sl; sl = sl->next) {
+          if(!strncmp(buf, sl->key, strlen(sl->key))) {
+            log_info("  %s\"%s\"\n", sl->key, sl->value);
+            if(fp2) fprintf(fp2, "%s\"%s\"\n", sl->key, sl->value);
+            *buf = 0;
+            break;
+          }
+        }
+      }
+      if(*buf && fp2) fputs(buf, fp2);
+    }
+
+    fclose(fp);
+
+    if(fp2) {
+      fclose(fp2);
+      rename(filename_tmp, filename);
+    }
+    else {
+      log_info("warning: %s not updated\n", filename);
+    }
+  }
 }
 
 
