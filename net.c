@@ -77,7 +77,7 @@ static int net_get_ip(char *text, char **ip, int with_prefix);
 static int net_check_ip(char *buf, int multi, int with_prefix);
 static int compare_subnet(char *ip1, char *ip2, unsigned prefix);
 static void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device);
-static void update_sysconfig(slist_t *slist, char *filename, char *filename_tmp);
+static void update_sysconfig(slist_t *slist, char *filename);
 
 
 /*
@@ -2282,11 +2282,8 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   }
 
   // 5. update global network config
-
   if(sl_global) {
-    update_sysconfig(sl_global,
-                     "/etc/sysconfig/network/config",
-                     "/etc/sysconfig/network/config.tmp");
+    update_sysconfig(sl_global, "/etc/sysconfig/network/config");
   }
 
   ok = 1;
@@ -2308,10 +2305,11 @@ err:
 
 // Update the sysconfig file *filename* with the data in *slist*.
 //
-// slist is mutated by appending "=" to the keys
-void update_sysconfig(slist_t *slist, char *filename, char *filename_tmp) {
+// *slist* is mutated by appending "=" to the keys.
+// A temporary file (*filename*.tmp) is used.
+void update_sysconfig(slist_t *slist, char *filename) {
   slist_t *sl;
-  FILE *fp, *fp2;
+  FILE *fp, *fp2 = NULL;
 
   log_info("adjusting %s:\n", filename);
 
@@ -2322,9 +2320,15 @@ void update_sysconfig(slist_t *slist, char *filename, char *filename_tmp) {
 
   if((fp = fopen(filename, "r"))) {
     char buf[4096];
+    char *filename_tmp;
 
-    // we allow open to fail and check fp2 for NULL later
-    fp2 = fopen(filename_tmp, "w");
+    if (asprintf(&filename_tmp, "%s.tmp", filename) == -1) {
+      filename_tmp = NULL;
+    }
+    if (filename_tmp) {
+      // we allow open to fail and check fp2 for NULL later
+      fp2 = fopen(filename_tmp, "w");
+    }
 
     while(fgets(buf, sizeof buf, fp)) {
       if(*buf && *buf != '#' && !isspace(*buf)) {
@@ -2349,6 +2353,8 @@ void update_sysconfig(slist_t *slist, char *filename, char *filename_tmp) {
     else {
       log_info("warning: %s not updated\n", filename);
     }
+
+    free(filename_tmp);
   }
 }
 
