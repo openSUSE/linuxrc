@@ -77,6 +77,7 @@ static int net_get_ip(char *text, char **ip, int with_prefix);
 static int net_check_ip(char *buf, int multi, int with_prefix);
 static int compare_subnet(char *ip1, char *ip2, unsigned prefix);
 static void get_and_copy_ifcfg_flags(ifcfg_t *ifcfg, char *device);
+static void update_sysconfig(slist_t *slist, char *filename);
 
 
 /*
@@ -2007,7 +2008,7 @@ int ifcfg_write(char *device, ifcfg_t *ifcfg, int flags)
 int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 {
   char *fname;
-  FILE *fp, *fp2;
+  FILE *fp;
   char *gw = NULL;	// allocated
   char *ns = NULL;	// allocated
   char *domain = NULL;	// allocated
@@ -2017,6 +2018,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   slist_t *sl_ifcfg = NULL;
   slist_t *sl_ifroute = NULL;
   slist_t *sl_global = NULL;
+  slist_t *sl_dhcp = NULL;
   unsigned ptp = 0;
   char *v4_ip = NULL;	// allocated
   unsigned v4_prefix = 0;
@@ -2151,7 +2153,7 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
 
   // set hostname, if requested
   if(config.net.sethostname) {
-    slist_setentry(&sl_ifcfg, "DHCLIENT_SET_HOSTNAME", "yes", 0);
+    slist_setentry(&sl_dhcp, "DHCLIENT_SET_HOSTNAME", "yes", 0);
   }
 
   // add wlan options, if necessary
@@ -2281,45 +2283,13 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
   }
 
   // 5. update global network config
-
   if(sl_global) {
-    log_info("adjusting network/config:\n");
+    update_sysconfig(sl_global, "/etc/sysconfig/network/config");
+  }
 
-    // it's easier below if we append the '=' to the keys
-    for(sl = sl_global; sl; sl = sl->next) {
-      strprintf(&sl->key, "%s=", sl->key);
-    }
-
-    if((fp = fopen("/etc/sysconfig/network/config", "r"))) {
-      char buf[4096];
-
-      // we allow open to fail and check fp2 for NULL later
-      fp2 = fopen("/etc/sysconfig/network/config.tmp", "w");
-
-      while(fgets(buf, sizeof buf, fp)) {
-        if(*buf && *buf != '#' && !isspace(*buf)) {
-          for(sl = sl_global; sl; sl = sl->next) {
-            if(!strncmp(buf, sl->key, strlen(sl->key))) {
-              log_info("  %s\"%s\"\n", sl->key, sl->value);
-              if(fp2) fprintf(fp2, "%s\"%s\"\n", sl->key, sl->value);
-              *buf = 0;
-              break;
-            }
-          }
-        }
-        if(*buf && fp2) fputs(buf, fp2);
-      }
-
-      fclose(fp);
-
-      if(fp2) {
-        fclose(fp2);
-        rename("/etc/sysconfig/network/config.tmp", "/etc/sysconfig/network/config");
-      }
-      else {
-        log_info("warning: /etc/sysconfig/network/config not updated\n");
-      }
-    }
+  // 6. update global DHCP config
+  if(sl_dhcp) {
+    update_sysconfig(sl_dhcp, "/etc/sysconfig/network/dhcp");
   }
 
   ok = 1;
@@ -2332,11 +2302,67 @@ err:
   str_copy(&vlan, NULL);
   str_copy(&v4_ip, NULL);
 
+  slist_free(sl_dhcp);
   slist_free(sl_global);
   slist_free(sl_ifcfg);
   slist_free(sl_ifroute);
 
   return ok;
+}
+
+// Update the sysconfig file *filename* with the data in *slist*.
+//
+// *slist* is mutated by appending "=" to the keys.
+// A temporary file (*filename*.tmp) is used.
+void update_sysconfig(slist_t *slist, char *filename) {
+  slist_t *sl;
+  FILE *fp, *fp2 = NULL;
+
+  log_info("adjusting %s:\n", filename);
+
+  // it's easier below if we append the '=' to the keys
+  for(sl = slist; sl; sl = sl->next) {
+    strprintf(&sl->key, "%s=", sl->key);
+  }
+
+  if((fp = fopen(filename, "r"))) {
+    char buf[4096];
+    char *filename_tmp;
+
+    if (asprintf(&filename_tmp, "%s.tmp", filename) == -1) {
+      filename_tmp = NULL;
+    }
+    if (filename_tmp) {
+      // we allow open to fail and check fp2 for NULL later
+      fp2 = fopen(filename_tmp, "w");
+    }
+
+    while(fgets(buf, sizeof buf, fp)) {
+      if(*buf && *buf != '#' && !isspace(*buf)) {
+        for(sl = slist; sl; sl = sl->next) {
+          if(!strncmp(buf, sl->key, strlen(sl->key))) {
+            log_info("  %s\"%s\"\n", sl->key, sl->value);
+            if(fp2) fprintf(fp2, "%s\"%s\"\n", sl->key, sl->value);
+            *buf = 0;
+            break;
+          }
+        }
+      }
+      if(*buf && fp2) fputs(buf, fp2);
+    }
+
+    fclose(fp);
+
+    if(fp2) {
+      fclose(fp2);
+      rename(filename_tmp, filename);
+    }
+    else {
+      log_info("warning: %s not updated\n", filename);
+    }
+
+    free(filename_tmp);
+  }
 }
 
 
