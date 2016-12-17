@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef MODULE_H_
+#define MODULE_H_
+
 int        mod_get_type(char *type_name);
 int        mod_check_modules(char *type_name);
 void       mod_init(int autoload);
@@ -21,3 +24,5 @@ void       mod_show_modules(void);
 void       mod_disk_text(char *buf, int type);
 int        mod_copy_modules(char *src_dir, int doit);
 int        mod_cmp(char *str1, char *str2);
+
+#endif // MODULE_H_

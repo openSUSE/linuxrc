@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef DIALOG_H
+#define DIALOG_H_
+
 #define MSGTYPE_INFO      0
 #define MSGTYPE_ERROR     1
 #define MSGTYPE_INFOENTER 2
@@ -139,3 +142,5 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
 int dia_show_lines2(char *head, slist_t *sl0, int width);
 int dia_input2(char *txt, char **input, int fieldlen, int pw_mode);
 int dia_input2_chopspace(char* txt, char** input, int fieldlen, int pw_mode);
+
+#endif // DIALOG_H

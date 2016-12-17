@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef GLOGAL_H_
+#define GLOBAL_H_
+
 
 #include <stdio.h>
 #include <netinet/in.h>
@@ -736,3 +739,5 @@ extern char           *lastlog_tg;
 extern char           *bootmsg_tg;
 extern char            xkbmodel_tg [20];
 extern int             reboot_wait_ig;
+
+#endif // GLOBAL_H_

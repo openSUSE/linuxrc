@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef WINDOW_H_
+#define WINDOW_H_
+
 #define STYLE_NORMAL   0
 #define STYLE_SUNKEN   1
 #define STYLE_RAISED   2
@@ -27,3 +30,5 @@ extern int  win_choose_button    (button_t *buttons_arr [], int nr_buttons_iv,
                                   int default_iv);
 extern int  win_input            (int x_iv,   int y_iv, char *input_tr,
                                   int len_iv, int fieldlen_iv, int pw_mode);
+
+#endif // WINDOW_H_

@@ -17,6 +17,9 @@
 
 /* Written by Paul Eggert.  */
 
+#ifndef U64_H_
+#define U64_H_
+
 #include <stdint.h>
 
 /* Return X rotated left by N bits, where 0 < N < 64.  */
@@ -156,3 +159,5 @@ u64shr (u64 x, int n)
 }
 
 #endif
+
+#endif // U_64_H_

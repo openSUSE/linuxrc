@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef LINUX_FS_H
+#define LINUX_FS_H
+
 #define KEY_SPECIAL (1 << 30)
 
 #define KEY_NONE         0
@@ -68,3 +71,5 @@ extern void  kbd_echo_off     (void);
 extern int   kbd_getch_old    (int);
 void kbd_unimode(void);
 extern int kbd_getch_raw(int do_wait);
+
+#endif // LINUX_FS_H

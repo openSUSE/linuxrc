@@ -1,3 +1,6 @@
+#ifndef UTF8_H_
+#define UTF8_H_
+
 int utf8_enc_len(int first_char);
 int utf8_decode(unsigned char *str);
 unsigned char *utf8_encode(int c);
@@ -7,4 +10,6 @@ int utf32_len(int *str);
 int utf32_char_width(int c);
 int utf8_strwidth(unsigned char *str);
 void utf8_strwcpy(unsigned char *dst, unsigned char *src, int width);
+
+#endif // UTF8_H_
 
