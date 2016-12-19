@@ -22,7 +22,7 @@ typedef struct url_data_s {
   unsigned unzip:1;
   unsigned label_shown:1;
   unsigned optional:1;
-  char *compressed;		// program name used for compression, if any
+  char *compressed;		///< program name used for compression, if any
   char *label;
   int percent;
   int pipe_fd;

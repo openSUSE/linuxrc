@@ -12,7 +12,7 @@
 #define MSGTYPE_REBOOT    3
 
 typedef enum {
-  di_none,	/* must be 0 */
+  di_none,	/**< must be 0 */
   di_skip,
 
   di_main_start,

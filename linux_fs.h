@@ -6,17 +6,17 @@
 #ifndef BLKGETSIZE
 #ifndef _IO
 /* pre-1.3.45 */
-#define BLKGETSIZE 0x1260		   /* return device size */
+#define BLKGETSIZE 0x1260		   /**< return device size */
 #else
 /* same on i386, m68k, arm; different on alpha, mips, sparc, ppc */
 #define BLKGETSIZE _IO(0x12,96)
 #endif
 #endif
 
-#define MINIX_SUPER_MAGIC   0x137F         /* minix v1, 14 char names */
-#define MINIX_SUPER_MAGIC2  0x138F         /* minix v1, 30 char names */
-#define MINIX2_SUPER_MAGIC  0x2468	   /* minix v2, 14 char names */
-#define MINIX2_SUPER_MAGIC2 0x2478         /* minix v2, 30 char names */
+#define MINIX_SUPER_MAGIC   0x137F         /**< minix v1, 14 char names */
+#define MINIX_SUPER_MAGIC2  0x138F         /**< minix v1, 30 char names */
+#define MINIX2_SUPER_MAGIC  0x2468	   /**< minix v2, 14 char names */
+#define MINIX2_SUPER_MAGIC2 0x2478         /**< minix v2, 30 char names */
 struct minix_super_block {
 	u_char   s_dummy[16];
 	short    s_magic;
@@ -26,7 +26,7 @@ struct minix_super_block {
 #define ISODCL(from, to) (to - from + 1)
 #define ISO_STANDARD_ID "CD001"
 struct iso_volume_descriptor {
-	char type[ISODCL(1,1)]; /* 711 */
+	char type[ISODCL(1,1)]; /**< 711 */
 	char id[ISODCL(2,6)];
 	char version[ISODCL(7,7)];
 	char data[ISODCL(8,2048)];
@@ -34,10 +34,10 @@ struct iso_volume_descriptor {
 
 #define HS_STANDARD_ID "CDROM"
 struct  hs_volume_descriptor {
-	char foo[ISODCL (  1,   8)]; /* 733 */
-	char type[ISODCL (  9,   9)]; /* 711 */
+	char foo[ISODCL (  1,   8)]; /**< 733 */
+	char type[ISODCL (  9,   9)]; /**< 711 */
 	char id[ISODCL ( 10,  14)];
-	char version[ISODCL ( 15,  15)]; /* 711 */
+	char version[ISODCL ( 15,  15)]; /**< 711 */
 	char data[ISODCL(16,2048)];
 };
 
@@ -51,7 +51,7 @@ struct ext_super_block {
 #define EXT2_PRE_02B_MAGIC  0xEF51
 #define EXT2_SUPER_MAGIC    0xEF53
 #define EXT3_FEATURE_COMPAT_HAS_JOURNAL 0x0004
-#define EXT4_FEATURE_INCOMPAT_EXTENTS   0x0040 /* extents support */
+#define EXT4_FEATURE_INCOMPAT_EXTENTS   0x0040 /**< extents support */
 struct ext2_super_block {
 	u_char 	s_dummy1[56];
 	u_char 	s_magic[2];
@@ -62,7 +62,7 @@ struct ext2_super_block {
 	u_char	s_uuid[16];
 	u_char 	s_volume_name[16];
 	u_char	s_dummy3[88];
-	u_char	s_journal_inum[4];	/* ext3 only */
+	u_char	s_journal_inum[4];	/**< ext3 only */
 };
 #define ext2magic(s)	((uint) s.s_magic[0] + (((uint) s.s_magic[1]) << 8))
 
@@ -93,7 +93,7 @@ struct reiserfs_super_block
 
 #define _XIAFS_SUPER_MAGIC 0x012FD16D
 struct xiafs_super_block {
-    u_char     s_boot_segment[512];     /*  1st sector reserved for boot */
+    u_char     s_boot_segment[512];     /**<  1st sector reserved for boot */
     u_char     s_dummy[60];
     u_char     s_magic[4];
 };
@@ -124,15 +124,15 @@ struct ntfs_super_block {
    has a partition table: IO.SYS, MSDOS.SYS, WINBOOT.SYS */
 struct fat_super_block {
     u_char    s_dummy[3];
-    u_char    s_os[8];		/* "MSDOS5.0" or "MSWIN4.0" or "MSWIN4.1" */
+    u_char    s_os[8];		/**< "MSDOS5.0" or "MSWIN4.0" or "MSWIN4.1" */
 				/* mtools-3.9.4 writes "MTOOL394" */
     u_char    s_dummy2[32];
-    u_char    s_label[11];	/* for DOS? */
-    u_char    s_fs[8];		/* "FAT12   " or "FAT16   " or all zero   */
+    u_char    s_label[11];	/**< for DOS? */
+    u_char    s_fs[8];		/**< "FAT12   " or "FAT16   " or all zero   */
                                 /* OS/2 BM has "FAT     " here. */
     u_char    s_dummy3[9];
-    u_char    s_label2[11];	/* for Windows? */
-    u_char    s_fs2[8];	        /* garbage or "FAT32   " */
+    u_char    s_label2[11];	/**< for Windows? */
+    u_char    s_fs2[8];	        /**< garbage or "FAT32   " */
 };
 
 #define XFS_SUPER_MAGIC "XFSB"
