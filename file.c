@@ -307,6 +307,7 @@ static struct {
   { key_debugshell,     "DebugShell",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
   { key_ibft_devices,   "IBFTDevices",    kf_cfg + kf_cmd                },
+  { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1764,6 +1765,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_ibft_devices:
         slist_assign_values(&config.ifcfg.ibft, f->value);
+        break;
+
+      case key_linuxrc_core:
+        str_copy(&config.core, *f->value ? f->value : NULL);
         break;
 
       default:

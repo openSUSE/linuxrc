@@ -157,3 +157,4 @@ void util_perror(unsigned level, char *msg);
 char *util_get_caller(int skip);
 void util_set_hostname(char *hostname);
 void util_run_debugshell(void);
+void util_setup_coredumps(void);

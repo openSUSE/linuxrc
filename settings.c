@@ -401,7 +401,6 @@ void set_activate_language(enum langid_t lang_id)
 void set_activate_keymap(char *keymap)
 {
   char cmd[MAX_FILENAME];
-  char *s;
 
   /* keymap might be config.keymap, so be careful... */
   keymap = keymap ? strdup(keymap) : NULL;

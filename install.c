@@ -26,6 +26,8 @@
 #include <sys/socket.h>
 #include <sys/reboot.h>
 #include <sys/vfs.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include <arpa/inet.h>
 
 #include <hd.h>

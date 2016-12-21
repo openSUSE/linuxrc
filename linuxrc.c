@@ -194,6 +194,8 @@ int main(int argc, char **argv, char **env)
       file_do_info(file_get_cmdline(key_tmpfs), kf_cmd + kf_cmd_early);
       file_do_info(file_get_cmdline(key_linuxrcstderr), kf_cmd + kf_cmd_early);
       file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
+      file_do_info(file_get_cmdline(key_linuxrc_core), kf_cmd + kf_cmd_early);
+      util_setup_coredumps();
       util_free_mem();
       umount("/proc");
 
@@ -685,7 +687,7 @@ void lxrc_init()
   siginterrupt(SIGTERM, 1);
   siginterrupt(SIGSEGV, 1);
   siginterrupt(SIGPIPE, 1);
-  lxrc_catch_signal(0);
+  if(!config.core) lxrc_catch_signal(0);
   signal(SIGINT,  SIG_IGN);
   signal(SIGUSR1, lxrc_usr1);
 
@@ -712,6 +714,8 @@ void lxrc_init()
     mount("sysfs", "/sys", "sysfs", 0, 0);
     mount("devpts", "/dev/pts", "devpts", 0, 0);
   }
+
+  util_setup_coredumps();
 
   #if defined(__s390__) || defined(__s390x__)
   if(util_check_exist("/sys/hypervisor/s390")) {
@@ -884,6 +888,8 @@ void lxrc_init()
     slist_free(sl0);
   }
 
+  util_setup_coredumps();
+
   if(!config.had_segv) {
     if (config.linemode)
       putchar('\n');
@@ -942,6 +948,8 @@ void lxrc_init()
     util_run_script("udev_setup");
     log_show("ok\n");
   }
+
+  util_setup_coredumps();
 
   if(config.had_segv) config.manual = 1;
 
