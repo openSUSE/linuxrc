@@ -125,4 +125,4 @@ extern void *__md5_buffer (const char *buffer, size_t len,
 }
 # endif
 
-#endif /* md5.h */
+#endif /**< md5.h */
