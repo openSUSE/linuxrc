@@ -25,6 +25,8 @@
 #include <sys/utsname.h>
 #include <sys/wait.h>
 #include <sys/klog.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include <fcntl.h>
 #include <time.h>
 #include <syscall.h>
@@ -1205,6 +1207,11 @@ void util_status_info(int log_it)
 
   if(config.self_update_url) {
     sprintf(buf, "self-update URL: %s", config.self_update_url);
+    slist_append_str(&sl0, buf);
+  }
+
+  if(config.core) {
+    sprintf(buf, "Core Dumps: %s (%sactive)", config.core, config.core_setup ? "" : "not ");
     slist_append_str(&sl0, buf);
   }
 
@@ -5463,5 +5470,73 @@ void util_run_debugshell()
     disp_cursor_off();
     if(!config.linemode) disp_restore_screen();
   }
+}
+
+
+/*
+ * Enable linuxrc to dump core.
+ *
+ * config.core is expected to be either a block device or a char device
+ *
+ * block device:
+ *   - the device is mounted at /coredumps and core files are stored there
+ *
+ * char device:
+ *   - the core dump is written uuencoded to the char device (e.g. serial console)
+ *
+ * util_setup_coredumps() can be called several times. Each time it checks
+ * if all prerequisites are all fulfilled and if so, enables core dumps.
+ *
+ * The point here is that e.g. a block device may appear only after udev has
+ * done its work while a char device may exist much earlier.
+ *
+ */
+void util_setup_coredumps()
+{
+  FILE *f;
+  int core_type;
+  char *core_dir = "/coredumps";
+  char *core_pattern = "%e.core.pid_%P.sig_%s.time_%t";
+
+  if(config.core_setup || !config.core || config.core[0] != '/') return;
+
+  core_type = util_check_exist(config.core);
+
+  if(!core_type) return;
+
+  if(core_type == 'b') {
+    mkdir(core_dir, 0755);
+    if(util_check_exist(core_dir) != 'd') return;
+
+    if(util_mount(config.core, core_dir, MS_SYNCHRONOUS, NULL)) return;
+
+    if((f = fopen("/proc/sys/kernel/core_pattern", "w"))) {
+      fprintf(f, "%s/%s", core_dir, core_pattern);
+      fclose(f);
+    }
+
+    log_info("dumping core to %s", config.core);
+  }
+  else {
+    if((f = fopen("/proc/sys/kernel/core_pattern", "w"))) {
+      fprintf(f, "|/dumpling %s", core_pattern);
+      fclose(f);
+    }
+
+    if((f = fopen("/dumpling", "w"))) {
+      fprintf(f, "#! /bin/sh\nexec /usr/bin/uuencode $1 >%s\n", config.core);
+      fchmod(fileno(f), 0755);
+      fclose(f);
+    }
+
+    log_info("dumping core uuencoded to %s", config.core);
+  }
+
+  setrlimit(RLIMIT_CORE, &(struct rlimit) { rlim_cur: RLIM_INFINITY, rlim_max: RLIM_INFINITY });
+
+  signal(SIGBUS, SIG_DFL);
+  signal(SIGSEGV, SIG_DFL);
+
+  config.core_setup = 1;
 }
 
