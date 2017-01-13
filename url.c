@@ -2162,8 +2162,11 @@ static int test_is_repo(url_t *url)
   ) return 0;
 
   if(!config.keepinstsysconfig) {
-    config.digests.list = slist_free(config.digests.list);
     config.digests.failed = 0;
+
+    // check for '/content' or '/repodata/repomd.xml' as indication we have a suse repo
+    // 'content' must be validly signed (we parse it), 'repomd.xml' not (we just check its presence)
+    // zenworks has a different approach ('settings.txt') - they don't have a repo
 
     strprintf(&buf, "/%s", config.zen ? config.zenconfig : "content");
     strprintf(&buf2, "file:%s", buf);
@@ -2172,9 +2175,19 @@ static int test_is_repo(url_t *url)
       url_read_file(url, NULL, buf, buf, NULL,
         URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
       )
-    ) return 0;
+    ) {
+      if(config.zen) return 0;
 
-    if(!config.sig_failed) {
+      // no content file -> also check for repomd.xml
+      // note: we don't parse repomd.xml, just check it exists
+      char *tmp_repomd = "/tmp/repomd.xml";
+      int read_failed = url_read_file(url, NULL, "/repodata/repomd.xml", tmp_repomd, NULL, URL_FLAG_NODIGEST);
+      unlink(tmp_repomd);
+
+      if(read_failed) return 0;
+    }
+
+    if(!config.sig_failed && util_check_exist(buf)) {
       file_read_info_file(buf2, config.zen ? kf_cont + kf_cfg : kf_cont);
     }
 
