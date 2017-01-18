@@ -139,6 +139,7 @@ sub_part1: sub_sub_part11 sub_sub_part12 ...
 ```
 
 You can modify a part specification by:
+
 1. prefixing it with `?` to mark it optional
 2. appending `?list=path_spec1,path_spec2,...` to indicate you need not the
 full image but only the files matching any of the path specs (shell glob
