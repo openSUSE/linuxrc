@@ -2148,7 +2148,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
  */
 static int test_is_repo(url_t *url)
 {
-  int ok = 0, i, opt, parts, part;
+  int ok = 0, i, opt, copy, parts, part;
   char *buf = NULL, *buf2 = NULL, *file_name, *s, *t;
   char *instsys_config;
   slist_t *sl, *file_list, *old_file_list;
@@ -2251,6 +2251,7 @@ static int test_is_repo(url_t *url)
 
   for(ok = 1, part = 1, sl = config.url.instsys_list; ok && sl; sl = sl->next, part++) {
     opt = *(s = sl->key) == '?' && s++;
+    copy = strstr(s, "?copy=1") ? 1 : 0;
     t = url_config_get_path(s);
     file_list = url_config_get_file_list(s);
 
@@ -2269,19 +2270,30 @@ static int test_is_repo(url_t *url)
 
     if(
       url->is.mountable &&
-      (util_is_mountable(buf) || !util_check_exist(buf)) &&
+      (copy || util_is_mountable(buf) || !util_check_exist(buf)) &&
       !config.rescue &&
       (!config.download.instsys || util_check_exist(buf) == 'd')
     ) {
       if(!util_check_exist(buf) && opt) {
-        log_info("mount %s -> %s failed (ignored)\n", buf, sl->value);
+        log_info("%s %s -> %s failed (ignored)\n", copy ? "copy" : "mount", buf, sl->value);
       }
       else {
-        log_info("mount %s -> %s\n", buf, sl->value);
-
-        i = util_mount_ro(buf, sl->value, url->file_list) ? 0 : 1;
-        ok &= i;
-        if(!i) log_info("instsys mount failed: %s\n", sl->value);
+        if(copy) {
+          char *argv[3];
+          char *dst = strrchr(t, '/') ?: t;
+          log_info("copy %s -> %s\n", buf, dst);
+          argv[1] = buf;
+          argv[2] = dst;
+          i = !util_cp_main(3, argv);
+          ok &= i;
+          if(!i) log_info("adding %s to instsys failed\n", dst);
+        }
+        else {
+          log_info("mount %s -> %s\n", buf, sl->value);
+          i = util_mount_ro(buf, sl->value, url->file_list) ? 0 : 1;
+          ok &= i;
+          if(!i) log_info("instsys mount failed: %s\n", sl->value);
+        }
       }
     }
     else {
@@ -2301,11 +2313,19 @@ static int test_is_repo(url_t *url)
         buf2,
         URL_FLAG_PROGRESS + URL_FLAG_UNZIP + opt * URL_FLAG_OPTIONAL
       )) {
-        log_info("mount %s -> %s\n", file_name, sl->value);
-
-        i = util_mount_ro(file_name, sl->value, url->file_list) ? 0 : 1;
-        ok &= i;
-        if(!i) log_info("instsys mount failed: %s\n", sl->value);
+        if(copy) {
+          char *dst = strrchr(t, '/') ?: t;
+          log_info("mv %s -> %s\n", file_name, dst);
+          i = !rename(file_name, dst);
+          ok &= i;
+          if(!i) log_info("adding %s to instsys failed\n", dst);
+        }
+        else {
+          log_info("mount %s -> %s\n", file_name, sl->value);
+          i = util_mount_ro(file_name, sl->value, url->file_list) ? 0 : 1;
+          ok &= i;
+          if(!i) log_info("instsys mount failed: %s\n", sl->value);
+        }
       }
       else {
         log_info("download failed: %s%s\n", sl->value, opt ? " (ignored)" : "");
