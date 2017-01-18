@@ -1,4 +1,4 @@
-#specifying installation repository in linuxrc
+#specifying installation repositories in linuxrc
 
 ##1. regular install media
 
@@ -92,4 +92,91 @@ cp content /tmp/foo/etc/linuxrc.d/
 cd /tmp/foo
 find . | cpio -o -H newc | xz --check=crc32 -c >>initrd_on_boot_medium
 ```
+
+##3. components linuxrc reads
+
+linuxrc reads files from two distinct locations:
+
+1. the installation system ('inst-sys')
+2. the installation repository ('repo')
+
+The repo location is specified with the `install` option. Optionally, the inst-sys location is specified
+with the `instsys` option. If it's not given, it is implicitly assumed to be `boot/<ARCH>/root`, relative to the
+repo location.
+
+See the previous sections for examples.
+
+###3.1. files read from inst-sys location
+
+linuxrc replaces the last path component from the location url with `config`
+to get the url of a config file and tries to read it.
+
+If the config file is *not* there, linuxrc will continue to read the inst-sys image as originally specified and mount it.
+
+If the config file was found (the normal case) it is parsed to determine the
+components needed for the inst-sys and then the components are loaded.
+
+A simple config file may look like:
+
+```sh
+# boot/x86_64/config
+
+root:   common root bind
+rescue: common rescue
+
+```
+
+Meaning that the `root` image consists of three files `common`, `root`, and `bind` and the `rescue` image of two parts
+`common` and `rescue`. So, assuming the standard locations,
+linuxrc will load `boot/<ARCH>/common`, `boot/<ARCH>/root`, and `boot/<ARCH>/bind` in the first case and
+`boot/<ARCH>/common` and `boot/<ARCH>/rescue` in the second.
+
+More general the syntax is:
+
+```sh
+part:      sub_part1 sub_part2 ...
+sub_part1: sub_sub_part11 sub_sub_part12 ...
+```
+
+You can modify a part specification by:
+1. prefixing it with `?` to mark it optional
+2. appending `?list=path_spec1,path_spec2,...` to indicate you need not the
+full image but only the files matching any of the path specs (shell glob
+syntax)
+3. appending `?copy=1` to indicate that this is not an image or archive to mount or unpack but a
+plain file to copy to the `/` directory
+4. using `<lang>` (verbatim!) as macro to be replaced by the current locale
+
+With this in mind a more realistic config file example could look like:
+
+```sh
+root:               common root bind ?cracklib-dict-full.rpm ?yast2-trans-<lang>.rpm ?configfiles
+rescue:             common rescue ?cracklib-dict-full.rpm
+configfiles:        control.xml?copy=1
+yast2-trans-ko.rpm: yast2-trans-ko.rpm un-fonts.rpm?list=*/UnDotum.ttf
+
+```
+
+Here, the inst-sys would consist of `common`, `root`, `bind`, `cracklib-dict-full.rpm` (if it exists),
+`yast2-trans-en_US.rpm` (if it exists and assuming current locale is `en_US`), and additionally (if it exists),
+`control.xml` is downloaded and stored as `/control.xml`.
+
+For the Korean locale we'll need also a special font rpm (`un-fonts.rpm`) but only `UnDotum.ttf` from it.
+
+###3.2. files read from repo location
+
+In addition to the files described in sections 1. and 2., linuxrc will try to read these files (and store them in `/`):
+
+- `/media.1/info.txt`
+- `/license.tar.gz`
+- `/part.info`
+- `/control.xml`
+
+and, if **no** `AutoYaST` option has been given, it will read **and parse**
+
+- `/autoinst.xml`
+
+and then add an `AutoYaST` option pointing to the downloaded file.
+
+Note this happens **after** downloading the files in section 3.1. and may overwrite them.
 
