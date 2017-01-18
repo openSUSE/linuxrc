@@ -863,7 +863,7 @@ char *auto2_serial_console()
 void auto2_read_repo_files(url_t *url)
 {
   int i;
-  char *dst = NULL;
+  char *tmp_file = NULL;
   static char *default_list[][2] = {
     { "/media.1/info.txt", "/info.txt" },
     { "/license.tar.gz", "/license.tar.gz" },
@@ -873,10 +873,19 @@ void auto2_read_repo_files(url_t *url)
   };
 
   for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
-    url_read_file(url, NULL, default_list[i][0], default_list[i][1], NULL, URL_FLAG_NODIGEST);
+    // be careful not to replace an existing file unless we successfully got
+    // a new version
+    str_copy(&tmp_file, new_download());
+    if(
+      !url_read_file(url, NULL, default_list[i][0], tmp_file, NULL, URL_FLAG_NODIGEST + URL_FLAG_OPTIONAL) &&
+      util_check_exist(tmp_file)
+    ) {
+      rename(tmp_file, default_list[i][1]);
+      log_info("mv %s -> %s\n", tmp_file, default_list[i][1]);
+    }
   }
 
-  str_copy(&dst, NULL);
+  str_copy(&tmp_file, NULL);
 
   if(!config.autoyast) {
     if(util_check_exist("/tmp/autoinst.xml")) rename("/tmp/autoinst.xml", "/autoinst.xml");
