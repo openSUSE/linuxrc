@@ -2279,12 +2279,9 @@ static int test_is_repo(url_t *url)
       }
       else {
         if(copy) {
-          char *argv[3];
           char *dst = strrchr(t, '/') ?: t;
           log_info("copy %s -> %s\n", buf, dst);
-          argv[1] = buf;
-          argv[2] = dst;
-          i = !util_cp_main(3, argv);
+          i = !util_cp_main(3, (char *[]) {0, buf, dst});
           ok &= i;
           if(!i) log_info("adding %s to instsys failed\n", dst);
         }
