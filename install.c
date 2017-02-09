@@ -1176,6 +1176,8 @@ int add_instsys()
 
   if(!config.test) {
     for(sl = config.url.instsys_list; sl; sl = sl->next) {
+      log_debug("instsys_list: key = %s, value = %s\n", sl->key, sl->value);
+      if(!sl->value) return 1;
       argv[1] = sl->value;
       argv[2] = "/";
       util_lndir_main(3, argv);
