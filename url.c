@@ -1951,7 +1951,7 @@ static int test_and_copy(url_t *url)
             strprintf(&buf,
               "%s: %s\n\n%s",
               url_print2(url_data->url, NULL),
-              "SHA1 sum wrong.",
+              "Digest verification failed.",
               "If you really trust your repository, you may continue in an insecure mode."
             );
             if(!(win = config.win)) util_disp_init();
@@ -3057,13 +3057,19 @@ int digest_verify(url_data_t *url_data, char *file_name)
   slist_t *sl, *sl0;
   int len, file_name_len, ok = 0;
 
+  // match only last path element
+  if(file_name) {
+    char *s = strrchr(file_name, '/');
+    if(s) file_name = s + 1;
+  }
+
   file_name_len = file_name ? strlen(file_name) : 0;
 
   for(sl = config.digests.list; sl; sl = sl->next) {
     // first check file name
     if(file_name_len) {
       len = strlen(sl->value);
-      if(len > file_name_len || strcmp(file_name + file_name_len - len, sl->value)) continue;
+      if(len < file_name_len || strcmp(file_name, sl->value + len - file_name_len)) continue;
     }
 
     // compare digest
