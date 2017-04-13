@@ -935,6 +935,8 @@ void url_cleanup()
  * return:
  *   0: ok
  *   1: abort download
+ *
+ * Note: it's possible that 'done' follows 'init' without any 'update' in between.
  */
 int url_progress(url_data_t *url_data, int stage)
 {

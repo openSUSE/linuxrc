@@ -314,6 +314,14 @@ void disp_toggle_output(int state)
 }
 
 
+/*
+ * Save window area.
+ *
+ * You can restore the window area later by calling disp_restore_area().
+ *
+ * Note: it is a programming error to call disp_save_area() two times in a
+ * row without disp_restore_area() in between.
+ */
 void disp_save_area(window_t *win)
 {
   int i, x_len, y_len;
@@ -332,9 +340,13 @@ void disp_save_area(window_t *win)
 
   if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
 
-//  log_info("save area at %d x %d (size %d x %d)\n", win->x_left, win->y_left, x_len, y_len);
+  log_debug("save area %p at %d x %d (size %d x %d)\n", win, win->x_left, win->y_left, x_len, y_len);
 
 //  dump_screen("save area, start");
+
+  if(win->save_area) {
+    log_info("Warning: save area already in use!");
+  }
 
   win->save_area = malloc(sizeof (character_t *) * y_len);
 
@@ -351,6 +363,13 @@ void disp_save_area(window_t *win)
 }
 
 
+/*
+ * Restore saved window area.
+ *
+ * Note: it is actually allowed to call this function without a prior
+ * disp_save_area(). It will do nothing in this case.
+ *
+ */
 void disp_restore_area(window_t *win)
 {
   int x, x_len;
@@ -373,6 +392,13 @@ void disp_restore_area(window_t *win)
   if(x_len + win->x_left > max_x_ig) x_len = max_x_ig - win->x_left + 1;
   if(y_len + win->y_left > max_y_ig) y_len = max_y_ig - win->y_left + 1;
 
+  log_debug("restore area %p at %d x %d (size %d x %d)\n", win, win->x_left, win->y_left, x_len, y_len);
+
+  if(!win->save_area) {
+    log_debug("Warning: restore area not initialized!");
+    return;
+  }
+
   for(y = 0; y < y_len; y++) {
     disp_gotoxy(win->x_left, win->y_left + y);
     for(x = 0; x < x_len;) {
@@ -385,6 +411,8 @@ void disp_restore_area(window_t *win)
   for(y = 0; y < y_len; y++) free(win->save_area[y]);
   free(win->save_area);
 
+  win->save_area = NULL;
+
   disp_set_attr(save_attr);
 }
 
@@ -394,6 +422,9 @@ void disp_flush_area(window_t *win)
   window_t tmp_win;
 
   tmp_win = *win;
+  /* we must not copy .save_area as it's modified by disp_{save,restore}_area */
+  tmp_win.save_area = NULL;
+
   disp_save_area(&tmp_win);
   disp_restore_area(&tmp_win);
 }
