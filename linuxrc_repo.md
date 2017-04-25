@@ -1,6 +1,6 @@
-#specifying installation repositories in linuxrc
+# specifying installation repositories in linuxrc
 
-##1. regular install media
+## 1. regular install media
 
 *(repo meta data are in /suse/setup/descr/)*
 
@@ -50,7 +50,7 @@ url. For example, if `content` provides a sha256 digest for `boot/x86_64/root` t
 `foo/root`.
 
 
-##2. plain repomd repository
+## 2. plain repomd repository
 
 *(repo meta data are in /repodata/)*
 
@@ -79,7 +79,7 @@ get warnings about linuxrc not being able to verify the downloaded images.
 
 Lets see how to avoid this.
 
-###2.1. solving the digest problem
+### 2.1. solving the digest problem
 
 As there's no longer a `content` file, linuxrc needs to get the digests in
 some other way. Fortunately it parses `content` just like any other config
@@ -93,7 +93,7 @@ cd /tmp/foo
 find . | cpio -o -H newc | xz --check=crc32 -c >>initrd_on_boot_medium
 ```
 
-##3. components linuxrc reads
+## 3. components linuxrc reads
 
 linuxrc reads files from two distinct locations:
 
@@ -106,7 +106,7 @@ repo location.
 
 See the previous sections for examples.
 
-###3.1. files read from inst-sys location
+### 3.1. files read from inst-sys location
 
 linuxrc replaces the last path component from the location url with `config`
 to get the url of a config file and tries to read it.
@@ -164,7 +164,7 @@ Here, the inst-sys would consist of `common`, `root`, `bind`, `cracklib-dict-ful
 
 For the Korean locale we'll need also a special font rpm (`un-fonts.rpm`) but only `UnDotum.ttf` from it.
 
-###3.2. files read from repo location
+### 3.2. files read from repo location
 
 In addition to the files described in sections 1. and 2., linuxrc will try to read these files (and store them in `/`):
 

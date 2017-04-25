@@ -1,4 +1,4 @@
-#hostname setting in installation/rescue system
+# hostname setting in installation/rescue system
 
 There are 3 cases:
 
@@ -11,7 +11,7 @@ There are 3 cases:
 linuxrc defaults to `install`, which may be overridden by dhcp (2) or user
 (3). (3) takes precedence over (2).
 
-##installation system
+## installation system
 
 When yast is started, the value from (3) is passed to yast via
 `/etc/install.inf::Hostname` and ends up in `/etc/hostname` of the installed system.
@@ -22,7 +22,7 @@ default `/etc/hostname` entry of the form `linux-XXXX` (+ `.suse` in sle12).
 
 There is no `/etc/hostname` file in the installation environment.
 
-##rescue system
+## rescue system
 
 linuxrc changes the hostname to `rescue`, which may be overridden by user (3).
 
