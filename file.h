@@ -105,4 +105,5 @@ file_t *file_parse_buffer(char *buf, file_key_flag_t flags);
 void file_do_info(file_t *f0, file_key_flag_t flags);
 void get_ide_options(void);
 slist_t *file_parse_xmllike(char *name, char *tag);
+void file_parse_repomd(char *file);
 

@@ -2546,31 +2546,29 @@ void wait_for_conn(int port)
 }
 
 
-slist_t *file_parse_xmllike(char *name, char *tag)
+/*
+ * *Very* limited xml parsing.
+ *
+ * Returns a list of elements; 'key' is the (complete) attribute info
+ * belonging to the element, 'value' is the element content.
+ *
+ * Elements without attribute cannot be matched.
+ *
+ * buf: buffer to parse
+ * tag: elements name to look for
+ */
+slist_t *file_parse_xmllike_buf(char *buf, char *tag)
 {
   slist_t *sl, *sl0 = NULL;
-  FILE *f;
-  char *buf = NULL, *tag_start = NULL, *tag_end = NULL;
+  char *tag_start = NULL, *tag_end = NULL;
   char *attr = NULL, *data = NULL;
-  int buf_size = 0, buf_ptr = 0, i;
+  int i;
   char *ptr, *s0, *s1;
 
-  if(!tag) return sl0;
+  if(!tag || !buf) return sl0;
 
-  if(!(f = fopen(name, "r"))) return sl0;
-
-  do {
-    buf = realloc(buf, buf_size += 0x1000);
-    i = fread(buf + buf_ptr, 1, buf_size - buf_ptr - 1, f);
-    buf_ptr += i;
-  }
-  while(buf_ptr == buf_size - 1);
-
-  buf[buf_ptr] = 0;
-
-  fclose(f);
-
-  if(!(buf_size = buf_ptr)) return sl0;
+  // we're going to modify the buffer
+  buf = strdup(buf);
 
   strprintf(&tag_start, "<%s ", tag);
   strprintf(&tag_end, "</%s>", tag);
@@ -2616,5 +2614,85 @@ slist_t *file_parse_xmllike(char *name, char *tag)
   free(tag_end);
 
   return sl0;
+}
+
+
+/*
+ * Very limited xml parsing.
+ *
+ * Returns a list of elements; cf. file_parse_xmllike_buf().
+ *
+ * name: name of file to read
+ * tag: elements name to look for
+ */
+slist_t *file_parse_xmllike(char *name, char *tag)
+{
+  slist_t *sl0 = NULL;
+  FILE *f;
+  char *buf = NULL;
+  int buf_size = 0, buf_ptr = 0, i;
+
+  if(!tag) return sl0;
+
+  if(!(f = fopen(name, "r"))) return sl0;
+
+  do {
+    buf = realloc(buf, buf_size += 0x1000);
+    i = fread(buf + buf_ptr, 1, buf_size - buf_ptr - 1, f);
+    buf_ptr += i;
+  }
+  while(buf_ptr == buf_size - 1);
+
+  buf[buf_ptr] = 0;
+
+  fclose(f);
+
+  if(!(buf_size = buf_ptr)) return sl0;
+
+  sl0 = file_parse_xmllike_buf(buf, tag);
+
+  free(buf);
+
+  return sl0;
+}
+
+
+/*
+ * Parse repomd data.
+ *
+ * - add file digest info to config.digests.list
+ * - associate 'types' to file names (e.g. 'license' -> 'XXX-license.tar.gz'
+ *   (stored in config.repomd_data)
+ */
+void file_parse_repomd(char *file)
+{
+  slist_t *repo, *sl, *sl_chk, *sl_digest, *sl_data;
+  char buf_digest[256], buf_type[256], buf_loc[256], *s;
+
+  repo = file_parse_xmllike(file, "data");
+
+  for(sl = repo; sl; sl = sl->next) {
+    if(sscanf(sl->key, "type=\"%255[^\"]\"", buf_type) == 1) {
+      if((sl_chk = file_parse_xmllike_buf(sl->value, "checksum"))) {
+        if(sscanf(sl_chk->key, "type=\"%255[^\"]\"", buf_digest) == 1) {
+          if(
+            (s = strstr(sl->value, "<location href=")) &&
+            sscanf(s, "<location href=\"%255[^\"]\"", buf_loc) == 1
+          ) {
+            sl_digest = slist_append(&config.digests.list, slist_new());
+            strprintf(&sl_digest->key, "%s %s", buf_digest, sl_chk->value);
+            str_copy(&sl_digest->value, buf_loc);
+
+            sl_data = slist_append_str(&config.repomd_data, buf_type);
+            str_copy(&sl_data->value, buf_loc);
+          }
+        }
+      }
+
+      slist_free(sl_chk);
+    }
+  }
+
+  slist_free(repo);
 }
 
