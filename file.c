@@ -2565,7 +2565,7 @@ slist_t *file_parse_xmllike_buf(char *buf, char *tag)
   int i;
   char *ptr, *s0, *s1;
 
-  if(!tag || !buf) return sl0;
+  if(!tag || !buf || !*buf) return sl0;
 
   // we're going to modify the buffer
   buf = strdup(buf);
@@ -2646,8 +2646,6 @@ slist_t *file_parse_xmllike(char *name, char *tag)
   buf[buf_ptr] = 0;
 
   fclose(f);
-
-  if(!(buf_size = buf_ptr)) return sl0;
 
   sl0 = file_parse_xmllike_buf(buf, tag);
 

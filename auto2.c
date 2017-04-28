@@ -925,7 +925,7 @@ void auto2_read_repomd_files(url_t *url)
     // be careful not to replace an existing file unless we successfully got
     // a new version
 
-    // first, get real file name
+    // get real file name
     slist_t *sl = slist_getentry(config.repomd_data, default_list[i][0]);
     if(!sl) continue;
 
