@@ -1203,6 +1203,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.upgrade, "upgrade");
   add_flag(&sl0, buf, config.net.sethostname, "hostname");
   add_flag(&sl0, buf, config.self_update, "self_update");
+  add_flag(&sl0, buf, config.repomd, "repomd");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.self_update_url) {
@@ -1582,11 +1583,20 @@ void util_status_info(int log_it)
     }
   }
 
+  if(config.repomd_data) {
+    strcpy(buf, "repomd-data:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.repomd_data; sl; sl = sl->next) {
+      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.digests.list) {
     strcpy(buf, "digests:");
     slist_append_str(&sl0, buf);
     for(sl = config.digests.list; sl; sl = sl->next) {
-      sprintf(buf, "  %s %s", sl->key, sl->value);
+      sprintf(buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }

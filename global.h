@@ -445,6 +445,7 @@ typedef struct {
   unsigned upgrade:1;		/**< upgrade or fresh install */
   unsigned systemboot:1;	/**< boot installed system */
   unsigned extend_running:1;	/**< currently running an 'extend' job */
+  unsigned repomd:1;		/**< install repo is repo-md */
   struct {
     unsigned check:1;		/**< check for braille displays and start brld if found */
     char *dev;			/**< braille device */
@@ -518,6 +519,7 @@ typedef struct {
   unsigned self_update:1;	/**< enables YaST self-update feature */
   char *core;			/**< linuxrc code dump destination (core dumps disabled if unset) */
   unsigned core_setup:1;	/**< linuxrc core dumps have been configured */
+  slist_t *repomd_data;		/**< parsed repomd.xml info */
 
   struct {
     unsigned md5:1;		/**< support md5 */

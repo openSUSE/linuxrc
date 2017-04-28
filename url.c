@@ -2173,6 +2173,9 @@ static int test_is_repo(url_t *url)
     strprintf(&buf, "/%s", config.zen ? config.zenconfig : "content");
     strprintf(&buf2, "file:%s", buf);
 
+    config.repomd = 0;
+    config.repomd_data = slist_free(config.repomd_data);
+
     if(
       url_read_file(url, NULL, buf, buf, NULL,
         URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
@@ -2180,13 +2183,17 @@ static int test_is_repo(url_t *url)
     ) {
       if(config.zen) return 0;
 
-      // no content file -> also check for repomd.xml
-      // note: we don't parse repomd.xml, just check it exists
-      char *tmp_repomd = "/tmp/repomd.xml";
-      int read_failed = url_read_file(url, NULL, "/repodata/repomd.xml", tmp_repomd, NULL, URL_FLAG_NODIGEST);
-      unlink(tmp_repomd);
+      // no content file -> download repomd.xml
+      int read_failed = url_read_file(
+        url, NULL, "/repodata/repomd.xml", "/repomd.xml", NULL,
+        URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+      );
 
       if(read_failed) return 0;
+
+      config.repomd = 1;
+
+      file_parse_repomd("/repomd.xml");
     }
 
     if(!config.sig_failed && util_check_exist(buf)) {

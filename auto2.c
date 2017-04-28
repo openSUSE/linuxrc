@@ -37,6 +37,7 @@
 static int driver_is_active(hd_t *hd);
 static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_files(url_t *url);
+static void auto2_read_repomd_files(url_t *url);
 static char *auto2_splash_name(void);
 static void auto2_kexec(url_t *url);
 
@@ -601,7 +602,10 @@ int auto2_find_repo()
   }
 
   /* get some files for lazy yast */
-  if(!err) auto2_read_repo_files(config.url.install);
+  if(!err) {
+    if(config.repomd) auto2_read_repomd_files(config.url.install);
+    auto2_read_repo_files(config.url.install);
+  }
 
   if(err) {
     log_info("no %s repository found\n", config.product);
@@ -901,6 +905,41 @@ void auto2_read_repo_files(url_t *url)
       net_update_ifcfg(IFCFG_IFUP);
     }
   }
+}
+
+
+/*
+ * Get various files from repo-md repositrory for yast's convenience.
+ *
+ * Well, atm it's just license.tar.gz.
+ */
+void auto2_read_repomd_files(url_t *url)
+{
+  int i;
+  char *tmp_file = NULL;
+  static char *default_list[][2] = {
+    { "license", "/license.tar.gz" },
+  };
+
+  for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
+    // be careful not to replace an existing file unless we successfully got
+    // a new version
+
+    // get real file name
+    slist_t *sl = slist_getentry(config.repomd_data, default_list[i][0]);
+    if(!sl) continue;
+
+    str_copy(&tmp_file, new_download());
+    if(
+      !url_read_file(url, NULL, sl->value, tmp_file, NULL, URL_FLAG_NODIGEST) &&
+      util_check_exist(tmp_file)
+    ) {
+      rename(tmp_file, default_list[i][1]);
+      log_info("mv %s -> %s\n", tmp_file, default_list[i][1]);
+    }
+  }
+
+  str_copy(&tmp_file, NULL);
 }
 
 
