@@ -84,6 +84,7 @@ static void kbd_set_timeout (long timeout_lv);
 static void kbd_timeout     (int signal_iv);
 
 static void get_screen_size(int fd);
+static void adjust_screen_size(void);
 
 
 /*
@@ -148,15 +149,7 @@ void kbd_init (int first)
     if(first && config.serial) {
       get_screen_size(config.kbd_fd);
 
-      if(max_x_ig > MAX_X) max_x_ig = MAX_X;
-      if(max_y_ig > MAX_Y) max_y_ig = MAX_Y;
-
-      if(max_x_ig < MIN_X || max_y_ig < MIN_Y) {
-        max_x_ig = X_DEFAULT;
-        max_y_ig = Y_DEFAULT;
-      }
-
-      if(!config.had_segv) log_info("Window size: %d x %d\n", max_x_ig, max_y_ig);
+      adjust_screen_size();
 
       memset(&winsize_ri, 0, sizeof winsize_ri);
 
@@ -164,6 +157,11 @@ void kbd_init (int first)
       winsize_ri.ws_row = max_y_ig;
 
       ioctl(config.kbd_fd, TIOCSWINSZ, &winsize_ri);
+    }
+
+    if(first) {
+      adjust_screen_size();
+      log_info("Window size: %d x %d\n", max_x_ig, max_y_ig);
     }
 
     }
@@ -527,5 +525,20 @@ void kbd_unimode()
   }
 
   if(fd >= 0) close(fd);
+}
+
+
+/*
+ * Clip screen size to maximum linuxrc can handle.
+ */
+void adjust_screen_size()
+{
+  if(max_x_ig > MAX_X) max_x_ig = MAX_X;
+  if(max_y_ig > MAX_Y) max_y_ig = MAX_Y;
+
+  if(max_x_ig < MIN_X || max_y_ig < MIN_Y) {
+    max_x_ig = X_DEFAULT;
+    max_y_ig = Y_DEFAULT;
+  }
 }
 
