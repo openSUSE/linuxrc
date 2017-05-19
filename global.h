@@ -83,7 +83,7 @@ enum langid_t {
 /* terminal sizes */
 #define X_DEFAULT		80
 #define Y_DEFAULT		24
-#define MAX_X			250
+#define MAX_X			500
 #define MAX_Y			150
 #define MIN_X			8
 #define MIN_Y			4
