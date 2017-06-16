@@ -3154,6 +3154,10 @@ void util_set_product_dir(char *prod)
     strprintf(&config.kexec_kernel, "boot/%s/loader/linux", arch);
     strprintf(&config.kexec_initrd, "boot/%s/loader/initrd", arch);
   }
+  else {
+    strprintf(&config.kexec_kernel, "boot/%s/linux", arch);
+    strprintf(&config.kexec_initrd, "boot/%s/initrd", arch);
+  }
 }
 
 
