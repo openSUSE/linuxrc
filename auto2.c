@@ -869,11 +869,12 @@ void auto2_read_repo_files(url_t *url)
   int i;
   char *tmp_file = NULL;
   static char *default_list[][2] = {
-    { "/media.1/info.txt", "/info.txt" },
-    { "/license.tar.gz", "/license.tar.gz" },
-    { "/part.info", "/part.info" },
+    { "/autoinst.xml", "/tmp/autoinst.xml" },
     { "/control.xml", "/control.xml" },
-    { "/autoinst.xml", "/tmp/autoinst.xml" }
+    { "/license.tar.gz", "/license.tar.gz" },
+    { "/media.1/info.txt", "/info.txt" },
+    { "/part.info", "/part.info" },
+    { "/README.BETA", "/README.BETA" }
   };
 
   for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
@@ -919,6 +920,7 @@ void auto2_read_repomd_files(url_t *url)
   char *tmp_file = NULL;
   static char *default_list[][2] = {
     { "license", "/license.tar.gz" },
+    { "/README.BETA", "/README.BETA" }
   };
 
   for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
