@@ -8,7 +8,7 @@ VERSION := $(shell $(GIT2LOG) --version VERSION ; cat VERSION)
 BRANCH  := $(shell [ -d .git ] && git branch | perl -ne 'print $$_ if s/^\*\s*//')
 PREFIX  := linuxrc-$(VERSION)
 
-SRC	= $(filter-out inflate.c,$(wildcard *.c))
+SRC	= $(filter-out inflate.c,$(sort $(wildcard *.c)))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
