@@ -131,6 +131,11 @@ ProxyURL: %s
 # entry is missing if unset
 Hostname: %s
 
+# 1: set hostname via DHCP
+# if this is 1 (the default) linuxrc has set DHCLIENT_SET_HOSTNAME to 'yes'
+# in /etc/sysconfig/network/dhcp
+SetHostname: 0|1
+
 # URL for registration server, use 'regurl' boot option to set
 # fate#303335
 # entry is missing if unset
