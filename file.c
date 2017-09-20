@@ -1898,6 +1898,7 @@ void file_write_install_inf(char *dir)
   if(config.net.realhostname) {
     file_write_str(f, key_hostname, config.net.realhostname);
   }
+  file_write_num(f, key_sethostname, config.net.sethostname);
 
   LXRC_WAIT
 
