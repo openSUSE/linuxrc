@@ -1747,7 +1747,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_sethostname:
-        if(f->is.numeric) config.net.sethostname = f->nvalue;
+        if(f->is.numeric) {
+          config.net.sethostname = f->nvalue;
+          config.net.sethostname_used = 1;
+        }
         break;
 
       case key_debugshell:
@@ -1899,6 +1902,7 @@ void file_write_install_inf(char *dir)
     file_write_str(f, key_hostname, config.net.realhostname);
   }
   file_write_num(f, key_sethostname, config.net.sethostname);
+  fprintf(f, "SetHostnameUsed: %u\n", config.net.sethostname_used);
 
   LXRC_WAIT
 
