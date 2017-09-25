@@ -136,6 +136,9 @@ Hostname: %s
 # in /etc/sysconfig/network/dhcp
 SetHostname: 0|1
 
+# 1: user has used SetHostname option to force a setting
+SetHostnameUsed: 0|1
+
 # URL for registration server, use 'regurl' boot option to set
 # fate#303335
 # entry is missing if unset

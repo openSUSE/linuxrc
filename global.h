@@ -633,6 +633,7 @@ typedef struct {
     unsigned ipv6:1;		/**< do ipv6 config */
     unsigned dhcp_timeout_set:1;	/**< dhcp_timeout was set explicitly */
     unsigned sethostname:1;	/**< wicked should set hostname */
+    unsigned sethostname_used:1;	/**< user has used linuxrc's SetHostname option */
     unsigned do_setup;		/**< do network setup */
     unsigned setup;		/**< bitmask: do these network setup things */
     char *device;		/**< currently used device */
