@@ -1998,7 +1998,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
   tc_flags = flags;
   tc_label = label;
   
-  if(!dst) return 1;
+  if(!dst || !url->scheme) return 1;
   if(!(flags & URL_FLAG_NOUNLINK)) unlink(dst);
 
   /* create missing directories */
@@ -2033,6 +2033,10 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
   }
 
   tc_src = src;
+
+  // it is expected that tc_src holds a non-NULL pointer
+  // (else there's no source to read from)
+  if(!tc_src) return 1;
 
   if(url->mount) {
     strprintf(&buf1, "file:%s", url->mount);
