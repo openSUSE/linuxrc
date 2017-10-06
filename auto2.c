@@ -352,6 +352,9 @@ void auto2_scan_hardware()
       file_read_info_file("file:/download/info", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
     }
+    else {
+      log_show("Failed to read info file.\n");
+    }
   }
 
   /*
@@ -391,6 +394,9 @@ void auto2_scan_hardware()
       log_info("parsing AutoYaST file\n");
       file_read_info_file("file:/download/autoinst.xml", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
+    }
+    else {
+      log_show_maybe(!url->quiet, "Failed to download AutoYaST file.\n");
     }
   }
 
