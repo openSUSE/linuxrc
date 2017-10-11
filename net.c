@@ -1609,10 +1609,10 @@ setup_ctc:
     case di_390net_osa:
       if (config.hwp.interface == di_osa_lcs)
         goto setup_ctc;
-      ccmd += sprintf(ccmd, "/sbin/chzdev -e ");
+      ccmd += sprintf(ccmd, "/sbin/chzdev -e qeth ");
       if(config.hwp.portno)
         ccmd += sprintf(ccmd, "portno=%d ", config.hwp.portno - 1);
-      ccmd += sprintf(ccmd, "%s:%s:%s:%s ",
+      ccmd += sprintf(ccmd, "%s %s:%s:%s ",
         config.hwp.layer2 == LAYER2_YES ? "layer2=1 " : "",
         config.hwp.readchan,
         config.hwp.writechan,
