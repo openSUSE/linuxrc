@@ -443,6 +443,7 @@ typedef struct {
   unsigned nanny:1;		/**< use wickedd-nanny */
   unsigned nanny_set:1;		/**< nanny setting was changed */
   unsigned upgrade:1;		/**< upgrade or fresh install */
+  unsigned media_upgrade:1;	/**< upgrade using media */
   unsigned systemboot:1;	/**< boot installed system */
   unsigned extend_running:1;	/**< currently running an 'extend' job */
   unsigned repomd:1;		/**< install repo is repo-md */

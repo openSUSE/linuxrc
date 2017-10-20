@@ -1201,6 +1201,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.withfcoe, "fcoe");
   add_flag(&sl0, buf, config.withipoib, "ipoib");
   add_flag(&sl0, buf, config.upgrade, "upgrade");
+  add_flag(&sl0, buf, config.media_upgrade, "media_upgrade");
   add_flag(&sl0, buf, config.net.sethostname, "hostname");
   add_flag(&sl0, buf, config.self_update, "self_update");
   add_flag(&sl0, buf, config.repomd, "repomd");
