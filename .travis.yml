@@ -1,0 +1,12 @@
+sudo: required
+language: bash
+services:
+  - docker
+
+before_install:
+  - docker build -t linuxrc-image .
+  # list the installed packages (just for easier debugging)
+  - docker run --rm -it linuxrc-image rpm -qa | sort
+
+script:
+  - docker run --rm -it -e TRAVIS=1 linuxrc-image bash -c "make -j `nproc` && ./smoke_test.sh"

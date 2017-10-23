@@ -269,6 +269,12 @@ EFI: %d
 # entry is missing if unset (0)
 Upgrade: 1
 
+# 1: YaST should do an upgrade using media (without using a registration server)
+# This setting is ignored if "Upgrade" option is not set, the option alone
+# does not trigger the upgrade mode in YaST.
+# entry is missing if unset (0)
+MediaUpgrade: 1
+
 # set via 'rootpassword' boot option
 # if set to 'ask', linuxrc will show a dialog asking for a password
 # this should be used a temporary root password for the target system

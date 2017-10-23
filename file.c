@@ -297,6 +297,7 @@ static struct {
   { key_restarted,      "Restarted",      kf_cfg                         },
   { key_withipoib,      "WithIPoIB",      kf_cfg + kf_cmd_early          },
   { key_upgrade,        "Upgrade",        kf_cfg + kf_cmd                },
+  { key_media_upgrade,  "MediaUpgrade",   kf_cfg + kf_cmd                },
   { key_ifcfg,          "ifcfg",          kf_cfg + kf_cmd_early          },
   { key_defaultinstall, "DefaultInstall", kf_cfg + kf_cmd                },
   { key_defaultinstall, "DefaultRepo",    kf_cfg + kf_cmd                },
@@ -1709,6 +1710,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.upgrade = f->nvalue;
         break;
 
+      case key_media_upgrade:
+        if(f->is.numeric) config.media_upgrade = f->nvalue;
+        break;
+
       case key_ifcfg:
         if(*f->value) ifcfg_append(&config.ifcfg.list, ifcfg_parse(f->value));
         break;
@@ -1940,6 +1945,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   file_write_num(f, key_insecure, !config.secure);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
+  if(config.media_upgrade) file_write_num(f, key_media_upgrade, config.media_upgrade);
   if(config.self_update_url)
     file_write_str(f, key_self_update, config.self_update_url);
   else if (config.self_update == 0 || config.self_update == 1)

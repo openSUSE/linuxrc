@@ -310,7 +310,7 @@ void check_for_key(int del_garbage)
 /*
  * Read keyboard input until some key sequence has been recognized.
  */
-int kbd_getch_raw(do_wait)
+int kbd_getch_raw(int do_wait)
 {
   unsigned char key;
   int i, esc_delay, time_to_wait, esc_count, delay;
