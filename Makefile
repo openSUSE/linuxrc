@@ -37,8 +37,8 @@ linuxrc: $(OBJ)
 	@mv $(@)-debug $@
 
 install: linuxrc
-	install -m 755 linuxrc $(DESTDIR)/usr/sbin
-	install -m 755 mkpsfu/mkpsfu $(DESTDIR)/usr/bin
+	install -D -m 755 linuxrc $(DESTDIR)/usr/sbin/linuxrc
+	install -D -m 755 mkpsfu/mkpsfu $(DESTDIR)/usr/bin/mkpsfu
 	install -d -m 755 $(DESTDIR)/usr/share/linuxrc
 	gzip -c9 mkpsfu/linuxrc-16.psfu >$(DESTDIR)/usr/share/linuxrc/linuxrc-16.psfu.gz
 	gzip -c9 mkpsfu/linuxrc2-16.psfu >$(DESTDIR)/usr/share/linuxrc/linuxrc2-16.psfu.gz
