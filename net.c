@@ -1601,19 +1601,19 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     case di_390net_escon:
 setup_ctc:
       if(config.hwp.protocol > 0)
-        sprintf(cmd, "ctc_configure %s %s 1 %d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
+        sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s:%s protocol=%d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
       else
-        sprintf(cmd, "ctc_configure %s %s 1", config.hwp.readchan, config.hwp.writechan);
+        sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s %s", config.hwp.readchan, config.hwp.writechan);
       break;
     case di_390net_hsi:
     case di_390net_osa:
       if (config.hwp.interface == di_osa_lcs)
         goto setup_ctc;
-      ccmd += sprintf(ccmd, "qeth_configure ");
+      ccmd += sprintf(ccmd, "/sbin/chzdev -e qeth --no-root-update ");
       if(config.hwp.portno)
-        ccmd += sprintf(ccmd, "-n %d ", config.hwp.portno - 1);
-      ccmd += sprintf(ccmd, "%s %s %s %s 1",
-        config.hwp.layer2 == LAYER2_YES ? "-l" : "",
+        ccmd += sprintf(ccmd, "portno=%d ", config.hwp.portno - 1);
+      ccmd += sprintf(ccmd, "%s %s:%s:%s ",
+        config.hwp.layer2 == LAYER2_YES ? "layer2=1 " : "layer2=0 ",
         config.hwp.readchan,
         config.hwp.writechan,
         config.hwp.datachan);

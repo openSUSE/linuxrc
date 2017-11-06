@@ -1087,13 +1087,13 @@ void lxrc_init()
         mod_modprobe("zfcp","");
         if(util_read_and_chop("/sys/firmware/ipl/device", device, sizeof device))
         {
-          sprintf(cmd,"/sbin/zfcp_host_configure %s 1",device);
+          sprintf(cmd,"/sbin/chzdev -e zfcp-host --no-root-update %s",device);
           if(!config.test) lxrc_run(cmd);
           if(util_read_and_chop("/sys/firmware/ipl/wwpn", wwpn, sizeof wwpn))
           {
             if(util_read_and_chop("/sys/firmware/ipl/lun", lun, sizeof lun))
             {
-              sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s 1",device,wwpn,lun);
+              sprintf(cmd,"/sbin/chzdev -e zfcp-lun --no-root-update %s:%s:%s",device,wwpn,lun);
               if(!config.test) lxrc_run(cmd);
             }
           }
