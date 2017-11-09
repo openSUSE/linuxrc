@@ -1008,7 +1008,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_brokenmodules:
         slist_assign_values(&config.module.broken, f->value);
-        if(config.module.broken && !config.test) {
+        if(!config.test) {
           if((w = fopen("/etc/modprobe.d/blacklist.conf", "w"))) {
             for(sl = config.module.broken; sl; sl = sl->next) {
               if(sl->key) fprintf(w, "blacklist %s\n", sl->key);
