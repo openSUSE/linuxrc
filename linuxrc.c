@@ -1605,6 +1605,12 @@ void lxrc_add_parts()
         if(util_check_exist("/modules/lz4_decompress.ko")) {
           lxrc_run("/sbin/insmod /modules/lz4_decompress.ko");
         }
+        if(util_check_exist("/modules/xxhash.ko")) {
+          lxrc_run("/sbin/insmod /modules/xxhash.ko");
+        }
+        if(util_check_exist("/modules/zstd_decompress.ko")) {
+          lxrc_run("/sbin/insmod /modules/zstd_decompress.ko");
+        }
       }
       strprintf(&mp, "/parts/mp_%04u", config.mountpoint.initrd_parts++);
       mkdir(mp, 0755);
