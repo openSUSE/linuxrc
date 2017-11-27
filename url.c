@@ -65,6 +65,9 @@ static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
 static char *url_instsys_config(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
+static hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd);
+static hd_t *relink_array(hd_t *hd_array[]);
+static void log_hd_list(char *label, hd_t *hd);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
 static char *url_print_zypp(url_t *url);
@@ -1437,7 +1440,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   hd_t *hd;
   hd_res_t *res;
   char *hwaddr;
-  hd_hw_item_t hw_item = hw_network_ctrl;
+  hd_hw_item_t *hw_items = (hd_hw_item_t[]) { hw_network_ctrl, hw_network, 0 };
   str_list_t *sl;
   char *url_device;
 
@@ -1455,15 +1458,15 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   if(!url->is.network) {
     switch(url->scheme) {
       case inst_cdrom:
-        hw_item = hw_cdrom;
+        hw_items = (hd_hw_item_t[]) { hw_cdrom, 0 };
         break;
 
       case inst_floppy:
-        hw_item = hw_floppy;
+        hw_items = (hd_hw_item_t[]) { hw_floppy, 0 };
         break;
 
       default:
-        hw_item = hw_block;
+        hw_items = (hd_hw_item_t[]) { hw_block, 0 };
         break;
     }
   }
@@ -1471,7 +1474,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   url_device = url->device;
   if(!url_device) url_device = url->is.network ? config.ifcfg.manual->device : config.device;
 
-  for(found = 0, hd = sort_a_bit(fix_device_names(hd_list(config.hd_data, hw_item, 0, NULL))); hd; hd = hd->next) {
+  for(found = 0, hd = sort_a_bit(fix_device_names(hd_list2(config.hd_data, hw_items, 0))); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
         hwaddr = res->hwaddr.addr;
@@ -1520,6 +1523,10 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     else {
       err = 1;
     }
+  }
+
+  if(!found) {
+    log_info("device not found (err = %d): %s\n", err, url_device ?: "");
   }
 
   /*
@@ -2077,6 +2084,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   char *hwaddr;
   str_list_t *sl;
   char *url_device;
+  hd_hw_item_t hw_items[] = { hw_network_ctrl, hw_network, 0 };
 
   if(!url || !url->is.network || config.ifcfg.if_up) return url_read_file(url, dir, src, dst, label, flags);
 
@@ -2093,7 +2101,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   if(config.hd_data) {
     url_device = url->device ?: config.ifcfg.manual->device;
 
-    for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_network_ctrl, 0, NULL)); hd; hd = hd->next) {
+    for(found = 0, hd = sort_a_bit(hd_list2(config.hd_data, hw_items, 0)); hd; hd = hd->next) {
       for(hwaddr = NULL, res = hd->res; res; res = res->next) {
         if(res->any.type == res_hwaddr) {
           hwaddr = res->hwaddr.addr;
@@ -2938,6 +2946,54 @@ slist_t *url_config_get_file_list(char *entry)
 
 
 /*
+ * Look up the parent device of hd in hd_list.
+ *
+ * Return NULL if none exists.
+ */
+hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd)
+{
+  unsigned idx;
+
+  if(!hd || !hd_list) return NULL;
+
+  for(idx = hd->attached_to; hd_list; hd_list = hd_list->next) {
+    if(hd_list->idx == idx) return hd_list;
+  }
+
+  return NULL;
+}
+
+
+/*
+ * Turn hd_array elements into a linked list, in order.
+ *
+ * Last element in hd_array must be NULL.
+ *
+ * Return linked list.
+ */
+hd_t *relink_array(hd_t *hd_array[])
+{
+  hd_t **hdp = hd_array;
+
+  for(; *hdp; hdp++) (*hdp)->next = hdp[1];
+
+  return *hd_array;
+}
+
+
+/*
+ * Log hardware list in abbreviated form (just device name + class).
+ */
+void log_hd_list(char *label, hd_t *hd)
+{
+  log_info("hd list (%s)\n", label);
+  for(; hd; hd = hd->next) {
+    log_info("  %s (%s)\n", hd->unix_dev_name, hd_hw_item_name(hd->hw_class));
+  }
+}
+
+
+/*
  * Re-sort hardware list to make some people happy.
  */
 hd_t *sort_a_bit(hd_t *hd_list)
@@ -2949,21 +3005,35 @@ hd_t *sort_a_bit(hd_t *hd_list)
 
   if(hds) {
     hd_t *hd_array[hds + 1];
-    unsigned u = 0;
+    unsigned u;
 
-    /* cards with link first */
+    if(config.debug >= 2) log_hd_list("before", hd_list);
 
-    for(hd = hd_list; hd; hd = hd->next) {
+    /* 1. drop network interfaces if there's also a corresponding card  */
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
+      if(
+        !(hd->hw_class == hw_network && find_parent_in_list(hd_list, hd))
+      ) {
+        hd_array[u++] = hd;
+      }
+    }
+    hd_array[u] = NULL;
+
+    hd_list = relink_array(hd_array);
+
+    /* 2. cards with link first */
+
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(link_detected(hd)) hd_array[u++] = hd;
     }
     for(hd = hd_list; hd; hd = hd->next) {
       if(!link_detected(hd)) hd_array[u++] = hd;
     }
-    hd_array[hds] = NULL;
-    for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
-    hd_list = hd_array[0];
+    hd_array[u] = NULL;
 
-    /* wlan cards last */
+    hd_list = relink_array(hd_array);
+
+    /* 3. wlan cards last */
 
     for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(!hd->is.wlan) hd_array[u++] = hd;
@@ -2971,9 +3041,23 @@ hd_t *sort_a_bit(hd_t *hd_list)
     for(hd = hd_list; hd; hd = hd->next) {
       if(hd->is.wlan) hd_array[u++] = hd;
     }
-    hd_array[hds] = NULL;
-    for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
-    hd_list = hd_array[0];
+    hd_array[u] = NULL;
+
+    hd_list = relink_array(hd_array);
+
+    /* 4. network interfaces last */
+
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
+      if(hd->hw_class != hw_network) hd_array[u++] = hd;
+    }
+    for(hd = hd_list; hd; hd = hd->next) {
+      if(hd->hw_class == hw_network) hd_array[u++] = hd;
+    }
+    hd_array[u] = NULL;
+
+    hd_list = relink_array(hd_array);
+
+    if(config.debug >= 1) log_hd_list("after", hd_list);
   }
 
   return hd_list;
