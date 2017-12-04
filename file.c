@@ -6,6 +6,8 @@
  *
  */
 
+#define _GNU_SOURCE		/* getline */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2703,5 +2705,37 @@ void file_parse_repomd(char *file)
   }
 
   slist_free(repo);
+}
+
+
+/*
+ * Parse CHECKSUMS file.
+ *
+ * Add digest info to config.digests.list.
+ *
+ * File format: lines with
+ *   SHA256 FILENAME
+ */
+void file_parse_checksums(char *file)
+{
+  FILE *fh;
+  char *buf = NULL;
+  size_t buf_size = 0;
+  char sha256[65], name[256];
+  slist_t *sl_digest;
+
+  if(!(fh = fopen(file, "r"))) return;
+
+  while(getline(&buf, &buf_size, fh) > 0) {
+    if(sscanf(buf, "%64s %255s", sha256, name) == 2) {
+      sl_digest = slist_append(&config.digests.list, slist_new());
+      strprintf(&sl_digest->key, "sha256 %s", sha256);
+      str_copy(&sl_digest->value, name);
+    }
+  }
+
+  free(buf);
+
+  fclose(fh);
 }
 

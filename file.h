@@ -107,4 +107,5 @@ void file_do_info(file_t *f0, file_key_flag_t flags);
 void get_ide_options(void);
 slist_t *file_parse_xmllike(char *name, char *tag);
 void file_parse_repomd(char *file);
+void file_parse_checksums(char *file);
 
