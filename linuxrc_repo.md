@@ -79,12 +79,19 @@ get warnings about linuxrc not being able to verify the downloaded images.
 
 Lets see how to avoid this.
 
-### 2.1. solving the digest problem
+### 2.1. getting file digests
 
-As there's no longer a `content` file, linuxrc needs to get the digests in
-some other way. Fortunately it parses `content` just like any other config
-file, so you can simply copy it into linuxrc's config directory and add that
-to the initrd.
+There is no longer a `content` file. Instead, there is now a `CHECKSUMS`
+file (with sligthly different format) containing sha256 digests of
+repository files.
+
+`CHECKSUMS` must be signed (detached signature in `CHECKSUMS.ASC`).
+
+linuxrc gets the digests from two locations:
+- a `content` file included in the initrd at installation system build time (placed directly into linuxrc's config directory)
+- `CHECKSUMS` from the repo location
+
+To include `content` in the initrd in a place linuxrc finds it, do something like:
 
 ```sh
 mkdir -p /tmp/foo/etc/linuxrc.d
