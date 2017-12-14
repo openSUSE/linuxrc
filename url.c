@@ -66,6 +66,7 @@ static char *url_instsys_config(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
 static hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd);
+static int same_device_name(hd_t *hd1, hd_t *hd2);
 static hd_t *relink_array(hd_t *hd_array[]);
 static void log_hd_list(char *label, hd_t *hd);
 static hd_t *sort_a_bit(hd_t *hd_list);
@@ -2975,6 +2976,22 @@ hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd)
 
 
 /*
+ * Compare device names of two hardware items.
+ *
+ * Return 1 if hd1 and hd2 are both not NULL and have the same unix_dev_name
+ * entry, else 0.
+ */
+int same_device_name(hd_t *hd1, hd_t *hd2)
+{
+  if(!hd1 || !hd2) return 0;
+
+  if(!hd1->unix_dev_name || !hd2->unix_dev_name) return 0;
+
+  return !strcmp(hd1->unix_dev_name, hd2->unix_dev_name);
+}
+
+
+/*
  * Turn hd_array elements into a linked list, in order.
  *
  * Last element in hd_array must be NULL.
@@ -3022,7 +3039,10 @@ hd_t *sort_a_bit(hd_t *hd_list)
     /* 1. drop network interfaces if there's also a corresponding card  */
     for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(
-        !(hd->hw_class == hw_network && find_parent_in_list(hd_list, hd))
+        !(
+          hd->hw_class == hw_network &&
+          same_device_name(hd, find_parent_in_list(hd_list, hd))
+        )
       ) {
         hd_array[u++] = hd;
       }
