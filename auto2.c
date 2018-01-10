@@ -1037,7 +1037,7 @@ void auto2_kexec(url_t *url)
 
     sync();
 
-    strprintf(&buf, "kexec -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
+    strprintf(&buf, "kexec -s -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
 
     if(!config.test) {
       lxrc_run(buf);

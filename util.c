@@ -5203,7 +5203,7 @@ void util_boot_system()
   }
 
   strprintf(&buf,
-    "kexec -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
+    "kexec -s -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
     kernel_name, initrd_name, kernel_options
   );
 
