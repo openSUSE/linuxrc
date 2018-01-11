@@ -1209,10 +1209,35 @@ int add_instsys()
     int win;
 
     if(!(win = config.win)) util_disp_init();
+
+    /*
+     * config.kexec settings:
+     *   2: ask user whether to load kernel
+     *   3: load kernel without user confirmation
+     *
+     * Note: config.kexec == 1 is handled in auto2_find_repo(); we never get
+     * here in this case.
+     */
+    if(
+      config.kexec == 3 ||
+      (
+        config.kexec == 2 &&
+        YES == dia_yesno(
+          "To use the selected repository a matching boot image is needed.\n"
+          "\n"
+          "Download it now and restart?",
+          YES
+        )
+      )
+    ) {
+      auto2_kexec(config.url.install);
+      log_info("kexec failed\n");
+    }
+
     if(config.instsys_complain == 1) {
       dia_message(
         "Installation system does not match your boot medium.\n\n"
-        "It may make your bugreports worthless.",
+        "This may cause problems and make your bugreports worthless.",
         MSGTYPE_ERROR
       );
     }

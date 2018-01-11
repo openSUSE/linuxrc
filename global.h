@@ -419,7 +419,6 @@ typedef struct {
   unsigned secure_always_fail:1;	/**< in secure mode: never ask the user but always fail directly */
   unsigned sslcerts:1;		/**< whether to check ssl certificates */
   unsigned sig_failed:2;	/**< signature check failed (1: not signed, 2: wrong signature) */
-  unsigned kexec:1;		/**< kexec to kernel & initrd from repo */
   unsigned kexec_reboot:1;	/**< kexec to installed system (just passed to yast) */
   unsigned nomodprobe:1;	/**< disable modprobe */
   unsigned y2gdb:1;		/**< pass to yast */
@@ -521,6 +520,12 @@ typedef struct {
   char *core;			/**< linuxrc code dump destination (core dumps disabled if unset) */
   unsigned core_setup:1;	/**< linuxrc core dumps have been configured */
   slist_t *repomd_data;		/**< parsed repomd.xml info */
+  unsigned kexec;		/**< kexec to kernel & initrd from repo (if inst-sys does not match)
+                                 * 0: never
+                                 * 1: always
+                                 * 2: if necessary, with user dialog (default)
+                                 * 3: if necessary, no user dialog
+                                 */
 
   struct {
     unsigned md5:1;		/**< support md5 */
