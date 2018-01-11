@@ -799,6 +799,7 @@ void lxrc_init()
   config.efi = -1;
   config.udev_mods = 1;
   config.devtmpfs = 1;
+  config.kexec = 2;		/* kexec if necessary, with user dialog */
 
   // defaults for self-update feature
   config.self_update_url = NULL;

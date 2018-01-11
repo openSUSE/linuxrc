@@ -39,7 +39,6 @@ static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_files(url_t *url);
 static void auto2_read_repomd_files(url_t *url);
 static char *auto2_splash_name(void);
-static void auto2_kexec(url_t *url);
 
 static int test_and_add_dud(url_t *url);
 
@@ -595,7 +594,7 @@ int auto2_find_repo()
   /* now go and look for repo */
   err = url_find_repo(config.url.install, config.mountpoint.instdata);
 
-  if(!err && config.kexec) {
+  if(!err && config.kexec == 1) {
     auto2_kexec(config.url.install);
     log_info("kexec failed\n");
     return 0;
@@ -1041,6 +1040,7 @@ void auto2_kexec(url_t *url)
 
     if(!config.test) {
       lxrc_run(buf);
+      LXRC_WAIT
       util_umount_all();
       sync();
       lxrc_run("kexec -e");

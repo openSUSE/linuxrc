@@ -2227,7 +2227,7 @@ static int test_is_repo(url_t *url)
     str_copy(&buf2, NULL);
   }
 
-  if(config.url.instsys->scheme != inst_rel || config.kexec) return 1;
+  if(config.url.instsys->scheme != inst_rel || config.kexec == 1) return 1;
 
   if(!config.keepinstsysconfig) {
     instsys_config = url_instsys_config(config.url.instsys->path);
