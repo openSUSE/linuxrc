@@ -15,10 +15,6 @@
 #include <fcntl.h>
 #include <fnmatch.h>
 #include <dirent.h>
-#include <rpc/rpc.h>
-#include <rpc/pmap_prot.h>
-#include <rpc/pmap_clnt.h>
-#include <rpcsvc/mount.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
