@@ -1948,11 +1948,12 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_insecure, !config.secure);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
   if(config.media_upgrade) file_write_num(f, key_media_upgrade, config.media_upgrade);
-  if(config.self_update_url)
+  if(config.self_update_url) {
     file_write_str(f, key_self_update, config.self_update_url);
-  else if (config.self_update == 0 || config.self_update == 1)
+  }
+  else if (config.self_update == 0 || config.self_update == 1) {
     file_write_num(f, key_self_update, config.self_update);
-  else
+  }
 
   if(
     config.rootpassword &&
