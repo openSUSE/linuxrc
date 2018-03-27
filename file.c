@@ -1935,11 +1935,12 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   file_write_num(f, key_insecure, !config.secure);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
-  if(config.self_update_url)
+  if(config.self_update_url) {
     file_write_str(f, key_self_update, config.self_update_url);
-  else if (config.self_update == 0 || config.self_update == 1)
+  }
+  else if (config.self_update == 0 || config.self_update == 1) {
     file_write_num(f, key_self_update, config.self_update);
-  else
+  }
 
   if(
     config.rootpassword &&
