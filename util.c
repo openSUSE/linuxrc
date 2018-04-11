@@ -5202,15 +5202,8 @@ void util_boot_system()
     return;
   }
 
-  // sometimes you need it, sometimes not - see bsc#1076839
-  #if defined(__x86_64__)
-    #define KEXEC_OPT	" -s"
-  #else
-    #define KEXEC_OPT	""
-  #endif
-
   strprintf(&buf,
-    "kexec" KEXEC_OPT " -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
+    "kexec -a -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
     kernel_name, initrd_name, kernel_options
   );
 

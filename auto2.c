@@ -1036,14 +1036,7 @@ void auto2_kexec(url_t *url)
 
     sync();
 
-    // sometimes you need it, sometimes not - see bsc#1076839
-    #if defined(__x86_64__)
-      #define KEXEC_OPT	" -s"
-    #else
-      #define KEXEC_OPT ""
-    #endif
-
-    strprintf(&buf, "kexec" KEXEC_OPT " -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
+    strprintf(&buf, "kexec -a -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
 
     if(!config.test) {
       lxrc_run(buf);
