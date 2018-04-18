@@ -419,6 +419,9 @@ void auto2_scan_hardware()
       strprintf(&err_buf, "Failed to load driver update:\n%s", url_print(url, 0));
 
       if(url->is.mountable) {
+        #if defined(__s390__) || defined(__s390x__)
+          if(url->is.network) net_activate_s390_devs();
+        #endif
         err = url_mount(url, config.mountpoint.update, test_and_add_dud);
         if(!url->quiet) {
           if(err) {
