@@ -1089,6 +1089,7 @@ void lxrc_init()
         if(util_read_and_chop("/sys/firmware/ipl/device", device, sizeof device))
         {
           sprintf(cmd,"/sbin/chzdev -e zfcp-host --no-root-update %s",device);
+          util_write_active_devices("%s\n", device);
           if(!config.test) lxrc_run(cmd);
           if(util_read_and_chop("/sys/firmware/ipl/wwpn", wwpn, sizeof wwpn))
           {
