@@ -1599,11 +1599,13 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s-%s protocol=%d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
       else
         sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s-%s", config.hwp.readchan, config.hwp.writechan);
+      util_write_active_devices("%s,%s\n", config.hwp.readchan, config.hwp.writechan);
       break;
     case di_390net_hsi:
     case di_390net_osa:
       if (config.hwp.interface == di_osa_lcs) {
         sprintf(cmd, "/sbin/chzdev -e lcs --no-root-update %s-%s", config.hwp.readchan, config.hwp.writechan);
+        util_write_active_devices("%s,%s\n", config.hwp.readchan, config.hwp.writechan);
           /* For whatever reason, LCS devices need to be enabled twice before they
            * actually come online. So, we execute lxrc_run here, and again after the end
            * of the case statement. */
@@ -1618,6 +1620,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
         config.hwp.readchan,
         config.hwp.writechan,
         config.hwp.datachan);
+        util_write_active_devices("%s,%s,%s\n", config.hwp.readchan, config.hwp.writechan, config.hwp.datachan);
       }
       break;
     default:

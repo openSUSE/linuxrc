@@ -5555,3 +5555,25 @@ void util_setup_coredumps()
   config.core_setup = 1;
 }
 
+
+/*
+ * Write s390 config values into /boot/zipl/active_devices.txt
+ * (see bsc#1095062).
+ */
+void util_write_active_devices(char *format, ...)
+{
+  const char *file_name = "/boot/zipl/active_devices.txt";
+  va_list args;
+  FILE *f;
+
+  f = fopen(file_name, "a");
+  if(f) {
+    va_start(args, format);
+    vfprintf(f, format, args);
+    va_end(args);
+    fclose(f);
+  }
+  else {
+    log_info("failed to open %s\n", file_name);
+  }
+}
