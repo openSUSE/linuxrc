@@ -2080,6 +2080,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
   FILE *f;
   file_t *ft;
   char **argv, *cmdline = NULL;
+  size_t cmdline_len = 0;
 
   if(config.test) {
     if(!config.had_segv) {
@@ -2090,8 +2091,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
   }
   else {
     if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
-    cmdline = calloc(1024, 1);
-    if(!fread(cmdline, 1, 1023, f)) *cmdline = 0;
+    getdelim(&cmdline, &cmdline_len, 0, f);
     fclose(f);
   }
 
