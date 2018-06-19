@@ -978,7 +978,7 @@ int url_progress(url_data_t *url_data, int stage)
     else {
       if(url_data->err) {
         printf("%s - %s\n",
-          url_data->label_shown && !url_data->percent >= 0 ? "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" : "",
+          url_data->label_shown && url_data->percent < 0 ? "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" : "",
           url_data->optional ? "missing (optional)" : "failed"
         );
         if(config.debug && !url_data->optional) printf("error %d: %s\n", url_data->err, url_data->err_buf);

@@ -605,7 +605,10 @@ void util_disp_init()
   fflush(stdout);
   if (config.linemode)
     return;
-  for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
+  for(i_ii = 1; i_ii < max_y_ig; i_ii++) {
+    printf("\n");
+  }
+  printf("\033[9;0]");
   disp_cursor_off();
   util_print_banner();
 }
@@ -1740,8 +1743,8 @@ int do_cp(char *src, char *dst)
   DIR *dir;
   struct dirent *de;
   struct stat sbuf, sbuf2;
-  char src2[0x100];
-  char dst2[0x100];
+  char src2[0x200];
+  char dst2[0x200];
   char *s;
   int i, j;
   int err = 0;
@@ -1752,8 +1755,8 @@ int do_cp(char *src, char *dst)
   if((dir = opendir(src))) {
     while((de = readdir(dir))) {
       if(!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
-      sprintf(src2, "%s/%s", src, de->d_name);
-      sprintf(dst2, "%s/%s", dst, de->d_name);
+      snprintf(src2, sizeof src2, "%s/%s", src, de->d_name);
+      snprintf(dst2, sizeof dst2, "%s/%s", dst, de->d_name);
       i = lstat(src2, &sbuf);
       if(i == -1) {
         perror_info(src2);
