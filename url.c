@@ -72,10 +72,12 @@ static void log_hd_list(char *label, hd_t *hd);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
 static char *url_print_zypp(url_t *url);
-static void digest_init(url_data_t *url_data);
-static void digest_process(url_data_t *url_data, void *buffer, size_t len);
-static void digest_finish(url_data_t *url_data);
-static int digest_verify(url_data_t *url_data, char *file_name);
+static void digests_init(url_data_t *url_data);
+static void digests_done(url_data_t *url_data);
+static void digests_process(url_data_t *url_data, void *buffer, size_t len);
+static int digests_match(url_data_t *url_data, char *digest_name, char *digest_value);
+static int digests_verify(url_data_t *url_data, char *file_name);
+static void digests_log(url_data_t *url_data);
 static int warn_signature_failed(char *file_name);
 static int is_gpg_signed(char *file);
 static int is_rpm_signed(char *file);
@@ -90,7 +92,7 @@ void url_read(url_data_t *url_data)
   char *buf, *s, *proxy_url = NULL;
   sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);
 
-  digest_init(url_data);
+  digests_init(url_data);
 
   c_handle = curl_easy_init();
   // log_info("curl handle = %p\n", c_handle);
@@ -196,8 +198,6 @@ void url_read(url_data_t *url_data)
   str_copy(&proxy_url, NULL);
 
   signal(SIGPIPE, old_sigpipe);
-
-  if(!url_data->err) digest_finish(url_data);
 }
 
 
@@ -211,7 +211,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 
   z1 = size * nmemb;
 
-  digest_process(url_data, buffer, z1);
+  digests_process(url_data, buffer, z1);
 
   if(url_data->buf.len < url_data->buf.max && z1) {
     z2 = url_data->buf.max - url_data->buf.len;
@@ -1937,18 +1937,13 @@ static int test_and_copy(url_t *url)
   else {
     ok = 1;
     if(config.secure) {
-      if(config.digests.md5) log_info("md5    %.32s\n", url_data->digest.md5);
-      if(config.digests.sha1) log_info("sha1   %.32s...\n", url_data->digest.sha1);
-      if(config.digests.sha224) log_info("sha224 %.32s...\n", url_data->digest.sha224);
-      if(config.digests.sha256) log_info("sha256 %.32s...\n", url_data->digest.sha256);
-      if(config.digests.sha384) log_info("sha384 %.32s...\n", url_data->digest.sha384 );
-      if(config.digests.sha512) log_info("sha512 %.32s...\n", url_data->digest.sha512);
+      digests_log(url_data);
 
       if((tc_flags & URL_FLAG_NODIGEST)) {
         log_info("digest not checked\n");
       }
       else {
-        if(digest_verify(url_data, url_data->url->path)) {
+        if(digests_verify(url_data, url_data->url->path)) {
           log_info("digest ok\n");
         }
         else {
@@ -3106,80 +3101,95 @@ int link_detected(hd_t *hd)
 }
 
 
-void digest_init(url_data_t *url_data)
-{
-  if(config.digests.md5) md5_init_ctx(&url_data->digest.ctx.md5);
-  if(config.digests.sha1) sha1_init_ctx(&url_data->digest.ctx.sha1);
-  if(config.digests.sha224) sha224_init_ctx(&url_data->digest.ctx.sha224);
-  if(config.digests.sha256) sha256_init_ctx(&url_data->digest.ctx.sha256);
-  if(config.digests.sha384) sha384_init_ctx(&url_data->digest.ctx.sha384);
-  if(config.digests.sha512) sha512_init_ctx(&url_data->digest.ctx.sha512);
-}
-
-
-void digest_process(url_data_t *url_data, void *buffer, size_t len)
-{
-  if(len) {
-    if(config.digests.md5) md5_process_bytes(buffer, len, &url_data->digest.ctx.md5);
-    if(config.digests.sha1) sha1_process_bytes(buffer, len, &url_data->digest.ctx.sha1);
-    if(config.digests.sha224) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha224);
-    if(config.digests.sha256) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha256);
-    if(config.digests.sha384) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha384);
-    if(config.digests.sha512) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha512);
-  }
-}
-
-
-void digest_finish(url_data_t *url_data)
+/*
+ * Initialize all relevant digests.
+ *
+ * config.digests.supported: list of supported (potentially needed digests)
+ *
+ * url_data->digest.list: fixed size array, should hold up to max_digests digests; if there
+ *   are more, those are ignored
+ *
+ */
+void digests_init(url_data_t *url_data)
 {
   int i;
-  unsigned char buf[MAX_DIGEST_SIZE];
+  slist_t *sl;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
 
-  if(config.digests.md5) {
-    md5_finish_ctx(&url_data->digest.ctx.md5, buf);
-    for(i = 0; i < MD5_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.md5 + 2 * i, "%02x", buf[i]);
-    }
-  }
+  digests_done(url_data);
 
-  if(config.digests.sha1) {
-    sha1_finish_ctx(&url_data->digest.ctx.sha1, buf);
-    for(i = 0; i < SHA1_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha1 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha224) {
-    sha224_finish_ctx(&url_data->digest.ctx.sha224, buf);
-    for(i = 0; i < SHA224_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha224 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha256) {
-    sha256_finish_ctx(&url_data->digest.ctx.sha256, buf);
-    for(i = 0; i < SHA256_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha256 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha384) {
-    sha384_finish_ctx(&url_data->digest.ctx.sha384, buf);
-    for(i = 0; i < SHA384_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha384 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha512) {
-    sha512_finish_ctx(&url_data->digest.ctx.sha512, buf);
-    for(i = 0; i < SHA512_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha512 + 2 * i, "%02x", buf[i]);
-    }
+  for(sl = config.digests.supported, i = 0; sl && i < max_digests; sl = sl->next, i++) {
+    url_data->digest.list[i] = mediacheck_digest_init(sl->key, NULL);
   }
 }
 
 
-int digest_verify(url_data_t *url_data, char *file_name)
+/*
+ * Free all digests.
+ */
+void digests_done(url_data_t *url_data)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  for(i = 0; i < max_digests; i++) {
+    mediacheck_digest_done(url_data->digest.list[i]);
+  }
+
+  memset(url_data->digest.list, 0, sizeof url_data->digest.list);
+}
+
+
+/*
+ * Calculate all digests.
+ *
+ * Note: since we don't know which digest type to compare against later,
+ * calculate all expected types in parallel.
+ */
+void digests_process(url_data_t *url_data, void *buffer, size_t len)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  if(!len) return;
+
+  for(i = 0; i < max_digests; i++) {
+    mediacheck_digest_process(url_data->digest.list[i], buffer, len);
+  }
+}
+
+
+/*
+ * Check f there's a matching digest.
+ *
+ * Return 1 if yes, else 0.
+ *
+ * Find the digest indicated by digest_name and compare its hex value with digest_value.
+ *
+ * Note: since we don't know which digest type to compare against later,
+ * calculate all expected types in parallel.
+ */
+int digests_match(url_data_t *url_data, char *digest_name, char *digest_value)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  for(i = 0; i < max_digests; i++) {
+    if(!strcasecmp(digest_name, mediacheck_digest_name(url_data->digest.list[i]))) {
+      if(!strcasecmp(digest_value, mediacheck_digest_hex(url_data->digest.list[i]))) return 1;
+    }
+  }
+
+  return 0;
+}
+
+
+/*
+ * Find and compare digest for file_name.
+ *
+ * Return 1 if a match was found, else 0.
+ */
+int digests_verify(url_data_t *url_data, char *file_name)
 {
   slist_t *sl, *sl0;
   int len, file_name_len, ok = 0;
@@ -3201,38 +3211,35 @@ int digest_verify(url_data_t *url_data, char *file_name)
 
     // compare digest
     sl0 = slist_split(' ', sl->key);
-    if(sl0->next) {
-      if(config.digests.md5 &&
-        !strcasecmp(sl0->key, "md5") &&
-        !strcasecmp(sl0->next->key, url_data->digest.md5)
-      ) ok = 1;
-      if(config.digests.sha1 &&
-        !strcasecmp(sl0->key, "sha1") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha1)
-      ) ok = 1;
-      if(config.digests.sha224 &&
-        !strcasecmp(sl0->key, "sha224") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha224)
-      ) ok = 1;
-      if(config.digests.sha256 &&
-        !strcasecmp(sl0->key, "sha256") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha256)
-      ) ok = 1;
-      if(config.digests.sha384 &&
-        !strcasecmp(sl0->key, "sha384") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha384)
-      ) ok = 1;
-      if(config.digests.sha512 &&
-        !strcasecmp(sl0->key, "sha512") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha512)
-      ) ok = 1;
-    }
+    if(sl0->next && digests_match(url_data, sl0->key, sl0->next->key)) ok = 1;
     slist_free(sl0);
 
     if(ok) break;
   }
 
   return ok;
+}
+
+
+/*
+ * Log all currently calculated digests.
+ *
+ * Log only the first 32 bytes of each to keep the log lines readable.
+ */
+void digests_log(url_data_t *url_data)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  for(i = 0; i < max_digests; i++) {
+    if(mediacheck_digest_valid(url_data->digest.list[i])) {
+      log_info(
+        "%-6s %.32s\n",
+        mediacheck_digest_name(url_data->digest.list[i]),
+        mediacheck_digest_hex(url_data->digest.list[i])
+      );
+    }
+  }
 }
 
 
@@ -3459,4 +3466,3 @@ void url_register_schemes()
     closedir(d);
   }
 }
-
