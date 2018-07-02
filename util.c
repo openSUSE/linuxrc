@@ -1194,10 +1194,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.efi, "efi");
   add_flag(&sl0, buf, config.efi_vars, "efivars");
   add_flag(&sl0, buf, config.udev_mods, "udev.mods");
-  add_flag(&sl0, buf, config.digests.md5, "md5");
-  add_flag(&sl0, buf, config.digests.sha1, "sha1");
-  add_flag(&sl0, buf, config.digests.sha256, "sha256");
-  add_flag(&sl0, buf, config.digests.sha512, "sha512");
   add_flag(&sl0, buf, config.devtmpfs, "devtmpfs");
   add_flag(&sl0, buf, config.plymouth, "plymouth");
   add_flag(&sl0, buf, config.withiscsi, "iscsi");
@@ -1592,6 +1588,15 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
     for(sl = config.repomd_data; sl; sl = sl->next) {
       sprintf(buf, "  %s: %s", sl->key, sl->value);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
+  if(config.digests.supported) {
+    strcpy(buf, "digest types:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.digests.supported; sl; sl = sl->next) {
+      sprintf(buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }

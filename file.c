@@ -1519,8 +1519,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             sl = slist_append_str(&config.digests.list, sl0->key);
             strprintf(&sl->key, "%s %s", sl->key, sl0->next->key);
             sl->value = strdup(sl0->next->next->key);
-            // key = 'SHAXXX <shaxxx_sum>'
-            // value = '<file name>'
+            // key = 'SHAXXX SHAXXX_DIGEST'
+            // value = 'FILE_NAME'
           }
           slist_free(sl0);
         }
@@ -1674,22 +1674,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_digests:
-        config.digests.md5 =
-        config.digests.sha1 =
-        config.digests.sha224 =
-        config.digests.sha256 =
-        config.digests.sha384 =
-        config.digests.sha512 = 0;
-        sl0 = slist_split(',', f->value);
-        for(sl = sl0; sl; sl = sl->next) {
-          if(!strcasecmp(sl->key, "md5")) config.digests.md5 = 1;
-          if(!strcasecmp(sl->key, "sha1")) config.digests.sha1 = 1;
-          if(!strcasecmp(sl->key, "sha224")) config.digests.sha224 = 1;
-          if(!strcasecmp(sl->key, "sha256")) config.digests.sha256 = 1;
-          if(!strcasecmp(sl->key, "sha384")) config.digests.sha384 = 1;
-          if(!strcasecmp(sl->key, "sha512")) config.digests.sha512 = 1;
-        }
-        slist_free(sl0);
+        slist_assign_values(&config.digests.supported, f->value);
         break;
 
       case key_plymouth:

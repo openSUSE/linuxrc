@@ -825,7 +825,7 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     char      tmp_txt_ti [STATUS_SIZE * 6 + 1];
 
     if(!config.win || config.linemode) {
-      printf("%s", txt_tv);
+      printf("%s:     ", txt_tv);
       fflush(stdout);
       return;
     }

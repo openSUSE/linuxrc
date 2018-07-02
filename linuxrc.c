@@ -817,8 +817,7 @@ void lxrc_init()
 
   str_copy(&config.namescheme, "by-id");
 
-  config.digests.sha1 =
-  config.digests.sha256 = 1;
+  slist_assign_values(&config.digests.supported, "sha1,sha256");
 
   config.plymouth = 1;
 
