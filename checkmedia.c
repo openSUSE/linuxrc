@@ -18,7 +18,6 @@ void digest_media_verify(char *device)
 {
   int i, ok;
   mediacheck_t *media = NULL;
-  char buf[256];
 
   log_info("digest_media_verify(%s)\n", device);
 
@@ -159,6 +158,8 @@ void digest_media_verify(char *device)
     dia_message("Media check canceled.", MSGTYPE_INFO);
   }
   else {
+    char buf[256];
+
     if(media->err_block) {
       sprintf(buf, "Error reading block %u.", media->err_block);
     }
