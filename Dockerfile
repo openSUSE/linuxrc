@@ -5,6 +5,7 @@ RUN zypper --non-interactive in --no-recommends \
   libblkid-devel \
   libcurl-devel \
   readline-devel \
+  libmediacheck-devel \
   tmux
 
 COPY . /usr/src/app
