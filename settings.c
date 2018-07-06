@@ -474,7 +474,6 @@ void set_expert_menu()
 int set_expert_cb(dia_item_t di)
 {
   int i;
-  char *dev = NULL;
   file_t *f;
 
   di_set_expert_last = di;
@@ -489,8 +488,7 @@ int set_expert_cb(dia_item_t di)
       break;
 
     case di_expert_verify:
-      util_choose_disk_device(&dev, 2, "Please choose the device to check.", "Enter the device to check.");
-      if(dev) digest_media_verify(dev);
+      check_media(NULL);
       break;
 
     case di_expert_eject:

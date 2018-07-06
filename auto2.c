@@ -115,15 +115,18 @@ int auto2_init()
   log_debug("  device = %s\n", device ?: "");
   log_debug("  ZyppRepoURL: %s\n", url_print(config.url.install, 4));
 
-  if(
-    ok &&
-    config.mediacheck &&
-    !config.url.install->is.network &&
-    config.url.install->is.mountable &&
-    device
-  ) {
+  if(ok && config.mediacheck) {
     if(!config.win) util_disp_init();
-    digest_media_verify(device);
+    if(
+      !config.url.install->is.network &&
+      config.url.install->is.mountable &&
+      device
+    ) {
+      ok = check_media(device);
+    }
+    else {
+      ok = check_media(NULL);
+    }
   }
 
   if(config.win && !win_old) util_disp_done();
