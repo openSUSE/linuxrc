@@ -449,7 +449,6 @@ void set_expert_menu()
   dia_item_t items[] = {
     di_expert_info,
     di_expert_modules,
-    di_expert_verify,
     di_expert_eject,
     di_extras_info,
     di_extras_change,
@@ -485,10 +484,6 @@ int set_expert_cb(dia_item_t di)
 
     case di_expert_modules:
       mod_menu();
-      break;
-
-    case di_expert_verify:
-      check_media(NULL);
       break;
 
     case di_expert_eject:
