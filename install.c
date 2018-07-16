@@ -45,6 +45,7 @@
 #include "settings.h"
 #include "auto2.h"
 #include "url.h"
+#include "checkmedia.h"
 
 #ifndef MNT_DETACH
 #define MNT_DETACH	(1 << 1)
@@ -103,6 +104,7 @@ int inst_menu()
     di_inst_rescue,
     di_inst_system,
     di_inst_net_config,
+    di_inst_check_media,
     di_none
   };
 
@@ -157,6 +159,11 @@ int inst_menu_cb(dia_item_t di)
 
     case di_inst_net_config:
       net_config();
+      err = 1;
+      break;
+
+    case di_inst_check_media:
+      check_media(NULL);
       err = 1;
       break;
 

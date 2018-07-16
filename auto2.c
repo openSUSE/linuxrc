@@ -90,6 +90,12 @@ int auto2_init()
     return 1;
   }
 
+  if(config.mediacheck) {
+    if(!config.win) util_disp_init();
+    ok = check_media(NULL);
+    if(!ok) return 0;
+  }
+
   if(config.win && !win_old) util_disp_done();
 
   ok = auto2_find_repo();
@@ -106,27 +112,12 @@ int auto2_init()
 
   device = config.url.install->used.device ?: config.url.install->device;
 
-  win_old = config.win;
-
   log_debug("find repo:\n");
   log_debug("  ok = %d\n", ok);
   log_debug("  is.network = %d\n", config.url.install->is.network);
   log_debug("  is.mountable = %d\n", config.url.install->is.mountable);
   log_debug("  device = %s\n", device ?: "");
   log_debug("  ZyppRepoURL: %s\n", url_print(config.url.install, 4));
-
-  if(
-    ok &&
-    config.mediacheck &&
-    !config.url.install->is.network &&
-    config.url.install->is.mountable &&
-    device
-  ) {
-    if(!config.win) util_disp_init();
-    digest_media_verify(device);
-  }
-
-  if(config.win && !win_old) util_disp_done();
 
   LXRC_WAIT
 
