@@ -903,6 +903,16 @@ void auto2_read_repo_files(url_t *url)
       log_info("parsing AutoYaST file\n");
       file_read_info_file("file:/autoinst.xml", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
+    } else if(util_check_exist("/sys/firmware/qemu_fw_cfg/by_name/opt/com.suse/autoinst/raw") == 'r') {
+      /*
+       * check if an autoyast profile was passed from the firmware interface
+       * if no autoyast= is given and no /autoinst.xml override exists.
+       */
+       log_info("Using AutoYaST profile from QEMU firmware config interface.\n");
+       str_copy(&config.autoyast, "file:///sys/firmware/qemu_fw_cfg/by_name/opt/com.suse/autoinst/raw");
+       log_info("parsing AutoYaST file\n");
+       file_read_info_file("file:/sys/firmware/qemu_fw_cfg/by_name/opt/com.suse/autoinst/raw", kf_cfg);
+       net_update_ifcfg(IFCFG_IFUP);
     }
   }
 }
