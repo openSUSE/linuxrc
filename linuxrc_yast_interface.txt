@@ -131,6 +131,21 @@ ProxyURL: %s
 # entry is missing if unset
 Hostname: %s
 
+# 1: set hostname via DHCP
+# If this is 1 (the default) linuxrc sets
+# /etc/sysconfig/network/dhcp::DHCLIENT_SET_HOSTNAME to 'yes' when it
+# configures any network interface.
+#
+# Note1: linuxrc does *not* set it to 'no' if SetHostname is 0.
+# Note2: a network interface might be up and running even if linuxrc
+#   did not configure one. wicked may set up interfaces based on
+#   firmware information, for example (ibft). So a configured interface is no
+#   indication that linuxrc has changed DHCLIENT_SET_HOSTNAME.
+SetHostname: 0|1
+
+# 1: user has used SetHostname option to force a setting
+SetHostnameUsed: 0|1
+
 # URL for registration server, use 'regurl' boot option to set
 # fate#303335
 # entry is missing if unset
