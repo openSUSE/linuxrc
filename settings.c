@@ -449,7 +449,6 @@ void set_expert_menu()
   dia_item_t items[] = {
     di_expert_info,
     di_expert_modules,
-    di_expert_verify,
     di_expert_eject,
     di_extras_info,
     di_extras_change,
@@ -474,7 +473,6 @@ void set_expert_menu()
 int set_expert_cb(dia_item_t di)
 {
   int i;
-  char *dev = NULL;
   file_t *f;
 
   di_set_expert_last = di;
@@ -486,11 +484,6 @@ int set_expert_cb(dia_item_t di)
 
     case di_expert_modules:
       mod_menu();
-      break;
-
-    case di_expert_verify:
-      util_choose_disk_device(&dev, 2, "Please choose the device to check.", "Enter the device to check.");
-      if(dev) digest_media_verify(dev);
       break;
 
     case di_expert_eject:

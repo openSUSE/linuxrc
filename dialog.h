@@ -22,7 +22,6 @@ typedef enum {
 
   di_expert_info,
   di_expert_modules,
-  di_expert_verify,
   di_expert_eject,
 
   di_extras_info,
@@ -50,6 +49,7 @@ typedef enum {
   di_inst_rescue,
   di_inst_system,
   di_inst_net_config,
+  di_inst_check_media,
 
   di_source_cdrom,
   di_source_net,

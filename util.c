@@ -605,7 +605,10 @@ void util_disp_init()
   fflush(stdout);
   if (config.linemode)
     return;
-  for(i_ii = 1; i_ii < max_y_ig; i_ii++) printf("\n"); printf("\033[9;0]");
+  for(i_ii = 1; i_ii < max_y_ig; i_ii++) {
+    printf("\n");
+  }
+  printf("\033[9;0]");
   disp_cursor_off();
   util_print_banner();
 }
@@ -1191,10 +1194,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.efi, "efi");
   add_flag(&sl0, buf, config.efi_vars, "efivars");
   add_flag(&sl0, buf, config.udev_mods, "udev.mods");
-  add_flag(&sl0, buf, config.digests.md5, "md5");
-  add_flag(&sl0, buf, config.digests.sha1, "sha1");
-  add_flag(&sl0, buf, config.digests.sha256, "sha256");
-  add_flag(&sl0, buf, config.digests.sha512, "sha512");
   add_flag(&sl0, buf, config.devtmpfs, "devtmpfs");
   add_flag(&sl0, buf, config.plymouth, "plymouth");
   add_flag(&sl0, buf, config.withiscsi, "iscsi");
@@ -1593,6 +1592,15 @@ void util_status_info(int log_it)
     }
   }
 
+  if(config.digests.supported) {
+    strcpy(buf, "digest types:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.digests.supported; sl; sl = sl->next) {
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.digests.list) {
     strcpy(buf, "digests:");
     slist_append_str(&sl0, buf);
@@ -1740,8 +1748,8 @@ int do_cp(char *src, char *dst)
   DIR *dir;
   struct dirent *de;
   struct stat sbuf, sbuf2;
-  char src2[0x100];
-  char dst2[0x100];
+  char src2[0x200];
+  char dst2[0x200];
   char *s;
   int i, j;
   int err = 0;
@@ -1752,8 +1760,8 @@ int do_cp(char *src, char *dst)
   if((dir = opendir(src))) {
     while((de = readdir(dir))) {
       if(!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
-      sprintf(src2, "%s/%s", src, de->d_name);
-      sprintf(dst2, "%s/%s", dst, de->d_name);
+      snprintf(src2, sizeof src2, "%s/%s", src, de->d_name);
+      snprintf(dst2, sizeof dst2, "%s/%s", dst, de->d_name);
       i = lstat(src2, &sbuf);
       if(i == -1) {
         perror_info(src2);
@@ -5202,15 +5210,8 @@ void util_boot_system()
     return;
   }
 
-  // sometimes you need it, sometimes not - see bsc#1076839
-  #if defined(__x86_64__)
-    #define KEXEC_OPT	" -s"
-  #else
-    #define KEXEC_OPT	""
-  #endif
-
   strprintf(&buf,
-    "kexec" KEXEC_OPT " -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
+    "kexec -a -l '/mnt/%s' --initrd='/mnt/%s' --append='%s'",
     kernel_name, initrd_name, kernel_options
   );
 
@@ -5562,3 +5563,25 @@ void util_setup_coredumps()
   config.core_setup = 1;
 }
 
+
+/*
+ * Write s390 config values into /boot/zipl/active_devices.txt
+ * (see bsc#1095062).
+ */
+void util_write_active_devices(char *format, ...)
+{
+  const char *file_name = "/boot/zipl/active_devices.txt";
+  va_list args;
+  FILE *f;
+
+  f = fopen(file_name, "a");
+  if(f) {
+    va_start(args, format);
+    vfprintf(f, format, args);
+    va_end(args);
+    fclose(f);
+  }
+  else {
+    log_info("failed to open %s\n", file_name);
+  }
+}

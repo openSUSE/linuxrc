@@ -482,6 +482,7 @@ void get_screen_size(int fd)
   struct timeval to;
   fd_set set;
   unsigned u1, u2;
+  int flags;
 
   if(fd < 0) return;
 
@@ -494,13 +495,22 @@ void get_screen_size(int fd)
   FD_SET(fd, &set);
   to.tv_sec = 0; to.tv_usec = 500000;
 
+  flags = fcntl(fd, F_GETFL, 0);
+  fcntl(fd, F_SETFL, flags | O_NONBLOCK);
   while(select(fd + 1, &set, NULL, NULL, &to) > 0) {
-    if((i = read(fd, buf + buf_len, sizeof buf - 1 - buf_len)) < 0) break;
+    if((i = read(fd, buf + buf_len, sizeof buf - 1 - buf_len)) < 0) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+       continue;
+      } else {
+         break;
+      }
+    }
     buf_len += i;
     buf[buf_len] = 0;
     to.tv_sec = 0; to.tv_usec = 500000;
     if(strchr(buf, 'R')) break;
   }
+  fcntl(fd, F_SETFL, flags);
 
   if(sscanf(buf, "\033[%u;%uR", &u1, &u2) == 2) {
     max_x_ig = u2;

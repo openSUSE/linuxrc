@@ -1595,24 +1595,33 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       break;
     case di_390net_ctc:
     case di_390net_escon:
-setup_ctc:
       if(config.hwp.protocol > 0)
-        sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s:%s protocol=%d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
+        sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s-%s protocol=%d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
       else
-        sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s %s", config.hwp.readchan, config.hwp.writechan);
+        sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s-%s", config.hwp.readchan, config.hwp.writechan);
+      util_write_active_devices("%s,%s\n", config.hwp.readchan, config.hwp.writechan);
       break;
     case di_390net_hsi:
     case di_390net_osa:
-      if (config.hwp.interface == di_osa_lcs)
-        goto setup_ctc;
-      ccmd += sprintf(ccmd, "/sbin/chzdev -e qeth --no-root-update ");
-      if(config.hwp.portno)
-        ccmd += sprintf(ccmd, "portno=%d ", config.hwp.portno - 1);
-      ccmd += sprintf(ccmd, "%s %s:%s:%s ",
+      if (config.hwp.interface == di_osa_lcs) {
+        sprintf(cmd, "/sbin/chzdev -e lcs --no-root-update %s-%s", config.hwp.readchan, config.hwp.writechan);
+        util_write_active_devices("%s,%s\n", config.hwp.readchan, config.hwp.writechan);
+          /* For whatever reason, LCS devices need to be enabled twice before they
+           * actually come online. So, we execute lxrc_run here, and again after the end
+           * of the case statement. */
+          rc = lxrc_run(cmd);
+      }
+      else {
+        ccmd += sprintf(ccmd, "/sbin/chzdev -e qeth --no-root-update ");
+        if(config.hwp.portno)
+          ccmd += sprintf(ccmd, "portno=%d ", config.hwp.portno - 1);
+        ccmd += sprintf(ccmd, "%s %s:%s:%s ",
         config.hwp.layer2 == LAYER2_YES ? "layer2=1 " : "layer2=0 ",
         config.hwp.readchan,
         config.hwp.writechan,
         config.hwp.datachan);
+        util_write_active_devices("%s,%s,%s\n", config.hwp.readchan, config.hwp.writechan, config.hwp.datachan);
+      }
       break;
     default:
       sprintf(cmd, "unknown s390 network type %d", config.hwp.type);

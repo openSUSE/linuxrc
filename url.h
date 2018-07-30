@@ -1,9 +1,4 @@
-#include "md5.h"
-#include "sha1.h"
-#include "sha256.h"
-#include "sha512.h"
-
-#define MAX_DIGEST_SIZE SHA512_DIGEST_SIZE
+#include <mediacheck.h>
 
 typedef struct url_data_s {
   url_t *url;
@@ -35,20 +30,14 @@ typedef struct url_data_s {
   } buf;
   int (*progress)(struct url_data_s *, int);
   struct {
-    struct {
-      struct md5_ctx md5;
-      struct sha1_ctx sha1;
-      struct sha256_ctx sha224;
-      struct sha256_ctx sha256;
-      struct sha512_ctx sha384;
-      struct sha512_ctx sha512;
-    } ctx;
-    char md5[MD5_DIGEST_SIZE * 2 + 1];
-    char sha1[SHA1_DIGEST_SIZE * 2 + 1];
-    char sha224[SHA224_DIGEST_SIZE * 2 + 1];
-    char sha256[SHA256_DIGEST_SIZE * 2 + 1];
-    char sha384[SHA384_DIGEST_SIZE * 2 + 1];
-    char sha512[SHA512_DIGEST_SIZE * 2 + 1];
+    /*
+     * The list must be able to hold an entry for each digest type (md5, sha1, ...)
+     * linuxrc should be able to handle.
+     *
+     * SUSE media have used 2 so far (sha1, sha256). libmediacheck supports 6.
+     * Pick some value between those...
+     */
+    mediacheck_digest_t *list[6];
   } digest;
 } url_data_t;
 

@@ -101,7 +101,7 @@ int mod_copy_modules(char *src_dir, int doit)
 {
   struct dirent *de;
   DIR *d;
-  char buf[256];
+  char buf[512];
   int i, i1, i2, cnt = 0, ok;
   window_t win;
   static int files = 0;
@@ -132,9 +132,9 @@ int mod_copy_modules(char *src_dir, int doit)
          * Copy only modules that are 'new': different size & date. This is
          * not perfect but will do in this case.
          */
-        sprintf(buf, "%s/%s", src_dir, de->d_name);
+        snprintf(buf, sizeof buf, "%s/%s", src_dir, de->d_name);
         i1 = stat(buf, &sbuf1);
-        sprintf(buf, "%s/%s", config.module.dir, de->d_name);
+        snprintf(buf, sizeof buf, "%s/%s", config.module.dir, de->d_name);
         i2 = stat(buf, &sbuf2);
         if(!i1 && !i2) {
           if(sbuf1.st_size == sbuf2.st_size && sbuf1.st_mtime == sbuf2.st_mtime) ok = 1;
@@ -142,7 +142,7 @@ int mod_copy_modules(char *src_dir, int doit)
       }
       if(!ok) {
         if(doit) {
-          sprintf(buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
+          snprintf(buf, sizeof buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
           lxrc_run(buf);
           if(doit == 2) {
             dia_status(&win, (cnt * 100) / files);

@@ -90,6 +90,12 @@ int auto2_init()
     return 1;
   }
 
+  if(config.mediacheck) {
+    if(!config.win) util_disp_init();
+    ok = check_media(NULL);
+    if(!ok) return 0;
+  }
+
   if(config.win && !win_old) util_disp_done();
 
   ok = auto2_find_repo();
@@ -106,27 +112,12 @@ int auto2_init()
 
   device = config.url.install->used.device ?: config.url.install->device;
 
-  win_old = config.win;
-
   log_debug("find repo:\n");
   log_debug("  ok = %d\n", ok);
   log_debug("  is.network = %d\n", config.url.install->is.network);
   log_debug("  is.mountable = %d\n", config.url.install->is.mountable);
   log_debug("  device = %s\n", device ?: "");
   log_debug("  ZyppRepoURL: %s\n", url_print(config.url.install, 4));
-
-  if(
-    ok &&
-    config.mediacheck &&
-    !config.url.install->is.network &&
-    config.url.install->is.mountable &&
-    device
-  ) {
-    if(!config.win) util_disp_init();
-    digest_media_verify(device);
-  }
-
-  if(config.win && !win_old) util_disp_done();
 
   LXRC_WAIT
 
@@ -419,6 +410,9 @@ void auto2_scan_hardware()
       strprintf(&err_buf, "Failed to load driver update:\n%s", url_print(url, 0));
 
       if(url->is.mountable) {
+        #if defined(__s390__) || defined(__s390x__)
+          if(url->is.network) net_activate_s390_devs();
+        #endif
         err = url_mount(url, config.mountpoint.update, test_and_add_dud);
         if(!url->quiet) {
           if(err) {
@@ -1036,14 +1030,7 @@ void auto2_kexec(url_t *url)
 
     sync();
 
-    // sometimes you need it, sometimes not - see bsc#1076839
-    #if defined(__x86_64__)
-      #define KEXEC_OPT	" -s"
-    #else
-      #define KEXEC_OPT ""
-    #endif
-
-    strprintf(&buf, "kexec" KEXEC_OPT " -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
+    strprintf(&buf, "kexec -a -l %s --initrd=%s --append='%s kexec=0'", kernel, initrd, cmdline);
 
     if(!config.test) {
       lxrc_run(buf);

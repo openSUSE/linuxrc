@@ -1,1 +1,1 @@
-void digest_media_verify(char *device);
+int check_media(char *device);
