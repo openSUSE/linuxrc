@@ -762,9 +762,9 @@ void lxrc_init()
 
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
+  config.setupcmd = strdup("setsid -wc inst_setup yast");
 
-  config.debugshell = strdup("setctsid `showconsole` /bin/bash -l");
+  config.debugshell = strdup("setsid -wc /bin/bash -l");
 
   config.update.map = calloc(1, MAX_UPDATES);
 
