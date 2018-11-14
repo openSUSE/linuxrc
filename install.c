@@ -1367,7 +1367,7 @@ int inst_execute_yast()
   str_copy(&setupcmd, config.setupcmd);
 
   if(config.url.install->scheme == inst_exec) {
-    strprintf(&setupcmd, "setctsid `showconsole` %s",
+    strprintf(&setupcmd, "setsid -wc %s",
       *config.url.install->path ? config.url.install->path : "/bin/sh"
     );
   }
