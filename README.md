@@ -55,7 +55,7 @@ Compiling linuxrc will require some additional dependencies.
 
 For example on openSUSE/SUSE distributions run:
 ```sh
-zypper install e2fsprogs-devel hwinfo-devel libblkid-devel libcurl-devel readline-devel
+zypper install e2fsprogs-devel hwinfo-devel libblkid-devel libcurl-devel readline-devel libmediacheck-devel
 ```
 ## Debugging
 
