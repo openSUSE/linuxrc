@@ -374,7 +374,7 @@ url_t *url_set(char *str)
 
     if(url->scheme) {
       s0 = s1;
-    
+
       if(s0[0] == '/' && s0[1] == '/') {
         i = strcspn(s0 + 2, "/?");
         if(i) {
@@ -466,7 +466,7 @@ url_t *url_set(char *str)
       *s1++ = 0;
       url->path = strdup(s1);
     }
-  }  
+  }
 
   /* unescape strings */
   {
@@ -1190,7 +1190,7 @@ int url_mount_really(url_t *url, char *device, char *dir)
  *   2: ok, but continue search
  *
  * url->used.device must be set
- * 
+ *
  * return:
  *   0: failed
  *   1: ok
@@ -1276,7 +1276,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             log_debug("[server = %s]\n", url->server ?: "");
 
             err = url_mount_really(url, buf, url->tmp_mount);
-    
+
             if(err) {
               log_info("nfs: %s: mount failed\n", url->used.device);
               str_copy(&url->tmp_mount, NULL);
@@ -2000,7 +2000,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
   tc_dst = dst;
   tc_flags = flags;
   tc_label = label;
-  
+
   if(!dst || !url->scheme) return 1;
   if(!(flags & URL_FLAG_NOUNLINK)) unlink(dst);
 
@@ -2139,7 +2139,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
     }
 
     LXRC_WAIT
- 
+
     return found ? 0 : 1;
   }
 
@@ -2192,23 +2192,27 @@ static int test_is_repo(url_t *url)
     ) {
       if(config.zen) return 0;
 
-      // no content file -> download repomd.xml
-      int read_failed = url_read_file(
-        url, NULL, "/repodata/repomd.xml", "/repomd.xml", NULL,
-        URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
-      );
-
-      if(read_failed) return 0;
-
       config.repomd = 1;
 
-      file_parse_repomd("/repomd.xml");
+      if(!config.norepo) {
+        // no content file -> download repomd.xml
+        int read_failed = url_read_file(
+          url, NULL, "/repodata/repomd.xml", "/repomd.xml", NULL,
+          URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+        );
+
+        if(read_failed) return 0;
+
+        file_parse_repomd("/repomd.xml");
+      }
 
       // download CHECKSUMS ...
-      read_failed = url_read_file(
+      int read_failed = url_read_file(
         url, NULL, "/CHECKSUMS", "/CHECKSUMS", NULL,
         URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
       );
+
+      if(read_failed && config.norepo) return 0;
 
       // ... and parse it
       if(!read_failed) file_parse_checksums("/CHECKSUMS");

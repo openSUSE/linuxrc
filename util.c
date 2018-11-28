@@ -1204,6 +1204,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.net.sethostname, "hostname");
   add_flag(&sl0, buf, config.self_update, "self_update");
   add_flag(&sl0, buf, config.repomd, "repomd");
+  add_flag(&sl0, buf, config.norepo, "norepo");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.self_update_url) {
