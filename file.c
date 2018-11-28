@@ -311,6 +311,7 @@ static struct {
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
   { key_ibft_devices,   "IBFTDevices",    kf_cfg + kf_cmd                },
   { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
+  { key_norepo,         "NoRepo",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1766,6 +1767,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         str_copy(&config.core, *f->value ? f->value : NULL);
         break;
 
+      case key_norepo:
+        if(f->is.numeric) config.norepo = f->nvalue;
+        break;
+
       default:
         break;
     }
@@ -1883,7 +1888,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_sourcemounted, url->mount ? 1 : 0);
 
   fprintf(f, "RepoURL: %s\n", url_print(url, 3));
-  fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
+  if(!config.norepo)   fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
   if(!config.sslcerts) fprintf(f, "ssl_verify: no\n");
 
   if(url->used.device && !url->is.network) fprintf(f, "Device: %s\n", short_dev(url->used.device));
