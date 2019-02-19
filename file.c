@@ -796,10 +796,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_manual:
-	// 'manual' has been added at times when hardware driver loading
-	// could cause all kinds of side effects. This does not happen
-	// anymore. So we are switching it off in general.
-        config.manual = 0;
+        if(f->is.numeric) config.manual = f->nvalue;
         break;
 
       case key_expert:
@@ -1878,7 +1875,10 @@ void file_write_install_inf(char *dir)
     return;
   }
 
-  file_write_num(f, key_manual, config.manual);
+  // 'manual' has been added at times when hardware driver loading
+  // could cause all kinds of side effects. This does not happen
+  // anymore. So we are switching it off in general in install.inf.
+  file_write_num(f, key_manual, 0);
 
   set_write_info(f);
 
