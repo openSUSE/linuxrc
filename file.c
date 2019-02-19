@@ -796,7 +796,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_manual:
-        if(f->is.numeric) config.manual = f->nvalue;
+	// 'manual' has been added at times when hardware driver loading
+	// could cause all kinds of side effects. This does not happen
+	// anymore. So we are switching it off in general.
+        config.manual = 0;
         break;
 
       case key_expert:
