@@ -1441,7 +1441,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   hd_t *hd;
   hd_res_t *res;
   char *hwaddr;
-  hd_hw_item_t *hw_items = (hd_hw_item_t[]) { hw_network_ctrl, hw_network, 0 };
+  hd_hw_item_t hw_items[3] = { hw_network_ctrl, hw_network, 0 };
   str_list_t *sl;
   char *url_device;
 
@@ -1459,17 +1459,18 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   if(!url->is.network) {
     switch(url->scheme) {
       case inst_cdrom:
-        hw_items = (hd_hw_item_t[]) { hw_cdrom, 0 };
+        hw_items[0] = hw_cdrom;
         break;
 
       case inst_floppy:
-        hw_items = (hd_hw_item_t[]) { hw_floppy, 0 };
+        hw_items[0] = hw_floppy;
         break;
 
       default:
-        hw_items = (hd_hw_item_t[]) { hw_block, 0 };
+        hw_items[0] = hw_block;
         break;
     }
+    hw_items[1] = 0;
   }
 
   url_device = url->device;
