@@ -150,6 +150,11 @@ int net_config()
     if(rc) return -1;
   }
 
+  /*
+   * VLANID is handled in net_input_vlanid() a few lines above. Take this
+   * into account when deciding if there's anything else besides DHCP to be
+   * done.
+   */
   if(config.win && (config.net.setup & ~NS_VLANID) != NS_DHCP) {
     if(
       config.net.setup & NS_DHCP &&
