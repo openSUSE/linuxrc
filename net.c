@@ -1164,6 +1164,8 @@ void net_wicked_dhcp()
   if(config.test) {
     config.net.dhcp_active = 1;
 
+    log_info("test mode: DHCP activated\n");
+
     return;
   }
 
@@ -2592,7 +2594,12 @@ void net_wicked_up(char *ifname)
     strprintf(&buf, "wicked ifup %s", ifname);
   }
 
-  if(!config.test) lxrc_run(buf);
+  if(!config.test) {
+    lxrc_run(buf);
+  }
+  else {
+    log_info("test mode: 'wicked ifup %s' called\n", ifname);
+  }
 
   sleep(config.net.ifup_wait + 1);
 
