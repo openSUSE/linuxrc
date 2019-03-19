@@ -150,7 +150,7 @@ int net_config()
     if(rc) return -1;
   }
 
-  if(config.win && config.net.setup != NS_DHCP) {
+  if(config.win && (config.net.setup & ~NS_VLANID) != NS_DHCP) {
     if(
       config.net.setup & NS_DHCP &&
 #if defined(__s390__) || defined(__s390x__)
