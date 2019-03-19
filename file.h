@@ -56,7 +56,7 @@ typedef enum {
   key_withipoib, key_upgrade, key_media_upgrade, key_ifcfg, key_defaultinstall,
   key_nanny, key_vlanid,
   key_sshkey, key_systemboot, key_sethostname, key_debugshell, key_self_update,
-  key_ibft_devices, key_linuxrc_core
+  key_ibft_devices, key_linuxrc_core, key_norepo
 } file_key_t;
 
 typedef enum {
@@ -107,4 +107,5 @@ void file_do_info(file_t *f0, file_key_flag_t flags);
 void get_ide_options(void);
 slist_t *file_parse_xmllike(char *name, char *tag);
 void file_parse_repomd(char *file);
+void file_parse_checksums(char *file);
 

@@ -65,13 +65,19 @@ static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
 static char *url_instsys_config(char *path);
 static char *url_config_get_path(char *entry);
 static slist_t *url_config_get_file_list(char *entry);
+static hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd);
+static int same_device_name(hd_t *hd1, hd_t *hd2);
+static hd_t *relink_array(hd_t *hd_array[]);
+static void log_hd_list(char *label, hd_t *hd);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
 static char *url_print_zypp(url_t *url);
-static void digest_init(url_data_t *url_data);
-static void digest_process(url_data_t *url_data, void *buffer, size_t len);
-static void digest_finish(url_data_t *url_data);
-static int digest_verify(url_data_t *url_data, char *file_name);
+static void digests_init(url_data_t *url_data);
+static void digests_done(url_data_t *url_data);
+static void digests_process(url_data_t *url_data, void *buffer, size_t len);
+static int digests_match(url_data_t *url_data, char *digest_name, char *digest_value);
+static int digests_verify(url_data_t *url_data, char *file_name);
+static void digests_log(url_data_t *url_data);
 static int warn_signature_failed(char *file_name);
 static int is_gpg_signed(char *file);
 static int is_rpm_signed(char *file);
@@ -86,7 +92,7 @@ void url_read(url_data_t *url_data)
   char *buf, *s, *proxy_url = NULL;
   sighandler_t old_sigpipe = signal(SIGPIPE, SIG_IGN);
 
-  digest_init(url_data);
+  digests_init(url_data);
 
   c_handle = curl_easy_init();
   // log_info("curl handle = %p\n", c_handle);
@@ -192,8 +198,6 @@ void url_read(url_data_t *url_data)
   str_copy(&proxy_url, NULL);
 
   signal(SIGPIPE, old_sigpipe);
-
-  if(!url_data->err) digest_finish(url_data);
 }
 
 
@@ -207,7 +211,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 
   z1 = size * nmemb;
 
-  digest_process(url_data, buffer, z1);
+  digests_process(url_data, buffer, z1);
 
   if(url_data->buf.len < url_data->buf.max && z1) {
     z2 = url_data->buf.max - url_data->buf.len;
@@ -370,7 +374,7 @@ url_t *url_set(char *str)
 
     if(url->scheme) {
       s0 = s1;
-    
+
       if(s0[0] == '/' && s0[1] == '/') {
         i = strcspn(s0 + 2, "/?");
         if(i) {
@@ -462,7 +466,7 @@ url_t *url_set(char *str)
       *s1++ = 0;
       url->path = strdup(s1);
     }
-  }  
+  }
 
   /* unescape strings */
   {
@@ -974,7 +978,7 @@ int url_progress(url_data_t *url_data, int stage)
     else {
       if(url_data->err) {
         printf("%s - %s\n",
-          url_data->label_shown && !url_data->percent >= 0 ? "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" : "",
+          url_data->label_shown && url_data->percent < 0 ? "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" : "",
           url_data->optional ? "missing (optional)" : "failed"
         );
         if(config.debug && !url_data->optional) printf("error %d: %s\n", url_data->err, url_data->err_buf);
@@ -1186,7 +1190,7 @@ int url_mount_really(url_t *url, char *device, char *dir)
  *   2: ok, but continue search
  *
  * url->used.device must be set
- * 
+ *
  * return:
  *   0: failed
  *   1: ok
@@ -1272,7 +1276,7 @@ int url_mount_disk(url_t *url, char *dir, int (*test_func)(url_t *))
             log_debug("[server = %s]\n", url->server ?: "");
 
             err = url_mount_really(url, buf, url->tmp_mount);
-    
+
             if(err) {
               log_info("nfs: %s: mount failed\n", url->used.device);
               str_copy(&url->tmp_mount, NULL);
@@ -1437,7 +1441,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   hd_t *hd;
   hd_res_t *res;
   char *hwaddr;
-  hd_hw_item_t hw_item = hw_network_ctrl;
+  hd_hw_item_t hw_items[3] = { hw_network_ctrl, hw_network, 0 };
   str_list_t *sl;
   char *url_device;
 
@@ -1455,23 +1459,24 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   if(!url->is.network) {
     switch(url->scheme) {
       case inst_cdrom:
-        hw_item = hw_cdrom;
+        hw_items[0] = hw_cdrom;
         break;
 
       case inst_floppy:
-        hw_item = hw_floppy;
+        hw_items[0] = hw_floppy;
         break;
 
       default:
-        hw_item = hw_block;
+        hw_items[0] = hw_block;
         break;
     }
+    hw_items[1] = 0;
   }
 
   url_device = url->device;
   if(!url_device) url_device = url->is.network ? config.ifcfg.manual->device : config.device;
 
-  for(found = 0, hd = sort_a_bit(fix_device_names(hd_list(config.hd_data, hw_item, 0, NULL))); hd; hd = hd->next) {
+  for(found = 0, hd = sort_a_bit(fix_device_names(hd_list2(config.hd_data, hw_items, 0))); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
         hwaddr = res->hwaddr.addr;
@@ -1520,6 +1525,10 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     else {
       err = 1;
     }
+  }
+
+  if(!found) {
+    log_info("device not found (err = %d): %s\n", err, url_device ?: "");
   }
 
   /*
@@ -1929,18 +1938,13 @@ static int test_and_copy(url_t *url)
   else {
     ok = 1;
     if(config.secure) {
-      if(config.digests.md5) log_info("md5    %.32s\n", url_data->digest.md5);
-      if(config.digests.sha1) log_info("sha1   %.32s...\n", url_data->digest.sha1);
-      if(config.digests.sha224) log_info("sha224 %.32s...\n", url_data->digest.sha224);
-      if(config.digests.sha256) log_info("sha256 %.32s...\n", url_data->digest.sha256);
-      if(config.digests.sha384) log_info("sha384 %.32s...\n", url_data->digest.sha384 );
-      if(config.digests.sha512) log_info("sha512 %.32s...\n", url_data->digest.sha512);
+      digests_log(url_data);
 
       if((tc_flags & URL_FLAG_NODIGEST)) {
         log_info("digest not checked\n");
       }
       else {
-        if(digest_verify(url_data, url_data->url->path)) {
+        if(digests_verify(url_data, url_data->url->path)) {
           log_info("digest ok\n");
         }
         else {
@@ -1997,7 +2001,7 @@ int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label
   tc_dst = dst;
   tc_flags = flags;
   tc_label = label;
-  
+
   if(!dst || !url->scheme) return 1;
   if(!(flags & URL_FLAG_NOUNLINK)) unlink(dst);
 
@@ -2077,6 +2081,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   char *hwaddr;
   str_list_t *sl;
   char *url_device;
+  hd_hw_item_t hw_items[] = { hw_network_ctrl, hw_network, 0 };
 
   if(!url || !url->is.network || config.ifcfg.if_up) return url_read_file(url, dir, src, dst, label, flags);
 
@@ -2093,7 +2098,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   if(config.hd_data) {
     url_device = url->device ?: config.ifcfg.manual->device;
 
-    for(found = 0, hd = sort_a_bit(hd_list(config.hd_data, hw_network_ctrl, 0, NULL)); hd; hd = hd->next) {
+    for(found = 0, hd = sort_a_bit(hd_list2(config.hd_data, hw_items, 0)); hd; hd = hd->next) {
       for(hwaddr = NULL, res = hd->res; res; res = res->next) {
         if(res->any.type == res_hwaddr) {
           hwaddr = res->hwaddr.addr;
@@ -2135,7 +2140,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
     }
 
     LXRC_WAIT
- 
+
     return found ? 0 : 1;
   }
 
@@ -2170,9 +2175,10 @@ static int test_is_repo(url_t *url)
   if(!config.keepinstsysconfig) {
     config.digests.failed = 0;
 
-    // check for '/content' or '/repodata/repomd.xml' as indication we have a suse repo
-    // 'content' must be validly signed (we parse it), 'repomd.xml' not (we just check its presence)
-    // zenworks has a different approach ('settings.txt') - they don't have a repo
+    // Check for '/content' resp. '/repodata/repomd.xml' as indication we
+    // have a SUSE repo.
+    // The file must be validly signed (because we parse it).
+    // zenworks has a different approach ('settings.txt') - they don't have a repo.
 
     strprintf(&buf, "/%s", config.zen ? config.zenconfig : "content");
     strprintf(&buf2, "file:%s", buf);
@@ -2187,17 +2193,30 @@ static int test_is_repo(url_t *url)
     ) {
       if(config.zen) return 0;
 
-      // no content file -> download repomd.xml
+      config.repomd = 1;
+
+      if(!config.norepo) {
+        // no content file -> download repomd.xml
+        int read_failed = url_read_file(
+          url, NULL, "/repodata/repomd.xml", "/repomd.xml", NULL,
+          URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
+        );
+
+        if(read_failed) return 0;
+
+        file_parse_repomd("/repomd.xml");
+      }
+
+      // download CHECKSUMS ...
       int read_failed = url_read_file(
-        url, NULL, "/repodata/repomd.xml", "/repomd.xml", NULL,
+        url, NULL, "/CHECKSUMS", "/CHECKSUMS", NULL,
         URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
       );
 
-      if(read_failed) return 0;
+      if(read_failed && config.norepo) return 0;
 
-      config.repomd = 1;
-
-      file_parse_repomd("/repomd.xml");
+      // ... and parse it
+      if(!read_failed) file_parse_checksums("/CHECKSUMS");
     }
 
     if(!config.sig_failed && util_check_exist(buf)) {
@@ -2208,7 +2227,7 @@ static int test_is_repo(url_t *url)
     str_copy(&buf2, NULL);
   }
 
-  if(config.url.instsys->scheme != inst_rel || config.kexec) return 1;
+  if(config.url.instsys->scheme != inst_rel || config.kexec == 1) return 1;
 
   if(!config.keepinstsysconfig) {
     instsys_config = url_instsys_config(config.url.instsys->path);
@@ -2938,6 +2957,70 @@ slist_t *url_config_get_file_list(char *entry)
 
 
 /*
+ * Look up the parent device of hd in hd_list.
+ *
+ * Return NULL if none exists.
+ */
+hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd)
+{
+  unsigned idx;
+
+  if(!hd || !hd_list) return NULL;
+
+  for(idx = hd->attached_to; hd_list; hd_list = hd_list->next) {
+    if(hd_list->idx == idx) return hd_list;
+  }
+
+  return NULL;
+}
+
+
+/*
+ * Compare device names of two hardware items.
+ *
+ * Return 1 if hd1 and hd2 are both not NULL and have the same unix_dev_name
+ * entry, else 0.
+ */
+int same_device_name(hd_t *hd1, hd_t *hd2)
+{
+  if(!hd1 || !hd2) return 0;
+
+  if(!hd1->unix_dev_name || !hd2->unix_dev_name) return 0;
+
+  return !strcmp(hd1->unix_dev_name, hd2->unix_dev_name);
+}
+
+
+/*
+ * Turn hd_array elements into a linked list, in order.
+ *
+ * Last element in hd_array must be NULL.
+ *
+ * Return linked list.
+ */
+hd_t *relink_array(hd_t *hd_array[])
+{
+  hd_t **hdp = hd_array;
+
+  for(; *hdp; hdp++) (*hdp)->next = hdp[1];
+
+  return *hd_array;
+}
+
+
+/*
+ * Log hardware list in abbreviated form (just device name + class).
+ */
+void log_hd_list(char *label, hd_t *hd)
+{
+  log_info("hd list (%s)\n", label);
+  for(; hd; hd = hd->next) {
+    log_info("  %s (%s)\n", hd->unix_dev_name, hd_hw_item_name(hd->hw_class));
+  }
+}
+
+
+/*
  * Re-sort hardware list to make some people happy.
  */
 hd_t *sort_a_bit(hd_t *hd_list)
@@ -2949,21 +3032,38 @@ hd_t *sort_a_bit(hd_t *hd_list)
 
   if(hds) {
     hd_t *hd_array[hds + 1];
-    unsigned u = 0;
+    unsigned u;
 
-    /* cards with link first */
+    if(config.debug >= 2) log_hd_list("before", hd_list);
 
-    for(hd = hd_list; hd; hd = hd->next) {
+    /* 1. drop network interfaces if there's also a corresponding card  */
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
+      if(
+        !(
+          hd->hw_class == hw_network &&
+          same_device_name(hd, find_parent_in_list(hd_list, hd))
+        )
+      ) {
+        hd_array[u++] = hd;
+      }
+    }
+    hd_array[u] = NULL;
+
+    hd_list = relink_array(hd_array);
+
+    /* 2. cards with link first */
+
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(link_detected(hd)) hd_array[u++] = hd;
     }
     for(hd = hd_list; hd; hd = hd->next) {
       if(!link_detected(hd)) hd_array[u++] = hd;
     }
-    hd_array[hds] = NULL;
-    for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
-    hd_list = hd_array[0];
+    hd_array[u] = NULL;
 
-    /* wlan cards last */
+    hd_list = relink_array(hd_array);
+
+    /* 3. wlan cards last */
 
     for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(!hd->is.wlan) hd_array[u++] = hd;
@@ -2971,9 +3071,23 @@ hd_t *sort_a_bit(hd_t *hd_list)
     for(hd = hd_list; hd; hd = hd->next) {
       if(hd->is.wlan) hd_array[u++] = hd;
     }
-    hd_array[hds] = NULL;
-    for(u = 0; u < hds; u++) hd_array[u]->next = hd_array[u + 1];
-    hd_list = hd_array[0];
+    hd_array[u] = NULL;
+
+    hd_list = relink_array(hd_array);
+
+    /* 4. network interfaces last */
+
+    for(u = 0, hd = hd_list; hd; hd = hd->next) {
+      if(hd->hw_class != hw_network) hd_array[u++] = hd;
+    }
+    for(hd = hd_list; hd; hd = hd->next) {
+      if(hd->hw_class == hw_network) hd_array[u++] = hd;
+    }
+    hd_array[u] = NULL;
+
+    hd_list = relink_array(hd_array);
+
+    if(config.debug >= 1) log_hd_list("after", hd_list);
   }
 
   return hd_list;
@@ -2992,80 +3106,95 @@ int link_detected(hd_t *hd)
 }
 
 
-void digest_init(url_data_t *url_data)
-{
-  if(config.digests.md5) md5_init_ctx(&url_data->digest.ctx.md5);
-  if(config.digests.sha1) sha1_init_ctx(&url_data->digest.ctx.sha1);
-  if(config.digests.sha224) sha224_init_ctx(&url_data->digest.ctx.sha224);
-  if(config.digests.sha256) sha256_init_ctx(&url_data->digest.ctx.sha256);
-  if(config.digests.sha384) sha384_init_ctx(&url_data->digest.ctx.sha384);
-  if(config.digests.sha512) sha512_init_ctx(&url_data->digest.ctx.sha512);
-}
-
-
-void digest_process(url_data_t *url_data, void *buffer, size_t len)
-{
-  if(len) {
-    if(config.digests.md5) md5_process_bytes(buffer, len, &url_data->digest.ctx.md5);
-    if(config.digests.sha1) sha1_process_bytes(buffer, len, &url_data->digest.ctx.sha1);
-    if(config.digests.sha224) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha224);
-    if(config.digests.sha256) sha256_process_bytes(buffer, len, &url_data->digest.ctx.sha256);
-    if(config.digests.sha384) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha384);
-    if(config.digests.sha512) sha512_process_bytes(buffer, len, &url_data->digest.ctx.sha512);
-  }
-}
-
-
-void digest_finish(url_data_t *url_data)
+/*
+ * Initialize all relevant digests.
+ *
+ * config.digests.supported: list of supported (potentially needed digests)
+ *
+ * url_data->digest.list: fixed size array, should hold up to max_digests digests; if there
+ *   are more, those are ignored
+ *
+ */
+void digests_init(url_data_t *url_data)
 {
   int i;
-  unsigned char buf[MAX_DIGEST_SIZE];
+  slist_t *sl;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
 
-  if(config.digests.md5) {
-    md5_finish_ctx(&url_data->digest.ctx.md5, buf);
-    for(i = 0; i < MD5_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.md5 + 2 * i, "%02x", buf[i]);
-    }
-  }
+  digests_done(url_data);
 
-  if(config.digests.sha1) {
-    sha1_finish_ctx(&url_data->digest.ctx.sha1, buf);
-    for(i = 0; i < SHA1_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha1 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha224) {
-    sha224_finish_ctx(&url_data->digest.ctx.sha224, buf);
-    for(i = 0; i < SHA224_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha224 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha256) {
-    sha256_finish_ctx(&url_data->digest.ctx.sha256, buf);
-    for(i = 0; i < SHA256_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha256 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha384) {
-    sha384_finish_ctx(&url_data->digest.ctx.sha384, buf);
-    for(i = 0; i < SHA384_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha384 + 2 * i, "%02x", buf[i]);
-    }
-  }
-
-  if(config.digests.sha512) {
-    sha512_finish_ctx(&url_data->digest.ctx.sha512, buf);
-    for(i = 0; i < SHA512_DIGEST_SIZE; i++) {
-      sprintf(url_data->digest.sha512 + 2 * i, "%02x", buf[i]);
-    }
+  for(sl = config.digests.supported, i = 0; sl && i < max_digests; sl = sl->next, i++) {
+    url_data->digest.list[i] = mediacheck_digest_init(sl->key, NULL);
   }
 }
 
 
-int digest_verify(url_data_t *url_data, char *file_name)
+/*
+ * Free all digests.
+ */
+void digests_done(url_data_t *url_data)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  for(i = 0; i < max_digests; i++) {
+    mediacheck_digest_done(url_data->digest.list[i]);
+  }
+
+  memset(url_data->digest.list, 0, sizeof url_data->digest.list);
+}
+
+
+/*
+ * Calculate all digests.
+ *
+ * Note: since we don't know which digest type to compare against later,
+ * calculate all expected types in parallel.
+ */
+void digests_process(url_data_t *url_data, void *buffer, size_t len)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  if(!len) return;
+
+  for(i = 0; i < max_digests; i++) {
+    mediacheck_digest_process(url_data->digest.list[i], buffer, len);
+  }
+}
+
+
+/*
+ * Check f there's a matching digest.
+ *
+ * Return 1 if yes, else 0.
+ *
+ * Find the digest indicated by digest_name and compare its hex value with digest_value.
+ *
+ * Note: since we don't know which digest type to compare against later,
+ * calculate all expected types in parallel.
+ */
+int digests_match(url_data_t *url_data, char *digest_name, char *digest_value)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  for(i = 0; i < max_digests; i++) {
+    if(!strcasecmp(digest_name, mediacheck_digest_name(url_data->digest.list[i]))) {
+      if(!strcasecmp(digest_value, mediacheck_digest_hex(url_data->digest.list[i]))) return 1;
+    }
+  }
+
+  return 0;
+}
+
+
+/*
+ * Find and compare digest for file_name.
+ *
+ * Return 1 if a match was found, else 0.
+ */
+int digests_verify(url_data_t *url_data, char *file_name)
 {
   slist_t *sl, *sl0;
   int len, file_name_len, ok = 0;
@@ -3087,38 +3216,35 @@ int digest_verify(url_data_t *url_data, char *file_name)
 
     // compare digest
     sl0 = slist_split(' ', sl->key);
-    if(sl0->next) {
-      if(config.digests.md5 &&
-        !strcasecmp(sl0->key, "md5") &&
-        !strcasecmp(sl0->next->key, url_data->digest.md5)
-      ) ok = 1;
-      if(config.digests.sha1 &&
-        !strcasecmp(sl0->key, "sha1") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha1)
-      ) ok = 1;
-      if(config.digests.sha224 &&
-        !strcasecmp(sl0->key, "sha224") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha224)
-      ) ok = 1;
-      if(config.digests.sha256 &&
-        !strcasecmp(sl0->key, "sha256") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha256)
-      ) ok = 1;
-      if(config.digests.sha384 &&
-        !strcasecmp(sl0->key, "sha384") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha384)
-      ) ok = 1;
-      if(config.digests.sha512 &&
-        !strcasecmp(sl0->key, "sha512") &&
-        !strcasecmp(sl0->next->key, url_data->digest.sha512)
-      ) ok = 1;
-    }
+    if(sl0->next && digests_match(url_data, sl0->key, sl0->next->key)) ok = 1;
     slist_free(sl0);
 
     if(ok) break;
   }
 
   return ok;
+}
+
+
+/*
+ * Log all currently calculated digests.
+ *
+ * Log only the first 32 bytes of each to keep the log lines readable.
+ */
+void digests_log(url_data_t *url_data)
+{
+  int i;
+  int max_digests = sizeof url_data->digest.list / sizeof *url_data->digest.list;
+
+  for(i = 0; i < max_digests; i++) {
+    if(mediacheck_digest_valid(url_data->digest.list[i])) {
+      log_info(
+        "%-6s %.32s\n",
+        mediacheck_digest_name(url_data->digest.list[i]),
+        mediacheck_digest_hex(url_data->digest.list[i])
+      );
+    }
+  }
 }
 
 
@@ -3345,4 +3471,3 @@ void url_register_schemes()
     closedir(d);
   }
 }
-

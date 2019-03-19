@@ -42,7 +42,6 @@ struct {
 
   { di_expert_info,      "System Information",           },
   { di_expert_modules,   "Kernel Modules (Hardware Drivers)",        },
-  { di_expert_verify,    "Verify Installation Medium",            },
   { di_expert_eject,     "Eject CD",            },
 
   { di_exit_reboot,      "Exit or Reboot",          },
@@ -64,6 +63,7 @@ struct {
   { di_inst_rescue,      "Rescue System",        },
   { di_inst_system,      "Boot Installed System",         },
   { di_inst_net_config,  "Network Setup",   },
+  { di_inst_check_media, "Verify Installation Medium",   },
 
   { di_source_cdrom,     "DVD / CD-ROM",                 },
   { di_source_net,       "Network",                 },
@@ -825,7 +825,7 @@ void dia_status_on (window_t *win_prr, char *txt_tv)
     char      tmp_txt_ti [STATUS_SIZE * 6 + 1];
 
     if(!config.win || config.linemode) {
-      printf("%s", txt_tv);
+      printf("%s:     ", txt_tv);
       fflush(stdout);
       return;
     }

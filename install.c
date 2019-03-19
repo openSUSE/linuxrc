@@ -45,6 +45,7 @@
 #include "settings.h"
 #include "auto2.h"
 #include "url.h"
+#include "checkmedia.h"
 
 #ifndef MNT_DETACH
 #define MNT_DETACH	(1 << 1)
@@ -103,6 +104,7 @@ int inst_menu()
     di_inst_rescue,
     di_inst_system,
     di_inst_net_config,
+    di_inst_check_media,
     di_none
   };
 
@@ -157,6 +159,11 @@ int inst_menu_cb(dia_item_t di)
 
     case di_inst_net_config:
       net_config();
+      err = 1;
+      break;
+
+    case di_inst_check_media:
+      check_media(NULL);
       err = 1;
       break;
 
@@ -1209,10 +1216,35 @@ int add_instsys()
     int win;
 
     if(!(win = config.win)) util_disp_init();
+
+    /*
+     * config.kexec settings:
+     *   2: ask user whether to load kernel
+     *   3: load kernel without user confirmation
+     *
+     * Note: config.kexec == 1 is handled in auto2_find_repo(); we never get
+     * here in this case.
+     */
+    if(
+      config.kexec == 3 ||
+      (
+        config.kexec == 2 &&
+        YES == dia_yesno(
+          "To use the selected repository a matching boot image is needed.\n"
+          "\n"
+          "Download it now and restart?",
+          YES
+        )
+      )
+    ) {
+      auto2_kexec(config.url.install);
+      log_info("kexec failed\n");
+    }
+
     if(config.instsys_complain == 1) {
       dia_message(
         "Installation system does not match your boot medium.\n\n"
-        "It may make your bugreports worthless.",
+        "This may cause problems and make your bugreports worthless.",
         MSGTYPE_ERROR
       );
     }
@@ -1335,7 +1367,7 @@ int inst_execute_yast()
   str_copy(&setupcmd, config.setupcmd);
 
   if(config.url.install->scheme == inst_exec) {
-    strprintf(&setupcmd, "setctsid `showconsole` %s",
+    strprintf(&setupcmd, "setsid -wc %s",
       *config.url.install->path ? config.url.install->path : "/bin/sh"
     );
   }

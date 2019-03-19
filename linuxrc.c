@@ -762,9 +762,9 @@ void lxrc_init()
 
   config.mountpoint.instdata = strdup("/var/adm/mount");
 
-  config.setupcmd = strdup("setctsid `showconsole` inst_setup yast");
+  config.setupcmd = strdup("setsid -wc inst_setup yast");
 
-  config.debugshell = strdup("setctsid `showconsole` /bin/bash -l");
+  config.debugshell = strdup("setsid -wc /bin/bash -l");
 
   config.update.map = calloc(1, MAX_UPDATES);
 
@@ -799,6 +799,7 @@ void lxrc_init()
   config.efi = -1;
   config.udev_mods = 1;
   config.devtmpfs = 1;
+  config.kexec = 2;		/* kexec if necessary, with user dialog */
 
   // defaults for self-update feature
   config.self_update_url = NULL;
@@ -816,8 +817,7 @@ void lxrc_init()
 
   str_copy(&config.namescheme, "by-id");
 
-  config.digests.sha1 =
-  config.digests.sha256 = 1;
+  slist_assign_values(&config.digests.supported, "sha1,sha256");
 
   config.plymouth = 1;
 
@@ -894,7 +894,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2016 SUSE LLC <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2019 SUSE LLC <<<\n",
       config.product
     );
     if (config.linemode)
@@ -1087,13 +1087,14 @@ void lxrc_init()
         mod_modprobe("zfcp","");
         if(util_read_and_chop("/sys/firmware/ipl/device", device, sizeof device))
         {
-          sprintf(cmd,"/sbin/zfcp_host_configure %s 1",device);
+          sprintf(cmd,"/sbin/chzdev -e zfcp-host --no-root-update %s",device);
+          util_write_active_devices("%s\n", device);
           if(!config.test) lxrc_run(cmd);
           if(util_read_and_chop("/sys/firmware/ipl/wwpn", wwpn, sizeof wwpn))
           {
             if(util_read_and_chop("/sys/firmware/ipl/lun", lun, sizeof lun))
             {
-              sprintf(cmd,"/sbin/zfcp_disk_configure %s %s %s 1",device,wwpn,lun);
+              sprintf(cmd,"/sbin/chzdev -e zfcp-lun --no-root-update %s:%s:%s",device,wwpn,lun);
               if(!config.test) lxrc_run(cmd);
             }
           }
@@ -1604,6 +1605,12 @@ void lxrc_add_parts()
         lxrc_run("/sbin/insmod /modules/loop.ko max_loop=64");
         if(util_check_exist("/modules/lz4_decompress.ko")) {
           lxrc_run("/sbin/insmod /modules/lz4_decompress.ko");
+        }
+        if(util_check_exist("/modules/xxhash.ko")) {
+          lxrc_run("/sbin/insmod /modules/xxhash.ko");
+        }
+        if(util_check_exist("/modules/zstd_decompress.ko")) {
+          lxrc_run("/sbin/insmod /modules/zstd_decompress.ko");
         }
       }
       strprintf(&mp, "/parts/mp_%04u", config.mountpoint.initrd_parts++);

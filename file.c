@@ -6,6 +6,8 @@
  *
  */
 
+#define _GNU_SOURCE		/* getline */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -309,6 +311,7 @@ static struct {
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
   { key_ibft_devices,   "IBFTDevices",    kf_cfg + kf_cmd                },
   { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
+  { key_norepo,         "NoRepo",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1008,7 +1011,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_brokenmodules:
         slist_assign_values(&config.module.broken, f->value);
-        if(config.module.broken && !config.test) {
+        if(!config.test) {
           if((w = fopen("/etc/modprobe.d/blacklist.conf", "w"))) {
             for(sl = config.module.broken; sl; sl = sl->next) {
               if(sl->key) fprintf(w, "blacklist %s\n", sl->key);
@@ -1517,8 +1520,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             sl = slist_append_str(&config.digests.list, sl0->key);
             strprintf(&sl->key, "%s %s", sl->key, sl0->next->key);
             sl->value = strdup(sl0->next->next->key);
-            // key = 'SHAXXX <shaxxx_sum>'
-            // value = '<file name>'
+            // key = 'SHAXXX SHAXXX_DIGEST'
+            // value = 'FILE_NAME'
           }
           slist_free(sl0);
         }
@@ -1672,22 +1675,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_digests:
-        config.digests.md5 =
-        config.digests.sha1 =
-        config.digests.sha224 =
-        config.digests.sha256 =
-        config.digests.sha384 =
-        config.digests.sha512 = 0;
-        sl0 = slist_split(',', f->value);
-        for(sl = sl0; sl; sl = sl->next) {
-          if(!strcasecmp(sl->key, "md5")) config.digests.md5 = 1;
-          if(!strcasecmp(sl->key, "sha1")) config.digests.sha1 = 1;
-          if(!strcasecmp(sl->key, "sha224")) config.digests.sha224 = 1;
-          if(!strcasecmp(sl->key, "sha256")) config.digests.sha256 = 1;
-          if(!strcasecmp(sl->key, "sha384")) config.digests.sha384 = 1;
-          if(!strcasecmp(sl->key, "sha512")) config.digests.sha512 = 1;
-        }
-        slist_free(sl0);
+        slist_assign_values(&config.digests.supported, f->value);
         break;
 
       case key_plymouth:
@@ -1777,6 +1765,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_linuxrc_core:
         str_copy(&config.core, *f->value ? f->value : NULL);
+        break;
+
+      case key_norepo:
+        if(f->is.numeric) config.norepo = f->nvalue;
         break;
 
       default:
@@ -1883,7 +1875,10 @@ void file_write_install_inf(char *dir)
     return;
   }
 
-  file_write_num(f, key_manual, config.manual);
+  // 'manual' has been added at times when hardware driver loading
+  // could cause all kinds of side effects. This does not happen
+  // anymore. So we are switching it off in general in install.inf.
+  file_write_num(f, key_manual, 0);
 
   set_write_info(f);
 
@@ -1896,7 +1891,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_sourcemounted, url->mount ? 1 : 0);
 
   fprintf(f, "RepoURL: %s\n", url_print(url, 3));
-  fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
+  if(!config.norepo)   fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
   if(!config.sslcerts) fprintf(f, "ssl_verify: no\n");
 
   if(url->used.device && !url->is.network) fprintf(f, "Device: %s\n", short_dev(url->used.device));
@@ -1946,11 +1941,12 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_insecure, !config.secure);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
   if(config.media_upgrade) file_write_num(f, key_media_upgrade, config.media_upgrade);
-  if(config.self_update_url)
+  if(config.self_update_url) {
     file_write_str(f, key_self_update, config.self_update_url);
-  else if (config.self_update == 0 || config.self_update == 1)
+  }
+  else if (config.self_update == 0 || config.self_update == 1) {
     file_write_num(f, key_self_update, config.self_update);
-  else
+  }
 
   if(
     config.rootpassword &&
@@ -2077,6 +2073,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
   FILE *f;
   file_t *ft;
   char **argv, *cmdline = NULL;
+  size_t cmdline_len = 0;
 
   if(config.test) {
     if(!config.had_segv) {
@@ -2087,8 +2084,7 @@ file_t *file_read_cmdline(file_key_flag_t flags)
   }
   else {
     if(!(f = fopen(CMDLINE_FILE, "r"))) return NULL;
-    cmdline = calloc(1024, 1);
-    if(!fread(cmdline, 1, 1023, f)) *cmdline = 0;
+    getdelim(&cmdline, &cmdline_len, 0, f);
     fclose(f);
   }
 
@@ -2703,5 +2699,37 @@ void file_parse_repomd(char *file)
   }
 
   slist_free(repo);
+}
+
+
+/*
+ * Parse CHECKSUMS file.
+ *
+ * Add digest info to config.digests.list.
+ *
+ * File format: lines with
+ *   SHA256 FILENAME
+ */
+void file_parse_checksums(char *file)
+{
+  FILE *fh;
+  char *buf = NULL;
+  size_t buf_size = 0;
+  char sha256[65], name[256];
+  slist_t *sl_digest;
+
+  if(!(fh = fopen(file, "r"))) return;
+
+  while(getline(&buf, &buf_size, fh) > 0) {
+    if(sscanf(buf, "%64s %255s", sha256, name) == 2) {
+      sl_digest = slist_append(&config.digests.list, slist_new());
+      strprintf(&sl_digest->key, "sha256 %s", sha256);
+      str_copy(&sl_digest->value, name);
+    }
+  }
+
+  free(buf);
+
+  fclose(fh);
 }
 
