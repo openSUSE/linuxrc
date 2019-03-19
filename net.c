@@ -150,7 +150,12 @@ int net_config()
     if(rc) return -1;
   }
 
-  if(config.win && config.net.setup != NS_DHCP) {
+  /*
+   * VLANID is handled in net_input_vlanid() a few lines above. Take this
+   * into account when deciding if there's anything else besides DHCP to be
+   * done.
+   */
+  if(config.win && (config.net.setup & ~NS_VLANID) != NS_DHCP) {
     if(
       config.net.setup & NS_DHCP &&
 #if defined(__s390__) || defined(__s390x__)
@@ -1163,6 +1168,8 @@ void net_wicked_dhcp()
 
   if(config.test) {
     config.net.dhcp_active = 1;
+
+    log_info("test mode: DHCP activated\n");
 
     return;
   }
@@ -2592,7 +2599,12 @@ void net_wicked_up(char *ifname)
     strprintf(&buf, "wicked ifup %s", ifname);
   }
 
-  if(!config.test) lxrc_run(buf);
+  if(!config.test) {
+    lxrc_run(buf);
+  }
+  else {
+    log_info("test mode: 'wicked ifup %s' called\n", ifname);
+  }
 
   sleep(config.net.ifup_wait + 1);
 
