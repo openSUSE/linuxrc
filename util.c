@@ -4605,8 +4605,7 @@ void util_run_script(char *name)
 
   /* pass the negated setting to stay compatible */
   if(!config.auto_assembly) {
-    strprintf(&buf, "%d", !config.auto_assembly);
-    setenv("linuxrc_no_auto_assembly", buf, 1);
+    setenv("linuxrc_no_auto_assembly", "1", 1);
   }
 
   if(config.loghost) setenv("LOGHOST", config.loghost, 1);
