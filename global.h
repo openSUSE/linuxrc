@@ -447,6 +447,7 @@ typedef struct {
   unsigned extend_running:1;	/**< currently running an 'extend' job */
   unsigned repomd:1;		/**< install repo is repo-md */
   unsigned norepo:1;            /**< disable repo location check, expect YaST */
+  unsigned auto_assembly:1;	/**< enable MD/RAID auto-assembly */
   struct {
     unsigned check:1;		/**< check for braille displays and start brld if found */
     char *dev;			/**< braille device */
