@@ -1,4 +1,4 @@
-#define _GNU_SOURCE	/* strnlen, getline, strcasestr */
+#define _GNU_SOURCE	/* strnlen, getline, strcasestr, strverscmp */
 
 /*
 
@@ -69,6 +69,7 @@ static hd_t *find_parent_in_list(hd_t *hd_list, hd_t *hd);
 static int same_device_name(hd_t *hd1, hd_t *hd2);
 static hd_t *relink_array(hd_t *hd_array[]);
 static void log_hd_list(char *label, hd_t *hd);
+static int cmp_hd_entries_by_name(const void *p0, const void *p1);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
 static char *url_print_zypp(url_t *url);
@@ -3021,6 +3022,25 @@ void log_hd_list(char *label, hd_t *hd)
 
 
 /*
+ * Compare two hardware items by name using strverscmp().
+ */
+int cmp_hd_entries_by_name(const void *p0, const void *p1)
+{
+  hd_t **hd0, **hd1;
+  char *name0, *name1;
+
+  hd0 = (hd_t **) p0;
+  hd1 = (hd_t **) p1;
+
+  name0 = (*hd0)->unix_dev_name;
+  name1 = (*hd1)->unix_dev_name;
+
+  // either string might be NULL
+  return strverscmp(name0 ?: "", name1 ?: "");
+}
+
+
+/*
  * Re-sort hardware list to make some people happy.
  */
 hd_t *sort_a_bit(hd_t *hd_list)
@@ -3047,11 +3067,20 @@ hd_t *sort_a_bit(hd_t *hd_list)
         hd_array[u++] = hd;
       }
     }
-    hd_array[u] = NULL;
+
+    // remember correct item count
+    hds = u;
+    hd_array[hds] = NULL;
 
     hd_list = relink_array(hd_array);
 
-    /* 2. cards with link first */
+    /* 2. sort list by name */
+
+    qsort(hd_array, hds, sizeof *hd_array, cmp_hd_entries_by_name);
+
+    hd_list = relink_array(hd_array);
+
+    /* 3. cards with link first */
 
     for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(link_detected(hd)) hd_array[u++] = hd;
@@ -3063,7 +3092,7 @@ hd_t *sort_a_bit(hd_t *hd_list)
 
     hd_list = relink_array(hd_array);
 
-    /* 3. wlan cards last */
+    /* 4. wlan cards last */
 
     for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(!hd->is.wlan) hd_array[u++] = hd;
@@ -3075,7 +3104,7 @@ hd_t *sort_a_bit(hd_t *hd_list)
 
     hd_list = relink_array(hd_array);
 
-    /* 4. network interfaces last */
+    /* 5. network interfaces last */
 
     for(u = 0, hd = hd_list; hd; hd = hd->next) {
       if(hd->hw_class != hw_network) hd_array[u++] = hd;
