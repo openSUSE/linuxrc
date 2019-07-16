@@ -4567,6 +4567,21 @@ char *mac_to_interface(char *mac, int *max_offset)
 }
 
 
+/*
+ * Outsource some setup tasks to shell scripts.
+ *
+ * Several linuxrc config settings are passed as environment vars to the
+ * scripts:
+ *
+ *   config.loghost        -> $LOGHOST
+ *   !config.auto_assembly -> $linuxrc_no_auto_assembly
+ *   config.debug          -> $linuxrc_debug
+ *
+ * /etc/install.inf is available when the scripts run.
+ *
+ * Scripts can pass settings back to linuxrc by putting them into
+ * /tmp/script.result (ususal info-file syntax).
+ */
 void util_run_script(char *name)
 {
   char *buf = NULL;
@@ -4580,6 +4595,11 @@ void util_run_script(char *name)
   if(config.debug) {
     strprintf(&buf, "%d", config.debug);
     setenv("linuxrc_debug", buf, 1);
+  }
+
+  /* pass the negated setting to stay compatible */
+  if(!config.auto_assembly) {
+    setenv("linuxrc_no_auto_assembly", "1", 1);
   }
 
   if(config.loghost) setenv("LOGHOST", config.loghost, 1);

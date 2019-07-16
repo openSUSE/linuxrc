@@ -311,6 +311,7 @@ static struct {
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
   { key_ibft_devices,   "IBFTDevices",    kf_cfg + kf_cmd                },
   { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
+  { key_auto_assembly,  "AutoAssembly",   kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1779,6 +1780,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_linuxrc_core:
         str_copy(&config.core, *f->value ? f->value : NULL);
+        break;
+
+      case key_auto_assembly:
+        if(f->is.numeric) config.auto_assembly = f->nvalue;
         break;
 
       default:
