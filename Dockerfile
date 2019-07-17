@@ -1,4 +1,4 @@
-FROM yastdevel/cpp
+FROM registry.opensuse.org/yast/head/containers/yast-cpp:latest
 
 RUN zypper --non-interactive in --no-recommends \
   e2fsprogs-devel \
