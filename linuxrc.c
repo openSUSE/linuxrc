@@ -800,7 +800,7 @@ void lxrc_init()
   config.udev_mods = 1;
   config.devtmpfs = 1;
   config.kexec = 2;		/* kexec if necessary, with user dialog */
-  config.auto_assembly = 1;	/* default to allow MD/RAID auto-assembly for now (bsc#1132688) */
+  config.auto_assembly = 0;	/* default to disable MD/RAID auto-assembly (bsc#1132688) */
 
   // defaults for self-update feature
   config.self_update_url = NULL;
