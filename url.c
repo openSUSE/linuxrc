@@ -2176,8 +2176,8 @@ static int test_is_repo(url_t *url)
   if(!config.keepinstsysconfig) {
     config.digests.failed = 0;
 
-    // Check for '/content' resp. '/repodata/repomd.xml' as indication we
-    // have a SUSE repo.
+    // Check for '/content' (SUSE tags repo), '/repodata/repomd.xml' (RPM-MD repo)
+    // or '/media.1/products' (multi-repository medium) as indication we have a SUSE repo.
     // The file must be validly signed (because we parse it).
     // zenworks has a different approach ('settings.txt') - they don't have a repo.
 
@@ -2203,9 +2203,20 @@ static int test_is_repo(url_t *url)
           URL_FLAG_NODIGEST + (config.secure ? URL_FLAG_CHECK_SIG : 0)
         );
 
-        if(read_failed) return 0;
+        if(read_failed) {
+          // no repomd.xml, check if it is a multi-repository medium,
+          // do not check the signatures, that file is not signed
+          read_failed = url_read_file(
+            url, NULL, "/media.1/products", "/products", NULL, URL_FLAG_NODIGEST
+          );
 
-        file_parse_repomd("/repomd.xml");
+          if(read_failed)
+            return 0;
+          else
+            log_info("found a multi product medium\n");
+        }
+        else
+          file_parse_repomd("/repomd.xml");
       }
 
       // download CHECKSUMS ...
