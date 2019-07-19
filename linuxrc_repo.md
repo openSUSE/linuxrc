@@ -1,8 +1,11 @@
 # specifying installation repositories in linuxrc
 
-## 1. regular install media
+## 1. SUSE tags install media
 
 *(repo meta data are in /suse/setup/descr/)*
+
+:warning: *Note: This is obsolete since SLE15/openSUSE Leap 15, the newer
+products use the repomd repositories on the installation media, see below.*
 
 linuxrc identifies this repo by checking for a file '/content' in the
 installation repository. The file must have a valid signature
@@ -58,26 +61,6 @@ linuxrc identifies this repo by checking for a file '/repodata/repomd.xml' in
 the installation repository. This file's signature is not checked (linuxrc
 does not parse this file).
 
-As there's normally no installation system included in such a repository,
-you'll have to pass its location using the `instsys` option. For example,
-the openSUSE Tumbleweed repo has repomd data.
-
-Normally you would use:
-
-```sh
-install=http://download.opensuse.org/tumbleweed/repo/oss
-```
-
-but you can also use repomd:
-
-```sh
-install=http://download.opensuse.org/tumbleweed/repo/oss/suse instsys=../boot/x86_64/root
-```
-
-Note that unless you specify also `insecure=1` in the latter case, you'll
-get warnings about linuxrc not being able to verify the downloaded images.
-
-Lets see how to avoid this.
 
 ### 2.1. getting file digests
 
@@ -100,7 +83,28 @@ cd /tmp/foo
 find . | cpio -o -H newc | xz --check=crc32 -c >>initrd_on_boot_medium
 ```
 
-## 3. components linuxrc reads
+## 3. Multi-repository medium
+
+A multi-repository medium contains several repositories in subdirectories
+indexed in the `/media.1/products` file. Each subdirectory contains
+a separate repository with own metadata.
+
+In that case linuxrc saves the URL path to the root directory into
+the `ZyppRepoURL` value in `/etc/install.inf` file. YaST will detect
+multiple subdirectories and handle that in a special way.
+
+
+## 4. No installation repository
+
+In some special cases (PXE boot) it is possible to start the installation without
+any installation repository. In that case YaST uses an integrated installation
+repository present in the inst-sys.
+
+Use the `no_repo=1` boot option to activate this mode. In this case linuxrc does
+not save the `ZyppRepoURL` value into the `/etc/install.inf` file.
+
+
+## 5. components linuxrc reads
 
 linuxrc reads files from two distinct locations:
 
@@ -113,7 +117,7 @@ repo location.
 
 See the previous sections for examples.
 
-### 3.1. files read from inst-sys location
+### 5.1. files read from inst-sys location
 
 linuxrc replaces the last path component from the location url with `config`
 to get the url of a config file and tries to read it.
@@ -171,7 +175,7 @@ Here, the inst-sys would consist of `common`, `root`, `bind`, `cracklib-dict-ful
 
 For the Korean locale we'll need also a special font rpm (`un-fonts.rpm`) but only `UnDotum.ttf` from it.
 
-### 3.2. files read from repo location
+### 5.2. files read from repo location
 
 In addition to the files described in sections 1. and 2., linuxrc will try to read these files (and store them in `/`):
 
