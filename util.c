@@ -4972,6 +4972,8 @@ slist_t *get_kernel_list(char *dev)
   char *kernel_pattern = "image-*";
 #elif defined(__x86_64__) || defined(__i386__)
   char *kernel_pattern = "vmlinuz-*";
+#elif defined(__aarch64__)
+  char *kernel_pattern = "Image-*";
 #else
   char *kernel_pattern = "vmlinux-*";
 #endif
