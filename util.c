@@ -730,7 +730,6 @@ int util_eject_cdrom(char *dev)
 void add_driver_update(char *dir, char *loc)
 {
   unsigned u;
-  size_t len;
   char *copy_dir[] = { "install", "modules", "y2update", "inst-sys" };
   char *src = NULL, *dst = NULL, *buf1 = NULL, *buf2 = NULL;
   char *argv[3];
@@ -844,10 +843,7 @@ void add_driver_update(char *dir, char *loc)
       strprintf(&buf2, "%s/modules/module.order", dst);
       if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
         while((de = readdir(d))) {
-          if(
-            (len = strlen(de->d_name)) > sizeof MODULE_SUFFIX - 1 &&
-            !strcmp(de->d_name + len - (sizeof MODULE_SUFFIX - 1), MODULE_SUFFIX)
-          ) {
+          if(mod_has_module_ext(de->d_name, strlen(de->d_name), NULL)) {
             fprintf(f, "%s\n", de->d_name);
           }
         }

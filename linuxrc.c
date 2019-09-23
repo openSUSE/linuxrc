@@ -1577,6 +1577,33 @@ int cmp_entry_s(const void *p0, const void *p1)
   return cmp_entry(*sl0, *sl1);
 }
 
+static void insmod_basics(void)
+{
+  static const struct {
+    char *name;
+    char *param;
+    int mandatory;
+  } *i, basics[] = {
+    { "loop", "max_loop=64", 1 },
+    { "lz4_decompress" },
+    { "xxhash" },
+    { "zstd_decompress" },
+    { }
+  };
+  char file[MAX_FILENAME], insmod[MAX_FILENAME + 200];
+
+  for (i = basics; i->name; i++) {
+    if(!mod_find_module("/modules", i->name, file)) {
+      if(i->mandatory)
+	log_show("Cannot find module %s!\n", i->name);
+      continue;
+    }
+
+    sprintf(insmod, "/sbin/insmod %s%s%s", file, i->param ? " " : "",
+	i->param ? : "");
+    lxrc_run(insmod);
+  }
+}
 
 void lxrc_add_parts()
 {
@@ -1603,16 +1630,7 @@ void lxrc_add_parts()
     if(!config.test) {
       if(!insmod_done) {
         insmod_done = 1;
-        lxrc_run("/sbin/insmod /modules/loop.ko max_loop=64");
-        if(util_check_exist("/modules/lz4_decompress.ko")) {
-          lxrc_run("/sbin/insmod /modules/lz4_decompress.ko");
-        }
-        if(util_check_exist("/modules/xxhash.ko")) {
-          lxrc_run("/sbin/insmod /modules/xxhash.ko");
-        }
-        if(util_check_exist("/modules/zstd_decompress.ko")) {
-          lxrc_run("/sbin/insmod /modules/zstd_decompress.ko");
-        }
+        insmod_basics();
       }
       strprintf(&mp, "/parts/mp_%04u", config.mountpoint.initrd_parts++);
       mkdir(mp, 0755);
