@@ -131,8 +131,6 @@ enum langid_t {
 
 #define MAX_FILENAME     300
 
-#define MODULE_SUFFIX	".ko"
-
 typedef struct {
                int c;
                char attr;

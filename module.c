@@ -39,6 +39,21 @@
 #define MODULE_CONFIG		"module.config"
 #define CARDMGR_PIDFILE		"/run/cardmgr.pid"
 
+#define MODULE_SUFFIX	".ko"
+#define MODULE_COMP1	".xz"
+#define MOD_EXT(mod)	{ .ext = (mod), .len = sizeof(mod) - 1 }
+
+typedef struct {
+	char *ext;
+	size_t len;
+} mod_extensions_t;
+
+static const mod_extensions_t mod_extensions[] = {
+  MOD_EXT(MODULE_SUFFIX MODULE_COMP1),
+  MOD_EXT(MODULE_SUFFIX),
+  { }
+};
+
 static int mod_types = 0;
 static int mod_type[MAX_MODULE_TYPES] = {};
 static int mod_menu_last = 0;
@@ -96,6 +111,40 @@ int mod_check_modules(char *type_name)
   return !i || (i == 1 && !*mod_items) ? 0 : 1;
 }
 
+static inline int mod_cmp_ext(const char *file, const size_t len,
+    const char *ext, const size_t ext_len)
+{
+  return len >= ext_len && !strcmp(file + len - ext_len, ext);
+}
+
+int mod_has_module_ext(const char *file, const size_t len, size_t *ext_pos)
+{
+  const mod_extensions_t *mod_ext;
+
+  for (mod_ext = mod_extensions; mod_ext->ext; mod_ext++)
+    if (mod_cmp_ext(file, len, mod_ext->ext, mod_ext->len)) {
+      if (ext_pos)
+	*ext_pos = len - mod_ext->len;
+      return 1;
+    }
+
+  return 0;
+}
+
+int mod_find_module(const char *prefix, const char *module, char *file)
+{
+  const mod_extensions_t *mod_ext;
+  int file_len;
+
+  file_len = sprintf(file, "%s/%s", prefix, module);
+  for (mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
+    strcpy(file + file_len, mod_ext->ext);
+    if(util_check_exist(file))
+      return 1;
+  }
+
+  return 0;
+}
 
 int mod_copy_modules(char *src_dir, int doit)
 {
@@ -119,12 +168,8 @@ int mod_copy_modules(char *src_dir, int doit)
 
   while((de = readdir(d))) {
     i = strlen(de->d_name);
-    if(
-      i >= sizeof MODULE_SUFFIX &&
-      (
-        !strcmp(de->d_name + i + 1 - sizeof MODULE_SUFFIX, MODULE_SUFFIX) ||
+    if(mod_has_module_ext(de->d_name, i, NULL) ||
         !strcmp(de->d_name, MODULE_CONFIG)
-      )
     ) {
       ok = 0;
       if(doit == 2) {
@@ -213,6 +258,7 @@ void mod_update_list()
   DIR *d;
   char buf[32];
   int i, found;
+  size_t ext_pos;
 
   for(ml1 = &config.module.list; *ml1; ml1 = &(*ml1)->next) (*ml1)->exists = 0;
 
@@ -221,12 +267,11 @@ void mod_update_list()
   while((de = readdir(d))) {
     i = strlen(de->d_name);
     if(
-      i >= sizeof MODULE_SUFFIX &&
       i < (int) sizeof buf &&
-      !strcmp(de->d_name + i + 1 - sizeof MODULE_SUFFIX, MODULE_SUFFIX)
+      mod_has_module_ext(de->d_name, i, &ext_pos)
     ) {
       strcpy(buf, de->d_name);
-      buf[i + 1 - sizeof MODULE_SUFFIX] = 0;
+      buf[ext_pos] = 0;
 
       for(found = 0, ml = config.module.list; ml; ml = ml->next) {
         /* Don't stop if it is an 'autoload' entry! */
@@ -632,8 +677,8 @@ void mod_load_module_manual(char *module, int show)
 int mod_insmod(char *module, char *param)
 {
   char buf[512];
+  size_t buf_len;
   int err, cnt;
-  char *force = config.forceinsmod ? "-f " : "";
   slist_t *sl;
   driver_t *drv;
 
@@ -647,19 +692,20 @@ int mod_insmod(char *module, char *param)
 
   if(mod_is_loaded(module)) return 0;
 
-  if(!config.forceinsmod) {
-    if(!util_check_exist(module)) {
-      sprintf(buf, "%s/%s" MODULE_SUFFIX, config.module.dir, module);
-      if(!util_check_exist(buf)) return -1;
-    }
+  buf_len = sprintf(buf, "insmod %s", config.forceinsmod ? "-f " : "");
+
+  if (util_check_exist(module)) {
+    /* wow, user provided a _path_ */
+    strcpy(buf + buf_len, module);
+  } else {
+    if(!mod_find_module(config.module.dir, module, buf + buf_len))
+      return -1;
   }
 
   if(slist_getentry(config.module.broken, module)) {
     log_info("%s tagged as broken, not loaded\n", module);
     return -1;
   }
-
-  sprintf(buf, "insmod %s%s/%s" MODULE_SUFFIX, force, config.module.dir, module);
 
   if(param && *param) sprintf(buf + strlen(buf), " '%s'", param);
 
