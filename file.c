@@ -1087,11 +1087,20 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         slist_free(sl0);
 
+        config.log.dest[1].level =
+          config.debug ? LOG_LEVEL_SHOW | LOG_LEVEL_INFO | LOG_LEVEL_DEBUG | LOG_TIMESTAMP : LOG_LEVEL_INFO;
+
         if(config.error_trace) {
           config.log.dest[2].level |= LOG_CALLER;
+          if(config.debug) {
+            config.log.dest[1].level |= LOG_CALLER;
+          }
         }
         else {
           config.log.dest[2].level &= ~LOG_CALLER;
+          if(config.debug) {
+            config.log.dest[1].level &= ~LOG_CALLER;
+          }
         }
         break;
 
