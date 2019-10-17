@@ -112,8 +112,8 @@ slp_get_descr(struct sockaddr_in *peer, unsigned char *url, int urllen)
   int s, l, l2, l3;
   int xid, al;
   char *d;
-  unsigned char sendbuf[8000];
-  unsigned char recvbuf[8000];
+  unsigned char sendbuf[0x10000];
+  unsigned char recvbuf[0x10000];
   unsigned char *bp, *end;
 
   xid = nextxid;
@@ -184,8 +184,8 @@ slp_get_descr(struct sockaddr_in *peer, unsigned char *url, int urllen)
 
 char *slp_get_install(url_t *url)
 {
-  unsigned char sendbuf[8000];
-  unsigned char recvbuf[80000];
+  unsigned char sendbuf[0x100000];
+  unsigned char recvbuf[0x100000];
   unsigned char *bp, *end, *service, service_key[256];
   int xid, l, s, l2, l3, ec, comma, ulen, i, acnt, service_key_len;
   struct sockaddr_in mysa;
