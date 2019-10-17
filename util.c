@@ -1247,8 +1247,15 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
   }
 
-  if(config.autoyast) {
-    sprintf(buf, "autoyast = %s", config.autoyast);
+  if((s = url_print(config.url.autoyast, 0))) {
+    slist_append_str(&sl0, "autoyast url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
+
+  if((s = url_print(config.url.autoyast2, 0))) {
+    slist_append_str(&sl0, "autoyast2 url:");
+    sprintf(buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
