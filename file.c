@@ -117,6 +117,9 @@ static struct {
   { key_screenmap,      "Screenmap",      kf_none                        },
   { key_fontmagic,      "Fontmagic",      kf_none                        },
   { key_autoyast,       "AutoYaST",       kf_cfg + kf_cmd_early          },
+  { key_autoyast,       "AY",             kf_cfg + kf_cmd_early          },
+  { key_autoyast_parse, "AutoYaSTParse",  kf_cfg + kf_cmd_early          },
+  { key_autoyast_parse, "AYParse",        kf_cfg + kf_cmd_early          },
   { key_autoyast2,      "AutoYaST2",      kf_cfg + kf_cmd_early          },
   { key_linuxrc,        "linuxrc",        kf_cfg + kf_cmd_early          },
   { key_forceinsmod,    "ForceInsmod",    kf_cfg + kf_cmd                },
@@ -350,11 +353,16 @@ static struct {
   { "exec",      inst_exec          },
   { "rel",       inst_rel           },
   { "disk",      inst_disk          },
-  { "extern",    inst_extern        },
+  { "usb",       inst_usb           },
+  { "label",     inst_label         },
   /* add new inst modes _here_! */
+  { "extern",    inst_extern        },
+  /* the following are just aliases */
   { "harddisk",  inst_hd            },
   { "cdrom",     inst_cdrom         },
   { "cifs",      inst_smb           },
+  { "device",    inst_disk          },
+  { "relurl",    inst_rel           },
 #if defined(__s390__) || defined(__s390x__)
   { "osa",	 di_390net_osa      },
   { "ctc",	 di_390net_ctc	    },
@@ -843,12 +851,24 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_autoyast:
-        str_copy(&config.autoyast, *f->value ? f->value : "default");
+        config.url.autoyast = url_free(config.url.autoyast);
+        if(strcmp(f->value, "default")) {
+          config.url.autoyast = url_set(f->value);
+          // if it's an SLP url, add 'autoyast' service query per default
+          if(config.url.autoyast->scheme == inst_slp) {
+            slist_setentry(&config.url.autoyast->query, "service", "autoyast", 0);
+          }
+        }
         config.manual = 0;
         break;
 
       case key_autoyast2:
-        str_copy(&config.autoyast2, *f->value ? f->value : NULL);
+        url_free(config.url.autoyast2);
+        config.url.autoyast2 = url_set(f->value);
+        break;
+
+      case key_autoyast_parse:
+        if(f->is.numeric) config.autoyast_parse = f->nvalue;
         break;
 
       case key_info:
@@ -1928,13 +1948,18 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);
   file_write_num(f, key_textmode, config.textmode);
-  file_write_str(f, key_autoyast, config.autoyast);
+  if(config.url.autoyast) {
+    log_info("final autoyast url: %s\n", url_print(config.url.autoyast, 0));
+    file_write_str(f, key_autoyast,
+      config.autoyast_parse ? url_print(config.url.autoyast, 5) : config.url.autoyast->str
+    );
+  }
   /*
    * autoyast + upgrade = autoupgrade
    *
    * autoyast uses a different config var to trigger updates for historical reasons
    */
-  if(config.autoyast && config.upgrade) {
+  if(config.url.autoyast && config.upgrade) {
     fprintf(f, "AutoUpgrade: 1\n");
   }
   file_write_num(f, key_memfree, config.memoryXXX.current >> 10);	// convention: in kB
