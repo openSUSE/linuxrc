@@ -185,7 +185,7 @@ typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
-  inst_rel, inst_disk,
+  inst_rel, inst_disk, inst_usb, inst_label,
   inst_extern ///< must be last
 } instmode_t;
 
@@ -265,6 +265,7 @@ typedef enum {
 typedef struct {
   char *str;
   instmode_t scheme;
+  instmode_t orig_scheme;
   char *server;
   char *share;
   char *path;
@@ -287,6 +288,7 @@ typedef struct {
     unsigned mountable:1;	/**< scheme is mountable */
     unsigned cdrom:1;		/**< device is cdrom */
     unsigned file:1;		/**< path points to file (not to directory) */
+    unsigned dir:1;		/**< path points to directory (not to file ) */
     unsigned wlan:1;		/**< wlan interface */
     unsigned blockdev:1;	/**< needs block device */
     unsigned nodevneeded:1;	/**< does not need any device */
@@ -446,6 +448,7 @@ typedef struct {
   unsigned repomd:1;		/**< install repo is repo-md */
   unsigned norepo:1;            /**< disable repo location check, expect YaST */
   unsigned auto_assembly:1;	/**< enable MD/RAID auto-assembly */
+  unsigned autoyast_parse:1;	/**< analyse autoyast parameter */
   struct {
     unsigned check:1;		/**< check for braille displays and start brld if found */
     char *dev;			/**< braille device */
@@ -465,8 +468,6 @@ typedef struct {
     slist_t *file;		/**< 'info' file name */
     unsigned add_cmdline:1;	/**< parse cmdline, too */
   } info;
-  char *autoyast;		/**< yast autoinstall parameter */
-  char *autoyast2;		/**< yast autoinstall parameter, loaded by linuxrc */
   char *yepurl;			/**< just pass it to yast */
   char *supporturl;		/**< just pass it to yast */
   slist_t *linuxrc;		/**< 'linuxrc' parameters */
@@ -540,6 +541,8 @@ typedef struct {
     url_t *install;		/**< install url */
     url_t *instsys;		/**< instsys url */
     url_t *proxy;		/**< proxy url */
+    url_t *autoyast;		/**< yast autoinstall parameter */
+    url_t *autoyast2;		/**< alternative yast autoinstall parameter */
   } url;
 
   struct {			/**< libblkid related things */

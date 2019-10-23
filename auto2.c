@@ -36,11 +36,13 @@
 
 static int driver_is_active(hd_t *hd);
 static void auto2_progress(char *pos, char *msg);
+static void auto2_read_repo_file(url_t *url, char *src, char *dst);
 static void auto2_read_repo_files(url_t *url);
 static void auto2_read_repomd_files(url_t *url);
 static char *auto2_splash_name(void);
 
 static int test_and_add_dud(url_t *url);
+static void auto2_read_autoyast(url_t *url);
 
 
 /*
@@ -364,31 +366,9 @@ void auto2_scan_hardware()
   }
 
   /*
-   * load autoyast file unless the user has specified an autoyast option
-   * -- ok this sounds weird but actually makes sense...
+   * load autoyast file; prefer autoyast option over autoyast2
    */
-  if(config.autoyast2 && !config.autoyast) {
-    url = url_set(config.autoyast2);
-    log_show_maybe(!url->quiet, "Downloading AutoYaST file: %s\n", config.autoyast2);
-
-    err = url_read_file_anywhere(url, NULL, NULL, "/download/autoinst.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
-    url_umount(url);
-    url_free(url);
-    if(!err) {
-      log_info("setting AutoYaST option to file:///download/autoinst.xml\n");
-      str_copy(&config.autoyast, "file:///download/autoinst.xml");
-      /* parse it:
-       * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
-       * otherwise the file content is ignored
-       */
-      log_info("parsing AutoYaST file\n");
-      file_read_info_file("file:/download/autoinst.xml", kf_cfg);
-      net_update_ifcfg(IFCFG_IFUP);
-    }
-    else {
-      log_show_maybe(!url->quiet, "Failed to download AutoYaST file.\n");
-    }
-  }
+  auto2_read_autoyast(config.url.autoyast && config.autoyast_parse ? config.url.autoyast : config.url.autoyast2);
 
   /* load & run driverupdates */
   if(config.update.urls) {
@@ -863,6 +843,28 @@ char *auto2_serial_console()
   return console;
 }
 
+/*
+ * Read a single file from repo directory.
+ *
+ * Be careful not to replace an existing file unless we successfully got
+ * a new version.
+ */
+void auto2_read_repo_file(url_t *url, char *src, char *dst)
+{
+  char *tmp_file = NULL;
+
+  str_copy(&tmp_file, new_download());
+  if(
+    !url_read_file(url, NULL, src, tmp_file, NULL, URL_FLAG_NODIGEST + URL_FLAG_OPTIONAL) &&
+    util_check_exist(tmp_file)
+  ) {
+    rename(tmp_file, dst);
+    log_info("mv %s -> %s\n", tmp_file, dst);
+  }
+
+  str_copy(&tmp_file, NULL);
+}
+
 
 /*
  * Get various files from repositrory for yast's convenience.
@@ -870,9 +872,7 @@ char *auto2_serial_console()
 void auto2_read_repo_files(url_t *url)
 {
   int i;
-  char *tmp_file = NULL;
   static char *default_list[][2] = {
-    { "/autoinst.xml", "/tmp/autoinst.xml" },
     { "/control.xml", "/control.xml" },
     { "/license.tar.gz", "/license.tar.gz" },
     { "/media.1/info.txt", "/info.txt" },
@@ -881,29 +881,37 @@ void auto2_read_repo_files(url_t *url)
   };
 
   for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
-    // be careful not to replace an existing file unless we successfully got
-    // a new version
-    str_copy(&tmp_file, new_download());
-    if(
-      !url_read_file(url, NULL, default_list[i][0], tmp_file, NULL, URL_FLAG_NODIGEST + URL_FLAG_OPTIONAL) &&
-      util_check_exist(tmp_file)
-    ) {
-      rename(tmp_file, default_list[i][1]);
-      log_info("mv %s -> %s\n", tmp_file, default_list[i][1]);
-    }
+    auto2_read_repo_file(url, default_list[i][0], default_list[i][1]);
   }
 
-  str_copy(&tmp_file, NULL);
+  char *autoyast_file = NULL;
 
-  if(!config.autoyast) {
+  if(config.url.autoyast) {
+    if(
+      config.url.autoyast->scheme == inst_rel &&
+      config.autoyast_parse
+    ) {
+      log_show_maybe(!config.url.autoyast->quiet, "AutoYaST file in repo: %s\n", url_print(config.url.autoyast, 5));
+
+      if(!config.url.autoyast->is.dir) {
+        autoyast_file = config.url.autoyast->path;
+      }
+    }
+  }
+  else {
+    autoyast_file = "/autoinst.xml";
+  }
+
+  if(autoyast_file) {
+    auto2_read_repo_file(url, autoyast_file, "/tmp/autoinst.xml");
+
     if(util_check_exist("/tmp/autoinst.xml")) rename("/tmp/autoinst.xml", "/autoinst.xml");
+
     if(util_check_exist("/autoinst.xml")) {
-      log_info("setting AutoYaST option to file:///autoinst.xml\n");
-      str_copy(&config.autoyast, "file:///autoinst.xml");
-      /* parse it:
-       * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
-       * otherwise the file content is ignored
-       */
+      log_info("setting AutoYaST option to file:/autoinst.xml\n");
+      url_free(config.url.autoyast);
+      config.url.autoyast = url_set("file:/autoinst.xml");
+      // parse for embedded linuxrc options in <info_file> element
       log_info("parsing AutoYaST file\n");
       file_read_info_file("file:/autoinst.xml", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
@@ -920,31 +928,18 @@ void auto2_read_repo_files(url_t *url)
 void auto2_read_repomd_files(url_t *url)
 {
   int i;
-  char *tmp_file = NULL;
   static char *default_list[][2] = {
     { "license", "/license.tar.gz" },
     { "/README.BETA", "/README.BETA" }
   };
 
   for(i = 0; i < sizeof default_list / sizeof *default_list; i++) {
-    // be careful not to replace an existing file unless we successfully got
-    // a new version
-
     // get real file name
     slist_t *sl = slist_getentry(config.repomd_data, default_list[i][0]);
     if(!sl) continue;
 
-    str_copy(&tmp_file, new_download());
-    if(
-      !url_read_file(url, NULL, sl->value, tmp_file, NULL, URL_FLAG_NODIGEST) &&
-      util_check_exist(tmp_file)
-    ) {
-      rename(tmp_file, default_list[i][1]);
-      log_info("mv %s -> %s\n", tmp_file, default_list[i][1]);
-    }
+    auto2_read_repo_file(url, sl->value, default_list[i][1]);
   }
-
-  str_copy(&tmp_file, NULL);
 }
 
 
@@ -1242,3 +1237,55 @@ int auto2_remove_extension(char *extension)
   return err;
 }
 
+
+/*
+ * Read autoyast file from url and parse it.
+ *
+ * If the autoyast url points to a directory, nothing is read but the
+ * function tries to mount the directory to ensure it exists. This is
+ * basically done to search for the correct medium.
+ */
+void auto2_read_autoyast(url_t *url)
+{
+  if(!url) return;
+
+  // rel url is taken care of in auto2_read_repo_files()
+  if(url->scheme == inst_rel) return;
+
+  /*
+   * If the AutoYaST url is a directory we have to very its existence
+   * somehow.
+   *
+   * That works for mountable url schemes.
+   *
+   * For the rest (http(s), (t)ftp) we'll just assume it works.
+   */
+  if(url->is.dir) {
+    /*
+     * do nothing but
+     *   - ensure network is set up
+     *   - the correct disk device has been identified
+     */
+    if(url->is.mountable) {
+      url_mount(url, NULL, NULL);
+      url_umount(url);
+    }
+
+    return;
+  }
+
+  log_show_maybe(!url->quiet, "Downloading AutoYaST file: %s\n", url->str);
+
+  int err = url_read_file_anywhere(url, NULL, NULL, "/download/autoinst.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
+  url_umount(url);
+
+  if(!err) {
+    // parse for embedded linuxrc options in <info_file> element
+    log_info("parsing AutoYaST file\n");
+    file_read_info_file("file:/download/autoinst.xml", kf_cfg);
+    net_update_ifcfg(IFCFG_IFUP);
+  }
+  else {
+    log_show_maybe(!url->quiet, "Failed to download AutoYaST file.\n");
+  }
+}

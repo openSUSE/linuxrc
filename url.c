@@ -60,6 +60,11 @@ static int url_progress(url_data_t *url_data, int stage);
 static int url_setup_device(url_t *url);
 static int url_setup_interface(url_t *url);
 static int url_setup_slp(url_t *url);
+static void fixup_url_rel(url_t *url);
+static void fixup_url_usb(url_t *url);
+static void fixup_url_label(url_t *url);
+static void skip_slashes(char **str);
+static void skip_not_slashes(char **str);
 static void url_parse_instsys_config(char *file);
 static slist_t *url_instsys_lookup(char *key, slist_t **sl_ll);
 static char *url_instsys_config(char *path);
@@ -73,6 +78,7 @@ static int cmp_hd_entries_by_name(const void *p0, const void *p1);
 static hd_t *sort_a_bit(hd_t *hd_list);
 static int link_detected(hd_t *hd);
 static char *url_print_zypp(url_t *url);
+static char *url_print_autoyast(url_t *url);
 static void digests_init(url_data_t *url_data);
 static void digests_done(url_data_t *url_data);
 static void digests_process(url_data_t *url_data, void *buffer, size_t len);
@@ -347,12 +353,36 @@ int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal,
 
 
 /*
- * scheme://domain;user:password@server:port/path?query
+ * Parse URL string.
  *
- * cifs: path = share/path
- * disk: path = [device/]path
+ * Return a freshly allocated url_t structure.
+ *
+ * A URL looks like: scheme://domain;user:password@server:port/path?query.
+ *
+ * For a general URL syntax overview, see
+ *   - https://tools.ietf.org/html/rfc3986#section-3
+ *   - https://tools.ietf.org/html/rfc1738 (older, with more examples)
+ *
+ * Notes:
+ *   - 'path' is prefixed with the share name ('share/path') for SMB/CIFS
+ *   - 'path' may optionally be prefixed with the device name ('device/path')
+ *     for URLs referring to local block devices
+ *   - 'domain' (aka workgroup) and 'share' are only relevant for SMB/CIFS
+ *
+ * Special AutoYaST URL schemes (note the *two* slashes ('//'):
+ *   - device://dev/path
+ *     -> is mapped to disk:/path?device=dev
+ *   - relurl://path
+ *     -> is mapped to rel:path
+ *   - usb://path
+ *     -> is mapped to disk:/path?device=disk/\*usb*
+ *   - label://label/path
+ *     -> is mapped to disk:/path?device=disk/by-label/label
+ *
+ *   Additionally, zero up to three consecutive slashes are acceptable at
+ *   the beginning of the URL as long as the meaning is unambiguous (e.g.
+ *   'label:foo').
  */
-
 url_t *url_set(char *str)
 {
   url_t *url = calloc(1, sizeof *url);
@@ -400,13 +430,12 @@ url_t *url_set(char *str)
     }
   }
   else {
-    // FIXME: should always be 'rel'
-    i = file_sym2num(str);
-    if(i >= 0) {
+    i = url_scheme2id(str);
+    if(i > 0) {
       url->scheme = i;
       url->path = strdup("");
     }
-    else if(i == -1) {
+    else {
       url->scheme = inst_rel;
       url->path = strdup(str);
     }
@@ -485,6 +514,15 @@ url_t *url_set(char *str)
     }
   }
 
+  url->orig_scheme = url->scheme;
+
+  /* adjust some url schemes to support autoyast syntax */
+  fixup_url_rel(url);
+  fixup_url_usb(url);
+  fixup_url_label(url);
+
+  url->is.blockdev = url_is_blockdev(url->scheme);
+
   /* local storage device: allow path to begin with device name */
   if(
     url->is.blockdev &&
@@ -535,6 +573,7 @@ url_t *url_set(char *str)
 
   if((sl = slist_getentry(url->query, "type"))) {
     url->is.file = strcmp(sl->value, "file") ? 0 : 1;
+    url->is.dir = strcmp(sl->value, "dir") ? 0 : 1;
   }
 
   if((sl = slist_getentry(url->query, "all"))) {
@@ -546,8 +585,6 @@ url_t *url_set(char *str)
   }
 
   url->is.mountable = url_is_mountable(url->scheme);
-
-  url->is.blockdev = url_is_blockdev(url->scheme);
 
   url->is.network = url_is_network(url->scheme);
 
@@ -572,10 +609,21 @@ url_t *url_set(char *str)
     }
   }
 
+  /* if URL path ends with '/', assume directory */
+  if(!url->is.file) {
+    if(url->path && *url->path && url->path[strlen(url->path) - 1] == '/') {
+      url->is.dir = 1;
+    }
+  }
+
   log_debug("url = %s\n", url->str);
 
   if(config.debug >= 2) {
-    log_debug("  scheme = %s (%d)", url_scheme2name(url->scheme), url->scheme);
+    log_debug(
+      "  scheme = %s (%d), orig scheme = %s (%d)",
+      url_scheme2name(url->scheme), url->scheme,
+      url_scheme2name(url->orig_scheme), url->orig_scheme
+    );
     if(url->server) log_debug(", server = \"%s\"", url->server);
     if(url->port) log_debug(", port = %u", url->port);
     if(url->path) log_debug(", path = \"%s\"", url->path);
@@ -597,8 +645,8 @@ url_t *url_set(char *str)
     }
 
     log_debug(
-      "  network = %u, blockdev = %u, mountable = %u, file = %u, all = %u, quiet = %u\n",
-      url->is.network, url->is.blockdev, url->is.mountable, url->is.file,
+      "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, all = %u, quiet = %u\n",
+      url->is.network, url->is.blockdev, url->is.mountable, url->is.file, url->is.dir,
       url->search_all, url->quiet
     );
 
@@ -610,9 +658,125 @@ url_t *url_set(char *str)
         log_debug("    %s = \"%s\"\n", sl->key, sl->value);
       }
     }
+
+    log_debug("url (zypp format) = %s\n", url_print(url, 4));
+    log_debug("url (ay format) = %s\n", url_print(url, 5));
   }
 
   return url;
+}
+
+
+/*
+ * Fix up autoyast 'rel' url scheme.
+ *
+ *   - relurl://foo/bar
+ *
+ * Note the '//'.
+ */
+void fixup_url_rel(url_t *url)
+{
+  if(
+    url->scheme == inst_rel &&
+    url->server &&
+    url->path
+  ) {
+    if(!*url->path) {
+      free(url->path);
+      url->path = url->server;
+      url->server = NULL;
+    }
+    else {
+      strprintf(&url->path, "%s/%s", url->server, url->path);
+      str_copy(&url->server, NULL);
+    }
+  }
+}
+
+
+/*
+ * Fix up autoyast 'usb' url scheme.
+ *
+ *   - usb://foo/bar
+ *
+ * Note the '//'.
+ *
+ * 'usb' is translated to the 'disk' url scheme with a suitable '?device=XXX'
+ * query parameter added to take care of matching only usb devices.
+ */
+void fixup_url_usb(url_t *url)
+{
+  if(url->scheme != inst_usb) return;
+
+  url->scheme = inst_disk;
+  slist_setentry(&url->query, "device", "disk/*usb*", 1);
+
+  if(url->server && url->path) {
+    if(!*url->path) {
+      free(url->path);
+      url->path = url->server;
+      url->server = NULL;
+    }
+    else {
+      strprintf(&url->path, "%s/%s", url->server, url->path);
+      str_copy(&url->server, NULL);
+    }
+  }
+}
+
+
+/*
+ * Handle autoyast 'label' scheme.
+ *
+ *   - label://label/foo/bar
+ *
+ * 'label' is translated to the 'disk' url scheme with a suitable '?device=XXX'
+ * query parameter added to take care of matching the label.
+ */
+void fixup_url_label(url_t *url)
+{
+  if(url->scheme != inst_label) return;
+
+  url->scheme = inst_disk;
+
+  if(url->server) {
+    slist_t *sl = slist_setentry(&url->query, "device", NULL, 1);
+    strprintf(&sl->value, "disk/by-label/%s", url->server);
+    slist_setentry(&url->query, "label", url->server, 1);
+  }
+  else if(url->path) {
+    char *s = url->path;
+    skip_slashes(&s);
+    if(*s) {
+      char *t = s;
+      skip_not_slashes(&t);
+      if(t != s) {
+        if(*t) *t++ = 0;
+        slist_t *sl = slist_setentry(&url->query, "device", NULL, 1);
+        strprintf(&sl->value, "disk/by-label/%s", s);
+        slist_setentry(&url->query, "label", s, 1);
+        str_copy(&url->path, t);
+      }
+    }
+  }
+}
+
+
+/*
+ * Skip sequence of slashes ('/').
+ */
+void skip_slashes(char **str)
+{
+  while(**str && **str == '/') (*str)++;
+}
+
+
+/*
+ * Skip sequence of non-slashes (not '/').
+ */
+void skip_not_slashes(char **str)
+{
+  while(**str && **str != '/') (*str)++;
 }
 
 
@@ -627,6 +791,7 @@ url_t *url_set(char *str)
  *   2: with device
  *   3: like 2, but remove 'rel:' scheme
  *   4: in zypp format
+ *   5: in autoyast format
  */
 char *url_print(url_t *url, int format)
 {
@@ -641,6 +806,8 @@ char *url_print(url_t *url, int format)
   if(!url) return buf;
 
   if(format == 4) return url_print_zypp(url);
+
+  if(format == 5) return url_print_autoyast(url);
 
   if(format != 3 || url->scheme != inst_rel) {
     strprintf(&buf, "%s:", url_scheme2name(url->scheme));
@@ -694,6 +861,14 @@ char *url_print(url_t *url, int format)
   }
 
   if(format == 0) {
+    // basically for the slp scheme
+    static char *params[] = { "service", "descr" };
+    slist_t *sl;
+    for (int i = 0; i < sizeof params / sizeof *params; i++) {
+      if((sl = slist_getentry(url->query, params[i]))) {
+        strprintf(&buf, "%s%c%s=%s", buf, q++ ? '&' : '?', sl->key, sl->value);
+      }
+    }
     if(config.debug >= 2 && url->used.hwaddr) {
       strprintf(&buf, "%s%chwaddr=%s", buf, q++ ? '&' : '?', url->used.hwaddr);
     }
@@ -830,6 +1005,107 @@ char *url_print_zypp(url_t *url)
 
   // log_info("end buf = %p\n", buf);
   // LXRC_WAIT
+
+  return buf;
+}
+
+
+/*
+ * Convert URL to AutoYAST format.
+ *
+ * url scheme doc
+ *   - https://doc.opensuse.org/projects/autoyast/#Commandline.ay
+ *
+ * actual implementation
+ *   - https://github.com/yast/yast-installation/blob/master/src/lib/transfer/file_from_url.rb
+ *   - https://github.com/yast/yast-autoinstallation/blob/master/src/modules/AutoinstConfig.rb
+ */
+char *url_print_autoyast(url_t *url)
+{
+  static char *buf = NULL, *s;
+  char *path = NULL, *file = NULL;
+  int scheme;
+
+  str_copy(&buf, NULL);
+
+  str_copy(&path, url->path);
+
+  if(url->is.file && path) {
+    if((file = strrchr(path, '/')) && *file) {
+      *file++ = 0;
+    }
+    else {
+      file = NULL;
+    }
+  }
+
+  scheme = url->scheme;
+
+  if(url->is.blockdev) {
+    strprintf(&buf, "device://");
+    if(url->used.device) {
+      strprintf(&buf, "%s%s", buf, short_dev(url->used.device));
+    }
+    else if(url->orig_scheme == inst_usb) {
+      strprintf(&buf, "usb:/");
+    }
+    else if(url->orig_scheme == inst_label) {
+      slist_t *sl;
+      strprintf(&buf, "label://");
+      if((sl = slist_getentry(url->query, "label"))) {
+        strprintf(&buf, "%s%s", buf, sl->value);
+      }
+    }
+  }
+  else if(scheme == inst_rel) {
+    strprintf(&buf, "relurl:/");
+  }
+  else if(scheme == inst_file) {
+    strprintf(&buf, "file://");
+  }
+  else if(scheme == inst_slp) {
+    strprintf(&buf, "slp");
+  }
+  else {
+    strprintf(&buf, "%s:", url_scheme2name(scheme));
+  }
+
+  if(url->domain || url->user || url->password || url->server || url->port) {
+    strprintf(&buf, "%s//", buf);
+    if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
+    if(url->user) {
+      s = curl_easy_escape(NULL, url->user, 0);
+      strprintf(&buf, "%s%s", buf, s);
+      curl_free(s);
+    }
+    if(url->password) {
+      s = curl_easy_escape(NULL, url->password, 0);
+      strprintf(&buf, "%s:%s", buf, s);
+      curl_free(s);
+    }
+    if(url->user || url->password) strprintf(&buf, "%s@", buf);
+    if(url->server) {
+      if(strchr(url->server, ':')) {
+        strprintf(&buf, "%s[%s]", buf, url->server);
+      }
+      else {
+        strprintf(&buf, "%s%s", buf, url->server);
+      }
+    }
+    if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
+  }
+
+  if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
+
+  if(path && url->scheme != inst_slp) {
+    strprintf(&buf, "%s/%s%s",
+      buf,
+      url->scheme == inst_ftp && *path == '/' ? "%2F" : "",
+      *path == '/' ? path + 1 : path
+    );
+  }
+
+  str_copy(&path, NULL);
 
   return buf;
 }
@@ -3425,7 +3701,11 @@ instmode_t url_scheme2id(char *scheme)
 
   i = file_sym2num(scheme);
 
-  if(i >= 0) return i;
+  if(i >= 0) {
+    char *str = url_scheme2name(i);
+    // ensure it really matches the expected scheme
+    if(str && !strcmp(str, scheme)) return i;
+  }
 
   if(util_check_exist2("/scripts/url", scheme) == 'd') {
     char *attr = NULL, *attr_val;
