@@ -635,20 +635,29 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
   unsigned u;
   FILE *w;
 
-  /* maybe it's an AutoYaST XML file */
+  /*
+   * Maybe it's an AutoYaST XML file.
+   *
+   * If so, try limiting the scope to lines in first '<info_file>' element.
+   */
   for(f = f0; f; f = f->next) {
-    if(f->key == key_comment && !strcmp(f->value, "start_linuxrc_conf")) {
-      is_xml = 1;
-      f0 = f->next;
-      break;
+    if(f->key == key_none) {
+      if(!strncmp(f->key_str, "<info_file", sizeof "<info_file" - 1)) {
+        is_xml = 1;
+        f0 = f->next;
+        break;
+      }
+      if(!strcmp(f->key_str, "</profile>")) {
+        is_xml = 1;
+      }
     }
   }
 
   for(f = f0; f; f = f->next) {
     if(
       is_xml &&
-      f->key == key_comment &&
-      !strcmp(f->value, "end_linuxrc_conf")
+      f->key == key_none &&
+      !strcmp(f->key_str, "</info_file>")
     ) {
       break;
     }

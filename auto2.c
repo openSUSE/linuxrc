@@ -911,10 +911,7 @@ void auto2_read_repo_files(url_t *url)
       log_info("setting AutoYaST option to file:/autoinst.xml\n");
       url_free(config.url.autoyast);
       config.url.autoyast = url_set("file:/autoinst.xml");
-      /* parse it:
-       * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
-       * otherwise the file content is ignored
-       */
+      // parse for embedded linuxrc options in <info_file> element
       log_info("parsing AutoYaST file\n");
       file_read_info_file("file:/autoinst.xml", kf_cfg);
       net_update_ifcfg(IFCFG_IFUP);
@@ -1283,10 +1280,7 @@ void auto2_read_autoyast(url_t *url)
   url_umount(url);
 
   if(!err) {
-    /* parse it:
-     * you can embed linuxrc options between lines with '# {start,end}_linuxrc_conf';
-     * otherwise the file content is ignored
-     */
+    // parse for embedded linuxrc options in <info_file> element
     log_info("parsing AutoYaST file\n");
     file_read_info_file("file:/download/autoinst.xml", kf_cfg);
     net_update_ifcfg(IFCFG_IFUP);
