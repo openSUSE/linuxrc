@@ -802,6 +802,7 @@ void lxrc_init()
   config.kexec = 2;		/* kexec if necessary, with user dialog */
   config.auto_assembly = 0;	/* default to disable MD/RAID auto-assembly (bsc#1132688) */
   config.autoyast_parse = 1;	/* analyse autoyast option and read autoyast file */
+  config.reboot_timeout = -1; /* timeout seconds (use -1 as not set) */
 
   // defaults for self-update feature
   config.self_update_url = NULL;

@@ -172,6 +172,10 @@ Options: %s
 # - obsolete - (technically impossible to actually see this entry)
 Reboot: Reboot|Halt|kexec
 
+# 0: Disable the countdown needing user confirmation to reboot the system
+# Timeout that YaST will wait until reboot the system (default: -1)
+reboot_timeout: %d
+
 # set via 'loghost' boot option
 # entry is missing if unset
 # - this is unused by linuxrc and just passed on -

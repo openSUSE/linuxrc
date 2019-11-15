@@ -21,7 +21,7 @@ typedef enum {
   key_bootfile, key_install, key_instsys, key_instmode, key_memtotal,
   key_memfree, key_buffers, key_cached, key_swaptotal, key_swapfree,
   key_memlimit, key_memyast, key_memloadimage, key_info, key_proxy,
-  key_usedhcp, key_dhcptimeout, key_tftptimeout, key_tmpfs,
+  key_usedhcp, key_dhcptimeout, key_tftptimeout, key_reboot_timeout, key_tmpfs,
   key_testmode, key_debugwait, key_expert, key_rescue, key_rootimage,
   key_rescueimage, key_vnc, key_vncpassword, key_displayip,
   key_sshpassword, key_sshpasswordenc, key_term, key_addswap, key_aborted, key_netstop,

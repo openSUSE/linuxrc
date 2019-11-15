@@ -149,6 +149,7 @@ static struct {
   { key_dhcptimeout,    "DHCPTimeout",    kf_cfg + kf_cmd_early          },
   { key_dhcptimeout,    "WickedTimeout",  kf_cfg + kf_cmd_early          },
   { key_tftptimeout,    "TFTPTimeout",    kf_cfg + kf_cmd                },
+  { key_reboot_timeout, "reboot_timeout", kf_cfg + kf_cmd                },
   { key_tmpfs,          "_TmpFS",         kf_cmd                         },
   { key_netstop,        "NetStop",        kf_cfg + kf_cmd                },
   { key_testmode,       "_TestMode",      kf_cfg                         },
@@ -738,6 +739,9 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           config.net.dhcp_timeout = f->nvalue;
           config.net.dhcp_timeout_set = 1;
         }
+        break;
+      case key_reboot_timeout:
+        if(f->is.numeric) config.reboot_timeout = f->nvalue;
         break;
 
       case key_tftptimeout:
@@ -1953,6 +1957,7 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_loghost, config.loghost);
   if(config.restart_method) file_write_num(f, key_reboot, config.restart_method);
+  if(config.reboot_timeout >= 0) file_write_num(f, key_reboot_timeout, config.reboot_timeout);
   file_write_num(f, key_keyboard, 1);	/* we always have one - what's the point ??? */
   file_write_str(f, key_updatedir, config.update.dir);
   file_write_num(f, key_yast2update, config.update.ask || config.update.count ? 1 : 0);

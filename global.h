@@ -431,6 +431,7 @@ typedef struct {
   unsigned restart_method;	/**< 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   unsigned efi_vars:1;		/**< efi vars exist */
   int efi;			/**< use efi; -1 = auto */
+  int reboot_timeout;		/**< reboot_timeout; -1: not_set, 0: disable, */
   unsigned udev_mods:1;		/**< let udev load modules */
   unsigned error_trace:1;	/**< enable backtrace log */
   unsigned early_bash:1;	/**< start bash on tty8 */
