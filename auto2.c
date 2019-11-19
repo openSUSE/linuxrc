@@ -1280,6 +1280,10 @@ void auto2_read_autoyast(url_t *url)
   url_umount(url);
 
   if(!err) {
+    if(!config.url.autoyast) {
+      // this means 'autoyast2' has been used; point autoyast url to downloaded file
+      config.url.autoyast = url_set("file:/download/autoinst.xml");
+    }
     // parse for embedded linuxrc options in <info_file> element
     log_info("parsing AutoYaST file\n");
     file_read_info_file("file:/download/autoinst.xml", kf_cfg);
