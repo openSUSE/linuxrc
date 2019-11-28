@@ -62,6 +62,7 @@ static int url_setup_interface(url_t *url);
 static int url_setup_slp(url_t *url);
 static void fixup_url_rel(url_t *url);
 static void fixup_url_usb(url_t *url);
+static void fixup_url_disk(url_t *url);
 static void fixup_url_label(url_t *url);
 static void skip_slashes(char **str);
 static void skip_not_slashes(char **str);
@@ -90,6 +91,42 @@ static int is_gpg_signed(char *file);
 static int is_rpm_signed(char *file);
 static int is_signed(char *file, int check);
 static unsigned url_scheme_attr(instmode_t scheme, char *attr_name);
+
+// mapping of URL schemes to internal constants
+static struct {
+  char *name;
+  instmode_t value;
+} url_schemes[] = {
+  { "no scheme", inst_none          },
+  { "file",      inst_file          },
+  { "nfs",       inst_nfs           },
+  { "ftp",       inst_ftp           },
+  { "smb",       inst_smb           },
+  { "http",      inst_http          },
+  { "https",     inst_https         },
+  { "tftp",      inst_tftp          },
+  { "cd",        inst_cdrom         },
+  { "floppy",    inst_floppy        },
+  { "hd",        inst_hd            },
+  { "dvd",       inst_dvd           },
+  { "cdwithnet", inst_cdwithnet     },
+  { "net",       inst_net           },
+  { "slp",       inst_slp           },
+  { "exec",      inst_exec          },
+  { "rel",       inst_rel           },
+  { "disk",      inst_disk          },
+  { "usb",       inst_usb           },
+  { "label",     inst_label         },
+  /* add new inst modes _here_! (before "extern") */
+  { "extern",    inst_extern        },
+  /* the following are just aliases */
+  { "harddisk",  inst_hd            },
+  { "cdrom",     inst_cdrom         },
+  { "cifs",      inst_smb           },
+  { "device",    inst_disk          },
+  { "relurl",    inst_rel           },
+};
+
 
 void url_read(url_data_t *url_data)
 {
@@ -517,6 +554,7 @@ url_t *url_set(char *str)
   url->orig_scheme = url->scheme;
 
   /* adjust some url schemes to support autoyast syntax */
+  fixup_url_disk(url);
   fixup_url_rel(url);
   fixup_url_usb(url);
   fixup_url_label(url);
@@ -710,6 +748,23 @@ void fixup_url_usb(url_t *url)
 
   url->scheme = inst_disk;
   slist_setentry(&url->query, "device", "disk/*usb*", 1);
+
+  fixup_url_disk(url);
+}
+
+
+/*
+ * Fix up autoyast usage of 'device'/'disk' url scheme.
+ *
+ *   - disk://some_dev/foo/bar
+ *
+ * Note the '//'.
+ *
+ * The server part of the url is prepended to path.
+ */
+void fixup_url_disk(url_t *url)
+{
+  if(url->scheme != inst_disk) return;
 
   if(url->server && url->path) {
     if(!*url->path) {
@@ -3690,21 +3745,17 @@ unsigned url_scheme_attr(instmode_t scheme, char *attr_name)
  * Convert URL scheme to internal number.
  *
  * Note: if the URL scheme is an externally supported one (via "/scripts/url")
- * it is regsitered and gets assigned an id.
+ * it is registered and gets assigned an id.
  */
 instmode_t url_scheme2id(char *scheme)
 {
-  int i;
   slist_t *sl;
+  instmode_t i;
 
   if(!scheme || !*scheme) return inst_none;
 
-  i = file_sym2num(scheme);
-
-  if(i >= 0) {
-    char *str = url_scheme2name(i);
-    // ensure it really matches the expected scheme
-    if(str && !strcmp(str, scheme)) return i;
+  for(unsigned u = 0; u < sizeof url_schemes / sizeof *url_schemes; u++) {
+    if(!strcasecmp(url_schemes[u].name, scheme)) return url_schemes[u].value;
   }
 
   if(util_check_exist2("/scripts/url", scheme) == 'd') {
@@ -3715,7 +3766,7 @@ instmode_t url_scheme2id(char *scheme)
     if(!slist_getentry(config.extern_scheme, scheme)) {
       log_info("registering url scheme: %s: %s\n", scheme, attr_val);
     }
-    sl = slist_setentry(&config.extern_scheme, scheme, *attr_val ? attr_val : NULL, 1);
+    slist_setentry(&config.extern_scheme, scheme, *attr_val ? attr_val : NULL, 1);
   }
 
   for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {
@@ -3738,7 +3789,12 @@ char *url_scheme2name(instmode_t scheme_id)
   instmode_t i;
 
   if(scheme_id < inst_extern) {
-    s = file_num2sym("no scheme", scheme_id);
+    for(unsigned u = 0; u < sizeof url_schemes / sizeof *url_schemes; u++) {
+      if(url_schemes[u].value == scheme_id) {
+        s = url_schemes[u].name;
+        break;
+      }
+    }
   }
   else {
     for(sl = config.extern_scheme, i = inst_extern; sl; sl = sl->next, i++) {

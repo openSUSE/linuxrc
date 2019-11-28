@@ -1253,7 +1253,7 @@ void auto2_read_autoyast(url_t *url)
   if(url->scheme == inst_rel) return;
 
   /*
-   * If the AutoYaST url is a directory we have to very its existence
+   * If the AutoYaST url is a directory we have to verify its existence
    * somehow.
    *
    * That works for mountable url schemes.
