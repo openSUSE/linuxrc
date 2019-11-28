@@ -1253,8 +1253,20 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
   }
 
+  if((s = url_print(config.url.autoyast, 5))) {
+    slist_append_str(&sl0, "autoyast url (ay fmt):");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
+
   if((s = url_print(config.url.autoyast2, 0))) {
     slist_append_str(&sl0, "autoyast2 url:");
+    sprintf(buf, "  %s", s);
+    slist_append_str(&sl0, buf);
+  }
+
+  if((s = url_print(config.url.autoyast2, 5))) {
+    slist_append_str(&sl0, "autoyast2 url (ay fmt):");
     sprintf(buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
@@ -5610,4 +5622,47 @@ void util_write_active_devices(char *format, ...)
   else {
     log_info("failed to open %s\n", file_name);
   }
+}
+
+
+/*
+ * Re-parse URL that might be interpreted differently after udevd has been
+ * started.
+ *
+ * This concerns URLs that might optionally start the path with a block
+ * device name.
+ *
+ * As it is unknown which part of the path covers a block device until the
+ * block device really exists, this works properly only after udevd has been
+ * started.
+ *
+ * This does not affect URLs that use an explicit 'device' query parameter.
+ */
+void util_reparse_blockdev_url(url_t **url_ptr)
+{
+  url_t *url = *url_ptr;
+
+  // not needed here
+  if(!url || !url->is.blockdev || !url->str) return;
+
+  log_info("re-parsing url: %s\n", url->str);
+  url = url_set(url->str);
+
+  if(url) {
+    url_free(*url_ptr);
+    *url_ptr = url;
+  }
+}
+
+
+/*
+ * Re-parse some URLs that might be interpreted differently after udevd has
+ * been started.
+ */
+void util_reparse_blockdev_urls()
+{
+  util_reparse_blockdev_url(&config.url.autoyast);
+  util_reparse_blockdev_url(&config.url.autoyast2);
+  util_reparse_blockdev_url(&config.url.install);
+  util_reparse_blockdev_url(&config.url.instsys);
 }
