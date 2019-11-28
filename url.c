@@ -798,6 +798,7 @@ void fixup_url_label(url_t *url)
     slist_t *sl = slist_setentry(&url->query, "device", NULL, 1);
     strprintf(&sl->value, "disk/by-label/%s", url->server);
     slist_setentry(&url->query, "label", url->server, 1);
+    str_copy(&url->server, NULL);
   }
   else if(url->path) {
     char *s = url->path;
