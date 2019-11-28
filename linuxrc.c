@@ -982,6 +982,9 @@ void lxrc_init()
     slist_append_str(&config.ifcfg.initial, sl->key);
   }
 
+  // now that udev is up and running, some URLs might be parsed differently
+  util_reparse_blockdev_urls();
+
   if(config.plymouth) util_run_script("plymouth_setup");
 
   util_free_mem();

@@ -160,3 +160,6 @@ void util_run_debugshell(void);
 void util_setup_coredumps(void);
 
 void util_write_active_devices(char *format, ...)  __attribute__ ((format (printf, 1, 2)));
+
+void util_reparse_blockdev_url(url_t **url_ptr);
+void util_reparse_blockdev_urls(void);
