@@ -730,6 +730,7 @@ typedef struct {
     int portno;
     char* osahwaddr;
     char* hypervisor;
+    char machine_name[255];
   } hwp;
   
 #endif

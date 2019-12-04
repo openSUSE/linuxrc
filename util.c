@@ -452,7 +452,14 @@ void util_print_banner (void)
 
     uname (&utsinfo_ri);
     if (config.linemode) {
-      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<\n", utsinfo_ri.release);
+#ifdef __s390x__
+      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) on %s <<<\n", 
+              utsinfo_ri.release,
+              config.hwp.machine_name);
+#else
+      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<\n", 
+              utsinfo_ri.release);
+#endif
         return;
     }
     memset (&win_ri, 0, sizeof (window_t));
@@ -483,8 +490,14 @@ void util_print_banner (void)
     win_ri.style = STYLE_SUNKEN;
     win_open (&win_ri);
 
+#ifdef __s390x__
+    sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) on %s <<<",
+             utsinfo_ri.release,
+             config.hwp.machine_name);
+#else
     sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<",
              utsinfo_ri.release);
+#endif
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
                     win_ri.bg_color);

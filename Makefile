@@ -1,6 +1,11 @@
 CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
+ARCH	= $(shell /usr/bin/uname -m)
+ifeq ($(ARCH),s390x)
+LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline -lmediacheck -lqc
+else
 LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline -lmediacheck
+endif
 
 GIT2LOG := $(shell if [ -x ./git2log ] ; then echo ./git2log --update ; else echo true ; fi)
 GITDEPS := $(shell [ -d .git ] && echo .git/HEAD .git/refs/heads .git/refs/tags)
