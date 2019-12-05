@@ -8,12 +8,12 @@ typedef struct {
   unsigned removed:1;
 } scsi_dev_t;
 
-scsi_dev_t **scsi_list;
-scsi_dev_t **cdrom_list;
-scsi_dev_t **disk_list;
-unsigned scsi_list_len;
-unsigned cdrom_list_len;
-unsigned disk_list_len;
+extern scsi_dev_t **scsi_list;
+extern scsi_dev_t **cdrom_list;
+extern scsi_dev_t **disk_list;
+extern unsigned scsi_list_len;
+extern unsigned cdrom_list_len;
+extern unsigned disk_list_len;
 
 void get_scsi_list(void);
 void free_scsi_list(void);
