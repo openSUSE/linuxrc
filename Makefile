@@ -1,5 +1,5 @@
 CC	= gcc
-CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
+CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign $(RPM_OPT_FLAGS)
 LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline -lmediacheck
 
 GIT2LOG := $(shell if [ -x ./git2log ] ; then echo ./git2log --update ; else echo true ; fi)
