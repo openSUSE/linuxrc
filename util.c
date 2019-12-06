@@ -452,14 +452,9 @@ void util_print_banner (void)
 
     uname (&utsinfo_ri);
     if (config.linemode) {
-#ifdef __s390x__
-      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) on %s <<<\n", 
+      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) %s <<<\n", 
               utsinfo_ri.release,
-              config.hwp.machine_name);
-#else
-      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<\n", 
-              utsinfo_ri.release);
-#endif
+              config.platform_name);
         return;
     }
     memset (&win_ri, 0, sizeof (window_t));
@@ -493,7 +488,7 @@ void util_print_banner (void)
 #ifdef __s390x__
     sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) on %s <<<",
              utsinfo_ri.release,
-             config.hwp.machine_name);
+             config.platform_name);
 #else
     sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<",
              utsinfo_ri.release);

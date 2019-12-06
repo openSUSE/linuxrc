@@ -527,6 +527,7 @@ typedef struct {
                                  * 2: if necessary, with user dialog (default)
                                  * 3: if necessary, no user dialog
                                  */
+  char *platform_name;           /* Human-readable name of the hardware */
 
   struct {
     unsigned failed:1;		/**< digest check failed */
@@ -730,7 +731,6 @@ typedef struct {
     int portno;
     char* osahwaddr;
     char* hypervisor;
-    char machine_name[255];
   } hwp;
   
 #endif

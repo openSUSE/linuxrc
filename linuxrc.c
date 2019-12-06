@@ -759,11 +759,13 @@ void lxrc_init()
 
   if (qc_get_return_code<=0) {
     log_show("Unable to retrieve machine type.\n");
-    strncpy(config.hwp.machine_name, "unknown machine type", sizeof("unknown machine type")-1);
+    strprintf(&config.platform_name, "%s", "on unknown machine type");
   }
-  else strncpy(config.hwp.machine_name, qc_result_string, 254);
+  else strprintf(&config.platform_name, "on %s", qc_result_string);
 
   qc_close(qc_configuration_handle);
+  #else
+  config.platform_name="";
   #endif
 
   /* add cmdline to info file */
@@ -917,18 +919,11 @@ void lxrc_init()
   if(!config.had_segv) {
     if (config.linemode)
       putchar('\n');
-#ifdef __s390x__
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2019 SUSE LLC on %s <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2019 SUSE LLC %s <<<\n",
       config.product,
-      config.hwp.machine_name
+      config.platform_name
     );
-#else
-    printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2019 SUSE LLC <<<\n",
-      config.product
-    );
-#endif
     if (config.linemode)
       putchar('\n');
     fflush(stdout);
