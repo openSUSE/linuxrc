@@ -452,7 +452,9 @@ void util_print_banner (void)
 
     uname (&utsinfo_ri);
     if (config.linemode) {
-      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<\n", utsinfo_ri.release);
+      printf (">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) %s <<<\n", 
+              utsinfo_ri.release,
+              config.platform_name);
         return;
     }
     memset (&win_ri, 0, sizeof (window_t));
@@ -483,8 +485,9 @@ void util_print_banner (void)
     win_ri.style = STYLE_SUNKEN;
     win_open (&win_ri);
 
-    sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) <<<",
-             utsinfo_ri.release);
+    sprintf (text_ti, ">>> linuxrc " LXRC_FULL_VERSION " (Kernel %s) %s <<<",
+             utsinfo_ri.release,
+             config.platform_name);
     util_center_text (text_ti, max_x_ig - 4);
     disp_set_color (colors_prg->has_colors ? COL_BWHITE : colors_prg->msg_fg,
                     win_ri.bg_color);
