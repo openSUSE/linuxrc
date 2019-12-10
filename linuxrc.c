@@ -46,6 +46,9 @@
 #include "checkmedia.h"
 #include "url.h"
 #include <sys/utsname.h>
+#ifdef __s390x__
+#include <query_capacity.h>
+#endif
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -718,6 +721,11 @@ void lxrc_init()
   util_setup_coredumps();
 
   #if defined(__s390__) || defined(__s390x__)
+  void *qc_configuration_handle = NULL;
+  const char *qc_result_string = NULL;
+  int qc_return_code = 0;
+  int qc_get_return_code = 0;
+
   if(util_check_exist("/sys/hypervisor/s390")) {
     char *type;
 
@@ -742,6 +750,22 @@ void lxrc_init()
     if(!strncmp(utsinfo.machine, "s390x", sizeof "s390x" - 1 )) config.hwp.hypervisor="KVM";
     else config.hwp.hypervisor="Reallyunknown";
   }
+
+  qc_configuration_handle = qc_open(&qc_return_code);
+  if (qc_return_code==0)
+    qc_get_return_code = qc_get_attribute_string(qc_configuration_handle, qc_type_name,
+                                                    0, &qc_result_string);
+  else log_show("The call to qc_open failed.\n");
+
+  if (qc_get_return_code<=0) {
+    log_show("Unable to retrieve machine type.\n");
+    strprintf(&config.platform_name, "%s", "on unknown machine type");
+  }
+  else strprintf(&config.platform_name, "on %s", qc_result_string);
+
+  qc_close(qc_configuration_handle);
+  #else
+  config.platform_name="";
   #endif
 
   /* add cmdline to info file */
@@ -896,8 +920,9 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2019 SUSE LLC <<<\n",
-      config.product
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2019 SUSE LLC %s <<<\n",
+      config.product,
+      config.platform_name
     );
     if (config.linemode)
       putchar('\n');
