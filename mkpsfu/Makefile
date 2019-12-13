@@ -1,5 +1,5 @@
 CC	 = gcc
-CFLAGS	 = -Wall -O2 -fomit-frame-pointer $(RPM_OPT_FLAGS)
+CFLAGS	 = -Wall -O2 -fomit-frame-pointer
 
 .PHONY: all fonts font1 font2 clean
 

@@ -1,5 +1,5 @@
 CC	= gcc
-CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign $(RPM_OPT_FLAGS)
+CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
 LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline -lmediacheck
 ARCH	= $(shell /usr/bin/uname -m)
 ifeq ($(ARCH),s390x)
