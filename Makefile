@@ -1,6 +1,9 @@
 CC	= gcc
 CFLAGS	= -c -g -O2 -Wall -Wno-pointer-sign
-LDFLAGS	= -rdynamic -lhd -lblkid -lcurl -lreadline -lmediacheck
+CFLAGS += -fmessage-length=0 -grecord-gcc-switches -fstack-protector-strong -fstack-protector-all \
+          -funwind-tables -fasynchronous-unwind-tables -fstack-clash-protection \
+          -fsanitize=address
+LDFLAGS	= -lasan -rdynamic -lhd -lblkid -lcurl -lreadline -lmediacheck
 ARCH	= $(shell /usr/bin/uname -m)
 ifeq ($(ARCH),s390x)
 LDFLAGS	+= -lqc
