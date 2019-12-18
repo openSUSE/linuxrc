@@ -1120,15 +1120,11 @@ int auto2_add_extension(char *extension)
   char *argv[3] = { };
   char *s, *cmd = NULL;
   slist_t *sl;
-  char xxx[8];
 
   log_info("instsys add extension: %s\n", extension);
 
   if(config.test) {
     log_info("test mode - do nothing\n");
-    update_device_list(0);
-    xxx[12] = 9;
-    fprintf(stderr, "%s\n", xxx);
     return 0;
   }
 
