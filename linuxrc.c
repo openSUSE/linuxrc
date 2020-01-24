@@ -1500,7 +1500,7 @@ void find_shell()
 void lxrc_usr1(int signum)
 {
   static unsigned extend_cnt = 0;
-  int i, err = 0;
+  int err = 0;
   char *s, buf[1024];
   FILE *f;
   slist_t *sl = NULL, *sl_task = NULL;
@@ -1531,18 +1531,28 @@ void lxrc_usr1(int signum)
       else if(task == 'r' && sl) {
         str_copy(&sl->key, NULL);
       }
-      if(!fork()) {
+
+      pid_t child_pid = fork();
+
+      if(!child_pid) {
         config.extend_running = 1;
 
         log_debug("=== extend started ===\n");
 
-        for(i = 0; i < 3; i++) close(i);
 
         // get us a copy of the logs
         unlink("/tmp/extend.log");
         str_copy(&config.log.dest[1].name, "/tmp/extend.log");
-        config.log.dest[1].f = NULL;
+        config.log.dest[1].f = fopen(config.log.dest[1].name, "a");
         config.log.dest[1].level = LOG_LEVEL_SHOW | LOG_LEVEL_INFO | LOG_LEVEL_DEBUG | LOG_TIMESTAMP;
+
+        // close stdin; stdout and stderr point to log file
+        close(0);
+        if(config.log.dest[1].f) {
+          int fd = fileno(config.log.dest[1].f);
+          dup2(fd, 1);
+          dup2(fd, 2);
+        }
 
         config.download.cnt = 1000 + extend_cnt;
         config.mountpoint.cnt = 1000 + extend_cnt;
@@ -1575,8 +1585,12 @@ void lxrc_usr1(int signum)
         config.log.dest[1].level = 0;
         log_debug("=== extend finished ===\n");
 
-        if(extend_pid > 0) kill(extend_pid, SIGUSR1);
         exit(0);
+      }
+      else {
+        // wait for child to finish, then signal extend command to go on
+        waitpid(child_pid, NULL, 0);
+        if(extend_pid > 0) kill(extend_pid, SIGUSR1);
       }
     }
   }

@@ -2705,6 +2705,9 @@ int util_extend(char *extension, char task, int verbose)
         fscanf(f, "%d", &err);
         fclose(f);
       }
+      else {
+        err = 1;
+      }
     }
   }
   else {
