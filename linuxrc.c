@@ -1759,12 +1759,12 @@ void select_repo_url(char *msg, char **repo)
 
 char * get_platform_name()
 {
+  char *platform = NULL;
 #if defined(__s390__) || defined(__s390x__)
   void *qc_configuration_handle = NULL;
   const char *qc_result_string = NULL;
   int qc_return_code = 0;
   int qc_get_return_code = 0;
-  char *platform = NULL;
 
   qc_configuration_handle = qc_open(&qc_return_code);
   if (qc_return_code==0)
@@ -1780,7 +1780,7 @@ char * get_platform_name()
 
   qc_close(qc_configuration_handle);
 #else
-  &platform="";
+  str_copy(&platform, "");
 #endif
 return platform;
 }
