@@ -46,6 +46,9 @@
 #include "auto2.h"
 #include "url.h"
 #include "checkmedia.h"
+#ifdef __s390x__
+#include <query_capacity.h>
+#endif
 
 #ifndef MNT_DETACH
 #define MNT_DETACH	(1 << 1)
@@ -86,6 +89,7 @@ static dia_item_t di_inst_choose_display_last = di_none;
 #endif
 
 static int ask_for_swap(int64_t size, char *msg);
+static char * get_platform_name();
 
 
 /*
@@ -1325,6 +1329,21 @@ int inst_execute_yast()
     return err;
   }
 
+  config.platform_name=get_platform_name();
+
+  if(!config.had_segv) {
+    if (config.linemode)
+      putchar('\n');
+    printf(
+      "\n>>> Starting the %s installation program (c) 1996-2020 SUSE LLC %s <<<\n",
+      config.product,
+      config.platform_name
+    );
+    if (config.linemode)
+      putchar('\n');
+    fflush(stdout);
+  }
+
   if(!config.test) {
     if(util_check_exist("/sbin/update")) lxrc_run("/sbin/update");
   }
@@ -1638,3 +1657,30 @@ int ask_for_swap(int64_t size, char *msg)
   return j;
 }
 
+char * get_platform_name()
+{
+  char *platform = NULL;
+#if defined(__s390__) || defined(__s390x__)
+  void *qc_configuration_handle = NULL;
+  const char *qc_result_string = NULL;
+  int qc_return_code = 0;
+  int qc_get_return_code = 0;
+
+  qc_configuration_handle = qc_open(&qc_return_code);
+  if (qc_return_code==0)
+    qc_get_return_code = qc_get_attribute_string(qc_configuration_handle, qc_type_name,
+                                                    0, &qc_result_string);
+  else log_show("The call to qc_open failed.\n");
+
+  if (qc_get_return_code<=0) {
+    log_show("Unable to retrieve machine type.\n");
+    strprintf(&platform, "%s", "on unknown machine type");
+  }
+  else strprintf(&platform, "on %s", qc_result_string);
+
+  qc_close(qc_configuration_handle);
+#else
+  str_copy(&platform, "");
+#endif
+return platform;
+}

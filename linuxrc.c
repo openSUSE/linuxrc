@@ -46,9 +46,6 @@
 #include "checkmedia.h"
 #include "url.h"
 #include <sys/utsname.h>
-#ifdef __s390x__
-#include <query_capacity.h>
-#endif
 
 #if defined(__alpha__) || defined(__ia64__)
 #define SIGNAL_ARGS	int signum, int x, struct sigcontext *scp
@@ -88,7 +85,6 @@ static void lxrc_add_parts(void);
 static void lxrc_makelinks(char *name);
 #endif
 static void select_repo_url(char *msg, char **repo);
-static char * get_platform_name();
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
@@ -849,8 +845,6 @@ void lxrc_init()
     lxrc_add_parts();
   }
 
-  config.platform_name=get_platform_name();
-
   LXRC_WAIT
 
   if(util_check_exist("/sbin/mount.smbfs")) {
@@ -902,9 +896,8 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2020 SUSE LLC %s <<<\n",
-      config.product,
-      config.platform_name
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2020 SUSE LLC <<<\n",
+      config.product
     );
     if (config.linemode)
       putchar('\n');
@@ -1755,32 +1748,4 @@ void select_repo_url(char *msg, char **repo)
   item_list = NULL;
 
   log_debug("repo: %s\n", *repo ?: "");
-}
-
-char * get_platform_name()
-{
-  char *platform = NULL;
-#if defined(__s390__) || defined(__s390x__)
-  void *qc_configuration_handle = NULL;
-  const char *qc_result_string = NULL;
-  int qc_return_code = 0;
-  int qc_get_return_code = 0;
-
-  qc_configuration_handle = qc_open(&qc_return_code);
-  if (qc_return_code==0)
-    qc_get_return_code = qc_get_attribute_string(qc_configuration_handle, qc_type_name,
-                                                    0, &qc_result_string);
-  else log_show("The call to qc_open failed.\n");
-
-  if (qc_get_return_code<=0) {
-    log_show("Unable to retrieve machine type.\n");
-    strprintf(&platform, "%s", "on unknown machine type");
-  }
-  else strprintf(&platform, "on %s", qc_result_string);
-
-  qc_close(qc_configuration_handle);
-#else
-  str_copy(&platform, "");
-#endif
-return platform;
 }
