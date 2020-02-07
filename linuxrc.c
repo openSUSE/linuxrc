@@ -295,8 +295,8 @@ void lxrc_change_root()
   slist_t *sl;
   char *argv[3] = { };
   char *dirs[] = {
-    "bin", "boot", "etc", "home", "lib", "run",
-    "media", "mounts", "mounts/initrd", "mnt", "proc", "sbin",
+    "bin", "boot", "etc", "home", "lib", "lib/modules", "lib/firmware", "run",
+    "media", "mounts", "mounts/initrd", "mnt", "parts", "proc", "sbin",
     "sys", "tmp", "usr", "usr/lib", "usr/lib/microcode", "var",
     NULL
   };
@@ -311,6 +311,8 @@ void lxrc_change_root()
     (mp = config.url.instsys->mount)
   ) {
     log_info("starting rescue\n");
+
+    mount("tmpfs", mp, "tmpfs", 0, "size=100%,nr_inodes=0");
 
     // add dud images
     for(i = 0; i < config.update.ext_count; i++) {
@@ -330,15 +332,15 @@ void lxrc_change_root()
 
     // move module tree
     strprintf(&buf, "%s/lib/modules", mp);
-    rename("/lib/modules", buf);
+    mount("/lib/modules", buf, "none", MS_BIND, 0);
 
     // move firmware tree
     strprintf(&buf, "%s/lib/firmware", mp);
-    rename("/lib/firmware", buf);
+    mount("/lib/firmware", buf, "none", MS_BIND, 0);
 
     // move 'parts' tree
     strprintf(&buf, "%s/parts", mp);
-    rename("/parts", buf);
+    mount("/parts", buf, "none", MS_BIND | MS_REC, 0);
 
     // add devices
     strprintf(&buf, "%s/dev", mp);
@@ -452,9 +454,6 @@ void lxrc_movetotmpfs()
 
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
-
-  /* put / entry back into /proc/mounts */
-  mount("/", "/", "none", MS_BIND, 0);
 
   for(i = 0; i < 20; i++) close(i);
 
@@ -681,7 +680,6 @@ void lxrc_catch_signal(int signum)
 
 void lxrc_init()
 {
-  int i;
   slist_t *sl;
 
   siginterrupt(SIGALRM, 1);
@@ -963,10 +961,6 @@ void lxrc_init()
   if(config.had_segv) config.manual = 1;
 
   if(!config.test && !config.had_segv) {
-    log_info("Remount of / ");
-    i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
-    log_info(i ? "failed\n" : "ok\n");
-
     /* Check for special case with aborted installation */
     if(util_check_exist ("/.bin")) {
       unlink("/bin");
