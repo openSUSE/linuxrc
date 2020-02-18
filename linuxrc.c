@@ -981,8 +981,6 @@ void lxrc_init()
     slist_append_str(&config.ifcfg.initial, sl->key);
   }
 
-  if(config.plymouth) util_run_script("plymouth_setup");
-
   util_free_mem();
 
   if(config.memoryXXX.free < config.memoryXXX.min_free) {
@@ -1001,10 +999,6 @@ void lxrc_init()
     freopen(config.console, "a", stdout);
   }
 
-  util_get_splash_status();
-
-  util_splash_bar(10, SPLASH_10);
-
   if(util_check_exist("/proc/iSeries")) {
     config.is_iseries = 1;
     config.linemode = 1;
@@ -1016,6 +1010,12 @@ void lxrc_init()
 
   // clear keyboard queue
   while(kbd_getch_old(0));
+
+  if(config.plymouth) util_run_script("plymouth_setup");
+
+  util_get_splash_status();
+
+  util_splash_bar(10, SPLASH_10);
 
   set_activate_language(config.language);
 
