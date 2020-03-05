@@ -639,6 +639,7 @@ typedef struct {
     unsigned dhcp_timeout_set:1;	/**< dhcp_timeout was set explicitly */
     unsigned sethostname:1;	/**< wicked should set hostname */
     unsigned sethostname_used:1;	/**< user has used linuxrc's SetHostname option */
+    unsigned search:1;          /**< search for matching iface which can access installation */
     unsigned do_setup;		/**< do network setup */
     unsigned setup;		/**< bitmask: do these network setup things */
     char *device;		/**< currently used device */

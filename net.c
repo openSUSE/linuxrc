@@ -2430,6 +2430,13 @@ ifcfg_t *ifcfg_parse(char *str)
   }
 
   s = slist_key(sl0, 1);
+  if(s && (strncmp(s, "try", sizeof "try" -1) == 0))
+  {
+    log_debug("Will try to detect interface with access to installation");
+    config.net.search = 1;
+    s = slist_key(sl0, 2);
+  }
+
   if(s && !strncmp(s, "dhcp", sizeof "dhcp" - 1)) {
     str_copy(&ifcfg->type, s);
     ifcfg->dhcp = 1;

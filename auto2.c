@@ -611,7 +611,7 @@ void auto2_user_netconfig()
   if(!net_config_needed(0)) return;
 
   check_ptp(config.ifcfg.manual->device);
-  
+
   if( ((net_config_mask() & 3) == 3) || (config.ifcfg.manual->ptp && ((net_config_mask() & 1) == 1)) ) {
     /* we have IP & netmask (or just IP for PTP devices) */
     config.net.configured = nc_static;
