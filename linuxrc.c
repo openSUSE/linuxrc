@@ -84,6 +84,7 @@ static void lxrc_movetotmpfs(void);
 static int cmp_entry(slist_t *sl0, slist_t *sl1);
 static int cmp_entry_s(const void *p0, const void *p1);
 static void lxrc_add_parts(void);
+static void lxrc_umount_parts(char *basedir);
 #if SWISS_ARMY_KNIFE 
 static void lxrc_makelinks(char *name);
 #endif
@@ -296,7 +297,7 @@ void lxrc_change_root()
   char *argv[3] = { };
   char *dirs[] = {
     "bin", "boot", "etc", "home", "lib", "run",
-    "media", "mounts", "mounts/initrd", "mnt", "proc", "sbin",
+    "media", "mounts", "mounts/initrd", "mnt", "parts", "parts/mp_0000", "proc", "sbin",
     "sys", "tmp", "usr", "usr/lib", "usr/lib/microcode", "var",
     NULL
   };
@@ -311,6 +312,8 @@ void lxrc_change_root()
     (mp = config.url.instsys->mount)
   ) {
     log_info("starting rescue\n");
+
+    mount("tmpfs", mp, "tmpfs", 0, "size=100%,nr_inodes=0");
 
     // add dud images
     for(i = 0; i < config.update.ext_count; i++) {
@@ -328,17 +331,20 @@ void lxrc_change_root()
       if(!strcmp(*s, "tmp")) chmod(buf, 01777);
     }
 
-    // move module tree
+    // link module tree
     strprintf(&buf, "%s/lib/modules", mp);
-    rename("/lib/modules", buf);
+    symlink("/parts/mp_0000/lib/modules", buf);
 
-    // move firmware tree
+    // link firmware tree
     strprintf(&buf, "%s/lib/firmware", mp);
-    rename("/lib/firmware", buf);
+    symlink("/parts/mp_0000/lib/firmware", buf);
 
-    // move 'parts' tree
-    strprintf(&buf, "%s/parts", mp);
-    rename("/parts", buf);
+    // mount 'parts/00_lib' (kernel parts)
+    strprintf(&buf, "%s/parts/mp_0000", mp);
+    util_mount_ro("/parts/00_lib", buf, NULL);
+
+    // unmount filesystems below /parts
+    lxrc_umount_parts("");
 
     // add devices
     strprintf(&buf, "%s/dev", mp);
@@ -452,9 +458,6 @@ void lxrc_movetotmpfs()
 
   mount(".", "/", NULL, MS_MOVE, NULL);
   chroot(".");
-
-  /* put / entry back into /proc/mounts */
-  mount("/", "/", "none", MS_BIND, 0);
 
   for(i = 0; i < 20; i++) close(i);
 
@@ -681,7 +684,6 @@ void lxrc_catch_signal(int signum)
 
 void lxrc_init()
 {
-  int i;
   slist_t *sl;
 
   siginterrupt(SIGALRM, 1);
@@ -963,10 +965,6 @@ void lxrc_init()
   if(config.had_segv) config.manual = 1;
 
   if(!config.test && !config.had_segv) {
-    log_info("Remount of / ");
-    i = mount(0, "/", 0, MS_MGC_VAL | MS_REMOUNT, 0);
-    log_info(i ? "failed\n" : "ok\n");
-
     /* Check for special case with aborted installation */
     if(util_check_exist ("/.bin")) {
       unlink("/bin");
@@ -1683,6 +1681,26 @@ void lxrc_readd_parts()
     argv[1] = mp;
     argv[2] = "/";
     util_lndir_main(3, argv);
+  }
+
+  free(mp);
+}
+
+
+/*
+ * Unmount initrd parts when no longer needed.
+ *
+ * This is called when moving control to the rescue system.
+ */
+void lxrc_umount_parts(char *basedir)
+{
+  char *mp = NULL;
+
+  if(config.test) return;
+
+  for(unsigned u = 0; u < config.mountpoint.initrd_parts; u++) {
+    strprintf(&mp, "%s/parts/mp_%04u", basedir, u);
+    umount2(mp, MNT_DETACH);
   }
 
   free(mp);
