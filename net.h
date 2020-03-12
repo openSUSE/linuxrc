@@ -40,3 +40,4 @@ unsigned check_ptp(char *ifname);
 void net_wicked_get_config_keys(void);
 void net_nanny(void);
 char *net_get_ifname(ifcfg_t *ifcfg);
+int net_try_next_device(ifcfg_t *list, int flags, int attempt);

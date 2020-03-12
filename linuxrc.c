@@ -684,7 +684,10 @@ void lxrc_catch_signal(int signum)
 
 void lxrc_init()
 {
+  int autosetup_works = 0, attempt = 0;
+
   slist_t *sl;
+  ifcfg_t *search_list = NULL;
 
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);
@@ -1182,6 +1185,29 @@ void lxrc_init()
     }
   }
 
+  // copy parsed ifcfg(s) list to separate list when try option is involved
+  // - net_update_ifcfg releases the list otherwise
+  if(config.net.search && config.ifcfg.list)
+  {
+    ifcfg_t * ifcfg = NULL;
+
+    log_debug("Creating search list for try option");
+
+    for( ifcfg = config.ifcfg.list; ifcfg; ifcfg = ifcfg->next)
+    {
+      ifcfg_t *clone = calloc(1, sizeof *ifcfg);
+
+      if( !clone)
+      {
+        log_debug("Cannot create list for try option");
+        break;
+      }
+
+      ifcfg_copy( clone, ifcfg);
+      ifcfg_append( &search_list, clone);
+    }
+  }
+
   net_update_ifcfg(0);
 
   net_wicked_up("all");
@@ -1190,7 +1216,33 @@ void lxrc_init()
 
   if(config.braille.check) run_braille();
 
-  if(!config.manual && !auto2_init()) {
+  autosetup_works = auto2_init();
+
+  while(!autosetup_works && config.net.search)
+  {
+    log_debug("Trying to match another interfaces, attempt: %u", attempt +1);
+
+    // activate new net configuration
+    net_wicked_down("all");
+
+    // shift ifcfg(s) to other device(s)
+    if(!net_try_next_device( search_list, 0, ++attempt))
+    {
+      log_debug("Cannot find another device to try");
+      config.net.search = 0;
+    }
+
+    // activate new net configuration
+    net_wicked_up("all");
+
+    // try to activate new config, but only if new device was assigned to an ifcfg
+    if(config.net.search)
+    {
+      autosetup_works = auto2_init();
+    }
+  }
+
+  if(!config.manual && !autosetup_works) {
     char *buf = NULL, *repo = NULL;
 
     log_info("Automatic setup not possible.\n");

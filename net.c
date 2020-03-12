@@ -2442,19 +2442,22 @@ ifcfg_t *ifcfg_parse(char *str)
     ifcfg->dhcp = 1;
   }
   else {
+    // try keyword is optional, so position of other params can vary
+    int try_shift = config.net.search ? 1 : 0;
+
     str_copy(&ifcfg->type, "static");
 
     t = NULL;
 
     if(s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ip, s);
 
-    s = slist_key(sl0, 2);
+    s = slist_key(sl0, 2 + try_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->gw, s);
 
-    s = slist_key(sl0, 3);
+    s = slist_key(sl0, 3 + try_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ns, s);
 
-    s = slist_key(sl0, 4);
+    s = slist_key(sl0, 4 + try_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->domain, s);
   }
 
@@ -2980,5 +2983,93 @@ char *net_get_ifname(ifcfg_t *ifcfg)
   if(ifcfg->vlan) strprintf(&buf, "%s.%s", buf, ifcfg->vlan);
 
   return buf;
+}
+
+/*
+ * Try to use another matching device in static configurations.
+ *
+ * Useful only when user booted with try option in an ifcfg. It also stops devices
+ * which are being released.
+ *
+ * Param list is list of parsed ifcfg options which should be used for searching
+ * Param attempt number of reconfiguration attempt. Initial (current) configuration
+ *               is attempt = 0 (so it means "no change"), first search for another
+ *               matching device is attempt = 1
+ * Param flags see ifcfg_write
+ *
+ * Returns 0 when no other device can be used in any ifcfg config
+ *         1 when a configuration was assigned to a new device
+ */
+int net_try_next_device(ifcfg_t *list, int flags, int attempt)
+{
+  hd_t *net_list = hd_list(config.hd_data, hw_network_ctrl, 0, NULL);
+  hd_t *hd = NULL;
+  hd_res_t *hd_res = NULL;
+  ifcfg_t *ifcfg;
+  int res = 0;
+  int matched = 0;
+  char *hwaddr;
+
+  log_debug("net_try_next_device <<< res: %u\n", res);
+
+  if(!config.net.search || attempt < 0 || !list)
+  {
+    log_debug("net_try_next_device: invalid input");
+    return 0;
+  }
+  if(attempt == 0)
+  {
+    log_debug("net_try_next_device: nothing to do");
+    return 1;
+  }
+
+  // we're going to deal with static configurations only because configuration
+  // like ifcfg=*=dhcp is always assigned to all matching devices. It also means that
+  // ifcfg=*=try,dhcp is only syntactic sugar which in fact has no efect.
+  //
+  // On the other hand ifcfg=*=<static config> uses first matching device (in first run)
+  for(ifcfg = list; ifcfg; ifcfg = ifcfg->next)
+  {
+    log_debug("net_try_next_device: handling %s", ifcfg->device);
+
+    if(!ifcfg->pattern) continue;
+    if(ifcfg->dhcp) continue;
+
+    for(hd = net_list; hd; hd = hd->next, attempt--)
+    {
+       for(hwaddr = NULL, hd_res = hd->res; hd_res; hd_res = hd_res->next)
+       {
+         if(hd_res->any.type == res_hwaddr)
+         {
+            hwaddr = hd_res->hwaddr.addr;
+            break;
+         }
+       }
+
+      matched = ifcfg->device ? match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device) : 0;
+      log_debug("net_try_next_device: %s, matched: %u\n", hd->unix_dev_name, matched);
+
+      // should be the device used in previous attempt
+      if(matched && attempt == 1)
+      {
+        str_copy(&config.ifcfg.current, hd->unix_dev_name);
+        net_stop();
+      }
+
+      // this device should be used now
+      if(matched && attempt == 0)
+      {
+        ifcfg_write(hd->unix_dev_name, ifcfg, flags | IFCFG_INITIAL);
+        res = 1;
+        break;
+      }
+    }
+  }
+
+  hd_free_hd_list(net_list);
+
+  log_debug("net_try_next_device >>> res: %u\n", res);
+
+  return res;
 }
 
