@@ -631,7 +631,6 @@ typedef struct {
   struct {
     unsigned dhcp_active:1;	/**< dhcpd is running */
     unsigned ifconfig:1;	/**< setup network interface */
-    unsigned is_configured:1;	/**< set if network is configured */
     unsigned all_ifs:1;		/**< try all interfaces */
     unsigned now:1;		/**< configure network _now_ */
     unsigned ipv4:1;		/**< do ipv4 config */
