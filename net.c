@@ -2387,6 +2387,7 @@ ifcfg_t *ifcfg_parse(char *str)
   slist_t *sl, *sl0, *slx;
   ifcfg_t *ifcfg;
   char *s, *t;
+  int try_shift = 0; // try keyword is optional, so position of following params can vary
 
   if(!str) return NULL;
 
@@ -2425,7 +2426,13 @@ ifcfg_t *ifcfg_parse(char *str)
   if(s && (strncmp(s, "try", sizeof "try" -1) == 0))
   {
     log_debug("Will try to detect interface with access to installation");
+
+    // having global flag helps a bit, otherwise we would need to
+    // go throught all ifcfgs when detecting the feature.
     config.net.search = 1;
+    ifcfg->search = 1;
+    try_shift = 1;
+
     s = slist_key(sl0, 2);
   }
 
@@ -2434,9 +2441,6 @@ ifcfg_t *ifcfg_parse(char *str)
     ifcfg->dhcp = 1;
   }
   else {
-    // try keyword is optional, so position of other params can vary
-    int try_shift = config.net.search ? 1 : 0;
-
     str_copy(&ifcfg->type, "static");
 
     t = NULL;
@@ -2488,11 +2492,14 @@ void ifcfg_copy(ifcfg_t *dst, ifcfg_t *src)
 
   str_copy(&dst->device, src->device);
   str_copy(&dst->type, src->type);
+
   dst->dhcp = src->dhcp;
   dst->used = src->used;
   dst->pattern = src->pattern;
   dst->ptp = src->ptp;
+  dst->search = src->search;
   dst->netmask_prefix = src->netmask_prefix;
+
   str_copy(&dst->vlan, src->vlan);
   str_copy(&dst->ip, src->ip);
   str_copy(&dst->gw, src->gw);
@@ -2522,10 +2529,10 @@ char *ifcfg_print(ifcfg_t *ifcfg)
   if(ifcfg->vlan) strprintf(&buf, "%s  vlan = %s\n", buf, ifcfg->vlan);
   if(ifcfg->type) strprintf(&buf, "%s  type = %s\n", buf, ifcfg->type);
   strprintf(&buf,
-    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u\n",
+    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u, search = %u\n",
     buf,
     ifcfg->dhcp, ifcfg->pattern, ifcfg->used,
-    ifcfg->netmask_prefix, ifcfg->ptp
+    ifcfg->netmask_prefix, ifcfg->ptp, ifcfg->search
   );
   if(ifcfg->ip) strprintf(&buf, "%s  ip = %s\n", buf, ifcfg->ip);
   if(ifcfg->gw) strprintf(&buf, "%s  gw = %s\n", buf, ifcfg->gw);
@@ -3002,9 +3009,9 @@ int net_try_next_device(ifcfg_t *list, int flags, int attempt)
   int matched = 0;
   char *hwaddr;
 
-  log_debug("net_try_next_device <<< res: %u\n", res);
+  log_debug("net_try_next_device <<< attempt: %u\n", attempt);
 
-  if(!config.net.search || attempt < 0 || !list)
+  if( attempt < 0 || !list)
   {
     log_debug("net_try_next_device: invalid input");
     return 0;
@@ -3024,8 +3031,9 @@ int net_try_next_device(ifcfg_t *list, int flags, int attempt)
   {
     log_debug("net_try_next_device: handling %s", ifcfg->device);
 
-    if(!ifcfg->pattern) continue;
-    if(ifcfg->dhcp) continue;
+    if(!ifcfg->pattern) continue;  // we cannot shift configuration for the particular device
+    if(ifcfg->dhcp) continue;      // dhcp config with pattern is already used for all mathing devices
+    if(!ifcfg->search) continue;   // is the "try" suboption enabled for particular ifcfg
 
     for(hd = net_list; hd; hd = hd->next, attempt--)
     {
@@ -3038,7 +3046,7 @@ int net_try_next_device(ifcfg_t *list, int flags, int attempt)
          }
        }
 
-      matched = ifcfg->device ? match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device) : 0;
+      matched = match_netdevice(hd->unix_dev_name, hwaddr, ifcfg->device);
       log_debug("net_try_next_device: %s, matched: %u\n", hd->unix_dev_name, matched);
 
       // should be the device used in previous attempt
@@ -3065,3 +3073,31 @@ int net_try_next_device(ifcfg_t *list, int flags, int attempt)
   return res;
 }
 
+/*
+ * Performs actions for ifcfg's try suboption
+ *
+ * It shuts the network down.
+ *
+ * param search_list  ifcfg configs which should be used
+ * param attempt  number of try - helps to recognize which device should be used
+ *                as the next one
+ *
+ * returns 0 when no new match was found 1 when succeedes
+ */
+int net_perform_search(ifcfg_t * search_list, int attempt)
+{
+    int res = 0;
+
+    log_debug("Trying to match another interfaces, attempt: %u", attempt);
+
+    // deactivate current net configuration
+    net_wicked_down("all");
+
+    // shift ifcfg(s) to other device(s)
+    res = net_try_next_device( search_list, 0, attempt);
+
+    // activate new net configuration
+    net_wicked_up("all");
+
+    return res;
+}

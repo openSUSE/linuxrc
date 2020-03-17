@@ -1200,6 +1200,7 @@ void lxrc_init()
       if( !clone)
       {
         log_debug("Cannot create list for try option");
+        config.net.search = 0;
         break;
       }
 
@@ -1218,27 +1219,30 @@ void lxrc_init()
 
   autosetup_works = auto2_init();
 
+  // if try suboption was used in any ifcfg command, search for better net config
   while(!autosetup_works && config.net.search)
   {
-    log_debug("Trying to match another interfaces, attempt: %u", attempt +1);
-
-    // activate new net configuration
-    net_wicked_down("all");
-
-    // shift ifcfg(s) to other device(s)
-    if(!net_try_next_device( search_list, 0, ++attempt))
-    {
-      log_debug("Cannot find another device to try");
-      config.net.search = 0;
-    }
-
-    // activate new net configuration
-    net_wicked_up("all");
-
     // try to activate new config, but only if new device was assigned to an ifcfg
-    if(config.net.search)
+    if(net_perform_search( search_list, ++attempt))
     {
       autosetup_works = auto2_init();
+    }
+    else
+    {
+      // we don't need the search_list anymore -> release it
+      ifcfg_t * ifcfg = search_list;
+
+      log_debug("Cannot find another device to try");
+
+      while( ifcfg)
+      {
+        search_list = ifcfg->next;
+        free(ifcfg);
+        ifcfg = search_list;
+      }
+
+      // nothing more to try
+      break;
     }
   }
 
@@ -1258,7 +1262,7 @@ void lxrc_init()
     util_disp_init();
 
     if(util_check_exist("/nextmedia") == 'r') {
-      config.cd1texts = file_parse_xmllike("/nextmedia", "text");  
+      config.cd1texts = file_parse_xmllike("/nextmedia", "text");
     }
 
     char *next_msg = get_translation(config.cd1texts, current_language()->locale);
