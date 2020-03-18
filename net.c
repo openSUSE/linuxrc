@@ -2507,6 +2507,35 @@ void ifcfg_copy(ifcfg_t *dst, ifcfg_t *src)
   str_copy(&dst->domain, src->domain);
 }
 
+/*
+ * Deep copy of list of icfg_t structs
+ *
+ * Content of dst list is ignored.
+ *
+ * Return 0 in case of failure, 1 otherwise
+ */
+int ifcfg_list_copy(ifcfg_t **dst, ifcfg_t *src)
+{
+  if( !dst || !src)
+    return 0;
+
+  for( ; src; src = src->next)
+  {
+    *dst = calloc(1, sizeof *src);
+
+    if( !(*dst))
+    {
+      log_debug("ifcfg_list_copy: memory allocation failed");
+      return 0;
+    }
+
+    ifcfg_copy( *dst, src);
+    dst = &(*dst)->next;
+  }
+
+  return 1;
+}
+
 
 ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p)
 {

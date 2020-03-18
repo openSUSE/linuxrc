@@ -1189,23 +1189,12 @@ void lxrc_init()
   // - net_update_ifcfg releases the list otherwise
   if(config.net.search && config.ifcfg.list)
   {
-    ifcfg_t * ifcfg = NULL;
-
     log_debug("Creating search list for try option");
 
-    for( ifcfg = config.ifcfg.list; ifcfg; ifcfg = ifcfg->next)
+    if(!ifcfg_list_copy(&search_list, config.ifcfg.list))
     {
-      ifcfg_t *clone = calloc(1, sizeof *ifcfg);
-
-      if( !clone)
-      {
-        log_debug("Cannot create list for try option");
-        config.net.search = 0;
-        break;
-      }
-
-      ifcfg_copy( clone, ifcfg);
-      ifcfg_append( &search_list, clone);
+      log_debug("List creation failed -> disabling try option");
+      config.net.search = 0;
     }
   }
 

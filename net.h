@@ -30,6 +30,7 @@ void net_update_ifcfg(int flags);
 ifcfg_t *ifcfg_parse(char *str);
 ifcfg_t *ifcfg_append(ifcfg_t **p0, ifcfg_t *p);
 void ifcfg_copy(ifcfg_t *dst, ifcfg_t *src);
+int ifcfg_list_copy(ifcfg_t **dst, ifcfg_t *src);
 char *ifcfg_print(ifcfg_t *ifcfg);
 void net_update_state(void);
 void net_wicked_up(char *ifname);
