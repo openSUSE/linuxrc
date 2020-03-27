@@ -694,6 +694,7 @@ typedef struct {
 
   struct {
     ifcfg_t *list;		/**< list of ifcfg entries */
+    ifcfg_t *parsed_input;      /**< what we got after parsing ifcfg option **/
     ifcfg_t *manual;		/**< ifcfg data for manual network setup */
     ifcfg_t *all;		/**< all we ever did, kept for debugging */
     slist_t *initial;		/**< list of initially set up network interfaces */

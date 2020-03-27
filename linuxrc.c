@@ -684,10 +684,7 @@ void lxrc_catch_signal(int signum)
 
 void lxrc_init()
 {
-  int autosetup_works = 0, attempt = 0;
-
   slist_t *sl;
-  ifcfg_t *search_list = NULL;
 
   siginterrupt(SIGALRM, 1);
   signal(SIGHUP, SIG_IGN);
@@ -1185,17 +1182,12 @@ void lxrc_init()
     }
   }
 
-  // copy parsed ifcfg(s) list to separate list when try option is involved
-  // - net_update_ifcfg releases the list otherwise
-  if(config.net.search && config.ifcfg.list)
+  // store parsed ifcfg before subsequent net_update_ifcfg deletes it
+  // if storing fails, disable features which requires to know the original state
+  if(!ifcfg_list_copy(&config.ifcfg.parsed_input, config.ifcfg.list))
   {
-    log_debug("Creating search list for try option");
-
-    if(!ifcfg_list_copy(&search_list, config.ifcfg.list))
-    {
-      log_debug("List creation failed -> disabling try option");
-      config.net.search = 0;
-    }
+    log_debug("List of parsed ifcfgs creation failed -> disabling try option");
+    config.net.search = 0;
   }
 
   net_update_ifcfg(0);
@@ -1206,36 +1198,7 @@ void lxrc_init()
 
   if(config.braille.check) run_braille();
 
-  autosetup_works = auto2_init();
-
-  // if try suboption was used in any ifcfg command, search for better net config
-  while(!autosetup_works && config.net.search)
-  {
-    // try to activate new config, but only if new device was assigned to an ifcfg
-    if(net_perform_search( search_list, ++attempt))
-    {
-      autosetup_works = auto2_init();
-    }
-    else
-    {
-      // we don't need the search_list anymore -> release it
-      ifcfg_t * ifcfg = search_list;
-
-      log_debug("Cannot find another device to try");
-
-      while( ifcfg)
-      {
-        search_list = ifcfg->next;
-        free(ifcfg);
-        ifcfg = search_list;
-      }
-
-      // nothing more to try
-      break;
-    }
-  }
-
-  if(!config.manual && !autosetup_works) {
+  if(!config.manual && !auto2_init()) {
     char *buf = NULL, *repo = NULL;
 
     log_info("Automatic setup not possible.\n");

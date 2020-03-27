@@ -109,6 +109,47 @@ int auto2_init()
       ok = auto2_find_repo();
     }
   }
+  else
+  {
+    // if
+    // 1) cannot find repo and
+    // 2) installation source is on network and
+    // 3) try option is enabled
+    // then we try to automatically match static network configuration in a way
+    // that installation can be started
+    //
+    // copy parsed ifcfg(s) list to separate list when try option is involved
+    // - net_update_ifcfg releases the list otherwise
+    if( !ok && config.url.install->is.network && config.net.search && config.ifcfg.parsed_input)
+    {
+      ifcfg_t *search_list = config.ifcfg.parsed_input;
+      int attempt = 0;
+
+      // if try suboption was used in any ifcfg command, search for better net config
+      while(!ok && config.net.search)
+      {
+        // try to activate new config, but only if new device was assigned to an ifcfg
+        if(net_perform_search( search_list, ++attempt))
+        {
+          ok = auto2_find_repo();
+        }
+        else
+        {
+          // we don't need the search_list anymore -> release it
+          ifcfg_t * ifcfg = search_list;
+
+          log_debug("auto2_init: Cannot find another device to try");
+
+          while( ifcfg)
+          {
+            search_list = ifcfg->next;
+            free(ifcfg);
+            ifcfg = search_list;
+          }
+        }
+      }
+    }
+  }
 
   LXRC_WAIT
 
