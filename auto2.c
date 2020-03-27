@@ -135,17 +135,7 @@ int auto2_init()
         }
         else
         {
-          // we don't need the search_list anymore -> release it
-          ifcfg_t * ifcfg = search_list;
-
           log_debug("auto2_init: Cannot find another device to try");
-
-          while( ifcfg)
-          {
-            search_list = ifcfg->next;
-            free(ifcfg);
-            ifcfg = search_list;
-          }
         }
       }
     }
