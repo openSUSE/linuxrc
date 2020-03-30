@@ -136,6 +136,7 @@ int auto2_init()
         else
         {
           log_debug("auto2_init: Cannot find another device to try");
+          break;
         }
       }
     }
