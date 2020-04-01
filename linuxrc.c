@@ -1206,7 +1206,7 @@ void lxrc_init()
     util_disp_init();
 
     if(util_check_exist("/nextmedia") == 'r') {
-      config.cd1texts = file_parse_xmllike("/nextmedia", "text");  
+      config.cd1texts = file_parse_xmllike("/nextmedia", "text");
     }
 
     char *next_msg = get_translation(config.cd1texts, current_language()->locale);
