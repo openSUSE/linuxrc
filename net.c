@@ -2395,6 +2395,7 @@ ifcfg_t *ifcfg_parse(char *str)
   slist_t *sl, *sl0, *slx;
   ifcfg_t *ifcfg;
   char *s, *t;
+  int try_shift = 0; // try keyword is optional, so position of following params can vary
 
   if(!str) return NULL;
 
@@ -2430,6 +2431,16 @@ ifcfg_t *ifcfg_parse(char *str)
   }
 
   s = slist_key(sl0, 1);
+  if(s && (strncmp(s, "try", sizeof "try" -1) == 0))
+  {
+    log_debug("Will try to detect interface with access to installation");
+
+    ifcfg->search = 1;
+    try_shift = 1;
+
+    s = slist_key(sl0, 2);
+  }
+
   if(s && !strncmp(s, "dhcp", sizeof "dhcp" - 1)) {
     str_copy(&ifcfg->type, s);
     ifcfg->dhcp = 1;
@@ -2441,13 +2452,13 @@ ifcfg_t *ifcfg_parse(char *str)
 
     if(s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ip, s);
 
-    s = slist_key(sl0, 2);
+    s = slist_key(sl0, 2 + try_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->gw, s);
 
-    s = slist_key(sl0, 3);
+    s = slist_key(sl0, 3 + try_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ns, s);
 
-    s = slist_key(sl0, 4);
+    s = slist_key(sl0, 4 + try_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->domain, s);
   }
 
@@ -2486,11 +2497,14 @@ void ifcfg_copy(ifcfg_t *dst, ifcfg_t *src)
 
   str_copy(&dst->device, src->device);
   str_copy(&dst->type, src->type);
+
   dst->dhcp = src->dhcp;
   dst->used = src->used;
   dst->pattern = src->pattern;
   dst->ptp = src->ptp;
+  dst->search = src->search;
   dst->netmask_prefix = src->netmask_prefix;
+
   str_copy(&dst->vlan, src->vlan);
   str_copy(&dst->ip, src->ip);
   str_copy(&dst->gw, src->gw);
@@ -2520,10 +2534,10 @@ char *ifcfg_print(ifcfg_t *ifcfg)
   if(ifcfg->vlan) strprintf(&buf, "%s  vlan = %s\n", buf, ifcfg->vlan);
   if(ifcfg->type) strprintf(&buf, "%s  type = %s\n", buf, ifcfg->type);
   strprintf(&buf,
-    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u\n",
+    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u, search = %u\n",
     buf,
     ifcfg->dhcp, ifcfg->pattern, ifcfg->used,
-    ifcfg->netmask_prefix, ifcfg->ptp
+    ifcfg->netmask_prefix, ifcfg->ptp, ifcfg->search
   );
   if(ifcfg->ip) strprintf(&buf, "%s  ip = %s\n", buf, ifcfg->ip);
   if(ifcfg->gw) strprintf(&buf, "%s  gw = %s\n", buf, ifcfg->gw);
