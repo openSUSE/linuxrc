@@ -113,9 +113,6 @@ void net_ask_password()
  *      0: ok
  *   != 0: error or abort
  *
- * Global vars changed:
- *  config.net.is_configured
- *
  * Does nothing if DHCP is active.
  *
  * FIXME: needs window mode or not?
@@ -199,9 +196,6 @@ int net_config()
 /*
  * Shut down all network interfaces.
  *
- * Global vars changed:
- *  config.net.is_configured
- *
  * config.net.device:    interface
  * /proc/net/route: configured interfaces
  */
@@ -214,12 +208,10 @@ void net_stop()
   log_debug("%s: network down\n", device);
 
   if(config.test) {
-    config.net.is_configured = nc_none;
     return;
   }
 
   net_wicked_down(device);
-  config.net.is_configured = nc_none;
 
   // delete current config
   if(config.ifcfg.current) {
