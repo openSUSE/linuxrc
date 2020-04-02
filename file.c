@@ -1715,7 +1715,18 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_ifcfg:
-        if(*f->value) ifcfg_append(&config.ifcfg.list, ifcfg_parse(f->value));
+        if(*f->value) {
+          ifcfg_t *ifcfg = ifcfg_parse(f->value);
+          if(ifcfg) {
+            // if 'try' flag is set, move to config.ifcfg.manual
+            if(ifcfg->search) {
+              ifcfg_copy(config.ifcfg.manual, ifcfg);
+            }
+            else {
+              ifcfg_append(&config.ifcfg.list, ifcfg);
+            }
+          }
+        }
         break;
 
       case key_defaultinstall:

@@ -310,6 +310,7 @@ typedef struct ifcfg_s {
   unsigned used:1;	///< config has been used
   unsigned pattern:1;	///< 'device' is shell glob
   unsigned ptp:1;	///< ptp config, gw is ptp peer
+  unsigned search:1;    ///< whether "try" feature is enabled for this ifcfg
   int netmask_prefix;	///< prefix given via netmask option and only used if an ip doen't have one
   char *vlan;		///< vlan id, if any
   char *ip;		///< list of ip addresses, space separated
@@ -631,7 +632,6 @@ typedef struct {
   struct {
     unsigned dhcp_active:1;	/**< dhcpd is running */
     unsigned ifconfig:1;	/**< setup network interface */
-    unsigned is_configured:1;	/**< set if network is configured */
     unsigned all_ifs:1;		/**< try all interfaces */
     unsigned now:1;		/**< configure network _now_ */
     unsigned ipv4:1;		/**< do ipv4 config */

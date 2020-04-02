@@ -1776,7 +1776,7 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   char *hwaddr;
   hd_hw_item_t hw_items[3] = { hw_network_ctrl, hw_network, 0 };
   str_list_t *sl;
-  char *url_device;
+  char *url_device = NULL;
 
   if(!url || !url->scheme) return 1;
 
@@ -1806,8 +1806,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     hw_items[1] = 0;
   }
 
-  url_device = url->device;
-  if(!url_device) url_device = url->is.network ? config.ifcfg.manual->device : config.device;
+  str_copy(&url_device, url->device);
+  if(!url_device) str_copy(&url_device, url->is.network ? config.ifcfg.manual->device : config.device);
 
   for(found = 0, hd = sort_a_bit(fix_device_names(hd_list2(config.hd_data, hw_items, 0))); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
@@ -1885,6 +1885,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
     str_copy(&url->used.hwaddr, NULL);
     str_copy(&url->used.unique_id, NULL);
   }
+
+  str_copy(&url_device, NULL);
 
   return found ? 0 : 1;
 }
@@ -2413,7 +2415,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   hd_res_t *res;
   char *hwaddr;
   str_list_t *sl;
-  char *url_device;
+  char *url_device = NULL;
   hd_hw_item_t hw_items[] = { hw_network_ctrl, hw_network, 0 };
 
   if(!url || !url->is.network || config.ifcfg.if_up) return url_read_file(url, dir, src, dst, label, flags);
@@ -2429,7 +2431,7 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   LXRC_WAIT
 
   if(config.hd_data) {
-    url_device = url->device ?: config.ifcfg.manual->device;
+    str_copy(&url_device, url->device ?: config.ifcfg.manual->device);
 
     for(found = 0, hd = sort_a_bit(hd_list2(config.hd_data, hw_items, 0)); hd; hd = hd->next) {
       for(hwaddr = NULL, res = hd->res; res; res = res->next) {
@@ -2471,6 +2473,8 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
       str_copy(&url->used.hwaddr, NULL);
       str_copy(&url->used.unique_id, NULL);
     }
+
+    str_copy(&url_device, NULL);
 
     LXRC_WAIT
 

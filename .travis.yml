@@ -9,4 +9,4 @@ before_install:
   - docker run --rm -it linuxrc-image rpm -qa | sort
 
 script:
-  - docker run --rm -it -e TRAVIS=1 linuxrc-image bash -c "make -j `nproc` && ./smoke_test.sh"
+  - docker run --rm -it -e TRAVIS=1 --privileged linuxrc-image bash -c "make -j `nproc` && ./smoke_test.sh"
