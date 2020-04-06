@@ -121,6 +121,7 @@ static int cmp_alpha(slist_t *sl0, slist_t *sl1);
 static int cmp_alpha_s(const void *p0, const void *p1);
 static slist_t *get_kernel_list(char *dev);
 
+static int has_device_auto_config(void);
 
 void util_redirect_kmsg()
 {
@@ -5683,6 +5684,8 @@ void util_device_auto_config()
 {
   unsigned do_it = config.device_auto_config;
 
+  if(do_it && !has_device_auto_config()) do_it = 0;
+
   if(do_it == 2) {
     int win_old = config.win;
     char *msg = config.device_auto_config_done ?
@@ -5698,4 +5701,23 @@ void util_device_auto_config()
     util_run_script("device_auto_config");
     config.device_auto_config_done = 1;
   }
+}
+
+
+/*
+ * Check if S390 I/O device pre-config data is available.
+ */
+int has_device_auto_config()
+{
+  FILE *f;
+  int has_it = 0;
+
+  if((f = fopen("/sys/firmware/sclp_sd/config/data", "r"))) {
+    has_it = fgetc(f) != EOF;
+    fclose(f);
+  }
+
+  log_info("has I/O device pre-config data: %d\n", has_it);
+
+  return has_it;
 }
