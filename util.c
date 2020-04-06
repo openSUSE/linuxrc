@@ -5689,7 +5689,7 @@ void util_device_auto_config()
   if(do_it == 2) {
     int win_old = config.win;
     char *msg = config.device_auto_config_done ?
-      "Reapply I/O device pre-configuration?" : "Apply I/O device pre-configuration?";
+      "Reapply I/O device auto-configuration?" : "Apply I/O device auto-configuration?";
 
     if(!config.win) util_disp_init();
     do_it = dia_yesno(msg, YES) == YES;
@@ -5697,7 +5697,7 @@ void util_device_auto_config()
   }
 
   if(do_it) {
-    log_info("applying I/O device pre-configuration\n");
+    log_info("applying I/O device auto-configuration\n");
     util_run_script("device_auto_config");
     config.device_auto_config_done = 1;
   }
@@ -5705,7 +5705,7 @@ void util_device_auto_config()
 
 
 /*
- * Check if S390 I/O device pre-config data is available.
+ * Check if S390 I/O device auto-config data is available.
  */
 int has_device_auto_config()
 {
@@ -5717,7 +5717,7 @@ int has_device_auto_config()
     fclose(f);
   }
 
-  log_info("has I/O device pre-config data: %d\n", has_it);
+  log_info("has I/O device auto-config data: %d\n", has_it);
 
   return has_it;
 }
