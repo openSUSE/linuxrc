@@ -181,6 +181,9 @@ int set_settings()
     di_set_startshell,
     di_set_slp,
     di_inst_net_config,
+#if defined(__s390x__)
+    di_set_auto_config,
+#endif
     di_none
   };
 
@@ -299,6 +302,12 @@ int set_settings_cb (dia_item_t di)
 
     case di_inst_net_config:
       net_config();
+      rc = 1;
+      break;
+
+    case di_set_auto_config:
+      config.device_auto_config = 2;
+      util_device_auto_config();
       rc = 1;
       break;
 

@@ -316,6 +316,7 @@ static struct {
   { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
   { key_norepo,         "NoRepo",         kf_cfg + kf_cmd                },
   { key_auto_assembly,  "AutoAssembly",   kf_cfg + kf_cmd_early          },
+  { key_device_auto_config, "DeviceAutoConfig",  kf_cfg + kf_cmd_early   },
 };
 
 static struct {
@@ -328,6 +329,7 @@ static struct {
   { "yes",       1                  },
   { "j",         1                  },	// keep for compatibility?
   { "default",   1                  },
+  { "ask",       2                  },
   { "Undef",     0                  },
   { "Mono",      1                  },
   { "Color",     2                  },
@@ -1796,6 +1798,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_auto_assembly:
         if(f->is.numeric) config.auto_assembly = f->nvalue;
+        break;
+
+      case key_device_auto_config:
+        if(f->is.numeric) config.device_auto_config = f->nvalue;
         break;
 
       default:
