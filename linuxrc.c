@@ -808,6 +808,9 @@ void lxrc_init()
   config.kexec = 2;		/* kexec if necessary, with user dialog */
   config.auto_assembly = 0;	/* default to disable MD/RAID auto-assembly (bsc#1132688) */
   config.autoyast_parse = 1;	/* analyse autoyast option and read autoyast file */
+#if defined(__s390x__)
+  config.device_auto_config = 2;	/* ask before doing s390 device auto config */
+#endif
 
   // defaults for self-update feature
   config.self_update_url = NULL;
@@ -1043,6 +1046,8 @@ void lxrc_init()
   log_show(" ok\n");
 
   LXRC_WAIT
+
+  util_device_auto_config();
 
   /* look for driver updates in initrd */
   util_chk_driver_update("/", "/");

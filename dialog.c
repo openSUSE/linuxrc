@@ -57,6 +57,7 @@ struct {
   { di_set_usessh,       "Enable or Disable SSH Mode",          },
   { di_set_startshell,   "Start shell before and after YaST?",    },
   { di_set_slp,          "Get SLP info",        },
+  { di_set_auto_config,  "I/O device pre-configuration" },
 
   { di_inst_install,     "Installation",       },
   { di_inst_update,      "Upgrade",       },

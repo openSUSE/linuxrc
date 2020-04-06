@@ -1204,6 +1204,7 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.self_update, "self_update");
   add_flag(&sl0, buf, config.repomd, "repomd");
   add_flag(&sl0, buf, config.norepo, "norepo");
+  add_flag(&sl0, buf, config.device_auto_config, "deviceautoconfig");
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.self_update_url) {
@@ -5671,4 +5672,30 @@ void util_reparse_blockdev_urls()
   util_reparse_blockdev_url(&config.url.autoyast2);
   util_reparse_blockdev_url(&config.url.install);
   util_reparse_blockdev_url(&config.url.instsys);
+}
+
+/*
+ * Apply S390 I/O device auto-config.
+ *
+ * Ask user before doing so, if requested.
+ */
+void util_device_auto_config()
+{
+  unsigned do_it = config.device_auto_config;
+
+  if(do_it == 2) {
+    int win_old = config.win;
+    char *msg = config.device_auto_config_done ?
+      "Reapply I/O device pre-configuration?" : "Apply I/O device pre-configuration?";
+
+    if(!config.win) util_disp_init();
+    do_it = dia_yesno(msg, YES) == YES;
+    if(config.win && !win_old) util_disp_done();
+  }
+
+  if(do_it) {
+    log_info("applying I/O device pre-configuration\n");
+    util_run_script("device_auto_config");
+    config.device_auto_config_done = 1;
+  }
 }
