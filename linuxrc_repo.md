@@ -80,7 +80,7 @@ To include `content` in the initrd in a place linuxrc finds it, do something lik
 mkdir -p /tmp/foo/etc/linuxrc.d
 cp content /tmp/foo/etc/linuxrc.d/
 cd /tmp/foo
-find . | cpio -o -H newc | xz --check=crc32 -c >>initrd_on_boot_medium
+find . | cpio --create --format=newc | xz --check=crc32 --to-stdout >>initrd_on_boot_medium
 ```
 
 ## 3. Multi-repository medium
