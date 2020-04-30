@@ -120,6 +120,7 @@ static struct {
   { key_autoyast,       "AY",             kf_cfg + kf_cmd_early          },
   { key_autoyast_parse, "AutoYaSTParse",  kf_cfg + kf_cmd_early          },
   { key_autoyast_parse, "AYParse",        kf_cfg + kf_cmd_early          },
+  { key_autoyast_passurl, "AutoYaSTPassURL",  kf_cfg + kf_cmd_early      },
   { key_autoyast2,      "AutoYaST2",      kf_cfg + kf_cmd_early          },
   { key_linuxrc,        "linuxrc",        kf_cfg + kf_cmd_early          },
   { key_forceinsmod,    "ForceInsmod",    kf_cfg + kf_cmd                },
@@ -853,6 +854,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_autoyast_parse:
         if(f->is.numeric) config.autoyast_parse = f->nvalue;
+        break;
+
+      case key_autoyast_passurl:
+        if(f->is.numeric) config.autoyast_passurl = f->nvalue;
         break;
 
       case key_info:
@@ -1950,7 +1955,7 @@ void file_write_install_inf(char *dir)
   if(config.url.autoyast) {
     log_info("final autoyast url: %s\n", url_print(config.url.autoyast, 0));
     file_write_str(f, key_autoyast,
-      config.autoyast_parse ? url_print(config.url.autoyast, 5) : config.url.autoyast->str
+      config.autoyast_parse && !config.autoyast_passurl ? url_print(config.url.autoyast, 5) : config.url.autoyast->str
     );
   }
   /*

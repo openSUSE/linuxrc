@@ -450,6 +450,7 @@ typedef struct {
   unsigned norepo:1;            /**< disable repo location check, expect YaST */
   unsigned auto_assembly:1;	/**< enable MD/RAID auto-assembly */
   unsigned autoyast_parse:1;	/**< analyse autoyast parameter */
+  unsigned autoyast_passurl:1;	/**< pass autoyast url unmodified on to yast */
   unsigned device_auto_config:2;	/**< run s390 device auto-config (cf. bsc#1168036) */
   unsigned device_auto_config_done:1;	/**< set after s390 device auto-config has been run */
   struct {
