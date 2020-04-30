@@ -1,4 +1,4 @@
-#define _GNU_SOURCE	/* strnlen, getline, strcasestr, strverscmp */
+#define _GNU_SOURCE	/* strnlen, getline, strcasestr, strverscmp, fnmatch */
 
 /*
 
@@ -17,6 +17,7 @@ known issues:
 #include <fcntl.h>
 #include <signal.h>
 #include <dirent.h>
+#include <fnmatch.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
@@ -91,6 +92,7 @@ static int is_gpg_signed(char *file);
 static int is_rpm_signed(char *file);
 static int is_signed(char *file, int check);
 static unsigned url_scheme_attr(instmode_t scheme, char *attr_name);
+static void url_add_query_string(char **buf, int n, url_t *url);
 
 // mapping of URL schemes to internal constants
 static struct {
@@ -837,6 +839,33 @@ void skip_not_slashes(char **str)
 
 
 /*
+ * (Re-)append arbitrary query parameters to url.
+ *
+ *  buf: buffer pointer, will be updated as needed
+ *    n: parameter position (starting at 0)
+ *  url: url to process
+ */
+void url_add_query_string(char **buf, int n, url_t *url)
+{
+  slist_t *sl;
+
+  if(
+    url->scheme != inst_ftp &&
+    url->scheme != inst_tftp &&
+    url->scheme != inst_http &&
+    url->scheme != inst_https
+  ) return;
+
+  for(sl = url->query; sl; sl = sl->next) {
+    // skip parameters handled by linuxrc
+    if(fnmatch("@(device|instsys|list|type|all|quiet|label|service|descr|proxy*)", sl->key, FNM_EXTMATCH)) {
+      strprintf(buf, "%s%c%s=%s", *buf, n++ ? '&' : '?', sl->key, sl->value);
+    }
+  }
+}
+
+
+/*
  * Print url to string.
  *
  * scheme://domain;user:password@server:port/path?query
@@ -914,6 +943,8 @@ char *url_print(url_t *url, int format)
       strprintf(&buf, "%s%clist=%s", buf, q++ ? '&' : '?', s = slist_join(",", url->file_list));
       free(s);
     }
+
+    url_add_query_string(&buf, q, url);
   }
 
   if(format == 0) {
@@ -1053,6 +1084,8 @@ char *url_print_zypp(url_t *url)
     if(config.url.proxy->password) strprintf(&buf, "%s%cproxypass=%s", buf, q++ ? '&' : '?', config.url.proxy->password);
   }
 
+  url_add_query_string(&buf, q, url);
+
   if(url->is.file && file) {
     strprintf(&buf, "iso:/?iso=%s&url=%s", file, buf);
   }
@@ -1162,6 +1195,8 @@ char *url_print_autoyast(url_t *url)
   }
 
   str_copy(&path, NULL);
+
+  url_add_query_string(&buf, 0, url);
 
   return buf;
 }
