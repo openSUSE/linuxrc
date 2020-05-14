@@ -1636,7 +1636,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     return -1;
   }
 
-  rc = lxrc_run("/sbin/udevadm settle");
+  rc = lxrc_run("/usr/bin/udevadm settle");
   if(rc) {
     sprintf(cmd, "udevadm settle failed (error code %d)", rc);
     dia_message(cmd, MSGTYPE_ERROR);
