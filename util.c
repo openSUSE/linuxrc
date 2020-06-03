@@ -1120,6 +1120,9 @@ void util_status_info(int log_it)
   sprintf(buf, "product = \"%s\"", config.product);
   slist_append_str(&sl0, buf);
 
+  sprintf(buf, "release version: %s", config.releasever ?: "unset");
+  slist_append_str(&sl0, buf);
+
   sprintf(buf,
     "memory (MB): total %lld, free %lld (%lld), ramdisk %lld",
     (long long) config.memoryXXX.total >> 20,
@@ -3191,6 +3194,28 @@ void util_set_product_dir(char *prod)
     strprintf(&config.kexec_kernel, "boot/%s/linux", arch);
     strprintf(&config.kexec_initrd, "boot/%s/initrd", arch);
   }
+}
+
+
+/*
+ * Read product version from /usr/lib/os-release.
+ *
+ * The product version is used for replacing $releasever in URLs.
+ */
+void util_get_releasever()
+{
+  file_t *f0, *f;
+
+  f0 = file_read_file("/usr/lib/os-release", kf_none);
+
+  for(f = f0; f; f = f->next) {
+    if(!strcmp(f->key_str, "VERSION_ID")) {
+      str_copy(&config.releasever, f->value);
+      break;
+    }
+  }
+
+  file_free_file(f0);
 }
 
 

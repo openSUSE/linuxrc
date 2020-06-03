@@ -265,7 +265,6 @@ typedef enum {
 typedef struct {
   char *str;
   instmode_t scheme;
-  instmode_t orig_scheme;
   char *server;
   char *share;
   char *path;
@@ -299,6 +298,16 @@ typedef struct {
     char *model;
     char *unique_id;
   } used;
+  struct {
+    /*
+     * The original values of some url components that might get modified in url_set().
+     */
+    instmode_t scheme;
+    char *server;
+    char *share;
+    char *path;
+    char *instsys;
+  } orig;
 } url_t;
 
 
@@ -494,6 +503,7 @@ typedef struct {
   char *serial;			/**< serial console parameters, e.g. ttyS0,38400 or ttyS1,9600n8 */
   char *product;		/**< product name */
   char *product_dir;		/**< product specific dir component (e.g. 'suse') */
+  char *releasever;		/**< product version, to be used for replacing $releasever in zypp */
   int kbdtimeout;		/**< keyboard timeout (in s) */
   int escdelay;			/**< timeout to differ esc from function keys */
   int loglevel;			/**< set kernel log level */
