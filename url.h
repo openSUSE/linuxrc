@@ -51,6 +51,7 @@ typedef struct url_data_s {
 
 void url_read(url_data_t *url_data);
 url_t *url_set(char *str);
+void url_log(url_t *url);
 url_t *url_free(url_t *url);
 void url_cleanup(void);
 url_data_t *url_data_new(void);

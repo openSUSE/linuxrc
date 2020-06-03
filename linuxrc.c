@@ -856,6 +856,8 @@ void lxrc_init()
 
   config.platform_name=get_platform_name();
 
+  util_get_releasever();
+
   LXRC_WAIT
 
   if(util_check_exist("/sbin/mount.smbfs")) {

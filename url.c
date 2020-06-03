@@ -93,6 +93,9 @@ static int is_rpm_signed(char *file);
 static int is_signed(char *file, int check);
 static unsigned url_scheme_attr(instmode_t scheme, char *attr_name);
 static void url_add_query_string(char **buf, int n, url_t *url);
+static char *url_replace_vars(char *url);
+static void url_replace_vars_with_backup(char **str, char **backup);
+
 
 // mapping of URL schemes to internal constants
 static struct {
@@ -553,7 +556,7 @@ url_t *url_set(char *str)
     }
   }
 
-  url->orig_scheme = url->scheme;
+  url->orig.scheme = url->scheme;
 
   /* adjust some url schemes to support autoyast syntax */
   fixup_url_disk(url);
@@ -658,52 +661,71 @@ url_t *url_set(char *str)
 
   log_debug("url = %s\n", url->str);
 
-  if(config.debug >= 2) {
-    log_debug(
-      "  scheme = %s (%d), orig scheme = %s (%d)",
-      url_scheme2name(url->scheme), url->scheme,
-      url_scheme2name(url->orig_scheme), url->orig_scheme
-    );
-    if(url->server) log_debug(", server = \"%s\"", url->server);
-    if(url->port) log_debug(", port = %u", url->port);
-    if(url->path) log_debug(", path = \"%s\"", url->path);
-    log_debug("\n");
+  url_replace_vars_with_backup(&url->server, &url->orig.server);
+  url_replace_vars_with_backup(&url->share, &url->orig.share);
+  url_replace_vars_with_backup(&url->path, &url->orig.path);
+  url_replace_vars_with_backup(&url->instsys, &url->orig.instsys);
 
-    if(url->user || url->password) {
-      i = 0;
-      if(url->user) log_debug("%c user = \"%s\"", i++ ? ',' : ' ', url->user);
-      if(url->password) log_debug("%c password = \"%s\"", i++ ? ',' : ' ', url->password);
-      log_debug("\n");
-    }
-
-    if(url->share || url->domain || url->device) {
-      i = 0;
-      if(url->share) log_debug("%c share = \"%s\"", i++ ? ',' : ' ', url->share);
-      if(url->domain) log_debug("%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
-      if(url->device) log_debug("%c device = \"%s\"", i++ ? ',' : ' ', url->device);
-      log_debug("\n");
-    }
-
-    log_debug(
-      "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, all = %u, quiet = %u\n",
-      url->is.network, url->is.blockdev, url->is.mountable, url->is.file, url->is.dir,
-      url->search_all, url->quiet
-    );
-
-    if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
-
-    if(url->query) {
-      log_debug("  query:\n");
-      for(sl = url->query; sl; sl = sl->next) {
-        log_debug("    %s = \"%s\"\n", sl->key, sl->value);
-      }
-    }
-
-    log_debug("url (zypp format) = %s\n", url_print(url, 4));
-    log_debug("url (ay format) = %s\n", url_print(url, 5));
-  }
+  if(config.debug >= 2) url_log(url);
 
   return url;
+}
+
+
+/*
+ * Detailed log of parsed url components.
+ */
+void url_log(url_t *url)
+{
+  int i;
+  slist_t *sl;
+
+  log_debug(
+    "  scheme = %s (%d), orig scheme = %s (%d)",
+    url_scheme2name(url->scheme), url->scheme,
+    url_scheme2name(url->orig.scheme), url->orig.scheme
+  );
+  if(url->server) log_debug(", server = \"%s\"", url->server);
+  if(url->orig.server) log_debug(", server (orig) = \"%s\"", url->orig.server);
+  if(url->port) log_debug(", port = %u", url->port);
+  if(url->path) log_debug(", path = \"%s\"", url->path);
+  if(url->orig.path) log_debug(", path (orig) = \"%s\"", url->orig.path);
+  log_debug("\n");
+
+  if(url->user || url->password) {
+    i = 0;
+    if(url->user) log_debug("%c user = \"%s\"", i++ ? ',' : ' ', url->user);
+    if(url->password) log_debug("%c password = \"%s\"", i++ ? ',' : ' ', url->password);
+    log_debug("\n");
+  }
+
+  if(url->share || url->domain || url->device) {
+    i = 0;
+    if(url->share) log_debug("%c share = \"%s\"", i++ ? ',' : ' ', url->share);
+    if(url->orig.share) log_debug("%c share (orig) = \"%s\"", i++ ? ',' : ' ', url->orig.share);
+    if(url->domain) log_debug("%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
+    if(url->device) log_debug("%c device = \"%s\"", i++ ? ',' : ' ', url->device);
+    log_debug("\n");
+  }
+
+  log_debug(
+    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, all = %u, quiet = %u\n",
+    url->is.network, url->is.blockdev, url->is.mountable, url->is.file, url->is.dir,
+    url->search_all, url->quiet
+  );
+
+  if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
+  if(url->orig.instsys) log_debug("  instsys (orig) = %s\n", url->orig.instsys);
+
+  if(url->query) {
+    log_debug("  query:\n");
+    for(sl = url->query; sl; sl = sl->next) {
+      log_debug("    %s = \"%s\"\n", sl->key, sl->value);
+    }
+  }
+
+  log_debug("url (zypp format) = %s\n", url_print(url, 4));
+  log_debug("url (ay format) = %s\n", url_print(url, 5));
 }
 
 
@@ -973,13 +995,19 @@ char *url_print(url_t *url, int format)
 
 
 /*
- * according to zypp/media/MediaManager.h
+ * Construct URL suitable for zypp.
+ *
+ * See
+ *   - https://doc.opensuse.org/projects/libzypp/HEAD/classzypp_1_1media_1_1MediaManager.html#MediaAccessUrl
+ * for URL scheme documentation.
+ *
+ * This builds a URL without zypp variables replaced.
  */
 char *url_print_zypp(url_t *url)
 {
   static char *buf = NULL, *s;
   char *path = NULL, *file = NULL;
-  int q = 0, scheme;
+  int q = 0;
 
   // log_info("start buf = %p\n", buf);
   // LXRC_WAIT
@@ -991,8 +1019,12 @@ char *url_print_zypp(url_t *url)
   }
 
   str_copy(&buf, NULL);
+  int scheme = url->scheme;
 
-  str_copy(&path, url->path);
+  /* prefer original values (without zypp variables replaced) */
+  char *server = url->orig.server ?: url->server;
+  char *share = url->orig.share ?: url->share;
+  str_copy(&path, url->orig.path ?: url->path);
 
   if(url->is.file && path) {
     if((file = strrchr(path, '/')) && *file) {
@@ -1002,8 +1034,6 @@ char *url_print_zypp(url_t *url)
       file = NULL;
     }
   }
-
-  scheme = url->scheme;
 
   if(scheme == inst_disk) {
     scheme = url->is.cdrom ? inst_cdrom : inst_hd;
@@ -1023,7 +1053,7 @@ char *url_print_zypp(url_t *url)
 
   strprintf(&buf, "%s:", url_scheme2name(scheme));
 
-  if(url->domain || url->user || url->password || url->server || url->port) {
+  if(url->domain || url->user || url->password || server || url->port) {
     strprintf(&buf, "%s//", buf);
     if(url->domain) strprintf(&buf, "%s%s;", buf, url->domain);
     if(url->user) {
@@ -1037,18 +1067,18 @@ char *url_print_zypp(url_t *url)
       curl_free(s);
     }
     if(url->user || url->password) strprintf(&buf, "%s@", buf);
-    if(url->server) {
-      if(strchr(url->server, ':')) {
-        strprintf(&buf, "%s[%s]", buf, url->server);
+    if(server) {
+      if(strchr(server, ':')) {
+        strprintf(&buf, "%s[%s]", buf, server);
       }
       else {
-        strprintf(&buf, "%s%s", buf, url->server);
+        strprintf(&buf, "%s%s", buf, server);
       }
     }
     if(url->port) strprintf(&buf, "%s:%u", buf, url->port);
   }
 
-  if(url->share) strprintf(&buf, "%s/%s", buf, url->share);
+  if(share) strprintf(&buf, "%s/%s", buf, share);
   if(path) {
     strprintf(&buf, "%s/%s%s",
       buf,
@@ -1135,10 +1165,10 @@ char *url_print_autoyast(url_t *url)
     if(url->used.device) {
       strprintf(&buf, "%s%s", buf, short_dev(url->used.device));
     }
-    else if(url->orig_scheme == inst_usb) {
+    else if(url->orig.scheme == inst_usb) {
       strprintf(&buf, "usb:/");
     }
-    else if(url->orig_scheme == inst_label) {
+    else if(url->orig.scheme == inst_label) {
       slist_t *sl;
       strprintf(&buf, "label://");
       if((sl = slist_getentry(url->query, "label"))) {
@@ -1243,6 +1273,11 @@ url_t *url_free(url_t *url)
 
     slist_free(url->query);
     slist_free(url->file_list);
+
+    free(url->orig.server);
+    free(url->orig.share);
+    free(url->orig.path);
+    free(url->orig.instsys);
 
     free(url);
   }
@@ -3885,5 +3920,56 @@ void url_register_schemes()
       }
     }
     closedir(d);
+  }
+}
+
+
+/*
+ * Replace zypp variables in string.
+ *
+ * Return new string.
+ *
+ * The returned value is a copy of the passed argument and must be freed later.
+ *
+ * Currently only $releasever and ${releasever} are replaced.
+ */
+char *url_replace_vars(char *str)
+{
+  static char *vars[] = { "${releasever}", "$releasever" };
+  char *res = NULL;
+
+  str_copy(&res, str);
+
+  if(!config.releasever) return res;
+
+  for(int i = 0; i < sizeof vars / sizeof *vars; i++) {
+    int len = strlen(vars[i]);
+    char *s;
+    if((s = strstr(res, vars[i]))) {
+      s[len - 1] = 0;
+      s[0] = 0;
+      strprintf(&res, "%s%s%s", res, config.releasever, s + len);
+    }
+  }
+
+  return res;
+}
+
+
+/*
+ * Replace zypp variables and store a backup of the original string.
+ */
+void url_replace_vars_with_backup(char **str, char **backup)
+{
+  if(!*str) return;
+
+  char *new_str = url_replace_vars(*str);
+
+  if(!strcmp(new_str, *str)) {
+    free(new_str);
+  }
+  else {
+    *backup = *str;
+    *str = new_str;
   }
 }
