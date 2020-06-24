@@ -121,8 +121,6 @@ static int cmp_alpha(slist_t *sl0, slist_t *sl1);
 static int cmp_alpha_s(const void *p0, const void *p1);
 static slist_t *get_kernel_list(char *dev);
 
-static int has_device_auto_config(void);
-
 void util_redirect_kmsg()
 {
   static char newvt[2] = { 11, 4 /* console 4 */ };
@@ -5709,7 +5707,7 @@ void util_device_auto_config()
 {
   unsigned do_it = config.device_auto_config;
 
-  if(do_it && !has_device_auto_config()) do_it = 0;
+  if(do_it && !util_has_device_auto_config()) do_it = 0;
 
   if(do_it == 2) {
     int win_old = config.win;
@@ -5725,6 +5723,10 @@ void util_device_auto_config()
     log_info("applying I/O device auto-configuration\n");
     util_run_script("device_auto_config");
     config.device_auto_config_done = 1;
+    config.device_auto_config = 1;
+  }
+  else {
+    config.device_auto_config = 0;
   }
 }
 
@@ -5732,7 +5734,7 @@ void util_device_auto_config()
 /*
  * Check if S390 I/O device auto-config data is available.
  */
-int has_device_auto_config()
+int util_has_device_auto_config()
 {
   FILE *f;
   int has_it = 0;

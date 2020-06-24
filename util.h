@@ -166,3 +166,4 @@ void util_reparse_blockdev_url(url_t **url_ptr);
 void util_reparse_blockdev_urls(void);
 
 void util_device_auto_config(void);
+int util_has_device_auto_config(void);
