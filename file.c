@@ -318,6 +318,7 @@ static struct {
   { key_norepo,         "NoRepo",         kf_cfg + kf_cmd                },
   { key_auto_assembly,  "AutoAssembly",   kf_cfg + kf_cmd_early          },
   { key_device_auto_config, "DeviceAutoConfig",  kf_cfg + kf_cmd_early   },
+  { key_rd_zdev,        "rd.zdev",        kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1809,6 +1810,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.device_auto_config = f->nvalue;
         break;
 
+      case key_rd_zdev:
+        if(!strcmp(f->value, "no-auto")) {
+          config.device_auto_config = 0;
+        }
+        break;
+
       default:
         break;
     }
@@ -1899,7 +1906,6 @@ void file_write_install_inf(char *dir)
   char file_name[256], *s;
   slist_t *sl;
   file_t *ft0, *ft;
-  int i;
   url_t *url = config.url.install;
 
   if(!url) return;
@@ -2012,16 +2018,35 @@ void file_write_install_inf(char *dir)
 
   ft0 = file_read_cmdline(kf_cmd + kf_cmd_early + kf_boot);
 
-  for(i = 0, ft = ft0; ft; ft = ft->next) {
+  slist_t *parm_list = NULL;
+
+  for(ft = ft0; ft; ft = ft->next) {
     if(
       ft->key == key_none ||
       ft->key == key_vga
     ) {
-      fprintf(f, "%s%s", i ? " " : "Cmdline: ", ft->unparsed);
-      i = 1;
+      slist_append_str(&parm_list, ft->unparsed);
     }
   }
-  if(i) fprintf(f, "\n");
+
+#if defined(__s390x__)
+  /*
+   * bsc#1168036
+   *
+   * If device auto-config has been disabled pass this setting on to the target system.
+   */
+  if(config.device_auto_config == 0 && util_has_device_auto_config()) {
+    slist_append_str(&parm_list, "rd.zdev=no-auto");
+  }
+#endif
+
+  if(parm_list) {
+    char *str = slist_join(" ", parm_list);
+    fprintf(f, "Cmdline: %s\n", str);
+    free(str);
+  }
+
+  slist_free(parm_list);
 
   file_free_file(ft0);
 

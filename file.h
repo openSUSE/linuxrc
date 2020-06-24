@@ -57,7 +57,7 @@ typedef enum {
   key_nanny, key_vlanid,
   key_sshkey, key_systemboot, key_sethostname, key_debugshell, key_self_update,
   key_ibft_devices, key_linuxrc_core, key_norepo, key_auto_assembly, key_autoyast_parse,
-  key_device_auto_config, key_autoyast_passurl
+  key_device_auto_config, key_autoyast_passurl, key_rd_zdev
 } file_key_t;
 
 typedef enum {
