@@ -18,7 +18,7 @@ See https://github.com/yast/yast-network/blob/master/doc/hostname.md
 
 ## If `ifcfg=*=dhcp` is used
 
-- `linuxrc` writes `/etc/sysconfig/network/dhcp:DHCLIENT_SET_HOSTNAME="yes"`
+- `linuxrc` writes `/etc/sysconfig/network/dhcp::DHCLIENT_SET_HOSTNAME="yes"`
 
 ## If `hostname` boot option is used
 
