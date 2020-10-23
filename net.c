@@ -2070,6 +2070,10 @@ int _ifcfg_write(char *device, ifcfg_t *ifcfg)
       sl = slist_append_str(&sl_ifcfg, "ETHERDEVICE");
       str_copy(&sl->value, device);
     }
+    if(ifcfg->rfc2132) {
+      sl = slist_append_str(&sl_ifcfg, "DHCLIENT_CREATE_CID");
+      str_copy(&sl->value, "rfc2132");
+    }
   }
 
   // 2. create ifcfg entries
@@ -2387,7 +2391,11 @@ ifcfg_t *ifcfg_parse(char *str)
   slist_t *sl, *sl0, *slx;
   ifcfg_t *ifcfg;
   char *s, *t;
-  int try_shift = 0; // try keyword is optional, so position of following params can vary
+  /*
+   * optional keywords "dhcp", "dhcp4", "dhcp6", "try", "rfc2132" move the
+   * position of following params
+   */
+  int option_shift = 0;
 
   if(!str) return NULL;
 
@@ -2422,38 +2430,53 @@ ifcfg_t *ifcfg_parse(char *str)
     str_copy(&ifcfg->device, s);
   }
 
-  s = slist_key(sl0, 1);
-  if(s && (strncmp(s, "try", sizeof "try" -1) == 0))
-  {
-    log_debug("Will try to detect interface with access to installation");
+  // parse optional keywords (in any order)
+  while((s = slist_key(sl0, 1 + option_shift))) {
+    if(!strcmp(s, "dhcp") || !strcmp(s, "dhcp4") || !strcmp(s, "dhcp6")) {
+      str_copy(&ifcfg->type, s);
+      ifcfg->dhcp = 1;
 
-    ifcfg->search = 1;
-    try_shift = 1;
+      option_shift++;
+      continue;
+    }
 
-    s = slist_key(sl0, 2);
+    if(!strcmp(s, "try")) {
+      log_debug("Will try to detect interface with access to installation");
+      ifcfg->search = 1;
+
+      option_shift++;
+      continue;
+    }
+
+    if(!strcmp(s, "rfc2132")) {
+      ifcfg->rfc2132 = 1;
+
+      option_shift++;
+      continue;
+    }
+
+    break;
   }
 
-  if(s && !strncmp(s, "dhcp", sizeof "dhcp" - 1)) {
-    str_copy(&ifcfg->type, s);
-    ifcfg->dhcp = 1;
-  }
-  else {
+  // if not dhcp, get static config options
+  if(!ifcfg->dhcp) {
     str_copy(&ifcfg->type, "static");
 
     t = NULL;
 
     if(s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ip, s);
 
-    s = slist_key(sl0, 2 + try_shift);
+    s = slist_key(sl0, 2 + option_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->gw, s);
 
-    s = slist_key(sl0, 3 + try_shift);
+    s = slist_key(sl0, 3 + option_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->ns, s);
 
-    s = slist_key(sl0, 4 + try_shift);
+    s = slist_key(sl0, 4 + option_shift);
     if(!t && s && *s && !(t = strchr(s, '='))) str_copy(&ifcfg->domain, s);
   }
 
+  // get anything in the form of FOO=bar to be put directly into ifcfg file
   for(sl = sl0->next; sl; sl = sl->next) {
     if((t = strchr(sl->key, '='))) {
       *t++ = 0;
@@ -2465,6 +2488,7 @@ ifcfg_t *ifcfg_parse(char *str)
 
   slist_free(sl0);
 
+  // decide if device spec refers to a device name or a pattern to match
   if(ifcfg->device) {
     for(s = ifcfg->device; *s; s++) {
       if(!isalnum(*s) && *s != '_') {
@@ -2526,10 +2550,10 @@ char *ifcfg_print(ifcfg_t *ifcfg)
   if(ifcfg->vlan) strprintf(&buf, "%s  vlan = %s\n", buf, ifcfg->vlan);
   if(ifcfg->type) strprintf(&buf, "%s  type = %s\n", buf, ifcfg->type);
   strprintf(&buf,
-    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u, search = %u\n",
+    "%s  dhcp = %u, pattern = %u, used = %u, prefix = %d, ptp = %u, search = %u, rfc2132 = %u\n",
     buf,
     ifcfg->dhcp, ifcfg->pattern, ifcfg->used,
-    ifcfg->netmask_prefix, ifcfg->ptp, ifcfg->search
+    ifcfg->netmask_prefix, ifcfg->ptp, ifcfg->search, ifcfg->rfc2132
   );
   if(ifcfg->ip) strprintf(&buf, "%s  ip = %s\n", buf, ifcfg->ip);
   if(ifcfg->gw) strprintf(&buf, "%s  gw = %s\n", buf, ifcfg->gw);
