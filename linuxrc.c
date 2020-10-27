@@ -959,6 +959,12 @@ void lxrc_init()
     gm->tm_year + 1900, gm->tm_mon + 1, gm->tm_mday, gm->tm_hour, gm->tm_min, gm->tm_sec
   );
 
+  /*
+   * Do what has to be done before udevd starts; atm this is just the
+   * insmod.pre option.
+   */
+  file_read_info_file("cmdline", kf_cmd0);
+
   if(!config.test) {
     log_show("Starting udev... ");
     util_run_script("udev_setup");
