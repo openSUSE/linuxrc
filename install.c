@@ -474,7 +474,9 @@ int inst_choose_partition(char **partition, int flags, char *txt_menu, char *txt
   char **items3, **values3;
   char *type;
   slist_t *sl;
-  char buf[256], *dev;
+  // buf[] must be able to hold a command (of fixed known length) + filename[256],
+  // so make a bit larger than 256
+  char buf[512], *dev;
   int found = 0, item_mk_part = 0, item_mk_file = 0;
   char *s, *tmp = NULL;
   static char *last_part = NULL;
