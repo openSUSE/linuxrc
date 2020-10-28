@@ -1327,25 +1327,36 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value) str_copy(&config.rootimage2, f->value);
         break;
 
-      case key_none:
       case key_is_ptoption:
-        if((flags & (kf_cmd + kf_cfg))) {
-          for(sl = config.ptoptions; sl; sl = sl->next) {
-            if(!strcasecmpignorestrich(sl->key, f->key_str)) {
-              str_copy(&sl->value, f->value);
-              f->key = key_is_ptoption;
-              break;
-            }
+        // store option value
+        for(sl = config.ptoptions; sl; sl = sl->next) {
+          if(!strcasecmpignorestrich(sl->key, f->key_str)) {
+            str_copy(&sl->value, f->value);
+            break;
           }
         }
+        break;
 
-        /* was user defined option */
-        if(f->key == key_is_ptoption) break;
+      case key_none:
+        /*
+         * Do interpretation of module.foo=bar in command line only once
+         * (with kf_cmd_early) - the outcome would not change doing it again.
+         */
+        if(!(flags & kf_cmd_early)) break;
 
-        /* assume kernel module option if it can be parsed as 'module.option' */
+        /* it must not look like any of the linuxrc options */
+        if(file_str2key(f->key_str, kf_all) != key_none) break;
 
-        /* Note: f->unparsed is only set when we read from cmdline/argv *NOT* from files. */
-        if((flags & kf_cmd_early) && (s1 = f->unparsed)) {
+        log_debug("parser: =0x%02x= =%d:%s= =%s= >%s<\n", flags, f->key, f->key_str, f->value, f->unparsed);
+
+        /*
+         * Assume it is a kernel module option if it can be parsed as
+         * 'module.option'.
+         *
+         * Note: f->unparsed is only set when reading from cmdline/argv, not
+         * from files.
+         */
+        if((s1 = f->unparsed)) {
           i = strlen(f->unparsed);
           if(s1[0] == '"' && s1[i - 1] == '"') {
             s1[i - 1] = 0;
@@ -1360,7 +1371,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
           break;
         }
 
-        /* continue with key_options */
+      /* fall through to key_options */
 
       case key_options:
         if(*f->value) {
