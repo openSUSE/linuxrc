@@ -854,6 +854,9 @@ void lxrc_init()
     lxrc_add_parts();
   }
 
+  // modprobe config files exist from here on
+  config.module.modprobe_ok = 1;
+
   config.platform_name=get_platform_name();
 
   util_get_releasever();
@@ -958,6 +961,12 @@ void lxrc_init()
     "===  linuxrc " LXRC_FULL_VERSION " - %04d-%02d-%02d %02d:%02d:%02d  ===\n",
     gm->tm_year + 1900, gm->tm_mon + 1, gm->tm_mday, gm->tm_hour, gm->tm_min, gm->tm_sec
   );
+
+  /*
+   * Do what has to be done before udevd starts; atm this is just the
+   * insmod.pre option.
+   */
+  file_read_info_file("cmdline", kf_cmd0);
 
   if(!config.test) {
     log_show("Starting udev... ");
