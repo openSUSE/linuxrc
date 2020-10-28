@@ -77,6 +77,7 @@ static struct {
   { key_language,       "lang",           kf_cfg + kf_cmd                },
   { key_rebootmsg,      "RebootMsg",      kf_yast                        },
   { key_insmod,         "Insmod",         kf_cfg + kf_cmd1               },
+  { key_insmod_pre,     "InsmodPre",      kf_cfg + kf_cmd0               },
   { key_display,        "Display",        kf_cfg + kf_cmd                },
   { key_ip,             "IP",             kf_none                        },
   { key_netmask,        "Netmask",        kf_cfg + kf_cmd + kf_dhcp      },
@@ -641,6 +642,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
     switch(f->key) {
       case key_insmod:
+      case key_insmod_pre:
         file_module_load(f->value);
         break;
 

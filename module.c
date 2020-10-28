@@ -692,10 +692,20 @@ int mod_insmod(char *module, char *param)
 
   if(mod_is_loaded(module)) return 0;
 
-  buf_len = sprintf(buf, "insmod %s", config.forceinsmod ? "-f " : "");
+  /*
+   * When loading a module before linuxrc's module loading framework has
+   * been initialized, use modprobe instead of insmod as module deps are not
+   * yet known to linuxrc.
+   */
+  unsigned use_modprobe = config.module.modprobe_ok && (config.module.list ? 0 : 1);
 
-  if (util_check_exist(module)) {
-    /* wow, user provided a _path_ */
+  buf_len = sprintf(buf, "%s %s",
+    use_modprobe ? "modprobe" : "insmod",
+    config.forceinsmod ? "-f " : ""
+  );
+
+  /* insmod expects a full path as argument, modprobe not */
+  if (use_modprobe || util_check_exist(module)) {
     strcpy(buf + buf_len, module);
   } else {
     if(!mod_find_module(config.module.dir, module, buf + buf_len))

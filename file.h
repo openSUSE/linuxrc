@@ -57,7 +57,7 @@ typedef enum {
   key_nanny, key_vlanid,
   key_sshkey, key_systemboot, key_sethostname, key_debugshell, key_self_update,
   key_ibft_devices, key_linuxrc_core, key_norepo, key_auto_assembly, key_autoyast_parse,
-  key_device_auto_config, key_autoyast_passurl, key_rd_zdev
+  key_device_auto_config, key_autoyast_passurl, key_rd_zdev, key_insmod_pre
 } file_key_t;
 
 typedef enum {
@@ -69,10 +69,11 @@ typedef enum {
   kf_dhcp = 1 << 4,		/**< dhcp info file */
   kf_mem = 1 << 5,		/**< /proc/meminfo */
   kf_boot = 1 << 6,		/**< things the boot loader used */
-  kf_cmd1 = 1 << 7,		/**< between cmd_early and start of hw detection */
+  kf_cmd1 = 1 << 7,		/**< between starting udevd and starting hw detection */
   kf_ibft = 1 << 8,		/**< ibft values (iSCSI BIOS) */
   kf_cont = 1 << 9,		/**< 'content' file */
-  kf_comma = 1 << 10		/**< accept commas as option separator (in command line syntax) */
+  kf_comma = 1 << 10,		/**< accept commas as option separator (in command line syntax) */
+  kf_cmd0 = 1 << 11,		/**< between cmd_early and starting udevd */
 } file_key_flag_t;
 
 typedef struct file_s {
