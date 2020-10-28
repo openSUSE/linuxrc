@@ -61,6 +61,7 @@ typedef enum {
 } file_key_t;
 
 typedef enum {
+  kf_all = -1,
   kf_none = 0,
   kf_cfg = 1 << 0,		/**< /linuxrc.config & /info */
   kf_cmd = 1 << 1,		/**< /proc/cmdline, after info */
