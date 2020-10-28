@@ -854,6 +854,9 @@ void lxrc_init()
     lxrc_add_parts();
   }
 
+  // modprobe config files exist from here on
+  config.module.modprobe_ok = 1;
+
   config.platform_name=get_platform_name();
 
   util_get_releasever();

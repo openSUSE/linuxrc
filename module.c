@@ -697,7 +697,7 @@ int mod_insmod(char *module, char *param)
    * been initialized, use modprobe instead of insmod as module deps are not
    * yet known to linuxrc.
    */
-  unsigned use_modprobe = config.module.list ? 0 : 1;
+  unsigned use_modprobe = config.module.modprobe_ok && (config.module.list ? 0 : 1);
 
   buf_len = sprintf(buf, "%s %s",
     use_modprobe ? "modprobe" : "insmod",
