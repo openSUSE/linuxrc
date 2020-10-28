@@ -601,6 +601,7 @@ typedef struct {
     driver_t *drivers;		/**< list of extra drive info */
     unsigned disks:1;		/**< automatically ask for module disks */
     slist_t *options;		/**< potential module parameters */
+    unsigned modprobe_ok:1;	/**< if set, using modprobe is possible */
   } module;
 
   struct {			/**< Note: all memory sizes are now in bytes */
