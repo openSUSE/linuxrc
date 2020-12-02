@@ -5284,15 +5284,9 @@ void util_boot_system()
     kernel_name, initrd_name, kernel_options
   );
 
-  char *buf1 = NULL;
-
-  // on x86, non-uefi use real-mode interface;
-  // this seems to work better
-  if(strstr(kernel_name, "vmlinuz-") && !config.efi_vars) {
-    str_copy(&buf1, "--real-mode");
-  }
-
   if(config.debug) {
+    char *buf1 = NULL;
+
     if(dia_input2("Enter additional kexec options", &buf1, 57, 0)) {
       util_umount("/mnt");
 
@@ -5303,10 +5297,12 @@ void util_boot_system()
 
       return;
     }
-    if(buf1) strprintf(&buf, "%s %s", buf, buf1);
-  }
 
-  str_copy(&buf1, NULL);
+    if(buf1) {
+      strprintf(&buf, "%s %s", buf, buf1);
+      str_copy(&buf1, NULL);
+    }
+  }
 
   if(!config.test) {
     int err = lxrc_run(buf);
