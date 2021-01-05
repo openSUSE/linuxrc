@@ -1078,7 +1078,7 @@ void lxrc_init()
   if(config.had_segv) config.manual = 1;
 
   /* check efi status */
-  if(util_check_exist("/sys/firmware/efi/vars") == 'd') {
+  if(util_check_exist("/sys/firmware/efi/vars") == 'd' || util_check_exist("/sys/firmware/efi/efivars") == 'd') {
     config.efi_vars = 1;
   }
   log_debug("efi = %d\n", config.efi_vars);
