@@ -1,10 +1,9 @@
-#define _GNU_SOURCE
-
 /*
  *
  * module.c      Load modules needed for installation
  *
- * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG
+ * Copyright (c) 2002-2021  SUSE Solutions GmbH
  *
  */
 
@@ -126,7 +125,7 @@ int mod_has_module_ext(const char *file, const size_t len, size_t *ext_pos)
   for (mod_ext = mod_extensions; mod_ext->ext; mod_ext++)
     if (mod_cmp_ext(file, len, mod_ext->ext, mod_ext->len)) {
       if (ext_pos)
-	*ext_pos = len - mod_ext->len;
+        *ext_pos = len - mod_ext->len;
       return 1;
     }
 
@@ -226,7 +225,7 @@ void mod_init(int autoload)
     util_update_netdevice_list(NULL, 1);
   }
 
-  sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
+  snprintf(tmp, sizeof(tmp), "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
 
   if(autoload && !config.test) {
@@ -267,8 +266,6 @@ void mod_update_list()
   module_t *ml, **ml1;
   struct dirent *de;
   DIR *d;
-  char buf[32];
-  int i, found;
   size_t ext_pos;
 
   for(ml1 = &config.module.list; *ml1; ml1 = &(*ml1)->next) (*ml1)->exists = 0;
@@ -276,17 +273,12 @@ void mod_update_list()
   if(!(d = opendir(config.module.dir))) return;
 
   while((de = readdir(d))) {
-    i = strlen(de->d_name);
-    if(
-      i < (int) sizeof buf &&
-      mod_has_module_ext(de->d_name, i, &ext_pos)
-    ) {
-      strcpy(buf, de->d_name);
-      buf[ext_pos] = 0;
+    if(mod_has_module_ext(de->d_name, strlen(de->d_name), &ext_pos)) {
+      int found = 0;
 
       for(found = 0, ml = config.module.list; ml; ml = ml->next) {
         /* Don't stop if it is an 'autoload' entry! */
-        if(!strcmp(ml->name, buf)) {
+        if(!strcmp(ml->name, de->d_name)) {
           found = 1;
           ml->exists = 1;
           if(ml->type != 0) break;	/* 0: autoload, cf. file_read_modinfo() */
@@ -298,7 +290,7 @@ void mod_update_list()
         ml = *ml1 = calloc(1, sizeof **ml1);
         ml->exists = 1;
         ml->type = MAX_MODULE_TYPES - 1;	/* reserved for 'other' */
-        ml->name = strdup(buf);
+        ml->name = strdup(de->d_name);
         ml->descr = strdup("");
 
         ml1 = &ml->next;
@@ -307,7 +299,6 @@ void mod_update_list()
   }
 
   closedir(d);
-
 }
 
 
@@ -335,7 +326,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   int i, width;
 
   if(items) {
-    for(i = 0; i < mods; i++) if(items[i]) free(items[i]);
+    for(i = 0; i < mods; i++) free(items[i]);
     free(items);
     free(mod_items);
   }
@@ -358,7 +349,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
   for(i = 0, ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == type && ml->exists && ml->descr) {
-      asprintf(&items[i], "%*s%s%s",
+      strprintf(&items[i], "%*s%s%s",
         width,
         ml->name,
         *ml->descr ? ml->detected ? ml->active ? " * " : " + " : " : " : "", ml->descr
@@ -380,7 +371,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
 char *mod_get_title(int type)
 {
-  char buf[256], *s = NULL;
+  char *s = NULL;
 
   /* we have translations for these... */
   if(type) {
@@ -395,12 +386,11 @@ char *mod_get_title(int type)
     }
   }
 
-  if(!s) {
-    sprintf(buf, "Load %s Modules", config.module.type_name[type]);
-    s = buf;
-  }
+  if (s)
+    return strdup(s);
 
-  return strdup(s);
+  strprintf(&s, "Load %s Modules", config.module.type_name[type]);
+  return s;
 }
 
 
@@ -535,7 +525,7 @@ void mod_unload_module(char *module)
   char cmd[300];
   int err;
 
-  sprintf(cmd, "rmmod %s", module);
+  snprintf(cmd, sizeof(cmd), "rmmod %s", module);
   err = lxrc_run(cmd);
   util_update_kernellog();
 
@@ -585,7 +575,6 @@ int mod_unload_modules(char *modules)
 
 int mod_load_modules(char *modules, int show)
 {
-  char buf[256];
   int ok = 1;
   slist_t *sl0, *sl;
 
@@ -594,7 +583,9 @@ int mod_load_modules(char *modules, int show)
   for(sl = sl0; sl && ok; sl = sl->next) {
     if(mod_is_loaded(sl->key)) {
       if(show == 2) {
-        sprintf(buf, "Module \"%s\" has already been loaded.", sl->key);
+        char buf[256];
+
+        snprintf(buf, sizeof(buf), "Module \"%s\" has already been loaded.", sl->key);
         dia_message(buf, MSGTYPE_INFO);
       }
     }
@@ -638,7 +629,7 @@ char *mod_get_params(module_t *mod)
     sl->key = strdup(mod->name);
   }
 
-  if(sl->value) free(sl->value);
+  free(sl->value);
   sl->value = buf2;
 
   return sl->value;
@@ -648,7 +639,7 @@ char *mod_get_params(module_t *mod)
 void mod_load_module_manual(char *module, int show)
 {
   module_t *ml;
-  char *s, buf[256];
+  char *s;
   window_t win;
   int i;
 
@@ -668,7 +659,9 @@ void mod_load_module_manual(char *module, int show)
   }
 
   if(show && s) {
-    sprintf(buf,
+    char buf[300];
+
+    snprintf(buf, sizeof buf,
       "Trying to load module \"%s\"...\n\n"
       "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
       ml->name
@@ -678,12 +671,12 @@ void mod_load_module_manual(char *module, int show)
     win_close(&win);
     i = mod_is_loaded(ml->name);
     if(i) {
-      sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
+      snprintf(buf, sizeof buf, "Module \"%s\" loaded successfully.", ml->name);
       dia_message(buf, MSGTYPE_INFO);
     }
     else {
       util_beep(FALSE);
-      sprintf(buf, "Failed to load module \"%s\".", ml->name);
+      snprintf(buf, sizeof buf, "Failed to load module \"%s\".", ml->name);
       dia_message(buf, MSGTYPE_ERROR);
     }
   }
@@ -718,7 +711,7 @@ int mod_insmod(char *module, char *param)
    */
   unsigned use_modprobe = config.module.modprobe_ok && (config.module.list ? 0 : 1);
 
-  buf_len = sprintf(buf, "%s %s",
+  buf_len = snprintf(buf, sizeof(buf), "%s %s",
     use_modprobe ? "modprobe" : "insmod",
     config.forceinsmod ? "-f " : ""
   );
@@ -827,7 +820,8 @@ int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t alig
   file_t *f0, *f;
 
   if(item) {
-    for(i = 0; i < max_mods; i++) if(item[i]) free(item[i]);
+    for(i = 0; i < max_mods; i++)
+      free(item[i]);
     free(item);
     free(mods);
   }
