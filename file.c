@@ -606,29 +606,50 @@ char *file_read_info_file(char *file, file_key_flag_t flags)
  */
 void file_do_info(file_t *f0, file_key_flag_t flags)
 {
-  file_t *f;
+  file_t *f, *xml_section_start = 0;
   int i, is_xml = 0;
   char buf[256], *s, *t, *s1;
   slist_t *sl, *sl0;
   unsigned u;
   FILE *w;
 
+  if(config.debug >= 2) {
+    log_debug("= config file [flags 0x%02x] =\n", flags);
+    for(f = f0; f; f = f->next) {
+      log_info("  key %d \"%s\", value %d \"%s\", raw \"%s\"\n", f->key, f->key_str, f->nvalue, f->value, f->unparsed ?: "");
+    }
+  }
+
   /*
    * Maybe it's an AutoYaST XML file.
    *
-   * If so, try limiting the scope to lines in first '<info_file>' element.
+   * If so, limit the scope to lines in first '<info_file>' element.
    */
   for(f = f0; f; f = f->next) {
     if(f->key == key_none) {
-      if(!strncmp(f->key_str, "<info_file", sizeof "<info_file" - 1)) {
+      if(
+        !strncmp(f->key_str, "<info_file", sizeof "<info_file" - 1) &&
+        !strstr(f->key_str, "</info_file>") &&
+        !strstr(f->key_str, "/>")
+      ) {
         is_xml = 1;
-        f0 = f->next;
+        xml_section_start = f->next;
         break;
       }
-      if(!strcmp(f->key_str, "</profile>")) {
+      if(
+        !strncmp(f->key_str, "<?xml", sizeof "<?xml" - 1) ||
+        !strncmp(f->key_str, "<profile", sizeof "<profile" - 1) ||
+        !strcmp(f->key_str, "</profile>")
+      ) {
         is_xml = 1;
       }
     }
+  }
+
+  if(is_xml) f0 = xml_section_start;
+
+  if(config.debug >= 2 && is_xml) {
+    log_debug("  = xml file, applying only these lines =\n", flags);
   }
 
   for(f = f0; f; f = f->next) {
@@ -638,6 +659,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
       !strcmp(f->key_str, "</info_file>")
     ) {
       break;
+    }
+
+    if(config.debug >= 2 && is_xml) {
+      log_debug("    key %d \"%s\", value %d \"%s\", raw \"%s\"\n", f->key, f->key_str, f->nvalue, f->value, f->unparsed ?: "");
     }
 
     switch(f->key) {
