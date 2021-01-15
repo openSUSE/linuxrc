@@ -397,15 +397,28 @@ char *mod_get_title(int type)
 
 void mod_menu()
 {
-  char *items[MAX_MODULE_TYPES + 3];
-  int i;
-  int again;
+  char *extra_items[] = {
+    "Show Loaded Modules",
+    "Unload Modules",
+    "Add Driver Update",
+    "Show Driver Updates"
+  };
+  char *items[MAX_MODULE_TYPES + sizeof extra_items / sizeof *extra_items];
+  int i, again;
 
   net_stop();
 
   do {
     mod_update_list();
 
+    /*
+     * Get list of actually present module types.
+     *
+     * Start with module type 1. 0 is reserved for 'autoload' and does not
+     * show up in this menu.
+     * This implies that this part of the list has max. MAX_MODULE_TYPES - 1
+     * entries.
+     */
     for(mod_types = 0, i = 1 /* 0 is reserved for 'autoload' */; i < MAX_MODULE_TYPES; i++) {
       if(mod_show_type(i)) {
         mod_type[mod_types] = i;
@@ -413,14 +426,11 @@ void mod_menu()
       }
     }
 
-    i = mod_types;
+    for (i = 0; i < sizeof extra_items / sizeof *extra_items; i++) {
+      items[mod_types + i] = extra_items[i];
+    }
 
-    items[i++] = "Show Loaded Modules";
-    items[i++] = "Unload Modules";
-    items[i++] = "Add Driver Update";
-    items[i++] = "Show Driver Updates";
-
-    items[i] = NULL;
+    items[mod_types + i] = NULL;
 
     again = dia_list("Kernel Modules (Hardware Drivers)", 40, mod_menu_cb, items, mod_menu_last, align_center);
 
