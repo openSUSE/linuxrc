@@ -239,15 +239,24 @@ void mod_init(int autoload)
 
 module_t *mod_get_entry(char *name)
 {
-  module_t *ml;
+  module_t *ml, *mod_found = NULL;
 
   if(!name) return NULL;
 
+  /*
+   * A module might appear several times in config.module.list (because it's
+   * in different categories).
+   *
+   * Prefer to return an entry that's user-visible (has a 'descr' field).
+   */
   for(ml = config.module.list; ml; ml = ml->next) {
-    if(!mod_cmp(ml->name, name)) break;
+    if(!mod_cmp(ml->name, name)) {
+      mod_found = ml;
+      if(ml->descr) break;
+    }
   }
 
-  return ml;
+  return mod_found;
 }
 
 
