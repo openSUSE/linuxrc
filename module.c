@@ -648,24 +648,24 @@ void mod_load_module_manual(char *module, int show)
     s = ml->param && (ml->autoload || ml->dontask) ? ml->param : "";
   }
 
-  if(show) {
-    if(s) {
-      sprintf(buf, "Trying to load module \"%s\"...\n\n"
-                   "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
-                   ml->name);
-      dia_info(&win, buf, MSGTYPE_INFO);
-      mod_insmod(ml->name, s);
-      win_close(&win);
-      i = mod_is_loaded(ml->name);
-      if(i) {
-        sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
-        dia_message(buf, MSGTYPE_INFO);
-      }
-      else {
-        util_beep(FALSE);
-        sprintf(buf, "Failed to load module \"%s\".", ml->name);
-        dia_message(buf, MSGTYPE_ERROR);
-      }
+  if(show && s) {
+    sprintf(buf,
+      "Trying to load module \"%s\"...\n\n"
+      "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
+      ml->name
+    );
+    dia_info(&win, buf, MSGTYPE_INFO);
+    mod_insmod(ml->name, s);
+    win_close(&win);
+    i = mod_is_loaded(ml->name);
+    if(i) {
+      sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
+      dia_message(buf, MSGTYPE_INFO);
+    }
+    else {
+      util_beep(FALSE);
+      sprintf(buf, "Failed to load module \"%s\".", ml->name);
+      dia_message(buf, MSGTYPE_ERROR);
     }
   }
   else {
