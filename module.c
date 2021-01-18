@@ -991,6 +991,18 @@ void mod_auto_detect()
   hd_free_hd_data(hd_data);
 
   free(hd_data);
-}
 
+  file_t *f, *f0 = file_read_file("/proc/modules", kf_none);
+
+  for(f = f0; f; f = f->next) {
+    module_t *mod;
+    for(mod = config.module.list; mod; mod = mod->next) {
+      if(!mod_cmp(mod->name, f->key_str)) {
+        mod->detected = mod->active = 1;
+      }
+    }
+  }
+
+  file_free_file(f0);
+}
 
