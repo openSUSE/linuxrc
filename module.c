@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 /*
  *
  * module.c      Load modules needed for installation
@@ -331,7 +333,6 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   static module_t **mod_items = NULL;
   static int mods = 0;
   int i, width;
-  char buf[256];
 
   if(items) {
     for(i = 0; i < mods; i++) if(items[i]) free(items[i]);
@@ -357,12 +358,11 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
   for(i = 0, ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == type && ml->exists && ml->descr) {
-      sprintf(buf, "%*s%s%s",
+      asprintf(&items[i], "%*s%s%s",
         width,
         ml->name,
         *ml->descr ? ml->detected ? ml->active ? " * " : " + " : " : " : "", ml->descr
       );
-      items[i] = strdup(buf);
       mod_items[i++] = ml;
     }
   }
