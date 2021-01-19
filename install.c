@@ -1110,7 +1110,7 @@ int inst_start_install()
 
   LXRC_WAIT
 
-  util_splash_bar(60, SPLASH_60);
+  util_splash_bar(60);
 
   if(config.manual) {
     util_umount_all();
@@ -1364,8 +1364,6 @@ int inst_execute_yast()
   disp_set_color(COL_WHITE, COL_BLACK);
   if(config.win) util_disp_done();
 
-  if(config.splash && config.textmode) lxrc_run_console("echo 0 >/proc/splash");
-
   str_copy(&setupcmd, config.setupcmd);
 
   if(config.url.install->scheme == inst_exec) {
@@ -1448,8 +1446,6 @@ int inst_execute_yast()
   lxrc_readd_parts();
 
   str_copy(&setupcmd, NULL);
-
-  if(config.splash && config.textmode) lxrc_run_console("echo 1 >/proc/splash");
 
   log_info("install program exit code is %d\n", err);
 

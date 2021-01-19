@@ -370,12 +370,10 @@ typedef struct {
 #define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_GATEWAY | NS_NAMESERVER)
 #endif
 
-#define SPLASH_10	NULL
-#define SPLASH_20	"rlchange B"
-#define SPLASH_30	NULL
-#define SPLASH_40	NULL
-#define SPLASH_50	"rlchange 3"
-#define SPLASH_60	"splash_early start"
+#define PLY_MODE_UPDATE		"updates"
+#define PLY_MODE_UPGRADE	"system-upgrade"
+#define PLY_MODE_REBOOT		"reboot"
+#define PLY_MODE_SHUTDOWN	"shutdown"
 
 typedef struct {
   unsigned rebootmsg:1;		/**< show reboot message */
@@ -404,7 +402,6 @@ typedef struct {
   unsigned sshd_only:1;		/**< start only sshd */
   unsigned addswap:2;		/**< offer to add swap if yast needs it */
   unsigned aborted:1;		/**< yast did abort the installation */
-  unsigned splash:1;		/**< splash active */
   unsigned netstop:2;		/**< shut down network interface at end 0: no, 1: yes, 3: auto */
   unsigned noshell:1;		/**< don't start any shells */
   volatile unsigned restart_on_segv:1;	/**< restart linuxrc after segfault */
