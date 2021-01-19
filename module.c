@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 /*
  *
  * module.c      Load modules needed for installation
@@ -239,15 +241,24 @@ void mod_init(int autoload)
 
 module_t *mod_get_entry(char *name)
 {
-  module_t *ml;
+  module_t *ml, *mod_found = NULL;
 
   if(!name) return NULL;
 
+  /*
+   * A module might appear several times in config.module.list (because it's
+   * in different categories).
+   *
+   * Prefer to return an entry that's user-visible (has a 'descr' field).
+   */
   for(ml = config.module.list; ml; ml = ml->next) {
-    if(!mod_cmp(ml->name, name)) break;
+    if(!mod_cmp(ml->name, name)) {
+      mod_found = ml;
+      if(ml->descr) break;
+    }
   }
 
-  return ml;
+  return mod_found;
 }
 
 
@@ -322,7 +333,6 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   static module_t **mod_items = NULL;
   static int mods = 0;
   int i, width;
-  char buf[256];
 
   if(items) {
     for(i = 0; i < mods; i++) if(items[i]) free(items[i]);
@@ -348,12 +358,11 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
   for(i = 0, ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == type && ml->exists && ml->descr) {
-      sprintf(buf, "%*s%s%s",
+      asprintf(&items[i], "%*s%s%s",
         width,
         ml->name,
         *ml->descr ? ml->detected ? ml->active ? " * " : " + " : " : " : "", ml->descr
       );
-      items[i] = strdup(buf);
       mod_items[i++] = ml;
     }
   }
@@ -397,15 +406,28 @@ char *mod_get_title(int type)
 
 void mod_menu()
 {
-  char *items[MAX_MODULE_TYPES + 3];
-  int i;
-  int again;
+  char *extra_items[] = {
+    "Show Loaded Modules",
+    "Unload Modules",
+    "Add Driver Update",
+    "Show Driver Updates"
+  };
+  char *items[MAX_MODULE_TYPES + sizeof extra_items / sizeof *extra_items];
+  int i, again;
 
   net_stop();
 
   do {
     mod_update_list();
 
+    /*
+     * Get list of actually present module types.
+     *
+     * Start with module type 1. 0 is reserved for 'autoload' and does not
+     * show up in this menu.
+     * This implies that this part of the list has max. MAX_MODULE_TYPES - 1
+     * entries.
+     */
     for(mod_types = 0, i = 1 /* 0 is reserved for 'autoload' */; i < MAX_MODULE_TYPES; i++) {
       if(mod_show_type(i)) {
         mod_type[mod_types] = i;
@@ -413,14 +435,11 @@ void mod_menu()
       }
     }
 
-    i = mod_types;
+    for (i = 0; i < sizeof extra_items / sizeof *extra_items; i++) {
+      items[mod_types + i] = extra_items[i];
+    }
 
-    items[i++] = "Show Loaded Modules";
-    items[i++] = "Unload Modules";
-    items[i++] = "Add Driver Update";
-    items[i++] = "Show Driver Updates";
-
-    items[i] = NULL;
+    items[mod_types + i] = NULL;
 
     again = dia_list("Kernel Modules (Hardware Drivers)", 40, mod_menu_cb, items, mod_menu_last, align_center);
 
@@ -648,24 +667,24 @@ void mod_load_module_manual(char *module, int show)
     s = ml->param && (ml->autoload || ml->dontask) ? ml->param : "";
   }
 
-  if(show) {
-    if(s) {
-      sprintf(buf, "Trying to load module \"%s\"...\n\n"
-                   "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
-                   ml->name);
-      dia_info(&win, buf, MSGTYPE_INFO);
-      mod_insmod(ml->name, s);
-      win_close(&win);
-      i = mod_is_loaded(ml->name);
-      if(i) {
-        sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
-        dia_message(buf, MSGTYPE_INFO);
-      }
-      else {
-        util_beep(FALSE);
-        sprintf(buf, "Failed to load module \"%s\".", ml->name);
-        dia_message(buf, MSGTYPE_ERROR);
-      }
+  if(show && s) {
+    sprintf(buf,
+      "Trying to load module \"%s\"...\n\n"
+      "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
+      ml->name
+    );
+    dia_info(&win, buf, MSGTYPE_INFO);
+    mod_insmod(ml->name, s);
+    win_close(&win);
+    i = mod_is_loaded(ml->name);
+    if(i) {
+      sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
+      dia_message(buf, MSGTYPE_INFO);
+    }
+    else {
+      util_beep(FALSE);
+      sprintf(buf, "Failed to load module \"%s\".", ml->name);
+      dia_message(buf, MSGTYPE_ERROR);
     }
   }
   else {
@@ -972,6 +991,18 @@ void mod_auto_detect()
   hd_free_hd_data(hd_data);
 
   free(hd_data);
-}
 
+  file_t *f, *f0 = file_read_file("/proc/modules", kf_none);
+
+  for(f = f0; f; f = f->next) {
+    module_t *mod;
+    for(mod = config.module.list; mod; mod = mod->next) {
+      if(!mod_cmp(mod->name, f->key_str)) {
+        mod->detected = mod->active = 1;
+      }
+    }
+  }
+
+  file_free_file(f0);
+}
 
