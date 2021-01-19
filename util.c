@@ -845,7 +845,7 @@ void add_driver_update(char *dir, char *loc)
       strprintf(&buf2, "%s/modules/module.order", dst);
       if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
         while((de = readdir(d))) {
-          if(mod_has_module_ext(de->d_name, strlen(de->d_name), NULL)) {
+          if(mod_basename_len(de->d_name)) {
             fprintf(f, "%s\n", de->d_name);
           }
         }
@@ -1003,7 +1003,9 @@ void util_do_driver_update(unsigned idx)
     }
     if(*buf1) mod_unload_modules(buf1);
     for(f = f0; f; f = f->next) {
-      mod_modprobe(f->key_str, NULL);
+      char *basename = mod_basename(f->key_str);
+      mod_modprobe(basename, NULL);
+      free(basename);
     }
   }
 
@@ -1020,21 +1022,19 @@ void util_do_driver_update(unsigned idx)
  */
 void create_update_name(unsigned idx)
 {
-  char *buf1 = NULL, *mod;
+  char *buf1 = NULL;
   file_t *f0, *f;
-  size_t len;
   module_t *ml;
 
   strprintf(&buf1, "%s/%03u/modules/module.order", config.update.dst, idx);
   f0 = file_read_file(buf1, kf_none);
   for(f = f0; f; f = f->next) {
-    len = strlen(mod = f->key_str);
-    if(len > 2 && !strcmp(mod + len - 2, ".o")) {
-      mod[len - 2] = 0;
-      ml = mod_get_entry(mod);
-      if(ml && ml->descr && *ml->descr) mod = ml->descr;
-      slist_append_str(&config.update.name_list, mod);
-    }
+    char *basename = mod_basename(f->key_str);
+
+    ml = mod_get_entry(basename);
+    slist_append_str(&config.update.name_list, ml && ml->descr && *ml->descr ? ml->descr : basename);
+
+    free(basename);
   }
 
   file_free_file(f0);
