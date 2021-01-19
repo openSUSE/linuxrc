@@ -155,7 +155,7 @@ void auto2_scan_hardware()
 #endif
 
   log_info("Starting hardware detection...\n");
-  util_splash_message("Hardware detection");
+  util_splash_msg("Hardware detection");
   printf("Starting hardware detection...");
   if(hd_data->progress) printf("\n");
   fflush(stdout);
