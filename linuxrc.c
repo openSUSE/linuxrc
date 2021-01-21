@@ -266,6 +266,8 @@ int main(int argc, char **argv, char **env)
 
 void lxrc_reboot()
 {
+  util_splash_mode(PLY_MODE_REBOOT);
+
   if(config.test) {
     log_info("*** reboot ***\n");
     return;
@@ -278,6 +280,8 @@ void lxrc_reboot()
 
 void lxrc_halt()
 {
+  util_splash_mode(PLY_MODE_SHUTDOWN);
+
   if(config.test) {
     log_info("*** power off ***\n");
     return;
@@ -1036,9 +1040,9 @@ void lxrc_init()
 
   if(config.plymouth) util_run_script("plymouth_setup");
 
-  util_get_splash_status();
+  util_splash_mode(PLY_MODE_UPGRADE);
 
-  util_splash_bar(10, SPLASH_10);
+  util_splash_bar(10);
 
   set_activate_language(config.language);
 
@@ -1053,6 +1057,7 @@ void lxrc_init()
   LXRC_WAIT
 
   log_show("Loading basic drivers...");
+  util_splash_msg("Loading basic drivers");
   mod_init(1);
   log_show(" ok\n");
 

@@ -39,7 +39,6 @@ static void auto2_progress(char *pos, char *msg);
 static void auto2_read_repo_file(url_t *url, char *src, char *dst);
 static void auto2_read_repo_files(url_t *url);
 static void auto2_read_repomd_files(url_t *url);
-static char *auto2_splash_name(void);
 
 static int test_and_add_dud(url_t *url);
 static void auto2_read_autoyast(url_t *url);
@@ -73,7 +72,7 @@ int auto2_init()
 
   if(config.sig_failed) return 0;
 
-  util_splash_bar(40, SPLASH_40);
+  util_splash_bar(40);
 
   win_old = config.win;
 
@@ -123,7 +122,7 @@ int auto2_init()
 
   LXRC_WAIT
 
-  util_splash_bar(50, SPLASH_50);
+  util_splash_bar(50);
 
   return ok;
 }
@@ -156,6 +155,7 @@ void auto2_scan_hardware()
 #endif
 
   log_info("Starting hardware detection...\n");
+  util_splash_msg("Hardware detection");
   printf("Starting hardware detection...");
   if(hd_data->progress) printf("\n");
   fflush(stdout);
@@ -171,7 +171,7 @@ void auto2_scan_hardware()
   fflush(stdout);
   log_info("Hardware detection finished.\n");
 
-  util_splash_bar(20, SPLASH_20);
+  util_splash_bar(20);
 
   log_show("(If a driver is not working for you, try booting with brokenmodules=driver_name.)\n\n");
 
@@ -266,7 +266,7 @@ void auto2_scan_hardware()
     log_show(" ok\n");
   }
 
-  util_splash_bar(30, SPLASH_30);
+  util_splash_bar(30);
 
   /* look for keyboard and remember if it's usb */
   for(ju = 0, hd = hd_data->hd; hd; hd = hd->next) {
@@ -944,45 +944,13 @@ void auto2_read_repomd_files(url_t *url)
 
 
 /*
- * Return splash file name (or NULL if not appropriate).
- */
-char *auto2_splash_name()
-{
-  unsigned width, height;
-  char *splash = NULL, *s;
-  FILE *f;
-
-  if(!config.kexec_initrd) return NULL;
-
-  f = fopen("/sys/devices/platform/vesafb.0/graphics/fb0/virtual_size", "r");
-  if(f) {
-    if(fscanf(f, "%u,%u", &width, &height) == 2) {
-      str_copy(&splash, config.kexec_initrd);
-      s = strrchr(splash, '/');
-      if(s) {
-        *s = 0;
-        strprintf(&splash, "%s/%04u%04u.spl", splash, width, height);
-      }
-      else {
-        str_copy(&splash, NULL);
-      }
-    }
-
-    fclose(f);
-  }
-
-  return splash;
-}
-
-
-/*
  * Download new kernel & initrd and run kexec.
  *
  * Does not return if successful.
  */
 void auto2_kexec(url_t *url)
 {
-  char *kernel, *initrd, *buf = NULL, *cmdline = NULL, *splash = NULL, *splash_name = NULL;
+  char *kernel, *initrd, *buf = NULL, *cmdline = NULL;
   FILE *f;
   int err = 0;
   unsigned vga_mode = 0;
@@ -991,9 +959,6 @@ void auto2_kexec(url_t *url)
     log_info("no kernel and initrd for kexec specified\n");
     return;
   }
-
-  splash_name = auto2_splash_name();
-  log_debug("splash = %s\n", splash_name);
 
 #if defined(__i386__) || defined(__x86_64__)
   if(config.vga) {
@@ -1004,21 +969,9 @@ void auto2_kexec(url_t *url)
 
   kernel = strdup(new_download());
   initrd = strdup(new_download());
-  splash = strdup(new_download());
 
   err = url_read_file(url, NULL, config.kexec_kernel, kernel, NULL, URL_FLAG_PROGRESS);
   if(!err) err = url_read_file(url, NULL, config.kexec_initrd, initrd, NULL, URL_FLAG_PROGRESS);
-
-  if(!err && splash_name) {
-    err = url_read_file(url, NULL, splash_name, splash, NULL, URL_FLAG_PROGRESS);
-    if(!err) {
-      strprintf(&buf, "cat %s >>%s", splash, initrd);
-      lxrc_run_console(buf);
-    }
-    else {
-      err = 0;
-    }
-  }
 
   if(!err) {
     cmdline = calloc(1024, 1);
@@ -1042,8 +995,6 @@ void auto2_kexec(url_t *url)
 
   free(kernel);
   free(initrd);
-  free(splash);
-  free(splash_name);
   free(buf);
   free(cmdline);
 }

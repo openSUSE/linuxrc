@@ -1180,7 +1180,6 @@ void util_status_info(int log_it)
   add_flag(&sl0, buf, config.ask_language, "ask_lang");
   add_flag(&sl0, buf, config.ask_keytable, "ask_keytbl");
   add_flag(&sl0, buf, config.addswap, "addswap");
-  add_flag(&sl0, buf, config.splash, "splash");
   add_flag(&sl0, buf, config.noshell, "noshell");
   add_flag(&sl0, buf, config.had_segv, "segv");
   add_flag(&sl0, buf, config.scsi_before_usb, "scsibeforeusb");
@@ -1667,46 +1666,50 @@ void util_status_info(int log_it)
   free(hd_data);
 }
 
-void util_get_splash_status()
-{
-  FILE *f;
-  char s[80];
-
-  config.splash = 0;
-
-  if((f = fopen("/proc/splash", "r"))) {
-    if(fgets(s, sizeof s, f)) {
-      if(strstr(s, ": on")) config.splash = 1;
-      setenv("SPLASHCFG", "/etc/splash.cfg", 1);
-    }
-    fclose(f);
-  }
-}
-
-
 /*
  * Set splash progress bar to num percent.
  */
-void util_splash_bar(unsigned num, char *trigger)
+void util_splash_bar(unsigned num)
 {
   static unsigned old = 0;
-  char buf[256], buf2[256];
+  char buf[256];
 
-  if(!config.splash) return;
+  if(!config.plymouth) return;
 
   if(num > 100) num = 100;
 
-  num = (num * 65535) / 100;
-
   if(num < old) old = num;
 
-  *buf2 = 0;
-  if(trigger) sprintf(buf2, "-t '%s'", trigger);
-
-  sprintf(buf, "/sbin/splash -p %u:%d %s", old, num - old, buf2);
+  sprintf(buf, "/usr/bin/plymouth system-update --progress=%u", old);
   lxrc_run_console(buf);
 
   old = num;
+}
+
+/*
+ * Set splash message.
+ */
+void util_splash_msg(char *msg)
+{
+  char buf[256];
+
+  if(!config.plymouth) return;
+
+  sprintf(buf, "/usr/bin/plymouth display-message --text=\"%s\"", msg);
+  lxrc_run_console(buf);
+}
+
+/*
+ * Set splash message.
+ */
+void util_splash_mode(char *mode)
+{
+  char buf[256];
+
+  if(!config.plymouth) return;
+
+  sprintf(buf, "/usr/bin/plymouth change-mode --%s", mode);
+  lxrc_run_console(buf);
 }
 
 
