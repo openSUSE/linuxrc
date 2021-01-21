@@ -147,7 +147,7 @@ char *mod_basename(const char *file)
   char *buf = strdup(file);
   int base_len = mod_basename_len(file);
 
-  if(base_len) buf[base_len] = 0;
+  if(buf && base_len) buf[base_len] = 0;
 
   return buf;
 }
@@ -693,7 +693,10 @@ int mod_insmod(char *module, char *param)
   }
   else {
     char *filename = mod_find_module(config.module.dir, module);
-    if(!filename) return -1;
+    if(!filename) {
+      free(buf);
+      return -1;
+    }
     strprintf(&buf, "%s%s", buf, filename);
     free(filename);
   }
