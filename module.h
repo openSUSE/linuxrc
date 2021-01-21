@@ -19,8 +19,7 @@ int        mod_insmod(char *module, char *param);
 int        mod_modprobe(char *module, char *param);
 void       mod_show_modules(void);
 void       mod_disk_text(char *buf, int type);
-int        mod_copy_modules(char *src_dir, int doit);
 int        mod_cmp(char *str1, char *str2);
-int        mod_has_module_ext(const char *file, const size_t len,
-		size_t *ext_pos);
-int        mod_find_module(const char *prefix, const char *module, char *file);
+int        mod_basename_len(const char *file);
+char      *mod_basename(const char *file);
+char      *mod_find_module(const char *prefix, const char *module);

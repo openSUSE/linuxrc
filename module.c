@@ -1,10 +1,9 @@
-#define _GNU_SOURCE
-
 /*
  *
  * module.c      Load modules needed for installation
  *
  * Copyright (c) 1996-2002  Hubert Mantel, SuSE Linux AG  (mantel@suse.de)
+ * Copyright (c) 2002-2021  SUSE LLC
  *
  */
 
@@ -41,18 +40,17 @@
 #define MODULE_CONFIG		"module.config"
 #define CARDMGR_PIDFILE		"/run/cardmgr.pid"
 
-#define MODULE_SUFFIX	".ko"
-#define MODULE_COMP1	".xz"
 #define MOD_EXT(mod)	{ .ext = (mod), .len = sizeof(mod) - 1 }
 
 typedef struct {
-	char *ext;
-	size_t len;
+  char *ext;
+  size_t len;
 } mod_extensions_t;
 
+// list of recognized module file name extensions
 static const mod_extensions_t mod_extensions[] = {
-  MOD_EXT(MODULE_SUFFIX MODULE_COMP1),
-  MOD_EXT(MODULE_SUFFIX),
+  MOD_EXT(".ko.xz"),
+  MOD_EXT(".ko"),
   { }
 };
 
@@ -119,98 +117,61 @@ static inline int mod_cmp_ext(const char *file, const size_t len,
   return len >= ext_len && !strcmp(file + len - ext_len, ext);
 }
 
-int mod_has_module_ext(const char *file, const size_t len, size_t *ext_pos)
+/*
+ * Return length of module file name without module extension if it is a
+ * module file name. Otherwise 0.
+ */
+int mod_basename_len(const char *file)
 {
   const mod_extensions_t *mod_ext;
+  size_t len = strlen(file);
 
-  for (mod_ext = mod_extensions; mod_ext->ext; mod_ext++)
-    if (mod_cmp_ext(file, len, mod_ext->ext, mod_ext->len)) {
-      if (ext_pos)
-	*ext_pos = len - mod_ext->len;
-      return 1;
+  for(mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
+    if(mod_cmp_ext(file, len, mod_ext->ext, mod_ext->len)) {
+      return len - mod_ext->len;
     }
-
-  return 0;
-}
-
-int mod_find_module(const char *prefix, const char *module, char *file)
-{
-  const mod_extensions_t *mod_ext;
-  int file_len;
-
-  file_len = sprintf(file, "%s/%s", prefix, module);
-  for (mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
-    strcpy(file + file_len, mod_ext->ext);
-    if(util_check_exist(file))
-      return 1;
   }
 
   return 0;
 }
 
-int mod_copy_modules(char *src_dir, int doit)
+
+/*
+ * Return file name with module extension removed if it is a module; else
+ * return a copy of the file name.
+ *
+ * The returned storage must be released using free().
+ */
+char *mod_basename(const char *file)
 {
-  struct dirent *de;
-  DIR *d;
-  char buf[512];
-  int i, i1, i2, cnt = 0, ok;
-  window_t win;
-  static int files = 0;
-  struct stat sbuf1, sbuf2;
+  char *buf = strdup(file);
+  int base_len = mod_basename_len(file);
 
-  if(doit == 2 && !files) return 0;
-  if(!(d = opendir(src_dir))) return 0;
+  if(buf && base_len) buf[base_len] = 0;
 
-  if(doit == 2) {
-    dia_status_on(&win, "Copying modules...");
-  }
-  else {
-    files = 0;
-  }
+  return buf;
+}
 
-  while((de = readdir(d))) {
-    i = strlen(de->d_name);
-    if(mod_has_module_ext(de->d_name, i, NULL) ||
-        !strcmp(de->d_name, MODULE_CONFIG)
-    ) {
-      ok = 0;
-      if(doit == 2) {
-        /*
-         * Copy only modules that are 'new': different size & date. This is
-         * not perfect but will do in this case.
-         */
-        snprintf(buf, sizeof buf, "%s/%s", src_dir, de->d_name);
-        i1 = stat(buf, &sbuf1);
-        snprintf(buf, sizeof buf, "%s/%s", config.module.dir, de->d_name);
-        i2 = stat(buf, &sbuf2);
-        if(!i1 && !i2) {
-          if(sbuf1.st_size == sbuf2.st_size && sbuf1.st_mtime == sbuf2.st_mtime) ok = 1;
-        }
-      }
-      if(!ok) {
-        if(doit) {
-          snprintf(buf, sizeof buf, "cp -p %s/%s %s", src_dir, de->d_name, config.module.dir);
-          lxrc_run(buf);
-          if(doit == 2) {
-            dia_status(&win, (cnt * 100) / files);
-            if(strcmp(de->d_name, MODULE_CONFIG)) cnt++;
-          }
-        }
-        else {
-          files++;
-        }
-      }
-    }
+
+/*
+ * Return full module file name (including dir and file extension) or NULL
+ * if module was not found.
+ *
+ * Returned storage must be released using free().
+ */
+char *mod_find_module(const char *prefix, const char *module)
+{
+  char *file = NULL;
+  const mod_extensions_t *mod_ext;
+
+  for(mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
+    strprintf(&file, "%s/%s%s", prefix, module, mod_ext->ext);
+    if(util_check_exist(file)) return file;
   }
 
-  closedir(d);
+  free(file);
 
-  if(doit == 2) {
-    if(cnt) usleep(200000);
-    dia_status_off(&win);
-  }
-
-  return cnt;
+  return NULL;
 }
 
 
@@ -219,15 +180,16 @@ int mod_copy_modules(char *src_dir, int doit)
  */
 void mod_init(int autoload)
 {
-  char tmp[256];
+  char *tmp = NULL;
   module_t *ml;
 
   if(!config.net.devices) {
     util_update_netdevice_list(NULL, 1);
   }
 
-  sprintf(tmp, "%s/" MODULE_CONFIG, config.module.dir);
+  strprintf(&tmp, "%s/" MODULE_CONFIG, config.module.dir);
   file_read_modinfo(tmp);
+  free(tmp);
 
   if(autoload && !config.test) {
     for(ml = config.module.list; ml; ml = ml->next) {
@@ -267,26 +229,19 @@ void mod_update_list()
   module_t *ml, **ml1;
   struct dirent *de;
   DIR *d;
-  char buf[32];
-  int i, found;
-  size_t ext_pos;
 
   for(ml1 = &config.module.list; *ml1; ml1 = &(*ml1)->next) (*ml1)->exists = 0;
 
   if(!(d = opendir(config.module.dir))) return;
 
   while((de = readdir(d))) {
-    i = strlen(de->d_name);
-    if(
-      i < (int) sizeof buf &&
-      mod_has_module_ext(de->d_name, i, &ext_pos)
-    ) {
-      strcpy(buf, de->d_name);
-      buf[ext_pos] = 0;
+    if(mod_basename_len(de->d_name)) {
+      char *basename = mod_basename(de->d_name);
+      int found = 0;
 
       for(found = 0, ml = config.module.list; ml; ml = ml->next) {
         /* Don't stop if it is an 'autoload' entry! */
-        if(!strcmp(ml->name, buf)) {
+        if(!strcmp(ml->name, basename)) {
           found = 1;
           ml->exists = 1;
           if(ml->type != 0) break;	/* 0: autoload, cf. file_read_modinfo() */
@@ -298,16 +253,17 @@ void mod_update_list()
         ml = *ml1 = calloc(1, sizeof **ml1);
         ml->exists = 1;
         ml->type = MAX_MODULE_TYPES - 1;	/* reserved for 'other' */
-        ml->name = strdup(buf);
+        ml->name = strdup(basename);
         ml->descr = strdup("");
 
         ml1 = &ml->next;
       }
+
+      free(basename);
     }
   }
 
   closedir(d);
-
 }
 
 
@@ -335,7 +291,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
   int i, width;
 
   if(items) {
-    for(i = 0; i < mods; i++) if(items[i]) free(items[i]);
+    for(i = 0; i < mods; i++) free(items[i]);
     free(items);
     free(mod_items);
   }
@@ -358,7 +314,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
   for(i = 0, ml = config.module.list; ml; ml = ml->next) {
     if(ml->type == type && ml->exists && ml->descr) {
-      asprintf(&items[i], "%*s%s%s",
+      strprintf(&items[i], "%*s%s%s",
         width,
         ml->name,
         *ml->descr ? ml->detected ? ml->active ? " * " : " + " : " : " : "", ml->descr
@@ -380,7 +336,7 @@ int mod_build_list(int type, char ***list, module_t ***mod_list)
 
 char *mod_get_title(int type)
 {
-  char buf[256], *s = NULL;
+  char *s = NULL;
 
   /* we have translations for these... */
   if(type) {
@@ -395,12 +351,14 @@ char *mod_get_title(int type)
     }
   }
 
-  if(!s) {
-    sprintf(buf, "Load %s Modules", config.module.type_name[type]);
-    s = buf;
+  if(s) {
+    s = strdup(s);
+  }
+  else {
+    strprintf(&s, "Load %s Modules", config.module.type_name[type]);
   }
 
-  return strdup(s);
+  return s;
 }
 
 
@@ -532,11 +490,13 @@ int mod_load_manually(int type)
 
 void mod_unload_module(char *module)
 {
-  char cmd[300];
+  char *cmd = NULL;
   int err;
 
-  sprintf(cmd, "rmmod %s", module);
+  strprintf(&cmd, "rmmod %s", module);
   err = lxrc_run(cmd);
+  free(cmd);
+
   util_update_kernellog();
 
   if(!err) {
@@ -585,7 +545,6 @@ int mod_unload_modules(char *modules)
 
 int mod_load_modules(char *modules, int show)
 {
-  char buf[256];
   int ok = 1;
   slist_t *sl0, *sl;
 
@@ -594,8 +553,10 @@ int mod_load_modules(char *modules, int show)
   for(sl = sl0; sl && ok; sl = sl->next) {
     if(mod_is_loaded(sl->key)) {
       if(show == 2) {
-        sprintf(buf, "Module \"%s\" has already been loaded.", sl->key);
+        char *buf = NULL;
+        strprintf(&buf, "Module \"%s\" has already been loaded.", sl->key);
         dia_message(buf, MSGTYPE_INFO);
+        free(buf);
       }
     }
     else {
@@ -638,7 +599,7 @@ char *mod_get_params(module_t *mod)
     sl->key = strdup(mod->name);
   }
 
-  if(sl->value) free(sl->value);
+  free(sl->value);
   sl->value = buf2;
 
   return sl->value;
@@ -648,7 +609,7 @@ char *mod_get_params(module_t *mod)
 void mod_load_module_manual(char *module, int show)
 {
   module_t *ml;
-  char *s, buf[256];
+  char *s;
   window_t win;
   int i;
 
@@ -668,7 +629,9 @@ void mod_load_module_manual(char *module, int show)
   }
 
   if(show && s) {
-    sprintf(buf,
+    char *buf = NULL;
+
+    strprintf(&buf,
       "Trying to load module \"%s\"...\n\n"
       "During loading, you may want to watch the kernel messages on virtual console 4 (ALT-F4). Use ALT-F1 to switch back to this menu.",
       ml->name
@@ -678,14 +641,16 @@ void mod_load_module_manual(char *module, int show)
     win_close(&win);
     i = mod_is_loaded(ml->name);
     if(i) {
-      sprintf(buf, "Module \"%s\" loaded successfully.", ml->name);
+      strprintf(&buf, "Module \"%s\" loaded successfully.", ml->name);
       dia_message(buf, MSGTYPE_INFO);
     }
     else {
       util_beep(FALSE);
-      sprintf(buf, "Failed to load module \"%s\".", ml->name);
+      strprintf(&buf, "Failed to load module \"%s\".", ml->name);
       dia_message(buf, MSGTYPE_ERROR);
     }
+
+    free(buf);
   }
   else {
     mod_insmod(ml->name, s);
@@ -695,8 +660,7 @@ void mod_load_module_manual(char *module, int show)
 
 int mod_insmod(char *module, char *param)
 {
-  char buf[512];
-  size_t buf_len;
+  char *buf = NULL;
   int err, cnt;
   slist_t *sl;
   driver_t *drv;
@@ -718,17 +682,23 @@ int mod_insmod(char *module, char *param)
    */
   unsigned use_modprobe = config.module.modprobe_ok && (config.module.list ? 0 : 1);
 
-  buf_len = sprintf(buf, "%s %s",
+  strprintf(&buf, "%s %s",
     use_modprobe ? "modprobe" : "insmod",
     config.forceinsmod ? "-f " : ""
   );
 
   /* insmod expects a full path as argument, modprobe not */
-  if (use_modprobe || util_check_exist(module)) {
-    strcpy(buf + buf_len, module);
-  } else {
-    if(!mod_find_module(config.module.dir, module, buf + buf_len))
+  if(use_modprobe || util_check_exist(module)) {
+    strprintf(&buf, "%s%s", buf, module);
+  }
+  else {
+    char *filename = mod_find_module(config.module.dir, module);
+    if(!filename) {
+      free(buf);
       return -1;
+    }
+    strprintf(&buf, "%s%s", buf, filename);
+    free(filename);
   }
 
   if(slist_getentry(config.module.broken, module)) {
@@ -736,7 +706,7 @@ int mod_insmod(char *module, char *param)
     return -1;
   }
 
-  if(param && *param) sprintf(buf + strlen(buf), " '%s'", param);
+  if(param && *param) strprintf(&buf, "%s '%s'", buf, param);
 
   if(config.run_as_linuxrc) {
     util_update_netdevice_list(NULL, 1);
@@ -747,6 +717,8 @@ int mod_insmod(char *module, char *param)
   }
 
   err = lxrc_run(buf);
+
+  free(buf);
 
   if(config.module.delay > 0) sleep(config.module.delay);
 
@@ -827,7 +799,7 @@ int mod_list_loaded_modules(char ***list, module_t ***mod_list, dia_align_t alig
   file_t *f0, *f;
 
   if(item) {
-    for(i = 0; i < max_mods; i++) if(item[i]) free(item[i]);
+    for(i = 0; i < max_mods; i++) free(item[i]);
     free(item);
     free(mods);
   }
@@ -1005,4 +977,3 @@ void mod_auto_detect()
 
   file_free_file(f0);
 }
-

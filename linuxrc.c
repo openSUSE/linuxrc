@@ -1629,18 +1629,23 @@ static void insmod_basics(void)
     { "zstd_decompress" },
     { }
   };
-  char file[MAX_FILENAME], insmod[MAX_FILENAME + 200];
 
-  for (i = basics; i->name; i++) {
-    if(!mod_find_module("/modules", i->name, file)) {
-      if(i->mandatory)
+  for(i = basics; i->name; i++) {
+    char *buf = mod_find_module("/modules", i->name);
+
+    if(!buf) {
+      if(i->mandatory) {
 	log_show("Cannot find module %s!\n", i->name);
+      }
       continue;
     }
 
-    sprintf(insmod, "/sbin/insmod %s%s%s", file, i->param ? " " : "",
-	i->param ? : "");
-    lxrc_run(insmod);
+    strprintf(&buf, "/sbin/insmod %s", buf);
+    if(i->param) strprintf(&buf, "%s %s", buf, i->param);
+
+    lxrc_run(buf);
+
+    free(buf);
   }
 }
 
