@@ -320,6 +320,9 @@ static struct {
   { key_auto_assembly,  "AutoAssembly",   kf_cfg + kf_cmd_early          },
   { key_device_auto_config, "DeviceAutoConfig",  kf_cfg + kf_cmd_early   },
   { key_rd_zdev,        "rd.zdev",        kf_cfg + kf_cmd_early          },
+  { key_zram,           "zram",           kf_cmd_early                   },
+  { key_zram_root,      "zram_root",      kf_cmd_early                   },
+  { key_zram_swap,      "zram_swap",      kf_cmd_early                   },
 };
 
 static struct {
@@ -1854,6 +1857,27 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
+      case key_zram:
+        if(f->is.numeric) {
+          if(f->nvalue) {
+            str_copy(&config.zram.root_size, "1G");
+            str_copy(&config.zram.swap_size, "1G");
+          }
+          else {
+            str_copy(&config.zram.root_size, NULL);
+            str_copy(&config.zram.swap_size, NULL);
+          }
+        }
+        break;
+
+      case key_zram_root:
+        str_copy(&config.zram.root_size, *f->value ? f->value : NULL);
+        break;
+
+      case key_zram_swap:
+        str_copy(&config.zram.swap_size, *f->value ? f->value : NULL);
+        break;
+
       default:
         break;
     }
@@ -2026,6 +2050,7 @@ void file_write_install_inf(char *dir)
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
   file_write_num(f, key_efi, config.efi >= 0 ? config.efi : config.efi_vars);
   file_write_num(f, key_insecure, !config.secure);
+  file_write_str(f, key_zram_swap, config.zram.swap_size);
   if(config.upgrade) file_write_num(f, key_upgrade, config.upgrade);
   if(config.media_upgrade) file_write_num(f, key_media_upgrade, config.media_upgrade);
   if(config.self_update_url) {

@@ -461,6 +461,10 @@ typedef struct {
   unsigned device_auto_config:2;	/**< run s390 device auto-config (cf. bsc#1168036) */
   unsigned device_auto_config_done:1;	/**< set after s390 device auto-config has been run */
   struct {
+    char *root_size;		/**< zram root fs size (e.g. "1G" or "512M") */
+    char *swap_size;		/**< zram swap size (e.g. "1G" or "512M") */
+  } zram;
+  struct {
     unsigned check:1;		/**< check for braille displays and start brld if found */
     char *dev;			/**< braille device */
     char *type;			/**< braille driver */

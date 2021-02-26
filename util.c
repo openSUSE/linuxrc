@@ -1151,6 +1151,13 @@ void util_status_info(int log_it)
   slist_append_str(&sl0, buf);
 
   sprintf(buf,
+    "zram: root size \"%s\", swap size \"%s\"",
+    config.zram.root_size ?: "",
+    config.zram.swap_size ?: ""
+  );
+  slist_append_str(&sl0, buf);
+
+  sprintf(buf,
     "InstsysID: %s%s",
     config.instsys_id ?: "unset",
     config.instsys_complain ? config.instsys_complain == 1 ? " (check)" : " (block)" : ""
