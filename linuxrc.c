@@ -135,6 +135,10 @@ int main(int argc, char **argv, char **env)
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
 
+  // use zram
+  str_copy(&config.zram.root_size, "1G");
+  str_copy(&config.zram.swap_size, "1G");
+
   str_copy(&config.console, "/dev/console");
 
   // define logging destinations for the various log levels:
@@ -200,6 +204,9 @@ int main(int argc, char **argv, char **env)
       file_do_info(file_get_cmdline(key_linuxrcstderr), kf_cmd + kf_cmd_early);
       file_do_info(file_get_cmdline(key_lxrcdebug), kf_cmd + kf_cmd_early);
       file_do_info(file_get_cmdline(key_linuxrc_core), kf_cmd + kf_cmd_early);
+      file_do_info(file_get_cmdline(key_zram), kf_cmd_early);
+      file_do_info(file_get_cmdline(key_zram_root), kf_cmd_early);
+      file_do_info(file_get_cmdline(key_zram_swap), kf_cmd_early);
       util_setup_coredumps();
       util_free_mem();
       umount("/proc");
@@ -433,14 +440,38 @@ void lxrc_movetotmpfs()
   int i;
   char *newroot = "/.newroot";
 
-  log_info("Moving into tmpfs...");
+  log_info("Moving into %s...", config.zram.root_size ? "zram" : "tmpfs");
+
   i = mkdir(newroot, 0755);
   if(i) {
     perror(newroot);
     return;
   }
 
-  i = mount("tmpfs", newroot, "tmpfs", 0, "size=100%,nr_inodes=0");
+  if(config.zram.root_size) {
+    mount("proc", "/proc", "proc", 0, 0);
+    mount("sysfs", "/sys", "sysfs", 0, 0);
+    mount("devtmpfs", "/dev", "devtmpfs", 0, 0);
+    char *buf = NULL;
+    strprintf(&buf, "/scripts/zram_setup %s", config.zram.root_size);
+    i = system(buf);
+    free(buf);
+    if(!i) {
+      i = util_mount_rw("/dev/zram0", newroot, NULL);
+    }
+    umount("/dev");
+    umount("/sys");
+    umount("/proc");
+    if(i) log_info("zram setup failed, falling back to tmpfs...");
+  }
+  else {
+    i = 1;
+  }
+
+  if(i) {
+    i = mount("tmpfs", newroot, "tmpfs", 0, "size=100%,nr_inodes=0");
+  }
+
   if(i) {
     perror(newroot);
     return;

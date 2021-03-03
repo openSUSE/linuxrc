@@ -329,6 +329,14 @@ Insecure: 0|1
 # entry is missing if no xvideo option was used
 XVideo: %s
 
+# the yast setup script (/sbin/inst_setup) uses this entry to set up (and
+# enable) a zram swap device
+#
+# the value is the disk size that is passed to /sys/block/zramN/disksize
+#
+# entry is missing if unset
+zram_swap: %s
+
 *** Note ***
 
  There may be some more entries in install.inf but they are put there by
