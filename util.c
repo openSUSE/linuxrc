@@ -2799,7 +2799,7 @@ char *util_attach_loop(char *file, int ro)
     sprintf(buf, "/dev/loop%d", i);
     if((device = open(buf, (ro ? O_RDONLY : O_RDWR) | O_LARGEFILE)) >= 0) {
       memset(&loopinfo, 0, sizeof loopinfo);
-      strcpy(loopinfo.lo_name, file);
+      strncpy(loopinfo.lo_name, file, sizeof loopinfo.lo_name - 1);
       rc = ioctl(device, LOOP_SET_FD, fd);
       if(rc != -1) rc = ioctl(device, LOOP_SET_STATUS, &loopinfo);
       close(device);
