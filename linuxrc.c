@@ -135,10 +135,6 @@ int main(int argc, char **argv, char **env)
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
 
-  // use zram
-  str_copy(&config.zram.root_size, "1G");
-  str_copy(&config.zram.swap_size, "1G");
-
   str_copy(&config.console, "/dev/console");
 
   // define logging destinations for the various log levels:
