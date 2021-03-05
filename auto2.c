@@ -274,7 +274,7 @@ void auto2_scan_hardware()
       if(hd->bus.id == bus_usb) ju++;
       di = hd->driver_info;
       if(di && di->any.type == di_kbd) {
-        if(di->kbd.XkbModel) strcpy(xkbmodel_tg, di->kbd.XkbModel);
+        if(di->kbd.XkbModel) strncpy(xkbmodel_tg, di->kbd.XkbModel, sizeof xkbmodel_tg - 1);
         if(di->kbd.keymap) {
           str_copy(&config.keymap, di->kbd.keymap);
         }
