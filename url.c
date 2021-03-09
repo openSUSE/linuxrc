@@ -3269,6 +3269,11 @@ void url_build_instsys_list(char *image, int read_list)
     }
   }
 
+  // if user specified extra parts to add via 'extend' option, add them here
+  for(sl = config.extend_option; sl; sl = sl->next) {
+    slist_append_str(&config.url.instsys_list, sl->key);
+  }
+
   for(sl = config.url.instsys_list; sl; sl = sl->next) {
     s = sl->key;
     if(*s == '?') s++;

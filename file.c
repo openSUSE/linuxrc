@@ -323,6 +323,7 @@ static struct {
   { key_zram,           "zram",           kf_cmd_early                   },
   { key_zram_root,      "zram_root",      kf_cmd_early                   },
   { key_zram_swap,      "zram_swap",      kf_cmd_early                   },
+  { key_extend,         "Extend",         kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1876,6 +1877,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_zram_swap:
         str_copy(&config.zram.swap_size, *f->value ? f->value : NULL);
+        break;
+
+      case key_extend:
+        slist_assign_values(&config.extend_option, f->value);
         break;
 
       default:
