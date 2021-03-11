@@ -544,6 +544,7 @@ typedef struct {
                                  * 3: if necessary, no user dialog
                                  */
   char *platform_name;           /* Human-readable name of the hardware */
+  slist_t *extend_option;	/**< list of instsys extensions given via 'extend' boot option */
 
   struct {
     unsigned failed:1;		/**< digest check failed */

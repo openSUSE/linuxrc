@@ -1520,6 +1520,16 @@ void util_status_info(int log_it)
   sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
   slist_append_str(&sl0, buf);
 
+  if(config.extend_option) {
+    strcpy(buf, "extend option:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.extend_option; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   sprintf(buf, "setup command = \"%s\"", config.setupcmd);
   slist_append_str(&sl0, buf);
 
