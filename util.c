@@ -942,7 +942,7 @@ int util_chk_driver_update(char *dir, char *loc)
 
 void util_do_driver_update(unsigned idx)
 {
-  char *s, *buf1 = NULL, *buf2 = NULL, *dst = NULL;
+  char *buf1 = NULL, *buf2 = NULL, *dst = NULL;
   file_t *f0, *f;
   slist_t *sl;
 
@@ -982,10 +982,19 @@ void util_do_driver_update(unsigned idx)
   strprintf(&buf1, "%s/modules/module.order", dst);
   f0 = file_read_file(buf1, kf_none);
   for(f = f0; f; f = f->next) {
+    char *mod_name = mod_basename(f->key_str);
+
+    // remove existing module, with any extension
+    for(const mod_extensions_t *mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
+      strprintf(&buf2, "/modules/%s%s", mod_name, mod_ext->ext);
+      unlink(buf2);
+    }
+
     strprintf(&buf1, "%s/modules/%s", dst, f->key_str);
     strprintf(&buf2, "/modules/%s", f->key_str);
-    unlink(buf2);
     symlink(buf1, buf2);
+
+    free(mod_name);
   }
 
   /* load new modules */
@@ -997,15 +1006,17 @@ void util_do_driver_update(unsigned idx)
   }
   else {
     str_copy(&buf1, "");
+    // build list of modules to unload
     for(f = f0; f; f = f->next) {
-      if((s = strrchr(f->key_str, '.'))) *s = 0;
-      strprintf(&buf1, "%s %s", buf1, f->key_str);
+      char *mod_name = mod_basename(f->key_str);
+      strprintf(&buf1, "%s %s", buf1, mod_name);
+      free(mod_name);
     }
     if(*buf1) mod_unload_modules(buf1);
     for(f = f0; f; f = f->next) {
-      char *basename = mod_basename(f->key_str);
-      mod_modprobe(basename, NULL);
-      free(basename);
+      char *mod_name = mod_basename(f->key_str);
+      mod_modprobe(mod_name, NULL);
+      free(mod_name);
     }
   }
 
@@ -1013,7 +1024,6 @@ void util_do_driver_update(unsigned idx)
   free(dst);
   free(buf1);
   free(buf2);
-
 }
 
 

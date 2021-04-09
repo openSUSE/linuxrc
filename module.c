@@ -42,13 +42,9 @@
 
 #define MOD_EXT(mod)	{ .ext = (mod), .len = sizeof(mod) - 1 }
 
-typedef struct {
-  char *ext;
-  size_t len;
-} mod_extensions_t;
-
 // list of recognized module file name extensions
-static const mod_extensions_t mod_extensions[] = {
+// list ends with an empty entry
+const mod_extensions_t mod_extensions[] = {
   MOD_EXT(".ko.xz"),
   MOD_EXT(".ko"),
   { }
