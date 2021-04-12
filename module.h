@@ -6,6 +6,14 @@
  *
  */
 
+typedef struct {
+  char *ext;
+  size_t len;
+} mod_extensions_t;
+
+// array of possible module extensions
+extern const mod_extensions_t mod_extensions[];
+
 int        mod_get_type(char *type_name);
 int        mod_check_modules(char *type_name);
 void       mod_init(int autoload);
