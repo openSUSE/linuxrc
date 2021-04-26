@@ -846,7 +846,9 @@ void add_driver_update(char *dir, char *loc)
       if(!util_check_exist(buf2) && (f = fopen(buf2, "w"))) {
         while((de = readdir(d))) {
           if(mod_basename_len(de->d_name)) {
-            fprintf(f, "%s\n", de->d_name);
+            char *mod_name = mod_basename(de->d_name);
+            fprintf(f, "%s\n", mod_name);
+            free(mod_name);
           }
         }
         fclose(f);
@@ -983,17 +985,32 @@ void util_do_driver_update(unsigned idx)
   f0 = file_read_file(buf1, kf_none);
   for(f = f0; f; f = f->next) {
     char *mod_name = mod_basename(f->key_str);
+    char *update_mod_name = NULL;
+    const mod_extensions_t *update_mod_ext;
 
-    // remove existing module, with any extension
-    for(const mod_extensions_t *mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
-      strprintf(&buf2, "/modules/%s%s", mod_name, mod_ext->ext);
-      unlink(buf2);
+    // check if module exists in driver update
+    //
+    // if so, update_mod_ext->ext points to the module extension used for the module
+    // else, update_mod_ext->ext is NULL
+    for(update_mod_ext = mod_extensions; update_mod_ext->ext; update_mod_ext++) {
+      strprintf(&update_mod_name, "%s/modules/%s%s", dst, mod_name, update_mod_ext->ext);
+      if(util_check_exist(update_mod_name)) break;
     }
 
-    strprintf(&buf1, "%s/modules/%s", dst, f->key_str);
-    strprintf(&buf2, "/modules/%s", f->key_str);
-    symlink(buf1, buf2);
+    // if the driver update contains the module...
+    if(update_mod_ext->ext) {
+      // remove existing module, with any possible extension
+      for(const mod_extensions_t *mod_ext = mod_extensions; mod_ext->ext; mod_ext++) {
+        strprintf(&buf1, "/modules/%s%s", mod_name, mod_ext->ext);
+        unlink(buf1);
+      }
 
+      // create a link to the updated module
+      strprintf(&buf1, "/modules/%s%s", mod_name, update_mod_ext->ext);
+      symlink(update_mod_name, buf1);
+    }
+
+    free(update_mod_name);
     free(mod_name);
   }
 
