@@ -342,14 +342,6 @@ void lxrc_change_root()
       if(!strcmp(*s, "tmp")) chmod(buf, 01777);
     }
 
-    // link module tree
-    strprintf(&buf, "%s/lib/modules", mp);
-    symlink("/parts/mp_0000/lib/modules", buf);
-
-    // link firmware tree
-    strprintf(&buf, "%s/lib/firmware", mp);
-    symlink("/parts/mp_0000/lib/firmware", buf);
-
     // mount 'parts/00_lib' (kernel parts)
     strprintf(&buf, "%s/parts/mp_0000", mp);
     util_mount_ro("/parts/00_lib", buf, NULL);
