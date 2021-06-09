@@ -4001,6 +4001,8 @@ uint64_t blk_size(char *dev)
 
 /*
  * Update device list in config.hd_data (if udev got new events).
+ *
+ * Do nothing if config.lock_device_list is != 0.
  */
 void update_device_list(int force)
 {
@@ -4025,6 +4027,11 @@ void update_device_list(int force)
   }
 
   if(!force) return;
+
+  if(config.lock_device_list) {
+    log_info("device list locked - no update\n");
+    return;
+  }
 
   log_info("%sscanning devices\n", config.hd_data ? "re" : "");
 
