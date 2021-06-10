@@ -453,6 +453,7 @@ typedef struct {
   unsigned autoyast_passurl:1;	/**< pass autoyast url unmodified on to yast */
   unsigned device_auto_config:2;	/**< run s390 device auto-config (cf. bsc#1168036) */
   unsigned device_auto_config_done:1;	/**< set after s390 device auto-config has been run */
+  unsigned lock_device_list;	/**< prevent device list updates if != 0 */
   struct {
     unsigned check:1;		/**< check for braille displays and start brld if found */
     char *dev;			/**< braille device */
