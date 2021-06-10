@@ -1879,6 +1879,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
   str_copy(&url_device, url->device);
   if(!url_device) str_copy(&url_device, url->is.network ? config.ifcfg.manual->device : config.device);
 
+  config.lock_device_list++;
+
   for(found = 0, hd = sort_a_bit(fix_device_names(hd_list2(config.hd_data, hw_items, 0))); hd; hd = hd->next) {
     for(hwaddr = NULL, res = hd->res; res; res = res->next) {
       if(res->any.type == res_hwaddr) {
@@ -1929,6 +1931,8 @@ int url_mount(url_t *url, char *dir, int (*test_func)(url_t *))
       err = 1;
     }
   }
+
+  config.lock_device_list--;
 
   if(!found) {
     log_info("device not found (err = %d): %s\n", err, url_device ?: "");
@@ -2503,6 +2507,8 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
   if(config.hd_data) {
     str_copy(&url_device, url->device ?: config.ifcfg.manual->device);
 
+    config.lock_device_list++;
+
     for(found = 0, hd = sort_a_bit(hd_list2(config.hd_data, hw_items, 0)); hd; hd = hd->next) {
       for(hwaddr = NULL, res = hd->res; res; res = res->next) {
         if(res->any.type == res_hwaddr) {
@@ -2536,6 +2542,8 @@ int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *la
       }
       if(config.sig_failed || config.digests.failed) break;
     }
+
+    config.lock_device_list--;
 
     if(!found) {
       str_copy(&url->used.device, NULL);
