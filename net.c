@@ -96,7 +96,7 @@ void net_ask_password()
     }
   }
 
-  if(config.usessh && !config.net.sshpassword && !config.net.sshkey) {
+  if(config.usessh && !(config.net.sshpassword || config.net.sshpassword_enc || config.net.sshkey)) {
     if(!config.win) util_disp_init();
     dia_input2("Enter your temporary SSH password.", &config.net.sshpassword, 20, 1);
   }
