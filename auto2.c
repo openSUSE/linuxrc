@@ -1251,9 +1251,13 @@ int auto2_remove_extension(char *extension)
 /*
  * Read autoyast file from url and parse it.
  *
- * If the autoyast url points to a directory, nothing is read but the
- * function tries to mount the directory to ensure it exists. This is
- * basically done to search for the correct medium.
+ * If the autoyast url points to a directory, the function tries to mount
+ * the directory to ensure it exists. If it is a non-mountable url (e.g.
+ * http) it assumes a rules-based setup and that a file rules/rules.xml
+ * exists below the specified directory. The rules file is only read, not
+ * parsed.
+ *
+ * This is basically done to search for the correct medium.
  */
 void auto2_read_autoyast(url_t *url)
 {
@@ -1268,7 +1272,7 @@ void auto2_read_autoyast(url_t *url)
    *
    * That works for mountable url schemes.
    *
-   * For the rest (http(s), (t)ftp) we'll just assume it works.
+   * For the rest (http(s), (t)ftp), try to read rules/rules.xml.
    */
   if(url->is.dir) {
     /*
@@ -1279,6 +1283,22 @@ void auto2_read_autoyast(url_t *url)
     if(url->is.mountable) {
       url_mount(url, NULL, NULL);
       url_umount(url);
+    }
+    else if(url->path) {
+      char *old_path = NULL;
+      str_copy(&old_path, url->path);
+
+      int path_len = strlen(url->path);
+      if(path_len && url->path[path_len - 1] == '/') url->path[path_len - 1] = 0;
+
+      strprintf(&url->path, "%s/rules/rules.xml", url->path);
+
+      log_show_maybe(!url->quiet, "Downloading AutoYaST rules file: %s\n", url->str);
+
+      url_read_file_anywhere(url, NULL, NULL, "/download/rules.xml", NULL, URL_FLAG_PROGRESS + URL_FLAG_NODIGEST);
+
+      str_copy(&url->path, old_path);
+      free(old_path);
     }
 
     return;
