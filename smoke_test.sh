@@ -103,10 +103,10 @@ sleep 5
 dump_screen $SESSION
 expect_text $SESSION "Please make sure your installation medium is available"
 
-# FIXME: ??? sending Ctrl+C for some reason does not work in Travis,
+# FIXME: ??? sending Ctrl+C for some reason does not work in Travis/GitHub Actions,
 # so kill the process and finish here
-if [ "$TRAVIS" == "1" ]; then
-  echo "Travis environment set, stopping the test..."
+if [ "$TRAVIS" == "1" -o "$GITHUB_RUN_ID" != "" ]; then
+  echo "CI environment set, stopping the test..."
   kill -9 `pidof linuxrc`
   exit 0
 fi
