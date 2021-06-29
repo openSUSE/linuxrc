@@ -1,0 +1,37 @@
+
+# See https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    container: registry.opensuse.org/yast/head/containers/yast-cpp:latest
+
+    steps:
+
+    - name: Git Checkout
+      uses: actions/checkout@v2
+
+    - name: Prepare System
+      run: |
+        zypper --non-interactive in --no-recommends \
+          e2fsprogs-devel \
+          libblkid-devel \
+          libcurl-devel \
+          readline-devel \
+          libmediacheck-devel \
+          tmux
+
+    - name: Compile
+      run: make -j `nproc`
+
+    - name: Smoke Test
+      # Run the test in a tty wrapper, the smoke test uses "tmux" which needs
+      # a terminal, but that is not available when running in a GitHub Action.
+      # The wrapper opens a new tty device and runs the command there.
+      run: /usr/lib/YaST2/bin/tty_wrapper ./smoke_test.sh
+      env:
+        TERM: linux
