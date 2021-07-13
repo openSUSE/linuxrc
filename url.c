@@ -156,6 +156,7 @@ void url_read(url_data_t *url_data)
   curl_easy_setopt(c_handle, CURLOPT_MAXREDIRS, 10);
   curl_easy_setopt(c_handle, CURLOPT_SSL_VERIFYPEER, config.sslcerts ? 1 : 0);
   curl_easy_setopt(c_handle, CURLOPT_SSL_VERIFYHOST, config.sslcerts ? 2 : 0);
+  curl_easy_setopt(c_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSFUNCTION, url_progress_cb);
   curl_easy_setopt(c_handle, CURLOPT_PROGRESSDATA, url_data);
@@ -180,6 +181,7 @@ void url_read(url_data_t *url_data)
   if(proxy_url) {
     if(config.debug >= 2) log_debug("using proxy %s\n", proxy_url);
     curl_easy_setopt(c_handle, CURLOPT_PROXY, proxy_url);
+    curl_easy_setopt(c_handle, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
     if(config.debug >= 2) log_debug("proxy: %s\n", proxy_url);
   }
 
