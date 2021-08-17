@@ -894,7 +894,7 @@ void url_add_query_string(char **buf, int n, url_t *url)
  *
  * format:
  *   0: for logging
- *   1: without query part
+ *   1: with non-standard query part
  *   2: with device
  *   3: like 2, but remove 'rel:' scheme
  *   4: in zypp format
@@ -955,6 +955,11 @@ char *url_print(url_t *url, int format)
       url->scheme == inst_ftp && *url->path == '/' ? "%2F" : "",
       *url->path == '/' ? url->path + 1 : url->path
     );
+  }
+
+  if(format == 1) {
+    // add the non-standard query parameters
+    url_add_query_string(&buf, q, url);
   }
 
   if(format == 0 || format == 2 || format == 3) {
