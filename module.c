@@ -46,6 +46,8 @@
 // list ends with an empty entry
 const mod_extensions_t mod_extensions[] = {
   MOD_EXT(".ko.xz"),
+  MOD_EXT(".ko.gz"),
+  MOD_EXT(".ko.zst"),
   MOD_EXT(".ko"),
   { }
 };
