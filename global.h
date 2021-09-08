@@ -365,7 +365,7 @@ typedef struct {
 #define NS_NOW			(1 << 9)
 
 #if defined(__s390__) || defined(__s390x__)
-#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_GATEWAY | NS_NAMESERVER | NS_DISPLAY)
+#define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_GATEWAY | NS_NAMESERVER | NS_DISPLAY | NS_VLANID)
 #else
 #define NS_DEFAULT		(NS_DHCP | NS_HOSTIP | NS_GATEWAY | NS_NAMESERVER)
 #endif
