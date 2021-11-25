@@ -6,13 +6,14 @@
  *
  */
 
-#define _GNU_SOURCE		/* getline */
+#define _GNU_SOURCE		/* getline, fnmatch */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <fnmatch.h>
 #include <sys/mount.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -444,6 +445,7 @@ file_key_t file_str2key(char *str, file_key_flag_t flags)
   if(flags & (kf_cmd + kf_cfg)) {
     for(sl = config.ptoptions; sl; sl = sl->next) {
       if(!strcasecmpignorestrich(sl->key, str)) return key_is_ptoption;
+      if(!fnmatch(sl->key, str, FNM_EXTMATCH + FNM_CASEFOLD)) return key_is_ptoption;
     }
   }
 
@@ -1361,6 +1363,11 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         for(sl = config.ptoptions; sl; sl = sl->next) {
           if(!strcasecmpignorestrich(sl->key, f->key_str)) {
             str_copy(&sl->value, f->value);
+            break;
+          }
+          // If a pattern matches, create an entry with the actual option name.
+          if(!fnmatch(sl->key, f->key_str, FNM_EXTMATCH + FNM_CASEFOLD)) {
+            slist_setentry(&config.ptoptions, f->key_str, f->value, 1);
             break;
           }
         }
