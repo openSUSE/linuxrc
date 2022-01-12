@@ -1,3 +1,5 @@
+#define _GNU_SOURCE     /* getline, strchrnul */
+
 /*
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
@@ -90,6 +92,7 @@ static void lxrc_makelinks(char *name);
 #endif
 static void select_repo_url(char *msg, char **repo);
 static char * get_platform_name();
+static char *get_console_device();
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
@@ -838,6 +841,7 @@ void lxrc_init()
 #if defined(__s390x__)
   config.device_auto_config = 2;	/* ask before doing s390 device auto config */
 #endif
+  config.switch_to_fb = 1;
 
   // defaults for self-update feature
   config.self_update_url = NULL;
@@ -990,8 +994,7 @@ void lxrc_init()
   );
 
   /*
-   * Do what has to be done before udevd starts; atm this is just the
-   * insmod.pre option.
+   * Do what has to be done before udevd starts.
    */
   file_read_info_file("cmdline", kf_cmd0);
 
@@ -1466,6 +1469,27 @@ void lxrc_check_console()
 {
   util_set_serial_console(auto2_serial_console());
 
+  /*
+   * Switch to tty1 if there is a framebuffer device and the user hasn't
+   * specified something else explicitly.
+   *
+   * The idea here is to catch cases where udev loads graphics drivers and a
+   * local graphical terminal becomes available. In this case, switch to
+   * that terminal.
+   */
+  if(
+    config.switch_to_fb &&
+    !config.console_option &&
+    util_check_exist("/dev/fb0") == 'c' &&
+    util_check_exist("/dev/tty1") == 'c'
+  ) {
+    if(strcmp(get_console_device(), "/dev/tty1")) {
+      str_copy(&config.console, "/dev/tty1");
+      log_info("switching console to %s\n", config.console);
+      kbd_switch_tty(0, 1);
+    }
+  }
+
   if(config.serial) {
     log_info(
       "Console: %s, serial line params \"%s\"\n",
@@ -1850,4 +1874,32 @@ char * get_platform_name()
   str_copy(&platform, "");
 #endif
 return platform;
+}
+
+
+/*
+ * Get current console device name.
+ *
+ * Do not free() the returned string.
+ */
+char *get_console_device()
+{
+  FILE *f;
+  static char *buf = NULL;
+  size_t len;
+
+  str_copy(&buf, NULL);
+
+  if((f = popen("showconsole", "r"))) {
+    if(getline(&buf, &len, f) > 0) {
+      *strchrnul(buf, '\n') = 0;
+    }
+    pclose(f);
+  }
+
+  if(!buf) str_copy(&buf, "/dev/console");
+
+  log_info("get_console_device: %s\n", buf);
+
+  return buf;
 }
