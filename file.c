@@ -1206,9 +1206,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
             else if(!strcmp(s, "vlanid")) i = NS_VLANID;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
-#if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
-#endif
             else if(!strcmp(s, "now")) i = NS_NOW;
             else if(!strcmp(s, "all")) do_all = 1;
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
