@@ -69,10 +69,8 @@ static int   inst_execute_yast        (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_netsource    (void);
 static int   inst_choose_netsource_cb (dia_item_t di);
-#if defined(__s390__) || defined(__s390x__)
 static int   inst_choose_display      (void);
 static int   inst_choose_display_cb   (dia_item_t di);
-#endif
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
@@ -81,9 +79,7 @@ static int choose_dud(char **dev);
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_none;
-#if defined(__s390__) || defined(__s390x__)  
 static dia_item_t di_inst_choose_display_last = di_none;
-#endif
 
 static int ask_for_swap(int64_t size, char *msg);
 
@@ -298,7 +294,14 @@ int inst_choose_netsource_cb(dia_item_t di)
   return err ? 1 : 0;
 }
 
-#if defined(__s390__) || defined(__s390x__)  
+
+/*
+ * Menu: installer UI variant
+ *
+ * return values:
+ *   0 : ok
+ *   1 : error
+ */
 int inst_choose_display()
 {
   if(!config.manual && (config.net.displayip || config.vnc || config.usessh)) {
@@ -317,7 +320,7 @@ int inst_choose_display()
 
     di = dia_menu2("Select the display type.", 33, inst_choose_display_cb, items, di_inst_choose_display_last);
 
-    return di == di_none ? -1 : 0;
+    return di == di_none ? 1 : 0;
   }
 }
 
@@ -358,7 +361,6 @@ int inst_choose_display_cb(dia_item_t di)
 
   return 0;
 }
-#endif
 
 
 /*
@@ -1132,12 +1134,10 @@ int inst_start_install()
     return 0;
   }
 
-#if defined(__s390__) || defined(__s390x__)
   if(!err &&
     (config.net.setup & NS_DISPLAY) &&
     inst_choose_display()
   ) err = 1;
-#endif
 
   if(config.debug >= 2) util_status_info(1);
   
