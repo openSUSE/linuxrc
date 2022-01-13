@@ -311,10 +311,11 @@ int inst_choose_display()
   else {
     dia_item_t di;
     dia_item_t items[] = {
-      di_display_x11,
+      di_display_qt,
+      di_display_console,
       di_display_vnc,
       di_display_ssh,
-      di_display_console,
+      di_display_x11,
       di_none
     };
 
@@ -327,39 +328,53 @@ int inst_choose_display()
 
 /*
  * return values:
- * -1    : abort (aka ESC)
  *  0    : ok
  *  other: stay in menu
  */
 int inst_choose_display_cb(dia_item_t di)
 {
+  int result = 0;
+
   di_inst_choose_display_last = di;
 
   switch(di) {
     case di_display_x11:
-      if(dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40, 0)) return -1;
+      dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40, 0);
+      if(!config.net.displayip) result = 1;
       break;
 
     case di_display_vnc:
-      config.vnc=1;
+      config.vnc = 1;
       net_ask_password();
+      if(!config.net.vncpassword) {
+        config.vnc = 0;
+        result = 1;
+      }
       break;
 
     case di_display_ssh:
-      config.usessh=1;
-      config.vnc=0;
+      config.usessh = 1;
+      config.vnc = 0;
       net_ask_password();
+      if(!(config.net.sshpassword || config.net.sshpassword_enc)) {
+        config.usessh = 0;
+        result = 1;
+      }
       break;
 
     case di_display_console:
-      /* nothing to do */
+      config.textmode = 1;
+      break;
+
+    case di_display_qt:
+      config.textmode = 0;
       break;
 
     default:
       break;
   }
 
-  return 0;
+  return result;
 }
 
 
