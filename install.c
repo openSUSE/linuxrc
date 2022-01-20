@@ -1427,6 +1427,11 @@ int inst_execute_yast()
       else {
         signal(SIGUSR1, SIG_IGN);
 
+        // stdout = stderr
+        dup2(1, 2);
+        // close other file descriptors
+        for(int fd = 3; fd < 10; fd++) close(fd);
+
         // log_info("%d: system()\n", getpid());
         err = system(setupcmd);
         // log_info("%d: exit(%d)\n", getpid(), err);
