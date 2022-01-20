@@ -80,6 +80,7 @@ typedef enum {
   di_display_vnc,
   di_display_ssh,
   di_display_console,
+  di_display_qt,
 
   di_390net_osa,
   di_390net_ctc,
