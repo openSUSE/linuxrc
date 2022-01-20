@@ -68,7 +68,7 @@ static keymap_t set_keymaps_arm [] =
 { "Ceske",                "cz"           },
 { "Dansk",                "dk"           },
 { "Deutsch",              "de-nodeadkeys"},
-{ "English (UK)",         "uk"           },
+{ "English (UK)",         "gb"           },
 { "English (US)",         "us"           },
 { "Español",              "es"           },
 { "Français",             "fr"           },
