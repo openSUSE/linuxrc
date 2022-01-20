@@ -1492,6 +1492,7 @@ void lxrc_check_console()
    * that terminal.
    */
   if(
+    !config.test &&
     (config.switch_to_fb == 2 || (config.switch_to_fb == 1 && !config.console_option)) &&
     util_check_exist("/dev/fb0") == 'c' &&
     util_check_exist(LXRC_CONSOLE_DEV) == 'c'
@@ -1909,7 +1910,7 @@ char *get_console_device()
 
   str_copy(&buf, NULL);
 
-  if((f = popen("showconsole", "r"))) {
+  if((f = popen("showconsole 2>/dev/null", "r"))) {
     if(getline(&buf, &len, f) > 0) {
       *strchrnul(buf, '\n') = 0;
     }
