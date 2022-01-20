@@ -95,7 +95,7 @@ static struct {
   { key_rebootwait,     "WaitReboot",     kf_cfg + kf_cmd                },	/* drop it? */
   { key_sourcemounted,  "Sourcemounted",  kf_none                        },
   { key_cdrom,          "Cdrom",          kf_none                        },
-  { key_console,        "Console",        kf_none                        },
+  { key_console,        "Console",        kf_cmd0                        },
   { key_ptphost,        "Pointopoint",    kf_cfg + kf_cmd                },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_domain,         "DNSDOMAIN",      kf_cfg + kf_cmd + kf_dhcp      },
@@ -325,6 +325,7 @@ static struct {
   { key_zram_root,      "zram_root",      kf_cmd_early                   },
   { key_zram_swap,      "zram_swap",      kf_cmd_early                   },
   { key_extend,         "Extend",         kf_cfg + kf_cmd                },
+  { key_switch_to_fb,   "SwitchToFB",     kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1016,6 +1017,11 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_noshell:
         if(f->is.numeric) config.noshell = f->nvalue;
+        break;
+
+      case key_console:
+        // just remember that it was used
+        config.console_option = 1;
         break;
 
       case key_consoledevice:
@@ -1886,6 +1892,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_extend:
         slist_assign_values(&config.extend_option, f->value);
+        break;
+
+      case key_switch_to_fb:
+        if(f->is.numeric) config.switch_to_fb = f->nvalue;
         break;
 
       default:

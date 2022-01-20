@@ -711,7 +711,7 @@ int mod_insmod(char *module, char *param)
     util_update_disk_list(NULL, 1);
     util_update_cdrom_list();
 
-    if(mod_show_kernel_messages) kbd_switch_tty(4);
+    if(mod_show_kernel_messages) kbd_switch_tty(config.kbd_fd, 4);
   }
 
   err = lxrc_run(buf);
@@ -747,7 +747,7 @@ int mod_insmod(char *module, char *param)
       }
     }
 
-    if(mod_show_kernel_messages) kbd_switch_tty(1);
+    if(mod_show_kernel_messages) kbd_switch_tty(config.kbd_fd, 1);
 
     util_update_kernellog();
 

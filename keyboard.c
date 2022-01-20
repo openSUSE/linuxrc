@@ -183,10 +183,10 @@ void kbd_end(int close_fd)
 }
 
 
-void kbd_switch_tty(int tty)
+void kbd_switch_tty(int kbd_fd, int tty)
 {
-  ioctl(config.kbd_fd, VT_ACTIVATE, tty);
-  ioctl(config.kbd_fd, VT_WAITACTIVE, tty);
+  ioctl(kbd_fd, VT_ACTIVATE, tty);
+  ioctl(kbd_fd, VT_WAITACTIVE, tty);
 }
 
 

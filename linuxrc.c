@@ -1,3 +1,5 @@
+#define _GNU_SOURCE     /* getline, strchrnul */
+
 /*
  *
  * linuxrc.c     Load modules and rootimage to ramdisk
@@ -90,6 +92,7 @@ static void lxrc_makelinks(char *name);
 #endif
 static void select_repo_url(char *msg, char **repo);
 static char * get_platform_name();
+static char *get_console_device();
 
 #if SWISS_ARMY_KNIFE
 int probe_main(int argc, char **argv);
@@ -846,6 +849,7 @@ void lxrc_init()
 #if defined(__s390x__)
   config.device_auto_config = 2;	/* ask before doing s390 device auto config */
 #endif
+  config.switch_to_fb = 1;
 
   // defaults for self-update feature
   config.self_update_url = NULL;
@@ -998,8 +1002,7 @@ void lxrc_init()
   );
 
   /*
-   * Do what has to be done before udevd starts; atm this is just the
-   * insmod.pre option.
+   * Do what has to be done before udevd starts.
    */
   file_read_info_file("cmdline", kf_cmd0);
 
@@ -1467,12 +1470,52 @@ return (1);
 }
 
 
-/* Check if we start linuxrc on a serial console. On Intel and
-   Alpha, we look if the "console" parameter was used on the
-   commandline. On SPARC, we use the result from hardwareprobing. */
+#define LXRC_CONSOLE_DEV "/dev/tty1"
+
+/*
+ * Set console device linuxrc is going to use.
+ *
+ * This is usually just /dev/console or something specified via the
+ * 'console' boot option.
+ *
+ * But if a framebuffer device exists (after udev loads some drivers) and
+ * the user hasn't specified any 'console' option, switch to
+ * LXRC_CONSOLE_DEV (that is, use the framebuffer).
+ *
+ * This console switching can be prevented using the 'switch_to_fb=0' boot
+ * option or enforced using 'switch_to_fb=2'. (The default setting is 1.)
+ */
 void lxrc_check_console()
 {
+  char *current_console = get_console_device();
+
   util_set_serial_console(auto2_serial_console());
+
+  /*
+   * Switch to tty1 if there is a framebuffer device and the user hasn't
+   * specified something else explicitly.
+   *
+   * The idea here is to catch cases where udev loads graphics drivers and a
+   * local graphical terminal becomes available. In this case, switch to
+   * that terminal.
+   */
+  if(
+    (config.switch_to_fb == 2 || (config.switch_to_fb == 1 && !config.console_option)) &&
+    util_check_exist("/dev/fb0") == 'c' &&
+    util_check_exist(LXRC_CONSOLE_DEV) == 'c'
+  ) {
+    if(strcmp(current_console, LXRC_CONSOLE_DEV)) {
+      str_copy(&config.console, LXRC_CONSOLE_DEV);
+      log_show(
+        "\nFramebuffer device detected - continuing installation on console %s.\n"
+        "Use boot option 'switch_to_fb=0' to prevent this.\n\n",
+        config.console
+      );
+      kbd_switch_tty(0, 1);
+    }
+  }
+
+  log_debug("going for console device: %s\n", config.console);
 
   if(config.serial) {
     log_info(
@@ -1858,4 +1901,32 @@ char * get_platform_name()
   str_copy(&platform, "");
 #endif
 return platform;
+}
+
+
+/*
+ * Get current console device name.
+ *
+ * Do not free() the returned string.
+ */
+char *get_console_device()
+{
+  FILE *f;
+  static char *buf = NULL;
+  size_t len;
+
+  str_copy(&buf, NULL);
+
+  if((f = popen("showconsole", "r"))) {
+    if(getline(&buf, &len, f) > 0) {
+      *strchrnul(buf, '\n') = 0;
+    }
+    pclose(f);
+  }
+
+  if(!buf) str_copy(&buf, "/dev/console");
+
+  log_info("get_console_device: %s\n", buf);
+
+  return buf;
 }
