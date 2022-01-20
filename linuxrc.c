@@ -848,8 +848,8 @@ void lxrc_init()
   config.autoyast_parse = 1;	/* analyse autoyast option and read autoyast file */
 #if defined(__s390x__)
   config.device_auto_config = 2;	/* ask before doing s390 device auto config */
-#endif
   config.switch_to_fb = 1;
+#endif
 
   // defaults for self-update feature
   config.self_update_url = NULL;
