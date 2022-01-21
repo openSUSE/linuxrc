@@ -461,6 +461,7 @@ typedef struct {
   unsigned device_auto_config:2;	/**< run s390 device auto-config (cf. bsc#1168036) */
   unsigned device_auto_config_done:1;	/**< set after s390 device auto-config has been run */
   unsigned lock_device_list;	/**< prevent device list updates if != 0 */
+  unsigned switch_to_fb:2;	/**< switch to framebuffer device; 0: no, 1: auto, 2: always */
   struct {
     char *root_size;		/**< zram root fs size (e.g. "1G" or "512M") */
     char *swap_size;		/**< zram swap size (e.g. "1G" or "512M") */
@@ -503,6 +504,7 @@ typedef struct {
   char **argv;			/**< store argv here */
   uint64_t segv_addr;		/**< segfault addr if last linuxrc run */
   char *console;		/**< console device */
+  unsigned console_option:1;	/**< whether 'console' kernel boot option was used */
   char *serial;			/**< serial console parameters, e.g. ttyS0,38400 or ttyS1,9600n8 */
   char *product;		/**< product name */
   char *product_dir;		/**< product specific dir component (e.g. 'suse') */

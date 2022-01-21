@@ -69,10 +69,8 @@ static int   inst_execute_yast        (void);
 static int   inst_commit_install      (void);
 static int   inst_choose_netsource    (void);
 static int   inst_choose_netsource_cb (dia_item_t di);
-#if defined(__s390__) || defined(__s390x__)
 static int   inst_choose_display      (void);
 static int   inst_choose_display_cb   (dia_item_t di);
-#endif
 static int   inst_choose_source       (void);
 static int   inst_choose_source_cb    (dia_item_t di);
 static int   inst_menu_cb             (dia_item_t di);
@@ -81,9 +79,7 @@ static int choose_dud(char **dev);
 static dia_item_t di_inst_menu_last = di_none;
 static dia_item_t di_inst_choose_source_last = di_none;
 static dia_item_t di_inst_choose_netsource_last = di_none;
-#if defined(__s390__) || defined(__s390x__)  
 static dia_item_t di_inst_choose_display_last = di_none;
-#endif
 
 static int ask_for_swap(int64_t size, char *msg);
 
@@ -298,7 +294,14 @@ int inst_choose_netsource_cb(dia_item_t di)
   return err ? 1 : 0;
 }
 
-#if defined(__s390__) || defined(__s390x__)  
+
+/*
+ * Menu: installer UI variant
+ *
+ * return values:
+ *   0 : ok
+ *   1 : error
+ */
 int inst_choose_display()
 {
   if(!config.manual && (config.net.displayip || config.vnc || config.usessh)) {
@@ -308,57 +311,71 @@ int inst_choose_display()
   else {
     dia_item_t di;
     dia_item_t items[] = {
-      di_display_x11,
+      di_display_qt,
+      di_display_console,
       di_display_vnc,
       di_display_ssh,
-      di_display_console,
+      di_display_x11,
       di_none
     };
 
     di = dia_menu2("Select the display type.", 33, inst_choose_display_cb, items, di_inst_choose_display_last);
 
-    return di == di_none ? -1 : 0;
+    return di == di_none ? 1 : 0;
   }
 }
 
 
 /*
  * return values:
- * -1    : abort (aka ESC)
  *  0    : ok
  *  other: stay in menu
  */
 int inst_choose_display_cb(dia_item_t di)
 {
+  int result = 0;
+
   di_inst_choose_display_last = di;
 
   switch(di) {
     case di_display_x11:
-      if(dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40, 0)) return -1;
+      dia_input2("Enter the name of the host running the X11 server.", &config.net.displayip, 40, 0);
+      if(!config.net.displayip) result = 1;
       break;
 
     case di_display_vnc:
-      config.vnc=1;
+      config.vnc = 1;
       net_ask_password();
+      if(!config.net.vncpassword) {
+        config.vnc = 0;
+        result = 1;
+      }
       break;
 
     case di_display_ssh:
-      config.usessh=1;
-      config.vnc=0;
+      config.usessh = 1;
+      config.vnc = 0;
       net_ask_password();
+      if(!(config.net.sshpassword || config.net.sshpassword_enc)) {
+        config.usessh = 0;
+        result = 1;
+      }
       break;
 
     case di_display_console:
-      /* nothing to do */
+      config.textmode = 1;
+      break;
+
+    case di_display_qt:
+      config.textmode = 0;
       break;
 
     default:
       break;
   }
 
-  return 0;
+  return result;
 }
-#endif
 
 
 /*
@@ -1132,12 +1149,10 @@ int inst_start_install()
     return 0;
   }
 
-#if defined(__s390__) || defined(__s390x__)
   if(!err &&
-    (config.net.setup & NS_DISPLAY) &&
+    (config.manual || (config.net.setup & NS_DISPLAY)) &&
     inst_choose_display()
   ) err = 1;
-#endif
 
   if(config.debug >= 2) util_status_info(1);
   
@@ -1411,6 +1426,11 @@ int inst_execute_yast()
       }
       else {
         signal(SIGUSR1, SIG_IGN);
+
+        // stdout = stderr
+        dup2(1, 2);
+        // close other file descriptors
+        for(int fd = 3; fd < 10; fd++) close(fd);
 
         // log_info("%d: system()\n", getpid());
         err = system(setupcmd);

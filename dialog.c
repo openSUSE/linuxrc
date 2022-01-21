@@ -97,9 +97,10 @@ struct {
   { di_extras_quit,      "Quit linuxrc"         },
   
   { di_display_vnc,    	 "VNC"	          },
-  { di_display_x11,  	 "X11"	          },
+  { di_display_x11,  	 "Remote X11"	          },
   { di_display_ssh,      "SSH"	          },
-  { di_display_console,  "ASCII Console"	  },
+  { di_display_console,  "Text-based UI"	  },
+  { di_display_qt,       "Graphical UI"	  },
   
   { di_390net_osa,	 "OSA-2 or OSA Express"           },
   { di_390net_ctc,	 "Channel To Channel (CTC)"	          },

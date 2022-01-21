@@ -553,6 +553,7 @@ int util_check_exist(char *file)
   if(S_ISREG(sbuf.st_mode)) return 'r';
   if(S_ISDIR(sbuf.st_mode)) return 'd';
   if(S_ISBLK(sbuf.st_mode)) return 'b';
+  if(S_ISCHR(sbuf.st_mode)) return 'c';
 
   return 1;
 }
@@ -1202,6 +1203,8 @@ void util_status_info(int log_it)
   sprintf(buf, "flags = ");
   add_flag(&sl0, buf, config.test, "test");
   add_flag(&sl0, buf, config.tmpfs, "tmpfs");
+  add_flag(&sl0, buf, config.console_option, "console");
+  add_flag(&sl0, buf, config.switch_to_fb, "switch2fb");
   add_flag(&sl0, buf, config.manual, "manual");
   add_flag(&sl0, buf, config.utf8, "utf8");
   add_flag(&sl0, buf, config.rescue, "rescue");

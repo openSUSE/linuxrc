@@ -95,7 +95,7 @@ static struct {
   { key_rebootwait,     "WaitReboot",     kf_cfg + kf_cmd                },	/* drop it? */
   { key_sourcemounted,  "Sourcemounted",  kf_none                        },
   { key_cdrom,          "Cdrom",          kf_none                        },
-  { key_console,        "Console",        kf_none                        },
+  { key_console,        "Console",        kf_cmd0                        },
   { key_ptphost,        "Pointopoint",    kf_cfg + kf_cmd                },
   { key_domain,         "Domain",         kf_cfg + kf_cmd + kf_dhcp      },
   { key_domain,         "DNSDOMAIN",      kf_cfg + kf_cmd + kf_dhcp      },
@@ -325,6 +325,7 @@ static struct {
   { key_zram_root,      "zram_root",      kf_cmd_early                   },
   { key_zram_swap,      "zram_swap",      kf_cmd_early                   },
   { key_extend,         "Extend",         kf_cfg + kf_cmd                },
+  { key_switch_to_fb,   "SwitchToFB",     kf_cfg + kf_cmd_early          },
 };
 
 static struct {
@@ -1018,6 +1019,11 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.noshell = f->nvalue;
         break;
 
+      case key_console:
+        // just remember that it was used
+        config.console_option = 1;
+        break;
+
       case key_consoledevice:
         if(*f->value) {
           if(!config.console || strcmp(config.console, f->value)) {
@@ -1206,9 +1212,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
             else if(!strcmp(s, "hostip")) i = NS_HOSTIP;
             else if(!strcmp(s, "vlanid")) i = NS_VLANID;
             else if(!strcmp(s, "gateway")) i = NS_GATEWAY;
-#if defined(__s390__) || defined(__s390x__)
             else if(!strcmp(s, "display")) i = NS_DISPLAY;
-#endif
             else if(!strcmp(s, "now")) i = NS_NOW;
             else if(!strcmp(s, "all")) do_all = 1;
             else if(!strncmp(s, "nameserver", sizeof "nameserver" - 1)) {
@@ -1888,6 +1892,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_extend:
         slist_assign_values(&config.extend_option, f->value);
+        break;
+
+      case key_switch_to_fb:
+        if(f->is.numeric) config.switch_to_fb = f->nvalue;
         break;
 
       default:
