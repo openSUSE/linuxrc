@@ -1999,7 +1999,7 @@ void file_write_install_inf(char *dir)
 
   file_write_str(f, key_console, config.serial);
 
-  file_write_num(f, key_sourcemounted, url->mount ? 1 : 0);
+  file_write_num(f, key_sourcemounted, 0);
 
   fprintf(f, "RepoURL: %s\n", url_print(url, 3));
   if(!config.norepo)   fprintf(f, "ZyppRepoURL: %s\n", url_print(url, 4));
