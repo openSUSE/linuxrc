@@ -1488,22 +1488,31 @@ int url_progress(url_data_t *url_data, int stage)
 
 /*
  * Unmounts volumes used by 'url'.
+ *
+ * Return error code (0 if ok).
  */
-void url_umount(url_t *url)
+int url_umount(url_t *url)
 {
-  if(!url) return;
-
-  // FIXME: this is wrong!
+  int err = 0;
+  if(!url) return 0;
 
   if(url->mount && util_umount(url->mount)) {
     log_debug("%s: url umount failed\n", url->mount);
+    err = 1;
   }
-  str_copy(&url->mount, NULL);
+  else {
+    str_copy(&url->mount, NULL);
+  }
 
   if(url->tmp_mount && util_umount(url->tmp_mount)) {
     log_debug("%s: url umount failed\n", url->tmp_mount);
+    err = 1;
   }
-  str_copy(&url->tmp_mount, NULL);
+  else {
+    str_copy(&url->tmp_mount, NULL);
+  }
+
+  return err;
 }
 
 
