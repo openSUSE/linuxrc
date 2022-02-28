@@ -56,7 +56,7 @@ url_t *url_free(url_t *url);
 void url_cleanup(void);
 url_data_t *url_data_new(void);
 void url_data_free(url_data_t *url_data);
-void url_umount(url_t *url);
+int url_umount(url_t *url);
 int url_mount(url_t *url, char *dir, int (*test_func)(url_t *));
 int url_read_file(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
 int url_read_file_anywhere(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
