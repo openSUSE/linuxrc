@@ -1116,10 +1116,22 @@ int auto2_add_extension(char *extension)
     err = url_find_instsys(config.url.instsys, config.mountpoint.instsys);
   }
 
-  sync();
-
-  url_umount(config.url.install);
-  if(err) url_umount(config.url.instsys);
+  /* retry a few times to umount in case the mountpoint is still busy */
+  int umount_err = 0;
+  int umount_try_count = 0;
+  do {
+    sync();
+    umount_err = url_umount(config.url.install);
+    if(err) umount_err |= url_umount(config.url.instsys);
+    if(umount_err && umount_try_count++ < 5) {
+      log_info("url_umount failed; going to re-try #%d\n", ++umount_try_count);
+      sleep(1);
+    }
+    else {
+      break;
+    }
+  }
+  while(1);
 
   if(config.mountpoint.instdata) rmdir(config.mountpoint.instdata);
   if(config.mountpoint.instsys) rmdir(config.mountpoint.instsys);
