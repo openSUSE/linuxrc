@@ -1342,6 +1342,21 @@ int inst_execute_yast()
     return err;
   }
 
+  log_debug("= config.url.install =");
+  url_log(config.url.install);
+  log_debug("= config.url.instsys =");
+  url_log(config.url.instsys);
+
+  // we can't unmount if yast runs directly from the install medium
+  if(config.download.instsys) {
+    log_debug("unmounting installation medium");
+    url_umount(config.url.instsys);
+    url_umount(config.url.install);
+  }
+  else {
+    log_debug("insufficient memory - unmounting installation medium not possible");
+  }
+
   if(!config.test) {
     if(util_check_exist("/sbin/update")) lxrc_run("/sbin/update");
   }

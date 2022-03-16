@@ -661,14 +661,17 @@ url_t *url_set(char *str)
     }
   }
 
-  log_debug("url = %s\n", url->str);
-
   url_replace_vars_with_backup(&url->server, &url->orig.server);
   url_replace_vars_with_backup(&url->share, &url->orig.share);
   url_replace_vars_with_backup(&url->path, &url->orig.path);
   url_replace_vars_with_backup(&url->instsys, &url->orig.instsys);
 
-  if(config.debug >= 2) url_log(url);
+  if(config.debug >= 2) {
+    url_log(url);
+  }
+  else {
+    log_debug("url = %s\n", url->str);
+  }
 
   return url;
 }
@@ -682,17 +685,20 @@ void url_log(url_t *url)
   int i;
   slist_t *sl;
 
+  if(!url) return;
+
+  log_debug("url = %s\n", url->str);
+
   log_debug(
     "  scheme = %s (%d), orig scheme = %s (%d)",
     url_scheme2name(url->scheme), url->scheme,
     url_scheme2name(url->orig.scheme), url->orig.scheme
   );
-  if(url->server) log_debug(", server = \"%s\"", url->server);
-  if(url->orig.server) log_debug(", server (orig) = \"%s\"", url->orig.server);
-  if(url->port) log_debug(", port = %u", url->port);
-  if(url->path) log_debug(", path = \"%s\"", url->path);
-  if(url->orig.path) log_debug(", path (orig) = \"%s\"", url->orig.path);
-  log_debug("\n");
+  if(url->server) log_debug("  server = \"%s\"", url->server);
+  if(url->orig.server) log_debug("  server (orig) = \"%s\"", url->orig.server);
+  if(url->port) log_debug("  port = %u", url->port);
+  if(url->path) log_debug("  path = \"%s\"", url->path);
+  if(url->orig.path) log_debug("  path (orig) = \"%s\"", url->orig.path);
 
   if(url->user || url->password) {
     i = 0;
@@ -702,12 +708,10 @@ void url_log(url_t *url)
   }
 
   if(url->share || url->domain || url->device) {
-    i = 0;
-    if(url->share) log_debug("%c share = \"%s\"", i++ ? ',' : ' ', url->share);
-    if(url->orig.share) log_debug("%c share (orig) = \"%s\"", i++ ? ',' : ' ', url->orig.share);
-    if(url->domain) log_debug("%c domain = \"%s\"", i++ ? ',' : ' ', url->domain);
-    if(url->device) log_debug("%c device = \"%s\"", i++ ? ',' : ' ', url->device);
-    log_debug("\n");
+    if(url->share) log_debug("  share = \"%s\"", url->share);
+    if(url->orig.share) log_debug("  share (orig) = \"%s\"", url->orig.share);
+    if(url->domain) log_debug("  domain = \"%s\"", url->domain);
+    if(url->device) log_debug("  device = \"%s\"", url->device);
   }
 
   log_debug(
@@ -726,8 +730,10 @@ void url_log(url_t *url)
     }
   }
 
-  log_debug("url (zypp format) = %s\n", url_print(url, 4));
-  log_debug("url (ay format) = %s\n", url_print(url, 5));
+  log_debug("  mount = %s, tmp_mount = %s\n", url->mount, url->tmp_mount);
+
+  log_debug("  url (zypp format) = %s\n", url_print(url, 4));
+  log_debug("  url (ay format) = %s\n", url_print(url, 5));
 }
 
 
@@ -1487,22 +1493,31 @@ int url_progress(url_data_t *url_data, int stage)
 
 /*
  * Unmounts volumes used by 'url'.
+ *
+ * Return error code (0 if ok).
  */
-void url_umount(url_t *url)
+int url_umount(url_t *url)
 {
-  if(!url) return;
-
-  // FIXME: this is wrong!
+  int err = 0;
+  if(!url) return 0;
 
   if(url->mount && util_umount(url->mount)) {
     log_debug("%s: url umount failed\n", url->mount);
+    err = 1;
   }
-  str_copy(&url->mount, NULL);
+  else {
+    str_copy(&url->mount, NULL);
+  }
 
   if(url->tmp_mount && util_umount(url->tmp_mount)) {
     log_debug("%s: url umount failed\n", url->tmp_mount);
+    err = 1;
   }
-  str_copy(&url->tmp_mount, NULL);
+  else {
+    str_copy(&url->tmp_mount, NULL);
+  }
+
+  return err;
 }
 
 
