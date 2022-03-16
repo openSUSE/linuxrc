@@ -4045,6 +4045,9 @@ void update_device_list(int force)
 
   config.hd_data = calloc(1, sizeof *config.hd_data);
 
+  // consider also raid devices
+  config.hd_data->flags.list_md = 1;
+
   fix_device_names(hd_list2(config.hd_data, hw_items, 1));
 
   // update wlan interface list
