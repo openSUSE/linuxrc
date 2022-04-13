@@ -18,6 +18,7 @@
 #include <sys/syscall.h>
 #include <sys/wait.h>
 #include <sys/select.h>
+#include <sys/sysinfo.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
@@ -116,6 +117,8 @@ int main(int argc, char **argv, char **env)
 {
   char *prog, *s;
   int err, i, j;
+  struct sysinfo si;
+  uint64_t totalram = 0;
 
   prog = (prog = strrchr(*argv, '/')) ? prog + 1 : *argv;
 
@@ -138,9 +141,13 @@ int main(int argc, char **argv, char **env)
   config.run_as_linuxrc = 1;
   config.tmpfs = 1;
 
-  // use zram
-  str_copy(&config.zram.root_size, "1G");
-  str_copy(&config.zram.swap_size, "1G");
+  if(!sysinfo(&si)) totalram = si.totalram * si.mem_unit;
+
+  // do not use zram if there's more than 64 GiB free memory (bsc#1197253)
+  if(totalram < (64ull << 30)) {
+    str_copy(&config.zram.root_size, "1G");
+    str_copy(&config.zram.swap_size, "1G");
+  }
 
   str_copy(&config.console, "/dev/console");
 
@@ -161,6 +168,8 @@ int main(int argc, char **argv, char **env)
   str_copy(&config.product, "SUSE Linux");
 
   config.update.next_name = &config.update.name_list;
+
+  log_info("totalram: %"PRIu64"\n", totalram);
 
   /* maybe we had a segfault recently... */
   if(argc == 4 && !strcmp(argv[1], "segv")) {
