@@ -106,7 +106,7 @@ struct {
   { di_390net_ctc,	 "Channel To Channel (CTC)"	          },
   { di_390net_escon,	 "ESCON"         },
   { di_390net_iucv,	 "Inter-User Communication Vehicle (IUCV)"          },
-  { di_390net_hsi,	 "Hipersockets"	          },
+  { di_390net_hsi,	 "HiperSockets"	          },
   { di_390net_virtio,	 "VirtIO Ethernet CCW Device"},
   { di_390net_sep,	 "#--------------------" },
   
