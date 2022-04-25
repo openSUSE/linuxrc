@@ -617,7 +617,7 @@ int net_choose_device()
     { "ctc",   "channel to channel connection"   },
     { "ci",    "channel attached cisco router"  },
     { "iucv",  "IUCV connection"  },
-    { "hsi",   "Hipersocket"   }
+    { "hsi",   "HiperSocket"   }
   };
   hd_data_t *hd_data = calloc(1, sizeof *hd_data);
   hd_t *hd, *hd_cards;
