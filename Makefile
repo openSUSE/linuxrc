@@ -16,7 +16,7 @@ SRC	= $(filter-out inflate.c,$(sort $(wildcard *.c)))
 INC	= $(wildcard *.h)
 OBJ	= $(SRC:.c=.o)
 
-SUBDIRS	= mkpsfu
+SUBDIRS	= mkpsfu edid-write
 
 .EXPORT_ALL_VARIABLES:
 .PHONY:	all clean install libs archive
@@ -43,6 +43,7 @@ linuxrc: $(OBJ)
 install: linuxrc
 	install -m 755 linuxrc $(DESTDIR)/usr/sbin
 	install -m 755 mkpsfu/mkpsfu $(DESTDIR)/usr/bin
+	install -m 755 edid-write/edid-write $(DESTDIR)/usr/bin
 	install -d -m 755 $(DESTDIR)/usr/share/linuxrc
 	gzip -c9 mkpsfu/linuxrc-16.psfu >$(DESTDIR)/usr/share/linuxrc/linuxrc-16.psfu.gz
 	gzip -c9 mkpsfu/linuxrc2-16.psfu >$(DESTDIR)/usr/share/linuxrc/linuxrc2-16.psfu.gz
