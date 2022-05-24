@@ -5804,3 +5804,77 @@ int util_has_device_auto_config()
 
   return has_it;
 }
+
+
+/*
+ * Parse string and set config.edid accordingly.
+ */
+void util_parse_edid(const char *str)
+{
+  int args;
+
+  config.edid.valid = 0;
+
+  args = sscanf(str, "%ux%u,%ux%u", &config.edid.width, &config.edid.height, &config.edid.width_mm, &config.edid.height_mm);
+  if(args == 4) {
+    if(config.edid.width_mm && config.edid.height_mm) config.edid.valid = 1;
+  }
+  else if(args == 3) {
+    config.edid.dpi = config.edid.width_mm;
+    config.edid.width_mm = config.edid.height_mm = 0;
+    if(config.edid.dpi) config.edid.valid = 1;
+  }
+  else if(args == 2) {
+    config.edid.dpi = config.edid.width_mm = config.edid.height_mm = 0;
+    config.edid.valid = 1;
+  }
+
+  log_debug("EDID data: valid %u, pixel %u x %u, mm %u x %u, dpi %u\n",
+    config.edid.valid, config.edid.width, config.edid.height, config.edid.width_mm, config.edid.height_mm, config.edid.dpi
+  );
+}
+
+
+/*
+ * Write firmware blob according to EDID data and set up drm module loading
+ * parameters to use it.
+ */
+void util_write_edid()
+{
+  char *cmd = NULL;
+
+  if(!config.edid.valid) return;
+
+  if(config.edid.width_mm && config.edid.height_mm) {
+    asprintf(&cmd,
+      "edid-write --output /lib/firmware/edid_blob --width %u --height %u --width_mm %u --height_mm %u",
+      config.edid.width, config.edid.height, config.edid.width_mm, config.edid.height_mm
+    );
+  }
+  else if(config.edid.dpi) {
+    asprintf(&cmd,
+      "edid-write --output /lib/firmware/edid_blob --width %u --height %u --dpi %u",
+      config.edid.width, config.edid.height, config.edid.dpi
+    );
+  }
+  else {
+    asprintf(&cmd,
+      "edid-write --output /lib/firmware/edid_blob --width %u --height %u",
+      config.edid.width, config.edid.height
+    );
+  }
+
+  lxrc_run(cmd);
+
+  free(cmd);
+
+  // create config in /run to avoid it being copied to the target system
+  mkdir("/run/modprobe.d", 0755);
+
+  FILE *f = fopen("/run/modprobe.d/10-edid.conf", "w");
+
+  if(f) {
+    fprintf(f, "options drm edid_firmware=edid_blob\n");
+    fclose(f);
+  }
+}

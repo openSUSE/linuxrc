@@ -724,6 +724,15 @@ typedef struct {
   } ifcfg;
 
   struct {
+    unsigned valid:1;		/**< set if struct holds valid data */
+    unsigned width;		/**< width in pixel */
+    unsigned height;		/**< height in pixel */
+    unsigned width_mm;		/**< width in mm */
+    unsigned height_mm;		/**< height in mm */
+    unsigned dpi;		/**< dpi (alternative to width_mm & height_mm) */
+  } edid;
+
+  struct {
     log_file_t dest[3];		/**< logging destinations, see linuxrc.c */
   } log;
 
