@@ -1008,6 +1008,8 @@ void lxrc_init()
   file_read_info_file("cmdline", kf_cmd0);
 
   if(!config.test) {
+    util_write_edid();
+
     log_show("Starting udev... ");
     util_run_script("udev_setup");
     log_show("ok\n");
