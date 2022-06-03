@@ -385,7 +385,13 @@ void auto2_scan_hardware()
 
       if(url->scheme == inst_slp) {
 
-        /* It's an slp scheme, search for the right URL */
+        /* It's an slp scheme, do we have network? */
+        if(net_config_needed(1) && net_config()) {
+          log_show_maybe(!url->quiet, "No network, cant parse %s\n", url_print(url, 0));
+          continue;
+        }
+        
+        /* search for the right URL */
 
         log_show_maybe(!url->quiet, "Searching for driver update: %s\n", sl->key);
         char * new_url = slp_get_install(url);
@@ -411,8 +417,7 @@ void auto2_scan_hardware()
           }
 
           size_t szpath = strlen(url->path) + strlen(urlstart) + 2;
-          printf("urlstart=%s\nbase=%s\n",urlstart,url->path);
-
+  
           char * new_path = malloc(szpath);
           strncpy(new_path,url->path,szpath);
           strncat(new_path,"/",szpath);
