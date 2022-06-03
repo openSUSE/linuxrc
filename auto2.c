@@ -383,6 +383,55 @@ void auto2_scan_hardware()
 
       url = url_set(sl->key);
 
+      if(url->scheme == inst_slp) {
+
+        /* It's an slp scheme, do we have network? */
+        if(net_config_needed(1) && net_config()) {
+          log_show_maybe(!url->quiet, "No network, cant parse %s\n", url_print(url, 0));
+          continue;
+        }
+        
+        /* search for the right URL */
+
+        log_show_maybe(!url->quiet, "Searching for driver update: %s\n", sl->key);
+        char * new_url = slp_get_install(url);
+
+        if(new_url) {
+
+          /* Combine URL from the original parameter with the one found by slp */
+
+          char * original_path = strdup(url->path); 
+          url_free(url);
+          url = url_set(new_url);
+
+          /* Fix URL path (if necessary) */
+          
+          char * urlstart = original_path;
+          while(*urlstart && !strncasecmp(urlstart,"../",3)) {
+            urlstart += 3;
+            char *ptr = strrchr(url->path,'/');
+            if(!ptr) {
+              break;
+            }
+            *ptr = 0;
+          }
+
+          size_t szpath = strlen(url->path) + strlen(urlstart) + 2;
+  
+          char * new_path = malloc(szpath);
+          strncpy(new_path,url->path,szpath);
+          strncat(new_path,"/",szpath);
+          strncat(new_path,urlstart,szpath);
+
+          free(url->path);
+          url->path = new_path;
+
+          free(original_path);
+
+        }
+        log_show_maybe(!url->quiet, "Real driver update URL: %s\n", url_print(url, 0));
+      }
+
       log_show_maybe(!url->quiet, "Reading driver update: %s\n", sl->key);
 
       // for later...
