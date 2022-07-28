@@ -122,6 +122,7 @@ static struct {
   { "disk",      inst_disk          },
   { "usb",       inst_usb           },
   { "label",     inst_label         },
+  { "repo",      inst_repo          },
   /* add new inst modes _here_! (before "extern") */
   { "extern",    inst_extern        },
   /* the following are just aliases */
@@ -2675,7 +2676,10 @@ static int test_is_repo(url_t *url)
     str_copy(&buf2, NULL);
   }
 
-  if(config.url.instsys->scheme != inst_rel || config.kexec == 1) return 1;
+  if(
+    (config.url.instsys->scheme != inst_rel && config.url.instsys->scheme != inst_repo) ||
+    config.kexec == 1
+  ) return 1;
 
   if(!config.keepinstsysconfig) {
     instsys_config = url_instsys_config(config.url.instsys->path);
@@ -2875,6 +2879,7 @@ int url_find_instsys(url_t *url, char *dir)
     !url ||
     !url->scheme ||
     url->scheme == inst_rel ||
+    url->scheme == inst_repo ||
     !url->path
   ) return 1;
 
