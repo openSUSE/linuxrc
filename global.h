@@ -185,7 +185,7 @@ typedef enum {
   inst_none = 0, inst_file, inst_nfs, inst_ftp, inst_smb,
   inst_http, inst_https, inst_tftp, inst_cdrom, inst_floppy, inst_hd,
   inst_dvd, inst_cdwithnet, inst_net, inst_slp, inst_exec,
-  inst_rel, inst_disk, inst_usb, inst_label,
+  inst_rel, inst_disk, inst_usb, inst_label, inst_repo,
   inst_extern ///< must be last
 } instmode_t;
 
