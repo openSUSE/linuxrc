@@ -42,7 +42,7 @@
 #define INSTALL_INF_FILE	"/etc/install.inf"
 #define CMDLINE_FILE		"/proc/cmdline"
 
-#define DEBUG_FILE
+// #define DEBUG_FILE
 
 #define INET_WRITE_IP		1
 #define INET_WRITE_IP_BOTH	2
