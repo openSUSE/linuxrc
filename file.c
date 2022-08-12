@@ -42,7 +42,7 @@
 #define INSTALL_INF_FILE	"/etc/install.inf"
 #define CMDLINE_FILE		"/proc/cmdline"
 
-// #define DEBUG_FILE
+#define DEBUG_FILE
 
 #define INET_WRITE_IP		1
 #define INET_WRITE_IP_BOTH	2
@@ -327,6 +327,7 @@ static struct {
   { key_extend,         "Extend",         kf_cfg + kf_cmd                },
   { key_switch_to_fb,   "SwitchToFB",     kf_cfg + kf_cmd_early          },
   { key_edid,           "EDID",           kf_cmd_early                   },
+  { key_slp_quiet,      "SLPQuiet",       kf_cfg + kf_cmd + kf_cmd_early },
 };
 
 static struct {
@@ -1903,6 +1904,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(*f->value) util_parse_edid(f->value);
         break;
 
+      case key_slp_quiet:
+        if(f->is.numeric) config.slp_quiet = f->nvalue;
+		    break;
+		
       default:
         break;
     }

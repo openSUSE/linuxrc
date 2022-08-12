@@ -498,13 +498,21 @@ char *slp_get_install(url_t *url)
 
       if(acnt == 0) break;
 
-      i = acnt == 1 ? 1 : dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
+      log_info("Got %d url(s) from SLP service (quiet mode is %s)\n", acnt, config.slp_quiet ? "active" : "inactive");
 
-      if (i > 0 && i - 1 < acnt)
-	{
+      // i = acnt == 1 ? 1 : dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
+      i = 1;
+
+      if(acnt > 1 && !config.slp_quiet) {
+        i = dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
+      }
+
+      if (i > 0 && i - 1 < acnt) {
           strcpy(urlbuf, ambg[i - 1]);
-	  break;
-	}
+          log_info("Using %s",urlbuf);
+	        break;
+	    }
+      
     }
   if(config.win && !win_old) util_disp_done();
   for (i = 0; i < urlcnt; i++)
