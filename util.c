@@ -5877,4 +5877,12 @@ void util_write_edid()
     fprintf(f, "options drm edid_firmware=edid_blob\n");
     fclose(f);
   }
+
+  // in case the drm driver has been compiled into the kernel, write option via sysfs
+  f = fopen("/sys/module/drm/parameters/edid_firmware", "w");
+
+  if(f) {
+    fprintf(f, "edid_blob");
+    fclose(f);
+  }
 }
