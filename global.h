@@ -540,6 +540,7 @@ typedef struct {
   char *core;			/**< linuxrc code dump destination (core dumps disabled if unset) */
   unsigned core_setup:1;	/**< linuxrc core dumps have been configured */
   slist_t *repomd_data;		/**< parsed repomd.xml info */
+  unsigned slp_quiet:1;	/**< Hide dialog when SLPd reports more than one repository, select the first one */
   unsigned kexec;		/**< kexec to kernel & initrd from repo (if inst-sys does not match)
                                  * 0: never
                                  * 1: always
