@@ -662,6 +662,8 @@ url_t *url_set(char *str)
     }
   }
 
+  if(url->scheme == inst_rel || url->scheme == inst_repo) url->is.relative = 1;
+
   url_replace_vars_with_backup(&url->server, &url->orig.server);
   url_replace_vars_with_backup(&url->share, &url->orig.share);
   url_replace_vars_with_backup(&url->path, &url->orig.path);
@@ -716,9 +718,9 @@ void url_log(url_t *url)
   }
 
   log_debug(
-    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, all = %u, quiet = %u\n",
+    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, relative = %u, all = %u, quiet = %u\n",
     url->is.network, url->is.blockdev, url->is.mountable, url->is.file, url->is.dir,
-    url->search_all, url->quiet
+    url->is.relative, url->search_all, url->quiet
   );
 
   if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
@@ -2672,7 +2674,7 @@ static int test_is_repo(url_t *url)
   }
 
   if(
-    (config.url.instsys->scheme != inst_rel && config.url.instsys->scheme != inst_repo) ||
+    !config.url.instsys->is.relative ||
     config.kexec == 1
   ) return 1;
 
@@ -2873,8 +2875,7 @@ int url_find_instsys(url_t *url, char *dir)
   if(
     !url ||
     !url->scheme ||
-    url->scheme == inst_rel ||
-    url->scheme == inst_repo ||
+    url->is.relative ||
     !url->path
   ) return 1;
 

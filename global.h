@@ -291,6 +291,7 @@ typedef struct {
     unsigned wlan:1;		/**< wlan interface */
     unsigned blockdev:1;	/**< needs block device */
     unsigned nodevneeded:1;	/**< does not need any device */
+    unsigned relative:1;	/**< url is relative (to some other url) */
   } is;
   struct {
     char *device;
