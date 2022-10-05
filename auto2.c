@@ -888,7 +888,7 @@ void auto2_read_repo_files(url_t *url)
 
   if(config.url.autoyast) {
     if(
-      (config.url.autoyast->scheme == inst_rel || config.url.autoyast->scheme == inst_repo) &&
+      config.url.autoyast->is.relative &&
       config.autoyast_parse
     ) {
       log_show_maybe(!config.url.autoyast->quiet, "AutoYaST file in repo: %s\n", url_print(config.url.autoyast, 5));
@@ -1098,7 +1098,7 @@ int auto2_add_extension(char *extension)
     err = 1;
   }
 
-  if((config.url.instsys->scheme == inst_rel || config.url.instsys->scheme == inst_repo)  && !config.url.install) {
+  if(config.url.instsys->is.relative && !config.url.install) {
     log_info("no repo\n");
     err = 2;
   }
@@ -1110,7 +1110,7 @@ int auto2_add_extension(char *extension)
 
   strprintf(&config.url.instsys->path, "%s/%s", s, extension);
 
-  if(config.url.instsys->scheme == inst_rel || config.url.instsys->scheme == inst_repo) {
+  if(config.url.instsys->is.relative) {
     err = url_find_repo(config.url.install, config.mountpoint.instdata);
   }
 
@@ -1230,7 +1230,7 @@ void auto2_read_autoyast(url_t *url)
   if(!url) return;
 
   // rel url is taken care of in auto2_read_repo_files()
-  if(url->scheme == inst_rel || url->scheme == inst_repo) return;
+  if(url->is.relative) return;
 
   /*
    * If the AutoYaST url is a directory we have to verify its existence
