@@ -1091,18 +1091,18 @@ char *url_print_zypp(url_t *url)
   if(path) {
     strprintf(&buf, "%s/%s%s",
       buf,
-      url->scheme == inst_ftp && *path == '/' ? "%2F" : "",
+      scheme == inst_ftp && *path == '/' ? "%2F" : "",
       *path == '/' ? path + 1 : path
     );
   }
 
-  if(url->scheme == inst_hd) {
+  if(scheme == inst_hd) {
     if((s = url->used.device) || (s = url->device)) {
       strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', long_dev(s));
     }
   }
 
-  if(url->scheme == inst_cdrom) {
+  if(scheme == inst_cdrom) {
     if((s = url->used.device) || (s = url->device)) {
       strprintf(&buf, "%s%cdevices=%s", buf, q++ ? '&' : '?', long_dev(s));
     }
@@ -1111,10 +1111,10 @@ char *url_print_zypp(url_t *url)
   if(
     config.url.proxy &&
     config.url.proxy->server && (
-      url->scheme == inst_http ||
-      url->scheme == inst_https ||
-      url->scheme == inst_ftp ||
-      url->scheme == inst_tftp
+      scheme == inst_http ||
+      scheme == inst_https ||
+      scheme == inst_ftp ||
+      scheme == inst_tftp
     )
   ) {
     strprintf(&buf, "%s%cproxy=%s", buf, q++ ? '&' : '?', config.url.proxy->server);
