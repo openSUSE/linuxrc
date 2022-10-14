@@ -770,7 +770,10 @@ void lxrc_init()
 
   util_setup_coredumps();
 
-  #if defined(__s390__) || defined(__s390x__)
+  /*
+   * config.hwp.hypervisor is a s390 specific setting
+   */
+  str_copy(&config.hwp.hypervisor, "Reallyunknown");
   if(util_check_exist("/sys/hypervisor/s390")) {
     char *type;
 
@@ -779,23 +782,21 @@ void lxrc_init()
     type = util_get_attr("/sys/hypervisor/s390/hyp/type");
 
     if(!strncmp(type, "z/VM", sizeof "z/VM" - 1)) {
-      config.hwp.hypervisor = "z/VM";
+      str_copy(&config.hwp.hypervisor, "z/VM");
     }
     else if(!strncmp(type, "LPAR", sizeof "LPAR" - 1)) {
-      config.hwp.hypervisor = "LPAR";
+      str_copy(&config.hwp.hypervisor, "LPAR");
     }
     else {
-      config.hwp.hypervisor = "Unknown";
+      str_copy(&config.hwp.hypervisor, "Unknown");
     }
   }
   else {
     struct utsname utsinfo;
 
     uname(&utsinfo);
-    if(!strncmp(utsinfo.machine, "s390x", sizeof "s390x" - 1 )) config.hwp.hypervisor="KVM";
-    else config.hwp.hypervisor="Reallyunknown";
+    if(!strncmp(utsinfo.machine, "s390x", sizeof "s390x" - 1 )) str_copy(&config.hwp.hypervisor, "KVM");
   }
-  #endif
 
   /* add cmdline to info file */
   config.info.add_cmdline = 1;

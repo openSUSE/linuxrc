@@ -84,7 +84,6 @@ typedef enum {
 
   di_390net_osa,
   di_390net_ctc,
-  di_390net_escon,
   di_390net_iucv,
   di_390net_hsi,
   di_390net_virtio,
