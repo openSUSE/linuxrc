@@ -327,6 +327,7 @@ static struct {
   { key_extend,         "Extend",         kf_cfg + kf_cmd                },
   { key_switch_to_fb,   "SwitchToFB",     kf_cfg + kf_cmd_early          },
   { key_edid,           "EDID",           kf_cmd_early                   },
+  { key_hypervisor,     "Hypervisor",     kf_cmd_early                   },
 };
 
 static struct {
@@ -1901,6 +1902,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_edid:
         if(*f->value) util_parse_edid(f->value);
+        break;
+
+      case key_hypervisor:
+        str_copy(&config.hwp.hypervisor, f->value);
         break;
 
       default:

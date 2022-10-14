@@ -638,7 +638,7 @@ int net_choose_device()
      IUCV is available for use unless the driver is already loaded. So,
      if we're running on z/VM we always load it, no matter what.       */
   #if defined(__s390__) || defined(__s390x__)
-  if(!strncmp(config.hwp.hypervisor, "z/VM", sizeof "z/VM" - 1 )) {
+  if(!strcmp(config.hwp.hypervisor, "z/VM")) {
      dia_info(&win, "We are running on z/VM", MSGTYPE_INFO);
      dia_info(&win, "Loading the IUCV network driver", MSGTYPE_INFO);
      mod_modprobe("netiucv","");
@@ -1419,7 +1419,7 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       di_390net_iucv,
       di_none
     };
-    if(!strncmp(config.hwp.hypervisor, "KVM", sizeof "KVM" - 1)) {
+    if(!strcmp(config.hwp.hypervisor, "KVM")) {
       config.hwp.type = di_390net_virtio;
     }
     else {

@@ -737,7 +737,6 @@ typedef struct {
     log_file_t dest[3];		/**< logging destinations, see linuxrc.c */
   } log;
 
-#if defined(__s390__) || defined(__s390x__)
   /* hwcfg file parameters */
   struct {
     char* userid;
@@ -762,9 +761,6 @@ typedef struct {
     char* osahwaddr;
     char* hypervisor;
   } hwp;
-  
-#endif
-
 } config_t;
 
 extern config_t config;
