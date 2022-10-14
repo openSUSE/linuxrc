@@ -615,7 +615,6 @@ int net_choose_device()
     { "fddi",  "FDDI network card"  },
     { "hip",   "HIPPI network card" },
     { "ctc",   "channel to channel connection"   },
-    { "escon", "ESCON connection" },
     { "ci",    "channel attached cisco router"  },
     { "iucv",  "IUCV connection"  },
     { "hsi",   "Hipersocket"   }
@@ -1403,9 +1402,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
   case 0x88:	/* CTC */
     config.hwp.type = di_390net_ctc;
     break;
-  case 0x8f:	/* ESCON */
-    config.hwp.type = di_390net_escon;
-    break;
   default:
     return -1;
   }
@@ -1415,7 +1411,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       di_390net_hsi,
       di_390net_sep,
       di_390net_ctc,
-      di_390net_escon,
       di_390net_iucv,
       di_none
     };
@@ -1448,7 +1443,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
     break;
 
   case di_390net_ctc:
-  case di_390net_escon:
     if(mod_modprobe("ctcm",NULL)) {
       dia_message("failed to load ctcm module",MSGTYPE_ERROR);
       return -1;
@@ -1593,7 +1587,6 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       sprintf(cmd, "iucv_configure %s 1", config.hwp.userid);
       break;
     case di_390net_ctc:
-    case di_390net_escon:
       if(config.hwp.protocol > 0)
         sprintf(cmd, "/sbin/chzdev -e ctc --no-root-update %s-%s protocol=%d", config.hwp.readchan, config.hwp.writechan, config.hwp.protocol - 1);
       else
