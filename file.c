@@ -326,6 +326,7 @@ static struct {
   { key_zram_swap,      "zram_swap",      kf_cmd_early                   },
   { key_extend,         "Extend",         kf_cfg + kf_cmd                },
   { key_switch_to_fb,   "SwitchToFB",     kf_cfg + kf_cmd_early          },
+  { key_hypervisor,     "Hypervisor",     kf_cmd_early                   },
 };
 
 static struct {
@@ -1896,6 +1897,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
 
       case key_switch_to_fb:
         if(f->is.numeric) config.switch_to_fb = f->nvalue;
+        break;
+
+      case key_hypervisor:
+        str_copy(&config.hwp.hypervisor, f->value);
         break;
 
       default:
