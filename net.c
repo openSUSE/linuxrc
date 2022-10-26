@@ -1412,6 +1412,8 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
       di_390net_sep,
       di_390net_ctc,
       di_390net_iucv,
+      di_390net_sep,
+      di_390net_pci,
       di_none
     };
     if(!strcmp(config.hwp.hypervisor, "KVM")) {
@@ -1559,6 +1561,10 @@ int net_activate_s390_devs_ex(hd_t* hd, char** device)
 
   case di_390net_virtio:
     config.hwp.layer2 = LAYER2_UNDEF;
+    return 0;
+    break;
+    
+  case di_390net_pci:
     return 0;
     break;
     
