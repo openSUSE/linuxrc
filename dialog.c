@@ -108,7 +108,8 @@ struct {
   { di_390net_hsi,	 "Hipersockets"	          },
   { di_390net_virtio,	 "VirtIO Ethernet CCW Device"},
   { di_390net_sep,	 "#--------------------" },
-  
+  { di_390net_pci,      "PCI-attached networking device" },
+
   { di_ctc_compat,	 "Compatibility mode (default)"      },
   { di_ctc_ext,		 "Extended mode"         },
   { di_ctc_zos390,	 "Compatibility mode for OS/390 and z/OS peers"      },
