@@ -91,6 +91,7 @@ typedef enum {
   di_390net_qdio,
   di_390net_lcs,
   di_390net_sep,
+  di_390net_pci,
   
   di_ctc_compat,
   di_ctc_ext,
