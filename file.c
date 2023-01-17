@@ -315,7 +315,8 @@ static struct {
   { key_sethostname,    "SetHostname",    kf_cfg + kf_cmd_early          },
   { key_debugshell,     "DebugShell",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
-  { key_ibft_devices,   "IBFTDevices",    kf_cfg + kf_cmd                },
+  { key_firmware_devices, "FirmwareDevices", kf_cfg + kf_cmd             },
+  { key_firmware_devices, "IBFTDevices",  kf_cfg + kf_cmd                },
   { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
   { key_norepo,         "NoRepo",         kf_cfg + kf_cmd                },
   { key_auto_assembly,  "AutoAssembly",   kf_cfg + kf_cmd_early          },
@@ -1843,8 +1844,8 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
-      case key_ibft_devices:
-        slist_assign_values(&config.ifcfg.ibft, f->value);
+      case key_firmware_devices:
+        slist_assign_values(&config.ifcfg.firmware, f->value);
         break;
 
       case key_linuxrc_core:
