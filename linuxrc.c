@@ -1036,10 +1036,15 @@ void lxrc_init()
 
   util_run_script("early_setup");
 
-  file_read_info_file("file:/etc/ibft_devices", kf_cfg);
+  if(util_check_exist("/etc/firmware_devices")) {
+    file_read_info_file("file:/etc/firmware_devices", kf_cfg);
+  }
+  else if(util_check_exist("/etc/ibft_devices")) {
+    file_read_info_file("file:/etc/ibft_devices", kf_cfg);
+  }
 
-  // ibft interfaces are handled by wicked
-  for(sl = config.ifcfg.ibft; sl; sl = sl->next) {
+  // firmware interfaces are handled by wicked
+  for(sl = config.ifcfg.firmware; sl; sl = sl->next) {
     slist_append_str(&config.ifcfg.initial, sl->key);
   }
 

@@ -1334,10 +1334,10 @@ void util_status_info(int log_it)
     }
   }
 
-  if(config.ifcfg.ibft) {
-    strcpy(buf, "ibft interfaces:");
+  if(config.ifcfg.firmware) {
+    strcpy(buf, "firmware interfaces:");
     slist_append_str(&sl0, buf);
-    for(sl = config.ifcfg.ibft; sl; sl = sl->next) {
+    for(sl = config.ifcfg.firmware; sl; sl = sl->next) {
       if(!sl->key) continue;
       sprintf(buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);

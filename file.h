@@ -56,7 +56,7 @@ typedef enum {
   key_withipoib, key_upgrade, key_media_upgrade, key_ifcfg, key_defaultinstall,
   key_nanny, key_vlanid,
   key_sshkey, key_systemboot, key_sethostname, key_debugshell, key_self_update,
-  key_ibft_devices, key_linuxrc_core, key_norepo, key_auto_assembly, key_autoyast_parse,
+  key_firmware_devices, key_linuxrc_core, key_norepo, key_auto_assembly, key_autoyast_parse,
   key_device_auto_config, key_autoyast_passurl, key_rd_zdev, key_insmod_pre,
   key_zram, key_zram_root, key_zram_swap, key_extend, key_switch_to_fb, key_edid,
   key_hypervisor
