@@ -1044,6 +1044,7 @@ void lxrc_init()
 
   if(util_check_exist("/etc/firmware_devices")) {
     file_read_info_file("file:/etc/firmware_devices", kf_cfg);
+    file_read_info_file("file:/etc/firmware_types", kf_cfg);
   }
   else if(util_check_exist("/etc/ibft_devices")) {
     file_read_info_file("file:/etc/ibft_devices", kf_cfg);
@@ -1139,6 +1140,7 @@ void lxrc_init()
 
   if(iscsi_check()) config.withiscsi = 1;
   if(fcoe_check()) config.withfcoe = 1;
+  if(nbft_check()) config.usenbft = 1;
 
   LXRC_WAIT
 
