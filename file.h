@@ -58,8 +58,8 @@ typedef enum {
   key_sshkey, key_systemboot, key_sethostname, key_debugshell, key_self_update,
   key_firmware_devices, key_linuxrc_core, key_norepo, key_auto_assembly, key_autoyast_parse,
   key_device_auto_config, key_autoyast_passurl, key_rd_zdev, key_insmod_pre,
-  key_zram, key_zram_root, key_zram_swap, key_extend, key_switch_to_fb, key_edid,
-  key_hypervisor
+  key_zram, key_zram_root, key_zram_swap, key_extend, key_switch_to_fb, key_edid, key_hypervisor,
+  key_usenbft, key_firmware_types
 } file_key_t;
 
 typedef enum {

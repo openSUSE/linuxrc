@@ -1344,6 +1344,16 @@ void util_status_info(int log_it)
     }
   }
 
+  if(config.ifcfg.firmware_types) {
+    strcpy(buf, "firmware interface types:");
+    slist_append_str(&sl0, buf);
+    for(sl = config.ifcfg.firmware_types; sl; sl = sl->next) {
+      if(!sl->key) continue;
+      sprintf(buf, "  %s", sl->key);
+      slist_append_str(&sl0, buf);
+    }
+  }
+
   if(config.ifcfg.if_state) {
     strcpy(buf, "network interface states:");
     slist_append_str(&sl0, buf);
@@ -4552,6 +4562,17 @@ int iscsi_check()
   str_copy(&ibft_mac, NULL);
 
   return 1;
+}
+
+
+/*
+ * Don't actually do anything except checking for NBFT data.
+ *
+ * NBFT interfaces are handled by wicked.
+ */
+int nbft_check()
+{
+  return slist_getentry(config.ifcfg.firmware_types, "nbft") ? 1 : 0;
 }
 
 
