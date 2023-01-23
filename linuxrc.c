@@ -1499,6 +1499,8 @@ void lxrc_check_console()
 {
   char *current_console = get_console_device();
 
+  unsigned textmode_initial = config.textmode;
+
   util_set_serial_console(auto2_serial_console());
 
   /*
@@ -1523,6 +1525,8 @@ void lxrc_check_console()
         config.console
       );
       kbd_switch_tty(0, 1);
+      /* restore user-provided textmode setting (util_set_serial_console() might have changed it) */
+      config.textmode = textmode_initial;
     }
   }
 
