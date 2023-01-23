@@ -1127,7 +1127,7 @@ void util_status_info(int log_it)
   char *s;
   hd_data_t *hd_data;
   slist_t *sl, *sl0 = NULL;
-  char buf[256];
+  char *buf = NULL;
   language_t *lang;
   driver_t *drv;
 
@@ -1143,13 +1143,13 @@ void util_status_info(int log_it)
     }
   }
 
-  sprintf(buf, "product = \"%s\"", config.product);
+  strprintf(&buf, "product = \"%s\"", config.product);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "release version: %s", config.releasever ?: "unset");
+  strprintf(&buf, "release version: %s", config.releasever ?: "unset");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf,
+  strprintf(&buf,
     "memory (MB): total %lld, free %lld (%lld), ramdisk %lld",
     (long long) config.memoryXXX.total >> 20,
     (long long) config.memoryXXX.current >> 20,
@@ -1158,7 +1158,7 @@ void util_status_info(int log_it)
   );
   slist_append_str(&sl0, buf);
 
-  sprintf(buf,
+  strprintf(&buf,
     "memory limits (MB): min %lld, yast %lld, image %lld",
     (long long) config.memoryXXX.min_free >> 20,
     (long long) config.memoryXXX.min_yast >> 20,
@@ -1168,37 +1168,44 @@ void util_status_info(int log_it)
 
   util_get_ram_size();
 
-  sprintf(buf,
+  strprintf(&buf,
     "RAM size (MB): total %lld, min %lld",
     (long long) (config.memoryXXX.ram >> 20),
     (long long) (config.memoryXXX.ram_min >> 20)
   );
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "swap file size: %u MB", config.swap_file_size);
+  strprintf(&buf, "swap file size: %u MB", config.swap_file_size);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf,
+  strprintf(&buf,
     "zram: root size \"%s\", swap size \"%s\"",
     config.zram.root_size ?: "",
     config.zram.swap_size ?: ""
   );
   slist_append_str(&sl0, buf);
 
-  sprintf(buf,
+  strprintf(&buf,
     "InstsysID: %s%s",
     config.instsys_id ?: "unset",
     config.instsys_complain ? config.instsys_complain == 1 ? " (check)" : " (block)" : ""
   );
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "InitrdID: %s", config.initrd_id ?: "unset");
+  strprintf(&buf, "InitrdID: %s", config.initrd_id ?: "unset");
   slist_append_str(&sl0, buf);
 
   for(sl = config.update.expected_name_list; sl; sl = sl->next) {
-    sprintf(buf, "expected update: %s", sl->key);
+    strprintf(&buf, "expected update: %s", sl->key);
     slist_append_str(&sl0, buf);
   }
+
+  /*
+   * For the following sequence of add_flag() calls, a large enough buffer
+   * is needed. add_flag() assumes a minimal buffer size of about
+   * 50 + maximal flag name length - so 256 should be big enough.
+   */
+  buf = realloc(buf, 256);
 
   sprintf(buf, "flags = ");
   add_flag(&sl0, buf, config.test, "test");
@@ -1246,120 +1253,120 @@ void util_status_info(int log_it)
   if(*buf) slist_append_str(&sl0, buf);
 
   if(config.self_update_url) {
-    sprintf(buf, "self-update URL: %s", config.self_update_url);
+    strprintf(&buf, "self-update URL: %s", config.self_update_url);
     slist_append_str(&sl0, buf);
   }
 
   if(config.core) {
-    sprintf(buf, "Core Dumps: %s (%sactive)", config.core, config.core_setup ? "" : "not ");
+    strprintf(&buf, "Core Dumps: %s (%sactive)", config.core, config.core_setup ? "" : "not ");
     slist_append_str(&sl0, buf);
   }
 
   if(config.extern_scheme) {
-    strcpy(buf, "additional URL schemes:");
+    strprintf(&buf, "additional URL schemes:");
     slist_append_str(&sl0, buf);
     for(sl = config.extern_scheme; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s: %s", sl->key, sl->value ?: "");
+      strprintf(&buf, "  %s: %s", sl->key, sl->value ?: "");
       slist_append_str(&sl0, buf);
     }
   }
 
-  sprintf(buf, "net_config_mask = 0x%x", net_config_mask());
+  strprintf(&buf, "net_config_mask = 0x%x", net_config_mask());
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
+  strprintf(&buf, "netsetup = 0x%x/0x%x", config.net.do_setup, config.net.setup);
   slist_append_str(&sl0, buf);
 
   if((s = url_print(config.url.install, 0))) {
     slist_append_str(&sl0, "install url:");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
   if((s = url_print(config.url.instsys, 0))) {
     slist_append_str(&sl0, "instsys url:");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
   if((s = url_print(config.url.proxy, 0))) {
     slist_append_str(&sl0, "proxy url:");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
   if((s = url_print(config.url.autoyast, 0))) {
     slist_append_str(&sl0, "autoyast url:");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
   if((s = url_print(config.url.autoyast, 5))) {
     slist_append_str(&sl0, "autoyast url (ay fmt):");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
   if((s = url_print(config.url.autoyast2, 0))) {
     slist_append_str(&sl0, "autoyast2 url:");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
   if((s = url_print(config.url.autoyast2, 5))) {
     slist_append_str(&sl0, "autoyast2 url (ay fmt):");
-    sprintf(buf, "  %s", s);
+    strprintf(&buf, "  %s", s);
     slist_append_str(&sl0, buf);
   }
 
-  strcpy(buf, "net devices = (");
+  strprintf(&buf, "net devices = (");
   for(i = 0, sl = config.net.devices; sl; sl = sl->next) {
     if(!sl->key) continue;
     j = !config.net.device || strcmp(sl->key, config.net.device) ? 0 : 1;
-    sprintf(buf + strlen(buf), "%s%s%s", i ? ", " : " ", sl->key, j ? "*" : "");
-    if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+    strprintf(&buf, "%s%s%s%s", buf, i ? ", " : " ", sl->key, j ? "*" : "");
+    if(sl->value) strprintf(&buf, "%s [%s]", buf, sl->value);
     i = 1;
   }
-  strcat(buf, " )");
+  strprintf(&buf, "%s )", buf);
   slist_append_str(&sl0, buf);
 
   if(config.ifcfg.initial) {
-    strcpy(buf, "initially configured network interfaces:");
+    strprintf(&buf, "initially configured network interfaces:");
     slist_append_str(&sl0, buf);
     for(sl = config.ifcfg.initial; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.ifcfg.ibft) {
-    strcpy(buf, "ibft interfaces:");
+    strprintf(&buf, "ibft interfaces:");
     slist_append_str(&sl0, buf);
     for(sl = config.ifcfg.ibft; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.ifcfg.if_state) {
-    strcpy(buf, "network interface states:");
+    strprintf(&buf, "network interface states:");
     slist_append_str(&sl0, buf);
     for(sl = config.ifcfg.if_state; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      strprintf(&buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.ifcfg.if_up) {
-    strcpy(buf, "up interfaces:");
+    strprintf(&buf, "up interfaces:");
     slist_append_str(&sl0, buf);
     for(sl = config.ifcfg.if_up; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
@@ -1367,13 +1374,13 @@ void util_status_info(int log_it)
   if(config.ifcfg.all) {
     ifcfg_t *ifcfg;
     slist_t *sl_ifcfg;
-    strcpy(buf, "ifcfg entries:");
+    strprintf(&buf, "ifcfg entries:");
     slist_append_str(&sl0, buf);
     for(ifcfg = config.ifcfg.all; ifcfg; ifcfg = ifcfg->next) {
       sl_ifcfg = slist_split('\n', ifcfg_print(ifcfg));
       for(sl = sl_ifcfg; sl; sl = sl->next) {
         if(*sl->key || ifcfg->next) {	// keep newline between entries
-          sprintf(buf, "%s", sl->key);
+          strprintf(&buf, "%s", sl->key);
           slist_append_str(&sl0, buf);
         }
       }
@@ -1384,12 +1391,12 @@ void util_status_info(int log_it)
   if(config.ifcfg.manual) {
     ifcfg_t *ifcfg = config.ifcfg.manual;
     slist_t *sl_ifcfg;
-    strcpy(buf, "manual ifcfg entry:");
+    strprintf(&buf, "manual ifcfg entry:");
     slist_append_str(&sl0, buf);
     sl_ifcfg = slist_split('\n', ifcfg_print(ifcfg));
     for(sl = sl_ifcfg; sl; sl = sl->next) {
       if(*sl->key) {
-        sprintf(buf, "%s", sl->key);
+        strprintf(&buf, "%s", sl->key);
         slist_append_str(&sl0, buf);
       }
     }
@@ -1397,65 +1404,65 @@ void util_status_info(int log_it)
   }
 
   if(config.ifcfg.to_global) {
-    strcpy(buf, "values to store in global network config file:");
+    strprintf(&buf, "values to store in global network config file:");
     slist_append_str(&sl0, buf);
     for(sl = config.ifcfg.to_global; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.cdid) {
-    sprintf(buf, "cdrom id = %s", config.cdid);
+    strprintf(&buf, "cdrom id = %s", config.cdid);
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "hostname = %s", inet2print(&config.net.hostname));
+  strprintf(&buf, "hostname = %s", inet2print(&config.net.hostname));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "network = %s", inet2print(&config.net.network));
+  strprintf(&buf, "network = %s", inet2print(&config.net.network));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "netmask = %s", inet2print(&config.net.netmask));
+  strprintf(&buf, "netmask = %s", inet2print(&config.net.netmask));
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "gateway = %s", inet2print(&config.net.gateway));
+  strprintf(&buf, "gateway = %s", inet2print(&config.net.gateway));
   slist_append_str(&sl0, buf);
 
   for(i = 0; i < config.net.nameservers; i++) {
-    sprintf(buf, "nameserver%d = %s", i + 1, inet2print(&config.net.nameserver[i]));
+    strprintf(&buf, "nameserver%d = %s", i + 1, inet2print(&config.net.nameserver[i]));
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.vncpassword) {
-    sprintf(buf, "vncpassword = %s", config.net.vncpassword);
+    strprintf(&buf, "vncpassword = %s", config.net.vncpassword);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.sshpassword) {
-    sprintf(buf, "password = %s", config.net.sshpassword);
+    strprintf(&buf, "password = %s", config.net.sshpassword);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.sshpassword_enc) {
-    sprintf(buf, "encrypted password = %s", config.net.sshpassword_enc);
+    strprintf(&buf, "encrypted password = %s", config.net.sshpassword_enc);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.wlan.devices) {
-    sprintf(buf, "wlan interfaces%s:", config.net.wlan.devices_fixed ? " (fixed)" : "");
+    strprintf(&buf, "wlan interfaces%s:", config.net.wlan.devices_fixed ? " (fixed)" : "");
     slist_append_str(&sl0, buf);
     for(sl = config.net.wlan.devices; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.net.wlan.auth) {
     static char *wlan_a[] = { "", "open", "wpa psk", "wpa eap" };
-    sprintf(buf, "wlan auth = %d (%s)",
+    strprintf(&buf, "wlan auth = %d (%s)",
       config.net.wlan.auth,
       wlan_a[config.net.wlan.auth < sizeof wlan_a / sizeof *wlan_a ? config.net.wlan.auth : 0]
     );
@@ -1463,73 +1470,73 @@ void util_status_info(int log_it)
   }
 
   if(config.net.wlan.essid) {
-    sprintf(buf, "wlan essid = \"%s\"", config.net.wlan.essid);
+    strprintf(&buf, "wlan essid = \"%s\"", config.net.wlan.essid);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.wlan.wpa_psk) {
-    sprintf(buf, "wlan psk = \"%s\"", config.net.wlan.wpa_psk);
+    strprintf(&buf, "wlan psk = \"%s\"", config.net.wlan.wpa_psk);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.wlan.wpa_identity) {
-    sprintf(buf, "wlan eap id = \"%s\"", config.net.wlan.wpa_identity);
+    strprintf(&buf, "wlan eap id = \"%s\"", config.net.wlan.wpa_identity);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.wlan.wpa_password) {
-    sprintf(buf, "wlan eap pass = \"%s\"", config.net.wlan.wpa_password);
+    strprintf(&buf, "wlan eap pass = \"%s\"", config.net.wlan.wpa_password);
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf,
+  strprintf(&buf,
     "timeouts: dhcp* = %ds, tftp = %ds",
     config.net.dhcp_timeout, config.net.tftp_timeout
   );
   slist_append_str(&sl0, buf);
 
   if(config.net.retry) {
-    sprintf(buf, "max connection retries: %d", config.net.retry);
+    strprintf(&buf, "max connection retries: %d", config.net.retry);
     slist_append_str(&sl0, buf);
   }
 
   if(config.rootpassword) {
-    sprintf(buf, "rootpassword = %s", config.rootpassword);
+    strprintf(&buf, "rootpassword = %s", config.rootpassword);
     slist_append_str(&sl0, buf);
   }
 
   if(config.net.ifup_wait) {
-    sprintf(buf, "net config wait = %ds", config.net.ifup_wait);
+    strprintf(&buf, "net config wait = %ds", config.net.ifup_wait);
     slist_append_str(&sl0, buf);
   }
 
   lang = current_language();
 
-  sprintf(buf, "language = %s, keymap = %s", lang->locale, config.keymap ?: "");
+  strprintf(&buf, "language = %s, keymap = %s", lang->locale, config.keymap ?: "");
   slist_append_str(&sl0, buf);
 
-  sprintf(buf,
+  strprintf(&buf,
     "dud = %d, updates = %d, dir = \"%s\"",
     config.update.ask, config.update.count, config.update.dir
   );
   slist_append_str(&sl0, buf);
 
   if(config.term) {
-    sprintf(buf, "term = \"%s\"", config.term);
+    strprintf(&buf, "term = \"%s\"", config.term);
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "console = \"%s\"", config.console);
-  if(config.serial) sprintf(buf + strlen(buf), ", serial line params = \"%s\"", config.serial);
+  strprintf(&buf, "console = \"%s\"", config.console);
+  if(config.serial) strprintf(&buf, "%s, serial line params = \"%s\"", buf, config.serial);
   slist_append_str(&sl0, buf);
-  sprintf(buf, "esc delay: %dms", config.escdelay);
+  strprintf(&buf, "esc delay: %dms", config.escdelay);
   slist_append_str(&sl0, buf);
 
-  sprintf(buf, "debug level = %d", config.debug);
+  strprintf(&buf, "debug level = %d", config.debug);
   slist_append_str(&sl0, buf);
 
   for(i = 0; i < sizeof config.log.dest / sizeof *config.log.dest; i++) {
-    sprintf(buf,
+    strprintf(&buf,
       "log[%d]: mask = 0x%x, name = %s, fd = %d",
       i,
       config.log.dest[i].level,
@@ -1539,109 +1546,109 @@ void util_status_info(int log_it)
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "rootimage = \"%s\"", config.rootimage);
+  strprintf(&buf, "rootimage = \"%s\"", config.rootimage);
   slist_append_str(&sl0, buf);
 
   if(config.rootimage2) {
-    sprintf(buf, "rootimage2 = \"%s\"", config.rootimage2);
+    strprintf(&buf, "rootimage2 = \"%s\"", config.rootimage2);
     slist_append_str(&sl0, buf);
   }
 
-  sprintf(buf, "rescueimage = \"%s\"", config.rescueimage);
+  strprintf(&buf, "rescueimage = \"%s\"", config.rescueimage);
   slist_append_str(&sl0, buf);
 
   if(config.extend_option) {
-    strcpy(buf, "extend option:");
+    strprintf(&buf, "extend option:");
     slist_append_str(&sl0, buf);
     for(sl = config.extend_option; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
-  sprintf(buf, "setup command = \"%s\"", config.setupcmd);
+  strprintf(&buf, "setup command = \"%s\"", config.setupcmd);
   slist_append_str(&sl0, buf);
 
   if(config.defaultrepo) {
-    strcpy(buf, "default repo locations:");
+    strprintf(&buf, "default repo locations:");
     slist_append_str(&sl0, buf);
     for(sl = config.defaultrepo; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.module.broken) {
-    strcpy(buf, "broken modules:");
+    strprintf(&buf, "broken modules:");
     slist_append_str(&sl0, buf);
     for(sl = config.module.broken; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.module.initrd) {
-    strcpy(buf, "extra initrd modules:");
+    strprintf(&buf, "extra initrd modules:");
     slist_append_str(&sl0, buf);
     for(sl = config.module.initrd; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.ethtool) {
-    strcpy(buf, "ethtool options:");
+    strprintf(&buf, "ethtool options:");
     slist_append_str(&sl0, buf);
     for(sl = config.ethtool; sl; sl = sl->next) {
-      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      strprintf(&buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.cdroms) {
-    strcpy(buf, "cdroms:");
+    strprintf(&buf, "cdroms:");
     slist_append_str(&sl0, buf);
     for(sl = config.cdroms; sl; sl = sl->next) {
       if(!sl->key) continue;
       i = config.cdrom && !strcmp(sl->key, config.cdrom) ? 1 : 0;
-      sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
-      if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+      strprintf(&buf, "  %s%s", sl->key, i ? "*" : "");
+      if(sl->value) strprintf(&buf, "%s [%s]", buf, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.disks) {
-    strcpy(buf, "disks:");
+    strprintf(&buf, "disks:");
     slist_append_str(&sl0, buf);
     for(sl = config.disks; sl; sl = sl->next) {
       if(!sl->key) continue;
-      sprintf(buf, "  %s", sl->key);
-      if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+      strprintf(&buf, "  %s", sl->key);
+      if(sl->value) strprintf(&buf, "%s [%s]", buf, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.partitions) {
-    strcpy(buf, "partitions:");
+    strprintf(&buf, "partitions:");
     slist_append_str(&sl0, buf);
     for(sl = config.partitions; sl; sl = sl->next) {
       if(!sl->key) continue;
       i = config.device && !strcmp(sl->key, config.device) ? 1 : 0;
-      sprintf(buf, "  %s%s", sl->key, i ? "*" : "");
-      if(sl->value) sprintf(buf + strlen(buf), " [%s]", sl->value);
+      strprintf(&buf, "  %s%s", sl->key, i ? "*" : "");
+      if(sl->value) strprintf(&buf, "%s [%s]", buf, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.module.drivers) {
-    strcpy(buf, "new driver info (v d sv sd c cm, module, sysfs, usage):");
+    strprintf(&buf, "new driver info (v d sv sd c cm, module, sysfs, usage):");
     slist_append_str(&sl0, buf);
     for(drv = config.module.drivers; drv; drv = drv->next) {
-      sprintf(buf, "  %s, %s, %s, %u",   
+      strprintf(&buf, "  %s, %s, %s, %u",
         print_driverid(drv, 1),
         drv->name ?: "",
         drv->sysfs_name ?: "",
@@ -1652,46 +1659,46 @@ void util_status_info(int log_it)
   }
 
   if(config.repomd_data) {
-    strcpy(buf, "repomd-data:");
+    strprintf(&buf, "repomd-data:");
     slist_append_str(&sl0, buf);
     for(sl = config.repomd_data; sl; sl = sl->next) {
-      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      strprintf(&buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.digests.supported) {
-    strcpy(buf, "digest types:");
+    strprintf(&buf, "digest types:");
     slist_append_str(&sl0, buf);
     for(sl = config.digests.supported; sl; sl = sl->next) {
-      sprintf(buf, "  %s", sl->key);
+      strprintf(&buf, "  %s", sl->key);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.digests.list) {
-    strcpy(buf, "digests:");
+    strprintf(&buf, "digests:");
     slist_append_str(&sl0, buf);
     for(sl = config.digests.list; sl; sl = sl->next) {
-      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      strprintf(&buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.ptoptions) {
-    strcpy(buf, "user defined options:");
+    strprintf(&buf, "user defined options:");
     slist_append_str(&sl0, buf);
     for(sl = config.ptoptions; sl; sl = sl->next) {
-      sprintf(buf, "  %s: %s", sl->key, sl->value ?: "<unset>");
+      strprintf(&buf, "  %s: %s", sl->key, sl->value ?: "<unset>");
       slist_append_str(&sl0, buf);
     }
   }
 
   if(config.module.options) {
-    strcpy(buf, "module options:");
+    strprintf(&buf, "module options:");
     slist_append_str(&sl0, buf);
     for(sl = config.module.options; sl; sl = sl->next) {
-      sprintf(buf, "  %s: %s", sl->key, sl->value);
+      strprintf(&buf, "  %s: %s", sl->key, sl->value);
       slist_append_str(&sl0, buf);
     }
   }
@@ -1708,6 +1715,7 @@ void util_status_info(int log_it)
   }
 
   slist_free(sl0);
+  free(buf);
 
   hd_free_hd_data(hd_data);
   free(hd_data);
