@@ -315,7 +315,8 @@ static struct {
   { key_sethostname,    "SetHostname",    kf_cfg + kf_cmd_early          },
   { key_debugshell,     "DebugShell",     kf_cfg + kf_cmd + kf_cmd_early },
   { key_self_update,    "SelfUpdate",     kf_cfg + kf_cmd                },
-  { key_ibft_devices,   "IBFTDevices",    kf_cfg + kf_cmd                },
+  { key_firmware_devices, "FirmwareDevices", kf_cfg + kf_cmd             },
+  { key_firmware_devices, "IBFTDevices",  kf_cfg + kf_cmd                },
   { key_linuxrc_core,   "LinuxrcCore",    kf_cfg + kf_cmd_early          },
   { key_norepo,         "NoRepo",         kf_cfg + kf_cmd                },
   { key_auto_assembly,  "AutoAssembly",   kf_cfg + kf_cmd_early          },
@@ -328,6 +329,7 @@ static struct {
   { key_switch_to_fb,   "SwitchToFB",     kf_cfg + kf_cmd_early          },
   { key_edid,           "EDID",           kf_cmd_early                   },
   { key_hypervisor,     "Hypervisor",     kf_cmd_early                   },
+  { key_usenbft,        "UseNBFT",        kf_cfg + kf_cmd                },
 };
 
 static struct {
@@ -1466,6 +1468,10 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         if(f->is.numeric) config.withfcoe = f->nvalue;
         break;
 
+      case key_usenbft:
+        if(f->is.numeric) config.usenbft = f->nvalue;
+        break;
+
       case key_startshell:
         if(!*f->value) config.startshell = 1;
         if(f->is.numeric) config.startshell = f->nvalue;
@@ -1844,8 +1850,12 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         }
         break;
 
-      case key_ibft_devices:
-        slist_assign_values(&config.ifcfg.ibft, f->value);
+      case key_firmware_devices:
+        slist_assign_values(&config.ifcfg.firmware, f->value);
+        break;
+
+      case key_firmware_types:
+        slist_assign_values(&config.ifcfg.firmware_types, f->value);
         break;
 
       case key_linuxrc_core:
@@ -2076,6 +2086,7 @@ void file_write_install_inf(char *dir)
   file_write_str(f, key_instsys_id, config.instsys_id);
   file_write_num(f, key_withiscsi, config.withiscsi);
   file_write_num(f, key_withfcoe, config.withfcoe);
+  file_write_num(f, key_usenbft, config.usenbft);
   file_write_num(f, key_startshell, config.startshell);
   file_write_num(f, key_y2gdb, config.y2gdb);
   file_write_num(f, key_kexec_reboot, config.kexec_reboot);
