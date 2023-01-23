@@ -436,6 +436,7 @@ typedef struct {
   unsigned withiscsi;		/**< iSCSI parameter */
   unsigned withfcoe;		/**< FCoE parameter */
   unsigned withipoib;		/**< IPoIB */
+  unsigned usenbft;		/**< use NBFT info to activate disk (for yast) */
   unsigned restart_method;	/**< 0: start new root fs, 1: reboot, 2: halt, 3: kexec */
   unsigned efi_vars:1;		/**< efi vars exist */
   int efi;			/**< use efi; -1 = auto */
@@ -720,7 +721,8 @@ typedef struct {
     slist_t *if_up;		/**< network interfaces != lo that are 'up' */
     char *current;		/**< interface name for last written ifcfg file */
     slist_t *to_global;		/**< keys that go to global /etc/sysconfig/network/config */
-    slist_t *ibft;		/**< list of ibft interfaces (not to be configured by linuxrc) */
+    slist_t *firmware;		/**< list of network interfaces handled by firmware (they are not to be configured by linuxrc) */
+    slist_t *firmware_types;	/**< list of firmware interfaces types (e.g. ibft, nbft) */
   } ifcfg;
 
   struct {
