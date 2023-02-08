@@ -330,6 +330,7 @@ static struct {
   { key_edid,           "EDID",           kf_cmd_early                   },
   { key_hypervisor,     "Hypervisor",     kf_cmd_early                   },
   { key_usenbft,        "UseNBFT",        kf_cfg + kf_cmd                },
+  { key_firmware_types, "FirmwareTypes",  kf_cfg + kf_cmd                },
 };
 
 static struct {
