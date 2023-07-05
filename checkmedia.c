@@ -60,7 +60,7 @@ int check_media_device(char *device)
     return 1;
   }
 
-  if(media->app_id) log_info("app: %s\n", media->app_id);
+  if(*media->app_id) log_info("app: %s\n", media->app_id);
 
   if(media->iso_blocks) {
     log_info(
