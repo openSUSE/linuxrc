@@ -52,7 +52,7 @@ struct cramfs_super_block {
 };
 
 static size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp);
-static int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
+static int url_progress_cb(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
 static int url_read_file_nosig(url_t *url, char *dir, char *src, char *dst, char *label, unsigned flags);
 static int url_mount_really(url_t *url, char *device, char *dir);
@@ -159,8 +159,8 @@ void url_read(url_data_t *url_data)
   curl_easy_setopt(c_handle, CURLOPT_SSL_VERIFYHOST, config.sslcerts ? 2 : 0);
   curl_easy_setopt(c_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 
-  curl_easy_setopt(c_handle, CURLOPT_PROGRESSFUNCTION, url_progress_cb);
-  curl_easy_setopt(c_handle, CURLOPT_PROGRESSDATA, url_data);
+  curl_easy_setopt(c_handle, CURLOPT_XFERINFOFUNCTION, url_progress_cb);
+  curl_easy_setopt(c_handle, CURLOPT_XFERINFODATA, url_data);
   curl_easy_setopt(c_handle, CURLOPT_NOPROGRESS, 0);
 
   if(config.net.ipv6 && !config.net.ipv4) {
@@ -387,7 +387,7 @@ size_t url_write_cb(void *buffer, size_t size, size_t nmemb, void *userp)
 }
 
 
-int url_progress_cb(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+int url_progress_cb(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
 {
   url_data_t *url_data = clientp;
 
@@ -1415,10 +1415,10 @@ int url_progress(url_data_t *url_data, int stage)
   /* update */
 
   if(url_data->p_total) {
-    percent = (100 * (uint64_t) url_data->p_now) / url_data->p_total;
+    percent = (100 * url_data->p_now) / url_data->p_total;
   }
   else if(url_data->zp_total) {
-    percent = (100 * (uint64_t) url_data->zp_now) / url_data->zp_total;
+    percent = (100 * url_data->zp_now) / url_data->zp_total;
   }
 
   if(percent > 100) percent = 100;
@@ -1432,7 +1432,7 @@ int url_progress(url_data_t *url_data, int stage)
         strprintf(&buf, "Loading %s", url_print(url_data->url, 0));
       }
       if(percent >= 0) {
-        strprintf(&buf, "%s (%u kB)",
+        strprintf(&buf, "%s (%" PRIu64 " kB)",
           buf,
           ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
         );
@@ -1443,7 +1443,7 @@ int url_progress(url_data_t *url_data, int stage)
     else {
       if(percent >= 0) {
         strprintf(&buf,
-          " (%u kB) -     ",
+          " (%" PRIu64 " kB) -     ",
           ((url_data->zp_total ?: url_data->p_total) + 1023) >> 10
         );
       }
