@@ -3131,13 +3131,13 @@ int util_update_disk_list(char *module, int add)
   }
   else {
     for(sl = config.disks; sl; sl = sl->next) {
-      if(!search_str_list(hd_data->disks, sl->key)) {
+      if(!hd_search_str_list(hd_data->disks, sl->key)) {
         str_copy(&sl->key, NULL);
         str_copy(&sl->value, NULL);
       }
     }
     for(sl = config.partitions; sl; sl = sl->next) {
-      if(!search_str_list(hd_data->partitions, sl->key)) {
+      if(!hd_search_str_list(hd_data->partitions, sl->key)) {
         str_copy(&sl->key, NULL);
         str_copy(&sl->value, NULL);
       }
