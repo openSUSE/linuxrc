@@ -48,11 +48,6 @@ int scsi_rename_main(int argc, char **argv)
 }
 
 
-str_list_t *reverse_str_list(str_list_t *list);
-str_list_t *free_str_list(str_list_t *list);
-str_list_t *read_dir(char *dir_name, int type);
-char *hd_read_sysfs_link(char *base_dir, char *link_name);
-
 void get_scsi_list()
 {
   scsi_dev_t *scsi_dev;
@@ -63,7 +58,7 @@ void get_scsi_list()
 
   scsi_list = calloc(MAX_SCSI_DEVS + 1, sizeof *scsi_list);
 
-  sf_class = reverse_str_list(read_dir("/sys/block", 'D'));
+  sf_class = hd_reverse_str_list(hd_read_dir("/sys/block", 'D'));
 
   if(!sf_class) {
     log_info("no block devices\n");
@@ -107,7 +102,7 @@ void get_scsi_list()
   }
 
   free(sf_cdev);
-  sf_class = free_str_list(sf_class);
+  sf_class = hd_free_str_list(sf_class);
 
   if(scsi_list_len) {
     qsort(scsi_list, scsi_list_len, sizeof *scsi_list, cmp_func);

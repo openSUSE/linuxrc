@@ -8,8 +8,8 @@ typedef struct url_data_s {
   char *err_buf;
   char *curl_err_buf;
   unsigned err_buf_len;
-  unsigned p_now, p_total;
-  unsigned zp_now, zp_total;
+  uint64_t p_now, p_total;
+  uint64_t zp_now, zp_total;
   unsigned z_progress:1;
   unsigned flush:1;
   unsigned cramfs:1;

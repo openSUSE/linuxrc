@@ -15,9 +15,6 @@
 #include <blkid/blkid.h>
 
 #include <hd.h>
-extern str_list_t *search_str_list(str_list_t *sl, char *str);
-extern str_list_t *add_str_list(str_list_t **sl, char *str);
-extern char *hd_join(char *del, str_list_t *str);
 
 /* lang_undef _must_ be 0 */
 enum langid_t {
