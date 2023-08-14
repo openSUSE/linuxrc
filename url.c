@@ -888,7 +888,7 @@ void url_add_query_string(char **buf, int n, url_t *url)
 
   for(sl = url->query; sl; sl = sl->next) {
     // skip parameters handled by linuxrc
-    if(fnmatch("@(device|instsys|list|type|all|quiet|label|service|descr|proxy*)", sl->key, FNM_EXTMATCH)) {
+    if(fnmatch("@(device|instsys|list|type|all|quiet|label|service|descr|proxy*|url|auto)", sl->key, FNM_EXTMATCH)) {
       strprintf(buf, "%s%c%s=%s", *buf, n++ ? '&' : '?', sl->key, sl->value);
     }
   }
