@@ -472,6 +472,9 @@ char *slp_get_install(url_t *url)
   set_activate_language(config.language);
   if(!config.win) util_disp_init();
   *urlbuf = 0;
+  int select_first = 0;
+  sl = slist_getentry(url->query, "auto");
+  if(sl && !strcmp(sl->value, "1")) select_first = 1;
   for (;;)
     {
       sl = slist_getentry(url->query, "descr");
@@ -479,7 +482,7 @@ char *slp_get_install(url_t *url)
 
       while(1) {
         for(i = acnt = 0; i < urlcnt; i++) {
-          if(key && fnmatch(key, descs[i], FNM_CASEFOLD)) continue;
+          if(key && fnmatch(key, descs[i], FNM_EXTMATCH + FNM_CASEFOLD)) continue;
           if(acnt == 0 || strcmp(descs[i], ambg[acnt - 1])) {
             ambg[acnt++] = descs[i];
           }
@@ -488,6 +491,8 @@ char *slp_get_install(url_t *url)
         if(acnt || !key) break;
         str_copy(&key, NULL);
       }
+
+      if(select_first && acnt > 1) acnt = 1;
 
       i = acnt == 1 && !config.manual ? 1 : dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
       if (i <= 0 || i > acnt)
@@ -499,7 +504,7 @@ char *slp_get_install(url_t *url)
 
       while(1) {
         for(i = acnt = 0; i < urlcnt; i++) {
-          if(key && fnmatch(key, urls[i], FNM_CASEFOLD)) continue;
+          if(key && fnmatch(key, urls[i], FNM_EXTMATCH + FNM_CASEFOLD)) continue;
           if(!strcmp(descs[i], d)) {
             ambg[acnt++] = urls[i];
           }
@@ -510,6 +515,8 @@ char *slp_get_install(url_t *url)
       }
 
       if(acnt == 0) break;
+
+      if(select_first && acnt > 1) acnt = 1;
 
       i = acnt == 1 ? 1 : dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
 
