@@ -230,12 +230,25 @@ char *slp_get_install(url_t *url)
   bp = sendbuf + 16;
   *bp++ = 0;
   *bp++ = 0;	/* prlistlen */
-  memcpy(bp, "\000\024service:", sizeof "\000\024service:" - 1);
-  bp += sizeof "\000\024service:" - 1;
+
+  /*
+   * Format note: each string (strings are not 0-terminated) is preceded by
+   * a 16-bit big-endian encoded length.
+   */
+
+  /* Get service name, use default if not set */
   sl = slist_getentry(url->query, "service");
   service = sl ? sl->value : "install.suse";
+
+  *(bp++) = 0x00;
+  *(bp++) = strlen(service) + sizeof "service:" - 1;
+
+  memcpy(bp, "service:", sizeof "service:" - 1);
+  bp += sizeof "service:" - 1;
+
   memcpy(bp, service, strlen(service));
   bp += strlen(service);
+
   memcpy(bp, "\000\007default", 7 + 2);
   bp += 7 + 2;
 
