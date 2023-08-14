@@ -473,8 +473,9 @@ char *slp_get_install(url_t *url)
   if(!config.win) util_disp_init();
   *urlbuf = 0;
   int select_first = 0;
-  sl = slist_getentry(url->query, "auto");
-  if(sl && !strcmp(sl->value, "1")) select_first = 1;
+  if((sl = slist_getentry(url->query, "auto"))) {
+    select_first = sl->value ? strtoul(sl->value, NULL, 0) : 1;
+  }
   for (;;)
     {
       sl = slist_getentry(url->query, "descr");
