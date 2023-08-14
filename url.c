@@ -627,7 +627,7 @@ url_t *url_set(char *str)
   }
 
   if((sl = slist_getentry(url->query, "quiet"))) {
-    url->quiet = strtoul(sl->value, NULL, 0);
+    url->quiet = sl->value ? strtoul(sl->value, NULL, 0) : 1;
   }
 
   url->is.mountable = url_is_mountable(url->scheme);
