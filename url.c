@@ -626,7 +626,7 @@ url_t *url_set(char *str)
   }
 
   if((sl = slist_getentry(url->query, "quiet"))) {
-    url->quiet = strtoul(sl->value, NULL, 0);
+    url->quiet = sl->value ? strtoul(sl->value, NULL, 0) : 1;
   }
 
   url->is.mountable = url_is_mountable(url->scheme);
@@ -888,7 +888,7 @@ void url_add_query_string(char **buf, int n, url_t *url)
 
   for(sl = url->query; sl; sl = sl->next) {
     // skip parameters handled by linuxrc
-    if(fnmatch("@(device|instsys|list|type|all|quiet|label|service|descr|proxy*)", sl->key, FNM_EXTMATCH)) {
+    if(fnmatch("@(device|instsys|list|type|all|quiet|label|service|descr|proxy*|url|auto)", sl->key, FNM_EXTMATCH)) {
       strprintf(buf, "%s%c%s=%s", *buf, n++ ? '&' : '?', sl->key, sl->value);
     }
   }

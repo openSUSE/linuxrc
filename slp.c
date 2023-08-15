@@ -230,12 +230,25 @@ char *slp_get_install(url_t *url)
   bp = sendbuf + 16;
   *bp++ = 0;
   *bp++ = 0;	/* prlistlen */
-  memcpy(bp, "\000\024service:", sizeof "\000\024service:" - 1);
-  bp += sizeof "\000\024service:" - 1;
+
+  /*
+   * Format note: each string (strings are not 0-terminated) is preceded by
+   * a 16-bit big-endian encoded length.
+   */
+
+  /* Get service name, use default if not set */
   sl = slist_getentry(url->query, "service");
   service = sl ? sl->value : "install.suse";
+
+  *(bp++) = 0x00;
+  *(bp++) = strlen(service) + sizeof "service:" - 1;
+
+  memcpy(bp, "service:", sizeof "service:" - 1);
+  bp += sizeof "service:" - 1;
+
   memcpy(bp, service, strlen(service));
   bp += strlen(service);
+
   memcpy(bp, "\000\007default", 7 + 2);
   bp += 7 + 2;
 
@@ -459,6 +472,10 @@ char *slp_get_install(url_t *url)
   set_activate_language(config.language);
   if(!config.win) util_disp_init();
   *urlbuf = 0;
+  int select_first = 0;
+  if((sl = slist_getentry(url->query, "auto"))) {
+    select_first = sl->value ? strtoul(sl->value, NULL, 0) : 1;
+  }
   for (;;)
     {
       sl = slist_getentry(url->query, "descr");
@@ -466,7 +483,7 @@ char *slp_get_install(url_t *url)
 
       while(1) {
         for(i = acnt = 0; i < urlcnt; i++) {
-          if(key && fnmatch(key, descs[i], FNM_CASEFOLD)) continue;
+          if(key && fnmatch(key, descs[i], FNM_EXTMATCH + FNM_CASEFOLD)) continue;
           if(acnt == 0 || strcmp(descs[i], ambg[acnt - 1])) {
             ambg[acnt++] = descs[i];
           }
@@ -475,6 +492,8 @@ char *slp_get_install(url_t *url)
         if(acnt || !key) break;
         str_copy(&key, NULL);
       }
+
+      if(select_first && acnt > 1) acnt = 1;
 
       i = acnt == 1 && !config.manual ? 1 : dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
       if (i <= 0 || i > acnt)
@@ -486,7 +505,7 @@ char *slp_get_install(url_t *url)
 
       while(1) {
         for(i = acnt = 0; i < urlcnt; i++) {
-          if(key && fnmatch(key, urls[i], FNM_CASEFOLD)) continue;
+          if(key && fnmatch(key, urls[i], FNM_EXTMATCH + FNM_CASEFOLD)) continue;
           if(!strcmp(descs[i], d)) {
             ambg[acnt++] = urls[i];
           }
@@ -497,6 +516,8 @@ char *slp_get_install(url_t *url)
       }
 
       if(acnt == 0) break;
+
+      if(select_first && acnt > 1) acnt = 1;
 
       i = acnt == 1 ? 1 : dia_list("Choose an installation source", 70, NULL, ambg, 0, align_left);
 
