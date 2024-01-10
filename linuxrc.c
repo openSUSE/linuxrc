@@ -955,7 +955,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2023 SUSE LLC %s <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2024 SUSE LLC %s <<<\n",
       config.product,
       config.platform_name
     );
