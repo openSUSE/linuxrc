@@ -2028,10 +2028,6 @@ void file_write_install_inf(char *dir)
 
   set_write_info(f);
 
-  if(config.keymap_set || config.manual) {
-    file_write_str(f, key_keytable, config.keymap);
-  }
-
   file_write_str(f, key_console, config.serial);
 
   // don't leave anything mounted unless we're low in memory and run yast
