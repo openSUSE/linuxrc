@@ -30,7 +30,7 @@ extern void set_choose_keytable (int);
 extern void set_activate_language(enum langid_t lang_id);
 extern void set_activate_keymap (char *keymap);
 extern void set_choose_language (void);
-extern void set_write_info      (FILE *f);
+extern void set_write_info      (FILE *install_inf);
 language_t *current_language    (void);
 extern void set_expert_menu     (void);
 

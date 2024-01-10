@@ -413,6 +413,8 @@ void lxrc_change_root()
     /* change hostname from 'install' to 'rescue' unless we've had something better */
     if(!config.net.realhostname) util_set_hostname("rescue");
 
+    file_write_install_inf("");
+
     lxrc_run_console("/mounts/initrd/scripts/prepare_rescue");
 
     LXRC_WAIT
@@ -953,7 +955,7 @@ void lxrc_init()
     if (config.linemode)
       putchar('\n');
     printf(
-      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2023 SUSE LLC %s <<<\n",
+      "\n>>> %s installation program v" LXRC_FULL_VERSION " (c) 1996-2024 SUSE LLC %s <<<\n",
       config.product,
       config.platform_name
     );

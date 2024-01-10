@@ -419,6 +419,7 @@ void set_activate_keymap(char *keymap)
   if((config.keymap = keymap)) {
     kbd_unimode();
     sprintf(cmd, "loadkeys -q %s", keymap);
+    config.keymap_applied = 1;
     if(!config.test) {
       lxrc_run_console(cmd);
     }
@@ -525,13 +526,36 @@ int set_expert_cb(dia_item_t di)
 }
 
 
-void set_write_info(FILE *f)
+/*
+ * Write language (locale) and keymap settings to
+ *   - /etc/locale.conf
+ *   - /etc/vconsole.conf
+ *   - /etc/install.inf (via passed file handle)
+ */
+void set_write_info(FILE *install_inf)
 {
   language_t *lang;
+  FILE *f;
 
   lang = set_languages_arm + set_get_current_language(lang_undef) - 1;
 
-  file_write_str(f, key_locale, lang->locale);
+  file_write_str(install_inf, key_locale, lang->locale);
+
+  if((f = fopen("/etc/locale.conf", "w"))) {
+    fprintf(f, "LANG=%s.UTF-8\n", lang->locale);
+    fclose(f);
+  }
+
+  if(config.keymap_set || config.manual) {
+    file_write_str(install_inf, key_keytable, config.keymap);
+  }
+
+  if(config.keymap_applied) {
+    if((f = fopen("/etc/vconsole.conf", "w"))) {
+      fprintf(f, "KEYMAP=%s\n", config.keymap);
+      fclose(f);
+    }
+  }
 }
 
 
