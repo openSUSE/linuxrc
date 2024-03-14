@@ -763,7 +763,7 @@ int net_choose_device()
     choice = 1;
   }
   else {
-    choice = dia_list("Choose the network device.", 72, NULL, items, last_item, align_left);
+    choice = dia_list("Choose the network device.", 0, NULL, items, last_item, align_left);
     if(choice) last_item = choice;
   }
 
