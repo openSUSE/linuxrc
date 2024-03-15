@@ -1649,6 +1649,8 @@ dia_item_t dia_menu2(char *title, int width, int (*func)(dia_item_t), dia_item_t
 
 /*
  * returns selected item (1 based), or 0 (ESC pressed)
+ *
+ * Use width = 0 to have width automatically calculated to fit the longest item.
  */
 int dia_list(char *title, int width, int (*func)(int), char **items, int default_item, dia_align_t align)
 {
@@ -1663,6 +1665,17 @@ int dia_list(char *title, int width, int (*func)(int), char **items, int default
   if(!config.win) util_disp_init();
 
   item_list = calloc(item_cnt, sizeof *item_list);
+
+  if(width == 0) {
+    for(i = 0, it = items; *it; it++, i++) {
+      int w = strlen(*it);
+      if(w > width) width = w;
+    }
+
+    width += 1;
+    if(width < 20) width = 20;
+    if(width > max_x_ig - 6) width = max_x_ig - 6;
+  }
 
   util_create_items(item_list, item_cnt, width);
 
