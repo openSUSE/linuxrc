@@ -493,6 +493,7 @@ typedef struct {
   enum langid_t language;	/**< currently selected language */
   char *keymap;			/**< current keymap */
   unsigned keymap_set:1;	/**< explicitly set via 'keytable' option */
+  unsigned keymap_applied:1;	/**< config.keymap has been applied via loadkeys command */
   unsigned sourcetype:1;	/**< 0: directory, 1: file */
   char *new_root;		/**< root device to boot */
   char *rootimage;		/**< "boot/<arch>/root" */
