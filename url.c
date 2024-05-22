@@ -122,6 +122,7 @@ static struct {
   { "disk",      inst_disk          },
   { "usb",       inst_usb           },
   { "label",     inst_label         },
+  { "repo",      inst_repo          },
   /* add new inst modes _here_! (before "extern") */
   { "extern",    inst_extern        },
   /* the following are just aliases */
@@ -661,6 +662,8 @@ url_t *url_set(char *str)
     }
   }
 
+  if(url->scheme == inst_rel || url->scheme == inst_repo) url->is.relative = 1;
+
   url_replace_vars_with_backup(&url->server, &url->orig.server);
   url_replace_vars_with_backup(&url->share, &url->orig.share);
   url_replace_vars_with_backup(&url->path, &url->orig.path);
@@ -715,9 +718,9 @@ void url_log(url_t *url)
   }
 
   log_debug(
-    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, all = %u, quiet = %u\n",
+    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, relative = %u, all = %u, quiet = %u\n",
     url->is.network, url->is.blockdev, url->is.mountable, url->is.file, url->is.dir,
-    url->search_all, url->quiet
+    url->is.relative, url->search_all, url->quiet
   );
 
   if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
@@ -1090,18 +1093,18 @@ char *url_print_zypp(url_t *url)
   if(path) {
     strprintf(&buf, "%s/%s%s",
       buf,
-      url->scheme == inst_ftp && *path == '/' ? "%2F" : "",
+      scheme == inst_ftp && *path == '/' ? "%2F" : "",
       *path == '/' ? path + 1 : path
     );
   }
 
-  if(url->scheme == inst_hd) {
+  if(scheme == inst_hd) {
     if((s = url->used.device) || (s = url->device)) {
       strprintf(&buf, "%s%cdevice=%s", buf, q++ ? '&' : '?', long_dev(s));
     }
   }
 
-  if(url->scheme == inst_cdrom) {
+  if(scheme == inst_cdrom) {
     if((s = url->used.device) || (s = url->device)) {
       strprintf(&buf, "%s%cdevices=%s", buf, q++ ? '&' : '?', long_dev(s));
     }
@@ -1110,10 +1113,10 @@ char *url_print_zypp(url_t *url)
   if(
     config.url.proxy &&
     config.url.proxy->server && (
-      url->scheme == inst_http ||
-      url->scheme == inst_https ||
-      url->scheme == inst_ftp ||
-      url->scheme == inst_tftp
+      scheme == inst_http ||
+      scheme == inst_https ||
+      scheme == inst_ftp ||
+      scheme == inst_tftp
     )
   ) {
     strprintf(&buf, "%s%cproxy=%s", buf, q++ ? '&' : '?', config.url.proxy->server);
@@ -2670,7 +2673,10 @@ static int test_is_repo(url_t *url)
     str_copy(&buf2, NULL);
   }
 
-  if(config.url.instsys->scheme != inst_rel || config.kexec == 1) return 1;
+  if(
+    !config.url.instsys->is.relative ||
+    config.kexec == 1
+  ) return 1;
 
   if(!config.keepinstsysconfig) {
     instsys_config = url_instsys_config(config.url.instsys->path);
@@ -2869,7 +2875,7 @@ int url_find_instsys(url_t *url, char *dir)
   if(
     !url ||
     !url->scheme ||
-    url->scheme == inst_rel ||
+    url->is.relative ||
     !url->path
   ) return 1;
 
