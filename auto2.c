@@ -909,7 +909,9 @@ void auto2_read_repo_files(url_t *url)
 
     if(util_check_exist("/autoinst.xml")) {
       // with repo scheme, pass the the original URL to yast
-      if(config.url.autoyast->scheme != inst_repo) {
+      // note: autoyast url might be initially unset if looking for an
+      // implicit autoinst.xml on the install medium
+      if(!config.url.autoyast || config.url.autoyast->scheme != inst_repo) {
         log_info("setting AutoYaST option to file:/autoinst.xml\n");
         url_free(config.url.autoyast);
         config.url.autoyast = url_set("file:/autoinst.xml");
