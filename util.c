@@ -4993,7 +4993,7 @@ int util_choose_disk_device(char **dev, int type, char *list_title, char *input_
 }
 
 
-void util_restart()
+void util_restart(int sig)
 {
   if(config.restarting || config.restarted) return;
 

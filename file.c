@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <fnmatch.h>
+#include <signal.h>
 #include <sys/mount.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -1764,7 +1765,7 @@ void file_do_info(file_t *f0, file_key_flag_t flags)
         break;
 
       case key_restart:
-        if(f->is.numeric && f->nvalue > 0) util_restart();
+        if(f->is.numeric && f->nvalue > 0) util_restart(SIGTERM);
         break;
 
       case key_restarted:
