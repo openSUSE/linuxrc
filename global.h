@@ -6,6 +6,7 @@
  *
  */
 
+#pragma GCC diagnostic ignored "-Wunused-result"
 
 #include <stdio.h>
 #include <netinet/in.h>

@@ -143,7 +143,7 @@ void util_run_script(char *name);
 void util_plymouth_off(void);
 int util_choose_disk_device(char **dev, int type, char *list_title, char *input_title);
 
-void util_restart();
+void util_restart(int sig);
 
 char *compress_type(void *buf);
 char *compressed_file(char *name);
