@@ -133,7 +133,7 @@ void util_redirect_kmsg()
 
   if(loglevel) klogctl(8, NULL, loglevel);
 
-  if(!config.serial && (fd = open(config.console, O_RDONLY))) {
+  if(!config.serial && (fd = open(config.console, O_RDONLY)) != -1) {
     ioctl(fd, TIOCLINUX, &newvt);
     close(fd);
     /* 'create' console 4 */
@@ -343,7 +343,7 @@ int util_fileinfo(char *file_name, int *size, int *compressed)
   if(size) *size = 0;
   if(compressed) *compressed = 0;
 
-  if(!(fd = open(file_name, O_RDONLY | O_LARGEFILE))) return -1;
+  if((fd = open(file_name, O_RDONLY | O_LARGEFILE)) == -1) return -1;
 
   if(read(fd, buf, 2) != 2) {
     close(fd);

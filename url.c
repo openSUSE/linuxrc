@@ -718,13 +718,18 @@ void url_log(url_t *url)
   }
 
   log_debug(
-    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, relative = %u, all = %u, quiet = %u\n",
+    "  network = %u, blockdev = %u, mountable = %u, file = %u, dir = %u, relative = %u, all = %u, download = %u, quiet = %u\n",
     url->is.network, url->is.blockdev, url->is.mountable, url->is.file, url->is.dir,
-    url->is.relative, url->search_all, url->quiet
+    url->is.relative, url->search_all, url->download, url->quiet
   );
 
   if(url->instsys) log_debug("  instsys = %s\n", url->instsys);
   if(url->orig.instsys) log_debug("  instsys (orig) = %s\n", url->orig.instsys);
+
+  if(url->used.device) log_debug("  used.device = %s\n", url->used.device);
+  if(url->used.hwaddr) log_debug("  used.hwaddr = %s\n", url->used.hwaddr);
+  if(url->used.model) log_debug("  used.model = %s\n", url->used.model);
+  if(url->used.unique_id) log_debug("  used.unique_id = %s\n", url->used.unique_id);
 
   if(url->query) {
     log_debug("  query:\n");
